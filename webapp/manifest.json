@@ -51,6 +51,67 @@
                 "settings": {
                     "bundleName": "sap.kt.com.minihrsolution.i18n.i18n"
                 }
+            },
+            "AssignmentStatus": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/AssignmentStatus.json",
+                "preload": true
+            },
+            "BloodGroup": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/BloodGroup.json",
+                "preload": true
+            },
+            "CollegeGrade": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/CollegeGrade.json",
+                "preload": true
+            },
+            "CompanyInvoiceStatus": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/CompanyInvoiceStatus.json",
+                "preload": true
+            },
+            "Degree": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Degree.json",
+                "preload": true
+            },
+            "EmployeeRelationShip": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/EmployeeRelationShip.json",
+                "preload": true
+            },
+            "EmployementBond": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/EmployementBond.json",
+                "preload": true
+            },
+            "ModeOfPayment": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/ModeOfPayment.json",
+                "preload": true
+            },
+            "MyInbox": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/MyInbox.json",
+                "preload": true
+            },
+            "RateType": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/RateType.json",
+                "preload": true
+            },
+            "TripType": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/TripType.json",
+                "preload": true
+            },
+            "WorkingMode": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/WorkingMode.json",
+                "preload": true
+            }
             }
         },
         "resources": {

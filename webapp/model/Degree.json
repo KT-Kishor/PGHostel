@@ -1,0 +1,35 @@
+[
+    {
+      "ID": 1,
+      "DegreeName": "School/10th"
+    },
+    {
+      "ID": 2,
+      "DegreeName": "PUC/12TH"
+    },
+    {
+      "ID": 3,
+      "DegreeName": "BTech/BE"
+    },
+    {
+      "ID": 4,
+      "DegreeName": "MTech/ME"
+    },
+    {
+      "ID": 5,
+      "DegreeName": "BCA"
+    },
+    {
+      "ID": 6,
+      "DegreeName": "MCA"
+    },
+    {
+      "ID": 7,
+      "DegreeName": "MBA"
+    },
+    {
+      "ID": 8,
+      "DegreeName": "Diploma"
+    }
+  ]
+  

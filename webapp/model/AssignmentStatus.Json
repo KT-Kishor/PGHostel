@@ -1,0 +1,19 @@
+[
+    {
+      "ID": 1,
+      "Value": "New"
+    },
+    {
+      "ID": 2,
+      "Value": "Active"
+    },
+    {
+      "ID": 3,
+      "Value": "Renewed"
+    },
+    {
+      "ID": 4,
+      "Value": "Inactive"
+    }
+  ]
+  
