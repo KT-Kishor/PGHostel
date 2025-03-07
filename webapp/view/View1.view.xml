@@ -1,6 +1,94 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.View1"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m">
+    	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:form="sap.ui.layout.form" 
+	xmlns:l="sap.ui.layout"
+     xmlns:u="sap.ui.unified"
+	
+	xmlns:f="sap.ui.layout.form">
     <Page id="page" title="{i18n>title}">
+    <content>
+  
+<f:SimpleForm
+    layout="ColumnLayout" editable="true"
+   >  
+    	<f:content>              
+    <Label text="Mobile No" />
+                <Input id="idMobileNo"  required="true" liveChange="validateMobileNo" maxLength="10" />
+                
+                <Label text="Email" />
+                <Input id="idEmail" type="Email"  required="true"  liveChange="validateEmail"/>
+                
+                <Label text="Name" />
+                <Input id="idName"  required="true"  liveChange="validateName"/>
+                
+                <Label text="Amount" />
+                <Input id="idAmount" type="Number"  required="true" liveChange="validateAmount" maxLength="15"/>
+                
+                <Label text="Account Number" />
+                <Input id="idAccountNumber"  required="true" />
+                
+                <Label text="Date" />
+                <DatePicker id="idDate"  required="true" />
+                
+                <Label text="Address" />
+                <TextArea id="idAddress"  required="true" />
+                
+                <Label text="PAN Card" />
+                <Input id="idPanCard"  required="true"  liveChange="validatePanCard"/>
+                
+                <Label text="Aadhar Card" />
+                <Input id="idAadharCard"  required="true" liveChange="validateAadharCard" />
+                
+                <Label text="GST" />
+                <Input id="idGst"  required="true" />
+                
+                <Label text="Company Name" />
+                <Input id="idCompanyName"  required="true" />
+                
+                <Label text="Comments" />
+                <TextArea id="idComments"  required="true" />
+                
+                <Label text="Source" />
+                <Input id="idSource"  required="true" />
+                
+                <Label text="Destination" />
+                <Input id="idDestination"  required="true" />
+                
+                <Label text="Country" />
+                <Input id="idCountry"  required="true" />
+                
+                <Label text="Accountant Name" />
+                <Input id="idAccountantName"  required="true" />
+                
+                <Label text="Bank Name" />
+                <Input id="idBankName"  required="true" />
+                
+                <Label text="IFSC Code" />
+                <Input id="idIfscCode"  required="true" />
+                
+                
+                
+                <Label text="Passport" />
+                <Input id="idPassport"  required="true"  liveChange="validatepassport"/>
+                
+                <Label text="Voter ID" />
+                <Input id="idVoterID"  required="true" liveChange="validateVoterId" />
+                 <Label text="Upload File" required="true"/>
+                <u:FileUploader
+                    id="idFileUploader"
+                    buttonText="File Uploader"
+                    fileType="xlsx"
+                    placeholder="Choose an Excel file"
+                    icon="sap-icon://upload"
+                   
+                />
+                <Button text="Save" press="onSave" />
+                   </f:content>
+						</f:SimpleForm>     
+
+    </content>
+
     </Page>
 </mvc:View>
