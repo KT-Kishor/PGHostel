@@ -112,7 +112,6 @@
                 "uri": "model/WorkingMode.json",
                 "preload": true
             }
-            }
         },
         "resources": {
             "css": [
