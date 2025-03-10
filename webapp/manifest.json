@@ -135,16 +135,27 @@
             "routes": [
                 {
                     "name": "RouteView1",
-                    "pattern": ":?query:",
+                    "pattern": "View1",
                     "target": [
                         "TargetView1"
                     ]
+                },
+                {
+                    "name": "RouteHomePage",
+                    "pattern": ":?query:",
+                    "target": "TargetHomePage"
                 }
             ],
             "targets": {
                 "TargetView1": {
                     "id": "View1",
                     "name": "View1"
+                },
+                "TargetHomePage": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "viewId": "HomePage",
+                    "viewName": "HomePage"
                 }
             }
         },

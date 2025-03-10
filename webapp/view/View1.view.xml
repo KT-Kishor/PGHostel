@@ -13,68 +13,68 @@
    >
 				<f:content>
 					<Label text="Mobile No" />
-					<Input id="idMobileNo"  required="true" liveChange="validateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}"/>
+					<Input id="V1_id_MobileNo"  required="true" liveChange="validateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}"/>
 
 					<Label text="Email" />
-					<Input id="idEmail" type="Email"  required="true"  liveChange="validateEmail" maxLength="50" valueStateText="{i18n>emailValueState}"/>
+					<Input id="V1_id_Email" type="Email"  required="true"  liveChange="validateEmail" maxLength="50" valueStateText="{i18n>emailValueState}"/>
 
 					<Label text="Name" />
-					<Input id="idName"  required="true"  liveChange="validateName" maxLength="50" valueStateText="{i18n>nameValueState}"/>
+					<Input id="V1_id_Name"  required="true"  liveChange="validateName" maxLength="50" valueStateText="{i18n>nameValueState}"/>
 
 					<Label text="Amount" />
-					<Input id="idAmount"   required="true" liveChange="validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}"/>
+					<Input id="V1_id_Amount"   required="true" liveChange="validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}"/>
 
 					<Label text="Account Number" />
-					<Input id="idAccountNumber"  required="true"  liveChange="validateAccountNo" maxLength="18" valueStateText="{i18n>accountnoValueState}"/>
+					<Input id="V1_id_AccountNumber"  required="true"  liveChange="validateAccountNo" maxLength="18" valueStateText="{i18n>accountnoValueState}"/>
 
 					<Label text="Date" />
-					<DatePicker id="idDate"  required="true" displayFormat="dd/MM/yyyy"  valueFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}" />
+					<DatePicker id="V1_id_Date"  required="true" displayFormat="dd/MM/yyyy"  valueFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}" />
 
 					<Label text="Address" />
-					<TextArea id="idAddress"  required="true" liveChange="ValidateCommonFields"  maxLength="120" valueStateText="{i18n>addressValueState}"/>
+					<TextArea id="V1_id_Address"  required="true" liveChange="ValidateCommonFields"  maxLength="120" valueStateText="{i18n>addressValueState}"/>
 
 					<Label text="PAN Card" />
-					<Input id="idPanCard"  required="true"  liveChange="validatePanCard" maxLength="10" valueStateText="{i18n>panCardValueState}"/>
+					<Input id="V1_id_PanCard"  required="true"  liveChange="validatePanCard" maxLength="10" valueStateText="{i18n>panCardValueState}"/>
 
 					<Label text="Aadhar Card" />
-					<Input id="idAadharCard"  required="true" liveChange="validateAadharCard" maxLength="12" valueStateText="{i18n>aadharNoValueState}"/>
+					<Input id="V1_id_AadharCard"  required="true" liveChange="validateAadharCard" maxLength="12" valueStateText="{i18n>aadharNoValueState}"/>
 
 					<Label text="GST" />
-					<Input id="idGst"  required="true" liveChange="validateGstNumber" maxLength="15" valueStateText="{i18n>gstNoValueState}" />
+					<Input id="V1_id_Gst"  required="true" liveChange="validateGstNumber" maxLength="15" valueStateText="{i18n>gstNoValueState}" />
 
 					<Label text="Company Name" />
-					<Input id="idCompanyName"  required="true"  liveChange="ValidateCommonFields" maxLength="50" valueStateText="{i18n>companyNameValueState}"/>
+					<Input id="V1_id_CompanyName"  required="true"  liveChange="ValidateCommonFields" maxLength="50" valueStateText="{i18n>companyNameValueState}"/>
 
 					<Label text="Comments" />
-					<TextArea id="idComments"  required="true" liveChange="ValidateCommonFields" maxLength="1000" valueStateText="{i18n>commentsValueState}"/>
+					<TextArea id="V1_id_Comments"  required="true" liveChange="ValidateCommonFields" maxLength="1000" valueStateText="{i18n>commentsValueState}"/>
 
 					<Label text="Source" />
-					<Input id="idSource"  required="true" liveChange="ValidateCommonFields" maxLength="20" valueStateText="{i18n>sourceValueState}"/>
+					<Input id="V1_id_Source"  required="true" liveChange="ValidateCommonFields" maxLength="20" valueStateText="{i18n>sourceValueState}"/>
 
 					<Label text="Destination" />
-					<Input id="idDestination"  required="true"  liveChange="ValidateCommonFields" maxLength="20" valueStateText="{i18n>destinationValueState}"/>
+					<Input id="V1_id_Destination"  required="true"  liveChange="ValidateCommonFields" maxLength="20" valueStateText="{i18n>destinationValueState}"/>
 
 					<Label text="Country" />
-					<Input id="idCountry"  required="true" liveChange="ValidateCommonFields" maxLength="20" valueStateText="{i18n>countryValueState}" />
+					<Input id="V1_id_Country"  required="true" liveChange="ValidateCommonFields" maxLength="20" valueStateText="{i18n>countryValueState}" />
 
 					<Label text="Account Holder Name" />
-					<Input id="idAccountantName"  required="true" liveChange="validateName" maxLength="50"  valueStateText="{i18n>accountHolderValueState}"/>
+					<Input id="V1_id_AccountHolderName"  required="true" liveChange="validateName" maxLength="50"  valueStateText="{i18n>accountHolderValueState}"/>
 
 					<Label text="Bank Name" />
-					<Input id="idBankName"  required="true" liveChange="ValidateCommonFields" maxLength="20" valueStateText="{i18n>bankNameValueState}"/>
+					<Input id="V1_id_BankName"  required="true" liveChange="ValidateCommonFields" maxLength="20" valueStateText="{i18n>bankNameValueState}"/>
 
 					<Label text="IFSC Code" />
-					<Input id="idIfscCode"  required="true"  liveChange="validateIfcCode" maxLength="11" valueStateText="{i18n>ifcsCodeValueState}"/>
+					<Input id="V1_id_IfscCode"  required="true"  liveChange="validateIfcCode" maxLength="11" valueStateText="{i18n>ifcsCodeValueState}"/>
 
 					<Label text="Passport" />
-					<Input id="idPassport"  required="true"  liveChange="validatePassport" maxLength="8" valueStateText="{i18n>passportNoValueState}"/>
+					<Input id="V1_id_Passport"  required="true"  liveChange="validatePassport" maxLength="8" valueStateText="{i18n>passportNoValueState}"/>
 
 					<Label text="Voter ID" />
-					<Input id="idVoterID"  required="true" liveChange="validateVoterId" maxLength="10" valueStateText="{i18n>voterIdValueState}"/>
+					<Input id="V1_id_VoterID"  required="true" liveChange="validateVoterId" maxLength="10" valueStateText="{i18n>voterIdValueState}"/>
 
 					<Label text="Upload File" required="true"/>
 					<u:FileUploader
-                    id="idFileUploader"
+                    id="V1_id_FileUploader"
                     buttonText="File Uploader"
                     fileType="xlsx"
                     change="ValidateCommonFields"
@@ -82,7 +82,7 @@
                     icon="sap-icon://upload"
                     valueStateText="{i18n>fileUploaderValueState}" />
 
-					<Button text="Save" press="onSubmitData" />
+					<Button text="Save" press="V1_SubmitData" />
 
 				</f:content>
 			</f:SimpleForm>

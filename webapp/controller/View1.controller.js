@@ -51,13 +51,12 @@ sap.ui.define([
         },
 
         //Save the Data
-        onSubmitData: function (oEvent) {
+        V1_SubmitData: function (oEvent) {
             try {
-                if (utils._LCvalidateMobileNumber(this.byId("idMobileNo"), "ID") && utils._LCvalidateName(this.byId("idName"), "ID") && utils._LCvalidateEmail(this.byId("idEmail"), "ID") && utils._LCvalidateAmount(this.byId("idAmount"), "ID") && utils._LCvalidateVoterId(this.byId("idVoterID"), "ID") && utils._LCvalidateAadharCard(this.byId("idAadharCard"), "ID") && utils._LCvalidatePassport(this.byId("idPassport"), "ID") && utils._LCvalidatePanCard(this.byId("idPanCard"), "ID")
-                    && utils._LCvalidateAccountNo(this.byId("idAccountNumber"), "ID") && utils._LCvalidateName(this.byId("idAccountantName"), "ID") && utils._LCvalidateIfcCode(this.byId("idIfscCode"), "ID") && utils._LCvalidateDate(this.byId("idDate"), "ID") && utils._LCvalidateGstNumber(this.byId("idGst"), "ID") && utils._LCvalidateMandatoryField(this.byId("idAddress"), "ID") && utils._LCvalidateMandatoryField(this.byId("idCompanyName"), "ID")
-                    && utils._LCvalidateMandatoryField(this.byId("idComments"), "ID") && utils._LCvalidateMandatoryField(this.byId("idSource"), "ID") && utils._LCvalidateMandatoryField(this.byId("idDestination"), "ID") && utils._LCvalidateMandatoryField(this.byId("idCountry"), "ID") && utils._LCvalidateMandatoryField(this.byId("idBankName"), "ID") && utils._LCvalidateMandatoryField(this.byId("idFileUploader"), "ID")) {
+                if (utils._LCvalidateMobileNumber(this.byId("V1_id_MobileNo"), "ID") && utils._LCvalidateEmail(this.byId("V1_id_Email"), "ID") && utils._LCvalidateName(this.byId("V1_id_Name"), "ID") && utils._LCvalidateAmount(this.byId("V1_id_Amount"), "ID") && utils._LCvalidateAccountNo(this.byId("V1_id_AccountNumber"), "ID") && utils._LCvalidateDate(this.byId("V1_id_Date"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Address"), "ID") && utils._LCvalidatePanCard(this.byId("V1_id_PanCard"), "ID") && utils._LCvalidateAadharCard(this.byId("V1_id_AadharCard"), "ID") && utils._LCvalidateGstNumber(this.byId("V1_id_Gst"), "ID")
+                    && utils._LCvalidateMandatoryField(this.byId("V1_id_CompanyName"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Comments"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Source"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Destination"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Country"), "ID") && utils._LCvalidateName(this.byId("V1_id_AccountHolderName"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_BankName"), "ID") && utils._LCvalidateIfcCode(this.byId("V1_id_IfscCode"), "ID") && utils._LCvalidatePassport(this.byId("V1_id_Passport"), "ID")
+                    && utils._LCvalidateVoterId(this.byId("V1_id_VoterID"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_FileUploader"), "ID")) {
                 }
-
                 else {
                     sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered value");
                 }

@@ -25,9 +25,10 @@ sap.ui.define([], function () {
             if (!regex.test(oField.getValue().trim())) {
                 oField.setValueState("Error");
                 return false;
+            } else {
+                oField.setValueState("None");
+                return true;
             }
-            oField.setValueState("None");
-            return true;
         },
 
         // Name validation function
@@ -56,10 +57,7 @@ sap.ui.define([], function () {
                 cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
             }
             oInput.setValue(cleanedValue);
-            if (!cleanedValue) {
-                oInput.setValueState("Error");
-                return false;
-            } else if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
+            if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
                 oInput.setValueState("Error");
                 return false;
             } else {
@@ -72,30 +70,30 @@ sap.ui.define([], function () {
         _LCvalidatePanCard: function (oEvent, type) {
             var oField = (type === "ID") ? oEvent : oEvent.getSource();
             if (!oField) return false;
-            var value = oField.getValue().trim().toUpperCase();
-            oField.setValue(value);
+            oField.setValue(oField.getValue().trim().toUpperCase());
             var regex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-            if (!regex.test(value)) {
+            if (!regex.test(oField.getValue().trim().toUpperCase())) {
                 oField.setValueState("Error");
                 return false;
+            } else {
+                oField.setValueState("None");
+                return true;
             }
-            oField.setValueState("None");
-            return true;
         },
 
         // IFSC code validation
         _LCvalidateIfcCode: function (oEvent, type) {
             var oField = (type === "ID") ? oEvent : oEvent.getSource();
             if (!oField) return false;
-            var value = oField.getValue().trim().toUpperCase();
-            oField.setValue(value);
+            oField.setValue(oField.getValue().trim().toUpperCase());
             var regex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
-            if (!regex.test(value)) {
+            if (!regex.test(oField.getValue().trim().toUpperCase())) {
                 oField.setValueState("Error");
                 return false;
+            } else {
+                oField.setValueState("None");
+                return true;
             }
-            oField.setValueState("None");
-            return true;
         },
 
         // Aadhar card validation
@@ -108,9 +106,10 @@ sap.ui.define([], function () {
             if (!regex.test(oValue)) {
                 oField.setValueState("Error");
                 return false;
+            } else {
+                oField.setValueState("None");
+                return true;
             }
-            oField.setValueState("None");
-            return true;
         },
 
         // Voter ID validation
@@ -123,9 +122,10 @@ sap.ui.define([], function () {
             if (!regex.test(value)) {
                 oField.setValueState("Error");
                 return false;
+            } else {
+                oField.setValueState("None");
+                return true;
             }
-            oField.setValueState("None");
-            return true;
         },
 
         // Passport validation
@@ -138,9 +138,10 @@ sap.ui.define([], function () {
             if (!regex.test(value)) {
                 oField.setValueState("Error");
                 return false;
+            } else {
+                oField.setValueState("None");
+                return true;
             }
-            oField.setValueState("None");
-            return true;
         },
 
         // Account No Validation
@@ -153,9 +154,10 @@ sap.ui.define([], function () {
             if (!regex.test(oValue)) {
                 oField.setValueState("Error");
                 return false;
+            } else {
+                oField.setValueState("None");
+                return true;
             }
-            oField.setValueState("None");
-            return true;
         },
 
         // Date validation function
@@ -174,9 +176,10 @@ sap.ui.define([], function () {
             if (date.getFullYear() !== parseInt(parts[2], 10) || date.getMonth() !== parseInt(parts[1], 10) - 1 || date.getDate() !== parseInt(parts[0], 10)) {
                 oField.setValueState("Error");
                 return false;
+            } else {
+                oField.setValueState("None");
+                return true;
             }
-            oField.setValueState("None");
-            return true;
         },
 
         // GST Number Validation
@@ -188,9 +191,10 @@ sap.ui.define([], function () {
             if (!regex.test(oField.getValue().toUpperCase())) {
                 oField.setValueState("Error");
                 return false;
+            } else {
+                oField.setValueState("None");
+                return true;
             }
-            oField.setValueState("None");
-            return true;
         },
 
         // Mandatory Field Validation
@@ -200,9 +204,10 @@ sap.ui.define([], function () {
             if (!oField.getValue().trim()) {
                 oField.setValueState("Error");
                 return false;
+            } else {
+                oField.setValueState("None");
+                return true;
             }
-            oField.setValueState("None");
-            return true;
         }
     };
 });
