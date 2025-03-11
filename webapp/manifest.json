@@ -149,6 +149,11 @@
                     "name": "RouteLoginPage",
                     "pattern": "LoginPage",
                     "target": "TargetLoginPage"
+                },
+                {
+                    "name": "RouteTilePage",
+                    "pattern": "TilePage",
+                    "target": "TargetTilePage"
                 }
             ],
             "targets": {
@@ -167,6 +172,12 @@
                     "transition": "slide",
                     "viewId": "LoginPage",
                     "viewName": "LoginPage"
+                },
+                "TargetTilePage": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "viewId": "TilePage",
+                    "viewName": "TilePage"
                 }
             }
         },

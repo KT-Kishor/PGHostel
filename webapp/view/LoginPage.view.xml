@@ -1,53 +1,62 @@
 <mvc:View
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:form="sap.ui.layout.form" 
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:form="sap.ui.layout.form" 
     controllerName="sap.kt.com.minihrsolution.controller.LoginPage" 
     displayBlock="true">
-    
-    <Page id="idPageView1" class="login-background">
-        <headerContent>
-            <!-- Company logo and title -->
-            <Avatar src="./image/logo.jpg" displaySize="XS" press=".onAvatarPressed" tooltip="{i18n>companyLogo}"/>
-            <Title level="H1" text="Kalpavriksha Technology" class="custom-text" wrapping="false"/>	
-            <ToolbarSpacer/>
-            <!-- Home button -->
-            <Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd"/>
-        </headerContent>
-        
-        <content>
-           <FlexBox class="sapUiMediumMargin" direction="Column" alignItems="End" justifyContent="End">
+	<Page id="" class="login-background">
+		<headerContent>
+			<!-- Company logo and title -->
+			<Avatar src="./image/logo.jpg" displaySize="XS" press=".onAvatarPressed" tooltip="{i18n>companyLogo}"/>
+			<Title level="H1" text="Kalpavriksha Technology" class="custom-text" wrapping="false"/>
+			<ToolbarSpacer/>
+			<!-- Home button -->
+			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
+		</headerContent>
+		<content>
+			<FlexBox class="sapUiMediumMargin" direction="Column" alignItems="End" justifyContent="End">
 				<form:SimpleForm editable="true" layout="ResponsiveGridLayout" 
                 class="loginForm"
-                title="Login Details" >
+                title="{i18n>loginDetails}" >
 					<form:content>
-                        <!-- User ID input -->
-                        <Label text="User Id" required="true"/>
-                        <Input placeholder="{i18n>enterUserId}" id="idUserid" change="Login" value="{loginModel>/userIds}" maxLength="50"/>
-
-                        <!-- User name input -->
-                        <Label text="User Name" required="true"/>
-                        <Input placeholder="{i18n>enterUserName}" id="idUsername" change="Login" value="{loginModel>/userNames}" maxLength="50"/>
-                        
-                        <!-- Captcha input and OTP button -->
-                        <Label text="OTP" required="true" />
-                        <HBox alignItems="End" justifyContent="Start">
-                            <Input value="{loginModel>/enteredCaptcha}" id="idCaptchaInput" class="sapUiTinyMarginEnd" placeholder="{i18n>CaptchPlaceholader}" submit="onLoginSubmit" maxLength="6" />
-                             <core:Icon visible="false" id="idEyeIcon" class="sapUiTinyMarginBottom sapUiTinyMarginBegin"
-                            src="sap-icon://information" press="onPressIcon">
-                             </core:Icon>
-                            <Button text="{18n>sendOtp}" icon="sap-icon://email" press="SendOtp" class="OTP" id="idOTP" visible="false"/>
-                        </HBox>
-                        <Label/>
-
-                        <!-- Login button -->
-                        <HBox alignContent="Center" justifyContent="End">
-                            <Button text="{i18n>login}" press="onLogin" icon="sap-icon://key" type="Emphasized" class="Login" width="8rem"/>
-                        </HBox>
-                    </form:content>
-                </form:SimpleForm>
-            </FlexBox>
-        </content>				
-    </Page>
+						<!-- User ID input -->
+						<Label text="{i18n>userId}" required="true"/>
+						<Input placeholder="{i18n>placeUserId}" id="idUserid" change="Login" value="{loginModel>/userIds}" maxLength="50"/>
+						<!-- User name input -->
+						<Label text="{i18n>userName}" required="true"/>
+						<Input placeholder="{i18n>placeUserName}" id="idUsername" change="Login" value="{loginModel>/userNames}" maxLength="50"/>
+						<!-- Captcha input and OTP button -->
+						<Label text="{i18n>otp}" required="true" />
+						<HBox alignItems="End" justifyContent="Start">
+							<Input value="{loginModel>/enteredCaptcha}" id="idCaptchaInput" class="sapUiTinyMarginEnd" placeholder="{i18n>placeOtp}" submit="onLoginSubmit" maxLength="6" />
+							<core:Icon visible="false" id="idEyeIcon" class="sapUiTinyMarginBottom sapUiTinyMarginBegin"
+                            src="sap-icon://information" press="onPressIcon"></core:Icon>
+							<Button text="{18n>sendOtp}" icon="sap-icon://email" press="SendOtp" class="OTP" id="idOTP" visible="false"/>
+						</HBox>
+						<Label/>
+						<!-- Login button -->
+						<HBox alignContent="Center" justifyContent="End">
+							<Button text="{i18n>btnLogin}" press="onLogin" icon="sap-icon://key" type="Emphasized" class="Login" width="8rem"/>
+						</HBox>
+					</form:content>
+				</form:SimpleForm>
+			</FlexBox>
+		</content>
+		<footer>
+			<Bar>
+				<contentLeft>
+					<HBox class="sapUiTinyMarginTop">
+						<Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
+						<Link
+        class="footer-CoName sapUiTinyMarginBegin"
+        text="Developed by Kalpavriksha Technologies"
+        href="https://www.kalpavrikshatechnologies.com/" 
+        target="_blank"  
+    />
+					</HBox>
+				</contentLeft>
+			</Bar>
+		</footer>
+	</Page>
 </mvc:View>
