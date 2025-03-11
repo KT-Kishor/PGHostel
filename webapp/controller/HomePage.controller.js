@@ -91,7 +91,7 @@ sap.ui.define([
 		oContainer.appendChild(iframe);
 	  },
 	  onpressLogin: function () {
-		sap.m.URLHelper.redirect("https://www.kalpavrikshatechnologies.com/EmployeeLogin", false);
+		this.getRouter().navTo("RouteLoginPage")
 	  },
 	  //linkdin link
 	  onClicklinkdin: function () {

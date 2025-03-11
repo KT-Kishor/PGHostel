@@ -144,6 +144,11 @@
                     "name": "RouteHomePage",
                     "pattern": ":?query:",
                     "target": "TargetHomePage"
+                },
+                {
+                    "name": "RouteLoginPage",
+                    "pattern": "LoginPage",
+                    "target": "TargetLoginPage"
                 }
             ],
             "targets": {
@@ -156,6 +161,12 @@
                     "transition": "slide",
                     "viewId": "HomePage",
                     "viewName": "HomePage"
+                },
+                "TargetLoginPage": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "viewId": "LoginPage",
+                    "viewName": "LoginPage"
                 }
             }
         },

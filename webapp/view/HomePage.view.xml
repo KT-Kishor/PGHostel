@@ -106,7 +106,7 @@
 </layout:VerticalLayout>
 <layout:VerticalLayout class="sapUiResponsiveMargin HomeSlider">
 <layout:HorizontalLayout allowWrapping="true">
-<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop" header="{i18n>empheader1}" subheader="{i18n>subhead1}">
+<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop" header="{i18n>empheaderLeave}" subheader="{i18n>subheaderCust}">
 <TileContent unit="{i18n>CreateLeave}">
 <ImageContent src="sap-icon://time-off"/>
 </TileContent>
