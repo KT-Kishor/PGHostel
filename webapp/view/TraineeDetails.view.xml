@@ -1,0 +1,131 @@
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.TraineeDetails"
+	xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core">
+	<Page id="pageTrainee" title="{i18n>headerTrainee}" navButtonPress="onPressback" showNavButton="true">
+		<content>
+			<!-- Wizard component  -->
+			<Wizard id="idWizardTrainee"	
+					showNextButton="true" finishButtonText="{i18n>submit}">
+				<!-- Step 1: Form input for trainee details -->
+				<WizardStep id="idWizardStep1Trainee"
+                            title="{i18n>basicDetails}" 							
+                            validated="true" >
+					<f:SimpleForm 
+            layout="ResponsiveGridLayout"
+			labelSpanXL="3"
+			labelSpanL="3"
+			labelSpanM="3"
+			labelSpanS="12"
+			adjustLabelSpan="false"
+			emptySpanXL="4"
+			emptySpanL="4"
+			emptySpanM="4"
+			emptySpanS="0"
+			columnsXL="1"
+			columnsL="1"
+			columnsM="1"
+			singleContainerFullSize="false">
+						<f:content >
+							<!-- Field for Trainee's Name with Salutation selection -->
+							<Label text="{i18n>nameLabel}" required="true" />
+							<HBox width="100%" justifyContent="Start" alignItems="Center">
+								<VBox width="20%">
+									<!-- Select input for Salutation -->
+									<Select
+                                               id="selectManagerSalutation"
+                                               selectedKey="{oTraineeDetails>/NameSalutation}"
+                                               items="{NameSalutation>/items}"
+                                               width="100%">
+										<!-- Binding the key and text of the Select control to the NameSalutation model -->
+										<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}"/>
+									</Select>
+								</VBox>
+								<VBox width="80%">
+									<!-- Input field for Trainee Name -->
+									<Input value="{oTraineeDetails>/Name}" maxLength="50" placeholder="{i18n>enterNamePlaceholder}" id="idName" liveChange="onLiveChange" />
+								</VBox>
+							</HBox>
+							<!-- Field for Reporting Manager with Salutation selection -->
+							<Label text="{i18n>reportingManager}" required="true" />
+							<HBox width="100%" justifyContent="Start" alignItems="Center">
+								<VBox width="20%">
+									<!-- Select input for Salutation of the reporting manager -->
+									<Select
+                                               id="selectSalutation"
+                                               selectedKey="{oTraineeDetails>/ReportingManagerSalutation}"
+                                               items="{NameSalutation>/items}"
+                                               width="100%">
+										<!-- Binding the key and text of the Select control to the NameSalutation model -->
+										<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}"/>
+									</Select>
+								</VBox>
+								<VBox width="80%">
+									<!-- Input field for Reporting Manager Name -->
+									<ComboBox showSecondaryValues="true" change="onLiveChange"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{idModel>/results}" id="idReportingManager" width="100%">
+									<core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}" />
+								</ComboBox>
+								</VBox>
+							</HBox>
+							<!-- Field for Trainee's Email -->
+							<Label text="{i18n>emailID}" required="true" />
+							<Input value="{oTraineeDetails>/TraineeEmail}" maxLength="50" id="idtraineeEmail" placeholder="Enter Email ID" liveChange="onLiveChange"/>
+							<!-- Field for Stipend with Currency selection -->
+							<Label text="{i18n>tableColumnStipend}" required="true" />
+							<Input value="{oTraineeDetails>/Stipend}" maxLength="50" type="Number" placeholder="{i18n>traineeEnterStipend}" id="idStipend" liveChange="onLiveChange" />
+							<Select items="{currencyModel>/results}" selectedKey="{oTraineeDetails>/Currency}" id="idComboBoxTrainee" width="100%" class="marginLeft">
+								<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
+							</Select>
+							<!-- Date picker for Joining Date -->
+							<Label text="{i18n>joiningDate}" id="idJoiningDate" required="true" />
+							<DatePicker width="50%" value="{path:'oTraineeDetails>/JoiningDate',type: 'sap.ui.model.type.Date',formatOptions: { pattern: 'dd/MM/yyyy' }}" id="dateJoining"  change="onChange" />
+						</f:content>
+					</f:SimpleForm>
+				</WizardStep>
+				<!-- Step 3: Review step displaying entered details -->
+				<WizardStep 
+							complete="onReviewSubmit"
+                            title="{i18n>review}"
+                            validated="true">
+					<f:SimpleForm                    
+             editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="3"
+			labelSpanM="4"
+			labelSpanS="12"
+			adjustLabelSpan="false"
+			emptySpanXL="0"
+			emptySpanL="4"
+			emptySpanM="0"
+			emptySpanS="0"
+			columnsXL="2"
+			columnsL="1"
+			columnsM="1">
+						<f:content>
+							<!-- Display Trainee Name and Salutation -->
+							<Label text="{i18n>nameLabel}"/>
+							<Text text="{= ${oTraineeDetails>/NameSalutation} + ' ' + ${oTraineeDetails>/Name}}"/>
+							<!-- Display Reporting Manager Name and Salutation -->
+							<Label text="{i18n>reportingManager}" />
+							<Text text="{= ${oTraineeDetails>/ReportingManagerSalutation} + ' ' + ${oTraineeDetails>/ReportingManager}}"/>
+							<!-- Display Trainee Email -->
+							<Label text="{i18n>emailID}" />
+							<Text  text="{oTraineeDetails>/TraineeEmail}"/>
+							<!-- Display Stipend -->
+							<Label text="{i18n>tableColumnStipend}" />
+							<Text text="{oTraineeDetails>/Stipend}"/>
+							<!-- Display Currency -->
+							<Label text="{i18n>currency}" />
+							<Text text="{oTraineeDetails>/Currency}"/>
+							<!-- Display Joining Date with formatter -->
+							<Label text="{i18n>joiningDate}" />
+							<Text text="{path:'oTraineeDetails>/JoiningDate', formatter: '.Formatter.formatDate'}"/>
+						</f:content>
+					</f:SimpleForm>
+				</WizardStep>
+			</Wizard>
+		</content>
+	</Page>
+</mvc:View>

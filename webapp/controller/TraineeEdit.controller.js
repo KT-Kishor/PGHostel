@@ -10,14 +10,10 @@ sap.ui.define([
 ],
     function (BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
         "use strict";
-        return BaseController.extend("sap.kt.com.minihrsolution.controller.TilePage", {
+        return BaseController.extend("sap.kt.com.minihrsolution.controller.TraineeEdit", {
             onInit: function () {
-                this.getRouter().getRoute("RouteTilePage").attachMatched(this._onRouteMatched, this);
+                this.getRouter().getRoute("RouteTraineeEdit").attachMatched(this._onRouteMatched, this);
             },
-			onpressTrainee:function(){
-				this.getRouter().navTo("RouteTraineeDetails");
-			}
-            
          
            
         });

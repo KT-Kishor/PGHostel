@@ -74,7 +74,7 @@
 				
 				<GenericTile visible="{modelTileVisible>/GenerateContract}"
                     class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>ContractDetails}" press="onpressContract"
+                    header="{i18n>headerContractDetails}" press="onpressContract"
                     subheader="{i18n>subhead}">
 					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>tileFooter}">
 						<ImageContent src="sap-icon://decision" />					
