@@ -3,15 +3,13 @@
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core">
-	<Page id="pageTrainee" title="{i18n>headerTrainee}" navButtonPress="onPressback" showNavButton="true">
+	<Page id="TD_id_Page" title="{i18n>headerTrainee}" navButtonPress="T_onPressback" showNavButton="true">
 		<content>
 			<!-- Wizard component  -->
-			<Wizard id="idWizardTrainee"	
+			<Wizard id="TD_id_Wizard" complete="onWizardComplete"	
 					showNextButton="true" finishButtonText="{i18n>submit}">
 				<!-- Step 1: Form input for trainee details -->
-				<WizardStep id="idWizardStep1Trainee"
-                            title="{i18n>basicDetails}" 							
-                            validated="true" >
+				<WizardStep id="TD_id_StepOne" title="{i18n>traineeDetails}" validated="true">
 					<f:SimpleForm 
             layout="ResponsiveGridLayout"
 			labelSpanXL="3"
@@ -28,64 +26,53 @@
 			columnsM="1"
 			singleContainerFullSize="false">
 						<f:content >
-							<!-- Field for Trainee's Name with Salutation selection -->
-							<Label text="{i18n>nameLabel}" required="true" />
+							<Label text="{i18n>traineeName}" required="true" />
 							<HBox width="100%" justifyContent="Start" alignItems="Center">
 								<VBox width="20%">
-									<!-- Select input for Salutation -->
 									<Select
-                                               id="selectManagerSalutation"
-                                               selectedKey="{oTraineeDetails>/NameSalutation}"
-                                               items="{NameSalutation>/items}"
+                                               id="TD_id_NameSalutation"
+                                               selectedKey="{oTraineeDetails>/TSalutation}"
+                                               items="{Salutation>/salutation}"
                                                width="100%">
-										<!-- Binding the key and text of the Select control to the NameSalutation model -->
-										<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}"/>
+										<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 									</Select>
 								</VBox>
-								<VBox width="80%">
-									<!-- Input field for Trainee Name -->
-									<Input value="{oTraineeDetails>/Name}" maxLength="50" placeholder="{i18n>enterNamePlaceholder}" id="idName" liveChange="onLiveChange" />
+								<VBox width="78%">
+									<Input value="{oTraineeDetails>/TraineeName}" maxLength="50" placeholder="{i18n>placeTraineeName}" id="TD_id_Name" liveChange="validateName" class="sapUiTinyMarginBegin"/>
 								</VBox>
 							</HBox>
-							<!-- Field for Reporting Manager with Salutation selection -->
 							<Label text="{i18n>reportingManager}" required="true" />
 							<HBox width="100%" justifyContent="Start" alignItems="Center">
 								<VBox width="20%">
-									<!-- Select input for Salutation of the reporting manager -->
 									<Select
-                                               id="selectSalutation"
-                                               selectedKey="{oTraineeDetails>/ReportingManagerSalutation}"
-                                               items="{NameSalutation>/items}"
+                                               id="TD_id_ManagerSalutation"
+                                               selectedKey="{oTraineeDetails>/RSalutation}"
+                                               items="{Salutation>/salutation}"
                                                width="100%">
-										<!-- Binding the key and text of the Select control to the NameSalutation model -->
-										<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}"/>
+										<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 									</Select>
 								</VBox>
-								<VBox width="80%">
-									<!-- Input field for Reporting Manager Name -->
-									<ComboBox showSecondaryValues="true" change="onLiveChange"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{idModel>/results}" id="idReportingManager" width="100%">
-									<core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}" />
-								</ComboBox>
+								<VBox width="78%">
+									<ComboBox showSecondaryValues="true"  change="validateName"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{idModel>/results}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin">
+										<core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}" />
+									</ComboBox>
 								</VBox>
 							</HBox>
-							<!-- Field for Trainee's Email -->
-							<Label text="{i18n>emailID}" required="true" />
-							<Input value="{oTraineeDetails>/TraineeEmail}" maxLength="50" id="idtraineeEmail" placeholder="Enter Email ID" liveChange="onLiveChange"/>
-							<!-- Field for Stipend with Currency selection -->
-							<Label text="{i18n>tableColumnStipend}" required="true" />
-							<Input value="{oTraineeDetails>/Stipend}" maxLength="50" type="Number" placeholder="{i18n>traineeEnterStipend}" id="idStipend" liveChange="onLiveChange" />
-							<Select items="{currencyModel>/results}" selectedKey="{oTraineeDetails>/Currency}" id="idComboBoxTrainee" width="100%" class="marginLeft">
+							<Label text="{i18n>emailId}" required="true" />
+							<Input value="{oTraineeDetails>/EmailID}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="validateEmail"/>
+							<Label text="{i18n>stipend}" required="true" />
+							<Input value="{oTraineeDetails>/Stipend}" maxLength="50" type="Number" placeholder="{i18n>placeStipend}" id="TD_id_Stipend" liveChange="validateAmount" />
+							<Select items="{currencyModel>/results}" selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" width="100%" class="marginLeft">
 								<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
 							</Select>
-							<!-- Date picker for Joining Date -->
-							<Label text="{i18n>joiningDate}" id="idJoiningDate" required="true" />
-							<DatePicker width="50%" value="{path:'oTraineeDetails>/JoiningDate',type: 'sap.ui.model.type.Date',formatOptions: { pattern: 'dd/MM/yyyy' }}" id="dateJoining"  change="onChange" />
+							<Label text="{i18n>joiningDate}"  id="TD_id_Ljoin" required="true" />
+							<DatePicker width="50%" value="oTraineeDetails>/JoiningDate'}" id="TD_id_JoiningDate"  change="validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"/>
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
 				<!-- Step 3: Review step displaying entered details -->
 				<WizardStep 
-							complete="onReviewSubmit"
+							complete="TD_onSubmitData"
                             title="{i18n>review}"
                             validated="true">
 					<f:SimpleForm                    
@@ -105,16 +92,16 @@
 			columnsM="1">
 						<f:content>
 							<!-- Display Trainee Name and Salutation -->
-							<Label text="{i18n>nameLabel}"/>
+							<Label text="{i18n>traineeName}"/>
 							<Text text="{= ${oTraineeDetails>/NameSalutation} + ' ' + ${oTraineeDetails>/Name}}"/>
 							<!-- Display Reporting Manager Name and Salutation -->
 							<Label text="{i18n>reportingManager}" />
 							<Text text="{= ${oTraineeDetails>/ReportingManagerSalutation} + ' ' + ${oTraineeDetails>/ReportingManager}}"/>
 							<!-- Display Trainee Email -->
-							<Label text="{i18n>emailID}" />
+							<Label text="{i18n>emailId}" />
 							<Text  text="{oTraineeDetails>/TraineeEmail}"/>
 							<!-- Display Stipend -->
-							<Label text="{i18n>tableColumnStipend}" />
+							<Label text="{i18n>stipend}" />
 							<Text text="{oTraineeDetails>/Stipend}"/>
 							<!-- Display Currency -->
 							<Label text="{i18n>currency}" />

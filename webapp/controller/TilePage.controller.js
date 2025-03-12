@@ -15,7 +15,7 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTilePage").attachMatched(this._onRouteMatched, this);
             },
 			onpressTrainee:function(){
-				this.getRouter().navTo("RouteTraineeDetails");
+				this.getRouter().navTo("RouteTrainee");
 			}
             
          

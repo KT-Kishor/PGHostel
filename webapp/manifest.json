@@ -111,6 +111,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/WorkingMode.json",
                 "preload": true
+            },
+            "Salutation": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Salutation.json",
+                "preload": true
             }
         },
         "resources": {
@@ -161,9 +166,9 @@
                     "target": "TargetTraineeDetails"
                 },
                 {
-                    "name": "RouteTraineeEdit",
-                    "pattern": "TraineeEdit",
-                    "target": "TargetTraineeEdit"
+                    "name": "RouteTrainee",
+                    "pattern": "Trainee",
+                    "target": "TargetTrainee"
                 }
             ],
             "targets": {
@@ -195,11 +200,11 @@
                     "viewId": "TraineeDetails",
                     "viewName": "TraineeDetails"
                 },
-                "TargetTraineeEdit": {
+                "TargetTrainee": {
                     "viewType": "XML",
                     "transition": "slide",
-                    "viewId": "TraineeEdit",
-                    "viewName": "TraineeEdit"
+                    "viewId": "Trainee",
+                    "viewName": "Trainee"
                 }
             }
             },

@@ -1,0 +1,109 @@
+<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+    controllerName="sap.kt.com.minihrsolution.controller.Trainee"
+	xmlns:fb="sap.ui.comp.filterbar"
+    displayBlock="true">
+	<Page  >
+		<headerContent>
+			<Button  press="T_onPressback" icon="sap-icon://home" />
+			<Text text="Trainee Details" class="boldBlackText"></Text>
+			<ToolbarSpacer />
+			<Button  press="T_onSignout" icon="sap-icon://log" tooltip="{i18n>backButtonTooltip}"></Button>
+		</headerContent>
+		<content>
+			<fb:FilterBar  class="sapUiTinyMargin" id="T_id_AdminFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem name="Trainee" label="Trainee Name" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox  showSecondaryValues= "true"  items="{path:'CompanyDetails>/results',length:1000 }" change="onChangeCompanyName" id="T_id_TraineeName" showClearIcon="true">
+								<core:ListItem key="{CompanyDetails>CompanyCode}" text="{CompanyDetails>CompanyName}" additionalText="{CompanyDetails>CompanyCode}" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Reporting Manager" label="Reporting Manager" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox name="Reporting Manager"  items="{ path: 'BaseLocation>/results', length:1000,  sorter: { path: 'Company', descending: false,
+                                        group: true } }"  id="T_id_RmFilterBar" showClearIcon="true">
+								<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Joining Date" label="Joining Date" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+                    <DateRangeSelection
+                    id="T_id_JoiningDate"
+                    valueFormat="yyyy-MM-dd" 
+                    displayFormat="dd/MM/yyyy"
+                    change="onDateChange" />						
+					</fb:control>
+						</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table id="T_id_TraineeTable" class="sapUiTinyMargin" items="{ path:'oAdminModel>/results',sorter: {
+			path: 'Company', descending: false, group:true}}"  busyIndicatorDelay="0"  width="auto"
+                inset="false"    growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
+				 <headerToolbar>
+                <OverflowToolbar >
+                    <Title id="T_id_Title" text="Trainee Details"/>
+                    <ToolbarSpacer/>
+                    <Button  text="{i18n>onboard}" id="T_id_Onboard"  type="Neutral" press="t_onOnboardPress"  icon="sap-icon://manager"/>
+                    <Button text="{i18n>rejectTainee}" id="T_id_Reject" type="Reject"  press="T_onRejectPress" icon="sap-icon://employee-rejections" />
+                    <Button text="{i18n>addTrainee}" id="T_id_Add" type="Accept"  press="T_onPressAddTrainee"  icon="sap-icon://employee-approvals"/>
+                </OverflowToolbar>
+            </headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>traineeName}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>reportingManager}" />
+					</Column>
+					
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>stipend}" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>joiningDate}" />
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>emailId}" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true" width="8%">
+						<Text text="{i18n>status}" />
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem type="Navigation" press="OnNavigationEmployee">
+						<cells>
+						    <Text text="{oAdminModel>EmployeeName} ({oAdminModel>EmployeeID})"/>							
+							<Text text="{oAdminModel>JoiningDate}"/>
+							<Text text="{oAdminModel>Branch}"/>
+							<Text text="{oAdminModel>Designation}"/>
+							<Text text="{oAdminModel>MobileNo}"/>
+							<Text text="{oAdminModel>CompanyEmail}"/>
+							<ObjectStatus text="{oAdminModel>EmployeeStatus}" inverted="true" class="centerText" state="{path: 'oAdminModel>EmployeeStatus', formatter: '.Formatter.statusStateFormatter'}" />
+
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<Bar>
+				<contentLeft>
+					   <HBox class="sapUiTinyMarginTop">
+    <Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
+    <Link
+        class="footer-CoName sapUiTinyMarginBegin"
+        text="Developed by Kalpavriksha Technologies"
+        href="https://www.kalpavrikshatechnologies.com/" 
+        target="_blank"  
+    />
+</HBox>
+				</contentLeft>
+			</Bar>
+		</footer>
+	</Page>
+</mvc:View>
