@@ -15,7 +15,7 @@
 				<GenericTile visible="{modelTileVisible>/GenerateEmployeeOffer}"
                     class="sapUiMediumMargin"
                     
-                    header="{i18n>headerEmployeeOffer}" press="onPressemployee"
+                    header="{i18n>headerEmployeeOffer}" press="onPressOffer"
                     subheader="{i18n>subhead}">
 					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>tileFooter}">
 						<ImageContent src="sap-icon://employee-approvals" />					

@@ -1,0 +1,208 @@
+
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.EmployeeOfferDetails"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:l="sap.ui.layout"
+	xmlns:m="sap.m">
+	<Page   title="{i18n>headerEmpDetails}" showNavButton="true" navButtonPress="onPressBack">
+		<content>
+			<NavContainer id="wizardNavContainer">
+				<pages>
+					<Page>
+						<content>
+							<!-- Wizard page step1 -->
+							<Wizard complete="onPressReview" id="idWizardemp" finishButtonText="{i18n>submit}" showNextButton="true">
+								<WizardStep id="idWizardStepone"   complete="onCalculate" title="{i18n>basicDetails}" validated="true">
+									<!-- SimpleForm inside the WizardStep for form layout -->
+									<f:SimpleForm editable="false" layout="ColumnLayout" columnsM="1" columnsL="2" columnsXL="2">
+    <f:content>
+        <!-- Salutation and Consultant Name in one line -->
+        <Label text="{i18n>consultantName}" required="true" />
+        
+                <Input value="{employeeModel>/ConsultantName}" placeholder="{i18n>consultantName}" required="true" 
+                    editable="true" id="idConsultant" liveChange="validateName" maxLength="50" />
+        
+
+        <!-- Offer Release Date -->
+        <Label text="{i18n>offerReleaseDate}" required="true" />
+        <DatePicker id="idReldate" placeholder="{i18n>offerReleaseDate}" 
+            value="{path: 'employeeModel>/OfferReleaseDate', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'dd/MM/yyyy' }}" 
+            change="validateDate" class="sapUiSmallMarginBottom" />
+
+        <!-- Joining Date -->
+        <Label text="{i18n>joiningDate}" required="true" />
+        <DatePicker id="idJoindate" placeholder="{i18n>joiningDate}" 
+            value="{path: 'employeeModel>/JoiningDate', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'dd/MM/yyyy' }}" 
+            change="validateDate" class="sapUiSmallMarginBottom disableInput" />
+
+        <!-- Designation -->
+        <Label text="{i18n>designation}" required="true" />
+        <Select id="idDesignationemp" items="{DesignationModel>/results}" selectedKey="{employeeModel>/Designation}">
+            <core:Item key="{DesignationModel>DesignationName}" text="{DesignationModel>DesignationName}" />
+        </Select>
+
+        <!-- Base Location -->
+        <Label text="{i18n>baseLocation}" required="true" />
+        <Select items="{CityJsonModel>/results}" id="idBaseLocationemp" selectedKey="{employeeModel>/BaseLocation}">
+            <core:Item key="{CityJsonModel>LocationName}" text="{CityJsonModel>LocationName}" />
+        </Select>
+
+        <!-- Email -->
+        <Label text="{i18n>emailId}" required="true" />
+        <Input value="{employeeModel>/EmployeeEmail}" placeholder="{i18n>placeEmplyeeEmail}" 
+             id="idmail" maxLength="50" liveChange="validateEmail" />
+
+        <!-- Consultant Address -->
+        <Label text="{i18n>consultantAddress}" required="true" />
+        <TextArea value="{employeeModel>/ConsultantAddress}" placeholder="{i18n>consultantAddress}" liveChange="ValidateCommonFields"
+            id="idAddressemp" maxLength="120" />
+
+        <!-- CTC -->
+        <Label text="{i18n>ctc}" required="true" />
+        <Input value="{employeeModel>/CTC}" id="idinputCTC" placeholder="{i18n>placeCtc}" 
+            type="Number" liveChange="validateAmount" maxLength="10" />
+
+        <!-- Joining Bonus -->
+        <Label text="{i18n>joiningBonus}" required="true" />
+        <Input value="{employeeModel>/JoiningBonus}" placeholder="{i18n>joiningBonus}" 
+            type="Number" liveChange="validateAmount" maxLength="10" id="idJoiningBonus" />
+
+        <!-- Salary Type -->
+        <Label text="{i18n>salaryType}"/>
+        <RadioButtonGroup id="idRadioMainEmp" columns="3" select="onTDSCheckboxChange">
+            <RadioButton id="idRadioMainTds" text="{i18n>tds}" />
+            <RadioButton id="idRadioMainNoTds" text="{i18n>noTds}" />
+            <RadioButton id="idRadioMainPf" text="{i18n>pf}" />
+        </RadioButtonGroup>
+
+        <!-- Bond -->
+        <Label text="{i18n>bond}" required="true" />
+        <RadioButtonGroup columns="2" id="idRadioGroup" select="onRadioButtonSelect">
+            <buttons>
+                <RadioButton text="{i18n>yes}" key="yes" />
+                <RadioButton text="{i18n>no}" key="no" selected="true" />
+            </buttons>
+        </RadioButtonGroup>
+
+        <!-- Select Year -->
+        <Label text="{i18n>selectYear}" />
+        <Select items="{bondModel>/results}" id="idComboBoxemp" selectedKey="{employeeModel>/EmploymentBond}" visible="false" change="validateInputs">
+            <core:Item key="{bondModel>Value}" text="{bondModel>Value}" />
+        </Select>
+
+    </f:content>
+</f:SimpleForm>
+
+								</WizardStep>
+								<!-- wizard step 2 with all ctc calculation value -->
+								<WizardStep  title="{i18n>ctcCalculation}" validated="true">
+									<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="2" columnsL="4" columnsXL="4">
+										<f:content>
+											<core:Title text="{i18n>monthlyComponents}" />
+											<Label text="{i18n>basicSalary}" />
+											<Input value="{employeeModel>/BasicSalary}" editable="false" />
+											<Label text="{i18n>hra}" />
+											<Input value="{employeeModel>/HRA}" editable="false" />
+											<Label text="{i18n>statutoryBonus}" />
+											<Input value="{employeeModel>/StatutoryBonus}" editable="false" />
+											<Label text="{i18n>totalMonthly}" class="boldBlackText" />
+											<Input value="{employeeModel>/TotalMontly}" editable="false" />
+											<Label text="{i18n>totalMonthlyAnnualized}" class="boldBlackText" />
+											<Input value="{employeeModel>/TotalmothlyAnnualized}" editable="false" />
+											<core:Title text="{i18n>retiralsBenefits}" />
+											<Label text="{i18n>tds}" />
+											<Input value="{employeeModel>/TDS}" editable="false" />
+											<Label text="{i18n>medicalInsurance}" />
+											<Input value="{employeeModel>/MedicalInsurance}" editable="false" />
+											<Label text="{i18n>gratuity}" />
+											<Input value="{employeeModel>/Gratuity}" editable="false" />
+											<Label text="{i18n>totalRetirals}" class="boldBlackText" />
+											<Input value="{employeeModel>/TotalRetires}" editable="false" />
+											<core:Title text="{i18n>variableComponents}" />
+											<Label text="{i18n>performanceBonus}" />
+											<Input value="{employeeModel>/PerformanceBonus}" editable="false" />
+											<Label text="{i18n>engagementPB}" />
+											<Input value="{employeeModel>/EngagementPB}" editable="false" />
+											<Label text="{i18n>totalVariableComponents}" class="boldBlackText" />
+											<Input value="{employeeModel>/TotalVariablePay}" editable="false" />
+											<core:Title text="{i18n>totalCost}" />
+											<Label text="{i18n>costOfCompany}" class="boldBlackText" />
+											<Input value="{employeeModel>/CostofCompany}" class="boldBlackText" editable="false" />
+											<Label text="{i18n>joiningBonus}" class="boldBlackText" />
+											<Input value="{employeeModel>/DisplayJoiningBonus}" editable="false" />
+											<Label text="{i18n>totalinr}" class="boldBlackText" />
+											<Input value="{employeeModel>/Total}" editable="false" class="boldBlackText" />
+										</f:content>
+									</f:SimpleForm>
+								</WizardStep>
+								<!-- Review wizard step with simple form -->
+								<WizardStep  complete="onReviewSubmit"  title="{i18n>review}" validated="true">
+									<f:SimpleForm  editable="false"  layout="ColumnLayout"  title="{i18n>bothEmpDetails}" columnsM="2" columnsL="4" columnsXL="4">
+										<f:content>
+											<core:Title text="Basic Details" />
+											<Label text="{i18n>consultantName}" />
+											<Text text="{= ${employeeModel>/Salutation} + ' ' + ${employeeModel>/ConsultantName} }" />
+											<Label text="{i18n>consultantAddress}" />
+											<Text text="{employeeModel>/ConsultantAddress}" />
+											<core:Title text="" />
+											<Label text="{i18n>offerReleaseDate}" />
+											<Text text="{path: 'employeeModel>/OfferReleaseDate', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'dd/MM/yyyy' }}" />
+											<Label text="{i18n>joiningDate}" />
+											<Text text="{path: 'employeeModel>/JoiningDate', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'dd/MM/yyyy' }}" />
+											<core:Title text="" />
+											<Label text="{i18n>designation}" />
+											<Text text="{employeeModel>/Designation}" />
+											<Label text="{i18n>baseLocation}" />
+											<Text text="{employeeModel>/BaseLocation}" />
+											<core:Title text="" />
+											<Label text="{i18n>bond}" />
+											<Text text="{employeeModel>/EmploymentBond}" />
+											<Label text="{i18n>employeeEmail}" />
+											<Text text="{employeeModel>/EmployeeEmail}" />
+											<core:Title text="{i18n>monthlyComponents}" />
+											<Label text="{i18n>basicSalary}" />
+											<Text text="{path: 'employeeModel>/BasicSalary'}" />
+											<Label text="{i18n>hra}" />
+											<Text text="{path: 'employeeModel>/HRA'}" />
+											<Label text="{i18n>statutoryBonus}" />
+											<Text text="{path: 'employeeModel>/StatutoryBonus'}" />
+											<Label text="{i18n>totalMontly}" />
+											<Text text="{path: 'employeeModel>/TotalMontly'}" />
+											<Label text="{i18n>totalAnnual}" />
+											<Text text="{path: 'employeeModel>/TotalmothlyAnnualized'}" />
+											<core:Title text="{i18n>retiralsBenefits}" />
+											<Label text="{i18n>tds}" />
+											<Text text="{path: 'employeeModel>/TDS'}" />
+											<Label text="{i18n>medicalInsurancePremium}" />
+											<Text text="{path: 'employeeModel>/MedicalInsurance'}" />
+											<Label text="{i18n>gratuity}" />
+											<Text text="{path: 'employeeModel>/Gratuity'}" />
+											<Label text="{i18n>totalRetires}" />
+											<Text text="{path: 'employeeModel>/TotalRetires'}" />
+											<core:Title text="{i18n>Variable Components (INR)}" />
+											<Label text="{i18n>performanceBonusSection}" />
+											<Text text="{path: 'employeeModel>/PerformanceBonus'}" />
+											<Label text="{i18n>engagementBonus}" />
+											<Text text="{path: 'employeeModel>/EngagementPB'}" />
+											<Label text="{i18n>totalVariableComponents}" />
+											<Text text="{path: 'employeeModel>/TotalVariablePay'}" />
+											<core:Title text="{i18n>totalCost}" />
+											<Label text="{i18n>costOfCompany}" />
+											<Text text="{path: 'employeeModel>/CostofCompany'}" />
+											<Label text="{i18n>joiningBonus}" />
+											<Text text="{path: 'employeeModel>/DisplayJoiningBonus'}" />
+											<Label text="{i18n>totalinr}" />
+											<Text text="{path: 'employeeModel>/Total'}" />
+										</f:content>
+									</f:SimpleForm>
+								</WizardStep>
+							</Wizard>
+						</content>
+					</Page>
+				</pages>
+			</NavContainer>
+		</content>
+	</Page>
+</mvc:View>

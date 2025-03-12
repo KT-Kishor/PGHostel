@@ -169,6 +169,17 @@
                     "name": "RouteTrainee",
                     "pattern": "Trainee",
                     "target": "TargetTrainee"
+                },
+                {
+                    "name": "RouteOffer",
+                    "pattern": "Offer",
+                    "target": "TargetOffer"
+                },
+                {
+                    "name": "RouteEmployeeOfferDetails",
+                    "pattern": "EmployeeOfferDetails",
+                    "target": "TargetEmployeeOfferDetails"
+
                 }
             ],
             "targets": {
@@ -205,6 +216,18 @@
                     "transition": "slide",
                     "viewId": "Trainee",
                     "viewName": "Trainee"
+                },
+                "TargetOffer": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "viewId": "Offer",
+                    "viewName": "Offer"
+                },
+                "TargetEmployeeOfferDetails": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "viewId": "EmployeeOfferDetails",
+                    "viewName": "EmployeeOfferDetails"
                 }
             }
             },

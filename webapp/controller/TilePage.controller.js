@@ -16,7 +16,10 @@ sap.ui.define([
             },
 			onpressTrainee:function(){
 				this.getRouter().navTo("RouteTrainee");
-			}
+			},
+            onPressOffer: function () {
+                this.getRouter().navTo("RouteOffer");
+            },
             
          
            
