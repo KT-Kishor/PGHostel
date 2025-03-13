@@ -212,9 +212,36 @@
                     "pattern": "ContractDetails",
                     "target": [
                       "TargetContractDetails"
-                    ]   
-                    
-                }
+                    ]         
+                },
+                {
+                    "name": "RouteConsultantInvoiceApplication",
+                    "pattern": "ConsultantInvoice",
+                    "target": [
+                      "TargetConsultantInvoiceApplication"
+                    ]
+                },   
+                {
+                    "name": "RouteNavConsultantInvoiceApplication",
+                    "pattern": "ConsultantInvoiceDetails/{sPath}/{oPath}",
+                    "target": [
+                      "TargetNavConsultantInvoiceApplication"
+                    ]
+                },
+                {
+                    "name": "RouteAdminPaySlip",
+                    "pattern": "AdminPaySlip",
+                    "target": [
+                      "TargetAdminPaySlip"
+                    ]
+                  },
+                  {
+                    "name": "RouteNavAdminPaySlipApp",
+                    "pattern": "AdminPaySlipDetails",
+                    "target": [
+                      "TargetNavAdminPaySlipApp"
+                    ]
+                  }
             ],
             "targets": {
                 "TargetView1": {
@@ -290,7 +317,35 @@
                     "clearControlAggregation": false,
                     "viewId": "ContractDetails",
                     "viewName": "ContractDetails"
-                }
+                },
+                "TargetConsultantInvoiceApplication": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ConsultantInvoice",
+                    "viewName": "ConsultantInvoice"
+                  },
+                "TargetNavConsultantInvoiceApplication": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ConsultantInvoiceDetails",
+                    "viewName": "ConsultantInvoiceDetails"
+                },
+                "TargetAdminPaySlip": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "AdminPaySlip",
+                    "viewName": "AdminPaySlip"
+                  },
+                  "TargetNavAdminPaySlipApp": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "AdminPaySlipDetails",
+                    "viewName": "AdminPaySlipDetails"
+                  }
             }
             },
             "rootView": {

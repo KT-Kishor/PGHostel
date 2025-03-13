@@ -1,4 +1,4 @@
-<mvc:View controllerName="sap.kt.com.minihrsolution.controller.NavigationConsultantInvoice" 
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.ConsultantInvoiceDetails" 
 	xmlns:mvc="sap.ui.core.mvc" 
 	displayBlock="true"
 	xmlns:f="sap.ui.layout.form"

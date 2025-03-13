@@ -1,0 +1,175 @@
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.AdminPaySlipDetails"
+   xmlns:mvc="sap.ui.core.mvc" 
+    displayBlock="true"
+	xmlns:f="sap.ui.layout.form"
+	xmlns="sap.uxap"
+	xmlns:g="sap.f"
+	xmlns:core="sap.ui.core"
+	xmlns:layout="sap.ui.layout"
+	xmlns:m="sap.m">
+   <m:Page title="{i18n>paySlipTitle}" navButtonPress="onBack" showNavButton="true">
+		<ObjectPageLayout id="idNavAdmin"  enableLazyLoading="true"
+            useIconTabBar="false"
+            class="sapUiSmallmarginResponsive">
+			<sections>
+				<ObjectPageSection id="idFirst" titleUppercase="false">
+					<subSections>
+						<ObjectPageSubSection titleUppercase="false">
+							<blocks>
+								<m:VBox>
+									<m:HBox justifyContent="Start" alignItems="Center" width="100%">
+										<m:Label text="{i18n>selectID}" class="sapUiSmallMarginEnd" />
+										<m:ComboBox showSecondaryValues="true" id="idemployee" change="onEmployeeIDChange" 
+											items="{Employeemodel>/employees}" 
+											class="sapUiSmallMarginEnd">
+											<core:ListItem key="{Employeemodel>key}" text="{Employeemodel>key}" additionalText="{Employeemodel>text}"/>
+										</m:ComboBox>
+										<m:Label text="{i18n>selectMonth}" class="sapUiSmallMarginEnd" />
+										<m:ComboBox showSecondaryValues="true" id="idbg" items="{MonthsModel>/results}" value="{payrollModel>/Month}" change="onMonthChange" class="sapUiSmallMarginEnd"  editable="false">
+											<core:Item key="{MonthsModel>ID}" text="{MonthsModel>Month}" />
+										</m:ComboBox>
+										<m:Label text="{i18n>year}" class="sapUiSmallMarginEnd" />
+										<m:DatePicker width="50%" id="idpayroll" value="{path: 'payrollModel>/Year', type: 'sap.ui.model.type.String'}"
+                                         displayFormat="yyyy" change="handleChange" class="sapUiSmallMarginEnd" editable="false"/>
+										<m:Button text="{i18n>go}" press="onFetchEmployeedetails" class="sapUiSmallMarginBeginEnd" visible="false"/>
+									</m:HBox>
+								</m:VBox>
+							</blocks>
+						</ObjectPageSubSection>
+						<ObjectPageSubSection titleUppercase="false" title="{i18n>employeedetails}">
+							<blocks>
+								<m:VBox>
+									<m:HBox>
+										<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" columnsXL="3" columnsL="3" columnsM="3">
+											<f:content>
+											  <m:Label text="{i18n>employeeIDAndEmployeeName}" />
+												<m:Text text="{payrollModel>/ID} - {payrollModel>/EmployeeName}" />
+												<m:Label text="{i18n>baseLocation}" />
+												<m:Text text="{payrollModel>/BaseLocation}" />
+												<m:Label text="{i18n>bankName}" />
+												<m:Text text="{payrollModel>/BankName}" />
+												<m:Label text="{i18n>accountNo}" />
+												<m:Text text="{payrollModel>/AccountNo}" />
+												<m:Label text="{i18n>payableDays}" />
+												<m:Text text="{payrollModel>/PayableDays}" id="payableDaysInput"/>
+												<m:Label text="{i18n>PAN}"  />
+												<m:Text text="{payrollModel>/PAN}" />
+												<m:Label text="{i18n>department}" />
+												<m:Text text="{payrollModel>/Designation}" />
+												<m:Label text="{i18n>role}" />
+												<m:Text text="{payrollModel>/Role}" />
+												<m:Label text="{i18n>joiningDate}" />
+												<m:Text text="{payrollModel>/AppraisalDate}"/>
+											</f:content>
+										</f:SimpleForm>
+									</m:HBox>
+								</m:VBox>
+							</blocks>
+						</ObjectPageSubSection>
+					<!-- Salary Details SubSection -->
+<ObjectPageSubSection titleUppercase="false" title="{i18n>salaryDetailsEmployee}">
+    <m:VBox class="sapUiSmallMargin">
+        <!-- GridContainer for Tables -->
+        <g:GridContainer columnsChange=".onGridColumnsChange">
+            <g:layout>
+                <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+            </g:layout>
+            <g:layoutXS>
+                <g:GridContainerSettings columnSize="100%" gap="10px" />
+            </g:layoutXS>
+            <g:layoutS>
+                <g:GridContainerSettings columnSize="100%" gap="10px" />
+            </g:layoutS>
+            <g:layoutM>
+                <g:GridContainerSettings columnSize="100%" gap="10px" />
+            </g:layoutM>
+            <!-- Earnings Table -->
+            <m:VBox class="sapUiSmallMargin">
+                <m:Toolbar>
+                    <m:ToolbarSpacer />
+                    <m:Button type="Transparent" icon="sap-icon://add" tooltip="{i18n>addSalaryField}" press="onAddSalaryField" />
+                    <m:ToolbarSeparator />
+                </m:Toolbar>
+                <m:Table id="idSalaryTable" items="{EarningModel>/SalaryFields}" mode="Delete" delete="onPressDeleteSalaryFields">
+                    <m:columns>
+                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                            <m:Text text="{i18n>desc}" />
+                        </m:Column>
+                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                            <m:Text text="{i18n>amount}" />
+                        </m:Column>
+                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                            <m:Text text="{i18n>yearlyAmount}" />
+                        </m:Column>
+                    </m:columns>
+                    <m:items>
+                        <m:ColumnListItem>
+                            <m:cells>
+                                <m:Input value="{EarningModel>Description}" maxLength="25" editable="{= ${EarningModel>Flag} === true }" />
+                                <m:Input value="{EarningModel>Amount}" change="onEarningAmountChange" textAlign="End" type="Number" />
+                                <m:Input value="{EarningModel>Year}" editable="false" textAlign="End" type="Number" />
+                            </m:cells>
+                        </m:ColumnListItem>
+                    </m:items>
+                </m:Table>
+                <m:HBox class="customEarningBox" width="100%">
+                    <m:Text class="boldBlackText" text="{i18n>totalEarningAmount} :" textAlign="End" />
+                    <m:Text class="boldBlackText" text="{path:'EarningModel>/TotalEarningMonth', formatter: '.Formatter.numberFormater'}" textAlign="End" />
+                    <m:Text class="boldBlackText" text="{path:'EarningModel>/TotalEarningYearly', formatter: '.Formatter.numberFormater'}" textAlign="End" />
+                </m:HBox>
+            </m:VBox>
+            <!-- Deductions Table -->
+            <m:VBox class="sapUiSmallMargin">
+                <m:Toolbar>
+                    <m:ToolbarSpacer />
+                    <m:Button type="Transparent" icon="sap-icon://add" tooltip="{i18n>addDeductionField}" press="onAddDeductionField" />
+                    <m:ToolbarSeparator />
+                </m:Toolbar>
+                <m:Table items="{DeductionModel>/DeductionFields}" mode="Delete" delete="onPressDeleteDeductionFields">
+                    <m:columns>
+                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                            <m:Text text="{i18n>desc}" />
+                        </m:Column>
+                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                            <m:Text text="{i18n>amount}" />
+                        </m:Column>
+                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                            <m:Text text="{i18n>yearlyAmount}" />
+                        </m:Column>
+                    </m:columns>
+                    <m:items>
+                        <m:ColumnListItem>
+                            <m:cells>
+                                <m:Input value="{DeductionModel>Description}" maxLength="25" editable="{= ${DeductionModel>Flag} === true }"/>
+                                <m:Input value="{DeductionModel>Amount}" change="onDeductionAmountChange" textAlign="End" type="Number"/>
+                                <m:Input value="{DeductionModel>Year}" editable="false" textAlign="End" type="Number" />
+                            </m:cells>
+                        </m:ColumnListItem>
+                    </m:items>
+                </m:Table>
+                <m:HBox class="customDeductionBox" width="100%">
+                    <m:Text class="boldBlackText" text="{i18n>totalDeductionAmount} :" textAlign="End" />
+                    <m:Text class="boldBlackText" text="{path:'DeductionModel>/TotalDeductionMonth', formatter: '.Formatter.numberFormater'}" textAlign="Right" />
+                    <m:Text class="boldBlackText" text="{path:'DeductionModel>/TotalDeductionYearly', formatter: '.Formatter.numberFormater'}" textAlign="Right" />
+                </m:HBox>
+            </m:VBox>
+        </g:GridContainer>
+        <m:HBox class="customNetPayBox" width="100%">
+            <m:Text text="Net Pay ( INR ) :  {path: 'DeductionModel>/totalNetPay', formatter: '.Formatter.numberFormater'} ({DeductionModel>/totalNetPayText})"
+                class="boldBlackText" width="100%" />
+        </m:HBox>
+    </m:VBox>
+</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+			</sections>
+		</ObjectPageLayout>
+		<m:footer>
+			<m:Toolbar>
+				<m:ToolbarSpacer/>
+				<m:Button text="{i18n>submit}" type="Emphasized" press="onPressSubmit" class="sendMail"/>
+				<m:Button text="{i18n>jsPdf}" press="onPressGeneratePdf" class="sapUiSmallMarginBeginEnd" visible="false"/>
+			</m:Toolbar>
+		</m:footer>
+	</m:Page>
+</mvc:View>

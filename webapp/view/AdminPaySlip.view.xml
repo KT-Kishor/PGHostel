@@ -1,0 +1,90 @@
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.AdminPaySlip"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:m="sap.m.Table"
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core">
+    <Page id="idPaySlip">
+       <headerContent>
+			<Button  press="back" icon="sap-icon://home" />
+			<Text text="{i18n>paySlipTitle}" class="boldBlackText"></Text>
+			<ToolbarSpacer />
+			<Button   press="onSignout" icon="sap-icon://log"></Button>
+		</headerContent>
+        <content>
+       <fb:FilterBar id="idAdminPaySlip"
+    clear="onClear"
+    showClearOnFB="true"
+    search=".onSearch"
+    showFilterConfiguration="false"
+    showRestoreButton="true"
+    useToolbar="false">
+    <fb:filterGroupItems>
+        <fb:FilterGroupItem groupName="Basic" name="EmployeeID" label="Employee ID" visibleInFilterBar="true">
+            <fb:control>
+                <ComboBox id="cbEmployeeID" items="{/EmployeeList}" selectedKey="{filters>/EmployeeID}">
+                    <core:Item key="{EmployeeID}" text="{EmployeeName}" />
+                </ComboBox>
+            </fb:control>
+        </fb:FilterGroupItem>
+        <fb:FilterGroupItem groupName="Basic" name="Month" label="Month" visibleInFilterBar="true">
+            <fb:control>
+                <ComboBox id="cbMonth" items="{/MonthList}" selectedKey="{filters>/Month}">
+                    <core:Item key="{Month}" text="{Month}" />
+                </ComboBox>
+            </fb:control>
+        </fb:FilterGroupItem>
+    </fb:filterGroupItems>
+</fb:FilterBar>
+
+<Table id="idAdminPaySlipTable">
+     <headerToolbar>
+        <Toolbar>
+         <Title id="" text="Pay Slip Details"/>
+            <ToolbarSpacer />
+            <ToolbarSeparator />
+            <Button icon="sap-icon://add" tooltip="{i18n>addPaySlip}" press="onPressAddPayslip" />
+            <ToolbarSeparator />
+        </Toolbar>
+    </headerToolbar>
+    <columns>
+        <Column>
+            <Text text="{i18n>employeeID}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>employeeName}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>month}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>year}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>payableDays}" />
+        </Column>
+    </columns>
+    <items>
+        <ColumnListItem type="Navigation" press="onPressPayslip">
+            <cells>
+                <Text text="{EmployeeID}" />
+            </cells>
+            <cells>
+                <Text text="{EmployeeName}" />
+            </cells>
+            <cells>
+                <Text text="{Month}" />
+            </cells>
+            <cells>
+                <Text text="{Year}" />
+            </cells>
+            <cells>
+                <Text text="{PayableDays}" />
+            </cells>
+        </ColumnListItem>
+    </items>
+</Table>
+        </content>
+    </Page>
+</mvc:View>

@@ -34,6 +34,9 @@ sap.ui.define([
             },
             onpressContract: function () {
                 this.getRouter().navTo("RouteContractDetails")
-            } 
+            },
+            onPressAdminPaySlip: function () {
+                this.getRouter().navTo("RouteAdminPaySlip");
+            },
         });
     });

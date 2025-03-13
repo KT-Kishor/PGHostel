@@ -10,7 +10,7 @@ sap.ui.define([
 ],
     function (BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
         "use strict";
-        return BaseController.extend("sap.kt.com.minihrsolution.controller.NavigationConsultantInvoice", {
+        return BaseController.extend("sap.kt.com.minihrsolution.controller.ConsultantInvoiceDetails", {
             onInit: function () {
                 this.getRouter().getRoute("RouteNavConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
               },
