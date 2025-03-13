@@ -38,7 +38,7 @@
 									</Select>
 								</VBox>
 								<VBox width="78%">
-									<Input value="{oTraineeDetails>/TraineeName}" maxLength="50" placeholder="{i18n>placeTraineeName}" id="TD_id_Name" liveChange="validateName" class="sapUiTinyMarginBegin"/>
+									<Input value="{oTraineeDetails>/TraineeName}" maxLength="50" placeholder="{i18n>placeTraineeName}" id="TD_id_Name" liveChange="validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>nameEmployeeValueState}"/>
 								</VBox>
 							</HBox>
 							<Label text="{i18n>reportingManager}" required="true" />
@@ -48,7 +48,8 @@
                                                id="TD_id_ManagerSalutation"
                                                selectedKey="{oTraineeDetails>/RSalutation}"
                                                items="{Salutation>/salutation}"
-                                               width="100%">
+                                               width="100%"
+											   valueStateText="{i18n>nameEmployeeValueState}">
 										<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 									</Select>
 								</VBox>
@@ -59,14 +60,14 @@
 								</VBox>
 							</HBox>
 							<Label text="{i18n>emailId}" required="true" />
-							<Input value="{oTraineeDetails>/EmailID}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="validateEmail"/>
+							<Input value="{oTraineeDetails>/EmailID}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="validateEmail" valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>stipend}" required="true" />
-							<Input value="{oTraineeDetails>/Stipend}" maxLength="50" type="Number" placeholder="{i18n>placeStipend}" id="TD_id_Stipend" liveChange="validateAmount" />
+							<Input value="{oTraineeDetails>/Stipend}" maxLength="50" type="Number" placeholder="{i18n>placeStipend}" id="TD_id_Stipend" liveChange="validateAmount" valueStateText="{i18n>ammountValuState}"/>
 							<Select items="{currencyModel>/results}" selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" width="100%" class="marginLeft">
 								<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
 							</Select>
 							<Label text="{i18n>joiningDate}"  id="TD_id_Ljoin" required="true" />
-							<DatePicker width="50%" value="oTraineeDetails>/JoiningDate'}" id="TD_id_JoiningDate"  change="validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"/>
+							<DatePicker width="50%" value="oTraineeDetails>/JoiningDate'}" id="TD_id_JoiningDate"  change="validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
