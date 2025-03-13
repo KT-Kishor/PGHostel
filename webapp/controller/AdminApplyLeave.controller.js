@@ -22,5 +22,59 @@ sap.ui.define([
                 that.byId("idleavefilterbar").setVisible(true);
                 that.byId("idLeaveYear").setValue(new Date().getFullYear());
             },
+               // Function to open the leave apply dialog
+               onPressApplyLeave: function () {
+                var oView = this.getView();
+                // var loginData = this.getOwnerComponent().getModel("loginModel").getData(); // Fetch login data of the user
+                var currentYear = new Date().getFullYear();
+
+                var leaveJson = {
+                    EmployeeID: "",
+                    EmployeeName: "",
+                    Email: "",
+                    FromDate: "",
+                    ToDate: "",
+                    NoofDays: "",
+                    TypeOfLeave: "All In One Leave",
+                    Comments: "",
+                    Submit: true,
+                    Save: false,
+                    HalfDay: false,
+                    MinToDate: null,
+                    ManagerRemark: "",
+                    maxDate: new Date(currentYear, 11, 31),
+                    // minDate: new Date(this.JoiningDate[2], this.JoiningDate[1] - 1, this.JoiningDate[0])
+                };
+                var oLeaveTempModel = new JSONModel(leaveJson);
+                this.getView().setModel(oLeaveTempModel, "LeaveTempModel");
+
+                this.openLeaveDialog(oView);
+            },
+
+            // Open the leave dialog fragment
+            openLeaveDialog: function (oView) {
+                if (!this.oDialog) {
+                    sap.ui.core.Fragment.load({
+                        name: "sap.kt.com.minihrsolution.fragment.ApplyLeave",
+                        controller: this
+                    }).then(function (oDialog) {
+                        this.oDialog = oDialog;
+                        oView.addDependent(this.oDialog);
+                        // var aDatePickerIds = ["idFromDate", "idToDate"];
+                        // this.FragmentDatePickersReadOnly(aDatePickerIds);
+                        this.oDialog.open();
+                    }.bind(this));
+                } else {
+                    // var aDatePickerIds = ["idFromDate", "idToDate"];
+                    // this.FragmentDatePickersReadOnly(aDatePickerIds);
+                    this.oDialog.open();
+                }
+            },
+            onPressClose: function () {
+                this.oDialog.close();
+                sap.ui.getCore().byId("idFromDate").setValueState("None");
+                sap.ui.getCore().byId("idToDate").setValueState("None");
+                sap.ui.getCore().byId("idLeaveComments").setValueState("None");
+            },
         });
     });

@@ -1,0 +1,329 @@
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.NavigationConsultantInvoice" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	displayBlock="true"
+	xmlns:f="sap.ui.layout.form"
+	xmlns="sap.uxap"
+	xmlns:core="sap.ui.core"
+	xmlns:m="sap.m"
+	xmlns:smartTable="sap.ui.comp.smarttable">
+	<m:Page title="{i18n>generateConsultantInvoice}" navButtonPress="onBack" showNavButton="true">
+		<ObjectPageLayout id="idNavConsultantInvoicePage"
+            enableLazyLoading="true"
+            useIconTabBar="false">
+			<sections>
+				<ObjectPageSection id="idFirstSection" titleUppercase="false">
+					<subSections>
+						<ObjectPageSubSection titleUppercase="false" title="{i18n>invoiceHeaderDetails}">
+							<blocks>
+								<m:VBox >
+									<m:HBox justifyContent="Center">									
+										 <m:FlexBox class="sapUiSmallMarginBegin"
+											alignItems="Start"
+											justifyContent="Start" width="100%">
+										
+										<!-- Copy Button -->
+										<m:Button 
+											visible="{visiablityPlay>/copyBtn}" 
+											class="sendMail" 
+											type="Emphasized" 
+											icon="sap-icon://copy" 
+											text="{i18n>copy}" 
+											press="onPressCopyBtn" />
+
+										<!-- Paste Button -->
+										<m:Button 
+											visible="{visiablityPlay>/pasteBtn}" 
+											type="Emphasized" 
+											icon="sap-icon://paste" 
+											text="{i18n>paste}" 
+											press="onPressPasteBtn" />
+
+										<!-- ComboBox -->
+										<m:ComboBox 
+											id="idCont" 
+											showSecondaryValues="true" 
+											placeholder="Select Contract ID" 
+											change="onChangeContractDetails" 
+											width="{= ${visiablityPlay>/copyBtn} || ${visiablityPlay>/pasteBtn} ? '300px' : '500px'}"
+											items="{contractModel>/contractDetails}">
+											<core:ListItem 
+												key="{contractModel>ContractNo}" 
+												text="{contractModel>ContractNo} - {contractModel>ConsultantName}" />
+										</m:ComboBox>
+									</m:FlexBox>							
+									</m:HBox>
+									<!-- Form Content -->
+									<m:HBox>      
+										<f:SimpleForm
+											editable="true"
+											layout="ColumnLayout"
+											labelSpanXL="4"
+											labelSpanL="3"
+											labelSpanM="4"
+											labelSpanS="12"
+											columnsXL="2"
+											columnsL="2"
+											columnsM="1">
+											<f:content>
+												<m:Label text="{i18n>invoiceNo}" required="true" />
+												<m:Input id="idInvoiceNoFilter" value="{ConsultantInvoiceModel>/InvoiceNo}" editable="false" />
+												<m:Label text="{i18n>invoiceDate}" required="true" />
+												<m:DatePicker
+													displayFormat="dd/MM/yyyy"
+													valueFormat="dd/MM/yyyy"
+													value="{ConsultantInvoiceModel>/InvoiceDate}"
+													editable="{visiablityPlay>/editable}"
+													id="idInDate" change="onChangeInvoiceDate"/>
+												<m:Label text="{i18n>payBy}" required="true" />
+												<m:DatePicker
+													displayFormat="dd/MM/yyyy"
+													valueFormat="dd/MM/yyyy"
+													value="{ConsultantInvoiceModel>/PayBy}"
+													editable="{visiablityPlay>/editable}"
+													id="idPaybyInv" />
+												<m:Label text="{i18n>invoiceTo}" required="true" />
+												<m:Input
+													value="{ConsultantInvoiceModel>/InvoiceTo}"
+													id="idInputInvoiceTo"
+													liveChange="onPressLiveChange"
+													editable="{visiablityPlay>/editable}"
+													maxLength="50" />
+												<m:Label text="{i18n>invoiceAddress}" required="true" />
+												<m:TextArea
+													value="{ConsultantInvoiceModel>/InvoiceAddress}"
+													id="idInputInvoiceAddress"
+													liveChange="onPressLiveChange"
+													rows="2"
+													maxLength="120"
+													editable="{visiablityPlay>/editable}" />
+												<m:Label text="{i18n>CompGSTNO}" />
+												<m:Input
+													value="{ConsultantInvoiceModel>/CompanyGSTNO}"
+													id="idInputCompGSTNO"
+													liveChange="onPressLiveChange"
+													editable="{visiablityPlay>/editable}"
+													maxLength="20" />
+											</f:content>
+										</f:SimpleForm>
+									</m:HBox>
+								</m:VBox>
+							</blocks>							
+						</ObjectPageSubSection>
+						<ObjectPageSubSection titleUppercase="false" title="{i18n>ConsultantHeaderDetails}">
+							<blocks>
+								<f:SimpleForm
+                                    editable="true"
+                                    layout="ColumnLayout"
+                                    labelSpanXL="4"
+                                    labelSpanL="3"
+                                    labelSpanM="4"
+                                    labelSpanS="12"
+                                    columnsXL="2"
+                                    columnsL="2"
+                                    columnsM="1">
+									<f:content>
+										<m:Label text="{i18n>consultantName}" required="true" />
+										<m:Input value="{ConsultantInvoiceModel>/ConsultantName}" editable="{visiablityPlay>/editable}" />
+										<m:Label text="{i18n>mobileNo}" required="true" />
+										<m:Input value="{ConsultantInvoiceModel>/MobileNo}" id="idInputMobile" liveChange="onPressLiveChange" editable="{visiablityPlay>/editable}" maxLength="10"/>
+										<m:Label text="{i18n>consultantAddress}" required="true" />
+										<m:TextArea value="{ConsultantInvoiceModel>/ConsultantAddress}" maxLength="120" id="idInputConsultantAddress" liveChange="onPressLiveChange" rows="3" editable="{visiablityPlay>/editable}"/>
+										<m:Label text="{i18n>gstNo}"/>
+										<m:Input value="{ConsultantInvoiceModel>/GSTNO}" id="idInputGSTNO" liveChange="onPressLiveChange" change="onChangeGstNo" editable="{visiablityPlay>/editable}" maxLength="20" />
+										<m:Label text="{i18n>type}" required="{ConsultantInvoiceModel>/GSTValid}"/>
+										<m:CheckBox text="{i18n>cgst}" id="idCheckboxCGST" selected="{ConsultantInvoiceModel>/CGSTSelected}" select="onSelectCGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
+										<m:CheckBox text="{i18n>igst}" id="idCheckboxIGST" selected="{ConsultantInvoiceModel>/IGSTSelected}" select="onSelectIGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
+										<m:Label text="{i18n>percentage}" required="{ConsultantInvoiceModel>/GSTValid}" />
+										<m:Input value="{ConsultantInvoiceModel>/Percentage}" liveChange="onPercentageChange"  editable="{ConsultantInvoiceModel>/GSTValid}" maxLength="10"/>
+										<m:Label text="{i18n>currency}" required="true"/>
+										<m:Select items="{currencyModel>/results}"
+												selectedKey="{ConsultantInvoiceModel>/Currency}" width="100%" editable="{visiablityPlay>/editable}" change="onCurrencyChange">
+											<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
+										</m:Select>
+									</f:content>
+								</f:SimpleForm>
+							</blocks>
+						</ObjectPageSubSection>
+						<ObjectPageSubSection titleUppercase="false" title="{i18n>invoiceBankDetails}">
+							<blocks>
+								<f:SimpleForm
+                                    editable="true"
+                                    layout="ColumnLayout"
+                                    labelSpanXL="4"
+                                    labelSpanL="3"
+                                    labelSpanM="4"
+                                    labelSpanS="12"
+                                    columnsXL="2"
+                                    columnsL="2"
+                                    columnsM="1">
+									<f:content>
+										<m:Label text="{i18n>bankName}" required="true" />
+										<m:Input value="{ConsultantInvoiceModel>/BankName}" id="idInputBankName" liveChange="onPressLiveChange" editable="{visiablityPlay>/editable}" maxLength="50"/>
+										<m:Label text="{i18n>accountName}" required="true" />
+										<m:Input value="{ConsultantInvoiceModel>/AccountName}" id="idInputAccountName" liveChange="onPressLiveChange" editable="{visiablityPlay>/editable}" maxLength="50"/>
+										<m:Label text="{i18n>accountNo}" required="true" />
+										<m:Input value="{ConsultantInvoiceModel>/AccountNo}" id="idInputAccountNo" liveChange="onPressLiveChange" editable="{visiablityPlay>/editable}" maxLength="18"/>
+										<m:Label text="{i18n>ifscCode}" required="true" />
+										<m:Input value="{ConsultantInvoiceModel>/IFSCCode}" id="idInputIFSCCode" liveChange="onPressLiveChange" editable="{visiablityPlay>/editable}" maxLength="11"/>
+									</f:content>
+								</f:SimpleForm>
+							</blocks>
+						</ObjectPageSubSection>
+						<ObjectPageSubSection titleUppercase="false" title="{i18n>invoiceItemDetails}">
+							<blocks>
+								<m:VBox>
+    <!-- Toolbar -->
+    <m:OverflowToolbar>
+        <m:ToolbarSpacer />
+        <m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://add" tooltip="{i18n>addItem}" press="onPressAddInvoiceDetails" type="Emphasized" />
+        <m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://signature" tooltip="{i18n>addSignature}" press="onPressAddSignature" type="Emphasized" id="idSign" />
+        <m:ToolbarSeparator />
+    </m:OverflowToolbar>
+
+    <!-- Table -->
+    <m:Table id="idTable" mode="Delete" delete="onPressDelete" items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}">
+        <m:columns>
+            <m:Column width="100px">
+                <m:Text text="{i18n>siNo}" />
+            </m:Column>
+            <m:Column width="300px">
+                <m:Text text="{i18n>item}" />
+            </m:Column>
+            <m:Column>
+                <m:Text text="{i18n>SAC}" />
+            </m:Column>
+            <m:Column>
+                <m:Text text="{i18n>GSTCalculation}" />
+            </m:Column>
+            <m:Column>
+                <m:Text text="{i18n>days}" />
+            </m:Column>
+            <m:Column>
+                <m:Text text="{i18n>unitPrice}" />
+            </m:Column>
+            <m:Column>
+                <m:Text text="{i18n>discount}" />
+            </m:Column>
+            <m:Column>
+                <m:Text text="{i18n>total}" />
+            </m:Column>
+        </m:columns>
+
+        <m:items>
+            <m:ColumnListItem>
+                <m:cells>
+                    <m:Input value="{IndexNo}" editable="false" />
+                </m:cells>
+                <m:cells>
+                    <m:Input value="{Item}" editable="{visiablityPlay>/editable}" maxLength="60"/>
+                </m:cells>
+                <m:cells>
+                    <m:ComboBox showSecondaryValues="true" items="{InvoiceSACModel>/results}" value="{SAC}" editable="{ConsultantInvoiceModel>/GSTValid}" selectedKey="1">
+                        <core:ListItem key="{InvoiceSACModel>ID}" additionalText="{InvoiceSACModel>Description}" text="{InvoiceSACModel>SAC}" />
+                    </m:ComboBox>
+                </m:cells>
+                <m:cells>
+                    <m:ComboBox value="{GSTCalculation}" selectedKey="1" editable="{ConsultantInvoiceModel>/GSTValid}" change="onChangeGSTCalculation">
+                        <core:Item key="{i18n>yes}" text="{i18n>yes}"/>
+                        <core:Item key="{i18n>no}" text="{i18n>no}"/>
+                    </m:ComboBox>
+                </m:cells>
+                <m:cells>
+                    <m:Input value="{Days}" editable="{visiablityPlay>/editable}" change="onInputChange" type="Number" maxLength="10" textAlign="End"/>
+                </m:cells>
+                <m:cells>
+                    <m:Input value="{UnitPrice}" editable="{visiablityPlay>/editable}" change="onInputChange" type="Number" maxLength="10" textAlign="End"/>
+                </m:cells>
+                <m:cells>
+                    <m:Input id="idDiscountInput" value="{Discount}" editable="{visiablityPlay>/editable}" liveChange="onchangeDiscount" maxLength="10" textAlign="End"/>
+                </m:cells>
+                <m:cells>
+                    <m:Input value="{path:'Total',formatter: '.Formatter.numberFormater'}" editable="false" textAlign="End"/>
+                </m:cells>
+            </m:ColumnListItem>
+        </m:items>
+    </m:Table>
+
+									<m:FlexBox class="custom-flexbox" direction="Column">
+										<m:VBox class="custom-vbox">
+											<!-- Sub Total(Non-Taxable) -->
+											<m:HBox justifyContent="SpaceBetween">
+												<m:Label text="{i18n>subTotal} ({i18n>NonTaxable}) ({ConsultantInvoiceModel>/Currency}) :" 
+                class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                visible="{= ${oModelDataPro>/TotalSum} > 0}" />
+												<m:Text text="{path:'oModelDataPro>/SubTotalNotGST',formatter: '.Formatter.numberFormater'}"
+                id="idSubTo"
+                class="amountText"
+                textAlign="End"
+                visible="{= ${oModelDataPro>/TotalSum} > 0}" />
+											</m:HBox>
+											<!-- Sub Total(Taxable) -->
+											<m:HBox justifyContent="SpaceBetween" visible="{= ${oModelDataPro>/SubTotal} > 0  }"  >
+												<m:Label text="{i18n>subTotal} ({i18n>Taxable}) ({ConsultantInvoiceModel>/Currency}) :" 
+                class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"/>
+												<m:Text text="{path:'oModelDataPro>/SubTotal',formatter: '.Formatter.numberFormater'}"
+                id="idSubtotal"
+                class="amountText" 
+                textAlign="End"/>
+											</m:HBox>
+											<!-- CGST -->
+											<m:HBox justifyContent="SpaceBetween">
+												<m:Label text="{= 'CGST ( ' + (${oModelDataPro>/CGSTPercentage} || ${ConsultantInvoiceModel>/Percentage}) + ' % ) : '}"
+                visible="{= ${oModelDataPro>/CGSTVisible} === true || ${ConsultantInvoiceModel>/CGSTVisible} === true}"
+                class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text text="{path:'oModelDataPro>/CGST',formatter: '.Formatter.numberFormater'}"
+                class="amountText"
+                textAlign="End"
+                visible="{= ${oModelDataPro>/CGSTVisible} === true || ${ConsultantInvoiceModel>/CGSTVisible} === true}" />
+											</m:HBox>
+											<!-- SGST -->
+											<m:HBox justifyContent="SpaceBetween">
+												<m:Label text="{= 'SGST ( ' + (${oModelDataPro>/SGSTPercentage} || ${ConsultantInvoiceModel>/Percentage}) + ' % ) : '}"
+                visible="{= ${oModelDataPro>/SGSTVisible} === true || ${ConsultantInvoiceModel>/SGSTVisible} === true}"
+                class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text text="{path:'oModelDataPro>/SGST',formatter: '.Formatter.numberFormater'}"
+                class="amountText"
+                textAlign="End"
+                visible="{= ${oModelDataPro>/SGSTVisible} === true || ${ConsultantInvoiceModel>/SGSTVisible} === true}" />
+											</m:HBox>
+											<!-- IGST -->
+											<m:HBox justifyContent="SpaceBetween">
+												<m:Label text="{= 'IGST ( ' + (${oModelDataPro>/IGSTPercentage} || ${ConsultantInvoiceModel>/Percentage}) + ' % ) : '}"
+                visible="{= ${oModelDataPro>/IGSTVisible} === true || ${ConsultantInvoiceModel>/IGSTVisible} === true}"
+                class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text text="{path:'oModelDataPro>/IGST',formatter: '.Formatter.numberFormater'}"
+                class="amountText"
+                textAlign="End"
+                visible="{= ${oModelDataPro>/IGSTVisible} === true || ${ConsultantInvoiceModel>/IGSTVisible} === true}" />
+											</m:HBox>
+											<!-- Total -->
+											<m:HBox justifyContent="SpaceBetween">
+												<m:Label text="{= ${i18n>total} + ' ( ' + ${ConsultantInvoiceModel>/Currency} + ' ) : '}"
+                class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                visible="{= ${oModelDataPro>/TotalSum} > 0}" />
+												<m:Text text="{path:'oModelDataPro>/TotalSum',formatter: '.Formatter.numberFormater'}"
+                id="TotalAmountId"
+                class="amountText"
+                textAlign="End"
+                visible="{= ${oModelDataPro>/TotalSum} > 0}" />
+											</m:HBox>
+										</m:VBox>
+									</m:FlexBox>
+								</m:VBox>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+			</sections>
+		</ObjectPageLayout>
+		<m:footer>
+			<m:Toolbar>
+				<m:ToolbarSpacer/>
+				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Emphasized" press="onPressSubmit" class="sendMail" />
+				<m:Button visible="{visiablityPlay>/editVisi}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"  press="onPressEdit" class="sendMail" />
+				<m:Button text="{i18n>buttonSendEmail}" id="idContractMail" press="onPressSendEmail" visible="{visiablityPlay>/merge}"/>
+				<m:Button text="{i18n>jsPdf}" press="onPressGeneratePdf"  visible="{visiablityPlay>/merge}" />
+			</m:Toolbar>
+		</m:footer>
+	</m:Page>
+</mvc:View>

@@ -115,6 +115,14 @@
 					</TileContent>
 				</GenericTile >
 
+				<GenericTile visible="{modelTileVisible>/QuotationApp}"
+                   class="sapUiMediumMargin"
+                    header="{i18n>headerQuotation}" press="onpressQuotaion">
+					<TileContent  unit="{i18n>subheader}">
+						<ImageContent src="sap-icon://my-sales-order" />
+					</TileContent>
+				</GenericTile>
+
 				<GenericTile visible="{modelTileVisible>/InvoiceApp}"
                     class="sapUiMediumMargin"
                     header="{i18n>headerCompanyInvoice}" press="onpressInvoiceApp">
@@ -128,14 +136,6 @@
                     header="{i18n>headerContractorInvoice}" press="onpressConsultantInvoice">
 					<TileContent  unit="{i18n>tileInvoiceFooter}">
 						<ImageContent src="sap-icon://monitor-payments" />
-					</TileContent>
-				</GenericTile>
-
-				<GenericTile visible="{modelTileVisible>/QuotationApp}"
-                   class="sapUiMediumMargin"
-                    header="{i18n>headerQuotation}" press="onpressQuotaion">
-					<TileContent  unit="{i18n>subheader}">
-						<ImageContent src="sap-icon://my-sales-order" />
 					</TileContent>
 				</GenericTile>
 

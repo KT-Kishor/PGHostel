@@ -29,5 +29,8 @@ sap.ui.define([
             onpressLeave: function () {
                 this.getRouter().navTo("RouteAdminApplyLeave")
             },  
+            onpressConsultantInvoice:function(){
+                this.getRouter().navTo("RouteConsultantInvoiceApplication")
+            },
         });
     });

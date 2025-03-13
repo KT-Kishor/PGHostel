@@ -1,0 +1,109 @@
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.ConsultantInvoice"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:m="sap.m.Table"
+    xmlns:f="sap.f"
+     xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core">
+    <Page id="idConsultantInvoicePage">
+		<headerContent>
+			<Button press="onBack" icon="sap-icon://home" />
+			<Text text="{i18n>consultantInvoice}" class="boldBlackText"></Text>
+			<ToolbarSpacer />
+			<Button press="onPressBack" icon="sap-icon://log"></Button>
+		</headerContent>
+        <content>
+       <fb:FilterBar id="idConsultantInvoiceFilterBar" persistencyKey="consultantInvoicePersKey" 
+    useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" 
+    filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false">
+
+    <fb:filterGroupItems>
+    <fb:FilterGroupItem name="InvoiceTo" label="Invoice To" groupName="ConsultantInvoice" visibleInFilterBar="true">
+        <fb:control>
+            <ComboBox id="idInvoiceTo"
+                items="{path:'oInvoiceModel>/InvoiceToList', length:1000}"
+                showSecondaryValues="true" showClearIcon="true">
+                <core:ListItem key="{oInvoiceModel>InvoiceToID}" text="{oInvoiceModel>InvoiceToName}" additionalText="{oInvoiceModel>InvoiceToID}" />
+            </ComboBox>
+        </fb:control>
+    </fb:FilterGroupItem>
+
+    <fb:FilterGroupItem name="InvoiceNo" label="Invoice No" groupName="ConsultantInvoice" visibleInFilterBar="true">
+        <fb:control>
+            <ComboBox id="idInvoiceNo"
+                items="{path:'oInvoiceModel>/InvoiceNoList', length:1000}"
+                showSecondaryValues="true" showClearIcon="true">
+                <core:ListItem key="{oInvoiceModel>InvoiceNoID}" text="{oInvoiceModel>InvoiceNo}" additionalText="{oInvoiceModel>InvoiceDate}" />
+            </ComboBox>
+        </fb:control>
+    </fb:FilterGroupItem>
+
+    <fb:FilterGroupItem name="EmployeeID" label="Employee ID" groupName="ConsultantInvoice" visibleInFilterBar="true">
+        <fb:control>
+            <ComboBox id="idContractEmployee"
+                items="{path:'oEmpModel>/results', length:1000 , sorter:{path:'Company',descending: false, group:true}}"
+                showSecondaryValues="true" showClearIcon="true">
+                <core:ListItem key="{oEmpModel>EmployeeID}" text="{oEmpModel>EmployeeName}" additionalText="{oEmpModel>EmployeeID}" />
+            </ComboBox>
+        </fb:control>
+    </fb:FilterGroupItem>
+</fb:filterGroupItems>
+</fb:FilterBar>
+<Table id="idConsultantInvoiceTable">
+    <headerToolbar>
+        <Toolbar>
+         <Title id="" text="Consultant Invoice Details"/>
+            <ToolbarSpacer />
+            <ToolbarSeparator />
+            <Button icon="sap-icon://add" tooltip="{i18n>addInvoice}" press="onPressAddInvoice" />
+            <ToolbarSeparator />
+        </Toolbar>
+    </headerToolbar>
+    <columns>
+        <Column>
+            <Text text="{i18n>employeeID}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>consultantName}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>invoiceNo}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>invoiceTo}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>invoiceDate}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>payBy}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>GSTNO}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>totalAmount}" />
+        </Column>
+        <Column>
+            <Text text="{i18n>currency}" />
+        </Column>
+    </columns>
+    <items>
+        <ColumnListItem type="Navigation" press="onPressInvoice">
+            <cells>
+                <Text text="{EmployeeID}" />
+                <Text text="{ConsultantName}" />
+                <Text text="{InvoiceNo}" />
+                <Text text="{InvoiceTo}" />
+                <Text text="{InvoiceDate}" />
+                <Text text="{PayBy}" />
+                <Text text="{GSTNO}" />
+                <Text text="{TotalSum}" />
+                <Text text="{Currency}" />
+            </cells>
+        </ColumnListItem>
+    </items>
+</Table>
+        </content>
+    </Page>
+</mvc:View>

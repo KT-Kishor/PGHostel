@@ -8,6 +8,7 @@
 			class="sapUiResponsiveContentPadding centeredTable">
 			<headerToolbar>
 				<Toolbar>
+				 <Title id="" text="Applied Leaves"/>
 					<ToolbarSpacer />
 					<ToolbarSeparator />
 					<Button icon="sap-icon://vertical-bar-chart" press="onPressBarChart" tooltip="Open Bar Charts" />

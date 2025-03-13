@@ -206,7 +206,21 @@
                     "target": [
                       "TargetAdminApplyLeave"
                     ]
-                }
+                },
+                {
+                    "name": "RouteConsultantInvoiceApplication",
+                    "pattern": "ConsultantInvoice",
+                    "target": [
+                      "TargetConsultantInvoiceApplication"
+                    ]
+                },
+                {
+                    "name": "RouteNavConsultantInvoiceApplication",
+                    "pattern": "NavigationConsultantInvoice/{sPath}/{oPath}",
+                    "target": [
+                      "TargetNavConsultantInvoiceApplication"
+                    ]
+                } 
             ],
             "targets": {
                 "TargetView1": {
@@ -275,6 +289,20 @@
                     "clearControlAggregation": false,
                     "viewId": "AdminApplyLeave",
                     "viewName": "AdminApplyLeave"
+                },
+                "TargetConsultantInvoiceApplication": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ConsultantInvoice",
+                    "viewName": "ConsultantInvoice"
+                },
+               "TargetNavConsultantInvoiceApplication": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "NavigationConsultantInvoice",
+                    "viewName": "NavigationConsultantInvoice"
                 }
             }
             },

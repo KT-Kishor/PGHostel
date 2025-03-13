@@ -15,21 +15,6 @@
        <content>
        <fb:FilterBar  id="idCardFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
-					<!-- <fb:FilterGroupItem name="Company" label="{i18n>company}" groupName="Group1" visibleInFilterBar="true">
-						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="{path:'CompanyDetails>/results',length:1000 }" change="onChangeCompanyName" id="idCompFilter" showClearIcon="true">
-								<core:ListItem key="{}" text="{}" additionalText="{}" />
-							</ComboBox>
-						</fb:control>
-					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Branch" label="{i18n>branch}" groupName="Group1" visibleInFilterBar="true">
-						<fb:control>
-							<ComboBox name="Branch"  items="{ path: 'BaseLocation>/results', length:1000,  sorter: { path: 'Company', descending: false,
-                                        group: true } }"  id="idBranchFilterBar" showClearIcon="true">
-								<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
-							</ComboBox>
-						</fb:control>
-					</fb:FilterGroupItem> -->
 					<fb:FilterGroupItem name="EmployeeName" label="{i18n>employeeName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox name="EmployeeName" items="{path:'oEmpModel>/results' ,length:1000 , sorter:{path:'Company',descending: false, group:true }}" id="idEmployeeNameAdmin" showSecondaryValues="true" showClearIcon="true">
@@ -43,22 +28,14 @@
     <Table id="idCardTable" mode="SingleSelectLeft" selectionChange="onSelectionChange">
         <headerToolbar>
          <OverflowToolbar>
-                        <Title
-                            text="ID Card ({= ${IdCardModel>/items}.length })"
-                            level="H2"
-                        />
-                        <ToolbarSpacer />
-                           </OverflowToolbar>
-            <Toolbar>
+                <Title id="" text="ID Card Details"/>
                 <ToolbarSpacer />
-                <ToolbarSeparator />
                 <Button icon="sap-icon://add" tooltip="{i18n>addCardDetails}" press="onPressIdCardDetails" />
                 <Button icon="sap-icon://edit" tooltip="{i18n>editCardDetails}" press="onPressIdCardDetailsEdit" id="idEditBtn"/>
                 <Button icon="sap-icon://delete" tooltip="{i18n>deleteCardDetails}" press="onPressIdCardDetailsDelete" id="idDeleteBtn"/>
                 <Button text="{i18n>GeneratePDF}" press="onPressMerge" id="idPdfBtn"/>
-                <ToolbarSeparator />
-            </Toolbar>
-        </headerToolbar>
+               </OverflowToolbar>
+            </headerToolbar>
         <columns>
             <Column><Text text="{i18n>employeeID}" /></Column>
             <Column><Text text="{i18n>employeeName}" /></Column>

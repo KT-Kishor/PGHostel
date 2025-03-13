@@ -55,10 +55,7 @@
                     >
                      <headerToolbar>
                     <OverflowToolbar>
-                        <Title
-                            text="ListOfHolidays ({= ${HolidayModel>/items}.length })"
-                            level="H2"
-                        />
+                       <Title id="" text="List Of Holidays"/>
                         <ToolbarSpacer />
                            </OverflowToolbar>
                 </headerToolbar>
