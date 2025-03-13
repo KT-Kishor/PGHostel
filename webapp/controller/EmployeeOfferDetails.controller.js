@@ -42,7 +42,7 @@ sap.ui.define([
                 this.validateStep();
             },
             EOD_onPressBack: function () {
-                this.getRouter().navTo("RouteOffer");
+                this.getRouter().navTo("RouteEmployeeOffer");
             },
             //Step validation
             validateStep: function () {

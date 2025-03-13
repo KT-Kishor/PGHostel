@@ -10,9 +10,9 @@ sap.ui.define([
 ],
     function (BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
         "use strict";
-        return BaseController.extend("sap.kt.com.minihrsolution.controller.Offer", {
+        return BaseController.extend("sap.kt.com.minihrsolution.controller.ContractDetails", {
             onInit: function () {
-                this.getRouter().getRoute("RouteOffer").attachMatched(this._onRouteMatched, this);
+                this.getRouter().getRoute("RouteContractDetails").attachMatched(this._onRouteMatched, this);
             },
             Ov_onSignout: function () {
                 this.getRouter().navTo("RouteLogin");

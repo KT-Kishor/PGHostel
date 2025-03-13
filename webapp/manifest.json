@@ -176,9 +176,9 @@
                     "target": "TargetTrainee"
                 },
                 {
-                    "name": "RouteOffer",
-                    "pattern": "Offer",
-                    "target": "TargetOffer"
+                    "name": "RouteEmployeeOffer",
+                    "pattern": "EmployeeOffer",
+                    "target": "TargetEmployeeOffer"
                 },
                 {
                     "name": "RouteEmployeeOfferDetails",
@@ -208,19 +208,13 @@
                     ]
                 },
                 {
-                    "name": "RouteConsultantInvoiceApplication",
-                    "pattern": "ConsultantInvoice",
+                    "name": "RouteContractDetails",
+                    "pattern": "ContractDetails",
                     "target": [
-                      "TargetConsultantInvoiceApplication"
-                    ]
-                },
-                {
-                    "name": "RouteNavConsultantInvoiceApplication",
-                    "pattern": "NavigationConsultantInvoice/{sPath}/{oPath}",
-                    "target": [
-                      "TargetNavConsultantInvoiceApplication"
-                    ]
-                } 
+                      "TargetContractDetails"
+                    ]   
+                    
+                }
             ],
             "targets": {
                 "TargetView1": {
@@ -257,11 +251,11 @@
                     "viewId": "Trainee",
                     "viewName": "Trainee"
                 },
-                "TargetOffer": {
+                "TargetEmployeeOffer": {
                     "viewType": "XML",
                     "transition": "slide",
-                    "viewId": "Offer",
-                    "viewName": "Offer"
+                    "viewId": "EmployeeOffer",
+                    "viewName": "EmployeeOffer"
                 },
                 "TargetEmployeeOfferDetails": {
                     "viewType": "XML",
@@ -290,19 +284,12 @@
                     "viewId": "AdminApplyLeave",
                     "viewName": "AdminApplyLeave"
                 },
-                "TargetConsultantInvoiceApplication": {
+                "TargetContractDetails": {
                     "viewType": "XML",
                     "transition": "slide",
                     "clearControlAggregation": false,
-                    "viewId": "ConsultantInvoice",
-                    "viewName": "ConsultantInvoice"
-                },
-               "TargetNavConsultantInvoiceApplication": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "NavigationConsultantInvoice",
-                    "viewName": "NavigationConsultantInvoice"
+                    "viewId": "ContractDetails",
+                    "viewName": "ContractDetails"
                 }
             }
             },

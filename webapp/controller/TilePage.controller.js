@@ -18,7 +18,7 @@ sap.ui.define([
 				this.getRouter().navTo("RouteTrainee");
 			},
             onPressOffer: function () {
-                this.getRouter().navTo("RouteOffer");
+                this.getRouter().navTo("RouteEmployeeOffer");
             },
             onpresslistofholidays: function () {
                 this.getRouter().navTo("RouteListofholidays",{Year:"Listofholidays"})
@@ -32,5 +32,8 @@ sap.ui.define([
             onpressConsultantInvoice:function(){
                 this.getRouter().navTo("RouteConsultantInvoiceApplication")
             },
+            onpressContract: function () {
+                this.getRouter().navTo("RouteContractDetails")
+            } 
         });
     });
