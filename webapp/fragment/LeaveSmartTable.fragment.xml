@@ -1,0 +1,63 @@
+<core:FragmentDefinition
+	xmlns="sap.m"	
+	xmlns:core="sap.ui.core">
+	<VBox id="idLeaveTable" >
+		<Table id="idLeaveTableStandard"
+			mode="SingleSelectLeft"
+			selectionChange="onSelectionChange"
+			class="sapUiResponsiveContentPadding centeredTable">
+			<headerToolbar>
+				<Toolbar>
+					<ToolbarSpacer />
+					<ToolbarSeparator />
+					<Button icon="sap-icon://vertical-bar-chart" press="onPressBarChart" tooltip="Open Bar Charts" />
+					<Button icon="sap-icon://create-leave-request" tooltip="{i18n>applyLeave}" press="onPressApplyLeave" />
+					<Button icon="sap-icon://edit" id="updatebtn" tooltip="{i18n>editDetails}" press="onPressUpdate" visible="{= ${Leave>Status} === 'Submitted' }"></Button>
+					<Button icon="sap-icon://delete" id="deletebtn" tooltip="{i18n>deleteDetails}" press="onPressLeaveDetailsDelete" visible="{= ${Leave>Status} === 'Submitted' }"></Button>
+					<ToolbarSeparator />
+				</Toolbar>
+			</headerToolbar>
+			<columns>
+				<Column minScreenWidth="Tablet" demandPopin="true">
+					<Text text="{i18n>fromDate}" />
+				</Column>
+				<Column minScreenWidth="Tablet" demandPopin="true">
+					<Text text="{i18n>toDate}" />
+				</Column>
+				<Column minScreenWidth="Tablet" demandPopin="true">
+					<Text text="{i18n>noOfDays}" />
+				</Column>
+				<Column minScreenWidth="Tablet" demandPopin="true">
+					<Text text="{i18n>typeOfLeave}" />
+				</Column>
+				<Column minScreenWidth="Tablet" demandPopin="true">
+					<Text text="{i18n>comments}" />
+				</Column>
+				<Column minScreenWidth="Tablet" demandPopin="true">
+					<Text text="{i18n>halfDay}" />
+				</Column>
+				<Column minScreenWidth="Tablet" demandPopin="true">
+					<Text text="{i18n>status}" />
+				</Column>
+				<Column minScreenWidth="Tablet" demandPopin="true">
+					<Text text="{i18n>managerRemarksLeave}" />
+				</Column>
+			</columns>
+			<items>
+				<ColumnListItem>
+					<cells>
+						<Text text="{FromDate}" />
+						<Text text="{ToDate}" />
+						<Text text="{NoofDays}" />
+						<Text text="{TypeOfLeave}" />
+						<Text text="{Comments}" />
+						<CheckBox selected="{= ${HalfDay} === 'true'}" editable="false"/>
+						<ObjectStatus inverted="true" text="{Status}" state="{path: 'Status', formatter: '.Formatter.statusStateFormatter'}" />
+						<Text text="{ManagerRemark}" />
+						<Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" />
+					</cells>
+				</ColumnListItem>
+			</items>
+		</Table>
+	</VBox>
+</core:FragmentDefinition>

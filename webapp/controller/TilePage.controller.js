@@ -20,8 +20,14 @@ sap.ui.define([
             onPressOffer: function () {
                 this.getRouter().navTo("RouteOffer");
             },
-            
-         
-           
+            onpresslistofholidays: function () {
+                this.getRouter().navTo("RouteListofholidays",{Year:"Listofholidays"})
+            },
+            onpressIDCARD: function () {
+                this.getRouter().navTo("RouteIDCardApplication")
+            },
+            onpressLeave: function () {
+                this.getRouter().navTo("RouteAdminApplyLeave")
+            },  
         });
     });

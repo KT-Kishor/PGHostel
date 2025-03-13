@@ -1,0 +1,93 @@
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.IdCard"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:m="sap.m.Table"
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core">
+    <Page id="idIDCardPage">
+      <headerContent>
+			<Button  press="onBack" icon="sap-icon://home" />
+			<Text text="{i18n>idCard}" class="boldBlackText"></Text>
+			<ToolbarSpacer />
+			<Button   press="onPressBack" icon="sap-icon://log"></Button>
+		</headerContent>
+       <content>
+       <fb:FilterBar  id="idCardFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+				<fb:filterGroupItems>
+					<!-- <fb:FilterGroupItem name="Company" label="{i18n>company}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox  showSecondaryValues= "true"  items="{path:'CompanyDetails>/results',length:1000 }" change="onChangeCompanyName" id="idCompFilter" showClearIcon="true">
+								<core:ListItem key="{}" text="{}" additionalText="{}" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Branch" label="{i18n>branch}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox name="Branch"  items="{ path: 'BaseLocation>/results', length:1000,  sorter: { path: 'Company', descending: false,
+                                        group: true } }"  id="idBranchFilterBar" showClearIcon="true">
+								<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem> -->
+					<fb:FilterGroupItem name="EmployeeName" label="{i18n>employeeName}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox name="EmployeeName" items="{path:'oEmpModel>/results' ,length:1000 , sorter:{path:'Company',descending: false, group:true }}" id="idEmployeeNameAdmin" showSecondaryValues="true" showClearIcon="true">
+								<core:ListItem key="{oEmpModel>EmployeeID}" text="{oEmpModel>EmployeeName}" additionalText="{oEmpModel>EmployeeID}" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>  
+    <!-- Table -->
+    <Table id="idCardTable" mode="SingleSelectLeft" selectionChange="onSelectionChange">
+        <headerToolbar>
+         <OverflowToolbar>
+                        <Title
+                            text="ID Card ({= ${IdCardModel>/items}.length })"
+                            level="H2"
+                        />
+                        <ToolbarSpacer />
+                           </OverflowToolbar>
+            <Toolbar>
+                <ToolbarSpacer />
+                <ToolbarSeparator />
+                <Button icon="sap-icon://add" tooltip="{i18n>addCardDetails}" press="onPressIdCardDetails" />
+                <Button icon="sap-icon://edit" tooltip="{i18n>editCardDetails}" press="onPressIdCardDetailsEdit" id="idEditBtn"/>
+                <Button icon="sap-icon://delete" tooltip="{i18n>deleteCardDetails}" press="onPressIdCardDetailsDelete" id="idDeleteBtn"/>
+                <Button text="{i18n>GeneratePDF}" press="onPressMerge" id="idPdfBtn"/>
+                <ToolbarSeparator />
+            </Toolbar>
+        </headerToolbar>
+        <columns>
+            <Column><Text text="{i18n>employeeID}" /></Column>
+            <Column><Text text="{i18n>employeeName}" /></Column>
+            <Column><Text text="{i18n>DOB}" /></Column>
+            <Column><Text text="{i18n>bloodGroup}" /></Column>
+            <Column><Text text="{i18n>mobileNo}" /></Column>
+            <Column><Text text="{i18n>designation}" /></Column>
+            <Column><Text text="{i18n>email}" /></Column>
+        </columns>
+        <items>
+            <ColumnListItem>
+                <cells>
+                    <Text text="{IdCardModel>EmployeeID}" />
+                    <Text text="{IdCardModel>EmployeeName}" />
+                    <Text text="{IdCardModel>DOB}" />
+                    <Text text="{IdCardModel>BloodGroup}" />
+                    <Text text="{IdCardModel>MobileNo}" />
+                    <Text text="{IdCardModel>Designation}" />
+                    <Text text="{IdCardModel>Email}" />
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</content>
+<footer>
+    <Toolbar>
+        <ToolbarSpacer/>
+        <Button text="{i18n>visit}" press="onPressVisitCard" id="idVisitfBtn"/>
+    </Toolbar>
+</footer>
+    </Page>
+</mvc:View>

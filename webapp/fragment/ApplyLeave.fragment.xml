@@ -1,0 +1,65 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core">
+	<Dialog
+        title="{i18n>applyLeave}">
+		<f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="3"
+            labelSpanL="3"
+            labelSpanM="3"
+            labelSpanS="12"
+            adjustLabelSpan="false"
+            emptySpanXL="4"
+            emptySpanL="4"
+            emptySpanM="4"
+            emptySpanS="0"
+            columnsXL="1"
+            columnsL="1"
+            columnsM="1"
+            singleContainerFullSize="false">
+			<f:content>
+				<!-- Employee ID -->
+				<Label text="{i18n>employeeID}" required="true" />
+				<Input  value="{LeaveTempModel>/EmployeeID}" editable="false" maxLength="50"/>
+				<!-- Employee Name -->
+				<Label text="{i18n>employeeName}" required="true"/>
+				<Input  value="{LeaveTempModel>/EmployeeName}" editable="false" maxLength="50"/>
+				<!-- Email -->
+				<Label text="{i18n>emailID}" required="true" />
+				<Input value="{LeaveTempModel>/Email}" maxLength="100"  editable="false"/>
+				<!-- Leave Type -->
+				<Label text="{i18n>type}" required="true"/>
+				<Select items="{leaveTypeModel>/results}" change="sType" selectedKey="{LeaveTempModel>/TypeOfLeave}" >
+					<core:Item key="{leaveTypeModel>Name}" text="{leaveTypeModel>Name}" />
+				</Select>
+				<VBox>
+					<!-- From Date -->
+					<Label text="{i18n>fromDate}" required="true" />
+					<DatePicker value="{LeaveTempModel>/FromDate}" id="idFromDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" maxDate="{LeaveTempModel>/maxDate}"
+                     change="onFromDateChange" liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend" minDate="{LeaveTempModel>/minDate}"/>
+					<!-- To Date -->
+					<Label text="{i18n>toDate}" required="true" />
+					<DatePicker minDate="{path: 'LeaveTempModel>/MinToDate'}" id="idToDate" value="{LeaveTempModel>/ToDate}" displayFormat="dd/MM/yyyy" maxDate="{LeaveTempModel>/maxDate}" 
+                valueFormat="dd/MM/yyyy" change="onToDateChange" liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend"/>
+					<!-- Half Day CheckBox -->
+					<CheckBox text="{i18n>halfDay}" select="onHalfDaySelect" selected="{LeaveTempModel>/HalfDay}"/>
+				</VBox>
+				<!-- Number of Days -->
+				<Label text="{i18n>noOfDays}" required="true"/>
+				<Input  value="{LeaveTempModel>/NoofDays}" editable="false" liveChange="onLiveChange" maxLength="20"/>
+				<!-- Add Feedback -->
+				<Label text="{i18n>comments}" required="true"></Label>
+				<TextArea value="{LeaveTempModel>/Comments}" rows="2" id="idLeaveComments" liveChange="onLiveLeaveComments"  maxLength="200" placeholder="{i18n>enterComments}"/>
+			</f:content>
+		</f:SimpleForm>
+		<!-- Buttons for Submit and Close actions -->
+		<FlexBox justifyContent="End" width="100%">
+			<Button text="{i18n>submit}" type="Emphasized" press="onPressSubmit" class="sendMail" visible="{LeaveTempModel>/Submit}"/>
+			<Button text="{i18n>save}" type="Emphasized" press="onPressSave" class="sendMail" visible="{LeaveTempModel>/Save}"/>
+			<Button text="{i18n>close}" class="sendMail" press="onPressClose" />
+		</FlexBox>
+	</Dialog>
+</core:FragmentDefinition>

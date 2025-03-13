@@ -1,0 +1,100 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified">
+	<Dialog title="{i18n>addCardDetails}">
+		<MessageStrip
+            text="{i18n>imageMsg}"
+            type="Warning"
+            showIcon="true"
+            class="sapUiTinyMarginBottom" />
+		<f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="3"
+            labelSpanL="3"
+            labelSpanM="3"
+            labelSpanS="12"
+            adjustLabelSpan="false"
+            emptySpanXL="4"
+            emptySpanL="4"
+            emptySpanM="4"
+            emptySpanS="0"
+            columnsXL="1"
+            columnsL="1"
+            columnsM="1"
+            singleContainerFullSize="false">
+			<f:content>
+				<Label text="Employee Type" required="true"/>
+				<RadioButtonGroup id="idGroupC"  selectedIndex="0" select="onRadioButtonSelect"  class="center-content" columns="2" editable="{IdCardModel>/isEditable}">
+					<RadioButton text="{i18n>employeeOffer}" />
+					<RadioButton text="{i18n>contractOffer}" />
+				</RadioButtonGroup>
+				<!-- Employee ID -->
+				<Label text="{i18n>employeeID}"  required="true" />
+				<ComboBox
+    id="comboBox"
+    showSecondaryValues="true"
+    value="{IdCardModel>/EmployeeID}" editable="{IdCardModel>/isEditable}" 
+    change=".onEmployeeIDChange">
+					<items>
+						<core:ListItem
+            key="{IdCardModel>key}"
+            text="{IdCardModel>key}"
+            additionalText="{IdCardModel>text}" />
+					</items>
+				</ComboBox>
+				<!-- Employee Name -->
+				<Label text="{i18n>employeeName}" required="true" />
+				<Input value="{IdCardModel>/EmployeeName}" maxLength="50" id="idNameid" liveChange="liveChangeValuState" editable="{IdCardModel>/isEditable}" />
+				<!-- Designation -->
+				<Label text="{i18n>designation}" required="true"/>
+				<Input value="{IdCardModel>/Designation}" maxLength="50" id="idDesiid" liveChange="liveChangeValuState "/>
+				<!-- Email -->
+				<Label text="{i18n>email}" required="true"/>
+				<Input value="{IdCardModel>/Email}" maxLength="100" id="idMailid" liveChange="validateMailID"/>
+				<!-- DOB -->
+				<Label text="{i18n>dateOfBirth}" required="true" />
+				<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{IdCardModel>/DOB}" id="idDateBirth" maxDate="{IdCardModel>/today}" initialFocusedDateValue="{IdCardModel>/minDOB}" change="liveChangeValuState"/>
+				<!-- MobileNo -->
+				<Label text="{i18n>mobileNo}" required="true"/>
+				<Input value="{IdCardModel>/MobileNo}" maxLength="10" id="idMoid" liveChange="validateMobileNo" />
+				<!-- BloodGroup -->
+				<Label text="{i18n>bloodGroup}" required="true" />
+				<ComboBox showSecondaryValues="true" id="idbgid"  items="{BloodGroupModel>/results}" change="liveChangeValuState" value="{IdCardModel>/BloodGroup}" >
+					<core:Item key="{BloodGroupModel>ID}" text="{BloodGroupModel>Code}" />
+				</ComboBox>
+				<!-- File Uploader -->
+				<Label text="{i18n>fileUploader}" required="true"/>
+				<HBox width="100%" justifyContent="Start" alignItems="Center">
+					<VBox width="30%">
+						<u:FileUploader                       
+                        name="myFileUpload"
+                        uploadUrl="upload/"
+                        tooltip="{i18n>fileUploadId}"
+                        change="onHandleUploadPress"
+                        buttonOnly="true"  
+						id="idfile"                  
+                        uploadComplete="handleUploadComplete"/>
+					</VBox>
+					<VBox width="70%" >
+						<Text text="{TextDisplay>/name}"></Text>
+					</VBox>
+				</HBox>
+				<Label text="{i18n>picture}"/>
+				<Button text="{i18n>openCamera}" icon="sap-icon://camera" press="onPressOpenCamera" />
+				<Label/>
+				<VBox id="canvasContainer" visible="true" class="sapUiSmallMargin canvas">
+					<core:HTML content="&lt;canvas id='canvas' class='passport-size-canvas'&gt;&lt;/canvas&gt;" />
+				</VBox>
+			</f:content>
+		</f:SimpleForm>
+		<!-- Buttons for Submit and Close actions -->
+		<FlexBox justifyContent="End" width="100%">
+			<Button text="{i18n>submit}" type="Emphasized" press="onPressSubmit" class="sendMail" visible="{IdCardModel>/Submit}"/>
+			<Button text="{i18n>save}" type="Emphasized" press="onPressSave" class="sendMail" visible="{IdCardModel>/Save}"/>
+			<Button text="{i18n>close}" class="sendMail" press="onPressClose" />
+		</FlexBox>
+	</Dialog>
+</core:FragmentDefinition>

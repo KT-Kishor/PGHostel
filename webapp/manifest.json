@@ -116,6 +116,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Salutation.json",
                 "preload": true
+            },
+            "Months": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Months.json",
+                "preload": true
             }
         },
         "resources": {
@@ -180,6 +185,27 @@
                     "pattern": "EmployeeOfferDetails",
                     "target": "TargetEmployeeOfferDetails"
 
+                },
+                {
+                    "name": "RouteListofholidays",
+                    "pattern": "Listofholidays/{Year}",
+                    "target": [
+                      "TargetListofholidays"
+                    ]
+                },
+                {
+                    "name": "RouteIDCardApplication",
+                    "pattern": "IdCard",
+                    "target": [
+                      "TargetIDCardApplication"
+                    ]
+                },
+                {
+                    "name": "RouteAdminApplyLeave",
+                    "pattern": "AdminApplyLeave",
+                    "target": [
+                      "TargetAdminApplyLeave"
+                    ]
                 }
             ],
             "targets": {
@@ -228,6 +254,27 @@
                     "transition": "slide",
                     "viewId": "EmployeeOfferDetails",
                     "viewName": "EmployeeOfferDetails"
+                },
+                "TargetListofholidays": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "Listofholidays",
+                    "viewName": "Listofholidays"
+                },
+                "TargetIDCardApplication": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "IdCard",
+                    "viewName": "IdCard"
+                },
+                "TargetAdminApplyLeave": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "AdminApplyLeave",
+                    "viewName": "AdminApplyLeave"
                 }
             }
             },
