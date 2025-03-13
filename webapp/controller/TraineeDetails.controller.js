@@ -7,7 +7,6 @@ sap.ui.define([
     "sap/ui/model/FilterOperator",
     "sap/m/MessagePopover",
     "sap/m/MessageItem"
-
 ],
     function (BaseController, utils, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
         "use strict";
@@ -51,15 +50,17 @@ sap.ui.define([
                 this.getView().setModel(oModel, "oTraineeDetails");
             },
             validateStep: function () {
-                var oView = this.getView();
-                var isValid = utils._LCvalidateName(oView.byId("TD_id_Name"), "ID") &&
-                    utils._LCvalidateName(oView.byId("TD_id_ReportingManager"), "ID") &&
-                    utils._LCvalidateEmail(oView.byId("TD_id_EmailID"), "ID") &&
-                    utils._LCvalidateAmount(oView.byId("TD_id_Stipend"), "ID") &&
-                    utils._LCvalidateDate(oView.byId("TD_id_JoiningDate"), "ID");
-
-                this.byId("TD_id_Wizard").getSteps()[0].setValidated(isValid);
+                // Check if all fields have values
+                var allFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getValue() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_Stipend").getValue() && this.getView().byId("TD_id_JoiningDate").getValue();
+                if (allFieldsFilled) {
+                    // Validate each field directly
+                    var isValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCvalidateAmount(this.getView().byId("TD_id_Stipend"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
+                    this.byId("TD_id_Wizard").getSteps()[0].setValidated(isValid);
+                } else {
+                    this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
+                }
             },
+
             TD_onSubmitData: function (oEvent) {
                 try {
                     if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {

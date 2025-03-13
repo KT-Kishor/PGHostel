@@ -10,7 +10,7 @@
 	<Page id="Ov_id_Page" >
 		<headerContent>
 			<Button  press="Ov_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>empOffPageTitle}" class="boldBlackText"></Text>
+			<Text text="{i18n>headerEmpDetails}" class="boldBlackText"></Text>
 			<ToolbarSpacer />
 			<Button  press="Ov_onSignout" icon="sap-icon://log"></Button>
 		</headerContent>
