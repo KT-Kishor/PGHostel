@@ -28,13 +28,13 @@ sap.ui.define(
           var oYearModel = this.getView().getModel("yearModel");
           if (this.YearData !== "Listofholidays") {
             var selectedYear = oYearModel.getProperty("/selectedYear");
-            this.byId("idHolidays").setValue(selectedYear);
+            this.byId("LOH_id_Holidays").setValue(selectedYear);
           } else {
             var selectedYear = oYearModel.setProperty(
               "/selectedYear",
               new Date().getFullYear()
             );
-            this.byId("idHolidays").setValue(new Date().getFullYear());
+            this.byId("LOH_id_Holidays").setValue(new Date().getFullYear());
           }
           this.HolidayReadCall();
         },
