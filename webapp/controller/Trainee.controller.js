@@ -15,7 +15,7 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
             T_onSignout: function () {
-                this.getRouter().navTo("RouteLogin");
+                this.getRouter().navTo("RouteLoginPage");
             },
             T_onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");

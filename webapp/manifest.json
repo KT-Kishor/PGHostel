@@ -215,6 +215,14 @@
                     ]         
                 },
                 {
+                    "name": "RouteContract",
+                    "pattern": "Contract",
+                    "target": [
+                      "TargetContract"
+                    ]   
+
+                },
+                {
                     "name": "RouteConsultantInvoiceApplication",
                     "pattern": "ConsultantInvoice",
                     "target": [
@@ -317,6 +325,13 @@
                     "clearControlAggregation": false,
                     "viewId": "ContractDetails",
                     "viewName": "ContractDetails"
+                },
+                "TargetContract": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "Contract",
+                    "viewName": "Contract"
                 },
                 "TargetConsultantInvoiceApplication": {
                     "viewType": "XML",

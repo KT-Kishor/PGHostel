@@ -1,30 +1,84 @@
 sap.ui.define([
-    "./BaseController", //call base controller
+    "./BaseController",
+    "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessagePopover",
     "sap/m/MessageItem"
-
 ],
-    function (BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
+    function (BaseController, utils, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.ContractDetails", {
             onInit: function () {
                 this.getRouter().getRoute("RouteContractDetails").attachMatched(this._onRouteMatched, this);
             },
-            Ov_onSignout: function () {
-                this.getRouter().navTo("RouteLogin");
+            _onRouteMatched: function (oEvent) {
+                this.byId("CD_id_Wizard").getSteps()[0].setValidated(false);
             },
-            Ov_onPressback: function () {
-                this.getRouter().navTo("RouteTilePage");
+            validateName: function (oEvent) {
+                utils._LCvalidateName(oEvent);
+                this.validateStep();
             },
-            Ov_onPressAddEmployee:function(){
-           this.getRouter().navTo("RouteEmployeeOfferDetails");
-            }
+            validateEmail: function (oEvent) {
+                utils._LCvalidateEmail(oEvent);
+                this.validateStep();
+            },
+            validateAmount: function (oEvent) {
+                utils._LCvalidateAmount(oEvent);
+                this.validateStep();
+            },
+            validateDate: function (oEvent) {
+                utils._LCvalidateDate(oEvent);
+                this.validateStep();
+            },
+            ValidateCommonFields: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+                this.validateStep();
+            },
+            CD_onPressback: function () {
+                this.getRouter().navTo("RouteContract");
+            },
+            //Step validation
+            validateStep: function () {
+                var step1Validated = this.byId("CD_id_AgreeDate").getValue() && this.byId("CD_id_CName").getValue() &&
+                    this.byId("CD_id_Address").getValue() && this.byId("CD_id_Email").getValue() &&
+                    this.byId("CD_id_Role").getValue() && this.byId("CD_id_Amount").getValue() &&
+                    utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") && utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
+                    utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") && utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
+                    utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID");
+            
+                var step2Validated = this.byId("CD_id_EndClientHirer").getSelectedKey() &&
+                    this.byId("CD_id_Datestart").getValue() && this.byId("CD_id_DateEnd").getValue() &&
+                    utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID");
+            
+                var isStep1Validated = step1Validated ? true : false;
+                var isStep2Validated = step2Validated ? true : false;
+            
+                // Update validation status for each step
+                this.byId("CD_id_Wizard").getSteps()[0].setValidated(isStep1Validated);
+                this.byId("CD_id_Wizard").getSteps()[1].setValidated(isStep2Validated);
+            },
+            
 
-         
-           
+
+            //Submit the data
+            CD_onSubmit: function () {
+                try {
+                    var allStepsValidated = this.byId("CD_id_Wizard").getSteps().every(function (step) {
+                        return step.getValidated();
+                    });
+                    
+                    if (allStepsValidated) {
+                        MessageToast.show("All Details Submitted Successfully");
+                    } else {
+                        MessageToast.show("Please fill all mandatory fields");
+                    }
+                } catch {
+                    MessageToast.show("Technical error occurred");
+                }
+            },
+            
         });
     });

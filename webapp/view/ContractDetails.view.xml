@@ -4,7 +4,7 @@
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core" >
-	<Page id="CD_idPage" title="{i18n>headerContractDetails}" showNavButton="true" navButtonPress="onPressback" >
+	<Page id="CD_idPage" title="{i18n>headerContractDetails}" showNavButton="true" navButtonPress="CD_onPressback" >
 		<content>
 			<!-- Wizard page step1 -->
 			<Wizard 
@@ -18,7 +18,7 @@
 							<Label text="{i18n>contractNo}" required="true"/>
 							<Input  id="CD_id_ContractNo" value="{ContractModelWizart>/ContractNo}" editable="false"/>
 							<Label text="{i18n>agreementDate}" required="true"/>
-							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="onDateChange" />
+							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="validateDate"  valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" />
 							<!-- Input for Client Company Name -->
 							<Label text="{i18n>consultantName}" required="true" />
 							<Select id="selectMSalutation" selectedKey="{ContractModelWizart>/Salutation}" items="{NameSalutation>/items}" width="100%">
@@ -26,18 +26,18 @@
 							</Select>
 							<!-- Input for Client Company Name -->
 							<Input value="{ContractModelWizart>/ConsultantName}" type="Text" 
-								placeholder="{i18n>placeConsultantName}"  change="inputClientCompanyName" id="CD_id_ClientCompanyName" liveChange="onLiveChange" maxLength="50" class="ClientCompanyInput"/>
+								placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="validateName" maxLength="50" class="ClientCompanyInput"/>
 							<!-- TextArea for Address -->
 							<Label text="{i18n>address}" required="true"/>
 							<TextArea value="{ContractModelWizart>/ConsultantAddress}"  maxLength="120" rows="3" id="CD_id_Address" placeholder="{i18n>placeAddress}" change="onAddress"
-									liveChange="onLiveChange"/>
+									liveChange="ValidateCommonFields"/>
 							<!-- Input for Consultant Email ID -->
 							<Label text="{i18n>consultantEmail}" required="true"/>
-							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="100" placeholder="{i18n>placeConsultantEmail}" type="Email" id="CD_id_Email" change="onContractEmail" liveChange="onLiveChange" />
+							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="100" placeholder="{i18n>placeConsultantEmail}" type="Email" id="CD_id_Email"  liveChange="validateEmail" />
 							<!-- Input for Role -->
 							<Label text="{i18n>role}" required="true"/>
 							<Input value="{ContractModelWizart>/Role}"  placeholder="{i18n>placeRole}"
-								id="CD_id_Role" change="onRole" liveChange="onLiveChange" type="Text" maxLength="50"/>
+								id="CD_id_Role" change="onRole" liveChange="ValidateCommonFields" type="Text" maxLength="50"/>
 							<!-- RadioButtonGroup for Rate Selection -->
 							<Label text="{i18n>rate}" required="true" />
 							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="0" select="RadioButtonSelect" >
@@ -47,7 +47,7 @@
 							</RadioButtonGroup>
 							<!-- Input for Amount -->
 							<Label text="{i18n>amount}" required="true" />
-							<Input value="{ContractModelWizart>/Amount}"  id="CD_id_Amount"  placeholder="{i18n>placeAmount}" change="onAmount" liveChange="onLiveChange" type="Number" maxLength="10" />
+							<Input value="{ContractModelWizart>/Amount}"  id="CD_id_Amount"  placeholder="{i18n>placeAmount}"  liveChange="validateAmount"  maxLength="10" />
 							<!-- ComboBox for Currency Selection -->
 							<Select items="{currencyModel>/results}"
 									selectedKey="{ContractModelWizart>/Currency}" id="CD_id_Currency" visible="true" width="100%" class="marginLeft">
@@ -72,7 +72,7 @@
 							<Input placeholder="{i18n>ContractNoPlaceholder}" id="CD_id_ConNo" editable="false"/>
 							<!-- End Client Hirer input field -->
 							<Label text="{i18n>endClientHirer}" required="true"/>
-							<ComboBox items="{AddCustomerModel>/results}"  value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="inputEndClientHirer">
+							<ComboBox items="{AddCustomerModel>/results}"  value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="validateName">
 								<core:Item key="{AddCustomerModel>Salutation} {AddCustomerModel>Name}" text="{AddCustomerModel>CompanyName}" />
 							</ComboBox>						
 							<!-- Location ComboBox dropdown -->
@@ -87,19 +87,18 @@
 								<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}" />
 							</Select>
 							<Input value="{ContractModelWizart>/HiringContact}"
-                             placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact"
-                             change="inputHiringContact" liveChange="onLiveChange1"/>
+                             placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" liveChange="validateName"/>
 							<!-- Assignment Status ComboBox -->
 							<Label text="{i18n>assignmentStatus}" required="true"/>
 							<ComboBox selectedKey="New" value="{ContractModelWizart>/AssignmentStatus}" 
-                      items="{path: 'Assignment>/Assignment'}" editable="false">
+                             items="{path: 'Assignment>/Assignment'}" editable="false">
 								<core:Item key="{Assignment>name}" text="{Assignment>name}"/>
 							</ComboBox>
 							<!-- DatePicker for Start Date and End Date -->
-							<Label text="{i18n>startDate}"/>
-							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart"  change="onDateChangeStart"/>
-							<Label text="{i18n>endDate}"/>
-							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd"  change="onDateChangeEnd"/>
+							<Label text="{i18n>startDate}" required="true"/>
+							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="validateDate"/>
+							<Label text="{i18n>endDate}" required="true"/>
+							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="validateDate"/>
 							<!-- Insurance Requirement ComboBox -->
 							<Label text="{i18n>specificInsuranceRequirement}" required="true"/>
 							<Select selectedKey="{ContractModelWizart>/InsuranceRequirement}" id="CD_id_InsuranceReq">
@@ -124,11 +123,11 @@
 							</Select>
 							<!-- Status ComboBox -->
 							<Label text="{i18n>status}" required="true"/>
-							<ComboBox selectedKey="{ContractModelWizart>/Status}"  items="{StatusModel>/Status}" id="CD_id_Status" visible="false">
+							<ComboBox selectedKey="{ContractModelWizart>/Status}"  items="{StatusModel>/Status}" id="CD_id_Status" visible="false" change="ValidateCommonFields">
 								<core:Item key="{StatusModel>name}" text="{StatusModel>name}"/>
 							</ComboBox>
 							<Label text="{i18n>contractLocation}" required="true"/>
-							<ComboBox id="CD_id_ConLocation" change="onChangeLocation"  items="{CityJsonModel>/results}"  value="{ContractModelWizart>/contractLocation}" >
+							<ComboBox id="CD_id_ConLocation" change="ValidateCommonFields"  items="{CityJsonModel>/results}"  value="{ContractModelWizart>/contractLocation}" >
 								<core:Item key="{CityJsonModel>ID}" text="{CityJsonModel>LocationName}" />
 							</ComboBox>
 						</f:content>
@@ -136,7 +135,7 @@
 				</WizardStep>
 				<!-- Review wizard Step3 -->
 				<WizardStep id="idWizardStep"
-							complete="onReviewSubmit"
+							complete="CD_onSubmit"
                             title="{i18n>review}"
                             validated="true">
 					<f:SimpleForm 

@@ -57,25 +57,25 @@
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
                     <Button tooltip="Onboard Employee" id="Ov_id_OnboardBtn" text="Onboard" type="Neutral" press="onOnboardPress"  icon="sap-icon://manager"/>
-                    <Button tooltip="Reject Employee" id="Ov_id_RejectBtn" type="Reject" text="Reject" press="onRejectPress" />
-                    <Button text="Generate Offer" press="Ov_onPressAddEmployee" type="Accept" tooltip="Add Employee"/>
+                    <Button tooltip="Reject Employee" id="Ov_id_RejectBtn" type="Reject" text="Reject" press="onRejectPress" icon="sap-icon://employee-rejections" />
+                    <Button text="Generate Offer" press="Ov_onPressAddEmployee" type="Accept" tooltip="Add Employee" icon="sap-icon://employee-approvals"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
 					<Column demandPopin="true">
-						<Text text="Consultant Name"/>
+						<Text text="{i18n>employeeName}"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="Designation" />
+						<Text text="{i18n>designation}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="Base Location" />
+						<Text text="{i18n>baseLocation}" />
 					</Column>
 					<Column demandPopin="true">
-						<Text text="CTC" />
+						<Text text="{i18n>ctc}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="Joining Date" />
+						<Text text="{i18n>joiningDate}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>status}" />

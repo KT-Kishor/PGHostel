@@ -33,7 +33,7 @@ sap.ui.define([
                 this.getRouter().navTo("RouteConsultantInvoiceApplication")
             },
             onpressContract: function () {
-                this.getRouter().navTo("RouteContractDetails")
+                this.getRouter().navTo("RouteContract")
             },
             onPressAdminPaySlip: function () {
                 this.getRouter().navTo("RouteAdminPaySlip");

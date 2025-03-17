@@ -15,7 +15,7 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
             Ov_onSignout: function () {
-                this.getRouter().navTo("RouteLogin");
+                this.getRouter().navTo("RouteLoginPage");
             },
             Ov_onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");

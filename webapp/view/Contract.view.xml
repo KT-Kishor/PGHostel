@@ -1,10 +1,122 @@
+
 <mvc:View
-	controllerName=""
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:c="sap.ui.core"
-	displayBlock="true"
-	height="100%"
-	busyIndicatorDelay="0"
->
+	xmlns:core="sap.ui.core"
+	xmlns:form="sap.ui.layout.form" 
+    controllerName="sap.kt.com.minihrsolution.controller.Contract"
+	xmlns:fb="sap.ui.comp.filterbar"	
+    displayBlock="true">
+	<Page id="C_id_Page" >
+		<headerContent>
+			<Button  press="C_onPressback" icon="sap-icon://home" />
+			<Text text="{i18n>contractDetails}" class="boldBlackText"></Text>
+			<ToolbarSpacer />
+			<Button  press="C_onSignout" icon="sap-icon://log"></Button>
+		</headerContent>
+		<content>
+			<fb:FilterBar  class="sapUiTinyMargin" id="C_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem name="Contract No" label="Contract No" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox name="Contract No" selectionChange=".onBranchChange" showClearIcon="true" items="{ path: 'BaseLocation>/results', length:1000,  sorter: { path: 'Company', descending: false,
+                                        group: true } }" >
+							<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+				<fb:FilterGroupItem name="Location Service" label="Location Service" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox name="Location Service"  items="{path: 'DropDownModel>/results',sorter: {path: 'Branch',descending: false,group: true},length:1000}" showClearIcon="true" id="C_id_DesiFilter">
+								<core:Item key="{DropDownModel>ConsultantName}" text="{DropDownModel>ConsultantName}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Year" label="Year" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+                    <DateRangeSelection
+                    id="C_id_Year"
+                    valueFormat="yyyy" 
+                    displayFormat="yyyy"
+                    change="onDateChange" />						
+					</fb:control>
+						</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Contract Status" label="{i18n>contractStatus}" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox name=" Contract Status" showClearIcon="true" selectionChange=".onSelectionChange" items="{EmployeeOffer>/Status}">
+							<core:Item key="{EmployeeOffer>ID}" text="{EmployeeOffer>Status}"/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="C_idSalary" items="{path: 'EmployeeOfferModel>/results',sorter: {path: 'Company',descending: false,group: true}}" mode="SingleSelectLeft" selectionChange="onSelectionEmployeeOffer" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			 <headerToolbar>
+                <OverflowToolbar >
+                    <Title id="" text="{i18n>contractDetails}"/>
+                    <!-- <ToolbarSeparator/> -->
+                    <ToolbarSpacer/>
+                    <Button text="Generate Contact" press="C_onPressAddContract" type="Accept" tooltip="Add Contract" icon="sap-icon://customer-order-entry"/>
+                </OverflowToolbar>
+            </headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="Contract No"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="Aggrement No" />
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="Consultant Name" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="Location Service" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="End Client" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="Start Date" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="End Date" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>contractStatus}" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="Comments" />
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem type="Navigation" press="OnNavigationEmployee">
+						<cells>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true" class="centerText" state="{path: 'EmployeeOfferModel>Status', formatter: '.Formatter.statusStateFormatter'}" />
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<Bar>
+				<contentLeft>
+					   <HBox class="sapUiTinyMarginTop">
+    <Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
+    <Link
+        class="footer-CoName sapUiTinyMarginBegin"
+        text="Developed by Kalpavriksha Technologies"
+        href="https://www.kalpavrikshatechnologies.com/" 
+        target="_blank"  
+    />
+</HBox>
+				</contentLeft>
+			</Bar>
+		</footer>
+	</Page>
 </mvc:View>
