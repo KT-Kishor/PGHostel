@@ -35,7 +35,7 @@
 					<fb:FilterGroupItem name="Joining Date" label="Joining Date" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
                     <DateRangeSelection
-                    id="T_id_JoiningDate"
+                    id="Ov_id_JoiningDate"
                     valueFormat="yyyy-MM-dd" 
                     displayFormat="dd/MM/yyyy"
                     change="onDateChange" />						
