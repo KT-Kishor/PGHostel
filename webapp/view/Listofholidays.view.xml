@@ -19,23 +19,20 @@
                 clear="onClear"
                 showClearOnFB="true"
                 search=".onSearch"
-                showFilterConfiguration="false"
->
+                showFilterConfiguration="false">
 				<filterbar:filterGroupItems>
 					<filterbar:FilterGroupItem
             name="YearPicker"
             label="Year"
             groupName="Group1"
-            visibleInFilterBar="true"
-        >
+            visibleInFilterBar="true">
 						<filterbar:control>
 							<DatePicker
   id="LOH_id_Holidays"
   value="{path: '/selectedYear', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'yyyy' }}"
   displayFormat="yyyy"
   placeholder="yyyy"
-  change="handleChange" 
-/>
+  change="handleChange"/>
 						</filterbar:control>
 					</filterbar:FilterGroupItem>
 				</filterbar:filterGroupItems>
@@ -43,13 +40,12 @@
 			<Table
                  growingScrollToLoad="true"
                      id="LOH_id_HolidayTable"
-                      width="auto"
+                     width="auto"
                      inset="false"
                      items="{HolidayModel>/items}"
                      growing="true"
                      growingThreshold="50"
-                     alternateRowColors="false" 
-                    >
+                     alternateRowColors="false">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title  id="LOH_id_Title" text="{i18n>listOfHolidays}"/>
@@ -86,17 +82,17 @@
 							<Text text="{HolidayModel>Date}"/>
 							<Text text="{HolidayModel>Day}"/>
 							<ObjectStatus 
-                        state="{= ${Karnataka} === '?' ? 'Success' : 'Error'}" 
-                        icon="{= ${Karnataka} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= ${HolidayModel>Karnataka} === '?' ? 'Success' : 'Error'}" 
+    icon="{= ${HolidayModel>Karnataka} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 							<ObjectStatus 
-                        state="{= ${Other States} === '?' ? 'Success' : 'Error'}" 
-                        icon="{= ${Other States} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= ${HolidayModel>OtherStates} === '?' ? 'Success' : 'Error'}" 
+    icon="{= ${HolidayModel>OtherStates} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 							<ObjectStatus 
-                        state="{= ${Maharashtra} === '?' ? 'Success' : 'Error'}" 
-                        icon="{= ${Maharashtra} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= ${HolidayModel>Maharashtra} === '?' ? 'Success' : 'Error'}" 
+    icon="{= ${HolidayModel>Maharashtra} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 							<ObjectStatus 
-                        state="{= ${Delhi} === '?' ? 'Success' : 'Error'}" 
-                        icon="{= ${Delhi} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= ${HolidayModel>Delhi} === '?' ? 'Success' : 'Error'}" 
+    icon="{= ${HolidayModel>Delhi} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 						</cells>
 					</ColumnListItem>
 				</items>

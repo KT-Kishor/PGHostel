@@ -1,67 +1,62 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.AdminApplyLeave"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:m="sap.m.Table"
-    xmlns:f="sap.f"
-    xmlns:filterbar="sap.ui.comp.filterbar"
-    xmlns:core="sap.ui.core">
-    <Page id="idLeaveePage">
-       <headerContent>
-			<Button  press="onBack" icon="sap-icon://home" />
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:m="sap.m.Table"
+	xmlns:f="sap.f"
+	xmlns:filterbar="sap.ui.comp.filterbar"
+	xmlns:core="sap.ui.core">
+	<Page id="AL_id_LeavePage">
+		<headerContent>
+			<Button press="AL" icon="sap-icon://home" />
 			<Text text="{i18n>leaveApplication}" class="boldBlackText"></Text>
 			<ToolbarSpacer />
-			<Button  press="onPressBack" icon="sap-icon://log"></Button>
+			<Button press="AL_onSignout" icon="sap-icon://log"></Button>
 		</headerContent>
-        <content>
-          <filterbar:FilterBar
-    id="idleavefilterbar"
+		<content>
+			<filterbar:FilterBar
+                id="AL_id_leavefilterbar"
                 persistencyKey="myPersKey"
                 useToolbar="false"
                 clear="onClear"
                 showClearOnFB="true"
                 search=".onSearch"
                 filterChange=".onFilterChange"
-                afterVariantLoad=".onAfterVariantLoad"
->
-    <filterbar:filterGroupItems>
-        <filterbar:FilterGroupItem
+                afterVariantLoad=".onAfterVariantLoad">
+				<filterbar:filterGroupItems>
+					<filterbar:FilterGroupItem
             name="Name"
             label="{i18n>dateRange}"
             groupName="Group1"
-            visibleInFilterBar="true"
-        >
-            <filterbar:control>
-                <DateRangeSelection
-                id="idDateRangeSelection"
+            visibleInFilterBar="true">
+						<filterbar:control>
+							<DateRangeSelection
+                id="AL_id_DateRangeSelection"
                 dateValue="{oFilteredModel>/FromDate}"
                 secondDateValue="{oFilteredModel>/ToDate}"
                 valueFormat="yyyy-MM-dd"
                 displayFormat="dd/MM/yyyy"
                 change="onSelectionChange"/>
-            </filterbar:control>
-        </filterbar:FilterGroupItem>
-
-        <filterbar:FilterGroupItem
+						</filterbar:control>
+					</filterbar:FilterGroupItem>
+					<filterbar:FilterGroupItem
             name="Type of Leave"
             label="Type of Leave"
             groupName="Group1"
-            visibleInFilterBar="true"
-        >
-            <filterbar:control>
-                 <MultiComboBox
-                id="idTypeOfLeavecombo"
+            visibleInFilterBar="true">
+						<filterbar:control>
+							<MultiComboBox
+                id="AL_id_TypeOfLeavecombo"
                 value="{oFilteredModel>/TypeOfLeave}"
                 selectionChange="onSelectionChange"
                 items="{leaveTypeModel>/results}">
-                <core:Item key="{leaveTypeModel>ID}" text="{leaveTypeModel>Name}"/>
-            </MultiComboBox>
-            </filterbar:control>
-        </filterbar:FilterGroupItem>
-    </filterbar:filterGroupItems>
-</filterbar:FilterBar>
-
-<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.LeaveSmartTable" type="XML" />	
-<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.LeaveBarChart" type="XML"/>	
-        </content>
-    </Page>
+								<core:Item key="{leaveTypeModel>ID}" text="{leaveTypeModel>Name}"/>
+							</MultiComboBox>
+						</filterbar:control>
+					</filterbar:FilterGroupItem>
+				</filterbar:filterGroupItems>
+			</filterbar:FilterBar>
+			<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.LeaveSmartTable" type="XML" />
+			<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.LeaveBarChart" type="XML"/>
+		</content>
+	</Page>
 </mvc:View>

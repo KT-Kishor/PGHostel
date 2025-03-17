@@ -1,27 +1,17 @@
 sap.ui.define(
   [
     "./BaseController", //call base controller
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
-    "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator",
-    "sap/m/MessagePopover",
-    "sap/m/MessageItem",
+    "sap/ui/model/json/JSONModel", //json model
   ],
-  function ( BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem
- ) {
+  function ( BaseController, JSONModel) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.Listofholidays",
       {
         onInit: function () {
-          var oYearModel = new sap.ui.model.json.JSONModel({
-            selectedYear: new Date().getFullYear(),
-          });
+          var oYearModel = new JSONModel({selectedYear: new Date().getFullYear(), });
           this.getView().setModel(oYearModel, "yearModel");
-          this.getRouter()
-            .getRoute("RouteListofholidays")
-            .attachMatched(this._onRouteMatched, this);
+          this.getRouter().getRoute("RouteListofholidays").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: function (oEvent) {
           this.YearData = oEvent.getParameter("arguments").Year;
@@ -30,10 +20,7 @@ sap.ui.define(
             var selectedYear = oYearModel.getProperty("/selectedYear");
             this.byId("LOH_id_Holidays").setValue(selectedYear);
           } else {
-            var selectedYear = oYearModel.setProperty(
-              "/selectedYear",
-              new Date().getFullYear()
-            );
+            var selectedYear = oYearModel.setProperty( "/selectedYear", new Date().getFullYear());
             this.byId("LOH_id_Holidays").setValue(new Date().getFullYear());
           }
           this.HolidayReadCall();
@@ -53,25 +40,17 @@ sap.ui.define(
               },
               success: function (data) {
                 sap.ui.core.BusyIndicator.hide();
-                if (data && Array.isArray(data)) {
-                  var oModel = new sap.ui.model.json.JSONModel(data);
+                var oModel = new sap.ui.model.json.JSONModel({ items: data.results });
                   that.getView().setModel(oModel, "HolidayModel");
-                }
-              },
+              },           
               error: function (error) {
                 sap.ui.core.BusyIndicator.hide();
-                sap.m.MessageToast.show(
-                  that.i18nModel.getText("commanMessage")
-                );
-                console.error("API Error: ", error);
+                sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered values");
               },
             });
           } catch (error) {
             sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show(
-              this.i18nModel.getText("commonErrorMessage")
-            );
-            console.error("Exception: ", error);
+            sap.m.MessageToast.show("Technical error please connect to administrator");
           }
         },
         onSearch: function () {

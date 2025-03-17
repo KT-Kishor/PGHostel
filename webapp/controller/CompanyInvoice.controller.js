@@ -14,9 +14,15 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteCompanyInvoice").attachMatched(this._onRouteMatched, this);
             },
-            onPressAddInvoice: function () {
+            CI_onPressAddInvoice: function () {
                 this.getRouter().navTo("RouteCompanyInvoiceDetails",
                     { sPath: "X" });
+            },
+            CI_onSignout: function () {
+                this.getRouter().navTo("RouteLoginPage");
+            },
+            CI_onPressback: function () {
+                this.getRouter().navTo("RouteTilePage");
             },
         });
     });
