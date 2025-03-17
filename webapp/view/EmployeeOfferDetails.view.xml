@@ -4,6 +4,7 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
+	xmlns:l="sap.ui.layout"
 	xmlns:core="sap.ui.core">
 	<Page   title="{i18n>headerEmployeeOffer}" showNavButton="true" navButtonPress="EOD_onPressBack">
 		<content>
@@ -16,8 +17,22 @@
 									<f:SimpleForm editable="true" layout="ColumnLayout" columnsM="1" columnsL="2" columnsXL="2">
 										<f:content>
 											<Label text="{i18n>consultantName}" required="true" />
+											<Select
+                                               id=""
+                                               selectedKey="{oTraineeDetails>/TSalutation}"
+                                               items="{Salutation>/salutation}"
+                                               width="100%">
+									     	<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
+											<layoutData>
+                                          <l:GridData span="XL1 L1 M2 S12" /> 
+		                                           </layoutData>
+									      </Select>
 											<Input value="{employeeModel>/ConsultantName}" placeholder="{i18n>consultantName}" required="true" 
-                                            editable="true" id="EOD_id_Name" liveChange="validateName" maxLength="50" valueStateText="{i18n>nameEmployeeValueState}"/>
+                                            editable="true" id="EOD_id_Name" liveChange="validateName" maxLength="50" valueStateText="{i18n>nameEmployeeValueState}">
+											<layoutData>
+                                            <l:GridData span="XL3 L3 M6 S12" />                                               
+		                                   </layoutData>
+		                                        </Input>
 											<Label text="{i18n>offerReleaseDate}" required="true" />
 											<DatePicker id="EOD_id_Reldate" placeholder="{i18n>offerReleaseDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
                                              value= "{employeeModel>/OfferReleaseDate}"

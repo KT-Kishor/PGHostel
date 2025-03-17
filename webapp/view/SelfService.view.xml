@@ -1,0 +1,378 @@
+<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:form="sap.ui.layout.form" 
+    controllerName="sap.kt.com.minihrsolution.controller.SelfService" 
+    displayBlock="true"
+	xmlns:l="sap.ui.layout"
+	xmlns:m="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+	xmlns:smartTable="sap.ui.comp.smarttable">
+	<Page id="idPageEmployee" >
+		<headerContent>
+					<Button  press="SS_onPressback" icon="sap-icon://home" />
+			<Text text="My Details" class="boldBlackText"></Text>
+
+			<ToolbarSpacer />
+			<Button press="SS_onPressSignout" icon="sap-icon://log"/>
+
+		</headerContent>
+		<content>
+			<IconTabBar
+			id="idIconTab"
+			select="onTabSelect"
+			expanded="{device>/isNoPhone}"
+			selectedKey="employeeDetailsKey"
+			class="sapUiResponsiveContentPadding" >
+				<items>
+					<IconTabFilter
+					design="Horizontal"
+					key="employeeDetailsKey"
+					text="{i18n>employeedetails}"
+					icon="sap-icon://person-placeholder">
+						<f:SimpleForm
+                                        editable="true" layout="ColumnLayout"
+                                         labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+                                         adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"                           
+                                         emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
+                                         columnsM="1" singleContainerFullSize="false">
+							<f:toolbar>
+								<Toolbar>
+									<Title text="{i18n>basicDetails}" />
+									<ToolbarSpacer />
+									<Button id="idEditSaveSelf" text="{= ${viewModel>/common} ? 'Save' : 'Edit' }"
+                              press="onEditEmpDetPress"   />
+									<Button tooltip="{i18n>visit}" id="idVisitingCard" press="onDownloadVisitCard" icon="sap-icon://visits" />
+									<Button tooltip="{i18n>terminateLetter}" id="idTerminate" press="onDownloadTerminateLetter"  visible="{modelButtonVisible>/TerminationButt}" icon="sap-icon://document-text" />
+									<Button tooltip="{i18n>relievingletter}" id="idExperience" press="onDownloadExperienceLetter"  visible="{modelButtonVisible>/RelivingExpeButt}" icon="sap-icon://create"/>
+									<Button tooltip="{i18n>resignationletter}" id="idResignation" press="onDownloadResignationLetter"  visible="true" icon="sap-icon://request" />
+								</Toolbar>
+							</f:toolbar>
+							<f:content>
+								<Label text="{i18n>employeeID}"/>
+								<Input value="{employeeData>/ID}" editable="false" id="idEmpID"/>
+								<Label text="{i18n>employeeName}"  />
+								<Input value="{employeeData>/Salutation} {employeeData>/EmployeeName}"  id="idNameEmp" editable="false" maxLength="50" liveChange="validateName"/>
+								<Label  text="{i18n>joiningDate}"/>
+								<DatePicker value="{employeeData>/AppraisalDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" id="idJoinn" editable="false"/>
+								<Label text="{i18n>dateOfBirth}" required="true" id="idldob" />
+								<DatePicker value="{employeeData>/DateOfBirth}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="liveChangeValuState"
+                                id="idDob" editable="{viewModel>/common}" initialFocusedDateValue="{controller>/focusedDate}"
+	                             maxDate="{controller>/maxDate}" />
+								<Label text="{i18n>bloodGroup}" required="true" id="idlb"/>
+								<Select change="onChangeBloodGroup"  selectedKey="{employeeData>/BloodGroup}" editable="{viewModel>/common}" items="{BloodGroupModel>/results}" id="idBloodGroup">
+									<core:Item key="{BloodGroupModel>Code}" text="{BloodGroupModel>Code}" />
+								</Select>
+								<Label text="{i18n>companyMailid}"  />
+								<Input value="{employeeData>/CompanyEmailID}" editable="{viewModel>/editBut}" id="idCompmail" liveChange="liveChangeValuState" placeholder="{i18n>companyMailid}" maxLength="100"/>
+								<Label text="{i18n>permanentAddress}" required="true" id="idlpa"/>
+								<TextArea value="{employeeData>/PermanentAddress}" editable="{viewModel>/common}" id="idPAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="liveChangeValuState"/>
+								<Label text="{i18n>correspondenceAddress}" required="true" id="idlca"/>
+								<TextArea value="{employeeData>/CorrespondenceAddress}" editable="{viewModel>/common}" id="idCAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="liveChangeValuState"/>
+								<Label text="{i18n>baseLocation}" />
+								<Select items="{CityJsonModel>/results}" selectedKey="{employeeData>/BaseLocation}" editable="{viewModel>/editBut}" id="idBaseL">
+									<core:Item key="{CityJsonModel>LocationName}" text="{CityJsonModel>LocationName}" />
+								</Select>
+								<Label text="{i18n>designation}"/>
+								<Select items="{DesignationModel>/results}" selectedKey="{employeeData>/Designation}" editable="{viewModel>/editBut}" id="idDesi">
+									<core:Item key="{DesignationModel>DesignationName}" text="{DesignationModel>DesignationName}"/>
+								</Select>
+								<Label text="{i18n>manager}"/>
+								<ComboBox value="{employeeData>/ManagerName}"
+								change="onChangeManage"
+				             showSecondaryValues= "true"
+				              id="idMangr"
+							  editable="{viewModel>/editBut}"
+				             items="{idModel>/results}"
+				           filterSecondaryValues="true">
+									<core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}"/>
+								</ComboBox>
+								<Label text="{i18n>mobileNo}" required="true" id="idlmo"/>
+								<Input value="{employeeData>/MobileNo}" editable="{viewModel>/common}" maxLength="10" id="idMoNo" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo"/>
+								<Label text="{i18n>role}"/>
+								<Select
+
+								editable="{viewModel>/editBut}"
+									width="100%"
+									id="idRoleEmpSele"
+									selectedKey="{employeeData>/Role}"
+									items="{roleModel>/items}" >
+									<core:Item key="{roleModel>Role}" text="{roleModel>Role}" />
+									<!-- Display role in the Select -->
+								</Select>
+								<Label text="{i18n>status}" />
+								<Select
+									change="onStatusChange"
+									id="idStatusSelf"
+									editable="{viewModel>/common}"
+					selectedKey="{employeeData>/EmployeeStatus}"
+					items="">
+									<core:Item key="Active" text="Active" />
+									<core:Item key="Inactive" text="Inactive" />
+								</Select>
+							</f:content>
+						</f:SimpleForm>
+						<f:SimpleForm
+                                         editable="true" layout="ColumnLayout"  title="{i18n>bankDetails}" class="sapUiSmallMarginTop"
+                                         labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+                                         adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"                           
+                                         emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
+                                         columnsM="1" singleContainerFullSize="false">
+							<f:content>
+								<Label text="{i18n>accountHolder}" required="true" id="idAh"/>
+								<Input value="{employeeData>/AccountHolderName}" editable="{viewModel>/common}" id="idAcName" liveChange="validateName" maxLength="50" />
+								<Label text="{i18n>accountNo}" required="true" id="idAn"/>
+								<Input value="{employeeData>/AccountNo}" editable="{viewModel>/common}" id="idAcno" liveChange="validateAccountNo" maxLength="18"/>
+								<Label text="{i18n>bankName}" required="true" id="idBn"/>
+								<Input value="{employeeData>/BankName}" editable="{viewModel>/common}" id="idBankName" maxLength="50" liveChange="liveChangeValuState"/>
+								<Label text="{i18n>bankBranch}" required="true" id="idBb"/>
+								<Input value="{employeeData>/BankBranch}" editable="{viewModel>/common}" id="idBranch" maxLength="50" liveChange="liveChangeValuState"/>
+								<Label text="{i18n>ifscCode}" required="true" id="idIfc"/>
+								<Input value="{employeeData>/IFSCCode}" editable="{viewModel>/common}" id="idIfcs" liveChange="validateIFCSNo" maxLength="11"/>
+								<Label text="{i18n>bankAddress}" required="true" id="idBa"/>
+								<TextArea value="{employeeData>/BankAddress}" editable="{viewModel>/common}" id="idAddress" maxLength="120" liveChange="liveChangeValuState" />
+								<Label text=""/>
+								<Button text="{i18n>uploadBank}" press="handleUploadPress" tooltip="{i18n>bankAttachment}" width="18%"/>
+								<Label text=""/>
+								<Text text="{i18n>uploadNote}"/>
+							</f:content>
+						</f:SimpleForm>
+						<MessageStrip
+				text="{i18n>uploadDocmsg}"
+				type="Information"
+				showIcon="true"
+				class="sapUiSmallMarginTop"/>
+						<f:SimpleForm
+                                         editable="true" layout="ColumnLayout" title="{i18n>docDetails}"  class="sapUiSmallMarginTop"
+                                         labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+                                         adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"                           
+                                         emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
+                                         columnsM="1" singleContainerFullSize="false">
+							<f:content>
+								<Label text="{i18n>custPan}" required="true" id="idLPan"/>
+								<Input value="{employeeData>/PANCard}" editable="{viewModel>/common}" id="idPan" maxLength="10" liveChange="validatePanNo"/>
+								<Label text="{i18n>adhar}"/>
+								<Input value="{employeeData>/AdharCard}" editable="{viewModel>/common}" id="idAdhar" maxLength="12"  liveChange="validateAdharCard"/>
+								<Label text="{i18n>passport}"/>
+								<Input value="{employeeData>/Passport}" editable="{viewModel>/common}" id="idPassport" maxLength="8" liveChange="validatePassportNo"/>
+								<Label text="{i18n>voterid}"/>
+								<Input value="{employeeData>/VoterId}" editable="{viewModel>/common}" id="idVoterid" maxLength="10" liveChange="validateVoterId"/>
+							</f:content>
+						</f:SimpleForm>
+						<f:SimpleForm
+                                         editable="true" layout="ColumnLayout"  title="{i18n>emergencyDetails}" class="sapUiSmallMarginTop"
+                                         labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+                                         adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"                           
+                                         emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
+                                         columnsM="1" singleContainerFullSize="false">
+							<f:content>
+								<core:Title class="emerContClass" text="{i18n>personOne}" />
+								<Label text="{i18n>nameLabel}" required="true" id="idEn" />
+								<Select id="idEmeSal1" editable="{viewModel>/common}" change=""
+                                               selectedKey="{employeeData>/EmergencyContactPerson1Salutation}"
+                                               items="{NameSalutation>/items}"
+                                               width="100%">
+									<!-- Binding the key and text of the Select control to the NameSalutation model -->
+									<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}" />
+									<layoutData>
+										<l:GridData span="XL2 L1 M3 S4" />
+									</layoutData>
+								</Select>
+								<Input  value="{employeeData>/EmergencyContactPerson1Name}"  editable="{viewModel>/common}" liveChange="validateName" id="idEmeName1" placeholder="{i18n>nameLabel}" maxLength="50"/>
+								<Label text="{i18n>realtion}" required="true" id="idRn"/>
+								<Select id="idRel1"  items="{relationModel>/results}" selectedKey="{employeeData>/EmergencyContactPerson1Realtion}" editable="{viewModel>/common}">
+									<core:Item key="{relationModel>Relationship}" text="{relationModel>Relationship}"/>
+								</Select>
+								<Label text="{i18n>mobileNo}" required="true" id="idMo" />
+								<Input value="{employeeData>/EmergencyContactPerson1ContactNo}" placeholder="{i18n>mobileNo}"  editable="{viewModel>/common}"   maxLength="10" liveChange="validateMobileNo" id="idEmpMo1"/>
+								<Label text="{i18n>address}" required="true" id="idAd"/>
+								<TextArea value="{employeeData>/EmergencyContactPerson1Address}" placeholder="{i18n>address}"  id="idEmpAdd1" editable="{viewModel>/common}" liveChange="liveChangeValuState" maxLength="120"/>
+								<core:Title class="emerContClass" text="{i18n>personTwo}" />
+								<Label text="{i18n>nameLabel}" required="true" id="idP" />
+								<Select id="idEmeSal2" editable="{viewModel>/common}"
+                                               selectedKey="{employeeData>/EmergencyContactPerson2Salutation}"
+                                               items="{NameSalutation>/items}"
+                                               width="100%">
+									<!-- Binding the key and text of the Select control to the NameSalutation model -->
+									<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}" />
+									<layoutData>
+										<l:GridData span="XL2 L1 M3 S4" />
+									</layoutData>
+								</Select>
+								<Input value="{employeeData>/EmergencyContactPerson2Name}"  editable="{viewModel>/common}" liveChange="validateName" id="idEmeName2" placeholder="{i18n>nameLabel}" maxLength="50"/>
+								<Label text="{i18n>realtion}" required="true" id="idRl"/>
+								<Select  id="idRel2" items="{relationModel>/results}" selectedKey="{employeeData>/EmergencyContactPerson2Realtion}" editable="{viewModel>/common}">
+									<core:Item key="{relationModel>Relationship}" text="{relationModel>Relationship}"/>
+								</Select>
+								<Label text="{i18n>mobileNo}" required="true" id="idMonb"/>
+								<Input value="{employeeData>/EmergencyContactPerson2ContactNo}" placeholder="{i18n>mobileNo}" editable="{viewModel>/common}" maxLength="10" liveChange="validateMobileNo" id="idEmpMo2"/>
+								<Label text="{i18n>address}" required="true" id="idAdd"/>
+								<TextArea value="{employeeData>/EmergencyContactPerson2Address}" placeholder="{i18n>address}" editable="{viewModel>/common}" maxLength="120" id="idEmpAdd2" liveChange="liveChangeValuState"/>
+							</f:content>
+						</f:SimpleForm>
+					</IconTabFilter>
+					<IconTabFilter
+    design="Horizontal"
+	key="educationDetailTab"
+    text="{i18n>educationalDetails}"
+    icon="sap-icon://education">
+						<smartTable:SmartTable
+    entitySet="EmployeeEducationDetails"
+	id="idEducationalSmartTable"
+	tableType="Table"
+    useTablePersonalisation="true"
+    header="{i18n>educationalDetails}"
+	showRowCount="true"
+    enableCopy="false"
+    initiallyVisibleFields="CollegeName,Degree,Grade,EducationStartDate,EducationEndDate,"
+    enableAutoBinding="true">
+							<smartTable:customToolbar>
+								<OverflowToolbar>
+									<ToolbarSpacer />
+									<m:Button icon="sap-icon://attachment" id="idEducationAttach" press="onPressOpenFolder" tooltip="{i18n>uploadEduDoc}" />
+									<Button icon="sap-icon://edit" id="idEducationEditbutton" visible="true" tooltip="{i18n>editEmpt}" press="onPressEditEducationalDetails" />
+									<Button icon="sap-icon://add" id="idEducationAddbutton" tooltip="{i18n>addEducation}" press="onPressAddEducationalDetails" />
+									<ToolbarSeparator />
+								</OverflowToolbar>
+							</smartTable:customToolbar>
+							<Table mode="SingleSelectLeft" selectionChange="onSelectionChangeEducation">
+								<columns>
+									<Column>
+										<customData>
+											<core:CustomData key="p13nData"
+                value='\{"columnKey": "Grade", "leadingProperty": "Grade", "sortProperty": "Grade", "filterProperty": "Grade", "columnIndex": 3}' />
+										</customData>
+										<Text text="{i18n>grade}" />
+									</Column>
+								</columns>
+								<items>
+									<ColumnListItem>
+										<cells>
+											<Text text="{path: 'Grade', formatter: '.Formatter.formatGrade'}" />
+										</cells>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</smartTable:SmartTable>
+					</IconTabFilter>
+					<IconTabFilter
+			design="Horizontal"
+			key="educationDetailTab"
+			text="{i18n>employmentDetails}"
+				icon="sap-icon://work-history">
+						<smartTable:SmartTable
+    entitySet="EmployeeEmployment"
+	id="idEmploymentSmartTable"
+    useTablePersonalisation="true"
+	tableType="Table"
+    header="{i18n>employmentDetails}"
+    enableCopy="false"
+	showRowCount="true"
+    initiallyVisibleFields="CompanyName,Designation,StartDate,EndDate,OfficeAddress,"
+    enableAutoBinding="true">
+							<smartTable:customToolbar>
+								<OverflowToolbar>
+									<ToolbarSpacer />
+									<ToolbarSeparator />
+									<Button 
+        icon="sap-icon://customer-and-contacts" 
+        id="idLinkButton" 
+        visible="true" 
+        tooltip="{i18n>referenceDetails}" 
+        press="onPressReferenceDetails" 
+        type="Transparent" />
+									<m:Button icon="sap-icon://attachment" id="idEmployementAttachbutton" press="onPressEmploymentFolder" tooltip="{i18n>uploadEmpDoc}" />
+									<Button icon="sap-icon://edit" id="idEmployementEditbutton" visible="true" tooltip="{i18n>editEmpt}" press="onPressEditEmployment" />
+									<Button icon="sap-icon://add" id="idEmployementAddbutton" tooltip="{i18n>addEmpt}" press="onPressAddEmploymentDetails" />
+									<ToolbarSeparator />
+								</OverflowToolbar>
+							</smartTable:customToolbar>
+							<Table mode="SingleSelectLeft" selectionChange="onSelectionChange">
+								<columns></columns>
+								<items>
+									<ColumnListItem></ColumnListItem>
+								</items>
+							</Table>
+						</smartTable:SmartTable>
+					</IconTabFilter>
+					<IconTabFilter
+			        design="Horizontal"
+					key="salaryDetailsTab"
+			        text="{i18n>salaryDetails}"
+				    icon="sap-icon://money-bills">
+						<m:Toolbar>
+							<m:Title text="" />
+							<m:ToolbarSpacer />
+							<m:ComboBox id="idCombHikeYear" items="{hikeYearModel>/items}" change="onChangeHikeYear">
+								<core:Item key="{hikeYearModel>year}" text="{hikeYearModel>year}" />
+							</m:ComboBox>
+							<m:Button visible="{modelButtonVisible>/AppraisalButt}" text="{i18n>oAppraiseName}" 
+                              press="onPressAppraise" id="idAppraiseButt"  />
+							<m:Button visible="{modelButtonVisible>/SalaryEditButt}" text="{i18n>buttonEdit}" 
+                              press="onPressEditAppraise" id="idAppraiseEditButt"  />
+							<m:Button visible="true" text="" icon="sap-icon://delete"
+                              press="onPressAppraiDele" id="idAppraiseDelButt"  />
+						</m:Toolbar>
+						<m:VBox id="idFormsContainer" />
+					</IconTabFilter>
+					<IconTabFilter text="{i18n>paySlip}"  icon="sap-icon://simple-payment" design="Horizontal" key="payslipTab">
+						 <smartTable:SmartTable
+                entitySet="AdminPaySlip"
+                id="idPaySlipSmartTable"
+                smartFilterId="idAdminPaySlip"
+                useTablePersonalisation="true"
+                header="{i18n>paySlipTableTitle}"
+                enableCopy="false"
+                initiallyVisibleFields="EmployeeName,Month,Year,PayableDays"
+				tableType="ResponsiveTable"
+				demandPopin="true"
+                class="sapUiResponsiveContentPadding centeredTable"
+                enableAutoBinding="true"
+                enableAutoColumnWidth="false">
+				  <Table mode="None" selectionChange="onSelectionChange">				
+					<columns>
+					<Column>
+							<customData>
+								<core:CustomData key="p13nData"
+                        value='\{"columnKey": "EarningsTotalYearly", "leadingProperty": "EarningsTotalYearly", "sortProperty": "EarningsTotalYearly", "filterProperty": "EarningsTotalYearly", "columnIndex": 6}' />
+							</customData>
+							<Text text="{i18n>earningsYearly}" />
+						</Column>					
+						<Column>
+							<customData>
+								<core:CustomData key="p13nData"
+                        value='\{"columnKey": "NetPay", "leadingProperty": "NetPay", "sortProperty": "NetPay", "filterProperty": "NetPay", "columnIndex": 7}' />
+							</customData>
+							<Text text="{i18n>netPay}" />
+						</Column>
+						<Column>
+							<customData>
+								<core:CustomData key="p13nData"
+                        value='\{"columnKey": "Currency", "leadingProperty": "Currency", "sortProperty": "Currency", "filterProperty": "Currency", "columnIndex": 8}' />
+							</customData>
+							<Text text="{i18n>currency}" />
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem type="Navigation" press="onPressPayrollApp">
+						<cells>
+								<Text text="{path: 'EarningsTotalYearly', formatter: '.Formatter.numberFormater'}" textAlign="End"/>
+							</cells>
+							<cells>
+								<Text text="{path: 'NetPay', formatter: '.Formatter.numberFormater'}" textAlign="End"/>
+							</cells>
+							<cells>
+								<Text text="{Currency}"  />
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</smartTable:SmartTable>
+					</IconTabFilter>
+				</items>
+			</IconTabBar>
+		</content>
+	</Page>
+</mvc:View>

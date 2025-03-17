@@ -38,5 +38,8 @@ sap.ui.define([
             onPressAdminPaySlip: function () {
                 this.getRouter().navTo("RouteAdminPaySlip");
             },
+            onpressSelfservice: function () {
+                this.getRouter().navTo("RouteSelfService");
+            }
         });
     });
