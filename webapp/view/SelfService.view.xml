@@ -24,39 +24,62 @@
 					key="employeeDetailsKey"
 					text="{i18n>headerEmpDetails}"
 					icon="sap-icon://person-placeholder">
-<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.BasicDetails" type="XML"/>
-
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.BasicDetails" type="XML"/>
 					</IconTabFilter>
 					<IconTabFilter
     design="Horizontal"
 	key="educationDetailTab"
     text="{i18n>educationalDetails}"
     icon="sap-icon://education">
-	<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.EducationDetails" type="XML"/>
-
-</IconTabFilter>
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.EducationDetails" type="XML"/>
+					</IconTabFilter>
 					<IconTabFilter
 			design="Horizontal"
 			key="educationDetailTab"
 			text="{i18n>employmentDetails}"
 				icon="sap-icon://work-history">
-				<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.EmploymentDetails" type="XML"/>
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.EmploymentDetails" type="XML"/>
 					</IconTabFilter>
 					<IconTabFilter
 			        design="Horizontal"
 					key="salaryDetailsTab"
 			        text="{i18n>salaryDetails}"
 				    icon="sap-icon://money-bills">
-					<VBox id="SS_id_FormsContainer" />
-
-					<!-- <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.SalaryDetails" type="XML"/> -->
+						<VBox id="SS_id_FormsContainer" />
+						<!-- <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.SalaryDetails" type="XML"/> -->
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>paySlip}"  icon="sap-icon://simple-payment" design="Horizontal" key="payslipTab">
-
-						
-					</IconTabFilter>
+					<IconTabFilter text="{i18n>paySlip}"  icon="sap-icon://simple-payment" design="Horizontal" key="payslipTab"></IconTabFilter>
 				</items>
 			</IconTabBar>
 		</content>
+		<footer>
+			<Bar>
+				<contentLeft>
+					<HBox class="sapUiTinyMarginTop">
+						<Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
+						<Link
+        class="footer-CoName sapUiTinyMarginBegin"
+        text="Developed by Kalpavriksha Technologies"
+        href="https://www.kalpavrikshatechnologies.com/" 
+        target="_blank"  
+    />
+					</HBox>
+				</contentLeft>
+				<contentRight>
+					<Button text="{i18n>visit}" type="Critical" 
+        press="onDownloadVisitCard" 
+        icon="sap-icon://visits" 
+        enabled="{viewModel>/isVisitMode}" 
+        tooltip="{i18n>visit}" 
+        visible="{viewModel>/isButtonVisible}" />
+					<Button text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" 
+        press="SS_onEditPress"
+        type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Neutral' }" 
+        icon="{= ${viewModel>/isEditMode} ? '' : 'sap-icon://edit' }"   
+        tooltip="{i18n>editDetails}" 
+        visible="{viewModel>/isEditButtonVisible}" />
+				</contentRight>
+			</Bar>
+		</footer>
 	</Page>
 </mvc:View>

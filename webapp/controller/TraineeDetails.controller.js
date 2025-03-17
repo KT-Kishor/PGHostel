@@ -1,14 +1,6 @@
 sap.ui.define([
-    "./BaseController", //call base controller
-    "../utils/validation", //call validation
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
-    "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator",
-    "sap/m/MessagePopover",
-    "sap/m/MessageItem"
-],
-    function (BaseController, utils, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
+    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel","sap/m/MessageToast"],
+    function (BaseController, utils, JSONModel, MessageToast) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.TraineeDetails", {
             onInit: function () {
@@ -16,6 +8,7 @@ sap.ui.define([
             },
             _onRouteMatched: function (oEvent) {
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
+                this.i18nModel=this.getView().getModel("i18n").getResourceBundle();
             },
             validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
@@ -64,12 +57,12 @@ sap.ui.define([
             TD_onSubmitData: function (oEvent) {
                 try {
                     if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
-                        MessageToast.show("Data Saved Successfully");
+                        MessageToast.show(this.i18nModel.getText("traineeDataSubmitted"));
                     } else {
-                        sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered values");
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
                 } catch (error) {
-                    sap.m.MessageToast.show("Technical error please connect to administrator");
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             }
         });

@@ -3,8 +3,8 @@
 	xmlns:c="sap.ui.core"
     xmlns:l="sap.ui.layout"
 	xmlns:core="sap.ui.core"
-	xmlns:f="sap.ui.layout.form"
->
+	xmlns:f="sap.ui.layout.form">
+	
 <f:SimpleForm
                                         editable="true" layout="ColumnLayout"
                                          labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
@@ -14,13 +14,10 @@
 							<f:toolbar>
 								<Toolbar>
 									<Title text="{i18n>basicDetails}" />
-									<ToolbarSpacer />
-									<Button id="SS_id_EditSaveSelf" text="{= ${viewModel>/common} ? 'Save' : 'Edit' }"
-                              press="SS_onEditEmpDetPress"   />
-									<Button tooltip="{i18n>visit}" id="SS_idVisitingCard" press="SS_onDownloadVisitCard" icon="sap-icon://visits" />
-									<Button tooltip="{i18n>terminateLetter}" id="SS_idTerminate" press="SS_onDownloadTerminateLetter"  visible="{modelButtonVisible>/TerminationButt}" icon="sap-icon://document-text" />
-									<Button tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter"  visible="{modelButtonVisible>/RelivingExpeButt}" icon="sap-icon://create"/>
-									<Button tooltip="{i18n>resignationletter}" id="SS_idResignation" press="SS_onDownloadResignationLetter"  visible="true" icon="sap-icon://request" />
+									
+									<!-- <Button tooltip="{i18n>terminateLetter}" id="SS_idTerminate" press="SS_onDownloadTerminateLetter"  visible="{modelButtonVisible>/TerminationButt}" icon="sap-icon://document-text" /> -->
+									<!-- <Button tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter"  visible="{modelButtonVisible>/RelivingExpeButt}" icon="sap-icon://create"/> -->
+									<!-- <Button tooltip="{i18n>resignationletter}" id="SS_idResignation" press="SS_onDownloadResignationLetter"  visible="true" icon="sap-icon://request" /> -->
 								</Toolbar>
 							</f:toolbar>
 							<f:content>
@@ -31,25 +28,25 @@
 								<Label  text="{i18n>joiningDate}"/>
 								<DatePicker value="{employeeData>/AppraisalDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" id="SS_id_Joinn" editable="false"/>
 								<Label text="{i18n>dateOfBirth}" required="true" id="SS_id_ldob" />
-								<DatePicker value="{employeeData>/DateOfBirth}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="liveChangeValuState"
-                                id="SS_id_Dob" editable="{viewModel>/common}" initialFocusedDateValue="{controller>/focusedDate}"
+								<DatePicker value="{employeeData>/DateOfBirth}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="validateDate"
+                                id="SS_id_Dob" editable="{viewModel>/isEditMode}" initialFocusedDateValue="{controller>/focusedDate}"
 	                             maxDate="{controller>/maxDate}" />
 								<Label text="{i18n>bloodGroup}" required="true" id="SS_id_lb"/>
-								<Select change="onChangeBloodGroup"  selectedKey="{employeeData>/BloodGroup}" editable="{viewModel>/common}" items="{BloodGroupModel>/results}" id="SS_id_BloodGroup">
+								<Select change="onChangeBloodGroup"  selectedKey="{employeeData>/BloodGroup}" editable="{viewModel>/isEditMode}" items="{BloodGroupModel>/results}" id="SS_id_BloodGroup">
 									<core:Item key="{BloodGroupModel>Code}" text="{BloodGroupModel>Code}" />
 								</Select>
 								<Label text="{i18n>companyMailid}"  />
-								<Input value="{employeeData>/CompanyEmailID}" editable="{viewModel>/editBut}" id="SS_id_Compmail" liveChange="liveChangeValuState" placeholder="{i18n>companyMailid}" maxLength="100"/>
+								<Input value="{employeeData>/CompanyEmailID}" editable="false" id="SS_id_Compmail" liveChange="liveChangeValuState" placeholder="{i18n>companyMailid}" maxLength="100"/>
 								<Label text="{i18n>permanentAddress}" required="true" id="SS_id_lpa"/>
-								<TextArea value="{employeeData>/PermanentAddress}" editable="{viewModel>/common}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="liveChangeValuState"/>
+								<TextArea value="{employeeData>/PermanentAddress}" editable="{viewModel>/isEditMode}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="ValidateCommonFields"/>
 								<Label text="{i18n>correspondenceAddress}" required="true" id="SS_id_lca"/>
-								<TextArea value="{employeeData>/CorrespondenceAddress}" editable="{viewModel>/common}" id="SS_id_CAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="liveChangeValuState"/>
+								<TextArea value="{employeeData>/CorrespondenceAddress}" editable="{viewModel>/isEditMode}" id="SS_id_CAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="ValidateCommonFields"/>
 								<Label text="{i18n>baseLocation}" />
-								<Select items="{CityJsonModel>/results}" selectedKey="{employeeData>/BaseLocation}" editable="{viewModel>/editBut}" id="SS_id_BaseL">
+								<Select items="{CityJsonModel>/results}" selectedKey="{employeeData>/BaseLocation}" editable="false" id="SS_id_BaseL">
 									<core:Item key="{CityJsonModel>LocationName}" text="{CityJsonModel>LocationName}" />
 								</Select>
 								<Label text="{i18n>designation}"/>
-								<Select items="{DesignationModel>/results}" selectedKey="{employeeData>/Designation}" editable="{viewModel>/editBut}" id="SS_id_Desi">
+								<Select items="{DesignationModel>/results}" selectedKey="{employeeData>/Designation}" editable="false" id="SS_id_Desi">
 									<core:Item key="{DesignationModel>DesignationName}" text="{DesignationModel>DesignationName}"/>
 								</Select>
 								<Label text="{i18n>manager}"/>
@@ -57,16 +54,16 @@
 								change="onChangeManage"
 				             showSecondaryValues= "true"
 				              id="SS_id_Manager"
-							  editable="{viewModel>/editBut}"
+							  editable="false"
 				             items="{idModel>/results}"
 				           filterSecondaryValues="true">
 									<core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}"/>
 								</ComboBox>
 								<Label text="{i18n>mobileNo}" required="true" id="SS_id_Lmo"/>
-								<Input value="{employeeData>/MobileNo}" editable="{viewModel>/common}" maxLength="10" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo"/>
+								<Input value="{employeeData>/MobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo"/>
 								<Label text="{i18n>role}"/>
 								<Select
-								editable="{viewModel>/editBut}"
+								editable="false"
 									width="100%"
 									id="SS_id_RoleEmpSele"
 									selectedKey="{employeeData>/Role}"
@@ -78,7 +75,7 @@
 								<Select
 									change="SS_onStatusChange"
 									id="SS_id_StatusSelf"
-									editable="{viewModel>/common}"
+									editable="false"
 					selectedKey="{employeeData>/EmployeeStatus}"
 					items="">
 									<core:Item key="Active" text="{i18n>active}" />
@@ -94,17 +91,17 @@
                                          columnsM="1" singleContainerFullSize="false">
 							<f:content>
 								<Label text="{i18n>accountHolder}" required="true" id="SS_id_Ah"/>
-								<Input value="{employeeData>/AccountHolderName}" editable="{viewModel>/common}" id="SS_id_AcName" liveChange="validateName" maxLength="50" placeholder="{i18n>placeAccountHolder}" />
+								<Input value="{employeeData>/AccountHolderName}" editable="{viewModel>/isEditMode}" id="SS_id_AcName" liveChange="validateName" maxLength="50" placeholder="{i18n>placeAccountHolder}" />
 								<Label text="{i18n>accountNo}" required="true" id="SS_id_An"/>
-								<Input value="{employeeData>/AccountNo}" editable="{viewModel>/common}" id="SS_id_Acno" liveChange="validateAccountNo" maxLength="18" placeholder="{i18n>placeAccountNo}"/>
+								<Input value="{employeeData>/AccountNo}" editable="{viewModel>/isEditMode}" id="SS_id_Acno" liveChange="validateAccountNo" maxLength="18" placeholder="{i18n>placeAccountNo}"/>
 								<Label text="{i18n>bankName}" required="true" id="SS_id_Bn"/>
-								<Input value="{employeeData>/BankName}" editable="{viewModel>/common}" id="SS_id_BankName" maxLength="50" liveChange="liveChangeValuState" placeholder="{i18n>placeBankName}"/>
+								<Input value="{employeeData>/BankName}" editable="{viewModel>/isEditMode}" id="SS_id_BankName" maxLength="50" liveChange="ValidateCommonFields" placeholder="{i18n>placeBankName}"/>
 								<Label text="{i18n>bankBranch}" required="true" id="SS_id_Bb"/>
-								<Input value="{employeeData>/BankBranch}" editable="{viewModel>/common}" id="SS_id_Branch" maxLength="50" liveChange="liveChangeValuState" placeholder="{i18n>placeBankBranch}"/>
+								<Input value="{employeeData>/BankBranch}" editable="{viewModel>/isEditMode}" id="SS_id_Branch" maxLength="50" liveChange="ValidateCommonFields" placeholder="{i18n>placeBankBranch}"/>
 								<Label text="{i18n>ifscCode}" required="true" id="SS_id_Ifc"/>
-								<Input value="{employeeData>/IFSCCode}" editable="{viewModel>/common}" id="SS_id_IfcsCode" liveChange="validateIFCSNo" maxLength="11" placeholder="{i18n>placeIfscCode}"/>
+								<Input value="{employeeData>/IFSCCode}" editable="{viewModel>/isEditMode}" id="SS_id_IfcsCode" liveChange="validateIfcCode" maxLength="11" placeholder="{i18n>placeIfscCode}"/>
 								<Label text="{i18n>bankAddress}" required="true" id="SS_id_Ba"/>
-								<TextArea value="{employeeData>/BankAddress}" editable="{viewModel>/common}" id="SS_id_Address" maxLength="120" liveChange="liveChangeValuState" placeholder="{i18n>placeBankAddress}"  />
+								<TextArea value="{employeeData>/BankAddress}" editable="{viewModel>/isEditMode}" id="SS_id_Address" maxLength="120" liveChange="ValidateCommonFields" placeholder="{i18n>placeBankAddress}"  />
 								<Label text=""/>
 								<Button text="{i18n>upload}" press="SS_handleUploadPress" tooltip="{i18n>bankAttachment}" width="18%"/>
 								<Label text=""/>
@@ -123,14 +120,14 @@
                                          emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
                                          columnsM="1" singleContainerFullSize="false">
 							<f:content>
-								<Label text="{i18n>panCard}" required="true" id="SS_id_LPan"/>
-								<Input value="{employeeData>/PANCard}" editable="{viewModel>/common}" id="SS_id_Pan" maxLength="10" liveChange="validatePanNo" placeholder="{i18n>placePan}"/>
+								<Label text="{i18n>panCardCommon}" required="true" id="SS_id_LPan"/>
+								<Input value="{employeeData>/PANCard}" editable="{viewModel>/isEditMode}" id="SS_id_Pan" maxLength="10" liveChange="validatePanCard" placeholder="{i18n>placePan}"/>
 								<Label text="{i18n>adharCard}"/>
-								<Input value="{employeeData>/AdharCard}" editable="{viewModel>/common}" id="SS_idAdhar" maxLength="12"  liveChange="validateAdharCard" placeholder="{i18n>placeAdhar}"/>
+								<Input value="{employeeData>/AdharCard}" editable="{viewModel>/isEditMode}" id="SS_idAdhar" maxLength="12"  liveChange="validateAadharCard" placeholder="{i18n>placeAdhar}"/>
 								<Label text="{i18n>passport}"/>
-								<Input value="{employeeData>/Passport}" editable="{viewModel>/common}" id="SS_id_Passport" maxLength="8" liveChange="validatePassportNo" placeholder="{i18n>placePassport}"/>
+								<Input value="{employeeData>/Passport}" editable="{viewModel>/isEditMode}" id="SS_id_Passport" maxLength="8" liveChange="validatePassport" placeholder="{i18n>placePassport}"/>
 								<Label text="{i18n>voterId}"/>
-								<Input value="{employeeData>/VoterId}" editable="{viewModel>/common}" id="SS_id_Voterid" maxLength="10" liveChange="validateVoterId" placeholder="{i18n>placeVoterId}"/>
+								<Input value="{employeeData>/VoterId}" editable="{viewModel>/isEditMode}" id="SS_id_Voterid" maxLength="10" liveChange="validateVoterId" placeholder="{i18n>placeVoterId}"/>
 							</f:content>
 						</f:SimpleForm>
 						<f:SimpleForm
@@ -142,7 +139,7 @@
 							<f:content>
 								<core:Title class="emerContClass" text="{i18n>personOne}" />
 								<Label text="{i18n>name}" required="true" id="SS_id_Pf" />
-								<Select id="idEmeSal1" editable="{viewModel>/common}" change=""
+								<Select id="SS_idEmeSalF" editable="{viewModel>/isEditMode}" change=""
                                                selectedKey="{employeeData>/EmergencyContactPerson1Salutation}"
                                                items="{NameSalutation>/items}"
                                                width="100%">
@@ -152,18 +149,18 @@
 										<l:GridData span="XL2 L1 M3 S4" />
 									</layoutData>
 								</Select>
-								<Input  value="{employeeData>/EmergencyContactPerson1Name}"  editable="{viewModel>/common}" liveChange="validateName" id="idEmeName1" placeholder="{i18n>placeName}" maxLength="50"/>
+								<Input  value="{employeeData>/EmergencyContactPerson1Name}"  editable="{viewModel>/isEditMode}" liveChange="validateName" id="SS_id_EmeNameF" placeholder="{i18n>placeName}" maxLength="50"/>
 								<Label text="{i18n>realtion}" required="true" id="SS_id_Rf"/>
-								<Select id="SS_id_Rel1"  items="{relationModel>/results}" selectedKey="{employeeData>/EmergencyContactPerson1Realtion}" editable="{viewModel>/common}">
+								<Select id="SS_id_RelF"  items="{relationModel>/results}" selectedKey="{employeeData>/EmergencyContactPerson1Realtion}" editable="{viewModel>/isEditMode}">
 									<core:Item key="{relationModel>Relationship}" text="{relationModel>Relationship}"/>
 								</Select>
 								<Label text="{i18n>mobileNo}" required="true" id="SS_id_Mf" />
-								<Input value="{employeeData>/EmergencyContactPerson1ContactNo}" placeholder="{i18n>mobileNo}"  editable="{viewModel>/common}"   maxLength="10" liveChange="validateMobileNo" id="idEmpMo1"/>
+								<Input value="{employeeData>/EmergencyContactPerson1ContactNo}" placeholder="{i18n>mobileNo}"  editable="{viewModel>/isEditMode}"   maxLength="10" liveChange="validateMobileNo" id="SS_id_EmpMoF"/>
 								<Label text="{i18n>address}" required="true" id="SS_id_Af"/>
-								<TextArea value="{employeeData>/EmergencyContactPerson1Address}" placeholder="{i18n>address}"  id="SS_id_AddF" editable="{viewModel>/common}" liveChange="liveChangeValuState" maxLength="120"/>
+								<TextArea value="{employeeData>/EmergencyContactPerson1Address}" placeholder="{i18n>address}"  id="SS_id_AddF" editable="{viewModel>/isEditMode}" liveChange="ValidateCommonFields" maxLength="120"/>
 								<core:Title class="emerContClass" text="{i18n>personTwo}" />
 								<Label text="{i18n>name}" required="true" id="SS_id_Ps" />
-								<Select id="idEmeSal2" editable="{viewModel>/common}"
+								<Select id="SS_id_EmeSalS" editable="{viewModel>/isEditMode}"
                                                selectedKey="{employeeData>/EmergencyContactPerson2Salutation}"
                                                items="{NameSalutation>/items}"
                                                width="100%">
@@ -173,15 +170,16 @@
 										<l:GridData span="XL2 L1 M3 S4" />
 									</layoutData>
 								</Select>
-								<Input value="{employeeData>/EmergencyContactPerson2Name}"  editable="{viewModel>/common}" liveChange="validateName" id="SS_id_NameF" placeholder="{i18n>placeName}" maxLength="50"/>
+								<Input value="{employeeData>/EmergencyContactPerson2Name}"  editable="{viewModel>/isEditMode}" liveChange="validateName" id="SS_id_NameS" placeholder="{i18n>placeName}" maxLength="50"/>
 								<Label text="{i18n>realtion}" required="true" id="SS_id_Rs"/>
-								<Select  id="idRel2" items="{relationModel>/results}" selectedKey="{employeeData>/EmergencyContactPerson2Realtion}" editable="{viewModel>/common}">
+								<Select  id="SS_id_RelS" items="{relationModel>/results}" selectedKey="{employeeData>/EmergencyContactPerson2Realtion}" editable="{viewModel>/isEditMode}">
 									<core:Item key="{relationModel>Relationship}" text="{relationModel>Relationship}"/>
 								</Select>
 								<Label text="{i18n>mobileNo}" required="true" id="SS_id_Ms"/>
-								<Input value="{employeeData>/EmergencyContactPerson2ContactNo}" placeholder="{i18n>mobileNo}" editable="{viewModel>/common}" maxLength="10" liveChange="validateMobileNo" id="idEmpMo2"/>
+								<Input value="{employeeData>/EmergencyContactPerson2ContactNo}" placeholder="{i18n>mobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" liveChange="validateMobileNo" id="SS_id_EmpMoS"/>
 								<Label text="{i18n>address}" required="true" id="SS_id_As"/>
-								<TextArea value="{employeeData>/EmergencyContactPerson2Address}" placeholder="{i18n>address}" editable="{viewModel>/common}" maxLength="120" id="idEmpAdd2" liveChange="liveChangeValuState"/>
+								<TextArea value="{employeeData>/EmergencyContactPerson2Address}" placeholder="{i18n>address}" editable="{viewModel>/isEditMode}" maxLength="120" id="SS_id_EmpAddS" liveChange="ValidateCommonFields"/>
 							</f:content>
 						</f:SimpleForm>
+				
 </c:FragmentDefinition>

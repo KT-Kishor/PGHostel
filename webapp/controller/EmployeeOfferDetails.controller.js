@@ -1,14 +1,7 @@
 sap.ui.define([
-    "./BaseController", //call base controller
-    "../utils/validation", //call validation
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
-    "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator",
-    "sap/m/MessagePopover",
-    "sap/m/MessageItem"
+    "./BaseController","../utils/validation", "sap/ui/model/json/JSONModel","sap/m/MessageToast",
 ],
-    function (BaseController, utils, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
+    function (BaseController, utils, JSONModel, MessageToast,) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOfferDetails", {
             onInit: function () {
@@ -18,6 +11,7 @@ sap.ui.define([
                 this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
                 this.getView().byId("EOD_id_BondCombo").setVisible(false);
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
+                this.i18nModel=this.getView().getModel("i18n").getResourceBundle();
                 this._commonDesignation();
                 this._commonBaseLocation();
             },
@@ -63,14 +57,14 @@ sap.ui.define([
             EOD_id_Submit: function () {
                 try {
                     if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
-                        MessageToast.show("Offer Details Submitted Successfully");
+                        MessageToast.show(this.i18nModel("offerSuccess"));
                     }
                     else {
-                        MessageToast.show("Please fill all mandatory fields");
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
                 }
                 catch {
-                    MessageToast.show("Technical error occured");
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
             onRadioButtonSelect: function (oEvent) {    

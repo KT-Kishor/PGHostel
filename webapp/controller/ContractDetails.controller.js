@@ -1,14 +1,7 @@
 sap.ui.define([
-    "./BaseController",
-    "../utils/validation",
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
-    "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator",
-    "sap/m/MessagePopover",
-    "sap/m/MessageItem"
+    "./BaseController","../utils/validation","sap/ui/model/json/JSONModel","sap/m/MessageToast",
 ],
-    function (BaseController, utils, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
+    function (BaseController, utils, JSONModel, MessageToast) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.ContractDetails", {
             onInit: function () {
@@ -16,6 +9,8 @@ sap.ui.define([
             },
             _onRouteMatched: function (oEvent) {
                 this.byId("CD_id_Wizard").getSteps()[0].setValidated(false);
+                this.i18nModel=this.getView().getModel("i18n").getResourceBundle();
+
             },
             validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
@@ -61,22 +56,19 @@ sap.ui.define([
                 this.byId("CD_id_Wizard").getSteps()[1].setValidated(isStep2Validated);
             },
             
-
-
             //Submit the data
             CD_onSubmit: function () {
                 try {
                     var allStepsValidated = this.byId("CD_id_Wizard").getSteps().every(function (step) {
                         return step.getValidated();
-                    });
-                    
+                    }); 
                     if (allStepsValidated) {
-                        MessageToast.show("All Details Submitted Successfully");
+                        MessageToast.show(this.i18nModel.getText("contractSuccess"));
                     } else {
-                        MessageToast.show("Please fill all mandatory fields");
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
                 } catch {
-                    MessageToast.show("Technical error occurred");
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
             

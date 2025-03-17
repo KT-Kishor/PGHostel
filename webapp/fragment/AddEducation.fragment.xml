@@ -66,7 +66,7 @@
 			<Button text="{i18n>Submit}" type="Accept" id="AddEd_id_Submit" press="AddEd_onSaveEdDetails" class="submit"  visible="{viewModel>/fragmentSave}" />
 			<Button text="{i18n>save}" type="Accept" press="AddEd_onUpdateEdDetails" class="submit" id="AddEd_id_Save" visible="{viewModel>/fragmentSubmit}"/>
 			<!-- Close button -->
-			<Button text="{i18n>close}" press="onCloseDial" class="sendMail" type="Negative"/>
+			<Button text="{i18n>close}" press="AddEd_onCloseDial" class="sendMail" type="Negative"/>
 		</HBox>
 	</Dialog>
 </core:FragmentDefinition>

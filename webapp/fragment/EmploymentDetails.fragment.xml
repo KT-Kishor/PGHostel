@@ -8,9 +8,9 @@
 				<!-- <ToolbarSeparator/> -->
 				<ToolbarSpacer/>
 				<Button icon="sap-icon://attachment"  press="SS_onPressFolder" tooltip="{i18n>toolUploadEmp}" />
-				<Button icon="sap-icon://add"  text="{i18n>add}" press="SS_onPressAddEmpDetails" type="Accept" tooltip="{i18n>toolAddEmp}"/>
-				<Button icon="sap-icon://edit"   text="{i18n>edit}" press="SS_onPressEditEmpDetails" type="Neutral" tooltip="{i18n>toolEditEmp}"/>
-				<Button icon="sap-icon://delete"   text="{i18n>delete}" press="SS_onPressDeletEmpDetails" type="Negative" tooltip="{i18n>toolDelEmp}" />
+				<Button icon="sap-icon://add"  text="{i18n>add}" press="EmpF_onAddEmp" type="Accept" tooltip="{i18n>toolAddEmp}"/>
+				<Button icon="sap-icon://edit"   text="{i18n>edit}" press="EmpF_onEditEmp" type="Neutral" tooltip="{i18n>toolEditEmp}"/>
+				<Button icon="sap-icon://delete"   text="{i18n>delete}" press="EmpF_onDeletEmp" type="Negative" tooltip="{i18n>toolDelEmp}" />
 			</OverflowToolbar>
 		</headerToolbar>
 		<columns>

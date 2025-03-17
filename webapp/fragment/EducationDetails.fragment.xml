@@ -8,9 +8,9 @@
 				<!-- <ToolbarSeparator/> -->
 				<ToolbarSpacer/>
 				<Button icon="sap-icon://attachment" id="EdF_id_EduAttach" press="EdF_EduAttach" tooltip="{i18n>toolUploadEdu}" />
-				<Button text="{i18n>add}" icon="sap-icon://add" id="EdF_id_EduAdd" tooltip="{i18n>toolEAddEdu}" press="EdF_EduAdd"  type="Accept"/>
-				<Button text="{i18n>edit}" icon="sap-icon://edit" id="EdF_id_EduEdit"  tooltip="{i18n>toolEEditEdu}" press="Edu_EduEdit" type="Neutral" />
-				<Button text="{i18n>delete}" icon="sap-icon://delete" id="EdF_id_EduDelete" tooltip="{i18n>toolDeleteEdu}" press="EdF_EduDelet" type="Negative"/>
+				<Button text="{i18n>add}" icon="sap-icon://add" id="EdF_id_EduAdd" tooltip="{i18n>toolEAddEdu}" press="EdF_AddEdu"  type="Accept"/>
+				<Button text="{i18n>edit}" icon="sap-icon://edit" id="EdF_id_EduEdit"  tooltip="{i18n>toolEEditEdu}" press="Edu_EditEdu" type="Neutral" />
+				<Button text="{i18n>delete}" icon="sap-icon://delete" id="EdF_id_EduDelete" tooltip="{i18n>toolDeleteEdu}" press="EdF_DeletEdu" type="Negative"/>
 			</OverflowToolbar>
 		</headerToolbar>
 		<columns>
