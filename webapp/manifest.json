@@ -33,7 +33,7 @@
         }
     },
     "sap.ui5": {
-        "flexEnabled": true,
+        "flexEnabled": false,
         "dependencies": {
             "minUI5Version": "1.133.0",
             "libs": {
@@ -256,6 +256,12 @@
                     "target":[
                       "TargetSelfService"
                     ]
+                  },{
+                    "name": "RouteMyInbox",
+                    "pattern": "MyInbox/{sMyInBox}",
+                    "target": [
+                      "TargetMyInbox"
+                    ]
                   }
             ],
             "targets": {
@@ -374,6 +380,13 @@
                     "clearControlAggregation": false,
                     "viewId": "SelfService",
                     "viewName": "SelfService"
+                  },
+                  "TargetMyInbox": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "MyInbox",
+                    "viewName": "MyInbox"
                   }
             }
             },

@@ -8,13 +8,13 @@
 		<headerContent>
 			<Text text="{= 'Welcome ' + ${loginModel>/userNames} }" class="boldBlueText sapUiLargeMarginBegin" />
 			<ToolbarSpacer />
-			<Button  press="backPress" icon="sap-icon://log"></Button>
+			<Button  press="TileV_onBackPress" icon="sap-icon://log"></Button>
 		</headerContent>
 		<layout:VerticalLayout >
 			<FlexBox wrap="Wrap" alignItems="Start" justifyContent="Start">
 				<GenericTile visible="{modelTileVisible>/MyInbox}"
                     class="sapUiMediumMargin"
-                    header="{i18n>headerInbox}" press="onpressInbox">
+                    header="{i18n>headerInbox}" press="TileV_onpressInbox">
 					<TileContent unit="{i18n>tileMyInboxFooter}" >
 						<ImageContent src="sap-icon://inbox" />
 					</TileContent>
@@ -22,7 +22,7 @@
 
 				<GenericTile visible="{modelTileVisible>/GenerateTraineeOffer}"
                    class="sapUiMediumMargin"
-                    header="{i18n>headerTrainee}" press="onpressTrainee"  subheader="{i18n>subhead}">
+                    header="{i18n>headerTrainee}" press="TileV_onpressTrainee"  subheader="{i18n>subhead}">
 					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>SendMail}">
 						<ImageContent src="sap-icon://account" />
 					</TileContent>
@@ -31,7 +31,7 @@
 				<GenericTile visible="{modelTileVisible>/GenerateEmployeeOffer}"
                     class="sapUiMediumMargin"
                     
-                    header="{i18n>headerEmployeeOffer}" press="onPressOffer"
+                    header="{i18n>headerEmployeeOffer}" press="TileV_onPressOffer"
                     subheader="{i18n>subhead}">
 					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>tileFooter}">
 						<ImageContent src="sap-icon://employee-approvals" />
@@ -40,7 +40,7 @@
 
 				<GenericTile visible="{modelTileVisible>/GenerateContract}"
                     class="sapUiMediumMargin"
-                    header="{i18n>headerContractDetails}" press="onpressContract"
+                    header="{i18n>headerContractDetails}" press="TileV_onpressContract"
                     subheader="{i18n>subhead}">
 					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>tileFooter}">
 						<ImageContent src="sap-icon://decision" />
@@ -49,7 +49,7 @@
 
 				<GenericTile visible="{modelTileVisible>/SelfService}"
                     class="sapUiMediumMargin"
-                    header="{i18n>headerSelfService}" press="onpressSelfservice"
+                    header="{i18n>headerSelfService}" press="TileV_onpressSelfservice"
                       subheader="{i18n>subhead}">
 					<TileContent unit="{i18n>tileSelfSerciceFooter}" >
 						<ImageContent src="sap-icon://form"/>
@@ -58,7 +58,7 @@
 
 				<GenericTile visible="{modelTileVisible>/EmployeeDetail}"
                     class="sapUiMediumMargin"
-                    header="{i18n>headerEmpDetails}" press="onpressEmployeeDetails"
+                    header="{i18n>headerEmpDetails}" press="TileV_onpressEmployeeDetails"
                     subheader="{i18n>subheadEmphike}">
 					<TileContent  unit="{i18n>tileEmplyeeFooter}">
 						<ImageContent src="sap-icon://employee" />
@@ -67,7 +67,7 @@
 
 				<GenericTile visible="{modelTileVisible>/AssignmentTask}"
                    class="sapUiMediumMargin" 
-                    header="{i18n>headerAssignTask}"  subheader="{i18n>subhead}" press="onpressAssignment">
+                    header="{i18n>headerAssignTask}"  subheader="{i18n>subhead}" press="TileV_onpressAssignment">
 					<TileContent  unit="{i18n>tileAssignmentFooter}">
 						<ImageContent src="sap-icon://activity-assigned-to-goal" />
 					</TileContent>
@@ -75,7 +75,7 @@
 
 				<GenericTile visible="{modelTileVisible>/Timesheet}"
                    class="sapUiMediumMargin"  subheader="{i18n>subhead}"
-                    header="{i18n>headerTimesheet}" press="onpresstimesheet">
+                    header="{i18n>headerTimesheet}" press="TileV_onpresstimesheet">
 					<TileContent  unit="{i18n>tileTimesheetFooter}">
 						<ImageContent src="sap-icon://timesheet" />
 					</TileContent>
@@ -83,7 +83,7 @@
 
 				<GenericTile  visible="{modelTileVisible>/TimeSheetApproval}"
                    class="sapUiMediumMargin"
-                    header="{i18n>headerTimesheetApproval}" press="onPressTimesheetApp">
+                    header="{i18n>headerTimesheetApproval}" press="TileV_onPressTimesheetApp">
 					<TileContent  unit="{i18n>tileMyInboxFooter}">
 						<ImageContent src="sap-icon://timesheet" />
 					</TileContent>
@@ -91,7 +91,7 @@
 
 				<GenericTile visible="{modelTileVisible>/AddCustomer}"
                     class="sapUiMediumMargin"
-                    header="{i18n>headerCustomer}" press="onpressAddCustomer"
+                    header="{i18n>headerCustomer}" press="TileV_onpressAddCustomer"
                     subheader="{i18n>subhead}">
 					<TileContent unit="{i18n>tileManagecustFooter}">
 						<ImageContent src="sap-icon://customer" />
@@ -100,7 +100,7 @@
 
 				<GenericTile visible="{modelTileVisible>/GenerateMsaNda}"
                     class="sapUiMediumMargin"
-                    header="{i18n>headerMSA}" press="onpressMSA"
+                    header="{i18n>headerMSA}" press="TileV_onpressMSA"
                      subheader="{i18n>subhead}">
 					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>SendMail}">
 						<ImageContent src="sap-icon://add-document" />
@@ -109,7 +109,7 @@
 
 				<GenericTile visible="{modelTileVisible>/ExpenseApp}"
                     class="sapUiMediumMargin"
-                    header="{i18n>headerExpense}" press="onpressExpenseApp">
+                    header="{i18n>headerExpense}" press="TileV_onpressExpenseApp">
 					<TileContent unit="{i18n>subhead}">
 						<ImageContent src="sap-icon://expense-report" />
 					</TileContent>
@@ -117,7 +117,7 @@
 
 				<GenericTile visible="{modelTileVisible>/QuotationApp}"
                    class="sapUiMediumMargin"
-                    header="{i18n>headerQuotation}" press="onpressQuotaion">
+                    header="{i18n>headerQuotation}" press="TileV_onpressQuotation">
 					<TileContent  unit="{i18n>subheader}">
 						<ImageContent src="sap-icon://my-sales-order" />
 					</TileContent>
@@ -125,7 +125,7 @@
 
 				<GenericTile visible="{modelTileVisible>/InvoiceApp}"
                     class="sapUiMediumMargin"
-                    header="{i18n>headerCompanyInvoice}" press="onpressInvoiceApp">
+                    header="{i18n>headerCompanyInvoice}" press="TileV_onpressInvoiceApp">
 					<TileContent unit="{i18n>tileInvoiceFooter}">
 						<ImageContent src="sap-icon://my-sales-order" />
 					</TileContent>
@@ -133,7 +133,7 @@
 
 				<GenericTile visible="{modelTileVisible>/ConsultantInvoice}"
                    class="sapUiMediumMargin"
-                    header="{i18n>headerContractorInvoice}" press="onpressConsultantInvoice">
+                    header="{i18n>headerContractorInvoice}" press="TileV_onpressConsultantInvoice">
 					<TileContent  unit="{i18n>tileInvoiceFooter}">
 						<ImageContent src="sap-icon://monitor-payments" />
 					</TileContent>
@@ -141,7 +141,7 @@
 
 				<GenericTile  visible="{modelTileVisible>/ListOfHolidays}"
                    class="sapUiMediumMargin"
-                    header="{i18n>headerListOfHolidays}" press="onpresslistofholidays">
+                    header="{i18n>headerListOfHolidays}" press="TileV_onpresslistofholidays">
 					<TileContent unit="{i18n>tileLeaveFooter}">
 						<ImageContent src="sap-icon://general-leave-request" />
 					</TileContent>
@@ -149,7 +149,7 @@
 
 				<GenericTile id="idLeaveGenericTile" visible="{modelTileVisible>/ApplyLeave}"
                    class="sapUiMediumMargin"
-                    header="{i18n>headerLeave}" press="onpressLeave"
+                    header="{i18n>headerLeave}" press="TileV_onpressLeave"
                     subheader="{i18n>subhead}">
 					<TileContent unit="{i18n>createLeave}">
 						<ImageContent src="sap-icon://time-off" />
@@ -158,7 +158,7 @@
 
 				<GenericTile visible="{modelTileVisible>/IDCard}"
                    class="sapUiMediumMargin"
-                    header="{i18n>headerIdCard}" press="onpressIDCARD"
+                    header="{i18n>headerIdCard}" press="TileV_onpressIDCARD"
                     subheader="{i18n>subhead}">
 					<TileContent  unit="{i18n>tileIdCardFooter}" >
 						<ImageContent src="sap-icon://badge" />
@@ -167,7 +167,7 @@
 
 				<GenericTile  visible="{modelTileVisible>/PaySlip}"
                    class="sapUiMediumMargin"
-                    header="{i18n>HeaderPaySlip}" press="onPressAdminPaySlip">
+                    header="{i18n>HeaderPaySlip}" press="TileV_onPressAdminPaySlip">
 					<TileContent  unit="{i18n>tilePaySlipFooter}">
 						<ImageContent src="sap-icon://money-bills" />
 					</TileContent>

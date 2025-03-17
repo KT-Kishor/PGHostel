@@ -14,32 +14,35 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteTilePage").attachMatched(this._onRouteMatched, this);
             },
-			onpressTrainee:function(){
+			TileV_onpressTrainee:function(){
 				this.getRouter().navTo("RouteTrainee");
 			},
-            onPressOffer: function () {
+            TileV_onPressOffer: function () {
                 this.getRouter().navTo("RouteEmployeeOffer");
             },
-            onpresslistofholidays: function () {
+            TileV_onpresslistofholidays: function () {
                 this.getRouter().navTo("RouteListofholidays",{Year:"Listofholidays"})
             },
-            onpressIDCARD: function () {
+            TileV_onpressIDCARD: function () {
                 this.getRouter().navTo("RouteIDCardApplication")
             },
-            onpressLeave: function () {
+            TileV_onpressLeave: function () {
                 this.getRouter().navTo("RouteAdminApplyLeave")
             },  
-            onpressConsultantInvoice:function(){
+            TileV_onpressConsultantInvoice:function(){
                 this.getRouter().navTo("RouteConsultantInvoiceApplication")
             },
-            onpressContract: function () {
+            TileV_onpressContract: function () {
                 this.getRouter().navTo("RouteContract")
             },
-            onPressAdminPaySlip: function () {
+            TileV_onPressAdminPaySlip: function () {
                 this.getRouter().navTo("RouteAdminPaySlip");
             },
-            onpressSelfservice: function () {
+            TileV_onpressSelfservice: function () {
                 this.getRouter().navTo("RouteSelfService");
+            },
+            TileV_onpressInbox: function(){
+                this.getRouter().navTo("RouteMyInbox",{sMyInBox:"MyInboxView"});
             }
         });
     });
