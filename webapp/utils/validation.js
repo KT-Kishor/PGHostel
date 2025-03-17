@@ -5,7 +5,7 @@ sap.ui.define([], function () {
         _LCvalidateMobileNumber: function (oEvent, type) {
             var oField = (type === "ID") ? oEvent : oEvent.getSource();
             if (!oField) return false;
-            var oValue = oField.getValue().replace(/[^0-9]/g, "");
+            var oValue = oField.getValue().replace(/[^0-9]/g, "").slice(0, 10);
             if (oField.getValue() !== oValue) oField.setValue(oValue);
             var regex = /^\d{10}$/;
             if (!regex.test(oValue)) {
@@ -202,6 +202,26 @@ sap.ui.define([], function () {
             var oField = (type === "ID") ? oEvent : oEvent.getSource();
             if (!oField) return false;
             if (!oField.getValue().trim()) {
+                oField.setValueState("Error");
+                return false;
+            } else {
+                oField.setValueState("None");
+                return true;
+            }
+        },
+
+        // Pin Code Validation (NEW FUNCTION ADDED)
+        _LCvalidatePinCode: function (oEvent, type) {
+            var oField = (type === "ID") ? oEvent : oEvent.getSource();
+            if (!oField) return false;
+            var oValue = oField.getValue().replace(/[^0-9]/g, "").slice(0, 6);
+            
+            if (oField.getValue() !== oValue) {
+                oField.setValue(oValue);
+            }
+
+            var regex = /^\d{6}$/;
+            if (!regex.test(oValue)) {
                 oField.setValueState("Error");
                 return false;
             } else {

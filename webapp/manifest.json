@@ -189,104 +189,110 @@
                     "name": "RouteEmployeeOfferDetails",
                     "pattern": "EmployeeOfferDetails",
                     "target": "TargetEmployeeOfferDetails"
-
                 },
                 {
                     "name": "RouteListofholidays",
                     "pattern": "Listofholidays/{Year}",
                     "target": [
-                      "TargetListofholidays"
+                        "TargetListofholidays"
                     ]
                 },
                 {
                     "name": "RouteIDCardApplication",
                     "pattern": "IdCard",
                     "target": [
-                      "TargetIDCardApplication"
+                        "TargetIDCardApplication"
                     ]
                 },
                 {
                     "name": "RouteAdminApplyLeave",
                     "pattern": "AdminApplyLeave",
                     "target": [
-                      "TargetAdminApplyLeave"
+                        "TargetAdminApplyLeave"
                     ]
                 },
                 {
                     "name": "RouteContractDetails",
                     "pattern": "ContractDetails",
                     "target": [
-                      "TargetContractDetails"
-                    ]         
+                        "TargetContractDetails"
+                    ]
                 },
                 {
                     "name": "RouteContract",
                     "pattern": "Contract",
                     "target": [
-                      "TargetContract"
-                    ]   
-
+                        "TargetContract"
+                    ]
                 },
                 {
                     "name": "RouteConsultantInvoiceApplication",
                     "pattern": "ConsultantInvoice",
                     "target": [
-                      "TargetConsultantInvoiceApplication"
+                        "TargetConsultantInvoiceApplication"
                     ]
-                },   
+                },
                 {
                     "name": "RouteNavConsultantInvoiceApplication",
                     "pattern": "ConsultantInvoiceDetails/{sPath}/{oPath}",
                     "target": [
-                      "TargetNavConsultantInvoiceApplication"
+                        "TargetNavConsultantInvoiceApplication"
                     ]
                 },
                 {
                     "name": "RouteAdminPaySlip",
                     "pattern": "AdminPaySlip",
                     "target": [
-                      "TargetAdminPaySlip"
+                        "TargetAdminPaySlip"
                     ]
-                  },
-                  {
+                },
+                {
                     "name": "RouteNavAdminPaySlipApp",
                     "pattern": "AdminPaySlipDetails",
                     "target": [
-                      "TargetNavAdminPaySlipApp"
+                        "TargetNavAdminPaySlipApp"
                     ]
-                  },
-                  {
-                    "name":"RouteSelfService",
-                    "pattern":"SelfService",
-                    "target":[
-                      "TargetSelfService"
+                },
+                {
+                    "name": "RouteSelfService",
+                    "pattern": "SelfService",
+                    "target": [
+                        "TargetSelfService"
                     ]
-                  },{
+                },
+                {
                     "name": "RouteMyInbox",
                     "pattern": "MyInbox/{sMyInBox}",
                     "target": [
-                      "TargetMyInbox"
+                        "TargetMyInbox"
                     ]
-                  },
-                  {
+                },
+                {
                     "name": "RouteCompanyInvoice",
                     "pattern": "CompanyInvoice/{sPath}",
                     "target": [
-                      "TargetCompanyInvoice"
+                        "TargetCompanyInvoice"
                     ]
-                  },
-                  {
+                },
+                {
                     "name": "RouteCompanyInvoiceDetails",
                     "pattern": "InvoiceDetails/{sPath}",
                     "target": [
-                      "TargetCompanyInvoiceDetails"
+                        "TargetCompanyInvoiceDetails"
                     ]
-                  },
-                  {
+                },
+                {
                     "name": "RouteQuotation",
                     "pattern": "Quotation",
                     "target": [
                         "TargetQuotation"
+                    ]
+                },
+                {
+                    "name": "RouteQuotationForm",
+                    "pattern": "QuotationForm",
+                    "target": [
+                        "TargetQuotationForm"
                     ]
                 }
             ],
@@ -378,7 +384,7 @@
                     "clearControlAggregation": false,
                     "viewId": "ConsultantInvoice",
                     "viewName": "ConsultantInvoice"
-                  },
+                },
                 "TargetNavConsultantInvoiceApplication": {
                     "viewType": "XML",
                     "transition": "slide",
@@ -392,55 +398,62 @@
                     "clearControlAggregation": false,
                     "viewId": "AdminPaySlip",
                     "viewName": "AdminPaySlip"
-                  },
-                  "TargetNavAdminPaySlipApp": {
+                },
+                "TargetNavAdminPaySlipApp": {
                     "viewType": "XML",
                     "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "AdminPaySlipDetails",
                     "viewName": "AdminPaySlipDetails"
-                  },
-                  "TargetSelfService": {
+                },
+                "TargetSelfService": {
                     "viewType": "XML",
                     "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "SelfService",
                     "viewName": "SelfService"
-                  },
-                  "TargetMyInbox": {
+                },
+                "TargetMyInbox": {
                     "viewType": "XML",
                     "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "MyInbox",
                     "viewName": "MyInbox"
-                  },
-                  "TargetCompanyInvoice": {
+                },
+                "TargetCompanyInvoice": {
                     "viewType": "XML",
                     "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "CompanyInvoice",
                     "viewName": "CompanyInvoice"
-                  },
-                  "TargetCompanyInvoiceDetails": {
+                },
+                "TargetCompanyInvoiceDetails": {
                     "viewType": "XML",
                     "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "CompanyInvoiceDetails",
                     "viewName": "CompanyInvoiceDetails"
-                  },
-                  "TargetQuotation": {
+                },
+                "TargetQuotation": {
                     "viewType": "XML",
                     "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "Quotation",
                     "viewName": "Quotation"
+                },
+                "TargetQuotationForm": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "QuotationForm",
+                    "viewName": "QuotationForm"
                 }
             }
-            },
-            "rootView": {
-                "viewName": "sap.kt.com.minihrsolution.view.App",
-                "type": "XML",
-                "id": "App"
-            }
+        },
+        "rootView": {
+            "viewName": "sap.kt.com.minihrsolution.view.App",
+            "type": "XML",
+            "id": "App"
         }
     }
+}
