@@ -6,12 +6,12 @@
 	xmlns:core="sap.ui.core"
 	xmlns:m="sap.m"
 	xmlns:smartTable="sap.ui.comp.smarttable">
-	<m:Page title="{i18n>generateConsultantInvoice}" navButtonPress="onBack" showNavButton="true">
-		<ObjectPageLayout id="idNavConsultantInvoicePage"
+	<m:Page title="{i18n>generateConsultantInvoice}" navButtonPress="CI_onPressback" showNavButton="true">
+		<ObjectPageLayout id="CI_id_NavConsultantInvoicePage"
             enableLazyLoading="true"
             useIconTabBar="false">
 			<sections>
-				<ObjectPageSection id="idFirstSection" titleUppercase="false">
+				<ObjectPageSection id="CI_id_FirstSection" titleUppercase="false">
 					<subSections>
 						<ObjectPageSubSection titleUppercase="false" title="{i18n>invoiceHeaderDetails}">
 							<blocks>
@@ -40,7 +40,7 @@
 
 										<!-- ComboBox -->
 										<m:ComboBox 
-											id="idCont" 
+											id="CI_id_Cont" 
 											showSecondaryValues="true" 
 											placeholder="Select Contract ID" 
 											change="onChangeContractDetails" 
@@ -66,43 +66,42 @@
 											columnsM="1">
 											<f:content>
 												<m:Label text="{i18n>invoiceNo}" required="true" />
-												<m:Input id="idInvoiceNoFilter" value="{ConsultantInvoiceModel>/InvoiceNo}" editable="false" />
+												<m:Input id="CI_id_InvoiceNoFilter" value="{ConsultantInvoiceModel>/InvoiceNo}" editable="false" />
 												<m:Label text="{i18n>invoiceDate}" required="true" />
 												<m:DatePicker
 													displayFormat="dd/MM/yyyy"
 													valueFormat="dd/MM/yyyy"
 													value="{ConsultantInvoiceModel>/InvoiceDate}"
 													editable="{visiablityPlay>/editable}"
-													id="idInDate" change="onChangeInvoiceDate"/>
+													id="CI_id_InDate" change="validateDate"/>
 												<m:Label text="{i18n>payBy}" required="true" />
 												<m:DatePicker
 													displayFormat="dd/MM/yyyy"
 													valueFormat="dd/MM/yyyy"
 													value="{ConsultantInvoiceModel>/PayBy}"
 													editable="{visiablityPlay>/editable}"
-													id="idPaybyInv" />
+													id="CI_id_PaybyInv" change="validateDate"/>
 												<m:Label text="{i18n>invoiceTo}" required="true" />
 												<m:Input
 													value="{ConsultantInvoiceModel>/InvoiceTo}"
-													id="idInputInvoiceTo"
-													liveChange="onPressLiveChange"
+													id="CI_id_InputInvoiceTo"
+													liveChange="ValidateCommonFields" maxLength="50" valueStateText="{i18n>validInvoiceToMsg}"
 													editable="{visiablityPlay>/editable}"
-													maxLength="50" />
+													 />
 												<m:Label text="{i18n>invoiceAddress}" required="true" />
 												<m:TextArea
 													value="{ConsultantInvoiceModel>/InvoiceAddress}"
-													id="idInputInvoiceAddress"
-													liveChange="onPressLiveChange"
+													id="CI_id_InputInvoiceAddress"
+													liveChange="ValidateCommonFields"  maxLength="120" valueStateText="{i18n>addressValueState}"
 													rows="2"
-													maxLength="120"
 													editable="{visiablityPlay>/editable}" />
 												<m:Label text="{i18n>CompGSTNO}" />
 												<m:Input
 													value="{ConsultantInvoiceModel>/CompanyGSTNO}"
-													id="idInputCompGSTNO"
-													liveChange="onPressLiveChange"
+													id="CI_id_InputCompGSTNO"
+													 liveChange="validateGstNumber" maxLength="15" valueStateText="{i18n>gstNoValueState}"
 													editable="{visiablityPlay>/editable}"
-													maxLength="20" />
+													/>
 											</f:content>
 										</f:SimpleForm>
 									</m:HBox>
@@ -123,16 +122,16 @@
                                     columnsM="1">
 									<f:content>
 										<m:Label text="{i18n>consultantName}" required="true" />
-										<m:Input value="{ConsultantInvoiceModel>/ConsultantName}" editable="{visiablityPlay>/editable}" />
+										<m:Input value="{ConsultantInvoiceModel>/ConsultantName}" editable="{visiablityPlay>/editable}" liveChange="ValidateCommonFields" maxLength="50" valueStateText="{i18n>validConsultantNameMsg}" />
 										<m:Label text="{i18n>mobileNo}" required="true" />
-										<m:Input value="{ConsultantInvoiceModel>/MobileNo}" id="idInputMobile" liveChange="onPressLiveChange" editable="{visiablityPlay>/editable}" maxLength="10"/>
+										<m:Input value="{ConsultantInvoiceModel>/MobileNo}" id="CI_id_InputMobile" liveChange="validateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}" editable="{visiablityPlay>/editable}"/>
 										<m:Label text="{i18n>consultantAddress}" required="true" />
-										<m:TextArea value="{ConsultantInvoiceModel>/ConsultantAddress}" maxLength="120" id="idInputConsultantAddress" liveChange="onPressLiveChange" rows="3" editable="{visiablityPlay>/editable}"/>
+										<m:TextArea value="{ConsultantInvoiceModel>/ConsultantAddress}" maxLength="120" id="CI_id_InputConsultantAddress" liveChange="ValidateCommonFields" valueStateText="{i18n>validConsultantAddressMsg}" rows="3" editable="{visiablityPlay>/editable}"/>
 										<m:Label text="{i18n>gstNo}"/>
-										<m:Input value="{ConsultantInvoiceModel>/GSTNO}" id="idInputGSTNO" liveChange="onPressLiveChange" change="onChangeGstNo" editable="{visiablityPlay>/editable}" maxLength="20" />
+										<m:Input value="{ConsultantInvoiceModel>/GSTNO}" id="CI_id_InputGSTNO"  liveChange="validateGstNumber" maxLength="15" valueStateText="{i18n>gstNoValueState}"  change="onChangeGstNo" editable="{visiablityPlay>/editable}"/>
 										<m:Label text="{i18n>type}" required="{ConsultantInvoiceModel>/GSTValid}"/>
-										<m:CheckBox text="{i18n>cgst}" id="idCheckboxCGST" selected="{ConsultantInvoiceModel>/CGSTSelected}" select="onSelectCGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
-										<m:CheckBox text="{i18n>igst}" id="idCheckboxIGST" selected="{ConsultantInvoiceModel>/IGSTSelected}" select="onSelectIGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
+										<m:CheckBox text="{i18n>cgst}" id="CI_id_CheckboxCGST" selected="{ConsultantInvoiceModel>/CGSTSelected}" select="onSelectCGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
+										<m:CheckBox text="{i18n>igst}" id="CI_id_CheckboxIGST" selected="{ConsultantInvoiceModel>/IGSTSelected}" select="onSelectIGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
 										<m:Label text="{i18n>percentage}" required="{ConsultantInvoiceModel>/GSTValid}" />
 										<m:Input value="{ConsultantInvoiceModel>/Percentage}" liveChange="onPercentageChange"  editable="{ConsultantInvoiceModel>/GSTValid}" maxLength="10"/>
 										<m:Label text="{i18n>currency}" required="true"/>
@@ -158,13 +157,13 @@
                                     columnsM="1">
 									<f:content>
 										<m:Label text="{i18n>bankName}" required="true" />
-										<m:Input value="{ConsultantInvoiceModel>/BankName}" id="idInputBankName" liveChange="onPressLiveChange" editable="{visiablityPlay>/editable}" maxLength="50"/>
+										<m:Input value="{ConsultantInvoiceModel>/BankName}" id="CI_id_InputBankName" liveChange="ValidateCommonFields" maxLength="50" valueStateText="{i18n>validBankNameMsg}" editable="{visiablityPlay>/editable}"/>
 										<m:Label text="{i18n>accountName}" required="true" />
-										<m:Input value="{ConsultantInvoiceModel>/AccountName}" id="idInputAccountName" liveChange="onPressLiveChange" editable="{visiablityPlay>/editable}" maxLength="50"/>
+										<m:Input value="{ConsultantInvoiceModel>/AccountName}" id="CI_id_InputAccountName" liveChange="ValidateCommonFields" maxLength="50" valueStateText="{i18n>validAccountNameMsg}" editable="{visiablityPlay>/editable}"/>
 										<m:Label text="{i18n>accountNo}" required="true" />
-										<m:Input value="{ConsultantInvoiceModel>/AccountNo}" id="idInputAccountNo" liveChange="onPressLiveChange" editable="{visiablityPlay>/editable}" maxLength="18"/>
+										<m:Input value="{ConsultantInvoiceModel>/AccountNo}" id="CI_id_InputAccountNo" liveChange="validateAccountNo" maxLength="18" valueStateText="{i18n>accountnoValueState}" editable="{visiablityPlay>/editable}"/>
 										<m:Label text="{i18n>ifscCode}" required="true" />
-										<m:Input value="{ConsultantInvoiceModel>/IFSCCode}" id="idInputIFSCCode" liveChange="onPressLiveChange" editable="{visiablityPlay>/editable}" maxLength="11"/>
+										<m:Input value="{ConsultantInvoiceModel>/IFSCCode}" id="CI_id_InputIFSCCode" liveChange="validateIfcCode" maxLength="11" valueStateText="{i18n>ifcsCodeValueState}" editable="{visiablityPlay>/editable}"/>
 									</f:content>
 								</f:SimpleForm>
 							</blocks>
@@ -176,12 +175,12 @@
     <m:OverflowToolbar>
         <m:ToolbarSpacer />
         <m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://add" tooltip="{i18n>addItem}" press="onPressAddInvoiceDetails" type="Emphasized" />
-        <m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://signature" tooltip="{i18n>addSignature}" press="onPressAddSignature" type="Emphasized" id="idSign" />
+        <m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://signature" tooltip="{i18n>addSignature}" press="onPressAddSignature" type="Emphasized" id="CI_id_Sign" />
         <m:ToolbarSeparator />
     </m:OverflowToolbar>
 
     <!-- Table -->
-    <m:Table id="idTable" mode="Delete" delete="onPressDelete" items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}">
+    <m:Table id="CI_id_ConsultantInvoiceDeatailTable" mode="Delete" delete="onPressDelete" items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}">
         <m:columns>
             <m:Column width="100px">
                 <m:Text text="{i18n>siNo}" />
@@ -235,7 +234,7 @@
                     <m:Input value="{UnitPrice}" editable="{visiablityPlay>/editable}" change="onInputChange" type="Number" maxLength="10" textAlign="End"/>
                 </m:cells>
                 <m:cells>
-                    <m:Input id="idDiscountInput" value="{Discount}" editable="{visiablityPlay>/editable}" liveChange="onchangeDiscount" maxLength="10" textAlign="End"/>
+                    <m:Input id="CI_id_DiscountInput" value="{Discount}" editable="{visiablityPlay>/editable}" liveChange="onchangeDiscount" maxLength="10" textAlign="End"/>
                 </m:cells>
                 <m:cells>
                     <m:Input value="{path:'Total',formatter: '.Formatter.numberFormater'}" editable="false" textAlign="End"/>
@@ -252,7 +251,7 @@
                 class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                 visible="{= ${oModelDataPro>/TotalSum} > 0}" />
 												<m:Text text="{path:'oModelDataPro>/SubTotalNotGST',formatter: '.Formatter.numberFormater'}"
-                id="idSubTo"
+                id="CI_id_SubTo"
                 class="amountText"
                 textAlign="End"
                 visible="{= ${oModelDataPro>/TotalSum} > 0}" />
@@ -262,7 +261,7 @@
 												<m:Label text="{i18n>subTotal} ({i18n>Taxable}) ({ConsultantInvoiceModel>/Currency}) :" 
                 class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"/>
 												<m:Text text="{path:'oModelDataPro>/SubTotal',formatter: '.Formatter.numberFormater'}"
-                id="idSubtotal"
+                id="CI_id_Subtotal"
                 class="amountText" 
                 textAlign="End"/>
 											</m:HBox>
@@ -302,7 +301,7 @@
                 class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                 visible="{= ${oModelDataPro>/TotalSum} > 0}" />
 												<m:Text text="{path:'oModelDataPro>/TotalSum',formatter: '.Formatter.numberFormater'}"
-                id="TotalAmountId"
+                id="CI_id_TotalAmount"
                 class="amountText"
                 textAlign="End"
                 visible="{= ${oModelDataPro>/TotalSum} > 0}" />
@@ -321,7 +320,7 @@
 				<m:ToolbarSpacer/>
 				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Emphasized" press="onPressSubmit" class="sendMail" />
 				<m:Button visible="{visiablityPlay>/editVisi}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"  press="onPressEdit" class="sendMail" />
-				<m:Button text="{i18n>buttonSendEmail}" id="idContractMail" press="onPressSendEmail" visible="{visiablityPlay>/merge}"/>
+				<m:Button text="{i18n>buttonSendEmail}" id="CI_id_ContractMail" press="onPressSendEmail" visible="{visiablityPlay>/merge}"/>
 				<m:Button text="{i18n>jsPdf}" press="onPressGeneratePdf"  visible="{visiablityPlay>/merge}" />
 			</m:Toolbar>
 		</m:footer>
