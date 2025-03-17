@@ -45,7 +45,10 @@ sap.ui.define([
                 this.getRouter().navTo("RouteMyInbox",{sMyInBox:"MyInboxView"});
             },
             TileV_onpressInvoiceApp: function () {
-                this.getRouter().navTo("RouteCompanyInvoice",{sPath:"Invoice"})
+                this.getRouter().navTo("RouteCompanyInvoice",{sPath:"Invoice"});
             },
+            TileV_onpressQuotation: function () {
+                this.getRouter().navTo("RouteQuotation");
+            }
         });
     });
