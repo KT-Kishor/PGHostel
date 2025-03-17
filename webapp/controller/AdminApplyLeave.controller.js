@@ -7,9 +7,10 @@ sap.ui.define(
     "sap/ui/model/FilterOperator",
     "sap/m/MessagePopover",
     "sap/m/MessageItem",
+    "../utils/validation"
   ],
   function (
-    BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem
+    BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem,utils
   ) {
     "use strict";
     return BaseController.extend(
@@ -67,12 +68,24 @@ sap.ui.define(
             this.oDialog.open();
           }
         },
-         // Close the leave dialog fragment
+        // Close the leave dialog fragment
         onPressClose: function () {
           this.oDialog.close();
-          sap.ui.getCore().byId("idFromDate").setValueState("None");
-          sap.ui.getCore().byId("idToDate").setValueState("None");
-          sap.ui.getCore().byId("idLeaveComments").setValueState("None");
+          sap.ui.getCore().byId("AL_id_FromDate").setValueState("None");
+          sap.ui.getCore().byId("AL_id_ToDate").setValueState("None");
+          sap.ui.getCore().byId("AL_id_LeaveComments").setValueState("None");
+        },
+        validateDate: function (oEvent) {
+          utils._LCvalidateDate(oEvent);
+        },
+        ValidateCommonFields: function (oEvent) {
+          utils._LCvalidateMandatoryField(oEvent);
+        },
+        AL_onSignout: function () {
+          this.getRouter().navTo("RouteLoginPage");
+        },
+        AL_onPressback: function () {
+          this.getRouter().navTo("RouteTilePage");
         },
       }
     );

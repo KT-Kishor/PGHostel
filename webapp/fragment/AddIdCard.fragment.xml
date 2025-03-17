@@ -47,22 +47,22 @@
 				</ComboBox>
 				<!-- Employee Name -->
 				<Label text="{i18n>employeeName}" required="true" />
-				<Input value="{IdCardModel>/EmployeeName}" maxLength="50" id="idNameid" liveChange="liveChangeValuState" editable="{IdCardModel>/isEditable}" />
+				<Input value="{IdCardModel>/EmployeeName}" liveChange="validateName" maxLength="50" valueStateText="{i18n>validEmpNameMsg}" editable="{IdCardModel>/isEditable}" />
 				<!-- Designation -->
 				<Label text="{i18n>designation}" required="true"/>
-				<Input value="{IdCardModel>/Designation}" maxLength="50" id="idDesiid" liveChange="liveChangeValuState "/>
+				<Input value="{IdCardModel>/Designation}" liveChange="ValidateCommonFields" maxLength="20" valueStateText="{i18n>destinationValueState}"/>
 				<!-- Email -->
 				<Label text="{i18n>email}" required="true"/>
-				<Input value="{IdCardModel>/Email}" maxLength="100" id="idMailid" liveChange="validateMailID"/>
+				<Input value="{IdCardModel>/Email}"  liveChange="validateEmail" maxLength="50" valueStateText="{i18n>emailValueState}"/>
 				<!-- DOB -->
 				<Label text="{i18n>dateOfBirth}" required="true" />
-				<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{IdCardModel>/DOB}" id="idDateBirth" maxDate="{IdCardModel>/today}" initialFocusedDateValue="{IdCardModel>/minDOB}" change="liveChangeValuState"/>
+				<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{IdCardModel>/DOB}" id="idDateBirth" maxDate="{IdCardModel>/today}" initialFocusedDateValue="{IdCardModel>/minDOB}" change="validateDate" valueStateText="{i18n>dateValueState}" />
 				<!-- MobileNo -->
 				<Label text="{i18n>mobileNo}" required="true"/>
-				<Input value="{IdCardModel>/MobileNo}" maxLength="10" id="idMoid" liveChange="validateMobileNo" />
+				<Input value="{IdCardModel>/MobileNo}" liveChange="validateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}" />
 				<!-- BloodGroup -->
 				<Label text="{i18n>bloodGroup}" required="true" />
-				<ComboBox showSecondaryValues="true" id="idbgid"  items="{BloodGroupModel>/results}" change="liveChangeValuState" value="{IdCardModel>/BloodGroup}" >
+				<ComboBox showSecondaryValues="true" id="idbgid"  items="{BloodGroupModel>/results}" change="ValidateCommonFields" value="{IdCardModel>/BloodGroup}" >
 					<core:Item key="{BloodGroupModel>ID}" text="{BloodGroupModel>Code}" />
 				</ComboBox>
 				<!-- File Uploader -->
@@ -73,9 +73,11 @@
                         name="myFileUpload"
                         uploadUrl="upload/"
                         tooltip="{i18n>fileUploadId}"
-                        change="onHandleUploadPress"
+                        change="IC_onHandleUploadPress"
                         buttonOnly="true"  
-						id="idfile"                  
+						id="idfile"  
+						fileType="jpg,png,jpeg"  
+						valueStateText="{i18n>fileUploaderValueState}"               
                         uploadComplete="handleUploadComplete"/>
 					</VBox>
 					<VBox width="70%" >
@@ -83,7 +85,7 @@
 					</VBox>
 				</HBox>
 				<Label text="{i18n>picture}"/>
-				<Button text="{i18n>openCamera}" icon="sap-icon://camera" press="onPressOpenCamera" />
+				<Button text="{i18n>openCamera}" icon="sap-icon://camera" press="IC_onPressOpenCamera" />
 				<Label/>
 				<VBox id="canvasContainer" visible="true" class="sapUiSmallMargin canvas">
 					<core:HTML content="&lt;canvas id='canvas' class='passport-size-canvas'&gt;&lt;/canvas&gt;" />
@@ -92,9 +94,9 @@
 		</f:SimpleForm>
 		<!-- Buttons for Submit and Close actions -->
 		<FlexBox justifyContent="End" width="100%">
-			<Button text="{i18n>submit}" type="Emphasized" press="onPressSubmit" class="sendMail" visible="{IdCardModel>/Submit}"/>
-			<Button text="{i18n>save}" type="Emphasized" press="onPressSave" class="sendMail" visible="{IdCardModel>/Save}"/>
-			<Button text="{i18n>close}" class="sendMail" press="onPressClose" />
+			<Button text="{i18n>submit}" type="Emphasized" press="IC_onPressSubmit" class="sendMail" visible="{IdCardModel>/Submit}"/>
+			<Button text="{i18n>save}" type="Emphasized" press="IC_onPressSave" class="sendMail" visible="{IdCardModel>/Save}"/>
+			<Button text="{i18n>close}" class="sendMail" press="IC_onPressClose" />
 		</FlexBox>
 	</Dialog>
 </core:FragmentDefinition>

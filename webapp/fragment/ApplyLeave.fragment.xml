@@ -38,12 +38,12 @@
 				<VBox>
 					<!-- From Date -->
 					<Label text="{i18n>fromDate}" required="true" />
-					<DatePicker value="{LeaveTempModel>/FromDate}" id="idFromDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" maxDate="{LeaveTempModel>/maxDate}"
-                     change="onFromDateChange" liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend" minDate="{LeaveTempModel>/minDate}"/>
+					<DatePicker value="{LeaveTempModel>/FromDate}" id="AL_id_FromDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}"  maxDate="{LeaveTempModel>/maxDate}"
+                    liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend" minDate="{LeaveTempModel>/minDate}"/>
 					<!-- To Date -->
 					<Label text="{i18n>toDate}" required="true" />
-					<DatePicker minDate="{path: 'LeaveTempModel>/MinToDate'}" id="idToDate" value="{LeaveTempModel>/ToDate}" displayFormat="dd/MM/yyyy" maxDate="{LeaveTempModel>/maxDate}" 
-                valueFormat="dd/MM/yyyy" change="onToDateChange" liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend"/>
+					<DatePicker minDate="{path: 'LeaveTempModel>/MinToDate'}" id="AL_id_ToDate" value="{LeaveTempModel>/ToDate}" displayFormat="dd/MM/yyyy" maxDate="{LeaveTempModel>/maxDate}" 
+                valueFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}"  liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend"/>
 					<!-- Half Day CheckBox -->
 					<CheckBox text="{i18n>halfDay}" select="onHalfDaySelect" selected="{LeaveTempModel>/HalfDay}"/>
 				</VBox>
@@ -52,7 +52,7 @@
 				<Input  value="{LeaveTempModel>/NoofDays}" editable="false" liveChange="onLiveChange" maxLength="20"/>
 				<!-- Add Feedback -->
 				<Label text="{i18n>comments}" required="true"></Label>
-				<TextArea value="{LeaveTempModel>/Comments}" rows="2" id="idLeaveComments" liveChange="onLiveLeaveComments"  maxLength="200" placeholder="{i18n>enterComments}"/>
+				<TextArea value="{LeaveTempModel>/Comments}" rows="2" id="AL_id_LeaveComments"  liveChange="ValidateCommonFields" valueStateText="{i18n>commentsValueState}"  maxLength="200" placeholder="{i18n>enterComments}"/>
 			</f:content>
 		</f:SimpleForm>
 		<!-- Buttons for Submit and Close actions -->

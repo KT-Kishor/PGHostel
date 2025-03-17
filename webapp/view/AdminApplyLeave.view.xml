@@ -7,7 +7,7 @@
 	xmlns:core="sap.ui.core">
 	<Page id="AL_id_LeavePage">
 		<headerContent>
-			<Button press="AL" icon="sap-icon://home" />
+			<Button press="AL_onPressback" icon="sap-icon://home" />
 			<Text text="{i18n>leaveApplication}" class="boldBlackText"></Text>
 			<ToolbarSpacer />
 			<Button press="AL_onSignout" icon="sap-icon://log"></Button>

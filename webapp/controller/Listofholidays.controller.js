@@ -43,12 +43,12 @@ sap.ui.define(
                 var oModel = new sap.ui.model.json.JSONModel({ items: data.results });
                   that.getView().setModel(oModel, "HolidayModel");
               },           
-              error: function (error) {
+              error: function (err) {
                 sap.ui.core.BusyIndicator.hide();
-                sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered values");
-              },
+                sap.m.MessageToast.show(err.responseJSON.message);
+              }.bind(this),
             });
-          } catch (error) {
+          }catch(error) {
             sap.ui.core.BusyIndicator.hide();
             sap.m.MessageToast.show("Technical error please connect to administrator");
           }
