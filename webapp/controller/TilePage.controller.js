@@ -43,6 +43,9 @@ sap.ui.define([
             },
             TileV_onpressInbox: function(){
                 this.getRouter().navTo("RouteMyInbox",{sMyInBox:"MyInboxView"});
-            }
+            },
+            TileV_onpressInvoiceApp: function () {
+                this.getRouter().navTo("RouteCompanyInvoice",{sPath:"Invoice"})
+            },
         });
     });

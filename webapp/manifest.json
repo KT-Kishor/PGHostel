@@ -121,6 +121,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Months.json",
                 "preload": true
+            },
+            "Quotation": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Quotation.json",
+                "preload": true
             }
         },
         "resources": {
@@ -262,7 +267,28 @@
                     "target": [
                       "TargetMyInbox"
                     ]
-                  }
+                  },
+                  {
+                    "name": "RouteCompanyInvoice",
+                    "pattern": "CompanyInvoice/{sPath}",
+                    "target": [
+                      "TargetCompanyInvoice"
+                    ]
+                  },
+                  {
+                    "name": "RouteCompanyInvoiceDetails",
+                    "pattern": "InvoiceDetails/{sPath}",
+                    "target": [
+                      "TargetCompanyInvoiceDetails"
+                    ]
+                  },
+                  {
+                    "name": "RouteQuotation",
+                    "pattern": "Quotation",
+                    "target": [
+                        "TargetQuotation"
+                    ]
+                }
             ],
             "targets": {
                 "TargetView1": {
@@ -387,7 +413,28 @@
                     "clearControlAggregation": false,
                     "viewId": "MyInbox",
                     "viewName": "MyInbox"
-                  }
+                  },
+                  "TargetCompanyInvoice": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "CompanyInvoice",
+                    "viewName": "CompanyInvoice"
+                  },
+                  "TargetCompanyInvoiceDetails": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "CompanyInvoiceDetails",
+                    "viewName": "CompanyInvoiceDetails"
+                  },
+                  "TargetQuotation": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "Quotation",
+                    "viewName": "Quotation"
+                }
             }
             },
             "rootView": {

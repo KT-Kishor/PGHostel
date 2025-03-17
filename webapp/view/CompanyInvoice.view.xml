@@ -1,0 +1,85 @@
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.CompanyInvoice"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:m="sap.m.Table"
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core">
+   <Page id="idCompanyInvoice">
+		<headerContent>
+			<Button press="onBackPress" icon="sap-icon://home" />
+			<Text text="{i18n>invoiceApplication}" class="boldBlackText"></Text>
+			<ToolbarSpacer />
+			<Button press="onPressBackBtn" icon="sap-icon://log"></Button>
+		</headerContent>
+        <content>
+     <fb:FilterBar id="idInvoiceFilterBar" showFilterConfiguration="false" useToolbar="false" showClearOnFB="true" search="onSearch" >
+    <fb:filterGroupItems>
+        <fb:FilterGroupItem name="InvNo" label="Invoice No" groupName="ConsultantInvoice" visibleInFilterBar="true">
+            <fb:control>
+                <ComboBox id="idInvNo"
+                    items="{path:'oInvoiceModel>/InvoiceNoList', length:1000}"
+                    showSecondaryValues="true" showClearIcon="true">
+                    <core:ListItem key="{oInvoiceModel>InvoiceNoID}" text="{oInvoiceModel>InvoiceNo}" additionalText="{oInvoiceModel>InvoiceDate}" />
+                </ComboBox>
+            </fb:control>
+        </fb:FilterGroupItem>
+         <fb:FilterGroupItem name="InvoiceDate" label="Invoice Date" groupName="ConsultantInvoice" visibleInFilterBar="true">
+            <fb:control>
+                <DateRangeSelection id="idInvoiceDatePicker" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
+            </fb:control>
+        </fb:FilterGroupItem>
+
+       <fb:FilterGroupItem name="CustomerName" label="Customer Name" groupName="ConsultantInvoice" visibleInFilterBar="true">
+    <fb:control>
+        <ComboBox id="idCustomerNameComboBox" />
+    </fb:control>
+</fb:FilterGroupItem>
+
+<fb:FilterGroupItem name="Status" label="Status" groupName="ConsultantInvoice" visibleInFilterBar="true">
+    <fb:control>
+        <ComboBox id="idStatusComboBox" />
+    </fb:control>
+</fb:FilterGroupItem>
+           </fb:filterGroupItems>
+</fb:FilterBar>
+
+<Table id="idInvoiceTable" items="{path: '/CompanyInvoice'}" mode="SingleSelect" selectionChange="onSelectionChange">
+ <headerToolbar>
+        <Toolbar>
+         <Title id="" text="Company Invoice"/>
+            <ToolbarSpacer />
+            <ToolbarSeparator />
+        <Button icon="sap-icon://add-employee" tooltip="{i18n>addInvoice}" press="onPressAddInvoice" />
+            <ToolbarSeparator />
+            <Button text="MSA SOW" tooltip="{i18n>addInvoice}" press="onPressMSASOW" />
+        </Toolbar>
+    </headerToolbar>
+    <columns>
+        <Column><Text text="{i18n>invoiceNo}" /></Column>
+        <Column><Text text="{i18n>invoiceDate}" /></Column>
+        <Column><Text text="{i18n>PayByDate}" /></Column>
+        <Column><Text text="{i18n>invoiceDescription}" /></Column>
+        <Column><Text text="{i18n>customerName}" /></Column>
+        <Column><Text text="{i18n>totalAmount}" /></Column>
+        <Column><Text text="{i18n>currency}" /></Column>
+        <Column><Text text="{i18n>status}" /></Column>
+    </columns>
+    <items>
+        <ColumnListItem type="Navigation" press="onPressInvoiceRow">
+            <cells>
+                <Text text="{InvNo}" />
+                <Text text="{InvoiceDate}" />
+                <Text text="{PayByDate}" />
+                <Text text="{InvoiceDescription}" />
+                <Text text="{CustomerName}" />
+                <Text text="{path: 'TotalAmount', formatter: '.Formatter.numberFormatter'}" textAlign="End" />
+                <Text text="{Currency}" textAlign="End" />
+                <ObjectStatus text="{Status}" inverted="true" state="{path: 'Status', formatter: '.Formatter.statusStateFormatter'}" />
+            </cells>
+        </ColumnListItem>
+    </items>
+</Table>
+        </content>
+    </Page>
+</mvc:View>

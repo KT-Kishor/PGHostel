@@ -1,109 +1,106 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.Listofholidays"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:m="sap.m.Table"
-    xmlns:f="sap.f"
-    xmlns:filterbar="sap.ui.comp.filterbar"
-    xmlns:core="sap.ui.core">
-    <Page id="idListOfholidays">
-       <headerContent>
-			<Button  press="onBack" icon="sap-icon://home" />
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:m="sap.m.Table"
+	xmlns:f="sap.f"
+	xmlns:filterbar="sap.ui.comp.filterbar"
+	xmlns:core="sap.ui.core">
+	<Page id="LOH_id_ListOfholidays">
+		<headerContent>
+			<Button  press="LOH_onPressback" icon="sap-icon://home" />
 			<Text text="{i18n>listOfHolidays}" class="boldBlackText"></Text>
 			<ToolbarSpacer />
-			<Button  press="onPressBack" icon="sap-icon://log"></Button>
+			<Button  press="LOH_onSignout" icon="sap-icon://log"></Button>
 		</headerContent>
-        <content>
-        <filterbar:FilterBar
-         id="filterbar"
+		<content>
+			<filterbar:FilterBar
+        id="LOH_id_AdminFilter"
                 useToolbar="false"
                 clear="onClear"
                 showClearOnFB="true"
                 search=".onSearch"
                 showFilterConfiguration="false"
 >
-    <filterbar:filterGroupItems>
-        <filterbar:FilterGroupItem
+				<filterbar:filterGroupItems>
+					<filterbar:FilterGroupItem
             name="YearPicker"
             label="Year"
             groupName="Group1"
             visibleInFilterBar="true"
         >
-            <filterbar:control>
-                <DatePicker
-                    id="idHolidays"
-                    value="{
-                        path: '/SelectedYear',
-                        type: 'sap.ui.model.type.Date',
-                        formatOptions: { pattern: 'yyyy' }
-                    }"
-                    displayFormat="yyyy"
-                    placeholder="yyyy"
-                />
-            </filterbar:control>
-        </filterbar:FilterGroupItem>
-    </filterbar:filterGroupItems>
-</filterbar:FilterBar>
-				<Table
+						<filterbar:control>
+							<DatePicker
+  id="LOH_id_Holidays"
+  value="{path: '/selectedYear', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'yyyy' }}"
+  displayFormat="yyyy"
+  placeholder="yyyy"
+  change="handleChange" 
+/>
+						</filterbar:control>
+					</filterbar:FilterGroupItem>
+				</filterbar:filterGroupItems>
+			</filterbar:FilterBar>
+			<Table
                  growingScrollToLoad="true"
-                     id="TableId"
+                     id="LOH_id_HolidayTable"
                       width="auto"
                      inset="false"
                      items="{HolidayModel>/items}"
                      growing="true"
                      growingThreshold="50"
-                     alternateRowColors="false"
+                     alternateRowColors="false" 
                     >
-                     <headerToolbar>
-                    <OverflowToolbar>
-                       <Title id="" text="List Of Holidays"/>
-                        <ToolbarSpacer />
-                           </OverflowToolbar>
-                </headerToolbar>
-					<columns>
-						<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true" width="15rem">
-							<Text text="{i18n>Name}" textAlign="Center"></Text>
-						</Column>
-						<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true" >
-							<Text text="{i18n>Date}" id="DateId" textAlign="Center"></Text>
-						</Column>
-						<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>Day}" textAlign="Center"></Text>
-						</Column>
-						<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>karnataka}" textAlign="Center"></Text>
-						</Column>
-						<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>otherStates}" textAlign="Center"></Text>
-						</Column>
-						<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>maharashtra}" textAlign="Center"></Text>
-						</Column>
-						<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>delhi}" textAlign="Center"></Text>
-						</Column>
-					</columns>
-					<items>
-						<ColumnListItem id="comunListId">
-							<cells>
-								<Text text="{HolidayModel>Name}"/>
-								<Text text="{HolidayModel>Date}"/>
-								<Text text="{HolidayModel>Day}"/>
-								<ObjectStatus 
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title  id="LOH_id_Title" text="{i18n>listOfHolidays}"/>
+						<ToolbarSpacer />
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true" width="15rem">
+						<Text text="{i18n>Name}" textAlign="Center"></Text>
+					</Column>
+					<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true" >
+						<Text text="{i18n>Date}" id="DateId" textAlign="Center"></Text>
+					</Column>
+					<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>Day}" textAlign="Center"></Text>
+					</Column>
+					<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>karnataka}" textAlign="Center"></Text>
+					</Column>
+					<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>otherStates}" textAlign="Center"></Text>
+					</Column>
+					<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>maharashtra}" textAlign="Center"></Text>
+					</Column>
+					<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>delhi}" textAlign="Center"></Text>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem id="comunListId">
+						<cells>
+							<Text text="{HolidayModel>Name}"/>
+							<Text text="{HolidayModel>Date}"/>
+							<Text text="{HolidayModel>Day}"/>
+							<ObjectStatus 
                         state="{= ${Karnataka} === '?' ? 'Success' : 'Error'}" 
                         icon="{= ${Karnataka} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
-								<ObjectStatus 
+							<ObjectStatus 
                         state="{= ${Other States} === '?' ? 'Success' : 'Error'}" 
                         icon="{= ${Other States} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
-								<ObjectStatus 
+							<ObjectStatus 
                         state="{= ${Maharashtra} === '?' ? 'Success' : 'Error'}" 
                         icon="{= ${Maharashtra} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
-								<ObjectStatus 
+							<ObjectStatus 
                         state="{= ${Delhi} === '?' ? 'Success' : 'Error'}" 
                         icon="{= ${Delhi} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
-							</cells>
-						</ColumnListItem>
-					</items>
-				</Table>
-        </content>
-    </Page>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+	</Page>
 </mvc:View>

@@ -13,7 +13,7 @@
 			<Button   press="onPressBack" icon="sap-icon://log"></Button>
 		</headerContent>
        <content>
-       <fb:FilterBar  id="idCardFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+       <fb:FilterBar  id="idCardFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmployeeName" label="{i18n>employeeName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
@@ -39,7 +39,7 @@
         <columns>
             <Column><Text text="{i18n>employeeID}" /></Column>
             <Column><Text text="{i18n>employeeName}" /></Column>
-            <Column><Text text="{i18n>DOB}" /></Column>
+            <Column><Text text="{i18n>dateOfBirth}" /></Column>
             <Column><Text text="{i18n>bloodGroup}" /></Column>
             <Column><Text text="{i18n>mobileNo}" /></Column>
             <Column><Text text="{i18n>designation}" /></Column>
