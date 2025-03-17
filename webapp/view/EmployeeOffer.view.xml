@@ -3,7 +3,6 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
-	xmlns:form="sap.ui.layout.form" 
     controllerName="sap.kt.com.minihrsolution.controller.EmployeeOffer"
 	xmlns:fb="sap.ui.comp.filterbar"	
     displayBlock="true">
@@ -19,26 +18,21 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="Employee Name" label="Employee Name" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Employee Name" selectionChange=".onBranchChange" showClearIcon="true" items="{ path: 'BaseLocation>/results', length:1000,  sorter: { path: 'Company', descending: false,
-                                        group: true } }" >
+						<ComboBox name="Employee Name" selectionChange=".onBranchChange" showClearIcon="true" items="" >
 							<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Base Location" label="Base Location" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="Base Location"  items="{path: 'DropDownModel>/results',sorter: {path: 'Branch',descending: false,group: true},length:1000}" showClearIcon="true" id="Ov_id_DesiFilter">
+							<ComboBox name="Base Location"  items="" showClearIcon="true" id="Ov_id_DesiFilter">
 								<core:Item key="{DropDownModel>ConsultantName}" text="{DropDownModel>ConsultantName}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Joining Date" label="Joining Date" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-                    <DateRangeSelection
-                    id="Ov_id_JoiningDate"
-                    valueFormat="yyyy-MM-dd" 
-                    displayFormat="dd/MM/yyyy"
-                    change="onDateChange" />						
+                    <DateRangeSelection id="Ov_id_JoiningDate" valueFormat="yyyy-MM-dd"  displayFormat="dd/MM/yyyy" change="onDateChange" />						
 					</fb:control>
 						</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
@@ -50,15 +44,15 @@
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="Ov_idSalary" items="{path: 'EmployeeOfferModel>/results',sorter: {path: 'Company',descending: false,group: true}}" mode="SingleSelectLeft" selectionChange="onSelectionEmployeeOffer" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="Ov_idSalary" items="" growing="true"  growingThreshold="50"  alternateRowColors="true">
 			 <headerToolbar>
                 <OverflowToolbar >
-                    <Title id="" text="Employee Details"/>
+                    <Title id="" text="{i18n>headerEmpDetails}"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
-                    <Button tooltip="Onboard Employee" id="Ov_id_OnboardBtn" text="Onboard" type="Neutral" press="onOnboardPress"  icon="sap-icon://manager"/>
-                    <Button tooltip="Reject Employee" id="Ov_id_RejectBtn" type="Reject" text="Reject" press="onRejectPress" icon="sap-icon://employee-rejections" />
-                    <Button text="Generate Offer" press="Ov_onPressAddEmployee" type="Accept" tooltip="Add Employee" icon="sap-icon://employee-approvals"/>
+                    <Button tooltip="{i18n>onboardEmp}" id="Ov_id_OnboardBtn" text="Onboard" type="Neutral" press="O_onOnboardPress"  icon="sap-icon://manager"/>
+                    <Button tooltip="{i18n>rejectEmp}" id="Ov_id_RejectBtn" type="Reject" text="Reject" press="O_onRejectPress" icon="sap-icon://employee-rejections" />
+                    <Button text="{i18n>generateOffer}" press="Ov_onPressAddEmployee" type="Accept"  icon="sap-icon://employee-approvals"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
@@ -82,7 +76,7 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem type="Navigation" press="OnNavigationEmployee">
+					<ColumnListItem>
 						<cells>
 							<Text text="{EmployeeOfferModel>Salutation} {EmployeeOfferModel>ConsultantName}"/>
 							<Text text="{EmployeeOfferModel>Designation}"/>

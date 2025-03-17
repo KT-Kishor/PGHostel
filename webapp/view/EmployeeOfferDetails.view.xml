@@ -12,7 +12,7 @@
 				<pages>
 					<Page>
 						<content>
-							<Wizard complete="onPressReview" id="EOD_id_Wizard" finishButtonText="{i18n>submit}" showNextButton="true">
+							<Wizard complete="EOD_onPressReview" id="EOD_id_Wizard" finishButtonText="{i18n>submit}" showNextButton="true">
 								<WizardStep id="EOD_id_WizardStep"   complete="onCalculate" title="{i18n>basicDetails}" validated="true">
 									<f:SimpleForm editable="true" layout="ColumnLayout" columnsM="1" columnsL="2" columnsXL="2">
 										<f:content>

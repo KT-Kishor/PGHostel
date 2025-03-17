@@ -17,26 +17,21 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="Trainee" label="Trainee Name" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="{path:'CompanyDetails>/results',length:1000 }" change="onChangeCompanyName" id="T_id_TraineeName" showClearIcon="true">
-								<core:ListItem key="{CompanyDetails>CompanyCode}" text="{CompanyDetails>CompanyName}" additionalText="{CompanyDetails>CompanyCode}" />
+							<ComboBox  showSecondaryValues= "true"  items="" change="" id="T_id_TraineeName" showClearIcon="true">
+								<core:ListItem key="" text="" additionalText="" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Reporting Manager" label="Reporting Manager" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="Reporting Manager"  items="{ path: 'BaseLocation>/results', length:1000,  sorter: { path: 'Company', descending: false,
-                                        group: true } }"  id="T_id_RmFilterBar" showClearIcon="true">
+							<ComboBox name="Reporting Manager"  items="" id="T_id_RmFilterBar" showClearIcon="true">
 								<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Joining Date" label="Joining Date" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-                    <DateRangeSelection
-                    id="T_id_JoiningDate"
-                    valueFormat="yyyy-MM-dd" 
-                    displayFormat="dd/MM/yyyy"
-                    change="onDateChange" />						
+                    <DateRangeSelection id="T_id_JoiningDate" valueFormat="dd/MM/yyyy"  displayFormat="dd/MM/yyyy" change="onDateChange" />						
 					</fb:control>
 						</fb:FilterGroupItem>
 				</fb:filterGroupItems>
@@ -75,7 +70,7 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem type="Navigation" press="OnNavigationEmployee">
+					<ColumnListItem >
 						<cells>
 						    <Text text="{oAdminModel>EmployeeName} ({oAdminModel>EmployeeID})"/>							
 							<Text text="{oAdminModel>JoiningDate}"/>

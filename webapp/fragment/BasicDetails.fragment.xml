@@ -1,0 +1,187 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+>
+<f:SimpleForm
+                                        editable="true" layout="ColumnLayout"
+                                         labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+                                         adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"                           
+                                         emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
+                                         columnsM="1" singleContainerFullSize="false">
+							<f:toolbar>
+								<Toolbar>
+									<Title text="{i18n>basicDetails}" />
+									<ToolbarSpacer />
+									<Button id="SS_id_EditSaveSelf" text="{= ${viewModel>/common} ? 'Save' : 'Edit' }"
+                              press="SS_onEditEmpDetPress"   />
+									<Button tooltip="{i18n>visit}" id="SS_idVisitingCard" press="SS_onDownloadVisitCard" icon="sap-icon://visits" />
+									<Button tooltip="{i18n>terminateLetter}" id="SS_idTerminate" press="SS_onDownloadTerminateLetter"  visible="{modelButtonVisible>/TerminationButt}" icon="sap-icon://document-text" />
+									<Button tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter"  visible="{modelButtonVisible>/RelivingExpeButt}" icon="sap-icon://create"/>
+									<Button tooltip="{i18n>resignationletter}" id="SS_idResignation" press="SS_onDownloadResignationLetter"  visible="true" icon="sap-icon://request" />
+								</Toolbar>
+							</f:toolbar>
+							<f:content>
+								<Label text="{i18n>employeeID}"/>
+								<Input value="{employeeData>/ID}" editable="false" id="SS_id_EmpID"/>
+								<Label text="{i18n>employeeName}"  />
+								<Input value="{employeeData>/Salutation} {employeeData>/EmployeeName}"  id="SS_id_NameEmp" editable="false" maxLength="50" liveChange="validateName"/>
+								<Label  text="{i18n>joiningDate}"/>
+								<DatePicker value="{employeeData>/AppraisalDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" id="SS_id_Joinn" editable="false"/>
+								<Label text="{i18n>dateOfBirth}" required="true" id="SS_id_ldob" />
+								<DatePicker value="{employeeData>/DateOfBirth}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="liveChangeValuState"
+                                id="SS_id_Dob" editable="{viewModel>/common}" initialFocusedDateValue="{controller>/focusedDate}"
+	                             maxDate="{controller>/maxDate}" />
+								<Label text="{i18n>bloodGroup}" required="true" id="SS_id_lb"/>
+								<Select change="onChangeBloodGroup"  selectedKey="{employeeData>/BloodGroup}" editable="{viewModel>/common}" items="{BloodGroupModel>/results}" id="SS_id_BloodGroup">
+									<core:Item key="{BloodGroupModel>Code}" text="{BloodGroupModel>Code}" />
+								</Select>
+								<Label text="{i18n>companyMailid}"  />
+								<Input value="{employeeData>/CompanyEmailID}" editable="{viewModel>/editBut}" id="SS_id_Compmail" liveChange="liveChangeValuState" placeholder="{i18n>companyMailid}" maxLength="100"/>
+								<Label text="{i18n>permanentAddress}" required="true" id="SS_id_lpa"/>
+								<TextArea value="{employeeData>/PermanentAddress}" editable="{viewModel>/common}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="liveChangeValuState"/>
+								<Label text="{i18n>correspondenceAddress}" required="true" id="SS_id_lca"/>
+								<TextArea value="{employeeData>/CorrespondenceAddress}" editable="{viewModel>/common}" id="SS_id_CAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="liveChangeValuState"/>
+								<Label text="{i18n>baseLocation}" />
+								<Select items="{CityJsonModel>/results}" selectedKey="{employeeData>/BaseLocation}" editable="{viewModel>/editBut}" id="SS_id_BaseL">
+									<core:Item key="{CityJsonModel>LocationName}" text="{CityJsonModel>LocationName}" />
+								</Select>
+								<Label text="{i18n>designation}"/>
+								<Select items="{DesignationModel>/results}" selectedKey="{employeeData>/Designation}" editable="{viewModel>/editBut}" id="SS_id_Desi">
+									<core:Item key="{DesignationModel>DesignationName}" text="{DesignationModel>DesignationName}"/>
+								</Select>
+								<Label text="{i18n>manager}"/>
+								<ComboBox value="{employeeData>/ManagerName}"
+								change="onChangeManage"
+				             showSecondaryValues= "true"
+				              id="SS_id_Manager"
+							  editable="{viewModel>/editBut}"
+				             items="{idModel>/results}"
+				           filterSecondaryValues="true">
+									<core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}"/>
+								</ComboBox>
+								<Label text="{i18n>mobileNo}" required="true" id="SS_id_Lmo"/>
+								<Input value="{employeeData>/MobileNo}" editable="{viewModel>/common}" maxLength="10" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo"/>
+								<Label text="{i18n>role}"/>
+								<Select
+								editable="{viewModel>/editBut}"
+									width="100%"
+									id="SS_id_RoleEmpSele"
+									selectedKey="{employeeData>/Role}"
+									items="{roleModel>/items}" >
+									<core:Item key="{roleModel>Role}" text="{roleModel>Role}" />
+									<!-- Display role in the Select -->
+								</Select>
+								<Label text="{i18n>employeeStatus}" />
+								<Select
+									change="SS_onStatusChange"
+									id="SS_id_StatusSelf"
+									editable="{viewModel>/common}"
+					selectedKey="{employeeData>/EmployeeStatus}"
+					items="">
+									<core:Item key="Active" text="{i18n>active}" />
+									<core:Item key="Inactive" text="{i18n>inactive}" />
+								</Select>
+							</f:content>
+						</f:SimpleForm>
+						<f:SimpleForm
+                                         editable="true" layout="ColumnLayout"  title="{i18n>bankDetails}" class="sapUiSmallMarginTop"
+                                         labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+                                         adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"                           
+                                         emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
+                                         columnsM="1" singleContainerFullSize="false">
+							<f:content>
+								<Label text="{i18n>accountHolder}" required="true" id="SS_id_Ah"/>
+								<Input value="{employeeData>/AccountHolderName}" editable="{viewModel>/common}" id="SS_id_AcName" liveChange="validateName" maxLength="50" placeholder="{i18n>placeAccountHolder}" />
+								<Label text="{i18n>accountNo}" required="true" id="SS_id_An"/>
+								<Input value="{employeeData>/AccountNo}" editable="{viewModel>/common}" id="SS_id_Acno" liveChange="validateAccountNo" maxLength="18" placeholder="{i18n>placeAccountNo}"/>
+								<Label text="{i18n>bankName}" required="true" id="SS_id_Bn"/>
+								<Input value="{employeeData>/BankName}" editable="{viewModel>/common}" id="SS_id_BankName" maxLength="50" liveChange="liveChangeValuState" placeholder="{i18n>placeBankName}"/>
+								<Label text="{i18n>bankBranch}" required="true" id="SS_id_Bb"/>
+								<Input value="{employeeData>/BankBranch}" editable="{viewModel>/common}" id="SS_id_Branch" maxLength="50" liveChange="liveChangeValuState" placeholder="{i18n>placeBankBranch}"/>
+								<Label text="{i18n>ifscCode}" required="true" id="SS_id_Ifc"/>
+								<Input value="{employeeData>/IFSCCode}" editable="{viewModel>/common}" id="SS_id_IfcsCode" liveChange="validateIFCSNo" maxLength="11" placeholder="{i18n>placeIfscCode}"/>
+								<Label text="{i18n>bankAddress}" required="true" id="SS_id_Ba"/>
+								<TextArea value="{employeeData>/BankAddress}" editable="{viewModel>/common}" id="SS_id_Address" maxLength="120" liveChange="liveChangeValuState" placeholder="{i18n>placeBankAddress}"  />
+								<Label text=""/>
+								<Button text="{i18n>upload}" press="SS_handleUploadPress" tooltip="{i18n>bankAttachment}" width="18%"/>
+								<Label text=""/>
+								<Text text="{i18n>uploadNote}"/>
+							</f:content>
+						</f:SimpleForm>
+						<MessageStrip
+				text="{i18n>uploadDocmsg}"
+				type="Information"
+				showIcon="true"
+				class="sapUiSmallMarginTop"/>
+						<f:SimpleForm
+                                         editable="true" layout="ColumnLayout" title="{i18n>docDetails}"  class="sapUiSmallMarginTop"
+                                         labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+                                         adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"                           
+                                         emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
+                                         columnsM="1" singleContainerFullSize="false">
+							<f:content>
+								<Label text="{i18n>panCard}" required="true" id="SS_id_LPan"/>
+								<Input value="{employeeData>/PANCard}" editable="{viewModel>/common}" id="SS_id_Pan" maxLength="10" liveChange="validatePanNo" placeholder="{i18n>placePan}"/>
+								<Label text="{i18n>adharCard}"/>
+								<Input value="{employeeData>/AdharCard}" editable="{viewModel>/common}" id="SS_idAdhar" maxLength="12"  liveChange="validateAdharCard" placeholder="{i18n>placeAdhar}"/>
+								<Label text="{i18n>passport}"/>
+								<Input value="{employeeData>/Passport}" editable="{viewModel>/common}" id="SS_id_Passport" maxLength="8" liveChange="validatePassportNo" placeholder="{i18n>placePassport}"/>
+								<Label text="{i18n>voterId}"/>
+								<Input value="{employeeData>/VoterId}" editable="{viewModel>/common}" id="SS_id_Voterid" maxLength="10" liveChange="validateVoterId" placeholder="{i18n>placeVoterId}"/>
+							</f:content>
+						</f:SimpleForm>
+						<f:SimpleForm
+                                         editable="true" layout="ColumnLayout"  title="{i18n>emergencyDetails}" class="sapUiSmallMarginTop"
+                                         labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+                                         adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"                           
+                                         emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
+                                         columnsM="1" singleContainerFullSize="false">
+							<f:content>
+								<core:Title class="emerContClass" text="{i18n>personOne}" />
+								<Label text="{i18n>name}" required="true" id="SS_id_Pf" />
+								<Select id="idEmeSal1" editable="{viewModel>/common}" change=""
+                                               selectedKey="{employeeData>/EmergencyContactPerson1Salutation}"
+                                               items="{NameSalutation>/items}"
+                                               width="100%">
+									<!-- Binding the key and text of the Select control to the NameSalutation model -->
+									<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}" />
+									<layoutData>
+										<l:GridData span="XL2 L1 M3 S4" />
+									</layoutData>
+								</Select>
+								<Input  value="{employeeData>/EmergencyContactPerson1Name}"  editable="{viewModel>/common}" liveChange="validateName" id="idEmeName1" placeholder="{i18n>placeName}" maxLength="50"/>
+								<Label text="{i18n>realtion}" required="true" id="SS_id_Rf"/>
+								<Select id="SS_id_Rel1"  items="{relationModel>/results}" selectedKey="{employeeData>/EmergencyContactPerson1Realtion}" editable="{viewModel>/common}">
+									<core:Item key="{relationModel>Relationship}" text="{relationModel>Relationship}"/>
+								</Select>
+								<Label text="{i18n>mobileNo}" required="true" id="SS_id_Mf" />
+								<Input value="{employeeData>/EmergencyContactPerson1ContactNo}" placeholder="{i18n>mobileNo}"  editable="{viewModel>/common}"   maxLength="10" liveChange="validateMobileNo" id="idEmpMo1"/>
+								<Label text="{i18n>address}" required="true" id="SS_id_Af"/>
+								<TextArea value="{employeeData>/EmergencyContactPerson1Address}" placeholder="{i18n>address}"  id="SS_id_AddF" editable="{viewModel>/common}" liveChange="liveChangeValuState" maxLength="120"/>
+								<core:Title class="emerContClass" text="{i18n>personTwo}" />
+								<Label text="{i18n>name}" required="true" id="SS_id_Ps" />
+								<Select id="idEmeSal2" editable="{viewModel>/common}"
+                                               selectedKey="{employeeData>/EmergencyContactPerson2Salutation}"
+                                               items="{NameSalutation>/items}"
+                                               width="100%">
+									<!-- Binding the key and text of the Select control to the NameSalutation model -->
+									<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}" />
+									<layoutData>
+										<l:GridData span="XL2 L1 M3 S4" />
+									</layoutData>
+								</Select>
+								<Input value="{employeeData>/EmergencyContactPerson2Name}"  editable="{viewModel>/common}" liveChange="validateName" id="SS_id_NameF" placeholder="{i18n>placeName}" maxLength="50"/>
+								<Label text="{i18n>realtion}" required="true" id="SS_id_Rs"/>
+								<Select  id="idRel2" items="{relationModel>/results}" selectedKey="{employeeData>/EmergencyContactPerson2Realtion}" editable="{viewModel>/common}">
+									<core:Item key="{relationModel>Relationship}" text="{relationModel>Relationship}"/>
+								</Select>
+								<Label text="{i18n>mobileNo}" required="true" id="SS_id_Ms"/>
+								<Input value="{employeeData>/EmergencyContactPerson2ContactNo}" placeholder="{i18n>mobileNo}" editable="{viewModel>/common}" maxLength="10" liveChange="validateMobileNo" id="idEmpMo2"/>
+								<Label text="{i18n>address}" required="true" id="SS_id_As"/>
+								<TextArea value="{employeeData>/EmergencyContactPerson2Address}" placeholder="{i18n>address}" editable="{viewModel>/common}" maxLength="120" id="idEmpAdd2" liveChange="liveChangeValuState"/>
+							</f:content>
+						</f:SimpleForm>
+</c:FragmentDefinition>

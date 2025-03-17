@@ -1,0 +1,45 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core">
+	<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"  items=""   growing="true"  growingThreshold="50"  alternateRowColors="true">
+		<headerToolbar>
+			<OverflowToolbar >
+				<Title text="{i18n>educationalDetails}"/>
+				<!-- <ToolbarSeparator/> -->
+				<ToolbarSpacer/>
+				<Button icon="sap-icon://attachment" id="EdF_id_EduAttach" press="EdF_EduAttach" tooltip="{i18n>toolUploadEdu}" />
+				<Button text="{i18n>add}" icon="sap-icon://add" id="EdF_id_EduAdd" tooltip="{i18n>toolEAddEdu}" press="EdF_EduAdd"  type="Accept"/>
+				<Button text="{i18n>edit}" icon="sap-icon://edit" id="EdF_id_EduEdit"  tooltip="{i18n>toolEEditEdu}" press="Edu_EduEdit" type="Neutral" />
+				<Button text="{i18n>delete}" icon="sap-icon://delete" id="EdF_id_EduDelete" tooltip="{i18n>toolDeleteEdu}" press="EdF_EduDelet" type="Negative"/>
+			</OverflowToolbar>
+		</headerToolbar>
+		<columns>
+			<Column demandPopin="true">
+				<Text text="{i18n>collegeName}"/>
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Text text="{i18n>degree}" />
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Text text="{i18n>geade}" />
+			</Column>
+			<Column demandPopin="true">
+				<Text text="{i18n>startDate}" />
+			</Column>
+			<Column minScreenWidth="Desktop" demandPopin="true">
+				<Text text="{i18n>endDate}" />
+			</Column>
+		</columns>
+		<items>
+			<ColumnListItem >
+				<cells>
+					<Text text="{CollegeName}"/>
+					<Text text="{Degree}"/>
+					<Text text="{Grade}"/>
+					<Text text="{EducationStartDate}"/>
+					<Text text="{EducationEndDate}"/>
+				</cells>
+			</ColumnListItem>
+		</items>
+	</Table>
+</c:FragmentDefinition>

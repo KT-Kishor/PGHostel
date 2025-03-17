@@ -91,7 +91,7 @@
 							<!-- Assignment Status ComboBox -->
 							<Label text="{i18n>assignmentStatus}" required="true"/>
 							<ComboBox selectedKey="New" value="{ContractModelWizart>/AssignmentStatus}" 
-                             items="{path: 'Assignment>/Assignment'}" editable="false">
+                             items="" editable="false">
 								<core:Item key="{Assignment>name}" text="{Assignment>name}"/>
 							</ComboBox>
 							<!-- DatePicker for Start Date and End Date -->

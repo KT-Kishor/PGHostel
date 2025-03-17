@@ -1,0 +1,45 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core">
+	<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"  items=""  growing="true"  growingThreshold="50"  alternateRowColors="true">
+		<headerToolbar>
+			<OverflowToolbar >
+				<Title  text="Employment Details"/>
+				<!-- <ToolbarSeparator/> -->
+				<ToolbarSpacer/>
+				<Button icon="sap-icon://attachment"  press="SS_onPressFolder" tooltip="{i18n>toolUploadEmp}" />
+				<Button icon="sap-icon://add"  text="{i18n>add}" press="SS_onPressAddEmpDetails" type="Accept" tooltip="{i18n>toolAddEmp}"/>
+				<Button icon="sap-icon://edit"   text="{i18n>edit}" press="SS_onPressEditEmpDetails" type="Neutral" tooltip="{i18n>toolEditEmp}"/>
+				<Button icon="sap-icon://delete"   text="{i18n>delete}" press="SS_onPressDeletEmpDetails" type="Negative" tooltip="{i18n>toolDelEmp}" />
+			</OverflowToolbar>
+		</headerToolbar>
+		<columns>
+			<Column demandPopin="true">
+				<Text text="{i18n>companyName}"/>
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Text text="{i18n>designation}" />
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Text text="{i18n>startDate}" />
+			</Column>
+			<Column demandPopin="true">
+				<Text text="{i18n>endDate}" />
+			</Column>
+			<Column minScreenWidth="Desktop" demandPopin="true">
+				<Text text="{i18n>officeAddress}" />
+			</Column>
+		</columns>
+		<items>
+			<ColumnListItem>
+				<cells>
+					<Text text="{CompanyName}"/>
+					<Text text="{Designation}"/>
+					<Text text="{StartDate}"/>
+					<Text text="{EndDate}"/>
+					<Text text="{OfficeAddress}"/>
+				</cells>
+			</ColumnListItem>
+		</items>
+	</Table>
+</c:FragmentDefinition>

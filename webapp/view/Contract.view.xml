@@ -3,7 +3,6 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
-	xmlns:form="sap.ui.layout.form" 
     controllerName="sap.kt.com.minihrsolution.controller.Contract"
 	xmlns:fb="sap.ui.comp.filterbar"	
     displayBlock="true">
@@ -19,15 +18,14 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="Contract No" label="Contract No" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Contract No" selectionChange=".onBranchChange" showClearIcon="true" items="{ path: 'BaseLocation>/results', length:1000,  sorter: { path: 'Company', descending: false,
-                                        group: true } }" >
+						<ComboBox name="Contract No" selectionChange=".onBranchChange" showClearIcon="true" items="" >
 							<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Location Service" label="Location Service" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="Location Service"  items="{path: 'DropDownModel>/results',sorter: {path: 'Branch',descending: false,group: true},length:1000}" showClearIcon="true" id="C_id_DesiFilter">
+							<ComboBox name="Location Service"  items="" showClearIcon="true" id="C_id_DesiFilter">
 								<core:Item key="{DropDownModel>ConsultantName}" text="{DropDownModel>ConsultantName}"/>
 							</ComboBox>
 						</fb:control>
@@ -50,46 +48,46 @@
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="C_idSalary" items="{path: 'EmployeeOfferModel>/results',sorter: {path: 'Company',descending: false,group: true}}" mode="SingleSelectLeft" selectionChange="onSelectionEmployeeOffer" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="C_idSalary"  items="" growing="true"  growingThreshold="50"  alternateRowColors="true">
 			 <headerToolbar>
                 <OverflowToolbar >
                     <Title id="" text="{i18n>contractDetails}"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
-                    <Button text="Generate Contact" press="C_onPressAddContract" type="Accept" tooltip="Add Contract" icon="sap-icon://customer-order-entry"/>
+                    <Button text="{i18n>headerContractDetails}" press="C_onPressAddContract" type="Accept" tooltip="Add Contract" icon="sap-icon://customer-order-entry"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
 					<Column demandPopin="true">
-						<Text text="Contract No"/>
+						<Text text="{i18n>contractNo}"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="Aggrement No" />
+						<Text text="{i18n>aggrementNo}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="Consultant Name" />
+						<Text text="{i18n>consultantName}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="Location Service" />
+						<Text text="{i18n>locationService}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="End Client" />
+						<Text text="{i18n>endClient}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="Start Date" />
+						<Text text="{i18n>startDate}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="End Date" />
+						<Text text="{i18n>endDate}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>contractStatus}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="Comments" />
+						<Text text="{i18n>comments}" />
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem type="Navigation" press="OnNavigationEmployee">
+					<ColumnListItem >
 						<cells>
 							<Text text=""/>
 							<Text text=""/>
@@ -97,7 +95,7 @@
 							<Text text=""/>
 							<Text text=""/>
 							<Text text=""/>
-							<ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true" class="centerText" state="{path: 'EmployeeOfferModel>Status', formatter: '.Formatter.statusStateFormatter'}" />
+							<ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true" class="centerText"  />
 						</cells>
 					</ColumnListItem>
 				</items>
