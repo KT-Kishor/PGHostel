@@ -30,12 +30,12 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="CustomerName" label="{i18n>customerName}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_CustomerNameComboBox" />
+							<ComboBox id="CI_id_CustomerNameComboBox" showClearIcon="true"/>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_StatusComboBox" />
+							<ComboBox id="CI_id_StatusComboBox" showClearIcon="true" />
 						</fb:control>
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>

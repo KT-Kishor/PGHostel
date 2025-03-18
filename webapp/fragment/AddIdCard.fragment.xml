@@ -52,7 +52,7 @@
 				<Label text="{i18n>designation}" required="true"/>
 				<Input value="{IdCardModel>/Designation}" liveChange="ValidateCommonFields" maxLength="20" id="IC_id_Designation" valueStateText="{i18n>destinationValueState}"/>
 				<!-- Email -->
-				<Label text="{i18n>email}" required="true"/>
+				<Label text="{i18n>emailId}" required="true"/>
 				<Input value="{IdCardModel>/Email}" id="IC_id_Email" liveChange="validateEmail" maxLength="50" valueStateText="{i18n>emailValueState}"/>
 				<!-- DOB -->
 				<Label text="{i18n>dateOfBirth}" required="true" />

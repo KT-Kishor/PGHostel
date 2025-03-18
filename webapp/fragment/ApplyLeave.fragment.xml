@@ -28,7 +28,7 @@
 				<Label text="{i18n>employeeName}" required="true"/>
 				<Input  value="{LeaveTempModel>/EmployeeName}" editable="false" maxLength="50"/>
 				<!-- Email -->
-				<Label text="{i18n>emailID}" required="true" />
+				<Label text="{i18n>emailId}" required="true" />
 				<Input value="{LeaveTempModel>/Email}" maxLength="100"  editable="false"/>
 				<!-- Leave Type -->
 				<Label text="{i18n>type}" required="true"/>

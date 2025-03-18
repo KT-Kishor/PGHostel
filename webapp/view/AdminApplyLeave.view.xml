@@ -48,6 +48,8 @@
                 id="AL_id_TypeOfLeavecombo"
                 value="{oFilteredModel>/TypeOfLeave}"
                 selectionChange="onSelectionChange"
+				showClearIcon="true"
+				valueStateText="{i18n>selectTypeOfLeave}"
                 items="{leaveTypeModel>/results}">
 								<core:Item key="{leaveTypeModel>ID}" text="{leaveTypeModel>Name}"/>
 							</MultiComboBox>

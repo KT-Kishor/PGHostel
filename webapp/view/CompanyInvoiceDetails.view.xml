@@ -57,13 +57,13 @@
 										<m:Input visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}"  value="{path:'SelectedCustomerModel>/AmountInFCurrency',formatter: '.Formatter.numberFormater'}" maxLength="50" editable="false"/>
 										<m:Label visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}"  text="{i18n>custLutVa}" />
 										<m:Input visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}"  value="{SelectedCustomerModel>/LUT}" maxLength="50" editable="{visiablityPlay>/editable}"/>
-										<m:Label text="{i18n>panCard}" />
+										<m:Label text="{i18n>panCardCommon}" />
 										<m:Input value="{SelectedCustomerModel>/PAN}" id="CID_id_InputPAN" liveChange="onPressLiveChange" maxLength="50" editable="{visiablityPlay>/CInvoice}" />
-										<m:Label text="{i18n>gst}" visible="{visiablityPlay>/GST}"/>
+										<m:Label text="{i18n>gstNo}" visible="{visiablityPlay>/GST}"/>
 										<m:Input value="{SelectedCustomerModel>/GST}" id="CID_id_InputGST" liveChange="onPressLiveChange" maxLength="50" editable="{visiablityPlay>/CInvoice}" visible="{visiablityPlay>/GST}" />
 										<m:Label text="{i18n>address}" />
 										<m:TextArea id="CID_id_InputAddress" value="{SelectedCustomerModel>/Address}" maxLength="120" liveChange="onPressLiveChange" editable="{visiablityPlay>/CInvoice}"/>
-										<m:Label text="{i18n>emailID}" required="true"/>
+										<m:Label text="{i18n>emailId}" required="true"/>
 										<m:Input value="{SelectedCustomerModel>/MailID}" id="CID_id_InputMailID" maxLength="500" liveChange="onPressLiveChange" editable="{visiablityPlay>/CInvoice}" change="onchangeEmail"/>
 										<m:Label text="{i18n>mobileNo}" />
 										<m:Input value="{SelectedCustomerModel>/MobileNo}" id="CID_id_InputMobileNo" maxLength="10" liveChange="onPressLiveChange" editable="{visiablityPlay>/CInvoice}" />

@@ -8,7 +8,7 @@
 	<Page id="LOH_id_ListOfholidays">
 		<headerContent>
 			<Button  press="LOH_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>listOfHolidays}" class="boldBlackText"></Text>
+			<Text text="{i18n>headerListOfHolidays}" class="boldBlackText"></Text>
 			<ToolbarSpacer />
 			<Button  press="LOH_onSignout" icon="sap-icon://log"></Button>
 		</headerContent>
@@ -48,7 +48,7 @@
                      alternateRowColors="false">
 				<headerToolbar>
 					<OverflowToolbar>
-						<Title  id="LOH_id_Title" text="{i18n>listOfHolidays}"/>
+						<Title  id="LOH_id_Title" text="{i18n>headerListOfHolidays}"/>
 						<ToolbarSpacer />
 					</OverflowToolbar>
 				</headerToolbar>

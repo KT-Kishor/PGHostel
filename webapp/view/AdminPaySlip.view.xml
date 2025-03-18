@@ -23,14 +23,14 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem groupName="Basic" name="EmployeeID" label="Employee ID" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="cbEmployeeID" items="{/EmployeeList}" selectedKey="{filters>/EmployeeID}">
+							<ComboBox id="cbEmployeeID" showClearIcon="true" items="{/EmployeeList}" selectedKey="{filters>/EmployeeID}">
 								<core:Item key="{EmployeeID}" text="{EmployeeName}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="Basic" name="Month" label="Month" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="cbMonth" items="{/MonthList}" selectedKey="{filters>/Month}">
+							<ComboBox id="cbMonth" showClearIcon="true" items="{/MonthList}" selectedKey="{filters>/Month}">
 								<core:Item key="{Month}" text="{Month}" />
 							</ComboBox>
 						</fb:control>

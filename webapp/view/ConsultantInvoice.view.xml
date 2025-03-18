@@ -17,9 +17,9 @@
     useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" 
     filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false">
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="InvoiceTo" label="{i18n>invoiceTo}" groupName="ConsultantInvoice" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="InvoiceTo" label="{i18n>invoiceTo}" groupName="ConsultantInvoice" visibleInFilterBar="true" >
 						<fb:control>
-							<ComboBox id="CI_id_InvoiceTo"
+							<ComboBox id="CI_id_InvoiceTo" 
                 items="{path:'oInvoiceModel>/InvoiceToList', length:1000}"
                 showSecondaryValues="true" showClearIcon="true">
 								<core:ListItem key="{oInvoiceModel>InvoiceToID}" text="{oInvoiceModel>InvoiceToName}" additionalText="{oInvoiceModel>InvoiceToID}" />
@@ -28,7 +28,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="InvoiceNo" label="{i18n>invoiceNo}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_InvoiceNo"
+							<ComboBox id="CI_id_InvoiceNo" 
                 items="{path:'oInvoiceModel>/InvoiceNoList', length:1000}"
                 showSecondaryValues="true" showClearIcon="true">
 								<core:ListItem key="{oInvoiceModel>InvoiceNoID}" text="{oInvoiceModel>InvoiceNo}" additionalText="{oInvoiceModel>InvoiceDate}" />

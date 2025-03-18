@@ -73,14 +73,14 @@
 													valueFormat="dd/MM/yyyy"
 													value="{ConsultantInvoiceModel>/InvoiceDate}"
 													editable="{visiablityPlay>/editable}"
-													id="CI_id_InDate" change="validateDate"/>
+													id="CI_id_InDate" change="validateDate" valueStateText="{i18n>dateValueState}"/>
 												<m:Label text="{i18n>payBy}" required="true" />
 												<m:DatePicker
 													displayFormat="dd/MM/yyyy"
 													valueFormat="dd/MM/yyyy"
 													value="{ConsultantInvoiceModel>/PayBy}"
 													editable="{visiablityPlay>/editable}"
-													id="CI_id_PaybyInv" change="validateDate"/>
+													id="CI_id_PaybyInv" change="validateDate" valueStateText="{i18n>dateValueState}"/>
 												<m:Label text="{i18n>invoiceTo}" required="true" />
 												<m:Input
 													value="{ConsultantInvoiceModel>/InvoiceTo}"
@@ -95,7 +95,7 @@
 													liveChange="ValidateCommonFields"  maxLength="120" valueStateText="{i18n>addressValueState}"
 													rows="2"
 													editable="{visiablityPlay>/editable}" />
-												<m:Label text="{i18n>CompGSTNO}" />
+												<m:Label text="{i18n>gstNo}" />
 												<m:Input
 													value="{ConsultantInvoiceModel>/CompanyGSTNO}"
 													id="CI_id_InputCompGSTNO"
