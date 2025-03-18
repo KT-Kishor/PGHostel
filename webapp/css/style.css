@@ -9,7 +9,11 @@
   border-color: greenyellow;
   color: deeppink;
 }
-
+.sapMGT{
+  background-position: center;
+  background-image: url('../image/footer.jpg');
+  
+}
 /* background image style */
 .myBackgroundStyle {
   height: 100%;
@@ -165,6 +169,7 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 0.60rem;
 }
 
 .service-background {
@@ -173,6 +178,7 @@
   background-position: center;
   background-repeat: no-repeat;
   opacity: 92%;
+  border-radius: 0.60rem;
 }
 
 .home-background {
@@ -180,6 +186,21 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 0.60rem;
+}
+.Servicetab{
+  border-radius: 0.60rem;
+}
+.Products_list{
+  border-radius: 0.60rem;
+}
+.demo-form{
+  background-image: url('../image/grow.jpg');
+  background-size: cover; 
+  border-radius: 0.60rem;
+  background-position: center; 
+  background-repeat: no-repeat;
+
 }
 
 .login-background {
@@ -215,6 +236,7 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 0.60rem;
 }
 
 

@@ -1,0 +1,53 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:l="sap.ui.layout"
+    xmlns:m="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+>
+            <!-- Left Column - Form -->
+            <m:VBox width="45%" class="sapUiSmallMargin">
+                <f:SimpleForm editable="true" layout="ResponsiveGridLayout"
+                    labelSpanXL="3" labelSpanL="3"
+                    labelSpanM="4" labelSpanS="12" columnsXL="1" columnsL="1" columnsM="1" width="100%" singleContainerFullSize="false">
+    
+                    <f:content>
+                    
+                        <m:Label text="{i18n>customername}" required="true"/>
+                        <m:Input id="idcustomername" liveChange="validateName" value="{formData>/CustomerName}" valueStateText="{formData>/valueStates/customerName}"/>
+                        
+                        <m:Label text="{i18n>companyName}" required="true"/>
+                        <m:Input id="idCompanyname" liveChange="validateCompnayname" value="{formData>/CompanyName}" valueStateText="{formData>/valueStates/companyName}"/>
+                        
+                        <m:Label text="{i18n>email}" required="true"/>
+                        <m:Input id="idCustmailid" liveChange="validateEmail"  value="{formData>/Email}" type="Email" valueStateText="{formData>/valueStates/email}"/>
+                        
+                        <m:Label text="{i18n>address}" required="true"/>
+                        <m:TextArea id="idCustaddress" liveChange="ValidateCommonFields"  value="{formData>/Address}" rows="2" valueStateText="{formData>/valueStates/address}"/>
+                        
+                        <m:Label text="{i18n>timeslot}" required="true"/>
+                        <m:DateTimePicker id="idtimeslot" liveChange="ValidateCommonFields" value="{formData>/TimeSlot}" valueFormat="yyyy-MM-dd HH:mm"
+                            displayFormat="dd/MM/yyyy HH:mm" valueStateText="{formData>/valueStates/timeSlot}"/>
+                        
+                        <m:Label text="{i18n>mobilenumber}" required="true"/>
+                        <m:Input id="idmobilenumber" liveChange="validateMobileNo" maxLength="10" value="{formData>/MobileNo}" valueStateText="{formData>/valueStates/mobileNumber}"/>
+                        
+                        <m:Label text="{i18n>comments}" required="true"/>
+                        <m:TextArea id="idcomment" liveChange="ValidateCommonFields" value="{formData>/Comments}" rows="2" valueStateText="{formData>/valueStates/comments}"/>
+<m:Label text=""/>
+                         <m:HBox justifyContent="End">
+        <m:Button text="{i18n>savebtn}" type="Accept" press=".onDemoformSave"/>
+    </m:HBox>
+                    </f:content>
+                </f:SimpleForm>
+            </m:VBox>
+
+            
+            <!-- <m:VBox width="45%" class="videoContainer">
+                <m:Carousel id="videoCarousel" height="500px" width="100%"
+                    loop="true" showPageIndicator="true" class="sapUiMediumMargin"/>
+            </m:VBox> -->
+
+       
+   
+</mvc:View>

@@ -28,6 +28,7 @@
 <IconTabFilter key="idCustomer" text="Our Experties" visible="false"/>
 <IconTabFilter key="idCareer" text="Careers"/>
 <IconTabFilter key="idContact" text="Contact"/>
+<IconTabFilter key="idBookfordemo" text="Book for Demo"/>
 </items>
 </IconTabHeader>
 </tnt:ToolHeader>
@@ -35,7 +36,7 @@
 <tnt:mainContents>
 <NavContainer id="pageContainer">
 <pages>
-<ScrollContainer id="idHome" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background">
+<ScrollContainer id="idHome" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background sapUiTinyMargin">
 <l:Grid defaultSpan="XL12 L12 M12 S12" width="100%" class="position-welcome">
 <VBox class="sapUiLargeMarginTop">
 <Text class="custom-welcome sapUiTinyMarginTopBottom" textAlign="Center" text="Welcome to"/>
@@ -45,7 +46,7 @@
 </VBox>
 </l:Grid>
 </ScrollContainer>
-<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding service-background">
+<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding service-background sapUiTinyMargin">
 <l:Grid defaultSpan="XL7 L7 M12 S12" class="sapUiSmallMarginTop">
 <Text class="custom-aboutus sapUiLargeMarginTop" textAlign="Left" text="Kalpavriksha Technologies, where innovation meets excellence. Founded with a vision to transform the technology landscape to provide services across the globe. Our name, inspired by the mythical wish-fulfilling tree, reflects our commitment to creating technology that meets your every need"/>
 <Text class="custom-aboutus sapUiTinyMarginTop" textAlign="Left" text="Our team comprises seasoned professionals with extensive experience in SAP ECC, S/4 HANA, S/4 HANA Cloud, Rise with SAP"/>
@@ -54,178 +55,15 @@
 
 </l:Grid>
 </ScrollContainer>
-<Page id="idAchivement" showHeader="false">
+<Page id="idAchivement" showHeader="false" class="Servicetab sapUiTinyMargin">
 <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ServiceTab" type="XML"/>
 
 </Page>
-<ScrollContainer id="idProducts" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding service-background">
-  <layout:VerticalLayout >
-             <FlexBox wrap="Wrap" alignItems="Start" justifyContent="Start">
-            
-				<GenericTile visible="{modelTileVisible>/GenerateEmployeeOffer}"
-                    class="sapUiMediumMargin HomeSlider"
 
-                    header="{i18n>headerEmployeeOffer}" press="onPressemployee"
-                    subheader="{i18n>subhead}">
-					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>tileFooter}">
-						<ImageContent src="sap-icon://employee-approvals" />					
-					</TileContent>
-					</GenericTile>
-				
-				<GenericTile visible="{modelTileVisible>/GenerateContract}"
-                    class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerContractDetails}" press="onpressContract"
-                    subheader="{i18n>subhead}">
-					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>tileFooter}">
-						<ImageContent src="sap-icon://decision" />					
-					</TileContent>
-					</GenericTile>                    
-
-                <GenericTile visible="{modelTileVisible>/GenerateMsaNda}"
-                    class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerMSA}" press="onpressMSA"
-                     subheader="{i18n>subhead}">
-                    <TileContent  unit="{i18n>tileUnit}" footer="{i18n>SendMail}">
-						<ImageContent src="sap-icon://add-document" />					
-					</TileContent>
-					</GenericTile>
-
-                <GenericTile visible="{modelTileVisible>/GenerateTraineeOffer}"
-                   class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerTrainee}" press="onpressTrainee"  subheader="{i18n>subhead}">
-                    <TileContent  unit="{i18n>tileUnit}" footer="{i18n>SendMail}">
-						<ImageContent src="sap-icon://account" />
-					</TileContent>
-                </GenericTile>
-
-                <GenericTile  visible="{modelTileVisible>/ListOfHolidays}"
-                   class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerListOfHolidays}" press="onpresslistofholidays">
-					<TileContent unit="{i18n>tileLeaveFooter}">
-						<ImageContent src="sap-icon://general-leave-request" />
-					</TileContent>
-                   </GenericTile>
-
-                <GenericTile visible="{modelTileVisible>/ApplyLeave}"
-                   class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerLeave}" press="onpressLeave"
-                    subheader="{i18n>subhead}">
-					<TileContent unit="{i18n>createLeave}">
-						<ImageContent src="sap-icon://time-off" />
-					</TileContent>
-					</GenericTile>
-
-				<GenericTile visible="{modelTileVisible>/MyInbox}"
-                    class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerInbox}" press="onpressInbox">
-					<TileContent unit="{i18n>tileMyInboxFooter}" >
-						<ImageContent src="sap-icon://inbox" />
-					</TileContent>
-					</GenericTile>
-				
-                <GenericTile visible="{modelTileVisible>/ExpenseApp}"
-                    class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerExpense}" press="onpressExpenseApp">
-                    <TileContent unit="{i18n>subhead}">
-						<ImageContent src="sap-icon://expense-report" />
-					</TileContent>
-                    </GenericTile >
-
-                <GenericTile visible="{modelTileVisible>/InvoiceApp}"
-                    class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerCompanyInvoice}" press="onpressInvoiceApp">
-                    <TileContent unit="{i18n>tileInvoiceFooter}">
-						<ImageContent src="sap-icon://my-sales-order" />
-					</TileContent>
-                    </GenericTile >
-    
-                <GenericTile visible="{modelTileVisible>/SelfService}"
-                    class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerSelfService}" press="onpressSelfservice"
-                      subheader="{i18n>subhead}">
-                      <TileContent unit="{i18n>tileSelfSerciceFooter}" >
-                      <ImageContent src="sap-icon://form"/>
-                      </TileContent>
-                </GenericTile>
-           
-                <GenericTile visible="{modelTileVisible>/AddCustomer}"
-                    class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerCustomer}" press="onpressAddCustomer"
-                    subheader="{i18n>subhead}">
-                    <TileContent unit="{i18n>tileManagecustFooter}">
-						<ImageContent src="sap-icon://customer" />
-					</TileContent>
-                    </GenericTile >
-            
-				<GenericTile visible="{modelTileVisible>/IDCard}"
-                   class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerIdCard}" press="onpressIDCARD"
-                    subheader="{i18n>subhead}">
-					<TileContent  unit="{i18n>tileIdCardFooter}" >
-						<ImageContent src="sap-icon://badge" />					
-					</TileContent>
-					</GenericTile>   
-                    
-                <GenericTile visible="{modelTileVisible>/ConsultantInvoice}"
-                   class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerContractorInvoice}" press="onpressConsultantInvoice">
-					<TileContent  unit="{i18n>tileInvoiceFooter}">
-						<ImageContent src="sap-icon://monitor-payments" />					
-				</TileContent>
-				</GenericTile>   
-
-                <GenericTile visible="{modelTileVisible>/EmployeeDetail}"
-                    class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerEmpDetails}" press="onpressEmployeeDetails"
-                    subheader="{i18n>subheadEmphike}">
-					<TileContent  unit="{i18n>tileEmplyeeFooter}">
-						<ImageContent src="sap-icon://employee" />					
-				</TileContent>
-				</GenericTile>   
-
-                 <GenericTile visible="{modelTileVisible>/QuotationApp}"
-                   class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerQuotation}" press="onpressQuotaion">
-					<TileContent  unit="{i18n>subheader}">
-						<ImageContent src="sap-icon://my-sales-order" />					
-				</TileContent>
-				</GenericTile>   
-
-                 <GenericTile visible="{modelTileVisible>/AssignmentTask}"
-                   class="sapUiMediumMargin HomeSlider" 
-                    header="{i18n>headerAssignTask}"  subheader="{i18n>subhead}" press="onpressAssignment">
-					<TileContent  unit="{i18n>tileAssignmentFooter}">
-						<ImageContent src="sap-icon://activity-assigned-to-goal" />					
-				</TileContent>
-				</GenericTile>   
-
-                 <GenericTile visible="{modelTileVisible>/Timesheet}"
-                   class="sapUiMediumMargin HomeSlider"  subheader="{i18n>subhead}"
-                    header="{i18n>headerTimesheet}" press="onpresstimesheet">
-					<TileContent  unit="{i18n>tileTimesheetFooter}">
-						<ImageContent src="sap-icon://timesheet" />					
-				</TileContent>
-				</GenericTile>   
-
-                <GenericTile  visible="{modelTileVisible>/TimeSheetApproval}"
-                   class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>headerTimesheetApproval}" press="onPressTimesheetApp">
-				<TileContent  unit="{i18n>tileMyInboxFooter}">
-						<ImageContent src="sap-icon://timesheet" />					
-				</TileContent>
-				</GenericTile>   
-
-                  <GenericTile  visible="{modelTileVisible>/PaySlip}"
-                   class="sapUiMediumMargin HomeSlider"
-                    header="{i18n>HeaderPaySlip}" press="onPressAdminPaySlip">
-					<TileContent  unit="{i18n>tilePaySlipFooter}">
-						<ImageContent src="sap-icon://money-bills" />					
-				</TileContent>
-				</GenericTile>
-
-			</FlexBox>
-		</layout:VerticalLayout>
-</ScrollContainer>
+<Page id="idProducts" showHeader="false" class=" Products_list sapUiTinyMargin" >
+<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ProductList" type="XML"/>
+  
+</Page>
 <ScrollContainer id="idCustomer" horizontal="false" vertical="true" height="100%" class=" service-background">
 <l:Grid defaultSpan="XL12 L12 M12 S12" class="sapUiMediumMargin">
 <Carousel height="100%">
@@ -272,7 +110,7 @@
 </Carousel>
 </l:Grid>
 </ScrollContainer>
-<ScrollContainer id="idCareer" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding career-background">
+<ScrollContainer id="idCareer" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding career-background sapUiTinyMargin" >
 
 <l:VerticalLayout  width="100%">
 		<l:BlockLayout background="Dashboard">
@@ -307,10 +145,13 @@
 
 
 </ScrollContainer>
-<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding contact-background">
+<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding contact-background sapUiTinyMargin">
 <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ContactPage" type="XML"/>
 
 </ScrollContainer>
+<Page id="idBookfordemo" showHeader="false" class="sapUiContentPadding demo-form sapUiTinyMargin" >   
+ <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Demoform" type="XML"/>
+</Page>
 </pages>
 </NavContainer>
 </tnt:mainContents>
