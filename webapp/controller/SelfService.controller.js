@@ -10,7 +10,7 @@ sap.ui.define([
             _onRouteMatched: function () {
                 var oViewModel = new JSONModel({ isEditMode: false, Max: new Date() });
                 this.getView().setModel(oViewModel, "viewModel");
-                this.i18nModel=this.getView().getModel("i18n").getResourceBundle()
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle()
             },
             SS_onPressSignout: function () {
                 this.getRouter().navTo("RouteLoginPage");
@@ -111,5 +111,34 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
+            AddEd_onSubmitEdDetails: function () {
+                try {
+                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID")
+                         && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_Grade"), "ID")) {
+                            MessageToast.show(this.i18nModel.getText("eduDataSaved"));
+                        }
+                    else {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    }
+                }
+                catch {
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                }
+            },
+            AddEmp_onSubmitEmp: function () {
+                try {
+                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID")) {
+                            MessageToast.show(this.i18nModel.getText("empDataSaved"));
+                        }
+                    else {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    }
+                }
+                catch {
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                }
+
+
+            }
         });
     });

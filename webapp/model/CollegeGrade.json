@@ -1,4 +1,5 @@
-[
+{
+  "grade": [
     {
       "ID": 1,
       "Value": "Percentage"
@@ -8,4 +9,4 @@
       "Value": "CGPA"
     }
   ]
-  
+}

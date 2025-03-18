@@ -1,4 +1,3 @@
-
 <core:FragmentDefinition
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
@@ -25,47 +24,43 @@
 			singleContainerFullSize="false" >
 			<f:content>
 				<Label text="{i18n>employeeID}"  />
-				<!-- HBox for Salutation Select  -->
-				<!-- Employee Name Input,  -->
 				<Input value="{educationModel>/EmployeeID}"   maxLength="20"  editable="false"/>
 				<Label text="{i18n>collegeName}" required="true" />
-				<!-- Employee Name Input,  -->
-				<Input value="{educationModel>/CollegeName}" placeholder="{i18n>collegeName}" id="AddEd_id_College" maxLength="50" change="validateCollegeName"/>
+				<Input value="{educationModel>/CollegeName}" placeholder="{i18n>collegeName}" id="AddEd_id_College" maxLength="50" liveChange="ValidateCommonFields" valueStateText="{i18n>collegeNameValueState}"/>
 				<Label text="{i18n>degree}" required="true" />
-				<Select  selectedKey="{educationModel>/Degree}" items="{Degree>/Degree}" id="AddEd_id_Degree" change="validateDegree" >
-					<core:Item key="{Degree>Value}" text="{Degree>Value}" />
+				<Select  selectedKey="{educationModel>/Degree}" items="{Degree>/degree}" id="AddEd_id_Degree" change="" >
+					<core:Item key="{Degree>DegreeName}" text="{Degree>DegreeName}" />
 				</Select>
 				<Label text="{i18n>startDate}" required="true" />
 				<DatePicker id="AddEd_id_StartEdu" 
 				value="{educationModel>/EducationStartDate}"
-            change="onStartDateChange"
+            change="validateDate"
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy"
-           maxDate="{viewModel>/Max}" />
-				<Label text="{i18n>eduEndDate}" required="true" />
+           maxDate="{viewModel>/Max}"
+		   valueStateText="{i18>dateValueState}" />
+				<Label text="{i18n>endDate}" required="true" />
 				<DatePicker id="AddEd_id_EndEdu" 
 				value="{educationModel>/EducationEndDate}"
-            change="validateEducationEndDate"
+            change="validateDate"
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy" 
 			maxDate="{viewModel>/Max}"
-            minDate="{startDate}" />
+            minDate="{startDate}" 
+			valueStateText="{i18n>dateValueState}"/>
 				<Label text="{i18n>grade}"  required="true" />
 				<HBox width="70%" justifyContent="Start">
-					<Input  value="{educationModel>/Grade}"   id="AddEd_id_Grade" change="validateGrade"  class=""
-                 type="Number"  liveChange="validateGrade"  placeholder="{i18n>grade}" />
-					<!-- Dropdown for Grade type -->
-					<Select  selectedKey="{educationModel>/GradeType}" items="{GradeType>/Grade}" id="idGradeSelect" class="sapUiSmallMarginBegin">
-						<core:Item key="{GradeType>Value}" text="{GradeType>Value}" />
+					<Input  value="{educationModel>/Grade}"   id="AddEd_id_Grade" liveChange="ValidateCommonFields" 
+                 type="Number"   placeholder="{i18n>grade}"  valueStateText="{i18n>gradeValueState}" />
+					<Select  selectedKey="{educationModel>/GradeType}" items="{CollegeGrade>/grade}" id="AddEd_id_GradeType" class="sapUiSmallMarginBegin">
+						<core:Item key="{CollegeGrade>Value}" text="{CollegeGrade>Value}" />
 					</Select>
 				</HBox>
 			</f:content>
 		</f:SimpleForm>
 		<HBox justifyContent="End" >
-			<!-- OnBoard button  -->
-			<Button text="{i18n>Submit}" type="Accept" id="AddEd_id_Submit" press="AddEd_onSaveEdDetails" class="submit"  visible="{viewModel>/fragmentSave}" />
-			<Button text="{i18n>save}" type="Accept" press="AddEd_onUpdateEdDetails" class="submit" id="AddEd_id_Save" visible="{viewModel>/fragmentSubmit}"/>
-			<!-- Close button -->
+			<Button text="{i18n>Submit}" type="Accept" id="AddEd_id_Submit" press="AddEd_onSubmitEdDetails" class="submit"  visible="{viewModel>/fragmentSave}" />
+			<!-- <Button text="{i18n>save}" type="Accept" press="AddEd_onUpdateEdDetails" class="submit" id="AddEd_id_Save" visible="{viewModel>/fragmentSubmit}"/> -->
 			<Button text="{i18n>close}" press="AddEd_onCloseDial" class="sendMail" type="Negative"/>
 		</HBox>
 	</Dialog>

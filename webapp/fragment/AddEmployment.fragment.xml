@@ -5,7 +5,6 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core">
 	<Dialog showHeader="true"  title="{i18n>employmentDetails}" id="AddEmp_id_Dialog" >
-		<!-- SimpleForm inside the WizardStep for form layout -->
 		<f:SimpleForm 
 			editable="false"
 			layout="ResponsiveGridLayout"
@@ -23,36 +22,37 @@
 			columnsM="1"
 			singleContainerFullSize="false" >
 			<f:content>
-				<!-- Consultant Name with Salutation Dropdown -->
 				<Label text="{i18n>employeeID}"  />
 				<Input value="{employmentModel>/EmployeeID}" required="true" maxLength="10" editable="false" />
-				<Label text="{i18n>empOfcompanyName}" required="true"/>
-				<Input value="{employmentModel>/CompanyName}" id="AddEmp_id_Company" placeholder="{i18n>empOfcompanyName}" maxLength="50" change="validateCompanyName"/>
-				<Label text="{i18n>empOfdesignation}" required="true" />
-				<ComboBox items="{path:'Designation>/results', length:1000}" value="{employmentModel>/Designation}" id="AddEmp_id_Desig" change="validateDesignation">
+				<Label text="{i18n>companyName}" required="true"/>
+				<Input value="{employmentModel>/CompanyName}" id="AddEmp_id_Company" placeholder="{i18n>companyName}" maxLength="50" liveChange="ValidateCommonFields" valueStateText="{i18n>companyNameValueState}"/>
+				<Label text="{i18n>designation}" required="true" />
+				<ComboBox items="{path:'Designation>/results', length:1000}" value="{employmentModel>/Designation}" id="AddEmp_id_Desig" change="ValidateCommonFields" valueStateText="{i18n>designationValueState}">
 					<core:Item key="{Designation>DesignationName}" text="{Designation>DesignationName}" />
 				</ComboBox>
-				<Label text="{i18n>officeTileHeader}" required="true"/>
-				<TextArea value="{employmentModel>/OfficeAddress}" id="AddEmp_id_OfcAddress" placeholder="{i18n>officeTileHeader}" maxLength="120"  change="validateOfficeAddress"/>
+				<Label text="{i18n>companyAddress}" required="true"/>
+				<TextArea value="{employmentModel>/OfficeAddress}" id="AddEmp_id_OfcAddress" placeholder="{i18n>companyAddress}" maxLength="120"  liveChange="ValidateCommonFields" valueStateText="{i18n>addressValueState}"/>
 				<Label text="{i18n>startDate}" required="true"/>
 				<DatePicker value="{employmentModel>/StartDate}" 
             maxDate="{viewModel>/Max}" 
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy" 
             id="AddEmp_id_StartDate" 
-            change="changeEmpStartDate"/>
+            change="validateDate"
+			valueStateText="{i18n>dateValueState}"/>
 				<Label text="{i18n>endDate}" required="true"/>
 				<DatePicker value="{employmentModel>/EndDate}" 
             maxDate="{viewModel>/Max}" 
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy"  
             id="AddEmp_id_EndDate" 
-            change="validateEndDate"/>
+            change="validateDate"
+			valueStateText="{i18n>dateValueState}"/>
 			</f:content>
 		</f:SimpleForm>
 		<FlexBox justifyContent="End">
-			<Button text="{i18n>submit}" id="AddEmp_id_Submit" type="Accept" press="AddEmp_onSaveEmp" class="submit" visible="{viewModel>/fragmentSave}" ></Button>
-			<Button text="{i18n>save}" type="Accept" id="AddEmp_id_Save" press="AddEmp_onUpdateEmp" class="submit" visible="{viewModel>/fragmentSubmit}"></Button>
+			<Button text="{i18n>submit}" id="AddEmp_id_Submit" type="Accept" press="AddEmp_onSubmitEmp" class="submit" visible="{viewModel>/fragmentSave}" ></Button>
+			<!-- <Button text="{i18n>save}" type="Accept" id="AddEmp_id_Save" press="AddEmp_onUpdateEmp" class="submit" visible="{viewModel>/fragmentSubmit}"></Button> -->
 			<Button text="{i18n>close}" press="AddEmp_onClose" class="sendMail" type="Negative"></Button>
 		</FlexBox>
 	</Dialog>
