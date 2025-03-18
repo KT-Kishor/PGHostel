@@ -1,112 +1,117 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.MyInbox"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:f="sap.ui.layout.form"
-    xmlns:core="sap.ui.core"
-    xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
-	xmlns:smartTable="sap.ui.comp.smarttable">
-    <Page id="idMyInboxPage">
-        <headerContent>
-            <Button  press="MI_onBack" icon="sap-icon://home" />
-            <Text text="{i18n>myInbox}" class="boldBlackText"></Text>
-            <ToolbarSpacer />
-            <Button  press="MI_onPressBack" icon="sap-icon://log"></Button>
-        </headerContent>
-        <content>
-        <smartFilterBar:SmartFilterBar
-                id="MI_id_SmartFilterBar" 
-				clear="onClearFilters"
-				showClearOnFB="true"
-                showFilterConfiguration="true" 
-                useToolbar="false" 
-                entitySet="InboxDetails"  
-                search="onSearch">
-				<!--Smart filter feild to filter the data in table based on ID-->
-				<smartFilterBar:controlConfiguration>
-					<smartFilterBar:ControlConfiguration key="EmpID" visibleInAdvancedArea="true"/>
-				</smartFilterBar:controlConfiguration>
-				<smartFilterBar:controlConfiguration>
-					<smartFilterBar:ControlConfiguration key="Type" visibleInAdvancedArea="true">
-                    <smartFilterBar:customControl>
-					<MultiComboBox
-                    id="MI_id_Type"
-                    selectionChange="onSelectionChange"
-                    items="{oTypeModel>/}">
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar">
+	<Page id="MI_id_MyInboxPage">
+		<headerContent>
+			<Button  press="MI_onPressBack" icon="sap-icon://home" />
+			<Text text="{i18n>headerInbox}" class="boldBlackText"></Text>
+			<ToolbarSpacer />
+			<Button  press="MI_onPressSignOut" icon="sap-icon://log"></Button>
+		</headerContent>
+		<content>
+			<fb:FilterBar  class="sapUiTinyMargin" id="MI_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem name="EmpID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox  showSecondaryValues= "true"  items="" change="" id="MI_id_EmpIDFilter" showClearIcon="true">
+								<core:ListItem key="" text="" additionalText="" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox  showSecondaryValues= "true"  items="" change="" id="MI_id_StatusFilter" showClearIcon="true">
+								<core:ListItem key="" text="" additionalText="" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Type" label="{i18n>type}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<MultiComboBox
+							id="MI_id_TypeFilter"
+							selectionChange="MI_onSelectionChangeType"
+							items="{oTypeModel>/}">
 								<core:Item key="{oTypeModel>type}" text="{oTypeModel>type}"/>
 							</MultiComboBox>
-						</smartFilterBar:customControl>
-					</smartFilterBar:ControlConfiguration>
-				</smartFilterBar:controlConfiguration>
-				<smartFilterBar:controlConfiguration>
-					<smartFilterBar:ControlConfiguration id="MI_id_Status" key="Status" visibleInAdvancedArea="true" >
-                </smartFilterBar:ControlConfiguration>
-				</smartFilterBar:controlConfiguration>
-				<smartFilterBar:controlConfiguration>
-					<smartFilterBar:ControlConfiguration key="SubmittedDate" visibleInAdvancedArea="true">
-                   	<smartFilterBar:customControl>
-					<DateRangeSelection
-                    id="MI_id_SubmittedDate"
-                    valueFormat="yyyy-MM-dd" 
-                    displayFormat="dd/MM/yyyy"
-                    change="onDateChange" />
-						</smartFilterBar:customControl>
-					</smartFilterBar:ControlConfiguration>
-				</smartFilterBar:controlConfiguration>
-			</smartFilterBar:SmartFilterBar>
-			<!--Smart Table  to display the data or add our custom feilds-->
-			<smartTable:SmartTable
-                id="MI_id_SmartTable"
-				entitySet="InboxDetails"
-				smartFilterId="idMyInboxSmartFilterBar"
-				tableType="ResponsiveTable"
-                demandPopin="true"
-				enableAutoBinding="false"
-                beforeRebindTable="onBeforeRebindTable"
-				enableAutoColumnWidth="false"
-				useTablePersonalisation="true"
-				header="{i18n>employeedetails}"
-				showRowCount="true"
-                class="centeredTable"
-                enableCopy="false"
-				initiallyVisibleFields="EmpID,EmpName,StartDate,EndDate,Type,SubType,SubmittedDate">
-                <smartTable:customToolbar>
-				<OverflowToolbar>
-					<ToolbarSpacer />
-					<Button icon="sap-icon://detail-view" visible="{modelButtonVisible>/LOPDataButt}" press="MI_onPressLOPData" tooltip="LOP Leave Details" />
-					<ToolbarSeparator />
-				</OverflowToolbar>
-			</smartTable:customToolbar>
-            <Table mode="SingleSelectLeft" selectionChange="MI_onSelectionChangeStatus" >
-			    <columns>
-                <Column minScreenWidth="Tablet" demandPopin="true">
-					<customData>
-						<core:CustomData key="p13nData"
-                        value='\{"columnKey": "Status", "leadingProperty": "Status", "sortProperty": "Status", "filterProperty": "Status", "columnIndex": 8}' />
-					</customData>
-					<Text text="{i18n>status}" />
-				</Column>
-                </columns>
-				<items >
-					<ColumnListItem type="Navigation" press="MI_onPressColNavigation" >
-                    <cells>
-                        <ObjectStatus text="{Status}" inverted="true"
-                        state="{path: 'Status', formatter: '.Formatter.statusStateFormatter'}" />
-                    </cells>
-                    </ColumnListItem>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="SubmittedDate" label="{i18n>submittedDate}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<DateRangeSelection id="MI_id_SubmittedDateFilter" valueFormat="dd/MM/yyyy"  displayFormat="dd/MM/yyyy" change="MI_onDateChangeFilter" />
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table id="MI_id_MyInboxTable" class="sapUiTinyMargin" items="{ path:'',sorter: {
+			path: '', descending: false, group:true}}"  busyIndicatorDelay="0"  width="auto"
+                inset="false"    growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
+				<headerToolbar>
+					<OverflowToolbar >
+						<Title id="MI_id_TitleTable" text="{i18n>headerEmpDetails}"/>
+						<ToolbarSpacer />
+						<Button icon="sap-icon://detail-view" visible="{modelButtonVisible>/LOPDataButt}" press="MI_onPressLOPData" tooltip="LOP Leave Details" />
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>employeeID}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>employeeName}" />
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>startDate}" />
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>endDate}" />
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>type}" />
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>subType}" />
+					</Column>
+					<Column demandPopin="true" >
+						<Text text="{i18n>status}" />
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem type="Navigation" press="MI_onPressColNavigation">
+						<cells>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<ObjectStatus text="{Status}" inverted="true" state="{path: 'Status', formatter: '.Formatter.statusStateFormatter'}" />
+						</cells>
+					</ColumnListItem>
 				</items>
 			</Table>
-			</smartTable:SmartTable>
-            </content>
-            <footer>
-                <Bar id="idfooterBar">
-                    <contentRight>
-                        <!-- Footer Buttons -->
-                        <Button id="MI_id_ButApprove" text="{i18n>approve}" press="MI_onPressApprove" type="Accept" visible="false"/>
-                        <Button id="MI_id_ButReject" text="{i18n>reject}" press="MI_onPressReject" type="Reject" visible="false"/>
-                        <Button id="MI_id_ButReSend" text="{i18n>resend}" press="MI_onPressReSend" type="Emphasized" visible="false"/>
-                        <Button id="MI_id_ButPaid" text="{i18n>paid}" press="MI_onPressPaidBut" type="Success" visible="false"/>
-                    </contentRight>
-                </Bar>
-            </footer>
-    </Page>
+		</content>
+		<footer>
+			<Bar id="MI_id_FooterBar">
+			    <contentLeft>
+				<HBox class="sapUiTinyMarginTop">
+					<Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
+					<Link
+					class="footer-CoName sapUiTinyMarginBegin"
+					text="Developed by Kalpavriksha Technologies"
+					href="https://www.kalpavrikshatechnologies.com/" 
+					target="_blank"  />
+				</HBox>
+                </contentLeft>
+				<contentRight>
+					<!-- Footer Buttons -->
+					<Button id="MI_id_ButApprove" text="{i18n>approve}" press="MI_onPressApprove" type="Accept" visible="true"/>
+					<Button id="MI_id_ButReject" text="{i18n>reject}" press="MI_onPressReject" type="Reject" visible="true"/>
+					<Button id="MI_id_ButReSend" text="{i18n>resend}" press="MI_onPressReSend" type="Emphasized" visible="true"/>
+					<Button id="MI_id_ButPaid" text="{i18n>paid}" press="MI_onPressPaidBut" type="Success" visible="true"/>
+				</contentRight>
+			</Bar>
+		</footer>
+	</Page>
 </mvc:View>

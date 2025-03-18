@@ -56,6 +56,9 @@ sap.ui.define([
             },
             TileV_onPressManagePayroll: function () {
                 this.getRouter().navTo("RouteManagePayroll");
+            },
+            TileV_onpressEmployeeDetails: function () {
+                this.getRouter().navTo("RouteEmployeeDetails");
             }
         });
     });

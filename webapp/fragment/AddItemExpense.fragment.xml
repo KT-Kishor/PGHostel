@@ -20,7 +20,7 @@
 			columnsL="1"
 			columnsM="1">
 				<f:content>					
-					<Label text="{i18n>expDetItemID}"/>
+					<Label text="{i18n>itemID}"/>
 					<Input value="{ExpenseCreateModel>/IndexNo}" editable="false" maxLength="50"/>
 					<!-- Item Type -->
 					<Label text="{i18n>expDetItemType}" required="true"/>
@@ -39,7 +39,7 @@
 					<Label text="{i18n>expDetExpenseAmount}" required="true"/>
 					<HBox width="100%">
 						<VBox width="70%">
-							<Input id="idExpAmount" valueState="None" value="{ExpenseCreateModel>/ExpenseAmount}" type="Number" liveChange="onLiveValidationItem" placeholder="{i18n>expenseAmountPlaceholder}" enabled="{EnableModel>/enable}" maxLength="50"/>
+							<Input id="idExpAmount" valueState="None" value="{ExpenseCreateModel>/ExpenseAmount}" type="Number" liveChange="onLiveValidationItem" placeholder="{i18n>placeAmount}" enabled="{EnableModel>/enable}" maxLength="50"/>
 						</VBox>
 						<VBox width="30%">
 							<Select items="{currencyModel>/results}" change="onChangeCurrency" selectedKey="{ExpenseCreateModel>/Currency}"  id="idCurrency" enabled="{EnableModel>/enable}">
@@ -52,7 +52,7 @@
 					<Input id="idExpConversionRate" valueState="None" value="{ExpenseCreateModel>/ConversionRate}" liveChange="onLiveValidationItem" type="Number" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="10 " change="onChangeConverstionRate"/>
 					<!-- ForeignAmount Label -->
 					<!-- <Label text="{i18n>expenseForeignAmount}" visible="{ExpenseCreateModel>/DisplayForeignAmount}" />					 -->
-					<Label text="{i18n>expDetComments}" required="true" ></Label>
+					<Label text="{i18n>comments}" required="true" ></Label>
 					<TextArea id="idExpItemComments"  liveChange="onLiveValidationItem" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
 				</f:content>
 			</f:SimpleForm>

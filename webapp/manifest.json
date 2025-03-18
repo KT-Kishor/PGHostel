@@ -273,6 +273,13 @@
                     ]
                 },
                 {
+                    "name": "RouteEmployeeDetails",
+                    "pattern": "EmployeeDetails",
+                    "target": [
+                        "TargetEmployeeDetails"
+                    ]
+                },
+                {
                     "name": "RouteCompanyInvoice",
                     "pattern": "CompanyInvoice/{sPath}",
                     "target": [
@@ -476,6 +483,13 @@
                     "clearControlAggregation": false,
                     "viewId": "MyInbox",
                     "viewName": "MyInbox"
+                },
+                "TargetEmployeeDetails": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "EmployeeDetails",
+                    "viewName": "EmployeeDetails"
                 },
                 "TargetCompanyInvoice": {
                     "viewType": "XML",

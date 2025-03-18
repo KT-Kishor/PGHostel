@@ -18,7 +18,7 @@
     <content>
         <!-- <fb:FilterBar id="exp-id-FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" class="sapUiResponsiveMargin" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Employee ID" label="{i18n>expEmployeeId}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Employee ID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
 						<ComboBox name="Employee ID" showClearIcon="true" items="" >
 							<core:Item key="" text=""/>
@@ -46,7 +46,7 @@
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-				<fb:FilterGroupItem name="Status" label="{i18n>expStatus}" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
 						<ComboBox name="Status" showClearIcon="true" items="">
 							<core:Item key="" text=""/>
@@ -68,28 +68,28 @@
             </headerToolbar>
 				<columns>
 					<Column>
-						<Label text="{i18n>expEmployeeName}" />
+						<Label text="{i18n>employeeName}" />
 					</Column>
 					<Column>
 						<Label text="{i18n>expExpenseName}" />
 					</Column>
 					<Column>
-						<Label text="{i18n>expStartDate}" />
+						<Label text="{i18n>startDate}" />
 					</Column>
 					<Column>
-						<Label text="{i18n>expEndDate}" />
+						<Label text="{i18n>endDate}" />
 					</Column>
 					<Column>
 						<Label text="{i18n>expDestination}" />
 					</Column>
 					<Column>
-						<Label text="{i18n>expTotalAmount}" />
+						<Label text="{i18n>totalAmount}" />
 					</Column>
 					<Column>
 						<Label text="{i18n>expReimbursementAmount}" />
 					</Column>
 					<Column>
-						<Label text="{i18n>expStatus}" />
+						<Label text="{i18n>status}" />
 					</Column>
 					<Column>
 						<Label text="Actions" />

@@ -1,0 +1,100 @@
+<mvc:View
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
+	controllerName="sap.kt.com.minihrsolution.controller.EmployeeDetails"
+	height="100%">
+	<!-- use this to make the table occupy the available screen height -->
+	<Page >
+		<headerContent>
+			<Button  press="ED_onPressBack" icon="sap-icon://home" />
+			<Text text="{i18n>headerEmpDetails}" class="boldBlackText"></Text>
+			<ToolbarSpacer />
+			<Button  press="ED_onPressSignOut" icon="sap-icon://log"></Button>
+		</headerContent>
+		<content>
+			<fb:FilterBar  class="sapUiTinyMargin" id="ED_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem name="ID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox  showSecondaryValues= "true"  items="" change="" id="ED_id_EmpIDFilter" showClearIcon="true">
+								<core:ListItem key="" text="" additionalText="" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Manager" label="{i18n>manager}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox  showSecondaryValues= "true"  items="" change="" id="ED_id_ManagerFilter" showClearIcon="true">
+								<core:ListItem key="" text="" additionalText="" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table id="ED_id_EmpDetailsTable" class="sapUiTinyMargin" items="{ path:'',sorter: {
+			path: '', descending: false, group:true}}"  busyIndicatorDelay="0"  width="auto"
+                inset="false"    growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
+				<headerToolbar>
+					<OverflowToolbar >
+						<Title id="ED_id_TitleTable" text="{i18n>headerEmpDetails}"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>employeeID}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>employeeName}" />
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>role}" />
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>designation}" />
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>dateOfBirth}" />
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>email}" />
+					</Column>
+					<Column demandPopin="true" >
+						<Text text="{i18n>manager}" />
+					</Column>
+					<Column demandPopin="true" >
+						<Text text="{i18n>baseLocation}" />
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem type="Navigation" press="ED_onPressEmployeeRow">
+						<cells>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+        	<footer>
+			<Bar id="ED_id_FooterBar">
+			    <contentLeft>
+				<HBox class="sapUiTinyMarginTop">
+					<Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
+					<Link
+					class="footer-CoName sapUiTinyMarginBegin"
+					text="Developed by Kalpavriksha Technologies"
+					href="https://www.kalpavrikshatechnologies.com/" 
+					target="_blank"  />
+				</HBox>
+                </contentLeft>
+            </Bar>
+            </footer>
+	</Page>
+</mvc:View>

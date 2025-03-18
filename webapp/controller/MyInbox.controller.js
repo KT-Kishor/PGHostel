@@ -1,11 +1,17 @@
 sap.ui.define([
-      "sap/ui/core/mvc/Controller",
+      "./BaseController", 
     "../utils/validation"
-], (Controller, utils) => {
+], (BaseController, utils) => {
     "use strict";
-     return Controller.extend("sap.kt.com.minihrsolution.controller.MyInbox" ,{
+     return BaseController.extend("sap.kt.com.minihrsolution.controller.MyInbox" ,{
         onInit() {
            
         },
+        MI_onPressBack:function(){
+          this.getRouter().navTo("RouteTilePage");
+        },
+        MI_onPressSignOut:function(){
+          this.getRouter().navTo("RouteLoginPage");
+        }
      })
 })

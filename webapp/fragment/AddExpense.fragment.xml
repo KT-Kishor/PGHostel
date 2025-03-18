@@ -13,19 +13,19 @@
               emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 			<f:content>
 				<!-- Employee ID -->
-				<Label text="{i18n>expEmployeeId}"/>
+				<Label text="{i18n>employeeID}"/>
 				<Input  value="{ExpenseData>/EmployeeID}" editable="false"/>
 				<!-- EmployeeName ID -->
-				<Label text="{i18n>expEmployeeName}"/>
+				<Label text="{i18n>employeeName}"/>
 				<Input  value="{ExpenseData>/EmployeeName}"  editable="false"/>
 				<!-- Expense Name -->
 				<Label text="{i18n>expExpenseName}" required="true"/>
 				<Input value="{ExpenseData>/ExpenseName}" valueStateText="{i18n>expenseNamePlaceholder}" id="exp-Id-ExpenseName" liveChange="onLiveExpenseName" placeholder="{i18n>expenseNamePlaceholder}" change="onInputChange" maxLength="200" />
 				<!-- Start Date -->
-				<Label text="{i18n>expStartDate}" required="true" />
+				<Label text="{i18n>startDate}" required="true" />
 				<DatePicker id="exp-Id-StartDate" valueStateText="{i18n>expValStaStartDate}" value="" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" maxDate="" change="onDatePickerChange"/>
 				<!-- End Date -->
-				<Label text="{i18n>expEndDate}" required="true" />
+				<Label text="{i18n>endDate}" required="true" />
 				<DatePicker id="exp-Id-EndDate" valueStateText="{i18n>expValStaEndDate}" value="" minDate="" maxDate="" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="onEndDateChange" />
 				<!-- Travel Allowance -->
 				<Label text="{i18n>expTravelAllowance}" required="true"></Label>
@@ -59,7 +59,7 @@
 					<core:Item key="{tripTypeModel>Name}" text="{tripTypeModel>Name}" />
 				</Select>
 				<Label text="{i18n>expEmployeeRemark}" required="true"/>
-				<TextArea liveChange="onChangeEmployeeRemark" valueStateText="{i18n>expValStaEmployeeRemark}" id="exp-Id-EmployeeRemark" rows="2" value="{ExpenseData>/Comments}" placeholder="{i18n>expPlaceHolderRemark}" maxLength="1000" />
+				<TextArea liveChange="onChangeEmployeeRemark" valueStateText="{i18n>expValStaEmployeeRemark}" id="exp-Id-EmployeeRemark" rows="2" value="{ExpenseData>/Comments}" placeholder="{i18n>expValStaEmployeeRemark}" maxLength="1000" />
 				<!-- <rich:RichTextEditor change="onLiveValidation" value="{ExpenseData>/Comments}"/> -->
 			</f:content>
 		</f:SimpleForm>

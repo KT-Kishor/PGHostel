@@ -167,7 +167,7 @@
 
 				<GenericTile  visible="{modelTileVisible>/PaySlip}"
                    class="sapUiMediumMargin"
-                    header="{i18n>headerPaySlip}" press="TileV_onPressAdminPaySlip">
+                    header="{i18n>HeaderPaySlip}" press="TileV_onPressAdminPaySlip">
 					<TileContent  unit="{i18n>tilePaySlipFooter}">
 						<ImageContent src="sap-icon://money-bills" />
 					</TileContent>

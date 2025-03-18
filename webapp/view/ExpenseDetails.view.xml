@@ -49,13 +49,13 @@
 										</f:toolbar>
 									<!-- <f:content> -->
 										<!-- Employee ID -->
-										<m:Label text="{i18n>expEmployeeId}" required="true" />
+										<m:Label text="{i18n>employeeID}" required="true" />
 										<m:Input  value="{FilteredExpenseModel>/EmployeeID}" editable="false" maxLength="20" />
 										<!-- Employee Name -->
 										<m:Label text="{i18n>expExpenseName}" required="true" />
 										<m:Input  value="{FilteredExpenseModel>/EmployeeName}" editable="false" maxLength="50" />
 										<!-- Total Amount -->
-										<m:Label text="{i18n>expTotalAmount}" required="true"/>
+										<m:Label text="{i18n>totalAmount}" required="true"/>
 										<m:Input  value="{path:'FilteredExpenseModel>/TotalAmount',formatter:'.Formatter.numberFormater'}" editable="false" />
 										<!-- Reimbursement Amount -->
 										<m:Label text="{i18n>expReimbursementAmount}" required="true"/>
@@ -78,10 +78,10 @@
 										<m:Label text="{i18n>expExpenseName}" required="true"/>
 										<m:Input id="idEditExpName" valueState="None"  liveChange="onLiveAllValidation" value="{FilteredExpenseModel>/ExpenseName}" maxLength="200"  editable="false" />
 										<!-- Start Date -->
-										<m:Label text="{i18n>expStartDate}" required="true" />
+										<m:Label text="{i18n>startDate}" required="true" />
 										<m:DatePicker  displayFormat="dd/MM/yyyy"  value="{FilteredExpenseModel>/ExpStartDate}" id="idExpStart" editable="false"  />
 										<!-- EndDate -->
-										<m:Label text="{i18n>expEndDate}" required="true" />
+										<m:Label text="{i18n>endDate}" required="true" />
 										<m:DatePicker  displayFormat="dd/MM/yyyy" value="{FilteredExpenseModel>/ExpEndDate}" id="isExpEnd" editable="false" />										
 										<!-- Source -->
 										<m:Label text="{i18n>expSource}" required="true"/>
@@ -105,7 +105,7 @@
 											<core:Item key="{countryModel>CountryName}" text="{countryModel>CountryName}"/>
 										</m:ComboBox>
 
-										<m:Label text="{i18n>expManagerRemarks}" />
+										<m:Label text="{i18n>managerRemarksLeave}" />
 										<m:Text text="{= ${FilteredExpenseModel>/ManagerRemark}.length > 80 ? ${FilteredExpenseModel>/ManagerRemark}.substring(0, 80) + '...' : ${FilteredExpenseModel>/ManagerRemark}}" wrapping="false" />
 										<m:Link text="{i18n>showMore}" press="onPressManagerRemarks" visible="{= ${FilteredExpenseModel>/ManagerRemark}.length > 80}" />
 
@@ -136,7 +136,7 @@
 									</m:headerToolbar>
 										<m:columns>
 											<m:Column>
-												<m:Label text="{i18n>expDetItemID}" />
+												<m:Label text="{i18n>itemID}" />
 											</m:Column>
 											<m:Column>
 												<m:Label text="{i18n>expDetItemType}" />
@@ -154,7 +154,7 @@
 												<m:Label text="{i18n>expModeOfPayment}" />
 											</m:Column>
 											<m:Column>
-												<m:Label text="{i18n>expDetComments}" />
+												<m:Label text="{i18n>comments}" />
 											</m:Column>
 										</m:columns>
 										<m:items>
