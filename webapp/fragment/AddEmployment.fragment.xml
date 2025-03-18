@@ -53,7 +53,7 @@
 		<FlexBox justifyContent="End">
 			<Button text="{i18n>submit}" id="AddEmp_id_Submit" type="Accept" press="AddEmp_onSubmitEmp" class="submit" visible="{viewModel>/fragmentSave}" ></Button>
 			<!-- <Button text="{i18n>save}" type="Accept" id="AddEmp_id_Save" press="AddEmp_onUpdateEmp" class="submit" visible="{viewModel>/fragmentSubmit}"></Button> -->
-			<Button text="{i18n>close}" press="AddEmp_onClose" class="sendMail" type="Negative"></Button>
+			<Button text="{i18n>close}" press="AddEmp_onClose" class="sendMail" type="Reject"></Button>
 		</FlexBox>
 	</Dialog>
 </core:FragmentDefinition>  

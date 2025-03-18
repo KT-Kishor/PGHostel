@@ -13,53 +13,52 @@
     selectedKeys="{newTaskModel>/EmployeeIDs}" 
     showSecondaryValues="true"
      width="100%"  
-    maxWidth="400px"
-    id="employeeIDInput"
+    id="NAF_id_EmpId"
     visible="{visiblePlay>/empId}"
-    change="liveChangeValuState"
+    change="ValidateCommonFields"
     items="{idModel>/results}">
     <core:ListItem key="{idModel>ID}" text="{idModel>ID}" additionalText="{idModel>EmployeeName}"/>
 </MultiComboBox>
                 <Label text="{i18n>taskName}" required="true"/>
-                <Input value="{newTaskModel>/TaskName}" id="taskNameInput" liveChange="liveChangeValuState" maxLength="100"/>
+                <Input value="{newTaskModel>/TaskName}" id="NA_id_TaskName" liveChange="ValidateCommonFields" maxLength="100"/>
                 <Label text="{i18n>taskType}" required="true"/>
                 <Select id="idTasktype" items="{TaskJsonModel>/results}" selectedKey="{newTaskModel>/TaskType}" visible="{visiblePlay>/showTaskType}" change="onChangeTaskType" >
                     <core:Item key="{TaskJsonModel>Value}" text="{TaskJsonModel>Value}"/>
                 </Select>
-                <Label text="{i18n>description}" required="true" id="idDescriptionLabel"/>
-                <Input value="{newTaskModel>/TaskTypeDescription}" id="idDescription" liveChange="liveChangeValuState"  visible="{visiblePlay>/showTaskDescription}" maxLength="50"/>
+                <Label text="{i18n>description}" required="true" id="NAF_id_Ldesc"/>
+                <Input value="{newTaskModel>/TaskTypeDescription}" id="NAF_id_Description" liveChange="ValidateCommonFields"  visible="{visiblePlay>/showTaskDescription}" maxLength="50"/>
                 <Label text="{i18n>startDate}" required="true"/>
                 <DatePicker minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"
-                    change="liveChangeValuState"
+                    change="validateDate"
                     value="{newTaskModel>/StartDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
-                    id="idTaskStart"/>
+                    id="NAF_id_StartDate"/>
                 <Label text="{i18n>endDate}" required="true"/>
                 <DatePicker
                     minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"
-                    change="liveChangeValuState"
+                    change="validateDate"
                     value="{newTaskModel>/EndDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
-                    id="idTaskEnd"/>
+                    id="NAF_id_EndDate"/>
                 <Label text="{i18n>hours}" required="true" visible="{visiblePlay>/showHoursWorked}" />
                 <TimePicker 
     value="{newTaskModel>/HoursWorked}" 
-    id="hoursWorkedTimePicker" 
+    id="NAF_id_HoursWorked" 
     displayFormat="HH" 
     valueFormat="HH" 
     visible="{visiblePlay>/showHoursWorked}"
-    change="onHoursWorkedChange"
+    change="ValidateCommonFields"
      />
             </f:content>
             <HBox justifyContent="End">
-                <Button text="{i18n>save}" type="Emphasized" press="onEditSaveTask" class="submit" visible="{visiblePlay>/save}"></Button>
-                <Button text="{i18n>submit}" type="Emphasized" press="onSubmitTask" class="submit" visible="{visiblePlay>/submit}"></Button>
-                <Button id="idEmployeeAssignButton" type="Emphasized" text="{i18n>assignButton}" press="onPressEmployeeAssign" visible="{visiblePlay>/showEmployeeAssignButton}" class="submit"/>
-                <Button text="{i18n>close}" press="TaskF_onTaskClose" class="sendMail"></Button>
+                <!-- <Button text="{i18n>save}" type="Emphasized" press="onEditSaveTask" class="submit" visible="{visiblePlay>/save}"></Button> -->
+                <Button text="{i18n>submit}" type="Accept" press="NAF_onSubmitTask" class="submit" visible="{visiblePlay>/submit}"></Button>
+                <!-- <Button id="idEmployeeAssignButton" type="Emphasized" text="{i18n>assignButton}" press="onPressEmployeeAssign" visible="{visiblePlay>/showEmployeeAssignButton}" class="submit"/> -->
+                <Button text="{i18n>close}" press="NAF_onTaskClose" class="sendMail" type="Reject"></Button>
             </HBox>
         </f:SimpleForm>
     </Dialog>

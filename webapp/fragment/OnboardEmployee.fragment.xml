@@ -6,7 +6,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core" >
 	<Dialog 
-        title="{i18n>employeedetails}">
+        title="{i18n>headerEmpDetails}">
 		<f:SimpleForm
                                           editable="true" layout="ColumnLayout"
                                          labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
@@ -64,8 +64,8 @@
 			</f:content>
 		</f:SimpleForm>
 		<HBox justifyContent="End" >
-			<Button text="{i18n>onboard}" type="Emphasized" press="Oef_onPressOnBoard" class="submit" />
-			<Button text="{i18n>close}" press="Oef_onPressClose" class="sendMail"/>
+			<Button text="{i18n>onboard}" type="Accept" press="Oef_onPressOnBoard" class="submit" />
+			<Button text="{i18n>close}" press="Oef_onPressClose" class="sendMail" type="Reject"/>
 		</HBox>
 	</Dialog>
 </core:FragmentDefinition>
