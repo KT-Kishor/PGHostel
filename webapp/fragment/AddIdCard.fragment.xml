@@ -62,8 +62,8 @@
 				<Input value="{IdCardModel>/MobileNo}" id="IC_id_Mobile" liveChange="validateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}" />
 				<!-- BloodGroup -->
 				<Label text="{i18n>bloodGroup}" required="true" />
-				<ComboBox showSecondaryValues="true" id="IC_id_bloodGroup"  items="{BloodGroupModel>/results}" change="ValidateCommonFields" valueStateText="{i18n>validBloodGroupMsg}" value="{IdCardModel>/BloodGroup}" >
-					<core:Item key="{BloodGroupModel>ID}" text="{BloodGroupModel>Code}" />
+				<ComboBox showSecondaryValues="true" id="IC_id_bloodGroup"  items="{BloodGroup>/bloodgroup}" change="ValidateCommonFields" valueStateText="{i18n>validBloodGroupMsg}" value="{IdCardModel>/BloodGroup}" >
+					<core:Item key="{BloodGroup>ID}" text="{BloodGroup>Code}" />
 				</ComboBox>
 				<!-- File Uploader -->
 				<Label text="{i18n>fileUploader}" required="true"/>
