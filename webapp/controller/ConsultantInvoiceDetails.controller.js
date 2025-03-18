@@ -99,6 +99,29 @@ sap.ui.define(
         CI_onPressback: function () {
           this.getRouter().navTo("RouteConsultantInvoiceApplication");
         },
+        CI_onPressSubmit: function (oEvent) {
+          try {
+              if (
+                  utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
+                  utils._LCvalidateDate(this.byId("CI_id_PaybyInv"), "ID") &&
+                  utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceTo"), "ID") &&
+                  utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceAddress"), "ID") &&
+                  utils._LCvalidateGstNumber(this.byId("CI_id_InputCompGSTNO"), "ID") &&
+                  utils._LCvalidateMandatoryField(this.byId("CI_id_ConsultantName"), "ID") &&
+                  utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
+                  utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
+                  utils._LCvalidateGstNumber(this.byId("CI_id_InputGSTNO"), "ID") &&
+                  utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
+                  utils._LCvalidateMandatoryField(this.byId("CI_id_InputAccountName"), "ID") &&
+                  utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
+                  utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID")) {
+              } else {
+                  sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered value");
+              }
+          } catch (error) {
+              sap.m.MessageToast.show("Technical error, please contact the administrator");
+          }
+      },
       }
     );
   }

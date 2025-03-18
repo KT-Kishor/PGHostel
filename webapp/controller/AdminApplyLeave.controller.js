@@ -69,7 +69,7 @@ sap.ui.define(
           }
         },
         // Close the leave dialog fragment
-        onPressClose: function () {
+        AL_onPressClose: function () {
           this.oDialog.close();
           sap.ui.getCore().byId("AL_id_FromDate").setValueState("None");
           sap.ui.getCore().byId("AL_id_ToDate").setValueState("None");
@@ -87,6 +87,19 @@ sap.ui.define(
         AL_onPressback: function () {
           this.getRouter().navTo("RouteTilePage");
         },
+      AL_onPressSubmit: function (oEvent) {
+        try {
+            if (
+              utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
+              utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
+              utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")) {
+            } else {
+                sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered value");
+            }
+        } catch (error) {
+            sap.m.MessageToast.show("Technical error, please contact the administrator");
+        }
+    },
       }
     );
   }

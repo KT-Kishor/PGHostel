@@ -28,7 +28,7 @@
 											type="Emphasized" 
 											icon="sap-icon://copy" 
 											text="{i18n>copy}" 
-											press="onPressCopyBtn" />
+											press="CI_onPressCopyBtn" />
 
 										<!-- Paste Button -->
 										<m:Button 
@@ -36,7 +36,7 @@
 											type="Emphasized" 
 											icon="sap-icon://paste" 
 											text="{i18n>paste}" 
-											press="onPressPasteBtn" />
+											press="CI_onPressPasteBtn" />
 
 										<!-- ComboBox -->
 										<m:ComboBox 
@@ -122,7 +122,7 @@
                                     columnsM="1">
 									<f:content>
 										<m:Label text="{i18n>consultantName}" required="true" />
-										<m:Input value="{ConsultantInvoiceModel>/ConsultantName}" editable="{visiablityPlay>/editable}" liveChange="ValidateCommonFields" maxLength="50" valueStateText="{i18n>validConsultantNameMsg}" />
+										<m:Input value="{ConsultantInvoiceModel>/ConsultantName}" editable="{visiablityPlay>/editable}" id="CI_id_ConsultantName" liveChange="ValidateCommonFields" maxLength="50" valueStateText="{i18n>validConsultantNameMsg}" />
 										<m:Label text="{i18n>mobileNo}" required="true" />
 										<m:Input value="{ConsultantInvoiceModel>/MobileNo}" id="CI_id_InputMobile" liveChange="validateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}" editable="{visiablityPlay>/editable}"/>
 										<m:Label text="{i18n>consultantAddress}" required="true" />
@@ -174,8 +174,8 @@
     <!-- Toolbar -->
     <m:OverflowToolbar>
         <m:ToolbarSpacer />
-        <m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://add" tooltip="{i18n>addItem}" press="onPressAddInvoiceDetails" type="Emphasized" />
-        <m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://signature" tooltip="{i18n>addSignature}" press="onPressAddSignature" type="Emphasized" id="CI_id_Sign" />
+        <m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://add" tooltip="{i18n>addItem}" press="CI_onPressAddInvoiceDetails" type="Emphasized" />
+        <m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://signature" tooltip="{i18n>addSignature}" press="CI_onPressAddSignature" type="Emphasized" id="CI_id_Sign" />
         <m:ToolbarSeparator />
     </m:OverflowToolbar>
 
@@ -318,10 +318,10 @@
 		<m:footer>
 			<m:Toolbar>
 				<m:ToolbarSpacer/>
-				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Emphasized" press="onPressSubmit" class="sendMail" />
-				<m:Button visible="{visiablityPlay>/editVisi}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"  press="onPressEdit" class="sendMail" />
-				<m:Button text="{i18n>buttonSendEmail}" id="CI_id_ContractMail" press="onPressSendEmail" visible="{visiablityPlay>/merge}"/>
-				<m:Button text="{i18n>jsPdf}" press="onPressGeneratePdf"  visible="{visiablityPlay>/merge}" />
+				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Emphasized" press="CI_onPressSubmit" class="sendMail" />
+				<m:Button visible="{visiablityPlay>/editVisi}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"  press="CI_onPressEdit" class="sendMail" />
+				<m:Button text="{i18n>buttonSendEmail}" id="CI_id_ContractMail" press="CI_onPressSendEmail" visible="{visiablityPlay>/merge}"/>
+				<m:Button text="{i18n>jsPdf}" press="CI_onPressGeneratePdf"  visible="{visiablityPlay>/merge}" />
 			</m:Toolbar>
 		</m:footer>
 	</m:Page>

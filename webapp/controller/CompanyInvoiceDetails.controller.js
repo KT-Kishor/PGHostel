@@ -8,7 +8,7 @@ sap.ui.define([
     "sap/m/MessageItem",
      "../utils/validation"
 ],
-    function (BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
+    function (BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem,utils) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.CompanyInvoiceDetails", {
             onInit: function () {
@@ -63,5 +63,21 @@ sap.ui.define([
             validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
             },
+            ValidateCommonFields: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+            },
+             //Save the Data
+             CID_onPressSubmit: function (oEvent) {
+            try {
+                if (utils._LCvalidateMandatoryField(this.byId("CID_id_AddCustComboBox"), "ID") && utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") && utils._LCvalidateMandatoryField(this.byId("CID_id_SowPO"), "ID") && utils._LCvalidateMandatoryField(this.byId("CID_id_TDS"), "ID") && utils._LCvalidateMandatoryField(this.byId("CID_id_SowDetails"), "ID") && utils._LCvalidateMandatoryField(this.byId("CID_id_CurrencySelect"), "ID") && utils._LCvalidateDate(this.byId("CID_id_Invoice"), "ID") && utils._LCvalidateDate(this.byId("CID_id_Payby"), "ID")) {
+                }
+                else {
+                    sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered value");
+                }
+            }
+            catch {
+                sap.m.MessageToast.show("Technical error please connect to administrator");
+            }
+        }
         });
     });

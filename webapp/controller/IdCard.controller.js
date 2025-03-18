@@ -264,6 +264,22 @@ sap.ui.define([
         validateMobileNo: function (oEvent) {
           utils._LCvalidateMobileNumber(oEvent);
         },
+        IC_onPressSubmit: function (oEvent) {
+          try {
+              if (
+                  utils._LCvalidateName(sap.ui.getCore().byId("IC_id_EmployeeName"), "ID") &&
+                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId("IC_id_Designation"), "ID") &&
+                  utils._LCvalidateEmail(sap.ui.getCore().byId("IC_id_Email"), "ID") &&
+                  utils._LCvalidateDate(sap.ui.getCore().byId("IC_id_DateBirth"), "ID") &&
+                  utils._LCvalidateMobileNumber(sap.ui.getCore().byId("IC_id_Mobile"), "ID") &&
+                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId("IC_id_bloodGroup"), "ID")) {  
+              } else {
+                  sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered value");
+              }
+          } catch (error) {
+              sap.m.MessageToast.show("Technical error, please contact the administrator");
+          }
+      }      
       }
     );
   }

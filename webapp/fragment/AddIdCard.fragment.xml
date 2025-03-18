@@ -47,22 +47,22 @@
 				</ComboBox>
 				<!-- Employee Name -->
 				<Label text="{i18n>employeeName}" required="true" />
-				<Input value="{IdCardModel>/EmployeeName}" liveChange="validateName" maxLength="50" valueStateText="{i18n>validEmpNameMsg}" editable="{IdCardModel>/isEditable}" />
+				<Input value="{IdCardModel>/EmployeeName}" liveChange="validateName" maxLength="50" valueStateText="{i18n>validEmpNameMsg}" id="IC_id_EmployeeName" editable="{IdCardModel>/isEditable}" />
 				<!-- Designation -->
 				<Label text="{i18n>designation}" required="true"/>
-				<Input value="{IdCardModel>/Designation}" liveChange="ValidateCommonFields" maxLength="20" valueStateText="{i18n>destinationValueState}"/>
+				<Input value="{IdCardModel>/Designation}" liveChange="ValidateCommonFields" maxLength="20" id="IC_id_Designation" valueStateText="{i18n>destinationValueState}"/>
 				<!-- Email -->
 				<Label text="{i18n>email}" required="true"/>
-				<Input value="{IdCardModel>/Email}"  liveChange="validateEmail" maxLength="50" valueStateText="{i18n>emailValueState}"/>
+				<Input value="{IdCardModel>/Email}" id="IC_id_Email" liveChange="validateEmail" maxLength="50" valueStateText="{i18n>emailValueState}"/>
 				<!-- DOB -->
 				<Label text="{i18n>dateOfBirth}" required="true" />
-				<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{IdCardModel>/DOB}" id="idDateBirth" maxDate="{IdCardModel>/today}" initialFocusedDateValue="{IdCardModel>/minDOB}" change="validateDate" valueStateText="{i18n>dateValueState}" />
+				<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{IdCardModel>/DOB}" id="IC_id_DateBirth" maxDate="{IdCardModel>/today}" initialFocusedDateValue="{IdCardModel>/minDOB}" change="validateDate" valueStateText="{i18n>dateValueState}" />
 				<!-- MobileNo -->
 				<Label text="{i18n>mobileNo}" required="true"/>
-				<Input value="{IdCardModel>/MobileNo}" liveChange="validateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}" />
+				<Input value="{IdCardModel>/MobileNo}" id="IC_id_Mobile" liveChange="validateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}" />
 				<!-- BloodGroup -->
 				<Label text="{i18n>bloodGroup}" required="true" />
-				<ComboBox showSecondaryValues="true" id="idbgid"  items="{BloodGroupModel>/results}" change="ValidateCommonFields" value="{IdCardModel>/BloodGroup}" >
+				<ComboBox showSecondaryValues="true" id="IC_id_bloodGroup"  items="{BloodGroupModel>/results}" change="ValidateCommonFields" valueStateText="{i18n>validBloodGroupMsg}" value="{IdCardModel>/BloodGroup}" >
 					<core:Item key="{BloodGroupModel>ID}" text="{BloodGroupModel>Code}" />
 				</ComboBox>
 				<!-- File Uploader -->
