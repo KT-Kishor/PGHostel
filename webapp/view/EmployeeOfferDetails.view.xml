@@ -76,13 +76,13 @@
                                             id="EOD_id_Address" maxLength="120" valueStateText="{i18n>addressValueState}"/>
 											<Label text="{i18n>ctc}" required="true" />
 											<Input value="{employeeModel>/CTC}" id="EOD_id_CTC" placeholder="{i18n>placeCtc}" 
-                                            type="Number" liveChange="validateAmount" maxLength="10" valueStateText="{i18n>ammountValuState}" />
+                                             liveChange="validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}" />
 											<Select items="{currencyModel>/results}" selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" width="100%" class="marginLeft">
 												<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
 											</Select>
 											<Label text="{i18n>joiningBonus}" required="true" />
 											<Input value="{employeeModel>/JoiningBonus}" placeholder="{i18n>joiningBonus}" 
-                                            type="Number" liveChange="validateAmount" maxLength="10" id="EOD_id_Bonus" valueStateText="{i18n>ammountValuState}" />
+                                             liveChange="validateAmount" maxLength="10" id="EOD_id_Bonus" valueStateText="{i18n>ammountValuState}" />
 											<Label text="{i18n>salaryType}"/>
 											<RadioButtonGroup id="EOD_id_Main" columns="3" select="onTDSCheckboxChange">
 												<RadioButton id="EOD_id_Tds" text="{i18n>tds}" />

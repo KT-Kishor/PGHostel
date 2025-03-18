@@ -1,0 +1,79 @@
+<mvc:View 
+    controllerName="sap.kt.com.minihrsolution.controller.TimesheetDetails"
+	xmlns:mvc="sap.ui.core.mvc" 
+    displayBlock="true"
+	xmlns:u="sap.ui.unified"
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form">
+	<Page showNavButton="true" navButtonPress="TSD_onPressBack" title="{i18n>createTimeEntry}">
+		<content>
+			<u:CalendarDateInterval
+                    id="TSD_id_Calendar"
+                    width="100%"
+                    legend="calendarLegend"
+                    select="onDateSelect" 
+                    startDateChange="onInitializeCalendarLegend"
+                     />
+			<f:SimpleForm id=""
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            labelSpanXL="4"
+                            labelSpanL="3"
+                            labelSpanM="4"
+                            labelSpanS="12"
+                            adjustLabelSpan="false"
+                            emptySpanXL="0"
+                            emptySpanL="4"
+                            emptySpanM="0"
+                            emptySpanS="0"
+                            columnsXL="2"
+                            columnsL="1"
+                            columnsM="1"
+                            width="100%"
+                            singleContainerFullSize="false"
+                            ariaLabelledBy="Title1">
+				<f:content>
+					<Label text="{i18n>selectAssignment}" />
+					<Input id="TSD_id_Assignment" 
+           textFormatMode="KeyValue" 
+           showSuggestion="true" 
+		   liveChange="ValidateCommonFields"
+           value="{newModel>/TaskName}"
+           showValueHelp="true" 
+           valueHelpRequest="onValueHelpRequest"
+		   valueStateText="{i18n>selectAssignment}" />
+					<Label text="{i18n>hoursWorked}" />
+					<Input value="{newModel>/HoursWorked}" 
+           id="TSD_id_TimeHours" 
+           liveChange="ValidateCommonFields" 
+           type="Number" 
+           editable="{editModel>/editableBut}"
+           maxLength="5"  valueStateText="{i18n>hoursValueState}"/>
+					<Text id="TSD_id_Text" text="" />
+					<Label text="{i18n>employeeComment}" />
+					<TextArea value="{newModel>/EmployeeComments}" 
+           id="TSD_id_EmpComment" 
+           editable="{editModel>/editableBut}"
+           liveChange="ValidateCommonFields" 
+           maxLength="1000"  valueStateText="{i18n>commentsValueState}"/>
+				</f:content>
+			</f:SimpleForm>
+		</content>
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer />
+				<Button
+  text="{= ${viewModel>/isEditing} ? 'Save' : 'Edit' }"
+  press="TSD_onUpdate"
+  type="Default"
+  id="TSD_id_EditDetail"
+  visible="{= ${viewModel>/isUpdate} ? (!${viewModel>/isSubmitted} ? true : false) : false }" />
+				<Button
+  text="{i18n>save}"
+  press="TSD_onSubmit"
+  type="Emphasized"
+  visible="{= ${viewModel>/isCreate} }"/>
+			</Toolbar>
+		</footer>
+	</Page>
+</mvc:View>

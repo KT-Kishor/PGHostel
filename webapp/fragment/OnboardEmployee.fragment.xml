@@ -36,7 +36,7 @@
 					<core:Item key="{CityJsonModel>LocationName}" text="{CityJsonModel>LocationName}" />
 				</Select>
 				<Label text="{i18n>companyMailid}" required="true"/>
-				<Input value="{oEmpolyeeDetailsModel>/CompanyEmailID}" id="OeF_id_CompanyMail" maxLength="50" liveChange="validateEmail" placeholder="{i18n>companyMailid}"/>
+				<Input value="{oEmpolyeeDetailsModel>/CompanyEmailID}" id="OeF_id_CompanyMail" maxLength="50" liveChange="validateEmail" placeholder="{i18n>companyMailid}" valueStateText="{i18n>emailValueState}"/>
 				<Label text="{i18n>permanentAddress}" />
 				<TextArea value="{oEmpolyeeDetailsModel>/PermanentAddress}" placeholder="{i18n>permanentAddress}" maxLength="120"/>
 				<Label text="{i18n>correspondenceAddress}" />
@@ -46,13 +46,14 @@
                  id="Oef_id_DateofBirth"
                  change="validateDate"
 	             displayFormat="dd/MM/yyyy"
-				 valueFormat="dd/MM/yyyy" />
+				 valueFormat="dd/MM/yyyy"
+				 valueStateText="{i18n>dateValueState}" />
 				<Label text="{i18n>bloodGroup}"/>
 				<Select  selectedKey="{oEmpolyeeDetailsModel>/BloodGroup}" items="{BloodGroupModel>/results}" id="Oef_id_blood" >
 					<core:Item key="{BloodGroupModel>Code}" text="{BloodGroupModel>Code}" />
 				</Select>
 				<Label text="{i18n>mobileNo}" required="true" />
-				<Input value="{oEmpolyeeDetailsModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo" maxLength="10" id="Oef_id_Mobile"/>
+				<Input value="{oEmpolyeeDetailsModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo" maxLength="10" id="Oef_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
 				<Label text="{i18n>manager}"/>
 				<ComboBox value="{oEmpolyeeDetailsModel>/Manager}"
 				showSecondaryValues= "true"

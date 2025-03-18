@@ -1,10 +1,116 @@
 <mvc:View
-	controllerName=""
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:c="sap.ui.core"
-	displayBlock="true"
-	height="100%"
-	busyIndicatorDelay="0"
->
+	xmlns:core="sap.ui.core"
+    controllerName="sap.kt.com.minihrsolution.controller.Timesheet"
+	xmlns:fb="sap.ui.comp.filterbar"	
+    displayBlock="true"
+    xmlns:u="sap.ui.unified">
+	<Page id="TS_id_Page" >
+		<headerContent>
+			<Button  press="TS_onPressback" icon="sap-icon://home" />
+			<Text text="{i18n>headerTimesheet}" class="boldBlackText"></Text>
+			<ToolbarSpacer />
+			<Button  press="TS_onSignout" icon="sap-icon://log"></Button>
+		</headerContent>
+		<content>
+		  <u:CalendarDateInterval
+ id="TS_id_calendarTimesheet"
+ width="100%"
+ startDateChange="onCalendarSelect"/>
+			<fb:FilterBar  class="sapUiTinyMargin" id="TS_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem name="Month" label="Month" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox name="Month"  showClearIcon="true" items="" >
+							<core:Item key="" text=""/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Year" label="Year" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+                    <DatePicker
+                    id="TS_id_Year"
+                    valueFormat="yyyy" 
+                    displayFormat="yyyy"
+                    change="onDateChange" />						
+					</fb:control>
+						</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<MessageStrip
+                text="{i18n>notification}"
+                type="Information"
+                showIcon="true"
+                class="sapUiResponsiveLayout"/>
+			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"   items="" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			 <headerToolbar>
+                <OverflowToolbar >
+                    <Title id="" text="{i18n>tileTimesheetFooter}"/>
+                    <ToolbarSpacer/>
+                    <Button text="{i18n>fillTimesheet}" press="TS_onFillDetails" type="Accept" tooltip="" icon="sap-icon://create-entry-time"/>
+                </OverflowToolbar>
+            </headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>taskName}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>date}" />
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>day}" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>hoursWorked}" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>manager}" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>status}" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>employeeComment}" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>managerComment}" />
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem >
+						<cells>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+							<Text text=""/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<Bar>
+				<contentLeft>
+					   <HBox class="sapUiTinyMarginTop">
+    <Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
+    <Link
+        class="footer-CoName sapUiTinyMarginBegin"
+        text="Developed by Kalpavriksha Technologies"
+        href="https://www.kalpavrikshatechnologies.com/" 
+        target="_blank"  
+    />
+</HBox>
+				</contentLeft>
+				<contentRight>
+					<Button text="{i18n>submit}" press="TS_onSubmitTimesheet" type="Success"  id="TS_id_Submited"/>
+                <Button text="{i18n>delete}" press="TS_onDeleteTimesheet" type="Negative"  id="TS_id_Delete"/>
+				</contentRight>
+			</Bar>
+		</footer>
+	</Page>
 </mvc:View>
