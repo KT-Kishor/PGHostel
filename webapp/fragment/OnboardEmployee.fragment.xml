@@ -1,0 +1,71 @@
+
+
+<core:FragmentDefinition
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core" >
+	<Dialog 
+        title="{i18n>employeedetails}">
+		<f:SimpleForm
+                                          editable="true" layout="ColumnLayout"
+                                         labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+                                         adjustLabelSpan="false" emptySpanXL="0" columnsXL="2" columnsL="2"
+                                         columnsM="1" singleContainerFullSize="false">
+			<f:content>
+				<Label text="{i18n>employeeID}" />
+				<Input value="{oEmpolyeeDetailsModel>/ID}" editable="false" />
+				<Label text="{i18n>employeeName}"  />
+				<Input value=" {oEmpolyeeDetailsModel>/Salutation} {oEmpolyeeDetailsModel>/EmployeeName}"   editable="false" />
+				<Label text="{i18n>designation}" required="true"/>
+				<Select items="{DesignationModel>/results}" selectedKey="{oEmpolyeeDetailsModel>/Designation}">
+					<core:Item key="{DesignationModel>DesignationName}" text="{DesignationModel>DesignationName}"/>
+				</Select>
+				<Label text="{i18n>employeeRole}" required="true"/>
+				<Select
+                 id="selectEmployeeRole"
+                 width="100%"
+                 selectedKey="{oEmpolyeeDetailsModel>/Role}"
+                 items="{roleModel>/items}" >
+					<core:Item key="{roleModel>Role}" text="{roleModel>Role}" />
+				</Select>
+				<Label text="{i18n>joiningDate}" />
+				<Input editable="false"  value="{oEmpolyeeDetailsModel>/AppraisalDate}"/>
+				<Label text="{i18n>baseLocation}" required="true"/>
+				<Select  selectedKey="{oEmpolyeeDetailsModel>/BaseLocation}" items="{CityJsonModel>/results}" >
+					<core:Item key="{CityJsonModel>LocationName}" text="{CityJsonModel>LocationName}" />
+				</Select>
+				<Label text="{i18n>companyMailid}" required="true"/>
+				<Input value="{oEmpolyeeDetailsModel>/CompanyEmailID}" id="OeF_id_CompanyMail" maxLength="50" liveChange="validateEmail" placeholder="{i18n>companyMailid}"/>
+				<Label text="{i18n>permanentAddress}" />
+				<TextArea value="{oEmpolyeeDetailsModel>/PermanentAddress}" placeholder="{i18n>permanentAddress}" maxLength="120"/>
+				<Label text="{i18n>correspondenceAddress}" />
+				<TextArea value="{oEmpolyeeDetailsModel>/CorrespondenceAddress}" placeholder="{i18n>correspondenceAddress}" maxLength="120"/>
+				<Label text="{i18n>dateOfBirth}" required="true" />
+				<DatePicker 
+                 id="Oef_id_DateofBirth"
+                 change="validateDate"
+	             displayFormat="dd/MM/yyyy"
+				 valueFormat="dd/MM/yyyy" />
+				<Label text="{i18n>bloodGroup}"/>
+				<Select  selectedKey="{oEmpolyeeDetailsModel>/BloodGroup}" items="{BloodGroupModel>/results}" id="Oef_id_blood" >
+					<core:Item key="{BloodGroupModel>Code}" text="{BloodGroupModel>Code}" />
+				</Select>
+				<Label text="{i18n>mobileNo}" required="true" />
+				<Input value="{oEmpolyeeDetailsModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo" maxLength="10" id="Oef_id_Mobile"/>
+				<Label text="{i18n>manager}"/>
+				<ComboBox value="{oEmpolyeeDetailsModel>/Manager}"
+				showSecondaryValues= "true"
+				id="Oef_id_Manager"
+				items="{idModel>/results}"
+				filterSecondaryValues="true">
+					<core:ListItem key="{key}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}"/>
+				</ComboBox>
+			</f:content>
+		</f:SimpleForm>
+		<HBox justifyContent="End" >
+			<Button text="{i18n>onboard}" type="Emphasized" press="Oef_onPressOnBoard" class="submit" />
+			<Button text="{i18n>close}" press="Oef_onPressClose" class="sendMail"/>
+		</HBox>
+	</Dialog>
+</core:FragmentDefinition>

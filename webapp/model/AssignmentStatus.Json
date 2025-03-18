@@ -1,4 +1,5 @@
-[
+{
+  "assignmentStatus": [
     {
       "ID": 1,
       "Value": "New"
@@ -16,4 +17,4 @@
       "Value": "Inactive"
     }
   ]
-  
+}

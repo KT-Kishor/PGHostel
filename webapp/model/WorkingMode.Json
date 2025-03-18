@@ -1,4 +1,5 @@
-[
+{
+  "location": [
     {
       "ID": 1,
       "Location": "HYBRID"
@@ -12,4 +13,4 @@
       "Location": "REMOTE"
     }
   ]
-  
+}

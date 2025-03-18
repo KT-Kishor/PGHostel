@@ -125,7 +125,7 @@
 									</f:SimpleForm>
 								</WizardStep>
 								<!-- Review wizard step with simple form -->
-								<WizardStep  complete="EOD_id_Submit"  title="{i18n>review}" validated="true">
+								<WizardStep  complete="EOD_onSubmitData"  title="{i18n>review}" validated="true">
 									<f:SimpleForm  editable="false"  layout="ColumnLayout"  title="{i18n>bothEmpDetails}" columnsM="2" columnsL="4" columnsXL="4">
 										<f:content>
 											<core:Title text="Basic Details" />

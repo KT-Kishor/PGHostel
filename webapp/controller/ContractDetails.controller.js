@@ -44,8 +44,7 @@ sap.ui.define([
                     utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") && utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
                     utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID");
             
-                var step2Validated = this.byId("CD_id_EndClientHirer").getSelectedKey() &&
-                    this.byId("CD_id_Datestart").getValue() && this.byId("CD_id_DateEnd").getValue() &&
+                var step2Validated =   this.byId("CD_id_Datestart").getValue() && this.byId("CD_id_DateEnd").getValue() &&
                     utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID");
             
                 var isStep1Validated = step1Validated ? true : false;

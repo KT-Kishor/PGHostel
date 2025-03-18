@@ -21,8 +21,8 @@
 							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="validateDate"  valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 							<!-- Input for Client Company Name -->
 							<Label text="{i18n>consultantName}" required="true" />
-							<Select id="selectMSalutation" selectedKey="{ContractModelWizart>/Salutation}" items="{NameSalutation>/items}" width="100%">
-								<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}" />
+							<Select id="" selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}" width="100%">
+								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
 							<!-- Input for Client Company Name -->
 							<Input value="{ContractModelWizart>/ConsultantName}" type="Text" 
@@ -77,22 +77,22 @@
 							</ComboBox>						
 							<!-- Location ComboBox dropdown -->
 							<Label text="{i18n>locationswhereServices}" required="true"/>
-							<Select id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{ContractlocationModel>/results}">
-								<core:Item key="{ContractlocationModel>Location}" text="{ContractlocationModel>Location}" />
+							<Select id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}">
+								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
 							</Select>
 							<!-- Client Hiring Contact input -->
 							<Label text="{i18n>clienthiringcontact}" required="true"/>
 							<Select id="CD_id_selectSal" selectedKey="{ContractModelWizart>/Salutation2}" 
-                              items="{NameSalutation>/items}" width="100%">
-								<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}" />
+                              items="{Salutation>/salutation}" width="100%">
+								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
 							<Input value="{ContractModelWizart>/HiringContact}"
                              placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" liveChange="validateName" valueStateText="{i18n>commonNameValueState}"/>
 							<!-- Assignment Status ComboBox -->
 							<Label text="{i18n>assignmentStatus}" required="true"/>
 							<ComboBox selectedKey="New" value="{ContractModelWizart>/AssignmentStatus}" 
-                             items="" editable="false">
-								<core:Item key="{Assignment>name}" text="{Assignment>name}"/>
+                             items="{AssignmentStatus>/assignmentStatus}" editable="false">
+								<core:Item key="{AssignmentStatus>Value}" text="{AssignmentStatus>Value}"/>
 							</ComboBox>
 							<!-- DatePicker for Start Date and End Date -->
 							<Label text="{i18n>startDate}" required="true"/>
@@ -117,7 +117,7 @@
 								<core:Item key="No" text="{i18n>no}" />
 							</Select>
 							<!-- Payment Terms ComboBox -->
-							<Label text="{i18n>paymentTerms}" required="true"/>
+							<Label text="{i18n>paymentterms}" required="true"/>
 							<Select id="CD_id_PaymentTerms" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/results}">
 								<core:Item key="{ContractpaymentModel>Days}" text="{ContractpaymentModel>Days}" />
 							</Select>
