@@ -294,6 +294,16 @@
                     "target": [
                         "TargetQuotationForm"
                     ]
+                },                
+                {
+                    "name": "RouteExpensePage",
+                    "pattern": "Expense",
+                    "target": "TargetExpense"
+                },
+                {
+                    "name": "RouteExpensDetails",
+                    "pattern": "ExpenseDetails/{sPath}",
+                    "target": "TargetExpenseDetails"
                 }
             ],
             "targets": {
@@ -447,6 +457,18 @@
                     "clearControlAggregation": false,
                     "viewId": "QuotationForm",
                     "viewName": "QuotationForm"
+                },
+                "TargetExpense": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "viewId": "Expense",
+                    "viewName": "ExpenseApplication"
+                },
+                "TargetExpenseDetails": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "viewId": "ExpenseDetails",
+                    "viewName": "ExpenseDetails"
                 }
             }
         },

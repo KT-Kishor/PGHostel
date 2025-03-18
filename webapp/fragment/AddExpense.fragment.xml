@@ -1,0 +1,72 @@
+	
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:rich="sap.ui.richtexteditor"
+	xmlns:core="sap.ui.core">
+	<Dialog
+        title="{i18n>expCreateTitle}">
+		<f:SimpleForm 
+            editable="true" layout="ColumnLayout"
+              labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+              adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"
+              emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
+			<f:content>
+				<!-- Employee ID -->
+				<Label text="{i18n>expEmployeeId}"/>
+				<Input  value="{ExpenseData>/EmployeeID}" editable="false"/>
+				<!-- EmployeeName ID -->
+				<Label text="{i18n>expEmployeeName}"/>
+				<Input  value="{ExpenseData>/EmployeeName}"  editable="false"/>
+				<!-- Expense Name -->
+				<Label text="{i18n>expExpenseName}" required="true"/>
+				<Input value="{ExpenseData>/ExpenseName}" valueStateText="{i18n>expenseNamePlaceholder}" id="exp-Id-ExpenseName" liveChange="onLiveExpenseName" placeholder="{i18n>expenseNamePlaceholder}" change="onInputChange" maxLength="200" />
+				<!-- Start Date -->
+				<Label text="{i18n>expStartDate}" required="true" />
+				<DatePicker id="exp-Id-StartDate" valueStateText="{i18n>expValStaStartDate}" value="" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" maxDate="" change="onDatePickerChange"/>
+				<!-- End Date -->
+				<Label text="{i18n>expEndDate}" required="true" />
+				<DatePicker id="exp-Id-EndDate" valueStateText="{i18n>expValStaEndDate}" value="" minDate="" maxDate="" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="onEndDateChange" />
+				<!-- Travel Allowance -->
+				<Label text="{i18n>expTravelAllowance}" required="true"></Label>
+				<Select id="exp-Id-TravelAllowance" showSecondaryValues="true"  selectedKey="{ExpenseData>/TravelAllowance}">
+					<core:Item key="{i18n>no}" text="{i18n>no}" />
+					<core:Item key="{i18n>yes}" text="{i18n>yes}" />
+				</Select>
+				<!-- Country -->
+				<Label text="{i18n>expCountry}" required="true"/>
+				<ComboBox change="onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="exp-Id-Country" items="{path:'countryModel>/results',length:1000}" selectedKey="{ExpenseData>/Country}" showSecondaryValues="true">
+					<core:Item key="{countryModel>CountryName}" text="{countryModel>CountryName}"/>
+				</ComboBox>
+				<!-- Source -->
+				<Label text="{i18n>expSource}"  required="true"/>
+				<ComboBox change="onChangeSource" valueStateText="{i18n>expValStaSource}" id="exp-Id-Source" items="{CityJsonModel>/results}"  value="{ExpenseData>/Source}" >
+					<core:Item key="{CityJsonModel>ID}" text="{CityJsonModel>LocationName}" />
+				</ComboBox>
+				<!-- Destination -->
+				<Label text="{i18n>expDestination}" required="{ExpenseType>/required}"/>
+				<ComboBox change="onChangeDestination" valueStateText="{i18n>expValStaDestination}" id="exp-Id-Destination" items="{CityJsonModel>/results}"  value="{ExpenseData>/Destination}"  >
+					<core:Item key="{CityJsonModel>ID}" text="{CityJsonModel>LocationName}" />
+				</ComboBox>
+				<!-- Cost Center -->
+				<Label text="{i18n>expCostCenter}" required="true"/>
+				<Select items="{costCenterModel>/results}" id="exp-id-CostCenter" selectedKey="{ExpenseData>/CostCenter}" >
+					<core:Item key="{costCenterModel>Value}" text="{costCenterModel>Value}" />
+				</Select>
+				<!-- Trip Type -->
+				<Label text="{i18n>expExpenseType}" required="true"/>
+				<Select items="{tripTypeModel>/results}" id="exp-Id-ExpenseType" selectedKey="{ExpenseData>/TripType}" change="onChangeExpenseType">
+					<core:Item key="{tripTypeModel>Name}" text="{tripTypeModel>Name}" />
+				</Select>
+				<Label text="{i18n>expEmployeeRemark}" required="true"/>
+				<TextArea liveChange="onChangeEmployeeRemark" valueStateText="{i18n>expValStaEmployeeRemark}" id="exp-Id-EmployeeRemark" rows="2" value="{ExpenseData>/Comments}" placeholder="{i18n>expPlaceHolderRemark}" maxLength="1000" />
+				<!-- <rich:RichTextEditor change="onLiveValidation" value="{ExpenseData>/Comments}"/> -->
+			</f:content>
+		</f:SimpleForm>
+		<!-- Buttons for Submit and Close actions -->
+		<FlexBox justifyContent="End" width="100%">
+			<Button text="{i18n>submit}" type="Emphasized" press="onPressSubmit" class="sendMail" />
+			<Button text="{i18n>close}" class="sendMail" press="onPressClose" />
+		</FlexBox>
+	</Dialog>
+</core:FragmentDefinition>

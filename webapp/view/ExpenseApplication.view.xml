@@ -1,0 +1,117 @@
+<mvc:View
+	controllerName="sap.kt.com.minihrsolution.controller.ExpenseApplication"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	displayBlock="true"
+	xmlns:core="sap.ui.core"
+	height="100%"
+	xmlns:fb="sap.ui.comp.filterbar"
+	busyIndicatorDelay="0">
+<Page >
+    <headerContent>
+		<Button  press="onPressback" icon="sap-icon://home" />
+		<Text text="{i18n>expApplicationTitle}" class="boldBlackText"></Text>
+		<ToolbarSpacer />
+		<Button  press="onSignout" icon="sap-icon://log"></Button>
+	</headerContent>
+
+    <content>
+        <!-- <fb:FilterBar id="exp-id-FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" class="sapUiResponsiveMargin" >
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem name="Employee ID" label="{i18n>expEmployeeId}" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox name="Employee ID" showClearIcon="true" items="" >
+							<core:Item key="" text=""/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+				<fb:FilterGroupItem name="Expense Name" label="{i18n>expExpenseName}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox name="Expense Name"  items="" showClearIcon="true" id="idConsultantNameFilterBar">
+								<core:Item key="" text=""/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				<fb:FilterGroupItem name="Source" label="{i18n>expSource}" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox name="Source" showClearIcon="true"  items="">
+							<core:Item key="" text=""/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+				<fb:FilterGroupItem name="Destination" label="{i18n>expDestination}" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox name="Destination" showClearIcon="true" items="">
+							<core:Item key="" text=""/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+				<fb:FilterGroupItem name="Status" label="{i18n>expStatus}" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox name="Status" showClearIcon="true" items="">
+							<core:Item key="" text=""/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar> -->
+
+			<Table id="exp_Id_ExpenseTable" items="{ExpenseModel>/expenses}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" >
+			 <headerToolbar>
+                <OverflowToolbar >
+                    <Title id="title" text="Expense Details"/>
+                    <!-- <ToolbarSeparator/> -->
+                    <ToolbarSpacer/>
+                   <Button icon="sap-icon://add-employee" tooltip="{i18n>expenseAddTooltip}" press="onPressAddExpense" />
+					<Button icon="sap-icon://download" press="onPressExpenseDownload" />
+                </OverflowToolbar>
+            </headerToolbar>
+				<columns>
+					<Column>
+						<Label text="{i18n>expEmployeeName}" />
+					</Column>
+					<Column>
+						<Label text="{i18n>expExpenseName}" />
+					</Column>
+					<Column>
+						<Label text="{i18n>expStartDate}" />
+					</Column>
+					<Column>
+						<Label text="{i18n>expEndDate}" />
+					</Column>
+					<Column>
+						<Label text="{i18n>expDestination}" />
+					</Column>
+					<Column>
+						<Label text="{i18n>expTotalAmount}" />
+					</Column>
+					<Column>
+						<Label text="{i18n>expReimbursementAmount}" />
+					</Column>
+					<Column>
+						<Label text="{i18n>expStatus}" />
+					</Column>
+					<Column>
+						<Label text="Actions" />
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem type="Navigation" press="onCheckExpenseDetails">
+						<cells>
+							<Text text="{ExpenseModel>employeeName}" />
+							<Text text="{ExpenseModel>expenseName}" />
+							<Text text="{ExpenseModel>startDate}" />
+							<Text text="{ExpenseModel>endDate}" />
+							<Text text="{ExpenseModel>destination}" />
+							<Text text="{ExpenseModel>totalAmount}" />
+							<Text text="{ExpenseModel>reimbursementAmount}" />
+							<Text text="{ExpenseModel>status}" />
+							<Button icon="sap-icon://delete" press="onPressEditExpense" />
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+    </content>
+    
+</Page>
+</mvc:View>
