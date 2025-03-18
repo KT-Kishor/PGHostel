@@ -1,21 +1,19 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.ConsultantInvoice"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:m="sap.m.Table"
-	xmlns:f="sap.f"
 	xmlns:fb="sap.ui.comp.filterbar"
 	xmlns:core="sap.ui.core">
 	<Page id="CI_id_ConsultantInvoicePage">
 		<headerContent>
-			<Button  press="CI_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>consultantInvoice}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button press="CI_onSignout" icon="sap-icon://log"></Button>
+			<Button press="CI_onPressback" icon="sap-icon://home" />
+			<Text text="{i18n>consultantInvoice}" class="boldBlackText"/>
+			<ToolbarSpacer/>
+			<Button press="CI_onSignout" icon="sap-icon://log"/>
 		</headerContent>
 		<content>
 			<fb:FilterBar id="CI_id_ConsultantInvoiceFilterBar" persistencyKey="consultantInvoicePersKey" 
     useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" 
-    filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false">
+    filterChange=".onFilterChange"  showFilterConfiguration="false">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="InvoiceTo" label="{i18n>invoiceTo}" groupName="ConsultantInvoice" visibleInFilterBar="true" >
 						<fb:control>
@@ -31,7 +29,7 @@
 							<ComboBox id="CI_id_InvoiceNo" 
                 items="{path:'oInvoiceModel>/InvoiceNoList', length:1000}"
                 showSecondaryValues="true" showClearIcon="true">
-								<core:ListItem key="{oInvoiceModel>InvoiceNoID}" text="{oInvoiceModel>InvoiceNo}" additionalText="{oInvoiceModel>InvoiceDate}" />
+								<core:ListItem key="{oInvoiceModel>InvoiceNoID}" text="{oInvoiceModel>InvoiceNo}" additionalText="{oInvoiceModel>InvoiceDate}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -49,10 +47,10 @@
 			<Table id="CI_id-ConsultantInvoiceTable">
 				<headerToolbar>
 					<Toolbar>
-						<Title id="CI_id_TitleInv" text="Consultant Invoice Details"/>
+						<Title id="CI_id_TitleInv" text="{i18n>consultantInvoiceDetails}"/>
 						<ToolbarSpacer />
 						<ToolbarSeparator />
-						<Button icon="sap-icon://add" tooltip="{i18n>addInvoice}" press="onPressAddInvoice" />
+						<Button icon="sap-icon://add" tooltip="{i18n>addInvoice}" press="CI_onPressAddInvoice" />
 						<ToolbarSeparator />
 					</Toolbar>
 				</headerToolbar>
@@ -86,7 +84,7 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem type="Navigation" press="onPressInvoice">
+					<ColumnListItem type="Navigation" press="CI_onPressInvoice">
 						<cells>
 							<Text text="{ConsultantModel>EmployeeID}" />
 							<Text text="{ConsultantModel>ConsultantName}" />

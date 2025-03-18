@@ -1,16 +1,14 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.AdminPaySlip"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:m="sap.m.Table"
-	xmlns:f="sap.f"
 	xmlns:fb="sap.ui.comp.filterbar"
 	xmlns:core="sap.ui.core">
 	<Page id="AP_id_PaySlipPage">
 		<headerContent>
-			<Button  press="AP_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>paySlipTitle}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button   press="AP_onSignout" icon="sap-icon://log"></Button>
+			<Button press="AP_onPressback" icon="sap-icon://home"/>
+			<Text text="{i18n>paySlipTitle}" class="boldBlackText"/>
+			<ToolbarSpacer/>
+			<Button press="AP_onSignout" icon="sap-icon://log"/>
 		</headerContent>
 		<content>
 			<fb:FilterBar id="AP_id_AdminPaySlip"
@@ -21,16 +19,16 @@
     showRestoreButton="true"
     useToolbar="false">
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem groupName="Basic" name="EmployeeID" label="Employee ID" visibleInFilterBar="true">
+					<fb:FilterGroupItem groupName="Basic" name="EmployeeID" label="{i18n>employeeID}" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="cbEmployeeID" showClearIcon="true" items="{/EmployeeList}" selectedKey="{filters>/EmployeeID}">
+							<ComboBox id="AP_id_Employee" showClearIcon="true" items="{/EmployeeList}" selectedKey="{filters>/EmployeeID}">
 								<core:Item key="{EmployeeID}" text="{EmployeeName}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem groupName="Basic" name="Month" label="Month" visibleInFilterBar="true">
+					<fb:FilterGroupItem groupName="Basic" name="Month" label="{i18n>month}" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="cbMonth" showClearIcon="true" items="{/MonthList}" selectedKey="{filters>/Month}">
+							<ComboBox id="AP_id_Month" showClearIcon="true" items="{/MonthList}" selectedKey="{filters>/Month}">
 								<core:Item key="{Month}" text="{Month}" />
 							</ComboBox>
 						</fb:control>
@@ -40,9 +38,9 @@
 			<Table id="AP_id_AdminPaySlipTable">
 				<headerToolbar>
 					<Toolbar>
-						<Title id="AP_id_Title" text="Pay Slip Details"/>
-						<ToolbarSpacer />
-						<ToolbarSeparator />
+						<Title id="AP_id_Title" text="{i18n>paySlipDetails}"/>
+						<ToolbarSpacer/>
+						<ToolbarSeparator/>
 						<Button icon="sap-icon://add" tooltip="{i18n>addPaySlip}" press="AP_onPressAddPayslip" />
 						<ToolbarSeparator />
 					</Toolbar>
@@ -65,7 +63,7 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem type="Navigation" press="onPressPayslip">
+					<ColumnListItem type="Navigation" press="AP_onPressPayslip">
 						<cells>
 							<Text text="{EmployeeID}" />
 						</cells>

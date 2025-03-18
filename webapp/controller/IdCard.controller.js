@@ -2,18 +2,15 @@ sap.ui.define([
   "./BaseController", //call base controller
   "sap/ui/model/json/JSONModel",
   "sap/m/MessageToast",
-  "sap/ui/model/Filter",
-  "sap/ui/model/FilterOperator",
-  "sap/m/MessagePopover",
-  "sap/m/MessageItem",
    "../utils/validation"
 ],
-  function (BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem,utils) {
+  function (BaseController, JSONModel, MessageToast, utils) {
       "use strict";
       return BaseController.extend("sap.kt.com.minihrsolution.controller.IdCard", {
           onInit: function () {
               this.getRouter().getRoute("RouteIDCardApplication").attachMatched(this._onRouteMatched, this);
           },
+
           _onRouteMatched: function () {
               var that = this
               that.i18nModelMess = that.getView().getModel('i18n').getResourceBundle()
@@ -24,6 +21,7 @@ sap.ui.define([
                   oIdCardModel.attachPropertyChange(this.IC_onPressDisplayImageOnCanvas.bind(this));
               }
           },
+
         onAfterRendering: function () {
           var canvasElement = document.getElementById("canvas");
           if (canvasElement) {
@@ -33,6 +31,7 @@ sap.ui.define([
             }
           }
         },
+
         // Function to open the ID card details dialog
         IC_onPressIdCardDetails: function () {
           var oView = this.getView();
@@ -61,6 +60,7 @@ sap.ui.define([
           this.getView().setModel(oIdCardModel, "IdCardModel");
           this.IC_openIdCardDialog(oView, true);
         },
+
         // Open the ID card dialog fragment
         IC_openIdCardDialog: function (oView, value) {
           this.getView().getModel("TextDisplay").setProperty("/name", "");
@@ -81,19 +81,21 @@ sap.ui.define([
             this.oDialog.open();
           }
           if (value) {
-            sap.ui.getCore().byId("idGroupC").setSelectedIndex(0);
-            sap.ui.getCore().byId("comboBox").setSelectedKey("");
+            sap.ui.getCore().byId("IC_id_GroupC").setSelectedIndex(0);
+            sap.ui.getCore().byId("IC_id_EmployeeID").setSelectedKey("");
           } else {
             if (this.oId.split("-").length === 1) {
-              sap.ui.getCore().byId("idGroupC").setSelectedIndex(0);
+              sap.ui.getCore().byId("IC_id_GroupC").setSelectedIndex(0);
             } else {
-              sap.ui.getCore().byId("idGroupC").setSelectedIndex(1);
+              sap.ui.getCore().byId("IC_id_GroupC").setSelectedIndex(1);
             }
           }
         },
+
         IC_onPressClose: function () {
           this.oDialog.close();
         },
+
         IC_onHandleUploadPress: function (oEvent) {
           var oFileUploader = oEvent.getSource();
           var oFile = oFileUploader.oFileUpload.files[0];
@@ -137,6 +139,7 @@ sap.ui.define([
           }.bind(this);
           oReader.readAsDataURL(oFile);
         },
+
         //open camera function
         IC_onPressOpenCamera: function () {
           var oView = this.getView();
@@ -161,6 +164,7 @@ sap.ui.define([
             this.oCameraDialog.open();
           }
         },
+
         IC_StartCamera: function () {
           var oVideo = document.getElementById("video");
           if (!oVideo) {
@@ -179,6 +183,7 @@ sap.ui.define([
               MessageToast.show("Camera access denied");
             });
         },
+
         IC_StopCamera: function () {
           if (this._cameraStream) {
             this._cameraStream.getTracks().forEach(function (track) {
@@ -191,6 +196,7 @@ sap.ui.define([
             oVideo.srcObject = null;
           }
         },
+
         IC_onCapturePress: function () {
           var oCanvas = document.getElementById("canvas");
           var oVideo = document.getElementById("video");
@@ -225,12 +231,14 @@ sap.ui.define([
           this.IC_StopCamera();
           this.oCameraDialog.close();
         },
+
         IC_onPressCloseCameraDialog: function () {
           this.IC_StopCamera();
           if (this.oCameraDialog) {
             this.oCameraDialog.close();
           }
         },
+
         IC_onPressDisplayImageOnCanvas: function (sFileBinary, sFileType) {
           var canvas = document.getElementById("canvas");
           if (canvas) {
@@ -243,27 +251,35 @@ sap.ui.define([
             img.src = "data:" + sFileType + ";base64," + sFileBinary;
           }
         },
+
         IC_onSignout: function () {
           this.getRouter().navTo("RouteLoginPage");
         },
+
         IC_onPressback: function () {
           this.getRouter().navTo("RouteTilePage");
         },
+
         validateName: function (oEvent) {
           utils._LCvalidateName(oEvent);
         },
+        
         ValidateCommonFields: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
+
         validateEmail: function (oEvent) {
           utils._LCvalidateEmail(oEvent);
         },
+
         validateDate: function (oEvent) {
           utils._LCvalidateDate(oEvent);
         },
+
         validateMobileNo: function (oEvent) {
           utils._LCvalidateMobileNumber(oEvent);
         },
+        
         IC_onPressSubmit: function (oEvent) {
           try {
               if (

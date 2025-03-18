@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <Dialog title="Camera Capture" >
+    <Dialog title="{i18n>cameraCapture}" >
         <VBox class="sapUiSmallMargin">
             <HBox class="sapUiTinyMarginTop">
                 <core:HTML content="&lt;video id='video' autoplay class='squareVideo'&gt;&lt;/video&gt;"/>

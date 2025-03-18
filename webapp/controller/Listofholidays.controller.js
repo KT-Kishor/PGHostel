@@ -11,6 +11,7 @@ sap.ui.define(
         onInit: function () {
           var oYearModel = new JSONModel({selectedYear: new Date().getFullYear(), });
           this.getView().setModel(oYearModel, "yearModel");
+
           this.getRouter().getRoute("RouteListofholidays").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: function (oEvent) {
@@ -25,6 +26,7 @@ sap.ui.define(
           }
           this.HolidayReadCall();
         },
+
         HolidayReadCall: function () {
           sap.ui.core.BusyIndicator.show(0);
           var that = this;
@@ -35,8 +37,7 @@ sap.ui.define(
               headers: {
                 "Content-Type": "application/json",
                 name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                password:
-                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+                password:"$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
               },
               success: function (data) {
                 sap.ui.core.BusyIndicator.hide();

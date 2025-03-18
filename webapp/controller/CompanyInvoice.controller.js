@@ -1,14 +1,9 @@
 sap.ui.define([
     "./BaseController", //call base controller
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
-    "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator",
-    "sap/m/MessagePopover",
-    "sap/m/MessageItem"
-
+    "sap/m/MessageToast"
 ],
-    function (BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
+    function (BaseController, JSONModel, MessageToast) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.CompanyInvoice", {
             onInit: function () {

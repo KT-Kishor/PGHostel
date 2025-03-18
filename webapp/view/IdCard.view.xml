@@ -1,19 +1,17 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.IdCard"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:m="sap.m.Table"
-	xmlns:f="sap.f"
 	xmlns:fb="sap.ui.comp.filterbar"
 	xmlns:core="sap.ui.core">
 	<Page id="IC_id_IDCardPage">
 		<headerContent>
-			<Button  press="IC_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>idCard}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button   press="IC_onSignout" icon="sap-icon://log"></Button>
+			<Button press="IC_onPressback" icon="sap-icon://home"/>
+			<Text text="{i18n>idCard}" class="boldBlackText"/>
+			<ToolbarSpacer/>
+			<Button press="IC_onSignout" icon="sap-icon://log"/>
 		</headerContent>
 		<content>
-			<fb:FilterBar  id="IC_id_CardFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false">
+			<fb:FilterBar  id="IC_id_CardFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange"  showFilterConfiguration="false">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmployeeName" label="{i18n>employeeName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
@@ -28,12 +26,12 @@
 			<Table id="IC_id_CardTable" mode="SingleSelectLeft" selectionChange="onSelectionChange">
 				<headerToolbar>
 					<OverflowToolbar>
-						<Title id="IC_id_Title" text="ID Card Details"/>
-						<ToolbarSpacer />
+						<Title id="IC_id_Title" text="{i18n>idCardDetails}"/>
+						<ToolbarSpacer/>
 						<Button icon="sap-icon://add" tooltip="{i18n>addCardDetails}" press="IC_onPressIdCardDetails" />
-						<Button icon="sap-icon://edit" tooltip="{i18n>editCardDetails}" press="IC_onPressIdCardDetailsEdit" id="idEditBtn"/>
-						<Button icon="sap-icon://delete" tooltip="{i18n>deleteCardDetails}" press="IC_onPressIdCardDetailsDelete" id="idDeleteBtn"/>
-						<Button text="{i18n>GeneratePDF}" press="onPressMerge" id="idPdfBtn"/>
+						<Button icon="sap-icon://edit" tooltip="{i18n>editCardDetails}" press="IC_onPressIdCardDetailsEdit" id="IC_id_EditBtn"/>
+						<Button icon="sap-icon://delete" tooltip="{i18n>deleteCardDetails}" press="IC_onPressIdCardDetailsDelete" id="IC_id_DeleteBtn"/>
+						<Button text="{i18n>GeneratePDF}" press="ID_onPressMerge" id="IC_id_PdfBtn"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>

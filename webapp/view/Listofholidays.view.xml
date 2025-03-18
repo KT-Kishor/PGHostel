@@ -1,10 +1,7 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.Listofholidays"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:m="sap.m.Table"
-	xmlns:f="sap.f"
-	xmlns:filterbar="sap.ui.comp.filterbar"
-	xmlns:core="sap.ui.core">
+	xmlns:filterbar="sap.ui.comp.filterbar">
 	<Page id="LOH_id_ListOfholidays">
 		<headerContent>
 			<Button  press="LOH_onPressback" icon="sap-icon://home" />
@@ -13,18 +10,14 @@
 			<Button  press="LOH_onSignout" icon="sap-icon://log"></Button>
 		</headerContent>
 		<content>
-			<filterbar:FilterBar
-        id="LOH_id_AdminFilter"
+			<filterbar:FilterBar id="LOH_id_AdminFilter"
                 useToolbar="false"
                 clear="onClear"
                 showClearOnFB="true"
                 search=".onSearch"
                 showFilterConfiguration="false">
 				<filterbar:filterGroupItems>
-					<filterbar:FilterGroupItem
-            name="YearPicker"
-            label="{i18n>year}"
-            groupName="Group1"
+					<filterbar:FilterGroupItem name="YearPicker" label="{i18n>year}" groupName="Group1"
             visibleInFilterBar="true">
 						<filterbar:control>
 							<DatePicker
@@ -41,11 +34,10 @@
                  growingScrollToLoad="true"
                      id="LOH_id_HolidayTable"
                      width="auto"
-                     inset="false"
                      items="{HolidayModel>/items}"
                      growing="true"
                      growingThreshold="50"
-                     alternateRowColors="false">
+                     alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title  id="LOH_id_Title" text="{i18n>headerListOfHolidays}"/>
@@ -57,7 +49,7 @@
 						<Text text="{i18n>Name}" textAlign="Center"></Text>
 					</Column>
 					<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true" >
-						<Text text="{i18n>Date}" id="DateId" textAlign="Center"></Text>
+						<Text text="{i18n>Date}" textAlign="Center"></Text>
 					</Column>
 					<Column hAlign="Center" class="heading"  minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>Day}" textAlign="Center"></Text>
@@ -76,7 +68,7 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem id="comunListId">
+					<ColumnListItem>
 						<cells>
 							<Text text="{HolidayModel>Name}"/>
 							<Text text="{HolidayModel>Date}"/>

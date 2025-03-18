@@ -2,13 +2,9 @@ sap.ui.define([
     "./BaseController", //call base controller
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator",
-    "sap/m/MessagePopover",
-    "sap/m/MessageItem",
      "../utils/validation"
 ],
-    function (BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem,utils) {
+    function (BaseController, JSONModel, MessageToast,utils) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.CompanyInvoiceDetails", {
             onInit: function () {
@@ -57,6 +53,7 @@ sap.ui.define([
                 var visiablityPlay = new JSONModel({ createVisi: true, editVisi: false, editable: true, igstVisi: false, gstVisiable: false, flexVisiable: false, CInvoice: false, addInvBtn: true, merge: false, GST: true, payByDate: false, Form: true, Table: false, MultiEmail: true, Edit: true, TDS: true });
                 this.getView().setModel(visiablityPlay, "visiablityPlay");
             },
+            
             CI_onPressback: function () {
                 this.getRouter().navTo("RouteCompanyInvoice", { sPath: "Company" });
             },

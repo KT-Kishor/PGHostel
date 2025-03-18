@@ -1,6 +1,5 @@
 <core:FragmentDefinition
 	xmlns="sap.m"
-	xmlns:f="sap.ui.layout.form"
 	xmlns:g="sap.f"
 	xmlns:com="sap.suite.ui.commons"
 	xmlns:smartField="sap.ui.comp.smartfield"
@@ -18,11 +17,11 @@
 				</ComboBox>
 				<ToolbarSeparator />
 				<Label text="Year" id="AL_id_YearLabel" />
-				<ComboBox items="{YearModel>/items}" change="onChangeYears" id="idLeaveYear" width="100px">
+				<ComboBox items="{YearModel>/items}" change="AL_onChangeYears" id="AL_id_LeaveYear" width="100px">
 					<core:Item key="{YearModel>}" text="{YearModel>}" />
 				</ComboBox>
-				<ToolbarSpacer />
-				<Button id="AL_id_SmartTableCharBut" icon="sap-icon://table-view" tooltip="Go to Smart table" press="AL_onPressGoSmartTable" />
+				<ToolbarSpacer/>
+				<Button id="AL_id_SmartTableCharBut" icon="sap-icon://table-view" tooltip="{i18n>gototable}" press="AL_onPressGoSmartTable" />
 			</OverflowToolbar>
 		</Panel>
 		<g:GridContainer id="AL_id_DemoGrid" columnsChange=".onGridColumnsChange">
@@ -173,7 +172,7 @@
 				</com:ChartContainer>
 			</VBox>
 			<!-- fourth chart -->
-			<VBox id="idYearlyChart" height="25rem" width="auto" class="sapUiSmallMargin">
+			<VBox id="AL_id_YearlyChart" height="25rem" width="auto" class="sapUiSmallMargin">
 			<com:ChartContainer
                         id="AL_id_ChartContainer6"
                         showFullScreen="true"
@@ -202,7 +201,7 @@
 									</viz.data:FlattenedDataset>
 								</viz:dataset>
 								<viz:feeds>
-									<viz.feeds:FeedItem id='valueAxisFeed' uid="valueAxis" type="Measure"
+									<viz.feeds:FeedItem id='AL_id_valueAxisFeed' uid="valueAxis" type="Measure"
                                                 values="All In One Leave" />
 									<viz.feeds:FeedItem id='AL_id_ValueAxisFeed1' uid="valueAxis" type="Measure"
                                                 values="LOP" />

@@ -1,16 +1,14 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.AdminApplyLeave"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:m="sap.m.Table"
-	xmlns:f="sap.f"
 	xmlns:filterbar="sap.ui.comp.filterbar"
 	xmlns:core="sap.ui.core">
 	<Page id="AL_id_LeavePage">
 		<headerContent>
 			<Button press="AL_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>leaveApplication}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button press="AL_onSignout" icon="sap-icon://log"></Button>
+			<Text text="{i18n>leaveApplication}" class="boldBlackText"/>
+			<ToolbarSpacer/>
+			<Button press="AL_onSignout" icon="sap-icon://log"/>
 		</headerContent>
 		<content>
 			<filterbar:FilterBar
@@ -20,12 +18,9 @@
                 clear="onClear"
                 showClearOnFB="true"
                 search=".onSearch"
-                filterChange=".onFilterChange"
-                afterVariantLoad=".onAfterVariantLoad">
+                filterChange=".onFilterChange">
 				<filterbar:filterGroupItems>
-					<filterbar:FilterGroupItem
-            name="Name"
-            label="{i18n>dateRange}"
+					<filterbar:FilterGroupItem name="Name" label="{i18n>dateRange}"
             groupName="Group1"
             visibleInFilterBar="true">
 						<filterbar:control>
@@ -44,15 +39,14 @@
             groupName="Group1"
             visibleInFilterBar="true">
 						<filterbar:control>
-							<MultiComboBox
+							<ComboBox
                 id="AL_id_TypeOfLeavecombo"
                 value="{oFilteredModel>/TypeOfLeave}"
-                selectionChange="onSelectionChange"
 				showClearIcon="true"
 				valueStateText="{i18n>selectTypeOfLeave}"
                 items="{leaveTypeModel>/results}">
 								<core:Item key="{leaveTypeModel>ID}" text="{leaveTypeModel>Name}"/>
-							</MultiComboBox>
+							</ComboBox>
 						</filterbar:control>
 					</filterbar:FilterGroupItem>
 				</filterbar:filterGroupItems>

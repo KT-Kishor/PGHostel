@@ -12,9 +12,9 @@
             useIconTabBar="false"
             class="sapUiSmallmarginResponsive">
 			<sections>
-				<ObjectPageSection id="APD_id_First" titleUppercase="false">
+				<ObjectPageSection id="APD_id_First">
 					<subSections>
-						<ObjectPageSubSection titleUppercase="false">
+						<ObjectPageSubSection>
 							<blocks>
 								<m:VBox>
 									<m:HBox justifyContent="Start" alignItems="Center" width="100%">
@@ -30,13 +30,12 @@
 										</m:ComboBox>
 										<m:Label text="{i18n>year}" class="sapUiSmallMarginEnd" />
 										<m:DatePicker width="50%" id="APD_id_Payroll" value="{path: 'payrollModel>/Year', type: 'sap.ui.model.type.String'}"
-                                         displayFormat="yyyy" change="handleChange" class="sapUiSmallMarginEnd" editable="false"/>
-										<m:Button text="{i18n>go}" press="onFetchEmployeedetails" class="sapUiSmallMarginBeginEnd" visible="false"/>
+                                         displayFormat="yyyy"  class="sapUiSmallMarginEnd" editable="false"/>
 									</m:HBox>
 								</m:VBox>
 							</blocks>
 						</ObjectPageSubSection>
-						<ObjectPageSubSection titleUppercase="false" title="{i18n>employeedetails}">
+						<ObjectPageSubSection title="{i18n>employeedetails}">
 							<blocks>
 								<m:VBox>
 									<m:HBox>
@@ -51,8 +50,8 @@
 												<m:Label text="{i18n>accountNo}" />
 												<m:Text text="{payrollModel>/AccountNo}" />
 												<m:Label text="{i18n>payableDays}" />
-												<m:Text text="{payrollModel>/PayableDays}" id="APD_id_PayableDaysInput"/>
-												<m:Label text="{i18n>PAN}"  />
+												<m:Text text="{payrollModel>/PayableDays}"/>
+												<m:Label text="{i18n>PAN}"/>
 												<m:Text text="{payrollModel>/PAN}" />
 												<m:Label text="{i18n>department}" />
 												<m:Text text="{payrollModel>/Designation}" />
@@ -67,7 +66,7 @@
 							</blocks>
 						</ObjectPageSubSection>
 						<!-- Salary Details SubSection -->
-						<ObjectPageSubSection titleUppercase="false" title="{i18n>salaryDetailsEmployee}">
+						<ObjectPageSubSection title="{i18n>salaryDetailsEmployee}">
 							<m:VBox class="sapUiSmallMargin">
 								<!-- GridContainer for Tables -->
 								<g:GridContainer columnsChange=".onGridColumnsChange">
@@ -107,7 +106,7 @@
 													<m:cells>
 														<m:Input value="{EarningModel>Description}" maxLength="25" editable="{= ${EarningModel>Flag} === true }" />
 														<m:Input value="{EarningModel>Amount}" change="onEarningAmountChange" textAlign="End" type="Number" />
-														<m:Input value="{EarningModel>Year}" editable="false" textAlign="End" type="Number" />
+														<m:Input value="{EarningModel>Year}" editable="false" textAlign="End" />
 													</m:cells>
 												</m:ColumnListItem>
 											</m:items>
@@ -142,7 +141,7 @@
 													<m:cells>
 														<m:Input value="{DeductionModel>Description}" maxLength="25" editable="{= ${DeductionModel>Flag} === true }"/>
 														<m:Input value="{DeductionModel>Amount}" change="onDeductionAmountChange" textAlign="End" type="Number"/>
-														<m:Input value="{DeductionModel>Year}" editable="false" textAlign="End" type="Number" />
+														<m:Input value="{DeductionModel>Year}" editable="false" textAlign="End" />
 													</m:cells>
 												</m:ColumnListItem>
 											</m:items>
@@ -156,7 +155,7 @@
 								</g:GridContainer>
 								<m:HBox class="customNetPayBox" width="100%">
 									<m:Text text="Net Pay ( INR ) :  {path: 'DeductionModel>/totalNetPay', formatter: '.Formatter.numberFormater'} ({DeductionModel>/totalNetPayText})"
-                class="boldBlackText" width="100%" />
+                                    class="boldBlackText" width="100%" />
 								</m:HBox>
 							</m:VBox>
 						</ObjectPageSubSection>

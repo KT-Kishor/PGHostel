@@ -1,15 +1,14 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.CompanyInvoice"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:m="sap.m.Table"
 	xmlns:fb="sap.ui.comp.filterbar"
 	xmlns:core="sap.ui.core">
 	<Page id="CI_id_CompanyInvoice">
 		<headerContent>
-			<Button press="CI_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>invoiceApplication}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button press="CI_onSignout" icon="sap-icon://log"></Button>
+			<Button press="CI_onPressback" icon="sap-icon://home"/>
+			<Text text="{i18n>invoiceApplication}" class="boldBlackText"/>
+			<ToolbarSpacer/>
+			<Button press="CI_onSignout" icon="sap-icon://log"/>
 		</headerContent>
 		<content>
 			<fb:FilterBar id="CI_id_InvoiceFilterBar" showFilterConfiguration="false" useToolbar="false" showClearOnFB="true" search="onSearch" >
@@ -19,13 +18,13 @@
 							<ComboBox id="CI_id_InvNo"
                     items="{path:'oInvoiceModel>/InvoiceNoList', length:1000}"
                     showSecondaryValues="true" showClearIcon="true">
-								<core:ListItem key="{oInvoiceModel>InvoiceNoID}" text="{oInvoiceModel>InvoiceNo}" additionalText="{oInvoiceModel>InvoiceDate}" />
+								<core:ListItem key="{oInvoiceModel>InvoiceNoID}" text="{oInvoiceModel>InvoiceNo}" additionalText="{oInvoiceModel>InvoiceDate}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="InvoiceDate" label="{i18n>invoiceDate}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<DateRangeSelection id="CI_id_InvoiceDatePicker" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
+							<DateRangeSelection id="CI_id_InvoiceDatePicker" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="CustomerName" label="{i18n>customerName}" groupName="ConsultantInvoice" visibleInFilterBar="true">
@@ -40,7 +39,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="CI_id_InvoiceTable" items="{path: '/CompanyInvoice'}" mode="SingleSelect" selectionChange="onSelectionChange">
+			<Table id="CI_id_InvoiceTable" items="{pavan>/}" mode="SingleSelect" selectionChange="onSelectionChange">
 				<headerToolbar>
 					<Toolbar>
 						<Title id="CI_id_Title" text="{i18n>invoiceapp}"/>
@@ -48,7 +47,7 @@
 						<ToolbarSeparator />
 						<Button icon="sap-icon://add-employee" tooltip="{i18n>addInvoice}" press="CI_onPressAddInvoice" />
 						<ToolbarSeparator />
-						<Button text="MSA SOW" tooltip="{i18n>addInvoice}" press="CI_onPressMSASOW" />
+						<Button text="{i18n>msasow}" tooltip="{i18n>addInvoice}" press="CI_onPressMSASOW"/>
 					</Toolbar>
 				</headerToolbar>
 				<columns>
