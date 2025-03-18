@@ -12,6 +12,10 @@ sap.ui.define([
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.LoginPage", {
             onInit: function () {
+                var model = new JSONModel({
+                    HeaderName: "",
+                });
+                this.getOwnerComponent().setModel(model,"LoginModel");
                 this.getRouter().getRoute("RouteLoginPage").attachMatched(this._onRouteMatched, this);
             },
             onpresshome: function () {
