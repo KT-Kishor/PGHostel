@@ -1,0 +1,91 @@
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.AssignTask"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar">  
+	<Page showNavButton="true" title="{i18n>tileAssignmentFooter}" navButtonPress="AT_onPressback">
+		<content>
+	<ObjectHeader responsive="true" backgroundDesign="Translucent" class="sapUiResponsivePadding--header"> 
+    <ObjectAttribute title="{i18n>taskName}" text="{taskAssigned>/TaskName}" class="taskNameColor" /> 
+    <ObjectAttribute title="{i18n>description}" text="{taskAssigned>/TaskType}  -  {taskAssigned>/TaskTypeDescription}" class="taskNameColor" /> 
+    <ObjectAttribute title="{i18n>startDate}" text="{taskAssigned>/StartDate}"  class="sapUiSmallMarginEnd taskNameColor" textDirection="LTR" /> 
+    <ObjectAttribute title="{i18n>endDate}" text="{taskAssigned>/EndDate}"   class="sapUiSmallMarginEnd taskNameColor" textDirection="LTR" /> 
+
+    </ObjectHeader>
+	
+				<fb:FilterBar  class="sapUiTinyMargin" id="AT_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem name="Employee ID" label="Employee ID" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox name="Employee ID" selectionChange="" showClearIcon="true" items="" >
+							<core:Item key="" text=""/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+				
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"  items="" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			 <headerToolbar>
+                <OverflowToolbar >
+                    <Title id="" text="{i18n>tileAssignmentFooter}"/>
+                    <!-- <ToolbarSeparator/> -->
+                    <ToolbarSpacer/>
+
+					    <Button  text="Assign Employee" press="AT_onAssignEmpTask"  icon="sap-icon://employee-lookup" id="AT_id_Assign" type="Accept"/>
+						<Button  icon="sap-icon://edit"  press="AT_onEditTask" text="{i18n>edit}" id="AT_id_EditTask" type="Neutral" />
+				
+                   </OverflowToolbar>
+            </headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>assignmentName}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>assignmentType}" />
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>assignmentDes}" />
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>startDate}" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>endDate}" />
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>hoursWorked}" />
+					</Column>
+					
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{}"/>
+							<Text text="{}"/>
+							<Text text="{}"/>
+							<Text text="{}"/>
+							<Text text="{}"/>
+							<Text text="{}"/>
+							</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<Bar>
+				<contentLeft>
+					   <HBox class="sapUiTinyMarginTop">
+    <Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
+    <Link
+        class="footer-CoName sapUiTinyMarginBegin"
+        text="Developed by Kalpavriksha Technologies"
+        href="https://www.kalpavrikshatechnologies.com/" 
+        target="_blank"  
+    />
+</HBox>
+				</contentLeft>
+			</Bar>
+		</footer>
+	</Page>
+</mvc:View>

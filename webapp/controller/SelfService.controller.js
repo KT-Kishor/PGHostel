@@ -137,8 +137,20 @@ sap.ui.define([
                 catch {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
-
-
-            }
+            },
+            SS_onTabSelect: async function (oEvent) {        
+                if (oEvent.getParameter("key") === "educationDetailKey") {  
+                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
+                } else if (oEvent.getParameter("key") === "employmentKey") {  
+                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
+                } else if (oEvent.getParameter("key") === "salaryKey") {    
+                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
+                }  else if(oEvent.getParameter("key")=== "paySlipKey"){
+                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible",false);
+                }
+                else {   
+                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", true); 
+                }
+              },
         });
     });

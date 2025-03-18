@@ -1,0 +1,66 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:u="sap.ui.unified"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core">
+    <Dialog class="sapUiSmallMarginBegin" id="idTaskDialog" title=""  >
+        <f:SimpleForm editable="false" layout="ResponsiveGridLayout" labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12"
+            adjustLabelSpan="false" emptySpanXL="4" emptySpanL="4" emptySpanM="4" emptySpanS="0" columnsXL="1"
+            columnsL="1" columnsM="1" singleContainerFullSize="false">
+            <f:content>
+                <Label text="{i18n>employeeID}"  visible="{visiblePlay>/empId}" required="true"/>
+                <MultiComboBox 
+    selectedKeys="{newTaskModel>/EmployeeIDs}" 
+    showSecondaryValues="true"
+     width="100%"  
+    maxWidth="400px"
+    id="employeeIDInput"
+    visible="{visiblePlay>/empId}"
+    change="liveChangeValuState"
+    items="{idModel>/results}">
+    <core:ListItem key="{idModel>ID}" text="{idModel>ID}" additionalText="{idModel>EmployeeName}"/>
+</MultiComboBox>
+                <Label text="{i18n>taskName}" required="true"/>
+                <Input value="{newTaskModel>/TaskName}" id="taskNameInput" liveChange="liveChangeValuState" maxLength="100"/>
+                <Label text="{i18n>taskType}" required="true"/>
+                <Select id="idTasktype" items="{TaskJsonModel>/results}" selectedKey="{newTaskModel>/TaskType}" visible="{visiblePlay>/showTaskType}" change="onChangeTaskType" >
+                    <core:Item key="{TaskJsonModel>Value}" text="{TaskJsonModel>Value}"/>
+                </Select>
+                <Label text="{i18n>description}" required="true" id="idDescriptionLabel"/>
+                <Input value="{newTaskModel>/TaskTypeDescription}" id="idDescription" liveChange="liveChangeValuState"  visible="{visiblePlay>/showTaskDescription}" maxLength="50"/>
+                <Label text="{i18n>startDate}" required="true"/>
+                <DatePicker minDate="{newTaskModel>/minDate}"
+                    maxDate="{newTaskModel>/maxDate}"
+                    change="liveChangeValuState"
+                    value="{newTaskModel>/StartDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                    id="idTaskStart"/>
+                <Label text="{i18n>endDate}" required="true"/>
+                <DatePicker
+                    minDate="{newTaskModel>/minDate}"
+                    maxDate="{newTaskModel>/maxDate}"
+                    change="liveChangeValuState"
+                    value="{newTaskModel>/EndDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                    id="idTaskEnd"/>
+                <Label text="{i18n>hours}" required="true" visible="{visiblePlay>/showHoursWorked}" />
+                <TimePicker 
+    value="{newTaskModel>/HoursWorked}" 
+    id="hoursWorkedTimePicker" 
+    displayFormat="HH" 
+    valueFormat="HH" 
+    visible="{visiblePlay>/showHoursWorked}"
+    change="onHoursWorkedChange"
+     />
+            </f:content>
+            <HBox justifyContent="End">
+                <Button text="{i18n>save}" type="Emphasized" press="onEditSaveTask" class="submit" visible="{visiblePlay>/save}"></Button>
+                <Button text="{i18n>submit}" type="Emphasized" press="onSubmitTask" class="submit" visible="{visiblePlay>/submit}"></Button>
+                <Button id="idEmployeeAssignButton" type="Emphasized" text="{i18n>assignButton}" press="onPressEmployeeAssign" visible="{visiblePlay>/showEmployeeAssignButton}" class="submit"/>
+                <Button text="{i18n>close}" press="TaskF_onTaskClose" class="sendMail"></Button>
+            </HBox>
+        </f:SimpleForm>
+    </Dialog>
+</core:FragmentDefinition>

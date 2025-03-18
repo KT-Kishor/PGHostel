@@ -41,6 +41,15 @@ sap.ui.define([
             },
             TileV_onpressQuotation: function () {
                 this.getRouter().navTo("RouteQuotation");
+            },
+            TileV_onpressAssignment:function(){
+                this.getRouter().navTo("RouteManageAssignment");
+            },
+            TileV_onpresstimesheet:function(){
+                this.getRouter().navTo("RouteTimesheet");
+            },
+            TileV_onPressTimesheetApp:function(){
+                this.getRouter().navTo("RouteTimesheetApproval")
             }
         });
     });

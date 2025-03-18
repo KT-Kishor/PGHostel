@@ -294,7 +294,7 @@
                     "target": [
                         "TargetQuotationForm"
                     ]
-                },                
+                },
                 {
                     "name": "RouteExpensePage",
                     "pattern": "Expense",
@@ -304,6 +304,34 @@
                     "name": "RouteExpensDetails",
                     "pattern": "ExpenseDetails/{sPath}",
                     "target": "TargetExpenseDetails"
+                },
+                {
+                    "name": "RouteManageAssignment",
+                    "pattern": "ManageAssignment",
+                    "target": [
+                        "TargetManageAssignment"
+                    ]
+                },
+                {
+                    "name": "RouteTimesheet",
+                    "pattern": "Timesheet",
+                    "target": [
+                        "TargetTimesheet"
+                    ]
+                },
+                {
+                    "name": "RouteTimesheetApproval",
+                    "pattern": "TimesheetApproval",
+                    "target": [
+                        "TargetTimesheetApproval"
+                    ]
+                },
+                {
+                    "name": "RouteAssignTask",
+                    "pattern": "AssignTask",
+                    "target": [
+                        "TargetAssignTask"
+                    ]
                 }
             ],
             "targets": {
@@ -469,6 +497,34 @@
                     "transition": "slide",
                     "viewId": "ExpenseDetails",
                     "viewName": "ExpenseDetails"
+                },
+                "TargetManageAssignment": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ManageAssignment",
+                    "viewName": "ManageAssignment"
+                },
+                "TargetTimesheet": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "Timesheet",
+                    "viewName": "Timesheet"
+                },
+                "TargetTimesheetApproval": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "TimesheetApproval",
+                    "viewName": "TimesheetApproval"
+                },
+                "TargetAssignTask": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "AssignTask",
+                    "viewName": "AssignTask"
                 }
             }
         },

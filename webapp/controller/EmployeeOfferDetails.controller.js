@@ -12,8 +12,8 @@ sap.ui.define([
                 this.getView().byId("EOD_id_BondCombo").setVisible(false);
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this._commonDesignation();
-                this._commonBaseLocation();
+                // this._commonDesignation();
+                // this._commonBaseLocation();
             },
             validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
@@ -57,7 +57,7 @@ sap.ui.define([
             EOD_onSubmitData: function (oEvent) {
                 try {
                     if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
-                        MessageToast.show(this.i18nModel("offerSuccess"));
+                        MessageToast.show(this.i18nModel.getText("offerSuccess"));
                     }
                     else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
