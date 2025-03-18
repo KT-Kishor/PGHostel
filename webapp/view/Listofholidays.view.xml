@@ -23,7 +23,7 @@
 				<filterbar:filterGroupItems>
 					<filterbar:FilterGroupItem
             name="YearPicker"
-            label="Year"
+            label="{i18n>year}"
             groupName="Group1"
             visibleInFilterBar="true">
 						<filterbar:control>

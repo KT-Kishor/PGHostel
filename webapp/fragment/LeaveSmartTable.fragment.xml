@@ -1,20 +1,20 @@
 <core:FragmentDefinition
 	xmlns="sap.m"	
 	xmlns:core="sap.ui.core">
-	<VBox id="idLeaveTable" >
-		<Table id="idLeaveTableStandard"
+	<VBox id="AL_id_LeaveTable" >
+		<Table id="AL_id_LeaveTableStandard"
 			mode="SingleSelectLeft"
 			selectionChange="onSelectionChange"
 			class="sapUiResponsiveContentPadding centeredTable">
 			<headerToolbar>
 				<Toolbar>
-				 <Title id="" text="Applied Leaves"/>
+				 <Title id="Al_id_Title" text="{i18n>appliedLeave}"/>
 					<ToolbarSpacer />
 					<ToolbarSeparator />
-					<Button icon="sap-icon://vertical-bar-chart" press="onPressBarChart" tooltip="Open Bar Charts" />
-					<Button icon="sap-icon://create-leave-request" tooltip="{i18n>applyLeave}" press="onPressApplyLeave" />
-					<Button icon="sap-icon://edit" id="updatebtn" tooltip="{i18n>editDetails}" press="onPressUpdate" visible="{= ${Leave>Status} === 'Submitted' }"></Button>
-					<Button icon="sap-icon://delete" id="deletebtn" tooltip="{i18n>deleteDetails}" press="onPressLeaveDetailsDelete" visible="{= ${Leave>Status} === 'Submitted' }"></Button>
+					<Button icon="sap-icon://vertical-bar-chart" press="AL_onPressBarChart" tooltip="Open Bar Charts" />
+					<Button icon="sap-icon://create-leave-request" tooltip="{i18n>applyLeave}" press="AL_onPressApplyLeave" />
+					<Button icon="sap-icon://edit" id="updatebtn" tooltip="{i18n>editDetails}" press="AL_onPressUpdate" visible="{= ${Leave>Status} === 'Submitted' }"></Button>
+					<Button icon="sap-icon://delete" id="deletebtn" tooltip="{i18n>deleteDetails}" press="AL_onPressLeaveDetailsDelete" visible="{= ${Leave>Status} === 'Submitted' }"></Button>
 					<ToolbarSeparator />
 				</Toolbar>
 			</headerToolbar>

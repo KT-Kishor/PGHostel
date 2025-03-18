@@ -40,8 +40,8 @@ sap.ui.define(
               },
               success: function (data) {
                 sap.ui.core.BusyIndicator.hide();
-                var oModel = new sap.ui.model.json.JSONModel({ items: data.results });
-                  that.getView().setModel(oModel, "HolidayModel");
+                var oModel = new JSONModel({ items: data.results });
+                that.getView().setModel(oModel, "HolidayModel");
               },           
               error: function (err) {
                 sap.ui.core.BusyIndicator.hide();

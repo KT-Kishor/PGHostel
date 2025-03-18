@@ -40,7 +40,7 @@
 					</filterbar:FilterGroupItem>
 					<filterbar:FilterGroupItem
             name="Type of Leave"
-            label="Type of Leave"
+            label="{i18n>typeOfLeave}"
             groupName="Group1"
             visibleInFilterBar="true">
 						<filterbar:control>

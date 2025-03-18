@@ -22,12 +22,12 @@ sap.ui.define(
         _onRouteMatched: function () {
           var that = this;
           that.i18nModelMess = that.getView().getModel("i18n").getResourceBundle();
-          that.byId("idLeaveBarChart").setVisible(false);
-          that.byId("idLeaveTableStandard").setVisible(true);
-          that.byId("idleavefilterbar").setVisible(true);
-          that.byId("idLeaveYear").setValue(new Date().getFullYear());
+          that.byId("AL_id_LeaveBarChart").setVisible(false);
+          that.byId("AL_id_LeaveTableStandard").setVisible(true);
+          that.byId("AL_id_leavefilterbar").setVisible(true);
+          that.byId("AL_id_LeaveYear").setValue(new Date().getFullYear());
         },
-        onPressApplyLeave: function () {
+        AL_onPressApplyLeave: function () {
           var oView = this.getView();
           var currentYear = new Date().getFullYear();
           var leaveJson = {
@@ -87,7 +87,7 @@ sap.ui.define(
         AL_onPressback: function () {
           this.getRouter().navTo("RouteTilePage");
         },
-      AL_onPressSubmit: function (oEvent) {
+        AL_onPressSubmit: function (oEvent) {
         try {
             if (
               utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
@@ -99,7 +99,7 @@ sap.ui.define(
         } catch (error) {
             sap.m.MessageToast.show("Technical error, please contact the administrator");
         }
-    },
+      },
       }
     );
   }
