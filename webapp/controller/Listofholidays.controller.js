@@ -53,18 +53,6 @@ sap.ui.define(
             sap.m.MessageToast.show("Technical error please connect to administrator");
           }
         },
-        onSearch: function () {
-          this.YearData = "onSearchFilter";
-          this.HolidayReadCall();
-        },
-        handleChange: function (oEvent) {
-          var oYearModel = this.getView().getModel("yearModel");
-          var newYear = this.byId("LOH_id_Holidays").getValue();
-          if (newYear && !isNaN(newYear)) {
-            oYearModel.setProperty("/selectedYear", newYear);
-            this.HolidayReadCall();
-          }
-        },
         LOH_onSignout: function () {
           this.getRouter().navTo("RouteLoginPage");
         },

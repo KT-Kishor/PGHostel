@@ -6,7 +6,6 @@ sap.ui.define([
     "sap/ui/model/FilterOperator",
     "sap/m/MessagePopover",
     "sap/m/MessageItem"
-
 ],
     function (BaseController, JSONModel, MessageToast, Filter, FilterOperator, MessagePopover, MessageItem) {
         "use strict";
@@ -14,5 +13,8 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteAdminPaySlip").attachMatched(this._onRouteMatched, this);
             },
+            APD_onPressBack: function () {
+                this.getRouter().navTo("RouteAdminPaySlip");
+            }
         });
     });

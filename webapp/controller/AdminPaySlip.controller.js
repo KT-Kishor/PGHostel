@@ -14,8 +14,14 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteAdminPaySlip").attachMatched(this._onRouteMatched, this);
             },
-            onPressAddPayslip: function () {
+            AP_onPressAddPayslip: function () {
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
+            },
+            AP_onSignout: function () {
+                this.getRouter().navTo("RouteLoginPage");
+            },
+              AP_onPressback: function () {
+                this.getRouter().navTo("RouteTilePage");
             },
         });
     });
