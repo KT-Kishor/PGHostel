@@ -126,6 +126,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Quotation.json",
                 "preload": true
+            },
+            "Payroll": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Payroll.json",
+                "preload": true
             }
         },
         "resources": {
@@ -332,6 +337,20 @@
                     "target": [
                         "TargetAssignTask"
                     ]
+                },
+                {
+                    "name": "RouteGenerateSalary",
+                    "pattern": "GenerateSalary",
+                    "target": [
+                        "TargetGenerateSalary"
+                    ]
+                },
+                {
+                    "name": "RouteManagePayroll",
+                    "pattern": "ManagePayroll",
+                    "target": [
+                        "TargetManagePayroll"
+                    ]
                 }
             ],
             "targets": {
@@ -525,6 +544,20 @@
                     "clearControlAggregation": false,
                     "viewId": "AssignTask",
                     "viewName": "AssignTask"
+                },
+                "TargetGenerateSalary": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "GenerateSalary",
+                    "viewName": "GenerateSalary"
+                },
+                "TargetManagePayroll": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ManagePayroll",
+                    "viewName": "ManagePayroll"
                 }
             }
         },

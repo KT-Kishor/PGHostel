@@ -50,6 +50,12 @@ sap.ui.define([
             },
             TileV_onPressTimesheetApp:function(){
                 this.getRouter().navTo("RouteTimesheetApproval")
+            },
+            TileV_onPressGenerateSalary: function () {
+                this.getRouter().navTo("RouteGenerateSalary");
+            },
+            TileV_onPressManagePayroll: function () {
+                this.getRouter().navTo("RouteManagePayroll");
             }
         });
     });

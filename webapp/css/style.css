@@ -360,6 +360,10 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   height: 100%;
 }
 
+.salUploadBtn {
+  width: fit-content !important;
+}
+
 .center-content {
   justify-content: center;
   align-items: center;
