@@ -1,5 +1,5 @@
 sap.ui.define([
-    "./BaseController","../utils/validation","sap/ui/model/json/JSONModel","sap/m/MessageToast",
+    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",
 ],
     function (BaseController, utils, JSONModel, MessageToast) {
         "use strict";
@@ -9,7 +9,7 @@ sap.ui.define([
             },
             _onRouteMatched: function (oEvent) {
                 this.byId("CD_id_Wizard").getSteps()[0].setValidated(false);
-                this.i18nModel=this.getView().getModel("i18n").getResourceBundle();
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
             },
             CD_validateName: function (oEvent) {
@@ -43,24 +43,24 @@ sap.ui.define([
                     utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") && utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
                     utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") && utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
                     utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID");
-            
-                var step2Validated =   this.byId("CD_id_Datestart").getValue() && this.byId("CD_id_DateEnd").getValue() &&
-                    utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID");
-            
+
+                var step2Validated = this.byId("CD_id_HiringContact").getValue() && this.byId("CD_id_Datestart").getValue() && this.byId("CD_id_DateEnd").getValue() &&
+                    utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID");
+
                 var isStep1Validated = step1Validated ? true : false;
                 var isStep2Validated = step2Validated ? true : false;
-            
+
                 // Update validation status for each step
                 this.byId("CD_id_Wizard").getSteps()[0].setValidated(isStep1Validated);
                 this.byId("CD_id_Wizard").getSteps()[1].setValidated(isStep2Validated);
             },
-            
+
             //Submit the data
             CD_onSubmit: function () {
                 try {
                     var allStepsValidated = this.byId("CD_id_Wizard").getSteps().every(function (step) {
                         return step.getValidated();
-                    }); 
+                    });
                     if (allStepsValidated) {
                         MessageToast.show(this.i18nModel.getText("contractSuccess"));
                     } else {
@@ -70,6 +70,6 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
-            
+
         });
     });
