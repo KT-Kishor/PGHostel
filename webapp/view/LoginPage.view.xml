@@ -7,35 +7,41 @@
     displayBlock="true">
 	<Page id="idLoginpage" class="login-background">
 		<headerContent>
-			<!-- Company logo and title -->
 			<Avatar src="./image/logo.jpg" displaySize="XS" press=".onAvatarPressed" tooltip="Company Logo"/>
 			<Title level="H1" text="{i18n>companynameKT}" class="custom-text" wrapping="false"/>
 			<ToolbarSpacer/>
-			<!-- Home button -->
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
 		</headerContent>
 		<content>
 			<FlexBox class="sapUiMediumMargin" direction="Column" alignItems="End" justifyContent="End">
 				<form:SimpleForm editable="true" layout="ResponsiveGridLayout" 
                 class="loginForm"
-                title="{i18n>loginDetails}" >
+                title="{i18n>loginDetails}" singleContainerFullSize="false" >
 					<form:content>
-						<!-- User ID input -->
 						<Label text="{i18n>userId}" required="true"/>
 						<Input placeholder="{i18n>placeUserId}" id="idUserid" change="Login" value="{loginModel>/userIds}" maxLength="50"/>
-						<!-- User name input -->
+						
 						<Label text="{i18n>userName}" required="true"/>
 						<Input placeholder="{i18n>placeUserName}" id="idUsername" change="Login" value="{loginModel>/userNames}" maxLength="50"/>
-						<!-- Captcha input and OTP button -->
-						<Label text="{i18n>otp}" required="true" />
+						
+						<Label text="{i18n>headloginwith}" required="true" />
 						<HBox alignItems="End" justifyContent="Start">
-							<Input value="{loginModel>/enteredCaptcha}" id="idCaptchaInput" class="sapUiTinyMarginEnd" placeholder="{i18n>placeOtp}" submit="onLoginSubmit" maxLength="6" />
-							<core:Icon visible="false" id="idEyeIcon" class="sapUiTinyMarginBottom sapUiTinyMarginBegin"
-                            src="sap-icon://information" press="onPressIcon"></core:Icon>
-							<Button text="{18n>sendOtp}" icon="sap-icon://email" press="SendOtp" class="OTP" id="idOTP" visible="false"/>
+							<RadioButton id="idOtpRadio" text="{i18n>btnotp}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd" />
+							<RadioButton id="idPasswordRadio" text="{i18n>btnpass}" groupName="loginOption" select="onLoginOptionChange"/>
 						</HBox>
-						<Label/>
-						<!-- Login button -->
+
+						<!-- OTP Input Field -->
+						<Label text="{i18n>btnotp}" id="idOtpLabel" visible="false"/>
+						<Input value="{loginModel>/enteredCaptcha}" id="idCaptchaInput" class="sapUiTinyMarginEnd" 
+                            placeholder="{i18n>placeOtp}" submit="onLoginSubmit" maxLength="6" visible="false"/>
+
+						<!-- Password Input Field (Initially Hidden) -->
+						<Label text="{i18n>btnpass}" id="idPasswordLabel" visible="false"/>
+						<Input id="idPasswordInput" type="Password" placeholder="{i18n>placepass}" visible="false"/>
+
+						<!-- Forgot Password Link (Initially Hidden) -->
+						<Link text="{i18n>forgotPass}" press="onForgotPassword" id="idForgotPasswordLink" visible="false"/>
+						
 						<HBox alignContent="Center" justifyContent="End">
 							<Button text="{i18n>btnLogin}" press="onLogin" icon="sap-icon://key" type="Emphasized" class="Login" width="8rem"/>
 						</HBox>
@@ -43,6 +49,5 @@
 				</form:SimpleForm>
 			</FlexBox>
 		</content>
-		
 	</Page>
 </mvc:View>

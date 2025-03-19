@@ -1,0 +1,246 @@
+<mvc:View
+    controllerName="sap.kt.com.minihrsolution.controller.SchemeUpload"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:m="sap.m.Table"
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:filterBar="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core"
+>
+    <Page id="idPageQuotationScheme">
+        <headerContent>
+           <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+        </headerContent>
+        <content>
+            <fb:FilterBar
+                id="filterbar"
+                persistencyKey="myPersKey"
+                useToolbar="false"
+                clear="onClear"
+                showClearOnFB="true"
+                search=".onSearch"
+                filterChange=".onFilterChange"
+                afterVariantLoad=".onAfterVariantLoad"
+                class="sapUiTinyMargin"
+            >
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="Company"
+                        label="{i18n>quoSchemeCompany}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                            showClearIcon="true"
+                                change="onCompanyChange"
+                                name="Company"
+                                items="{CompanyDetails>/results}"
+                                id="idCompanyCode"
+                                showSecondaryValues="true"
+                            >
+                                <core:ListItem
+                                    key="{CompanyDetails>CompanyCode}"
+                                    text="{CompanyDetails>CompanyName}"
+                                    additionalText="{CompanyDetails>CompanyCode}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        name="Model"
+                        label="{i18n>quoSchemeModel}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                            showClearIcon="true"
+                                name="Model"
+                                id="idModelComboBox"
+                                enabled="{editableModel>/isModelEditable}"
+                                change="onModelChange"
+                            >
+                                <core:Item
+                                    key="{ModelFilter>Model}"
+                                    text="{ModelFilter>Model}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        name="Variant"
+                        label="{i18n>quoSchemeVariant}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                            showClearIcon="true"
+                                name="Variant"
+                                id="idVariant1"
+                                enabled="{editableModel>/isVariantEditable}"
+                            >
+                                <core:Item
+                                    key="{ModelVarient>Variant}"
+                                    text="{ModelVarient>Variant}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem
+                        name="Transmission"
+                        label="{i18n>quoSchemeTransmission}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                            showClearIcon="true"
+                                name="Transmission"
+                                id="idTransmission1"
+                                items="{ModelVarient>/TransmissionResults}"
+                                enabled="{editableModel>/isTransmissionEditable}"
+                            >
+                                <core:Item
+                                    key="{ModelVarient>Transmission}"
+                                    text="{ModelVarient>Transmission}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+        </content>
+        <content>
+            <Table
+            growingScrollToLoad="true"
+                id="idQuotationtable"
+                class="sapUiTinyMargin"
+                width="auto"
+                inset="false"
+                items="{
+        path: 'MainModel>/items',
+        sorter: [{
+            path: 'Company', 
+            group: true
+        },
+        {
+        path:'Model',
+        group:true
+        }]
+    }"
+                mode="SingleSelectLeft"
+                growing="true"
+                growingThreshold="50"
+                alternateRowColors="false"
+            >
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title
+                            text="Quotation Scheme ({= ${MainModel>/items}.length })"
+                            level="H2"
+                        />
+                        <ToolbarSpacer />
+                        <Button
+                            id="idUpload"
+                            text="{i18n>quoSchemeupload}"
+                            icon="sap-icon://upload"
+                            press="onUploadpress"
+                            type="Ghost"
+                        />
+                        <Button
+                            id="idExport"
+                            text="{i18n>quoSchemeDownload}"
+                            icon="sap-icon://download"
+                            press="onDownloadpress"
+                            type="Neutral"
+                        />
+                        <Button
+                            id="idAdd"
+                            text="{i18n>offerLetterTileUnit}"
+                            icon="sap-icon://add"
+                            press="onCreateform"
+                            type="Accept"
+                        />
+                        <Button
+                            id="idDelete"
+                            text="{i18n>delete}"
+                            icon="sap-icon://delete"
+                            press="onDeletepress"
+                            type="Reject"
+                        />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column
+                        hAlign="Left"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>quoSchemeModel}" />
+                    </Column>
+                    <Column
+                        hAlign="Left"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>quoSchemeVariant}" />
+                    </Column>
+                    <Column
+                        hAlign="Left"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>quoSchemeTransmission}" />
+                    </Column>
+                    <Column
+                        hAlign="Left"
+                        minScreenWidth="Desktop"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>quoSchemeColor}" />
+                    </Column>
+                    <Column
+                        hAlign="Left"
+                        minScreenWidth="Desktop"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>quoSchemeFuel}" />
+                    </Column>
+                    <Column
+                        hAlign="Left"
+                        minScreenWidth="Desktop"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>quoSchemeBoardPlate}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem
+                        press="onItemPress"
+                        type="Navigation"
+                    >
+                        <cells>
+                            <!-- <Text text="" />s -->
+                            <Text text="{MainModel>Model}" />
+                            <Text text="{MainModel>Variant}" />
+                            <Text text="{MainModel>Transmission}" />
+                            <Text text="{MainModel>Color}" />
+                            <Text text="{MainModel>Fuel}" />
+                            <Text text="{MainModel>BoardPlate}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <Bar>
+                <contentLeft>
+              <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                </contentLeft>
+            </Bar>
+        </footer>
+    </Page>
+</mvc:View>

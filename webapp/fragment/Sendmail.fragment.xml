@@ -1,0 +1,47 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core">
+	<Dialog title="{i18n>forgotPass}">
+		<VBox>
+			<f:SimpleForm          
+            editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="3"
+			labelSpanM="4"
+			labelSpanS="12"
+			emptySpanXL="0"
+			emptySpanL="4"
+			emptySpanM="0"
+			emptySpanS="0"
+			columnsXL="2"
+			columnsL="1"
+			columnsM="1">
+				<f:content>
+					<Label text="{i18n>userId}" required="true" />
+					<Input id="userIdInput" value="{FragmentModel>/frgUserID}" placeholder="{i18n>placeUserId}" change="onChangeSendOTP" maxLength="10" />
+					<Label text="{i18n>userName}" required="true" />
+					<Input id="userNameInput" value="{FragmentModel>/frgUserName}" placeholder="{i18n>placeUserName}" change="onChangeSendOTP" maxLength="50" />
+
+					<Label text="{i18n>btnotp}" required="true" />
+					<Input id="otpInput" liveChange="onFrgOTPInputLiveChange" value="{FragmentModel>/FrgOTP}" placeholder="{i18n>otp}" type="Number" visible="{visibleModel>/OTP}" change="onLiveChangeOTP"/>
+					
+					<Label text="{i18n>inpNewpassword}" required="true" />
+					<Input id="newPasswordInput" value="{FragmentModel>/frgNewPassword}" placeholder="{i18n>placenewpass}" type="Password" liveChange="onChnageSetAndConfirm" valueState="None" visible="{visibleModel>/NewPassword}"  showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="onTogglePasswordVisibility" maxLength="50" />
+
+					<Label text="{i18n>inpConpassword}" required="true" />
+					<Input id="confirmPasswordInput" value="{FragmentModel>/frgConfirmPassword}" placeholder="{i18n>placeconpass}" type="Password" liveChange="onChnageSetAndConfirm" visible="{visibleModel>/ConfirmPassword}"  showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="onTogglePasswordVisibility" maxLength="50" />
+
+				</f:content>
+			</f:SimpleForm>
+		</VBox>
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer />
+				<Button text="{i18n>save}" class="marginRigth" type="Accept" id="idSaveBTN" press="onPressSave"/>
+				<Button text="{i18n>btnCancel}" class="marginRigth" press="onPressCancle" type="Negative"/>
+			</Toolbar>
+		</footer>
+	</Dialog>
+</core:FragmentDefinition>

@@ -189,6 +189,13 @@
 						<ImageContent src="sap-icon://money-bills" />
 					</TileContent>
 				</GenericTile>
+				<GenericTile  visible="{modelTileVisible>/ManagePayroll}"
+                   class="sapUiMediumMargin"
+                    header="{i18n>schemeupload}" press="TileV_onPressManageSchemeUpload">
+					<TileContent  unit="{i18n>createmaintain}">
+						<ImageContent src="sap-icon://time-off" />
+					</TileContent>
+				</GenericTile>
 			</FlexBox>
 		</layout:VerticalLayout>
 		<footer>
