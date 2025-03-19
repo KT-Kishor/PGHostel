@@ -9,10 +9,13 @@
         
         <!-- Left Column - Form -->
         <l:content>
-            <m:VBox width="100%" height="400px" class="sapUiMediumMarginTop commonclass sapUiLargeMarginEnd">
-                <f:SimpleForm editable="true" layout="ResponsiveGridLayout"
+            <m:VBox  class="sapUiSmallMargin">
+            <m:HBox  class="sapUiSmallMargin">
+             <m:Carousel id="videoCarousel"  loop="true" showPageIndicator="true" class="sapUiMediumMargin"/>
+
+                <f:SimpleForm editable="true" layout="ResponsiveGridLayout" 
                     labelSpanXL="3" labelSpanL="3"
-                    labelSpanM="4" labelSpanS="12" columnsXL="1" columnsL="1" columnsM="1" width="100%" singleContainerFullSize="false">
+                    labelSpanM="3" labelSpanS="12" backgroundDesign="Transparent" singleContainerFullSize="false">
     
                     <f:content>
                         
@@ -36,17 +39,17 @@
                         <m:TextArea id="idCustaddress" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Address}" rows="2" valueStateText="Invalid entry" width="80%"/>
                         <m:Label text="{i18n>comments}" required="true"/>
                         <m:TextArea id="idcomment" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Comments}" rows="2" valueStateText="Invalid entry" width="80%"/>
-<m:Label text=""/>
+                        <m:Label text=""/>
                         <m:HBox justifyContent="End">
                             <m:Button text="{i18n>savebtn}" type="Accept" press=".onDemoformSave" class="btnrequest"/>
                         </m:HBox>
                     </f:content>
                 </f:SimpleForm>
-            </m:VBox>
+           
 
             <!-- Right Column - Video Carousel -->
-            <m:VBox width="100%" class="sapUiMediumMarginTop commonclass sapUiLargeMarginStart">
-                <m:Carousel id="videoCarousel" height="100%" width="100%" loop="true" showPageIndicator="true" class="sapUiNoMargin"/>
+            
+                 </m:HBox>
             </m:VBox>
         </l:content>
     </l:Grid>
