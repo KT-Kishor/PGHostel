@@ -63,5 +63,8 @@ sap.ui.define([
             TileV_onBackPress:function(){
                 this.getRouter().navTo("RouteLoginPage");
             },
+            TileV_onpressAddCustomer:function(){
+                this.getRouter().navTo("RouteManageCustomer");
+            }
         });
     });

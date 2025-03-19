@@ -15,6 +15,7 @@ sap.ui.define(
           this.getRouter().getRoute("RouteListofholidays").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: function (oEvent) {
+          this._commonEmployeeLeaveType();
           this.HolidayReadCall();
           this.getView().getModel("LoginModel").setProperty("/HeaderName", "List of Holidays"); 
           this.YearData = oEvent.getParameter("arguments").Year;

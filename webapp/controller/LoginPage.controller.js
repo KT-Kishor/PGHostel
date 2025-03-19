@@ -24,6 +24,12 @@ sap.ui.define(
         onInit: function () {
           var model = new JSONModel({
             HeaderName: "",
+            url: "https://www.rest.kalpavrikshatechnologies.com/",
+            headers: {
+              "Content-Type": "application/json",
+              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+              password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+            },
           });
           this.getOwnerComponent().setModel(model, "LoginModel");
           this.getRouter()

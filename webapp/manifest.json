@@ -365,6 +365,13 @@
                     "target": [
                         "TargetManagePayroll"
                     ]
+                },
+                {
+                    "name": "RouteManageCustomer",
+                    "pattern": "ManageCustomer",
+                    "target": [
+                        "TargetManageCustomer"
+                    ]
                 }
             ],
             "targets": {
@@ -586,6 +593,13 @@
                     "clearControlAggregation": false,
                     "viewId": "ManagePayroll",
                     "viewName": "ManagePayroll"
+                },
+                "TargetManageCustomer": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ManageCustomer",
+                    "viewName": "ManageCustomer"
                 }
             }
         },

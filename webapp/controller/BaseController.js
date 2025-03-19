@@ -93,230 +93,75 @@ sap.ui.define([
       }
     },
 
-    _commonDesignation: function () {
+    _fetchCommonData: function (entityName, modelName, filter = "") {
       sap.ui.core.BusyIndicator.show(0);
+      let url =  this.getView().getModel("LoginModel").getData().url + entityName;
       try {
         $.ajax({
-          url: "https://www.rest.kalpavrikshatechnologies.com/Designation",
+          url: url,
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-          },
+          headers: this.getView().getModel("LoginModel").getData().headers,
+          data:filter,
           success: function (data) {
             sap.ui.core.BusyIndicator.hide();
-            if(data){
-              var oDesignationModel = new JSONModel(data);
-              this.getOwnerComponent().setModel(oDesignationModel, "DesignationModel");
+            if (data) {
+              var oModel = new JSONModel(data);
+              this.getOwnerComponent().setModel(oModel, modelName);
             }
-          },
+          }.bind(this),
           error: function (err) {
             sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show(err.responseJSON.message);
-          }.bind(this),
+            sap.m.MessageToast.show(err.responseJSON?.message);
+          }.bind(this)
         });
-      }catch(error) {
+      } catch (error) {
         sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error please connect to administrator");
+        sap.m.MessageToast.show("Technical error, please contact the administrator");
       }
     },
-
-    _commonBaseLocation: function () {
-      sap.ui.core.BusyIndicator.show(0);
-      try {
-        $.ajax({
-          url: "https://www.rest.kalpavrikshatechnologies.com/BaseLocation",
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-          },
-          success: function (data) {
-            sap.ui.core.BusyIndicator.hide();
-            if(data){
-              var oBaseLocationModel = new JSONModel(data);
-              this.getOwnerComponent().setModel(oBaseLocationModel, "BaseLocationModel");
-            }
-          },
-          error: function (err) {
-            sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show(err.responseJSON.message);
-          }.bind(this),
-        });
-      }catch(error) {
-        sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error please connect to administrator");
-      }
+ 
+    _commonCompanyCodeDetails: function (filter = {branchcode: "KLB01"}) {
+      this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", filter);
     },
 
-    _commonDepartment: function () {
-      sap.ui.core.BusyIndicator.show(0);
-      try {
-        $.ajax({
-          url: "https://www.rest.kalpavrikshatechnologies.com/Department",
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-          },
-          success: function (data) {
-            if (data) { 
-              var oDepartmentModel = new JSONModel(data);
-              this.getOwnerComponent().setModel(oDepartmentModel, "DepartmentModel");
-          }
-          },
-          error: function (err) {
-            sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show(err.responseJSON.message);
-          }.bind(this),
-        });
-      }catch(error) {
-        sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error please connect to administrator");
-      }
+    _commonDesignation: function (filter = "") {
+      this._fetchCommonData("Designation", "DesignationModel", filter);
     },
 
-    _commonCompanyInvoiceSAC: function () {
-      sap.ui.core.BusyIndicator.show(0);
-      try {
-        $.ajax({
-          url: "https://www.rest.kalpavrikshatechnologies.com/CompanyInvoiceSAC",
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-          },
-          success: function (data) {
-            if (data) { 
-              var oCompanyInvoiceSACModel = new JSONModel(data);
-              this.getOwnerComponent().setModel(oCompanyInvoiceSACModel, "CompanyInvoiceSACModel");
-          }
-          },
-          error: function (err) {
-            sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show(err.responseJSON.message);
-          }.bind(this),
-        });
-      }catch(error) {
-        sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error please connect to administrator");
-      }
+    _commonBaseLocation: function (filter = "") {
+      this._fetchCommonData("BaseLocation", "BaseLocationModel", filter);
     },
 
-    _commonCountry: function () {
-      sap.ui.core.BusyIndicator.show(0);
-      try {
-        $.ajax({
-          url: "https://www.rest.kalpavrikshatechnologies.com/Country",
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-          },
-          success: function (data) {
-            if (data) { 
-              var oCountryModel = new JSONModel(data);
-              this.getOwnerComponent().setModel(oCountryModel, "CountryModel");
-          }
-          },
-          error: function (err) {
-            sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show(err.responseJSON.message);
-          }.bind(this),
-        });
-      }catch(error) {
-        sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error please connect to administrator");
-      }
+    _commonDepartment: function (filter = "") {
+      this._fetchCommonData("Department", "DepartmentModel", filter);
     },
 
-    _commonCurrency: function () {
-      sap.ui.core.BusyIndicator.show(0);
-      try {
-        $.ajax({
-          url: "https://www.rest.kalpavrikshatechnologies.com/Currency",
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-          },
-          success: function (data) {
-            if (data) { 
-              var oCurrencyModel = new JSONModel(data);
-              this.getOwnerComponent().setModel(oCurrencyModel, "CurrencyModel");
-          }
-          },
-          error: function (err) {
-            sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show(err.responseJSON.message);
-          }.bind(this),
-        });
-      }catch(error) {
-        sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error please connect to administrator");
-      }
+    _commonCompanyInvoiceSAC  : function (filter = "") {
+      this._fetchCommonData("CompanyInvoiceSAC", "CompanyInvoiceSACModel", filter);
     },
 
-    _commonPaymentTerms: function () {
-      sap.ui.core.BusyIndicator.show(0);
-      try {
-        $.ajax({
-          url: "https://www.rest.kalpavrikshatechnologies.com/PaymentTerms",
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-          },
-          success: function (data) {
-            if (data) { 
-              var oPaymentTermsModel = new JSONModel(data);
-              this.getOwnerComponent().setModel(oPaymentTermsModel, "PaymentTermsModel");
-          }
-          },
-          error: function (err) {
-            sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show(err.responseJSON.message);
-          }.bind(this),
-        });
-      }catch(error) {
-        sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error please connect to administrator");
-      }
+    _commonCountry: function (filter = "") {
+      this._fetchCommonData("Country", "CountryModel", filter);
     },
 
-    _commonTaskType: function () {
-      sap.ui.core.BusyIndicator.show(0);
-      try {
-        $.ajax({
-          url: "https://www.rest.kalpavrikshatechnologies.com/TaskType",
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-          },
-          success: function (data) {
-            if (data) { 
-              var oTaskTypeModel = new JSONModel(data);
-              this.getOwnerComponent().setModel(oTaskTypeModel, "TaskTypeModel");
-          }
-          },
-          error: function (err) {
-            sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show(err.responseJSON.message);
-          }.bind(this),
-        });
-      }catch(error) {
-        sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error please connect to administrator");
-      }
+    _commonCurrency: function (filter = "") {
+      this._fetchCommonData("Currency", "CurrencyModel", filter);
+    },
+
+    _commonPaymentTerms: function (filter = "") {
+      this._fetchCommonData("PaymentTerms", "PaymentTermsModel", filter);
+    },
+
+    _commonTaskType: function (filter = "") {
+      this._fetchCommonData("TaskType", "TaskTypeModel", filter);
+    },
+
+    _commonCompanyEmails: function (filter = {branchcode: "KLB01"}) {
+      this._fetchCommonData("CompanyEmails", "CompanyEmailsModel", filter);
+    },
+
+    _commonLeaveType: function (filter = "") {
+      this._fetchCommonData("LeaveType", "LeaveTypeModel", filter);
     },
   })
 });
