@@ -59,6 +59,9 @@ sap.ui.define([
             },
             TileV_onpressEmployeeDetails: function () {
                 this.getRouter().navTo("RouteEmployeeDetails");
-            }
+            },
+            TileV_onBackPress:function(){
+                this.getRouter().navTo("RouteLoginPage");
+            },
         });
     });

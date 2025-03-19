@@ -4,7 +4,7 @@
 	xmlns:m="sap.m"
 	xmlns="sap.uxap"
 	xmlns:f="sap.ui.layout.form">
-	<m:Page title="{i18n>invoiceDetails}" showNavButton="true" navButtonPress="CI_onPressback" id="CID_id_MyPageId" >
+	<m:Page title="{i18n>invoiceDetails}" showNavButton="true" navButtonPress="CID_onPressback" id="CID_id_MyPageId" >
 		<!-- <m:ScrollContainer > -->
 		<ObjectPageLayout id="CID_id_CmpInvObjectPageLayout"
             enableLazyLoading="true"
@@ -24,7 +24,7 @@
               emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 									<f:content>
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>customerName}" required="true" />
-										<m:ComboBox id="CID_id_AddCustComboBox" visible="{visiablityPlay>/createVisi}" items="{AddCustomerModel>/results}" value="{SelectedCustomerModel>/Customer}" change="ValidateCommonFields" valueStateText="{i18n>selectCustomer}">
+										<m:ComboBox id="CID_id_AddCustComboBox" visible="{visiablityPlay>/createVisi}" items="{AddCustomerModel>/results}" value="{SelectedCustomerModel>/Customer}" change="CID_ValidateCommonFields" valueStateText="{i18n>selectCustomer}">
 											<core:Item key="{AddCustomerModel>ID}" text="{AddCustomerModel>CompanyName}" />
 										</m:ComboBox>
 
@@ -41,16 +41,16 @@
 										<m:DatePicker visible="{visiablityPlay>/createVisi}" id="CID_id_Payby" value="{path:'SelectedCustomerModel>/PayByDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"/>
 
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>invoiceDate}" required="true" />
-										<m:DatePicker visible="{visiablityPlay>/editVisi}" id="CID_id_NavInvoice" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/InvoiceDate}"  editable="{visiablityPlay>/editable}" change="validateDate"/>
+										<m:DatePicker visible="{visiablityPlay>/editVisi}" id="CID_id_NavInvoice" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/InvoiceDate}"  editable="{visiablityPlay>/editable}" change="CID_ValidateDate"/>
 
 										<m:Label visible="{visiablityPlay>/editVisi}"  text="{i18n>PayByDate}" required="true" />
-										<m:DatePicker visible="{visiablityPlay>/editVisi}" id="CID_id_NavPayby" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/PayByDate}" editable="{visiablityPlay>/editable}" change="validateDate"/>
+										<m:DatePicker visible="{visiablityPlay>/editVisi}" id="CID_id_NavPayby" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/PayByDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDate"/>
 
 										<m:Label text="{i18n>invoiceDescription}" required="true" />
-										<m:Input id="CID_id_InvoiceDesc" value="{SelectedCustomerModel>/InvoiceDescription}" placeholder="{i18n>companyInvoiceDescPlaceH}" editable="{visiablityPlay>/editable}" liveChange="ValidateCommonFields"  maxLength="120" valueStateText="{i18n>companyInvoiceDescPlaceH}" />
+										<m:Input id="CID_id_InvoiceDesc" value="{SelectedCustomerModel>/InvoiceDescription}" placeholder="{i18n>companyInvoiceDescPlaceH}" editable="{visiablityPlay>/editable}" liveChange="CID_ValidateCommonFields"  maxLength="120" valueStateText="{i18n>companyInvoiceDescPlaceH}" />
 
 										<m:Label text="{i18n>sowPO}" required="true"></m:Label>
-										<m:Input id="CID_id_SowPO" value="{SelectedCustomerModel>/POSOW}" maxLength="14" placeholder="Enter the SOW" editable="{visiablityPlay>/editable}" liveChange="ValidateCommonFields"   valueStateText="{i18n>sowPoH}" ></m:Input>
+										<m:Input id="CID_id_SowPO" value="{SelectedCustomerModel>/POSOW}" maxLength="14" placeholder="Enter the SOW" editable="{visiablityPlay>/editable}" liveChange="CID_ValidateCommonFields"   valueStateText="{i18n>sowPoH}" ></m:Input>
 
 										<m:Label visible="{visiablityPlay>/GST}"  text="{i18n>type}" />
 										<m:Text visible="{visiablityPlay>/GST}" text="{ parts: [{path: 'SelectedCustomerModel>/Type'}, {path: 'SelectedCustomerModel>/Value'}], formatter: '.Formatter.formatCustomerTypeValue' }" id="CID_id_Type"/>
@@ -74,30 +74,30 @@
 										<m:Input visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}"  value="{SelectedCustomerModel>/LUT}" maxLength="50" editable="{visiablityPlay>/editable}"/>
 
 										<m:Label text="{i18n>panCardCommon}" />
-										<m:Input value="{SelectedCustomerModel>/PAN}" id="CID_id_InputPAN" liveChange="onPressLiveChange" maxLength="50" editable="{visiablityPlay>/CInvoice}" />
+										<m:Input value="{SelectedCustomerModel>/PAN}" id="CID_id_InputPAN" liveChange="CID_onPressLiveChange" maxLength="50" editable="{visiablityPlay>/CInvoice}" />
 
 										<m:Label text="{i18n>gstNo}" visible="{visiablityPlay>/GST}"/>
-										<m:Input value="{SelectedCustomerModel>/GST}" id="CID_id_InputGST" liveChange="onPressLiveChange" maxLength="50" editable="{visiablityPlay>/CInvoice}" visible="{visiablityPlay>/GST}" />
+										<m:Input value="{SelectedCustomerModel>/GST}" id="CID_id_InputGST" liveChange="CID_onPressLiveChange" maxLength="50" editable="{visiablityPlay>/CInvoice}" visible="{visiablityPlay>/GST}" />
 
 										<m:Label text="{i18n>address}" />
-										<m:TextArea id="CID_id_InputAddress" value="{SelectedCustomerModel>/Address}" maxLength="120" liveChange="onPressLiveChange" editable="{visiablityPlay>/CInvoice}"/>
+										<m:TextArea id="CID_id_InputAddress" value="{SelectedCustomerModel>/Address}" maxLength="120" liveChange="CID_onPressLiveChange" editable="{visiablityPlay>/CInvoice}"/>
 
 										<m:Label text="{i18n>emailId}" required="true"/>
-										<m:Input value="{SelectedCustomerModel>/MailID}" id="CID_id_InputMailID" maxLength="500" liveChange="onPressLiveChange" editable="{visiablityPlay>/CInvoice}" change="onchangeEmail"/>
+										<m:Input value="{SelectedCustomerModel>/MailID}" id="CID_id_InputMailID" maxLength="500" liveChange="CID_onPressLiveChange" editable="{visiablityPlay>/CInvoice}" change="onchangeEmail"/>
 
 										<m:Label text="{i18n>mobileNo}" />
-										<m:Input value="{SelectedCustomerModel>/MobileNo}" id="CID_id_InputMobileNo" maxLength="10" liveChange="onPressLiveChange" editable="{visiablityPlay>/CInvoice}" />
+										<m:Input value="{SelectedCustomerModel>/MobileNo}" id="CID_id_InputMobileNo" maxLength="10" liveChange="CID_onPressLiveChange" editable="{visiablityPlay>/CInvoice}" />
 
 										<m:Label  visible="{visiablityPlay>/TDS}" text="{i18n>TDS}" />
-										<m:Input  visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/TDS}" id="CID_id_TDS"  editable="{visiablityPlay>/editable}" liveChange="ValidateCommonFields"  maxLength="25" valueStateText="{i18n>invoiceTransaction}"/>
+										<m:Input  visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/TDS}" id="CID_id_TDS"  editable="{visiablityPlay>/editable}" liveChange="CID_ValidateCommonFields"  maxLength="25" valueStateText="{i18n>invoiceTransaction}"/>
 
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>selectSOW}" />
-										<m:ComboBox visible="{visiablityPlay>/createVisi}" items="{CombinedData>/items}" value="{SelectedCustomerModel>/SOWDetails}" change="ValidateCommonFields" valueStateText="{i18n>selectSOW}" id="CID_id_SowDetails">
+										<m:ComboBox visible="{visiablityPlay>/createVisi}" items="{CombinedData>/items}" value="{SelectedCustomerModel>/SOWDetails}" change="CID_ValidateCommonFields" valueStateText="{i18n>selectSOW}" id="CID_id_SowDetails">
 											<core:Item key="{CombinedData>MsaID} - {CombinedData>SowID}" text="{parts:[{path:'CombinedData>CompanyName'},{path:'CombinedData>Description'},{path:'CombinedData>StartDate'},{path:'CombinedData>EndDate'}],formatter: '.Formatter.formatCompanyAndDescription'}"/>
 										</m:ComboBox>
 
 										<m:Label text="{i18n>currency}" required="true"/>
-										<m:ComboBox items="{currencyModel>/results}" value="{FilteredSOWModel>/Currency}" id="CID_id_CurrencySelect" change="ValidateCommonFields" valueStateText="{i18n>selectCurrency}">
+										<m:ComboBox items="{currencyModel>/results}" value="{FilteredSOWModel>/Currency}" id="CID_id_CurrencySelect" change="CID_ValidateCommonFields" valueStateText="{i18n>selectCurrency}">
 											<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
 										</m:ComboBox>
 
@@ -109,24 +109,24 @@
 								</f:SimpleForm>
 							</blocks>
 							<actions>
-								<m:Button visible="{visiablityPlay>/createVisi}" type="Transparent" icon="sap-icon://add" text="{i18n>addCustomerBtn}" press="onPressAddCustomer" />
-								<m:Button visible="{visiablityPlay>/createVisi}" type="Transparent" text="{i18n>ActiveSOW}" press="onPressMSAandSOW" />
+								<m:Button visible="{visiablityPlay>/createVisi}" type="Transparent" icon="sap-icon://add" text="{i18n>addCustomerBtn}" press="CID_onPressAddCustomer" />
+								<m:Button visible="{visiablityPlay>/createVisi}" type="Transparent" text="{i18n>ActiveSOW}" press="CID_onPressMSAandSOW" />
 							</actions>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection>
 							<blocks>
 								<m:VBox >
-									<m:Table id="CID_id_TableInvoiceItem" mode="Delete" delete="onPressDelete">
+									<m:Table id="CID_id_TableInvoiceItem" mode="Delete" delete="CID_onPressDelete">
 										<m:headerToolbar>
 											<m:Toolbar>
 												<m:ToolbarSpacer />
 												<m:Button text="{i18n>btnTransaction}" 
-                      press="onPressDisplayPaymentDetail" 
+                      press="CID_onPressDisplayPaymentDetail" 
                       visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
 												<m:Button visible="{visiablityPlay>/addInvBtn}" 
                       icon="sap-icon://add" 
                       type="Default" 
-                      press="onPressAddInvoiceItems" />
+                      press="CID_onPressAddInvoiceItems" />
 												<m:ToolbarSeparator />
 											</m:Toolbar>
 										</m:headerToolbar>
@@ -268,11 +268,12 @@
 		</ObjectPageLayout>
 		<m:footer>
 			<m:Toolbar>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				<m:ToolbarSpacer/>
 				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Emphasized" press="CID_onPressSubmit" class="sendMail" />
-				<m:Button text="{i18n>companyInvoiceSendEmail}" press="onPressSendEmail" visible="{visiablityPlay>/payByDate}" />
+				<m:Button text="{i18n>companyInvoiceSendEmail}" press="CID_onPressSendEmail" visible="{visiablityPlay>/payByDate}" />
 				<m:Button visible="{visiablityPlay>/Edit}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"  press="CID_onPressEdit" class="sendMail" />
-				<m:Button text="{i18n>sendInvoiceText}" press="onPressSendMultipalEmail" visible="{visiablityPlay>/MultiEmail}"/>
+				<m:Button text="{i18n>sendInvoiceText}" press="CID_onPressSendMultipalEmail" visible="{visiablityPlay>/MultiEmail}"/>
 				<m:Button text="{i18n>GeneratePDF}" press="CID_onPressGeneratePdf"  visible="{visiablityPlay>/merge}" />
 			</m:Toolbar>
 		</m:footer>

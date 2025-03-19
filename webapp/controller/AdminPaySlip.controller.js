@@ -11,19 +11,19 @@ sap.ui.define([
             },
 
             _onRouteMatched:function(oEvent){
-
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Generate Pay Slip"); 
             },
 
             AP_onPressAddPayslip: function () {
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             },
 
-            AP_onSignout: function () {
-                this.getRouter().navTo("RouteLoginPage");
+            onPressback: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
             },
-            
-              AP_onPressback: function () {
-                this.getRouter().navTo("RouteTilePage");
+      
+            onLogout: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
             },
         });
     });

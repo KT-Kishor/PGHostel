@@ -10,6 +10,7 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteCompanyInvoiceDetails").attachMatched(this._onRouteMatched, this);
             },
+
             _onRouteMatched: function (oEvent) {
                 var sArg = oEvent.getParameter("arguments").sPath;
                 this.decodedPath = decodeURIComponent(decodeURIComponent(sArg));
@@ -54,15 +55,18 @@ sap.ui.define([
                 this.getView().setModel(visiablityPlay, "visiablityPlay");
             },
             
-            CI_onPressback: function () {
+            CID_onPressback: function () {
                 this.getRouter().navTo("RouteCompanyInvoice", { sPath: "Company" });
             },
-            validateDate: function (oEvent) {
+
+            CID_ValidateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
             },
-            ValidateCommonFields: function (oEvent) {
+
+            CID_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
+            
              //Save the Data
              CID_onPressSubmit: function (oEvent) {
             try {

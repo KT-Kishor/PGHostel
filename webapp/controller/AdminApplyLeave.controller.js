@@ -14,14 +14,17 @@ sap.ui.define(
         onInit: function () {
           this.getRouter().getRoute("RouteAdminApplyLeave").attachMatched(this._onRouteMatched, this);
         },
+
         _onRouteMatched: function () {
           var that = this;
+          that.getView().getModel("LoginModel").setProperty("/HeaderName", "Leave Application"); 
           that.i18nModelMess = that.getView().getModel("i18n").getResourceBundle();
           that.byId("AL_id_LeaveBarChart").setVisible(false);
           that.byId("AL_id_LeaveTableStandard").setVisible(true);
           that.byId("AL_id_leavefilterbar").setVisible(true);
           that.byId("AL_id_LeaveYear").setValue(new Date().getFullYear());
         },
+
         AL_onPressApplyLeave: function () {
           var oView = this.getView();
           var currentYear = new Date().getFullYear();
@@ -46,6 +49,7 @@ sap.ui.define(
           this.getView().setModel(oLeaveTempModel, "LeaveTempModel");
           this.openLeaveDialog(oView);
         },
+
         // Open the leave dialog fragment
         openLeaveDialog: function (oView) {
           if (!this.oDialog) {
@@ -63,6 +67,7 @@ sap.ui.define(
             this.oDialog.open();
           }
         },
+
         // Close the leave dialog fragment
         AL_onPressClose: function () {
           this.oDialog.close();
@@ -70,18 +75,23 @@ sap.ui.define(
           sap.ui.getCore().byId("AL_id_ToDate").setValueState("None");
           sap.ui.getCore().byId("AL_id_LeaveComments").setValueState("None");
         },
-        validateDate: function (oEvent) {
+
+        AL_ValidateDate: function (oEvent) {
           utils._LCvalidateDate(oEvent);
         },
-        ValidateCommonFields: function (oEvent) {
+
+        AL_ValidateCommonFields: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
-        AL_onSignout: function () {
-          this.getRouter().navTo("RouteLoginPage");
+
+        onPressback: function () {
+          this.getOwnerComponent().getRouter().navTo("RouteTilePage");
         },
-        AL_onPressback: function () {
-          this.getRouter().navTo("RouteTilePage");
+
+        onLogout: function () {
+          this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
         },
+
         AL_onPressSubmit: function (oEvent) {
         try {
             if (

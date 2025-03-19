@@ -86,7 +86,7 @@
 									<m:VBox class="sapUiSmallMargin">
 										<m:Toolbar>
 											<m:ToolbarSpacer />
-											<m:Button type="Transparent" icon="sap-icon://add" tooltip="{i18n>addSalaryField}" press="onAddSalaryField" />
+											<m:Button type="Transparent" icon="sap-icon://add" tooltip="{i18n>addSalaryField}" press="APD_onAddSalaryField" />
 											<m:ToolbarSeparator />
 										</m:Toolbar>
 										<m:Table id="APD_id_SalaryTable" items="{EarningModel>/SalaryFields}" mode="Delete" delete="onPressDeleteSalaryFields">
@@ -121,7 +121,7 @@
 									<m:VBox class="sapUiSmallMargin">
 										<m:Toolbar>
 											<m:ToolbarSpacer />
-											<m:Button type="Transparent" icon="sap-icon://add" tooltip="{i18n>addDeductionField}" press="onAddDeductionField" />
+											<m:Button type="Transparent" icon="sap-icon://add" tooltip="{i18n>addDeductionField}" press="APD_onAddDeductionField" />
 											<m:ToolbarSeparator />
 										</m:Toolbar>
 										<m:Table items="{DeductionModel>/DeductionFields}" mode="Delete" delete="onPressDeleteDeductionFields">
@@ -164,10 +164,11 @@
 			</sections>
 		</ObjectPageLayout>
 		<m:footer>
-			<m:Toolbar>
+		<m:Toolbar>
+			 <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				<m:ToolbarSpacer/>
-				<m:Button text="{i18n>submit}" type="Emphasized" press="onPressSubmit" class="sendMail"/>
-				<m:Button text="{i18n>jsPdf}" press="onPressGeneratePdf" class="sapUiSmallMarginBeginEnd" visible="false"/>
+				<m:Button text="{i18n>submit}" type="Emphasized" press="APD_onPressSubmit" class="sendMail"/>
+				<m:Button text="{i18n>jsPdf}" press="APD_onPressGeneratePdf" class="sapUiSmallMarginBeginEnd" visible="false"/>
 			</m:Toolbar>
 		</m:footer>
 	</m:Page>

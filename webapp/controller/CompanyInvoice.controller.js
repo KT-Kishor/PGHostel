@@ -9,15 +9,22 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteCompanyInvoice").attachMatched(this._onRouteMatched, this);
             },
+
+            _onRouteMatched: function () {
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Company Invoice Application"); 
+            },
+
             CI_onPressAddInvoice: function () {
                 this.getRouter().navTo("RouteCompanyInvoiceDetails",
                     { sPath: "X" });
             },
-            CI_onSignout: function () {
-                this.getRouter().navTo("RouteLoginPage");
+
+            onPressback: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
             },
-            CI_onPressback: function () {
-                this.getRouter().navTo("RouteTilePage");
+      
+            onLogout: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
             },
         });
     });

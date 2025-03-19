@@ -76,27 +76,27 @@ sap.ui.define(
           this.getView().setModel(visibilityPlay, "visiablityPlay");
         },
 
-        validateDate: function (oEvent) {
+        CID_ValidateDate: function (oEvent) {
           utils._LCvalidateDate(oEvent);
         },
 
-        validateGstNumber: function (oEvent) {
+        CID_ValidateGstNumber: function (oEvent) {
           utils._LCvalidateGstNumber(oEvent);
         },
 
-        ValidateCommonFields: function (oEvent) {
+        CID_ValidateCommonFields: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
 
-        validateMobileNo: function (oEvent) {
+        CID_ValidateMobileNo: function (oEvent) {
           utils._LCvalidateMobileNumber(oEvent);
         },
 
-        validateAccountNo: function (oEvent) {
+        CID_ValidateAccountNo: function (oEvent) {
           utils._LCvalidateAccountNo(oEvent);
         },
 
-        validateIfcCode: function (oEvent) {
+        CID_ValidateIfscCode: function (oEvent) {
           utils._LCvalidateIfcCode(oEvent);
         },
 

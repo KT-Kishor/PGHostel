@@ -13,6 +13,7 @@ sap.ui.define([
 
           _onRouteMatched: function () {
               var that = this
+              that.getView().getModel("LoginModel").setProperty("/HeaderName", "ID CARD"); 
               that.i18nModelMess = that.getView().getModel('i18n').getResourceBundle()
               var oTextModel = new JSONModel({ name: "" });
               that.getView().setModel(oTextModel, "TextDisplay");
@@ -252,31 +253,31 @@ sap.ui.define([
           }
         },
 
-        IC_onSignout: function () {
-          this.getRouter().navTo("RouteLoginPage");
+        onPressback: function () {
+          this.getOwnerComponent().getRouter().navTo("RouteTilePage");
         },
 
-        IC_onPressback: function () {
-          this.getRouter().navTo("RouteTilePage");
+        onLogout: function () {
+            this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
         },
 
-        validateName: function (oEvent) {
+        IC_ValidateEmployeeName: function (oEvent) {
           utils._LCvalidateName(oEvent);
         },
         
-        ValidateCommonFields: function (oEvent) {
+        IC_ValidateCommonFields: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
 
-        validateEmail: function (oEvent) {
+        IC_ValidateEmail: function (oEvent) {
           utils._LCvalidateEmail(oEvent);
         },
 
-        validateDate: function (oEvent) {
+        IC_ValidateDate: function (oEvent) {
           utils._LCvalidateDate(oEvent);
         },
 
-        validateMobileNo: function (oEvent) {
+        IC_ValidateMobileNo: function (oEvent) {
           utils._LCvalidateMobileNumber(oEvent);
         },
         
