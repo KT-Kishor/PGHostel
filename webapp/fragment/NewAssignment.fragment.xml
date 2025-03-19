@@ -1,6 +1,5 @@
 <core:FragmentDefinition
     xmlns="sap.m"
-    xmlns:u="sap.ui.unified"
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core">
     <Dialog class="sapUiSmallMarginBegin" id="idTaskDialog" title=""  >

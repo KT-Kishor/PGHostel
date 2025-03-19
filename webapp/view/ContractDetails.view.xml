@@ -6,7 +6,6 @@
 	xmlns:core="sap.ui.core" >
 	<Page id="CD_idPage" title="{i18n>headerContractDetails}" showNavButton="true" navButtonPress="CD_onPressback" >
 		<content>
-			<!-- Wizard page step1 -->
 			<Wizard 
                         id="CD_id_Wizard"	
 						showNextButton="true" finishButtonText="{i18n>submit}" >
@@ -19,36 +18,28 @@
 							<Input  id="CD_id_ContractNo" value="{ContractModelWizart>/ContractNo}" editable="false"/>
 							<Label text="{i18n>agreementDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="validateDate"  valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
-							<!-- Input for Client Company Name -->
 							<Label text="{i18n>consultantName}" required="true" />
 							<Select id="" selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}" width="100%">
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
-							<!-- Input for Client Company Name -->
 							<Input value="{ContractModelWizart>/ConsultantName}" type="Text" 
 								placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="validateName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
-							<!-- TextArea for Address -->
 							<Label text="{i18n>address}" required="true"/>
 							<TextArea value="{ContractModelWizart>/ConsultantAddress}"  maxLength="120" rows="3" id="CD_id_Address" placeholder="{i18n>placeAddress}" change="onAddress" valueStateText="{i18n>addressValueState}"
 									liveChange="ValidateCommonFields"/>
-							<!-- Input for Consultant Email ID -->
 							<Label text="{i18n>consultantEmail}" required="true"/>
 							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="100" placeholder="{i18n>placeConsultantEmail}" type="Email" id="CD_id_Email"  liveChange="validateEmail"  valueStateText="{i18n>emailValueState}"/>
-							<!-- Input for Role -->
 							<Label text="{i18n>role}" required="true"/>
 							<Input value="{ContractModelWizart>/Role}"  placeholder="{i18n>placeRole}"
 								id="CD_id_Role" change="onRole" liveChange="ValidateCommonFields" type="Text" maxLength="50" valueStateText="{i18n>roleValueState}"/>
-							<!-- RadioButtonGroup for Rate Selection -->
 							<Label text="{i18n>rate}" required="true" />
 							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="0" select="RadioButtonSelect" >
 								<RadioButton id="RB3-1" text="{i18n>rateHour}" />
 								<RadioButton id="RB3-2" text="{i18n>rateDaily}" />
 								<RadioButton id="RB3-3" text="{i18n>rateMonthly}" />
 							</RadioButtonGroup>
-							<!-- Input for Amount -->
 							<Label text="{i18n>amount}" required="true" />
 							<Input value="{ContractModelWizart>/Amount}"  id="CD_id_Amount"  placeholder="{i18n>placeAmount}"  liveChange="validateAmount"  maxLength="10" valueStateText="{i18n>ammountValuState}" />
-							<!-- ComboBox for Currency Selection -->
 							<Select items="{currencyModel>/results}"
 									selectedKey="{ContractModelWizart>/Currency}" id="CD_id_Currency" visible="true" width="100%" class="marginLeft">
 								<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
@@ -56,31 +47,25 @@
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
-				<!-- WizardStep Step2 -->
 				<WizardStep id="CD_id_Secstep"
                             title="{i18n>basicDetails}"
                             validated="true" >
-					<!-- Simple Form structure -->
 					<f:SimpleForm id="SimpleFormToolbar2" editable="true" layout="ColumnLayout"
                        labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
                        adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"  
                        emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"    
                        columnsM="1" >
 						<f:content>
-							<!-- Agreement Number input field -->
 							<Label text="{i18n>contractNo}" required="true"/>
 							<Input placeholder="{i18n>ContractNoPlaceholder}" id="CD_id_ConNo" editable="false"/>
-							<!-- End Client Hirer input field -->
 							<Label text="{i18n>endClientHirer}" required="true"/>
 							<ComboBox items="{AddCustomerModel>/results}"  value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="validateName">
 								<core:Item key="{AddCustomerModel>Salutation} {AddCustomerModel>Name}" text="{AddCustomerModel>CompanyName}" />
 							</ComboBox>						
-							<!-- Location ComboBox dropdown -->
 							<Label text="{i18n>locationswhereServices}" required="true"/>
 							<Select id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}">
 								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
 							</Select>
-							<!-- Client Hiring Contact input -->
 							<Label text="{i18n>clienthiringcontact}" required="true"/>
 							<Select id="CD_id_selectSal" selectedKey="{ContractModelWizart>/Salutation2}" 
                               items="{Salutation>/salutation}" width="100%">
@@ -88,40 +73,33 @@
 							</Select>
 							<Input value="{ContractModelWizart>/HiringContact}"
                              placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" liveChange="validateName" valueStateText="{i18n>commonNameValueState}"/>
-							<!-- Assignment Status ComboBox -->
 							<Label text="{i18n>assignmentStatus}" required="true"/>
 							<ComboBox selectedKey="New" value="{ContractModelWizart>/AssignmentStatus}" 
                              items="{AssignmentStatus>/assignmentStatus}" editable="false">
 								<core:Item key="{AssignmentStatus>Value}" text="{AssignmentStatus>Value}"/>
 							</ComboBox>
-							<!-- DatePicker for Start Date and End Date -->
 							<Label text="{i18n>startDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>endDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}"/>
-							<!-- Insurance Requirement ComboBox -->
 							<Label text="{i18n>specificInsuranceRequirement}" required="true"/>
 							<Select selectedKey="{ContractModelWizart>/InsuranceRequirement}" id="CD_id_InsuranceReq">
 								<core:Item key="Yes" text="{i18n>yes}" />
 								<core:Item key="No" text="{i18n>no}" />
 							</Select>
-							<!-- Warranty Date ComboBox -->
 							<Label text="{i18n>warrantyDate}" required="true"/>
 							<Select id="CD_id_Warranty" selectedKey="{ContractModelWizart>/WarrantyDate}" items="{contractwarrantyModel>/results}">
 								<core:Item key="{contractwarrantyModel>Months}" text="{contractwarrantyModel>Months}" />
 							</Select>
-							<!-- Additional Rates ComboBox -->
 							<Label text="{i18n>calloutadditionalratesexpenses}" required="true"/>
 							<Select  id="CD_id_AddRate" selectedKey="{ContractModelWizart>/AdditionalRates}">
 								<core:Item key="Yes" text="{i18n>yes}" />
 								<core:Item key="No" text="{i18n>no}" />
 							</Select>
-							<!-- Payment Terms ComboBox -->
 							<Label text="{i18n>paymentterms}" required="true"/>
 							<Select id="CD_id_PaymentTerms" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/results}">
 								<core:Item key="{ContractpaymentModel>Days}" text="{ContractpaymentModel>Days}" />
 							</Select>
-							<!-- Status ComboBox -->
 							<Label text="{i18n>status}" required="true"/>
 							<ComboBox selectedKey="{ContractModelWizart>/Status}"  items="{StatusModel>/Status}" id="CD_id_Status" visible="false" change="ValidateCommonFields">
 								<core:Item key="{StatusModel>name}" text="{StatusModel>name}"/>
@@ -133,7 +111,6 @@
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
-				<!-- Review wizard Step3 -->
 				<WizardStep id="idWizardStep"
 							complete="CD_onSubmit"
                             title="{i18n>review}"
@@ -154,7 +131,6 @@
                                 columnsXL="2"
                                 columnsL="2"    
                                 columnsM="1">
-						<!-- review form -->
 						<f:content>
 							<Label text="{i18n>ContractNo}"/>
 							<Text text="{ContractModelWizart>/ContractNo}"/>

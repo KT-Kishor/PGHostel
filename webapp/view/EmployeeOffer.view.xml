@@ -78,12 +78,13 @@
 				<items>
 					<ColumnListItem>
 						<cells>
-							<Text text="{EmployeeOfferModel>Salutation} {EmployeeOfferModel>ConsultantName}"/>
-							<Text text="{EmployeeOfferModel>Designation}"/>
-							<Text text="{EmployeeOfferModel>JoiningDate}"/>
-							<Text text="INR {path:'EmployeeOfferModel>CTC',formatter: '.Formatter.IndiaNumberFormatter'}"/>
-							<!-- <Text text=""/> -->
-							<ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true" class="centerText" state="{path: 'EmployeeOfferModel>Status', formatter: '.Formatter.statusStateFormatter'}" />
+							<Text text="{}"/>
+							<Text text="{}"/>
+							<Text text="{}"/>
+							<Text text=" {}"/>
+							<Text text=" {}"/>
+							<Text text=" {}"/>
+							<ObjectStatus text="{}" />
 						</cells>
 					</ColumnListItem>
 				</items>

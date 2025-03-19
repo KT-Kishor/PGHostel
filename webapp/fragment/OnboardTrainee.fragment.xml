@@ -1,12 +1,9 @@
 <core:FragmentDefinition
-	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core" >
-	<!-- Dialog container for Employee Details -->
 	<Dialog 
         title="{i18n>onBoardTrainee}">
-		<!-- SimpleForm with ResponsiveGridLayout -->
 		<f:SimpleForm 
 			editable="false"
 			layout="ResponsiveGridLayout"
@@ -32,9 +29,7 @@
 			</f:content>
 		</f:SimpleForm>
 		<HBox justifyContent="End" >
-			<!-- OnBoard button  -->
 			<Button text="{i18n>onboard}" type="Accept" press="OTF_onPressOnboard" class="submit" />
-			<!-- Close button -->
 			<Button text="{i18n>close}" press="OTF_onPressClose" class="sendMail" type="Reject"/>
 		</HBox>
 	</Dialog>

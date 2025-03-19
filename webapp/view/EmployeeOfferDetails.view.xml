@@ -1,6 +1,3 @@
-
-
-
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.EmployeeOfferDetails"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
