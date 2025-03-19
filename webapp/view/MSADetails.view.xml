@@ -34,7 +34,7 @@
 			ariaLabelledBy="Title1">
 						<f:content>
 							<Label text="{i18n>companyName}" required="true" />
-							<Input value="{msaModelWizart>/CompanyName}" maxLength="50" placeholder="{i18n>placeCompany}" id="MsaD_id_CompanyName" liveChange="MsaD_ValidateCommonFields" />
+							<Input value="{msaModelWizart>/CompanyName}" maxLength="50" placeholder="{i18n>placeCompany}" id="MsaD_id_CompanyName" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeCompany}" />
 
 							<Label text="{i18n>companyHeadName}" required="true" />
 							<HBox width="100%" justifyContent="Start" alignItems="Center">
@@ -46,12 +46,12 @@
 								</VBox>
 								<VBox width="78%">
 									<Input value="{msaModelWizart>/CompanyHeadName}" maxLength="50" class="sapUiTinyMarginBegin"
-										placeholder="{i18n>placeHeadName}" id="MsaD_id_HeadName" width="100%" liveChange="MsaD_validateName" />
+										placeholder="{i18n>placeHeadName}" id="MsaD_id_HeadName" width="100%" liveChange="MsaD_validateName" valueStateText="{i18n>placeHeadName}" />
 								</VBox>
 							</HBox>
 
 							<Label text="{i18n>companyHeadPosition}" required="true" />
-							<Input value="{msaModelWizart>/CompanyHeadPosition}" placeholder="{i18n>placeHedaPosition}" maxLength="50" id="MsaD_id_HeadPosition" liveChange="MsaD_ValidateCommonFields" valueState="None" />
+							<Input value="{msaModelWizart>/CompanyHeadPosition}" placeholder="{i18n>placeHedaPosition}" maxLength="50" id="MsaD_id_HeadPosition" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeHedaPosition}" />
 
 							<Label text="{i18n>contractPeriod}" required="true" />
 							<Select id="MsaD_id_ContractPeriod" items="{contractwarrantyModel>/results}" selectedKey="{msaModelWizart>/ContractPeriod}">
@@ -59,16 +59,16 @@
 							</Select>
 
 							<Label text="{i18n>createMSADate}" required="true" />
-							<DatePicker id="MsaD_id_CreateMSADate" value="" change="MsaD_validateDate" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" />
+							<DatePicker id="MsaD_id_CreateMSADate" value="" change="MsaD_validateDate" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}" />
 
 							<Label text="{i18n>panCardReg}" required="true" />
-							<Input  value="{msaModelWizart>/PANCard}"  placeholder="{i18n>placePanCardReg}" id="MsaD_id_PanCard" liveChange="MsaD_ValidateCommonFields"  maxLength="50" />
+							<Input  value="{msaModelWizart>/PANCard}"  placeholder="{i18n>placePanCardReg}" id="MsaD_id_PanCard" liveChange="MsaD_ValidateCommonFields"  maxLength="50" valueStateText="{i18n>placePanCardReg}" />
 
 							<Label text="{i18n>emailId}" required="true" />
-							<TextArea  value="{msaModelWizart>/MSAEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" change="MSAEmail" />
+							<TextArea  value="{msaModelWizart>/MSAEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" valueStateText="{i18n>emailValueState}" />
 
 							<Label text="{i18n>address}" required="true" />
-							<TextArea value="{msaModelWizart>/Address}" placeholder="{i18n>placeAddress}" id="MsaD_id_Address"  liveChange="MsaD_ValidateCommonFields"  maxLength="120"/>
+							<TextArea value="{msaModelWizart>/Address}" placeholder="{i18n>placeAddress}" id="MsaD_id_Address"  liveChange="MsaD_ValidateCommonFields"  maxLength="120" valueStateText="{i18n>addressValueState}"/>
 							
 							<Label text="{i18n>paymentterms}" required="true"></Label>
 							<Select  items="{ContractpaymentModel>/results}" selectedKey="{msaModelWizart>/PaymentTerms}" id="MsaD_id_PaymentTerms" >
