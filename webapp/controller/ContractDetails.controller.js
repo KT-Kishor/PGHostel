@@ -12,23 +12,23 @@ sap.ui.define([
                 this.i18nModel=this.getView().getModel("i18n").getResourceBundle();
 
             },
-            validateName: function (oEvent) {
+            CD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
                 this.validateStep();
             },
-            validateEmail: function (oEvent) {
+            CD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
                 this.validateStep();
             },
-            validateAmount: function (oEvent) {
+            CD_validateAmount: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
                 this.validateStep();
             },
-            validateDate: function (oEvent) {
+            CD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
                 this.validateStep();
             },
-            ValidateCommonFields: function (oEvent) {
+            CD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 this.validateStep();
             },

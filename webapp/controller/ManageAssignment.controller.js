@@ -7,11 +7,15 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteManageAssignment").attachMatched(this._onRouteMatched, this);
             },
-            MT_onSignout: function () {
-                this.getRouter().navTo("RouteLoginPage");
+            _onRouteMatched: function () {
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Create New Assignment");
             },
-            MT_onPressBack: function () {
-                this.getRouter().navTo("RouteTilePage");
+            onPressback: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+            },
+            onLogout: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
             },
             MA_onCreateTask:function(){
            this.getRouter().navTo("RouteAssignTask");

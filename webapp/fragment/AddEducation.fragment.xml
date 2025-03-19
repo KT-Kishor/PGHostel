@@ -24,7 +24,7 @@
 				<Label text="{i18n>employeeID}"  />
 				<Input value="{educationModel>/EmployeeID}"   maxLength="20"  editable="false"/>
 				<Label text="{i18n>collegeName}" required="true" />
-				<Input value="{educationModel>/CollegeName}" placeholder="{i18n>collegeName}" id="AddEd_id_College" maxLength="50" liveChange="ValidateCommonFields" valueStateText="{i18n>collegeNameValueState}"/>
+				<Input value="{educationModel>/CollegeName}" placeholder="{i18n>collegeName}" id="AddEd_id_College" maxLength="50" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>collegeNameValueState}"/>
 				<Label text="{i18n>degree}" required="true" />
 				<Select  selectedKey="{educationModel>/Degree}" items="{Degree>/degree}" id="AddEd_id_Degree" change="" >
 					<core:Item key="{Degree>DegreeName}" text="{Degree>DegreeName}" />
@@ -32,7 +32,7 @@
 				<Label text="{i18n>startDate}" required="true" />
 				<DatePicker id="AddEd_id_StartEdu" 
 				value="{educationModel>/EducationStartDate}"
-            change="validateDate"
+            change="SS_validateDate"
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy"
            maxDate="{viewModel>/Max}"
@@ -40,7 +40,7 @@
 				<Label text="{i18n>endDate}" required="true" />
 				<DatePicker id="AddEd_id_EndEdu" 
 				value="{educationModel>/EducationEndDate}"
-            change="validateDate"
+            change="SS_validateDate"
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy" 
 			maxDate="{viewModel>/Max}"
@@ -48,7 +48,7 @@
 			valueStateText="{i18n>dateValueState}"/>
 				<Label text="{i18n>grade}"  required="true" />
 				<HBox width="70%" justifyContent="Start">
-					<Input  value="{educationModel>/Grade}"   id="AddEd_id_Grade" liveChange="ValidateCommonFields" 
+					<Input  value="{educationModel>/Grade}"   id="AddEd_id_Grade" liveChange="SS_ValidateCommonFields" 
                  type="Number"   placeholder="{i18n>grade}"  valueStateText="{i18n>gradeValueState}" />
 					<Select  selectedKey="{educationModel>/GradeType}" items="{CollegeGrade>/grade}" id="AddEd_id_GradeType" class="sapUiSmallMarginBegin">
 						<core:Item key="{CollegeGrade>Value}" text="{CollegeGrade>Value}" />

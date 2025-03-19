@@ -8,10 +8,8 @@
     xmlns:u="sap.ui.unified">
 	<Page id="TSA_id_Page" >
 		<headerContent>
-			<Button  press="TSA_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>headerTimesheetApproval}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button  press="TSA_onSignout" icon="sap-icon://log"></Button>
+		 <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+
 		</headerContent>
 		<content>
 		  <u:CalendarDateInterval
@@ -20,23 +18,23 @@
  startDateChange="TSA_onSelect"/>
 			<fb:FilterBar  class="sapUiTinyMargin" id="TSA_id_Filter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Employee ID" label="Employee ID" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Employee ID" label="{i18n>employeeId}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Employee ID"  showClearIcon="true" items="" >
+						<ComboBox   showClearIcon="true" items="" >
 							<core:Item key="" text=""/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Month" label="Month" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Month" label="{i18n>month}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Month"  showClearIcon="true" items="" >
+						<ComboBox  showClearIcon="true" items="" >
 							<core:Item key="" text=""/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Status" label="Status" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-                   		<ComboBox name="Status"  showClearIcon="true" items="" >
+                   		<ComboBox   showClearIcon="true" items="" >
 							<core:Item key="" text=""/>
 						</ComboBox>	
 					</fb:control>
@@ -92,17 +90,9 @@
 		</content>
 		<footer>
 			<Bar>
-				<contentLeft>
-					   <HBox class="sapUiTinyMarginTop">
-    <Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
-    <Link
-        class="footer-CoName sapUiTinyMarginBegin"
-        text="Developed by Kalpavriksha Technologies"
-        href="https://www.kalpavrikshatechnologies.com/" 
-        target="_blank"  
-    />
-</HBox>
-				</contentLeft>
+				 <contentLeft>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                </contentLeft>
 				<contentRight>
 					<Button text="{i18n>approve}" press="TSA_onApprove" type="Success"  id="TSA_id_Approve"/>
                 <Button text="{i18n>reject}" press="TSA_onReject" type="Negative"  id="TSA_id_Reject"/>

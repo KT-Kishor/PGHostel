@@ -23,20 +23,20 @@
 				<Label text="{i18n>employeeID}"  />
 				<Input value="{employmentModel>/EmployeeID}" required="true" maxLength="10" editable="false" />
 				<Label text="{i18n>companyName}" required="true"/>
-				<Input value="{employmentModel>/CompanyName}" id="AddEmp_id_Company" placeholder="{i18n>companyName}" maxLength="50" liveChange="ValidateCommonFields" valueStateText="{i18n>companyNameValueState}"/>
+				<Input value="{employmentModel>/CompanyName}" id="AddEmp_id_Company" placeholder="{i18n>companyName}" maxLength="50" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>companyNameValueState}"/>
 				<Label text="{i18n>designation}" required="true" />
-				<ComboBox items="{path:'Designation>/results', length:1000}" value="{employmentModel>/Designation}" id="AddEmp_id_Desig" change="ValidateCommonFields" valueStateText="{i18n>designationValueState}">
+				<ComboBox items="{path:'Designation>/results', length:1000}" value="{employmentModel>/Designation}" id="AddEmp_id_Desig" change="SS_ValidateCommonFields" valueStateText="{i18n>designationValueState}">
 					<core:Item key="{Designation>DesignationName}" text="{Designation>DesignationName}" />
 				</ComboBox>
 				<Label text="{i18n>companyAddress}" required="true"/>
-				<TextArea value="{employmentModel>/OfficeAddress}" id="AddEmp_id_OfcAddress" placeholder="{i18n>companyAddress}" maxLength="120"  liveChange="ValidateCommonFields" valueStateText="{i18n>addressValueState}"/>
+				<TextArea value="{employmentModel>/OfficeAddress}" id="AddEmp_id_OfcAddress" placeholder="{i18n>companyAddress}" maxLength="120"  liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}"/>
 				<Label text="{i18n>startDate}" required="true"/>
 				<DatePicker value="{employmentModel>/StartDate}" 
             maxDate="{viewModel>/Max}" 
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy" 
             id="AddEmp_id_StartDate" 
-            change="validateDate"
+            change="SS_validateDate"
 			valueStateText="{i18n>dateValueState}"/>
 				<Label text="{i18n>endDate}" required="true"/>
 				<DatePicker value="{employmentModel>/EndDate}" 
@@ -44,7 +44,7 @@
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy"  
             id="AddEmp_id_EndDate" 
-            change="validateDate"
+            change="SS_validateDate"
 			valueStateText="{i18n>dateValueState}"/>
 			</f:content>
 		</f:SimpleForm>

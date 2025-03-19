@@ -9,7 +9,7 @@ sap.ui.define([
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             },
-            ValidateCommonFields: function (oEvent) {
+            TD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
             TSD_onPressBack: function () {

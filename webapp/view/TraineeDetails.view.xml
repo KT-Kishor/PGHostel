@@ -3,12 +3,9 @@
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core">
-	<Page id="TD_id_Page" title="{i18n>headerTrainee}" navButtonPress="T_onPressback" showNavButton="true">
+	<Page id="TD_id_Page" title="{i18n>headerTrainee}" navButtonPress="TD_onPressback" showNavButton="true">
 		<content>
-			<!-- Wizard component  -->
-			<Wizard id="TD_id_Wizard" complete="onWizardComplete"	
-					showNextButton="true" finishButtonText="{i18n>submit}">
-				<!-- Step 1: Form input for trainee details -->
+			<Wizard id="TD_id_Wizard" complete="TD_onWizardComplete"	showNextButton="true" finishButtonText="{i18n>submit}">
 				<WizardStep id="TD_id_StepOne" title="{i18n>traineeDetails}" validated="true">
 					<f:SimpleForm 
             layout="ResponsiveGridLayout"
@@ -38,7 +35,7 @@
 									</Select>
 								</VBox>
 								<VBox width="78%">
-									<Input value="{oTraineeDetails>/TraineeName}" maxLength="50" placeholder="{i18n>placeTraineeName}" id="TD_id_Name" liveChange="validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>nameEmployeeValueState}"/>
+									<Input value="{oTraineeDetails>/TraineeName}" maxLength="50" placeholder="{i18n>placeTraineeName}" id="TD_id_Name" liveChange="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>nameEmployeeValueState}"/>
 								</VBox>
 							</HBox>
 							<Label text="{i18n>reportingManager}" required="true" />
@@ -54,24 +51,23 @@
 									</Select>
 								</VBox>
 								<VBox width="78%">
-									<ComboBox showSecondaryValues="true"  change="validateName"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{idModel>/results}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin">
+									<ComboBox showSecondaryValues="true"  change="TD_validateName"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{idModel>/results}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin">
 										<core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}" />
 									</ComboBox>
 								</VBox>
 							</HBox>
 							<Label text="{i18n>emailId}" required="true" />
-							<Input value="{oTraineeDetails>/EmailID}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="validateEmail" valueStateText="{i18n>emailValueState}"/>
+							<Input value="{oTraineeDetails>/EmailID}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>stipend}" required="true" />
-							<Input value="{oTraineeDetails>/Stipend}" maxLength="50" type="Number" placeholder="{i18n>placeStipend}" id="TD_id_Stipend" liveChange="validateAmount" valueStateText="{i18n>ammountValuState}"/>
-							<Select items="{currencyModel>/results}" selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" width="100%" class="marginLeft">
+							<Input value="{oTraineeDetails>/Stipend}" maxLength="15" placeholder="{i18n>placeStipend}" id="TD_id_Stipend" liveChange="TD_validateAmount" valueStateText="{i18n>ammountValuState}"/>
+							<Select items="{currencyModel>/results}" selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" class="marginLeft">
 								<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
 							</Select>
 							<Label text="{i18n>joiningDate}"  id="TD_id_Ljoin" required="true" />
-							<DatePicker width="50%" value="oTraineeDetails>/JoiningDate'}" id="TD_id_JoiningDate"  change="validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
+							<DatePicker width="50%" value="oTraineeDetails>/JoiningDate'}" id="TD_id_JoiningDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
-				<!-- Step 3: Review step displaying entered details -->
 				<WizardStep 
 							complete="TD_onSubmitData"
                             title="{i18n>review}"
@@ -92,28 +88,29 @@
 			columnsL="1"
 			columnsM="1">
 						<f:content>
-							<!-- Display Trainee Name and Salutation -->
 							<Label text="{i18n>traineeName}"/>
 							<Text text="{= ${oTraineeDetails>/NameSalutation} + ' ' + ${oTraineeDetails>/Name}}"/>
-							<!-- Display Reporting Manager Name and Salutation -->
 							<Label text="{i18n>reportingManager}" />
 							<Text text="{= ${oTraineeDetails>/ReportingManagerSalutation} + ' ' + ${oTraineeDetails>/ReportingManager}}"/>
-							<!-- Display Trainee Email -->
 							<Label text="{i18n>emailId}" />
 							<Text  text="{oTraineeDetails>/TraineeEmail}"/>
-							<!-- Display Stipend -->
 							<Label text="{i18n>stipend}" />
 							<Text text="{oTraineeDetails>/Stipend}"/>
-							<!-- Display Currency -->
 							<Label text="{i18n>currency}" />
 							<Text text="{oTraineeDetails>/Currency}"/>
-							<!-- Display Joining Date with formatter -->
 							<Label text="{i18n>joiningDate}" />
-							<Text text="{path:'oTraineeDetails>/JoiningDate', formatter: '.Formatter.formatDate'}"/>
+							<Text text="{}"/>
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
 			</Wizard>
 		</content>
+				<footer>
+			<Bar>
+					    <contentLeft>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                </contentLeft>
+			</Bar>
+		</footer>
 	</Page>
 </mvc:View>

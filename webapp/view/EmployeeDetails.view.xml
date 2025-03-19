@@ -5,13 +5,9 @@
 	xmlns:fb="sap.ui.comp.filterbar"
 	controllerName="sap.kt.com.minihrsolution.controller.EmployeeDetails"
 	height="100%">
-	<!-- use this to make the table occupy the available screen height -->
 	<Page >
 		<headerContent>
-			<Button  press="ED_onPressBack" icon="sap-icon://home" />
-			<Text text="{i18n>headerEmpDetails}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button  press="ED_onPressSignOut" icon="sap-icon://log"></Button>
+	   <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 		</headerContent>
 		<content>
 			<fb:FilterBar  class="sapUiTinyMargin" id="ED_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
@@ -32,9 +28,8 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="ED_id_EmpDetailsTable" class="sapUiTinyMargin" items="{ path:'',sorter: {
-			path: '', descending: false, group:true}}"  busyIndicatorDelay="0"  width="auto"
-                inset="false"    growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			<Table id="ED_id_EmpDetailsTable" class="sapUiTinyMargin" items=""  busyIndicatorDelay="0"  width="auto"
+                   growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar >
 						<Title id="ED_id_TitleTable" text="{i18n>headerEmpDetails}"/>
@@ -85,14 +80,7 @@
         	<footer>
 			<Bar id="ED_id_FooterBar">
 			    <contentLeft>
-				<HBox class="sapUiTinyMarginTop">
-					<Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
-					<Link
-					class="footer-CoName sapUiTinyMarginBegin"
-					text="Developed by Kalpavriksha Technologies"
-					href="https://www.kalpavrikshatechnologies.com/" 
-					target="_blank"  />
-				</HBox>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
             </Bar>
             </footer>

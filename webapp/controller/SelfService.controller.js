@@ -11,13 +11,16 @@ sap.ui.define([
                 var oViewModel = new JSONModel({ isEditMode: false, Max: new Date() });
                 this.getView().setModel(oViewModel, "viewModel");
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle()
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "My Details");
+
             },
-            SS_onPressSignout: function () {
-                this.getRouter().navTo("RouteLoginPage");
+            onPressback: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
             },
-            SS_onPressback: function () {
-                this.getRouter().navTo("RouteTilePage");
+            onLogout: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
             },
+
             //Education dialog open
             EdF_AddEdu: function () {
                 if (!this.SEd_oDialog) {
@@ -57,34 +60,34 @@ sap.ui.define([
             AddEmp_onClose: function () {
                 this.SEmp_oDialog.close();
             },
-            validateMobileNo: function (oEvent) {
+            SS_validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
             },
-            validateName: function (oEvent) {
+            SS_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
             },
-            validateVoterId: function (oEvent) {
+            SS_validateVoterId: function (oEvent) {
                 utils._LCvalidateVoterId(oEvent);
             },
-            validateAadharCard: function (oEvent) {
+            SS_validateAadharCard: function (oEvent) {
                 utils._LCvalidateAadharCard(oEvent);
             },
-            validatePassport: function (oEvent) {
+            SS_validatePassport: function (oEvent) {
                 utils._LCvalidatePassport(oEvent);
             },
-            validatePanCard: function (oEvent) {
+            SS_validatePanCard: function (oEvent) {
                 utils._LCvalidatePanCard(oEvent);
             },
-            validateAccountNo: function (oEvent) {
+            SS_validateAccountNo: function (oEvent) {
                 utils._LCvalidateAccountNo(oEvent);
             },
-            validateIfcCode: function (oEvent) {
+            SS_validateIfcCode: function (oEvent) {
                 utils._LCvalidateIfcCode(oEvent);
             },
-            validateDate: function (oEvent) {
+            SS_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
             },
-            ValidateCommonFields: function (oEvent) {
+            SS_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
             SS_onEditPress: function () {
@@ -114,9 +117,9 @@ sap.ui.define([
             AddEd_onSubmitEdDetails: function () {
                 try {
                     if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID")
-                         && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_Grade"), "ID")) {
-                            MessageToast.show(this.i18nModel.getText("eduDataSaved"));
-                        }
+                        && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_Grade"), "ID")) {
+                        MessageToast.show(this.i18nModel.getText("eduDataSaved"));
+                    }
                     else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
@@ -128,8 +131,8 @@ sap.ui.define([
             AddEmp_onSubmitEmp: function () {
                 try {
                     if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID")) {
-                            MessageToast.show(this.i18nModel.getText("empDataSaved"));
-                        }
+                        MessageToast.show(this.i18nModel.getText("empDataSaved"));
+                    }
                     else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
@@ -138,19 +141,19 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
-            SS_onTabSelect: async function (oEvent) {        
-                if (oEvent.getParameter("key") === "educationDetailKey") {  
+            SS_onTabSelect: async function (oEvent) {
+                if (oEvent.getParameter("key") === "educationDetailKey") {
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
-                } else if (oEvent.getParameter("key") === "employmentKey") {  
+                } else if (oEvent.getParameter("key") === "employmentKey") {
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
-                } else if (oEvent.getParameter("key") === "salaryKey") {    
+                } else if (oEvent.getParameter("key") === "salaryKey") {
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
-                }  else if(oEvent.getParameter("key")=== "paySlipKey"){
-                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible",false);
+                } else if (oEvent.getParameter("key") === "paySlipKey") {
+                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
                 }
-                else {   
-                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", true); 
+                else {
+                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", true);
                 }
-              },
+            },
         });
     });

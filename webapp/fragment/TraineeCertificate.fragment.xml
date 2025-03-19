@@ -45,7 +45,7 @@
 					<core:Item key="{DepartmentModel>DepartmentName}" text="{DepartmentModel>DepartmentName}"/>
 				</Select>
 				<Label text="{i18n>projectName}"  required="true" />
-				<TextArea id="TCF_id_ProjectName" rows="2" liveChange="ValidateCommonFields" value="{oTraineeDetailsModel>/ProjectName}" maxLength="100" valueStateText="{i18n>projectValueState}" />
+				<TextArea id="TCF_id_ProjectName" rows="2" liveChange="T_ValidateCommonFields" value="{oTraineeDetailsModel>/ProjectName}" maxLength="100" valueStateText="{i18n>projectValueState}" />
 			</f:content>
 		</f:SimpleForm>
 		<HBox justifyContent="End" >

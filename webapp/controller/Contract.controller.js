@@ -1,22 +1,26 @@
 sap.ui.define([
-    "./BaseController","sap/ui/model/json/JSONModel","sap/m/MessageToast",],
+    "./BaseController", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",],
     function (BaseController, JSONModel, MessageToast) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Contract", {
             onInit: function () {
                 this.getRouter().getRoute("RouteContract").attachMatched(this._onRouteMatched, this);
             },
-            C_onSignout: function () {
-                this.getRouter().navTo("RouteLoginPage");
+            _onRouteMatched: function () {
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Contract Details");
             },
-            C_onPressback: function () {
-                this.getRouter().navTo("RouteTilePage");
+            onPressback: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
             },
-            C_onPressAddContract:function(){
-           this.getRouter().navTo("RouteContractDetails");
+            onLogout: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+            },
+            C_onPressAddContract: function () {
+                this.getRouter().navTo("RouteContractDetails");
             }
 
-         
-           
+
+
         });
     });

@@ -14,22 +14,22 @@
      width="100%"  
     id="NAF_id_EmpId"
     visible="{visiblePlay>/empId}"
-    change="ValidateCommonFields"
+    change="AT_ValidateCommonFields"
     items="{idModel>/results}">
     <core:ListItem key="{idModel>ID}" text="{idModel>ID}" additionalText="{idModel>EmployeeName}"/>
 </MultiComboBox>
                 <Label text="{i18n>taskName}" required="true"/>
-                <Input value="{newTaskModel>/TaskName}" id="NA_id_TaskName" liveChange="ValidateCommonFields" maxLength="100" valueStateText="{i18n>taskNameValueState}"/>
+                <Input value="{newTaskModel>/TaskName}" id="NA_id_TaskName" liveChange="AT_ValidateCommonFields" maxLength="100" valueStateText="{i18n>taskNameValueState}"/>
                 <Label text="{i18n>taskType}" required="true"/>
-                <Select id="idTasktype" items="{TaskJsonModel>/results}" selectedKey="{newTaskModel>/TaskType}" visible="{visiblePlay>/showTaskType}" change="onChangeTaskType"  >
+                <Select id="idTasktype" items="{TaskJsonModel>/results}" selectedKey="{newTaskModel>/TaskType}" visible="{visiblePlay>/showTaskType}" change="AT_onChangeTaskType"  >
                     <core:Item key="{TaskJsonModel>Value}" text="{TaskJsonModel>Value}"/>
                 </Select>
                 <Label text="{i18n>description}" required="true" id="NAF_id_Ldesc"/>
-                <Input value="{newTaskModel>/TaskTypeDescription}" id="NAF_id_Description" liveChange="ValidateCommonFields"  visible="{visiblePlay>/showTaskDescription}" maxLength="50" valueStateText="{i18n>taskDescription}"/>
+                <Input value="{newTaskModel>/TaskTypeDescription}" id="NAF_id_Description" liveChange="AT_ValidateCommonFields"  visible="{visiblePlay>/showTaskDescription}" maxLength="50" valueStateText="{i18n>taskDescription}"/>
                 <Label text="{i18n>startDate}" required="true"/>
                 <DatePicker minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"
-                    change="validateDate"
+                    change="AT_validateDate"
                     value="{newTaskModel>/StartDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
@@ -39,7 +39,7 @@
                 <DatePicker
                     minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"
-                    change="validateDate"
+                    change="AT_validateDate"
                     value="{newTaskModel>/EndDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
@@ -52,7 +52,7 @@
     displayFormat="HH" 
     valueFormat="HH" 
     visible="{visiblePlay>/showHoursWorked}"
-    change="ValidateCommonFields"
+    change="AT_ValidateCommonFields"
      valueStateText="{i18n>hoursLimit}"/>
             </f:content>
             <HBox justifyContent="End">

@@ -1,16 +1,24 @@
 sap.ui.define([
-    "./BaseController", 
-],function(BaseController){
-    "use strict";
-    return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeDetails",{
-        onInit: function () {
-           
-        },
-        ED_onPressBack:function(){
-            this.getRouter().navTo("RouteTilePage");
-        },
-        ED_onPressSignOut:function(){
-            this.getRouter().navTo("RouteLoginPage");
-        }
-    })
-})
+    "./BaseController", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",],
+    function (BaseController, JSONModel, MessageToast) {
+        "use strict";
+        return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeDetails", {
+            onInit: function () {
+                this.getRouter().getRoute("RouteEmployeeDetails").attachMatched(this._onRouteMatched, this);
+            },
+            _onRouteMatched: function () {
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Employee Details");
+            },
+            onPressback: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+            },
+            onLogout: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+            },
+            
+
+
+
+        });
+    });

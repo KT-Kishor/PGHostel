@@ -10,10 +10,10 @@ sap.ui.define([
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             },
-            validateDate: function (oEvent) {
+            AT_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
             },
-            ValidateCommonFields: function (oEvent) {
+            AT_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
 

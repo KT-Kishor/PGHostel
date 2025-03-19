@@ -6,10 +6,7 @@
 	xmlns:core="sap.ui.core">
 	<Page id="SS_id_Page" >
 		<headerContent>
-			<Button  press="SS_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>tileSelfSerciceFooter}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button press="SS_onPressSignout" icon="sap-icon://log"/>
+		<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 		</headerContent>
 		<content>
 			<IconTabBar
@@ -54,17 +51,9 @@
 		</content>
 		<footer>
 			<Bar>
-				<contentLeft>
-					<HBox class="sapUiTinyMarginTop">
-						<Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
-						<Link
-        class="footer-CoName sapUiTinyMarginBegin"
-        text="Developed by Kalpavriksha Technologies"
-        href="https://www.kalpavrikshatechnologies.com/" 
-        target="_blank"  
-    />
-					</HBox>
-				</contentLeft>
+				 <contentLeft>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                </contentLeft>
 				<contentRight>
 					<Button text="{i18n>visit}" type="Critical" 
         press="onDownloadVisitCard" 

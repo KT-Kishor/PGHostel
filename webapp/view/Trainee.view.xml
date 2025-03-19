@@ -7,38 +7,34 @@
     displayBlock="true">
 	<Page  >
 		<headerContent>
-			<Button  press="T_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>traineeDetails}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button  press="T_onSignout" icon="sap-icon://log" tooltip="{i18n>backButtonTooltip}"></Button>
-		</headerContent>
+	     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+			</headerContent>
 		<content>
 			<fb:FilterBar  class="sapUiTinyMargin" id="T_id_AdminFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Trainee" label="Trainee Name" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Trainee" label="{i18n>traineeName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox  showSecondaryValues= "true"  items="" change="" id="T_id_TraineeName" showClearIcon="true">
 								<core:ListItem key="" text="" additionalText="" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Reporting Manager" label="Reporting Manager" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Reporting Manager" label="{i18n>reportingManager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="Reporting Manager"  items="" id="T_id_RmFilterBar" showClearIcon="true">
+							<ComboBox   items="" id="T_id_RmFilterBar" showClearIcon="true">
 								<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Joining Date" label="Joining Date" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Joining Date" label="{i18n>joiningDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
                     <DateRangeSelection id="T_id_JoiningDate" valueFormat="dd/MM/yyyy"  displayFormat="dd/MM/yyyy" change="onDateChange" />						
 					</fb:control>
 						</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="T_id_TraineeTable" class="sapUiTinyMargin" items="{ path:'oAdminModel>/results',sorter: {
-			path: 'Company', descending: false, group:true}}"  busyIndicatorDelay="0"  width="auto"
-                inset="false"    growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			<Table id="T_id_TraineeTable" class="sapUiTinyMargin" items=""  busyIndicatorDelay="0"  width="auto"
+                    growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				 <headerToolbar>
                 <OverflowToolbar >
                     <Title id="T_id_Title" text="{i18n>traineeDetails}"/>
@@ -88,15 +84,7 @@
 		<footer>
 			<Bar>
 				<contentLeft>
-					   <HBox class="sapUiTinyMarginTop">
-    <Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
-    <Link
-        class="footer-CoName sapUiTinyMarginBegin"
-        text="Developed by Kalpavriksha Technologies"
-        href="https://www.kalpavrikshatechnologies.com/" 
-        target="_blank"  
-    />
-</HBox>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</contentLeft>
 			</Bar>
 		</footer>

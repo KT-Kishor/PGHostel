@@ -1,5 +1,8 @@
 sap.ui.define([
-    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel","sap/m/MessageToast"],
+    "./BaseController",
+     "../utils/validation",
+      "sap/ui/model/json/JSONModel",
+      "sap/m/MessageToast"],
     function (BaseController, utils, JSONModel, MessageToast) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.TraineeDetails", {
@@ -10,23 +13,23 @@ sap.ui.define([
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 this.i18nModel=this.getView().getModel("i18n").getResourceBundle();
             },
-            validateName: function (oEvent) {
+            TD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
                 this.validateStep();
             },
-            validateEmail: function (oEvent) {
+            TD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
                 this.validateStep();
             },
-            validateAmount: function (oEvent) {
+            TD_validateAmount: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
                 this.validateStep();
             },
-            validateDate: function (oEvent) {
+            TD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
                 this.validateStep();
             },
-            T_onPressback: function () {
+            TD_onPressback: function () {
                 this.getRouter().navTo("RouteTrainee");
             },
             // Common Model

@@ -15,9 +15,9 @@
 	
 				<fb:FilterBar  class="sapUiTinyMargin" id="AT_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad">
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Employee ID" label="Employee ID" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Employee ID" label="{i18n>employeeId}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Employee ID" selectionChange="" showClearIcon="true" items="" >
+						<ComboBox  selectionChange="" showClearIcon="true" items="" >
 							<core:Item key="" text=""/>
 						</ComboBox>
 					</fb:control>
@@ -74,17 +74,9 @@
 		</content>
 		<footer>
 			<Bar>
-				<contentLeft>
-					   <HBox class="sapUiTinyMarginTop">
-    <Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
-    <Link
-        class="footer-CoName sapUiTinyMarginBegin"
-        text="Developed by Kalpavriksha Technologies"
-        href="https://www.kalpavrikshatechnologies.com/" 
-        target="_blank"  
-    />
-</HBox>
-				</contentLeft>
+				 <contentLeft>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                </contentLeft>
 			</Bar>
 		</footer>
 	</Page>

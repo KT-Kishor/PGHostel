@@ -8,29 +8,27 @@
     displayBlock="true">
 	<Page id="C_id_Page" >
 		<headerContent>
-			<Button  press="C_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>contractDetails}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button  press="C_onSignout" icon="sap-icon://log"></Button>
+	    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+
 		</headerContent>
 		<content>
 			<fb:FilterBar  class="sapUiTinyMargin" id="C_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Contract No" label="Contract No" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Contract No" label="{i18n>contractNo}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Contract No" selectionChange=".onBranchChange" showClearIcon="true" items="" >
+						<ComboBox  selectionChange=".onBranchChange" showClearIcon="true" items="" >
 							<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-				<fb:FilterGroupItem name="Location Service" label="Location Service" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="Location Service" label="{i18n>locationService}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="Location Service"  items="" showClearIcon="true" id="C_id_DesiFilter">
+							<ComboBox   items="" showClearIcon="true" id="C_id_DesiFilter">
 								<core:Item key="{DropDownModel>ConsultantName}" text="{DropDownModel>ConsultantName}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Year" label="Year" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Year" label="{i18n>year}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
                     <DateRangeSelection
                     id="C_id_Year"
@@ -41,7 +39,7 @@
 						</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Contract Status" label="{i18n>contractStatus}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name=" Contract Status" showClearIcon="true" selectionChange=".onSelectionChange" items="{EmployeeOffer>/Status}">
+						<ComboBox showClearIcon="true" selectionChange=".onSelectionChange" items="{EmployeeOffer>/Status}">
 							<core:Item key="{EmployeeOffer>ID}" text="{EmployeeOffer>Status}"/>
 						</ComboBox>
 					</fb:control>
@@ -103,17 +101,9 @@
 		</content>
 		<footer>
 			<Bar>
-				<contentLeft>
-					   <HBox class="sapUiTinyMarginTop">
-    <Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
-    <Link
-        class="footer-CoName sapUiTinyMarginBegin"
-        text="Developed by Kalpavriksha Technologies"
-        href="https://www.kalpavrikshatechnologies.com/" 
-        target="_blank"  
-    />
-</HBox>
-				</contentLeft>
+					    <contentLeft>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                </contentLeft>
 			</Bar>
 		</footer>
 	</Page>

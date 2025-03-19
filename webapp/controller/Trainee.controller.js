@@ -1,5 +1,8 @@
 sap.ui.define([
-    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",
+    "./BaseController",
+    "../utils/validation",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageToast",
 ],
     function (BaseController, utils, JSONModel, MessageToast) {
         "use strict";
@@ -9,20 +12,20 @@ sap.ui.define([
             },
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
             },
 
-            ValidateCommonFields: function (oEvent) {
+            T_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
-            validateEmail: function (oEvent) {
+            T_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
             },
-
-            T_onSignout: function () {
-                this.getRouter().navTo("RouteLoginPage");
+            onPressback: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
             },
-            T_onPressback: function () {
-                this.getRouter().navTo("RouteTilePage");
+            onLogout: function () {
+                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
             },
             T_onPressAddTrainee: function () {
                 this.getRouter().navTo("RouteTraineeDetails");
@@ -76,10 +79,10 @@ sap.ui.define([
             },
 
             OTF_onPressClose: function () {
-                this.TOb_oDialog.close();     
+                this.TOb_oDialog.close();
             },
             //onboard trainee
-            OTF_onPressOnboard:function(){
+            OTF_onPressOnboard: function () {
                 try {
                     if (utils._LCvalidateEmail(sap.ui.getCore().byId("OTF_id_TraineeMail"), "ID")) {
                         MessageToast.show(this.i18nModel.getText("traineeOnboardSucess"));
@@ -93,8 +96,6 @@ sap.ui.define([
                 }
 
             }
-
-
 
         });
     });
