@@ -1,0 +1,283 @@
+<mvc:View
+    controllerName="sap.kt.com.minihrsolution.controller.Quotation"
+    xmlns:filterbar="sap.ui.comp.filterbar"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Page>
+        <headerContent>
+            <Button
+                press="Q_onPressback"
+                icon="sap-icon://home"
+                tooltip="{i18n>toolHome}"
+            />
+            <Text
+                text="{i18n>qPageHeaderTitle}"
+                class="boldBlackText"
+            />
+            <ToolbarSpacer />
+            <Button
+                press="Q_onLogout"
+                icon="sap-icon://log"
+                tooltip="{i18n>logoutTooltip}"
+            />
+        </headerContent>
+        <content>
+            <filterbar:FilterBar
+                useToolbar="false"
+                clear="Q_onPressClear"
+                showClearOnFB="true"
+                showFilterConfiguration="false"
+                search=".Q_onSearch"
+                class="sapUiTinyMargin"
+            >
+                <filterbar:filterGroupItems>
+                    <filterbar:FilterGroupItem
+                        name="Branch"
+                        label="{i18n>branch}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <filterbar:control>
+                            <ComboBox
+                                showClearIcon="true"
+                                id="Q_id_FilterBranch"
+                                name="Branch"
+                                editable="{Quotation>/isEditable}"
+                                items="{
+                                    path: 'Quotation>/BaseLocationData',
+                                    length: 1000
+                                }"
+                                selectionChange="Q_onBranchFilterChange"
+                            >
+                                <core:Item
+                                    key="{Quotation>City}"
+                                    text="{Quotation>City}"
+                                />
+                            </ComboBox>
+                        </filterbar:control>
+                    </filterbar:FilterGroupItem>
+                    <filterbar:FilterGroupItem
+                        name="QIBy"
+                        label="{i18n>qIssuedBy}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <filterbar:control>
+                            <ComboBox
+                                showClearIcon="true"
+                                id="Q_id_IssuedBy"
+                                name="QIBy"
+                                editable="{Quotation>/isEditable}"
+                                items="{
+                                    path: 'Quotation>/SelfServiceData',
+                                    sorter: {
+                                        path: 'Branch',
+                                        descending: false,
+                                        group: true
+                                    },
+                                    length: 1000
+                                }"
+                            >
+                                <core:Item
+                                    key="{Quotation>EmployeeName}"
+                                    text="{Quotation>EmployeeName}"
+                                />
+                            </ComboBox>
+                        </filterbar:control>
+                    </filterbar:FilterGroupItem>
+                    <filterbar:FilterGroupItem
+                        name="QDate"
+                        label="{i18n>date}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <filterbar:control>
+                            <DateRangeSelection
+                                id="Q_id_QDate"
+                                name="QDate"
+                                delimiter="to"
+                                displayFormat="dd/MM/yyyy"
+                                valueFormat="dd/MM/yyyy"
+                                change="Q_onFilterChange"
+                            />
+                        </filterbar:control>
+                    </filterbar:FilterGroupItem>
+                    <filterbar:FilterGroupItem
+                        name="PinCode"
+                        label="{i18n>pinCode}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <filterbar:control>
+                            <Input
+                                id="Q_id_FilterPinCode"
+                                name="PinCode"
+                                type="Number"
+                                liveChange="Q_onFilterPinChange"
+                            />
+                        </filterbar:control>
+                    </filterbar:FilterGroupItem>
+                    <filterbar:FilterGroupItem
+                        name="Status"
+                        label="{i18n>status}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <filterbar:control>
+                            <ComboBox
+                                showClearIcon="true"
+                                id="Q_id_Status"
+                                name="Status"
+                                items="{
+                                    path: 'Quotation>/StatusList',
+                                    length: 1000
+                                }"
+                            >
+                                <core:Item
+                                    key="{Quotation>key}"
+                                    text="{Quotation>text}"
+                                />
+                            </ComboBox>
+                        </filterbar:control>
+                    </filterbar:FilterGroupItem>
+                </filterbar:filterGroupItems>
+            </filterbar:FilterBar>
+            <Table
+                id="Q_id_Table"
+                busyIndicatorDelay="0"
+                class="sapUiTinyMargin"
+                width="auto"
+                inset="false"
+                growing="true"
+                growingThreshold="50"
+                growingScrollToLoad="true"
+                items="{Quotation>/QTableData}"
+            >
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title
+                            text="{i18n>qTableTitle} ({Quotation>/RowCount})"
+                            level="H2"
+                        />
+                        <ToolbarSpacer />
+                        <Button
+                            type="Emphasized"
+                            press="Q_onPressDashboard"
+                            text="{i18n>dashboard}"
+                        />
+                        <Button
+                            icon="sap-icon://add"
+                            text="Create"
+                            type="Accept"
+                            press="Q_onPressCreate"
+                            tooltip="{i18n>create}"
+                        />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column
+                        mergeDuplicates="true"
+                        vAlign="Middle"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                        visible="true"
+                    >
+                        <Text text="{i18n>qIssuedBy}" />
+                    </Column>
+                    <Column
+                        vAlign="Middle"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>qNumber}" />
+                    </Column>
+                    <Column
+                        vAlign="Middle"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>branch}" />
+                    </Column>
+                    <Column
+                        vAlign="Middle"
+                        minScreenWidth="Desktop"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>qCreateDate}" />
+                    </Column>
+                    <Column vAlign="Middle">
+                        <Text text="{i18n>customerName}" />
+                    </Column>
+                    <Column
+                        vAlign="Middle"
+                        minScreenWidth="Desktop"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>pinCode}" />
+                    </Column>
+                    <Column vAlign="Middle">
+                        <Text text="{i18n>amount}" />
+                    </Column>
+                    <Column
+                        vAlign="Middle"
+                        minScreenWidth="Desktop"
+                        demandPopin="true"
+                        width="10%"
+                    >
+                        <Text text="{i18n>status}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem
+                        vAlign="Middle"
+                        type="Navigation"
+                        press="onRowPress"
+                    >
+                        <cells>
+                            <Text text="{Quotation>QuotationIssuedBy}" />
+                            <Text text="{Quotation>QuotationNumber}" />
+                            <Text text="{Quotation>Branch}" />
+                            <Text
+                                text="{ path: 'Quotation>QuotationDate', formatter: '.formatter.DateFormatter' }"
+                            />
+                            <Text text="{Quotation>CustomerName}" />
+                            <Text text="{Quotation>CustPinCode}" />
+                            <Text
+                                text="{ path: 'Quotation>TotalOnRoad', formatter: '.formatter.IndiaNumberFormatter' }"
+                            />
+                            <ObjectStatus
+                                inverted="true"
+                                state="{= ${Quotation>Status} === 'New' ? 'Information' : 
+                                        ${Quotation>Status} === 'Booked' ? 'Success' :  
+                                        ${Quotation>Status} === 'Cancelled' ? 'Error' : 'None'}"
+                                text="{Quotation>Status}"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <Bar>
+                <contentLeft>
+                    <HBox class="sapUiTinyMarginTop">
+                        <Image
+                            src="../image/logo.jpg"
+                            width="30px"
+                            height="30px"
+                            class="companylogo"
+                        />
+                        <Link
+                            class="footer-CoName sapUiTinyMarginBegin"
+                            text="{i18n>developedBy}"
+                            href="https://www.kalpavrikshatechnologies.com/"
+                            target="_blank"
+                        />
+                    </HBox>
+                </contentLeft>
+            </Bar>
+        </footer>
+    </Page>
+</mvc:View>

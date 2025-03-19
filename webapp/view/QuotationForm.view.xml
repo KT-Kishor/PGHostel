@@ -1,0 +1,751 @@
+<mvc:View
+    controllerName="sap.kt.com.minihrsolution.controller.QuotationForm"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.uxap"
+    xmlns:layout="sap.ui.layout"
+    xmlns:m="sap.m"
+    xmlns:f="sap.ui.layout.form"
+>
+    <m:Page
+        id="QF_id_Page"
+        busyIndicatorDelay="0"
+        showHeader="true"
+        title="{i18n>quotation}"
+        titleLevel="H1"
+        navButtonPress="QF_onNavBack"
+        navButtonTooltip="{i18n>back}"
+        showNavButton="true"
+    >
+        <ObjectPageLayout
+            id="QF_id_OPL"
+            busyIndicatorDelay="0"
+            enableLazyLoading="true"
+            useIconTabBar="true"
+            showTitleInHeaderContent="true"
+            upperCaseAnchorBar="false"
+        >
+            <headerTitle>
+                <ObjectPageDynamicHeaderTitle>
+                    <expandedHeading>
+                        <m:Title
+                            text="Kalpavriksha Automotive LLP"
+                            wrapping="true"
+                        />
+                    </expandedHeading>
+
+                    <snappedHeading>
+                        <m:FlexBox
+                            fitContainer="true"
+                            alignItems="Center"
+                        >
+                            <m:Avatar
+                                displayShape="Circle"
+                                displaySize="M"
+                                src="../image/logo.jpg"
+                                class="sapUiTinyMarginEnd"
+                            />
+                            <m:Title
+                                text="Kalpavriksha Automotive LLP"
+                                wrapping="true"
+                            />
+                        </m:FlexBox>
+                    </snappedHeading>
+
+                    <expandedContent>
+                        <m:Text
+                            visible="true"
+                            text="A future of Tomorrow"
+                        />
+                    </expandedContent>
+
+                    <snappedContent>
+                        <layout:VerticalLayout>
+                            <m:Text
+                                visible="true"
+                                text="A future of Tomorrow"
+                            />
+                            <layout:HorizontalLayout class="sapUiTinyMarginTop">
+                                <m:Label
+                                    text="{i18n>qIssuedBy} "
+                                    showColon="true"
+                                />
+                                <m:Text
+                                    class="sapUiTinyMarginBegin"
+                                    text="Me, 9876543210"
+                                />
+                            </layout:HorizontalLayout>
+                        </layout:VerticalLayout>
+                    </snappedContent>
+                </ObjectPageDynamicHeaderTitle>
+            </headerTitle>
+
+            <headerContent>
+                <m:FlexBox
+                    wrap="Wrap"
+                    fitContainer="true"
+                >
+                    <m:Avatar
+                        class="sapUiLargeMarginEnd"
+                        displayShape="Circle"
+                        displaySize="XL"
+                        src="../image/logo.jpg"
+                    />
+
+                    <layout:VerticalLayout
+                        class="sapUiSmallMarginBottom sapUiSmallMarginEnd"
+                    >
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd"
+                        >
+                            <m:Label
+                                showColon="true"
+                                text="{i18n>cell} "
+                            />
+                            <m:Text width="5px" />
+                            <m:Link
+                                text="{Quotation>/CompanyCodeData/mobile}"
+                            />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd"
+                        >
+                            <m:Label
+                                showColon="true"
+                                text="{i18n>email} "
+                            />
+                            <m:Text width="5px" />
+                            <m:Link text="{Quotation>/CompanyCodeData/email}" />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            visible="true"
+                            class="sapUiSmallMarginBeginEnd"
+                        >
+                            <m:Label
+                                showColon="true"
+                                text="{i18n>website} "
+                            />
+                            <m:Text width="5px" />
+                            <m:Link
+                                text="kalpavrikshatechnologies.com"
+                                href="https://kalpavrikshatechnologies.com"
+                                target="_blank"
+                            />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd"
+                        >
+                            <m:Label
+                                text="{i18n>gstNo}: {Quotation>/CompanyCodeData/GSTIN}"
+                            />
+                        </layout:HorizontalLayout>
+                    </layout:VerticalLayout>
+
+                    <layout:VerticalLayout
+                        class="sapUiSmallMarginBeginEnd sapUiMediumMarginEnd sapUiSmallMarginBottom"
+                    >
+                        <m:Label
+                            text="#111, Karekal layout, Sharanbasaveshwar Nagar, Near Naganhalli Railway Over Bridge, Gulbarga, Karnataka 585102, IN"
+                            width="300px"
+                            wrapping="true"
+                            wrappingType="Normal"
+                        />
+                        <layout:HorizontalLayout />
+                    </layout:VerticalLayout>
+
+                    <layout:VerticalLayout
+                        class="sapUiTinyMarginBottom sapUiSmallMarginBegin"
+                    >
+                        <layout:HorizontalLayout>
+                            <m:ObjectStatus
+                                title="{i18n>status}"
+                                visible="{= ${Quotation>/VisibleStatus} ? false : true }"
+                                text="{Quotation>/Status}"
+                                inverted="true"
+                                state="{= ${Quotation>/Status} === 'New' ? 'Information' : 
+                                        ${Quotation>/Status} === 'Booked' ? 'Success' :
+                                        ${Quotation>/Status} === 'Cancelled' ? 'Error' : 'None'}"
+                            />
+                        </layout:HorizontalLayout>
+                    </layout:VerticalLayout>
+                </m:FlexBox>
+            </headerContent>
+            <sections>
+                <ObjectPageSection
+                    id="QF_id_OPS"
+                    showTitle="false"
+                    titleVisible="false"
+                >
+                    <subSections>
+                        <ObjectPageSubSection
+                            showTitle="true"
+                            title="{i18n>invoiceHeaderDetails}"
+                            titleLevel="H1"
+                            titleUppercase="false"
+                            titleVisible="true"
+                        >
+                            <f:SimpleForm
+                                editable="true"
+                                layout="ColumnLayout"
+                                columnsL="4"
+                                columnsM="2"
+                                singleContainerFullSize="true"
+                            >
+                                <f:content>
+                                    <m:Label
+                                        text="{i18n>qIssuedBy} "
+                                        showColon="true"
+                                    />
+                                    <m:Input
+                                        value="{Quotation>/QuotationIssuedBy}"
+                                        editable="false"
+                                    />
+                                    <m:Label
+                                        text="{i18n>cell} "
+                                        showColon="true"
+                                    />
+                                    <m:Input
+                                        id="QF_id_EmpMobile"
+                                        editable="{Quotation>/MasterEdit}"
+                                        value="{Quotation>/EmployeeMobile}"
+                                        liveChange=".QF_onEmpMobileChange"
+                                        type="Number"
+                                    />
+                                    <m:Label
+                                        text="{i18n>coCode} "
+                                        showColon="true"
+                                    />
+                                    <m:ComboBox
+                                        width="auto"
+                                        id="QF_id_CoCodes"
+                                        selectedKey="{Quotation>/CompanyCode}"
+                                        items="{
+                                            path: 'Quotation>/allCompanyCodeDetails',
+                                            length: 1000
+                                        }"
+                                        change="QF_onCompanyCodeChange"
+                                        editable="{= ${Quotation>/AddCase} ? true : false }"
+                                        showSecondaryValues="true"
+                                        visible="{= ${UserDetails>/Role} === 'Admin' || ${UserDetails>/Role} === 'CEO' || ${UserDetails>/Role} === 'GM' ? true : false }"
+                                    >
+                                        <core:ListItem
+                                            key="{Quotation>CompanyCode}"
+                                            text="{Quotation>CompanyCode}"
+                                            additionalText="{Quotation>Branch}"
+                                        />
+                                    </m:ComboBox>
+                                    <m:Label
+                                        text="{i18n>status} "
+                                        showColon="true"
+                                        visible="{Quotation>/VisibleStatus}"
+                                    />
+                                    <m:Select
+                                        visible="{Quotation>/VisibleStatus}"
+                                        selectedKey="{Quotation>/Status}"
+                                        items="{
+                                            path: 'Quotation>/StatusList'
+                                        }"
+                                    >
+                                        <core:Item
+                                            key="{Quotation>key}"
+                                            text="{Quotation>text}"
+                                        />
+                                    </m:Select>
+                                </f:content>
+                            </f:SimpleForm>
+                        </ObjectPageSubSection>
+                        <ObjectPageSubSection
+                            showTitle="true"
+                            title="{i18n>custDetails} "
+                        >
+                            <f:SimpleForm
+                                editable="true"
+                                layout="ColumnLayout"
+                                columnsL="4"
+                                columnsM="2"
+                                singleContainerFullSize="true"
+                            >
+                                <f:content>
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>qNumber} "
+                                    />
+                                    <m:Input
+                                        value="{Quotation>/QuotationNumber}"
+                                        editable="false"
+                                        visible="{Quotation>/ShowCase}"
+                                    />
+
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>date} "
+                                    />
+                                    <m:DatePicker
+                                        id="QF_id_CreateDate"
+                                        editable="false"
+                                    />
+
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>validUpto} "
+                                    />
+                                    <m:DatePicker
+                                        id="QF_id_ValidUpto"
+                                        editable="false"
+                                        value="{Quotation>/ValidUpto}"
+                                        displayFormat="dd/MM/yyyy"
+                                        valueFormat="dd/MM/yyyy"
+                                    />
+
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>name} "
+                                    />
+                                    <m:Input
+                                        id="QF_id_CustomerName"
+                                        editable="{Quotation>/MasterEdit}"
+                                        value="{Quotation>/CustomerName}"
+                                        liveChange=".QF_onNameChange"
+                                        required="true"
+                                        maxLength="25"
+                                        valueStateText="{i18n>commonNameValueState}"
+                                    />
+
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>cell} "
+                                    />
+                                    <m:Input
+                                        id="QF_id_CustMobile"
+                                        editable="{Quotation>/MasterEdit}"
+                                        value="{Quotation>/CustMobile}"
+                                        required="true"
+                                        type="Number"
+                                        liveChange=".QF_onMobileChange"
+                                        valueStateText="{i18n>mobileNoValueState}"
+                                    />
+
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>email} "
+                                    />
+                                    <m:Input
+                                        id="QF_id_CustEmail"
+                                        editable="{Quotation>/MasterEdit}"
+                                        value="{Quotation>/CustEmail}"
+                                        liveChange=".QF_onEmailChange"
+                                        maxLength="49"
+                                        valueStateText="{i18n>emailValueState}"
+                                    />
+
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>aadharNo} "
+                                    />
+                                    <m:Input
+                                        id="QF_id_CustAadhar"
+                                        editable="{Quotation>/MasterEdit}"
+                                        value="{Quotation>/CustAadhar}"
+                                        liveChange=".QF_onAadharChange"
+                                        type="Number"
+                                        valueStateText="{i18n>aadharNoValueState}"
+                                    />
+
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>pan} "
+                                    />
+                                    <m:Input
+                                        id="QF_id_CustPanNumber"
+                                        editable="{Quotation>/MasterEdit}"
+                                        value="{Quotation>/CustPanNumber}"
+                                        liveChange=".QF_onPanChange"
+                                        maxLength="10"
+                                        valueStateText="{i18n>panCardValueState}"
+                                    />
+
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>GSTIN} "
+                                    />
+                                    <m:Input
+                                        id="QF_id_CustGSTNo"
+                                        editable="{Quotation>/MasterEdit}"
+                                        value="{Quotation>/CustGSTNo}"
+                                        liveChange=".QF_onGSTChange"
+                                        maxLength="15"
+                                        valueStateText="{i18n>gstNoValueState}"
+                                    />
+
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>address} "
+                                    />
+                                    <m:TextArea
+                                        id="QF_id_CustAddress"
+                                        editable="{Quotation>/MasterEdit}"
+                                        value="{Quotation>/CustAddress}"
+                                        change=".QF_onAddressChange"
+                                        rows="4"
+                                        required="true"
+                                        maxLength="60"
+                                        valueStateText="{i18n>addressValueState}"
+                                    />
+
+                                    <m:Label
+                                        showColon="true"
+                                        text="{i18n>pinCode} "
+                                    />
+                                    <m:Input
+                                        id="QF_id_CustPinCode"
+                                        editable="{Quotation>/MasterEdit}"
+                                        value="{Quotation>/CustPinCode}"
+                                        liveChange=".QF_onPinChange"
+                                        required="true"
+                                        type="Number"
+                                        maxLength="6"
+                                        valueStateText="{i18n>pinValueState}"
+                                    />
+                                </f:content>
+                            </f:SimpleForm>
+                        </ObjectPageSubSection>
+
+                        <ObjectPageSubSection
+                            class="sapUiSmallMarginBottom"
+                            showTitle="true"
+                            title="{i18n>qTableTitle}"
+                            titleLevel="H1"
+                            titleUppercase="false"
+                            titleVisible="true"
+                        >
+                            <layout:VerticalLayout width="100%">
+                                <m:Label
+                                    class="sapUiTinyMarginTop"
+                                    design="Bold"
+                                    text="{i18n>vehicleDetails} "
+                                />
+
+                                <f:SimpleForm
+                                    editable="true"
+                                    layout="ColumnLayout"
+                                    columnsL="4"
+                                    columnsM="2"
+                                    singleContainerFullSize="true"
+                                >
+                                    <f:content>
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleModel} "
+                                        />
+                                        <m:ComboBox
+                                            editable="{Quotation>/MasterEdit}"
+                                            id="QF_id_VehModel"
+                                            change=".QF_onModelSelect"
+                                            value="{Quotation>/Model}"
+                                            selectedKey=""
+                                            items="{
+                                                path: 'Quotation>/ModelList',
+                                                length: 1000
+                                            }"
+                                            required="true"
+                                            selectionChange=".QF_onModelSelectionChange"
+                                            valueStateText="{i18n>modelValueState}"
+                                        >
+                                            <core:Item
+                                                key="{Quotation>}"
+                                                text="{Quotation>}"
+                                            />
+                                        </m:ComboBox>
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleVariant} "
+                                        />
+                                        <m:Input
+                                            editable="{Quotation>/MasterEdit}"
+                                            id="QF_id_VehVariant"
+                                            change=".QF_onVariantChange"
+                                            value="{Quotation>/Variant}"
+                                            showValueHelp="true"
+                                            valueHelpRequest="QF_onOpenValueHelpDialog"
+                                            required="true"
+                                            valueStateText="{i18n>variantValueState}"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleTransmission} "
+                                        />
+                                        <m:Input
+                                            value="{Quotation>/Transmission}"
+                                            editable="false"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleFuel} "
+                                        />
+                                        <m:Input
+                                            value="{Quotation>/Fuel}"
+                                            editable="false"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleColor} "
+                                        />
+                                        <m:Input
+                                            editable="false"
+                                            value="{Quotation>/Color}"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleBoardPlate} "
+                                        />
+                                        <m:Input
+                                            value="{Quotation>/BoardPlate}"
+                                            editable="false"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleMake} "
+                                        />
+                                        <m:Input
+                                            value="{Quotation>/Make}"
+                                            editable="false"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleEmission} "
+                                        />
+                                        <m:Input
+                                            value="{Quotation>/Emission}"
+                                            editable="false"
+                                        />
+                                    </f:content>
+                                </f:SimpleForm>
+                                <m:Label
+                                    class="sapUiSmallMarginTop"
+                                    text="{i18n>priceBreakdown} "
+                                    design="Bold"
+                                    textAlign="Center"
+                                />
+
+                                <f:SimpleForm
+                                    editable="true"
+                                    layout="ColumnLayout"
+                                    columnsL="4"
+                                    columnsM="2"
+                                    singleContainerFullSize="true"
+                                >
+                                    <f:content>
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleExShowroom} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/ExShowroom', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/isEditable}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleTCS} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/TCS1Perc', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/isEditable}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>insurance} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/AddOnInsurance', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/isEditable}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleRoadTax} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/ROADTAX', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/isEditable}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>regHyp} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/RegHypCharge', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/isEditable}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleFastTag} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/FastTag', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/isEditable}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>stdFitAcc} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/STDFittings', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/MasterEdit}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>extWarranty} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/EXTDWarrantyFOR4YR80K', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/MasterEdit}"
+                                            visible="{= ${Quotation>/CompanyCodeData/Company} === 'Hyundai' ? true : false }"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>sot} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/ShieldOfTrust4YR45K', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/MasterEdit}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleVAS} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/VAS', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/MasterEdit}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>vehicleRSA} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/RSA', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/isEditable}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>schemeDiscount} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/ConsumerScheme', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/isEditable}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>exShowDiscount} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/ExShowroomAfterScheme', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="false"
+                                            visible="{= ${Quotation>/CompanyCodeData/Company} === 'Hyundai' ? false : true }"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>discountOffers} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/DiscountOffers', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="{Quotation>/isEditable}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>onRoad} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/TotalOnRoad', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            editable="false"
+                                        />
+                                    </f:content>
+                                </f:SimpleForm>
+                            </layout:VerticalLayout>
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+            </sections>
+        </ObjectPageLayout>
+        <m:footer>
+            <m:Bar>
+                <m:contentLeft>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                </m:contentLeft>
+                <m:contentRight>
+                    <m:Button
+                        iconFirst="true"
+                        icon="sap-icon://pdf-attachment"
+                        text="{i18n>generate}"
+                        id="QF_id_PDFBtn"
+                        type="Reject"
+                        press="QF_onDownloadPDF"
+                        visible="{Quotation>/ShowCase}"
+                    />
+                    <m:Button
+                        text="{= ${Quotation>/MasterEdit} ? ${i18n>save} : ${i18n>edit}}"
+                        press="QF_onPressEdit"
+                        type="{= ${Quotation>/MasterEdit} ? 'Accept' : 'Neutral'}"
+                        visible="{Quotation>/ShowCase}"
+                        icon="{= ${Quotation>/MasterEdit} ? '' : 'sap-icon://edit'}"
+                    />
+
+                    <m:Button
+                        text="{i18n>submit}"
+                        press="QF_onPressSubmit"
+                        type="Accept"
+                        visible="{Quotation>/AddCase}"
+                        enabled="{Quotation>/EnableSubmit}"
+                    />
+                </m:contentRight>
+            </m:Bar>
+        </m:footer>
+    </m:Page>
+</mvc:View>

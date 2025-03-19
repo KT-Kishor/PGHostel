@@ -92,6 +92,7 @@ sap.ui.define([
         return;
       }
     },
+
     _commonDesignation: function () {
       sap.ui.core.BusyIndicator.show(0);
       var that = this;
@@ -106,21 +107,22 @@ sap.ui.define([
           },
           success: function (data) {
             sap.ui.core.BusyIndicator.hide();
-            var oModel = new sap.ui.model.json.JSONModel(data);
-            that.getView().setModel(oModel, "oDesignationModel");
-
+            if(data){
+              var oDesignationModel = new sap.ui.model.json.JSONModel(data);
+              that.getView().setModel(oDesignationModel, "DesignationModel");
+            }
           },
-          error: function (error) {
+          error: function (err) {
             sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show("Failed to read data");
-          }
+            sap.m.MessageToast.show(err.responseJSON.message);
+          }.bind(this),
         });
-      } catch (error) {
+      }catch(error) {
         sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error");
+        sap.m.MessageToast.show("Technical error please connect to administrator");
       }
-
     },
+
     _commonBaseLocation: function () {
       sap.ui.core.BusyIndicator.show(0);
       var that = this;
@@ -135,20 +137,107 @@ sap.ui.define([
           },
           success: function (data) {
             sap.ui.core.BusyIndicator.hide();
-            var oModel = new sap.ui.model.json.JSONModel(data);
-            that.getView().setModel(oModel, "oBaseLocationModel");
-
+            if(data){
+              var oBaseLocationModel = new sap.ui.model.json.JSONModel(data);
+              that.getView().setModel(oBaseLocationModel, "BaseLocationModel");
+            }
           },
-          error: function (error) {
+          error: function (err) {
             sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show("Failed to read data");
-          }
+            sap.m.MessageToast.show(err.responseJSON.message);
+          }.bind(this),
         });
-      } catch (error) {
+      }catch(error) {
         sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error");
+        sap.m.MessageToast.show("Technical error please connect to administrator");
       }
+    },
 
-    }
+    _commonDepartment: function () {
+      sap.ui.core.BusyIndicator.show(0);
+      var that = this;
+      try {
+        $.ajax({
+          url: "https://www.rest.kalpavrikshatechnologies.com/Department",
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+          },
+          success: function (data) {
+            if (data) { 
+              var oDepartmentModel = new sap.ui.model.json.JSONModel(data);
+              that.getView().setModel(oDepartmentModel, "DepartmentModel");
+          }
+          },
+          error: function (err) {
+            sap.ui.core.BusyIndicator.hide();
+            sap.m.MessageToast.show(err.responseJSON.message);
+          }.bind(this),
+        });
+      }catch(error) {
+        sap.ui.core.BusyIndicator.hide();
+        sap.m.MessageToast.show("Technical error please connect to administrator");
+      }
+    },
+
+    _commonCompanyInvoiceSAC: function () {
+      sap.ui.core.BusyIndicator.show(0);
+      var that = this;
+      try {
+        $.ajax({
+          url: "https://www.rest.kalpavrikshatechnologies.com/CompanyInvoiceSAC",
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+          },
+          success: function (data) {
+            if (data) { 
+              var oCompanyInvoiceSACModel = new sap.ui.model.json.JSONModel(data);
+              that.getView().setModel(oCompanyInvoiceSACModel, "CompanyInvoiceSACModel");
+          }
+          },
+          error: function (err) {
+            sap.ui.core.BusyIndicator.hide();
+            sap.m.MessageToast.show(err.responseJSON.message);
+          }.bind(this),
+        });
+      }catch(error) {
+        sap.ui.core.BusyIndicator.hide();
+        sap.m.MessageToast.show("Technical error please connect to administrator");
+      }
+    },
+
+    _commonCountry: function () {
+      sap.ui.core.BusyIndicator.show(0);
+      var that = this;
+      try {
+        $.ajax({
+          url: "https://www.rest.kalpavrikshatechnologies.com/Country",
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+          },
+          success: function (data) {
+            if (data) { 
+              var oCountryModel = new sap.ui.model.json.JSONModel(data);
+              that.getView().setModel(oCountryModel, "CountryModel");
+          }
+          },
+          error: function (err) {
+            sap.ui.core.BusyIndicator.hide();
+            sap.m.MessageToast.show(err.responseJSON.message);
+          }.bind(this),
+        });
+      }catch(error) {
+        sap.ui.core.BusyIndicator.hide();
+        sap.m.MessageToast.show("Technical error please connect to administrator");
+      }
+    },
   })
 });
