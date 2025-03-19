@@ -72,17 +72,18 @@ sap.ui.define(
       },
 
       _onRouteMatched: function () {
+        this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Payroll Data"); 
         var oModel = this.getView().getModel("Payroll");
         oModel.setProperty("/ShowOnGenerate",false);
         oModel.setProperty("/ShowOnPayroll",true);
       },
 
-      MP_onPressback: function () {
-        this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+      onPressback: function () {
+        this.getRouter().navTo("RouteTilePage");
       },
 
-      MP_onLogout: function () {
-        this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+      onLogout: function () {
+        this.getRouter().navTo("RouteLoginPage");
       }
     });
   }

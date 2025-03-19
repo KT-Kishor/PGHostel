@@ -8,14 +8,16 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteQuotation").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: function () {},
-
-        Q_onPressback: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+        _onRouteMatched: function () {
+            this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
         },
 
-        Q_onLogout: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+        onPressback: function () {
+          this.getRouter().navTo("RouteTilePage");
+        },
+  
+        onLogout: function () {
+          this.getRouter().navTo("RouteLoginPage");
         },
 
         Q_onPressDashboard: function () {

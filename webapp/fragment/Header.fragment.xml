@@ -3,7 +3,7 @@
     xmlns:core="sap.ui.core"
 >
     <Button
-        press="GS_onPressback"
+        press="onPressback"
         icon="sap-icon://home"
         tooltip="{i18n>home}"
     />
@@ -13,7 +13,7 @@
     />
     <ToolbarSpacer />
     <Button
-        press="GS_onLogout"
+        press="onLogout"
         icon="sap-icon://log"
         tooltip="{i18n>logoutTooltip}"
     />

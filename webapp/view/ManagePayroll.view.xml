@@ -8,21 +8,7 @@
 >
     <Page id="MP_id_Page">
         <headerContent>
-            <Button
-                press="MP_onPressback"
-                icon="sap-icon://home"
-                tooltip="{i18n>home}"
-            />
-            <Text
-                text="{i18n>headerManagePayroll}"
-                class="boldBlackText"
-            />
-            <ToolbarSpacer />
-            <Button
-                press="MP_onLogout"
-                icon="sap-icon://log"
-                tooltip="{i18n>logoutTooltip}"
-            />
+        <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
         </headerContent>
         <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.SalaryTable" type="XML" />
         <footer>

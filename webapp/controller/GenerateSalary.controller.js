@@ -72,20 +72,18 @@ sap.ui.define(
       },
 
       _onRouteMatched: function () {
-        this.getView().getModel("LoginModel").setProperty("/HeaderName", "Hii"); 
+        this.getView().getModel("LoginModel").setProperty("/HeaderName", "Generate Salary"); 
         var oModel = this.getView().getModel("Payroll");
         oModel.setProperty("/ShowOnGenerate",true);
         oModel.setProperty("/ShowOnPayroll",false);
-
-      
       },
 
-      GS_onPressback: function () {
-        this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+      onPressback: function () {
+        this.getRouter().navTo("RouteTilePage");
       },
 
-      GS_onLogout: function () {
-        this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+      onLogout: function () {
+        this.getRouter().navTo("RouteLoginPage");
       }
     });
   }

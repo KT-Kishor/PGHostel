@@ -7,21 +7,7 @@
 >
     <Page>
         <headerContent>
-            <Button
-                press="Q_onPressback"
-                icon="sap-icon://home"
-                tooltip="{i18n>toolHome}"
-            />
-            <Text
-                text="{i18n>qPageHeaderTitle}"
-                class="boldBlackText"
-            />
-            <ToolbarSpacer />
-            <Button
-                press="Q_onLogout"
-                icon="sap-icon://log"
-                tooltip="{i18n>logoutTooltip}"
-            />
+        <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
         </headerContent>
         <content>
             <filterbar:FilterBar
@@ -262,20 +248,7 @@
         <footer>
             <Bar>
                 <contentLeft>
-                    <HBox class="sapUiTinyMarginTop">
-                        <Image
-                            src="../image/logo.jpg"
-                            width="30px"
-                            height="30px"
-                            class="companylogo"
-                        />
-                        <Link
-                            class="footer-CoName sapUiTinyMarginBegin"
-                            text="{i18n>developedBy}"
-                            href="https://www.kalpavrikshatechnologies.com/"
-                            target="_blank"
-                        />
-                    </HBox>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
             </Bar>
         </footer>
