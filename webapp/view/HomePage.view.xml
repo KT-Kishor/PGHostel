@@ -6,9 +6,9 @@
 
 <tnt:ToolPage id="toolPage">
 <tnt:header>
-<tnt:ToolHeader class="">
+<tnt:ToolHeader>
 <Avatar src="./image/logo.jpg" displaySize="XS" press=".onAvatarPressed" tooltip="Company Logo"/>
-<Title level="H1" text="Kalpavriksha Technologies" class="custom-text" wrapping="false"/>
+<Title level="H1" text="{i18n>companyName}" class="custom-text" wrapping="false"/>
 <ToolbarSpacer/>
 <Button icon="sap-icon://employee-pane" text="" tooltip="{i18n>tooltipLogin}" press="onpressLogin">
 <layoutData>

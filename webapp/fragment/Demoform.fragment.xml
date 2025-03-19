@@ -15,17 +15,15 @@
                     labelSpanM="4" labelSpanS="12" columnsXL="1" columnsL="1" columnsM="1" width="100%" singleContainerFullSize="false">
     
                     <f:content>
-                        <m:Label text="{i18n>customername}" required="true"/>
-                        <m:Input id="idcustomername" liveChange="validateName" maxLength="50" value="{formData>/CustomerName}" valueStateText="Invalid entry" width="80%"/>
                         
                         <m:Label text="{i18n>companyName}" required="true"/>
                         <m:Input id="idCompanyname" liveChange="validateCompnayname" maxLength="50" value="{formData>/CompanyName}" valueStateText="Invalid entry" width="80%"/>
+                        <m:Label text="{i18n>customername}" required="true"/>
+                        <m:Input id="idcustomername" liveChange="validateName" maxLength="50" value="{formData>/CustomerName}" valueStateText="Invalid entry" width="80%"/>
                         
                         <m:Label text="{i18n>email}" required="true"/>
                         <m:Input id="idCustmailid" liveChange="validateEmail" maxLength="50" value="{formData>/Email}" type="Email" valueStateText="Enter Valid Email" width="80%"/>
                         
-                        <m:Label text="{i18n>address}" required="true"/>
-                        <m:TextArea id="idCustaddress" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Address}" rows="2" valueStateText="Invalid entry" width="80%"/>
                         
                         <m:Label text="{i18n>timeslot}" required="true"/>
                         <m:DateTimePicker id="idtimeslot" liveChange="ValidateCommonFields" value="{formData>/TimeSlot}" valueFormat="yyyy-MM-dd HH:mm"
@@ -34,6 +32,8 @@
                         <m:Label text="{i18n>mobilenumber}" required="true"/>
                         <m:Input id="idmobilenumber" liveChange="validateMobileNo" maxLength="10" value="{formData>/MobileNo}" valueStateText="Enter Atleast 10 digit number" width="80%"/>
                         
+                        <m:Label text="{i18n>address}" required="true"/>
+                        <m:TextArea id="idCustaddress" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Address}" rows="2" valueStateText="Invalid entry" width="80%"/>
                         <m:Label text="{i18n>comments}" required="true"/>
                         <m:TextArea id="idcomment" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Comments}" rows="2" valueStateText="Invalid entry" width="80%"/>
 <m:Label text=""/>

@@ -88,7 +88,7 @@ sap.ui.define(
                 header: "Company info",
                 title: "Kalpavriksha Technologies",
                 titleUrl: "",
-                icon: "./image/logo.jpg.png",
+                icon: "./image/logo.jpg",
                 displayShape: "circle",
                 description: "Cell Phone : +91 9686145959",
                 groups: [

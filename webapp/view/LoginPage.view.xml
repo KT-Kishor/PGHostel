@@ -5,11 +5,11 @@
 	xmlns:form="sap.ui.layout.form" 
     controllerName="sap.kt.com.minihrsolution.controller.LoginPage" 
     displayBlock="true">
-	<Page id="" class="login-background">
+	<Page id="idLoginpage" class="login-background">
 		<headerContent>
 			<!-- Company logo and title -->
-			<Avatar src="./image/logo.jpg" displaySize="XS" press=".onAvatarPressed" tooltip="{i18n>companyLogo}"/>
-			<Title level="H1" text="Kalpavriksha Technology" class="custom-text" wrapping="false"/>
+			<Avatar src="./image/logo.jpg" displaySize="XS" press=".onAvatarPressed" tooltip="Company Logo"/>
+			<Title level="H1" text="{i18n>companyName}" class="custom-text" wrapping="false"/>
 			<ToolbarSpacer/>
 			<!-- Home button -->
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
@@ -43,20 +43,6 @@
 				</form:SimpleForm>
 			</FlexBox>
 		</content>
-		<footer>
-			<Bar>
-				<contentLeft>
-					<HBox class="sapUiTinyMarginTop">
-						<Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
-						<Link
-        class="footer-CoName sapUiTinyMarginBegin"
-        text="Developed by Kalpavriksha Technologies"
-        href="https://www.kalpavrikshatechnologies.com/" 
-        target="_blank"  
-    />
-					</HBox>
-				</contentLeft>
-			</Bar>
-		</footer>
+		
 	</Page>
 </mvc:View>
