@@ -2,7 +2,7 @@
     displayBlock="true"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
-    xmlns:l="sap.ui.layout" xmlns:layout="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt" height="100%">>
+    xmlns:l="sap.ui.layout" xmlns:layout="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt" height="100%">
 
 <tnt:ToolPage id="toolPage">
 <tnt:header>

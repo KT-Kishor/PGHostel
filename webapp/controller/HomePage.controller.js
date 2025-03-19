@@ -34,6 +34,53 @@ sap.ui.define(
           oNavContainer.to(this.byId("idHome"));
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
+          var oCarousel = this.byId("videoCarousel");
+
+          var videoUrls = [
+            "../video/Employee details Part 1.mp4",
+            "../video/Employee offer.mp4",
+            "../video/Quotation.mp4",
+            "../video/Scheme upload.mp4",
+            "../video/Self Service.mp4",
+          ];
+
+          // Add videos dynamically to the carousel
+          videoUrls.forEach(function (url, index) {
+            var oHtmlControl = new sap.ui.core.HTML({
+              content:
+                '<video width="600" height="400" autoplay muted loop>' +
+                '<source src="' +
+                url +
+                '" type="video/mp4">' +
+                "</video>",
+            });
+
+            var oVBox = new sap.m.VBox({
+              alignItems: "Center",
+              items: [
+                new sap.m.Title({
+                  level: "H2",
+                  class: "custom-text2",
+                }),
+                oHtmlControl,
+              ],
+            });
+
+            oVBox.addStyleClass("transparentVBox"); // Apply transparent background class
+            oCarousel.addPage(oVBox);
+          });
+
+          var iCurrentIndex = 0;
+          var aPages = oCarousel.getPages(); // Get all slides
+
+          function autoSlide() {
+            if (aPages.length > 1) {
+              iCurrentIndex = (iCurrentIndex + 1) % aPages.length; // Move to next slide
+              oCarousel.setActivePage(aPages[iCurrentIndex]); // Update active slide
+            }
+          }
+          setInterval(autoSlide, 8000);
+
           var oData = {
             pages: [
               {
@@ -179,7 +226,18 @@ sap.ui.define(
               },
               data: JSON.stringify(payload),
               success: function (response) {
-                console.log("Data saved successfully:", response);
+                var resetData = {
+                  CustomerName: "",
+                  CompanyName: "",
+                  Email: "",
+                  Address: "",
+                  TimeSlot: "",
+                  MobileNo: "",
+                  Comments: "",
+                };
+
+                oModel.setData(resetData);
+                oModel.refresh(true);
                 sap.m.MessageToast.show("Data saved successfully!");
 
                 that.SendEmail(oData.Email, oData.CustomerName);
@@ -201,7 +259,8 @@ sap.ui.define(
           // Prepare email payload
           var emailPayload = {
             to: Email,
-            name: CustomerName,
+            toName: CustomerName,
+            Type: "CustDemo",
           };
           $.ajax({
             url: "https://www.rest.kalpavrikshatechnologies.com/SendEmail",
@@ -215,20 +274,6 @@ sap.ui.define(
             data: JSON.stringify(emailPayload),
             success: function (emailResponse) {
               sap.m.MessageToast.show("Confirmation email sent!");
-
-              // Reset the Form after email is sent
-              var resetData = {
-                CustomerName: "",
-                CompanyName: "",
-                Email: "",
-                Address: "",
-                TimeSlot: "",
-                MobileNo: "",
-                Comments: "",
-              };
-
-              oModel.setData(resetData);
-              oModel.refresh(true); // Refresh UI to reflect cleared fields
             },
             error: function (emailError) {
               sap.m.MessageToast.show("Error sending confirmation email.");
