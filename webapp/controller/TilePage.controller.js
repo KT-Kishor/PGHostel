@@ -65,6 +65,9 @@ sap.ui.define([
             },
             TileV_onpressAddCustomer:function(){
                 this.getRouter().navTo("RouteManageCustomer");
+            },
+            TileV_onpressMSA:function(){
+                this.getRouter().navTo("RouteMSA")
             }
         });
     });

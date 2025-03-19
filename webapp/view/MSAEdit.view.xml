@@ -1,0 +1,185 @@
+<mvc:View
+    controllerName="sap.kt.com.minihrsolution.controller.MSAEdit"
+	xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+	xmlns:f="sap.ui.layout.form"
+	xmlns="sap.uxap"
+	xmlns:core="sap.ui.core"
+	xmlns:m="sap.m">
+	<m:Page id="MsaE_id_Page" title="{i18n>msaDetails}" navButtonPress="MsaE_onBack" showNavButton="true">
+		<ObjectPageLayout id="MsaE_id_ObjectPage"
+            enableLazyLoading="true"
+            useIconTabBar="true"
+            showTitleInHeaderContent="true"
+            class="sapUiSmallmarginResponsive">
+			<headerTitle>
+				<ObjectPageDynamicHeaderTitle>
+					<expandedHeading>
+						<m:Title text="{FilteredMsaModel>/CompanyName}" wrapping="true" width="100%" />
+					</expandedHeading>
+					<expandedContent>
+						<m:Label text="{FilteredMsaModel>/PANCard}" wrapping="true" width="100%" />
+					</expandedContent>
+				</ObjectPageDynamicHeaderTitle>
+			</headerTitle>
+			<sections>
+				<ObjectPageSection titleUppercase="false">
+					<subSections>
+						<ObjectPageSubSection  titleUppercase="false" title="{i18n>basicDetails}">
+							<blocks>
+								<f:SimpleForm id="idSimpleFormToolbar"
+                                    editable="true"
+                                    layout="ResponsiveGridLayout"
+									labelSpanXL="4"
+									labelSpanL="3"
+									labelSpanM="4"
+									labelSpanS="12"
+									adjustLabelSpan="false"
+									emptySpanXL="0"
+									emptySpanL="4"
+									emptySpanM="0"
+									emptySpanS="0"
+									columnsXL="2"
+									columnsL="1"
+									columnsM="1"
+									singleContainerFullSize="false"
+									ariaLabelledBy="Title1">
+									<f:toolbar>
+											<m:Toolbar>												
+												<m:ToolbarSpacer />
+												<m:Button  text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" 
+                    press="MsaE_onEditOrSavePress" />
+					<m:Button text="{i18n>tileFooter}" enabled="{simpleForm>/isEnabled}" press="MsaE_onSendEmailMSA" />
+					<m:Button text="{i18n>tileUnit}" enabled="{simpleForm>/isEnabled}"  press="MsaE_onPressMerge"  />
+											</m:Toolbar>
+										</f:toolbar>
+									<!-- Form content: Labels and Input fields for MSA data -->
+									<f:content>
+										<m:Label text="{i18n>companyName}"/>
+										<m:Input liveChange="onLiveChange"  id="MsaE_id_CompanyName" maxLength="50" value="{FilteredMsaModel>/CompanyName}" editable="{simpleForm>/editable}" required="true"/>
+										
+										<m:Label text="{i18n>companyHeadName}" required="true" />
+										<m:HBox width="100%" justifyContent="Start" alignItems="Center">
+											<m:VBox width="20%">
+												<m:Select selectedKey="{FilteredMsaModel>/Salutation}"
+												items="{Salutation>/salutation}" width="100%" editable="{simpleForm>/editable}">
+														<core:Item key="{Salutation>text}" text="{Salutation>text}" />
+												</m:Select>
+											</m:VBox>
+											<m:VBox width="78%">
+												<m:Input  liveChange="onLiveChange" id="MsaE_id_MsaHead" value="{FilteredMsaModel>/CompanyHeadName}" editable="{simpleForm>/editable}" maxLength="50" required="true" class="sapUiTinyMarginBegin"/>
+											</m:VBox>
+										</m:HBox>
+
+										<m:Label text="{i18n>companyHeadPosition}"/>
+										<m:Input  liveChange="onLiveChange" value="{FilteredMsaModel>/CompanyHeadPosition}" id="MsaE_id_HeadPosition" editable="{simpleForm>/editable}" maxLength="50" required="true"/>
+
+										<m:Label text="{i18n>contractPeriod}" required="true"/>
+										<m:Select items="{contractwarrantyModel>/results}" selectedKey="{FilteredMsaModel>/ContractPeriod}" editable="{simpleForm>/editable}">
+											<core:Item key="{contractwarrantyModel>Months}" text="{contractwarrantyModel>Months}" />
+										</m:Select>
+
+										<m:Label text="{i18n>createMSADate}"/>
+										<m:DatePicker value="{FilteredMsaModel>/CreateMSADate}" editable="{simpleForm>/editable}" id="MsaE_id_CreateMSADate" required="true" displayFormat="dd/MM/yyyy"  valueFormat="dd/MM/yyyy"/>
+
+										<!-- Input for PAN card, includes a liveChange event -->
+										<m:Label text="{i18n>panCard}" required="true"/>
+										<m:Input  id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/PANCard}" editable="{simpleForm>/editable}" liveChange="onLiveChange"/>
+
+										<m:Label text="{i18n>emailId}" required="true"/>
+										<m:TextArea  maxLength="500" id="MsaE_id_MSAEmail" value="{FilteredMsaModel>/MSAEmail}" editable="{simpleForm>/editable}" change="onchangeEmail" />																																							
+
+										<m:Label text="{i18n>Address}"/>
+										<m:TextArea  id="MsaE_id_MsaAddress" value="{FilteredMsaModel>/Address}" maxLength="120" editable="{simpleForm>/editable}" liveChange="onLiveChangeAddress" required="true"/>
+
+										<m:Label text="{i18n>paymentterms}" required="true"/>
+										<m:Select items="{ContractpaymentModel>/results}" selectedKey="{FilteredMsaModel>/PaymentTerms}" editable="{simpleForm>/editable}">
+											<core:Item key="{ContractpaymentModel>Days}" text="{ContractpaymentModel>Days}" />
+										</m:Select>																				
+
+									</f:content>
+								</f:SimpleForm>
+							</blocks>
+						</ObjectPageSubSection>
+						<ObjectPageSubSection title="{i18n>sowDetails}" titleUppercase="false">
+							<blocks>
+								<m:Table  >
+								<m:headerToolbar>
+										<m:OverflowToolbar>
+									 <m:Title id="" text="{i18n>sowTitle}"/>
+
+											<m:ToolbarSpacer />											
+											<m:Button text="{i18n>headerCompanyInvoice}" press="MsaE_GoToInvoice"/>
+											<m:ToolbarSeparator />
+											 <m:ComboBox id="MsaE_id_SowStatus" items="{SowStatusModel>/SowStatus}" width="10%" change="MsaE_onChangeSowStatus">
+												<core:Item key="{SowStatusModel>ID}" text="{SowStatusModel>Status}" />
+											</m:ComboBox>
+											<m:ToolbarSeparator />
+											<m:Button text="{i18n>addSOW}" press="MsaE_onPressCreateSow"/>
+											<m:ToolbarSeparator />
+											<m:Button text="{i18n>active}" id="MsaE_id_ActiveBtn" press="MsaE_onPressSOWActive"/>
+											<m:ToolbarSeparator />
+											<m:Button text="{i18n>inactive}" id="Msa_id_InactiveBtn" press="MsaE_onPressSOWActive"/>
+											<m:ToolbarSeparator />
+											<m:Button enabled="true" id="MsaE_id_RelesedBtn" press="MsaE_onPressRelesedSow" text="{i18n>ReleaseBtn}" />
+											<m:ToolbarSeparator />
+											<m:Button text="{i18n>ExpendBtn}" id="MsaE_id_ExpendBtn" press="MasE_onPressExpendSow" enabled="false"/>											
+											<m:ToolbarSeparator />
+											<m:Button id="MsaE_id_SowEmailBut" text="{i18n>tileFooter}" enabled="false" press="MsaE_onPressSendEmailSOW"/>
+											<m:ToolbarSeparator />
+											<m:Button id="MsaE_id_SowMergeBut" text="{i18n>GeneratePDF}" enabled="false" press="MsaE_onPressMergeSow"/>
+											<m:ToolbarSeparator />
+											<m:Button icon="sap-icon://edit" enabled="false" id="MsaE_id_UpdateSow" press="MsaE_onPressUpdateSOW"/>
+										</m:OverflowToolbar>
+										</m:headerToolbar>
+
+										<m:columns>
+					<m:Column demandPopin="true">
+						<m:Text text="{i18n>sowId}"/>
+					</m:Column>
+					<m:Column demandPopin="true">
+						<m:Text text="{i18n>consultantName}" />
+					</m:Column>
+					
+					<m:Column minScreenWidth="Tablet" demandPopin="true">
+						<m:Text text="{i18n>assignmentDes}" />
+					</m:Column>
+					<m:Column minScreenWidth="Desktop" demandPopin="true">
+						<m:Text text="{i18n>startDate}" />
+					</m:Column>
+					<m:Column minScreenWidth="Tablet" demandPopin="true">
+						<m:Text text="{i18n>endDate}" />
+					</m:Column>
+					<m:Column minScreenWidth="Tablet" demandPopin="true">
+						<m:Text text="{i18n>designation}" />
+					</m:Column>
+					<m:Column minScreenWidth="Tablet" demandPopin="true">
+						<m:Text text="{i18n>rate}" />
+					</m:Column>
+					<m:Column minScreenWidth="Tablet" demandPopin="true">
+						<m:Text text="{i18n>status}" />
+					</m:Column>
+				</m:columns>
+				<m:items>
+					<m:ColumnListItem >
+						<m:cells>
+						    <m:Text text="{}"/>							
+							<m:Text text="{}"/>
+							<m:Text text="{}"/>
+							<m:Text text="{}"/>
+							<m:Text text="{}"/>
+							<m:Text text="{}"/>
+							<m:Text text="{}"/>
+
+						</m:cells>
+					</m:ColumnListItem>
+				</m:items>
+										</m:Table>
+									
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+			</sections>
+		</ObjectPageLayout>
+	</m:Page>
+</mvc:View>

@@ -1,0 +1,128 @@
+<mvc:View     controllerName="sap.kt.com.minihrsolution.controller.MSADetails"
+	xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"	>
+	<Page id="MsaD_id_Page" title="{i18n>generateMsa}" navButtonPress="MsaD_onBack" showNavButton="true">
+		<content>
+			<Wizard id="MsaD_id_Wizard"	
+					showNextButton="true" finishButtonText="{i18n>submit}"
+                    class="sapUiResponsivePadding--header sapUiResponsivePadding--content">
+				<WizardStep id="MsaD_id_WizardO"
+                            nextStep="MsaD_id_WizardStepT"
+							complete="MsaD_onComplete"
+                            activate="optionalStepActivation"
+                            title="{i18n>msaDetails}"							
+                            validated="true">
+					<f:SimpleForm 
+            id="idSimpleFormToolbar1"
+            editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="3"
+			labelSpanM="4"
+			labelSpanS="12"
+			adjustLabelSpan="false"
+			emptySpanXL="0"
+			emptySpanL="4"
+			emptySpanM="0"
+			emptySpanS="0"
+			columnsXL="2"
+			columnsL="1"
+			columnsM="1"
+			singleContainerFullSize="false"
+			ariaLabelledBy="Title1">
+						<f:content>
+							<Label text="{i18n>companyName}" required="true" />
+							<Input value="{msaModelWizart>/CompanyName}" maxLength="50" placeholder="{i18n>placeCompany}" id="MsaD_id_CompanyName" liveChange="MsaD_ValidateCommonFields" />
+
+							<Label text="{i18n>companyHeadName}" required="true" />
+							<HBox width="100%" justifyContent="Start" alignItems="Center">
+								<VBox width="20%">
+									<Select id="MsaD_id_HeadSal" selectedKey="{msaModelWizart>/Salutation}"
+                                    items="{Salutation>/salutation}" width="100%">
+                                            <core:Item key="{Salutation>text}" text="{Salutation>text}" />
+                                    </Select>
+								</VBox>
+								<VBox width="78%">
+									<Input value="{msaModelWizart>/CompanyHeadName}" maxLength="50" class="sapUiTinyMarginBegin"
+										placeholder="{i18n>placeHeadName}" id="MsaD_id_HeadName" width="100%" liveChange="MsaD_validateName" />
+								</VBox>
+							</HBox>
+
+							<Label text="{i18n>companyHeadPosition}" required="true" />
+							<Input value="{msaModelWizart>/CompanyHeadPosition}" placeholder="{i18n>placeHedaPosition}" maxLength="50" id="MsaD_id_HeadPosition" liveChange="MsaD_ValidateCommonFields" valueState="None" />
+
+							<Label text="{i18n>contractPeriod}" required="true" />
+							<Select id="MsaD_id_ContractPeriod" items="{contractwarrantyModel>/results}" selectedKey="{msaModelWizart>/ContractPeriod}">
+								<core:Item key="{contractwarrantyModel>Months}" text="{contractwarrantyModel>Months}" />
+							</Select>
+
+							<Label text="{i18n>createMSADate}" required="true" />
+							<DatePicker id="MsaD_id_CreateMSADate" value="" change="MsaD_validateDate" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" />
+
+							<Label text="{i18n>panCardReg}" required="true" />
+							<Input  value="{msaModelWizart>/PANCard}"  placeholder="{i18n>placePanCardReg}" id="MsaD_id_PanCard" liveChange="MsaD_ValidateCommonFields"  maxLength="50" />
+
+							<Label text="{i18n>emailId}" required="true" />
+							<TextArea  value="{msaModelWizart>/MSAEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" change="MSAEmail" />
+
+							<Label text="{i18n>address}" required="true" />
+							<TextArea value="{msaModelWizart>/Address}" placeholder="{i18n>placeAddress}" id="MsaD_id_Address"  liveChange="MsaD_ValidateCommonFields"  maxLength="120"/>
+							
+							<Label text="{i18n>paymentterms}" required="true"></Label>
+							<Select  items="{ContractpaymentModel>/results}" selectedKey="{msaModelWizart>/PaymentTerms}" id="MsaD_id_PaymentTerms" >
+								<core:Item key="{ContractpaymentModel>Days}" text="{ContractpaymentModel>Days}" />
+							</Select>
+						</f:content>
+					</f:SimpleForm>
+				</WizardStep>
+				<WizardStep 
+                            nextStep="idWizardStep3"
+							complete="MsaD_reviewSubmit"
+                            activate="optionalStepActivation"
+                            title="{i18n>review}"
+                            validated="true">
+					<f:SimpleForm 
+                                editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="3"
+			labelSpanM="4"
+			labelSpanS="12"
+			adjustLabelSpan="false"
+			emptySpanXL="0"
+			emptySpanL="4"
+			emptySpanM="0"
+			emptySpanS="0"
+			columnsXL="2"
+			columnsL="1"
+			columnsM="1"
+			singleContainerFullSize="false"
+			ariaLabelledBy="Title1">
+						<f:content>
+							<Label text="{i18n>companyName}" />
+							<Text text="{msaModelWizart>/CompanyName}" />
+							<Label text="{i18n>companyHeadName}" />
+							<Text text="{= ${msaModelWizart>/Salutation} + ' ' + ${msaModelWizart>/CompanyHeadName} }" />
+							<Label text="{i18n>companyHeadPosition}" />
+							<Text text="{msaModelWizart>/CompanyHeadPosition}" />
+							<Label text="{i18n>contractPeriod}" />
+							<Text text="{msaModelWizart>/ContractPeriod}" />
+							<Label text="{i18n>createMSADate}" />
+							<Text text="{path :'msaModelWizart>/CreateMSADate','type': 'sap.ui.model.type.Date', 'formatOptions': {'pattern': 'dd/M/yyyy'}}" />
+							<Label text="{i18n>panCardReg}" />
+							<Text text="{msaModelWizart>/PANCard}" />
+							<Label text="{i18n>emailId}" />
+							<Text text="{msaModelWizart>/MSAEmail}" />
+							<Label text="{i18n>address}" />
+							<Text text="{msaModelWizart>/Address}" />
+							<Label text="{i18n>paymentterms}" />
+							<Text text="{msaModelWizart>/PaymentTerms}" />
+						</f:content>
+					</f:SimpleForm>
+				</WizardStep>
+			</Wizard>
+		</content>
+	</Page>
+</mvc:View>
