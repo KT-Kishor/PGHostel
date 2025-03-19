@@ -95,7 +95,6 @@ sap.ui.define([
 
     _commonDesignation: function () {
       sap.ui.core.BusyIndicator.show(0);
-      var that = this;
       try {
         $.ajax({
           url: "https://www.rest.kalpavrikshatechnologies.com/Designation",
@@ -108,8 +107,8 @@ sap.ui.define([
           success: function (data) {
             sap.ui.core.BusyIndicator.hide();
             if(data){
-              var oDesignationModel = new sap.ui.model.json.JSONModel(data);
-              that.getView().setModel(oDesignationModel, "DesignationModel");
+              var oDesignationModel = new JSONModel(data);
+              this.getOwnerComponent().setModel(oDesignationModel, "DesignationModel");
             }
           },
           error: function (err) {
@@ -125,7 +124,6 @@ sap.ui.define([
 
     _commonBaseLocation: function () {
       sap.ui.core.BusyIndicator.show(0);
-      var that = this;
       try {
         $.ajax({
           url: "https://www.rest.kalpavrikshatechnologies.com/BaseLocation",
@@ -138,8 +136,8 @@ sap.ui.define([
           success: function (data) {
             sap.ui.core.BusyIndicator.hide();
             if(data){
-              var oBaseLocationModel = new sap.ui.model.json.JSONModel(data);
-              that.getView().setModel(oBaseLocationModel, "BaseLocationModel");
+              var oBaseLocationModel = new JSONModel(data);
+              this.getOwnerComponent().setModel(oBaseLocationModel, "BaseLocationModel");
             }
           },
           error: function (err) {
@@ -155,7 +153,6 @@ sap.ui.define([
 
     _commonDepartment: function () {
       sap.ui.core.BusyIndicator.show(0);
-      var that = this;
       try {
         $.ajax({
           url: "https://www.rest.kalpavrikshatechnologies.com/Department",
@@ -167,8 +164,8 @@ sap.ui.define([
           },
           success: function (data) {
             if (data) { 
-              var oDepartmentModel = new sap.ui.model.json.JSONModel(data);
-              that.getView().setModel(oDepartmentModel, "DepartmentModel");
+              var oDepartmentModel = new JSONModel(data);
+              this.getOwnerComponent().setModel(oDepartmentModel, "DepartmentModel");
           }
           },
           error: function (err) {
@@ -184,7 +181,6 @@ sap.ui.define([
 
     _commonCompanyInvoiceSAC: function () {
       sap.ui.core.BusyIndicator.show(0);
-      var that = this;
       try {
         $.ajax({
           url: "https://www.rest.kalpavrikshatechnologies.com/CompanyInvoiceSAC",
@@ -196,8 +192,8 @@ sap.ui.define([
           },
           success: function (data) {
             if (data) { 
-              var oCompanyInvoiceSACModel = new sap.ui.model.json.JSONModel(data);
-              that.getView().setModel(oCompanyInvoiceSACModel, "CompanyInvoiceSACModel");
+              var oCompanyInvoiceSACModel = new JSONModel(data);
+              this.getOwnerComponent().setModel(oCompanyInvoiceSACModel, "CompanyInvoiceSACModel");
           }
           },
           error: function (err) {
@@ -213,7 +209,6 @@ sap.ui.define([
 
     _commonCountry: function () {
       sap.ui.core.BusyIndicator.show(0);
-      var that = this;
       try {
         $.ajax({
           url: "https://www.rest.kalpavrikshatechnologies.com/Country",
@@ -225,8 +220,92 @@ sap.ui.define([
           },
           success: function (data) {
             if (data) { 
-              var oCountryModel = new sap.ui.model.json.JSONModel(data);
-              that.getView().setModel(oCountryModel, "CountryModel");
+              var oCountryModel = new JSONModel(data);
+              this.getOwnerComponent().setModel(oCountryModel, "CountryModel");
+          }
+          },
+          error: function (err) {
+            sap.ui.core.BusyIndicator.hide();
+            sap.m.MessageToast.show(err.responseJSON.message);
+          }.bind(this),
+        });
+      }catch(error) {
+        sap.ui.core.BusyIndicator.hide();
+        sap.m.MessageToast.show("Technical error please connect to administrator");
+      }
+    },
+
+    _commonCurrency: function () {
+      sap.ui.core.BusyIndicator.show(0);
+      try {
+        $.ajax({
+          url: "https://www.rest.kalpavrikshatechnologies.com/Currency",
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+          },
+          success: function (data) {
+            if (data) { 
+              var oCurrencyModel = new JSONModel(data);
+              this.getOwnerComponent().setModel(oCurrencyModel, "CurrencyModel");
+          }
+          },
+          error: function (err) {
+            sap.ui.core.BusyIndicator.hide();
+            sap.m.MessageToast.show(err.responseJSON.message);
+          }.bind(this),
+        });
+      }catch(error) {
+        sap.ui.core.BusyIndicator.hide();
+        sap.m.MessageToast.show("Technical error please connect to administrator");
+      }
+    },
+
+    _commonPaymentTerms: function () {
+      sap.ui.core.BusyIndicator.show(0);
+      try {
+        $.ajax({
+          url: "https://www.rest.kalpavrikshatechnologies.com/PaymentTerms",
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+          },
+          success: function (data) {
+            if (data) { 
+              var oPaymentTermsModel = new JSONModel(data);
+              this.getOwnerComponent().setModel(oPaymentTermsModel, "PaymentTermsModel");
+          }
+          },
+          error: function (err) {
+            sap.ui.core.BusyIndicator.hide();
+            sap.m.MessageToast.show(err.responseJSON.message);
+          }.bind(this),
+        });
+      }catch(error) {
+        sap.ui.core.BusyIndicator.hide();
+        sap.m.MessageToast.show("Technical error please connect to administrator");
+      }
+    },
+
+    _commonTaskType: function () {
+      sap.ui.core.BusyIndicator.show(0);
+      try {
+        $.ajax({
+          url: "https://www.rest.kalpavrikshatechnologies.com/TaskType",
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+          },
+          success: function (data) {
+            if (data) { 
+              var oTaskTypeModel = new JSONModel(data);
+              this.getOwnerComponent().setModel(oTaskTypeModel, "TaskTypeModel");
           }
           },
           error: function (err) {
