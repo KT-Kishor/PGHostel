@@ -1,0 +1,67 @@
+<core:FragmentDefinition
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core" >
+	<Dialog 
+        title="{i18n>custFragTitle}">
+		<f:SimpleForm 
+            id="MC_id_SimpleFormAddToolbar"
+            editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="3"
+			labelSpanM="4"
+			labelSpanS="12"
+			emptySpanXL="0"
+			emptySpanL="4"
+			emptySpanM="0"
+			emptySpanS="0"
+			columnsXL="2"
+			columnsL="1"
+			columnsM="1">
+			<f:content>
+				<Label text="{i18n>companyName}"  />
+				<Input id="MC_id_CustCompanyName" value="{CreateCustomerModel>/CompanyName}" required="true" maxLength="50" placeholder="{i18n>companyNamePlace}" liveChange="onliveChangeCompanyName" valueState="None"/>
+				<Label text="{i18n>custName}" required="true"/>
+				<HBox width="100%" justifyContent="Start" alignItems="Center">
+					<VBox width="22%">
+						<Select id="MC_id_SelectReportingManagerSalutation" selectedKey="{CreateCustomerModel>/Salutation}"
+                                   items="{NameSalutation>/items}" width="100%">
+							<core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}" />
+						</Select>
+					</VBox>
+					<VBox width="78%">
+						<Input id="MC_id_CustCustomerName" value="{CreateCustomerModel>/Name}" maxLength="20" placeholder="{i18n>placeholderCustName}" liveChange="onLiveCustName" valueState="None" />
+					</VBox>
+				</HBox>
+				<Label text="{i18n>panCard}" />
+				<Input value="{CreateCustomerModel>/PAN}" placeholder="{i18n>panCardPlaceholder}" maxLength="50" id="MC_id_CustomPan" valueState="None" />
+				<Label text="{i18n>custGst}" />
+				<Input value="{CreateCustomerModel>/GST}" maxLength="15" placeholder="{i18n>placeholderGST}" id="MC_id_CustomGst"  liveChange="onLiveChange" valueState="None" />
+				<Label text="{i18n>type}" labelFor="groupC" />
+				<RadioButtonGroup visible="{visiblePlay>/IDInput}" select="onRadioButtonChange"  id="MC_id_groupCustGst" columns="2" selectedIndex="{visiblePlay>/selectedIndex}">
+					<RadioButton text="{i18n>custCgst}" />
+					<RadioButton text="{i18n>custIgst}" />
+				</RadioButtonGroup>
+				<Label visible="{visiblePlay>/IDInput}" text="{i18n>custValue}" />
+				<Input visible="{visiblePlay>/IDInput}" value="{CreateCustomerModel>/Value}" maxLength="5" />
+				<Label text="{i18n>custMailId}" required="true" />
+				<Input value="{CreateCustomerModel>/MailID}" placeholder="{i18n>emailSetValueText}" id="MC_id_CustMail"  maxLength="190" liveChange="onLiveChangeEmail" valueState="None" />
+				<Label text="{i18n>customerEmail}" required="true"/>
+				<Input value="{CreateCustomerModel>/CustomerEmail}" id="MC_id_FinanceEmail" placeholder="{i18n>placeholderFinanceEmail}" maxLength="190" liveChange="onLiveChangeFinanceEmail" valueState="None" />
+				<Label text="{i18n>custMobileNo}"/>
+				<Input value="{CreateCustomerModel>/MobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="10" change="validateMobileNo" />
+				<Label text="{i18n>custLut}" />
+				<Input value="{CreateCustomerModel>/LUT}" maxLength="20" placeholder="{i18n>placeholderLUT}"  />
+				<Label text="{i18n>cusdAddress}" required="true" />
+				<TextArea id="MC_id_CustAddress" value="{CreateCustomerModel>/Address}" placeholder="{i18n>addressPlaceholder}" maxLength="200" liveChange="onLiveChangeAddress" valueState="None" ></TextArea>
+			</f:content>
+		</f:SimpleForm>
+		<HBox justifyContent="End" >
+			<Button text="{i18n>save}" type="Emphasized" press="MC_onPressSave" class="submit" visible="{visiblePlay>/save}"></Button>
+			<Button text="{i18n>submit}" type="Emphasized" press="MC_onPressSubmit" class="submit"  visible="{visiblePlay>/submit}"></Button>
+			<Button text="{i18n>close}" press="MC_onPressClose" class="sendMail"></Button>
+		</HBox>
+	</Dialog>
+</core:FragmentDefinition>

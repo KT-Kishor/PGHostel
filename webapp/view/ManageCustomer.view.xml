@@ -10,17 +10,18 @@
 		<content>
 			<fb:FilterBar id="MC_id_CompanyFilter" persistencyKey="myPersKey" useToolbar="false" clear="onClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" showFilterConfiguration="false">
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="CompanyName" label="{i18n>companyName}" groupName="Group1" visibleInFilterBar="true">
-						<fb:control>
-							<Input id="IC_id_CompanyName" value="{filters>/CompanyName}" showClearIcon="true" />
-						</fb:control>
-					</fb:FilterGroupItem>
-				</fb:filterGroupItems>
+				<fb:FilterGroupItem name="CompanyName" label="{i18n>companyName}" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox id="MC_id_CompanyName" selectedKey="{filters>/CompanyName}" showClearIcon="true">
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+			</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="idCustTable" mode="SingleSelectLeft" selectionChange="onSelectionCustmer">
 				<headerToolbar>
 					<OverflowToolbar>
-						<Title id="MC_id_Title" text="{i18n>manageCustomer}"/>
+						<Title id="MC_id_Title" text="{i18n>custDetails}"/>
 						<ToolbarSpacer/>
 						<Button icon="sap-icon://add-employee" tooltip="{i18n>custAddButToolTip}" press="MC_onAddCustomerDetails" />
 						<ToolbarSeparator />
@@ -31,25 +32,25 @@
 				</headerToolbar>
 				<columns>
 					<Column>
-						<Text text="{i18n>CompanyName}" />
+						<Text text="{i18n>companyName}" />
 					</Column>
 					<Column>
-						<Text text="{i18n>Name}" />
+						<Text text="{i18n>name}" />
 					</Column>
 					<Column>
-						<Text text="{i18n>GST}" />
+						<Text text="{i18n>gstNo}" />
 					</Column>
 					<Column>
-						<Text text="{i18n>Type}" />
+						<Text text="{i18n>type}" />
 					</Column>
 					<Column>
-						<Text text="{i18n>Value}" />
+						<Text text="{i18n>percentage}" />
 					</Column>
 					<Column>
-						<Text text="{i18n>MailID}" />
+						<Text text="{i18n>emailId}" />
 					</Column>
 					<Column>
-						<Text text="{i18n>MobileNo}" />
+						<Text text="{i18n>mobileNo}" />
 					</Column>
 				</columns>
 				<items>
