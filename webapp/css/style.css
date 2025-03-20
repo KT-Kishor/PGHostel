@@ -194,6 +194,9 @@
 .Products_list{
   border-radius: 0.60rem;
 }
+.allvideo{
+  border-radius: 0.80rem !important;
+}
 .demo-form{
   background-image: url('../image/grow.jpg');
   background-size: cover; 

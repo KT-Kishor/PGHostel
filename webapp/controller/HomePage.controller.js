@@ -39,7 +39,7 @@ sap.ui.define(
           var videoUrls = [
             "../video/Employee offer.mp4",
             "../video/Self Service.mp4",
-            "../video/Employee details Part 1.mp4", 
+            "../video/Employee details Part 1.mp4",
             "../video/Quotation.mp4",
             "../video/Scheme upload.mp4",
           ];
@@ -79,7 +79,7 @@ sap.ui.define(
               oCarousel.setActivePage(aPages[iCurrentIndex]); // Update active slide
             }
           }
-          setInterval(autoSlide, 8000);
+          setInterval(autoSlide, 30000);
 
           var oData = {
             pages: [
