@@ -95,13 +95,13 @@ sap.ui.define([
     },
 
     _fetchCommonData: function (entityName, modelName, filter = "") {
-      let url =  this.getView().getModel("LoginModel").getData().url + entityName;
+      let url =  this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;
       sap.ui.core.BusyIndicator.show(0);
       try {
         $.ajax({
           url: url,
           method: "GET",
-          headers:this.getView().getModel("LoginModel").getData().headers,
+          headers:this.getOwnerComponent().getModel("LoginModel").getData().headers,
           data:filter,
           success: function (data) {
             sap.ui.core.BusyIndicator.hide();

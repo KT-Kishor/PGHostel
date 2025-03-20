@@ -1,5 +1,5 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
+    "./BaseController",
     "../utils/validation",
     "sap/m/MessageToast",
     "../utils/EmployeeOfferJsPDF"
@@ -8,6 +8,7 @@ sap.ui.define([
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.QuotationForm", {
         onInit() {
+            this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
             this.getOwnerComponent().getRouter().getRoute("RouteQuotationForm").attachMatched(this._onRouteMatched, this);
         },
 
@@ -90,6 +91,8 @@ sap.ui.define([
         },
 
         QF_onDownloadPDF: function () {
+            var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getData();
+            console.log(oCompanyDetailsModel);
             var oModel = this.getView().getModel("Payroll").getData();
             jsPDF._GenerateEmployeeOffer(oModel);
         }
