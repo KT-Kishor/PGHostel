@@ -134,6 +134,14 @@
             }
         },
         "resources": {
+            "js": [
+                {
+                    "uri": "./libs/jspdf.umd.min.js"
+                },
+                {
+                    "uri": "./libs/jspdf.plugin.autotable.min.js"
+                }
+            ],
             "css": [
                 {
                     "uri": "css/style.css"

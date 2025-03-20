@@ -1,5 +1,11 @@
 {
     "RowCount": 0,
     "ShowOnPayroll": false,
-    "ShowOnGenerate": false
+    "ShowOnGenerate": false,
+    "EmpName": "Shivang S Patil",
+    "EmpRole": "Junior Software Engineer",
+    "EmpAddress": "#102, SHIVAM, Yeshwanth Nagar, Navaldi Layout, Udnoor Road, Kalaburagi, Karnataka, IN",
+    "EmpPinCode": "585102",
+    "CreateDate": "19/3/2025",
+    "EmpCTC": "2,40,000"
 }

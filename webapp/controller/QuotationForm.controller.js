@@ -1,12 +1,12 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "../utils/validation",
-    "sap/m/MessageToast"
-], (BaseController, utils, MessageToast) => {
+    "sap/m/MessageToast",
+    "../utils/EmployeeOfferJsPDF"
+], (BaseController, utils, MessageToast, jsPDF) => {
     "use strict";
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.QuotationForm", {
-        utils: utils,
         onInit() {
             this.getOwnerComponent().getRouter().getRoute("RouteQuotationForm").attachMatched(this._onRouteMatched, this);
         },
@@ -87,6 +87,11 @@ sap.ui.define([
             } catch (error) {
                 MessageToast.show("Technical error occurred");
             }
+        },
+
+        QF_onDownloadPDF: function () {
+            var oModel = this.getView().getModel("Payroll").getData();
+            jsPDF._GenerateEmployeeOffer(oModel);
         }
         
     });
