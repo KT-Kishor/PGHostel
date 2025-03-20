@@ -22,11 +22,11 @@
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
 			<sections>
-				<ObjectPageSection titleUppercase="false">
+				<ObjectPageSection>
 					<subSections>
-						<ObjectPageSubSection  titleUppercase="false" title="{i18n>basicDetails}">
+						<ObjectPageSubSection title="{i18n>basicDetails}">
 							<blocks>
-								<f:SimpleForm id="idSimpleFormToolbar"
+								<f:SimpleForm 
                                     editable="true"
                                     layout="ResponsiveGridLayout"
 									labelSpanXL="4"
@@ -54,8 +54,8 @@
 										</f:toolbar>
 									<!-- Form content: Labels and Input fields for MSA data -->
 									<f:content>
-										<m:Label text="{i18n>companyName}"/>
-										<m:Input liveChange="onLiveChange"  id="MsaE_id_CompanyName" maxLength="50" value="{FilteredMsaModel>/CompanyName}" editable="{simpleForm>/editable}" required="true"/>
+										<m:Label text="{i18n>companyName}" required="true"/>
+										<m:Input liveChange="onLiveChange"  id="MsaE_id_CompanyName" maxLength="50" value="{FilteredMsaModel>/CompanyName}" editable="{simpleForm>/editable}" />
 										
 										<m:Label text="{i18n>companyHeadName}" required="true" />
 										<m:HBox width="100%" justifyContent="Start" alignItems="Center">
@@ -66,20 +66,20 @@
 												</m:Select>
 											</m:VBox>
 											<m:VBox width="78%">
-												<m:Input  liveChange="onLiveChange" id="MsaE_id_MsaHead" value="{FilteredMsaModel>/CompanyHeadName}" editable="{simpleForm>/editable}" maxLength="50" required="true" class="sapUiTinyMarginBegin"/>
+												<m:Input  liveChange="onLiveChange" id="MsaE_id_MsaHead" value="{FilteredMsaModel>/CompanyHeadName}" editable="{simpleForm>/editable}" maxLength="50" class="sapUiTinyMarginBegin"/>
 											</m:VBox>
 										</m:HBox>
 
-										<m:Label text="{i18n>companyHeadPosition}"/>
-										<m:Input  liveChange="onLiveChange" value="{FilteredMsaModel>/CompanyHeadPosition}" id="MsaE_id_HeadPosition" editable="{simpleForm>/editable}" maxLength="50" required="true"/>
+										<m:Label text="{i18n>companyHeadPosition}" required="true"/>
+										<m:Input  liveChange="onLiveChange" value="{FilteredMsaModel>/CompanyHeadPosition}" id="MsaE_id_HeadPosition" editable="{simpleForm>/editable}" maxLength="50" />
 
 										<m:Label text="{i18n>contractPeriod}" required="true"/>
 										<m:Select items="{contractwarrantyModel>/results}" selectedKey="{FilteredMsaModel>/ContractPeriod}" editable="{simpleForm>/editable}">
 											<core:Item key="{contractwarrantyModel>Months}" text="{contractwarrantyModel>Months}" />
 										</m:Select>
 
-										<m:Label text="{i18n>createMSADate}"/>
-										<m:DatePicker value="{FilteredMsaModel>/CreateMSADate}" editable="{simpleForm>/editable}" id="MsaE_id_CreateMSADate" required="true" displayFormat="dd/MM/yyyy"  valueFormat="dd/MM/yyyy"/>
+										<m:Label text="{i18n>createMSADate}" required="true"/>
+										<m:DatePicker value="{FilteredMsaModel>/CreateMSADate}" editable="{simpleForm>/editable}" id="MsaE_id_CreateMSADate" displayFormat="dd/MM/yyyy"  valueFormat="dd/MM/yyyy"/>
 
 										<!-- Input for PAN card, includes a liveChange event -->
 										<m:Label text="{i18n>panCard}" required="true"/>
@@ -88,8 +88,8 @@
 										<m:Label text="{i18n>emailId}" required="true"/>
 										<m:TextArea  maxLength="500" id="MsaE_id_MSAEmail" value="{FilteredMsaModel>/MSAEmail}" editable="{simpleForm>/editable}" change="onchangeEmail" />																																							
 
-										<m:Label text="{i18n>Address}"/>
-										<m:TextArea  id="MsaE_id_MsaAddress" value="{FilteredMsaModel>/Address}" maxLength="120" editable="{simpleForm>/editable}" liveChange="onLiveChangeAddress" required="true"/>
+										<m:Label text="{i18n>Address}" required="true"/>
+										<m:TextArea  id="MsaE_id_MsaAddress" value="{FilteredMsaModel>/Address}" maxLength="120" editable="{simpleForm>/editable}" liveChange="onLiveChangeAddress"/>
 
 										<m:Label text="{i18n>paymentterms}" required="true"/>
 										<m:Select items="{ContractpaymentModel>/results}" selectedKey="{FilteredMsaModel>/PaymentTerms}" editable="{simpleForm>/editable}">
@@ -100,12 +100,12 @@
 								</f:SimpleForm>
 							</blocks>
 						</ObjectPageSubSection>
-						<ObjectPageSubSection title="{i18n>sowDetails}" titleUppercase="false">
+						<ObjectPageSubSection title="{i18n>sowDetails}">
 							<blocks>
 								<m:Table  >
 								<m:headerToolbar>
 										<m:OverflowToolbar>
-									 <m:Title id="" text="{i18n>sowTitle}"/>
+									 <m:Title text="{i18n>sowTitle}"/>
 
 											<m:ToolbarSpacer />											
 											<m:Button text="{i18n>headerCompanyInvoice}" press="MsaE_GoToInvoice"/>

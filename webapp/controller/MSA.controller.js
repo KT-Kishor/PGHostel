@@ -15,10 +15,10 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");
             },
             onPressback: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+                this.getRouter().navTo("RouteTilePage");
             },
             onLogout: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+                this.getRouter().navTo("RouteLoginPage");
             },
             MSA_AddmsaDetails:function(){
                 this.getRouter().navTo("RouteMSADetails");

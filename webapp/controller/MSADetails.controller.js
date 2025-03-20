@@ -15,7 +15,7 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             },
             MsaD_onBack: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteMSA");
+                this.getRouter().navTo("RouteMSA");
             },
             MsaD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);

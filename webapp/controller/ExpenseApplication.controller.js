@@ -38,6 +38,7 @@ sap.ui.define([
 					status: "Pending"
 				  }
 				]
+				
 			  };
 		
 			var View = new JSONModel({SaveBtn:false, SubmitBtn:false});
@@ -46,6 +47,14 @@ sap.ui.define([
 
 			  var oModel = new JSONModel(oData);
 			  this.getOwnerComponent().setModel(oModel,"ExpenseModel");
+			  this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
+
+		},
+		onPressback: function () {
+			this.getRouter().navTo("RouteTilePage");
+		},
+		onLogout: function () {
+			this.getRouter().navTo("RouteLoginPage");
 		},
 
 		onPressAddExpense:function(expense) {

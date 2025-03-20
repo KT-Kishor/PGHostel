@@ -14,34 +14,33 @@
                             validated="true" complete="onComplete">
 					<f:SimpleForm  editable="true" layout="ColumnLayout" columnsM="1" columnsL="2" columnsXL="2">
 						<f:content>
-							<Label text="{i18n>contractNo}" required="true"/>
+							<Label text="{i18n>contractNo}"/>
 							<Input  id="CD_id_ContractNo" value="{ContractModelWizart>/ContractNo}" editable="false"/>
 							<Label text="{i18n>agreementDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="CD_validateDate"  valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>consultantName}" required="true" />
-							<Select id="" selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}" width="100%">
+							<Select id="" selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}">
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
-							<Input value="{ContractModelWizart>/ConsultantName}" type="Text" 
-								placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="CD_validateName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
+							<Input value="{ContractModelWizart>/ConsultantName}" 					placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="CD_validateName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
 							<Label text="{i18n>address}" required="true"/>
 							<TextArea value="{ContractModelWizart>/ConsultantAddress}"  maxLength="120" rows="3" id="CD_id_Address" placeholder="{i18n>placeAddress}" change="onAddress" valueStateText="{i18n>addressValueState}"
 									liveChange="CD_ValidateCommonFields"/>
 							<Label text="{i18n>consultantEmail}" required="true"/>
-							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="100" placeholder="{i18n>placeConsultantEmail}" type="Email" id="CD_id_Email"  liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}"/>
+							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="50" placeholder="{i18n>placeConsultantEmail}" id="CD_id_Email"  liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>role}" required="true"/>
 							<Input value="{ContractModelWizart>/Role}"  placeholder="{i18n>placeRole}"
-								id="CD_id_Role" change="onRole" liveChange="CD_ValidateCommonFields" type="Text" maxLength="50" valueStateText="{i18n>roleValueState}"/>
+								id="CD_id_Role" liveChange="CD_ValidateCommonFields" maxLength="50" valueStateText="{i18n>roleValueState}"/>
 							<Label text="{i18n>rate}" required="true" />
 							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="0" select="RadioButtonSelect" >
-								<RadioButton id="RB3-1" text="{i18n>rateHour}" />
-								<RadioButton id="RB3-2" text="{i18n>rateDaily}" />
-								<RadioButton id="RB3-3" text="{i18n>rateMonthly}" />
+								<RadioButton  text="{i18n>rateHour}" />
+								<RadioButton text="{i18n>rateDaily}" />
+								<RadioButton text="{i18n>rateMonthly}" />
 							</RadioButtonGroup>
 							<Label text="{i18n>amount}" required="true" />
-							<Input value="{ContractModelWizart>/Amount}"  id="CD_id_Amount"  placeholder="{i18n>placeAmount}"  liveChange="CD_validateAmount"  maxLength="10" valueStateText="{i18n>ammountValuState}" />
+							<Input value="{ContractModelWizart>/Amount}"  id="CD_id_Amount"  placeholder="{i18n>placeAmount}"  liveChange="CD_validateAmount"  maxLength="15" valueStateText="{i18n>ammountValuState}" />
 							<Select items="{currencyModel>/results}"
-									selectedKey="{ContractModelWizart>/Currency}" id="CD_id_Currency" visible="true" width="100%" class="marginLeft">
+									selectedKey="{ContractModelWizart>/Currency}" id="CD_id_Currency" visible="true" class="marginLeft">
 								<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
 							</Select>
 						</f:content>
@@ -56,7 +55,7 @@
                        emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"    
                        columnsM="1" >
 						<f:content>
-							<Label text="{i18n>contractNo}" required="true"/>
+							<Label text="{i18n>contractNo}"/>
 							<Input placeholder="{i18n>ContractNoPlaceholder}" id="CD_id_ConNo" editable="false"/>
 							<Label text="{i18n>endClientHirer}" required="true"/>
 							<ComboBox items="{AddCustomerModel>/results}"  value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName">
@@ -68,12 +67,12 @@
 							</Select>
 							<Label text="{i18n>clienthiringcontact}" required="true"/>
 							<Select id="CD_id_selectSal" selectedKey="{ContractModelWizart>/Salutation2}" 
-                              items="{Salutation>/salutation}" width="100%">
+                              items="{Salutation>/salutation}" >
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
 							<Input value="{ContractModelWizart>/HiringContact}"
                              placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" liveChange="CD_validateName" valueStateText="{i18n>commonNameValueState}"/>
-							<Label text="{i18n>assignmentStatus}" required="true"/>
+							<Label text="{i18n>assignmentStatus}"/>
 							<ComboBox selectedKey="New" value="{ContractModelWizart>/AssignmentStatus}" 
                              items="{AssignmentStatus>/assignmentStatus}" editable="false">
 								<core:Item key="{AssignmentStatus>Value}" text="{AssignmentStatus>Value}"/>
@@ -83,27 +82,27 @@
 							<Label text="{i18n>endDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>specificInsuranceRequirement}" required="true"/>
-							<Select selectedKey="{ContractModelWizart>/InsuranceRequirement}" id="CD_id_InsuranceReq">
-								<core:Item key="Yes" text="{i18n>yes}" />
-								<core:Item key="No" text="{i18n>no}" />
+
+							<Select id="CD_id_InsuranceReq" selectedKey="{ContractModelWizart>/InsuranceRequirement}" items="{TravelAllowance>/type}">
+							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
 							</Select>
 							<Label text="{i18n>warrantyDate}" required="true"/>
 							<Select id="CD_id_Warranty" selectedKey="{ContractModelWizart>/WarrantyDate}" items="{contractwarrantyModel>/results}">
 								<core:Item key="{contractwarrantyModel>Months}" text="{contractwarrantyModel>Months}" />
 							</Select>
 							<Label text="{i18n>calloutadditionalratesexpenses}" required="true"/>
-							<Select  id="CD_id_AddRate" selectedKey="{ContractModelWizart>/AdditionalRates}">
-								<core:Item key="Yes" text="{i18n>yes}" />
-								<core:Item key="No" text="{i18n>no}" />
+							<Select  id="CD_id_AddRate" selectedKey="{ContractModelWizart>/AdditionalRates}" items="{TravelAllowance>/type}">
+							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
+
 							</Select>
 							<Label text="{i18n>paymentterms}" required="true"/>
 							<Select id="CD_id_PaymentTerms" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/results}">
 								<core:Item key="{ContractpaymentModel>Days}" text="{ContractpaymentModel>Days}" />
 							</Select>
-							<Label text="{i18n>status}" required="true"/>
+							<!-- <Label text="{i18n>status}" required="true"/>
 							<ComboBox selectedKey="{ContractModelWizart>/Status}"  items="{StatusModel>/Status}" id="CD_id_Status" visible="false" change="CD_ValidateCommonFields">
 								<core:Item key="{StatusModel>name}" text="{StatusModel>name}"/>
-							</ComboBox>
+							</ComboBox> -->
 							<Label text="{i18n>contractLocation}" required="true"/>
 							<ComboBox id="CD_id_ConLocation" change="CD_ValidateCommonFields"  items="{CityJsonModel>/results}"  value="{ContractModelWizart>/contractLocation}" >
 								<core:Item key="{CityJsonModel>ID}" text="{CityJsonModel>LocationName}" />

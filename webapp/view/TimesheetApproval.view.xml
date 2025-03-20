@@ -34,7 +34,7 @@
 				</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-                   		<ComboBox   showClearIcon="true" items="" >
+                   		<ComboBox showClearIcon="true" items="" >
 							<core:Item key="" text=""/>
 						</ComboBox>	
 					</fb:control>

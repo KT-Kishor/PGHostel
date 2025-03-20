@@ -28,7 +28,7 @@
 			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"  items="" growing="true"  growingThreshold="50"  alternateRowColors="true">
 			 <headerToolbar>
                 <OverflowToolbar >
-                    <Title id="" text="{i18n>tileAssignmentFooter}"/>
+                    <Title text="{i18n>tileAssignmentFooter}"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
 

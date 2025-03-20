@@ -1,5 +1,5 @@
 sap.ui.define([
-    "./BaseController","../utils/validation", "sap/ui/model/json/JSONModel","sap/m/MessageToast",],
+    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",],
     function (BaseController, utils, JSONModel, MessageToast) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetDetails", {
@@ -15,7 +15,7 @@ sap.ui.define([
             TSD_onPressBack: function () {
                 this.getRouter().navTo("RouteTimesheet");
             },
-            onValueHelpRequest:function(){
+            onValueHelpRequest: function () {
                 if (!this.TSD_oDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.TimesheetTask",
@@ -29,7 +29,7 @@ sap.ui.define([
                     this.TSD_oDialog.open();
                 }
             },
-            TSD_onSubmit:function(){
+            TSD_onSubmit: function () {
                 try {
                     if (utils._LCvalidateMandatoryField(this.byId("TSD_id_Assignment"), "ID") && utils._LCvalidateMandatoryField(this.byId("TSD_id_TimeHours"), "ID") && utils._LCvalidateMandatoryField(this.byId("TSD_id_EmpComment"), "ID")) {
                         MessageToast.show(this.i18nModel.getText("timesheetSuccess"));
@@ -41,6 +41,6 @@ sap.ui.define([
                 catch {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
-            }     
+            }
         });
     });

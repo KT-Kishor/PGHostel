@@ -2,10 +2,9 @@
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core" >
-	<Dialog id="AddEd_id_dialog"
-        title="{i18n>educationalDetails}">
+	<Dialog title="{i18n>educationalDetails}">
 		<f:SimpleForm 
-			editable="false"
+			editable="true"
 			layout="ResponsiveGridLayout"
 			labelSpanXL="3"
 			labelSpanL="3"
@@ -22,11 +21,11 @@
 			singleContainerFullSize="false" >
 			<f:content>
 				<Label text="{i18n>employeeID}"  />
-				<Input value="{educationModel>/EmployeeID}"   maxLength="20"  editable="false"/>
+				<Input value="{educationModel>/EmployeeID}" editable="false"/>
 				<Label text="{i18n>collegeName}" required="true" />
 				<Input value="{educationModel>/CollegeName}" placeholder="{i18n>collegeName}" id="AddEd_id_College" maxLength="50" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>collegeNameValueState}"/>
 				<Label text="{i18n>degree}" required="true" />
-				<Select  selectedKey="{educationModel>/Degree}" items="{Degree>/degree}" id="AddEd_id_Degree" change="" >
+				<Select  selectedKey="{educationModel>/Degree}" items="{Degree>/degree}" id="AddEd_id_Degree" >
 					<core:Item key="{Degree>DegreeName}" text="{Degree>DegreeName}" />
 				</Select>
 				<Label text="{i18n>startDate}" required="true" />
@@ -48,8 +47,7 @@
 			valueStateText="{i18n>dateValueState}"/>
 				<Label text="{i18n>grade}"  required="true" />
 				<HBox width="70%" justifyContent="Start">
-					<Input  value="{educationModel>/Grade}"   id="AddEd_id_Grade" liveChange="SS_ValidateCommonFields" 
-                 type="Number"   placeholder="{i18n>grade}"  valueStateText="{i18n>gradeValueState}" />
+					<Input  value="{educationModel>/Grade}" id="AddEd_id_Grade" liveChange="SS_ValidateCommonFields" placeholder="{i18n>grade}"  valueStateText="{i18n>gradeValueState}" />
 					<Select  selectedKey="{educationModel>/GradeType}" items="{CollegeGrade>/grade}" id="AddEd_id_GradeType" class="sapUiSmallMarginBegin">
 						<core:Item key="{CollegeGrade>Value}" text="{CollegeGrade>Value}" />
 					</Select>

@@ -11,10 +11,10 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Employee Details");
             },
             onPressback: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+                this.getRouter().navTo("RouteTilePage");
             },
             onLogout: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+                this.getRouter().navTo("RouteLoginPage");
             },
             
 

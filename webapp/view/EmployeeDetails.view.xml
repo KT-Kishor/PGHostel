@@ -14,14 +14,14 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="ID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="" change="" id="ED_id_EmpIDFilter" showClearIcon="true">
+							<ComboBox  showSecondaryValues= "true"  items="" id="ED_id_EmpIDFilter" showClearIcon="true">
 								<core:ListItem key="" text="" additionalText="" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Manager" label="{i18n>manager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="" change="" id="ED_id_ManagerFilter" showClearIcon="true">
+							<ComboBox  showSecondaryValues= "true"  items="" id="ED_id_ManagerFilter" showClearIcon="true">
 								<core:ListItem key="" text="" additionalText="" />
 							</ComboBox>
 						</fb:control>

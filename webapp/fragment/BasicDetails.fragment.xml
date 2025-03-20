@@ -22,9 +22,9 @@
 							</f:toolbar>
 							<f:content>
 								<Label text="{i18n>employeeID}"/>
-								<Input value="{employeeData>/ID}" editable="false" id="SS_id_EmpID"/>
+								<Input value="{employeeData>/ID}" editable="false"/>
 								<Label text="{i18n>employeeName}"  />
-								<Input value="{employeeData>/Salutation} {employeeData>/EmployeeName}"  id="SS_id_NameEmp" editable="false" maxLength="50" />
+								<Input value="{employeeData>/Salutation} {employeeData>/EmployeeName}" editable="false"/>
 								<Label  text="{i18n>joiningDate}"/>
 								<DatePicker value="{employeeData>/AppraisalDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" id="SS_id_Joinn" editable="false"/>
 								<Label text="{i18n>dateOfBirth}" required="true" id="SS_id_ldob" />

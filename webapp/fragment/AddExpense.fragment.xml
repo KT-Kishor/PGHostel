@@ -20,7 +20,7 @@
 				<Input  value="{ExpenseData>/EmployeeName}"  editable="false"/>
 				<!-- Expense Name -->
 				<Label text="{i18n>expExpenseName}" required="true"/>
-				<Input value="{ExpenseData>/ExpenseName}" valueStateText="{i18n>expenseNamePlaceholder}" id="exp-Id-ExpenseName" liveChange="onLiveExpenseName" placeholder="{i18n>expenseNamePlaceholder}" change="onInputChange" maxLength="200" />
+				<Input value="{ExpenseData>/ExpenseName}" valueStateText="{i18n>expenseNamePlaceholder}" id="exp-Id-ExpenseName" liveChange="onLiveExpenseName" placeholder="{i18n>expenseNamePlaceholder}" change="onInputChange" maxLength="50" />
 				<!-- Start Date -->
 				<Label text="{i18n>startDate}" required="true" />
 				<DatePicker id="exp-Id-StartDate" valueStateText="{i18n>expValStaStartDate}" value="" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" maxDate="" change="onDatePickerChange"/>

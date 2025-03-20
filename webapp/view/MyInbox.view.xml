@@ -5,10 +5,8 @@
 	xmlns:fb="sap.ui.comp.filterbar">
 	<Page id="MI_id_MyInboxPage">
 		<headerContent>
-			<Button  press="MI_onPressBack" icon="sap-icon://home" />
-			<Text text="{i18n>headerInbox}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button  press="MI_onPressSignOut" icon="sap-icon://log"></Button>
+	    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+
 		</headerContent>
 		<content>
 			<fb:FilterBar  class="sapUiTinyMargin" id="MI_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
@@ -95,14 +93,7 @@
 		<footer>
 			<Bar id="MI_id_FooterBar">
 			    <contentLeft>
-				<HBox class="sapUiTinyMarginTop">
-					<Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
-					<Link
-					class="footer-CoName sapUiTinyMarginBegin"
-					text="Developed by Kalpavriksha Technologies"
-					href="https://www.kalpavrikshatechnologies.com/" 
-					target="_blank"  />
-				</HBox>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
 				<contentRight>
 					<!-- Footer Buttons -->

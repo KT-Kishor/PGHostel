@@ -9,11 +9,9 @@
 	busyIndicatorDelay="0">
 <Page >
     <headerContent>
-		<Button  press="onPressback" icon="sap-icon://home" />
-		<Text text="{i18n>expApplicationTitle}" class="boldBlackText"></Text>
-		<ToolbarSpacer />
-		<Button  press="onSignout" icon="sap-icon://log"></Button>
-	</headerContent>
+	    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+
+		</headerContent>
 
     <content>
         <!-- <fb:FilterBar id="exp-id-FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" class="sapUiResponsiveMargin" >
@@ -112,6 +110,13 @@
 				</items>
 			</Table>
     </content>
+	<footer>
+			<Bar>
+					    <contentLeft>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                </contentLeft>
+			</Bar>
+		</footer>
     
 </Page>
 </mvc:View>

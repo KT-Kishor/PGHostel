@@ -14,7 +14,7 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="Company Name" label="{i18n>companyName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="" change="" id="MSA_id_CompanyName" showClearIcon="true">
+							<ComboBox  showSecondaryValues= "true"  items=""  id="MSA_id_CompanyName" showClearIcon="true">
 								<core:ListItem key="" text="" additionalText="" />
 							</ComboBox>
 						</fb:control>
@@ -27,7 +27,7 @@
                 <OverflowToolbar >
                     <Title id="MSA_id_Title" text="{i18n>msaDetails}"/>
                     <ToolbarSpacer/>
-                    <Button  text="Edit"   press="MSA_EditMsaDetails"/>
+                    <Button  text="{i18n>edit}"   press="MSA_EditMsaDetails"/>
                     <Button  text="{i18n>addMSA}" id="MSA_id_Add"  type="Accept" press="MSA_AddmsaDetails"  icon="sap-icon://company-view"/>
                     <Button text="{i18n>headerCustomer}" id="MSA_id_Customer" type="Emphasized"  press="MSA_onAddCustomer" icon="sap-icon://customer" />
                 </OverflowToolbar>

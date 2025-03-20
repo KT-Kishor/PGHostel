@@ -4,7 +4,7 @@
 	xmlns:core="sap.ui.core">
 	<Dialog showHeader="true"  title="{i18n>employmentDetails}" id="AddEmp_id_Dialog" >
 		<f:SimpleForm 
-			editable="false"
+			editable="true"
 			layout="ResponsiveGridLayout"
 			labelSpanXL="3"
 			labelSpanL="3"
@@ -20,12 +20,12 @@
 			columnsM="1"
 			singleContainerFullSize="false" >
 			<f:content>
-				<Label text="{i18n>employeeID}"  />
-				<Input value="{employmentModel>/EmployeeID}" required="true" maxLength="10" editable="false" />
+				<Label text="{i18n>employeeID}"/>
+				<Input value="{employmentModel>/EmployeeID}" editable="false" />
 				<Label text="{i18n>companyName}" required="true"/>
 				<Input value="{employmentModel>/CompanyName}" id="AddEmp_id_Company" placeholder="{i18n>companyName}" maxLength="50" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>companyNameValueState}"/>
 				<Label text="{i18n>designation}" required="true" />
-				<ComboBox items="{path:'Designation>/results', length:1000}" value="{employmentModel>/Designation}" id="AddEmp_id_Desig" change="SS_ValidateCommonFields" valueStateText="{i18n>designationValueState}">
+				<ComboBox items="" id="AddEmp_id_Desig" change="SS_ValidateCommonFields" valueStateText="{i18n>designationValueState}">
 					<core:Item key="{Designation>DesignationName}" text="{Designation>DesignationName}" />
 				</ComboBox>
 				<Label text="{i18n>companyAddress}" required="true"/>

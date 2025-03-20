@@ -14,7 +14,7 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             },
             MsaE_onBack: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteMSA");
+                this.getRouter().navTo("RouteMSA");
             },
 
             MsaE_onPressCreateSow: function () {

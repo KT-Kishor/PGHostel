@@ -15,7 +15,6 @@
                             title="{i18n>msaDetails}"							
                             validated="true">
 					<f:SimpleForm 
-            id="idSimpleFormToolbar1"
             editable="true"
 			layout="ResponsiveGridLayout"
 			labelSpanXL="4"
@@ -78,7 +77,7 @@
 					</f:SimpleForm>
 				</WizardStep>
 				<WizardStep 
-                            nextStep="idWizardStep3"
+                            nextStep="MasD_id_ThirdStep"
 							complete="MsaD_reviewSubmit"
                             activate="optionalStepActivation"
                             title="{i18n>review}"

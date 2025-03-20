@@ -12,10 +12,10 @@
                     id="TSD_id_Calendar"
                     width="100%"
                     legend="calendarLegend"
-                    select="onDateSelect" 
+                    select="TSD_onDateSelect" 
                     startDateChange="onInitializeCalendarLegend"
                      />
-			<f:SimpleForm id=""
+			<f:SimpleForm
                             editable="true"
                             layout="ResponsiveGridLayout"
                             labelSpanXL="4"
@@ -47,7 +47,6 @@
 					<Input value="{newModel>/HoursWorked}" 
            id="TSD_id_TimeHours" 
            liveChange="TD_ValidateCommonFields" 
-           type="Number" 
            editable="{editModel>/editableBut}"
            maxLength="5"  valueStateText="{i18n>hoursValueState}"/>
 					<Text id="TSD_id_Text" text="" />

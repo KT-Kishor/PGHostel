@@ -22,10 +22,10 @@ sap.ui.define([
                 utils._LCvalidateEmail(oEvent);
             },
             onPressback: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+                this.getRouter().navTo("RouteTilePage");
             },
             onLogout: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+                this.getRouter().navTo("RouteLoginPage");
             },
             T_onPressAddTrainee: function () {
                 this.getRouter().navTo("RouteTraineeDetails");

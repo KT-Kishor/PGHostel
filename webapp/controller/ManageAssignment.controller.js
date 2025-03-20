@@ -12,16 +12,16 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Create New Assignment");
             },
             onPressback: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+                this.getRouter().navTo("RouteTilePage");
             },
             onLogout: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+                this.getRouter().navTo("RouteLoginPage");
             },
-            MA_onCreateTask:function(){
-           this.getRouter().navTo("RouteAssignTask");
+            MA_onCreateTask: function () {
+                this.getRouter().navTo("RouteAssignTask");
             }
 
-         
-           
+
+
         });
     });

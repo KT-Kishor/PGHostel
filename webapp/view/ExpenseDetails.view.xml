@@ -70,9 +70,9 @@
 										</m:Select>
 										<!-- Travel Allowance -->
 										<m:Label text="{i18n>expTravelAllowance}" required="true" />
-										<m:Select  selectedKey="{FilteredExpenseModel>/TravelAllowance}"  editable="false">
-											<core:Item key="{i18n>no}" text="{i18n>no}" />
-											<core:Item key="{i18n>yes}" text="{i18n>yes}" />
+										<m:Select  selectedKey="{FilteredExpenseModel>/TravelAllowance}"  editable="false" items="{TravelAllowance>/type}" >
+										<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
+
 										</m:Select>
 										<!-- Expense Name -->
 										<m:Label text="{i18n>expExpenseName}" required="true"/>
@@ -180,7 +180,12 @@
 			</sections>
 		</ObjectPageLayout>
 		<m:footer>
+
 			<m:Bar>
+		
+					    <m:contentLeft>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                </m:contentLeft>
 				<m:contentRight>					
 					<m:Button text="{i18n>submit}" type="Emphasized" press="onPressSubmitExpenseItems" visible="{VisibleModel>/status}" id="idExpenseSubmit" enabled="{VisibleModel>/enable}" />
 				</m:contentRight>

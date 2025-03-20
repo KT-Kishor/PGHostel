@@ -2,8 +2,8 @@
     xmlns="sap.m"
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core">
-    <Dialog class="sapUiSmallMarginBegin" id="idTaskDialog" title=""  >
-        <f:SimpleForm editable="false" layout="ResponsiveGridLayout" labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12"
+    <Dialog class="sapUiSmallMarginBegin" id="idTaskDialog">
+        <f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12"
             adjustLabelSpan="false" emptySpanXL="4" emptySpanL="4" emptySpanM="4" emptySpanS="0" columnsXL="1"
             columnsL="1" columnsM="1" singleContainerFullSize="false">
             <f:content>

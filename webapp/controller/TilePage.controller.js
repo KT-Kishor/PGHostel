@@ -68,6 +68,9 @@ sap.ui.define([
             },
             TileV_onpressMSA:function(){
                 this.getRouter().navTo("RouteMSA")
+            },
+            TileV_onpressExpenseApp:function(){
+                this.getRouter().navTo("RouteExpensePage")
             }
         });
     });

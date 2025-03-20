@@ -1,5 +1,5 @@
 sap.ui.define([
-    "./BaseController","sap/ui/model/json/JSONModel","sap/m/MessageToast",],
+    "./BaseController", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",],
     function (BaseController, JSONModel, MessageToast) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Timesheet", {
@@ -11,16 +11,16 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "My Timesheet");
             },
             onPressback: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+                this.getRouter().navTo("RouteTilePage");
             },
             onLogout: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+                this.getRouter().navTo("RouteLoginPage");
             },
-            TS_onFillDetails:function(){
-           this.getRouter().navTo("RouteTimesheetDetails");
+            TS_onFillDetails: function () {
+                this.getRouter().navTo("RouteTimesheetDetails");
             }
 
-         
-           
+
+
         });
     });

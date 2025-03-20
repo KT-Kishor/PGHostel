@@ -5,7 +5,7 @@
 	<Dialog 
         title="{i18n>generateCertificate}">
 		<f:SimpleForm 
-			editable="false"
+			editable="true"
 			layout="ResponsiveGridLayout"
 			labelSpanXL="3"
 			labelSpanL="3"
