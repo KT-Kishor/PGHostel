@@ -19,22 +19,23 @@
                 title="{i18n>loginDetails}" singleContainerFullSize="false" >
 					<form:content>
 						<Label text="{i18n>userId}" required="true"/>
-						<Input placeholder="{i18n>placeUserId}" id="idUserid" change="Login" value="{loginModel>/userIds}" maxLength="50"/>
+						<Input placeholder="{i18n>placeUserId}" id="idUserid" value="{loginModel>/userIds}" maxLength="50" valueStateText="Enter user ID" change="onDetailscheck"/>
 						
 						<Label text="{i18n>userName}" required="true"/>
-						<Input placeholder="{i18n>placeUserName}" id="idUsername" change="Login" value="{loginModel>/userNames}" maxLength="50"/>
+						<Input placeholder="{i18n>placeUserName}" id="idUsername"  value="{loginModel>/userNames}" valueStateText="Enter user Name" maxLength="50" change="onDetailscheck"/>
 						
-						<Label text="{i18n>headloginwith}" required="true" />
-						<HBox alignItems="End" justifyContent="Start">
-							<RadioButton id="idOtpRadio" text="{i18n>btnotp}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd" />
-							<RadioButton id="idPasswordRadio" text="{i18n>btnpass}" groupName="loginOption" select="onLoginOptionChange"/>
-						</HBox>
-
+						<Label text="{i18n>headloginwith}" visible="{LoginModel>/isRadioVisible}"/>
+<HBox alignItems="End" justifyContent="Start" visible="{LoginModel>/isRadioVisible}">
+    <RadioButton id="idOtpRadio" text="{i18n>btnotp}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd"/>
+    <RadioButton id="idPasswordRadio" text="{i18n>btnpass}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd"/>
+	<Button text="Send OTP" press="onOtppress" id="idbtnsendotp" type="Emphasized" class="Login" width="8rem" visible="false"/>
+</HBox>
+						
 						<!-- OTP Input Field -->
 						<Label text="{i18n>btnotp}" id="idOtpLabel" visible="false"/>
 						<Input value="{loginModel>/enteredCaptcha}" id="idCaptchaInput" class="sapUiTinyMarginEnd" 
                             placeholder="{i18n>placeOtp}" submit="onLoginSubmit" maxLength="6" visible="false"/>
-
+                          
 						<!-- Password Input Field (Initially Hidden) -->
 						<Label text="{i18n>btnpass}" id="idPasswordLabel" visible="false"/>
 						<Input id="idPasswordInput" type="Password" placeholder="{i18n>placepass}" visible="false"/>

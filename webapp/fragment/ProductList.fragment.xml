@@ -109,28 +109,15 @@
                                 </m:GenericTile>
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
-                                    header="{i18n>headerEmpDetails}"
-                                    subheader="{i18n>subheadEmphike}"
+                                    header="{i18n>headerInbox}"
                                 >
-                                    <m:TileContent
-                                        unit="{i18n>tileEmplyeeFooter}"
-                                    >
+                                    <m:TileContent unit="{i18n>tileMyInboxFooter}">
                                         <m:ImageContent
-                                            src="sap-icon://employee"
+                                            src="sap-icon://inbox"
                                         />
                                     </m:TileContent>
                                 </m:GenericTile>
-                                <m:GenericTile
-                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
-                                    header="{i18n>headerIdCard}"
-                                    subheader="{i18n>subhead}"
-                                >
-                                    <m:TileContent unit="{i18n>tileIdCardFooter}">
-                                        <m:ImageContent
-                                            src="sap-icon://business-card"
-                                        />
-                                    </m:TileContent>
-                                </m:GenericTile>
+                               
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headerAssignTask}"
@@ -163,16 +150,7 @@
                                         />
                                     </m:TileContent>
                                 </m:GenericTile>
-                                <m:GenericTile
-                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
-                                    header="{i18n>headerInbox}"
-                                >
-                                    <m:TileContent unit="{i18n>tileMyInboxFooter}">
-                                        <m:ImageContent
-                                            src="sap-icon://inbox"
-                                        />
-                                    </m:TileContent>
-                                </m:GenericTile>
+                                
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>HeaderPaySlip}"
@@ -180,6 +158,41 @@
                                     <m:TileContent unit="{i18n>tilePaySlipFooter}">
                                         <m:ImageContent
                                             src="sap-icon://money-bills"
+                                        />
+                                    </m:TileContent>
+                                </m:GenericTile>
+                                 <m:GenericTile
+                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
+                                    header="{i18n>headerSelfService}"
+                                    subheader="{i18n>subhead}"
+                                >
+                                    <m:TileContent unit="{i18n>tileSelfSerciceFooter}">
+                                        <m:ImageContent
+                                            src="sap-icon://employee-approvals"
+                                        />
+                                    </m:TileContent>
+                                </m:GenericTile>
+                                <m:GenericTile
+                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
+                                    header="{i18n>headerEmpDetails}"
+                                    subheader="{i18n>subheadEmphike}"
+                                >
+                                    <m:TileContent
+                                        unit="{i18n>tileEmplyeeFooter}"
+                                    >
+                                        <m:ImageContent
+                                            src="sap-icon://employee"
+                                        />
+                                    </m:TileContent>
+                                </m:GenericTile>
+                                 <m:GenericTile
+                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
+                                    header="{i18n>headerIdCard}"
+                                    subheader="{i18n>subhead}"
+                                >
+                                    <m:TileContent unit="{i18n>tileIdCardFooter}">
+                                        <m:ImageContent
+                                            src="sap-icon://business-card"
                                         />
                                     </m:TileContent>
                                 </m:GenericTile>

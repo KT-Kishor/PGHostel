@@ -1,12 +1,13 @@
 sap.ui.define(
   [
-    "./BaseController", //call base controller
+    "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessagePopover",
     "sap/m/MessageItem",
+    "../utils/validation",
   ],
   function (
     BaseController,
@@ -15,7 +16,8 @@ sap.ui.define(
     Filter,
     FilterOperator,
     MessagePopover,
-    MessageItem
+    MessageItem,
+    utils
   ) {
     "use strict";
     return BaseController.extend(
@@ -23,7 +25,8 @@ sap.ui.define(
       {
         onInit: function () {
           var model = new JSONModel({
-            HeaderName: "",
+            EmployeeID: "",
+            EmployeeName: "",
             url: "https://www.rest.kalpavrikshatechnologies.com/",
             headers: {
               "Content-Type": "application/json",
@@ -31,20 +34,10 @@ sap.ui.define(
               password:
                 "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
             },
+            isRadioVisible: false, // Initially, radio buttons are hidden
           });
-          this.getOwnerComponent().setModel(model, "LoginModel");
-          var visibleName = {
-            OTP: false,
-            NewPassword: false,
-            ConfirmPassword: false,
-          };
-          var visible = new JSONModel(visibleName);
-          this.getView().setModel(visible, "visibleModel");
-          this.visibleModel = this.getView().getModel("visibleModel");
 
-          this.getRouter()
-            .getRoute("RouteLoginPage")
-            .attachMatched(this._onRouteMatched, this);
+          this.getOwnerComponent().setModel(model, "LoginModel");
         },
         onpresshome: function () {
           this.getRouter().navTo("RouteHomePage");
@@ -59,6 +52,77 @@ sap.ui.define(
             MessageToast.show("Invalid credentials.");
           }
         },
+        onValidateUserId: function (oEvent) {
+          utils._LCvalidateMandatoryField(oEvent);
+        },
+        onValidateUsername: function (oEvent) {
+          utils._LCvalidateName(oEvent);
+        },
+
+        onDetailscheck: function () {
+          var oView = this.getView();
+          var oModel = oView.getModel("LoginModel");
+
+          var userId = oView.byId("idUserid").getValue().trim();
+          var userName = oView.byId("idUsername").getValue().trim();
+
+          if (!userId || !userName) {
+            MessageToast.show("Please enter User ID and Username.");
+            return;
+          }
+
+          $.ajax({
+            url: "https://www.rest.kalpavrikshatechnologies.com/LoginDetails",
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json",
+            headers: {
+              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+              password:
+                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+            },
+            data: {
+              EmployeeID: userId,
+              EmployeeName: userName,
+            },
+            success: function (response) {
+              console.log("Response from server:", response); // Debugging
+              // Validate response structure
+              if (
+                !response ||
+                !response.success ||
+                !response.data ||
+                response.data.length === 0
+              ) {
+                MessageToast.show("Invalid credentials. Please try again.");
+                oModel.setProperty("/isRadioVisible", false);
+                return;
+              }
+
+              // Check if user exists in response data
+              var userFound = response.data.some(function (user) {
+                return (
+                  user.EmployeeID === userId && user.EmployeeName === userName
+                );
+              });
+
+              if (userFound) {
+                oModel.setProperty("/isRadioVisible", true);
+                MessageToast.show(
+                  "User verified! Please select a login method."
+                );
+              } else {
+                MessageToast.show("Invalid credentials. Please try again.");
+                oModel.setProperty("/isRadioVisible", false);
+              }
+            },
+            error: function (xhr, status, error) {
+              MessageToast.show("Error verifying user. Please try again.");
+              oModel.setProperty("/isRadioVisible", false);
+            },
+          });
+        },
+
         onLoginOptionChange: function (oEvent) {
           var sSelectedButtonId = oEvent.getSource().getId();
           var oView = this.getView();
@@ -67,6 +131,7 @@ sap.ui.define(
           var oPasswordInput = oView.byId("idPasswordInput");
           var oPasswordLabel = oView.byId("idPasswordLabel");
           var oForgotPasswordLink = oView.byId("idForgotPasswordLink");
+          var oSendotp = oView.byId("idbtnsendotp");
 
           var oOtpInput = oView.byId("idCaptchaInput");
           var oOtpLabel = oView.byId("idOtpLabel");
@@ -80,10 +145,12 @@ sap.ui.define(
             // Hide OTP field
             oOtpInput.setVisible(false);
             oOtpLabel.setVisible(false);
+            oSendotp.setVisible(false);
           } else {
             // Show OTP input field
             oOtpInput.setVisible(true);
             oOtpLabel.setVisible(true);
+            oSendotp.setVisible(true);
 
             // Hide password field and forgot password link
             oPasswordInput.setVisible(false);
@@ -93,9 +160,6 @@ sap.ui.define(
         },
 
         onForgotPassword: function () {
-          this.visibleModel.setProperty("/OTP", false);
-          this.visibleModel.setProperty("/NewPassword", false);
-          this.visibleModel.setProperty("/ConfirmPassword", false);
           var oView = this.getView();
           if (!this.oDialog) {
             sap.ui.core.Fragment.load({

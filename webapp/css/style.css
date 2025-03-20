@@ -197,6 +197,7 @@
 .allvideo{
   border-radius: 0.80rem !important;
 }
+
 .demo-form{
   background-image: url('../image/grow.jpg');
   background-size: cover; 
@@ -454,7 +455,9 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   width: 20rem !important;
   max-width: 20rem !important;
 }
-
+.Login{
+  width: fit-content !important;
+}
 .taskNameColor .sapMObjectAttributeText {
   color: blue !important;
 }
