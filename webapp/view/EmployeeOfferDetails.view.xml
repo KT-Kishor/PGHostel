@@ -97,7 +97,7 @@
 												</buttons>
 											</RadioButtonGroup>
 											<Label text="{i18n>selectYear}" id="EOD_id_Lyear" visible="false" />
-											<Select items="{EmployementBond>/bond}" id="EOD_id_BondCombo" selectedKey="{employeeModel>/JoiningBonus}" >
+											<Select items="{EmployementBond>/bond}" id="EOD_id_BondCombo" selectedKey="{employeeModel>/Value}" visible="false" change="validateInputs">
 												<core:Item key="{EmployementBond>Value}" text="{EmployementBond>Value}" />
 											</Select>
 										</f:content>

@@ -80,7 +80,7 @@
 							<Text text="{EmployeeOfferModel>CTC}"/>
 							<Text text="{EmployeeOfferModel>JoiningDate}"/>
 							<ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true"
-                        state="{path:'{EmployeeOfferModel>Status}', formatter: '.Formatter.formatObjectStatus'}" />
+                        state="{path:'EmployeeOfferModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
 						</cells>
 					</ColumnListItem>
 				</items>
