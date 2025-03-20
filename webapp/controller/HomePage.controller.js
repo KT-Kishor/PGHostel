@@ -37,18 +37,18 @@ sap.ui.define(
           var oCarousel = this.byId("videoCarousel");
 
           var videoUrls = [
-            "../video/Employee details Part 1.mp4",
             "../video/Employee offer.mp4",
+            "../video/Self Service.mp4",
+            "../video/Employee details Part 1.mp4", 
             "../video/Quotation.mp4",
             "../video/Scheme upload.mp4",
-            "../video/Self Service.mp4",
           ];
 
           // Add videos dynamically to the carousel
           videoUrls.forEach(function (url, index) {
             var oHtmlControl = new sap.ui.core.HTML({
               content:
-                '<video width="600" height="400" autoplay muted loop>' +
+                '<video width="100%" height="100%" autoplay muted loop>' +
                 '<source src="' +
                 url +
                 '" type="video/mp4">' +
@@ -66,7 +66,7 @@ sap.ui.define(
               ],
             });
 
-            oVBox.addStyleClass("transparentVBox"); // Apply transparent background class
+            oVBox.addStyleClass("sapUiTinyMargin"); // Apply transparent background class
             oCarousel.addPage(oVBox);
           });
 
