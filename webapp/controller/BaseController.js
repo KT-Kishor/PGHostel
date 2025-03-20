@@ -1,3 +1,4 @@
+var url = "https://www.rest.kalpavrikshatechnologies.com/"
 sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/model/json/JSONModel",
@@ -94,18 +95,18 @@ sap.ui.define([
     },
 
     _fetchCommonData: function (entityName, modelName, filter = "") {
-      sap.ui.core.BusyIndicator.show(0);
       let url =  this.getView().getModel("LoginModel").getData().url + entityName;
+      sap.ui.core.BusyIndicator.show(0);
       try {
         $.ajax({
           url: url,
           method: "GET",
-          headers: this.getView().getModel("LoginModel").getData().headers,
+          headers:this.getView().getModel("LoginModel").getData().headers,
           data:filter,
           success: function (data) {
             sap.ui.core.BusyIndicator.hide();
             if (data) {
-              var oModel = new JSONModel(data);
+              var oModel = new JSONModel(data.data);
               this.getOwnerComponent().setModel(oModel, modelName);
             }
           }.bind(this),
@@ -119,49 +120,110 @@ sap.ui.define([
         sap.m.MessageToast.show("Technical error, please contact the administrator");
       }
     },
- 
-    _commonCompanyCodeDetails: function (filter = {branchcode: "KLB01"}) {
-      this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", filter);
+    _commonFragmentOpen: function (that, oFragmentName) {
+      var sId = that.getView().getId() + "--" + oFragmentName; // Unique ID per view
+      // Check if fragment exists, otherwise create
+      if (!that._fragments[sId]) {
+        sap.ui.core.Fragment.load({
+          id: sId,
+          name: "sap.kt.com.minihrsolution.fragment." + oFragmentName,
+          controller: that
+        }).then(function (oFragment) {
+          that.getView().addDependent(oFragment);
+          that._fragments[sId] = oFragment;
+          oFragment.open();
+        }.bind(that));
+      } else {
+        that._fragments[sId].open();
+      }
     },
-
-    _commonDesignation: function (filter = "") {
-      this._fetchCommonData("Designation", "DesignationModel", filter);
+    _commonFragmentClose: function (that, oFragmentName) {
+      var sId = that.getView().getId() + "--" + oFragmentName;
+      if (that._fragments[sId]) {
+        that._fragments[sId].close();
+      }
     },
-
-    _commonBaseLocation: function (filter = "") {
-      this._fetchCommonData("BaseLocation", "BaseLocationModel", filter);
+    //Common read call for all the app
+    async ajaxReadWithJQuery(sUrl,filter) {
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          url: this.getView().getModel("LoginModel").getData().url + sUrl,
+          method: "GET",
+          headers: this.getView().getModel("LoginModel").getData().headers,
+          data:filter,
+          success: function (data) {
+            resolve(data);
+          },
+          error: function (error) {
+            reject(error);
+          }
+        });
+      });
     },
-
-    _commonDepartment: function (filter = "") {
-      this._fetchCommonData("Department", "DepartmentModel", filter);
+    //Common create call for all the app
+    async ajaxCreateWithJQuery(sUrl, oPayLoad) {
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          url: this.getView().getModel("LoginModel").getData().url + sUrl,
+          method: "POST",
+          data: JSON.stringify(oPayLoad),
+          headers:this.getView().getModel("LoginModel").getData().headers,
+          success: function (data) {
+            resolve(data);
+          },
+          error: function (error) {
+            reject(error);
+          }
+        });
+      });
     },
+    _calculateSalaryComponents: function (oValue) {
+      var oModel = this.getView().getModel("employeeModel");
+      var CTC = parseInt(oModel.getProperty("/CTC"));
+      var joiningBonus = parseInt(oModel.getProperty("/JoiningBonus"));
+      var isTDSIncluded = oModel.getProperty("/IsTDSIncluded");
+      var BasicSalary, TDS;
+      // if (isTDSIncluded === undefined && oValue !== "SelfService") {
+      //   isTDSIncluded = oModel.setProperty("/IsTDSIncluded", this.byId("idTDSCheckBox").getSelected())
+      // }
+      // Calculate various salary components
+      BasicSalary = (CTC * 0.49) / 12;           // Monthly Basic Salary from 49% of CTC
+      var houseRentAllowance = (CTC * 0.49) / 12 * 0.50;     // 50% of Basic Salary
+      var StatutoryBonus = (CTC * 0.49) / 12 * 0.09575;   // 9.575% of Basic Salary
+      var TotalMontly = BasicSalary + houseRentAllowance + StatutoryBonus;  // Total Monthly Salary
+      var TotalmothlyAnnualized = TotalMontly * 12;   // Annualized Monthly Salary
+      TDS = TotalMontly * 0.1 * 12;  // Annual TDS at 10% of Basic Salary
 
-    _commonCompanyInvoiceSAC  : function (filter = "") {
-      this._fetchCommonData("CompanyInvoiceSAC", "CompanyInvoiceSACModel", filter);
-    },
-
-    _commonCountry: function (filter = "") {
-      this._fetchCommonData("Country", "CountryModel", filter);
-    },
-
-    _commonCurrency: function (filter = "") {
-      this._fetchCommonData("Currency", "CurrencyModel", filter);
-    },
-
-    _commonPaymentTerms: function (filter = "") {
-      this._fetchCommonData("PaymentTerms", "PaymentTermsModel", filter);
-    },
-
-    _commonTaskType: function (filter = "") {
-      this._fetchCommonData("TaskType", "TaskTypeModel", filter);
-    },
-
-    _commonCompanyEmails: function (filter = {branchcode: "KLB01"}) {
-      this._fetchCommonData("CompanyEmails", "CompanyEmailsModel", filter);
-    },
-
-    _commonLeaveType: function (filter = "") {
-      this._fetchCommonData("LeaveType", "LeaveTypeModel", filter);
+      var MedicalInsurance = BasicSalary * 0.4; // Medical Insurance at 40% of Basic
+      var Gratuity = (BasicSalary * 15) / 26;    // Gratuity calculation
+      var TotalRetires = TDS + MedicalInsurance + Gratuity;
+      var PerformanceBonus = (CTC * 5) / 100;  //5% of CTC as PerformanceBonus 
+      var EngagementPB = (CTC * 5) / 100;   // 5% of CTC as EngagementPB 
+      var TotalVariablePay = PerformanceBonus + EngagementPB;
+      if (!isTDSIncluded && isTDSIncluded !== undefined) {
+        PerformanceBonus += (TDS / 2)
+        EngagementPB += (TDS / 2);
+        TotalVariablePay = PerformanceBonus + EngagementPB
+        TDS = 0;
+        TotalRetires = TDS + MedicalInsurance + Gratuity;
+      }
+      var CostofCompany = TotalmothlyAnnualized + TotalRetires + TotalVariablePay;
+      var Total = CostofCompany + parseInt(joiningBonus);
+      // Set calculated values in the model with formatting
+      oModel.setProperty("/BasicSalary", this.Formatter.formatCurrencyInINRText(Math.round(BasicSalary)));
+      oModel.setProperty("/HRA", this.Formatter.formatCurrencyInINRText(Math.round(houseRentAllowance)));
+      oModel.setProperty("/StatutoryBonus", this.Formatter.formatCurrencyInINRText(Math.round(StatutoryBonus)));
+      oModel.setProperty("/TotalMonthly", this.Formatter.formatCurrencyInINRText(Math.round(TotalMontly)));
+      oModel.setProperty("/TotalmothlyAnnualized", this.Formatter.formatCurrencyInINRText(Math.round(TotalmothlyAnnualized)));
+      oModel.setProperty("/TDS", this.Formatter.formatCurrencyInINRText(Math.round(TDS)));
+      oModel.setProperty("/MedicalInsurance", this.Formatter.formatCurrencyInINRText(Math.round(MedicalInsurance)));
+      oModel.setProperty("/Gratuity", this.Formatter.formatCurrencyInINRText(Math.round(Gratuity)));
+      oModel.setProperty("/TotalRetires", this.Formatter.formatCurrencyInINRText(Math.round(TotalRetires)));
+      oModel.setProperty("/PerformanceBonus", this.Formatter.formatCurrencyInINRText(Math.round(PerformanceBonus)));
+      oModel.setProperty("/EngagementPB", this.Formatter.formatCurrencyInINRText(Math.round(EngagementPB)));
+      oModel.setProperty("/TotalVariablePay", this.Formatter.formatCurrencyInINRText(Math.round(TotalVariablePay)));
+      oModel.setProperty("/CostofCompany", this.Formatter.formatCurrencyInINRText(Math.round(CostofCompany)));
+      oModel.setProperty("/Total", this.Formatter.formatCurrencyInINRText(Math.round(Total)));
     },
   })
 });

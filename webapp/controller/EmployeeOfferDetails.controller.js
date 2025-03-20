@@ -12,26 +12,57 @@ sap.ui.define([
                 this.getView().byId("EOD_id_BondCombo").setVisible(false);
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                // this._commonDesignation();
-                // this._commonBaseLocation();
+                this._fetchCommonData("Designation", "DesignationModel");
+                this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                this._fetchCommonData("Currency", "CurrencyModel");
+                var jsonData={
+                    "Salutation": "Mr.",
+                    "ConsultantName": "",
+                    "ConsultantAddress": "",
+                    "Designation": "",
+                    "OfferReleaseDate": "",
+                    "JoiningDate": "",
+                    "CTC": "",
+                    "EmploymentBond": "",
+                    "JoiningBonus": "",
+                    "BaseLocation": "",
+                    "BasicSalary": "",
+                    "HRA": "",
+                    "StatutoryBonus": "",
+                    "TotalMonthly": "",
+                    "TotalmothlyAnnualized": "",
+                    "TDS": "",
+                    "MedicalInsurance": "",
+                    "Gratuity": "",
+                    "TotalRetires": "",
+                    "PerformanceBonus": "",
+                    "EngagementPB": "",
+                    "TotalVariablePay": "",
+                    "CostofCompany": "",
+                    "Total": "",
+                    "Status": "",
+                    "EmployeeEmail": "",
+                    "Year": ""
+                }
+                this.getView().setModel(new JSONModel(jsonData),"employeeModel");
             },
-            validateName: function (oEvent) {
+            EOD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
                 this.validateStep();
             },
-            validateEmail: function (oEvent) {
+            EOD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
                 this.validateStep();
             },
-            validateAmount: function (oEvent) {
+            EOD_validateAmount: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
                 this.validateStep();
             },
-            validateDate: function (oEvent) {
+            EOD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
                 this.validateStep();
             },
-            ValidateCommonFields: function (oEvent) {
+            EOD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 this.validateStep();
             },
@@ -67,7 +98,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
-            onRadioButtonSelect: function (oEvent) {
+            EOD_onRadioButtonSelect: function (oEvent) {
                 if (oEvent.getParameter("selectedIndex") === 0) {
                     this.getView().byId("EOD_id_BondCombo").setVisible(true);
                     this.getView().byId("EOD_id_Lyear").setVisible(true);
@@ -77,7 +108,24 @@ sap.ui.define([
                     this.getView().byId("EOD_id_Lyear").setVisible(false);
                     this.getView().byId("EOD_id_BondCombo").setSelectedKey("");
                 }
+            },
+            EOD_onStep2 : function(){
+                var oModel = this.getView().getModel("employeeModel");
+                this._calculateSalaryComponents("");
+            },
+            EOD_onPressReview : function(){
+                var oModel = this.getView().getModel("employeeModel").getData();
+                oModel = {
+                        "tableName": "EmployeeOffer",
+                        "data":oModel}
+                this.ajaxCreateWithJQuery("EmployeeOffer",oModel).then((oData) =>{
+                   if(oData.data.length > 0){
+                       MessageBox.success("Created successfully")
+                   }
+                })
+                .catch((oError) => {
+                    MessageBox.error("Error while creating the employee offer details")
+                })
             }
-
         });
     });

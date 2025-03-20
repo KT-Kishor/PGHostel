@@ -1,6 +1,8 @@
 sap.ui.define([
-    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",],
-    function (BaseController, utils, JSONModel, MessageToast,) {
+    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", 
+    "sap/m/MessageToast",
+    "sap/m/MessageBox"],
+    function (BaseController, utils, JSONModel, MessageToast,MessageBox) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOffer", {
             onInit: function () {
@@ -8,34 +10,35 @@ sap.ui.define([
             },
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-
+                this.readCallForEmployeeOffer();
+                this.byId("EO_id_OnboardBtn").setVisible(false);
+                this.byId("EO_id_RejectBtn").setVisible(false);
+                this._fetchCommonData("BaseLocation", "BaseLocationModel");
             },
-            Ov_onSignout: function () {
+            readCallForEmployeeOffer : function(){
+                var filter={ID:""}
+                this.ajaxReadWithJQuery("EmployeeOffer",filter).then((oData) =>{
+                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    this.getView().setModel(new JSONModel(offerData),"EmployeeOfferModel");
+                })
+                .catch((oError) => {
+                    MessageBox.error("Error while reading the employee offer details")
+                })
+            },
+            EO_onSignout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
-            Ov_onPressback: function () {
+            EO_onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
-            Ov_onPressAddEmployee: function () {
+            EO_onPressAddEmployee: function () {
                 this.getRouter().navTo("RouteEmployeeOfferDetails");
             },
-
-            O_onOnboardPress: function () {
-                if (!this.EO_oDialog) {
-                    sap.ui.core.Fragment.load({
-                        name: "sap.kt.com.minihrsolution.fragment.OnboardEmployee",
-                        controller: this,
-                    }).then(function (EO_oDialog) {
-                        this.EO_oDialog = EO_oDialog;
-                        this.getView().addDependent(this.EO_oDialog);
-                        this.EO_oDialog.open();
-                    }.bind(this));
-                } else {
-                    this.EO_oDialog.open();
-                }
+            EO_onOnboardPress: function () {
+                this._commonFragmentOpen(this,"OnboardEmployee");
             },
-            Oef_onPressClose: function () {
-                this.EO_oDialog.close();
+            OEF_onPressClose: function () {
+                this._commonFragmentClose(this,"OnboardEmployee");
             },
             validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
@@ -46,10 +49,9 @@ sap.ui.define([
             validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
             },
-
-            Oef_onPressOnBoard: function (oEvent) {
+            OEF_onPressOnBoard: function (oEvent) {
                 try {
-                    if (utils._LCvalidateEmail(sap.ui.getCore().byId("OeF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("Oef_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("Oef_id_Mobile"), "ID")) {
+                    if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID")) {
                         MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
                     }
                     else {
@@ -59,11 +61,23 @@ sap.ui.define([
                 catch {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
-
+            },
+            EO_onSelectionRadRowE:function(oEvent){
+                var oOnboardButton = this.byId("EO_id_OnboardBtn");
+                var oRejectButton = this.byId("EO_id_RejectBtn");
+                var oSelectedItem = oEvent.getParameter("listItem");
+                // If an item is selected, check the status and update button visibility accordingly
+                if (oSelectedItem) {
+                  var sStatus = oSelectedItem.getBindingContext().getProperty("Status");
+                  this.Id = oSelectedItem.getBindingContext().getProperty("ID")
+                  var isDisabled = sStatus === "OnBoarded" || sStatus === "Rejected";
+                  oOnboardButton.setVisible(!isDisabled);
+                  oRejectButton.setVisible(!isDisabled);
+                } else {
+                  // Hide both buttons if no item is selected
+                  oOnboardButton.setVisible(false);
+                  oRejectButton.setVisible(false);
+                }
             }
-
-
-
-
         });
     });

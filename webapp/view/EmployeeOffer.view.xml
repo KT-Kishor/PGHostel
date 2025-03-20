@@ -6,33 +6,33 @@
     controllerName="sap.kt.com.minihrsolution.controller.EmployeeOffer"
 	xmlns:fb="sap.ui.comp.filterbar"	
     displayBlock="true">
-	<Page id="Ov_id_Page" >
+	<Page id="EO_id_Page" >
 		<headerContent>
-			<Button  press="Ov_onPressback" icon="sap-icon://home" />
+			<Button  press="EO_onPressback" icon="sap-icon://home" />
 			<Text text="{i18n>headerEmpDetails}" class="boldBlackText"></Text>
 			<ToolbarSpacer />
-			<Button  press="Ov_onSignout" icon="sap-icon://log"></Button>
+			<Button  press="EO_onSignout" icon="sap-icon://log"></Button>
 		</headerContent>
 		<content>
-			<fb:FilterBar  class="sapUiTinyMargin" id="Ov_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+			<fb:FilterBar  class="sapUiTinyMargin" id="EO_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Employee Name" label="Employee Name" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="ConsultantName" label="{i18n>employeeName}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Employee Name" selectionChange=".onBranchChange" showClearIcon="true" items="" >
-							<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
+						<ComboBox items="{EmployeeOfferModel>/}" selectionChange=".onBranchChange" showClearIcon="true" >
+							<core:Item key="{EmployeeOfferModel>ConsultantName}" text="{EmployeeOfferModel>ConsultantName}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-				<fb:FilterGroupItem name="Base Location" label="Base Location" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="BaseLocation" label="{i18n>baseLocation}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="Base Location"  items="" showClearIcon="true" id="Ov_id_DesiFilter">
-								<core:Item key="{DropDownModel>ConsultantName}" text="{DropDownModel>ConsultantName}"/>
+							<ComboBox items="{BaseLocationModel>/}" showClearIcon="true" id="EO_id_DesiFilter">
+								<core:Item key="{BaseLocationModel>id}" text="{BaseLocationModel>city}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Joining Date" label="Joining Date" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="JoiningDate" label="{i18n>joiningDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-                    <DateRangeSelection id="Ov_id_JoiningDate" valueFormat="yyyy-MM-dd"  displayFormat="dd/MM/yyyy" change="onDateChange" />						
+                    <DateRangeSelection id="EO_id_JoiningDate" valueFormat="yyyy-MM-dd"  displayFormat="dd/MM/yyyy" change="onDateChange" />						
 					</fb:control>
 						</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
@@ -44,15 +44,14 @@
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="Ov_idSalary" items="" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			<Table mode="SingleSelectLeft" selectionChange="EO_onSelectionRadRowE" class="sapUiTinyMargin" items="{path: 'EmployeeOfferModel>/',sorter: {path: '',descending: false,group: false}}" growingScrollToLoad="true" width="auto" id="EO_id_" growing="true"  growingThreshold="50"  alternateRowColors="true">
 			 <headerToolbar>
                 <OverflowToolbar >
-                    <Title id="" text="{i18n>headerEmpDetails}"/>
-                    <!-- <ToolbarSeparator/> -->
+                    <Title text="{i18n>headerEmpDetails}"/>
                     <ToolbarSpacer/>
-                    <Button tooltip="{i18n>onboardEmp}" id="Ov_id_OnboardBtn" text="Onboard" type="Neutral" press="O_onOnboardPress"  icon="sap-icon://manager"/>
-                    <Button tooltip="{i18n>rejectEmp}" id="Ov_id_RejectBtn" type="Reject" text="Reject" press="O_onRejectPress" icon="sap-icon://employee-rejections" />
-                    <Button text="{i18n>generateOffer}" press="Ov_onPressAddEmployee" type="Accept"  icon="sap-icon://employee-approvals"/>
+                    <Button tooltip="{i18n>onboardEmp}" id="EO_id_OnboardBtn" text="Onboard" type="Neutral" press="EO_onOnboardPress"  icon="sap-icon://manager"/>
+                    <Button tooltip="{i18n>rejectEmp}" id="EO_id_RejectBtn" type="Reject" text="Reject" press="EO_onRejectPress" icon="sap-icon://employee-rejections" />
+                    <Button text="{i18n>generateOffer}" press="EO_onPressAddEmployee" type="Accept"  icon="sap-icon://employee-approvals"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
@@ -76,15 +75,16 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem>
+					<ColumnListItem type="Navigation" press="EO_onPressRowE">
 						<cells>
-							<Text text="{}"/>
-							<Text text="{}"/>
-							<Text text="{}"/>
-							<Text text=" {}"/>
-							<Text text=" {}"/>
-							<Text text=" {}"/>
-							<ObjectStatus text="{}" />
+							<Text text="{EmployeeOfferModel>Salutation} {EmployeeOfferModel>ConsultantName}"/>
+							<Text text="{EmployeeOfferModel>Designation}"/>
+							<Text text="{EmployeeOfferModel>BaseLocation}"/>
+							<Text text="{EmployeeOfferModel>JoiningDate}"/>
+							<Text text="{EmployeeOfferModel>CTC}"/>
+							<Text text="{EmployeeOfferModel>Status}"/>
+							<!-- <Text text="INR {path:'EmployeeOfferModel>CTC',formatter: '.Formatter.IndiaNumberFormatter'}"/> -->
+							<!-- <ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true" class="centerText" /> -->
 						</cells>
 					</ColumnListItem>
 				</items>
@@ -93,15 +93,7 @@
 		<footer>
 			<Bar>
 				<contentLeft>
-					   <HBox class="sapUiTinyMarginTop">
-    <Image src="../image/logo.jpg" width="30px" height="30px" class="companylogo" />
-    <Link
-        class="footer-CoName sapUiTinyMarginBegin"
-        text="Developed by Kalpavriksha Technologies"
-        href="https://www.kalpavrikshatechnologies.com/" 
-        target="_blank"  
-    />
-</HBox>
+				  <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</contentLeft>
 			</Bar>
 		</footer>

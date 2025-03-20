@@ -15,7 +15,12 @@ sap.ui.define([], function () {
             });
             return oCurrencyFormat.format(value) + " " + code;
         },
-
+        formatCurrencyInINRText: function (sValue) {
+            if (sValue || sValue === 0) {
+                return "INR " + parseFloat(sValue).toLocaleString('en-IN');
+            }
+            return "";
+        },
         formatObjectStatus: function (sStatus) {
             switch (sStatus) {
                 case "New":

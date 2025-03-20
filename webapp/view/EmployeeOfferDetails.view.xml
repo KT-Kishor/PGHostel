@@ -11,7 +11,7 @@
 					<Page>
 						<content>
 							<Wizard complete="EOD_onPressReview" id="EOD_id_Wizard" finishButtonText="{i18n>submit}" showNextButton="true">
-								<WizardStep id="EOD_id_WizardStep"   complete="onCalculate" title="{i18n>basicDetails}" validated="true">
+								<WizardStep id="EOD_id_WizardStep"   complete="EOD_onStep2" title="{i18n>basicDetails}" validated="true">
 									<f:SimpleForm editable="true" layout="ColumnLayout" 	labelSpanXL="4"
 			labelSpanL="4"
 			labelSpanM="12"
@@ -29,7 +29,7 @@
 											<Label text="{i18n>consultantName}" required="true" />
 											<Select
                                              id=""
-                                             selectedKey="{oTraineeDetails>/TSalutation}"
+                                             selectedKey="{employeeModel>/Salutation}"
                                              items="{Salutation>/salutation}">
 												<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 												<layoutData>
@@ -42,7 +42,7 @@
                                              required="true"
                                              editable="true"
                                              id="EOD_id_Name"
-                                             liveChange="validateName"
+                                             liveChange="EOD_validateName"
                                              maxLength="50"
                                              valueStateText="{i18n>nameEmployeeValueState}">
 												<layoutData>
@@ -52,34 +52,34 @@
 											<Label text="{i18n>offerReleaseDate}" required="true" />
 											<DatePicker id="EOD_id_Reldate" placeholder="{i18n>offerReleaseDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
                                              value= "{employeeModel>/OfferReleaseDate}"
-                                             change="validateDate" class="sapUiSmallMarginBottom" valueStateText="{i18n>dateValueState}"/>
+                                             change="EOD_validateDate" class="sapUiSmallMarginBottom" valueStateText="{i18n>dateValueState}"/>
 											<Label text="{i18n>joiningDate}" required="true" />
 											<DatePicker id="EOD_id_Joindate" placeholder="{i18n>joiningDate}" 
                                             value="{employeeModel>/JoiningDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
-                                            change="validateDate" class="sapUiSmallMarginBottom disableInput" valueStateText="{i18n>dateValueState}"/>
+                                            change="EOD_validateDate" class="sapUiSmallMarginBottom disableInput" valueStateText="{i18n>dateValueState}"/>
 											<Label text="{i18n>designation}" required="true" />
-											<Select id="EOD_id_Designation" items="{oDesignationModel>/results}" selectedKey="{employeeModel>/Designation}">
-												<core:Item key="{oDesignationModel>designationName}" text="{oDesignationModel>designationName}" />
+											<Select items="{DesignationModel>/}" id="EOD_id_Designation" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}">
+												<core:Item key="{DesignationModel>id}" text="{DesignationModel>designationName}" />
 											</Select>
 											<Label text="{i18n>baseLocation}" required="true" />
-											<Select items="{oBaseLocationModel>/results}" id="EOD_id_Location" selectedKey="{employeeModel>/BaseLocation}">
-												<core:Item key="{oBaseLocationModel>city}" text="{oBaseLocationModel>city}" />
+											<Select items="{BaseLocationModel>/}" id="EOD_id_Location" selectedKey="{employeeModel>/BaseLocation}">
+												<core:Item key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" />
 											</Select>
 											<Label text="{i18n>emailId}" required="true" />
 											<Input value="{employeeModel>/EmployeeEmail}" placeholder="{i18n>placeEmplyeeEmail}" 
-                                             id="EOD_id_mail" maxLength="50" liveChange="validateEmail" valueStateText="{i18n>emailValueState}"/>
+                                             id="EOD_id_mail" maxLength="50" liveChange="EOD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 											<Label text="{i18n>consultantAddress}" required="true" />
-											<TextArea value="{employeeModel>/ConsultantAddress}" placeholder="{i18n>consultantAddress}" liveChange="ValidateCommonFields"
+											<TextArea value="{employeeModel>/ConsultantAddress}" placeholder="{i18n>consultantAddress}" liveChange="EOD_ValidateCommonFields"
                                             id="EOD_id_Address" maxLength="120" valueStateText="{i18n>addressValueState}"/>
 											<Label text="{i18n>ctc}" required="true" />
 											<Input value="{employeeModel>/CTC}" id="EOD_id_CTC" placeholder="{i18n>placeCtc}" 
-                                             liveChange="validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}" />
-											<Select items="{currencyModel>/results}" selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" width="100%" class="marginLeft">
-												<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
+                                             liveChange="EOD_validateAmount" change="EOD_onChangeCTC" maxLength="15" valueStateText="{i18n>ammountValuState}" />
+											<Select items="{CurrencyModel>/}" selectedKey="{oTraineeDetails>/Currency}" id="EOD_id_Currency" width="100%" class="marginLeft">
+												<core:Item key="{CurrencyModel>id}" text="{CurrencyModel>currency}" />
 											</Select>
 											<Label text="{i18n>joiningBonus}" required="true" />
 											<Input value="{employeeModel>/JoiningBonus}" placeholder="{i18n>joiningBonus}" 
-                                             liveChange="validateAmount" maxLength="10" id="EOD_id_Bonus" valueStateText="{i18n>ammountValuState}" />
+                                             liveChange="EOD_validateAmount" maxLength="10" id="EOD_id_Bonus" valueStateText="{i18n>ammountValuState}" />
 											<Label text="{i18n>salaryType}"/>
 											<RadioButtonGroup id="EOD_id_Main" columns="3" select="onTDSCheckboxChange">
 												<RadioButton id="EOD_id_Tds" text="{i18n>tds}" />
@@ -87,7 +87,7 @@
 												<RadioButton id="EOD_id_Pf" text="{i18n>pf}" />
 											</RadioButtonGroup>
 											<Label text="{i18n>bond}" required="true" />
-											<RadioButtonGroup columns="2" id="EOD_id_Bond" select="onRadioButtonSelect">
+											<RadioButtonGroup columns="2" id="EOD_id_Bond" select="EOD_onRadioButtonSelect">
 												<buttons>
 													<RadioButton text="{i18n>yes}" key="yes" />
 													<RadioButton text="{i18n>no}" key="no" selected="true" />
@@ -100,7 +100,7 @@
 										</f:content>
 									</f:SimpleForm>
 								</WizardStep>
-								<WizardStep  title="{i18n>ctcCalculation}" validated="true" id="EDO_id_WizardStepT">
+								<WizardStep  title="{i18n>ctcCalculation}"  validated="true" id="EDO_id_WizardStepT">
 									<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="2" columnsL="4" columnsXL="4">
 										<f:content>
 											<core:Title text="{i18n>monthlyComponents}" />
