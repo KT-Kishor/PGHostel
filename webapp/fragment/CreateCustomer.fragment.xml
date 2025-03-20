@@ -4,7 +4,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core" >
 	<Dialog 
-        title="{i18n>custFragTitle}">
+        title="{i18n>custDetails}">
 		<f:SimpleForm 
             id="MC_id_SimpleFormAddToolbar"
             editable="true"
@@ -22,8 +22,8 @@
 			columnsM="1">
 			<f:content>
 				<Label text="{i18n>companyName}"  />
-				<Input id="MC_id_CustCompanyName" value="{CreateCustomerModel>/CompanyName}" required="true" maxLength="50" placeholder="{i18n>companyNamePlace}" liveChange="onliveChangeCompanyName" valueState="None"/>
-				<Label text="{i18n>custName}" required="true"/>
+				<Input id="MC_id_CustCompanyName" liveChange="MC_ValidateCommonFields"  value="{CreateCustomerModel>/CompanyName}" required="true" maxLength="50" placeholder="{i18n>companyNamePlace}" valueStateText="{i18n>placeCompany}"/>
+				<Label text="{i18n>customerName}" required="true"/>
 				<HBox width="100%" justifyContent="Start" alignItems="Center">
 					<VBox width="22%">
 						<Select id="MC_id_SelectReportingManagerSalutation" selectedKey="{CreateCustomerModel>/Salutation}"
@@ -32,30 +32,30 @@
 						</Select>
 					</VBox>
 					<VBox width="78%">
-						<Input id="MC_id_CustCustomerName" value="{CreateCustomerModel>/Name}" maxLength="20" placeholder="{i18n>placeholderCustName}" liveChange="onLiveCustName" valueState="None" />
+						<Input id="MC_id_CustCustomerName" value="{CreateCustomerModel>/Name}" maxLength="20" placeholder="{i18n>placeholderCustName}" liveChange="MC_ValidateCommonFields" valueStateText="{i18n>placeholderCustName}" />
 					</VBox>
 				</HBox>
-				<Label text="{i18n>panCard}" />
-				<Input value="{CreateCustomerModel>/PAN}" placeholder="{i18n>panCardPlaceholder}" maxLength="50" id="MC_id_CustomPan" valueState="None" />
-				<Label text="{i18n>custGst}" />
-				<Input value="{CreateCustomerModel>/GST}" maxLength="15" placeholder="{i18n>placeholderGST}" id="MC_id_CustomGst"  liveChange="onLiveChange" valueState="None" />
+				<Label text="{i18n>panCardCommon}" />
+				<Input value="{CreateCustomerModel>/PAN}" placeholder="{i18n>panCardPlaceholder}" maxLength="50" id="MC_id_CustomPan" liveChange="MC_ValidatePanCard" valueStateText="{i18n>panCardValueState}" />
+				<Label text="{i18n>gstNo}" />
+				<Input value="{CreateCustomerModel>/GST}" maxLength="15" placeholder="{i18n>placeholderGST}" id="MC_id_CustomGst"  liveChange="MC_ValidateGstNumber" valueStateText="{i18n>gstNoValueState}" />
 				<Label text="{i18n>type}" labelFor="groupC" />
 				<RadioButtonGroup visible="{visiblePlay>/IDInput}" select="onRadioButtonChange"  id="MC_id_groupCustGst" columns="2" selectedIndex="{visiblePlay>/selectedIndex}">
-					<RadioButton text="{i18n>custCgst}" />
-					<RadioButton text="{i18n>custIgst}" />
+					<RadioButton text="{i18n>cgst}" />
+					<RadioButton text="{i18n>igst}" />
 				</RadioButtonGroup>
 				<Label visible="{visiblePlay>/IDInput}" text="{i18n>custValue}" />
 				<Input visible="{visiblePlay>/IDInput}" value="{CreateCustomerModel>/Value}" maxLength="5" />
-				<Label text="{i18n>custMailId}" required="true" />
-				<Input value="{CreateCustomerModel>/MailID}" placeholder="{i18n>emailSetValueText}" id="MC_id_CustMail"  maxLength="190" liveChange="onLiveChangeEmail" valueState="None" />
-				<Label text="{i18n>customerEmail}" required="true"/>
-				<Input value="{CreateCustomerModel>/CustomerEmail}" id="MC_id_FinanceEmail" placeholder="{i18n>placeholderFinanceEmail}" maxLength="190" liveChange="onLiveChangeFinanceEmail" valueState="None" />
-				<Label text="{i18n>custMobileNo}"/>
-				<Input value="{CreateCustomerModel>/MobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="10" change="validateMobileNo" />
+				<Label text="{i18n>emailId}" required="true" />
+				<Input value="{CreateCustomerModel>/MailID}" placeholder="{i18n>placeEmailId}" id="MC_id_CustMail"  maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
+				<Label text="{i18n>emailId}" required="true"/>
+				<Input value="{CreateCustomerModel>/CustomerEmail}" id="MC_id_FinanceEmail" placeholder="{i18n>placeholderFinanceEmail}" maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
+				<Label text="{i18n>mobileNo}"/>
+				<Input value="{CreateCustomerModel>/MobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="10" liveChange="MC_ValidateMobileNo" valueStateText="{i18n>mobileNoValueState}" />
 				<Label text="{i18n>custLut}" />
-				<Input value="{CreateCustomerModel>/LUT}" maxLength="20" placeholder="{i18n>placeholderLUT}"  />
-				<Label text="{i18n>cusdAddress}" required="true" />
-				<TextArea id="MC_id_CustAddress" value="{CreateCustomerModel>/Address}" placeholder="{i18n>addressPlaceholder}" maxLength="200" liveChange="onLiveChangeAddress" valueState="None" ></TextArea>
+				<Input value="{CreateCustomerModel>/LUT}" maxLength="20" placeholder="{i18n>placeholderLUT}"/>
+				<Label text="{i18n>address}" required="true" />
+				<TextArea id="MC_id_CustAddress" value="{CreateCustomerModel>/Address}" placeholder="{i18n>addressPlaceholder}" maxLength="200" liveChange="MC_ValidateCommonFields" valueStateText="{i18n>addressValueState}" ></TextArea>
 			</f:content>
 		</f:SimpleForm>
 		<HBox justifyContent="End" >
