@@ -8,10 +8,7 @@
     displayBlock="true">
 	<Page id="EO_id_Page" >
 		<headerContent>
-			<Button  press="EO_onPressback" icon="sap-icon://home" />
-			<Text text="{i18n>headerEmpDetails}" class="boldBlackText"></Text>
-			<ToolbarSpacer />
-			<Button  press="EO_onSignout" icon="sap-icon://log"></Button>
+			<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 		</headerContent>
 		<content>
 			<fb:FilterBar  class="sapUiTinyMargin" id="EO_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
@@ -37,8 +34,8 @@
 						</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Status" showClearIcon="true" selectionChange=".onSelectionChange" items="{EmployeeOffer>/Status}">
-							<core:Item key="{EmployeeOffer>ID}" text="{EmployeeOffer>Status}"/>
+						<ComboBox name="Status" showClearIcon="true" selectionChange=".onSelectionChange" items="{EmployeeStatus>/}">
+							<core:Item key="{EmployeeStatus>ID}" text="{EmployeeStatus>StatusValue}"/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
@@ -80,11 +77,10 @@
 							<Text text="{EmployeeOfferModel>Salutation} {EmployeeOfferModel>ConsultantName}"/>
 							<Text text="{EmployeeOfferModel>Designation}"/>
 							<Text text="{EmployeeOfferModel>BaseLocation}"/>
-							<Text text="{EmployeeOfferModel>JoiningDate}"/>
 							<Text text="{EmployeeOfferModel>CTC}"/>
-							<Text text="{EmployeeOfferModel>Status}"/>
-							<!-- <Text text="INR {path:'EmployeeOfferModel>CTC',formatter: '.Formatter.IndiaNumberFormatter'}"/> -->
-							<!-- <ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true" class="centerText" /> -->
+							<Text text="{EmployeeOfferModel>JoiningDate}"/>
+							<ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true"
+                        state="{path:'{EmployeeOfferModel>Status}', formatter: '.Formatter.formatObjectStatus'}" />
 						</cells>
 					</ColumnListItem>
 				</items>

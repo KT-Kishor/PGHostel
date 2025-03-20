@@ -62,6 +62,11 @@
                 "uri": "model/BloodGroup.json",
                 "preload": true
             },
+            "EmployeeStatus": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/EmployeeStatus.json",
+                "preload": true
+            },
             "CollegeGrade": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/CollegeGrade.json",
@@ -84,7 +89,7 @@
             },
             "EmployementBond": {
                 "type": "sap.ui.model.json.JSONModel",
-                "uri": "model/EmployementBond.json",
+                "uri": "model/EmploymentBond.json",
                 "preload": true
             },
             "ModeOfPayment": {

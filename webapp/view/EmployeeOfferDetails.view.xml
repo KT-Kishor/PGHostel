@@ -10,7 +10,7 @@
 				<pages>
 					<Page>
 						<content>
-							<Wizard complete="EOD_onPressReview" id="EOD_id_Wizard" finishButtonText="{i18n>submit}" showNextButton="true">
+							<Wizard  id="EOD_id_Wizard" finishButtonText="{i18n>submit}" showNextButton="true">
 								<WizardStep id="EOD_id_WizardStep"   complete="EOD_onStep2" title="{i18n>basicDetails}" validated="true">
 									<f:SimpleForm editable="true" layout="ColumnLayout" 	labelSpanXL="4"
 			labelSpanL="4"
@@ -28,7 +28,6 @@
 										<f:content>
 											<Label text="{i18n>consultantName}" required="true" />
 											<Select
-                                             id=""
                                              selectedKey="{employeeModel>/Salutation}"
                                              items="{Salutation>/salutation}">
 												<core:Item key="{Salutation>text}" text="{Salutation>text}" />
@@ -59,11 +58,15 @@
                                             change="EOD_validateDate" class="sapUiSmallMarginBottom disableInput" valueStateText="{i18n>dateValueState}"/>
 											<Label text="{i18n>designation}" required="true" />
 											<Select items="{DesignationModel>/}" id="EOD_id_Designation" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}">
-												<core:Item key="{DesignationModel>id}" text="{DesignationModel>designationName}" />
+											    <items>
+												<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
+												</items>
 											</Select>
 											<Label text="{i18n>baseLocation}" required="true" />
-											<Select items="{BaseLocationModel>/}" id="EOD_id_Location" selectedKey="{employeeModel>/BaseLocation}">
-												<core:Item key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" />
+											 <Select items="{BaseLocationModel>/}" id="EOD_id_Location" showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}">
+												<items>
+													<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+												</items>
 											</Select>
 											<Label text="{i18n>emailId}" required="true" />
 											<Input value="{employeeModel>/EmployeeEmail}" placeholder="{i18n>placeEmplyeeEmail}" 
@@ -73,15 +76,15 @@
                                             id="EOD_id_Address" maxLength="120" valueStateText="{i18n>addressValueState}"/>
 											<Label text="{i18n>ctc}" required="true" />
 											<Input value="{employeeModel>/CTC}" id="EOD_id_CTC" placeholder="{i18n>placeCtc}" 
-                                             liveChange="EOD_validateAmount" change="EOD_onChangeCTC" maxLength="15" valueStateText="{i18n>ammountValuState}" />
-											<Select items="{CurrencyModel>/}" selectedKey="{oTraineeDetails>/Currency}" id="EOD_id_Currency" width="100%" class="marginLeft">
-												<core:Item key="{CurrencyModel>id}" text="{CurrencyModel>currency}" />
+                                             liveChange="EOD_validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}" />
+											<Select items="{CurrencyModel>/}" enabled="false" selectedKey="{employeeModel>/Currency}" id="EOD_id_Currency" width="100%" class="marginLeft">
+												<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 											</Select>
 											<Label text="{i18n>joiningBonus}" required="true" />
 											<Input value="{employeeModel>/JoiningBonus}" placeholder="{i18n>joiningBonus}" 
                                              liveChange="EOD_validateAmount" maxLength="10" id="EOD_id_Bonus" valueStateText="{i18n>ammountValuState}" />
 											<Label text="{i18n>salaryType}"/>
-											<RadioButtonGroup id="EOD_id_Main" columns="3" select="onTDSCheckboxChange">
+											<RadioButtonGroup id="EOD_id_RadioButTds" columns="3" select="EOD_onTDSCheckboxChange">
 												<RadioButton id="EOD_id_Tds" text="{i18n>tds}" />
 												<RadioButton id="EOD_id_NoTds" text="{i18n>noTds}" />
 												<RadioButton id="EOD_id_Pf" text="{i18n>pf}" />
@@ -94,7 +97,7 @@
 												</buttons>
 											</RadioButtonGroup>
 											<Label text="{i18n>selectYear}" id="EOD_id_Lyear" visible="false" />
-											<Select items="{EmployementBond>/results}" id="EOD_id_BondCombo" selectedKey="{employeeModel>/EmploymentBond}" visible="false" change="validateInputs">
+											<Select items="{EmployementBond>/bond}" id="EOD_id_BondCombo" selectedKey="{employeeModel>/JoiningBonus}" >
 												<core:Item key="{EmployementBond>Value}" text="{EmployementBond>Value}" />
 											</Select>
 										</f:content>
@@ -111,7 +114,7 @@
 											<Label text="{i18n>statutoryBonus}" />
 											<Text text="{employeeModel>/StatutoryBonus}"  />
 											<Label text="{i18n>totalMonthly}" class="boldBlackText" />
-											<Text text="{employeeModel>/TotalMontly}"  />
+											<Text text="{employeeModel>/TotalMonthly}"  />
 											<Label text="{i18n>totalMonthlyAnnualized}" class="boldBlackText" />
 											<Text text="{employeeModel>/TotalmothlyAnnualized}"  />
 											<core:Title text="{i18n>retiralsBenefits}" />
@@ -132,11 +135,11 @@
 											<Text text="{employeeModel>/TotalVariablePay}"  />
 											<core:Title text="{i18n>totalCost}" />
 											<Label text="{i18n>costOfCompany}" class="boldBlackText" />
-											<Text text="{employeeModel>/CostofCompany}" class="boldBlackText"  />
+											<Text text="{employeeModel>/CostofCompany}"  />
 											<Label text="{i18n>joiningBonus}" class="boldBlackText" />
-											<Text text="{employeeModel>/DisplayJoiningBonus}"  />
+											<Text text="{employeeModel>/JoiningBonus}"  />
 											<Label text="{i18n>totalinr}" class="boldBlackText" />
-											<Text text="{employeeModel>/Total}"  class="boldBlackText" />
+											<Text text="{employeeModel>/Total}"   />
 										</f:content>
 									</f:SimpleForm>
 								</WizardStep>
@@ -144,16 +147,16 @@
 								<WizardStep  complete="EOD_onSubmitData"  title="{i18n>review}" validated="true">
 									<f:SimpleForm  editable="false"  layout="ColumnLayout"  title="{i18n>bothEmpDetails}" columnsM="2" columnsL="4" columnsXL="4">
 										<f:content>
-											<core:Title text="Basic Details" />
+											<core:Title text="{i18n>basicDetails}" />
 											<Label text="{i18n>consultantName}" />
 											<Text text="{= ${employeeModel>/Salutation} + ' ' + ${employeeModel>/ConsultantName} }" />
 											<Label text="{i18n>consultantAddress}" />
 											<Text text="{employeeModel>/ConsultantAddress}" />
 											<core:Title text="" />
 											<Label text="{i18n>offerReleaseDate}" />
-											<Text text="{path: 'employeeModel>/OfferReleaseDate', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'dd/MM/yyyy' }}" />
+											<Text text="{employeeModel>/OfferReleaseDate}" />
 											<Label text="{i18n>joiningDate}" />
-											<Text text="{path: 'employeeModel>/JoiningDate', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'dd/MM/yyyy' }}" />
+											<Text text="{employeeModel>/JoiningDate}" />
 											<core:Title text="" />
 											<Label text="{i18n>designation}" />
 											<Text text="{employeeModel>/Designation}" />
@@ -166,38 +169,38 @@
 											<Text text="{employeeModel>/EmployeeEmail}" />
 											<core:Title text="{i18n>monthlyComponents}" />
 											<Label text="{i18n>basicSalary}" />
-											<Text text="{path: 'employeeModel>/BasicSalary'}" />
+											<Text text="{employeeModel>/BasicSalary}" />
 											<Label text="{i18n>hra}" />
-											<Text text="{path: 'employeeModel>/HRA'}" />
+											<Text text="{employeeModel>/HRA}" />
 											<Label text="{i18n>statutoryBonus}" />
-											<Text text="{path: 'employeeModel>/StatutoryBonus'}" />
+											<Text text="{employeeModel>/StatutoryBonus}" />
 											<Label text="{i18n>totalMontly}" />
-											<Text text="{path: 'employeeModel>/TotalMontly'}" />
+											<Text text="{employeeModel>/TotalMonthly}" />
 											<Label text="{i18n>totalAnnual}" />
-											<Text text="{path: 'employeeModel>/TotalmothlyAnnualized'}" />
+											<Text text="{employeeModel>/TotalmothlyAnnualized}" />
 											<core:Title text="{i18n>retiralsBenefits}" />
 											<Label text="{i18n>tds}" />
-											<Text text="{path: 'employeeModel>/TDS'}" />
+											<Text text="{employeeModel>/TDS}" />
 											<Label text="{i18n>medicalInsurancePremium}" />
-											<Text text="{path: 'employeeModel>/MedicalInsurance'}" />
+											<Text text="{employeeModel>/MedicalInsurance}" />
 											<Label text="{i18n>gratuity}" />
-											<Text text="{path: 'employeeModel>/Gratuity'}" />
+											<Text text="{employeeModel>/Gratuity}" />
 											<Label text="{i18n>totalRetires}" />
-											<Text text="{path: 'employeeModel>/TotalRetires'}" />
-											<core:Title text="{i18n>Variable Components (INR)}" />
+											<Text text="{employeeModel>/TotalRetires}" />
+											<core:Title text="{i18n>Variable Components}" />
 											<Label text="{i18n>performanceBonusSection}" />
-											<Text text="{path: 'employeeModel>/PerformanceBonus'}" />
+											<Text text="{employeeModel>/PerformanceBonus}" />
 											<Label text="{i18n>engagementBonus}" />
-											<Text text="{path: 'employeeModel>/EngagementPB'}" />
+											<Text text="{employeeModel>/EngagementPB}" />
 											<Label text="{i18n>totalVariableComponents}" />
-											<Text text="{path: 'employeeModel>/TotalVariablePay'}" />
+											<Text text="{employeeModel>/TotalVariablePay}" />
 											<core:Title text="{i18n>totalCost}" />
 											<Label text="{i18n>costOfCompany}" />
-											<Text text="{path: 'employeeModel>/CostofCompany'}" />
+											<Text text="{employeeModel>/CostofCompany}" />
 											<Label text="{i18n>joiningBonus}" />
-											<Text text="{path: 'employeeModel>/DisplayJoiningBonus'}" />
+											<Text text="{employeeModel>/JoiningBonus}" />
 											<Label text="{i18n>totalinr}" />
-											<Text text="{path: 'employeeModel>/Total'}" />
+											<Text text="{employeeModel>/Total}" />
 										</f:content>
 									</f:SimpleForm>
 								</WizardStep>

@@ -1,9 +1,13 @@
 sap.ui.define([
-    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",
+    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel",
+    "sap/m/MessageToast",
+    "sap/m/MessageBox",
+    "../model/formatter"
 ],
-    function (BaseController, utils, JSONModel, MessageToast,) {
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOfferDetails", {
+            Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteEmployeeOfferDetails").attachMatched(this._onRouteMatched, this);
             },
@@ -15,16 +19,17 @@ sap.ui.define([
                 this._fetchCommonData("Designation", "DesignationModel");
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this._fetchCommonData("Currency", "CurrencyModel");
-                var jsonData={
+                this.EOD_onResetWizard();
+                var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",
                     "ConsultantAddress": "",
                     "Designation": "",
-                    "OfferReleaseDate": "",
+                    "OfferReleaseDate": this.Formatter.formatDate(new Date()),
                     "JoiningDate": "",
                     "CTC": "",
                     "EmploymentBond": "",
-                    "JoiningBonus": "",
+                    "JoiningBonus": "0",
                     "BaseLocation": "",
                     "BasicSalary": "",
                     "HRA": "",
@@ -41,10 +46,15 @@ sap.ui.define([
                     "CostofCompany": "",
                     "Total": "",
                     "Status": "",
+                    "Currency": "",
                     "EmployeeEmail": "",
                     "Year": ""
                 }
-                this.getView().setModel(new JSONModel(jsonData),"employeeModel");
+                this.getView().setModel(new JSONModel(jsonData), "employeeModel");
+                this.byId("EOD_id_Joindate").setMinDate(new Date());
+                ["EOD_id_Name","EOD_id_mail", "EOD_id_Address", "EOD_validateAmount", "EOD_id_Bonus"].forEach(function (ids) {
+                    this.getView().byId(ids).setValueState("None");
+                }.bind(this));
             },
             EOD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
@@ -57,10 +67,18 @@ sap.ui.define([
             EOD_validateAmount: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
                 this.validateStep();
+                if(oEvent.getSource().getId().lastIndexOf("EOD_id_CTC") !== -1){
+                    this.EOD_onTDSCheckboxChange();
+                }
             },
             EOD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
                 this.validateStep();
+                if (oEvent.getSource().getId().lastIndexOf("EOD_id_Reldate") !== -1) {
+                    // Get selected dates and Update the minimum date for joining date
+                    var releaseDate = this.byId("EOD_id_Reldate").getDateValue();
+                    this.byId("EOD_id_Joindate").setMinDate(releaseDate);
+                }
             },
             EOD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
@@ -84,18 +102,35 @@ sap.ui.define([
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
                 }
             },
+            // Reset wizard to initial state
+            EOD_onResetWizard: function () {
+                var oWizard = this.getView().byId("EOD_id_Wizard");
+                oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
+                oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
+            },
             //Submit the data
             EOD_onSubmitData: function (oEvent) {
-                try {
-                    if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
-                        MessageToast.show(this.i18nModel.getText("offerSuccess"));
+                if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
+                    var oModel = this.getView().getModel("employeeModel").getData();
+                    oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
+                    oModel.Status = "Submitted";
+                    oModel = {
+                        "tableName": "EmployeeOffer",
+                        "data": oModel
                     }
-                    else {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                    }
+                    this.ajaxCreateWithJQuery("EmployeeOffer", oModel).then((oData) => {
+                        if (oData.results) {
+                            sap.ui.core.BusyIndicator.hide();
+                            MessageToast.show(this.i18nModel.getText("offerSuccess"));
+                            this.getRouter().navTo("RouteEmployeeOffer");
+                        }
+                    }).catch((oError) => {
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    })
                 }
-                catch {
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                else {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
             EOD_onRadioButtonSelect: function (oEvent) {
@@ -109,23 +144,13 @@ sap.ui.define([
                     this.getView().byId("EOD_id_BondCombo").setSelectedKey("");
                 }
             },
-            EOD_onStep2 : function(){
-                var oModel = this.getView().getModel("employeeModel");
-                this._calculateSalaryComponents("");
+            EOD_onTDSCheckboxChange: function () {
+                var oTdsVal = this.byId("EOD_id_RadioButTds").getAggregation("buttons")[this.byId("EOD_id_RadioButTds").getSelectedIndex()].getProperty("text");
+                this._calculateSalaryComponents(oTdsVal);
             },
-            EOD_onPressReview : function(){
-                var oModel = this.getView().getModel("employeeModel").getData();
-                oModel = {
-                        "tableName": "EmployeeOffer",
-                        "data":oModel}
-                this.ajaxCreateWithJQuery("EmployeeOffer",oModel).then((oData) =>{
-                   if(oData.data.length > 0){
-                       MessageBox.success("Created successfully")
-                   }
-                })
-                .catch((oError) => {
-                    MessageBox.error("Error while creating the employee offer details")
-                })
-            }
+            EOD_onStep2: function () {
+                var oTdsVal = this.byId("EOD_id_RadioButTds").getAggregation("buttons")[this.byId("EOD_id_RadioButTds").getSelectedIndex()].getProperty("text");
+                this._calculateSalaryComponents(oTdsVal);
+            },
         });
     });

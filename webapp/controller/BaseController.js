@@ -1,4 +1,3 @@
-var url = "https://www.rest.kalpavrikshatechnologies.com/"
 sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/model/json/JSONModel",
@@ -145,6 +144,7 @@ sap.ui.define([
     },
     //Common read call for all the app
     async ajaxReadWithJQuery(sUrl,filter) {
+      sap.ui.core.BusyIndicator.show(0);
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
@@ -162,7 +162,8 @@ sap.ui.define([
     },
     //Common create call for all the app
     async ajaxCreateWithJQuery(sUrl, oPayLoad) {
-      return new Promise((resolve, reject) => {
+      sap.ui.core.BusyIndicator.show(0);
+        return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
           method: "POST",
@@ -177,15 +178,11 @@ sap.ui.define([
         });
       });
     },
-    _calculateSalaryComponents: function (oValue) {
+    _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
-      var CTC = parseInt(oModel.getProperty("/CTC"));
-      var joiningBonus = parseInt(oModel.getProperty("/JoiningBonus"));
-      var isTDSIncluded = oModel.getProperty("/IsTDSIncluded");
+      var CTC = parseFloat(oModel.getProperty("/CTC"));
+      var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus"));
       var BasicSalary, TDS;
-      // if (isTDSIncluded === undefined && oValue !== "SelfService") {
-      //   isTDSIncluded = oModel.setProperty("/IsTDSIncluded", this.byId("idTDSCheckBox").getSelected())
-      // }
       // Calculate various salary components
       BasicSalary = (CTC * 0.49) / 12;           // Monthly Basic Salary from 49% of CTC
       var houseRentAllowance = (CTC * 0.49) / 12 * 0.50;     // 50% of Basic Salary
@@ -200,7 +197,7 @@ sap.ui.define([
       var PerformanceBonus = (CTC * 5) / 100;  //5% of CTC as PerformanceBonus 
       var EngagementPB = (CTC * 5) / 100;   // 5% of CTC as EngagementPB 
       var TotalVariablePay = PerformanceBonus + EngagementPB;
-      if (!isTDSIncluded && isTDSIncluded !== undefined) {
+      if (isTDSIncluded === "No TDS" || isTDSIncluded === "PF") {
         PerformanceBonus += (TDS / 2)
         EngagementPB += (TDS / 2);
         TotalVariablePay = PerformanceBonus + EngagementPB
