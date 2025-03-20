@@ -145,6 +145,12 @@
                 },
                 {
                     "uri": "./libs/jspdf.plugin.autotable.min.js"
+                },
+                {
+                    "uri": "./libs/json-to-xlsx.js"
+                },
+                {
+                    "uri": "./libs/xlsx-to-json.js"
                 }
             ],
             "css": [
@@ -406,7 +412,16 @@
                     "target": [
                         "TargetMSAEdit"
                     ]
+                },
+                {
+                    "name": "RouteSchemeUpload",
+                    "pattern": "SchemeUpload",
+                    "target": [
+                        "TargetSchemeUpload"
+                    ]
+                   
                 }
+
             ],
             "targets": {
                 "TargetView1": {
@@ -655,6 +670,13 @@
                     "clearControlAggregation": false,
                     "viewId": "MSAEdit",
                     "viewName": "MSAEdit"
+                },
+                "TargetSchemeUpload": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "SchemeUpload",
+                    "viewName": "SchemeUpload"
                 }
             }
         },

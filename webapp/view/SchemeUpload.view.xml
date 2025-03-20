@@ -27,7 +27,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Company"
-                        label="{i18n>quoSchemeCompany}"
+                        label="{i18n>company}"
                         groupName="Group1"
                         visibleInFilterBar="true"
                     >
@@ -41,16 +41,14 @@
                                 showSecondaryValues="true"
                             >
                                 <core:ListItem
-                                    key="{CompanyDetails>CompanyCode}"
-                                    text="{CompanyDetails>CompanyName}"
-                                    additionalText="{CompanyDetails>CompanyCode}"
-                                />
+                                
+                                />  
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
                     <fb:FilterGroupItem
                         name="Model"
-                        label="{i18n>quoSchemeModel}"
+                        label="{i18n>vehicleModel}"
                         groupName="Group1"
                         visibleInFilterBar="true"
                     >
@@ -71,7 +69,7 @@
                     </fb:FilterGroupItem>
                     <fb:FilterGroupItem
                         name="Variant"
-                        label="{i18n>quoSchemeVariant}"
+                        label="{i18n>vehicleVariant}"
                         groupName="Group1"
                         visibleInFilterBar="true"
                     >
@@ -92,7 +90,7 @@
 
                     <fb:FilterGroupItem
                         name="Transmission"
-                        label="{i18n>quoSchemeTransmission}"
+                        label="{i18n>vehicleTransmission}"
                         groupName="Group1"
                         visibleInFilterBar="true"
                     >
@@ -140,27 +138,27 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title
-                            text="Quotation Scheme ({= ${MainModel>/items}.length })"
+                            text="Quotation Scheme (0)"
                             level="H2"
                         />
                         <ToolbarSpacer />
                         <Button
                             id="idUpload"
-                            text="{i18n>quoSchemeupload}"
+                            text="{i18n>upload}"
                             icon="sap-icon://upload"
                             press="onUploadpress"
                             type="Ghost"
-                        />
+                        /> 
                         <Button
                             id="idExport"
-                            text="{i18n>quoSchemeDownload}"
+                            text="{i18n>download}"
                             icon="sap-icon://download"
                             press="onDownloadpress"
                             type="Neutral"
                         />
                         <Button
                             id="idAdd"
-                            text="{i18n>offerLetterTileUnit}"
+                            text="{i18n>create}"
                             icon="sap-icon://add"
                             press="onCreateform"
                             type="Accept"
@@ -179,42 +177,42 @@
                         hAlign="Left"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>quoSchemeModel}" />
+                        <Text text="{i18n>vehicleModel}" />
                     </Column>
                     <Column
                         hAlign="Left"
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>quoSchemeVariant}" />
+                        <Text text="{i18n>vehicleVariant}" />
                     </Column>
                     <Column
                         hAlign="Left"
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>quoSchemeTransmission}" />
+                        <Text text="{i18n>vehicleTransmission}" />
                     </Column>
                     <Column
                         hAlign="Left"
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>quoSchemeColor}" />
+                        <Text text="{i18n>vehicleColor}" />
                     </Column>
                     <Column
                         hAlign="Left"
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>quoSchemeFuel}" />
+                        <Text text="{i18n>vehicleFuel}" />
                     </Column>
                     <Column
                         hAlign="Left"
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>quoSchemeBoardPlate}" />
+                        <Text text="{i18n>vehicleBoardPlate}" />
                     </Column>
                 </columns>
                 <items>
