@@ -7,6 +7,7 @@ sap.ui.define([
 
   return Controller.extend("sap.kt.ktofferletter.products.controller.BaseController", {
     Formatter: Formatter,
+    _fragments : {},
 
     // Router Code 
     getRouter: function () {
@@ -94,6 +95,7 @@ sap.ui.define([
     },
 
     _fetchCommonData: function (entityName, modelName, filter = "") {
+      if(this.getOwnerComponent().getModel(modelName) === undefined){
       let url =  this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;
       sap.ui.core.BusyIndicator.show(0);
       try {
@@ -118,6 +120,7 @@ sap.ui.define([
         sap.ui.core.BusyIndicator.hide();
         sap.m.MessageToast.show("Technical error, please contact the administrator");
       }
+    }
     },
     _commonFragmentOpen: function (that, oFragmentName) {
       var sId = that.getView().getId() + "--" + oFragmentName; // Unique ID per view
@@ -150,7 +153,7 @@ sap.ui.define([
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
           method: "GET",
           headers: this.getView().getModel("LoginModel").getData().headers,
-          data:filter,
+          data:JSON.stringify(filter),
           success: function (data) {
             resolve(data);
           },
@@ -178,10 +181,28 @@ sap.ui.define([
         });
       });
     },
+    //Common update call for all the app
+    async ajaxUpdateWithJQuery(sUrl, oPayLoad) {
+      sap.ui.core.BusyIndicator.show(0);
+        return new Promise((resolve, reject) => {
+        $.ajax({
+          url: this.getView().getModel("LoginModel").getData().url + sUrl,
+          method: "PUT",
+          data: JSON.stringify(oPayLoad),
+          headers:this.getView().getModel("LoginModel").getData().headers,
+          success: function (data) {
+            resolve(data);
+          },
+          error: function (error) {
+            reject(error);
+          }
+        });
+      });
+    },
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
-      var CTC = parseFloat(oModel.getProperty("/CTC"));
-      var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus"));
+      var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",",""));
+      var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus").replaceAll(",",""));
       var BasicSalary, TDS;
       // Calculate various salary components
       BasicSalary = (CTC * 0.49) / 12;           // Monthly Basic Salary from 49% of CTC

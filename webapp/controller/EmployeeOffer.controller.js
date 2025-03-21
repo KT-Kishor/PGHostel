@@ -35,11 +35,72 @@ sap.ui.define([
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
-            EO_onPressAddEmployee: function () {
-                this.getRouter().navTo("RouteEmployeeOfferDetails");
+            EO_onPressEmployee: function (oEvent) {
+                var oParValue;
+                if(oEvent.getSource().getId().lastIndexOf("EO_id_AddEOffBut") !== -1){
+                   oParValue = "CreateOfferFlag"
+                }else{
+                    oParValue = oEvent.getSource().getBindingContext("EmployeeOfferModel").getModel().getData()[oEvent.getSource().getBindingContextPath().split("/")[1]].ID
+                }
+                this.getRouter().navTo("RouteEmployeeOfferDetails",{sParOffer : oParValue});
             },
             EO_onOnboardPress: function () {
-                this._commonFragmentOpen(this, "OnboardEmployee");
+                this._fetchCommonData("Designation", "DesignationModel");
+                this._fetchCommonData("AppVisibility", "RoleModel");
+                this._fetchCommonData("EmployeeDetails", "EmployeeModel");
+                this.onHandleEmployeeAction("OnBoarded", "onBoardEmployee");
+            },
+            onHandleEmployeeAction: function (status, actionMethod) {
+                var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
+                var oEmpModelData = this.getView().getModel("EmployeeModel")
+                var sName = oSelectedData.Salutation + " " + oSelectedData.ConsultantName;
+                var that = this;
+                // Confirm dialog before proceeding with status update
+                var sMessage = (status === "OnBoarded")
+                ? that.i18nModel.getText("confirmOnboard", [sName])
+                : that.i18nModel.getText("confirmReject", [sName]);
+                sap.m.MessageBox.confirm(sMessage, {
+                    title: (status === "OnBoarded")
+                    ? that.i18nModel.getText("confirmTitleOnboard")
+                    : that.i18nModel.getText("confirmTitleReject"),
+                    actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                    onClose: function (oAction) {
+                        if (oAction === sap.m.MessageBox.Action.YES) {
+                          if (status === "OnBoarded") {
+                        //     const employeeIds = oEmpModelData.getData().length > 0 ?
+                        //     oEmpModelData.filter(item => item.ID && item.ID.startsWith("KT"))
+                        //     .map(item => parseInt(item.ID.slice(2), 10))
+                        //     .filter(numericPart => !isNaN(numericPart)) : "";
+                        //   const lastIdNo = employeeIds.length > 0 ? Math.max(...employeeIds) : 0;
+                          const newEmployeeID = "KT" + (lastIdNo + 1).toString().padStart(3, '0');
+              
+                          const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({
+                            ID: newEmployeeID,
+                            Salutation: oSelectedData.Salutation,
+                            EmployeeName: oSelectedData.ConsultantName,
+                            Role: " ",
+                            DateOfBirth: "",
+                            CompanyEmailID: "",
+                            PermanentAddress: oSelectedData.ConsultantAddress,
+                            CorrespondenceAddress: oSelectedData.ConsultantAddress,
+                            BaseLocation: oSelectedData.BaseLocation,
+                            AppraisalDate: oSelectedData.JoiningDate,
+                            Designation: oSelectedData.Designation,
+                            EmpOfferID: oSelectedData.ID,
+                            MobileNo: "",
+                            Manager: "",
+                            ManagerName: "",
+                            BloodGroup: "",
+                            EmployeeStatus: "Active"
+                          });
+                          this.getView().setModel(oEmployeeDetailsModel, "oEmpolyeeDetailsModel");
+                          this._commonFragmentOpen(this, "OnboardEmployee");
+                      } else {
+                        that[actionMethod](oContext);
+                      }
+                    }
+                  }
+                });
             },
             OEF_onPressClose: function () {
                 this._commonFragmentClose(this, "OnboardEmployee");
@@ -66,7 +127,7 @@ sap.ui.define([
                 // If an item is selected, check the status and update button visibility accordingly
                 if (oSelectedItem) {
                     var sStatus = oSelectedItem.getBindingContext("EmployeeOfferModel").getProperty("Status");
-                    this.ID = oSelectedItem.getBindingContext("EmployeeOfferModel").getProperty("ID")
+                    // this.ID = oSelectedItem.getBindingContext("EmployeeOfferModel").getProperty("ID")
                     var isDisabled = sStatus === "OnBoarded" || sStatus === "Rejected";
                     this.byId("EO_id_OnboardBtn").setVisible(!isDisabled);
                     this.byId("EO_id_RejectBtn").setVisible(!isDisabled);

@@ -41,14 +41,14 @@
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table mode="SingleSelectLeft" selectionChange="EO_onSelectionRadRowE" class="sapUiTinyMargin" items="{path: 'EmployeeOfferModel>/',sorter: {path: '',descending: false,group: false}}" growingScrollToLoad="true" width="auto" id="EO_id_" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			<Table  id="EO_id_TableEOffer" mode="SingleSelectLeft" selectionChange="EO_onSelectionRadRowE" class="sapUiTinyMargin" items="{path: 'EmployeeOfferModel>/',sorter: {path: '',descending: false,group: false}}" growingScrollToLoad="true" width="auto"  growing="true"  growingThreshold="50"  alternateRowColors="true">
 			 <headerToolbar>
                 <OverflowToolbar >
                     <Title text="{i18n>headerEmpDetails}"/>
                     <ToolbarSpacer/>
                     <Button tooltip="{i18n>onboardEmp}" id="EO_id_OnboardBtn" text="Onboard" type="Neutral" press="EO_onOnboardPress"  icon="sap-icon://manager"/>
                     <Button tooltip="{i18n>rejectEmp}" id="EO_id_RejectBtn" type="Reject" text="Reject" press="EO_onRejectPress" icon="sap-icon://employee-rejections" />
-                    <Button text="{i18n>generateOffer}" press="EO_onPressAddEmployee" type="Accept"  icon="sap-icon://employee-approvals"/>
+                    <Button text="{i18n>generateOffer}" id="EO_id_AddEOffBut" press="EO_onPressEmployee" type="Accept"  icon="sap-icon://employee-approvals"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
@@ -72,7 +72,7 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem type="Navigation" press="EO_onPressRowE">
+					<ColumnListItem type="Navigation" press="EO_onPressEmployee">
 						<cells>
 							<Text text="{EmployeeOfferModel>Salutation} {EmployeeOfferModel>ConsultantName}"/>
 							<Text text="{EmployeeOfferModel>Designation}"/>

@@ -1,0 +1,186 @@
+<core:FragmentDefinition
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:l="sap.ui.layout"
+	xmlns="sap.uxap"
+	xmlns:m="sap.m"
+	xmlns:core="sap.ui.core">
+    <m:Page  id="EODF_id_PageUpdate" title="{i18n>pageTitleemployee}" showNavButton="true" navButtonPress="EOD_onPressBack">
+		<ObjectPageLayout id="EODF_id_ObjectPageLayoutEmp"
+                          selectedSection="{viewModel>/selectedSection}"
+                          useIconTabBar="true"
+                          showTitleInHeaderContent="true"
+                          class="sapUiSmallmarginResponsive">
+			<headerTitle>
+				<ObjectPageDynamicHeaderTitle>
+					<!-- Expanded heading to display Consultant Name and Designation -->
+					<expandedHeading>
+						<m:Title text=" {employeeModel>/Salutation} {employeeModel>/ConsultantName}" wrapping="true" width="100%" />
+					</expandedHeading>
+					<expandedContent>
+						<m:Label text="{employeeModel>/Designation}" wrapping="true" width="100%" />
+					</expandedContent>
+				</ObjectPageDynamicHeaderTitle>
+			</headerTitle>
+			<!-- Object Page Sections -->
+			<sections>
+				<ObjectPageSection titleUppercase="false"  id="EODF_id_BasicDetailsSection" title="{i18n>basicDetails}">
+					<subSections>
+						<!-- Subsection of the basic details section -->
+						<ObjectPageSubSection titleUppercase="false">
+							<blocks>
+								<!-- SimpleForm for displaying and editing Employee details -->
+								<f:SimpleForm 
+                                              editable="true"
+                                              layout="ColumnLayout"
+                                              columnsM="2"
+                                              columnsL="2"
+                                              columnsXL="2">
+									<f:content>
+										<!-- Consultant Name Field -->
+										<m:Label text="{i18n>consultantName}" required="true" />
+										<m:Select editable="{viewModel>/editable}"
+                                               selectedKey="{employeeModel>/Salutation}"
+                                               items="{Salutation>/salutation}"
+                                               width="100%">
+											<!-- Binding the key and text of the Select control to the NameSalutation model -->
+											<core:Item key="{Salutation>text}" text="{Salutation>text}" />
+										</m:Select>
+										<m:Input id="EOUF_id_Name" value="{employeeModel>/ConsultantName}" editable="{viewModel>/editable}" maxLength="50" liveChange="EOD_validateName" valueStateText="{i18n>nameEmployeeValueState}"/>
+										<!-- Designation ComboBox with data from the DesignationModel -->
+										<m:Label text="{i18n>designation}" required="true" />
+										<m:Select items="{DesignationModel>/}" editable="{viewModel>/editable}" id="EOUF_id_Designation" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}">
+											    <m:items>
+												<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
+												</m:items>
+										</m:Select>
+										<!-- Joining Date Field with DatePicker control -->
+										<m:Label text="{i18n>offerReleaseDate}" required="true" />
+											<m:DatePicker id="EOUF_id_Reldate" editable="{viewModel>/editable}" placeholder="{i18n>offerReleaseDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
+                                             value= "{employeeModel>/OfferReleaseDate}"
+                                             change="EOD_validateDate" class="sapUiSmallMarginBottom" valueStateText="{i18n>dateValueState}"/>
+											<m:Label text="{i18n>joiningDate}" required="true" />
+											<m:DatePicker id="EOUF_id_Joindate" editable="{viewModel>/editable}" placeholder="{i18n>joiningDate}" 
+                                            value="{employeeModel>/JoiningDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
+                                            change="EOD_validateDate" class="sapUiSmallMarginBottom disableInput" valueStateText="{i18n>dateValueState}"/>
+										<!-- Base Location ComboBox with data from CityJsonModel -->
+									     <m:Label text="{i18n>baseLocation}" required="true" />
+											 <m:Select items="{BaseLocationModel>/}" editable="{viewModel>/editable}" id="EOUF_id_Location" showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}">
+												<m:items>
+													<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+												</m:items>
+											</m:Select>
+										<!-- Consultant Address TextArea -->
+										<m:Label text="{i18n>consultantAddress}" required="true" />
+											<m:TextArea  editable="{viewModel>/editable}" value="{employeeModel>/ConsultantAddress}" placeholder="{i18n>consultantAddress}" liveChange="EOD_ValidateCommonFields"
+                                            id="EOUF_id_Address" maxLength="120" valueStateText="{i18n>addressValueState}"/>
+											<!-- Employment Bond Year ComboBox -->
+										<m:Label text="{i18n>selectYear}" id="EOUF_id_Lyear" visible="false" />
+											<m:Select editable="{viewModel>/editable}" items="{EmployementBond>/bond}" id="EOUF_id_BondCombo" selectedKey="{employeeModel>/Value}" visible="false" change="validateInputs">
+												<core:Item key="{EmployementBond>Value}" text="{EmployementBond>Value}" />
+											</m:Select>
+										<!-- Employee Email Input Field -->
+										<m:Label text="{i18n>emailId}" required="true" />
+										<m:Input editable="{viewModel>/editable}" value="{employeeModel>/EmployeeEmail}" placeholder="{i18n>placeEmplyeeEmail}" 
+                                             id="EOUF_id_mail" maxLength="50" liveChange="EOD_validateEmail" valueStateText="{i18n>emailValueState}"/>
+											<!-- Employee Status Input (read-only) -->
+										<m:Label text="{i18n>employeeStatus}" />
+										<m:Input value="{employeeModel>/Status}" editable="false" />
+									</f:content>
+								</f:SimpleForm>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+				<!-- Subsection of the basic details section -->
+				<ObjectPageSection  title="{i18n>salaryDetails}">
+					<subSections>
+						<ObjectPageSubSection >
+							<blocks>
+								<!-- Salary Details Form -->
+								<f:SimpleForm 
+                                              editable="true"
+                                              layout="ColumnLayout"
+                                              columnsM="3"
+                                              columnsL="3"
+                                              columnsXL="3">
+									<f:content>
+										<!-- Basic Salary  -->
+										<m:Label text="{i18n>basicSalary}" />
+										<m:Input value="{employeeModel>/BasicSalary}" editable="false" />
+										<!-- HRA  -->
+										<m:Label text="{i18n>hra}" />
+										<m:Input value="{employeeModel>/HRA}" editable="false" />
+										<!-- Statutory Bonus  -->
+										<m:Label text="{i18n>statutoryBonus}" />
+										<m:Input value="{employeeModel>/StatutoryBonus}" editable="false" />
+										<!-- Total Monthly salary -->
+										<m:Label text="{i18n>totalMonthly}" class="boldBlackText" />
+										<m:Input value="{employeeModel>/TotalMonthly}" editable="false" />
+										<!-- Total Monthly salary annualized -->
+										<m:Label text="{i18n>totalMonthlyAnnualized}" class="boldBlackText" />
+										<m:Input value="{employeeModel>/TotalmothlyAnnualized}" editable="false" />
+										<!-- Row 2 -->
+										<!-- TDS  -->
+										<m:Label text="{i18n>tds}" />
+										<m:Input value="{employeeModel>/TDS}" editable="false"  />
+										<!-- Medical Insurance  -->
+										<m:Label text="{i18n>medicalInsurance}" />
+										<m:Input value="{employeeModel>/MedicalInsurance}" editable="false" />
+										<!-- Gratuity  -->
+										<m:Label text="{i18n>gratuity}" />
+										<m:Input value="{employeeModel>/Gratuity}" editable="false" />
+										<!-- Total Retirement Benefits -->
+										<m:Label text="{i18n>totalRetires}" class="boldBlackText" />
+										<m:Input value="{employeeModel>/TotalRetires}" editable="false" />
+										<!-- Performance Bonus  -->
+										<m:Label text="{i18n>performanceBonus}" />
+										<m:Input value="{employeeModel>/PerformanceBonus}" editable="false" />
+										<!-- Row 3 -->
+										<!-- Engagement Performance Bonus  -->
+										<m:Label text="{i18n>engagementPB}" />
+										<m:Input value="{employeeModel>/EngagementPB}" editable="false" />
+										<!-- Total Variable Pay -->
+										<m:Label text="{i18n>totalVariablePay}" class="boldBlackText" />
+										<m:Input value="{employeeModel>/TotalVariablePay}" editable="false" />
+										<!-- Cost of Company  -->
+										<m:Label text="{i18n>costOfCompany}" class="boldBlackText" />
+										<m:Input value="{employeeModel>/CostofCompany}" editable="false" />
+										<m:Label text="{i18n>ctc}"  visible="{viewModel>/isCTCVisible}" required="true"/>
+										<m:Input value="{employeeModel>/CTC}" editable="{viewModel>/editable}" id="EOUF_id_CTC" placeholder="{i18n>placeCtc}" 
+                                             liveChange="EOD_validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}" />
+										<m:Label text="{i18n>salaryType}"/>
+										<m:RadioButtonGroup id="EOUF_id_RadioButTds" columns="3" selectedIndex="{employeeModel>/Type}" editable="{viewModel>/editable}" select="EOD_onTDSCheckboxChange">
+												<m:RadioButton  text="{i18n>tds}" />
+												<m:RadioButton  text="{i18n>noTds}" />
+												<m:RadioButton  text="{i18n>pf}" />
+										</m:RadioButtonGroup>
+										<!-- Joining Bonus input field -->
+                                        <m:Label text="{i18n>joiningBonus}" class="boldBlackText" />
+										<m:Input value="{employeeModel>/JoiningBonus}" editable="{viewModel>/editable}" placeholder="{i18n>joiningBonus}" 
+                                            liveChange="EOD_validateAmount" maxLength="10" id="EOUF_id_Bonus" valueStateText="{i18n>ammountValuState}" />
+											<!-- Total salary -->
+										<m:Label text="{i18n>totalinr}" class="boldBlackText" />
+										<m:Input value="{employeeModel>/Total}" editable="false" />
+									</f:content>
+								</f:SimpleForm>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+			</sections>
+		</ObjectPageLayout>
+		<m:footer>
+			<m:Bar id="idbar">
+				<m:contentRight>
+					<!-- Save/Edit and Merge Buttons -->
+					<m:Button text="{= ${viewModel>/editable} ? ${i18n>save} : ${i18n>edit} }"
+                              press="EOUF_onEditOrSavePress"  id="EOUF_id_SaveBut" visible="{= ${viewModel>/isVisiable} }"  />
+					<m:Button text="{i18n>tileFooter}" press="EOUF_onPressSendEmail"  id="EOUF_id_EmpmailBut" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}"/>
+					<m:Button text="{i18n>tileUnit}" press="EOUF_onPressMerge" visible="{= ${viewModel>/isVisiable} }" id="EOUF_id_EmpmergeButton" enabled="{viewModel>/isEditMode}" />
+				</m:contentRight>
+			</m:Bar>
+		</m:footer>
+	</m:Page>
+</core:FragmentDefinition>
