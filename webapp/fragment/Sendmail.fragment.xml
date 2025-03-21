@@ -25,13 +25,13 @@
 					<Input id="userNameInput" value="{FragmentModel>/frgUserName}" placeholder="{i18n>placeUserName}" change="onChangeSendOTP" maxLength="50" />
 
 					<Label text="{i18n>btnotp}" required="true" />
-					<Input id="otpInput" liveChange="onFrgOTPInputLiveChange" value="{FragmentModel>/FrgOTP}" placeholder="{i18n>otp}" type="Number" visible="{visibleModel>/OTP}" change="onLiveChangeOTP"/>
+					<Input id="otpInput" liveChange="onFrgOTPInputLiveChange"  value="{FragmentModel>/FrgOTP}" placeholder="{i18n>otp}" type="Number" visible="{LoginModel>/isRadioVisible}" change="onLiveChangeOTP"/>
 					
 					<Label text="{i18n>inpNewpassword}" required="true" />
-					<Input id="newPasswordInput" value="{FragmentModel>/frgNewPassword}" placeholder="{i18n>placenewpass}" type="Password" liveChange="onChnageSetAndConfirm" valueState="None" visible="{visibleModel>/NewPassword}"  showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="onTogglePasswordVisibility" maxLength="50" />
+					<Input id="newPasswordInput" value="{FragmentModel>/frgNewPassword}" placeholder="{i18n>placenewpass}" type="Password" liveChange="onChnageSetAndConfirm" valueState="None" visible="{LoginModel>/isRadioVisible}"  showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="onTogglePasswordVisibility" maxLength="50" />
 
 					<Label text="{i18n>inpConpassword}" required="true" />
-					<Input id="confirmPasswordInput" value="{FragmentModel>/frgConfirmPassword}" placeholder="{i18n>placeconpass}" type="Password" liveChange="onChnageSetAndConfirm" visible="{visibleModel>/ConfirmPassword}"  showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="onTogglePasswordVisibility" maxLength="50" />
+					<Input id="confirmPasswordInput" value="{FragmentModel>/frgConfirmPassword}" placeholder="{i18n>placeconpass}" type="Password" liveChange="onChnageSetAndConfirm" visible="{LoginModel>/isRadioVisible}"  showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="onTogglePasswordVisibility" maxLength="50" />
 
 				</f:content>
 			</f:SimpleForm>

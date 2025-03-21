@@ -425,6 +425,14 @@
                         "TargetSchemeUpload"
                     ]
                    
+                },
+                {
+                    "name": "RouteSchemeUploadDetails",
+                    "pattern": "SchemeuploadDetails",
+                    "target": [
+                        "TargetSchemeUploadDetails"
+                    ]
+                   
                 }
 
             ],
@@ -682,7 +690,15 @@
                     "clearControlAggregation": false,
                     "viewId": "SchemeUpload",
                     "viewName": "SchemeUpload"
+                },
+                "TargetSchemeUploadDetails": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "SchemeuploadDetails",
+                    "viewName": "SchemeuploadDetails"
                 }
+
             }
         },
         "rootView": {

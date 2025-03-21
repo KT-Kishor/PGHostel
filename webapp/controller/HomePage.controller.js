@@ -185,6 +185,9 @@ sap.ui.define(
           this.getRouter().navTo("RouteHomePage");
         },
 
+        validateCompnayname: function (oEvent) {
+          utils._LCvalidateMandatoryField(oEvent);
+        },
         validateName: function (oEvent) {
           utils._LCvalidateName(oEvent);
         },
@@ -206,8 +209,8 @@ sap.ui.define(
 
           // Form Validation
           if (
-            utils._LCvalidateName(this.byId("idcustomername"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idCompanyname"), "ID") &&
+            utils._LCvalidateName(this.byId("idcustomername"), "ID") &&
             utils._LCvalidateEmail(this.byId("idCustmailid"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idCustaddress"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idtimeslot"), "ID") &&

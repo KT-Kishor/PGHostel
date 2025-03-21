@@ -24,6 +24,9 @@ sap.ui.define(
       "sap.kt.com.minihrsolution.controller.LoginPage",
       {
         onInit: function () {
+          this.getRouter()
+            .getRoute("RouteLoginPage")
+            .attachMatched(this._onRouteMatched, this);
           var model = new JSONModel({
             EmployeeID: "",
             EmployeeName: "",
@@ -42,16 +45,7 @@ sap.ui.define(
         onpresshome: function () {
           this.getRouter().navTo("RouteHomePage");
         },
-        onLogin: function () {
-          var userid = this.byId("idUserid").getValue();
-          var username = this.byId("idUsername").getValue();
 
-          if (userid === "1" && username === "1") {
-            this.getRouter().navTo("RouteTilePage");
-          } else {
-            MessageToast.show("Invalid credentials.");
-          }
-        },
         onValidateUserId: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
@@ -59,12 +53,15 @@ sap.ui.define(
           utils._LCvalidateName(oEvent);
         },
 
-        onDetailscheck: function () {
+        onOtppress: function () {
           var oView = this.getView();
           var oModel = oView.getModel("LoginModel");
 
           var userId = oView.byId("idUserid").getValue().trim();
           var userName = oView.byId("idUsername").getValue().trim();
+          var oOtpInput = oView.byId("idCaptchaInput");
+          var oOtpLabel = oView.byId("idOtpLabel");
+          var oOtpButton = oView.byId("idbtnsendotp");
 
           if (!userId || !userName) {
             MessageToast.show("Please enter User ID and Username.");
@@ -72,53 +69,94 @@ sap.ui.define(
           }
 
           $.ajax({
-            url: "https://www.rest.kalpavrikshatechnologies.com/LoginDetails",
-            type: "GET",
+            url: "https://www.rest.kalpavrikshatechnologies.com/SendOTP",
+            type: "POST",
             contentType: "application/json",
-            dataType: "json",
             headers: {
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
               password:
                 "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
             },
-            data: {
+            data: JSON.stringify({
+              // FIXED: Converted data to JSON string
               EmployeeID: userId,
               EmployeeName: userName,
-            },
+              Type: "OTP",
+            }),
             success: function (response) {
-              console.log("Response from server:", response); // Debugging
+              oOtpInput.setVisible(true);
+              oOtpLabel.setVisible(true);
+              oOtpButton.setText("Resend OTP");
+              MessageToast.show(
+                "OTP sent to your registered email address. Please enter the OTP to proceed."
+              );
               // Validate response structure
-              if (
-                !response ||
-                !response.success ||
-                !response.data ||
-                response.data.length === 0
-              ) {
-                MessageToast.show("Invalid credentials. Please try again.");
-                oModel.setProperty("/isRadioVisible", false);
-                return;
-              }
+              // if (
+              //   !response ||
+              //   !response.success ||
+              //   !response.data ||
+              //   response.data.length === 0
+              // ) {
+              //   MessageToast.show("Invalid credentials. Please try again.");
+              //   oModel.setProperty("/isRadioVisible", false);
+              //   return;
+              // }
 
               // Check if user exists in response data
-              var userFound = response.data.some(function (user) {
-                return (
-                  user.EmployeeID === userId && user.EmployeeName === userName
-                );
-              });
+              // var userFound = response.data.some(function (user) {
+              //   return (
+              //     user.EmployeeID === userId && user.EmployeeName === userName
+              //   );
+              // });
 
-              if (userFound) {
-                oModel.setProperty("/isRadioVisible", true);
-                MessageToast.show(
-                  "User verified! Please select a login method."
-                );
-              } else {
-                MessageToast.show("Invalid credentials. Please try again.");
-                oModel.setProperty("/isRadioVisible", false);
-              }
+              // if (userFound) {
+              //   // MessageToast.show(
+              //   //   "OTP sent to your registered email address. Please enter the OTP to proceed."
+              //   // );
+              //   oOtpButton.setText("Resend OTP");
+              // } else {
+              //   MessageToast.show("Invalid credentials. Please try again.");
+              //   oOtpInput.setVisible(false);
+              //   oOtpLabel.setVisible(false);
+              // }
             },
             error: function (xhr, status, error) {
               MessageToast.show("Error verifying user. Please try again.");
-              oModel.setProperty("/isRadioVisible", false);
+            },
+          });
+        },
+
+        onLogin: function () {
+          var that = this;
+          var oView = this.getView();
+          var userId = oView.byId("idUserid").getValue().trim();
+          var userName = oView.byId("idUsername").getValue().trim();
+          var userOtp = oView.byId("idCaptchaInput").getValue().trim();
+
+          if (!userId || !userName) {
+            MessageToast.show("Please enter User ID and Username.");
+            return;
+          }
+          $.ajax({
+            url: "https://www.rest.kalpavrikshatechnologies.com/LoginDetails",
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+              password:
+                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+            },
+            data: JSON.stringify({
+              EmployeeID: userId,
+              EmployeeName: userName,
+              OTP: userOtp,
+            }),
+            success: function (response) {
+              MessageToast.show("Done");
+              that.getRouter().navTo("RouteTilePage");
+            },
+            error: function (xhr, status, error) {
+              MessageToast.show("Error Please try again.");
             },
           });
         },
@@ -148,8 +186,8 @@ sap.ui.define(
             oSendotp.setVisible(false);
           } else {
             // Show OTP input field
-            oOtpInput.setVisible(true);
-            oOtpLabel.setVisible(true);
+            // oOtpInput.setVisible(true);
+            // oOtpLabel.setVisible(true);
             oSendotp.setVisible(true);
 
             // Hide password field and forgot password link
