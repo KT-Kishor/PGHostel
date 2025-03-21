@@ -33,7 +33,7 @@
 						</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="T_id_TraineeTable" class="sapUiTinyMargin" items=""  busyIndicatorDelay="0"  width="auto"
+			<Table id="T_id_TraineeTable" class="sapUiTinyMargin"  items="{path: 'traineeModel>/'}"  busyIndicatorDelay="0"  width="auto"
                     growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				 <headerToolbar>
                 <OverflowToolbar >
@@ -62,20 +62,19 @@
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>emailId}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true" width="8%">
+					<Column minScreenWidth="Desktop" demandPopin="true" width="10%">
 						<Text text="{i18n>status}" />
 					</Column>
 				</columns>
 				<items>
 					<ColumnListItem >
 						<cells>
-						    <Text text="{}"/>							
-							<Text text="{}"/>
-							<Text text="{}"/>
-							<Text text="{}"/>
-							<Text text="{}"/>
-							<Text text="{}"/>
-
+						    <Text text="{traineeModel>nameSalutation} {traineeModel>traineeName}"/>							
+							<Text text="{traineeModel>reportingManagerSalutation} {traineeModel>reportingManager}"/>
+							<Text text="{traineeModel>stipend} {traineeModel>currency}"/>
+							<Text text="{traineeModel>joiningDate}"/>
+							<Text text="{traineeModel>traineeEmail}"/>
+							<ObjectStatus text="{traineeModel>status}" inverted="true" state="{path:'traineeModel>status',formatter:'.Formatter.formatObjectStatus'}"/>
 						</cells>
 					</ColumnListItem>
 				</items>

@@ -2,16 +2,40 @@ sap.ui.define([
     "./BaseController",
      "../utils/validation",
       "sap/ui/model/json/JSONModel",
-      "sap/m/MessageToast"],
-    function (BaseController, utils, JSONModel, MessageToast) {
+      "sap/m/MessageToast",
+      "../model/formatter"
+    ],
+    function (BaseController, utils, JSONModel, MessageToast,Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.TraineeDetails", {
+            Formatter:Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteTraineeDetails").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: function (oEvent) {
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
-                this.i18nModel=this.getView().getModel("i18n").getResourceBundle();
+                 this.i18nModel=this.getView().getModel("i18n").getResourceBundle();
+                this._fetchCommonData("Currency", "CurrencyModel");
+                this.T_onResetWizard();
+                var jsonData ={
+                    "nameSalutation":"Mr.",
+                    "traineeName":"",
+                    "reportingManagerSalutation":"Mr.",
+                    "reportingManager":"",
+                    "stipend":"",
+                    "joiningDate":this.Formatter.formatDate(new Date()),
+                    "traineeEmail":""
+                }
+                this.getView().setModel(new JSONModel(jsonData),"oTraineeDetails");
+                ["TD_id_Name","TD_id_ReportingManager", "TD_id_EmailID", "TD_id_Stipend", "TD_id_JoiningDate"].forEach(function (ids) {
+                    this.getView().byId(ids).setValueState("None");
+                }.bind(this));
+            },
+              // Reset wizard to initial state
+              T_onResetWizard: function () {
+                var oWizard = this.getView().byId("TD_id_Wizard");
+                oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
+                oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
             },
             TD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
@@ -31,20 +55,7 @@ sap.ui.define([
             },
             TD_onPressback: function () {
                 this.getRouter().navTo("RouteTrainee");
-            },
-            // Common Model
-            CommonModel: function () {
-                var oModel = new JSONModel({
-                    TSalutation: "Mr.",
-                    TraineeName: "",
-                    RSalutation: "Mr",
-                    ReportingManager: "",
-                    EmailID: "",
-                    Stipend: "",
-                    JoiningDate: new Date(),
-                });
-                this.getView().setModel(oModel, "oTraineeDetails");
-            },
+            },    
             validateStep: function () {
                 // Check if all fields have values
                 var allFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getValue() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_Stipend").getValue() && this.getView().byId("TD_id_JoiningDate").getValue();
@@ -58,15 +69,27 @@ sap.ui.define([
             },
 
             TD_onSubmitData: function (oEvent) {
-                try {
-                    if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
-                        MessageToast.show(this.i18nModel.getText("traineeDataSubmitted"));
-                    } else {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
+                    var oModel = this.getView().getModel("oTraineeDetails").getData();
+                    oModel.status = "Submitted";
+                    oModel = {
+                        "tableName": "Trainee",
+                        "data": oModel
                     }
-                } catch (error) {
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    this.ajaxCreateWithJQuery("Trainee", oModel).then((oData) => {
+                        if (oData.results) {
+                            sap.ui.core.BusyIndicator.hide();
+                            MessageToast.show(this.i18nModel.getText("traineeDataSubmitted"));
+                            this.getRouter().navTo("RouteTrainee");
+                        }
+                    }).catch((oError) => {
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    })
                 }
-            }
+                else {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                }
+            },
         });
     });

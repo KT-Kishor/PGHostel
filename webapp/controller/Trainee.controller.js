@@ -3,16 +3,31 @@ sap.ui.define([
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
+    "../model/formatter"
 ],
-    function (BaseController, utils, JSONModel, MessageToast) {
+    function (BaseController, utils, JSONModel, MessageToast,Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Trainee", {
+            Formatter:Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: function () {
+                this.readCallForTrainee();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
+            },
+
+            readCallForTrainee: function () {
+                var filter = { ID: "" }
+                this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
+                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    this.getView().setModel(new JSONModel(offerData), "traineeModel");
+                    sap.ui.core.BusyIndicator.hide();
+                }).catch((oError) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageBox.error("Error while reading the employee offer details")
+                })
             },
 
             T_ValidateCommonFields: function (oEvent) {

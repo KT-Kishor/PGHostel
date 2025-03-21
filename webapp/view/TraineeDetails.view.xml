@@ -28,14 +28,14 @@
 								<VBox width="20%">
 									<Select
                                                id="TD_id_NameSalutation"
-                                               selectedKey="{oTraineeDetails>/TSalutation}"
+                                               selectedKey="{oTraineeDetails>/nameSalutation}"
                                                items="{Salutation>/salutation}"
                                                width="100%">
 										<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 									</Select>
 								</VBox>
 								<VBox width="78%">
-									<Input value="{oTraineeDetails>/TraineeName}" maxLength="50" placeholder="{i18n>placeTraineeName}" id="TD_id_Name" liveChange="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>nameEmployeeValueState}"/>
+									<Input value="{oTraineeDetails>/traineeName}" maxLength="50" placeholder="{i18n>placeTraineeName}" id="TD_id_Name" liveChange="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>nameEmployeeValueState}"/>
 								</VBox>
 							</HBox>
 							<Label text="{i18n>reportingManager}" required="true" />
@@ -43,7 +43,7 @@
 								<VBox width="20%">
 									<Select
                                                id="TD_id_ManagerSalutation"
-                                               selectedKey="{oTraineeDetails>/RSalutation}"
+                                               selectedKey="{oTraineeDetails>/reportingManagerSalutation}"
                                                items="{Salutation>/salutation}"
                                                width="100%"
 											   valueStateText="{i18n>nameEmployeeValueState}">
@@ -51,20 +51,20 @@
 									</Select>
 								</VBox>
 								<VBox width="78%">
-									<ComboBox showSecondaryValues="true"  change="TD_validateName"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{idModel>/results}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin">
+									<ComboBox showSecondaryValues="true"  change="TD_validateName"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/reportingManager}" items="{idModel>/results}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin">
 										<core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}" />
 									</ComboBox>
 								</VBox>
 							</HBox>
 							<Label text="{i18n>emailId}" required="true" />
-							<Input value="{oTraineeDetails>/EmailID}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
+							<Input value="{oTraineeDetails>/traineeEmail}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>stipend}" required="true" />
-							<Input value="{oTraineeDetails>/Stipend}" maxLength="15" placeholder="{i18n>placeStipend}" id="TD_id_Stipend" liveChange="TD_validateAmount" valueStateText="{i18n>ammountValuState}"/>
-							<Select items="{currencyModel>/results}" selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" class="marginLeft">
-								<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
-							</Select>
-							<Label text="{i18n>joiningDate}"  id="TD_id_Ljoin" required="true" />
-							<DatePicker width="50%" value="oTraineeDetails>/JoiningDate'}" id="TD_id_JoiningDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
+							<Input value="{oTraineeDetails>/stipend}" maxLength="15" placeholder="{i18n>placeStipend}" id="TD_id_Stipend" liveChange="TD_validateAmount" valueStateText="{i18n>ammountValuState}"/>
+								<Select items="{CurrencyModel>/}"  selectedKey="{oTraineeDetails>/currency}" id="TD_id_Currency" width="100%" class="marginLeft">
+												<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
+											</Select>
+							<Label text="{i18n>joiningDate}"   required="true" />
+							<DatePicker width="50%" value="{oTraineeDetails>/joiningDate}" id="TD_id_JoiningDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
@@ -89,17 +89,17 @@
 			columnsM="1">
 						<f:content>
 							<Label text="{i18n>traineeName}"/>
-							<Text text="{= ${oTraineeDetails>/NameSalutation} + ' ' + ${oTraineeDetails>/Name}}"/>
+							<Text text="{= ${oTraineeDetails>/nameSalutation} + ' ' + ${oTraineeDetails>/traineeName}}"/>
 							<Label text="{i18n>reportingManager}" />
-							<Text text="{= ${oTraineeDetails>/ReportingManagerSalutation} + ' ' + ${oTraineeDetails>/ReportingManager}}"/>
+							<Text text="{= ${oTraineeDetails>/reportingManagerSalutation} + ' ' + ${oTraineeDetails>/reportingManager}}"/>
 							<Label text="{i18n>emailId}" />
-							<Text  text="{oTraineeDetails>/TraineeEmail}"/>
+							<Text  text="{oTraineeDetails>/traineeEmail}"/>
 							<Label text="{i18n>stipend}" />
-							<Text text="{oTraineeDetails>/Stipend}"/>
+							<Text text="{oTraineeDetails>/stipend} "/>
 							<Label text="{i18n>currency}" />
-							<Text text="{oTraineeDetails>/Currency}"/>
+							<Text text="{oTraineeDetails>/currency}"/>
 							<Label text="{i18n>joiningDate}" />
-							<Text text="{}"/>
+							<Text text="{oTraineeDetails>/joiningDate}"/>
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
