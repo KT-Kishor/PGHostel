@@ -12,6 +12,8 @@
     layout="ColumnLayout" editable="true"
    >
 				<f:content>
+					<Label text="Password" />
+					<Input id="V1_id_Password"  required="true" liveChange="validatePassword" maxLength="10" valueStateText="{i18n>passwordValueState}"/>
 					<Label text="Mobile No" />
 					<Input id="V1_id_MobileNo"  required="true" liveChange="validateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}"/>
 

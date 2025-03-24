@@ -10,6 +10,9 @@ sap.ui.define([
 
         },
 
+        validatePassword: function (oEvent) {
+            utils._LCvalidatePassword(oEvent);
+        },
         validateMobileNo: function (oEvent) {
             utils._LCvalidateMobileNumber(oEvent);
         },
@@ -53,7 +56,7 @@ sap.ui.define([
         //Save the Data
         V1_SubmitData: function (oEvent) {
             try {
-                if (utils._LCvalidateMobileNumber(this.byId("V1_id_MobileNo"), "ID") && utils._LCvalidateEmail(this.byId("V1_id_Email"), "ID") && utils._LCvalidateName(this.byId("V1_id_Name"), "ID") && utils._LCvalidateAmount(this.byId("V1_id_Amount"), "ID") && utils._LCvalidateAccountNo(this.byId("V1_id_AccountNumber"), "ID") && utils._LCvalidateDate(this.byId("V1_id_Date"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Address"), "ID") && utils._LCvalidatePanCard(this.byId("V1_id_PanCard"), "ID") && utils._LCvalidateAadharCard(this.byId("V1_id_AadharCard"), "ID") && utils._LCvalidateGstNumber(this.byId("V1_id_Gst"), "ID")
+                if ( utils._LCvalidatePassword(this.byId("V1_id_Password"), "ID") &&utils._LCvalidateMobileNumber(this.byId("V1_id_MobileNo"), "ID") && utils._LCvalidateEmail(this.byId("V1_id_Email"), "ID") && utils._LCvalidateName(this.byId("V1_id_Name"), "ID") && utils._LCvalidateAmount(this.byId("V1_id_Amount"), "ID") && utils._LCvalidateAccountNo(this.byId("V1_id_AccountNumber"), "ID") && utils._LCvalidateDate(this.byId("V1_id_Date"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Address"), "ID") && utils._LCvalidatePanCard(this.byId("V1_id_PanCard"), "ID") && utils._LCvalidateAadharCard(this.byId("V1_id_AadharCard"), "ID") && utils._LCvalidateGstNumber(this.byId("V1_id_Gst"), "ID")
                     && utils._LCvalidateMandatoryField(this.byId("V1_id_CompanyName"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Comments"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Source"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Destination"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_Country"), "ID") && utils._LCvalidateName(this.byId("V1_id_AccountHolderName"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_BankName"), "ID") && utils._LCvalidateIfcCode(this.byId("V1_id_IfscCode"), "ID") && utils._LCvalidatePassport(this.byId("V1_id_Passport"), "ID")
                     && utils._LCvalidateVoterId(this.byId("V1_id_VoterID"), "ID") && utils._LCvalidateMandatoryField(this.byId("V1_id_FileUploader"), "ID")) {
                 }

@@ -33,16 +33,16 @@
 						</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="T_id_TraineeTable" class="sapUiTinyMargin"  items="{path: 'traineeModel>/'}"  busyIndicatorDelay="0"  width="auto"
+			<Table id="T_id_TraineeTable" class="sapUiTinyMargin"  items="{path: 'traineeModel>/'}"  busyIndicatorDelay="0"  width="auto" mode="SingleSelectLeft" selectionChange="T_onTableSelectionChange"
                     growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				 <headerToolbar>
                 <OverflowToolbar >
                     <Title id="T_id_Title" text="{i18n>traineeDetails}"/>
                     <ToolbarSpacer/>
                     <Button  tooltip="{i18n>downloadcCertificate}" id="T_id_Download"  type="Success" press="T_onCertDownload"  icon="sap-icon://document-text"/>
-                    <Button  text="{i18n>onboard}" id="T_id_Onboard"  type="Neutral" press="T_onOnboardPress"  icon="sap-icon://manager"/>
-                    <Button text="{i18n>rejectTainee}" id="T_id_Reject" type="Reject"  press="T_onRejectPress" icon="sap-icon://employee-rejections" />
-                    <Button text="{i18n>addTrainee}" id="T_id_Add" type="Accept"  press="T_onPressAddTrainee"  icon="sap-icon://employee-approvals"/>
+                    <Button  text="{i18n>onboard}" id="T_id_OnboardBtn"  type="Neutral" press="T_onOnboardPress"  icon="sap-icon://manager"/>
+                    <Button text="{i18n>rejectTainee}" id="T_id_RejectBtn" type="Reject"  press="T_onRejectPress" icon="sap-icon://employee-rejections" />
+                    <Button text="{i18n>addTrainee}" id="T_id_AddBtn" type="Accept"  press="T_onPressAddTrainee"  icon="sap-icon://employee-approvals"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
@@ -67,7 +67,7 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem >
+					<ColumnListItem  type="Navigation" press="T_onPressAddTrainee">
 						<cells>
 						    <Text text="{traineeModel>nameSalutation} {traineeModel>traineeName}"/>							
 							<Text text="{traineeModel>reportingManagerSalutation} {traineeModel>reportingManager}"/>
@@ -85,6 +85,7 @@
 				<contentLeft>
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</contentLeft>
+				
 			</Bar>
 		</footer>
 	</Page>

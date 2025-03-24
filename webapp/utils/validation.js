@@ -228,6 +228,21 @@ sap.ui.define([], function () {
                 oField.setValueState("None");
                 return true;
             }
-        }
+        },
+        _LCvalidatePassword: function (oEvent, type) {
+            var oField = (type === "ID") ? oEvent : oEvent.getSource();
+            if (!oField) return false;
+        
+            var oValue = oField.getValue();
+            var regex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/;
+        
+            if (!regex.test(oValue)) {
+                oField.setValueState("Error");
+                return false;
+            } else {
+                oField.setValueState("None");
+                return true;
+            }
+        },
     };
 });
