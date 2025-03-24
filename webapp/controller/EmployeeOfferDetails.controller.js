@@ -110,8 +110,10 @@ sap.ui.define([
                 })
             },
             readCallForEmployeeOffer: function (sArgPara) {
-                var filter = { "filters":{"ID":sArgPara}}
-                this.ajaxReadWithJQuery("EmployeeOffer", filter).then((oData) => {
+                var queryString = $.param({
+                    "ID":sArgPara
+                    });
+                this.ajaxReadWithJQuery("EmployeeOffer", queryString).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     offerData[0].Type = offerData[0].Type === "TDS" ? 0 : (offerData[0].Type === "No TDS" ? 1 : 2);
                     this.getView().setModel(new JSONModel(offerData[0]), "employeeModel");
@@ -148,10 +150,15 @@ sap.ui.define([
             EOD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
                 this.validateStep();
-                if (oEvent.getSource().getId().lastIndexOf("EOD_id_Reldate") !== -1) {
+                var oOfferDateId = oEvent.getSource().getId().split("--")[2], releaseDate; 
+                if (oOfferDateId === "EOD_id_Reldate" || oOfferDateId === "EOUF_id_Reldate") {
                     // Get selected dates and Update the minimum date for joining date
-                    var releaseDate = this.byId("EOD_id_Reldate").getDateValue();
-                    this.byId("EOD_id_Joindate").setMinDate(releaseDate);
+                    if(oOfferDateId === "EOD_id_Reldate"){
+                        releaseDate = this.byId("EOD_id_Reldate").getDateValue();
+                        this.byId("EOD_id_Joindate").setMinDate(releaseDate);}
+                    else{
+                        releaseDate = this.byId("EOUF_id_Reldate").getDateValue();
+                        this.byId("EOUF_id_Joindate").setMinDate(releaseDate);}
                 }
             },
             EOD_ValidateCommonFields: function (oEvent) {
@@ -189,6 +196,7 @@ sap.ui.define([
                     var oModel = this.getView().getModel("employeeModel").getData();
                     oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.Type = oModel.Type === 0 ? "TDS" : (oModel.Type === 1 ? "No TDS" : "PF");
+                    oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey(); 
                     oModel.Status = "Submitted";
                     console.log(oModel);
                     oModel = {

@@ -150,10 +150,9 @@ sap.ui.define([
       sap.ui.core.BusyIndicator.show(0);
       return new Promise((resolve, reject) => {
         $.ajax({
-          url: this.getView().getModel("LoginModel").getData().url + sUrl,
+          url: this.getView().getModel("LoginModel").getData().url +sUrl+"?"+filter,
           method: "GET",
           headers: this.getView().getModel("LoginModel").getData().headers,
-          data:JSON.stringify(filter),
           success: function (data) {
             resolve(data);
           },

@@ -126,41 +126,43 @@ sap.ui.define(
           });
         },
 
+        // onLogin: function () {
+        //   var that = this;
+        //   var oView = this.getView();
+        //   var userId = oView.byId("idUserid").getValue().trim();
+        //   var userName = oView.byId("idUsername").getValue().trim();
+        //   var userOtp = oView.byId("idCaptchaInput").getValue().trim();
+
+        //   if (!userId || !userName) {
+        //     MessageToast.show("Please enter User ID and Username.");
+        //     return;
+        //   }
+        //   $.ajax({
+        //     url: "https://www.rest.kalpavrikshatechnologies.com/LoginDetails",
+        //     type: "GET",
+        //     contentType: "application/json",
+        //     headers: {
+        //       name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+        //       password:
+        //         "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+        //     },
+        //     data: JSON.stringify({
+        //       EmployeeID: userId,
+        //       EmployeeName: userName,
+        //       OTP: userOtp,
+        //     }),
+        //     success: function (response) {
+        //       MessageToast.show("Done");
+        //       that.getRouter().navTo("RouteTilePage");
+        //     },
+        //     error: function (xhr, status, error) {
+        //       MessageToast.show("Error Please try again.");
+        //     },
+        //   });
+        // },
         onLogin: function () {
-          var that = this;
-          var oView = this.getView();
-          var userId = oView.byId("idUserid").getValue().trim();
-          var userName = oView.byId("idUsername").getValue().trim();
-          var userOtp = oView.byId("idCaptchaInput").getValue().trim();
-
-          if (!userId || !userName) {
-            MessageToast.show("Please enter User ID and Username.");
-            return;
-          }
-          $.ajax({
-            url: "https://www.rest.kalpavrikshatechnologies.com/LoginDetails",
-            type: "GET",
-            contentType: "application/json",
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
-            data: JSON.stringify({
-              EmployeeID: userId,
-              EmployeeName: userName,
-              OTP: userOtp,
-            }),
-            success: function (response) {
-              MessageToast.show("Done");
-              that.getRouter().navTo("RouteTilePage");
-            },
-            error: function (xhr, status, error) {
-              MessageToast.show("Error Please try again.");
-            },
-          });
+          this.getRouter().navTo("RouteTilePage");
         },
-
         onLoginOptionChange: function (oEvent) {
           var sSelectedButtonId = oEvent.getSource().getId();
           var oView = this.getView();
