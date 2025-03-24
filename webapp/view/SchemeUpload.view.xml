@@ -3,25 +3,23 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:m="sap.m.Table"
-    xmlns:f="sap.f"
     xmlns:fb="sap.ui.comp.filterbar"
-    xmlns:filterBar="sap.ui.comp.filterbar"
     xmlns:core="sap.ui.core"
 >
-    <Page id="idPageQuotationScheme">
+    <Page id="SU_id_PageQuotationScheme">
         <headerContent>
            <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
         </headerContent>
         <content>
             <fb:FilterBar
-                id="filterbar"
+                id="SU_id_Filterbar"
                 persistencyKey="myPersKey"
                 useToolbar="false"
                 clear="onClear"
                 showClearOnFB="true"
-                search=".onSearch"
-                filterChange=".onFilterChange"
-                afterVariantLoad=".onAfterVariantLoad"
+                search="SU_onSearch"
+                filterChange="SU_onFilterChange"
+                afterVariantLoad="SU_onAfterVariantLoad"
                 class="sapUiTinyMargin"
             >
                 <fb:filterGroupItems>
@@ -34,11 +32,11 @@
                         <fb:control>
                             <ComboBox
                             showClearIcon="true"
-                                change="onCompanyChange"
+                                change="SU_onCompanyChange"
                                 name="Company"
                                 items="{CompanyDetails>/results}"
-                                id="idCompanyCode"
-                                showSecondaryValues="true"
+                                id="SU_id_CompanyCode"
+                              
                             >
                                 <core:ListItem
                                 
@@ -56,13 +54,13 @@
                             <ComboBox
                             showClearIcon="true"
                                 name="Model"
-                                id="idModelComboBox"
+                                id="SU_id_ModelComboBox"
                                 enabled="{editableModel>/isModelEditable}"
-                                change="onModelChange"
+                                change="SU_onModelChange"
                             >
                                 <core:Item
-                                    key="{ModelFilter>Model}"
-                                    text="{ModelFilter>Model}"
+                                    key=""
+                                    text=""
                                 />
                             </ComboBox>
                         </fb:control>
@@ -77,12 +75,12 @@
                             <ComboBox
                             showClearIcon="true"
                                 name="Variant"
-                                id="idVariant1"
+                                id="SU_id_Variant1"
                                 enabled="{editableModel>/isVariantEditable}"
                             >
                                 <core:Item
-                                    key="{ModelVarient>Variant}"
-                                    text="{ModelVarient>Variant}"
+                                    key=""
+                                    text=""
                                 />
                             </ComboBox>
                         </fb:control>
@@ -98,13 +96,13 @@
                             <ComboBox
                             showClearIcon="true"
                                 name="Transmission"
-                                id="idTransmission1"
-                                items="{ModelVarient>/TransmissionResults}"
+                                id="SU_id_Transmission1"
+                                items=""
                                 enabled="{editableModel>/isTransmissionEditable}"
                             >
                                 <core:Item
-                                    key="{ModelVarient>Transmission}"
-                                    text="{ModelVarient>Transmission}"
+                                    key=""
+                                    text=""
                                 />
                             </ComboBox>
                         </fb:control>
@@ -115,7 +113,7 @@
         <content>
             <Table
             growingScrollToLoad="true"
-                id="idQuotationtable"
+                id="SU_id_Quotationtable"
                 class="sapUiTinyMargin"
                 width="auto"
                 inset="false"
@@ -143,31 +141,31 @@
                         />
                         <ToolbarSpacer />
                         <Button
-                            id="idUpload"
+                            id="SU_id_Upload"
                             text="{i18n>upload}"
                             icon="sap-icon://upload"
-                            press="onUploadpress"
+                            press="SU_onUploadpress"
                             type="Ghost"
                         /> 
                         <Button
-                            id="idExport"
+                            id="SU_id_Export"
                             text="{i18n>download}"
                             icon="sap-icon://download"
-                            press="onDownloadpress"
+                            press="SU_onDownloadpress"
                             type="Neutral"
                         />
                         <Button
-                            id="idAdd"
+                            id="SU_id_Add"
                             text="{i18n>create}"
                             icon="sap-icon://add"
-                            press="onCreateform"
+                            press="SU_onCreateform"
                             type="Accept"
                         />
                         <Button
-                            id="idDelete"
+                            id="SU_id_Delete"
                             text="{i18n>delete}"
                             icon="sap-icon://delete"
-                            press="onDeletepress"
+                            press="SU_onDeletepress"
                             type="Reject"
                         />
                     </OverflowToolbar>
@@ -217,17 +215,17 @@
                 </columns>
                 <items>
                     <ColumnListItem
-                        press="onItemPress"
+                        press="SU_onItemPress"
                         type="Navigation"
                     >
                         <cells>
                             <!-- <Text text="" />s -->
-                            <Text text="{MainModel>Model}" />
-                            <Text text="{MainModel>Variant}" />
-                            <Text text="{MainModel>Transmission}" />
-                            <Text text="{MainModel>Color}" />
-                            <Text text="{MainModel>Fuel}" />
-                            <Text text="{MainModel>BoardPlate}" />
+                            <Text text="" />
+                            <Text text="" />
+                            <Text text="" />
+                            <Text text="" />
+                            <Text text="" />
+                            <Text text="" />
                         </cells>
                     </ColumnListItem>
                 </items>

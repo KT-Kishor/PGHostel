@@ -38,7 +38,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteLoginPage");
         },
         //open uploadBox
-        onUploadpress: function () {
+        SU_onUploadpress: function () {
           if (!this.oDialog) {
             this.oDialog = sap.ui.xmlfragment(
               "sap.kt.com.minihrsolution.fragment.Uploadscheme",

@@ -345,17 +345,7 @@
                                         />
                                     </m:TileContent>
                                 </m:GenericTile>
-                                 <m:GenericTile
-                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
-                                    header="{i18n>viewsalary}"
-                                   
-                                >
-                                    <m:TileContent unit="{i18n>viewsalary}">
-                                        <m:ImageContent
-                                            src="sap-icon://payment-approval"
-                                        />
-                                    </m:TileContent>
-                                </m:GenericTile>
+                               
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>HeaderPaySlip}"

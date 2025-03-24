@@ -4,15 +4,14 @@
     xmlns:u="sap.ui.unified"
     xmlns:f="sap.ui.layout.form"
     xmlns="sap.m"
-    xmlns:m="sap.m"
     xmlns:core="sap.ui.core"
 >
-    <m:Page id="idQuotationschemeDetails">
+    <Page id="SUD_id_QuotationschemeDetails">
         <headerContent>
             <Button
-                id="idBack"
+                id="SUD_id_Back"
                 text=""
-                press="onhandleBackPress"
+                press="SUD_onhandleBackPress"
                 type="Transparent"
                 visible="true"
                 icon="sap-icon://nav-back"
@@ -26,7 +25,7 @@
 
         <VBox class="sapUiSmallMargin">
             <f:SimpleForm
-                id="idSimpleForm"
+                id="SUD_id_SimpleForm"
                 editable="{detailModel>/isEditable}"
                 layout="ColumnLayout"
                 title=""
@@ -48,8 +47,8 @@
                     <Label text="{i18n>company}" />
                     <ComboBox
                         required="true"
-                        selectionChange="onFieldLiveChange"
-                        id="idCompanyName"
+                        selectionChange="SUD_onFieldLiveChange"
+                        id="SUD_id_CompanyName"
                         name="Company"
                         value="{detailModel>/Company}"
                         items=""
@@ -67,10 +66,10 @@
                         required="{= ${detailModel>/isNew} }"
                     />
                     <Input
-                        id="idModel"
+                        id="SUD_id_Model"
                         value="{detailModel>/Model}"
                         editable="{= ${detailModel>/isNew} ? true : false }"
-                        liveChange="onFieldLiveChange"
+                        liveChange="SUD_onFieldLiveChange"
                         maxLength="99"
                     />
                     <Label
@@ -78,10 +77,10 @@
                         required="{= ${detailModel>/isNew} }"
                     />
                     <Input
-                        id="idVariant"
+                        id="SUD_id_Variant"
                         value="{detailModel>/Variant}"
                         editable="{= ${detailModel>/isNew} ? true : false }"
-                        liveChange="onFieldLiveChange"
+                        liveChange="SUD_onFieldLiveChange"
                         maxLength="99"
                     />
                     <Label
@@ -89,10 +88,10 @@
                       required="{= ${detailModel>/isNew} }"
                     />
                     <Input
-                        id="idTransmission"
+                        id="SUD_id_Transmission"
                         value="{detailModel>/Transmission}"
                         editable="{= ${detailModel>/isNew} ? true : false }"
-                        liveChange="onFieldLiveChange"
+                        liveChange="SUD_onFieldLiveChange"
                         maxLength="49"
                     />
                     <Label
@@ -100,10 +99,10 @@
                       required="{= ${detailModel>/isNew} }"
                     />
                     <Input
-                        id="idColor"
+                        id="SUD_id_Color"
                         value="{detailModel>/Color}"
                         editable="{= ${detailModel>/isNew} ? true : false }"
-                        liveChange="onFieldLiveChange"
+                        liveChange="SUD_onFieldLiveChange"
                         maxLength="19"
                     />
                     <Label
@@ -111,10 +110,10 @@
                       required="{= ${detailModel>/isNew} }"
                     />
                     <Input
-                        id="idFuel"
+                        id="SUD_id_Fuel"
                         value="{detailModel>/Fuel}"
                         editable="{= ${detailModel>/isNew} ? true : false }"
-                        liveChange="onFieldLiveChange"
+                        liveChange="SUD_onFieldLiveChange"
                         maxLength="19"
                     />
                     <Label
@@ -153,53 +152,53 @@
                         value="{ path: 'detailModel>/ConsumerScheme', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                     />
                     <Label text="{i18n>schexshowroomafter}" />
                     <Input
                         value="{ path: 'detailModel>/ExShowroomAfterScheme', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                     />
                     <Label text="{i18n>vehicleTCS}" />
                     <Input
                         value="{ path: 'detailModel>/TCS1Perc', formatter: '.Formatter.IndiaNumberFormatter' }"
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
                     />
                     <Label text="{i18n>vehicleRoadTax}" />
                     <Input
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/ROADTAX', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
                     />
                     <Label text="{i18n>schAddoninsurance}" />
                     <Input
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/AddOnInsurance', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
                     />
                     <Label text="{i18n>regHyp}" />
                     <Input
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/RegHypCharge', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
                     />
                     <Label text="{i18n>sot}" />
                     <Input
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/ShieldOfTrust4YR45K', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
                     />
                     <Label text="{i18n>extWarranty}" />
                     <Input
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/EXTDWarrantyFOR4YR80K', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
@@ -213,28 +212,28 @@
                     />
                     <Label text="{i18n>schStdsetting}" />
                     <Input
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/STDFittings', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
                     />
                     <Label text="{i18n>vehicleFastTag}" />
                     <Input
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/FastTag', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
                     />
                     <Label text="{i18n>vehicleVAS}" />
                     <Input
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/VAS', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
                     />
                     <Label text="{i18n>discountOffers}" />
                     <Input
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/DiscountOffers', formatter: '.Formatter.IndiaNumberFormatter' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
@@ -251,16 +250,16 @@
                 </contentLeft>
                 <contentRight>
                  <Button
-                            id="idEdit"
+                            id="SUD_id_Edit"
                             text="{= ${detailModel>/isNew} ? ${i18n>quoSchemeSave} : (${detailModel>/isEditable} ? ${i18n>quoSchemeSave} : ${i18n>btnEdit}) }"
                             icon="{= ${detailModel>/isNew} ? '' : (${detailModel>/isEditable} ? '' : 'sap-icon://edit') }"
-                            press="handleEditPress"
-    type="{= ${detailModel>/isNew} ? 'Accept' : (${detailModel>/isEditable} ? 'Accept' : 'Neutral') }"
+                            press="SUD_onhandleEditPress"
+    type="Transparent"
                             visible="true"
                           
                         />
                 </contentRight>
             </Bar>
         </footer>
-    </m:Page>
+    </Page>
 </mvc:View>

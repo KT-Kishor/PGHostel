@@ -204,6 +204,9 @@
 					    <contentLeft>
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
+				<contentRight>
+				<Button text="Update Password" icon="sap-icon://refresh" press="TP_onupdatepress" />
+				</contentRight>
 			</Bar>
 		
 		</footer>
