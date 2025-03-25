@@ -31,7 +31,7 @@
 					<Input id="FSM_id_newPasswordInput"  placeholder="{i18n>placenewpass}" visible="false" type="Password" liveChange="SM_onChnageSetAndConfirm" valueState="None"  showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="SM_onTogglePasswordVisibility" maxLength="50" />
 
 					<Label text="{i18n>inpConpassword}" id="FSM_id_frgconpass" required="true" />
-					<Input id="FSM_id_confirmPasswordInput" visible="false"  placeholder="{i18n>placeconpass}" type="Password" liveChange="SM_onChnageSetAndConfirm"   showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="SM_onTogglePasswordVisibility" maxLength="50" />
+					<Input id="FSM_id_confirmPasswordInput" visible="false" value="{FragmentModel>/frgConfirmPassword}" placeholder="{i18n>placeconpass}" type="Password" liveChange="SM_onChnageSetAndConfirm"   showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="SM_onTogglePasswordVisibility" maxLength="50" />
 
 				</f:content>
 			</f:SimpleForm>

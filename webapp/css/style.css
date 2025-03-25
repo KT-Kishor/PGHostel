@@ -247,7 +247,10 @@
   border-radius: 0.60rem;
 }
 
-
+.Training-background{
+background-color: #eafdf9;
+border-radius: 0.60rem;
+}
 .custom-text {
   color: rgb(5, 5, 5) !important;
   font-size: 18px;

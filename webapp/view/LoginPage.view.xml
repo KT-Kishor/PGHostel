@@ -19,10 +19,10 @@
                 title="{i18n>loginDetails}" singleContainerFullSize="false" >
 					<form:content>
 						<Label text="{i18n>userId}" required="true"/>
-						<Input placeholder="{i18n>placeUserId}" id="Lp_id_Userid" value="{loginModel>/userIds}" maxLength="50" valueStateText="Enter user ID" />
+						<Input placeholder="{i18n>placeUserId}"  valueStateText="{i18n>placeUserId}" liveChange="LP_onValidateUserId" id="Lp_id_Userid" value="{loginModel>/userIds}" maxLength="50" />
 						
 						<Label text="{i18n>userName}" required="true"/>
-						<Input placeholder="{i18n>placeUserName}" id="Lp_id_Username"  value="{loginModel>/userNames}" valueStateText="Enter user Name" maxLength="50" />
+						<Input placeholder="{i18n>placeUserName}" valueStateText="{i18n>placeUserName}" liveChange="LP_onValidateUsername" id="Lp_id_Username"  value="{loginModel>/userNames}"  maxLength="50" />
 						
 						<Label text="{i18n>headloginwith}" />
 <HBox alignItems="End" justifyContent="Start" >

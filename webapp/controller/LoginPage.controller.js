@@ -42,15 +42,34 @@ sap.ui.define(
 
           this.getOwnerComponent().setModel(model, "LoginModel");
         },
+        _onRouteMatched: function () {
+          // $.ajax({
+          //   url: "https://www.rest.kalpavrikshatechnologies.com/DataBaseConn",
+          //   type: "GET",
+          //   contentType: "application/json",
+          //   headers: {
+          //     name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+          //     password:
+          //       "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+          //   },
+          //   success: function (response) {},
+          //   error: function () {
+          //     MessageToast.show("Error. Please try again.");
+          //   },
+          // });
+        },
         onpresshome: function () {
           this.getRouter().navTo("RouteHomePage");
         },
 
-        onValidateUserId: function (oEvent) {
+        LP_onValidateUserId: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
-        onValidateUsername: function (oEvent) {
+        LP_onValidateUsername: function (oEvent) {
           utils._LCvalidateName(oEvent);
+        },
+        SM_onChnageSetAndConfirm: function (oEvent) {
+          utils._LCvalidatePassword(oEvent);
         },
 
         LP_onOtppress: function () {
@@ -61,7 +80,11 @@ sap.ui.define(
           var oOtpLabel = oView.byId("Lp_id_OtpLabel");
           var oOtpButton = oView.byId("idbtnsendotp");
 
-          if (!userId || !userName) {
+          if (
+            utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
+            utils._LCvalidateName(this.byId("Lp_id_Username"), "ID")
+          ) {
+          } else {
             MessageToast.show("Please enter User ID and Username.");
             return;
           }
@@ -103,12 +126,15 @@ sap.ui.define(
           var userName = oView.byId("Lp_id_Username").getValue().trim();
           var userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
           var password = oView.byId("Lp_id_PasswordInput").getValue().trim();
-
           var isOtpLogin = oView.byId("Lp_id_OtpRadio").getSelected();
           var isPasswordLogin = oView.byId("Lp_id_PasswordRadio").getSelected();
 
           // Validation for mandatory fields
-          if (!userId || !userName) {
+          if (
+            utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
+            utils._LCvalidateName(this.byId("Lp_id_Username"), "ID")
+          ) {
+          } else {
             MessageToast.show("Please enter User ID and Username.");
             return;
           }
@@ -140,8 +166,15 @@ sap.ui.define(
               oView.byId("Lp_id_Username").setValue("");
               oView.byId("Lp_id_CaptchaInput").setValue("");
               oView.byId("Lp_id_PasswordInput").setValue("");
-
               oView.byId("idbtnsendotp").setText("Send OTP");
+
+              // Hide Password and OTP Fields
+              oView.byId("Lp_id_CaptchaInput").setVisible(false);
+              oView.byId("Lp_id_PasswordInput").setVisible(false);
+              oView.byId("Lp_id_OtpLabel").setVisible(false);
+              oView.byId("Lp_id_PasswordLabel").setVisible(false);
+              oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
+              oView.byId("idbtnsendotp").setVisible(false);
             },
             error: function () {
               MessageToast.show("Error. Please try again.");
@@ -197,32 +230,41 @@ sap.ui.define(
                 oView.addDependent(this.oDialog);
                 this.oDialog.open();
                 sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(false);
-                this.modelFunction();
-                sap.ui
-                  .getCore()
-                  .byId("FSM_id_newPasswordInput")
-                  .setValueState("None");
-                sap.ui
-                  .getCore()
-                  .byId("FSM_id_confirmPasswordInput")
-                  .setValueState("None");
               }.bind(this)
             );
           } else {
             this.oDialog.open();
             sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(false);
-            this.modelFunction();
-            sap.ui
-              .getCore()
-              .byId("FSM_id_newPasswordInput")
-              .setValueState("None");
-            sap.ui
-              .getCore()
-              .byId("FSM_id_confirmPasswordInput")
-              .setValueState("None");
           }
         },
         SM_onPressCancle: function () {
+          var oUserIdInput = sap.ui.getCore().byId("FSM_id_userIdInput");
+          var oUserNameInput = sap.ui.getCore().byId("FSM_id_userNameInput");
+          var otpInput = sap.ui.getCore().byId("FSM_id_otpInput");
+          var oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
+          var oConfirmPwInput = sap.ui
+            .getCore()
+            .byId("FSM_id_confirmPasswordInput");
+
+          // Reset values
+          oUserIdInput.setValue("");
+          oUserNameInput.setValue("");
+          otpInput.setValue("");
+          oNewPwInput.setValue("");
+          oConfirmPwInput.setValue("");
+
+          // Reset value states
+          oUserIdInput.setValueState("None");
+          oUserNameInput.setValueState("None");
+          otpInput.setValueState("None");
+          oNewPwInput.setValueState("None");
+          oConfirmPwInput.setValueState("None");
+
+          // Hide OTP, new password, and confirm password fields
+          otpInput.setVisible(false);
+          oNewPwInput.setVisible(false);
+          oConfirmPwInput.setVisible(false);
+
           this.oDialog.close();
         },
 
@@ -347,35 +389,36 @@ sap.ui.define(
             },
           });
         },
-        SM_onChnageSetAndConfirm: function () {
-          var oNewPassword = sap.ui.getCore().byId("FSM_id_newPasswordInput");
-          var oConfirmPassword = sap.ui
-            .getCore()
-            .byId("FSM_id_confirmPasswordInput");
-          var sNewPassword = oNewPassword.getValue();
-          var sConfirmPassword = oConfirmPassword.getValue();
-          var passwordPattern = /^(?=.*[A-Z])(?=.*[\W_]).{6,}$/;
 
-          if (!passwordPattern.test(sNewPassword)) {
-            this.NewPassword = false;
-            oNewPassword.setValueState("Error");
-            oNewPassword.setValueStateText(
-              "Password must be atleast 6 characters long, contains one uppercase letter and one special character"
-            );
-          } else {
-            oNewPassword.setValueState("None");
-            this.NewPassword = true;
-          }
+        // SM_onChnageSetAndConfirm: function () {
+        //   var oNewPassword = sap.ui.getCore().byId("FSM_id_newPasswordInput");
+        //   var oConfirmPassword = sap.ui
+        //     .getCore()
+        //     .byId("FSM_id_confirmPasswordInput");
+        //   var sNewPassword = oNewPassword.getValue();
+        //   var sConfirmPassword = oConfirmPassword.getValue();
+        //   // var passwordPattern = /^(?=.*[A-Z])(?=.*[\W_]).{6,}$/;
 
-          if (sConfirmPassword && sNewPassword !== sConfirmPassword) {
-            oConfirmPassword.setValueState("Error");
-            oConfirmPassword.setValueStateText("Password mismatch");
-            this.ConfirmPassword = false;
-          } else {
-            oConfirmPassword.setValueState("None");
-            this.ConfirmPassword = true;
-          }
-        },
+        //   // if (!passwordPattern.test(sNewPassword)) {
+        //   //   this.NewPassword = false;
+        //   //   oNewPassword.setValueState("Error");
+        //   //   oNewPassword.setValueStateText(
+        //   //     "Password must be atleast 6 characters long, contains one uppercase letter and one special character"
+        //   //   );
+        //   // } else {
+        //   //   oNewPassword.setValueState("None");
+        //   //   this.NewPassword = true;
+        //   // }
+
+        //   if (sConfirmPassword && sNewPassword !== sConfirmPassword) {
+        //     oConfirmPassword.setValueState("Error");
+        //     oConfirmPassword.setValueStateText("Password mismatch");
+        //     this.ConfirmPassword = false;
+        //   } else {
+        //     oConfirmPassword.setValueState("None");
+        //     this.ConfirmPassword = true;
+        //   }
+        // },
         SM_onTogglePasswordVisibility: function (oEvent) {
           var oInput = oEvent.getSource();
           var sType = oInput.getType() === "Password" ? "Text" : "Password";
@@ -391,32 +434,27 @@ sap.ui.define(
           oInput.setValue(sCurrentValue); // Set the value again to prevent it from being cleared
         },
         SM_onPressSave: function () {
-          var frgUserId = sap.ui
+          var oUserIdInput = sap.ui.getCore().byId("FSM_id_userIdInput");
+          var oUserNameInput = sap.ui.getCore().byId("FSM_id_userNameInput");
+          var oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
+          var oConfirmPwInput = sap.ui
             .getCore()
-            .byId("FSM_id_userIdInput")
-            .getValue()
-            .trim();
-          var newPassword = sap.ui
-            .getCore()
-            .byId("FSM_id_newPasswordInput")
-            .getValue()
-            .trim();
-          var confirmPassword = sap.ui
-            .getCore()
-            .byId("FSM_id_confirmPasswordInput")
-            .getValue()
-            .trim();
+            .byId("FSM_id_confirmPasswordInput");
 
-          if (!newPassword) {
-            MessageToast.show("Please enter a new password");
-            return;
+          var frgUserId = oUserIdInput.getValue().trim();
+          var newPassword = oNewPwInput.getValue().trim();
+          var confirmPassword = oConfirmPwInput.getValue().trim();
+
+          // Run validation checks
+          if (
+            !utils._LCvalidateMandatoryField(oUserIdInput, "ID") ||
+            !utils._LCvalidateName(oUserNameInput, "ID") ||
+            !utils._LCvalidatePassword(oNewPwInput, "ID") ||
+            !utils._LCvalidatePassword(oConfirmPwInput, "ID")
+          ) {
+            MessageToast.show("Mandatory fields should be filled");
+            return; // Stops execution if validation fails
           }
-
-          if (!confirmPassword) {
-            MessageToast.show("Please confirm your password");
-            return;
-          }
-
           if (newPassword !== confirmPassword) {
             MessageToast.show("Passwords do not match");
             return;

@@ -24,27 +24,6 @@
             >
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
-                        name="Company"
-                        label="{i18n>company}"
-                        groupName="Group1"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
-                            showClearIcon="true"
-                                change="SU_onCompanyChange"
-                                name="Company"
-                                items="{CompanyDetails>/results}"
-                                id="SU_id_CompanyCode"
-                              
-                            >
-                                <core:ListItem
-                                
-                                />  
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <fb:FilterGroupItem
                         name="Model"
                         label="{i18n>vehicleModel}"
                         groupName="Group1"
@@ -55,7 +34,7 @@
                             showClearIcon="true"
                                 name="Model"
                                 id="SU_id_ModelComboBox"
-                                enabled="{editableModel>/isModelEditable}"
+                                enabled="true"
                                 change="SU_onModelChange"
                             >
                                 <core:Item
@@ -76,7 +55,7 @@
                             showClearIcon="true"
                                 name="Variant"
                                 id="SU_id_Variant1"
-                                enabled="{editableModel>/isVariantEditable}"
+                                enabled="true"
                             >
                                 <core:Item
                                     key=""
@@ -98,7 +77,7 @@
                                 name="Transmission"
                                 id="SU_id_Transmission1"
                                 items=""
-                                enabled="{editableModel>/isTransmissionEditable}"
+                                enabled="true"
                             >
                                 <core:Item
                                     key=""
@@ -117,17 +96,7 @@
                 class="sapUiTinyMargin"
                 width="auto"
                 inset="false"
-                items="{
-        path: 'MainModel>/items',
-        sorter: [{
-            path: 'Company', 
-            group: true
-        },
-        {
-        path:'Model',
-        group:true
-        }]
-    }"
+                items="{MainModel>/items}"
                 mode="SingleSelectLeft"
                 growing="true"
                 growingThreshold="50"
@@ -136,7 +105,7 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title
-                            text="Quotation Scheme (0)"
+                            text="Quotation Scheme ({= ${MainModel>/items}.length })"
                             level="H2"
                         />
                         <ToolbarSpacer />
@@ -171,6 +140,12 @@
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
+                 <Column
+                        hAlign="Left"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>company}" />
+                    </Column>
                     <Column
                         hAlign="Left"
                         demandPopin="true"
@@ -220,12 +195,13 @@
                     >
                         <cells>
                             <!-- <Text text="" />s -->
-                            <Text text="" />
-                            <Text text="" />
-                            <Text text="" />
-                            <Text text="" />
-                            <Text text="" />
-                            <Text text="" />
+                            <Text text="{MainModel>Company}" />
+                            <Text text="{MainModel>Model}" />
+                            <Text text="{MainModel>Variant}" />
+                            <Text text="{MainModel>Transmission}" />
+                            <Text text="{MainModel>Color}" />
+                            <Text text="{MainModel>Fuel}" />
+                            <Text text="{MainModel>BoardPlate}" />
                         </cells>
                     </ColumnListItem>
                 </items>

@@ -152,10 +152,10 @@
                     "uri": "./libs/jspdf.plugin.autotable.min.js"
                 },
                 {
-                    "uri": "./libs/json-to-xlsx.js"
+                    "uri": "./libs/xlsx-to-json.js"
                 },
                 {
-                    "uri": "./libs/xlsx-to-json.js"
+                    "uri": "./libs/json-to-xlsx.js"
                 }
             ],
             "css": [

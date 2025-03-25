@@ -30,7 +30,7 @@
             <f:content >
                
 
-                <Label text="{i18n>fileupload}" required="true"/>
+                <Label text="{i18n>fileUploader}" required="true"/>
                 <u:FileUploader
                     id="idFileUploader"
                     width="300px"
@@ -46,10 +46,10 @@
         </f:SimpleForm>
      </VBox>
         <beginButton>
-            <Button text="{i18n>submit}" type="Accept" press=".onCreateDialogSubmit" enabled="{/isFileValid}"/>
+            <Button text="{i18n>submit}" type="Accept" press="onCreateDialogSubmit" enabled="{/isFileValid}"/>
         </beginButton>
         <endButton>
-            <Button text="{i18n>btnCancel}" type="Reject" press=".onCreateDialogCancel"/>
+            <Button text="{i18n>btnCancel}" type="Reject" press="onCreateDialogCancel"/>
         </endButton>
     </Dialog>
 </core:FragmentDefinition>
