@@ -135,7 +135,9 @@ sap.ui.define(
             utils._LCvalidateName(this.byId("Lp_id_Username"), "ID")
           ) {
           } else {
-            MessageToast.show("Please enter User ID and Username.");
+            MessageToast.show(
+              "Make sure all the mandatory fields are filled/validate the entered value"
+            );
             return;
           }
 
@@ -164,20 +166,20 @@ sap.ui.define(
               // Clear all input fields after successful login
               oView.byId("Lp_id_Userid").setValue("");
               oView.byId("Lp_id_Username").setValue("");
-              oView.byId("Lp_id_CaptchaInput").setValue("");
-              oView.byId("Lp_id_PasswordInput").setValue("");
-              oView.byId("idbtnsendotp").setText("Send OTP");
+              oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
+              oView.byId("Lp_id_PasswordInput").setValue("").setVisible(false);
+              oView.byId("idbtnsendotp").setText("Send OTP").setVisible(false);
 
               // Hide Password and OTP Fields
-              oView.byId("Lp_id_CaptchaInput").setVisible(false);
-              oView.byId("Lp_id_PasswordInput").setVisible(false);
               oView.byId("Lp_id_OtpLabel").setVisible(false);
               oView.byId("Lp_id_PasswordLabel").setVisible(false);
               oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
-              oView.byId("idbtnsendotp").setVisible(false);
+
+              oView.byId("Lp_id_OtpRadio").setSelected(false);
+              oView.byId("Lp_id_PasswordRadio").setSelected(false);
             },
-            error: function () {
-              MessageToast.show("Error. Please try again.");
+            error: function (error) {
+              MessageToast.show(JSON.parse(error.responseText).message);
             },
           });
         },
@@ -322,6 +324,8 @@ sap.ui.define(
               confirmpasslabel.setVisible(false);
               newpassinput.setVisible(false);
               conpassinput.setVisible(false);
+
+              otpInput.setValue("");
             },
             error: function (xhr, status, error) {
               MessageToast.show("Error verifying user. Please try again.");
@@ -379,6 +383,7 @@ sap.ui.define(
               MessageToast.show(
                 "OTP verified successfully. Please enter a new password."
               );
+
               newpasslabel.setVisible(true);
               newpassinput.setVisible(true);
               confirmpasslabel.setVisible(true);
@@ -436,6 +441,7 @@ sap.ui.define(
         SM_onPressSave: function () {
           var oUserIdInput = sap.ui.getCore().byId("FSM_id_userIdInput");
           var oUserNameInput = sap.ui.getCore().byId("FSM_id_userNameInput");
+          var oOtpInput = sap.ui.getCore().byId("FSM_id_otpInput");
           var oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
           var oConfirmPwInput = sap.ui
             .getCore()
@@ -480,9 +486,18 @@ sap.ui.define(
                 "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
             },
             success: function (response) {
+              // Clear input values
+              oUserIdInput.setValue("");
+              oUserNameInput.setValue("");
+              oOtpInput.setValue("").setVisible(false);
+              oNewPwInput.setValue("").setVisible(false);
+              oConfirmPwInput.setValue("").setVisible(false);
+
+              // Close dialog if it exists
               if (this.oDialog) {
                 this.oDialog.close();
               }
+
               MessageToast.show("Password updated successfully");
             }.bind(this),
             error: function (err) {

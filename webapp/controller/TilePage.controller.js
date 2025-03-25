@@ -54,9 +54,7 @@ sap.ui.define(
 
           if (!selectedKey) {
             oEmpCombo.setValueState("Error");
-            oEmpCombo.setValueStateText(
-              "Make sure all the mandatory fields are entered or validate the entered value"
-            );
+
             return;
           } else {
             oEmpCombo.setValueState("None");
@@ -79,7 +77,7 @@ sap.ui.define(
             // Ensure FragmentModel exists
             var oFragmentModel = this.getView().getModel("FragmentModel");
             if (!oFragmentModel) {
-              oFragmentModel = new sap.ui.model.json.JSONModel({});
+              oFragmentModel = new JSONModel({});
               this.getView().setModel(oFragmentModel, "FragmentModel");
             }
 
@@ -116,6 +114,13 @@ sap.ui.define(
 
         TP_onupdatepress: function () {
           var oView = this.getView();
+
+          // Ensure user selection is reset before opening
+          var oFragmentModel = this.getView().getModel("FragmentModel");
+          if (oFragmentModel) {
+            oFragmentModel.setData({ EmployeeID: "", EmployeeName: "" });
+          }
+
           if (!this.oDialog) {
             sap.ui.core.Fragment.load({
               name: "sap.kt.com.minihrsolution.fragment.ResetPassword",
@@ -132,22 +137,33 @@ sap.ui.define(
           }
         },
         RP_onPressCanclePW: function () {
-          var oUserIdInput = sap.ui.getCore().byId("RP_id_userid");
+          sap.ui
+            .getCore()
+            .byId("RP_id_userid")
+            .setValue("")
+            .setSelectedKey("")
+            .setValueState("None");
           var oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
-          var oNewPwInput = sap.ui.getCore().byId("RP_id_NewPW");
-          var oConfirmPwInput = sap.ui.getCore().byId("RP_id_ConfirmPW");
 
-          oUserIdInput.setValue("");
+          // Reset all input fields
           oUserNameInput.setValue("");
-          oNewPwInput.setValue("");
-          oConfirmPwInput.setValue("");
-          //  valuestateerror
-          oUserIdInput.setValueState("None");
           oUserNameInput.setValueState("None");
-          oNewPwInput.setValueState("None");
-          oConfirmPwInput.setValueState("None");
 
-          this.oDialog.close();
+          sap.ui
+            .getCore()
+            .byId("RP_id_NewPW")
+            .setValue("")
+            .setValueState("None");
+          sap.ui
+            .getCore()
+            .byId("RP_id_ConfirmPW")
+            .setValue("")
+            .setValueState("None");
+
+          // Close dialog
+          if (this.oDialog) {
+            this.oDialog.close();
+          }
         },
         RP_onPressSetSave: function () {
           var oUserIdInput = sap.ui.getCore().byId("RP_id_userid");
@@ -195,11 +211,17 @@ sap.ui.define(
                 "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
             },
             success: function (response) {
-              // Clear input fields after successful save
+              // Clear all input fields after successful save
               oUserIdInput.setValue("");
               oUserNameInput.setValue("");
               oNewPwInput.setValue("");
               oConfirmPwInput.setValue("");
+
+              // Refresh the model
+              var oModel = sap.ui.getCore().getModel("EmpModel");
+              if (oModel) {
+                oModel.refresh(true);
+              }
 
               // Close dialog if it exists
               if (this.oDialog) {
@@ -214,6 +236,7 @@ sap.ui.define(
             }.bind(this),
           });
         },
+
         //password visibility change
         RP_onTogglePasswordVisibility: function (oEvent) {
           var oInput = oEvent.getSource();
