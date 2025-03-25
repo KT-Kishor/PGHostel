@@ -22,9 +22,9 @@
 			singleContainerFullSize="false" >
 			<f:content>
 				<Label text="{i18n>traineeId}"  />
-				<Input value="{oTraineeDetailsModel>/TraineeId}"   editable="false"/>
+				<Input value="{oTraineeDetailsModel>/TraineeID}"   editable="false"/>
 				<Label text="{i18n>companyMailid}" required="true"/>
-				<Input value="{oTraineeDetailsModel>/CompanyEmailID}" id="OTF_id_TraineeMail" maxLength="50" liveChange="T_validateEmail" placeholder="{i18n>companyMailid}" valueStateText="{i18n>mobileNoValueState}"/>
+				<Input value="{oTraineeDetailsModel>/CompanyEmailID}" id="OTF_id_TraineeMail" maxLength="50" liveChange="T_validateEmail" placeholder="{i18n>companyMailid}" valueStateText="{i18n>emailValueState}"/>
 				
 			</f:content>
 		</f:SimpleForm>

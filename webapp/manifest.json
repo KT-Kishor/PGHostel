@@ -201,7 +201,7 @@
                 },
                 {
                     "name": "RouteTraineeDetails",
-                    "pattern": "TraineeDetails",
+                    "pattern": "TraineeDetails/{sParTrainee}",
                     "target": "TargetTraineeDetails"
                 },
                 {

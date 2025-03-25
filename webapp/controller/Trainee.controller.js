@@ -6,7 +6,7 @@ sap.ui.define([
     "sap/m/MessageBox",
     "../model/formatter"
 ],
-    function (BaseController, validation, JSONModel, MessageToast, MessageBox, Formatter) {
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Trainee", {
             Formatter: Formatter,
@@ -16,21 +16,22 @@ sap.ui.define([
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.readCallForTrainee();
-                this.byId("T_id_OnboardBtn").setVisible(false);
-                this.byId("T_id_RejectBtn").setVisible(false);
-                this.byId("T_id_Download").setVisible(false);
+                this.byId("T_id_OnboardBtn").setEnabled(false);
+                this.byId("T_id_RejectBtn").setEnabled(false);
+                this.byId("T_id_Download").setEnabled(false);
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
             },
             readCallForTrainee: function () {
-                var filter = { ID: "" }
+                var filter = { ID: "" };
                 this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getView().setModel(new JSONModel(offerData), "traineeModel");
+                    var oModel = new sap.ui.model.json.JSONModel(offerData);
+                    this.getOwnerComponent().setModel(oModel, "traineeModel");
                     sap.ui.core.BusyIndicator.hide();
                 }).catch((oError) => {
                     sap.ui.core.BusyIndicator.hide();
-                    MessageBox.error("Error while reading the trainee details")
-                })
+                    MessageBox.error("Error while reading the trainee details");
+                });
             },
             T_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
@@ -53,25 +54,37 @@ sap.ui.define([
                 }
                 this.getRouter().navTo("RouteTraineeDetails", { sParTrainee: oParValue });
             },
-
-            //certificate fragment
-            T_onCertDownload: function () {
-                if (!this.TC_oDialog) {
+            TC_commonOpenDialog: function (dialogProperty, fragmentName) {
+                if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
-                        name: "sap.kt.com.minihrsolution.fragment.TraineeCertificate",
+                        name: fragmentName,
                         controller: this,
-                    }).then(function (TC_oDialog) {
-                        this.TC_oDialog = TC_oDialog;
-                        this.getView().addDependent(this.TC_oDialog);
-                        this.TC_oDialog.open();
+                    }).then(function (oDialog) {
+                        this[dialogProperty] = oDialog;
+                        this.getView().addDependent(this[dialogProperty]);
+                        this[dialogProperty].open();
                     }.bind(this));
                 } else {
-                    this.TC_oDialog.open();
+                    this[dialogProperty].open();
                 }
+            },  
+
+            //certificate download dialog
+            T_onCertDownload: function () {
+                this.TC_commonOpenDialog("TC_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate");
             },
             TCF_onPressCloseDialog: function () {
                 this.TC_oDialog.close();
             },
+            
+            //onboard trainee dialog
+            // T_onOnboardPress: function () {
+            //     this.TC_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee");
+            // },
+            OTF_onPressClose: function () {
+                this.TOb_oDialog.close();
+            },
+              
             //download certificate
             TCF_onPressDownload: function () {
                 try {
@@ -86,25 +99,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
-            //onboard trainee dialog
-            T_onOnboardPress: function () {
-                if (!this.TOb_oDialog) {
-                    sap.ui.core.Fragment.load({
-                        name: "sap.kt.com.minihrsolution.fragment.OnboardTrainee",
-                        controller: this,
-                    }).then(function (TOb_oDialog) {
-                        this.TOb_oDialog = TOb_oDialog;
-                        this.getView().addDependent(this.TOb_oDialog);
-                        this.TOb_oDialog.open();
-                    }.bind(this));
-                } else {
-                    this.TOb_oDialog.open();
-                }
-            },
-
-            OTF_onPressClose: function () {
-                this.TOb_oDialog.close();
-            },
+           
             //onboard trainee
             OTF_onPressOnboard: function () {
                 try {
@@ -118,11 +113,11 @@ sap.ui.define([
             T_onTableSelectionChange: function (oEvent) {
                 var oSelectedItem = oEvent.getParameter("listItem");
                 if (oSelectedItem) {
-                    var sStatus = oSelectedItem.getBindingContext("traineeModel").getProperty("status");
+                    var sStatus = oSelectedItem.getBindingContext("traineeModel").getProperty("Status");
                     this.ID = oSelectedItem.getBindingContext("traineeModel").getProperty("ID")
                     var isDisabled = sStatus === "OnBoarded" || sStatus === "Rejected";
-                    this.byId("T_id_OnboardBtn").setVisible(!isDisabled);
-                    this.byId("T_id_RejectBtn").setVisible(!isDisabled);
+                    this.byId("T_id_OnboardBtn").setEnabled(!isDisabled);
+                    this.byId("T_id_RejectBtn").setEnabled(!isDisabled);
                 }
             },
             T_onOnboardPress: function () {
@@ -135,8 +130,9 @@ sap.ui.define([
                 var that = this;
                 var oContext = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel");
                 var message = (action === "onboard")
-                    ? "Are you sure you want to onboard " + oContext.getProperty("nameSalutation") + " " + oContext.getProperty("traineeName") + "?"
-                    : "Are you sure you want to reject " + oContext.getProperty("nameSalutation") + " " + oContext.getProperty("traineeName") + "?";
+                    ? "Are you sure you want to onboard " + oContext.getProperty("NameSalutation") + " " + oContext.getProperty("TraineeName") + "?"
+                    : "Are you sure you want to reject " + oContext.getProperty("NameSalutation") + " " + oContext.getProperty("TraineeName") + "?";
+            
                 var dialog = new sap.m.Dialog({
                     title: "Confirm Action",
                     type: "Message",
@@ -147,6 +143,8 @@ sap.ui.define([
                         press: function () {
                             if (action === "onboard") {
                                 that._handleOnboard(oContext);
+                                // Open the OnboardTrainee fragment after onboarding logic
+                                that.TC_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee");
                             } else if (action === "reject") {
                                 that._handleReject(oContext);
                             }
@@ -164,15 +162,19 @@ sap.ui.define([
                         dialog.destroy();
                     }
                 });
+            
                 dialog.open();
             },
             _handleOnboard: function (oContext) {
-                oContext.getModel().setProperty(oContext.getPath() + "/status", "OnBoarded");
+                oContext.getModel().setProperty(oContext.getPath() + "/Status", "OnBoarded");
                 MessageToast.show("Trainee onboarded successfully!");
             },
             _handleReject: function (oContext) {
-                oContext.getModel().setProperty(oContext.getPath() + "/status", "Rejected");
+                oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
                 MessageToast.show("Trainee rejected successfully!");
             },
+            
+            
+            
         });
     });

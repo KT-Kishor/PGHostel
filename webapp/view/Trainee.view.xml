@@ -12,25 +12,32 @@
 		<content>
 			<fb:FilterBar  class="sapUiTinyMargin" id="T_id_AdminFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Trainee" label="{i18n>traineeName}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="TraineeName" label="{i18n>traineeName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="" change="" id="T_id_TraineeName" showClearIcon="true">
-								<core:ListItem key="" text="" additionalText="" />
+							<ComboBox  showSecondaryValues= "true"  items="{traineeModel>/}" change="" id="T_id_TraineeName" showClearIcon="true">
+								<core:ListItem key="{traineeModel>TraineeName}" text="{traineeModel>TraineeName}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Reporting Manager" label="{i18n>reportingManager}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="ReportingManager" label="{i18n>reportingManager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox   items="" id="T_id_RmFilterBar" showClearIcon="true">
-								<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
+							<ComboBox   items="{traineeModel>/}" id="T_id_RmFilterBar" showClearIcon="true">
+								<core:Item key="{traineeModel>ReportingManager}" text="{traineeModel>ReportingManager}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Joining Date" label="{i18n>joiningDate}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="JoiningDate" label="{i18n>joiningDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
                     <DateRangeSelection id="T_id_JoiningDate" valueFormat="dd/MM/yyyy"  displayFormat="dd/MM/yyyy" change="onDateChange" />						
 					</fb:control>
 						</fb:FilterGroupItem>
+						<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox name="Status" showClearIcon="true" selectionChange="T_onSelectionChange" items="{EmployeeStatus>/}">
+							<core:Item key="{EmployeeStatus>ID}" text="{EmployeeStatus>StatusValue}"/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="T_id_TraineeTable" class="sapUiTinyMargin"  items="{path: 'traineeModel>/'}"  busyIndicatorDelay="0"  width="auto" mode="SingleSelectLeft" selectionChange="T_onTableSelectionChange"
@@ -69,12 +76,12 @@
 				<items>
 					<ColumnListItem  type="Navigation" press="T_onPressAddTrainee">
 						<cells>
-						    <Text text="{traineeModel>nameSalutation} {traineeModel>traineeName}"/>							
-							<Text text="{traineeModel>reportingManagerSalutation} {traineeModel>reportingManager}"/>
-							<Text text="{traineeModel>stipend} {traineeModel>currency}"/>
-							<Text text="{traineeModel>joiningDate}"/>
-							<Text text="{traineeModel>traineeEmail}"/>
-							<ObjectStatus text="{traineeModel>status}" inverted="true" state="{path:'traineeModel>status',formatter:'.Formatter.formatObjectStatus'}"/>
+						    <Text text="{traineeModel>NameSalutation} {traineeModel>TraineeName}"/>							
+							<Text text="{traineeModel>ReportingManagerSalutation} {traineeModel>ReportingManager}"/>
+							<Text text="{traineeModel>Stipend} {traineeModel>Currency}"/>
+							<Text text="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}" />
+							<Text text="{traineeModel>TraineeEmail}"/>
+							<ObjectStatus text="{traineeModel>Status}" inverted="true" state="{path:'traineeModel>Status',formatter:'.Formatter.formatObjectStatus'}"/>
 						</cells>
 					</ColumnListItem>
 				</items>
