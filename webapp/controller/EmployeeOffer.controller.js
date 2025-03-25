@@ -12,7 +12,7 @@ sap.ui.define([
             },
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this.readCallForEmployeeOffer();
+                this.readCallForEmployeeOffer("");
                 this.byId("EO_id_OnboardBtn").setVisible(false);
                 this.byId("EO_id_RejectBtn").setVisible(false);
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
@@ -36,12 +36,12 @@ sap.ui.define([
             },
             EO_onPressEmployee: function (oEvent) {
                 var oParValue;
-                if(oEvent.getSource().getId().lastIndexOf("EO_id_AddEOffBut") !== -1){
-                   oParValue = "CreateOfferFlag"
-                }else{
+                if (oEvent.getSource().getId().lastIndexOf("EO_id_AddEOffBut") !== -1) {
+                    oParValue = "CreateOfferFlag"
+                } else {
                     oParValue = oEvent.getSource().getBindingContext("EmployeeOfferModel").getModel().getData()[oEvent.getSource().getBindingContextPath().split("/")[1]].ID
                 }
-                this.getRouter().navTo("RouteEmployeeOfferDetails",{sParOffer : oParValue});
+                this.getRouter().navTo("RouteEmployeeOfferDetails", { sParOffer: oParValue });
             },
             EO_onOnboardPress: function () {
                 this._fetchCommonData("Designation", "DesignationModel");
@@ -49,11 +49,27 @@ sap.ui.define([
                 this._fetchCommonData("EmployeeDetails", "EmployeeModel");
                 this.onHandleEmployeeAction("OnBoarded", "onBoardEmployee");
             },
-            EO_onSearch:function(oEvent){
+            EO_onRejectPress: function () {
+                this.onHandleEmployeeAction("Rejected", "onRejectEmployee");
+            },
+            EO_onSearch: function (oEvent) {
+                var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
+                var params = {};
+                aFilterItems.forEach(function (oItem) {
+                  var oControl = oItem.getControl(); // Get the associated control
+                  var sValue = oItem.getName();
+                  if (oControl && oControl.getValue()) {
+                    params[sValue] = oControl.getValue();
+                  }
+                });
                 var queryString = $.param({
-                    "ID":sArgPara
-                    });
+                    params
+                });
                 this.readCallForEmployeeOffer(queryString)
+            },
+            // Update the status to 'Rejected' after confirmation
+            onRejectEmployee: function () {
+                this.updateCallForEmployeeOffer("Rejected");
             },
             onHandleEmployeeAction: function (status, actionMethod) {
                 var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
@@ -63,66 +79,67 @@ sap.ui.define([
                 var that = this;
                 // Confirm dialog before proceeding with status update
                 var sMessage = (status === "OnBoarded")
-                ? that.i18nModel.getText("confirmOnboard", [sName])
-                : that.i18nModel.getText("confirmReject", [sName]);
+                    ? that.i18nModel.getText("confirmOnboard", [sName])
+                    : that.i18nModel.getText("confirmReject", [sName]);
                 sap.m.MessageBox.confirm(sMessage, {
                     title: (status === "OnBoarded")
-                    ? that.i18nModel.getText("confirmTitleOnboard")
-                    : that.i18nModel.getText("confirmTitleReject"),
+                        ? that.i18nModel.getText("confirmTitleOnboard")
+                        : that.i18nModel.getText("confirmTitleReject"),
                     actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
                     onClose: function (oAction) {
                         if (oAction === sap.m.MessageBox.Action.YES) {
-                          if (status === "OnBoarded") {
-                        //     const employeeIds = oEmpModelData.getData().length > 0 ?
-                        //     oEmpModelData.filter(item => item.ID && item.ID.startsWith("KT"))
-                        //     .map(item => parseInt(item.ID.slice(2), 10))
-                        //     .filter(numericPart => !isNaN(numericPart)) : "";
-                        //   const lastIdNo = employeeIds.length > 0 ? Math.max(...employeeIds) : 0;
-                        var lastIdNo = 0;
-                          const newEmployeeID = "KT" + (lastIdNo + 1).toString().padStart(3, '0');
-              
-                          const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({
-                            ID: newEmployeeID,
-                            Salutation: oSelectedData.Salutation,
-                            EmployeeName: oSelectedData.ConsultantName,
-                            Role: " ",
-                            DateOfBirth: "",
-                            CompanyEmailID: "",
-                            PermanentAddress: oSelectedData.ConsultantAddress,
-                            CorrespondenceAddress: oSelectedData.ConsultantAddress,
-                            BaseLocation: oSelectedData.BaseLocation,
-                            AppraisalDate: oSelectedData.JoiningDate,
-                            Designation: oSelectedData.Designation,
-                            EmpOfferID: oSelectedData.ID,
-                            MobileNo: "",
-                            Manager: "",
-                            ManagerName: "",
-                            BloodGroup: "",
-                            EmployeeStatus: "Active"
-                          });
-                          that.getView().setModel(oEmployeeDetailsModel, "oEmpolyeeDetailsModel");
-                          that._commonFragmentOpen(that, "OnboardEmployee");
-                        //   if (!that.oDialog) {
-                        //     sap.ui.core.Fragment.load({
-                        //       name: "sap.kt.com.minihrsolution.fragment.OnboardEmployee",
-                        //       controller: that
-                        //     }).then(dialog => {
-                        //       that.oDialog = dialog;
-                        //       that.getView().addDependent(this.oDialog);
-                        //       that.oDialog.open();
-                        //     })
-                        //   } else {
-                        //     that.oDialog.open();
-                        //   }
-                      } else {
-                        that[actionMethod](oContext);
-                      }
+                            if (status === "OnBoarded") {
+                                    const employeeIds = oEmpModelData.getData().length > 0 ?
+                                    oEmpModelData.filter(item => item.ID && item.ID.startsWith("KT"))
+                                    .map(item => parseInt(item.ID.slice(2), 10))
+                                    .filter(numericPart => !isNaN(numericPart)) : "";
+                                  const lastIdNo = employeeIds.length > 0 ? Math.max(...employeeIds) : 0;
+                                const newEmployeeID = "KT" + (lastIdNo + 1).toString().padStart(3, '0');
+
+                                const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({
+                                    ID: newEmployeeID,
+                                    Salutation: oSelectedData.Salutation,
+                                    EmployeeName: oSelectedData.ConsultantName,
+                                    Role: " ",
+                                    DateOfBirth: "",
+                                    CompanyEmailID: "",
+                                    PermanentAddress: oSelectedData.ConsultantAddress,
+                                    CorrespondenceAddress: oSelectedData.ConsultantAddress,
+                                    BaseLocation: oSelectedData.BaseLocation,
+                                    AppraisalDate: oSelectedData.JoiningDate,
+                                    Designation: oSelectedData.Designation,
+                                    EmpOfferID: oSelectedData.ID,
+                                    MobileNo: "",
+                                    Manager: "",
+                                    ManagerName: "",
+                                    BloodGroup: "",
+                                    EmployeeStatus: "Active",
+                                });
+                                that.getView().setModel(oEmployeeDetailsModel, "oEmpolyeeDetailsModel");
+                                that._commonFragmentOpenOffer(that, "OnboardEmployee");
+                            } else {
+                                that[actionMethod]();
+                            }
+                        }
                     }
-                  }
                 });
             },
-            OEF_onPressClose: function () {
-                this._commonFragmentClose(this, "OnboardEmployee");
+            _commonFragmentOpenOffer:function(){
+                if (!this.oDialog) {
+                    sap.ui.core.Fragment.load({
+                      name: "sap.kt.com.minihrsolution.fragment.OnboardEmployee",
+                      controller: this
+                    }).then(dialog => {
+                      this.oDialog = dialog;
+                      this.getView().addDependent(this.oDialog);
+                      this.oDialog.open();
+                    })
+                  } else {
+                    this.oDialog.open();
+                  }
+            },
+            OEF_onPressClose:function(){
+                this.oDialog.close();
             },
             validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
@@ -136,20 +153,35 @@ sap.ui.define([
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
                 if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID")) {
-                    this.oSelectedRow.Status = "Onboard"
-                    this.ajaxUpdateWithJQuery("EmployeeOffer", this.oSelectedRow).then((oData) => {
-                        if (oData.results) {
-                            sap.ui.core.BusyIndicator.hide();
-                            MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
-                        }
-                    }).catch((oError) => {
-                        sap.ui.core.BusyIndicator.hide();
-                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                    })
+                  this.updateCallForEmployeeOffer("onBoarded")
                 }
                 else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
+            },
+            updateCallForEmployeeOffer : function(oStatus){
+                this.oSelectedRow.Status = oStatus;
+                var oModelOffer = {
+                    "data": this.oSelectedRow,
+                    "filters":{
+                        "ID":this.oSelectedRow.ID
+                    }
+                }
+                this.ajaxUpdateWithJQuery("EmployeeOffer",oModelOffer).then((oData) => {
+                    if (oData.results) {
+                        sap.ui.core.BusyIndicator.hide();
+                        var sSuccessMessage = (status === "OnBoarded")
+                        ? this.i18nModel.getText("successEmpOnboard")
+                        : this.i18nModel.getText("successEmpReject");
+                        MessageToast.show(sSuccessMessage);
+                        this.oDialog.close();
+                        this.readCallForEmployeeOffer("");
+                    }
+                }).catch((oError) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    this.oDialog.close();
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                })
             },
             EO_onSelectionRadRowE: function (oEvent) {
                 var oSelectedItem = oEvent.getParameter("listItem");

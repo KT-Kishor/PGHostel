@@ -7,8 +7,6 @@ sap.ui.define([
 
   return Controller.extend("sap.kt.ktofferletter.products.controller.BaseController", {
     Formatter: Formatter,
-    _fragments : {},
-
     // Router Code 
     getRouter: function () {
       return sap.ui.core.UIComponent.getRouterFor(this);
@@ -121,29 +119,6 @@ sap.ui.define([
         sap.m.MessageToast.show("Technical error, please contact the administrator");
       }
     }
-    },
-    _commonFragmentOpen: function (that, oFragmentName) {
-      var sId = that.getView().getId() + "--" + oFragmentName; // Unique ID per view
-      // Check if fragment exists, otherwise create
-      if (!that._fragments[sId]) {
-        sap.ui.core.Fragment.load({
-          id: sId,
-          name: "sap.kt.com.minihrsolution.fragment." + oFragmentName,
-          controller: that
-        }).then(function (oFragment) {
-          that.getView().addDependent(oFragment);
-          that._fragments[sId] = oFragment;
-          oFragment.open();
-        }.bind(that));
-      } else {
-        that._fragments[sId].open();
-      }
-    },
-    _commonFragmentClose: function (that, oFragmentName) {
-      var sId = that.getView().getId() + "--" + oFragmentName;
-      if (that._fragments[sId]) {
-        that._fragments[sId].close();
-      }
     },
     //Common read call for all the app
     async ajaxReadWithJQuery(sUrl,filter) {
