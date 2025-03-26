@@ -31,7 +31,7 @@ sap.ui.define(
           this.byId("LOH_id_Holidays").setValue(selectedYear);
           this._fetchCommonData("ListOfHolidays?", "HolidayModel", { startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31`});
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-         this.getView().getModel("LoginModel").setProperty("/HeaderName", "List of Holidays");
+          this.getView().getModel("LoginModel").setProperty("/HeaderName", "List of Holidays");
       },
       
       onSearch: function () {
@@ -75,7 +75,7 @@ sap.ui.define(
             var excelData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
     
             if (!excelData.length) {
-                MessageToast.show("noDatainFile");
+                MessageToast.show(that.i18nModel.getText("noDatainFile"));
                 return;
             }
     
@@ -95,10 +95,10 @@ sap.ui.define(
           });
           
     
-            if (!isValidYear) {
+          if (!isValidYear) {
                 MessageToast.show("Uploaded file contains data for a different year. Please upload data for " + selectedYear + ".");
                 return;
-            }
+          }
     
             var formattedData = excelData.map(item => {
               var formattedDate = "";
@@ -121,12 +121,12 @@ sap.ui.define(
               };
           });
           
-            try {
-                await this.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
-                MessageToast.show("File uploaded successfully!");
-            } catch (error) {
-                sap.m.MessageToast.show(error.responseJSON?.message);
-            }
+          try {
+              await this.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
+              MessageToast.show(that.i18nModel.getText("uplaodSuccessfull"));
+          }catch (error) {
+              MessageToast.show(error.responseJSON?.message);
+        }
         };
     
         reader.readAsBinaryString(oFile); 
@@ -149,7 +149,7 @@ sap.ui.define(
         const oModel = oTable.getModel("HolidayModel").getData();
        
         if (!oModel || oModel.length === 0) {
-          MessageToast.show(this.i18nModel.getText("noData"));
+          MessageToast.show(that.i18nModel.getText("noData"));
           return;
         }
   
