@@ -30,7 +30,7 @@
     <RadioButton id="Lp_id_OtpRadio" text="{i18n>btnotp}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd"/>
 	<Button text="{i18n>sendOtp}" press="LP_onOtppress" id="idbtnsendotp" type="Ghost" class="Login" width="8rem" visible="false" />
 </HBox>
-						
+						 
 						<!-- OTP Input Field -->
 						<Label text="{i18n>btnotp}" id="Lp_id_OtpLabel" visible="false" required="true" />
 						<Input value="{loginModel>/enteredCaptcha}" id="Lp_id_CaptchaInput" class="sapUiTinyMarginEnd" type="Number"
@@ -38,7 +38,7 @@
                           
 						<!-- Password Input Field (Initially Hidden) -->
 						<Label text="{i18n>btnpass}" id="Lp_id_PasswordLabel" visible="false" required="true" />
-						<Input id="Lp_id_PasswordInput" liveChange="LP_onpresPassword"  type="Password" placeholder="{i18n>placepass}" valueStateText="{i18n>passwordValueState}" visible="false"/>
+						<Input id="Lp_id_PasswordInput" liveChange="LP_onpresPassword"  type="Password" placeholder="{i18n>placepass}" valueStateText="{i18n>placepass}" visible="false"/>
 
 						<!-- Forgot Password Link (Initially Hidden) -->
 						<Link text="{i18n>forgotPass}" press="LP_onForgotPassword" id="Lp_id_ForgotPasswordLink" visible="false"/>

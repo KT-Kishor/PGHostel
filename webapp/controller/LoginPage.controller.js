@@ -52,7 +52,7 @@ sap.ui.define(
           utils._LCvalidatePassword(oEvent);
         },
         LP_onpresPassword(oEvent) {
-          utils._LCvalidatePassword(oEvent);
+          utils._LCvalidateMandatoryField(oEvent);
         },
         //for OTPsend
         LP_onOtppress: function () {
@@ -122,7 +122,10 @@ sap.ui.define(
             utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
             utils._LCvalidateName(this.byId("Lp_id_Username"), "ID") &&
             (!isPasswordLogin ||
-              utils._LCvalidatePassword(this.byId("Lp_id_PasswordInput"), "ID")) // Skip password validation if OTP login is selected
+              utils._LCvalidateMandatoryField(
+                this.byId("Lp_id_PasswordInput"),
+                "ID"
+              )) // Skip password validation if OTP login is selected
           ) {
             var queryString = $.param({
               EmployeeID: userId,
