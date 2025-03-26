@@ -46,7 +46,7 @@
                 <OverflowToolbar >
                     <Title id="T_id_Title" text="{i18n>traineeDetails}"/>
                     <ToolbarSpacer/>
-                    <Button  tooltip="{i18n>downloadcCertificate}" id="T_id_Download"  type="Success" press="T_onCertDownload"  icon="sap-icon://document-text"/>
+                    <Button  tooltip="{i18n>downloadcCertificate}" id="T_id_Download"  type="Success" press="T_onCertDownload"  icon="sap-icon://document-text" visible="false"/>
                     <Button  text="{i18n>onboard}" id="T_id_OnboardBtn"  type="Neutral" press="T_onOnboardPress"  icon="sap-icon://manager"/>
                     <Button text="{i18n>rejectTainee}" id="T_id_RejectBtn" type="Reject"  press="T_onRejectPress" icon="sap-icon://employee-rejections" />
                     <Button text="{i18n>addTrainee}" id="T_id_AddBtn" type="Accept"  press="T_onPressAddTrainee"  icon="sap-icon://employee-approvals"/>
