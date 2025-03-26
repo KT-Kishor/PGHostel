@@ -3,22 +3,9 @@ sap.ui.define(
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator",
-    "sap/m/MessagePopover",
-    "sap/m/MessageItem",
     "../utils/validation",
   ],
-  function (
-    BaseController,
-    JSONModel,
-    MessageToast,
-    Filter,
-    FilterOperator,
-    MessagePopover,
-    MessageItem,
-    utils
-  ) {
+  function (BaseController, JSONModel, MessageToast, utils) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.LoginPage",
@@ -43,25 +30,18 @@ sap.ui.define(
           this.getOwnerComponent().setModel(model, "LoginModel");
         },
         _onRouteMatched: function () {
-          // $.ajax({
-          //   url: "https://www.rest.kalpavrikshatechnologies.com/DataBaseConn",
-          //   type: "GET",
-          //   contentType: "application/json",
-          //   headers: {
-          //     name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-          //     password:
-          //       "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-          //   },
-          //   success: function (response) {},
-          //   error: function () {
-          //     MessageToast.show("Error. Please try again.");
-          //   },
-          // });
+          var oView = this.getView();
+          this.API = "https://www.rest.kalpavrikshatechnologies.com";
+          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+          oView.byId("Lp_id_PasswordRadio").setSelected(true);
+          oView.byId("Lp_id_PasswordLabel").setVisible(true);
+          oView.byId("Lp_id_PasswordInput").setVisible(true);
+          oView.byId("Lp_id_ForgotPasswordLink").setVisible(true);
         },
         onpresshome: function () {
           this.getRouter().navTo("RouteHomePage");
         },
-
+        //for validation purposes
         LP_onValidateUserId: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
@@ -71,9 +51,13 @@ sap.ui.define(
         SM_onChnageSetAndConfirm: function (oEvent) {
           utils._LCvalidatePassword(oEvent);
         },
-
+        LP_onpresPassword(oEvent) {
+          utils._LCvalidatePassword(oEvent);
+        },
+        //for OTPsend
         LP_onOtppress: function () {
           var oView = this.getView();
+          var that = this;
           var userId = oView.byId("Lp_id_Userid").getValue().trim();
           var userName = oView.byId("Lp_id_Username").getValue().trim();
           var oOtpInput = oView.byId("Lp_id_CaptchaInput");
@@ -85,12 +69,12 @@ sap.ui.define(
             utils._LCvalidateName(this.byId("Lp_id_Username"), "ID")
           ) {
           } else {
-            MessageToast.show("Please enter User ID and Username.");
+            MessageToast.show(that.i18nModel.getText("validateUser"));
             return;
           }
 
           $.ajax({
-            url: "https://www.rest.kalpavrikshatechnologies.com/SendOTP",
+            url: this.API + "/SendOTP",
             type: "POST",
             contentType: "application/json",
             headers: {
@@ -99,7 +83,7 @@ sap.ui.define(
                 "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
             },
             data: JSON.stringify({
-              // FIXED: Converted data to JSON string
+              // Converted data to JSON string
               EmployeeID: userId,
               EmployeeName: userName,
               Type: "OTP",
@@ -108,12 +92,10 @@ sap.ui.define(
               oOtpInput.setVisible(true);
               oOtpLabel.setVisible(true);
               oOtpButton.setText("Resend OTP");
-              MessageToast.show(
-                "OTP sent to your registered email address. Please enter the OTP to proceed."
-              );
+              MessageToast.show(that.i18nModel.getText("sentOTP"));
             },
             error: function (xhr, status, error) {
-              MessageToast.show("Error verifying user. Please try again.");
+              MessageToast.show(that.i18nModel.getText("errorMsguser"));
             },
           });
         },
@@ -129,59 +111,67 @@ sap.ui.define(
           var isOtpLogin = oView.byId("Lp_id_OtpRadio").getSelected();
           var isPasswordLogin = oView.byId("Lp_id_PasswordRadio").getSelected();
 
-          // Validation for mandatory fields
-          if (
-            utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
-            utils._LCvalidateName(this.byId("Lp_id_Username"), "ID")
-          ) {
-          } else {
-            MessageToast.show(
-              "Make sure all the mandatory fields are filled/validate the entered value"
-            );
+          // Check if OTP login is selected and OTP is empty
+          if (isOtpLogin && userOtp === "") {
+            MessageToast.show(that.i18nModel.getText("checkOTP"));
             return;
           }
 
-          var queryString = $.param({
-            EmployeeID: userId,
-            EmployeeName: userName,
-            OTP: isOtpLogin ? userOtp : "",
-            Password: isPasswordLogin ? password : "",
-          });
+          // Validate mandatory fields (excluding password when OTP login is selected)
+          if (
+            utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
+            utils._LCvalidateName(this.byId("Lp_id_Username"), "ID") &&
+            (!isPasswordLogin ||
+              utils._LCvalidatePassword(this.byId("Lp_id_PasswordInput"), "ID")) // Skip password validation if OTP login is selected
+          ) {
+            var queryString = $.param({
+              EmployeeID: userId,
+              EmployeeName: userName,
+              OTP: isOtpLogin ? userOtp : "",
+              Password: isPasswordLogin ? password : "",
+            });
 
-          $.ajax({
-            url:
-              "https://www.rest.kalpavrikshatechnologies.com/LoginDetails?" +
-              queryString,
-            type: "GET",
-            contentType: "application/json",
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
-            success: function (response) {
-              MessageToast.show("Login Successful");
-              that.getRouter().navTo("RouteTilePage");
+            $.ajax({
+              url: this.API + "/LoginDetails?" + queryString,
+              type: "GET",
+              contentType: "application/json",
+              headers: {
+                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                password:
+                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              },
+              success: function (response) {
+                MessageToast.show("Login Successful");
+                that.getRouter().navTo("RouteTilePage");
 
-              // Clear all input fields after successful login
-              oView.byId("Lp_id_Userid").setValue("");
-              oView.byId("Lp_id_Username").setValue("");
-              oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
-              oView.byId("Lp_id_PasswordInput").setValue("").setVisible(false);
-              oView.byId("idbtnsendotp").setText("Send OTP").setVisible(false);
+                // Clear all input fields after successful login
+                oView.byId("Lp_id_Userid").setValue("");
+                oView.byId("Lp_id_Username").setValue("");
+                oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
+                oView
+                  .byId("Lp_id_PasswordInput")
+                  .setValue("")
+                  .setVisible(false);
+                oView
+                  .byId("idbtnsendotp")
+                  .setText("Send OTP")
+                  .setVisible(false);
 
-              // Hide Password and OTP Fields
-              oView.byId("Lp_id_OtpLabel").setVisible(false);
-              oView.byId("Lp_id_PasswordLabel").setVisible(false);
-              oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
+                // Hide Password and OTP Fields
+                oView.byId("Lp_id_OtpLabel").setVisible(false);
+                oView.byId("Lp_id_PasswordLabel").setVisible(false);
+                oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
 
-              oView.byId("Lp_id_OtpRadio").setSelected(false);
-              oView.byId("Lp_id_PasswordRadio").setSelected(false);
-            },
-            error: function (error) {
-              MessageToast.show(JSON.parse(error.responseText).message);
-            },
-          });
+                oView.byId("Lp_id_OtpRadio").setSelected(false);
+                oView.byId("Lp_id_PasswordRadio").setSelected(false);
+              },
+              error: function (error) {
+                MessageToast.show(JSON.parse(error.responseText).message);
+              },
+            });
+          } else {
+            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+          }
         },
 
         onLoginOptionChange: function (oEvent) {
@@ -209,8 +199,6 @@ sap.ui.define(
             oSendotp.setVisible(false);
           } else {
             // Show OTP input field
-            // oOtpInput.setVisible(true);
-            // oOtpLabel.setVisible(true);
             oSendotp.setVisible(true);
 
             // Hide password field and forgot password link
@@ -232,6 +220,12 @@ sap.ui.define(
                 oView.addDependent(this.oDialog);
                 this.oDialog.open();
                 sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(false);
+                oView.byId("Lp_id_Userid").setValue("").setValueState("None");
+                oView.byId("Lp_id_Username").setValue("").setValueState("None");
+                oView
+                  .byId("Lp_id_PasswordInput")
+                  .setValue("")
+                  .setValueState("None");
               }.bind(this)
             );
           } else {
@@ -271,6 +265,7 @@ sap.ui.define(
         },
 
         SM_onChangeSendOTP: function () {
+          var that = this;
           var userfrgId = sap.ui
             .getCore()
             .byId("FSM_id_userIdInput")
@@ -292,12 +287,12 @@ sap.ui.define(
             .byId("FSM_id_confirmPasswordInput");
 
           if (!userfrgId || !userfrgName) {
-            MessageToast.show("Please enter User ID and Username.");
+            MessageToast.show(that.i18nModel.getText("validateUser"));
             return;
           }
 
           $.ajax({
-            url: "https://www.rest.kalpavrikshatechnologies.com/SendOTP",
+            url: this.API + "/SendOTP",
             type: "POST",
             contentType: "application/json",
             headers: {
@@ -311,10 +306,7 @@ sap.ui.define(
               Type: "OTP",
             }),
             success: function (response) {
-              MessageToast.show(
-                "OTP sent to your registered email address. Please enter the OTP to proceed."
-              );
-
+              MessageToast.show(that.i18nModel.getText("sentOTP"));
               // Show only the OTP input field and its label
               otplabel.setVisible(true);
               otpInput.setVisible(true);
@@ -328,12 +320,13 @@ sap.ui.define(
               otpInput.setValue("");
             },
             error: function (xhr, status, error) {
-              MessageToast.show("Error verifying user. Please try again.");
+              MessageToast.show(that.i18nModel.getText("errorMsguser"));
             },
           });
         },
 
         SM_onChangeOTP: function () {
+          var that = this;
           var frgUserId = sap.ui
             .getCore()
             .byId("FSM_id_userIdInput")
@@ -357,7 +350,7 @@ sap.ui.define(
             .byId("FSM_id_confirmPasswordInput");
 
           if (!otpValue) {
-            MessageToast.show("Please enter the OTP.");
+            MessageToast.show(that.i18nModel.getText("rqForotp"));
             return;
           }
           var queryString = $.param({
@@ -367,9 +360,7 @@ sap.ui.define(
           });
 
           $.ajax({
-            url:
-              "https://www.rest.kalpavrikshatechnologies.com/LoginDetails?" +
-              queryString,
+            url: this.API + "/LoginDetails?" + queryString,
             type: "GET",
             contentType: "application/json",
             headers: {
@@ -380,9 +371,7 @@ sap.ui.define(
 
             success: function (response) {
               sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(true);
-              MessageToast.show(
-                "OTP verified successfully. Please enter a new password."
-              );
+              MessageToast.show(that.i18nModel.getText("verifiedOTP"));
 
               newpasslabel.setVisible(true);
               newpassinput.setVisible(true);
@@ -390,40 +379,11 @@ sap.ui.define(
               conpassinput.setVisible(true);
             },
             error: function (xhr, status, error) {
-              MessageToast.show("Error verifying OTP. Please try again.");
+              MessageToast.show(that.i18nModel.getText("invalidOTP"));
             },
           });
         },
 
-        // SM_onChnageSetAndConfirm: function () {
-        //   var oNewPassword = sap.ui.getCore().byId("FSM_id_newPasswordInput");
-        //   var oConfirmPassword = sap.ui
-        //     .getCore()
-        //     .byId("FSM_id_confirmPasswordInput");
-        //   var sNewPassword = oNewPassword.getValue();
-        //   var sConfirmPassword = oConfirmPassword.getValue();
-        //   // var passwordPattern = /^(?=.*[A-Z])(?=.*[\W_]).{6,}$/;
-
-        //   // if (!passwordPattern.test(sNewPassword)) {
-        //   //   this.NewPassword = false;
-        //   //   oNewPassword.setValueState("Error");
-        //   //   oNewPassword.setValueStateText(
-        //   //     "Password must be atleast 6 characters long, contains one uppercase letter and one special character"
-        //   //   );
-        //   // } else {
-        //   //   oNewPassword.setValueState("None");
-        //   //   this.NewPassword = true;
-        //   // }
-
-        //   if (sConfirmPassword && sNewPassword !== sConfirmPassword) {
-        //     oConfirmPassword.setValueState("Error");
-        //     oConfirmPassword.setValueStateText("Password mismatch");
-        //     this.ConfirmPassword = false;
-        //   } else {
-        //     oConfirmPassword.setValueState("None");
-        //     this.ConfirmPassword = true;
-        //   }
-        // },
         SM_onTogglePasswordVisibility: function (oEvent) {
           var oInput = oEvent.getSource();
           var sType = oInput.getType() === "Password" ? "Text" : "Password";
@@ -439,6 +399,7 @@ sap.ui.define(
           oInput.setValue(sCurrentValue); // Set the value again to prevent it from being cleared
         },
         SM_onPressSave: function () {
+          var that = this;
           var oUserIdInput = sap.ui.getCore().byId("FSM_id_userIdInput");
           var oUserNameInput = sap.ui.getCore().byId("FSM_id_userNameInput");
           var oOtpInput = sap.ui.getCore().byId("FSM_id_otpInput");
@@ -458,11 +419,11 @@ sap.ui.define(
             !utils._LCvalidatePassword(oNewPwInput, "ID") ||
             !utils._LCvalidatePassword(oConfirmPwInput, "ID")
           ) {
-            MessageToast.show("Mandatory fields should be filled");
+            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
             return; // Stops execution if validation fails
           }
           if (newPassword !== confirmPassword) {
-            MessageToast.show("Passwords do not match");
+            MessageToast.show(that.i18nModel.getText("misPasswords"));
             return;
           }
 
@@ -476,7 +437,7 @@ sap.ui.define(
           };
 
           $.ajax({
-            url: "https://www.rest.kalpavrikshatechnologies.com/LoginDetails",
+            url: this.API + "/LoginDetails",
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(requestData), // Send data in the request body
@@ -498,11 +459,10 @@ sap.ui.define(
                 this.oDialog.close();
               }
 
-              MessageToast.show("Password updated successfully");
+              MessageToast.show(that.i18nModel.getText("updatepassword"));
             }.bind(this),
             error: function (err) {
               MessageToast.show("An error occurred: " + err.responseText);
-              console.error("AJAX Error:", err);
             }.bind(this),
           });
         },

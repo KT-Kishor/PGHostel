@@ -283,6 +283,23 @@ sap.ui.define(
             },
           });
         },
+        Tbtn_onPress: function () {
+          var oView = this.getView();
+          if (!this.oDialog) {
+            sap.ui.core.Fragment.load({
+              name: "sap.kt.com.minihrsolution.fragment.Sendmail",
+              controller: this,
+            }).then(
+              function (oDialog) {
+                this.oDialog = oDialog;
+                oView.addDependent(this.oDialog);
+                this.oDialog.open();
+              }.bind(this)
+            );
+          } else {
+            this.oDialog.open();
+          }
+        },
       }
     );
   }

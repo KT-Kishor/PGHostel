@@ -251,6 +251,16 @@
 background-color: #eafdf9;
 border-radius: 0.60rem;
 }
+.T_class{
+  margin-top: 4rem !important;
+  font-size: 2.1rem !important;
+}
+.T_textclass{
+  font-size: 1rem !important;
+}
+.T_imageclass{
+  border-radius: 2rem !important;
+}
 .custom-text {
   color: rgb(5, 5, 5) !important;
   font-size: 18px;

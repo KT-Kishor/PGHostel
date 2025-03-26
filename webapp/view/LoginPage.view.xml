@@ -26,19 +26,19 @@
 						
 						<Label text="{i18n>headloginwith}" />
 <HBox alignItems="End" justifyContent="Start" >
-    <RadioButton id="Lp_id_OtpRadio" text="{i18n>btnotp}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd"/>
     <RadioButton id="Lp_id_PasswordRadio" text="{i18n>btnpass}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd"/>
+    <RadioButton id="Lp_id_OtpRadio" text="{i18n>btnotp}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd"/>
 	<Button text="{i18n>sendOtp}" press="LP_onOtppress" id="idbtnsendotp" type="Ghost" class="Login" width="8rem" visible="false" />
 </HBox>
 						
 						<!-- OTP Input Field -->
-						<Label text="{i18n>btnotp}" id="Lp_id_OtpLabel" visible="false"/>
-						<Input value="{loginModel>/enteredCaptcha}" id="Lp_id_CaptchaInput" class="sapUiTinyMarginEnd" 
+						<Label text="{i18n>btnotp}" id="Lp_id_OtpLabel" visible="false" required="true" />
+						<Input value="{loginModel>/enteredCaptcha}" id="Lp_id_CaptchaInput" class="sapUiTinyMarginEnd" type="Number"
                             placeholder="{i18n>placeOtp}" visible="{LoginModel>/isRadioVisible}"  maxLength="6"/>
                           
 						<!-- Password Input Field (Initially Hidden) -->
-						<Label text="{i18n>btnpass}" id="Lp_id_PasswordLabel" visible="false"/>
-						<Input id="Lp_id_PasswordInput" type="Password" placeholder="{i18n>placepass}" visible="false"/>
+						<Label text="{i18n>btnpass}" id="Lp_id_PasswordLabel" visible="false" required="true" />
+						<Input id="Lp_id_PasswordInput" liveChange="LP_onpresPassword"  type="Password" placeholder="{i18n>placepass}" valueStateText="{i18n>passwordValueState}" visible="false"/>
 
 						<!-- Forgot Password Link (Initially Hidden) -->
 						<Link text="{i18n>forgotPass}" press="LP_onForgotPassword" id="Lp_id_ForgotPasswordLink" visible="false"/>

@@ -17,9 +17,12 @@ sap.ui.define(
             .attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: function () {
+          var that = this;
+          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+          this.API = "https://www.rest.kalpavrikshatechnologies.com";
           BusyIndicator.show(0);
           $.ajax({
-            url: "https://www.rest.kalpavrikshatechnologies.com/AllLoginDetails",
+            url: this.API + "/AllLoginDetails",
             type: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -34,7 +37,7 @@ sap.ui.define(
             }.bind(this),
             error: function (err) {
               BusyIndicator.hide();
-              MessageToast.show("An unexpected error occurred");
+              MessageToast.show(that.i18nModel.getText("commomerror"));
             }.bind(this),
           });
         },
@@ -49,6 +52,7 @@ sap.ui.define(
         },
 
         RP_onSelectUser: function () {
+          var that = this;
           var oEmpCombo = sap.ui.getCore().byId("RP_id_userid"); // User ID input field
           var selectedKey = oEmpCombo.getSelectedKey(); // Get selected user ID
 
@@ -62,7 +66,7 @@ sap.ui.define(
 
           var oEmpModel = this.getView().getModel("EmpModel"); // Fetch employee model
           if (!oEmpModel) {
-            MessageToast.show("Employee data not found!");
+            MessageToast.show(that.i18nModel.getText("noemp"));
             return;
           }
 
@@ -108,7 +112,7 @@ sap.ui.define(
               .setValue("")
               .setValueState("None");
           } else {
-            MessageToast.show("Selected Employee not found!");
+            MessageToast.show(that.i18nModel.getText("empnotfound"));
           }
         },
 
@@ -166,6 +170,7 @@ sap.ui.define(
           }
         },
         RP_onPressSetSave: function () {
+          var that = this;
           var oUserIdInput = sap.ui.getCore().byId("RP_id_userid");
           var oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
           var oNewPwInput = sap.ui.getCore().byId("RP_id_NewPW");
@@ -182,12 +187,12 @@ sap.ui.define(
             !utils._LCvalidatePassword(oNewPwInput, "ID") ||
             !utils._LCvalidatePassword(oConfirmPwInput, "ID")
           ) {
-            MessageToast.show("Make sure all the mandatory fields entered");
+            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
             return; // Stops execution if validation fails
           }
 
           if (newPassword !== confirmPassword) {
-            MessageToast.show("Passwords do not match");
+            MessageToast.show(that.i18nModel.getText("misPasswords"));
             return;
           }
 
@@ -201,7 +206,7 @@ sap.ui.define(
           };
 
           $.ajax({
-            url: "https://www.rest.kalpavrikshatechnologies.com/LoginDetails",
+            url: this.API + "/LoginDetails",
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(requestData), // Send data in the request body
@@ -228,11 +233,10 @@ sap.ui.define(
                 this.oDialog.close();
               }
 
-              MessageToast.show("Password updated successfully");
+              MessageToast.show(that.i18nModel.getText("updatepassword"));
             }.bind(this),
             error: function (err) {
               MessageToast.show("An error occurred: " + err.responseText);
-              console.error("AJAX Error:", err);
             }.bind(this),
           });
         },
