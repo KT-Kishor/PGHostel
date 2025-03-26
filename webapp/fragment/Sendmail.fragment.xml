@@ -25,7 +25,7 @@
 					<Input id="FSM_id_userNameInput"  placeholder="{i18n>placeUserName}" change="SM_onChangeSendOTP" maxLength="50" />
 
 					<Label text="{i18n>btnotp}" id="FSM_id_frgotp" required="true"/>
-					<Input id="FSM_id_otpInput"    placeholder="{i18n>otp}" type="Number" visible="false" change="SM_onChangeOTP" maxLength="6"/>
+					<Input id="FSM_id_otpInput" placeholder="{i18n>otp}"  visible="false" change="SM_onChangeOTP" maxLength="6"/>
 					
 					<Label text="{i18n>inpNewpassword}" id="FSM_id_frgnewpass" required="true" />
 					<Input id="FSM_id_newPasswordInput"  placeholder="{i18n>placenewpass}" visible="false" type="Password" liveChange="SM_onChnageSetAndConfirm" valueState="None"  showValueHelp="true" valueStateText="{i18n>placenewpass}" valueHelpIconSrc="sap-icon://show" valueHelpRequest="SM_onTogglePasswordVisibility" maxLength="50" />

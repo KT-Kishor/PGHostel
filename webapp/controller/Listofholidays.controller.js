@@ -13,33 +13,23 @@ sap.ui.define(
       {
         Formatter: Formatter,
         onInit: function () {
-          this.getRouter()
-            .getRoute("RouteListofholidays")
-            .attachMatched(this._onRouteMatched, this);
+          this.getRouter().getRoute("RouteListofholidays").attachMatched(this._onRouteMatched, this);
         },
 
         _onRouteMatched: function (oEvent) {
           this.byId("LOH_id_Holidays").setValue(new Date().getFullYear());
-          this._fetchCommonData("ListOfHolidays?", "HolidayModel", {
-            startDate: `${new Date().getFullYear()}-01-01`,
-            endDate: `${new Date().getFullYear()}-12-31`,
-          });
+          this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31`,});
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          this.getView()
-            .getModel("LoginModel")
-            .setProperty("/HeaderName", "List of Holidays");
+          this.getView().getModel("LoginModel").setProperty("/HeaderName", "List of Holidays");
         },
 
         onSearch: function () {
           var that = this;
           var selectedYear = this.byId("LOH_id_Holidays").getValue();
-          if (!selectedYear)
-            return MessageToast.show(that.i18nModel.getText("selectionYear"));
+          if (!selectedYear) return MessageToast.show(that.i18nModel.getText("selectionYear"));
           this.byId("LOH_id_Holidays").setValue(selectedYear);
-          this._fetchCommonData("ListOfHolidays?", "HolidayModel", {
-            startDate: `${selectedYear}-01-01`,
-            endDate: `${selectedYear}-12-31`,
-          });
+          this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`,
+          endDate: `${selectedYear}-12-31`,});
         },
 
         onUpload: function () {
@@ -84,11 +74,7 @@ sap.ui.define(
             });
 
             if (!isValidYear) {
-              MessageToast.show(
-                "Uploaded file contains data for a different year. Please upload data for " +
-                  selectedYear +
-                  "."
-              );
+              MessageToast.show("Uploaded file contains data for a different year. Please upload data for " + selectedYear +".");
               return;
             }
 
@@ -130,9 +116,7 @@ sap.ui.define(
         },
 
         onExport: function () {
-          const oModel = this.byId("LOH_id_HolidayTable")
-            .getModel("HolidayModel")
-            .getData();
+          const oModel = this.byId("LOH_id_HolidayTable").getModel("HolidayModel").getData();
 
           if (!oModel || oModel.length === 0) {
             MessageToast.show(that.i18nModel.getText("noData"));
@@ -141,10 +125,7 @@ sap.ui.define(
 
           const aCols = this.createColumnConfig();
           const oSettings = {
-            workbook: {
-              columns: aCols,
-              hierarchyLevel: "Level",
-            },
+            workbook: {columns: aCols, hierarchyLevel: "Level", },
             dataSource: oModel,
             fileName: "List_Of_Holidays.xlsx",
             worker: false,
