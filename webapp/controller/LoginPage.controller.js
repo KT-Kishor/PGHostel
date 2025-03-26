@@ -210,28 +210,173 @@ sap.ui.define(
             oForgotPasswordLink.setVisible(false);
           }
           if (sSelectedButtonId.includes("Lp_id_OtpRadio")) {
-            this.oView.byId("Lp_id_Userid").setValue("").setValueState("None");
-            this.oView
-              .byId("Lp_id_Username")
-              .setValue("")
-              .setValueState("None");
+            this.oView.byId("Lp_id_Userid").setValueState("None");
+            this.oView.byId("Lp_id_Username").setValueState("None");
             this.oView
               .byId("Lp_id_PasswordInput")
               .setValue("")
               .setValueState("None");
           } else {
-            this.oView.byId("Lp_id_Userid").setValue("").setValueState("None");
-            this.oView
-              .byId("Lp_id_Username")
-              .setValue("")
-              .setValueState("None");
+            this.oView.byId("Lp_id_Userid").setValueState("None");
+            this.oView.byId("Lp_id_Username").setValueState("None");
             this.oView
               .byId("Lp_id_PasswordInput")
               .setValue("")
               .setValueState("None");
           }
         },
+        //Password login change event
+        LP_onpasswordchange: function () {
+          var that = this;
+          var oView = this.getView();
+          var userId = oView.byId("Lp_id_Userid").getValue().trim();
+          var userName = oView.byId("Lp_id_Username").getValue().trim();
+          var userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
+          var password = oView.byId("Lp_id_PasswordInput").getValue().trim();
+          var isOtpLogin = oView.byId("Lp_id_OtpRadio").getSelected();
+          var isPasswordLogin = oView.byId("Lp_id_PasswordRadio").getSelected();
 
+          // Check if OTP login is selected and OTP is empty
+          if (isOtpLogin && userOtp === "") {
+            MessageToast.show(that.i18nModel.getText("checkOTP"));
+            return;
+          }
+
+          // Validate mandatory fields (excluding password when OTP login is selected)
+          if (
+            utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
+            utils._LCvalidateName(this.byId("Lp_id_Username"), "ID") &&
+            (!isPasswordLogin ||
+              utils._LCvalidateMandatoryField(
+                this.byId("Lp_id_PasswordInput"),
+                "ID"
+              )) // Skip password validation if OTP login is selected
+          ) {
+            var queryString = $.param({
+              EmployeeID: userId,
+              EmployeeName: userName,
+              OTP: isOtpLogin ? userOtp : "",
+              Password: isPasswordLogin ? password : "",
+            });
+
+            $.ajax({
+              url: this.API + "/LoginDetails?" + queryString,
+              type: "GET",
+              contentType: "application/json",
+              headers: {
+                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                password:
+                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              },
+              success: function (response) {
+                MessageToast.show(that.i18nModel.getText("logsuccess"));
+                that.getRouter().navTo("RouteTilePage");
+
+                // Clear all input fields after successful login
+                oView.byId("Lp_id_Userid").setValue("");
+                oView.byId("Lp_id_Username").setValue("");
+                oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
+                oView
+                  .byId("Lp_id_PasswordInput")
+                  .setValue("")
+                  .setVisible(false);
+                oView
+                  .byId("idbtnsendotp")
+                  .setText("Send OTP")
+                  .setVisible(false);
+
+                // Hide Password and OTP Fields
+                oView.byId("Lp_id_OtpLabel").setVisible(false);
+                oView.byId("Lp_id_PasswordLabel").setVisible(false);
+                oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
+
+                oView.byId("Lp_id_OtpRadio").setSelected(false);
+                oView.byId("Lp_id_PasswordRadio").setSelected(false);
+              },
+              error: function (error) {
+                MessageToast.show(JSON.parse(error.responseText).message);
+              },
+            });
+          } else {
+            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+          }
+        },
+        //OTP login change event
+        LP_onOTPchange: function () {
+          var that = this;
+          var oView = this.getView();
+          var userId = oView.byId("Lp_id_Userid").getValue().trim();
+          var userName = oView.byId("Lp_id_Username").getValue().trim();
+          var userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
+          var password = oView.byId("Lp_id_PasswordInput").getValue().trim();
+          var isOtpLogin = oView.byId("Lp_id_OtpRadio").getSelected();
+          var isPasswordLogin = oView.byId("Lp_id_PasswordRadio").getSelected();
+
+          // Check if OTP login is selected and OTP is empty
+          if (isOtpLogin && userOtp === "") {
+            MessageToast.show(that.i18nModel.getText("checkOTP"));
+            return;
+          }
+
+          // Validate mandatory fields (excluding password when OTP login is selected)
+          if (
+            utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
+            utils._LCvalidateName(this.byId("Lp_id_Username"), "ID") &&
+            (!isPasswordLogin ||
+              utils._LCvalidateMandatoryField(
+                this.byId("Lp_id_PasswordInput"),
+                "ID"
+              )) // Skip password validation if OTP login is selected
+          ) {
+            var queryString = $.param({
+              EmployeeID: userId,
+              EmployeeName: userName,
+              OTP: isOtpLogin ? userOtp : "",
+              Password: isPasswordLogin ? password : "",
+            });
+
+            $.ajax({
+              url: this.API + "/LoginDetails?" + queryString,
+              type: "GET",
+              contentType: "application/json",
+              headers: {
+                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                password:
+                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              },
+              success: function (response) {
+                MessageToast.show(that.i18nModel.getText("logsuccess"));
+                that.getRouter().navTo("RouteTilePage");
+
+                // Clear all input fields after successful login
+                oView.byId("Lp_id_Userid").setValue("");
+                oView.byId("Lp_id_Username").setValue("");
+                oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
+                oView
+                  .byId("Lp_id_PasswordInput")
+                  .setValue("")
+                  .setVisible(false);
+                oView
+                  .byId("idbtnsendotp")
+                  .setText("Send OTP")
+                  .setVisible(false);
+
+                // Hide Password and OTP Fields
+                oView.byId("Lp_id_OtpLabel").setVisible(false);
+                oView.byId("Lp_id_PasswordLabel").setVisible(false);
+                oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
+
+                oView.byId("Lp_id_OtpRadio").setSelected(false);
+                oView.byId("Lp_id_PasswordRadio").setSelected(false);
+              },
+              error: function (error) {
+                MessageToast.show(JSON.parse(error.responseText).message);
+              },
+            });
+          } else {
+            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+          }
+        },
         LP_onForgotPassword: function () {
           var oView = this.getView();
           if (!this.oDialog) {
@@ -255,6 +400,8 @@ sap.ui.define(
           } else {
             this.oDialog.open();
             sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(false);
+            oView.byId("Lp_id_Userid").setValue("").setValueState("None");
+            oView.byId("Lp_id_Username").setValue("").setValueState("None");
           }
         },
         SM_onPressCancle: function () {
@@ -491,7 +638,6 @@ sap.ui.define(
               oOtpInput.setValue("").setVisible(false);
               oNewPwInput.setValue("").setVisible(false);
               oConfirmPwInput.setValue("").setVisible(false);
-
               // Close dialog if it exists
               if (this.oDialog) {
                 this.oDialog.close();
