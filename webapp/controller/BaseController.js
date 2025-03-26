@@ -93,7 +93,7 @@ sap.ui.define([
     },
 
     _fetchCommonData: function (entityName, modelName, filter = "") {
-      if(this.getOwnerComponent().getModel(modelName) === undefined){
+      // if(this.getOwnerComponent().getModel(modelName) === undefined){
       let url =  this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;
       sap.ui.core.BusyIndicator.show(0);
       try {
@@ -118,7 +118,7 @@ sap.ui.define([
         sap.ui.core.BusyIndicator.hide();
         sap.m.MessageToast.show("Technical error, please contact the administrator");
       }
-    }
+    // }
     },
     //Common read call for all the app
     async ajaxReadWithJQuery(sUrl,filter) {
@@ -129,9 +129,11 @@ sap.ui.define([
           method: "GET",
           headers: this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
+            sap.ui.core.BusyIndicator.hide();
             resolve(data);
           },
           error: function (error) {
+            sap.ui.core.BusyIndicator.hide();
             reject(error);
           }
         });
@@ -147,9 +149,11 @@ sap.ui.define([
           data: JSON.stringify(oPayLoad),
           headers:this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
+            sap.ui.core.BusyIndicator.hide();
             resolve(data);
           },
           error: function (error) {
+            sap.ui.core.BusyIndicator.hide();
             reject(error);
           }
         });
@@ -165,9 +169,11 @@ sap.ui.define([
           data: JSON.stringify(oPayLoad),
           headers:this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
+            sap.ui.core.BusyIndicator.hide();
             resolve(data);
           },
           error: function (error) {
+            sap.ui.core.BusyIndicator.hide();
             reject(error);
           }
         });

@@ -267,9 +267,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteEmployeeOffer");
         },
         TileV_onpresslistofholidays: function () {
-          this.getRouter().navTo("RouteListofholidays", {
-            Year: "Listofholidays",
-          });
+          this.getRouter().navTo("RouteListofholidays");
         },
         TileV_onpressIDCARD: function () {
           this.getRouter().navTo("RouteIDCardApplication");

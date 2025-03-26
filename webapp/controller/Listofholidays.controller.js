@@ -13,48 +13,33 @@ sap.ui.define(
       {
         Formatter: Formatter,
         onInit: function () {
-          var oYearModel = new JSONModel({selectedYear: new Date().getFullYear(),});
-          this.getView().setModel(oYearModel, "yearModel");
           this.getRouter().getRoute("RouteListofholidays").attachMatched(this._onRouteMatched, this);
       },
       
       _onRouteMatched: function (oEvent) {
-          var oYearModel = this.getView().getModel("yearModel")
-          var selectedYear = oYearModel.getProperty("/selectedYear");
-          this.YearData = oEvent.getParameter("arguments").Year;
-          
-          if (this.YearData === "Listofholidays") {
-              selectedYear = new Date().getFullYear();
-              oYearModel.setProperty("/selectedYear", selectedYear);
-          }
-
-          this.byId("LOH_id_Holidays").setValue(selectedYear);
-          this._fetchCommonData("ListOfHolidays?", "HolidayModel", { startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31`});
+        this.byId("LOH_id_Holidays").setValue(new Date().getFullYear());
+          this._fetchCommonData("ListOfHolidays?", "HolidayModel", { startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31`});
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("LoginModel").setProperty("/HeaderName", "List of Holidays");
       },
       
       onSearch: function () {
         var that=this;
-        var oYearModel = this.getView().getModel("yearModel");
-        var selectedDate = this.byId("LOH_id_Holidays").getDateValue();
-        
-        if (!selectedDate) return MessageToast.show(that.i18nModel.getText("selectionYear"));
-        
-        var selectedYear = selectedDate.getFullYear().toString(); 
-        oYearModel.setProperty("/selectedYear", selectedYear);
-        
+        var selectedYear = this.byId("LOH_id_Holidays").getValue();
+        if (!selectedYear) return MessageToast.show(that.i18nModel.getText("selectionYear"));
+        this.byId("LOH_id_Holidays").setValue(selectedYear);
         this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`, 
         endDate: `${selectedYear}-12-31` });
        },
 
-       onUpload:function () {
+       onUpload: function () {
+        var that=this;
         var oFileUploader = this.byId("LOH_id_LocFileUpload");
         var aFiles = oFileUploader.oFileUpload.files;
     
         if (!aFiles.length) {
-          MessageToast.show(that.i18nModel.getText("selectFile"));
-          return;
+            MessageToast.show(that.i18nModel.getText("selectFile"));
+            return;
         }
     
         var oFile = aFiles[0];
@@ -64,7 +49,7 @@ sap.ui.define(
         var selectedYear = selectedDate ? new Date(selectedDate).getFullYear().toString() : null;
     
         if (!selectedYear) {
-          MessageToast.show(that.i18nModel.getText("validYear"));
+            MessageToast.show(that.i18nModel.getText("validYear"));
             return;
         }
     
@@ -80,58 +65,40 @@ sap.ui.define(
             }
     
             var isValidYear = excelData.every(item => {
-              if (item.Date) {
-                  var excelYear;
-                  if (typeof item.Date === "number") {
-                      var excelDate = new Date((item.Date - 25569) * 86400000);
-                      excelYear = excelDate.getFullYear().toString();
-                  } else {
-                      var excelDate = new Date(item.Date);
-                      excelYear = excelDate.getFullYear().toString();
-                  }
-                  return excelYear === selectedYear; 
-              }
-              return false;
-          });
-          
+                if (item.Date) {
+                    var excelDate = new Date(item.Date);
+                    var excelYear = excelDate.getFullYear().toString();
+                    return excelYear === selectedYear;
+                }
+                return false;
+            });
     
-          if (!isValidYear) {
+            if (!isValidYear) {
                 MessageToast.show("Uploaded file contains data for a different year. Please upload data for " + selectedYear + ".");
                 return;
-          }
+            }
     
-            var formattedData = excelData.map(item => {
-              var formattedDate = "";
-          
-              if (typeof item.Date === "number") {
-                  var excelDate = new Date((item.Date - 25569) * 86400000);
-                  formattedDate = excelDate.toISOString().split("T")[0]; 
-              } else {
-                  formattedDate = item.Date; 
-              }
-          
-              return {
-                  "Name": item.Name,
-                  "Date": formattedDate,
-                  "Day": item.Day,
-                  "Karnataka": item.Karnataka,
-                  "OtherStates": item.OtherStates,
-                  "Maharashtra": item.Maharashtra,
-                  "Delhi": item.Delhi
-              };
-          });
-          
-          try {
-              await this.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
-              MessageToast.show(that.i18nModel.getText("uplaodSuccessfull"));
-          }catch (error) {
-              MessageToast.show(error.responseJSON?.message);
-        }
+            var formattedData = excelData.map(item => ({
+                "Name": item.Name,
+                "Date": item.Date,
+                "Day": item.Day,
+                "Karnataka": item.Karnataka,
+                "OtherStates": item.OtherStates,
+                "Maharashtra": item.Maharashtra,
+                "Delhi": item.Delhi
+            }));
+    
+            try {
+                await this.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
+                MessageToast.show(that.i18nModel.getText("uplaodSuccessfull"));
+            } catch (error) {
+                sap.m.MessageToast.show(error.responseJSON?.message || "Error in file upload.");
+            }
         };
     
-        reader.readAsBinaryString(oFile); 
+        reader.readAsBinaryString(oFile);
     },
-    
+
       createColumnConfig: function() {
         return [
             { label: "Name", property: "Name", type: "string" },
@@ -145,8 +112,7 @@ sap.ui.define(
        },
 
        onExport: function () {
-        const oTable = this.byId("LOH_id_HolidayTable");
-        const oModel = oTable.getModel("HolidayModel").getData();
+        const oModel = this.byId("LOH_id_HolidayTable").getModel("HolidayModel").getData();
        
         if (!oModel || oModel.length === 0) {
           MessageToast.show(that.i18nModel.getText("noData"));

@@ -221,7 +221,7 @@
                 },
                 {
                     "name": "RouteListofholidays",
-                    "pattern": "Listofholidays/{Year}",
+                    "pattern": "Listofholidays",
                     "target": [
                         "TargetListofholidays"
                     ]
