@@ -24,32 +24,14 @@
 						<filterbar:control>
 							<DatePicker 
                     id="LOH_id_Holidays"
-                   value="{yearModel>/selectedYear}"
+                   value="{path: '/selectedYear', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'yyyy' }}"
                     displayFormat="yyyy"
 					valueFormat="yyyy"
                     placeholder="yyyy"
                     change="handleChange"/>
 						</filterbar:control>
 					</filterbar:FilterGroupItem>
-					<filterbar:FilterGroupItem
-            name="uploadBtn"
-            label=""
-            groupName="Group1"
-            visibleInFilterBar="true">
-						<filterbar:control>
-							<u:FileUploader
-                            class="salUploadBtn"
-                            id="LOH_id_LocFileUpload"
-                            buttonText="{i18n>import}"
-                            sameFilenameAllowed="true"
-                            buttonOnly="true"
-                            fileType="XLSX,xlsx,XLS,xls"
-                            style="Emphasized"
-                            icon="sap-icon://sys-next-page"
-                            change="onUpload"/>
-						</filterbar:control>
-					</filterbar:FilterGroupItem>
-				</filterbar:filterGroupItems>
+			</filterbar:filterGroupItems>
 			</filterbar:FilterBar>
 			<Table
                  growingScrollToLoad="true"
@@ -63,7 +45,8 @@
 					<OverflowToolbar>
 						<Title  id="LOH_id_Title" text="{i18n>headerListOfHolidays}"/>
 						<ToolbarSpacer />
-						<Button icon="sap-icon://excel-attachment" press="onExport"/>
+						<Button text="{i18n>import}" icon="sap-icon://sys-next-page" press="LOH_onOpenImport" type="Ghost"/>
+						<Button text="{i18n>export}" icon="sap-icon://excel-attachment" press="LOH_onExport" type="Ghost"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
