@@ -37,6 +37,7 @@ sap.ui.define(
           oView.byId("Lp_id_PasswordLabel").setVisible(true);
           oView.byId("Lp_id_PasswordInput").setVisible(true);
           oView.byId("Lp_id_ForgotPasswordLink").setVisible(true);
+          oView.byId("Lp_id_ForgotPasswordLink").setValue("");
         },
         onpresshome: function () {
           this.getRouter().navTo("RouteHomePage");
@@ -143,7 +144,7 @@ sap.ui.define(
                   "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
               },
               success: function (response) {
-                MessageToast.show("Login Successful");
+                MessageToast.show(that.i18nModel.getText("logsuccess"));
                 that.getRouter().navTo("RouteTilePage");
 
                 // Clear all input fields after successful login
@@ -408,6 +409,20 @@ sap.ui.define(
         },
 
         SM_onTogglePasswordVisibility: function (oEvent) {
+          var oInput = oEvent.getSource();
+          var sType = oInput.getType() === "Password" ? "Text" : "Password";
+          oInput.setType(sType);
+
+          // Toggle the value help icon properly without losing the value
+          var sIcon =
+            sType === "Password" ? "sap-icon://show" : "sap-icon://hide";
+          oInput.setValueHelpIconSrc(sIcon);
+
+          // Ensure the current value of the password is retained
+          var sCurrentValue = oInput.getValue(); // Get the current value before toggling
+          oInput.setValue(sCurrentValue); // Set the value again to prevent it from being cleared
+        },
+        LP_onTogglePasswordVisibility: function (oEvent) {
           var oInput = oEvent.getSource();
           var sType = oInput.getType() === "Password" ? "Text" : "Password";
           oInput.setType(sType);

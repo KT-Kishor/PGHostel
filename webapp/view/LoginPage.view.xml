@@ -33,12 +33,12 @@
 						 
 						<!-- OTP Input Field -->
 						<Label text="{i18n>btnotp}" id="Lp_id_OtpLabel" visible="false" required="true" />
-						<Input value="{loginModel>/enteredCaptcha}" id="Lp_id_CaptchaInput" class="sapUiTinyMarginEnd" type="Number"
+						<Input value="{loginModel>/enteredCaptcha}" id="Lp_id_CaptchaInput" class="sapUiTinyMarginEnd" 
                             placeholder="{i18n>placeOtp}" visible="{LoginModel>/isRadioVisible}"  maxLength="6"/>
                           
 						<!-- Password Input Field (Initially Hidden) -->
 						<Label text="{i18n>btnpass}" id="Lp_id_PasswordLabel" visible="false" required="true" />
-						<Input id="Lp_id_PasswordInput" liveChange="LP_onpresPassword"  type="Password" placeholder="{i18n>placepass}" valueStateText="{i18n>placepass}" visible="false"/>
+						<Input id="Lp_id_PasswordInput" liveChange="LP_onpresPassword"  type="Password" placeholder="{i18n>placepass}" valueStateText="{i18n>placepass}" visible="false" valueHelpIconSrc="sap-icon://show" valueHelpRequest="LP_onTogglePasswordVisibility" showValueHelp="true"  maxLength="20"/>
 
 						<!-- Forgot Password Link (Initially Hidden) -->
 						<Link text="{i18n>forgotPass}" press="LP_onForgotPassword" id="Lp_id_ForgotPasswordLink" visible="false"/>

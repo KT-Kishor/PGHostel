@@ -226,7 +226,7 @@ sap.ui.define(
               oConfirmPwInput.setValue("");
 
               // Refresh the model
-              var oModel = sap.ui.getCore().getModel("EmpModel");
+              var oModel = this.getView().getModel("EmpModel");
               if (oModel) {
                 oModel.refresh(true);
               }
