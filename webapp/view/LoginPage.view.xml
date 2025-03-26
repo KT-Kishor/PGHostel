@@ -26,8 +26,8 @@
 						
 						<Label text="{i18n>headloginwith}" />
 <HBox alignItems="End" justifyContent="Start" >
-    <RadioButton id="Lp_id_PasswordRadio" text="{i18n>btnpass}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd"/>
-    <RadioButton id="Lp_id_OtpRadio" text="{i18n>btnotp}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd"/>
+    <RadioButton id="Lp_id_PasswordRadio" text="{i18n>btnpass}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd "/>
+    <RadioButton id="Lp_id_OtpRadio" text="{i18n>btnotp}" groupName="loginOption" select="onLoginOptionChange" class="otpclass  sapUiTinyMarginEnd"/>
 	<Button text="{i18n>sendOtp}" press="LP_onOtppress" id="idbtnsendotp" type="Ghost" class="Login" width="8rem" visible="false" />
 </HBox>
 						 

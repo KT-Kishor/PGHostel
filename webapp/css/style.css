@@ -470,6 +470,10 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 .Login{
   width: fit-content !important;
+  margin-left: 1.9rem !important;
+}
+.otpclass{
+  margin-left: 1.5rem !important;
 }
 .taskNameColor .sapMObjectAttributeText {
   color: blue !important;
