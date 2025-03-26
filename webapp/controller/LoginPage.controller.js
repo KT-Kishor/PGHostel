@@ -103,7 +103,6 @@ sap.ui.define(
         LP_onLogin: function () {
           var that = this;
           var oView = this.getView();
-
           var userId = oView.byId("Lp_id_Userid").getValue().trim();
           var userName = oView.byId("Lp_id_Username").getValue().trim();
           var userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
@@ -208,6 +207,27 @@ sap.ui.define(
             oPasswordInput.setVisible(false);
             oPasswordLabel.setVisible(false);
             oForgotPasswordLink.setVisible(false);
+          }
+          if (sSelectedButtonId.includes("Lp_id_OtpRadio")) {
+            this.oView.byId("Lp_id_Userid").setValue("").setValueState("None");
+            this.oView
+              .byId("Lp_id_Username")
+              .setValue("")
+              .setValueState("None");
+            this.oView
+              .byId("Lp_id_PasswordInput")
+              .setValue("")
+              .setValueState("None");
+          } else {
+            this.oView.byId("Lp_id_Userid").setValue("").setValueState("None");
+            this.oView
+              .byId("Lp_id_Username")
+              .setValue("")
+              .setValueState("None");
+            this.oView
+              .byId("Lp_id_PasswordInput")
+              .setValue("")
+              .setValueState("None");
           }
         },
 

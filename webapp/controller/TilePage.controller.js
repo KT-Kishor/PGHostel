@@ -50,6 +50,9 @@ sap.ui.define(
         RP_onChangnewpass: function (oEvent) {
           utils._LCvalidatePassword(oEvent);
         },
+        RP_onChangcomfirmpass: function (oEvent) {
+          utils._LCvalidateMandatoryField(oEvent);
+        },
 
         RP_onSelectUser: function () {
           var that = this;
@@ -185,7 +188,7 @@ sap.ui.define(
             !utils._LCvalidateMandatoryField(oUserIdInput, "ID") ||
             !utils._LCvalidateName(oUserNameInput, "ID") ||
             !utils._LCvalidatePassword(oNewPwInput, "ID") ||
-            !utils._LCvalidatePassword(oConfirmPwInput, "ID")
+            !utils._LCvalidateMandatoryField(oConfirmPwInput, "ID")
           ) {
             MessageToast.show(that.i18nModel.getText("mandetoryFields"));
             return; // Stops execution if validation fails
