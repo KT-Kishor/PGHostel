@@ -40,12 +40,12 @@
 				<Label text="{i18n>gstNo}" />
 				<Input value="{CreateCustomerModel>/GST}" maxLength="15" placeholder="{i18n>placeholderGST}" id="MC_id_CustomGst"  liveChange="MC_ValidateGstNumber" valueStateText="{i18n>gstNoValueState}" />
 				<Label text="{i18n>type}" labelFor="groupC" />
-				<RadioButtonGroup visible="{visiblePlay>/IDInput}" select="onRadioButtonChange"  id="MC_id_groupCustGst" columns="2" selectedIndex="{visiblePlay>/selectedIndex}">
+				<RadioButtonGroup visible="{visiblePlay>/CC_id_CustInput}" select="onRadioButtonChange"  id="MC_id_groupCustGst" columns="2" selectedIndex="{visiblePlay>/selectedIndex}">
 					<RadioButton text="{i18n>cgst}" />
 					<RadioButton text="{i18n>igst}" />
 				</RadioButtonGroup>
-				<Label visible="{visiblePlay>/IDInput}" text="{i18n>custValue}" />
-				<Input visible="{visiblePlay>/IDInput}" value="{CreateCustomerModel>/Value}" maxLength="5" />
+				<Label visible="{visiblePlay>/CC_id_CustInput}" text="{i18n>custValue}" />
+				<Input visible="{visiblePlay>/CC_id_CustInput}" value="{CreateCustomerModel>/Value}" maxLength="5" />
 				<Label text="{i18n>emailId}" required="true" />
 				<Input value="{CreateCustomerModel>/MailID}" placeholder="{i18n>placeEmailId}" id="MC_id_CustMail"  maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
 				<Label text="{i18n>emailId}" required="true"/>

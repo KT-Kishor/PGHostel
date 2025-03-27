@@ -17,8 +17,10 @@ sap.ui.define([
 
         MC_onAddCustomerDetails: function () {
           var oView = this.getView();
-          var oModel;
-          var JSONModel = {
+          var data = { save: false, submit: true, CC_id_CustInput: false, selectedIndex: 0 };
+          var visibleData = new sap.ui.model.json.JSONModel(data);
+          this.getView().setModel(visibleData, "visiblePlay");
+          var AddCustomerModel = {
             CompanyName: "",
             Name: "",
             PAN: "",
@@ -30,9 +32,9 @@ sap.ui.define([
             Type: "",
             Value: "0",
             Salutation: "Mr.",
-            CustomerEmail: ""
+            CustomerEmail: "",
           };
-          oModel = new sap.ui.model.json.JSONModel(JSONModel);
+          var oModel = new JSONModel(AddCustomerModel);
           this.getView().setModel(oModel, "CreateCustomerModel");
           this.openLeaveDialog(oView);
         },

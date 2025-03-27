@@ -11,8 +11,6 @@
 		<content>
 			<filterbar:FilterBar id="LOH_id_AdminFilter"
     useToolbar="false"
-    clear="onClear"
-    showClearOnFB="true"
     search="onSearch"
     showFilterConfiguration="false">
 				<filterbar:filterGroupItems>
@@ -27,9 +25,7 @@
                    value="{path: '/selectedYear', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'yyyy' }}"
                     displayFormat="yyyy"
 					valueFormat="yyyy"
-                    placeholder="yyyy"
-					change="LOH_ValidateYear"
-					valueStateText="{i18n>selectionYear}"/>
+                    placeholder="yyyy"/>
 						</filterbar:control>
 					</filterbar:FilterGroupItem>
 			</filterbar:filterGroupItems>
