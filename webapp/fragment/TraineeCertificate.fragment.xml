@@ -22,7 +22,7 @@
 			singleContainerFullSize="false" >
 			<f:content>
 				<Label text="{i18n>traineeName}"  />
-				<Input value="{traineeModel>NameSalutation} {traineeModel>Name}"  editable="false"/>
+				<Input value="{traineeModel>NameSalutation} {traineeModel>TraineeName}"  editable="false"/>
 				<Label text="{i18n>reportingManager}" />
 				<Input value="{traineeModel>ReportingManagerSalutation} {traineeModel>ReportingManager}"   editable="false"/>
 				<Label text="{i18n>role}" required="true" />
@@ -33,7 +33,7 @@
 				<DatePicker value="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}"
                  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="false"  id="TCF_id_JoiningDate" />
 				<Label text="{i18n>endDate}" required="true"/>
-				<DatePicker   displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"  id="TCF_id_EndDate" value="{path:'traineeModel>EndDate' ,formatter:'.Formatter.formatDate'}"   minDate=""  />
+				<DatePicker   displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"  id="TCF_id_EndDate" value="{path:'traineeModel>EndDate' ,formatter:'.Formatter.formatDate'}"  minDate="{path:'traineeModel>/EndDate' , formatter:'.Formatter.formatDate'}"   />
 				<Label text="{i18n>department}"  required="true" />
 				<Select id="TCF_id_Department"  items="{Departmentmodel>/}" selectedKey="{traineeModel>Department}">
 					<core:Item key="{Departmentmodel>departmentName}" text="{Departmentmodel>departmentName}"/>

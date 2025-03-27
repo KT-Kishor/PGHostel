@@ -44,6 +44,7 @@ sap.ui.define([
                     this.getView().byId("TUF_id_pageTrainee").setVisible(true);
                     this.getModelData(this.sArgPara);
                 }
+                this._makeDatePickersReadOnly(["TD_id_JoiningDate","TU_id_JoinDate"]);
             },
             getModelData: function (sArgPara) {
                 var oModel = this.getOwnerComponent().getModel("traineeModel");
@@ -69,7 +70,7 @@ sap.ui.define([
                     var traineeData = aFilteredData[0];
                     this.getView().setModel(new JSONModel(traineeData), "editTraineeModel");
                     var oViewModel = this.getView().getModel("viewModel");
-                    if (traineeData.Status === "OnBoarded") {
+                    if (traineeData.Status === "OnBoarded" || traineeData.Status === "Training Completed") {
                         oViewModel.setProperty("/isVisiable", false);
                         oViewModel.setProperty("/editBut", false);
                     } else if (traineeData.Status === "Rejected") {

@@ -55,7 +55,7 @@ sap.ui.define([
                 }
                 this.getRouter().navTo("RouteTraineeDetails", { sParTrainee: oParValue });
             },
-            TC_commonOpenDialog: function (dialogProperty, fragmentName) {
+            TC_commonOpenDialog: function (dialogProperty, fragmentName, datePickerId) {
                 if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -63,28 +63,39 @@ sap.ui.define([
                     }).then(function (oDialog) {
                         this[dialogProperty] = oDialog;
                         this.getView().addDependent(this[dialogProperty]);
+                        this._FragmentDatePickersReadOnly([datePickerId]);
                         this[dialogProperty].open();
                     }.bind(this));
                 } else {
+                    this._FragmentDatePickersReadOnly([datePickerId]);
                     this[dialogProperty].open();
                 }
             },
+
             T_onTableSelectionChange: function (oEvent) {
                 var oSelectedItem = oEvent.getParameter("listItem");
+
                 if (oSelectedItem) {
                     var sStatus = oSelectedItem.getBindingContext("traineeModel").getProperty("Status");
+
                     var isDisabled = sStatus === "OnBoarded" || sStatus === "Rejected";
                     this.byId("T_id_OnboardBtn").setEnabled(!isDisabled);
                     this.byId("T_id_RejectBtn").setEnabled(!isDisabled);
 
-                    var isCertificateVisible = sStatus === "OnBoarded";
-                    this.byId("T_id_Download").setVisible(isCertificateVisible); // Ensure the button ID is correct
+                    var isCertificateVisible = sStatus === "Training Completed" || sStatus === "OnBoarded";
+                    this.byId("T_id_Download").setVisible(isCertificateVisible);
+
+                    var isEmpOnBoardVisible = sStatus === "Training Completed";
+                    this.byId("T_id_EmpOnBoard").setVisible(isEmpOnBoardVisible);
+
+                    var isOtherButtonsVisible = sStatus !== "Training Completed";
+                    this.byId("T_id_OnboardBtn").setVisible(isOtherButtonsVisible);
+                    this.byId("T_id_RejectBtn").setVisible(isOtherButtonsVisible);
                 }
             },
-            updateCallForTrainee: function (oStatus, oTraineeData) {
+            updateCallForTrainee: function (oTraineeData) {
                 var that = this;
-                oTraineeData.Status = oStatus;
-                if (oStatus === "OnBoarded") {
+                if (oTraineeData.Status === "OnBoarded") {
                     oTraineeData.CompanyEmailID = sap.ui.getCore().byId("OTF_id_TraineeMail").getValue();
                 }
                 var oModelOffer = {
@@ -126,7 +137,7 @@ sap.ui.define([
                         press: function () {
                             if (action === "onboard") {
                                 // Open the OnboardTrainee fragment after onboarding logic
-                                that.TC_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee");
+                                that.TC_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee", "");
                             } else if (action === "reject") {
                                 that._handleReject(oContext);
                             }
@@ -149,7 +160,7 @@ sap.ui.define([
             _handleReject: function (oContext) {
                 var that = this;
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
-                that.updateCallForTrainee("Rejected", oContext.getObject());
+                that.updateCallForTrainee(oContext.getObject());
                 MessageToast.show(this.i18nModel.getText("traineeRejectSucess"));
             },
             OTF_onPressOnboard: function () {
@@ -159,7 +170,7 @@ sap.ui.define([
                         // Update UI Model
                         oContext.getModel().setProperty(oContext.getPath() + "/Status", "OnBoarded");
                         // Prepare Data for Update Call
-                        this.updateCallForTrainee("OnBoarded", oContext.getObject());
+                        this.updateCallForTrainee(oContext.getObject());
                         MessageToast.show(this.i18nModel.getText("traineeOnboardSucess"));
                         this.TOb_oDialog.close();
                     } else {
@@ -191,7 +202,7 @@ sap.ui.define([
                 this.getView().setBindingContext(oTraineeContext, "traineeModel");
 
                 // Open the dialog
-                this.TC_commonOpenDialog("TC_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate");
+                this.TC_commonOpenDialog("TC_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate", "TCF_id_EndDate");
             },
 
             TCF_onPressCloseDialog: function () {
@@ -214,36 +225,35 @@ sap.ui.define([
                     let oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
                     // Create the updated trainee data
                     const oUpdatedData = {
-                        "data": {
-                            Department: oTraineeModel.Department,
-                            ProjectName: oTraineeModel.ProjectName,
-                            EndDate: oTraineeModel.EndDate,
-                            Role: oTraineeModel.Role,
-                            TraineeName: oTraineeModel.TraineeName,
-                            NameSalutation: oTraineeModel.NameSalutation,
-                            JoiningDate: oTraineeModel.JoiningDate,
-                            ReportingManager: oTraineeModel.ReportingManager,
-                            ReportingManagerSalutation: oTraineeModel.ReportingManagerSalutation,
-                            Stipend: oTraineeModel.Stipend,
-                            TraineeEmail: oTraineeModel.TraineeEmail,
-                            Status: "Training Completed",
-                        },
-                        "filters": {
-                            "ID": oTraineeModel.ID
-                        }
+                        ID: oTraineeModel.ID,
+                        CompanyEmailID: oTraineeModel.CompanyEmailID,
+                        CompanyName: oTraineeModel.CompanyName,
+                        Department: oTraineeModel.Department,
+                        ProjectName: oTraineeModel.ProjectName,
+                        EndDate: oTraineeModel.EndDate,
+                        Role: oTraineeModel.Role,
+                        TraineeName: oTraineeModel.TraineeName,
+                        NameSalutation: oTraineeModel.NameSalutation,
+                        JoiningDate: oTraineeModel.JoiningDate,
+                        ReportingManager: oTraineeModel.ReportingManager,
+                        ReportingManagerSalutation: oTraineeModel.ReportingManagerSalutation,
+                        Stipend: oTraineeModel.Stipend,
+                        TraineeEmail: oTraineeModel.TraineeEmail,
+                        Status: "Training Completed",
                     };
                     sap.ui.core.BusyIndicator.show(0);
-                    this.updateCallForTrainee("Trainee", oUpdatedData);
+                    this.updateCallForTrainee(oUpdatedData);
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("downloadSucess"));
+                    this.TC_oDialog.close();
 
                 } catch (oError) {
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
-
-
-
+            T_onBoardTrainee: function () {
+                this.getRouter().navTo("RouteEmployeeOfferDetails");
+            }
         });
     });

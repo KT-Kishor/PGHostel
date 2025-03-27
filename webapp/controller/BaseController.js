@@ -243,5 +243,42 @@ sap.ui.define([
       oModel.setProperty("/CostofCompany", this.Formatter.formatCurrencyInINRText(Math.round(CostofCompany)));
       oModel.setProperty("/Total", this.Formatter.formatCurrencyInINRText(Math.round(Total)));
     },
+
+     //Date picker common function 
+     _makeDatePickersReadOnly: function (aIds) {
+      var oView = this.getView();
+      aIds.forEach(function (sId) {
+        var oDatePicker = oView.byId(sId);
+        if (oDatePicker) {
+          oDatePicker.addEventDelegate({
+            onAfterRendering: function () {
+              var datePickerDomRef = oDatePicker.getFocusDomRef();
+              if (datePickerDomRef) {
+                datePickerDomRef.readOnly = true;
+                datePickerDomRef.style.cursor = 'pointer';
+              }
+            }
+          });
+        }
+      });
+    },
+
+    //fragment date picker function
+    _FragmentDatePickersReadOnly: function (aIds) {
+      aIds.forEach(function (sId) {
+        var oDatePicker = sap.ui.getCore().byId(sId);
+        if (oDatePicker) {
+          oDatePicker.addEventDelegate({
+            onAfterRendering: function () {
+              var datePickerDomRef = oDatePicker.getFocusDomRef();
+              if (datePickerDomRef) {
+                datePickerDomRef.readOnly = true;
+                datePickerDomRef.style.cursor = 'pointer';
+              }
+            }
+          });
+        }
+      });
+    },
   })
 });
