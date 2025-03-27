@@ -22,30 +22,24 @@
 			singleContainerFullSize="false" >
 			<f:content>
 				<Label text="{i18n>traineeName}"  />
-				<Input value="{oTraineeDetailsModel>/NameSalutation} {oTraineeDetailsModel>/Name}"  editable="false"/>
+				<Input value="{traineeModel>NameSalutation} {traineeModel>Name}"  editable="false"/>
 				<Label text="{i18n>reportingManager}" />
-				<Input value="{oTraineeDetailsModel>/ReportingManagerSalutation} {oTraineeDetailsModel>/ReportingManager}"   editable="false"/>
+				<Input value="{traineeModel>ReportingManagerSalutation} {traineeModel>ReportingManager}"   editable="false"/>
 				<Label text="{i18n>role}" required="true" />
-				<Select id="idRoleSelect"  items="{DesignationModel>/results}" selectedKey="{oTraineeDetailsModel>/Role}">
-					<core:Item key="{DesignationModel>DesignationName}" text="{DesignationModel>DesignationName}"/>
+				<Select id="idRoleSelect"  items="{DesignationModel>/}" selectedKey="{traineeModel>Role}">
+					<core:Item key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}"/>
 				</Select>
 				<Label text="{i18n>joiningDate}"  />
-				<DatePicker 
-    value="{oTraineeDetailsModel>/JoiningDate}" 
-    displayFormat="dd/MM/yyyy" 
-    valueFormat="dd/MM/yyyy"
-    editable="false" 
-    id="TCF_id_JoiningDate" />
+				<DatePicker value="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}"
+                 displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="false"  id="TCF_id_JoiningDate" />
 				<Label text="{i18n>endDate}" required="true"/>
-				<DatePicker   displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
-    id="TCF_id_EndDate"
-	 minDate="{= ${oTraineeDetailsModel>/EndDate} }" />
+				<DatePicker   displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"  id="TCF_id_EndDate" value="{path:'traineeModel>EndDate' ,formatter:'.Formatter.formatDate'}"   minDate=""  />
 				<Label text="{i18n>department}"  required="true" />
-				<Select id="TCF_id_Department"  items="{DepartmentModel>/results}" selectedKey="{oTraineeDetailsModel>/Department}">
-					<core:Item key="{DepartmentModel>DepartmentName}" text="{DepartmentModel>DepartmentName}"/>
+				<Select id="TCF_id_Department"  items="{Departmentmodel>/}" selectedKey="{traineeModel>Department}">
+					<core:Item key="{Departmentmodel>departmentName}" text="{Departmentmodel>departmentName}"/>
 				</Select>
 				<Label text="{i18n>projectName}"  required="true" />
-				<TextArea id="TCF_id_ProjectName" rows="2" liveChange="T_ValidateCommonFields" value="{oTraineeDetailsModel>/ProjectName}" maxLength="100" valueStateText="{i18n>projectValueState}" />
+				<TextArea id="TCF_id_ProjectName" rows="2" liveChange="T_ValidateCommonFields" value="{traineeModel>ProjectName}" maxLength="100" valueStateText="{i18n>projectValueState}" />
 			</f:content>
 		</f:SimpleForm>
 		<HBox justifyContent="End" >
