@@ -35,7 +35,7 @@
                 id="ALH_id_LocFileUpload"
                 width="300px"
                 buttonText="{i18n>fileupload}"
-                fileType="xlsx,csv"
+                fileType="xlsx"
                 placeholder="Choose an Excel file"
                 change="LOH_onUpload"
                 icon="sap-icon://upload"

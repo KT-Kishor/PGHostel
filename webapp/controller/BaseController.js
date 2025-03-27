@@ -123,9 +123,10 @@ sap.ui.define([
     //Common read call for all the app
     async ajaxReadWithJQuery(sUrl,filter) {
       sap.ui.core.BusyIndicator.show(0);
+      var queryString = new URLSearchParams(filter).toString();
       return new Promise((resolve, reject) => {
         $.ajax({
-          url: this.getView().getModel("LoginModel").getData().url +sUrl+"?"+filter,
+          url: this.getView().getModel("LoginModel").getData().url + sUrl + "?" + queryString,
           method: "GET",
           headers: this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
@@ -182,23 +183,25 @@ sap.ui.define([
      //Common delete call for all the app
      async ajaxDeleteWithJQuery(sUrl, oPayLoad) {
       sap.ui.core.BusyIndicator.show(0);
-        return new Promise((resolve, reject) => {
-        $.ajax({
-          url: this.getView().getModel("LoginModel").getData().url + sUrl,
-          method: "DELETE",
-          data: JSON.stringify(oPayLoad),
-          headers:this.getView().getModel("LoginModel").getData().headers,
-          success: function (data) {
-            sap.ui.core.BusyIndicator.hide();
-            resolve(data);
-          },
-          error: function (error) {
-            sap.ui.core.BusyIndicator.hide();
-            reject(error);
-          }
-        });
+      return new Promise((resolve, reject) => {
+          $.ajax({
+              url: this.getView().getModel("LoginModel").getData().url + sUrl,
+              method: "DELETE",
+              contentType: "application/json", 
+              dataType: "json",
+              data: JSON.stringify(oPayLoad),
+              headers: this.getView().getModel("LoginModel").getData().headers,
+              success: function (data) {
+                  sap.ui.core.BusyIndicator.hide();
+                  resolve(data);
+              },
+              error: function (error) {
+                  sap.ui.core.BusyIndicator.hide();
+                  reject(error);
+              }
+          });
       });
-    },
+  },  
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
       var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",",""));

@@ -79,17 +79,17 @@
 							<Text text="{path:'HolidayModel>Date' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{HolidayModel>Day}"/>
 							<ObjectStatus 
-    state="{= ${HolidayModel>Karnataka} === '?' ? 'Success' : 'Error'}" 
-    icon="{= ${HolidayModel>Karnataka} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= ${HolidayModel>Karnataka} === '✓' ? 'Success' : 'Error'}" 
+    icon="{= ${HolidayModel>Karnataka} === '✓' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 							<ObjectStatus 
-    state="{= ${HolidayModel>OtherStates} === '?' ? 'Success' : 'Error'}" 
-    icon="{= ${HolidayModel>OtherStates} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= ${HolidayModel>OtherStates} === '✓' ? 'Success' : 'Error'}" 
+    icon="{= ${HolidayModel>OtherStates} === '✓' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 							<ObjectStatus 
-    state="{= ${HolidayModel>Maharashtra} === '?' ? 'Success' : 'Error'}" 
-    icon="{= ${HolidayModel>Maharashtra} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= ${HolidayModel>Maharashtra} === '✓' ? 'Success' : 'Error'}" 
+    icon="{= ${HolidayModel>Maharashtra} === '✓' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 							<ObjectStatus 
-    state="{= ${HolidayModel>Delhi} === '?' ? 'Success' : 'Error'}" 
-    icon="{= ${HolidayModel>Delhi} === '?' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= ${HolidayModel>Delhi} === '✓' ? 'Success' : 'Error'}" 
+    icon="{= ${HolidayModel>Delhi} === '✓' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 						</cells>
 					</ColumnListItem>
 				</items>
