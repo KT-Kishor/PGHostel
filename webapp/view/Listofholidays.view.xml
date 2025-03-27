@@ -28,7 +28,8 @@
                     displayFormat="yyyy"
 					valueFormat="yyyy"
                     placeholder="yyyy"
-                    change="handleChange"/>
+					change="LOH_ValidateYear"
+					valueStateText="{i18n>selectionYear}"/>
 						</filterbar:control>
 					</filterbar:FilterGroupItem>
 			</filterbar:filterGroupItems>

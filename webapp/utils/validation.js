@@ -244,5 +244,23 @@ sap.ui.define([], function () {
                 return true;
             }
         },
+        _LCvalidateYear: function (oEvent, type) {
+            var oField = (type === "ID") ? oEvent : oEvent.getSource();
+            if (!oField) return false;
+            var value = oField.getValue();
+            
+            if (value && value.length >= 4) {
+                value = value.substring(0, 4);
+            }
+        
+            var regex = /^\d{4}$/;
+            if (!regex.test(value)) {
+                oField.setValueState("Error");
+                return false;
+            } else {
+                oField.setValueState("None");
+                return true;
+            }
+        }        
     };
 });

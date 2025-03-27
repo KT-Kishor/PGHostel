@@ -29,7 +29,8 @@
                 displayFormat="yyyy"
                 valueFormat="yyyy"
                 placeholder="yyyy"
-                change="handleChange"/>
+                change="LOH_ValidateYear"
+					      valueStateText="{i18n>selectionYear}"/>
 				<Label text="{i18n>selectFi}" required="true"/>
                <u:FileUploader
                 id="ALH_id_LocFileUpload"
@@ -38,8 +39,7 @@
                 fileType="xlsx"
                 placeholder="Choose an Excel file"
                 change="LOH_onUpload"
-                icon="sap-icon://upload"
-                enabled="false"/> 
+                icon="sap-icon://upload"/> 
 			</f:content>
 		</f:SimpleForm>
 	<beginButton>
