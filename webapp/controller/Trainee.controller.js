@@ -6,7 +6,7 @@ sap.ui.define([
     "sap/m/MessageBox",
     "../model/formatter"
 ],
-    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
+function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Trainee", {
             Formatter: Formatter,
@@ -17,12 +17,13 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._fetchCommonData("Designation", "DesignationModel");
                 this._fetchCommonData("Department", "Departmentmodel");
-                this.readCallForTrainee();
+                this.readCallForTrainee("");
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
+                this.T_onSearch();
             },
-            readCallForTrainee: function () {
+            readCallForTrainee: function (filter) {
                 var filter = { ID: "" };
                 this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -108,7 +109,7 @@ sap.ui.define([
                 this.ajaxUpdateWithJQuery("Trainee", oModelOffer).then((oData) => {
                     sap.ui.core.BusyIndicator.hide();
                     if (oData.results) {
-                        that.readCallForTrainee();
+                        that.readCallForTrainee("");
                     }
                 }).catch((oError) => {
                     sap.ui.core.BusyIndicator.hide();
@@ -181,6 +182,7 @@ sap.ui.define([
                 }
             },
             OTF_onPressClose: function () {
+                sap.ui.getCore().byId("OTF_id_TraineeMail").setValueState("None")
                 this.TOb_oDialog.close();
             },
             T_onCertDownload: function () {
@@ -196,7 +198,7 @@ sap.ui.define([
                 oCalculatedEndDate.setMonth(oCalculatedEndDate.getMonth() + 6);
                 var sFormattedEndDate = oCalculatedEndDate.toISOString().split("T")[0];
 
-                oTraineeModel.EndDate = sFormattedEndDate;
+                oTraineeModel.EndDate = new Date(sFormattedEndDate)
 
                 var oTraineeContext = oSelectedItem.getBindingContext("traineeModel");
                 this.getView().setBindingContext(oTraineeContext, "traineeModel");
@@ -206,6 +208,7 @@ sap.ui.define([
             },
 
             TCF_onPressCloseDialog: function () {
+                sap.ui.getCore().byId("TCF_id_ProjectName").setValueState("None");
                 this.TC_oDialog.close();
             },
             //download certificate
@@ -226,19 +229,10 @@ sap.ui.define([
                     // Create the updated trainee data
                     const oUpdatedData = {
                         ID: oTraineeModel.ID,
-                        CompanyEmailID: oTraineeModel.CompanyEmailID,
-                        CompanyName: oTraineeModel.CompanyName,
-                        Department: oTraineeModel.Department,
+                        Department: sap.ui.getCore().byId("TCF_id_Department").getSelectedKey(),
                         ProjectName: oTraineeModel.ProjectName,
                         EndDate: oTraineeModel.EndDate,
-                        Role: oTraineeModel.Role,
-                        TraineeName: oTraineeModel.TraineeName,
-                        NameSalutation: oTraineeModel.NameSalutation,
-                        JoiningDate: oTraineeModel.JoiningDate,
-                        ReportingManager: oTraineeModel.ReportingManager,
-                        ReportingManagerSalutation: oTraineeModel.ReportingManagerSalutation,
-                        Stipend: oTraineeModel.Stipend,
-                        TraineeEmail: oTraineeModel.TraineeEmail,
+                        Role: sap.ui.getCore().byId("TCF_id_Role").getSelectedKey(),
                         Status: "Training Completed",
                     };
                     sap.ui.core.BusyIndicator.show(0);
@@ -253,7 +247,59 @@ sap.ui.define([
                 }
             },
             T_onBoardTrainee: function () {
-                this.getRouter().navTo("RouteEmployeeOfferDetails");
-            }
+                var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem(); 
+                if (!oSelectedItem) {
+                    sap.m.MessageToast.show("Please select a trainee.");
+                    return;
+                }
+                var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject(); 
+                this.getRouter().navTo("RouteEmployeeOfferDetails", {
+                    sParOffer: oTraineeModel.TraineeName,
+                    sParEmployee:  oTraineeModel.NameSalutation
+                });
+            },
+           
+            T_onSearch: function (oEvent) {
+                var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
+                var params = {};
+                aFilterItems.forEach(function (oItem) {
+                  var oControl = oItem.getControl(); // Get the associated control
+                  var sValue = oItem.getName();
+                  if (oControl && oControl.getValue()) {
+                    params[sValue] = oControl.getValue();
+                  }
+                });
+                var queryString = $.param({
+                    params
+                });
+                this.readCallForTrainee(queryString)
+            },
+            //clear the filterbar
+            onPressClear: function () {
+                var oFilterBar = this.byId("T_id_Filterbar"); // Get the FilterBar instance
+                var aFilterItems = oFilterBar.getFilterGroupItems();
+        
+                aFilterItems.forEach(function (oItem) {
+                  var oControl = oItem.getControl(); // Get the associated control
+        
+                  if (oControl) {
+                    if (oControl.setValue) {
+                      oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
+                    }
+                    if (oControl.setSelectedKey) {
+                      oControl.setSelectedKey(""); // Reset selection for dropdowns
+                    }
+                    if (oControl.setSelected) {
+                      oControl.setSelected(false); // Reset selection for Checkboxes
+                    }
+                  }
+                });
+                // Reset the model if needed
+                var oFilterModel = this.getView().getModel("GetFilterData");
+                if (oFilterModel) {
+                  oFilterModel.setData({}); // Clear filter model data
+                }
+                oFilterBar.fireFilterChange(); // Trigger UI refresh
+              },
         });
     });

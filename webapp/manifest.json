@@ -216,7 +216,7 @@
                 },
                 {
                     "name": "RouteEmployeeOfferDetails",
-                    "pattern": "EmployeeOfferDetails/{sParOffer}",
+                    "pattern": "EmployeeOfferDetails/{sParOffer}/{sParEmployee}",
                     "target": "TargetEmployeeOfferDetails"
                 },
                 {

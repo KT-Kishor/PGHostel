@@ -26,7 +26,8 @@ sap.ui.define([
                     "ReportingManager": "",
                     "Stipend": "",
                     "JoiningDate": this.Formatter.formatDate(new Date()),
-                    "TraineeEmail": ""
+                    "TraineeEmail": "",
+                    "Currency":""
                 };
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, isCTCVisible: false });
@@ -128,6 +129,7 @@ sap.ui.define([
             TD_onSubmitData: function (oEvent) {
                 if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
+                    oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.Status = "Submitted";
                     oModel.JoiningDate = new Date(this.byId("TD_id_JoiningDate").getDateValue().getTime() - this.byId("TD_id_JoiningDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];                  
                       var oPayload = {

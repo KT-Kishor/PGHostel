@@ -10,11 +10,11 @@
 	     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 			</headerContent>
 		<content>
-			<fb:FilterBar  class="sapUiTinyMargin" id="T_id_AdminFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+			<fb:FilterBar  class="sapUiTinyMargin" id="T_id_Filterbar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search="T_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="TraineeName" label="{i18n>traineeName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="{traineeModel>/}" change="" id="T_id_TraineeName" showClearIcon="true">
+							<ComboBox  showSecondaryValues= "true"  items="{traineeModel>/}" id="T_id_TraineeName" showClearIcon="true">
 								<core:ListItem key="{traineeModel>TraineeName}" text="{traineeModel>TraineeName}" />
 							</ComboBox>
 						</fb:control>

@@ -13,6 +13,11 @@ sap.ui.define([
             },
             _onRouteMatched: function (oEvent) {
                 this.sArgPara = oEvent.getParameter("arguments").sParOffer
+                this.sSalutationArg = oEvent.getParameter("arguments").sParEmployee;
+                if (this.sArgPara !== "X") {
+                  this.getView().getModel("employeeModel").setProperty("/ConsultantName", this.sArgPara);
+                  this.getView().getModel("employeeModel").setProperty("/Salutation", this.sSalutationArg);
+                }
                 this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
                 this.getView().byId("EOD_id_BondCombo").setVisible(false);
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
