@@ -14,10 +14,6 @@ sap.ui.define([
             _onRouteMatched: function (oEvent) {
                 this.sArgPara = oEvent.getParameter("arguments").sParOffer
                 this.sSalutationArg = oEvent.getParameter("arguments").sParEmployee;
-                if (this.sArgPara !== "X") {
-                  this.getView().getModel("employeeModel").setProperty("/ConsultantName", this.sArgPara);
-                  this.getView().getModel("employeeModel").setProperty("/Salutation", this.sSalutationArg);
-                }
                 this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
                 this.getView().byId("EOD_id_BondCombo").setVisible(false);
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
@@ -57,15 +53,20 @@ sap.ui.define([
                     "Type": 0,
                 }
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
+
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, isCTCVisible: false });
                 this.getView().setModel(oViewModel, "viewModel");
                 this.byId("EOD_id_Joindate").setMinDate(new Date());
                 ["EOD_id_Name", "EOD_id_mail", "EOD_id_Address", "EOD_id_CTC", "EOD_id_Bonus"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
-                if (this.sArgPara === "CreateOfferFlag") {
+                if (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") {
                     this.getView().byId("EOD_id_PageCrate").setVisible(true);
                     this.getView().byId("EODF_id_PageUpdate").setVisible(false);
+                    if(this.sArgPara !== "CreateOfferFlag"){
+                    this.getView().getModel("employeeModel").setProperty("/ConsultantName", this.sArgPara);
+                    this.getView().getModel("employeeModel").setProperty("/Salutation", this.sSalutationArg);
+                    }
                     this.EOD_onResetWizard();
                 } else {
                     this.getView().byId("EOD_id_PageCrate").setVisible(false);

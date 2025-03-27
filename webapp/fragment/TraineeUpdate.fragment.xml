@@ -17,9 +17,9 @@
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
         <sections>
-            <ObjectPageSection>
+            <ObjectPageSection titleUppercase="false">
                 <subSections>
-                    <ObjectPageSubSection  title="{i18n>traineeDetails}">
+                    <ObjectPageSubSection  title="{i18n>traineeDetails}" >
                         <blocks>
                             <f:SimpleForm 
                             layout="ResponsiveGridLayout"
@@ -49,7 +49,7 @@
                                                  </m:Select>
                                             </m:VBox>
                                             <m:VBox width="78%">
-                                                <m:Input id="TU_id_Name" value="{editTraineeModel>/TraineeName}" editable="{viewModel>/editable}" maxLength="50" liveChange="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>commonNameValueState}"/>
+                                                <m:Input id="TU_id_Name" value="{editTraineeModel>/TraineeName}" editable="{viewModel>/editable}" maxLength="50" liveChange="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>placeTraineeName}"/>
                                                 </m:VBox>
                                         </m:HBox>
                                         <m:Label text="{i18n>reportingManager}" required="true" />
@@ -64,7 +64,7 @@
                                                  </m:Select>
                                             </m:VBox>
                                             <m:VBox width="78%">
-                                                <m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"  selectionChange=""  value="{editTraineeModel>/ReportingManager}" items="{idModel>/results}" editable="{viewModel>/editable}" width="100%" class="sapUiTinyMarginBegin" valueStateText="{i18n>commonNameValueState}">
+                                                <m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"  selectionChange=""  value="{editTraineeModel>/ReportingManager}" items="{idModel>/results}" editable="{viewModel>/editable}" width="100%" class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">
                                                     <core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}"/>
                                                 </m:ComboBox>
                                             </m:VBox>

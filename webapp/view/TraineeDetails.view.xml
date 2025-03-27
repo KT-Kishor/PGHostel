@@ -35,7 +35,7 @@
 									</Select>
 								</VBox>
 								<VBox width="78%">
-									<Input value="{oTraineeDetails>/TraineeName}" maxLength="50" placeholder="{i18n>placeTraineeName}" id="TD_id_Name" liveChange="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>nameEmployeeValueState}"/>
+									<Input value="{oTraineeDetails>/TraineeName}" maxLength="50" placeholder="{i18n>placeTraineeName}" id="TD_id_Name" liveChange="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>placeTraineeName}"/>
 								</VBox>
 							</HBox>
 							<Label text="{i18n>reportingManager}" required="true" />
@@ -51,7 +51,7 @@
 									</Select>
 								</VBox>
 								<VBox width="78%">
-									<ComboBox showSecondaryValues="true"  change="TD_validateName"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{idModel>/results}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin">
+									<ComboBox showSecondaryValues="true"  change="TD_validateName"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{idModel>/results}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">
 										<core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}" />
 									</ComboBox>
 								</VBox>

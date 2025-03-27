@@ -35,13 +35,17 @@ sap.ui.define([
                 this.getRouter().navTo("RouteLoginPage");
             },
             EO_onPressEmployee: function (oEvent) {
-                var oParValue;
+                var oParValue, value;
                 if (oEvent.getSource().getId().lastIndexOf("EO_id_AddEOffBut") !== -1) {
                     oParValue = "CreateOfferFlag"
+                    value = "CreateOffer";
                 } else {
                     oParValue = oEvent.getSource().getBindingContext("EmployeeOfferModel").getModel().getData()[oEvent.getSource().getBindingContextPath().split("/")[1]].ID
+                    value = "UpdateOffer";
                 }
-                this.getRouter().navTo("RouteEmployeeOfferDetails", { sParOffer: oParValue });
+                this.getRouter().navTo("RouteEmployeeOfferDetails", { sParOffer: oParValue ,
+                    sParEmployee : value
+                });
             },
             EO_onOnboardPress: function () {
                 this._fetchCommonData("Designation", "DesignationModel");
@@ -90,7 +94,7 @@ sap.ui.define([
                         if (oAction === sap.m.MessageBox.Action.YES) {
                             if (status === "OnBoarded") {
                                     const employeeIds = oEmpModelData.getData().length > 0 ?
-                                    oEmpModelData.filter(item => item.ID && item.ID.startsWith("KT"))
+                                    oEmpModelData.getData().filter(item => item.ID && item.ID.startsWith("KT"))
                                     .map(item => parseInt(item.ID.slice(2), 10))
                                     .filter(numericPart => !isNaN(numericPart)) : "";
                                   const lastIdNo = employeeIds.length > 0 ? Math.max(...employeeIds) : 0;
