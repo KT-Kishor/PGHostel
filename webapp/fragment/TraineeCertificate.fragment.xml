@@ -33,13 +33,13 @@
 				<DatePicker value="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}"
                  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="false"  id="TCF_id_JoiningDate" />
 				<Label text="{i18n>endDate}" required="true"/>
-				<DatePicker   displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"  id="TCF_id_EndDate" value="{path:'traineeModel>EndDate' ,formatter:'.Formatter.formatDate'}"   />
+				<DatePicker   displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"  id="TCF_id_EndDate" value="{path:'traineeModel>EndDate' ,formatter:'.Formatter.formatDate'}"  minDate="{traineeModel>EndDate}" />
 				<Label text="{i18n>department}"  required="true" />
 				<Select id="TCF_id_Department"  items="{Departmentmodel>/}" selectedKey="{traineeModel>Department}">
 					<core:Item key="{Departmentmodel>departmentName}" text="{Departmentmodel>departmentName}"/>
 				</Select>
 				<Label text="{i18n>projectName}"  required="true" />
-				<TextArea id="TCF_id_ProjectName" rows="2" liveChange="T_ValidateCommonFields" value="{traineeModel>ProjectName}" maxLength="100" valueStateText="{i18n>projectValueState}" />
+				<TextArea id="TCF_id_ProjectName" rows="2" liveChange="T_ValidateCommonFields" value="{traineeModel>ProjectName}" maxLength="100" valueStateText="{i18n>projectValueState}" placeholder="{i18n>projectValueState}" />
 			</f:content>
 		</f:SimpleForm>
 		<HBox justifyContent="End" >
