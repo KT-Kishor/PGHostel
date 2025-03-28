@@ -17,18 +17,22 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._fetchCommonData("Designation", "DesignationModel");
                 this._fetchCommonData("Department", "Departmentmodel");
-                this.readCallForTrainee("");
+                this.readCallForTrainee("Initial");
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
                 this.T_onSearch();
             },
             readCallForTrainee: function (filter) {
-                var filter = { ID: "" };
+                // var filter = { ID: "" };
                 this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     var oModel = new sap.ui.model.json.JSONModel(offerData);
                     this.getOwnerComponent().setModel(oModel, "traineeModel");
+                    if(filter === "Initial") {
+                        var oModelRm = new sap.ui.model.json.JSONModel(offerData);
+                        this.getOwnerComponent().setModel(oModelRm, "reportingModel");
+                    }
                     sap.ui.core.BusyIndicator.hide();
                 }).catch((oError) => {
                     sap.ui.core.BusyIndicator.hide();
@@ -263,19 +267,26 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
            
             T_onSearch: function (oEvent) {
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
-                var params = {};
+                var params = {}; 
                 aFilterItems.forEach(function (oItem) {
-                  var oControl = oItem.getControl(); // Get the associated control
-                  var sValue = oItem.getName();
-                  if (oControl && oControl.getValue()) {
-                    params[sValue] = oControl.getValue();
-                  }
+                    var oControl = oItem.getControl(); 
+                    var sValue = oItem.getName(); 
+                    if (oControl && oControl.getValue()) {
+                        if (sValue === "JoiningDate") {
+                            var sDateRange = oControl.getValue(); 
+                            var aDates = sDateRange.split(","); 
+                            if (aDates.length === 2) {
+                                params["startDate"] = aDates[0].trim();
+                                params["endDate"] = aDates[1].trim(); 
+                            }
+                        } else {
+                            params[sValue] = oControl.getValue();
+                        }
+                    }
                 });
-                var queryString = $.param({
-                    params
-                });
-                this.readCallForTrainee(queryString)
+                this._fetchCommonData("Trainee?", "traineeModel", params);
             },
+
             //clear the filterbar
             onPressClear: function () {
                 var oFilterBar = this.byId("T_id_Filterbar"); // Get the FilterBar instance

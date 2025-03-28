@@ -21,14 +21,14 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="ReportingManager" label="{i18n>reportingManager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox   items="{traineeModel>/}" id="T_id_RmFilterBar" showClearIcon="true">
-								<core:Item key="{traineeModel>ReportingManager}" text="{traineeModel>ReportingManager}"/>
+							<ComboBox   items="{reportingModel>/}" id="T_id_RmFilterBar" showClearIcon="true">
+								<core:Item key="{reportingModel>ReportingManager}" text="{reportingModel>ReportingManager}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="JoiningDate" label="{i18n>joiningDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-                    <DateRangeSelection id="T_id_JoiningDate" valueFormat="dd/MM/yyyy"  displayFormat="dd/MM/yyyy" change="onDateChange" />						
+                    <DateRangeSelection id="T_id_JoiningDate" valueFormat="yyyy-MM-dd"  displayFormat="dd/MM/yyyy" change="onDateChange" />						
 					</fb:control>
 						</fb:FilterGroupItem>
 						<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
