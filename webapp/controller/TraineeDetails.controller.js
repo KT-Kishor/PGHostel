@@ -17,7 +17,6 @@ sap.ui.define([
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this._fetchCommonData("Currency", "CurrencyModel");
                 this.T_onResetWizard();
                 var jsonData = {
                     "NameSalutation": "Mr.",
@@ -46,6 +45,8 @@ sap.ui.define([
                     this.getModelData(this.sArgPara);
                 }
                 this._makeDatePickersReadOnly(["TD_id_JoiningDate","TU_id_JoinDate"]);
+                this._fetchCommonData("Currency", "CurrencyModel");
+
             },
             getModelData: function (sArgPara) {
                 var oModel = this.getOwnerComponent().getModel("traineeModel");
@@ -116,7 +117,7 @@ sap.ui.define([
             },
             validateStep: function () {
                 // Check if all fields have values
-                var allFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getValue() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_Stipend").getValue() && this.getView().byId("TD_id_JoiningDate").getValue();
+                var allFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getValue() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_Stipend").getValue() && this.byId("TD_id_Currency").getSelectedKey() && this.getView().byId("TD_id_JoiningDate").getValue();
                 if (allFieldsFilled) {
                     // Validate each field 
                     var isValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCvalidateAmount(this.getView().byId("TD_id_Stipend"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
@@ -131,27 +132,53 @@ sap.ui.define([
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.Status = "Submitted";
-                    oModel.JoiningDate = new Date(this.byId("TD_id_JoiningDate").getDateValue().getTime() - this.byId("TD_id_JoiningDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];                  
-                      var oPayload = {
+                    oModel.JoiningDate = new Date(this.byId("TD_id_JoiningDate").getDateValue().getTime() - this.byId("TD_id_JoiningDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+            
+                    var oPayload = {
                         "tableName": "Trainee",
                         "data": oModel
                     };
                     this.ajaxCreateWithJQuery("Trainee", oPayload).then((oData) => {
                         sap.ui.core.BusyIndicator.hide();
                         if (oData.results) {
-                            MessageToast.show(this.i18nModel.getText("traineeDataSubmitted"));
-                            this.getRouter().navTo("RouteTrainee");
-                            sap.ui.core.BusyIndicator.hide();
+                            var oDialog = new sap.m.Dialog({
+                                title: this.i18nModel.getText("success"),
+                                type: sap.m.DialogType.Message,
+                                state: sap.ui.core.ValueState.Success,
+                                content: new sap.m.Text({ text: this.i18nModel.getText("traineeDataSubmitted") }),
+                                beginButton: new sap.m.Button({
+                                    text: "OK",
+                                    type: "Accept", 
+                                    press: function () {
+                                        oDialog.close();
+                                        this.getRouter().navTo("RouteTrainee"); // Navigate to RouteTrainee
+                                    }.bind(this)
+                                }),
+                                endButton: new sap.m.Button({
+                                    text: "Generate PDF",
+                                    type: "Reject", 
+                                    press: function () {
+                                      //  this._generatePDF(); // Call function to generate PDF
+                                        oDialog.close();
+                                    }.bind(this)
+                                }),
+                                afterClose: function () {
+                                    oDialog.destroy();
+                                }
+                            });
+            
+                            oDialog.open();
                         }
                     }).catch((oError) => {
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         sap.ui.core.BusyIndicator.hide();
-                    })
-                }
-                else {
+                    });
+            
+                } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
+    
             //Edit/save button visibility 
             TU_onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");

@@ -182,7 +182,8 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 }
             },
             OTF_onPressClose: function () {
-                sap.ui.getCore().byId("OTF_id_TraineeMail").setValueState("None")
+                sap.ui.getCore().byId("OTF_id_TraineeMail").setValueState("None");
+                sap.ui.getCore().byId("OTF_id_TraineeMail").setValue("");
                 this.TOb_oDialog.close();
             },
             T_onCertDownload: function () {
@@ -209,6 +210,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
 
             TCF_onPressCloseDialog: function () {
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValueState("None");
+                sap.ui.getCore().byId("TCF_id_ProjectName").setValue(""); 
                 this.TC_oDialog.close();
             },
             //download certificate
