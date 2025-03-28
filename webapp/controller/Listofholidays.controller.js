@@ -158,7 +158,7 @@ sap.ui.define(
                     Delhi: item.Delhi,
                 }));
     
-                var existingData = await that.ajaxReadWithJQuery("ListOfHolidays", {
+                var existingData =  that.ajaxReadWithJQuery("ListOfHolidays", {
                   startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31`});
     
                 if (existingData.data.length > 0) {
@@ -167,9 +167,9 @@ sap.ui.define(
                             actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
                             onClose:function (sAction) {
                               if (sAction === sap.m.MessageBox.Action.YES) {
-                                await that.ajaxDeleteWithJQuery("ListOfHolidays", {filters: {startDate: `${selectedYear}-01-01`,
+                                 that.ajaxDeleteWithJQuery("ListOfHolidays", {filters: {startDate: `${selectedYear}-01-01`,
                                 endDate: `${selectedYear}-12-31`} });
-                                await that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
+                                 that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
                                 that.oDialog.close();
                                 MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
                             }
@@ -177,7 +177,7 @@ sap.ui.define(
                         }
                     );
                 } else {
-                    await that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
+                     that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
                     that.oDialog.close();
                     MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
                 }

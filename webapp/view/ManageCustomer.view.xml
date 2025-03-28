@@ -18,7 +18,11 @@
 				</fb:FilterGroupItem>
 			</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="idCustTable" mode="SingleSelectLeft" selectionChange="onSelectionCustmer">
+			<Table id="MC_id_CustTable" mode="SingleSelectLeft" 
+			 items="{path: 'CreateCustomerModel>/'}"
+			 growing="true"
+             growingThreshold="100"
+             alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title id="MC_id_Title" text="{i18n>custDetails}"/>
@@ -56,13 +60,13 @@
 				<items>
 					<ColumnListItem>
 						<cells>
-							<Text text="{CompanyName}" />
-							<Text text="{Name}" />
-							<Text text="{GST}" />
-							<Text text="{Type}" />
-							<Text text="{Value}" />
-							<Text text="{MailID}" />
-							<Text text="{MobileNo}" />
+							<Text text="{CreateCustomerModel>companyName}" />
+							<Text text="{CreateCustomerModel>name}" />
+							<Text text="{CreateCustomerModel>GST}" />
+							<Text text="{CreateCustomerModel>type}" />
+							<Text text="{CreateCustomerModel>value}" />
+							<Text text="{CreateCustomerModel>mailID}" />
+							<Text text="{CreateCustomerModel>mobileNo}" />
 						</cells>
 					</ColumnListItem>
 				</items>
