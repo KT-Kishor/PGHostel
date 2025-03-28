@@ -28,7 +28,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="JoiningDate" label="{i18n>joiningDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-                    <DateRangeSelection id="T_id_JoiningDate" valueFormat="yyyy-MM-dd"  displayFormat="dd/MM/yyyy" change="onDateChange" />						
+                    <DateRangeSelection id="T_id_JoiningDate" valueFormat="MM/dd/yyyy"  displayFormat="MM/dd/yyyy" change="onDateChange" />						
 					</fb:control>
 						</fb:FilterGroupItem>
 						<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">

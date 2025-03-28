@@ -267,19 +267,16 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
            
             T_onSearch: function (oEvent) {
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
+                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                 var params = {}; 
                 aFilterItems.forEach(function (oItem) {
                     var oControl = oItem.getControl(); 
                     var sValue = oItem.getName(); 
                     if (oControl && oControl.getValue()) {
                         if (sValue === "JoiningDate") {
-                            var sDateRange = oControl.getValue(); 
-                            var aDates = sDateRange.split(","); 
-                            if (aDates.length === 2) {
-                                params["startDate"] = aDates[0].trim();
-                                params["endDate"] = aDates[1].trim(); 
-                            }
-                        } else {
+                            params["startDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
+                            params["endDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1])); 
+                        }else{
                             params[sValue] = oControl.getValue();
                         }
                     }
@@ -288,13 +285,10 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
             },
 
             //clear the filterbar
-            onPressClear: function () {
-                var oFilterBar = this.byId("T_id_Filterbar"); // Get the FilterBar instance
-                var aFilterItems = oFilterBar.getFilterGroupItems();
-        
+            onPressClear: function (oEvent) {
+                var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
                 aFilterItems.forEach(function (oItem) {
                   var oControl = oItem.getControl(); // Get the associated control
-        
                   if (oControl) {
                     if (oControl.setValue) {
                       oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
@@ -307,12 +301,6 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                     }
                   }
                 });
-                // Reset the model if needed
-                var oFilterModel = this.getView().getModel("GetFilterData");
-                if (oFilterModel) {
-                  oFilterModel.setData({}); // Clear filter model data
-                }
-                oFilterBar.fireFilterChange(); // Trigger UI refresh
               },
         });
     });

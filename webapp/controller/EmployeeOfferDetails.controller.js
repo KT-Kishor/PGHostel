@@ -53,37 +53,36 @@ sap.ui.define([
                     "Type": 0,
                 }
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
-
-                var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, isCTCVisible: false });
+                var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
                 this.getView().setModel(oViewModel, "viewModel");
                 this.byId("EOD_id_Joindate").setMinDate(new Date());
-                ["EOD_id_Name", "EOD_id_mail", "EOD_id_Address", "EOD_id_CTC", "EOD_id_Bonus"].forEach(function (ids) {
+                ["EOD_id_Name", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 if (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") {
-                    this.getView().byId("EOD_id_PageCrate").setVisible(true);
-                    this.getView().byId("EODF_id_PageUpdate").setVisible(false);
-                    if(this.sArgPara !== "CreateOfferFlag"){
-                    this.getView().getModel("employeeModel").setProperty("/ConsultantName", this.sArgPara);
-                    this.getView().getModel("employeeModel").setProperty("/Salutation", this.sSalutationArg);
+                    var createPage = true, updatePage = false;
+                    if (this.sArgPara !== "CreateOfferFlag") {
+                        this.getView().getModel("employeeModel").setProperty("/ConsultantName", this.sArgPara);
+                        this.getView().getModel("employeeModel").setProperty("/Salutation", this.sSalutationArg);
                     }
                     this.EOD_onResetWizard();
                 } else {
-                    this.getView().byId("EOD_id_PageCrate").setVisible(false);
-                    this.getView().byId("EODF_id_PageUpdate").setVisible(true);
+                    var createPage = false, updatePage = true;
                     var oBasicDetailsSection = this.getView().byId("EODF_id_BasicDetailsSection");
                     this.getView().byId("EODF_id_ObjectPageLayoutEmp").setSelectedSection(oBasicDetailsSection);
                     this.readCallForEmployeeOffer(this.sArgPara);
                 }
+                this.getView().byId("EOD_id_PageCrate").setVisible(createPage);
+                this.getView().byId("EODF_id_PageUpdate").setVisible(updatePage);
             },
             EOUF_onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
                     var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") &&
-                    utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_Bonus"), "ID");
+                        utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_Bonus"), "ID");
                     // Save the changes
-                    if(isValid)this.updateCallForEmployeeOffer(oViewModel);
+                    if (isValid) this.updateCallForEmployeeOffer(oViewModel);
                     else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 } else {
                     // Enable edit mode and make CTC field visible
@@ -94,12 +93,12 @@ sap.ui.define([
             },
             updateCallForEmployeeOffer: function (oViewModel) {
                 var oModel = this.getView().getModel("employeeModel").getData();
+                oModel.Status = oModel.Status === "Rejected" ? "Submitted" : oModel.Status;
                 oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
-                oModel.Type = oModel.Type === 0 ? "TDS" : (oModel.Type === 1 ? "No TDS" : "PF");
                 oModel = {
                     "data": oModel,
-                    "filters":{
-                        "ID":this.sArgPara
+                    "filters": {
+                        "ID": this.sArgPara
                     }
                 }
                 this.ajaxUpdateWithJQuery("EmployeeOffer", oModel).then((oData) => {
@@ -109,6 +108,7 @@ sap.ui.define([
                         oViewModel.setProperty("/isCTCVisible", false);
                         sap.ui.core.BusyIndicator.hide();
                         MessageToast.show(this.i18nModel.getText("offerUpdateSucc"));
+                        this.getRouter().navTo("RouteEmployeeOffer");
                     }
                 }).catch((oError) => {
                     sap.ui.core.BusyIndicator.hide();
@@ -117,11 +117,12 @@ sap.ui.define([
             },
             readCallForEmployeeOffer: function (sArgPara) {
                 var queryString = $.param({
-                    "ID":sArgPara
-                    });
+                    "ID": sArgPara
+                });
                 this.ajaxReadWithJQuery("EmployeeOffer", queryString).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    offerData[0].Type = offerData[0].Type === "TDS" ? 0 : (offerData[0].Type === "No TDS" ? 1 : 2);
+                    var index = offerData[0].TDS.split(" ")[1] !== "0" ? 0 : (offerData[0].TDS.split(" ")[1] === "0" ? 1 : 2);
+                    this.byId("EOUF_id_RadioButTds").setSelectedIndex(index);
                     this.getView().setModel(new JSONModel(offerData[0]), "employeeModel");
                     sap.ui.core.BusyIndicator.hide();
                     var oViewModel = this.getView().getModel("viewModel");
@@ -156,15 +157,11 @@ sap.ui.define([
             EOD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
                 this.validateStep();
-                var oOfferDateId = oEvent.getSource().getId().split("--")[2], releaseDate; 
+                var oOfferDateId = oEvent.getSource().getId().split("--")[2], releaseDate;
                 if (oOfferDateId === "EOD_id_Reldate" || oOfferDateId === "EOUF_id_Reldate") {
                     // Get selected dates and Update the minimum date for joining date
-                    if(oOfferDateId === "EOD_id_Reldate"){
-                        releaseDate = this.byId("EOD_id_Reldate").getDateValue();
-                        this.byId("EOD_id_Joindate").setMinDate(releaseDate);}
-                    else{
-                        releaseDate = this.byId("EOUF_id_Reldate").getDateValue();
-                        this.byId("EOUF_id_Joindate").setMinDate(releaseDate);}
+                    releaseDate = this.byId(oOfferDateId).getDateValue();
+                    this.byId(oOfferDateId).setMinDate(releaseDate);
                 }
             },
             EOD_ValidateCommonFields: function (oEvent) {
@@ -183,7 +180,7 @@ sap.ui.define([
                     // Validate each field directly
                     var isValid = utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_Bonus"), "ID");
-                        this.byId("EOD_id_Wizard").getSteps()[0].setValidated(isValid);
+                    this.byId("EOD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
                 }
@@ -193,18 +190,16 @@ sap.ui.define([
                 var oWizard = this.getView().byId("EOD_id_Wizard");
                 oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
                 oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
-                this.getView().getModel("employeeModel").setProperty("/Type", 0)
                 this.getView().byId("EOD_id_Bond").setSelectedIndex(1);
+                this.getView().byId("EOUF_id_RadioButTds").setSelectedIndex(0);
             },
             //Submit the data
             EOD_onSubmitData: function () {
                 if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("employeeModel").getData();
                     oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
-                    oModel.Type = oModel.Type === 0 ? "TDS" : (oModel.Type === 1 ? "No TDS" : "PF");
-                    oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey(); 
+                    oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();
                     oModel.Status = "Submitted";
-                    console.log(oModel);
                     oModel = {
                         "tableName": "EmployeeOffer",
                         "data": oModel
@@ -225,17 +220,14 @@ sap.ui.define([
                 }
             },
             EOD_onRadioButtonSelect: function (oEvent) {
-                if (oEvent.getParameter("selectedIndex") === 0) {
-                    this.getView().byId("EOD_id_BondCombo").setVisible(true);
-                    this.getView().byId("EOD_id_Lyear").setVisible(true);
-                } else { // "No" selected
-                    this.getView().byId("EOD_id_BondCombo").setVisible(false);
-                    this.getView().byId("EOD_id_Lyear").setVisible(false);
-                }
+                if (oEvent.getParameter("selectedIndex") === 0) var sValue = true;
+                else var sValue = false;
+                this.getView().byId("EOD_id_BondCombo").setVisible(sValue);
+                this.getView().byId("EOD_id_Lyear").setVisible(sValue);
             },
             EOD_onTDSCheckboxChange: function () {
-                var oTdsVal = this.getView().getModel("employeeModel").getProperty("/Type");
-                oTdsVal = oTdsVal === 0 ? "TDS" : (oTdsVal === 1 ? "No TDS" : "PF");
+                var ID = (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") ? "EOD_id_RadioButTds" : "EOUF_id_RadioButTds";
+                var oTdsVal = this.byId(ID).getAggregation("buttons")[this.byId(ID).getSelectedIndex()].getProperty("text");
                 if (this.getView().getModel("employeeModel").getProperty("/CTC"))
                     this._calculateSalaryComponents(oTdsVal);
             },
@@ -243,5 +235,12 @@ sap.ui.define([
                 var oTdsVal = this.byId("EOD_id_RadioButTds").getAggregation("buttons")[this.byId("EOD_id_RadioButTds").getSelectedIndex()].getProperty("text");
                 this._calculateSalaryComponents(oTdsVal);
             },
+            EOUF_onPressMerge :function(){
+                var oModel = this.getView().getModel("employeeModel");
+                this.offerGeneratingPdfFunction(oModel);
+            },
+            offerGeneratingPdfFunction : function(oModel){
+                  
+            }
         });
     });

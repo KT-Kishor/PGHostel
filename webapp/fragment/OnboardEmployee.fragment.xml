@@ -12,8 +12,8 @@
             adjustLabelSpan="false" emptySpanXL="0" columnsXL="2" columnsL="2"
             columnsM="1" singleContainerFullSize="false">
 			<f:content>
-				<Label text="{i18n>employeeID}" />
-				<Input value="{oEmpolyeeDetailsModel>/ID}" editable="false" />
+				<!-- <Label text="{i18n>employeeID}" />
+				<Input value="{oEmpolyeeDetailsModel>/ID}" editable="false" /> -->
 				<Label text="{i18n>employeeName}"  />
 				<Input value=" {oEmpolyeeDetailsModel>/Salutation} {oEmpolyeeDetailsModel>/EmployeeName}"   editable="false" />
 				<Label text="{i18n>designation}" required="true"/>

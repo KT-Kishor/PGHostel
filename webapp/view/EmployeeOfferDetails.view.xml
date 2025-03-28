@@ -84,7 +84,7 @@
 											<Input value="{employeeModel>/JoiningBonus}" placeholder="{i18n>joiningBonus}" 
                                              liveChange="EOD_validateAmount" maxLength="10" id="EOD_id_Bonus" valueStateText="{i18n>ammountValuState}" />
 											<Label text="{i18n>salaryType}"/>
-											<RadioButtonGroup id="EOD_id_RadioButTds" selectedIndex="{employeeModel>/Type}" columns="3" select="EOD_onTDSCheckboxChange">
+											<RadioButtonGroup id="EOD_id_RadioButTds" columns="3" select="EOD_onTDSCheckboxChange">
 												<RadioButton id="EOD_id_Tds" text="{i18n>tds}" />
 												<RadioButton id="EOD_id_NoTds" text="{i18n>noTds}" />
 												<RadioButton id="EOD_id_Pf" text="{i18n>pf}" />

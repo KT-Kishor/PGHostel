@@ -13,8 +13,8 @@ sap.ui.define([
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.readCallForEmployeeOffer("");
-                this.byId("EO_id_OnboardBtn").setVisible(false);
-                this.byId("EO_id_RejectBtn").setVisible(false);
+                this.byId("EO_id_OnboardBtn").setEnabled(false);
+                this.byId("EO_id_RejectBtn").setEnabled(false);
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
             },
@@ -58,18 +58,21 @@ sap.ui.define([
             },
             EO_onSearch: function (oEvent) {
                 var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
+                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                 var params = {};
                 aFilterItems.forEach(function (oItem) {
                   var oControl = oItem.getControl(); // Get the associated control
                   var sValue = oItem.getName();
                   if (oControl && oControl.getValue()) {
-                    params[sValue] = oControl.getValue();
-                  }
+                    if (sValue === "JoiningDate") {
+                        params["startDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
+                        params["endDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1])); 
+                    }else{
+                        params[sValue] = oControl.getValue();
+                    }
+                }
                 });
-                var queryString = $.param({
-                    params
-                });
-                this.readCallForEmployeeOffer(queryString)
+                this._fetchCommonData("EmployeeOffer","EmployeeOfferModel",params);
             },
             // Update the status to 'Rejected' after confirmation
             onRejectEmployee: function () {
@@ -93,15 +96,7 @@ sap.ui.define([
                     onClose: function (oAction) {
                         if (oAction === sap.m.MessageBox.Action.YES) {
                             if (status === "OnBoarded") {
-                                    const employeeIds = oEmpModelData.getData().length > 0 ?
-                                    oEmpModelData.getData().filter(item => item.ID && item.ID.startsWith("KT"))
-                                    .map(item => parseInt(item.ID.slice(2), 10))
-                                    .filter(numericPart => !isNaN(numericPart)) : "";
-                                  const lastIdNo = employeeIds.length > 0 ? Math.max(...employeeIds) : 0;
-                                const newEmployeeID = "KT" + (lastIdNo + 1).toString().padStart(3, '0');
-
                                 const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({
-                                    ID: newEmployeeID,
                                     Salutation: oSelectedData.Salutation,
                                     EmployeeName: oSelectedData.ConsultantName,
                                     Role: " ",
@@ -192,11 +187,10 @@ sap.ui.define([
                 // If an item is selected, check the status and update button visibility accordingly
                 if (oSelectedItem) {
                     var sStatus = oSelectedItem.getBindingContext("EmployeeOfferModel").getProperty("Status");
-                    // this.ID = oSelectedItem.getBindingContext("EmployeeOfferModel").getProperty("ID")
                     var isDisabled = sStatus === "OnBoarded" || sStatus === "Rejected";
-                    this.byId("EO_id_OnboardBtn").setVisible(!isDisabled);
-                    this.byId("EO_id_RejectBtn").setVisible(!isDisabled);
+                    this.byId("EO_id_OnboardBtn").setEnabled(!isDisabled);
+                    this.byId("EO_id_RejectBtn").setEnabled(!isDisabled);
                 }
-            }
+            },
         });
     });
