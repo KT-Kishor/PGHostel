@@ -18,8 +18,8 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 this._fetchCommonData("Designation", "DesignationModel");
                 this._fetchCommonData("Department", "Departmentmodel");
                 this.readCallForTrainee("Initial");
-                this.byId("T_id_OnboardBtn").setEnabled(false);
-                this.byId("T_id_RejectBtn").setEnabled(false);
+                ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
+                ["T_id_Download", "T_id_EmpOnBoard"].forEach(id => this.byId(id)?.setVisible(false));
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
                 this.T_onSearch();
             },
@@ -98,7 +98,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                     this.byId("T_id_RejectBtn").setVisible(isOtherButtonsVisible);
                 }
             },
-            updateCallForTrainee: function (oTraineeData) {
+            updateCallForTrainee: function (oTraineeData,text) {
                 var that = this;
                 if (oTraineeData.Status === "OnBoarded") {
                     oTraineeData.CompanyEmailID = sap.ui.getCore().byId("OTF_id_TraineeMail").getValue();
@@ -111,6 +111,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 };
                 sap.ui.core.BusyIndicator.show(0);
                 this.ajaxUpdateWithJQuery("Trainee", oModelOffer).then((oData) => {
+                    MessageToast.show(that.i18nModel.getText(text))
                     sap.ui.core.BusyIndicator.hide();
                     if (oData.results) {
                         that.readCallForTrainee("");
@@ -163,10 +164,9 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 dialog.open();
             },
             _handleReject: function (oContext) {
-                var that = this;
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
-                that.updateCallForTrainee(oContext.getObject());
-                MessageToast.show(this.i18nModel.getText("traineeRejectSucess"));
+                this.updateCallForTrainee(oContext.getObject(),"traineeRejectSucess");
+                ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
             },
             OTF_onPressOnboard: function () {
                 try {
@@ -175,9 +175,9 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                         // Update UI Model
                         oContext.getModel().setProperty(oContext.getPath() + "/Status", "OnBoarded");
                         // Prepare Data for Update Call
-                        this.updateCallForTrainee(oContext.getObject());
-                        MessageToast.show(this.i18nModel.getText("traineeOnboardSucess"));
+                        this.updateCallForTrainee(oContext.getObject(),"traineeOnboardSucess");
                         this.TOb_oDialog.close();
+                        ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
                     } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
@@ -192,10 +192,6 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
             },
             T_onCertDownload: function () {
                 var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
-                if (!oSelectedItem) {
-                    sap.m.MessageToast.show("Please select a trainee.");
-                    return;
-                }
                 var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
                 var oJoiningDate = new Date(oTraineeModel.JoiningDate);
                 // Calculate End Date (6 months from Joining Date)
@@ -227,10 +223,6 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                     }
                     // Get selected trainee's data from the table
                     let oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
-                    if (!oSelectedItem) {
-                        MessageToast.show(this.i18nModel.getText("selectTraineeMessage"));
-                        return;
-                    }
                     let oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
                     // Create the updated trainee data
                     const oUpdatedData = {
@@ -242,9 +234,9 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                         Status: "Training Completed",
                     };
                     sap.ui.core.BusyIndicator.show(0);
-                    this.updateCallForTrainee(oUpdatedData);
+                    this.updateCallForTrainee(oUpdatedData,"downloadSucess");
+                    this.byId("T_id_Download").setVisible(false);
                     sap.ui.core.BusyIndicator.hide();
-                    MessageToast.show(this.i18nModel.getText("downloadSucess"));
                     this.TC_oDialog.close();
 
                 } catch (oError) {
@@ -254,10 +246,6 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
             },
             T_onBoardTrainee: function () {
                 var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem(); 
-                if (!oSelectedItem) {
-                    sap.m.MessageToast.show("Please select a trainee.");
-                    return;
-                }
                 var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject(); 
                 this.getRouter().navTo("RouteEmployeeOfferDetails", {
                     sParOffer: oTraineeModel.TraineeName,

@@ -6,7 +6,7 @@
 	<Page id="TD_id_PageCreate" title="{i18n>headerTrainee}" navButtonPress="TD_onPressback" showNavButton="true">
 		<content>
 			<Wizard id="TD_id_Wizard" complete="TD_onWizardComplete"	showNextButton="true" finishButtonText="{i18n>submit}">
-				<WizardStep id="TD_id_StepOne" title="{i18n>traineeDetails}" validated="true">
+				<WizardStep id="TD_id_StepOne" title="{i18n>traineeDetails}" validated="true" complete="TD_StepTwo">
 					<f:SimpleForm 
             layout="ResponsiveGridLayout"
 			labelSpanXL="3"
