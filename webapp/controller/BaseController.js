@@ -94,14 +94,14 @@ sap.ui.define([
 
     _fetchCommonData: function (entityName, modelName, filter = "") {
       // if(this.getOwnerComponent().getModel(modelName) === undefined){
-      let url =  this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;
+      let url = this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;
       sap.ui.core.BusyIndicator.show(0);
       try {
         $.ajax({
           url: url,
           method: "GET",
-          headers:this.getOwnerComponent().getModel("LoginModel").getData().headers,
-          data:filter,
+          headers: this.getOwnerComponent().getModel("LoginModel").getData().headers,
+          data: filter,
           success: function (data) {
             sap.ui.core.BusyIndicator.hide();
             if (data) {
@@ -118,10 +118,10 @@ sap.ui.define([
         sap.ui.core.BusyIndicator.hide();
         sap.m.MessageToast.show("Technical error, please contact the administrator");
       }
-    // }
+      // }
     },
     //Common read call for all the app
-    async ajaxReadWithJQuery(sUrl,filter) {
+    async ajaxReadWithJQuery(sUrl, filter) {
       sap.ui.core.BusyIndicator.show(0);
       var queryString = new URLSearchParams(filter).toString();
       return new Promise((resolve, reject) => {
@@ -143,12 +143,12 @@ sap.ui.define([
     //Common create call for all the app
     async ajaxCreateWithJQuery(sUrl, oPayLoad) {
       sap.ui.core.BusyIndicator.show(0);
-        return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
           method: "POST",
           data: JSON.stringify(oPayLoad),
-          headers:this.getView().getModel("LoginModel").getData().headers,
+          headers: this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
             sap.ui.core.BusyIndicator.hide();
             resolve(data);
@@ -163,12 +163,12 @@ sap.ui.define([
     //Common update call for all the app
     async ajaxUpdateWithJQuery(sUrl, oPayLoad) {
       sap.ui.core.BusyIndicator.show(0);
-        return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
           method: "PUT",
           data: JSON.stringify(oPayLoad),
-          headers:this.getView().getModel("LoginModel").getData().headers,
+          headers: this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
             sap.ui.core.BusyIndicator.hide();
             resolve(data);
@@ -180,32 +180,32 @@ sap.ui.define([
         });
       });
     },
-     //Common delete call for all the app
-     async ajaxDeleteWithJQuery(sUrl, oPayLoad) {
+    //Common delete call for all the app
+    async ajaxDeleteWithJQuery(sUrl, oPayLoad) {
       sap.ui.core.BusyIndicator.show(0);
       return new Promise((resolve, reject) => {
-          $.ajax({
-              url: this.getView().getModel("LoginModel").getData().url + sUrl,
-              method: "DELETE",
-              contentType: "application/json", 
-              dataType: "json",
-              data: JSON.stringify(oPayLoad),
-              headers: this.getView().getModel("LoginModel").getData().headers,
-              success: function (data) {
-                  sap.ui.core.BusyIndicator.hide();
-                  resolve(data);
-              },
-              error: function (error) {
-                  sap.ui.core.BusyIndicator.hide();
-                  reject(error);
-              }
-          });
+        $.ajax({
+          url: this.getView().getModel("LoginModel").getData().url + sUrl,
+          method: "DELETE",
+          contentType: "application/json",
+          dataType: "json",
+          data: JSON.stringify(oPayLoad),
+          headers: this.getView().getModel("LoginModel").getData().headers,
+          success: function (data) {
+            sap.ui.core.BusyIndicator.hide();
+            resolve(data);
+          },
+          error: function (error) {
+            sap.ui.core.BusyIndicator.hide();
+            reject(error);
+          }
+        });
       });
-  },  
+    },
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
-      var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",",""));
-      var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus").replaceAll(",",""));
+      var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",", ""));
+      var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus").replaceAll(",", ""));
       var BasicSalary, TDS;
       // Calculate various salary components
       BasicSalary = (CTC * 0.49) / 12;           // Monthly Basic Salary from 49% of CTC
@@ -247,8 +247,8 @@ sap.ui.define([
       oModel.setProperty("/Total", this.Formatter.formatCurrencyInINRText(Math.round(Total)));
     },
 
-     //Date picker common function 
-     _makeDatePickersReadOnly: function (aIds) {
+    //Date picker common function 
+    _makeDatePickersReadOnly: function (aIds) {
       var oView = this.getView();
       aIds.forEach(function (sId) {
         var oDatePicker = oView.byId(sId);
@@ -282,6 +282,22 @@ sap.ui.define([
           });
         }
       });
+    },
+
+    _convertBLOBtoBASE64: function (buffer) {
+      if (!buffer || buffer.byteLength === 0) {
+        console.error("Invalid BLOB data.");
+        return "";
+      }
+
+      var binary = '';
+      var bytes = new Uint8Array(buffer);
+
+      for (var i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+
+      return btoa(binary); // Convert binary string to Base64
     },
   })
 });

@@ -4,9 +4,10 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "../model/formatter",
+    "../utils/CommonJsPDF",
     "sap/ui/core/BusyIndicator"
 ],
-    function (BaseController, utils, JSONModel, MessageToast, Formatter, BusyIndicator) {
+    function (BaseController, utils, JSONModel, MessageToast, Formatter, jsPDF, BusyIndicator) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.TraineeDetails", {
             Formatter: Formatter,
@@ -221,6 +222,57 @@ sap.ui.define([
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 });
+            },
+
+            onDownloadTraineeLetter: function() {
+                var oModel = this.getView().getModel("editTraineeModel");
+                this.offerGeneratingPdfFunction(oModel);
+            }, 
+            
+            offerGeneratingPdfFunction: function (oModel) {
+                var oEmpModel = oModel.getData();
+                this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
+                this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "TraineeOffer" });
+
+                var oPDFModel = this.getView().getModel("PDFData");
+                oPDFModel.setProperty("/Type", "TraineeOffer");
+                oPDFModel.setProperty("/EmpName", oEmpModel.NameSalutation + " " + oEmpModel.TraineeName);
+                oPDFModel.setProperty("/EmpRole", "Trainee");  
+                oPDFModel.setProperty("/CreateDate", "Field is missing");
+                oPDFModel.setProperty("/TrainingStartDate", oEmpModel.JoiningDate);
+                oPDFModel.setProperty("/TraineePeroid", oEmpModel.EndDate);
+                oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
+                oPDFModel.setProperty("/Stipend", oEmpModel.Stipend);
+                if(oEmpModel.Stipend == 0 || oEmpModel.Stipend == ""){
+                    oPDFModel.setProperty("/StipendSkipLine", 5);
+                }
+                else{
+                    oPDFModel.setProperty("/StipendSkipLine", null);
+                }
+                
+
+                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
+
+                if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                    MessageToast.show("Company Logo or Model not found.");
+                    return;
+                }
+
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo.data);
+                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature.data);
+                    if (logoBase64 && signBase64) {
+                        oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64; // Save in a new property
+                        oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64; // Save in a new property
+                    }
+                }
+
+                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                    console.log(oCompanyDetailsModel);
+                    jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                }
+
             }
 
         });

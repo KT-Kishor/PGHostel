@@ -137,6 +137,11 @@
                 "uri": "model/Payroll.json",
                 "preload": true
             },
+            "PDFData": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/PDFData.json",
+                "preload": true
+            },
             "TravelAllowance": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TravelAllowance.json",

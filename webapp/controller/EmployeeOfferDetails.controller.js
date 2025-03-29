@@ -2,9 +2,10 @@ sap.ui.define([
     "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
+    "../utils/CommonJsPDF",
     "../model/formatter"
 ],
-    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, jsPDF, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOfferDetails", {
             Formatter: Formatter,
@@ -235,12 +236,61 @@ sap.ui.define([
                 var oTdsVal = this.byId("EOD_id_RadioButTds").getAggregation("buttons")[this.byId("EOD_id_RadioButTds").getSelectedIndex()].getProperty("text");
                 this._calculateSalaryComponents(oTdsVal);
             },
-            EOUF_onPressMerge :function(){
+            EOUF_onPressMerge: function () {
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);
             },
-            offerGeneratingPdfFunction : function(oModel){
-                  
+            offerGeneratingPdfFunction: function (oModel) {
+                var oEmpModel = oModel.getData();
+                this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: oEmpModel.BranchCode });
+                this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
+
+                var oPDFModel = this.getView().getModel("PDFData");
+                oPDFModel.setProperty("/Type", "EmployeeOffer");
+                oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
+                oPDFModel.setProperty("/EmpRole", oEmpModel.Designation);
+                oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", pincode");
+                oPDFModel.setProperty("/EmpPinCode", "123456");
+                oPDFModel.setProperty("/CreateDate", oEmpModel.OfferReleaseDate);
+                oPDFModel.setProperty("/JoiningDate", oEmpModel.JoiningDate);
+                oPDFModel.setProperty("/EmpCTC", oEmpModel.Total);
+                oPDFModel.setProperty("/BondYears", oEmpModel.EmploymentBond || "0");
+                oPDFModel.setProperty("/MonthlyComponents/0/Text", oEmpModel.TotalmothlyAnnualized);
+                oPDFModel.setProperty("/MonthlyComponents/1/Text", oEmpModel.BasicSalary);
+                oPDFModel.setProperty("/MonthlyComponents/2/Text", oEmpModel.HRA);
+                oPDFModel.setProperty("/MonthlyComponents/3/Text", oEmpModel.StatutoryBonus);
+                oPDFModel.setProperty("/MonthlyComponents/4/Text", oEmpModel.TotalMonthly);
+                oPDFModel.setProperty("/Retrials/0/Text", oEmpModel.TotalRetires);
+                oPDFModel.setProperty("/Retrials/1/Text", oEmpModel.TDS);
+                oPDFModel.setProperty("/Retrials/2/Text", oEmpModel.MedicalInsurance);
+                oPDFModel.setProperty("/Retrials/3/Text", oEmpModel.Gratuity);
+                oPDFModel.setProperty("/VariableComponents/0/Text", oEmpModel.TotalVariablePay);
+                oPDFModel.setProperty("/VariableComponents/1/Text", oEmpModel.PerformanceBonus);
+                oPDFModel.setProperty("/VariableComponents/2/Text", oEmpModel.EngagementPB);
+                oPDFModel.setProperty("/Notes/0/Text", oEmpModel.JoiningBonus);
+
+                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
+
+                if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                    MessageToast.show("Company Logo or Model not found.");
+                    return;
+                }
+
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo.data);
+                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature.data);
+                    if (logoBase64 && signBase64) {
+                        oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64; // Save in a new property
+                        oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64; // Save in a new property
+                    }
+                }
+
+                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                    console.log(oCompanyDetailsModel);
+                    jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                }
+
             }
         });
     });
