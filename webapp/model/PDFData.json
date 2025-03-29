@@ -1,0 +1,112 @@
+{
+    "Type": "EmployeeOffer",
+    "EmpName": "Mr. Shivang S Patil",
+    "EmpRole": "Junior Software Engineer",
+    "EmpAddress": "#102, SHIVAM, Yeshwanth Nagar, Navaldi Layout, Udnoor Road, Kalaburagi, Karnataka, IN",
+    "EmpPinCode": "585102",
+    "CreateDate": "19/03/2025",
+    "JoiningDate": "01/04/2025",
+    "EmpCTC": "INR 2,40,000",
+    "BondYears":"2",
+    "SettlementDays":"120",
+    "AcceptanceDays":"3",
+    "ProbationPeriod": "6",
+    "SectorType": "Inormation Technology",
+    "CompanyLogoHeader": "../image/KT_Logo.png",
+    "PageHeader": "Salary Breakup",
+    "Title": "Annexure 1",
+    "SubTitle": "COMPENSATION PLAN",
+
+    "TraineePeroid": "six",
+    "TrainingStartDate": "02/01/2025",
+    "ReportingManager": "Mr. Veerang Shah",
+    "Stipend": null,
+    "StipendSkipLine": null,
+
+    "Headers": [
+        {
+            "Title": "Company",
+            "Text": "Kalpavriksha Technologies"
+        },
+        {
+            "Title": "Branch",
+            "Text": "Kalaburagi"
+        }
+    ],
+    "MonthlyComponents": [
+        {
+            "Title": "TOTAL: Monthly Components",
+            "Text": "INR 1,87,660"
+        },
+        {
+            "Title": "Basic Salary",
+            "Text": "INR 9,800"
+        },
+        {
+            "Title": "House Rent Allowance",
+            "Text": "INR 4,900"
+        },
+        {
+            "Title": "Statutory Bonus",
+            "Text": "INR 938"
+        },
+        {
+            "Title": "TOTAL: Monthly",
+            "Text": "INR 4,900"
+        }        
+    ],
+    "Retrials": [
+        {
+            "Title": "TOTAL: Retrials",
+            "Text": "INR 28,340"
+        },
+        {
+            "Title": "TDS",
+            "Text": "INR 18,766"
+        },
+        {
+            "Title": "Medical Insurance Premium",
+            "Text": "INR 3,920"
+        },
+        {
+            "Title": "Gratuity",
+            "Text": "INR 5,654"
+        }
+    ],
+    "VariableComponents": [
+        {
+            "Title": "TOTAL: Variable Components",
+            "Text": "INR 24,000"
+        },
+        {
+            "Title": "Performance Bonus",
+            "Text": "INR 12,000"
+        },
+        {
+            "Title": "Engagement PB (paid monthly) @ 100%",
+            "Text": "INR 12,000"
+        }
+    ],
+    "Notes": [
+        {
+            "Title": "You're eligible for an joining bonus amount of",
+            "Text": "INR 20,000"
+        },
+        {
+            "Sl.No": "1",
+            "Text": "All salary components are governed by the company policies and statutory guidelines."
+        },
+        {
+            "Sl.No": "2",
+            "Text": "This salary sheet is strictly confidential and must not be discussed with anyone other than your Kalpavriksha Reporting Manager and/or your HR Manager."
+        },
+        {
+            "Sl.No": "3",
+            "Text": "Any personal tax liability arising out of compensation on will be borne solely by the ...."
+        },
+        {
+            "Sl.No": "4",
+            "Text": "Gratuity to be payable as per act."
+        }
+    ]
+}
