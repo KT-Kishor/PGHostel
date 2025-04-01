@@ -104,73 +104,80 @@ sap.ui.define(
         },
 
         LP_onLogin: function () {
-          var that = this;
-          var oView = this.getView();
-          var userId = oView.byId("Lp_id_Userid").getValue().trim();
-          var userName = oView.byId("Lp_id_Username").getValue().trim();
-          var userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
-          var password = oView.byId("Lp_id_PasswordInput").getValue().trim();
-          var isOtpLogin = oView.byId("Lp_id_OtpRadio").getSelected();
-          var isPasswordLogin = oView.byId("Lp_id_PasswordRadio").getSelected();
+          this.getRouter().navTo("RouteTilePage");
 
-          // Check if OTP login is selected and OTP is empty
-          if (isOtpLogin && userOtp === "") {
-            MessageToast.show(that.i18nModel.getText("checkOTP"));
-            return;
-          }
+          // var that = this;
+          // var oView = this.getView();
+          // var oLoginModel = this.getView().getModel("LoginModel");
+          // var userId = oView.byId("Lp_id_Userid").getValue().trim();
+          // var userName = oView.byId("Lp_id_Username").getValue().trim();
+          // var userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
+          // var password = oView.byId("Lp_id_PasswordInput").getValue().trim();
+          // var isOtpLogin = oView.byId("Lp_id_OtpRadio").getSelected();
+          // var isPasswordLogin = oView.byId("Lp_id_PasswordRadio").getSelected();
 
-          // Validate mandatory fields (excluding password when OTP login is selected)
-          if (
-            utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
-            utils._LCvalidateName(this.byId("Lp_id_Username"), "ID") &&
-            (!isPasswordLogin ||
-              utils._LCvalidateMandatoryField(
-                this.byId("Lp_id_PasswordInput"),
-                "ID"
-              )) // Skip password validation if OTP login is selected
-          ) {
-            var queryString = $.param({
-              EmployeeID: userId,
-              EmployeeName: userName,
-              OTP: isOtpLogin ? userOtp : "",
-              Password: isPasswordLogin ? password : "",
-            });
+          // // Check if OTP login is selected and OTP is empty
+          // if (isOtpLogin && userOtp === "") {
+          //   MessageToast.show(that.i18nModel.getText("checkOTP"));
+          //   return;
+          // }
 
-            $.ajax({
-              url: this.API + "/LoginDetails?" + queryString,
-              type: "GET",
-              contentType: "application/json",
-              headers: this.getView().getModel("LoginModel").getData().headers,
-              success: function (response) {
-                MessageToast.show(that.i18nModel.getText("logsuccess"));
-                that.getRouter().navTo("RouteTilePage");
+          // // Validate mandatory fields (excluding password when OTP login is selected)
+          // if (
+          //   utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
+          //   utils._LCvalidateName(this.byId("Lp_id_Username"), "ID") &&
+          //   (!isPasswordLogin ||
+          //     utils._LCvalidateMandatoryField(
+          //       this.byId("Lp_id_PasswordInput"),
+          //       "ID"
+          //     )) // Skip password validation if OTP login is selected
+          // ) {
+          //   var queryString = $.param({
+          //     EmployeeID: userId,
+          //     EmployeeName: userName,
+          //     OTP: isOtpLogin ? userOtp : "",
+          //     Password: isPasswordLogin ? password : "",
+          //   });
 
-                // Clear all input fields after successful login
-                oView.byId("Lp_id_Userid").setValue("");
-                oView.byId("Lp_id_Username").setValue("");
-                oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
-                oView
-                  .byId("Lp_id_PasswordInput")
-                  .setValue("")
-                  .setVisible(false);
-                oView
-                  .byId("idbtnsendotp")
-                  .setText("Send OTP")
-                  .setVisible(false);
-                // Hide Password and OTP Fields
-                oView.byId("Lp_id_OtpLabel").setVisible(false);
-                oView.byId("Lp_id_PasswordLabel").setVisible(false);
-                oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
-                oView.byId("Lp_id_OtpRadio").setSelected(false);
-                oView.byId("Lp_id_PasswordRadio").setSelected(false);
-              },
-              error: function (error) {
-                MessageToast.show(JSON.parse(error.responseText).message);
-              },
-            });
-          } else {
-            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
-          }
+          //   $.ajax({
+          //     url: this.API + "/LoginDetails?" + queryString,
+          //     type: "GET",
+          //     contentType: "application/json",
+          //     headers: this.getView().getModel("LoginModel").getData().headers,
+          //     success: function (response) {
+          //       // Store only EmployeeID and EmployeeName in the model
+          //       oLoginModel.setProperty("/EmployeeID", response.data[0].EmployeeID);
+          //       oLoginModel.setProperty("/EmployeeName", response.data[0].EmployeeName);
+
+          //       MessageToast.show(that.i18nModel.getText("logsuccess"));
+          //       that.getRouter().navTo("RouteTilePage");
+
+          //       // Clear all input fields after successful login
+          //       oView.byId("Lp_id_Userid").setValue("");
+          //       oView.byId("Lp_id_Username").setValue("");
+          //       oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
+          //       oView
+          //         .byId("Lp_id_PasswordInput")
+          //         .setValue("")
+          //         .setVisible(false);
+          //       oView
+          //         .byId("idbtnsendotp")
+          //         .setText("Send OTP")
+          //         .setVisible(false);
+          //       // Hide Password and OTP Fields
+          //       oView.byId("Lp_id_OtpLabel").setVisible(false);
+          //       oView.byId("Lp_id_PasswordLabel").setVisible(false);
+          //       oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
+          //       oView.byId("Lp_id_OtpRadio").setSelected(false);
+          //       oView.byId("Lp_id_PasswordRadio").setSelected(false);
+          //     },
+          //     error: function (error) {
+          //       MessageToast.show(JSON.parse(error.responseText).message);
+          //     },
+          //   });
+          // } else {
+          //   MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+          // }
         },
 
         onLoginOptionChange: function (oEvent) {

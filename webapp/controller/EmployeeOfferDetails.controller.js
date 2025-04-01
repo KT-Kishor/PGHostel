@@ -30,7 +30,7 @@ sap.ui.define([
                     "OfferReleaseDate": this.Formatter.formatDate(new Date()),
                     "JoiningDate": "",
                     "CTC": "",
-                    "EmploymentBond": "",
+                    "EmploymentBond": "0",
                     "JoiningBonus": "0",
                     "BaseLocation": "",
                     "BasicSalary": "",
@@ -51,7 +51,6 @@ sap.ui.define([
                     "Currency": "",
                     "EmployeeEmail": "",
                     "Year": "",
-                    "Type": 0,
                 }
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
@@ -235,6 +234,9 @@ sap.ui.define([
             EOD_onStep2: function () {
                 var oTdsVal = this.byId("EOD_id_RadioButTds").getAggregation("buttons")[this.byId("EOD_id_RadioButTds").getSelectedIndex()].getProperty("text");
                 this._calculateSalaryComponents(oTdsVal);
+                var oModel = this.getView().getModel("employeeModel").getData();
+                if(oModel.BaseLocation === "")  this.getView().getModel("employeeModel").setProperty("/BaseLocation", this.byId("EOD_id_Location").getSelectedKey())
+                if(oModel.Designation === "")  this.getView().getModel("employeeModel").setProperty("/Designation", this.byId("EOD_id_Designation").getSelectedKey())
             },
             EOUF_onPressMerge: function () {
                 var oModel = this.getView().getModel("employeeModel");
@@ -246,7 +248,6 @@ sap.ui.define([
                 this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
 
                 var oPDFModel = this.getView().getModel("PDFData");
-                oPDFModel.setProperty("/Type", "EmployeeOffer");
                 oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
                 oPDFModel.setProperty("/EmpRole", oEmpModel.Designation);
                 oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", pincode");

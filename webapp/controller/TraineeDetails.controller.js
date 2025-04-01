@@ -178,6 +178,10 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
+            TD_StepTwo: function () {
+                var oModel = this.getView().getModel("oTraineeDetails").getData();
+                if(oModel.Currency === "")  this.getView().getModel("oTraineeDetails").setProperty("/Currency", this.byId("TD_id_Currency").getSelectedKey())
+            },
 
             //Edit/save button visibility 
             TU_onEditOrSavePress: function () {
