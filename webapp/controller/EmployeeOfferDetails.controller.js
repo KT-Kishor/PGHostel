@@ -248,6 +248,7 @@ sap.ui.define([
                 this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
 
                 var oPDFModel = this.getView().getModel("PDFData");
+                oPDFModel.setProperty("/Type", "EmployeeOffer");
                 oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
                 oPDFModel.setProperty("/EmpRole", oEmpModel.Designation);
                 oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", pincode");
@@ -262,12 +263,14 @@ sap.ui.define([
                 oPDFModel.setProperty("/MonthlyComponents/3/Text", oEmpModel.StatutoryBonus);
                 oPDFModel.setProperty("/MonthlyComponents/4/Text", oEmpModel.TotalMonthly);
                 oPDFModel.setProperty("/Retrials/0/Text", oEmpModel.TotalRetires);
-                oPDFModel.setProperty("/Retrials/1/Text", oEmpModel.TDS);
-                oPDFModel.setProperty("/Retrials/2/Text", oEmpModel.MedicalInsurance);
-                oPDFModel.setProperty("/Retrials/3/Text", oEmpModel.Gratuity);
+                oPDFModel.setProperty("/Retrials/1/Text", oEmpModel.MedicalInsurance);
+                oPDFModel.setProperty("/Retrials/2/Text", oEmpModel.Gratuity);
                 oPDFModel.setProperty("/VariableComponents/0/Text", oEmpModel.TotalVariablePay);
                 oPDFModel.setProperty("/VariableComponents/1/Text", oEmpModel.PerformanceBonus);
                 oPDFModel.setProperty("/VariableComponents/2/Text", oEmpModel.EngagementPB);
+                oPDFModel.setProperty("/TotalDeductions/1/Text", oEmpModel.TDS);
+                oPDFModel.setProperty("/TotalDeductions/2/Text", oEmpModel.PF);
+                oPDFModel.setProperty("/TotalDeductions/3/Text", oEmpModel.EPF);
                 oPDFModel.setProperty("/Notes/0/Text", oEmpModel.JoiningBonus);
 
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");

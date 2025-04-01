@@ -151,6 +151,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Course.json",
                 "preload": true
+            },
+            "TrainingDurationModel": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/TrainingDuration.json",
+                "preload": true
             }
         },
         "resources": {

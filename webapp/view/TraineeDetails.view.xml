@@ -18,6 +18,7 @@
 			emptySpanL="4"
 			emptySpanM="4"
 			emptySpanS="0"
+			editable="true"
 			columnsXL="1"
 			columnsL="1"
 			columnsM="1"
@@ -60,11 +61,19 @@
 							<Input value="{oTraineeDetails>/TraineeEmail}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>stipend}" required="true" />
 							<Input value="{oTraineeDetails>/Stipend}" maxLength="15" placeholder="{i18n>placeStipend}" id="TD_id_Stipend" liveChange="TD_validateAmount" valueStateText="{i18n>ammountValuState}"/>
-								<Select items="{CurrencyModel>/}"  selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" width="100%" class="marginLeft">
-												<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-											</Select>
+							<Select items="{CurrencyModel>/}"  selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" width="100%" class="marginLeft">
+								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
+							</Select>
+							<Label text="{i18n>traineeDuration}" required="true" />
+								<Select items="{TrainingDurationModel>/duration}"  selectedKey="{TrainingDurationModel>/TrainingDuration}" id="TD_id_TDuration" width="100%" class="marginLeft">
+									<core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
+								</Select>
+							<Label text="{i18n>releaseDateT}"   required="true" />
+							<DatePicker  value="{oTraineeDetails>/ReleaseDate}" id="TD_id_ReleaseDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>joiningDate}"   required="true" />
-							<DatePicker width="50%" value="{oTraineeDetails>/JoiningDate}" id="TD_id_JoiningDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
+							<DatePicker value="{oTraineeDetails>/JoiningDate}" id="TD_id_JoiningDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
+								
+							
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
@@ -98,21 +107,27 @@
 							<Text text="{oTraineeDetails>/Stipend} "/>
 							<Label text="{i18n>currency}" />
 							<Text text="{oTraineeDetails>/Currency}"/>
+
+							<Label text="{i18n>releaseDate}" />
+							<Text text="{oTraineeDetails>/ReleaseDate}"/>
 							<Label text="{i18n>joiningDate}" />
 							<Text text="{oTraineeDetails>/JoiningDate}"/>
+
+							<Label text="{i18n>traineeDuration}" />
+							<Text text="{oTraineeDetails>/TrainingDuration}"/>
+
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
 			</Wizard>
 		</content>
-				<footer>
+		<footer>
 			<Bar>
-					    <contentLeft>
-                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
-                </contentLeft>
+				<contentLeft>
+					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+				</contentLeft>
 			</Bar>
 		</footer>
 	</Page>
 	<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.TraineeUpdate" type="XML" />
-
 </mvc:View>

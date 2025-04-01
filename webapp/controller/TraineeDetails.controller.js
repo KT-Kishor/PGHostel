@@ -26,14 +26,16 @@ sap.ui.define([
                     "ReportingManagerSalutation": "Mr.",
                     "ReportingManager": "",
                     "Stipend": "",
+                    "ReleaseDate": this.Formatter.formatDate(new Date()),
                     "JoiningDate": this.Formatter.formatDate(new Date()),
                     "TraineeEmail": "",
-                    "Currency": ""
+                    "Currency": "",
+                    "TrainingDuration": ""
                 };
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, isCTCVisible: false });
                 this.getView().setModel(oViewModel, "viewModel");
-                ["TD_id_Name", "TD_id_ReportingManager", "TD_id_EmailID", "TD_id_Stipend", "TD_id_JoiningDate",
+                ["TD_id_Name", "TD_id_ReportingManager", "TD_id_EmailID", "TD_id_Stipend", "TD_id_JoiningDate", "TD_id_ReleaseDate",
                     "TU_id_Name", "TU_id_Manager", "TU_id_TraineeMail", "TU_id_JoinDate", "TU_id_Stipend"].forEach(function (ids) {
                         this.getView().byId(ids).setValueState("None");
                     }.bind(this));
@@ -46,7 +48,7 @@ sap.ui.define([
                     this.getView().byId("TUF_id_pageTrainee").setVisible(true);
                     this.getModelData(this.sArgPara);
                 }
-                this._makeDatePickersReadOnly(["TD_id_JoiningDate", "TU_id_JoinDate"]);
+                this._makeDatePickersReadOnly(["TD_id_JoiningDate","TD_id_ReleaseDate", "TU_id_JoinDate","TU_id_RelDate"]);
             },
             getModelData: function (sArgPara) {
                 var oModel = this.getOwnerComponent().getModel("traineeModel");
@@ -108,19 +110,25 @@ sap.ui.define([
                 utils._LCvalidateAmount(oEvent);
                 this.validateStep();
             },
-            TD_validateDate: function (oEvent) {
-                utils._LCvalidateDate(oEvent);
-                this.validateStep();
-            },
             TD_onPressback: function () {
                 this.getRouter().navTo("RouteTrainee");
             },
+            TD_validateDate: function (oEvent) {
+                utils._LCvalidateDate(oEvent);
+                this.validateStep();
+                var oOfferDateId = oEvent.getSource().getId().split("--")[2], releaseDate;
+                if (oOfferDateId === "TD_id_ReleaseDate" || oOfferDateId === "TU_id_RelDate") {
+                    // Get selected dates and Update the minimum date for joining date
+                    releaseDate = this.byId(oOfferDateId).getDateValue();
+                    this.byId(oOfferDateId).setMinDate(releaseDate);
+                }
+            },
             validateStep: function () {
                 // Check if all fields have values
-                var allFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getValue() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_Stipend").getValue() && this.byId("TD_id_Currency").getSelectedKey() && this.getView().byId("TD_id_JoiningDate").getValue();
+                var allFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getValue() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_Stipend").getValue() && this.byId("TD_id_Currency").getSelectedKey() && this.getView().byId("TD_id_JoiningDate").getValue() && this.getView().byId("TD_id_ReleaseDate").getValue();
                 if (allFieldsFilled) {
                     // Validate each field 
-                    var isValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCvalidateAmount(this.getView().byId("TD_id_Stipend"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
+                    var isValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCvalidateAmount(this.getView().byId("TD_id_Stipend"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID");
                     this.byId("TD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
@@ -133,6 +141,7 @@ sap.ui.define([
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.Status = "Submitted";
                     oModel.JoiningDate = new Date(this.byId("TD_id_JoiningDate").getDateValue().getTime() - this.byId("TD_id_JoiningDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                    oModel.ReleaseDate = new Date(this.byId("TD_id_ReleaseDate").getDateValue().getTime() - this.byId("TD_id_ReleaseDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
                     var oPayload = {
                         "tableName": "Trainee",
@@ -180,14 +189,15 @@ sap.ui.define([
             },
             TD_StepTwo: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
-                if(oModel.Currency === "")  this.getView().getModel("oTraineeDetails").setProperty("/Currency", this.byId("TD_id_Currency").getSelectedKey())
+                if (oModel.Currency === "") this.getView().getModel("oTraineeDetails").setProperty("/Currency", this.byId("TD_id_Currency").getSelectedKey())
+                if (oModel.TrainingDuration === "") this.getView().getModel("oTraineeDetails").setProperty("/TrainingDuration", this.byId("TD_id_TDuration").getSelectedKey())
             },
 
             //Edit/save button visibility 
             TU_onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");
                 if (oViewModel.getProperty("/editable")) {
-                    var isValid = utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") && utils._LCvalidateDate(this.getView().byId("TU_id_JoinDate"), "ID") && utils._LCvalidateAmount(this.getView().byId("TU_id_Stipend"), "ID");
+                    var isValid = utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID")  && utils._LCvalidateAmount(this.getView().byId("TU_id_Stipend"), "ID");
                     // Save the changes
                     if (isValid) this.updateCallForTrainee(oViewModel);
                     else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -199,6 +209,8 @@ sap.ui.define([
             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
+                oModel.ReleaseDate = new Date(
+                    this.byId("TU_id_RelDate").getDateValue().getTime() - this.byId("TU_id_RelDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
                 oModel.JoiningDate = new Date(
                     this.byId("TU_id_JoinDate").getDateValue().getTime() - this.byId("TU_id_JoinDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
                 // Check and update the status if it is 'Rejected'

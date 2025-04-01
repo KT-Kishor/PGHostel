@@ -35,6 +35,7 @@
                             columnsXL="1"
                             columnsL="1"
                             columnsM="1"
+                            editable="true"
                             singleContainerFullSize="false">
                                 <f:content>
                                     <m:Label text="{i18n>traineeName}" required="true" />
@@ -71,17 +72,24 @@
                                         </m:HBox>
                                     <m:Label text="{i18n>emailId}" required="true" />
                                     <m:Input id="TU_id_TraineeMail" value="{oTraineeDetails>/TraineeEmail}" editable="{viewModel>/editable}" maxLength="100" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
+                                    <m:Label text="{i18n>releaseDateT}" required="true" />
+                                     <m:DatePicker   id="TU_id_RelDate"   value="{ path: 'oTraineeDetails>/ReleaseDate',formatter:'.Formatter.formatDate' }"  editable="{viewModel>/editable}"  displayFormat="dd/MM/yyyy"     valueFormat="dd/MM/yyyy" 
+
+                                    change="TD_validateDate" valueStateText="{i18n>dateValueState}" />
                                     <m:Label text="{i18n>joiningDate}" required="true" />
                                         
                                     <m:DatePicker   id="TU_id_JoinDate"   value="{ path: 'oTraineeDetails>/JoiningDate',formatter:'.Formatter.formatDate' }"  editable="{viewModel>/editable}"  displayFormat="dd/MM/yyyy"     valueFormat="dd/MM/yyyy" 
-
                                     change="TD_validateDate" valueStateText="{i18n>dateValueState}" />
+                            
                                     <m:Label text="{i18n>stipend}" required="true" />
                                     <m:Input id="TU_id_Stipend" value="{oTraineeDetails>/Stipend}" type="Number" editable="{viewModel>/editable}"  liveChange="TD_validateAmount"  valueStateText="{i18n>ammountValuState}"/>
                                     <m:Select id="TU_id_Currency" editable="{viewModel>/editable}" items="{CurrencyModel>/}" selectedKey="{oTraineeDetails>/Currency}" width="100%" class="marginLeft"  >
                                         <core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
                                     </m:Select>
-                                    <!-- Status -->
+                                    <m:Label text="{i18n>traineeDuration}" required="true" />
+                                        <m:Select items="{TrainingDurationModel>/duration}"  selectedKey="{TrainingDurationModel>/TrainingDuration}" id="TU_id_TDuration" width="100%" class="marginLeft" editable="{viewModel>/editable}">
+                                            <core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
+                                        </m:Select>
                                     <m:Label text="{i18n>status}" required="true" />
                                     <m:Input value="{oTraineeDetails>/Status}" editable="false" enabled="true" class="onClassTarineStatus" maxLength="50" />
                                 </f:content>
