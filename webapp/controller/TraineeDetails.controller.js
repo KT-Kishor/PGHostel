@@ -28,7 +28,7 @@ sap.ui.define([
                     "Stipend": "",
                     "JoiningDate": this.Formatter.formatDate(new Date()),
                     "TraineeEmail": "",
-                    "Currency":""
+                    "Currency": ""
                 };
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, isCTCVisible: false });
@@ -46,7 +46,7 @@ sap.ui.define([
                     this.getView().byId("TUF_id_pageTrainee").setVisible(true);
                     this.getModelData(this.sArgPara);
                 }
-                this._makeDatePickersReadOnly(["TD_id_JoiningDate","TU_id_JoinDate"]);
+                this._makeDatePickersReadOnly(["TD_id_JoiningDate", "TU_id_JoinDate"]);
             },
             getModelData: function (sArgPara) {
                 var oModel = this.getOwnerComponent().getModel("traineeModel");
@@ -70,7 +70,7 @@ sap.ui.define([
                 });
                 if (aFilteredData.length > 0) {
                     var traineeData = aFilteredData[0];
-                    this.getView().setModel(new JSONModel(traineeData), "editTraineeModel");
+                    this.getView().setModel(new JSONModel(traineeData), "oTraineeDetails");
                     var oViewModel = this.getView().getModel("viewModel");
                     if (traineeData.Status === "OnBoarded" || traineeData.Status === "Training Completed") {
                         oViewModel.setProperty("/isVisiable", false);
@@ -133,7 +133,7 @@ sap.ui.define([
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.Status = "Submitted";
                     oModel.JoiningDate = new Date(this.byId("TD_id_JoiningDate").getDateValue().getTime() - this.byId("TD_id_JoiningDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
-            
+
                     var oPayload = {
                         "tableName": "Trainee",
                         "data": oModel
@@ -148,7 +148,7 @@ sap.ui.define([
                                 content: new sap.m.Text({ text: this.i18nModel.getText("traineeDataSubmitted") }),
                                 beginButton: new sap.m.Button({
                                     text: "OK",
-                                    type: "Accept", 
+                                    type: "Accept",
                                     press: function () {
                                         oDialog.close();
                                         this.getRouter().navTo("RouteTrainee"); // Navigate to RouteTrainee
@@ -156,9 +156,9 @@ sap.ui.define([
                                 }),
                                 endButton: new sap.m.Button({
                                     text: "Generate PDF",
-                                    type: "Reject", 
+                                    type: "Reject",
                                     press: function () {
-                                      //  this._generatePDF(); // Call function to generate PDF
+                                        //  this._generatePDF(); // Call function to generate PDF
                                         oDialog.close();
                                     }.bind(this)
                                 }),
@@ -166,19 +166,19 @@ sap.ui.define([
                                     oDialog.destroy();
                                 }
                             });
-            
+
                             oDialog.open();
                         }
                     }).catch((oError) => {
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         sap.ui.core.BusyIndicator.hide();
                     });
-            
+
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
-    
+
             //Edit/save button visibility 
             TU_onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");
@@ -194,20 +194,20 @@ sap.ui.define([
             },
             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel) {
-                var oModel = this.getView().getModel("editTraineeModel").getData();
+                var oModel = this.getView().getModel("oTraineeDetails").getData();
                 oModel.JoiningDate = new Date(
-                    this.byId("TU_id_JoinDate").getDateValue().getTime() - this.byId("TU_id_JoinDate").getDateValue().getTimezoneOffset() * 60000 ).toISOString().split("T")[0];
+                    this.byId("TU_id_JoinDate").getDateValue().getTime() - this.byId("TU_id_JoinDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
                 // Check and update the status if it is 'Rejected'
                 if (oModel.Status === "Rejected") {
                     oModel.Status = "Submitted";
                 }
-                this.getView().getModel("editTraineeModel").refresh(true);
+                this.getView().getModel("oTraineeDetails").refresh(true);
                 oModel = {
                     "data": oModel,
                     "filters": {
                         "ID": this.sArgPara
                     }
-                }; 
+                };
                 // AJAX call for updating the data
                 this.ajaxUpdateWithJQuery("Trainee", oModel).then((oData) => {
                     if (oData.results) {
@@ -224,11 +224,11 @@ sap.ui.define([
                 });
             },
 
-            onDownloadTraineeLetter: function() {
-                var oModel = this.getView().getModel("editTraineeModel");
+            onDownloadTraineeLetter: function () {
+                var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
-            }, 
-            
+            },
+
             offerGeneratingPdfFunction: function (oModel) {
                 var oEmpModel = oModel.getData();
                 this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
@@ -237,19 +237,19 @@ sap.ui.define([
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/Type", "TraineeOffer");
                 oPDFModel.setProperty("/EmpName", oEmpModel.NameSalutation + " " + oEmpModel.TraineeName);
-                oPDFModel.setProperty("/EmpRole", "Trainee");  
+                oPDFModel.setProperty("/EmpRole", "Trainee");
                 oPDFModel.setProperty("/CreateDate", "Field is missing");
                 oPDFModel.setProperty("/TrainingStartDate", oEmpModel.JoiningDate);
                 oPDFModel.setProperty("/TraineePeroid", oEmpModel.EndDate);
                 oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
                 oPDFModel.setProperty("/Stipend", oEmpModel.Stipend);
-                if(oEmpModel.Stipend == 0 || oEmpModel.Stipend == ""){
+                if (oEmpModel.Stipend == 0 || oEmpModel.Stipend == "") {
                     oPDFModel.setProperty("/StipendSkipLine", 5);
                 }
-                else{
+                else {
                     oPDFModel.setProperty("/StipendSkipLine", null);
                 }
-                
+
 
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
