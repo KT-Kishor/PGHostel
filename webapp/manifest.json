@@ -146,6 +146,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TravelAllowance.json",
                 "preload": true
+            },
+            "TraineeCourse": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Course.json",
+                "preload": true
             }
         },
         "resources": {

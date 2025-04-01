@@ -12,7 +12,7 @@
                 
                 <!-- SAP UI5 Section -->
                 <VBox class="content-box">
-                    <Text class="custom-contact-title sapUiTinyMargin service-section-text" text="Master SAP UI5 for your college project and internship"/>
+                    <Text class="custom-trainee-title sapUiTinyMargin " text="Master SAP UI5 for your college project and internship"/>
                     <Text class="description-text" text="Learn the skills you need to take the next step. Adopting ethical behavior, corporate values, and professional communication."/>
                     <Text class="highlight-text" text="Kalpavriksha Technologies - Transform Your Career With Expert-led Project Training With Certificate of Internship!"/>
                     
@@ -20,7 +20,7 @@
                     <Text class="checkmark-text" text="✅ Expert Trainings and Mentorship"/>
                     <Text class="checkmark-text" text="✅ Job-Ready Skills and Certification"/>
                     
-                    <Text class="section-title" text="🔹 Training Includes"/>
+                    <Text class="section-title" text="Training Includes"/>
                     <Text class="training-text" text="▪ SAP UI5, HANA, and OData Integration"/>
                     <Text class="training-text" text="▪ Build Responsive Enterprise Applications"/>
                     <Text class="training-text" text="▪ Real-World Project Portfolio"/>
@@ -28,7 +28,7 @@
 
                 <!-- CAPM Section -->
                 <VBox class="content-box">
-                    <Text class="custom-contact-title sapUiTinyMargin service-section-text" text="Master CAPM for your career Growth"/>
+                    <Text class="custom-trainee-title sapUiTinyMargin " text="Master CAPM for your career Growth"/>
                     <Text class="description-text" text="Get certified in CAPM with hands-on experience, live projects, and industry-recognized certification."/>
                     <Text class="highlight-text" text="Kalpavriksha Technologies - Advance Your Career with CAPM Training and Certification!"/>
                     
@@ -36,7 +36,7 @@
                     <Text class="checkmark-text" text="✅ Industry-Recognized Certification"/>
                     <Text class="checkmark-text" text="✅ Project Management Skills"/>
 
-                    <Text class="section-title" text="🔹 Training Includes"/>
+                    <Text class="section-title" text="Training Includes"/>
                     <Text class="training-text" text="▪ CAPM Fundamentals and Exam Preparation"/>
                     <Text class="training-text" text="▪ Agile and Traditional Project Management"/>
                     <Text class="training-text" text="▪ Real-World Case Studies"/>

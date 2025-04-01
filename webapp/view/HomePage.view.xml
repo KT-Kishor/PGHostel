@@ -29,7 +29,7 @@
 <IconTabFilter key="idCareer" text="Careers"/>
 <IconTabFilter key="idContact" text="Contact"/>
 <IconTabFilter key="idBookfordemo" text="Book for Demo"/>
-<IconTabFilter key="idTraning" text="Traning"/>
+<IconTabFilter key="idTraning" text="Training"/>
 
 </items>
 </IconTabHeader>

@@ -135,8 +135,17 @@ sap.ui.define(
               },
             ],
           };
-          var oModel = new JSONModel(oData);
-          this.getView().setModel(oModel);
+
+          var oTData = new JSONModel({
+            Name: "",
+            CollegeName: "",
+            EmailID: "",
+            MobileNo: "",
+            SelectCourse: "",
+            Comments: "",
+          });
+
+          this.getView().setModel(oTData, "TraineeData");
         },
 
         onTabSelect: function (oEvent) {
@@ -241,20 +250,17 @@ sap.ui.define(
 
                 oModel.setData(resetData);
                 oModel.refresh(true);
-                sap.m.MessageToast.show("Data saved successfully!");
+                MessageToast.show("Data saved successfully!");
 
                 that.SendEmail(oData.Email, oData.CustomerName);
                 // AJAX Call to Send Email
               },
               error: function (xhr, status, error) {
-                console.log("Error saving data:", xhr.responseText || error);
-                sap.m.MessageToast.show("Error saving data. Please try again.");
+                MessageToast.show("Error saving data. Please try again.");
               },
             });
           } else {
-            sap.m.MessageToast.show(
-              "Make sure all the mandatory fields are filled and validate the entered values."
-            );
+            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           }
         },
 
@@ -276,10 +282,10 @@ sap.ui.define(
             },
             data: JSON.stringify(emailPayload),
             success: function (emailResponse) {
-              sap.m.MessageToast.show("Confirmation email sent!");
+              MessageToast.show("Confirmation email sent!");
             },
             error: function (emailError) {
-              sap.m.MessageToast.show("Error sending confirmation email.");
+              MessageToast.show("Error sending confirmation email.");
             },
           });
         },
@@ -300,29 +306,94 @@ sap.ui.define(
             this.oDialog.open();
           }
         },
-        FTF_onlivecommon: function () {
+        FTF_onlivename: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
-        FTF_onlivemail: function () {
+        FTF_onliveclg: function (oEvent) {
+          utils._LCvalidateMandatoryField(oEvent);
+        },
+        FTF_onlivecomment: function (oEvent) {
+          utils._LCvalidateMandatoryField(oEvent);
+        },
+        FTF_onlivemail: function (oEvent) {
           utils._LCvalidateEmail(oEvent);
         },
-        FTF_onlivemobile: function () {
+        FTF_onlivemobile: function (oEvent) {
           utils._LCvalidateMobileNumber(oEvent);
         },
+
         FTF_onSubmitForm: function () {
-          // Form Validation
+          var oModel = this.getView().getModel("TraineeData");
+          var oData = JSON.parse(JSON.stringify(oModel.getData())); // Deep copy
+
+          // Get MultiComboBox Selected Values
+          var oMultiComboBox = sap.ui.getCore().byId("FTF_idMultiSelectCourse");
+          var aSelectedKeys = oMultiComboBox
+            .getSelectedKeys()
+            .filter((key) => key.trim() !== ""); // Get all selected keys as an array
+
+          // Convert Array to Comma-Separated String
+          oData.SelectCourse = aSelectedKeys.join(", "); // Example: "SAP UI5, HANA, OData"
+
+          var opayload = [oData]; // Wrap data in an array
+
+          var that = this;
           if (
-            utils._LCvalidateMandatoryField(this.byId("FTF_idName"), "ID") &&
-            utils._LCvalidateMandatoryField(this.byId("FTF_idClgname"), "ID") &&
-            utils._LCvalidateEmail(this.byId("FTF_idmail"), "ID") &&
-            utils._LCvalidateMobileNumber(this.byId("FTF_idMobnumber"), "ID") &&
-            utils._LCvalidateMandatoryField(this.byId("FTF_idcomments"), "ID")
+            utils._LCvalidateMandatoryField(
+              sap.ui.getCore().byId("FTF_idName"),
+              "ID"
+            ) &&
+            utils._LCvalidateMandatoryField(
+              sap.ui.getCore().byId("FTF_idClgname"),
+              "ID"
+            ) &&
+            utils._LCvalidateEmail(sap.ui.getCore().byId("FTF_idmail"), "ID") &&
+            utils._LCvalidateMobileNumber(
+              sap.ui.getCore().byId("FTF_idMobnumber"),
+              "ID"
+            ) &&
+            utils._LCvalidateMandatoryField(
+              sap.ui.getCore().byId("FTF_idcomments"),
+              "ID"
+            )
           ) {
+            //  AJAX Call to Save Data
+            $.ajax({
+              url: "https://www.rest.kalpavrikshatechnologies.com/Training",
+              type: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                password:
+                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              },
+              data: JSON.stringify({ data: opayload }), //  Sending formatted data
+              success: function (response) {
+                var resetData = {
+                  Name: "",
+                  CollegeName: "",
+                  EmailID: "",
+                  MobileNo: "",
+                  SelectCourse: [], //  Reset MultiComboBox
+                  Comments: "",
+                };
+
+                oModel.setData(resetData);
+                oModel.refresh(true);
+                that.oDialog.close();
+                MessageToast.show("Data saved successfully!");
+              },
+              error: function (xhr, status, error) {
+                MessageToast.show("Error saving data. Please try again.");
+              },
+            });
           } else {
-            sap.m.MessageToast.show(
-              "Make sure all the mandatory fields are filled and validate the entered values."
-            );
+            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           }
+        },
+
+        FTF_onCancelform: function () {
+          this.oDialog.close();
         },
       }
     );

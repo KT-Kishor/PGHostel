@@ -1,0 +1,32 @@
+{
+    "Course": [
+        {
+          "ID":1,
+          "name": "CAPM"
+        },
+        {
+          "ID":2,
+          "name": "SAP UI5"
+        },
+        {
+          "ID":3,
+          "name": "HTML"
+        },
+        {
+          "ID":3,
+          "name": "JAVASCRIPT"
+        },
+        {
+          "ID":4,
+          "name": "NODESCRIPT"
+        },
+        {
+          "ID":5,
+          "name": "SQL"
+        },
+        {
+          "ID":6,
+          "name": "SAP UI5"
+        }
+      ]
+}
