@@ -15,7 +15,7 @@
                 id="SU_id_Filterbar"
                 persistencyKey="myPersKey"
                 useToolbar="false"
-                clear="onClear"
+                clear="SU_onClear"
                 showClearOnFB="true"
                 search="SU_onSearch"
                 filterChange="SU_onFilterChange"
@@ -33,13 +33,14 @@
                             <ComboBox
                             showClearIcon="true"
                                 name="Model"
+                                items="{MainModel>/data}"
                                 id="SU_id_ModelComboBox"
                                 enabled="true"
                                 change="SU_onModelChange"
                             >
                                 <core:Item
-                                    key=""
-                                    text=""
+                                    key="{MainModel>Model}"
+                                    text="{MainModel>Model}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -56,10 +57,11 @@
                                 name="Variant"
                                 id="SU_id_Variant1"
                                 enabled="true"
+                                items="{MainModel>/data}"
                             >
                                 <core:Item
-                                    key=""
-                                    text=""
+                                    key="{MainModel>Variant}"
+                                    text="{MainModel>Variant}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -76,12 +78,12 @@
                             showClearIcon="true"
                                 name="Transmission"
                                 id="SU_id_Transmission1"
-                                items=""
+                                items="{MainModel>/data}"
                                 enabled="true"
                             >
                                 <core:Item
-                                    key=""
-                                    text=""
+                                    key="{MainModel>Transmission}"
+                                    text="{MainModel>Transmission}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -96,7 +98,7 @@
                 class="sapUiTinyMargin"
                 width="auto"
                 inset="false"
-                items="{MainModel>/items}"
+                items="{MainModel>/data}"
                 mode="SingleSelectLeft"
                 growing="true"
                 growingThreshold="50"
@@ -105,7 +107,7 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title
-                            text="Quotation Scheme ({= ${MainModel>/items}.length })"
+                            text="Quotation Scheme ({= ${MainModel>/data}.length })"
                             level="H2"
                         />
                         <ToolbarSpacer />
@@ -140,12 +142,7 @@
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
-                 <Column
-                        hAlign="Left"
-                        demandPopin="true"
-                    >
-                        <Text text="{i18n>company}" />
-                    </Column>
+                
                     <Column
                         hAlign="Left"
                         demandPopin="true"
@@ -195,7 +192,6 @@
                     >
                         <cells>
                             <!-- <Text text="" />s -->
-                            <Text text="{MainModel>Company}" />
                             <Text text="{MainModel>Model}" />
                             <Text text="{MainModel>Variant}" />
                             <Text text="{MainModel>Transmission}" />

@@ -249,40 +249,77 @@
 
 .Training-background{
 background-color: #eafdf9;
+background-image: url('../image/Home.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 border-radius: 0.60rem;
 }
-.T_class{
-  margin-top: 4rem !important;
-  font-size: 2.1rem !important;
+.main-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.T_textclass{
-  font-size: 1rem !important;
+.highlight-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #2964d9;
+  margin-bottom: 10px;
 }
-.T_imageclass{
-  border-radius: 2rem !important;
+.checkmark-text{
+  display: block;
+    margin-bottom: 12px
 }
-.custom-text {
-  color: rgb(5, 5, 5) !important;
+.description-text {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 10px;
+}
+.content-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.content-box {
+  width: 48%;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #222;
+}
+
+.location-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.apply-button {
+  margin-top: 20px;
+
+  color: white;
+  font-weight: bold;
+  width: 250px;
+  height: 50px;
   font-size: 18px;
-  line-height: 1.7;
-  font-family: League spartan !important;
-  font-weight: bolder !important;
-}
-
-.title-text {
-  font-family: 'Georgia', serif;
-  ;
-  font-weight: bolder;
-  font-size: 24px;
-  color: #ffffff;
-}
-
-.position-top-right {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 1rem;
-  width: auto;
+  border-radius: 8px;
 }
 
 .career-background {

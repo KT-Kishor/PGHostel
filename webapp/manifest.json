@@ -433,7 +433,7 @@
                 },
                 {
                     "name": "RouteSchemeUploadDetails",
-                    "pattern": "SchemeuploadDetails",
+                    "pattern": "SchemeuploadDetails/{data}",
                     "target": [
                         "TargetSchemeUploadDetails"
                     ]

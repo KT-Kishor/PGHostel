@@ -283,23 +283,47 @@ sap.ui.define(
             },
           });
         },
-        // Tbtn_onPress: function () {
-        //   var oView = this.getView();
-        //   if (!this.oDialog) {
-        //     sap.ui.core.Fragment.load({
-        //       name: "sap.kt.com.minihrsolution.fragment.Sendmail",
-        //       controller: this,
-        //     }).then(
-        //       function (oDialog) {
-        //         this.oDialog = oDialog;
-        //         oView.addDependent(this.oDialog);
-        //         this.oDialog.open();
-        //       }.bind(this)
-        //     );
-        //   } else {
-        //     this.oDialog.open();
-        //   }
-        // },
+        Tbtn_onPress: function () {
+          var oView = this.getView();
+          if (!this.oDialog) {
+            sap.ui.core.Fragment.load({
+              name: "sap.kt.com.minihrsolution.fragment.TraningForm",
+              controller: this,
+            }).then(
+              function (oDialog) {
+                this.oDialog = oDialog;
+                oView.addDependent(this.oDialog);
+                this.oDialog.open();
+              }.bind(this)
+            );
+          } else {
+            this.oDialog.open();
+          }
+        },
+        FTF_onlivecommon: function () {
+          utils._LCvalidateMandatoryField(oEvent);
+        },
+        FTF_onlivemail: function () {
+          utils._LCvalidateEmail(oEvent);
+        },
+        FTF_onlivemobile: function () {
+          utils._LCvalidateMobileNumber(oEvent);
+        },
+        FTF_onSubmitForm: function () {
+          // Form Validation
+          if (
+            utils._LCvalidateMandatoryField(this.byId("FTF_idName"), "ID") &&
+            utils._LCvalidateMandatoryField(this.byId("FTF_idClgname"), "ID") &&
+            utils._LCvalidateEmail(this.byId("FTF_idmail"), "ID") &&
+            utils._LCvalidateMobileNumber(this.byId("FTF_idMobnumber"), "ID") &&
+            utils._LCvalidateMandatoryField(this.byId("FTF_idcomments"), "ID")
+          ) {
+          } else {
+            sap.m.MessageToast.show(
+              "Make sure all the mandatory fields are filled and validate the entered values."
+            );
+          }
+        },
       }
     );
   }

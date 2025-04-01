@@ -1,0 +1,36 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout" 
+    xmlns:f="sap.ui.layout.form">
+    
+    <Dialog title="Contact Form" stretch="false">
+        <content>
+            <f:SimpleForm layout="ResponsiveGridLayout" editable="true">
+                <Label text="{i18n>name}" required="true"/>
+                <Input id="FTF_idName" liveChange="FTF_onlivecommon" placeholder="{i18n>placeName}" valueStateText="{i18n>placeName}"/>
+
+                <Label text="{i18n>collegeName}" required="true"/>
+                <Input id="FTF_idClgname" liveChange="FTF_onlivecommon" placeholder="{i18n>placeclg}"/>
+
+                <Label text="{i18n>email}" required="true"/>
+                <Input id="FTF_idmail" type="Email" liveChange="FTF_onlivemail" placeholder="{i18n>placeEmailId}"/>
+
+                <Label text="{i18n>mobileNo}" required="true"/>
+                <Input id="FTF_idMobnumber" type="Number" liveChange="FTF_onlivemobile" placeholder="{i18n>placeholderMobileNo}"/>
+                <Label  text="{i18n>selectcourse}" required="true"/>
+                <Select >
+                   
+                </Select>
+
+                <Label text="{i18n>comments}" required="true"/>
+                <TextArea id="FTF_idcomments" liveChange="FTF_onlivecommon" placeholder="{i18n>enterComments}"/>
+            </f:SimpleForm>
+        </content>
+        
+        <buttons>
+            <Button text="Submit" type="Emphasized" press="FTF_onSubmitForm"/>
+        </buttons>
+    </Dialog>
+
+</core:FragmentDefinition>

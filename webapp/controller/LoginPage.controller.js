@@ -15,11 +15,9 @@ sap.ui.define(
             .getRoute("RouteLoginPage")
             .attachMatched(this._onRouteMatched, this);
           var model = new JSONModel({
-            EmployeeID: "",
-            EmployeeName: "",
             url: "https://www.rest.kalpavrikshatechnologies.com/",
+            ContentType: "application/json",
             headers: {
-              "Content-Type": "application/json",
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
               password:
                 "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
@@ -34,9 +32,17 @@ sap.ui.define(
           this.API = "https://www.rest.kalpavrikshatechnologies.com";
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           oView.byId("Lp_id_PasswordRadio").setSelected(true);
-          oView.byId("Lp_id_PasswordLabel").setVisible(true);
-          oView.byId("Lp_id_PasswordInput").setVisible(true);
-          oView.byId("Lp_id_ForgotPasswordLink").setVisible(true);
+          var eleSetting = [
+            "Lp_id_PasswordLabel",
+            "Lp_id_PasswordInput",
+            "Lp_id_ForgotPasswordLink",
+          ];
+          eleSetting.forEach(function (id) {
+            var element = oView.byId(id);
+            if (element) {
+              element.setVisible(true);
+            }
+          });
           oView.byId("Lp_id_ForgotPasswordLink").setValue("");
         },
         onpresshome: function () {
@@ -78,11 +84,7 @@ sap.ui.define(
             url: this.API + "/SendOTP",
             type: "POST",
             contentType: "application/json",
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
+            headers: this.getView().getModel("LoginModel").getData().headers,
             data: JSON.stringify({
               // Converted data to JSON string
               EmployeeID: userId,
@@ -104,8 +106,6 @@ sap.ui.define(
         LP_onLogin: function () {
           var that = this;
           var oView = this.getView();
-          var oLoginModel = this.getView().getModel("LoginModel");
-
           var userId = oView.byId("Lp_id_Userid").getValue().trim();
           var userName = oView.byId("Lp_id_Username").getValue().trim();
           var userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
@@ -140,49 +140,38 @@ sap.ui.define(
               url: this.API + "/LoginDetails?" + queryString,
               type: "GET",
               contentType: "application/json",
-              headers: {
-                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                password:
-                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-              },
+              headers: this.getView().getModel("LoginModel").getData().headers,
               success: function (response) {
                 MessageToast.show(that.i18nModel.getText("logsuccess"));
-
-                // Store only EmployeeID and EmployeeName in the model
-                oLoginModel.setProperty("/EmployeeID", response.data[0].EmployeeID);
-                oLoginModel.setProperty("/EmployeeName", response.data[0].EmployeeName);
-
                 that.getRouter().navTo("RouteTilePage");
 
-            // Clear all input fields after successful login
-            oView.byId("Lp_id_Userid").setValue("");
-            oView.byId("Lp_id_Username").setValue("");
-            oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
-            oView
-              .byId("Lp_id_PasswordInput")
-              .setValue("")
-              .setVisible(false);
-            oView
-              .byId("idbtnsendotp")
-              .setText("Send OTP")
-              .setVisible(false);
-
-            // Hide Password and OTP Fields
-            oView.byId("Lp_id_OtpLabel").setVisible(false);
-            oView.byId("Lp_id_PasswordLabel").setVisible(false);
-            oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
-
-            oView.byId("Lp_id_OtpRadio").setSelected(false);
-            oView.byId("Lp_id_PasswordRadio").setSelected(false);
-          },
-          error: function (error) {
-            MessageToast.show(JSON.parse(error.responseText).message);
-          },
-        });
-      } else {
-        MessageToast.show(that.i18nModel.getText("mandetoryFields"));
-      }
-    },
+                // Clear all input fields after successful login
+                oView.byId("Lp_id_Userid").setValue("");
+                oView.byId("Lp_id_Username").setValue("");
+                oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
+                oView
+                  .byId("Lp_id_PasswordInput")
+                  .setValue("")
+                  .setVisible(false);
+                oView
+                  .byId("idbtnsendotp")
+                  .setText("Send OTP")
+                  .setVisible(false);
+                // Hide Password and OTP Fields
+                oView.byId("Lp_id_OtpLabel").setVisible(false);
+                oView.byId("Lp_id_PasswordLabel").setVisible(false);
+                oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
+                oView.byId("Lp_id_OtpRadio").setSelected(false);
+                oView.byId("Lp_id_PasswordRadio").setSelected(false);
+              },
+              error: function (error) {
+                MessageToast.show(JSON.parse(error.responseText).message);
+              },
+            });
+          } else {
+            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+          }
+        },
 
         onLoginOptionChange: function (oEvent) {
           var sSelectedButtonId = oEvent.getSource().getId();
@@ -234,155 +223,11 @@ sap.ui.define(
         },
         //Password login change event
         LP_onpasswordchange: function () {
-          var that = this;
-          var oView = this.getView();
-          var userId = oView.byId("Lp_id_Userid").getValue().trim();
-          var userName = oView.byId("Lp_id_Username").getValue().trim();
-          var userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
-          var password = oView.byId("Lp_id_PasswordInput").getValue().trim();
-          var isOtpLogin = oView.byId("Lp_id_OtpRadio").getSelected();
-          var isPasswordLogin = oView.byId("Lp_id_PasswordRadio").getSelected();
-
-          // Check if OTP login is selected and OTP is empty
-          if (isOtpLogin && userOtp === "") {
-            MessageToast.show(that.i18nModel.getText("checkOTP"));
-            return;
-          }
-
-          // Validate mandatory fields (excluding password when OTP login is selected)
-          if (
-            utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
-            utils._LCvalidateName(this.byId("Lp_id_Username"), "ID") &&
-            (!isPasswordLogin ||
-              utils._LCvalidateMandatoryField(
-                this.byId("Lp_id_PasswordInput"),
-                "ID"
-              )) // Skip password validation if OTP login is selected
-          ) {
-            var queryString = $.param({
-              EmployeeID: userId,
-              EmployeeName: userName,
-              OTP: isOtpLogin ? userOtp : "",
-              Password: isPasswordLogin ? password : "",
-            });
-
-            $.ajax({
-              url: this.API + "/LoginDetails?" + queryString,
-              type: "GET",
-              contentType: "application/json",
-              headers: {
-                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                password:
-                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-              },
-              success: function (response) {
-                MessageToast.show(that.i18nModel.getText("logsuccess"));
-                that.getRouter().navTo("RouteTilePage");
-
-                // Clear all input fields after successful login
-                oView.byId("Lp_id_Userid").setValue("");
-                oView.byId("Lp_id_Username").setValue("");
-                oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
-                oView
-                  .byId("Lp_id_PasswordInput")
-                  .setValue("")
-                  .setVisible(false);
-                oView
-                  .byId("idbtnsendotp")
-                  .setText("Send OTP")
-                  .setVisible(false);
-
-                // Hide Password and OTP Fields
-                oView.byId("Lp_id_OtpLabel").setVisible(false);
-                oView.byId("Lp_id_PasswordLabel").setVisible(false);
-                oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
-
-                oView.byId("Lp_id_OtpRadio").setSelected(false);
-                oView.byId("Lp_id_PasswordRadio").setSelected(false);
-              },
-              error: function (error) {
-                MessageToast.show(JSON.parse(error.responseText).message);
-              },
-            });
-          } else {
-            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
-          }
+          this.LP_onLogin();
         },
         //OTP login change event
         LP_onOTPchange: function () {
-          var that = this;
-          var oView = this.getView();
-          var userId = oView.byId("Lp_id_Userid").getValue().trim();
-          var userName = oView.byId("Lp_id_Username").getValue().trim();
-          var userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
-          var password = oView.byId("Lp_id_PasswordInput").getValue().trim();
-          var isOtpLogin = oView.byId("Lp_id_OtpRadio").getSelected();
-          var isPasswordLogin = oView.byId("Lp_id_PasswordRadio").getSelected();
-
-          // Check if OTP login is selected and OTP is empty
-          if (isOtpLogin && userOtp === "") {
-            MessageToast.show(that.i18nModel.getText("checkOTP"));
-            return;
-          }
-
-          // Validate mandatory fields (excluding password when OTP login is selected)
-          if (
-            utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") &&
-            utils._LCvalidateName(this.byId("Lp_id_Username"), "ID") &&
-            (!isPasswordLogin ||
-              utils._LCvalidateMandatoryField(
-                this.byId("Lp_id_PasswordInput"),
-                "ID"
-              )) // Skip password validation if OTP login is selected
-          ) {
-            var queryString = $.param({
-              EmployeeID: userId,
-              EmployeeName: userName,
-              OTP: isOtpLogin ? userOtp : "",
-              Password: isPasswordLogin ? password : "",
-            });
-
-            $.ajax({
-              url: this.API + "/LoginDetails?" + queryString,
-              type: "GET",
-              contentType: "application/json",
-              headers: {
-                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                password:
-                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-              },
-              success: function (response) {
-                MessageToast.show(that.i18nModel.getText("logsuccess"));
-                that.getRouter().navTo("RouteTilePage");
-
-                // Clear all input fields after successful login
-                oView.byId("Lp_id_Userid").setValue("");
-                oView.byId("Lp_id_Username").setValue("");
-                oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
-                oView
-                  .byId("Lp_id_PasswordInput")
-                  .setValue("")
-                  .setVisible(false);
-                oView
-                  .byId("idbtnsendotp")
-                  .setText("Send OTP")
-                  .setVisible(false);
-
-                // Hide Password and OTP Fields
-                oView.byId("Lp_id_OtpLabel").setVisible(false);
-                oView.byId("Lp_id_PasswordLabel").setVisible(false);
-                oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
-
-                oView.byId("Lp_id_OtpRadio").setSelected(false);
-                oView.byId("Lp_id_PasswordRadio").setSelected(false);
-              },
-              error: function (error) {
-                MessageToast.show(JSON.parse(error.responseText).message);
-              },
-            });
-          } else {
-            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
-          }
+          this.LP_onLogin();
         },
         LP_onForgotPassword: function () {
           var oView = this.getView();
@@ -473,11 +318,7 @@ sap.ui.define(
             url: this.API + "/SendOTP",
             type: "POST",
             contentType: "application/json",
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
+            headers: this.getView().getModel("LoginModel").getData().headers,
             data: JSON.stringify({
               EmployeeID: userfrgId,
               EmployeeName: userfrgName,
@@ -541,11 +382,7 @@ sap.ui.define(
             url: this.API + "/LoginDetails?" + queryString,
             type: "GET",
             contentType: "application/json",
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
+            headers: this.getView().getModel("LoginModel").getData().headers,
 
             success: function (response) {
               sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(true);
@@ -573,8 +410,8 @@ sap.ui.define(
           oInput.setValueHelpIconSrc(sIcon);
 
           // Ensure the current value of the password is retained
-          var sCurrentValue = oInput.getValue(); // Get the current value before toggling
-          oInput.setValue(sCurrentValue); // Set the value again to prevent it from being cleared
+          var sCurrentValue = oInput.getValue();
+          oInput.setValue(sCurrentValue);
         },
         LP_onTogglePasswordVisibility: function (oEvent) {
           var oInput = oEvent.getSource();
@@ -587,8 +424,8 @@ sap.ui.define(
           oInput.setValueHelpIconSrc(sIcon);
 
           // Ensure the current value of the password is retained
-          var sCurrentValue = oInput.getValue(); // Get the current value before toggling
-          oInput.setValue(sCurrentValue); // Set the value again to prevent it from being cleared
+          var sCurrentValue = oInput.getValue();
+          oInput.setValue(sCurrentValue);
         },
         SM_onPressSave: function () {
           var that = this;
@@ -633,11 +470,7 @@ sap.ui.define(
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(requestData), // Send data in the request body
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
+            headers: this.getView().getModel("LoginModel").getData().headers,
             success: function (response) {
               // Clear input values
               oUserIdInput.setValue("");

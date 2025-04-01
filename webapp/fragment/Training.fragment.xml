@@ -1,45 +1,52 @@
-
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:l="sap.ui.layout">
     
-    <l:Grid defaultSpan="L6 M6 S12" hSpacing="1" vSpacing="1">
+    <l:Grid defaultSpan="XL12 L12 M12 S12" class="grid-container">
         
-        <!-- Left Side - Content Section -->
-        <l:content>
-            <l:Grid defaultSpan="L12 M12 S6">
-                <l:content>
-                    <VBox>
-                        <Title text="Choose your path. Grow your career." level="H4" class="T_class"   />
-                        <Text text="Learn the skills you need to take the next step. Adopting ethical behavior, corporate values, and professional communication. " class="T_textclass" />
-                        <Label text=""/>
-                        <Text text="If You are Interested"/>
-                        <Button text="Contact us" type="Emphasized" press="Tbtn_onPress"/>
-                    </VBox>
-                </l:content>
-            </l:Grid>
-        </l:content>
-        
-        <!-- Right Side - Image Upload Section -->
-        <l:content>
-            <l:Grid defaultSpan="L12 M12 S12">
-                <l:content>
-                    <VBox>
-                        <Title text="" level="H2"/>
-                        
-                        <Image id="imgDisplay" class="T_imageclass" width="100%" height="30%" src="../image/training.jpg"/>
-                        <!-- <FileUploader
-                            id="fileUploader"
-                            change="onFileUpload"
-                            fileType="jpg,png,jpeg"
-                            mimeType="image/jpg,image/png,image/jpeg"
-                            buttonText="Upload Image"/>  -->
-                    </VBox>
-                </l:content>
-            </l:Grid>
-        </l:content>
-        
+        <!-- Main Container VBox -->
+        <VBox class="main-container">
+            
+            <FlexBox alignItems="Center" justifyContent="SpaceBetween" direction="Row" class="content-wrapper">
+                
+                <!-- SAP UI5 Section -->
+                <VBox class="content-box">
+                    <Text class="custom-contact-title sapUiTinyMargin service-section-text" text="Master SAP UI5 for your college project and internship"/>
+                    <Text class="description-text" text="Learn the skills you need to take the next step. Adopting ethical behavior, corporate values, and professional communication."/>
+                    <Text class="highlight-text" text="Kalpavriksha Technologies - Transform Your Career With Expert-led Project Training With Certificate of Internship!"/>
+                    
+                    <Text class="checkmark-text" text="✅ Hands-on, Project-Based Learning"/>
+                    <Text class="checkmark-text" text="✅ Expert Trainings and Mentorship"/>
+                    <Text class="checkmark-text" text="✅ Job-Ready Skills and Certification"/>
+                    
+                    <Text class="section-title" text="🔹 Training Includes"/>
+                    <Text class="training-text" text="▪ SAP UI5, HANA, and OData Integration"/>
+                    <Text class="training-text" text="▪ Build Responsive Enterprise Applications"/>
+                    <Text class="training-text" text="▪ Real-World Project Portfolio"/>
+                </VBox>
+
+                <!-- CAPM Section -->
+                <VBox class="content-box">
+                    <Text class="custom-contact-title sapUiTinyMargin service-section-text" text="Master CAPM for your career Growth"/>
+                    <Text class="description-text" text="Get certified in CAPM with hands-on experience, live projects, and industry-recognized certification."/>
+                    <Text class="highlight-text" text="Kalpavriksha Technologies - Advance Your Career with CAPM Training and Certification!"/>
+                    
+                    <Text class="checkmark-text" text="✅ Comprehensive CAPM Training"/>
+                    <Text class="checkmark-text" text="✅ Industry-Recognized Certification"/>
+                    <Text class="checkmark-text" text="✅ Project Management Skills"/>
+
+                    <Text class="section-title" text="🔹 Training Includes"/>
+                    <Text class="training-text" text="▪ CAPM Fundamentals and Exam Preparation"/>
+                    <Text class="training-text" text="▪ Agile and Traditional Project Management"/>
+                    <Text class="training-text" text="▪ Real-World Case Studies"/>
+                </VBox>
+
+            </FlexBox>
+            <!-- Common Apply Now Button -->
+            <Button text="Apply Now" class="apply-button" press="Tbtn_onPress" type="Emphasized"/>
+
+        </VBox>
+
     </l:Grid>
-    
 </core:FragmentDefinition>
