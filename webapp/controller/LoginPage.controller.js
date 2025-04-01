@@ -104,6 +104,8 @@ sap.ui.define(
         LP_onLogin: function () {
           var that = this;
           var oView = this.getView();
+          var oLoginModel = this.getView().getModel("LoginModel");
+
           var userId = oView.byId("Lp_id_Userid").getValue().trim();
           var userName = oView.byId("Lp_id_Username").getValue().trim();
           var userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
@@ -145,37 +147,42 @@ sap.ui.define(
               },
               success: function (response) {
                 MessageToast.show(that.i18nModel.getText("logsuccess"));
+
+                // Store only EmployeeID and EmployeeName in the model
+                oLoginModel.setProperty("/EmployeeID", response.data[0].EmployeeID);
+                oLoginModel.setProperty("/EmployeeName", response.data[0].EmployeeName);
+
                 that.getRouter().navTo("RouteTilePage");
 
-                // Clear all input fields after successful login
-                oView.byId("Lp_id_Userid").setValue("");
-                oView.byId("Lp_id_Username").setValue("");
-                oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
-                oView
-                  .byId("Lp_id_PasswordInput")
-                  .setValue("")
-                  .setVisible(false);
-                oView
-                  .byId("idbtnsendotp")
-                  .setText("Send OTP")
-                  .setVisible(false);
+            // Clear all input fields after successful login
+            oView.byId("Lp_id_Userid").setValue("");
+            oView.byId("Lp_id_Username").setValue("");
+            oView.byId("Lp_id_CaptchaInput").setValue("").setVisible(false);
+            oView
+              .byId("Lp_id_PasswordInput")
+              .setValue("")
+              .setVisible(false);
+            oView
+              .byId("idbtnsendotp")
+              .setText("Send OTP")
+              .setVisible(false);
 
-                // Hide Password and OTP Fields
-                oView.byId("Lp_id_OtpLabel").setVisible(false);
-                oView.byId("Lp_id_PasswordLabel").setVisible(false);
-                oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
+            // Hide Password and OTP Fields
+            oView.byId("Lp_id_OtpLabel").setVisible(false);
+            oView.byId("Lp_id_PasswordLabel").setVisible(false);
+            oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
 
-                oView.byId("Lp_id_OtpRadio").setSelected(false);
-                oView.byId("Lp_id_PasswordRadio").setSelected(false);
-              },
-              error: function (error) {
-                MessageToast.show(JSON.parse(error.responseText).message);
-              },
-            });
-          } else {
-            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
-          }
-        },
+            oView.byId("Lp_id_OtpRadio").setSelected(false);
+            oView.byId("Lp_id_PasswordRadio").setSelected(false);
+          },
+          error: function (error) {
+            MessageToast.show(JSON.parse(error.responseText).message);
+          },
+        });
+      } else {
+        MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+      }
+    },
 
         onLoginOptionChange: function (oEvent) {
           var sSelectedButtonId = oEvent.getSource().getId();

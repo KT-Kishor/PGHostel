@@ -31,7 +31,7 @@
 				<Label text="{i18n>startDate}" required="true" />
 				<DatePicker id="AddEd_id_StartEdu" 
 				value="{educationModel>/EducationStartDate}"
-            change="SS_validateDate"
+            change="onStartDateChange"
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy"
            maxDate="{viewModel>/Max}"
@@ -47,7 +47,7 @@
 			valueStateText="{i18n>dateValueState}"/>
 				<Label text="{i18n>grade}"  required="true" />
 				<HBox width="70%" justifyContent="Start">
-					<Input  value="{educationModel>/Grade}" id="AddEd_id_Grade" liveChange="SS_ValidateCommonFields" placeholder="{i18n>grade}"  valueStateText="{i18n>gradeValueState}" />
+					<Input  value="{educationModel>/Grade}" id="AddEd_id_Grade" liveChange="_LCvalidateGrade"  placeholder="{i18n>grade}"  valueStateText="{i18n>gradeValueState}" maxLength="5"/>
 					<Select  selectedKey="{educationModel>/GradeType}" items="{CollegeGrade>/grade}" id="AddEd_id_GradeType" class="sapUiSmallMarginBegin">
 						<core:Item key="{CollegeGrade>Value}" text="{CollegeGrade>Value}" />
 					</Select>

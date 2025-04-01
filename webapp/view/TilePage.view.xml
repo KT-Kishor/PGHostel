@@ -7,7 +7,7 @@
 	xmlns:layout="sap.ui.layout" >
 	<Page id="idPageTile" class="service-background " >
 		<headerContent>
-			<Text text="{= 'Welcome ' + ${loginModel>/userNames} }" class="boldBlueText sapUiLargeMarginBegin" />
+			<Text text="{= 'Welcome ' + ${LoginModel>/EmployeeName} }" class="boldBlueText sapUiLargeMarginBegin" />
 			<ToolbarSpacer />
 			<Button  press="TileV_onBackPress" icon="sap-icon://log"></Button>
 		</headerContent>

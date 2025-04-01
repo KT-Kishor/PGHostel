@@ -12,7 +12,8 @@ sap.ui.define([
                 this.getView().setModel(oViewModel, "viewModel");
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle()
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "My Details");
-
+                this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
+                this.SS_readCallForEmployeeDetails(this.EmployeeID);
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
@@ -20,22 +21,52 @@ sap.ui.define([
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
+            SS_readCallForEmployeeDetails: function (filter) {
+                var filter = { EmployeeID: filter };
+                this.ajaxReadWithJQuery("EmployeeDetails", filter).then((oData) => {
+                    var employeeData = Array.isArray(oData.data) ? oData.data[0] : [oData.data[0]];
+                    this.getOwnerComponent().setModel(new JSONModel(employeeData), "sEmployeeModel");
+                    sap.ui.core.BusyIndicator.hide();
+                }).catch((oError) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageBox.error("Error while reading the trainee details");
+                });
+            },
 
-            //Education dialog open
-            EdF_AddEdu: function () {
-                if (!this.SEd_oDialog) {
+            SS_commonOpenDialog: function (dialogProperty, fragmentName, datePickerIds = []) {
+                if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
-                        name: "sap.kt.com.minihrsolution.fragment.AddEducation",
+                        name: fragmentName,
                         controller: this,
-                    }).then(function (SEd_oDialog) {
-                        this.SEd_oDialog = SEd_oDialog;
-                        this.getView().addDependent(this.SEd_oDialog);
-                        this.SEd_oDialog.open();
-                    }.bind(this));
+                    }).then(oDialog => {
+                        this[dialogProperty] = oDialog;
+                        this.getView().addDependent(oDialog);
+                        this._FragmentDatePickersReadOnly(datePickerIds);
+                        oDialog.open();
+                    });
                 } else {
-                    this.SEd_oDialog.open();
+                    this._FragmentDatePickersReadOnly(datePickerIds);
+                    this[dialogProperty].open();
                 }
             },
+            
+            //Education dialog open
+            EdF_AddEdu: function () {
+                this.SS_commonOpenDialog("SEd_oDialog", "sap.kt.com.minihrsolution.fragment.AddEducation", ["AddEd_id_StartEdu", "AddEd_id_EndEdu"]);
+            },
+            onStartDateChange: function (oEvent) {
+                let oStartDate = oEvent.getSource().getDateValue();
+                let oEndDatePicker = sap.ui.getCore().byId("AddEd_id_EndEdu");
+            
+                if (oEndDatePicker) {
+                    let oEndDate = oEndDatePicker.getDateValue();
+                    oEndDatePicker.setMinDate(oStartDate);
+                    if (oEndDate && oEndDate < oStartDate) {
+                        oEndDatePicker.setDateValue(null);
+                    }
+                }
+            },
+               
             //Education dialog close
             AddEd_onCloseDial: function () {
                 this.SEd_oDialog.close();
@@ -43,18 +74,7 @@ sap.ui.define([
 
             //Employment dialog open
             EmpF_onAddEmp: function () {
-                if (!this.SEmp_oDialog) {
-                    sap.ui.core.Fragment.load({
-                        name: "sap.kt.com.minihrsolution.fragment.AddEmployment",
-                        controller: this,
-                    }).then(function (SEmp_oDialog) {
-                        this.SEmp_oDialog = SEmp_oDialog;
-                        this.getView().addDependent(this.SEmp_oDialog);
-                        this.SEmp_oDialog.open();
-                    }.bind(this));
-                } else {
-                    this.SEmp_oDialog.open();
-                }
+              this.SS_commonOpenDialog("SEmp_oDialog", "sap.kt.com.minihrsolution.fragment.AddEmployment", ["AddEmp_id_StartDate" ,"AddEmp_id_EndDate"]  );
             },
             //Employment dialog close
             AddEmp_onClose: function () {
@@ -90,6 +110,9 @@ sap.ui.define([
             SS_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
+            SS_validateEmail: function (oEvent) {
+                utils._LCvalidateEmail(oEvent);
+            },
             SS_onEditPress: function () {
                 var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
                 if (isEditMode) {
@@ -117,7 +140,7 @@ sap.ui.define([
             AddEd_onSubmitEdDetails: function () {
                 try {
                     if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID")
-                        && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_Grade"), "ID")) {
+                        && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") &&   this._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID") ) {
                         MessageToast.show(this.i18nModel.getText("eduDataSaved"));
                     }
                     else {
@@ -130,7 +153,8 @@ sap.ui.define([
             },
             AddEmp_onSubmitEmp: function () {
                 try {
-                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID")) {
+                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID") &&
+                        utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressI"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID") && utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressII"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID")) {
                         MessageToast.show(this.i18nModel.getText("empDataSaved"));
                     }
                     else {
@@ -155,5 +179,47 @@ sap.ui.define([
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", true);
                 }
             },
+            _LCvalidateGrade: function (oEvent, type) {
+                var oField = (type === "ID") ? oEvent : oEvent.getSource();
+                if (!oField) return false;
+            
+                var sGradeValue = oField.getValue().trim();
+            
+                // Allow only numeric input (restrict typing letters)
+                var cleanValue = sGradeValue.replace(/[^0-9.]/g, ''); // Remove all non-numeric characters except the period
+                oField.setValue(cleanValue); // Update the field with the cleaned value
+            
+                // Allow only numbers with up to two decimal places
+                var regex = /^\d{1,5}(\.\d{1,2})?$/; 
+                if (!regex.test(cleanValue) || isNaN(cleanValue)) {
+                    oField.setValueState("Error");
+                    oField.setValueStateText("Please enter a valid numeric value with up to two decimal places.");
+                    return false;
+                }
+            
+                var fGrade = parseFloat(cleanValue);
+                var sGradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey();
+            
+                var bIsValid = false;
+                if (sGradeType === "Percentage") {
+                    bIsValid = fGrade > 0 && fGrade <= 100;
+                } else if (sGradeType === "CGPA") {
+                    bIsValid = fGrade > 0 && fGrade <= 10;
+                }
+            
+                if (bIsValid) {
+                    oField.setValueState("None");
+                    return true;
+                } else {
+                    oField.setValueState("Error");
+                    var sErrorMsg = (sGradeType === "Percentage") 
+                        ? "Grade must be between 0 and 100 for Percentage." 
+                        : "Grade must be between 0 and 10 for CGPA.";
+                    oField.setValueStateText(sErrorMsg);
+                    return false;
+                }
+            }
+            
+            
         });
     });
