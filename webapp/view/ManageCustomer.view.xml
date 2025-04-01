@@ -8,12 +8,13 @@
 			<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 		</headerContent>
 		<content>
-			<fb:FilterBar id="MC_id_CompanyFilter" persistencyKey="myPersKey" useToolbar="false" clear="onClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" showFilterConfiguration="false">
+			<fb:FilterBar id="MC_id_CompanyFilter" persistencyKey="myPersKey" useToolbar="false" clear="MC_onClear" showClearOnFB="true" search="MC_onSearch" filterChange=".onFilterChange" showFilterConfiguration="false">
 				<fb:filterGroupItems>
 				<fb:FilterGroupItem name="CompanyName" label="{i18n>companyName}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox id="MC_id_CompanyName" selectedKey="{filters>/CompanyName}" showClearIcon="true">
-						</ComboBox>
+					<ComboBox items="{CreateCustomerModel>/}" id="MC_id_CompanyName" showClearIcon="true">
+					<core:ListItem key="{CreateCustomerModel>/companyName}" text="{CreateCustomerModel>companyName}" />
+					</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 			</fb:filterGroupItems>
