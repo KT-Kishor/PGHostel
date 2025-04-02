@@ -1,96 +1,101 @@
 {
-    "Type": "EmployeeOffer",
-    "EmpName": "Mr. Shivang S Patil",
-    "EmpRole": "Junior Software Engineer",
-    "EmpAddress": "#102, SHIVAM, Yeshwanth Nagar, Navaldi Layout, Udnoor Road, Kalaburagi, Karnataka, IN",
-    "EmpPinCode": "585102",
-    "CreateDate": "19/03/2025",
-    "JoiningDate": "01/04/2025",
-    "EmpCTC": "INR 2,40,000",
-    "BondYears":"2",
-    "SettlementDays":"120",
-    "AcceptanceDays":"3",
-    "ProbationPeriod": "6",
-    "SectorType": "Inormation Technology",
+    "Type": "(Type of PDF document)",
+    "EmpName": "(Employee Name)",
+    "EmpRole": "(Employee Role)",
+    "EmpAddress": "(Employee Address)",
+    "EmpPinCode": "(Employee Pin Code)",
+    "CreateDate": "(Offer Create Date)",
+    "JoiningDate": "(Employee Joining Date)",
+    "EmpCTC": "(CTC of Employee)",
+    "BondCondition":"(Condition of Bond)",
+    "SectorType": "(Type of Sector)",
     "CompanyLogoHeader": "../image/KT_Logo.png",
+
     "PageHeader": "Salary Breakup",
     "Title": "Annexure 1",
     "SubTitle": "COMPENSATION PLAN",
-
-    "TraineePeroid": "six",
-    "TrainingStartDate": "02/01/2025",
-    "ReportingManager": "Mr. Veerang Shah",
-    "Stipend": null,
-    "StipendSkipLine": null,
-
     "Headers": [
         {
             "Title": "Company",
-            "Text": "Kalpavriksha Technologies"
+            "Text": "(Name of Comapny)"
         },
         {
             "Title": "Branch",
-            "Text": "Kalaburagi"
+            "Text": "(Branch of Company)"
         }
     ],
     "MonthlyComponents": [
         {
             "Title": "TOTAL: Monthly Components",
-            "Text": "INR 1,87,660"
+            "Text": "Amount Value"
         },
         {
             "Title": "Basic Salary",
-            "Text": "INR 9,800"
+            "Text": "Amount Value"
         },
         {
             "Title": "House Rent Allowance",
-            "Text": "INR 4,900"
+            "Text": "Amount Value"
         },
         {
             "Title": "Statutory Bonus",
-            "Text": "INR 938"
+            "Text": "Amount Value"
         },
         {
             "Title": "TOTAL: Monthly",
-            "Text": "INR 4,900"
+            "Text": "Amount Value"
         }        
     ],
     "Retrials": [
         {
             "Title": "TOTAL: Retrials",
-            "Text": "INR 28,340"
-        },
-        {
-            "Title": "TDS",
-            "Text": "INR 18,766"
+            "Text": "Amount Value"
         },
         {
             "Title": "Medical Insurance Premium",
-            "Text": "INR 3,920"
+            "Text": "Amount Value"
         },
         {
             "Title": "Gratuity",
-            "Text": "INR 5,654"
+            "Text": "Amount Value"
         }
     ],
     "VariableComponents": [
         {
             "Title": "TOTAL: Variable Components",
-            "Text": "INR 24,000"
+            "Text": "Amount Value"
         },
         {
             "Title": "Performance Bonus",
-            "Text": "INR 12,000"
+            "Text": "Amount Value"
         },
         {
             "Title": "Engagement PB (paid monthly) @ 100%",
-            "Text": "INR 12,000"
+            "Text": "Amount Value"
+        }
+    ],
+    "TotalDeductions": [
+        {
+            "Title": "TOTAL: Deductions",
+            "Text": "Amount Value"
+        },
+        {
+            "Title": "TDS",
+            "Text": "Amount Value"
+        },
+        {
+            "Title": "PF",
+            "Text": "Amount Value"
+        },
+        {
+            "Title": "EPF",
+            "Text": "Amount Value"
         }
     ],
     "Notes": [
         {
             "Title": "You're eligible for an joining bonus amount of",
-            "Text": "INR 20,000"
+            "Text": "Amount Value"
         },
         {
             "Sl.No": "1",
@@ -108,5 +113,17 @@
             "Sl.No": "4",
             "Text": "Gratuity to be payable as per act."
         }
-    ]
+    ],
+
+    "TrainingStartDate": "(Training Start Date)",
+    "ReportingManager": "(Name of the Reporting Manager)",
+    "Stipend": null,
+    "StipendSkipLine": null,
+
+    "AgreementDate" : "02/04/2025",
+    "AgreementEndDate": "30/09/2025",
+    "ClientCompanyName" : "Google",
+    "ClientCompanyAddress" : "No. 3, Old Madras Rd, Sadanandanagar, Bennigana Halli, Bengaluru, Karnataka 560016",
+    "ClientName" : "Mr. Pavan Kadam",
+    "AgreementDuration" : "12"
 }

@@ -185,7 +185,7 @@ sap.ui.define([
                                     text: "Generate PDF",
                                     type: "Reject",
                                     press: function () {
-                                        //  this._generatePDF(); // Call function to generate PDF
+                                        this.onDownloadTraineeLetter();
                                         oDialog.close();
                                     }.bind(this)
                                 }),
@@ -276,50 +276,80 @@ sap.ui.define([
                 });
             },
 
-            offerGeneratingPdfFunction: function (oModel) {
+            async offerGeneratingPdfFunction(oModel) {
                 var oEmpModel = oModel.getData();
-                this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
-                this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "TraineeOffer" });
 
-                var oPDFModel = this.getView().getModel("PDFData");
-                oPDFModel.setProperty("/Type", "TraineeOffer");
-                oPDFModel.setProperty("/EmpName", oEmpModel.NameSalutation + " " + oEmpModel.TraineeName);
-                oPDFModel.setProperty("/EmpRole", "Trainee");
-                oPDFModel.setProperty("/CreateDate", "Field is missing");
-                oPDFModel.setProperty("/TrainingStartDate", oEmpModel.JoiningDate);
-                oPDFModel.setProperty("/TraineePeroid", oEmpModel.EndDate);
-                oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
-                oPDFModel.setProperty("/Stipend", oEmpModel.Stipend);
-                if (oEmpModel.Stipend == 0 || oEmpModel.Stipend == "") {
-                    oPDFModel.setProperty("/StipendSkipLine", 5);
-                }
-                else {
-                    oPDFModel.setProperty("/StipendSkipLine", null);
-                }
+                try {
+                    this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
+                    this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "TraineeOffer" });
+                    await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
 
-
-                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-                var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
-
-                if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                    MessageToast.show("Company Logo or Model not found.");
-                    return;
-                }
-
-                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
-                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo.data);
-                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature.data);
-                    if (logoBase64 && signBase64) {
-                        oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64; // Save in a new property
-                        oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64; // Save in a new property
+                    var oPDFModel = this.getView().getModel("PDFData");
+                    oPDFModel.setProperty("/Type", "TraineeOffer");
+                    oPDFModel.setProperty("/EmpName", oEmpModel.NameSalutation + " " + oEmpModel.TraineeName);
+                    oPDFModel.setProperty("/EmpRole", "Trainee");
+                    oPDFModel.setProperty("/CreateDate", oEmpModel.ReleaseDate);
+                    oPDFModel.setProperty("/TrainingStartDate", oEmpModel.JoiningDate);
+                    oPDFModel.setProperty("/TraineePeroid", oEmpModel.EndDate);
+                    oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
+                    oPDFModel.setProperty("/Stipend", oEmpModel.Stipend);
+                    if (oEmpModel.Stipend == 0 || oEmpModel.Stipend == "") {
+                        oPDFModel.setProperty("/StipendSkipLine", 5);
                     }
-                }
+                    else {
+                        oPDFModel.setProperty("/StipendSkipLine", null);
+                    }
 
-                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
-                    console.log(oCompanyDetailsModel);
-                    jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
-                }
+                    var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                    var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();  
+                    if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                        MessageToast.show("Company Logo or Model not found.");
+                        return;
+                    }
 
+                    if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+                        var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+                        var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
+                        if (logoBase64 && signBase64) {
+                            oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
+                            oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+                        }
+                    }
+
+                    if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                        if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                            jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                        } else {
+                            console.error("Error: jsPDF._GeneratePDF function not found.");
+                        }
+                    }
+
+                } catch (error) {
+                    console.error("Error waiting for models:", error);
+                }
+            },
+
+            _waitForModels(modelNames, interval = 200, timeout = 5000) {
+                return new Promise((resolve, reject) => {
+                    const startTime = Date.now();
+
+                    const checkModels = () => {
+                        let allLoaded = modelNames.every(modelName => {
+                            let model = this.getView().getModel(modelName);
+                            return model && model.getData() && Object.keys(model.getData()).length > 0;
+                        });
+
+                        if (allLoaded) {
+                            resolve(); // ✅ Proceed when models have data
+                        } else if (Date.now() - startTime > timeout) {
+                            reject(new Error("Timeout waiting for models: " + modelNames.join(", ")));
+                        } else {
+                            setTimeout(checkModels, interval);
+                        }
+                    };
+
+                    checkModels();
+                });
             }
 
         });

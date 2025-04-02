@@ -2,8 +2,6 @@ sap.ui.define([], function () {
     "use strict";
     return {
         _GeneratePDF: function (oModel, oCompanyModel, content) {
-            console.log(oModel);
-            console.log(content);
             var { jsPDF } = window.jspdf;
             var doc = new jsPDF({
                 unit: "mm",
@@ -100,41 +98,55 @@ sap.ui.define([], function () {
             let titleContentY = titleY + 10; // Initial Y position after titleY
 
             for (let i = 0; i < 10; i++) {
-                if (oModel.StipendSkipLine && i === oModel.StipendSkipLine-1) continue;
+                if (oModel.StipendSkipLine && i === oModel.StipendSkipLine - 1) continue;
                 if (!content[i]?.TitleContent) break;  // Break the loop if TitleContent doesn't exist
-
+            
                 // Evaluate TitleContent dynamically
                 let titleContent = new Function("oCompanyModel", "oModel", `return ${content[i].TitleContent};`)(oCompanyModel, oModel);
                 let titleContentLines = doc.splitTextToSize(titleContent, maxWidth);
-
-                // Iterate through each line and justify the text
+            
                 titleContentLines.forEach((line, lineIndex) => {
                     let words = line.split(" ");
                     let totalWords = words.length;
-
-                    // Calculate line width and space width
                     let lineWidth = doc.getTextWidth(line);
                     let spaceWidth = doc.getTextWidth(" ");
-
+                    let currentX = margin;
+            
                     if (lineIndex < titleContentLines.length - 1) {
                         // Justify all lines except the last line
                         let extraSpace = totalWords > 1 ? (maxWidth - lineWidth) / (totalWords - 1) : 0;
-                        let currentX = margin;
-
+            
                         words.forEach((word, index) => {
+                            // Check if the word should be bold
+                            if (word === "WHEREAS" || word.includes("Kalpavriksha Technologies")) {
+                                doc.setFont("times", "bold");
+                            } else {
+                                doc.setFont("times", "normal");
+                            }
+            
                             doc.text(word, currentX, titleContentY);
                             currentX += doc.getTextWidth(word) + spaceWidth + (index < totalWords - 1 ? extraSpace : 0);
                         });
+            
                     } else {
                         // Left-align the last line of the paragraph
-                        doc.text(line, margin, titleContentY);
+                        words.forEach((word) => {
+                            if (word === "WHEREAS" || word.includes("Kalpavriksha Technologies")) {
+                                doc.setFont("times", "bold");
+                            } else {
+                                doc.setFont("times", "normal");
+                            }
+            
+                            doc.text(word, currentX, titleContentY);
+                            currentX += doc.getTextWidth(word) + spaceWidth;
+                        });
                     }
-
+            
                     titleContentY += 6.2; // Move down after each line
                 });
-
+            
                 titleContentY += 5.5;  // Add extra spacing after each block of TitleContent
-            }
+            }            
 
             let contentafterTitleContentY = titleContentY;
             if (oModel.Type === "EmployeeOffer") {
@@ -167,8 +179,6 @@ sap.ui.define([], function () {
                     let pointContentTemplate = new Function("oCompanyModel", "oModel", `return ${content[i - 1].PointDesc};`)(oCompanyModel, oModel);
 
                     let pointContentParas = pointContentTemplate.split(`\n\n`); // Split content by paragraphs
-
-                    console.log(pointContentParas);
 
                     // Loop through each paragraph in the PointDesc
                     pointContentParas.forEach((paragraph) => {
@@ -209,6 +219,11 @@ sap.ui.define([], function () {
                     doc.setFont("times", "bold");
                 }
                 contentafterTitleContentY = currentY;
+            }
+
+            if (oModel.Type === "EmployeeOffer") {
+                doc.addPage();
+                contentafterTitleContentY = topMargin-10;
             }
 
             doc.setFont("times", "bold").setFontSize(12);
@@ -287,7 +302,7 @@ sap.ui.define([], function () {
 
                 let headerY = salSubTitleY + 12; // Initial Y position
 
-                for (let i = 1; i <= 10; i++) {
+                for (let i = 1; i <= headers.length; i++) {
                     // Break the loop if Title or Text is missing
                     if (!headers[i - 1]?.Title || !headers[i - 1]?.Text) break;
 
@@ -320,12 +335,9 @@ sap.ui.define([], function () {
 
                 doc.setFont("helvetica", "normal");
                 var monthlyComponents = oModel.MonthlyComponents;
-
                 let monCurrentY = monthlyCompTitleBotLineY + 5;  // Initial Y position
 
-                for (let i = 1; i <= monthlyComponents.length; i++) {
-                    // Check if Title or Text exists, otherwise break the loop
-                    if (!monthlyComponents[i]?.Title || !monthlyComponents[i]?.Text) break;
+                for (let i = 1; i <= monthlyComponents.length-1; i++) {
 
                     // Draw Title on the left
                     doc.text(monthlyComponents[i].Title, margin + 3, monCurrentY);
@@ -370,9 +382,7 @@ sap.ui.define([], function () {
                 var retrials = oModel.Retrials;
                 let retCurrentY = retrialsTitleBotLineY + 5;  // Initial Y position
 
-                for (let i = 1; i <= retrials.length; i++) {
-                    // Check if Title or Text exists, otherwise break the loop
-                    if (!retrials[i]?.Title || !retrials[i]?.Text) break;
+                for (let i = 1; i <= retrials.length-1; i++) {
 
                     // Draw Title on the left
                     doc.text(retrials[i].Title, margin + 3, retCurrentY);
@@ -417,9 +427,7 @@ sap.ui.define([], function () {
                 var varComp = oModel.VariableComponents;
                 let varCompCurrentY = varCompTitleBotLineY + 5;  // Initial Y position
 
-                for (let i = 1; i <= varComp.length; i++) {
-                    // Check if Title or Text exists, otherwise break the loop
-                    if (!varComp[i]?.Title || !varComp[i]?.Text) break;
+                for (let i = 1; i <= varComp.length-1; i++) {
 
                     // Draw Title on the left
                     doc.text(varComp[i].Title, margin + 3, varCompCurrentY);
@@ -446,9 +454,54 @@ sap.ui.define([], function () {
                 let varComp0TextX = pageWidth - varComp0TextWidth - margin - 3;
                 doc.text(varComp0Text, varComp0TextX, varComp0Y);
                 let varComp0BotLineY = varComp0Y + 2;
+                doc.setLineWidth(1);
                 doc.line(margin, varComp0BotLineY, pageWidth - margin, varComp0BotLineY);
 
-                let grossPayLineTopY = varComp0BotLineY + 7;
+                let deductionTitleY = varComp0BotLineY + 5;
+                let deductionTitle = "Deductions (in INR)";
+                let deductionTitleWidth = doc.getTextWidth(deductionTitle);
+                let deductionTitleX = (pageWidth - deductionTitleWidth) / 2;
+                let deductionTitleBotLineY = deductionTitleY + 2;
+                doc.line(margin, deductionTitleBotLineY, pageWidth - margin, deductionTitleBotLineY);
+                doc.setLineWidth(0.5);
+                doc.setFillColor(191, 191, 191);
+                doc.rect(margin, varComp0BotLineY, maxWidth, deductionTitleBotLineY - varComp0BotLineY, 'F');
+                doc.text(deductionTitle, deductionTitleX, deductionTitleY);
+
+                doc.setFont("helvetica", "normal");
+                var deduction = oModel.TotalDeductions;
+                let deductionCurrentY = deductionTitleBotLineY + 5;  // Initial Y position
+
+                for (let i = 1; i <= deduction.length-1; i++) {
+
+                    // Draw Title on the left
+                    doc.text(deduction[i].Title, margin + 3, deductionCurrentY);
+
+                    // Draw Text on the right, aligned to the right side
+                    let compText = deduction[i].Text;
+                    let compTextWidth = doc.getTextWidth(compText);
+                    let compTextX = pageWidth - compTextWidth - margin - 3;
+                    doc.text(compText, compTextX, deductionCurrentY);
+
+                    // Draw a line under each item
+                    let botLineY = deductionCurrentY + 2;
+                    doc.line(margin, botLineY, pageWidth - margin, botLineY);
+
+                    // Increment Y position for the next item
+                    deductionCurrentY = botLineY + 5;
+                }
+
+                doc.setFont("helvetica", "bold");
+                let deduction0Y = deductionCurrentY;
+                doc.text(deduction[0].Title, margin + 3, deduction0Y);
+                let deduction0Text = deduction[0].Text;
+                let deduction0TextWidth = doc.getTextWidth(deduction0Text);
+                let deduction0TextX = pageWidth - deduction0TextWidth - margin - 3;
+                doc.text(deduction0Text, deduction0TextX, deduction0Y);
+                let deduction0BotLineY = deduction0Y + 2;
+                doc.line(margin, deduction0BotLineY, pageWidth - margin, deduction0BotLineY);
+
+                let grossPayLineTopY = deduction0BotLineY + 7;
                 doc.setLineWidth(1);
                 doc.line(margin, grossPayLineTopY, pageWidth - margin, grossPayLineTopY);
 
@@ -468,7 +521,8 @@ sap.ui.define([], function () {
 
                 doc.line(pageMiddle + 10, monthlyCompTitleBotLineY, pageMiddle + 10, monComp0BotLineY);
                 doc.line(pageMiddle + 10, retrialsTitleBotLineY, pageMiddle + 10, retrials0BotLineY);
-                doc.line(pageMiddle + 10, varCompTitleBotLineY, pageMiddle + 10, grossPayBotLineY);
+                doc.line(pageMiddle + 10, varCompTitleBotLineY, pageMiddle + 10, varComp0BotLineY);
+                doc.line(pageMiddle + 10, deductionTitleBotLineY, pageMiddle + 10, grossPayBotLineY);
                 doc.line(margin, topLineY, margin, grossPayBotLineY);
                 doc.line(pageWidth - margin, topLineY, pageWidth - margin, grossPayBotLineY);
 

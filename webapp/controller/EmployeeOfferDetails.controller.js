@@ -226,7 +226,7 @@ sap.ui.define([
                                     text: "Generate PDF",
                                     type: "Reject",
                                     press: function () {
-                                        //  this._generatePDF(); // Call function to generate PDF
+                                        this.EOUF_onPressMerge();
                                         oDialog.close();
                                     }.bind(this)
                                 }),
@@ -269,59 +269,98 @@ sap.ui.define([
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);
             },
-            offerGeneratingPdfFunction: function (oModel) {
+            async offerGeneratingPdfFunction(oModel) {
                 var oEmpModel = oModel.getData();
-                this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: oEmpModel.BranchCode });
-                this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
-
-                var oPDFModel = this.getView().getModel("PDFData");
-                oPDFModel.setProperty("/Type", "EmployeeOffer");
-                oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
-                oPDFModel.setProperty("/EmpRole", oEmpModel.Designation);
-                oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", pincode");
-                oPDFModel.setProperty("/EmpPinCode", "123456");
-                oPDFModel.setProperty("/CreateDate", oEmpModel.OfferReleaseDate);
-                oPDFModel.setProperty("/JoiningDate", oEmpModel.JoiningDate);
-                oPDFModel.setProperty("/EmpCTC", oEmpModel.Total);
-                oPDFModel.setProperty("/BondYears", oEmpModel.EmploymentBond || "0");
-                oPDFModel.setProperty("/MonthlyComponents/0/Text", oEmpModel.TotalmothlyAnnualized);
-                oPDFModel.setProperty("/MonthlyComponents/1/Text", oEmpModel.BasicSalary);
-                oPDFModel.setProperty("/MonthlyComponents/2/Text", oEmpModel.HRA);
-                oPDFModel.setProperty("/MonthlyComponents/3/Text", oEmpModel.StatutoryBonus);
-                oPDFModel.setProperty("/MonthlyComponents/4/Text", oEmpModel.TotalMonthly);
-                oPDFModel.setProperty("/Retrials/0/Text", oEmpModel.TotalRetires);
-                oPDFModel.setProperty("/Retrials/1/Text", oEmpModel.MedicalInsurance);
-                oPDFModel.setProperty("/Retrials/2/Text", oEmpModel.Gratuity);
-                oPDFModel.setProperty("/VariableComponents/0/Text", oEmpModel.TotalVariablePay);
-                oPDFModel.setProperty("/VariableComponents/1/Text", oEmpModel.PerformanceBonus);
-                oPDFModel.setProperty("/VariableComponents/2/Text", oEmpModel.EngagementPB);
-                oPDFModel.setProperty("/TotalDeductions/1/Text", oEmpModel.TDS);
-                oPDFModel.setProperty("/TotalDeductions/2/Text", oEmpModel.PF);
-                oPDFModel.setProperty("/TotalDeductions/3/Text", oEmpModel.EPF);
-                oPDFModel.setProperty("/Notes/0/Text", oEmpModel.JoiningBonus);
-
-                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-                var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
-
-                if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                    MessageToast.show("Company Logo or Model not found.");
-                    return;
-                }
-
-                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
-                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo.data);
-                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature.data);
-                    if (logoBase64 && signBase64) {
-                        oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64; // Save in a new property
-                        oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64; // Save in a new property
+            
+                try {
+                    this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
+                    this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
+                    await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
+            
+                    var oPDFModel = this.getView().getModel("PDFData");
+                    oPDFModel.setProperty("/Type", "EmployeeOffer");
+                    oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
+                    oPDFModel.setProperty("/EmpRole", oEmpModel.Designation);
+                    oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", pincode");
+                    oPDFModel.setProperty("/EmpPinCode", "123456");
+                    oPDFModel.setProperty("/CreateDate", oEmpModel.OfferReleaseDate);
+                    oPDFModel.setProperty("/JoiningDate", oEmpModel.JoiningDate);
+                    oPDFModel.setProperty("/EmpCTC", oEmpModel.CostofCompany);
+                    if(oEmpModel.EmploymentBond == "0" || oEmpModel.EmploymentBond == ""){
+                        oPDFModel.setProperty("/BondCondition", "18 employment months");
                     }
-                }
+                    else{
+                        oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond years");
+                    }
+                    oPDFModel.setProperty("/MonthlyComponents/0/Text", oEmpModel.TotalmothlyAnnualized);
+                    oPDFModel.setProperty("/MonthlyComponents/1/Text", oEmpModel.BasicSalary);
+                    oPDFModel.setProperty("/MonthlyComponents/2/Text", oEmpModel.HRA);
+                    oPDFModel.setProperty("/MonthlyComponents/3/Text", oEmpModel.StatutoryBonus);
+                    oPDFModel.setProperty("/MonthlyComponents/4/Text", oEmpModel.TotalMonthly);
+                    oPDFModel.setProperty("/Retrials/0/Text", oEmpModel.TotalRetires);
+                    oPDFModel.setProperty("/Retrials/1/Text", oEmpModel.MedicalInsurance);
+                    oPDFModel.setProperty("/Retrials/2/Text", oEmpModel.Gratuity);
+                    oPDFModel.setProperty("/VariableComponents/0/Text", oEmpModel.TotalVariablePay);
+                    oPDFModel.setProperty("/VariableComponents/1/Text", oEmpModel.PerformanceBonus);
+                    oPDFModel.setProperty("/VariableComponents/2/Text", oEmpModel.EngagementPB);
+                    oPDFModel.setProperty("/TotalDeductions/1/Text", oEmpModel.TDS);
+                    oPDFModel.setProperty("/TotalDeductions/2/Text", oEmpModel.PF || "");
+                    oPDFModel.setProperty("/TotalDeductions/3/Text", oEmpModel.EPF || "");
+                    oPDFModel.setProperty("/Notes/0/Text", oEmpModel.JoiningBonus);
 
-                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
-                    console.log(oCompanyDetailsModel);
-                    jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                    var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                    oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
+                    oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
+                    var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();    
+            
+                    if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                        MessageToast.show("Company Logo or Model not found.");
+                        return;
+                    }
+            
+                    if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+                        var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+                        var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
+                        if (logoBase64 && signBase64) {
+                            oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
+                            oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+                        }
+                    }
+            
+                    if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                        if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                            jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                        } else {
+                            console.error("Error: jsPDF._GeneratePDF function not found.");
+                        }
+                    }
+            
+                } catch (error) {
+                    console.error("Error waiting for models:", error);
                 }
-
+            },                        
+            
+            _waitForModels(modelNames, interval = 200, timeout = 5000) {
+                return new Promise((resolve, reject) => {
+                    const startTime = Date.now();
+            
+                    const checkModels = () => {
+                        let allLoaded = modelNames.every(modelName => {
+                            let model = this.getView().getModel(modelName);
+                            return model && model.getData() && Object.keys(model.getData()).length > 0;
+                        });
+            
+                        if (allLoaded) {
+                            resolve(); // ✅ Proceed when models have data
+                        } else if (Date.now() - startTime > timeout) {
+                            reject(new Error("Timeout waiting for models: " + modelNames.join(", ")));
+                        } else {
+                            setTimeout(checkModels, interval);
+                        }
+                    };
+            
+                    checkModels();
+                });
             }
         });
     });
