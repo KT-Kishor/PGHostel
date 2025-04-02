@@ -350,7 +350,29 @@ sap.ui.define([
 
                     checkModels();
                 });
+            },
+            TU_onPressSendEmail: function(){
+                var oView = this.getView();
+                if (!this.oDial) {
+                  sap.ui.core.Fragment.load({
+                    name: "sap.kt.com.minihrsolution.fragment.SendMail",
+                    controller: this,
+                  }).then(
+                    function (oDial) {
+                      this.oDial = oDial;
+                      oView.addDependent(this.oDial);
+                      this.oDial.open();
+                    }.bind(this)
+                  );
+                } else {
+                  this.oDial.open();
+                  
+                }
+            },
+            Mail_onPressClose:function(){
+                this.oDial.close();
             }
+
 
         });
     });
