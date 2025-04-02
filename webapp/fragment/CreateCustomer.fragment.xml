@@ -36,7 +36,7 @@
 					</VBox>
 				</HBox>
 				<Label text="{i18n>panCardCommon}" />
-				<Input value="{CustomerModel>/PAN}" placeholder="{i18n>panCardPlaceholder}" maxLength="50" id="MC_id_CustomPan" liveChange="MC_ValidatePanCard" valueStateText="{i18n>panCardValueState}" />
+				<Input value="{CustomerModel>/PAN}" placeholder="{i18n>panCardPlaceholder}" maxLength="10" id="MC_id_CustomPan" liveChange="MC_ValidatePanCard" valueStateText="{i18n>panCardValueState}" />
 				<Label text="{i18n>gstNo}" />
 				<Input value="{CustomerModel>/GST}" maxLength="15" placeholder="{i18n>placeholderGST}" id="MC_id_CustomGst"  liveChange="MC_ValidateGstNumber" valueStateText="{i18n>gstNoValueState}" />
 				<Label text="{i18n>type}" labelFor="groupC" />

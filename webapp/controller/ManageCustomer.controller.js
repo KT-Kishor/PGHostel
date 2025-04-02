@@ -175,7 +175,7 @@ sap.ui.define([
               utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"),"ID")
             ) {
               var oData = this.getView().getModel("CustomerModel").getData();
-              this.ajaxCreateWithJQuery("ManageCustomer", oData);
+              this.ajaxCreateWithJQuery("ManageCustomer", { data: oData });
               this.byId("MC_id_CustTable").removeSelections(true);
               sap.m.MessageToast.show(this.i18nModel.getText("msgCustomer3"));
               this.oDialog.close();
@@ -266,12 +266,12 @@ sap.ui.define([
             },
         });
       },
-  
+
         MC_onDeleteAddCustomer: function () {
           var oTable = this.byId("MC_id_CustTable");
           var oSelectedItem = oTable.getSelectedItem();
           if (!oSelectedItem) {
-            MessageToast.show(this.i18nModel.getText("deleteCustomer"));
+            MessageBox.error(this.i18nModel.getText("deleteCustomer"));
             return;
           }
           var oContext = oSelectedItem.getBindingContext("CreateCustomerModel");

@@ -36,25 +36,25 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>companyName}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>name}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>gstNo}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>type}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>percentage}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>emailId}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>mobileNo}" />
 					</Column>
 				</columns>
