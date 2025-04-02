@@ -24,21 +24,25 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 this.T_onSearch();
             },
             readCallForTrainee: function (filter) {
-                // var filter = { ID: "" };
                 this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    var oModel = new sap.ui.model.json.JSONModel(offerData);
-                    this.getOwnerComponent().setModel(oModel, "traineeModel");
-                    if(filter === "Initial") {
-                        var oModelRm = new sap.ui.model.json.JSONModel(offerData);
-                        this.getOwnerComponent().setModel(oModelRm, "reportingModel");
+                    this.getView().setModel(new JSONModel(offerData), "traineeModel");
+            
+                    if (filter === "Initial") {
+                        offerData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "")
+                            .map(item => [item.TraineeName.trim(), item])).values()];
+                        this.getView().setModel(new JSONModel(offerData), "traineeModelInitial");
+        
+                        let reportingManagerData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "")
+                            .map(item => [item.ReportingManager.trim(), item])).values()];
+                        this.getView().setModel(new JSONModel(reportingManagerData), "traineeModelInitial");
                     }
                     sap.ui.core.BusyIndicator.hide();
                 }).catch((oError) => {
                     sap.ui.core.BusyIndicator.hide();
-                    MessageBox.error("Error while reading the trainee details");
+                    MessageBox.error("Error while reading the trainee details")
                 });
-            },
+            },        
             T_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
@@ -269,7 +273,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                         }
                     }
                 });
-                this._fetchCommonData("Trainee?", "traineeModel", params);
+                this.readCallForTrainee(params);
             },
 
             //clear the filterbar

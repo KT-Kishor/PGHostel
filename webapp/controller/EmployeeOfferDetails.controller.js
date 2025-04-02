@@ -160,7 +160,7 @@ sap.ui.define([
                 var oOfferDateId = oEvent.getSource().getId().split("--")[2], releaseDate;
                 if (oOfferDateId === "EOD_id_Reldate" || oOfferDateId === "EOUF_id_Reldate") {
                     // Get selected dates and Update the minimum date for joining date
-                    var joinDateVa = oOfferDateId === "EOD_id_Reldate" ? "EOD_id_Joindate": "EOUF_id_Joindate";
+                    var joinDateVa = oOfferDateId === "EOD_id_Reldate" ? "EOD_id_Joindate" : "EOUF_id_Joindate";
                     releaseDate = this.byId(oOfferDateId).getDateValue();
                     this.byId(joinDateVa).setValue("");
                     this.byId(joinDateVa).setMinDate(releaseDate);
@@ -208,16 +208,41 @@ sap.ui.define([
                     }
                     this.ajaxCreateWithJQuery("EmployeeOffer", oModel).then((oData) => {
                         if (oData.results) {
-                            sap.ui.core.BusyIndicator.hide();
-                            MessageToast.show(this.i18nModel.getText("offerSuccess"));
-                            this.getRouter().navTo("RouteEmployeeOffer");
+
+                            var oDialog = new sap.m.Dialog({
+                                title: this.i18nModel.getText("success"),
+                                type: sap.m.DialogType.Message,
+                                state: sap.ui.core.ValueState.Success,
+                                content: new sap.m.Text({ text: this.i18nModel.getText("offerSuccess") }),
+                                beginButton: new sap.m.Button({
+                                    text: "OK",
+                                    type: "Accept",
+                                    press: function () {
+                                        oDialog.close();
+                                        this.getRouter().navTo("RouteEmployeeOffer");
+                                    }.bind(this)
+                                }),
+                                endButton: new sap.m.Button({
+                                    text: "Generate PDF",
+                                    type: "Reject",
+                                    press: function () {
+                                        //  this._generatePDF(); // Call function to generate PDF
+                                        oDialog.close();
+                                    }.bind(this)
+                                }),
+                                afterClose: function () {
+                                    oDialog.destroy();
+                                }
+                            });
+
+                            oDialog.open();
                         }
                     }).catch((oError) => {
-                        sap.ui.core.BusyIndicator.hide();
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                    })
-                }
-                else {
+                        sap.ui.core.BusyIndicator.hide();
+                    });
+
+                } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
@@ -237,8 +262,8 @@ sap.ui.define([
                 var oTdsVal = this.byId("EOD_id_RadioButTds").getAggregation("buttons")[this.byId("EOD_id_RadioButTds").getSelectedIndex()].getProperty("text");
                 this._calculateSalaryComponents(oTdsVal);
                 var oModel = this.getView().getModel("employeeModel").getData();
-                if(oModel.BaseLocation === "")  this.getView().getModel("employeeModel").setProperty("/BaseLocation", this.byId("EOD_id_Location").getSelectedKey())
-                if(oModel.Designation === "")  this.getView().getModel("employeeModel").setProperty("/Designation", this.byId("EOD_id_Designation").getSelectedKey())
+                if (oModel.BaseLocation === "") this.getView().getModel("employeeModel").setProperty("/BaseLocation", this.byId("EOD_id_Location").getSelectedKey())
+                if (oModel.Designation === "") this.getView().getModel("employeeModel").setProperty("/Designation", this.byId("EOD_id_Designation").getSelectedKey())
             },
             EOUF_onPressMerge: function () {
                 var oModel = this.getView().getModel("employeeModel");

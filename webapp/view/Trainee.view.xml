@@ -14,15 +14,15 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="TraineeName" label="{i18n>traineeName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="{traineeModel>/}" id="T_id_TraineeName" showClearIcon="true">
-								<core:ListItem key="{traineeModel>TraineeName}" text="{traineeModel>TraineeName}" />
+							<ComboBox  showSecondaryValues= "true"  items="{traineeModelInitial>/}" id="T_id_TraineeName" showClearIcon="true">
+								<core:ListItem key="{traineeModelInitial>TraineeName}" text="{traineeModelInitial>TraineeName}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="ReportingManager" label="{i18n>reportingManager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox   items="{reportingModel>/}" id="T_id_RmFilterBar" showClearIcon="true">
-								<core:Item key="{reportingModel>ReportingManager}" text="{reportingModel>ReportingManager}"/>
+							<ComboBox   items="{traineeModelInitial>/}" id="T_id_RmFilterBar" showClearIcon="true">
+								<core:Item key="{traineeModelInitial>ReportingManager}" text="{traineeModelInitial>ReportingManager}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
