@@ -26,7 +26,7 @@
 				<Label text="{i18n>customerName}" required="true"/>
 				<HBox width="100%" justifyContent="Start" alignItems="Center">
 					<VBox width="22%">
-						<Select id="MC_id_SelectReportingManagerSalutation" selectedKey="{CustomerModel>/salutation}"
+						<Select id="MC_id_CompNameSalutation" selectedKey="{CustomerModel>/salutation}"
                                   items="{Salutation>/salutation}" width="100%">
 							<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 						</Select>
@@ -45,7 +45,7 @@
 					<RadioButton text="{i18n>igst}" />
 				</RadioButtonGroup>
 				<Label visible="{visiblePlay>/CC_id_CustInput}" text="{i18n>custValue}" />
-				<Input visible="{visiblePlay>/CC_id_CustInput}" value="{CustomerModel>/value}" maxLength="5" />
+				<Input visible="{visiblePlay>/CC_id_CustInput}" id="CC_id_custValue" value="{CustomerModel>/value}" maxLength="5" />
 				<Label text="{i18n>emailId}" required="true" />
 				<Input value="{CustomerModel>/mailID}" placeholder="{i18n>placeEmailId}" id="MC_id_CustMail"  maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
 				<Label text="{i18n>emailId}" required="true"/>
