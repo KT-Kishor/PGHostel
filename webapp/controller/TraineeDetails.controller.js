@@ -13,6 +13,7 @@ sap.ui.define([
             Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteTraineeDetails").attachMatched(this._onRouteMatched, this);
+                this.byId("TD_id_JoiningDate").setMinDate(new Date());
             },
             _onRouteMatched: function (oEvent) {
                 this._fetchCommonData("Currency", "CurrencyModel");
@@ -48,7 +49,7 @@ sap.ui.define([
                     this.getView().byId("TUF_id_pageTrainee").setVisible(true);
                     this.getModelData(this.sArgPara);
                 }
-                this._makeDatePickersReadOnly(["TD_id_JoiningDate","TD_id_ReleaseDate", "TU_id_JoinDate","TU_id_RelDate"]);
+                this._makeDatePickersReadOnly(["TD_id_JoiningDate", "TD_id_ReleaseDate", "TU_id_JoinDate", "TU_id_RelDate"]);
                 this.readCallForEmployee("");
             },
             getModelData: function (sArgPara) {
@@ -116,16 +117,28 @@ sap.ui.define([
             },
 
             TD_validateDate: function (oEvent) {
-                utils._LCvalidateDate(oEvent);
-                this.validateStep();
-                var oOfferDateId = oEvent.getSource().getId().split("--")[2], releaseDate;
+                utils._LCvalidateDate(oEvent); // Base validation
+                this.validateStep(); // Step validation
+                var oSource = oEvent.getSource();
+                var oOfferDateId = oSource.getId().split("--")[2];
+                var releaseDate, joinDateVa;
                 if (oOfferDateId === "TD_id_ReleaseDate" || oOfferDateId === "TU_id_RelDate") {
-                    // Get selected dates and Update the minimum date for joining date
-                    var joinDateVa = oOfferDateId === "TD_id_ReleaseDate" ? "TD_id_JoiningDate": "TU_id_JoinDate";
-                    releaseDate = this.byId(oOfferDateId).getDateValue();
-                    this.byId(joinDateVa).setValue("");
-                    this.byId(joinDateVa).setMinDate(releaseDate);
+                    joinDateVa = oOfferDateId === "TD_id_ReleaseDate" ? "TD_id_JoiningDate" : "TU_id_JoinDate";
+                    releaseDate = oSource.getDateValue();
+                    if (releaseDate) {
+                        var oJoinDatePicker = this.byId(joinDateVa);
+                        var joinDate = oJoinDatePicker.getDateValue();
+                        oJoinDatePicker.setMinDate(releaseDate);
+                        if (joinDate && joinDate < releaseDate) {
+                            oJoinDatePicker.setValue("");
+                        } else {
+                            oJoinDatePicker.setValueState("None");
+                        }
+                    }
                 }
+            },
+            onBeforeRendering: function () {
+                this.byId("TD_id_JoiningDate").setMinDate(new Date());
             },
 
             validateStep: function () {
@@ -202,7 +215,7 @@ sap.ui.define([
             TU_onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");
                 if (oViewModel.getProperty("/editable")) {
-                    var isValid = utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID")  && utils._LCvalidateAmount(this.getView().byId("TU_id_Stipend"), "ID");
+                    var isValid = utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") && utils._LCvalidateAmount(this.getView().byId("TU_id_Stipend"), "ID");
                     // Save the changes
                     if (isValid) this.updateCallForTrainee(oViewModel);
                     else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
