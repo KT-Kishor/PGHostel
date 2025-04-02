@@ -12,7 +12,7 @@ sap.ui.define([
             },
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this.readCallForEmployeeOffer("");
+                this.readCallForEmployeeOffer("Initial");
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
                 this.byId("EO_id_RejectBtn").setEnabled(false);
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
@@ -22,6 +22,10 @@ sap.ui.define([
                 this.ajaxReadWithJQuery("EmployeeOffer", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModel");
+                    if(filter === "Initial"){
+                        offerData = [...new Map(offerData.filter(item => item.ConsultantName && item.ConsultantName.trim() !== "").map(item => [item.ConsultantName.trim(), item])).values()];
+                        this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModelInitial");
+                    }
                     sap.ui.core.BusyIndicator.hide();
                 }).catch((oError) => {
                     sap.ui.core.BusyIndicator.hide();
@@ -58,7 +62,7 @@ sap.ui.define([
             },
             EO_onSearch: function (oEvent) {
                 var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
-                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
+                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" })
                 var params = {};
                 aFilterItems.forEach(function (oItem) {
                   var oControl = oItem.getControl(); // Get the associated control
@@ -72,11 +76,28 @@ sap.ui.define([
                     }
                 }
                 });
-                this._fetchCommonData("EmployeeOffer","EmployeeOfferModel",params);
+                this.readCallForEmployeeOffer(params);
             },
             // Update the status to 'Rejected' after confirmation
             onRejectEmployee: function () {
                 this.updateCallForEmployeeOffer("Rejected");
+            },
+            EO_onPressClear:function(){
+                var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
+                aFilterItems.forEach(function (oItem) {
+                  var oControl = oItem.getControl(); // Get the associated control
+                  if (oControl) {
+                    if (oControl.setValue) {
+                      oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
+                    }
+                    if (oControl.setSelectedKey) {
+                      oControl.setSelectedKey(""); // Reset selection for dropdowns
+                    }
+                    if (oControl.setSelected) {
+                      oControl.setSelected(false); // Reset selection for Checkboxes
+                    }
+                  }
+                });
             },
             onHandleEmployeeAction: function (status, actionMethod) {
                 var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
@@ -152,7 +173,7 @@ sap.ui.define([
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
                 if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID")) {
-                  this.updateCallForEmployeeOffer("onBoarded")
+                  this.updateCallForEmployeeOffer("OnBoarded")
                 }
                 else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -169,7 +190,7 @@ sap.ui.define([
                 this.ajaxUpdateWithJQuery("EmployeeOffer",oModelOffer).then((oData) => {
                     if (oData.results) {
                         sap.ui.core.BusyIndicator.hide();
-                        var sSuccessMessage = (status === "OnBoarded")
+                        var sSuccessMessage = (oStatus === "OnBoarded")
                         ? this.i18nModel.getText("successEmpOnboard")
                         : this.i18nModel.getText("successEmpReject");
                         MessageToast.show(sSuccessMessage);

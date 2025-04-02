@@ -160,8 +160,10 @@ sap.ui.define([
                 var oOfferDateId = oEvent.getSource().getId().split("--")[2], releaseDate;
                 if (oOfferDateId === "EOD_id_Reldate" || oOfferDateId === "EOUF_id_Reldate") {
                     // Get selected dates and Update the minimum date for joining date
+                    var joinDateVa = oOfferDateId === "EOD_id_Reldate" ? "EOD_id_Joindate": "EOUF_id_Joindate";
                     releaseDate = this.byId(oOfferDateId).getDateValue();
-                    this.byId(oOfferDateId).setMinDate(releaseDate);
+                    this.byId(joinDateVa).setValue("");
+                    this.byId(joinDateVa).setMinDate(releaseDate);
                 }
             },
             EOD_ValidateCommonFields: function (oEvent) {
