@@ -65,9 +65,9 @@
                                                  </m:Select>
                                             </m:VBox>
                                             <m:VBox width="78%">
-                                                <m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"  selectionChange=""  value="{oTraineeDetails>/ReportingManager}" items="{idModel>/results}" editable="{viewModel>/editable}" width="100%" class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">
-                                                    <core:ListItem key="{idModel>ID}" text="{idModel>EmployeeName}" additionalText="{idModel>ID}"/>
-                                                </m:ComboBox>
+                                                <m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"  selectionChange=""  value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" editable="{viewModel>/editable}" width="100%" class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">
+                                                    <core:ListItem key="{empModel>ManagerID}" text="{empModel>ManagerName}" additionalText="{empModel>ManagerID}" />
+                                                    </m:ComboBox>
                                             </m:VBox>
                                         </m:HBox>
                                     <m:Label text="{i18n>emailId}" required="true" />

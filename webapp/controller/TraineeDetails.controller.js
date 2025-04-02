@@ -27,7 +27,7 @@ sap.ui.define([
                     "ReportingManager": "",
                     "Stipend": "",
                     "ReleaseDate": this.Formatter.formatDate(new Date()),
-                    "JoiningDate": this.Formatter.formatDate(new Date()),
+                    "JoiningDate": "",
                     "TraineeEmail": "",
                     "Currency": "",
                     "TrainingDuration": ""
@@ -49,6 +49,7 @@ sap.ui.define([
                     this.getModelData(this.sArgPara);
                 }
                 this._makeDatePickersReadOnly(["TD_id_JoiningDate","TD_id_ReleaseDate", "TU_id_JoinDate","TU_id_RelDate"]);
+                this.readCallForEmployee("");
             },
             getModelData: function (sArgPara) {
                 var oModel = this.getOwnerComponent().getModel("traineeModel");
@@ -113,22 +114,26 @@ sap.ui.define([
             TD_onPressback: function () {
                 this.getRouter().navTo("RouteTrainee");
             },
+
             TD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
                 this.validateStep();
                 var oOfferDateId = oEvent.getSource().getId().split("--")[2], releaseDate;
                 if (oOfferDateId === "TD_id_ReleaseDate" || oOfferDateId === "TU_id_RelDate") {
                     // Get selected dates and Update the minimum date for joining date
+                    var joinDateVa = oOfferDateId === "TD_id_ReleaseDate" ? "TD_id_JoiningDate": "TU_id_JoinDate";
                     releaseDate = this.byId(oOfferDateId).getDateValue();
-                    this.byId(oOfferDateId).setMinDate(releaseDate);
+                    this.byId(joinDateVa).setValue("");
+                    this.byId(joinDateVa).setMinDate(releaseDate);
                 }
             },
+
             validateStep: function () {
                 // Check if all fields have values
-                var allFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getValue() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_Stipend").getValue() && this.byId("TD_id_Currency").getSelectedKey() && this.getView().byId("TD_id_JoiningDate").getValue() && this.getView().byId("TD_id_ReleaseDate").getValue();
+                var allFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getValue() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_Stipend").getValue() && this.byId("TD_id_Currency").getSelectedKey() && this.getView().byId("TD_id_ReleaseDate").getValue() && this.getView().byId("TD_id_JoiningDate").getValue();
                 if (allFieldsFilled) {
                     // Validate each field 
-                    var isValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCvalidateAmount(this.getView().byId("TD_id_Stipend"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID");
+                    var isValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCvalidateAmount(this.getView().byId("TD_id_Stipend"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
                     this.byId("TD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
@@ -140,8 +145,8 @@ sap.ui.define([
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.Status = "Submitted";
-                    oModel.JoiningDate = new Date(this.byId("TD_id_JoiningDate").getDateValue().getTime() - this.byId("TD_id_JoiningDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
                     oModel.ReleaseDate = new Date(this.byId("TD_id_ReleaseDate").getDateValue().getTime() - this.byId("TD_id_ReleaseDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                    oModel.JoiningDate = new Date(this.byId("TD_id_JoiningDate").getDateValue().getTime() - this.byId("TD_id_JoiningDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
                     var oPayload = {
                         "tableName": "Trainee",
@@ -217,6 +222,7 @@ sap.ui.define([
                 if (oModel.Status === "Rejected") {
                     oModel.Status = "Submitted";
                 }
+                oModel.TrainingDuration = this.byId("TU_id_TDuration").getSelectedKey();
                 this.getView().getModel("oTraineeDetails").refresh(true);
                 oModel = {
                     "data": oModel,
@@ -243,6 +249,18 @@ sap.ui.define([
             onDownloadTraineeLetter: function () {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
+            },
+            readCallForEmployee: function (filter) {
+                // var filter = { ID: "" };
+                this.ajaxReadWithJQuery("EmployeeDetails", filter).then((oData) => {
+                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    var oModel = new sap.ui.model.json.JSONModel(offerData);
+                    this.getOwnerComponent().setModel(oModel, "empModel");
+                    sap.ui.core.BusyIndicator.hide();
+                }).catch((oError) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageBox.error("Error while reading the trainee details");
+                });
             },
 
             offerGeneratingPdfFunction: function (oModel) {
