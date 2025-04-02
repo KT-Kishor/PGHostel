@@ -1,51 +1,47 @@
 <core:FragmentDefinition
-    xmlns="sap.m"
-    xmlns:f="sap.ui.layout.form"
-    xmlns:u="sap.ui.unified"
-    xmlns:rich="sap.ui.richtexteditor"
-    xmlns:core="sap.ui.core">
-    <Dialog title="Send Mail" contentWidth="80%" >
-        <f:SimpleForm
-            editable="true" visible="{loginModel>/sendEmailForm}"
-            layout="ResponsiveGridLayout">
-			<f:content>
-			<MessageStrip
-				text="{i18n>sendMailFragMsg}"
-				type="Warning"
-				showIcon="true"
-				class="sapUiTinyMarginBottom">
-			</MessageStrip>
-            <Label text="{i18n>fileUploader}" required="true"/>
-            <HBox width="100%" justifyContent="Start" alignItems="Center">
-                <VBox width="20%">
-                    <u:FileUploader                                       
-                        name="myFileUpload"
-                        multiple="true"
-                        uploadUrl="upload/"
-                        tooltip="{i18n>toolTipMsgSM}"
-                        change="handleUploadPress"
-                        buttonOnly="true"                    
-                        uploadComplete="handleUploadComplete"/>
-                </VBox>
-                <VBox width="80%" >
-                    <Text text="{TextDisplay>/name}"></Text>
-                </VBox>
-            </HBox>
-                
-                <Label text="{i18n>toMailText}" required="true" />
-                <Input value="{UploaderData>/ToEmail}" change="onEmailChange" editable="false" />
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core">
+	<Dialog title="{i18n>forgotPass}">
+		<VBox>
+			<f:SimpleForm          
+            editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="3"
+			labelSpanM="4"
+			labelSpanS="12"
+			emptySpanXL="0"
+			emptySpanL="4"
+			emptySpanM="0"
+			emptySpanS="0"
+			columnsXL="2"
+			columnsL="1"
+			columnsM="1">
+				<f:content>
+					<Label text="{i18n>userId}" required="true" />
+					<Input id="FSM_id_userIdInput"  placeholder="{i18n>placeUserId}" maxLength="10" />
+					<Label text="{i18n>userName}" required="true" />
+					<Input id="FSM_id_userNameInput"  placeholder="{i18n>placeUserName}" change="SM_onChangeSendOTP" maxLength="50" />
 
-                <Label text="{i18n>ccMailText}" required="true" />
-                <TextArea value="{UploaderData>/CCEmail}" maxLength="600" liveChange="onEmailChange"/>
-			</f:content>
-		</f:SimpleForm>
+					<Label text="{i18n>btnotp}" id="FSM_id_frgotp" required="true"/>
+					<Input id="FSM_id_otpInput" placeholder="{i18n>otp}"  visible="false" change="SM_onChangeOTP" maxLength="6"/>
+					
+					<Label text="{i18n>inpNewpassword}" id="FSM_id_frgnewpass" required="true" />
+					<Input id="FSM_id_newPasswordInput"  placeholder="{i18n>placenewpass}" visible="false" type="Password" liveChange="SM_onChnageSetAndConfirm" valueState="None"  showValueHelp="true" valueStateText="{i18n>placenewpass}" valueHelpIconSrc="sap-icon://show" valueHelpRequest="SM_onTogglePasswordVisibility" maxLength="50" />
 
-        <!-- <Label text="{i18n>notes}" required="true"/> -->
-	    <!-- <rich:RichTextEditor visible="{loginModel>/sendEmail}" value="{UploaderData>/htmlbody}" class="sapUiContentPadding" width="100%" /> -->
+					<Label text="{i18n>inpConpassword}" id="FSM_id_frgconpass" required="true" />
+					<Input id="FSM_id_confirmPasswordInput" visible="false" value="{FragmentModel>/frgConfirmPassword}" valueStateText="{i18n>placeconpass}" placeholder="{i18n>placeconpass}" type="Password" liveChange="SM_onChnageSetAndConfirm"   showValueHelp="true" valueHelpIconSrc="sap-icon://show"     valueHelpRequest="SM_onTogglePasswordVisibility" maxLength="50" />
 
-        <FlexBox justifyContent="End">
-           <Button text="{i18n>tileFooter}" type="Emphasized"  class="sendMail" press="Mail_onPressSaveEmail"  visible="{UploaderData>/button}" />
-            <Button text="{i18n>close}" width="80px"  class="sendMail" press="Mail_onPressClose"/>
-    	</FlexBox>
-    </Dialog>
+				</f:content>
+			</f:SimpleForm>
+		</VBox>
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer />
+				<Button text="{i18n>save}" class="marginRigth" type="Accept" id="FSM_id_SaveBTN" press="SM_onPressSave"  />
+				<Button text="{i18n>btnCancel}" class="marginRigth" press="SM_onPressCancle" type="Negative"/>
+			</Toolbar>
+		</footer>
+	</Dialog>
 </core:FragmentDefinition>

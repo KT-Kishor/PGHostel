@@ -178,15 +178,16 @@ sap.ui.define([
                                     type: "Accept",
                                     press: function () {
                                         oDialog.close();
-                                        this.getRouter().navTo("RouteTrainee"); // Navigate to RouteTrainee
+                                        this.getRouter().navTo("RouteTrainee");
                                     }.bind(this)
                                 }),
                                 endButton: new sap.m.Button({
                                     text: "Generate PDF",
                                     type: "Reject",
                                     press: function () {
-                                        this.onDownloadTraineeLetter();
+                                        this.TD_onPressMerge();
                                         oDialog.close();
+                                        this.getRouter().navTo("RouteTrainee");
                                     }.bind(this)
                                 }),
                                 afterClose: function () {
@@ -258,8 +259,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 });
             },
-
-            onDownloadTraineeLetter: function () {
+            TD_onPressMerge: function () {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
             },
@@ -301,7 +301,7 @@ sap.ui.define([
                     }
 
                     var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-                    var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();  
+                    var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
                     if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
                         MessageToast.show("Company Logo or Model not found.");
                         return;
@@ -351,25 +351,25 @@ sap.ui.define([
                     checkModels();
                 });
             },
-            TU_onPressSendEmail: function(){
+            TU_onPressSendEmail: function () {
                 var oView = this.getView();
                 if (!this.oDial) {
-                  sap.ui.core.Fragment.load({
-                    name: "sap.kt.com.minihrsolution.fragment.SendMail",
-                    controller: this,
-                  }).then(
-                    function (oDial) {
-                      this.oDial = oDial;
-                      oView.addDependent(this.oDial);
-                      this.oDial.open();
-                    }.bind(this)
-                  );
+                    sap.ui.core.Fragment.load({
+                        name: "sap.kt.com.minihrsolution.fragment.CommonMail",
+                        controller: this,
+                    }).then(
+                        function (oDial) {
+                            this.oDial = oDial;
+                            oView.addDependent(this.oDial);
+                            this.oDial.open();
+                        }.bind(this)
+                    );
                 } else {
-                  this.oDial.open();
-                  
+                    this.oDial.open();
+
                 }
             },
-            Mail_onPressClose:function(){
+            Mail_onPressClose: function () {
                 this.oDial.close();
             }
 
