@@ -35,9 +35,9 @@
 						<Input id="MC_id_CustCustomerName" value="{CustomerModel>/name}" maxLength="20" placeholder="{i18n>placeholderCustName}" liveChange="MC_ValidateCommonFields" valueStateText="{i18n>placeholderCustName}" />
 					</VBox>
 				</HBox>
-				<Label text="{i18n>panCardCommon}" />
+				<Label text="{i18n>panCardCommon}"  required="true"/>
 				<Input value="{CustomerModel>/PAN}" placeholder="{i18n>panCardPlaceholder}" maxLength="10" id="MC_id_CustomPan" liveChange="MC_ValidatePanCard" valueStateText="{i18n>panCardValueState}" />
-				<Label text="{i18n>gstNo}" />
+				<Label text="{i18n>gstNo}"  required="true"/>
 				<Input value="{CustomerModel>/GST}" maxLength="15" placeholder="{i18n>placeholderGST}" id="MC_id_CustomGst"  liveChange="MC_ValidateGstNumber" valueStateText="{i18n>gstNoValueState}" />
 				<Label text="{i18n>type}" labelFor="groupC" />
 				<RadioButtonGroup visible="{visiblePlay>/CC_id_CustInput}" select="onRadioButtonChange"  id="MC_id_groupCustGst" columns="2" selectedIndex="{visiblePlay>/selectedIndex}">
@@ -50,9 +50,9 @@
 				<Input value="{CustomerModel>/mailID}" placeholder="{i18n>placeEmailId}" id="MC_id_CustMail"  maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
 				<Label text="{i18n>emailId}" required="true"/>
 				<Input value="{CustomerModel>/customerEmail}" id="MC_id_FinanceEmail" placeholder="{i18n>placeholderFinanceEmail}" maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
-				<Label text="{i18n>mobileNo}"/>
+				<Label text="{i18n>mobileNo}"  required="true"/>
 				<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="10" liveChange="MC_ValidateMobileNo" valueStateText="{i18n>mobileNoValueState}" />
-				<Label text="{i18n>custLut}" />
+				<Label text="{i18n>custLut}"  required="true"/>
 				<Input value="{CustomerModel>/LUT}" maxLength="16" placeholder="{i18n>placeholderLUT}" liveChange="MC_ValidateLUTNo" valueStateText="{i18n>placeholderLUT}" id="MC_id_LUTNo"/>
 				<Label text="{i18n>address}" required="true" />
 				<TextArea id="MC_id_CustAddress" value="{CustomerModel>/address}" placeholder="{i18n>addressPlaceholder}" maxLength="200" liveChange="MC_ValidateCommonFields" valueStateText="{i18n>addressValueState}" ></TextArea>

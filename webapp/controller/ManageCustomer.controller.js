@@ -221,7 +221,9 @@ sap.ui.define([
                 }).catch((error) => {
                 MessageToast.show(error.responseText);
               });
-            }
+            }else {
+              MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+          }
           } catch (error) {
               MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
