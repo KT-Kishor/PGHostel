@@ -16,11 +16,10 @@ sap.ui.define(
             .attachMatched(this._onRouteMatched, this);
           var model = new JSONModel({
             url: "https://www.rest.kalpavrikshatechnologies.com/",
-            ContentType: "application/json",
             headers: {
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              password:"$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              "Content-Type": "application/json"
             },
             isRadioVisible: false, // Initially, radio buttons are hidden
           });

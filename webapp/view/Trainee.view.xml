@@ -67,6 +67,9 @@
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>joiningDate}" />
 					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>traineeDuration}" />
+					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>emailId}" />
 					</Column>
@@ -81,6 +84,7 @@
 							<Text text="{traineeModel>ReportingManagerSalutation} {traineeModel>ReportingManager}"/>
 							<Text text="{traineeModel>Stipend} {traineeModel>Currency}"/>
 							<Text text="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}" />
+							<Text text="{traineeModel>TrainingDuration}"/>
 							<Text text="{traineeModel>TraineeEmail}"/>
 							<ObjectStatus text="{traineeModel>Status}" inverted="true" state="{path:'traineeModel>Status',formatter:'.Formatter.formatObjectStatus'}"/>
 						</cells>
