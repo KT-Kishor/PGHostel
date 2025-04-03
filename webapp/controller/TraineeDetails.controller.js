@@ -242,6 +242,14 @@ sap.ui.define([
                 this.offerGeneratingPdfFunction(oModel);
             },
             async offerGeneratingPdfFunction(oModel) {
+                var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
+                var oPDFCondModel = this.getView().getModel("PDFConditionModel");
+                if (oCoModel && oPDFCondModel){
+                    oCoModel.destroy();
+                    oPDFCondModel.destroy();
+                    this.getView().setModel(null, "CompanyCodeDetailsModel");
+                    this.getView().setModel(null, "PDFConditionModel");
+                }
                 var oEmpModel = oModel.getData();
 
                 try {
