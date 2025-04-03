@@ -151,9 +151,11 @@
 <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ContactPage" type="XML"/>
 
 </ScrollContainer>
+
 <Page id="idBookfordemo" showHeader="false" class="sapUiContentPadding demo-form sapUiTinyMargin" >   
  <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Demoform" type="XML"/>
 </Page>
+
 <ScrollContainer id="idTraning" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding Training-background sapUiTinyMargin">
 <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Training" type="XML"/>
 

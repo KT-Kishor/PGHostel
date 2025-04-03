@@ -116,6 +116,13 @@
   font-size: 18px;
   font-weight: bold;
 }
+.custom-text {
+  color: rgb(5, 5, 5) !important;
+  font-size: 18px;
+  line-height: 1.7;
+  font-family: League spartan !important;
+  font-weight: bolder !important;
+}
 
 .custom-welcome {
   line-height: 1;
@@ -255,17 +262,9 @@ background-image: url('../image/Home.jpg');
   background-repeat: no-repeat;
 border-radius: 0.60rem;
 }
-.main-container {
-  width: 90%;
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.button-container {
+  margin-top: 20px; /* Adds space above the button */
+  width: 100%; /* Ensures it spans the entire width */
 }
 .highlight-text {
   font-size: 16px;
@@ -288,17 +287,11 @@ margin-left: 0.5rem;
 
   margin-bottom: 10px;
 }
-.content-wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
 
 .content-box {
-  width: 48%;
+ 
   padding: 20px;
-  background-color: #f9f9f9;
+ 
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   text-align: left;
@@ -326,14 +319,16 @@ margin-left: 0.5rem;
 
 .apply-button {
   margin-top: 20px;
-
   color: white;
   font-weight: bold;
-  width: 250px;
-  height: 50px;
+  width: 350px;
+  height: 150px;
   font-size: 18px;
   border-radius: 8px;
 }
+/* .btnclass{
+  height: 100px !important;
+} */
 
 .career-background {
   position: relative;

@@ -4,9 +4,9 @@
     xmlns:l="sap.ui.layout" 
     xmlns:f="sap.ui.layout.form">
     
-    <Dialog title="Contact Form" stretch="false" >
+    <Dialog title="Training enquiry" stretch="false" >
         <content>
-            <f:SimpleForm layout="ResponsiveGridLayout" editable="true"   >
+            <f:SimpleForm layout="ResponsiveGridLayout" editable="true">
                 <Label text="{i18n>name}" required="true"/>
                 <Input id="FTF_idName" liveChange="FTF_onlivename" value="{TraineeData>/Name}" placeholder="{i18n>placeName}" valueStateText="{i18n>placeName}" maxLength="40"/>
 
@@ -17,11 +17,12 @@
                 <Input id="FTF_idmail" type="Email" liveChange="FTF_onlivemail"  value="{TraineeData>/EmailID}" placeholder="{i18n>placeEmailId}"  valueStateText="{i18n>placeEmailId}" maxLength="50"/>
 
                 <Label text="{i18n>mobileNo}" required="true"/>
-                <Input id="FTF_idMobnumber" type="Number" liveChange="FTF_onlivemobile" value="{TraineeData>/MobileNo}" placeholder="{i18n>placeholderMobileNo}"  valueStateText="{i18n>placeholderMobileNo}" />
+                <Input id="FTF_idMobnumber" type="Number" liveChange="FTF_onlivemobile" value="{TraineeData>/MobileNo}" placeholder="{i18n>placeholderMobileNo}"  valueStateText="{i18n>placeholderMobileNo}"/>
                 <Label  text="{i18n>selectcourse}" required="true"/>
+             
               <MultiComboBox id="FTF_idMultiSelectCourse"
     selectedKeys="{TraineeData>/SelectCourse}"
-    items="{TraineeCourse>/Course}" change="FTF_onSelectionchange" width="500px">
+    items="{TraineeCourse>/Course}" change="FTF_onSelectionchange" valueStateText="{i18n>placecourse}" width="600px" placeholder="{i18n>placecourse}">
     <core:Item key="{TraineeCourse>name}" text="{TraineeCourse>name}"/>
 </MultiComboBox>
 

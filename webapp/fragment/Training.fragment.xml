@@ -3,15 +3,10 @@
     xmlns:core="sap.ui.core"
     xmlns:l="sap.ui.layout">
     
-    <l:Grid defaultSpan="XL12 L12 M12 S12" class="grid-container">
+    <l:Grid defaultSpan="XL6 L6 M12 S12" class="grid-container">
         
-        <!-- Main Container VBox -->
-        <VBox class="main-container">
-            
-            <FlexBox alignItems="Center" justifyContent="SpaceBetween" direction="Row" class="content-wrapper">
-                
                 <!-- SAP UI5 Section -->
-                <VBox class="content-box">
+                <VBox class="content-box"  backgroundDesign="Solid" >
                     <Text class="custom-trainee-title sapUiTinyMargin " text="Master SAP UI5 for your college project and internship"/>
                     <Text class="description-text" text="Learn the skills you need to take the next step. Adopting ethical behavior, corporate values, and professional communication."/>
                     <Text class="highlight-text" text="Kalpavriksha Technologies - Transform Your Career With Expert-led Project Training With Certificate of Internship!"/>
@@ -26,9 +21,9 @@
                     <Text class="training-text" text="▪ Real-World Project Portfolio"/>
                 </VBox>
 
-                <!-- CAPM Section -->
-                <VBox class="content-box">
-                    <Text class="custom-trainee-title sapUiTinyMargin " text="Master CAPM for your career Growth"/>
+                
+                <VBox class="content-box"  backgroundDesign="Solid">
+                    <Text class="custom-trainee-title sapUiTinyMargin " text="Master CAPM for your career Growth and leadership"/>
                     <Text class="description-text" text="Get certified in CAPM with hands-on experience, live projects, and industry-recognized certification."/>
                     <Text class="highlight-text" text="Kalpavriksha Technologies - Advance Your Career with CAPM Training and Certification!"/>
                     
@@ -42,11 +37,12 @@
                     <Text class="training-text" text="▪ Real-World Case Studies"/>
                 </VBox>
 
-            </FlexBox>
+             </l:Grid>
             <!-- Common Apply Now Button -->
+       <FlexBox alignItems="Center" justifyContent="Center" class="btnclass" >
             <Button text="Apply Now" class="apply-button" press="Tbtn_onPress" type="Emphasized"/>
+              </FlexBox>
+        
 
-        </VBox>
-
-    </l:Grid>
+   
 </core:FragmentDefinition>

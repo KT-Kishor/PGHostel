@@ -4,9 +4,8 @@ sap.ui.define(
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "sap/m/MessageBox",
   ],
-  function (BaseController, utils, JSONModel, MessageToast, MessageBox) {
+  function (BaseController, utils, JSONModel, MessageToast) {
     "use strict";
 
     return BaseController.extend(
@@ -27,10 +26,22 @@ sap.ui.define(
           });
 
           this.getView().setModel(oFormData, "formData");
+
+          var oTData = new JSONModel({
+            Name: "",
+            CollegeName: "",
+            EmailID: "",
+            MobileNo: "",
+            SelectCourse: "",
+            Comments: "",
+          });
+
+          this.getView().setModel(oTData, "TraineeData");
         },
 
         _onRouteMatched: function () {
           var oNavContainer = this.byId("pageContainer");
+          this.API = "https://www.rest.kalpavrikshatechnologies.com";
           oNavContainer.to(this.byId("idHome"));
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
@@ -136,16 +147,8 @@ sap.ui.define(
             ],
           };
 
-          var oTData = new JSONModel({
-            Name: "",
-            CollegeName: "",
-            EmailID: "",
-            MobileNo: "",
-            SelectCourse: "",
-            Comments: "",
-          });
-
-          this.getView().setModel(oTData, "TraineeData");
+          var oModel = new JSONModel(oData);
+          this.getView().setModel(oModel);
         },
 
         onTabSelect: function (oEvent) {
@@ -228,7 +231,7 @@ sap.ui.define(
           ) {
             // AJAX Call to Save Data
             $.ajax({
-              url: "https://www.rest.kalpavrikshatechnologies.com/CustomerDemo",
+              url: this.API + "/CustomerDemo",
               type: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -272,7 +275,7 @@ sap.ui.define(
             Type: "CustDemo",
           };
           $.ajax({
-            url: "https://www.rest.kalpavrikshatechnologies.com/SendEmail",
+            url: this.API + "/SendEmail",
             type: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -307,12 +310,9 @@ sap.ui.define(
           }
         },
         FTF_onlivename: function (oEvent) {
-          utils._LCvalidateMandatoryField(oEvent);
+          utils._LCvalidateName(oEvent);
         },
         FTF_onliveclg: function (oEvent) {
-          utils._LCvalidateMandatoryField(oEvent);
-        },
-        FTF_onlivecomment: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
         FTF_onlivemail: function (oEvent) {
@@ -320,6 +320,12 @@ sap.ui.define(
         },
         FTF_onlivemobile: function (oEvent) {
           utils._LCvalidateMobileNumber(oEvent);
+        },
+        FTF_onSelectionchange: function (oEvent) {
+          utils._LCvalidationComboBox(oEvent);
+        },
+        FTF_onlivecomment: function (oEvent) {
+          utils._LCvalidateMandatoryField(oEvent);
         },
 
         FTF_onSubmitForm: function () {
@@ -339,10 +345,7 @@ sap.ui.define(
 
           var that = this;
           if (
-            utils._LCvalidateMandatoryField(
-              sap.ui.getCore().byId("FTF_idName"),
-              "ID"
-            ) &&
+            utils._LCvalidateName(sap.ui.getCore().byId("FTF_idName"), "ID") &&
             utils._LCvalidateMandatoryField(
               sap.ui.getCore().byId("FTF_idClgname"),
               "ID"
@@ -352,6 +355,10 @@ sap.ui.define(
               sap.ui.getCore().byId("FTF_idMobnumber"),
               "ID"
             ) &&
+            utils._LCvalidationComboBox(
+              sap.ui.getCore().byId("FTF_idMultiSelectCourse"),
+              "ID"
+            ) &&
             utils._LCvalidateMandatoryField(
               sap.ui.getCore().byId("FTF_idcomments"),
               "ID"
@@ -359,7 +366,7 @@ sap.ui.define(
           ) {
             //  AJAX Call to Save Data
             $.ajax({
-              url: "https://www.rest.kalpavrikshatechnologies.com/Training",
+              url: this.API + "/Training",
               type: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -393,6 +400,38 @@ sap.ui.define(
         },
 
         FTF_onCancelform: function () {
+          var oModel = this.getView().getModel("TraineeData");
+
+          // Reset Data Model
+          var resetData = {
+            Name: "",
+            CollegeName: "",
+            EmailID: "",
+            MobileNo: "",
+            SelectCourse: [], // Reset MultiComboBox
+            Comments: "",
+          };
+          oModel.setData(resetData);
+          oModel.refresh(true);
+
+          // Reset Value States for Validation
+          var aFields = [
+            "FTF_idName",
+            "FTF_idClgname",
+            "FTF_idmail",
+            "FTF_idMobnumber",
+            "FTF_idcomments",
+            "FTF_idMultiSelectCourse",
+          ];
+
+          aFields.forEach(function (sFieldId) {
+            var oField = sap.ui.getCore().byId(sFieldId);
+            if (oField) {
+              oField.setValueState("None");
+            }
+          });
+
+          // Close the Dialog
           this.oDialog.close();
         },
       }

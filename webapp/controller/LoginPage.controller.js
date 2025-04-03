@@ -18,8 +18,9 @@ sap.ui.define(
             url: "https://www.rest.kalpavrikshatechnologies.com/",
             headers: {
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:"$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-              "Content-Type": "application/json"
+              password:
+                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              "Content-Type": "application/json",
             },
             isRadioVisible: false, // Initially, radio buttons are hidden
           });
@@ -103,8 +104,6 @@ sap.ui.define(
         },
 
         LP_onLogin: function () {
-          this.getRouter().navTo("RouteTilePage");
-
           var that = this;
           var oView = this.getView();
           var oLoginModel = this.getView().getModel("LoginModel");
@@ -145,8 +144,14 @@ sap.ui.define(
               headers: this.getView().getModel("LoginModel").getData().headers,
               success: function (response) {
                 // Store only EmployeeID and EmployeeName in the model
-                oLoginModel.setProperty("/EmployeeID", response.data[0].EmployeeID);
-                oLoginModel.setProperty("/EmployeeName", response.data[0].EmployeeName);
+                oLoginModel.setProperty(
+                  "/EmployeeID",
+                  response.data[0].EmployeeID
+                );
+                oLoginModel.setProperty(
+                  "/EmployeeName",
+                  response.data[0].EmployeeName
+                );
 
                 MessageToast.show(that.i18nModel.getText("logsuccess"));
                 that.getRouter().navTo("RouteTilePage");
