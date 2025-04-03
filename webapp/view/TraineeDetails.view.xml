@@ -65,7 +65,7 @@
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
 							<Label text="{i18n>traineeDuration}" required="true" />
-								<Select items="{TrainingDurationModel>/duration}"  selectedKey="{TrainingDurationModel>/TrainingDuration}" id="TD_id_TDuration" width="100%" class="marginLeft">
+								<Select items="{TrainingDurationModel>/duration}"  selectedKey="{oTraineeDetails>/TrainingDuration}" id="TD_id_TDuration" width="100%" class="marginLeft">
 									<core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
 								</Select>
 							<Label text="{i18n>releaseDateT}"   required="true" />

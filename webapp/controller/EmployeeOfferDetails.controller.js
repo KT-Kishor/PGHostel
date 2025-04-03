@@ -176,7 +176,7 @@ sap.ui.define([
                 this.validateStep();
             },
             EOD_onPressBack: function () {
-                this.getRouter().navTo("RouteEmployeeOffer");
+                this.getRouter().navTo("RouteEmployeeOffer",{valueEmp:"EmployeeOfferDetails"});
             },
             //Step validation
             validateStep: function () {
@@ -224,7 +224,7 @@ sap.ui.define([
                                     type: "Accept",
                                     press: function () {
                                         oDialog.close();
-                                        this.getRouter().navTo("RouteEmployeeOffer");
+                                        this.getRouter().navTo("RouteEmployeeOffer",{valueEmp:"EmployeeOfferDetails"});
                                     }.bind(this)
                                 }),
                                 endButton: new sap.m.Button({
@@ -233,7 +233,7 @@ sap.ui.define([
                                     press: function () {
                                         this.EOUF_onPressMerge();
                                         oDialog.close();
-                                        this.getRouter().navTo("RouteEmployeeOffer");
+                                        this.getRouter().navTo("RouteEmployeeOffer",{valueEmp:"EmployeeOfferDetails"});
                                     }.bind(this)
                                 }),
                                 afterClose: function () {
@@ -270,6 +270,46 @@ sap.ui.define([
                 var oModel = this.getView().getModel("employeeModel").getData();
                 if (oModel.BaseLocation === "") this.getView().getModel("employeeModel").setProperty("/BaseLocation", this.byId("EOD_id_Location").getSelectedKey())
                 if (oModel.Designation === "") this.getView().getModel("employeeModel").setProperty("/Designation", this.byId("EOD_id_Designation").getSelectedKey())
+            },
+            EOUF_onPressMerge: function () {
+                var oModel = this.getView().getModel("employeeModel");
+                this.offerGeneratingPdfFunction(oModel);
+            },
+
+            EOD_commonOpenDialog: function (dialogProperty, fragmentName) {
+                if (!this[dialogProperty]) {
+                    sap.ui.core.Fragment.load({
+                        name: fragmentName,
+                        controller: this,
+                    }).then(function (oDialog) {
+                        this[dialogProperty] = oDialog;
+                        this.getView().addDependent(this[dialogProperty]);
+                        this[dialogProperty].open();
+                    }.bind(this));
+                } else {
+                    this[dialogProperty].open();
+                }
+            },
+            EOUF_onPressSendEmail: function () {
+                this.EOD_commonOpenDialog("EOUF_oDialog", "sap.kt.com.minihrsolution.fragment.CommonMail");
+            },
+            Mail_onPressClose: function () {
+                this.EOUF_oDialog.close();
+            },
+            EOD_onPressBackBtn: function () {
+                this.EOD_commonOpenDialog("TCB_oDialog", "sap.kt.com.minihrsolution.fragment.CommonBack");
+               
+            },
+            onConfirmBack: function () {
+               this.getRouter().navTo("RouteEmployeeOffer",{valueEmp:"EmployeeOfferDetails"})
+                this.TCB_oDialog.close();
+            },
+            onCancel: function () {
+                this.TCB_oDialog.close();
+            },
+            onDialogClose: function () {
+                this.TCB_oDialog.destroy();
+                this.TCB_oDialog = null;   
             },
             EOUF_onPressMerge: function () {
                 var oModel = this.getView().getModel("employeeModel");

@@ -77,7 +77,7 @@ sap.ui.define([
                 }
             },
             TUF_onPressback: function () {
-                this.getRouter().navTo("RouteTrainee");
+                this.getRouter().navTo("RouteTrainee",{value:"TraineeDetails"});
             },
             // Reset wizard to initial state
             T_onResetWizard: function () {
@@ -97,10 +97,6 @@ sap.ui.define([
                 utils._LCvalidateAmount(oEvent);
                 this.validateStep();
             },
-            TD_onPressback: function () {
-                this.getRouter().navTo("RouteTrainee");
-            },
-
             TD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent); // Base validation
                 this.validateStep(); // Step validation
@@ -157,7 +153,7 @@ sap.ui.define([
                                     type: "Accept",
                                     press: function () {
                                         oDialog.close();
-                                        this.getRouter().navTo("RouteTrainee");
+                                        this.getRouter().navTo("RouteTrainee",{value:"TraineeDetails"});
                                     }.bind(this)
                                 }),
                                 endButton: new sap.m.Button({
@@ -166,7 +162,7 @@ sap.ui.define([
                                     press: function () {
                                         this.TD_onPressMerge();
                                         oDialog.close();
-                                        this.getRouter().navTo("RouteTrainee");
+                                        this.getRouter().navTo("RouteTrainee",{value:"TraineeDetails"});
                                     }.bind(this)
                                 }),
                                 afterClose: function () {
@@ -237,10 +233,46 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 });
             },
+            TD_commonOpenDialog: function (dialogProperty, fragmentName) {
+                if (!this[dialogProperty]) {
+                    sap.ui.core.Fragment.load({
+                        name: fragmentName,
+                        controller: this,
+                    }).then(function (oDialog) {
+                        this[dialogProperty] = oDialog;
+                        this.getView().addDependent(this[dialogProperty]);
+                        this[dialogProperty].open();
+                    }.bind(this));
+                } else {
+                    this[dialogProperty].open();
+                }
+            },
+            TU_onPressSendEmail: function () {
+                this.TD_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.CommonMail");
+            },
+            Mail_onPressClose: function () {
+                this.TOb_oDialog.close();
+            },
+            TD_onPressback: function () {
+                this.TD_commonOpenDialog("TCB_oDialog", "sap.kt.com.minihrsolution.fragment.CommonBack");
+               
+            },
+            onConfirmBack: function () {
+               this.getRouter().navTo("RouteTrainee",{value:"TraineeDetails"})
+                this.TCB_oDialog.close();
+            },
+            onCancel: function () {
+                this.TCB_oDialog.close();
+            },
+            onDialogClose: function () {
+                this.TCB_oDialog.destroy();
+                this.TCB_oDialog = null;   
+            },
             TD_onPressMerge: function () {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
             },
+
             async offerGeneratingPdfFunction(oModel) {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
                 var oPDFCondModel = this.getView().getModel("PDFConditionModel");

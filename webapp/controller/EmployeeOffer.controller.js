@@ -10,14 +10,22 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: function () {
+            _onRouteMatched: function (oEvent) {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this.readCallForEmployeeOffer("Initial");
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
                 this.byId("EO_id_RejectBtn").setEnabled(false);
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
-            },
+                this.oValue = oEvent.getParameter("arguments").valueEmp;
+                if(this.oValue==="EmployeeOffer"){
+                 this.readCallForEmployeeOffer("Initial");
+                 this.EO_onPressClear();
+                }
+                else{
+                 this.EO_onSearch(); 
+                }
+               
+             },
             readCallForEmployeeOffer: function (filter) {
                 this.ajaxReadWithJQuery("EmployeeOffer", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -60,7 +68,7 @@ sap.ui.define([
             EO_onRejectPress: function () {
                 this.onHandleEmployeeAction("Rejected", "onRejectEmployee");
             },
-            EO_onSearch: function (oEvent) {
+            EO_onSearch: function () {
                 var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" })
                 var params = {};

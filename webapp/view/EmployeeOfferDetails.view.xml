@@ -4,7 +4,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:l="sap.ui.layout"
 	xmlns:core="sap.ui.core">
-	<Page id="EOD_id_PageCrate" title="{i18n>headerEmployeeOffer}" showNavButton="true" navButtonPress="EOD_onPressBack">
+	<Page id="EOD_id_PageCrate" title="{i18n>headerEmployeeOffer}" showNavButton="true" navButtonPress="EOD_onPressBackBtn">
 		<content >
 			<NavContainer id="EOD_id_wizardNav">
 				<pages >

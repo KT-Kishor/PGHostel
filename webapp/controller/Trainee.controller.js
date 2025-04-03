@@ -14,16 +14,21 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
                 
             },
-            _onRouteMatched: function () {
+            _onRouteMatched: function (oEvent) {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._fetchCommonData("Designation", "DesignationModel");
-                this._fetchCommonData("Department", "Departmentmodel");
-                this.readCallForTrainee("Initial");
+                this._fetchCommonData("Department", "Departmentmodel");   
                 ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
                 ["T_id_Download", "T_id_EmpOnBoard"].forEach(id => this.byId(id)?.setVisible(false));
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
-                this.T_onSearch(); 
-              
+                this.oValue = oEvent.getParameter("arguments").value;
+                if(this.oValue==="Trainee"){
+                this.readCallForTrainee("Initial");
+                 this.T_onPressClear();
+                }
+                else{
+                 this.T_onSearch(); 
+                }           
             },
      
             readCallForTrainee: function (filter) {
@@ -269,7 +274,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
             },
 
             //clear the filterbar
-            onPressClear: function (oEvent) {
+            T_onPressClear: function () {
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
                 aFilterItems.forEach(function (oItem) {
                   var oControl = oItem.getControl(); // Get the associated control

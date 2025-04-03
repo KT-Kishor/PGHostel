@@ -221,12 +221,12 @@
                 },
                 {
                     "name": "RouteTrainee",
-                    "pattern": "Trainee",
+                    "pattern": "Trainee/{value}",
                     "target": "TargetTrainee"
                 },
                 {
                     "name": "RouteEmployeeOffer",
-                    "pattern": "EmployeeOffer",
+                    "pattern": "EmployeeOffer/{valueEmp}",
                     "target": "TargetEmployeeOffer"
                 },
                 {
