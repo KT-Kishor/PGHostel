@@ -18,7 +18,7 @@ sap.ui.define(
         _onRouteMatched: function () {
           var that = this;
           that.getView().getModel("LoginModel").setProperty("/HeaderName", "Leave Application"); 
-          that.i18nModelMess = that.getView().getModel("i18n").getResourceBundle();
+          that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
           that.byId("AL_id_LeaveBarChart").setVisible(false);
           that.byId("AL_id_LeaveTableStandard").setVisible(true);
           that.byId("AL_id_leavefilterbar").setVisible(true);
@@ -27,11 +27,12 @@ sap.ui.define(
 
         AL_onPressApplyLeave: function () {
           var oView = this.getView();
+          var loginData = this.getOwnerComponent().getModel("LoginModel").getData()
           var currentYear = new Date().getFullYear();
           var leaveJson = {
-            EmployeeID: "",
-            EmployeeName: "",
-            Email: "",
+            EmployeeID: loginData.EmployeeID,
+            EmployeeName: loginData.EmployeeName,
+            Email: loginData.EmailID,
             FromDate: "",
             ToDate: "",
             NoofDays: "",
@@ -85,24 +86,25 @@ sap.ui.define(
         },
 
         onPressback: function () {
-          this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+          this.getRouter().navTo("RouteTilePage");
         },
 
         onLogout: function () {
-          this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+          this.getRouter().navTo("RouteLoginPage");
         },
 
-        AL_onPressSubmit: function (oEvent) {
+        AL_onPressSubmit: function () {
         try {
+          var that=this;
             if (
               utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
               utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
               utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")) {
             } else {
-                sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered value");
+              sap.m.MessageToast.show(that.i18nModel.getText("mandetoryFields"));
             }
         } catch (error) {
-            sap.m.MessageToast.show("Technical error, please contact the administrator");
+          sap.m.MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
         }
       },
       }

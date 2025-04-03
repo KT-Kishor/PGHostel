@@ -152,6 +152,7 @@ sap.ui.define(
                   "/EmployeeName",
                   response.data[0].EmployeeName
                 );
+                oLoginModel.setProperty("/EmailID", response.data[0].EmailID);
 
                 MessageToast.show(that.i18nModel.getText("logsuccess"));
                 that.getRouter().navTo("RouteTilePage");

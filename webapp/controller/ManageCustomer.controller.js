@@ -71,10 +71,12 @@ sap.ui.define([
               function (oDialog) {
                 this.oDialog = oDialog;
                 this.getView().addDependent(this.oDialog);
+                this._resetDialogFields(); // Reset values
                 this.oDialog.open();
               }.bind(this)
             );
           } else {
+            this._resetDialogFields(); // Reset values
             this.oDialog.open();
           }
         },
@@ -101,11 +103,21 @@ sap.ui.define([
           this.manageCustomerDetails(true);
         },
 
-        //close the Dialog
-        MC_onPressClose: function () {
-          this.oDialog.close();
+        _resetDialogFields: function () {
+          sap.ui.getCore().byId("MC_id_CustCompanyName").setValueState("None");
+          sap.ui.getCore().byId("MC_id_CustCustomerName").setValueState("None");
           sap.ui.getCore().byId("MC_id_CustomGst").setValueState("None");
           sap.ui.getCore().byId("MC_id_CustomPan").setValueState("None");
+          sap.ui.getCore().byId("MC_id_CustMail").setValueState("None");
+          sap.ui.getCore().byId("MC_id_FinanceEmail").setValueState("None");
+          sap.ui.getCore().byId("MC_id_CustMob").setValueState("None");
+          sap.ui.getCore().byId("MC_id_CustAddress").setValueState("None");
+        },
+
+        //close the Dialog
+        MC_onPressClose: function () {
+          this._resetDialogFields(); // Reset values
+          this.oDialog.close();
           this.byId("MC_id_CustTable").removeSelections(true);
         },
 
@@ -159,76 +171,61 @@ sap.ui.define([
           utils._LCvalidateEmail(oEvent);
         },
 
-        MC_onPressSubmit: function () {
-          try {
-              if (
-                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCompanyName"), "ID") &&
-                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCustomerName"), "ID") &&
-                  utils._LCvalidatePanCard(sap.ui.getCore().byId("MC_id_CustomPan"), "ID") &&
-                  utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID") &&
-                  utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
-                  utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
-                  utils._LCvalidateMobileNumber(sap.ui.getCore().byId("MC_id_CustMob"), "ID") &&
-                  utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID") &&
-                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
-              ) {
-                  var oData = this.getView().getModel("CustomerModel").getData();
-                  var that = this;
-                  this.ajaxCreateWithJQuery("ManageCustomer", { data: oData }).then(() => {
-                  that.byId("MC_id_CustTable").removeSelections(true);
-                  sap.m.MessageToast.show(that.i18nModel.getText("msgCustomer3"));
-                  that.oDialog.close();
-                  that._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
-                }).catch((error) => {
-                  MessageToast.show(error.responseText);
-              });
-              } else {
-                  MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-              }
-          } catch (error) {
-              MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+      MC_onPressSubmit: async function () {
+        try {
+            if (
+              utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCompanyName"), "ID") &&
+              utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCustomerName"), "ID") &&
+              utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
+              utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
+              utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
+            ) {
+                var oData = this.getView().getModel("CustomerModel").getData();
+                var response = await this.ajaxCreateWithJQuery("ManageCustomer", { data: oData });
+                if (response.success === true) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("msgCustomer3"));
+                    this.oDialog.close();
+                    this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
+                }
+            } else {
+                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+            }
+        } catch (error) {
+            sap.m.MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+        }
+    },
+
+    MC_onPressSave: async function () {
+      try {
+          if (
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCompanyName"), "ID") &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCustomerName"), "ID") &&
+            utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
+            utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
+          ) {
+            var oTable = this.byId("MC_id_CustTable");
+            var oSelectedItem = oTable.getSelectedItem();
+            if (!oSelectedItem) {
+                MessageToast.show(this.i18nModel.getText("selectCustomerToUpdate"));
+                return;
+            }
+            var requestData = {filters:{ID: oSelectedItem.getBindingContext("CreateCustomerModel").getProperty("ID")}, data: oSelectedItem.getBindingContext("CreateCustomerModel").getObject()};
+            var response= await this.ajaxUpdateWithJQuery("/ManageCustomer", requestData)
+            if(response.success === true) {
+              oTable.removeSelections(true);
+              this.oDialog.close();
+              MessageToast.show(this.i18nModel.getText("msgCustomer4"));
+              this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
+            }
+          } else {
+              sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           }
-      },
+      } catch (error) {
+          sap.m.MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+      }
+     },
       
-      MC_onPressSave: function () {
-          try { 
-              if (
-                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCompanyName"), "ID") &&
-                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCustomerName"), "ID") &&
-                  utils._LCvalidatePanCard(sap.ui.getCore().byId("MC_id_CustomPan"), "ID") &&
-                  utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID") &&
-                  utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
-                  utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
-                  utils._LCvalidateMobileNumber(sap.ui.getCore().byId("MC_id_CustMob"), "ID") &&
-                  utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID") &&
-                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
-              ) {
-                  var oTable = this.byId("MC_id_CustTable");
-                  var oSelectedItem = oTable.getSelectedItem();
-                  if (!oSelectedItem) {
-                      MessageToast.show(this.i18nModel.getText("selectCustomerToUpdate"));
-                      return;
-                  }
-                  var oContext = oSelectedItem.getBindingContext("CreateCustomerModel");
-                  var sCustomerID = oContext.getProperty("ID");
-                  var oUpdatedData = oContext.getObject();
-                  var requestData = {filters:{ID: sCustomerID}, data: oUpdatedData};
-                  this.ajaxUpdateWithJQuery("/ManageCustomer", requestData).then(() => {
-                  oTable.removeSelections(true);
-                  MessageToast.show(this.i18nModel.getText("msgCustomer4"));
-                  this.oDialog.close();
-                  this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
-                }).catch((error) => {
-                MessageToast.show(error.responseText);
-              });
-            }else {
-              MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-          }
-          } catch (error) {
-              MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-          }
-      },
-    
       MC_onDeleteAddCustomer: function () {
         var oTable = this.byId("MC_id_CustTable");
         var oSelectedItem = oTable.getSelectedItem();
@@ -236,8 +233,7 @@ sap.ui.define([
             MessageBox.error(this.i18nModel.getText("deleteCustomer"));
             return;
         }
-        var oContext = oSelectedItem.getBindingContext("CreateCustomerModel");
-        var sCustomerID = oContext.getProperty("ID");
+        var sCustomerID = oSelectedItem.getBindingContext("CreateCustomerModel").getProperty("ID");
         var that = this;
         MessageBox.confirm("Are you sure you want to delete this customer data?", {
             title: "Confirm Deletion",
