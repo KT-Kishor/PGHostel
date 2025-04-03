@@ -245,10 +245,8 @@ sap.ui.define([
                     }.bind(this));
                 } else {
                     this[dialogProperty].open();
+
                 }
-            },
-            TU_onPressSendEmail: function () {
-                this.TD_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.CommonMail");
             },
             Mail_onPressClose: function () {
                 this.TOb_oDialog.close();
@@ -271,6 +269,24 @@ sap.ui.define([
             TD_onPressMerge: function () {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
+            },
+            TU_onSendEmail: function () {
+                var oModel = this.getView().getModel("oTraineeDetails");
+                var sEmail = oModel ? oModel.getProperty("/TraineeEmail") : "";
+                this.TD_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.CommonMail")
+                    .then(function (oDialog) {
+                        oDialog.attachAfterOpen(function () {
+                            var oEmailInput = sap.ui.getCore().byId("Mail_id_Text"); 
+                            if (oEmailInput) {
+                                oEmailInput.setValue(sEmail);
+                            }
+                        });
+                    })
+            },
+            Mail_onPressClose: function () {
+                this.TOb_oDialog.destroy();
+                this.TOb_oDialog = null;  
+                this.TOb_oDialog.close();
             },
 
             async offerGeneratingPdfFunction(oModel) {
@@ -356,27 +372,8 @@ sap.ui.define([
                     checkModels();
                 });
             },
-            TU_onPressSendEmail: function () {
-                var oView = this.getView();
-                if (!this.oDial) {
-                    sap.ui.core.Fragment.load({
-                        name: "sap.kt.com.minihrsolution.fragment.CommonMail",
-                        controller: this,
-                    }).then(
-                        function (oDial) {
-                            this.oDial = oDial;
-                            oView.addDependent(this.oDial);
-                            this.oDial.open();
-                        }.bind(this)
-                    );
-                } else {
-                    this.oDial.open();
 
-                }
-            },
-            Mail_onPressClose: function () {
-                this.oDial.close();
-            }
+           
 
 
         });

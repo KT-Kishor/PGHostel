@@ -111,38 +111,38 @@
 										<f:content>
 											<core:Title text="{i18n>monthlyComponents}" />
 											<Label text="{i18n>basicSalary}" />
-											<Text text="{employeeModel>/BasicSalary}"  />
+											<Text text="INR {employeeModel>/BasicSalary}"  />
 											<Label text="{i18n>hra}" />
-											<Text text="{employeeModel>/HRA}"  />
+											<Text text="INR {employeeModel>/HRA}"  />
 											<Label text="{i18n>statutoryBonus}" />
-											<Text text="{employeeModel>/StatutoryBonus}"  />
+											<Text text="INR {employeeModel>/StatutoryBonus}"  />
 											<Label text="{i18n>totalMonthly}" class="boldBlackText" />
-											<Text text="{employeeModel>/TotalMonthly}"  />
+											<Text text="INR {employeeModel>/TotalMonthly}"  />
 											<Label text="{i18n>totalMonthlyAnnualized}" class="boldBlackText" />
-											<Text text="{employeeModel>/TotalmothlyAnnualized}"  />
+											<Text text="INR {employeeModel>/TotalmothlyAnnualized}"  />
 											<core:Title text="{i18n>retiralsBenefits}" />
 											<Label text="{i18n>tds}" />
-											<Text text="{employeeModel>/TDS}"  />
+											<Text text="INR {employeeModel>/TDS}"  />
 											<Label text="{i18n>medicalInsurance}" />
-											<Text text="{employeeModel>/MedicalInsurance}"  />
+											<Text text="INR {employeeModel>/MedicalInsurance}"  />
 											<Label text="{i18n>gratuity}" />
-											<Text text="{employeeModel>/Gratuity}"  />
+											<Text text="INR {employeeModel>/Gratuity}"  />
 											<Label text="{i18n>totalRetirals}" class="boldBlackText" />
-											<Text text="{employeeModel>/TotalRetires}"  />
+											<Text text="INR {employeeModel>/TotalRetires}"  />
 											<core:Title text="{i18n>variableComponents}" />
 											<Label text="{i18n>performanceBonus}" />
-											<Text text="{employeeModel>/PerformanceBonus}"  />
+											<Text text="INR {employeeModel>/PerformanceBonus}"  />
 											<Label text="{i18n>engagementPB}" />
-											<Text text="{employeeModel>/EngagementPB}"  />
+											<Text text="INR {employeeModel>/EngagementPB}"  />
 											<Label text="{i18n>totalVariableComponents}" class="boldBlackText" />
-											<Text text="{employeeModel>/TotalVariablePay}"  />
+											<Text text="INR {employeeModel>/TotalVariablePay}"  />
 											<core:Title text="{i18n>totalCost}" />
 											<Label text="{i18n>costOfCompany}" class="boldBlackText" />
-											<Text text="{employeeModel>/CostofCompany}"  />
+											<Text text="INR {employeeModel>/CostofCompany}"  />
 											<Label text="{i18n>joiningBonus}" class="boldBlackText" />
-											<Text text="{employeeModel>/JoiningBonus}"  />
+											<Text text="INR {employeeModel>/JoiningBonus}"  />
 											<Label text="{i18n>totalinr}" class="boldBlackText" />
-											<Text text="{employeeModel>/Total}"   />
+											<Text text="INR {employeeModel>/Total}"   />
 										</f:content>
 									</f:SimpleForm>
 								</WizardStep>
@@ -175,38 +175,38 @@
 											<Text text="{employeeModel>/EmployeeEmail}" />
 											<core:Title text="{i18n>monthlyComponents}" />
 											<Label text="{i18n>basicSalary}" />
-											<Text text="{employeeModel>/BasicSalary}" />
+											<Text text="INR {employeeModel>/BasicSalary}" />
 											<Label text="{i18n>hra}" />
-											<Text text="{employeeModel>/HRA}" />
+											<Text text="INR {employeeModel>/HRA}" />
 											<Label text="{i18n>statutoryBonus}" />
-											<Text text="{employeeModel>/StatutoryBonus}" />
+											<Text text="INR {employeeModel>/StatutoryBonus}" />
 											<Label text="{i18n>totalMontly}" />
-											<Text text="{employeeModel>/TotalMonthly}" />
+											<Text text="INR {employeeModel>/TotalMonthly}" />
 											<Label text="{i18n>totalAnnual}" />
-											<Text text="{employeeModel>/TotalmothlyAnnualized}" />
+											<Text text="INR {employeeModel>/TotalmothlyAnnualized}" />
 											<core:Title text="{i18n>retiralsBenefits}" />
 											<Label text="{i18n>tds}" />
-											<Text text="{employeeModel>/TDS}" />
+											<Text text="INR {employeeModel>/TDS}" />
 											<Label text="{i18n>medicalInsurancePremium}" />
-											<Text text="{employeeModel>/MedicalInsurance}" />
+											<Text text="INR {employeeModel>/MedicalInsurance}" />
 											<Label text="{i18n>gratuity}" />
-											<Text text="{employeeModel>/Gratuity}" />
+											<Text text="INR {employeeModel>/Gratuity}" />
 											<Label text="{i18n>totalRetires}" />
-											<Text text="{employeeModel>/TotalRetires}" />
+											<Text text="INR {employeeModel>/TotalRetires}" />
 											<core:Title text="{i18n>Variable Components}" />
 											<Label text="{i18n>performanceBonusSection}" />
-											<Text text="{employeeModel>/PerformanceBonus}" />
+											<Text text="INR {employeeModel>/PerformanceBonus}" />
 											<Label text="{i18n>engagementBonus}" />
-											<Text text="{employeeModel>/EngagementPB}" />
+											<Text text="INR {employeeModel>/EngagementPB}" />
 											<Label text="{i18n>totalVariableComponents}" />
-											<Text text="{employeeModel>/TotalVariablePay}" />
+											<Text text="INR {employeeModel>/TotalVariablePay}" />
 											<core:Title text="{i18n>totalCost}" />
 											<Label text="{i18n>costOfCompany}" />
-											<Text text="{employeeModel>/CostofCompany}" />
+											<Text text="INR {employeeModel>/CostofCompany}" />
 											<Label text="{i18n>joiningBonus}" />
-											<Text text="{employeeModel>/JoiningBonus}" />
+											<Text text="INR {employeeModel>/JoiningBonus}" />
 											<Label text="{i18n>totalinr}" />
-											<Text text="{employeeModel>/Total}" />
+											<Text text="INR {employeeModel>/Total}" />
 										</f:content>
 									</f:SimpleForm>
 								</WizardStep>

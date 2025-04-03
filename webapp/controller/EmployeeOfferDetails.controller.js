@@ -176,7 +176,7 @@ sap.ui.define([
                 this.validateStep();
             },
             EOD_onPressBack: function () {
-                this.getRouter().navTo("RouteEmployeeOffer",{valueEmp:"EmployeeOfferDetails"});
+                this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
             },
             //Step validation
             validateStep: function () {
@@ -186,7 +186,7 @@ sap.ui.define([
                 if (allFieldsFilled) {
                     // Validate each field directly
                     var isValid = utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") &&
-                        utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"),"ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_Bonus"), "ID");
+                        utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_Bonus"), "ID");
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
@@ -224,7 +224,7 @@ sap.ui.define([
                                     type: "Accept",
                                     press: function () {
                                         oDialog.close();
-                                        this.getRouter().navTo("RouteEmployeeOffer",{valueEmp:"EmployeeOfferDetails"});
+                                        this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
                                     }.bind(this)
                                 }),
                                 endButton: new sap.m.Button({
@@ -233,7 +233,7 @@ sap.ui.define([
                                     press: function () {
                                         this.EOUF_onPressMerge();
                                         oDialog.close();
-                                        this.getRouter().navTo("RouteEmployeeOffer",{valueEmp:"EmployeeOfferDetails"});
+                                        this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
                                     }.bind(this)
                                 }),
                                 afterClose: function () {
@@ -278,30 +278,47 @@ sap.ui.define([
 
             EOD_commonOpenDialog: function (dialogProperty, fragmentName) {
                 if (!this[dialogProperty]) {
-                    sap.ui.core.Fragment.load({
+                    return sap.ui.core.Fragment.load({
                         name: fragmentName,
                         controller: this,
                     }).then(function (oDialog) {
                         this[dialogProperty] = oDialog;
                         this.getView().addDependent(this[dialogProperty]);
                         this[dialogProperty].open();
+                        return this[dialogProperty];
                     }.bind(this));
                 } else {
                     this[dialogProperty].open();
                 }
             },
-            EOUF_onPressSendEmail: function () {
-                this.EOD_commonOpenDialog("EOUF_oDialog", "sap.kt.com.minihrsolution.fragment.CommonMail");
+            EOUF_onSendEmail: function () {
+                var oModel = this.getView().getModel("employeeModel");
+                var sEmail = oModel ? oModel.getProperty("/EmployeeEmail") : "";
+                this.EOD_commonOpenDialog("EOUF_oDialog", "sap.kt.com.minihrsolution.fragment.CommonMail")
+                    .then(function (oDialog) {
+                        oDialog.attachAfterOpen(function () {
+                            var oEmailInput = sap.ui.getCore().byId("Mail_id_Text"); // Input ID in fragment
+                            if (oEmailInput) {
+                                oEmailInput.setValue(sEmail);
+                            }
+                        });
+                    })
             },
             Mail_onPressClose: function () {
                 this.EOUF_oDialog.close();
+                this.EOUF_oDialog.destroy();
+                this.EOUF_oDialog.null;  
+            },
+            Mail_onSendEmail:function(){
+                
+
             },
             EOD_onPressBackBtn: function () {
                 this.EOD_commonOpenDialog("TCB_oDialog", "sap.kt.com.minihrsolution.fragment.CommonBack");
-               
+
             },
             onConfirmBack: function () {
-               this.getRouter().navTo("RouteEmployeeOffer",{valueEmp:"EmployeeOfferDetails"})
+                this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" })
                 this.TCB_oDialog.close();
             },
             onCancel: function () {
@@ -309,7 +326,7 @@ sap.ui.define([
             },
             onDialogClose: function () {
                 this.TCB_oDialog.destroy();
-                this.TCB_oDialog = null;   
+                this.TCB_oDialog = null;
             },
             EOUF_onPressMerge: function () {
                 var oModel = this.getView().getModel("employeeModel");
@@ -318,19 +335,19 @@ sap.ui.define([
             async offerGeneratingPdfFunction(oModel) {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
                 var oPDFCondModel = this.getView().getModel("PDFConditionModel");
-                if (oCoModel && oPDFCondModel){
+                if (oCoModel && oPDFCondModel) {
                     oCoModel.destroy();
                     oPDFCondModel.destroy();
                     this.getView().setModel(null, "CompanyCodeDetailsModel");
                     this.getView().setModel(null, "PDFConditionModel");
                 }
                 var oEmpModel = oModel.getData();
-            
+
                 try {
                     this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
                     this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
                     await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
-            
+
                     var oPDFModel = this.getView().getModel("PDFData");
                     oPDFModel.setProperty("/Type", "EmployeeOffer");
                     oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
@@ -340,10 +357,10 @@ sap.ui.define([
                     oPDFModel.setProperty("/CreateDate", oEmpModel.OfferReleaseDate);
                     oPDFModel.setProperty("/JoiningDate", oEmpModel.JoiningDate);
                     oPDFModel.setProperty("/EmpCTC", oEmpModel.CostofCompany);
-                    if(oEmpModel.EmploymentBond == "0" || oEmpModel.EmploymentBond == ""){
+                    if (oEmpModel.EmploymentBond == "0" || oEmpModel.EmploymentBond == "") {
                         oPDFModel.setProperty("/BondCondition", "18 employment months");
                     }
-                    else{
+                    else {
                         oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond years");
                     }
                     oPDFModel.setProperty("/MonthlyComponents/0/Text", oEmpModel.TotalmothlyAnnualized);
@@ -365,13 +382,13 @@ sap.ui.define([
                     var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                     oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
                     oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
-                    var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();    
-            
+                    var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
+
                     if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
                         MessageToast.show("Company Logo or Model not found.");
                         return;
                     }
-            
+
                     if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
                         var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
                         var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
@@ -380,7 +397,7 @@ sap.ui.define([
                             oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
                         }
                     }
-            
+
                     if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                         if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
                             jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
@@ -388,22 +405,22 @@ sap.ui.define([
                             console.error("Error: jsPDF._GeneratePDF function not found.");
                         }
                     }
-            
+
                 } catch (error) {
                     console.error("Error waiting for models:", error);
                 }
-            },                        
-            
+            },
+
             _waitForModels(modelNames, interval = 200, timeout = 5000) {
                 return new Promise((resolve, reject) => {
                     const startTime = Date.now();
-            
+
                     const checkModels = () => {
                         let allLoaded = modelNames.every(modelName => {
                             let model = this.getView().getModel(modelName);
                             return model && model.getData() && Object.keys(model.getData()).length > 0;
                         });
-            
+
                         if (allLoaded) {
                             resolve(); // ✅ Proceed when models have data
                         } else if (Date.now() - startTime > timeout) {
@@ -412,7 +429,7 @@ sap.ui.define([
                             setTimeout(checkModels, interval);
                         }
                     };
-            
+
                     checkModels();
                 });
             }

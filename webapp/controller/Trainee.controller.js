@@ -6,31 +6,31 @@ sap.ui.define([
     "sap/m/MessageBox",
     "../model/formatter"
 ],
-function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Trainee", {
             Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
-                
+
             },
             _onRouteMatched: function (oEvent) {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._fetchCommonData("Designation", "DesignationModel");
-                this._fetchCommonData("Department", "Departmentmodel");   
+                this._fetchCommonData("Department", "Departmentmodel");
                 ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
                 ["T_id_Download", "T_id_EmpOnBoard"].forEach(id => this.byId(id)?.setVisible(false));
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
                 this.oValue = oEvent.getParameter("arguments").value;
-                if(this.oValue==="Trainee"){
-                this.readCallForTrainee("Initial");
-                 this.T_onPressClear();
+                if (this.oValue === "Trainee") {
+                    this.readCallForTrainee("Initial");
+                    this.T_onPressClear();
                 }
-                else{
-                 this.T_onSearch(); 
-                }           
+                else {
+                    this.T_onSearch();
+                }
             },
-     
+
             readCallForTrainee: function (filter) {
                 this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -39,7 +39,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                         offerData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "")
                             .map(item => [item.TraineeName.trim(), item])).values()];
                         this.getView().setModel(new JSONModel(offerData), "traineeModelInitial");
-        
+
                         let reportingManagerData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "")
                             .map(item => [item.ReportingManager.trim(), item])).values()];
                         this.getView().setModel(new JSONModel(reportingManagerData), "traineeModelInitial");
@@ -49,7 +49,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                     sap.ui.core.BusyIndicator.hide();
                     MessageBox.error(this.i18nModel.getText("commonReadingDataError"))
                 });
-            },        
+            },
             T_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
@@ -104,7 +104,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                     this.byId("T_id_RejectBtn").setVisible(isOtherButtonsVisible);
                 }
             },
-            updateCallForTrainee: function (oTraineeData,text) {
+            updateCallForTrainee: function (oTraineeData, text) {
                 var that = this;
                 if (oTraineeData.Status === "OnBoarded") {
                     oTraineeData.CompanyEmailID = sap.ui.getCore().byId("OTF_id_TraineeMail").getValue();
@@ -169,9 +169,10 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 });
                 dialog.open();
             },
+
             _handleReject: function (oContext) {
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
-                this.updateCallForTrainee(oContext.getObject(),"traineeRejectSucess");
+                this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
                 ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
             },
             OTF_onPressOnboard: function () {
@@ -181,7 +182,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                         // Update UI Model
                         oContext.getModel().setProperty(oContext.getPath() + "/Status", "OnBoarded");
                         // Prepare Data for Update Call
-                        this.updateCallForTrainee(oContext.getObject(),"traineeOnboardSucess");
+                        this.updateCallForTrainee(oContext.getObject(), "traineeOnboardSucess");
                         this.TOb_oDialog.close();
                         ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
                     } else {
@@ -213,7 +214,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
 
             TCF_onPressCloseDialog: function () {
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValueState("None");
-                sap.ui.getCore().byId("TCF_id_ProjectName").setValue(""); 
+                sap.ui.getCore().byId("TCF_id_ProjectName").setValue("");
                 this.TC_oDialog.close();
             },
             //download certificate
@@ -237,7 +238,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                         Status: "Training Completed",
                     };
                     sap.ui.core.BusyIndicator.show(0);
-                    this.updateCallForTrainee(oUpdatedData,"downloadSucess");
+                    this.updateCallForTrainee(oUpdatedData, "downloadSucess");
                     this.byId("T_id_Download").setVisible(false);
                     sap.ui.core.BusyIndicator.hide();
                     this.TC_oDialog.close();
@@ -247,25 +248,25 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 }
             },
             T_onBoardTrainee: function () {
-                var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem(); 
-                var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject(); 
+                var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
+                var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
                 this.getRouter().navTo("RouteEmployeeOfferDetails", {
                     sParOffer: oTraineeModel.TraineeName,
-                    sParEmployee:  oTraineeModel.NameSalutation
+                    sParEmployee: oTraineeModel.NameSalutation
                 });
-            },    
-            T_onSearch: function (oEvent) {
+            },
+            T_onSearch: function () {
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
-                var params = {}; 
+                var params = {};
                 aFilterItems.forEach(function (oItem) {
-                    var oControl = oItem.getControl(); 
-                    var sValue = oItem.getName(); 
+                    var oControl = oItem.getControl();
+                    var sValue = oItem.getName();
                     if (oControl && oControl.getValue()) {
                         if (sValue === "JoiningDate") {
                             params["startDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
-                            params["endDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1])); 
-                        }else{
+                            params["endDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
+                        } else {
                             params[sValue] = oControl.getValue();
                         }
                     }
@@ -277,19 +278,19 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
             T_onPressClear: function () {
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
                 aFilterItems.forEach(function (oItem) {
-                  var oControl = oItem.getControl(); // Get the associated control
-                  if (oControl) {
-                    if (oControl.setValue) {
-                      oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
+                    var oControl = oItem.getControl(); // Get the associated control
+                    if (oControl) {
+                        if (oControl.setValue) {
+                            oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
+                        }
+                        if (oControl.setSelectedKey) {
+                            oControl.setSelectedKey(""); // Reset selection for dropdowns
+                        }
+                        if (oControl.setSelected) {
+                            oControl.setSelected(false); // Reset selection for Checkboxes
+                        }
                     }
-                    if (oControl.setSelectedKey) {
-                      oControl.setSelectedKey(""); // Reset selection for dropdowns
-                    }
-                    if (oControl.setSelected) {
-                      oControl.setSelected(false); // Reset selection for Checkboxes
-                    }
-                  }
                 });
-              },
+            },
         });
     });

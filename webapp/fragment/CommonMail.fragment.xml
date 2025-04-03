@@ -33,10 +33,10 @@
             </HBox>
                 
                 <Label text="{i18n>toMailText}" required="true" />
-                <Input value="{UploaderData>/ToEmail}" change="onEmailChange" editable="false" />
+                <Input id="Mail_id_Text" change="onEmailChange" editable="false" />
 
                 <Label text="{i18n>ccMailText}" required="true" />
-                <TextArea value="{UploaderData>/CCEmail}" maxLength="600" liveChange="onEmailChange"/>
+                <TextArea value="" maxLength="600" liveChange="onEmailChange"/>
 			</f:content>
 		</f:SimpleForm>
 
@@ -44,7 +44,7 @@
 	    <!-- <rich:RichTextEditor visible="{loginModel>/sendEmail}" value="{UploaderData>/htmlbody}" class="sapUiContentPadding" width="100%" /> -->
 
         <FlexBox justifyContent="End">
-           <Button text="{i18n>tileFooter}" type="Emphasized"  class="sendMail" press="Mail_onPressSaveEmail"  visible="{UploaderData>/button}" />
+           <Button text="{i18n>tileFooter}" type="Emphasized"  class="sendMail" press="Mail_onSendEmail"  visible="{UploaderData>/button}" />
             <Button text="{i18n>close}" width="80px"  class="sendMail" press="Mail_onPressClose"/>
     	</FlexBox>
     </Dialog>

@@ -77,7 +77,7 @@
 							<Text text="{EmployeeOfferModel>Salutation} {EmployeeOfferModel>ConsultantName}"/>
 							<Text text="{EmployeeOfferModel>Designation}"/>
 							<Text text="{EmployeeOfferModel>BaseLocation}"/>
-							<Text text="{EmployeeOfferModel>CTC}"/>
+							<Text text="INR {path: 'EmployeeOfferModel>CTC' ,formatter: '.Formatter.formatCurrencyInINRText'}"/>
 							<Text text="{EmployeeOfferModel>JoiningDate}"/>
 							<ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true"
                         state="{path:'EmployeeOfferModel>Status', formatter: '.Formatter.formatObjectStatus'}" />

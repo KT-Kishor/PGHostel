@@ -109,21 +109,25 @@ sap.ui.define([
             },
             onHandleEmployeeAction: function (status, actionMethod) {
                 var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
-                this.oSelectedRow = oSelectedData
-                var oEmpModelData = this.getView().getModel("EmployeeModel")
+                this.oSelectedRow = oSelectedData;    
+
                 var sName = oSelectedData.Salutation + " " + oSelectedData.ConsultantName;
                 var that = this;
-                // Confirm dialog before proceeding with status update
+                // Confirm message
                 var sMessage = (status === "OnBoarded")
                     ? that.i18nModel.getText("confirmOnboard", [sName])
                     : that.i18nModel.getText("confirmReject", [sName]);
-                sap.m.MessageBox.confirm(sMessage, {
+            
+                var oDialog = new sap.m.Dialog({
                     title: (status === "OnBoarded")
                         ? that.i18nModel.getText("confirmTitleOnboard")
                         : that.i18nModel.getText("confirmTitleReject"),
-                    actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                    onClose: function (oAction) {
-                        if (oAction === sap.m.MessageBox.Action.YES) {
+                    type: "Message",
+                    content: new sap.m.Text({ text: sMessage }),
+                    beginButton: new sap.m.Button({
+                        text: that.i18nModel.getText("OkButton"),
+                        type: "Accept", // Green Button
+                        press: function () {
                             if (status === "OnBoarded") {
                                 const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({
                                     Salutation: oSelectedData.Salutation,
@@ -148,9 +152,21 @@ sap.ui.define([
                             } else {
                                 that[actionMethod]();
                             }
+                            oDialog.close();
                         }
+                    }),
+                    endButton: new sap.m.Button({
+                        text: that.i18nModel.getText("CancelButton"),
+                        type: "Reject", // Red Button
+                        press: function () {
+                            oDialog.close();
+                        }
+                    }),
+                    afterClose: function () {
+                        oDialog.destroy();
                     }
                 });
+                oDialog.open();
             },
             _commonFragmentOpenOffer:function(){
                 if (!this.oDialog) {
