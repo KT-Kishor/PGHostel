@@ -44,7 +44,7 @@
                     growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				 <headerToolbar>
                 <OverflowToolbar >
-                    <Title id="T_id_Title" text="{i18n>traineeDetails}"/>
+                    <Title id="T_id_Title" text="{i18n>traineeDetails} ({= ${traineeModel>/}.length })"/>
                     <ToolbarSpacer/>
                     <Button  tooltip="{i18n>downloadcCertificate}" id="T_id_Download"  type="Default" press="T_onCertDownload"  icon="sap-icon://document-text" visible="false"/>
                     <Button  tooltip="{i18n>onboardEmp}" id="T_id_EmpOnBoard"  type="Emphasized" press="T_onBoardTrainee"  icon="sap-icon://employee" visible="false"/>

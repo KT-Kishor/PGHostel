@@ -12,6 +12,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
             Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
+                
             },
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -21,13 +22,14 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
                 ["T_id_Download", "T_id_EmpOnBoard"].forEach(id => this.byId(id)?.setVisible(false));
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
-                this.T_onSearch();
+                this.T_onSearch(); 
+              
             },
+     
             readCallForTrainee: function (filter) {
                 this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getView().setModel(new JSONModel(offerData), "traineeModel");
-            
+                    this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
                     if (filter === "Initial") {
                         offerData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "")
                             .map(item => [item.TraineeName.trim(), item])).values()];
@@ -40,7 +42,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                     sap.ui.core.BusyIndicator.hide();
                 }).catch((oError) => {
                     sap.ui.core.BusyIndicator.hide();
-                    MessageBox.error("Error while reading the trainee details")
+                    MessageBox.error(this.i18nModel.getText("commonReadingDataError"))
                 });
             },        
             T_ValidateCommonFields: function (oEvent) {
@@ -83,20 +85,15 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
 
             T_onTableSelectionChange: function (oEvent) {
                 var oSelectedItem = oEvent.getParameter("listItem");
-
                 if (oSelectedItem) {
                     var sStatus = oSelectedItem.getBindingContext("traineeModel").getProperty("Status");
-
                     var isDisabled = sStatus === "OnBoarded" || sStatus === "Rejected";
                     this.byId("T_id_OnboardBtn").setEnabled(!isDisabled);
                     this.byId("T_id_RejectBtn").setEnabled(!isDisabled);
-
                     var isCertificateVisible = sStatus === "Training Completed" || sStatus === "OnBoarded";
                     this.byId("T_id_Download").setVisible(isCertificateVisible);
-
                     var isEmpOnBoardVisible = sStatus === "Training Completed";
                     this.byId("T_id_EmpOnBoard").setVisible(isEmpOnBoardVisible);
-
                     var isOtherButtonsVisible = sStatus !== "Training Completed";
                     this.byId("T_id_OnboardBtn").setVisible(isOtherButtonsVisible);
                     this.byId("T_id_RejectBtn").setVisible(isOtherButtonsVisible);
@@ -133,20 +130,20 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
             },
             onHandleTraineeAction: function (action) {
                 var that = this;
-                var oContext = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel");
+                var oContext = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel");            
                 var message = (action === "onboard")
-                    ? "Are you sure you want to onboard " + oContext.getProperty("NameSalutation") + " " + oContext.getProperty("TraineeName") + "?"
-                    : "Are you sure you want to reject " + oContext.getProperty("NameSalutation") + " " + oContext.getProperty("TraineeName") + "?";
+                    ? this.i18nModel.getText("OnboardMessage", [oContext.getProperty("NameSalutation"), oContext.getProperty("TraineeName")])
+                    : this.i18nModel.getText("RejectMessage", [oContext.getProperty("NameSalutation"), oContext.getProperty("TraineeName")]);
                 var dialog = new sap.m.Dialog({
-                    title: "Confirm Action",
+                    title: this.i18nModel.getText("ConfirmActionTitle"),
                     type: "Message",
                     content: new sap.m.Text({ text: message }),
                     beginButton: new sap.m.Button({
-                        text: "OK",
+                        text: this.i18nModel.getText("OkButton"),
                         type: "Accept",
                         press: function () {
                             if (action === "onboard") {
-                                // Open the OnboardTrainee fragment after onboarding logic
+                                // Open the OnboardTrainee fragment
                                 that.TC_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee", "");
                             } else if (action === "reject") {
                                 that._handleReject(oContext);
@@ -155,7 +152,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                         }
                     }),
                     endButton: new sap.m.Button({
-                        text: "Cancel",
+                        text: this.i18nModel.getText("CancelButton"),
                         type: "Reject",
                         press: function () {
                             dialog.close();
@@ -202,12 +199,9 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                 var oCalculatedEndDate = new Date(oJoiningDate);
                 oCalculatedEndDate.setMonth(oCalculatedEndDate.getMonth() + 6);
                 var sFormattedEndDate = oCalculatedEndDate.toISOString().split("T")[0];
-
                 oTraineeModel.EndDate = new Date(sFormattedEndDate)
-
                 var oTraineeContext = oSelectedItem.getBindingContext("traineeModel");
                 this.getView().setBindingContext(oTraineeContext, "traineeModel");
-
                 // Open the dialog
                 this.TC_commonOpenDialog("TC_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate", "TCF_id_EndDate");
             },
@@ -242,7 +236,6 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                     this.byId("T_id_Download").setVisible(false);
                     sap.ui.core.BusyIndicator.hide();
                     this.TC_oDialog.close();
-
                 } catch (oError) {
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -255,8 +248,7 @@ function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter)
                     sParOffer: oTraineeModel.TraineeName,
                     sParEmployee:  oTraineeModel.NameSalutation
                 });
-            },
-           
+            },    
             T_onSearch: function (oEvent) {
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
