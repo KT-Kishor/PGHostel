@@ -25,7 +25,7 @@
                         <m:Label text="{i18n>comments}" required="true"/>
                         <m:TextArea id="idcomment" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Comments}" rows="2" valueStateText="Invalid entry" />
                         <m:Label text=""/>
-                        <m:Button text="{i18n>savebtn}" type="Accept" press=".onDemoformSave" />
+                        <m:Button text="{i18n>savebtn}" type="Accept" press="onDemoformSave" />
                     </f:content>
                 </f:SimpleForm>
         </l:content>

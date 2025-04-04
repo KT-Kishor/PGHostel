@@ -33,7 +33,7 @@
                             <ComboBox
                             showClearIcon="true"
                                 name="Model"
-                                items="{MainModel>/data}"
+                                items="{MainModel>/results}"
                                 id="SU_id_ModelComboBox"
                                 enabled="true"
                                 change="SU_onModelChange"
@@ -57,7 +57,7 @@
                                 name="Variant"
                                 id="SU_id_Variant1"
                                 enabled="true"
-                                items="{MainModel>/data}"
+                                items="{MainModel>/results}"
                             >
                                 <core:Item
                                     key="{MainModel>Variant}"
@@ -78,7 +78,7 @@
                             showClearIcon="true"
                                 name="Transmission"
                                 id="SU_id_Transmission1"
-                                items="{MainModel>/data}"
+                                items="{MainModel>/results}"
                                 enabled="true"
                             >
                                 <core:Item
@@ -98,7 +98,7 @@
                 class="sapUiTinyMargin"
                 width="auto"
                 inset="false"
-                items="{MainModel>/data}"
+                items="{MainModel>/results}"
                 mode="SingleSelectLeft"
                 growing="true"
                 growingThreshold="50"
@@ -107,7 +107,7 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title
-                            text="Quotation Scheme ({= ${MainModel>/data}.length })"
+                            text="Quotation Scheme ({= ${MainModel>/results}.length })"
                             level="H2"
                         />
                         <ToolbarSpacer />

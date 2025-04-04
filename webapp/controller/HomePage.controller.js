@@ -217,16 +217,15 @@ sap.ui.define(
           var oModel = this.getView().getModel("formData");
           var oData = JSON.parse(JSON.stringify(oModel.getData())); // Deep copy to avoid reference issues
           var payload = [oData];
-          var that = this;
 
           // Form Validation
           if (
             utils._LCvalidateMandatoryField(this.byId("idCompanyname"), "ID") &&
             utils._LCvalidateName(this.byId("idcustomername"), "ID") &&
             utils._LCvalidateEmail(this.byId("idCustmailid"), "ID") &&
-            utils._LCvalidateMandatoryField(this.byId("idCustaddress"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idtimeslot"), "ID") &&
             utils._LCvalidateMobileNumber(this.byId("idmobilenumber"), "ID") &&
+            utils._LCvalidateMandatoryField(this.byId("idCustaddress"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idcomment"), "ID")
           ) {
             // AJAX Call to Save Data
@@ -255,7 +254,6 @@ sap.ui.define(
                 oModel.refresh(true);
                 MessageToast.show("Data saved successfully!");
 
-                that.SendEmail(oData.Email, oData.CustomerName);
                 // AJAX Call to Send Email
               },
               error: function (xhr, status, error) {
@@ -267,31 +265,6 @@ sap.ui.define(
           }
         },
 
-        SendEmail: function (Email, CustomerName) {
-          // Prepare email payload
-          var emailPayload = {
-            to: Email,
-            toName: CustomerName,
-            Type: "CustDemo",
-          };
-          $.ajax({
-            url: this.API + "/SendEmail",
-            type: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
-            data: JSON.stringify(emailPayload),
-            success: function (emailResponse) {
-              MessageToast.show("Confirmation email sent!");
-            },
-            error: function (emailError) {
-              MessageToast.show("Error sending confirmation email.");
-            },
-          });
-        },
         Tbtn_onPress: function () {
           var oView = this.getView();
           if (!this.oDialog) {
@@ -341,7 +314,7 @@ sap.ui.define(
           // Convert Array to Comma-Separated String
           oData.SelectCourse = aSelectedKeys.join(", "); // Example: "SAP UI5, HANA, OData"
 
-          var opayload = [oData]; // Wrap data in an array
+          var opayload = oData; // Wrap data in an array
 
           var that = this;
           if (
@@ -388,7 +361,7 @@ sap.ui.define(
                 oModel.setData(resetData);
                 oModel.refresh(true);
                 that.oDialog.close();
-                MessageToast.show("Data saved successfully!");
+                MessageToast.show("");
               },
               error: function (xhr, status, error) {
                 MessageToast.show("Error saving data. Please try again.");

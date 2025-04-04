@@ -90,7 +90,7 @@ sap.ui.define(
                   MessageToast.show("No data found.");
                 }
               },
-              error: function () {
+              errr: function () {
                 BusyIndicator.hide();
                 MessageToast.show("Error fetching data.");
               },
@@ -113,67 +113,76 @@ sap.ui.define(
             return;
           }
 
-          // Validate required fields only for new entries
-          if (!oData.id && !this.validateRequiredFields()) {
+          if (oData.isCreateMode && !this.validateRequiredFields()) {
             return;
           }
-          var oPayload = [
-            {
-              ID: oData.ID,
-              Variant: oData.Variant,
-              Model: oData.Model,
-              Fuel: oData.Fuel,
-              Transmission: oData.Transmission,
-              Color: oData.Color,
-              BoardPlate: oData.BoardPlate,
-              EXShowroom: oData.EXShowroom,
-              ConsumerScheme: oData.ConsumerScheme,
-              EXShowroomAfterScheme: oData.EXShowroomAfterScheme,
-              TCS1Perc: oData.TCS1Perc,
-              ROADTAX: oData.ROADTAX,
-              AddOnInsurance: oData.AddOnInsurance,
-              ShieldOfTrust4YR45K: oData.ShieldOfTrust4YR45K,
-              RegHypCharge: oData.RegHypCharge,
-              EXTDWarrantyFOR4YR80K: oData.EXTDWarrantyFOR4YR80K,
-              STDFittings: oData.STDFittings,
-              FastTag: oData.FastTag,
-              VAS: oData.VAS,
-              RSA: oData.RSA,
-              DiscountOffers: oData.DiscountOffers,
-              Make: oData.Make,
-              Emission: oData.Emission,
-            },
-          ];
 
-          var oSaveData = Object.assign({}, oData);
-          delete oSaveData.isEditable;
-          delete oSaveData.isCreateMode;
+          var bIsUpdate = !!oData.ID;
+          var sType = bIsUpdate ? "PUT" : "POST";
+          var sEndpoint =
+            "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade"; // Don't append ID to URL
 
-          var sType = oData.ID ? "PUT" : "POST";
-          if (sType === "POST") delete oPayload[0].ID;
+          var oPayload = {
+            variant: oData.Variant,
+            model: oData.Model,
+            fuel: oData.Fuel,
+            transmission: oData.Transmission,
+            color: oData.Color,
+            boardPlate: oData.BoardPlate,
+            exShowroom: oData.EXShowroom,
+            consumerScheme: oData.ConsumerScheme,
+            exShowroomAfterScheme: oData.EXShowroomAfterScheme,
+            TCS1Perc: oData.TCS1Perc,
+            roadTax: oData.ROADTAX,
+            addOnInsurance: oData.AddOnInsurance,
+            shieldOfTrust4YR45K: oData.ShieldOfTrust4YR45K,
+            regHypCharge: oData.RegHypCharge,
+            EXTDWarrantyFOR4YR80K: oData.EXTDWarrantyFOR4YR80K,
+            STDFittings: oData.STDFittings,
+            fastTag: oData.FastTag,
+            VAS: oData.VAS,
+            RSA: oData.RSA,
+            discountOffers: oData.DiscountOffers,
+            make: oData.Make,
+            emission: oData.Emission,
+          };
+
+          var oRequestBody = bIsUpdate
+            ? { data: oPayload, filters: { ID: oData.ID } }
+            : { data: oPayload };
 
           BusyIndicator.show(0);
 
           $.ajax({
-            url: "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade",
+            url: sEndpoint,
             type: sType,
-            contentType: "application/json",
             headers: {
+              "Content-Type": "application/json",
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
               password:
                 "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
             },
-            data: JSON.stringify({ data: oSaveData, oPayload }),
-            success: function () {
+            data: JSON.stringify(oRequestBody),
+            success: function (response) {
               BusyIndicator.hide();
-              MessageToast.show("Data saved successfully.");
+              MessageToast.show(
+                bIsUpdate
+                  ? "Scheme Updated Successfully"
+                  : "Scheme Created Successfully"
+              );
+
+              if (response && response.ID) {
+                oModel.setProperty("/ID", response.ID);
+              }
 
               oModel.setProperty("/isEditable", false);
               oView.byId("SUD_id_Edit").setText("Edit");
             },
-            error: function () {
+            error: function (jqXHR) {
               BusyIndicator.hide();
-              MessageToast.show("Error saving data.");
+              var sError =
+                jqXHR.responseJSON?.error || "Error: " + jqXHR.statusText;
+              MessageToast.show(sError);
             },
           });
         },

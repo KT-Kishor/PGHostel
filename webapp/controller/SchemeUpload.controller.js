@@ -25,65 +25,66 @@ sap.ui.define(
             .attachMatched(this._RouteAppVisibility, this);
         },
         _RouteAppVisibility: function () {
-          this.API =
-            "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade";
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().setModel(new JSONModel({ isFileValid: false })); //for createfragmentsubmit button
+          this.CommomReadCall("");
           this.MainModel = new JSONModel({ items: [] }); // Store table data
-          this.getOwnerComponent().setModel(this.MainModel, "MainModel");
           // Fetch data on initialization
-          this.CommomReadCall();
         },
         //for Search
         SU_onSearch: function () {
           BusyIndicator.show(0);
+
           var oView = this.getView();
           var oFilterBar = oView.byId("SU_id_Filterbar");
-          var oModel = oView.getModel("MainModel");
-          var sUrl = this.API;
           var aFilters = [];
+          var sUrl =
+            "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade";
 
-          // Handle Model ComboBox
+          // Handle mandatory Model ComboBox
           var oModelComboBox = oView.byId("SU_id_ModelComboBox");
           var sModelSelectedKey = oModelComboBox.getSelectedKey();
 
-          // Validate mandatory Model ComboBox
           if (!sModelSelectedKey) {
             oModelComboBox.setValueState("Error");
             BusyIndicator.hide();
             MessageToast.show("Please select a model");
             return;
           }
+
           oModelComboBox.setValueState("None");
           aFilters.push("model=" + encodeURIComponent(sModelSelectedKey));
 
-          // Collect other filters
+          // Iterate over FilterBar controls, skip "Model" since we already handled it
           oFilterBar.getFilterGroupItems().forEach(function (oItem) {
             var oControl = oItem.getControl();
-            var sValue;
+            var sName = oItem.getName();
 
-            // Handle different control types
+            // Skip model filter (already handled above)
+            if (sName === "Model") {
+              return;
+            }
+
+            var sValue;
             if (
               oControl instanceof sap.m.ComboBox ||
               oControl instanceof sap.m.Select
             ) {
               sValue = oControl.getSelectedKey();
             } else if (oControl instanceof sap.m.DatePicker) {
-              sValue = oControl.getDateValue()?.toISOString().split("T")[0]; // Format date
+              sValue = oControl.getDateValue()?.toISOString().split("T")[0];
             } else {
               sValue = oControl.getValue();
             }
 
             if (sValue) {
               aFilters.push(
-                encodeURIComponent(oItem.getName()) +
-                  "=" +
-                  encodeURIComponent(sValue)
+                encodeURIComponent(sName) + "=" + encodeURIComponent(sValue)
               );
             }
           });
 
-          // Build final URL
+          // Append filters to URL
           if (aFilters.length) {
             sUrl += (sUrl.includes("?") ? "&" : "?") + aFilters.join("&");
           }
@@ -91,6 +92,7 @@ sap.ui.define(
           this.CommomReadCall(sUrl);
           BusyIndicator.hide();
         },
+
         SU_onClear: function () {
           var oFilterBar = this.getView().byId("SU_id_Filterbar");
           oFilterBar.getFilterGroupItems().forEach(function (oItem) {
@@ -194,14 +196,17 @@ sap.ui.define(
           }
 
           const oData = oModel.getData();
-          if (!oData || !Array.isArray(oData) || oData.length === 0) {
+          const aResults = oData.results;
+
+          if (!Array.isArray(aResults) || aResults.length === 0) {
             MessageToast.show(this.i18nModel.getText("noData"));
             return;
           }
+
           const aCols = this.createColumnConfig();
           const oSettings = {
             workbook: { columns: aCols, hierarchyLevel: "Level" },
-            dataSource: oData,
+            dataSource: aResults,
             fileName: "QuotationScheme.xlsx",
             worker: false,
           };
@@ -220,11 +225,57 @@ sap.ui.define(
             { label: "Color", property: "Color", type: "string" },
             { label: "Fuel", property: "Fuel", type: "string" },
             { label: "BoardPlate", property: "BoardPlate", type: "string" },
+            { label: "Ex-showroom", property: "EXShowroom", type: "number" },
+            {
+              label: "Consumer Scheme",
+              property: "ConsumerScheme",
+              type: "number",
+            },
+            {
+              label: "Ex-Showroom  after Scheme",
+              property: "EXShowroomAfterScheme",
+              type: "number",
+            },
+            { label: "TCS  1%", property: "TCS1Perc", type: "number" },
+            { label: "ROAD TAX", property: "ROADTAX", type: "number" },
+            {
+              label: "Regular Insurance",
+              property: "Regular Insurance",
+              type: "number",
+            },
+            {
+              label: "Add On Insurance",
+              property: "AddOnInsurance",
+              type: "number",
+            },
+            { label: "Temp Charges", property: "Temp Charges", type: "number" },
+            { label: "RegHypCHARGE", property: "RegHypCharge", type: "number" },
+            {
+              label: "Shield of trust 4YR45K",
+              property: "ShieldOfTrust4YR45K",
+              type: "number",
+            },
+            {
+              label: "EXTD Warranty FOR 4YR80K",
+              property: "EXTDWarrantyFOR4YR80K",
+              type: "number",
+            },
+            { label: "RSA", property: "RSA", type: "number" },
+            { label: "STD Fittings", property: "STDFittings", type: "number" },
+            { label: "FAST TAG", property: "FastTag", type: "number" },
+            { label: "VAS", property: "VAS", type: "number" },
+            {
+              label: "Discountoffers",
+              property: "DiscountOffers",
+              type: "number",
+            },
+            { label: "Make", property: "Make", type: "string" },
+            { label: "Emission", property: "Emission", type: "string" },
           ];
         },
         SU_onDeletepress: function () {
           var that = this;
-          var oTable = this.byId("SU_id_Quotationtable"); // Verify table ID spelling
+          var oTable = this.byId("SU_id_Quotationtable");
           var oSelectedItem = oTable.getSelectedItem();
 
           if (!oSelectedItem) {
@@ -239,43 +290,39 @@ sap.ui.define(
             title: that.i18nModel.getText("msgBoxConfirm"),
             onClose: function (oAction) {
               if (oAction === MessageBox.Action.OK) {
-                BusyIndicator.show(0);
-
-                // 1. Fix potential URL typo ("SchemeUploade" -> "SchemeUpload"?)
+                BusyIndicator.show();
 
                 $.ajax({
-                  url: `https://www.rest.kalpavrikshatechnologies.com/SchemeUploade/${sID}`,
+                  url: "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade",
                   type: "DELETE",
-                  ContentType: "application/json",
                   headers: {
+                    "Content-Type": "application/json",
                     name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
                     password:
-                      "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u", // Ensure backend understands JSON
+                      "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
                   },
                   data: JSON.stringify({
-                    filter: {
+                    filters: {
                       ID: sID,
                     },
                   }),
                   success: function () {
                     BusyIndicator.hide();
-                    // 4. Refresh the model after deletion
-                    var oModel = that.getView().getModel("MainModel");
-                    oModel.refresh(); // Force model reload
+                    oTable.removeSelections();
+                    that.CommomReadCall("");
                     MessageToast.show(
                       that.i18nModel.getText("msgSchemeDeleted")
                     );
                   },
                   error: function (jqXHR) {
                     BusyIndicator.hide();
-                    MessageToast.show(
+                    var errorMessage =
                       jqXHR.responseJSON?.error ||
-                        that.i18nModel.getText("quoschemeerrordeelterow")
-                    );
+                      that.i18nModel.getText("quoschemeerrordeelterow");
+                    MessageToast.show(errorMessage);
                   },
                 });
               }
-              oTable.removeSelections();
             },
           });
         },
@@ -293,96 +340,87 @@ sap.ui.define(
 
           sap.ui.core.BusyIndicator.show(0);
 
-          try {
-            // Format Data
-            var formattedData = that._uploadedExcelData.map((row) => ({
-              Variant: row["Variant"] || "",
-              Model: row["Model"] || "",
-              Transmission: row["Transmission"] || "",
-              Color: row["Color"] || "",
-              Fuel: row["Fuel"] || "",
-              BoardPlate: row["BoardPlate"] || "",
-              EXShowroom: row["Ex-showroom"] || "",
-              ConsumerScheme: row["Consumer Scheme"] || "",
-              EXShowroomAfterScheme: row["Ex-Showroom  after Scheme"] || "",
-              TCS1Perc: row["TCS  1%"] || "",
-              ROADTAX: row["ROAD TAX"] || "",
-              AddOnInsurance: row["Add On Insurance"] || "",
-              RegHypCharge: row["RegHypCHARGE"] || "",
-              ShieldOfTrust4YR45K: row["Shield of trust 4YR45K"] || "",
-              EXTDWarrantyFOR4YR80K: row["EXTD Warranty FOR 4YR80K"] || "",
-              STDFittings: row["STD Fittings"] || "",
-              FastTag: row["FAST TAG"] || "",
-              VAS: row["VAS"] || "",
-              RSA: row["RSA"] || "",
-              DiscountOffers: row["Discountoffers"] || "",
-              Make: row["Make"] || "",
-              Emission: row["Emission"] || "",
-            }));
+          // Format Data
+          var formattedData = that._uploadedExcelData.map((row) => ({
+            Variant: row["Variant"] || "",
+            Model: row["Model"] || "",
+            Transmission: row["Transmission"] || "",
+            Color: row["Color"] || "",
+            Fuel: row["Fuel"] || "",
+            BoardPlate: row["BoardPlate"] || "",
+            EXShowroom: row["Ex-showroom"] || "",
+            ConsumerScheme: row["Consumer Scheme"] || "",
+            EXShowroomAfterScheme: row["Ex-Showroom  after Scheme"] || "",
+            TCS1Perc: row["TCS  1%"] || "",
+            ROADTAX: row["ROAD TAX"] || "",
+            AddOnInsurance: row["Add On Insurance"] || "",
+            RegHypCharge: row["RegHypCHARGE"] || "",
+            ShieldOfTrust4YR45K: row["Shield of trust 4YR45K"] || "",
+            EXTDWarrantyFOR4YR80K: row["EXTD Warranty FOR 4YR80K"] || "",
+            STDFittings: row["STD Fittings"] || "",
+            FastTag: row["FAST TAG"] || "",
+            VAS: row["VAS"] || "",
+            RSA: row["RSA"] || "",
+            DiscountOffers: row["Discountoffers"] || "",
+            Make: row["Make"] || "",
+            Emission: row["Emission"] || "",
+          }));
 
-            // Send data to backend
-            var response = await $.ajax({
-              url: "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade", // Check the correct URL
-              type: "POST",
-              contentType: "application/json", // Ensure proper JSON content type
-              dataType: "json", // Expect JSON response
-              data: JSON.stringify({ data: formattedData }), // Convert to JSON string
-              headers: {
-                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                password:
-                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u", // Ensure backend understands JSON
-              },
-            });
+          // Send data to backend
+          var response = await $.ajax({
+            url: "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade", // Check the correct URL
+            type: "POST",
+            contentType: "application/json", // Ensure proper JSON content type
+            dataType: "json", // Expect JSON response
+            data: JSON.stringify({ data: formattedData }), // Convert to JSON string
+            headers: {
+              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+              password:
+                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u", // Ensure backend understands JSON
+            },
+          });
 
-            if (response.success) {
-              MessageToast.show("Data saved successfully!");
+          if (response.success) {
+            sap.ui.core.BusyIndicator.hide();
+            MessageToast.show("Scheme saved successfully!");
 
-              // Update UI Model after successful save
+            // Update UI Model after successful save
 
-              that.getView().setModel(that.MainModel, "MainModel");
-              that.MainModel.refresh(true);
-            } else {
-              MessageToast.show("Failed to save data. Please try again.");
-            }
-          } catch (error) {
-            MessageToast.show("Error uploading data. Please try again.");
-            console.error("Upload Error:", error);
-          } finally {
+            that.getView().setModel(that.MainModel, "MainModel");
+            that.MainModel.refresh(true);
+          } else {
             sap.ui.core.BusyIndicator.hide();
             oFileUploader.setValue(""); // Reset file uploader
             that._uploadedExcelData = null;
             if (that.oDialog) that.oDialog.close();
+            MessageToast.show("Failed to save data. Please try again.");
           }
+          //  catch (error) {
+          //   MessageToast.show("Error uploading data. Please try again.");
+          //   console.error("Upload Error:", error);
+          // }
+          //  finally {
+
+          // }
         },
-        CommomReadCall: function () {
-          var that = this;
-          BusyIndicator.show(0); // Show loading indicator
-
-          $.ajax({
-            url: this.API,
-            type: "GET",
-            contentType: "application/json",
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
-            success: function (response) {
-              BusyIndicator.hide();
-
-              if (response && response.data) {
-                that.MainModel.setData({ data: response.data }); // Set fetched data
-                that.getView().getModel("MainModel").refresh(true);
-              } else {
-                MessageToast.show("No data received from the server.");
-              }
-            },
-            error: function (xhr, status, error) {
-              BusyIndicator.hide();
-              console.error("Error fetching data:", error);
-              MessageToast.show("Error while fetching data.");
-            },
-          });
+        CommomReadCall: function (filter) {
+          this.ajaxReadWithJQuery("SchemeUploade", filter)
+            .then((oData) => {
+              var offerData = Array.isArray(oData.data)
+                ? oData.data
+                : [oData.data];
+              this.getView().setModel(
+                new JSONModel({ results: offerData }),
+                "MainModel"
+              );
+              sap.ui.core.BusyIndicator.hide();
+            })
+            .catch((oError) => {
+              sap.ui.core.BusyIndicator.hide();
+              MessageBox.error(
+                this.i18nModel.getText("commonReadingDataError")
+              );
+            });
         },
         //Navigate to new page with data
         SU_onItemPress: function (oEvent) {

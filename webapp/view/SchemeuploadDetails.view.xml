@@ -129,7 +129,7 @@
                     <Input
                         value="{ path: 'detailModel>/EXShowroom', formatter: '.Formatter.fromatNumber' }"
                                             editable="{detailModel>/isEditable}"
-                                            change=".onFieldChange"
+                                            change="SUD_onFieldChange"
                                             maxLength="14"
                     />
                     <Label text="{i18n>schconsumer}" />
@@ -190,7 +190,7 @@
                     />
                     <Label text="{i18n>vehicleRSA}" />
                     <Input
-                        change="onFieldChange"
+                        change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/RSA', formatter: '.Formatter.fromatNumber' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
