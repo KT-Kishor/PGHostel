@@ -22,27 +22,27 @@
 			<f:content>
 				<!-- Employee ID -->
 				<Label text="{i18n>employeeID}"/>
-				<Input  value="{LeaveTempModel>/EmployeeID}" editable="false"/>
+				<Input  value="{LeaveTempModel>/employeeID}" editable="false"/>
 				<!-- Employee Name -->
 				<Label text="{i18n>employeeName}"/>
-				<Input  value="{LeaveTempModel>/EmployeeName}" editable="false"/>
+				<Input  value="{LeaveTempModel>/employeeName}" editable="false"/>
 				<!-- Email -->
 				<Label text="{i18n>emailId}"/>
-				<Input value="{LeaveTempModel>/Email}" editable="false"/>
+				<Input value="{LeaveTempModel>/email}" editable="false"/>
 				<!-- Leave Type -->
 				<Label text="{i18n>type}" required="true"/>
-				<Select items="{leaveTypeModel>/results}"  selectedKey="{LeaveTempModel>/TypeOfLeave}" >
-					<core:Item key="{leaveTypeModel>Name}" text="{leaveTypeModel>Name}" />
+				<Select items="{leaveTypeModel>/}" selectedKey="{LeaveTempModel>/typeOfLeave}">
+				<core:Item key="{leaveTypeModel>id}" text="{leaveTypeModel>name}" />
 				</Select>
 				<VBox>
 					<!-- From Date -->
 					<Label text="{i18n>fromDate}" required="true" />
-					<DatePicker value="{LeaveTempModel>/FromDate}" id="AL_id_FromDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="AL_ValidateDate" valueStateText="{i18n>dateValueState}"  maxDate="{LeaveTempModel>/maxDate}"
+					<DatePicker value="{LeaveTempModel>/fromDate}" id="AL_id_FromDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="AL_ValidateFromDate" valueStateText="{i18n>dateValueState}"  maxDate="{LeaveTempModel>/maxDate}"
                     liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend" minDate="{LeaveTempModel>/minDate}"/>
 					<!-- To Date -->
 					<Label text="{i18n>toDate}" required="true" />
-					<DatePicker minDate="{LeaveTempModel>/MinToDate}" id="AL_id_ToDate" value="{LeaveTempModel>/ToDate}" displayFormat="dd/MM/yyyy" maxDate="{LeaveTempModel>/maxDate}" 
-                valueFormat="dd/MM/yyyy" change="AL_ValidateDate" valueStateText="{i18n>dateValueState}"  liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend"/>
+					<DatePicker minDate="{LeaveTempModel>/MinToDate}" id="AL_id_ToDate" value="{LeaveTempModel>/toDate}" displayFormat="dd/MM/yyyy" maxDate="{LeaveTempModel>/maxDate}" 
+                valueFormat="dd/MM/yyyy" change="AL_ValidateToDate" valueStateText="{i18n>dateValueState}"  liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend"/>
 					<!-- Half Day CheckBox -->
 					<CheckBox text="{i18n>halfDay}" select="onHalfDaySelect" selected="{LeaveTempModel>/HalfDay}"/>
 				</VBox>
@@ -51,7 +51,7 @@
 				<Input  value="{LeaveTempModel>/NoofDays}" editable="false"/>
 				<!-- Add Feedback -->
 				<Label text="{i18n>comments}" required="true"></Label>
-				<TextArea value="{LeaveTempModel>/Comments}" rows="2" id="AL_id_LeaveComments"  liveChange="AL_ValidateCommonFields" valueStateText="{i18n>commentsValueState}"  maxLength="200" placeholder="{i18n>enterComments}"/>
+				<TextArea value="{LeaveTempModel>/comments}" rows="2" id="AL_id_LeaveComments"  liveChange="AL_ValidateCommonFields" valueStateText="{i18n>commentsValueState}"  maxLength="200" placeholder="{i18n>enterComments}"/>
 			</f:content>
 		</f:SimpleForm>
 		<!-- Buttons for Submit and Close actions -->

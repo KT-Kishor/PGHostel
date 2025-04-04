@@ -3,6 +3,11 @@
 		<Table id="AL_id_LeaveTableStandard"
 			mode="SingleSelectLeft"
 			selectionChange="onSelectionChange"
+			 width="auto"
+             items="{path: 'LeaveModel>/'}"
+             growing="true"
+             growingThreshold="100"
+            alternateRowColors="true"
 			class="sapUiResponsiveContentPadding centeredTable">
 			<headerToolbar>
 				<Toolbar>
@@ -33,10 +38,10 @@
 					<Text text="{i18n>comments}" />
 				</Column>
 				<Column minScreenWidth="Tablet" demandPopin="true">
-					<Text text="{i18n>halfDay}" />
+					<Text text="{i18n>status}" />
 				</Column>
 				<Column minScreenWidth="Tablet" demandPopin="true">
-					<Text text="{i18n>status}" />
+					<Text text="{i18n>halfDay}" />
 				</Column>
 				<Column minScreenWidth="Tablet" demandPopin="true">
 					<Text text="{i18n>managerRemarksLeave}" />
@@ -45,15 +50,14 @@
 			<items>
 				<ColumnListItem>
 					<cells>
-						<Text text="{FromDate}" />
-						<Text text="{ToDate}" />
-						<Text text="{NoofDays}" />
-						<Text text="{TypeOfLeave}" />
-						<Text text="{Comments}" />
-						<CheckBox selected="{= ${HalfDay} === 'true'}" editable="false"/>
-						<ObjectStatus inverted="true" text="{Status}" state="{path: 'Status', formatter: '.Formatter.statusStateFormatter'}" />
-						<Text text="{ManagerRemark}" />
-						<Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" />
+					<Text text="{path:'LeaveModel>fromDate' ,formatter:'.Formatter.formatDate'}" />
+					<Text text="{path:'LeaveModel>toDate' ,formatter:'.Formatter.formatDate'}" />
+						<Text text="{LeaveModel>NoofDays}" />
+						<Text text="{LeaveModel>typeOfLeave}" />
+						<Text text="{LeaveModel>comments}" />
+					<ObjectStatus inverted="true" text="{LeaveModel>status}" state="{path: 'LeaveModel>status', formatter: '.Formatter.formatObjectStatus'}" />
+					<CheckBox selected="{= ${LeaveModel>halfDay} === 'true'}" editable="false"/>				
+					<Button icon="sap-icon://display-more" text="{i18n>View}" press="onShowMore" />
 					</cells>
 				</ColumnListItem>
 			</items>

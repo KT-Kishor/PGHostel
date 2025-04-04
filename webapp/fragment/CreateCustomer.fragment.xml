@@ -46,9 +46,9 @@
 				</RadioButtonGroup>
 				<Label visible="{visiblePlay>/CC_id_CustInput}" text="{i18n>custValue}" />
 				<Input visible="{visiblePlay>/CC_id_CustInput}" id="CC_id_custValue" value="{CustomerModel>/value}" maxLength="5" />
-				<Label text="{i18n>emailId}" required="true" />
+				<Label text="{i18n>email}" required="true" />
 				<Input value="{CustomerModel>/mailID}" placeholder="{i18n>placeEmailId}" id="MC_id_CustMail"  maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
-				<Label text="{i18n>emailId}" required="true"/>
+				<Label text="{i18n>customerEmail}" required="true"/>
 				<Input value="{CustomerModel>/customerEmail}" id="MC_id_FinanceEmail" placeholder="{i18n>placeholderFinanceEmail}" maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
 				<Label text="{i18n>mobileNo}"/>
 				<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="10" liveChange="MC_ValidateMobileNo" valueStateText="{i18n>mobileNoValueState}" />

@@ -41,8 +41,8 @@
                 value="{oFilteredModel>/TypeOfLeave}"
 				showClearIcon="true"
 				valueStateText="{i18n>selectTypeOfLeave}"
-                items="{leaveTypeModel>/results}">
-								<core:Item key="{leaveTypeModel>ID}" text="{leaveTypeModel>Name}"/>
+                items="{leaveTypeModel>/}">
+								<core:Item key="{leaveTypeModel>id}" text="{leaveTypeModel>name}"/>
 							</ComboBox>
 						</filterbar:control>
 					</filterbar:FilterGroupItem>
