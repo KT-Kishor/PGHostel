@@ -16,8 +16,9 @@ sap.ui.define([
         this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         this.byId("MC_id_CustTable").removeSelections(true);
+        this.getView().getModel("LoginModel").setProperty("/HeaderName", 
+        this.i18nModel.getText("headerCustomer"));
         this.MC_onSearch();
-        this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("custDetails"));
       },
 
         //common Dialog Function

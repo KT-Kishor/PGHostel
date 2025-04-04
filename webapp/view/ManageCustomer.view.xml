@@ -26,7 +26,7 @@
              alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar>
-						<Title id="MC_id_Title" text="{i18n>custDetails}"/>
+						<Title id="MC_id_Title" text="{i18n>custDetails} ({= ${CreateCustomerModel>/}.length })"/>
 						<ToolbarSpacer/>
 						<Button icon="sap-icon://add-employee" tooltip="{i18n>custAddButToolTip}" press="MC_onAddCustomerDetails" />
 						<ToolbarSeparator />

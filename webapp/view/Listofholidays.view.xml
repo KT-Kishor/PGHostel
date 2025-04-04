@@ -40,7 +40,7 @@
                      alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar>
-						<Title  id="LOH_id_Title" text="{i18n>headerListOfHolidays}"/>
+						<Title  id="LOH_id_Title" text="{i18n>headerListOfHolidays} ({= ${HolidayModel>/}.length })"/>
 						<ToolbarSpacer />
 						<Button text="{i18n>import}" icon="sap-icon://sys-next-page" press="LOH_onOpenImport" type="Ghost"/>
 						<Button text="{i18n>export}" icon="sap-icon://excel-attachment" press="LOH_onExport" type="Ghost"/>
