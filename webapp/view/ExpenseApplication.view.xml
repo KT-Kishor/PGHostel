@@ -14,47 +14,47 @@
 		</headerContent>
 
     <content>
-        <!-- <fb:FilterBar id="exp-id-FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" class="sapUiResponsiveMargin" >
+        <fb:FilterBar id="Exp-id-FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="Exp_onPressClear" showClearOnFB="true" search="Exp_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" class="sapUiResponsiveMargin" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Employee ID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Employee ID" showClearIcon="true" items="" >
+						<ComboBox name="EmployeeID" showClearIcon="true" items="" id="Exp_id_EmployeeName">
 							<core:Item key="" text=""/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-				<fb:FilterGroupItem name="Expense Name" label="{i18n>expExpenseName}" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="ExpenseName" label="{i18n>expExpenseName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="Expense Name"  items="" showClearIcon="true" id="idConsultantNameFilterBar">
-								<core:Item key="" text=""/>
+							<ComboBox name="ExpenseName"  items="{FilterExpenseModel>/}" showClearIcon="true" id="Exp_id_ConsFilterBar">
+								<core:Item key="{FilterExpenseModel>ExpenseName}" text="{FilterExpenseModel>ExpenseName}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Source" label="{i18n>expSource}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Source" showClearIcon="true"  items="">
-							<core:Item key="" text=""/>
+						<ComboBox name="Source" showClearIcon="true" showSecondaryValues="true" id="Exp_id_SourceFilter" items="{BaseLocationModel>/}">
+							<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-				<fb:FilterGroupItem name="Destination" label="{i18n>expDestination}" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="Destination" id="Exp_id_DestinationFilter" label="{i18n>expDestination}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Destination" showClearIcon="true" items="">
-							<core:Item key="" text=""/>
+						<ComboBox name="Destination" showSecondaryValues="true" showClearIcon="true" items="{BaseLocationModel>/}">
+							<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Status" showClearIcon="true" items="">
-							<core:Item key="" text=""/>
+						<ComboBox name="Status" id="Exp_id_StatusFilter" showClearIcon="true" items="{MyInbox>/}">
+							<core:Item key="{MyInbox>StatusName}" text="{MyInbox>StatusName}"/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
-			</fb:FilterBar> -->
+			</fb:FilterBar>
 
-			<Table id="exp_Id_ExpenseTable" items="{ExpenseModel>/expenses}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" >
+			<Table id="exp_Id_ExpenseTable" items="{ExpenseModel>/}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" >
 			 <headerToolbar>
                 <OverflowToolbar >
                     <Title id="title" text="Expense Details"/>
@@ -90,21 +90,22 @@
 						<Label text="{i18n>status}" />
 					</Column>
 					<Column>
-						<Label text="Actions" />
+						<Label text="" />
 					</Column>
 				</columns>
 				<items>
 					<ColumnListItem type="Navigation" press="onCheckExpenseDetails">
 						<cells>
-							<Text text="{ExpenseModel>employeeName}" />
-							<Text text="{ExpenseModel>expenseName}" />
-							<Text text="{ExpenseModel>startDate}" />
-							<Text text="{ExpenseModel>endDate}" />
-							<Text text="{ExpenseModel>destination}" />
-							<Text text="{ExpenseModel>totalAmount}" />
-							<Text text="{ExpenseModel>reimbursementAmount}" />
-							<Text text="{ExpenseModel>status}" />
-							<Button icon="sap-icon://delete" press="onPressEditExpense" />
+							<Text text="{ExpenseModel>EmployeeID}" />
+							<Text text="{ExpenseModel>EmployeeName}" />
+							<Text text="{ExpenseModel>ExpStartDate}" />
+							<Text text="{ExpenseModel>ExpEndDate}" />
+							<Text text="{ExpenseModel>Destination}" />
+							<Text text="{path:'ExpenseModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" />
+							<Text text="{path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />
+							<Text text="{ExpenseModel>Status}" />
+							<!-- <ObjectStatus text="{ExpenseModel>Status}" inverted="true" state="" /> -->
+							<Button icon="sap-icon://delete" visible="{= ${Status} === 'Draft' }" press="onPressDeleteExpense" />
 						</cells>
 					</ColumnListItem>
 				</items>

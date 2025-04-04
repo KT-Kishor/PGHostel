@@ -24,36 +24,36 @@
 					<Input value="{ExpenseCreateModel>/IndexNo}" editable="false" />
 					<!-- Item Type -->
 					<Label text="{i18n>expDetItemType}" required="true"/>
-					<Select  items="{ItemTypeModel>/results}" change="onItemTypeChange"  selectedKey="{ExpenseCreateModel>/ItemType}">
-						<core:Item key="{ItemTypeModel>ItemName}" text="{ItemTypeModel>ItemName}" />
+					<Select  items="{ExpenseTypeModel>/}" change="onItemTypeChange"  selectedKey="{ExpenseCreateModel>/ItemType}">
+						<core:Item key="{ExpenseTypeModel>itemName}" text="{ExpenseTypeModel>itemName}" />
 					</Select>
 					<!-- Mode Of Payment -->
 					<Label text="{i18n>expModeOfPayment}" required="true"/>
-					<Select  items="{paymentModeModel>/results}" selectedKey="{ExpenseCreateModel>/ModeOfPayment}" enabled="{EnableModel>/enable}">
-						<core:Item key="{paymentModeModel>Code}" text="{paymentModeModel>Code}" />
+					<Select  items="{ModeOfPayment>/}" selectedKey="{ExpenseCreateModel>/ModeOfPayment}" enabled="{EnableModel>/enable}">
+						<core:Item key="{ModeOfPayment>Code}" text="{ModeOfPayment>Code}" />
 					</Select>
 					<!-- Expense Date -->
 					<Label text="{i18n>expDetExpenseDate}" required="true" />
-					<DatePicker minDate="{FilteredExpenseModel>/MinDate}" id="exp-id-ExpenseDate"  maxDate="{FilteredExpenseModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{ExpenseCreateModel>/ExpenseDate}"  />
+					<DatePicker minDate="{FilteredExpenseModel>/MinDate}" id="ExpDet_id_ExpenseDate"  maxDate="{FilteredExpenseModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{ExpenseCreateModel>/ExpenseDate}"  />
 					<!-- Expense Amount -->
 					<Label text="{i18n>expDetExpenseAmount}" required="true"/>
 					<HBox width="100%">
 						<VBox width="70%">
-							<Input id="idExpAmount" valueState="None" value="{ExpenseCreateModel>/ExpenseAmount}" liveChange="onLiveValidationItem" placeholder="{i18n>placeAmount}" enabled="{EnableModel>/enable}" maxLength="15"/>
+							<Input id="ExpDet_id_Amount" valueState="None" value="{ExpenseCreateModel>/ExpenseAmount}" liveChange="LC_ExpAmount" placeholder="{i18n>placeAmount}" enabled="{EnableModel>/enable}" maxLength="15"/>
 						</VBox>
 						<VBox width="30%">
-							<Select items="{currencyModel>/results}" change="onChangeCurrency" selectedKey="{ExpenseCreateModel>/Currency}"  id="idCurrency" enabled="{EnableModel>/enable}">
-								<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
+							<Select items="{CurrencyModel>/}" change="onChangeCurrency" selectedKey="{ExpenseCreateModel>/Currency}"  id="idCurrency" enabled="{EnableModel>/enable}">
+								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
 						</VBox>
 					</HBox>
 					<!-- Conversion Rate -->
 					<Label text="{i18n>expConversionRate}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }"/>
-					<Input id="idExpConversionRate" valueState="None" value="{ExpenseCreateModel>/ConversionRate}" liveChange="onLiveValidationItem" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="onChangeConverstionRate"/>
+					<Input id="ExpDet_id_ConvertionRate" valueState="None" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="onChangeConverstionRate"/>
 					<!-- ForeignAmount Label -->
 					<!-- <Label text="{i18n>expenseForeignAmount}" visible="{ExpenseCreateModel>/DisplayForeignAmount}" />					 -->
 					<Label text="{i18n>comments}" required="true" ></Label>
-					<TextArea id="idExpItemComments"  liveChange="onLiveValidationItem" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
+					<TextArea id="ExpDet_id_Comments"  liveChange="LC_ExpComments" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
 				</f:content>
 			</f:SimpleForm>
 		</VBox>

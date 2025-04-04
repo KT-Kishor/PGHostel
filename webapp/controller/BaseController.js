@@ -92,34 +92,37 @@ sap.ui.define([
       }
     },
 
-    _fetchCommonData: function (entityName, modelName, filter = "") {
-      // if(this.getOwnerComponent().getModel(modelName) === undefined){
+    _fetchCommonData: async function (entityName, modelName, filter = "") {
       let url = this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;
       sap.ui.core.BusyIndicator.show(0);
+
       try {
-        $.ajax({
-          url: url,
-          method: "GET",
-          headers: this.getOwnerComponent().getModel("LoginModel").getData().headers,
-          data: filter,
-          success: function (data) {
-            sap.ui.core.BusyIndicator.hide();
-            if (data) {
-              var oModel = new JSONModel(data.data);
-              this.getOwnerComponent().setModel(oModel, modelName);
+        const data = await new Promise((resolve, reject) => {
+          $.ajax({
+            url: url,
+            method: "GET",
+            headers: this.getOwnerComponent().getModel("LoginModel").getData().headers,
+            data: filter,
+            success: function (data) {
+              resolve(data);
+            },
+            error: function (err) {
+              reject(err);
             }
-          }.bind(this),
-          error: function (err) {
-            sap.ui.core.BusyIndicator.hide();
-            sap.m.MessageToast.show(err.responseJSON?.message);
-          }.bind(this)
+          });
         });
+
+        sap.ui.core.BusyIndicator.hide();
+        if (data) {
+          var oModel = new JSONModel(data.data);
+          this.getOwnerComponent().setModel(oModel, modelName);
+        }
       } catch (error) {
         sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Technical error, please contact the administrator");
+        sap.m.MessageToast.show(error.responseJSON?.message || "Technical error, please contact the administrator");
       }
-      // }
     },
+
     //Common read call for all the app
     async ajaxReadWithJQuery(sUrl, filter) {
       sap.ui.core.BusyIndicator.show(0);
@@ -231,20 +234,20 @@ sap.ui.define([
       var CostofCompany = TotalmothlyAnnualized + TotalRetires + TotalVariablePay;
       var Total = CostofCompany + parseInt(joiningBonus);
       // Set calculated values in the model with formatting
-      oModel.setProperty("/BasicSalary",(Math.round(BasicSalary)));
-      oModel.setProperty("/HRA",(Math.round(houseRentAllowance)));
-      oModel.setProperty("/StatutoryBonus",(Math.round(StatutoryBonus)));
-      oModel.setProperty("/TotalMonthly",(Math.round(TotalMontly)));
-      oModel.setProperty("/TotalmothlyAnnualized",(Math.round(TotalmothlyAnnualized)));
-      oModel.setProperty("/TDS",(Math.round(TDS)));
-      oModel.setProperty("/MedicalInsurance",(Math.round(MedicalInsurance)));
-      oModel.setProperty("/Gratuity",(Math.round(Gratuity)));
-      oModel.setProperty("/TotalRetires",(Math.round(TotalRetires)));
-      oModel.setProperty("/PerformanceBonus",(Math.round(PerformanceBonus)));
-      oModel.setProperty("/EngagementPB",(Math.round(EngagementPB)));
-      oModel.setProperty("/TotalVariablePay",(Math.round(TotalVariablePay)));
-      oModel.setProperty("/CostofCompany",(Math.round(CostofCompany)));
-      oModel.setProperty("/Total",(Math.round(Total)));
+      oModel.setProperty("/BasicSalary", (Math.round(BasicSalary)));
+      oModel.setProperty("/HRA", (Math.round(houseRentAllowance)));
+      oModel.setProperty("/StatutoryBonus", (Math.round(StatutoryBonus)));
+      oModel.setProperty("/TotalMonthly", (Math.round(TotalMontly)));
+      oModel.setProperty("/TotalmothlyAnnualized", (Math.round(TotalmothlyAnnualized)));
+      oModel.setProperty("/TDS", (Math.round(TDS)));
+      oModel.setProperty("/MedicalInsurance", (Math.round(MedicalInsurance)));
+      oModel.setProperty("/Gratuity", (Math.round(Gratuity)));
+      oModel.setProperty("/TotalRetires", (Math.round(TotalRetires)));
+      oModel.setProperty("/PerformanceBonus", (Math.round(PerformanceBonus)));
+      oModel.setProperty("/EngagementPB", (Math.round(EngagementPB)));
+      oModel.setProperty("/TotalVariablePay", (Math.round(TotalVariablePay)));
+      oModel.setProperty("/CostofCompany", (Math.round(CostofCompany)));
+      oModel.setProperty("/Total", (Math.round(Total)));
     },
 
     //Date picker common function 

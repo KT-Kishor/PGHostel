@@ -21,7 +21,7 @@ sap.ui.define([], function () {
             }
             return "";
         },
-        formatObjectStatus: function (sStatus) {
+        c: function (sStatus) {
             switch (sStatus) {
                 case "New":
                     return "Indication05";

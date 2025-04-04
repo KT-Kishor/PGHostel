@@ -23,10 +23,10 @@
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
 					<expandedHeading>
-						<m:Title text="{FilteredExpenseModel>/EmployeeName}" wrapping="true" width="100%" />
+						<m:Title text="{FilteredExpenseModel>/0/EmployeeName}" wrapping="true" width="100%" />
 					</expandedHeading>
 					<expandedContent>
-						<m:Label text="{FilteredExpenseModel>/EmployeeID}" wrapping="true" width="100%" />
+						<m:Label text="{FilteredExpenseModel>/0/EmployeeID}" wrapping="true" width="100%" />
 					</expandedContent>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
@@ -43,85 +43,80 @@
 											<f:toolbar>
 											<m:Toolbar>												
 												<m:ToolbarSpacer />
-												<m:Button  text="Edit" 
-                    press="onEditOrSavePress" />
+												<m:Button  text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" 
+                    press="onEditOrSavePress" visible="{viewModel>/status}"  />
 											</m:Toolbar>
 										</f:toolbar>
 									<!-- <f:content> -->
 										<!-- Employee ID -->
-										<m:Label text="{i18n>employeeID}" required="true" />
-										<m:Input  value="{FilteredExpenseModel>/EmployeeID}" editable="false" maxLength="20" />
+										<m:Label text="{i18n>employeeID}"/>
+										<m:Input  value="{FilteredExpenseModel>/0/EmployeeID}" editable="false" />
 										<!-- Employee Name -->
-										<m:Label text="{i18n>expExpenseName}" required="true" />
-										<m:Input  value="{FilteredExpenseModel>/EmployeeName}" editable="false" maxLength="50" />
+										<m:Label text="{i18n>expExpenseName}"/>
+										<m:Input  value="{FilteredExpenseModel>/0/EmployeeName}" editable="false" />
 										<!-- Total Amount -->
-										<m:Label text="{i18n>totalAmount}" required="true"/>
-										<m:Input  value="{path:'FilteredExpenseModel>/TotalAmount',formatter:'.Formatter.numberFormater'}" editable="false" />
+										<m:Label text="{i18n>totalAmount}"/>
+										<m:Input  value="{path:'FilteredExpenseModel>/0/TotalAmount',formatter:'.Formatter.numberFormater'}" editable="false" />
 										<!-- Reimbursement Amount -->
-										<m:Label text="{i18n>expReimbursementAmount}" required="true"/>
-										<m:Input  value="{path:'FilteredExpenseModel>/ReimbursementAmount',formatter: '.Formatter.numberFormater'}" editable="false" />
+										<m:Label text="{i18n>expReimbursementAmount}"/>
+										<m:Input  value="{path:'FilteredExpenseModel>/0/ReimbursementAmount',formatter: '.Formatter.numberFormater'}" editable="false" />
 										<!-- Status -->
-										<m:Label text="{i18n>expStatus}" required="true"/>
-										<m:Input  value="{FilteredExpenseModel>/Status}"  editable="false" />
+										<m:Label text="{i18n>expStatus}"/>
+										<m:Input  value="{FilteredExpenseModel>/0/Status}"  editable="false" />
 										<!-- Trip Type -->
-										<m:Label text="{i18n>expExpenseType}" required="true"/>
-										<m:Select items="{tripTypeModel>/results}" change="onChangeExpenseType" editable="false" selectedKey="{FilteredExpenseModel>/TripType}">
-											<core:Item key="{tripTypeModel>Name}" text="{tripTypeModel>Name}"/>
-										</m:Select>
+										<m:Label text="{i18n>expExpenseType}"/>
+										<m:Input value="{FilteredExpenseModel>/0/TripType}" editable="false"></m:Input>
 										<!-- Travel Allowance -->
-										<m:Label text="{i18n>expTravelAllowance}" required="true" />
-										<m:Select  selectedKey="{FilteredExpenseModel>/TravelAllowance}"  editable="false" items="{TravelAllowance>/type}" >
-										<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
-
-										</m:Select>
+										<m:Label text="{i18n>expTravelAllowance}"/>
+										<m:Input value="{FilteredExpenseModel>/0/TravelAllowance}" editable="false"></m:Input>
 										<!-- Expense Name -->
-										<m:Label text="{i18n>expExpenseName}" required="true"/>
-										<m:Input id="idEditExpName" valueState="None"  liveChange="onLiveAllValidation" value="{FilteredExpenseModel>/ExpenseName}" maxLength="200"  editable="false" />
+										<m:Label text="{i18n>expExpenseName}"/>
+										<m:Input value="{FilteredExpenseModel>/0/ExpenseName}" editable="false" />
 										<!-- Start Date -->
-										<m:Label text="{i18n>startDate}" required="true" />
-										<m:DatePicker  displayFormat="dd/MM/yyyy"  value="{FilteredExpenseModel>/ExpStartDate}" id="idExpStart" editable="false"  />
+										<m:Label text="{i18n>startDate}"/>
+										<m:DatePicker  displayFormat="dd/MM/yyyy"  value="{FilteredExpenseModel>/0/ExpStartDate}" editable="false"  />
 										<!-- EndDate -->
-										<m:Label text="{i18n>endDate}" required="true" />
-										<m:DatePicker  displayFormat="dd/MM/yyyy" value="{FilteredExpenseModel>/ExpEndDate}" id="isExpEnd" editable="false" />										
+										<m:Label text="{i18n>endDate}"/>
+										<m:DatePicker  displayFormat="dd/MM/yyyy" value="{FilteredExpenseModel>/0/ExpEndDate}" editable="false" />										
 										<!-- Source -->
 										<m:Label text="{i18n>expSource}" required="true"/>
-										<m:ComboBox id="idEditSource" valueState="None"  change="onLiveAllValidation" items="{CityJsonModel>/results}"  value="{FilteredExpenseModel>/Source}" editable="{simpleForm>/editable}">
-											<core:Item key="{CityJsonModel>ID}" text="{CityJsonModel>LocationName}" />
+										<m:ComboBox id="Exp_id_Source" valueState="None"  change="onLiveAllValidation" items="{BaseLocationModel>/}"  value="{FilteredExpenseModel>/0/Source}" editable="{viewModel>/editable}">
+											<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 										</m:ComboBox>
 										<!-- Destination -->
 										<m:Label text="{i18n>expDestination}" required="{ExpenseType>/required}"/>
-										<m:ComboBox  id="idEditDestination" valueState="None"  change="onLiveAllValidation" items="{CityJsonModel>/results}" editable="{simpleForm>/editable}" value="{FilteredExpenseModel>/Destination}">
-											<core:Item key="{CityJsonModel>ID}" text="{CityJsonModel>LocationName}" />
+										<m:ComboBox  id="Exp_id_Destination"   change="onLiveAllValidation" items="{BaseLocationModel>/}" editable="{viewModel>/editable}" value="{FilteredExpenseModel>/0/Destination}">
+											<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 										</m:ComboBox>
 										<!-- CostCenter -->
 										<m:Label text="{i18n>expCostCenter}" required="true"/>
 										<m:Select items="{costCenterModel>/results}" 												             
-												selectedKey="{FilteredExpenseModel>/CostCenter}"  editable="{simpleForm>/editable}">
+												selectedKey="{FilteredExpenseModel>/0/CostCenter}"  editable="{viewModel>/editable}">
 											<core:Item key="{costCenterModel>Value}" text="{costCenterModel>Value}"/>
 										</m:Select>																														
 										<!-- Country -->
 										<m:Label text="{i18n>expCountry}" required="true"/>
-										<m:ComboBox id="idEditCountry" valueState="None"  change="onLiveAllValidation" items="{countryModel>/results}" value="{FilteredExpenseModel>/Country}" editable="{simpleForm>/editable}">
-											<core:Item key="{countryModel>CountryName}" text="{countryModel>CountryName}"/>
+										<m:ComboBox id="Exp_id_Country" change="onLiveAllValidation" items="{path:'CountryModel>/',length:1000}" value="{FilteredExpenseModel>/0/Country}" editable="{viewModel>/editable}">
+											<core:ListItem key="{CountryModel>id}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 										</m:ComboBox>
 
 										<m:Label text="{i18n>managerRemarksLeave}" />
-										<m:Text text="{= ${FilteredExpenseModel>/ManagerRemark}.length > 80 ? ${FilteredExpenseModel>/ManagerRemark}.substring(0, 80) + '...' : ${FilteredExpenseModel>/ManagerRemark}}" wrapping="false" />
-										<m:Link text="{i18n>showMore}" press="onPressManagerRemarks" visible="{= ${FilteredExpenseModel>/ManagerRemark}.length > 80}" />
+										<m:Text text="{= ${FilteredExpenseModel>/0/ManagerRemark}.length > 80 ? ${FilteredExpenseModel>/0/ManagerRemark}.substring(0, 80) + '...' : ${FilteredExpenseModel>/0/ManagerRemark}}" wrapping="false" />
+										<m:Link text="{i18n>showMore}" press="onPressManagerRemarks" visible="{= ${FilteredExpenseModel>/0/ManagerRemark}.length > 80}" />
 
 										<m:Label text="{i18n>expAccountantRemark}" />
-										<m:Text id="textRemark" text="{= ${FilteredExpenseModel>/AccountingRemark}.length > 80 ? ${FilteredExpenseModel>/AccountingRemark}.substring(0, 80) + '...' : ${FilteredExpenseModel>/AccountingRemark}}" wrapping="false" />
-										<m:Link text="{i18n>showMore}" press="onPressAccountantRemark" visible="{= ${FilteredExpenseModel>/AccountingRemark}.length > 80}" />
+										<m:Text id="textRemark" text="{= ${FilteredExpenseModel>/0/AccountingRemark}.length > 80 ? ${FilteredExpenseModel>/0/AccountingRemark}.substring(0, 80) + '...' : ${FilteredExpenseModel>/0/AccountingRemark}}" wrapping="false" />
+										<m:Link text="{i18n>showMore}" press="onPressAccountantRemark" visible="{= ${FilteredExpenseModel>/0/AccountingRemark}.length > 80}" />
 
 										<m:Label text="{i18n>expEmployeeRemark}" required="true"/>
-										<m:TextArea id="idEditComments" valueState="None" liveChange="onLiveAllValidation" rows="4" value="{FilteredExpenseModel>/Comments}"  editable="{simpleForm>/editable}" maxLength="1000"/>
+										<m:TextArea id="Exp_id_EmpRemark" valueState="None" liveChange="onLiveAllValidation" rows="4" value="{FilteredExpenseModel>/0/Comments}"  editable="{viewModel>/editable}" maxLength="1000"/>
 									<!-- </f:content> -->
 								</f:SimpleForm>
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="" titleUppercase="false">
 							<blocks>
-								<m:Table id="exp_Id_ExpenseTable" items="{ExpenseModel>/expenses}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" >
+								<m:Table id="exp_Id_ExpenseTable" items="{ItemExpenseModel>/}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" mode="SingleSelectLeft" selectionChange="Exp_onChangeExpanesItem" >
 									<m:headerToolbar>
 										<m:OverflowToolbar>
 											<m:ToolbarSpacer />
@@ -160,15 +155,13 @@
 										<m:items>
 											<m:ColumnListItem type="Navigation" press="onCheckExpenseDetails">
 												<m:cells>
-													<m:Text text="{ExpenseModel>employeeName}" />
-													<m:Text text="{ExpenseModel>expenseName}" />
-													<m:Text text="{ExpenseModel>startDate}" />
-													<m:Text text="{ExpenseModel>endDate}" />
-													<m:Text text="{ExpenseModel>destination}" />
-													<m:Text text="{ExpenseModel>totalAmount}" />
-													<m:Text text="{ExpenseModel>reimbursementAmount}" />
-													<m:Text text="{ExpenseModel>status}" />
-													<m:Button icon="sap-icon://delete" press="onPressEditExpense" />
+													<m:Text text="{ItemExpenseModel>IndexNo}" />
+													<m:Text text="{ItemExpenseModel>ItemType}" />
+													<m:Text text="{ItemExpenseModel>ForeignAmount}" />
+													<m:Text text="{ItemExpenseModel>ExpenseDate}" />
+													<m:Text text="{ItemExpenseModel>ExpenseAmount}" />
+													<m:Text text="{ItemExpenseModel>ModeOfPayment}" />
+													<m:Text text="{ItemExpenseModel>Comments}" />													
 												</m:cells>
 											</m:ColumnListItem>
 										</m:items>
