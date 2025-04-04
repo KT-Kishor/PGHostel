@@ -18,6 +18,9 @@ sap.ui.define([
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
                 this._fetchCommonData("Currency", "CurrencyModel");
                 this._fetchCommonData("EmployeeDetails", "empModel");
+                this._fetchCommonData("CompanyEmails", "CCMailModel", {
+                    applicationName: "Trainee"
+                  });
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -233,7 +236,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 });
             },
-            TD_commonOpenDialog: function (fragmentName) {
+            TD_commonOpenDialog: function (fragmentName,TraineeEmail) {
                 if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -242,21 +245,22 @@ sap.ui.define([
                         this.oDialog = dialog;
                         this.getView().addDependent(this.oDialog);
                         this.oDialog.open();
+                        if(TraineeEmail !== "ConfirmationDia")
+                        sap.ui.getCore().byId("Mail_id_Text").setValue(TraineeEmail);
                     }).bind(this);
                 } else {
                     this.oDialog.open();
+                    if(TraineeEmail !== "ConfirmationDia")
+                        sap.ui.getCore().byId("Mail_id_Text").setValue(TraineeEmail);
                 }
             },
             
             TU_onSendEmail: function () {
-                this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
-                sap.ui.getCore().byId("Mail_id_Text").setValue(oModel.TraineeEmail);
-      
+                this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail",oModel.TraineeEmail);
             },
             TD_onPressback: function () {
-                this.TD_commonOpenDialog( "sap.kt.com.minihrsolution.fragment.CommonBack");
-               
+                this.TD_commonOpenDialog( "sap.kt.com.minihrsolution.fragment.CommonBack","ConfirmationDia");
             },
             onConfirmBack: function () {
                this.getRouter().navTo("RouteTrainee",{value:"TraineeDetails"})
@@ -280,6 +284,7 @@ sap.ui.define([
                 this.oDialog = null;  
                 this.oDialog.close();
             },
+            
 
             async offerGeneratingPdfFunction(oModel) {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
@@ -364,7 +369,7 @@ sap.ui.define([
                     checkModels();
                 });
             },
-
+            
            
 
 

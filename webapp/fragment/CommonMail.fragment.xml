@@ -5,47 +5,41 @@
     xmlns:rich="sap.ui.richtexteditor"
     xmlns:core="sap.ui.core">
     <Dialog title="Send Mail" contentWidth="80%" >
-        <f:SimpleForm
-            editable="true" visible="{loginModel>/sendEmailForm}"
-            layout="ResponsiveGridLayout">
-			<f:content>
-			<MessageStrip
-				text="{i18n>sendMailFragMsg}"
-				type="Warning"
-				showIcon="true"
-				class="sapUiTinyMarginBottom">
-			</MessageStrip>
-            <Label text="{i18n>fileUploader}" required="true"/>
-            <HBox width="100%" justifyContent="Start" alignItems="Center">
-                <VBox width="20%">
-                    <u:FileUploader                                       
-                        name="myFileUpload"
-                        multiple="true"
-                        uploadUrl="upload/"
-                        tooltip="{i18n>toolTipMsgSM}"
-                        change="handleUploadPress"
-                        buttonOnly="true"                    
-                        uploadComplete="handleUploadComplete"/>
-                </VBox>
-                <VBox width="80%" >
-                    <Text text="{TextDisplay>/name}"></Text>
-                </VBox>
-            </HBox>
-                
-                <Label text="{i18n>toMailText}" required="true" />
-                <Input id="Mail_id_Text" change="onEmailChange" editable="false" />
+        <f:SimpleForm editable="true" visible="{loginModel>/sendEmailForm}" layout="ResponsiveGridLayout">
+            <f:content>
+                <MessageStrip
+                    text="{i18n>sendMailFragMsg}"
+                    type="Warning"
+                    showIcon="true"
+                    class="sapUiTinyMarginBottom">
+                </MessageStrip>
+                <Label text="{i18n>fileUploader}" required="true"/>
+                <HBox width="100%" justifyContent="Start" alignItems="Center">
+                    <VBox width="20%">
+                        <u:FileUploader                                       
+                            name="myFileUpload"
+                            multiple="true"
+                            uploadUrl="upload/"
+                            tooltip="{i18n>toolTipMsgSM}"
+                            change="handleUploadPress"
+                            buttonOnly="true"                    
+                            uploadComplete="handleUploadComplete"/>
+                    </VBox>
+                    <VBox width="80%" >
+                        <Text text="{TextDisplay>/name}"></Text>
+                    </VBox>
+                </HBox>
+                <Label text="{i18n>toMailText}" required="true"/>
+                <Input id="Mail_id_Text" change="onEmailChange" editable="false"/>
 
-                <Label text="{i18n>ccMailText}" required="true" />
-                <TextArea value="" maxLength="600" liveChange="onEmailChange"/>
-			</f:content>
-		</f:SimpleForm>
-
-        <!-- <Label text="{i18n>notes}" required="true"/> -->
-	    <!-- <rich:RichTextEditor visible="{loginModel>/sendEmail}" value="{UploaderData>/htmlbody}" class="sapUiContentPadding" width="100%" /> -->
+                <Label text="{i18n>ccMailText}" required="true"/>
+                <TextArea id="CCMail_TextArea" value="{CCMailModel>/0/emails}" maxLength="600" liveChange="TD_validateEmail"/>
+            </f:content>
+        </f:SimpleForm>
 
         <FlexBox justifyContent="End">
-           <Button text="{i18n>tileFooter}" type="Emphasized"  class="sendMail" press="Mail_onSendEmail"  visible="{UploaderData>/button}" />
-            <Button text="{i18n>close}" width="80px"  class="sendMail" press="Mail_onPressClose"/>
-    	</FlexBox>
+           <Button id="SendMail_Button" text="{i18n>tileFooter}" type="Emphasized" class="sendMail" press="Mail_onSendEmail" enabled="false"/>
+           <Button text="{i18n>close}" width="80px" class="sendMail" press="Mail_onPressClose"/>
+        </FlexBox>
     </Dialog>
 </core:FragmentDefinition>

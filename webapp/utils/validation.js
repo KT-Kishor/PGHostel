@@ -24,8 +24,16 @@ sap.ui.define([], function () {
     _LCvalidateEmail: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
       if (!oField) return false;
+      var sValue = oField.getValue().trim();
+      if (!sValue) {
+        oField.setValueState("Error");
+        return false;
+      }
+      // Split emails by comma, semicolon, or space
+      var aEmails = sValue.split(/[,;]+/).map(email => email.trim()).filter(email => email);
       var regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!regex.test(oField.getValue().trim())) {
+      var bAllValid = aEmails.every(email => regex.test(email));
+      if (!bAllValid) {
         oField.setValueState("Error");
         return false;
       } else {
@@ -33,6 +41,7 @@ sap.ui.define([], function () {
         return true;
       }
     },
+    
 
     // Name validation function
     _LCvalidateName: function (oEvent, type) {

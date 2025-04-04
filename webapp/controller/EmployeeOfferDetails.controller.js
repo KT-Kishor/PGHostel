@@ -22,7 +22,11 @@ sap.ui.define([
                 this._fetchCommonData("Designation", "DesignationModel");
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this._fetchCommonData("Currency", "CurrencyModel");
-                var jsonData = {
+                this._fetchCommonData("CompanyEmails", "CCMailModel", {
+                    applicationName: "EmployeeOffer"
+                  });
+
+                  var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",
                     "ConsultantAddress": "",
@@ -276,7 +280,7 @@ sap.ui.define([
                 this.offerGeneratingPdfFunction(oModel);
             },
 
-            EOD_commonOpenDialog: function (FragmentName) {
+            EOD_commonOpenDialog: function (FragmentName,EmployeeEmail) {
                 if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
                         name: FragmentName,
@@ -285,15 +289,18 @@ sap.ui.define([
                         this.oDialog = dialog;
                         this.getView().addDependent(this.oDialog);
                         this.oDialog.open();
+                        if(EmployeeEmail !== "ConfirmationDia")
+                         sap.ui.getCore().byId("Mail_id_Text").setValue(EmployeeEmail);
                     }).bind(this);
                 } else {
                     this.oDialog.open();
+                    if(EmployeeEmail !== "ConfirmationDia")
+                        sap.ui.getCore().byId("Mail_id_Text").setValue(EmployeeEmail);
                 }
             },
             EOUF_onSendEmail:function(){
-                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
                 var oModel = this.getView().getModel("employeeModel").getData();
-                sap.ui.getCore().byId("Mail_id_Text").getValue(oModel.EmployeeEmail);
+                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail",oModel.EmployeeEmail);
             },
             Mail_onPressClose: function () {
                 this.oDialog.close();
