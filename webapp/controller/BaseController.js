@@ -231,20 +231,20 @@ sap.ui.define([
       var CostofCompany = TotalmothlyAnnualized + TotalRetires + TotalVariablePay;
       var Total = CostofCompany + parseInt(joiningBonus);
       // Set calculated values in the model with formatting
-      oModel.setProperty("/BasicSalary", this.Formatter.formatCurrencyInINRText(Math.round(BasicSalary)));
-      oModel.setProperty("/HRA", this.Formatter.formatCurrencyInINRText(Math.round(houseRentAllowance)));
-      oModel.setProperty("/StatutoryBonus", this.Formatter.formatCurrencyInINRText(Math.round(StatutoryBonus)));
-      oModel.setProperty("/TotalMonthly", this.Formatter.formatCurrencyInINRText(Math.round(TotalMontly)));
-      oModel.setProperty("/TotalmothlyAnnualized", this.Formatter.formatCurrencyInINRText(Math.round(TotalmothlyAnnualized)));
-      oModel.setProperty("/TDS", this.Formatter.formatCurrencyInINRText(Math.round(TDS)));
-      oModel.setProperty("/MedicalInsurance", this.Formatter.formatCurrencyInINRText(Math.round(MedicalInsurance)));
-      oModel.setProperty("/Gratuity", this.Formatter.formatCurrencyInINRText(Math.round(Gratuity)));
-      oModel.setProperty("/TotalRetires", this.Formatter.formatCurrencyInINRText(Math.round(TotalRetires)));
-      oModel.setProperty("/PerformanceBonus", this.Formatter.formatCurrencyInINRText(Math.round(PerformanceBonus)));
-      oModel.setProperty("/EngagementPB", this.Formatter.formatCurrencyInINRText(Math.round(EngagementPB)));
-      oModel.setProperty("/TotalVariablePay", this.Formatter.formatCurrencyInINRText(Math.round(TotalVariablePay)));
-      oModel.setProperty("/CostofCompany", this.Formatter.formatCurrencyInINRText(Math.round(CostofCompany)));
-      oModel.setProperty("/Total", this.Formatter.formatCurrencyInINRText(Math.round(Total)));
+      oModel.setProperty("/BasicSalary",(Math.round(BasicSalary)));
+      oModel.setProperty("/HRA",(Math.round(houseRentAllowance)));
+      oModel.setProperty("/StatutoryBonus",(Math.round(StatutoryBonus)));
+      oModel.setProperty("/TotalMonthly",(Math.round(TotalMontly)));
+      oModel.setProperty("/TotalmothlyAnnualized",(Math.round(TotalmothlyAnnualized)));
+      oModel.setProperty("/TDS",(Math.round(TDS)));
+      oModel.setProperty("/MedicalInsurance",(Math.round(MedicalInsurance)));
+      oModel.setProperty("/Gratuity",(Math.round(Gratuity)));
+      oModel.setProperty("/TotalRetires",(Math.round(TotalRetires)));
+      oModel.setProperty("/PerformanceBonus",(Math.round(PerformanceBonus)));
+      oModel.setProperty("/EngagementPB",(Math.round(EngagementPB)));
+      oModel.setProperty("/TotalVariablePay",(Math.round(TotalVariablePay)));
+      oModel.setProperty("/CostofCompany",(Math.round(CostofCompany)));
+      oModel.setProperty("/Total",(Math.round(Total)));
     },
 
     //Date picker common function 

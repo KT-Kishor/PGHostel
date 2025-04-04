@@ -233,60 +233,52 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 });
             },
-            TD_commonOpenDialog: function (dialogProperty, fragmentName) {
-                if (!this[dialogProperty]) {
+            TD_commonOpenDialog: function (fragmentName) {
+                if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
-                        controller: this,
-                    }).then(function (oDialog) {
-                        this[dialogProperty] = oDialog;
-                        this.getView().addDependent(this[dialogProperty]);
-                        this[dialogProperty].open();
-                    }.bind(this));
+                        controller: this
+                    }).then(dialog => {
+                        this.oDialog = dialog;
+                        this.getView().addDependent(this.oDialog);
+                        this.oDialog.open();
+                    }).bind(this);
                 } else {
-                    this[dialogProperty].open();
-
+                    this.oDialog.open();
                 }
             },
-            Mail_onPressClose: function () {
-                this.TOb_oDialog.close();
+            
+            TU_onSendEmail: function () {
+                this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
+                var oModel = this.getView().getModel("oTraineeDetails").getData();
+                sap.ui.getCore().byId("Mail_id_Text").setValue(oModel.TraineeEmail);
+      
             },
             TD_onPressback: function () {
-                this.TD_commonOpenDialog("TCB_oDialog", "sap.kt.com.minihrsolution.fragment.CommonBack");
+                this.TD_commonOpenDialog( "sap.kt.com.minihrsolution.fragment.CommonBack");
                
             },
             onConfirmBack: function () {
                this.getRouter().navTo("RouteTrainee",{value:"TraineeDetails"})
-                this.TCB_oDialog.close();
+                this.oDialog.close();
             },
             onCancel: function () {
-                this.TCB_oDialog.close();
+                this.oDialog.close();
             },
             onDialogClose: function () {
-                this.TCB_oDialog.destroy();
-                this.TCB_oDialog = null;   
+                this.oDialog.destroy();
+                this.oDialog = null;   
             },
             TD_onPressMerge: function () {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
             },
-            TU_onSendEmail: function () {
-                var oModel = this.getView().getModel("oTraineeDetails");
-                var sEmail = oModel ? oModel.getProperty("/TraineeEmail") : "";
-                this.TD_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.CommonMail")
-                    .then(function (oDialog) {
-                        oDialog.attachAfterOpen(function () {
-                            var oEmailInput = sap.ui.getCore().byId("Mail_id_Text"); 
-                            if (oEmailInput) {
-                                oEmailInput.setValue(sEmail);
-                            }
-                        });
-                    })
-            },
+         
+            
             Mail_onPressClose: function () {
-                this.TOb_oDialog.destroy();
-                this.TOb_oDialog = null;  
-                this.TOb_oDialog.close();
+                this.oDialog.destroy();
+                this.oDialog = null;  
+                this.oDialog.close();
             },
 
             async offerGeneratingPdfFunction(oModel) {

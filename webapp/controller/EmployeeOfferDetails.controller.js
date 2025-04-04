@@ -57,7 +57,7 @@ sap.ui.define([
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
                 this.getView().setModel(oViewModel, "viewModel");
                 this.byId("EOD_id_Joindate").setMinDate(new Date());
-                ["EOD_id_Name", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus"].forEach(function (ids) {
+                ["EOD_id_Name", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_PinCode"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 if (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") {
@@ -276,57 +276,47 @@ sap.ui.define([
                 this.offerGeneratingPdfFunction(oModel);
             },
 
-            EOD_commonOpenDialog: function (dialogProperty, fragmentName) {
-                if (!this[dialogProperty]) {
-                    return sap.ui.core.Fragment.load({
-                        name: fragmentName,
-                        controller: this,
-                    }).then(function (oDialog) {
-                        this[dialogProperty] = oDialog;
-                        this.getView().addDependent(this[dialogProperty]);
-                        this[dialogProperty].open();
-                        return this[dialogProperty];
-                    }.bind(this));
+            EOD_commonOpenDialog: function (FragmentName) {
+                if (!this.oDialog) {
+                    sap.ui.core.Fragment.load({
+                        name: FragmentName,
+                        controller: this
+                    }).then(dialog => {
+                        this.oDialog = dialog;
+                        this.getView().addDependent(this.oDialog);
+                        this.oDialog.open();
+                    }).bind(this);
                 } else {
-                    this[dialogProperty].open();
+                    this.oDialog.open();
                 }
             },
-            EOUF_onSendEmail: function () {
-                var oModel = this.getView().getModel("employeeModel");
-                var sEmail = oModel ? oModel.getProperty("/EmployeeEmail") : "";
-                this.EOD_commonOpenDialog("EOUF_oDialog", "sap.kt.com.minihrsolution.fragment.CommonMail")
-                    .then(function (oDialog) {
-                        oDialog.attachAfterOpen(function () {
-                            var oEmailInput = sap.ui.getCore().byId("Mail_id_Text"); // Input ID in fragment
-                            if (oEmailInput) {
-                                oEmailInput.setValue(sEmail);
-                            }
-                        });
-                    })
+            EOUF_onSendEmail:function(){
+                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
+                var oModel = this.getView().getModel("employeeModel").getData();
+                sap.ui.getCore().byId("Mail_id_Text").getValue(oModel.EmployeeEmail);
             },
             Mail_onPressClose: function () {
-                this.EOUF_oDialog.close();
-                this.EOUF_oDialog.destroy();
-                this.EOUF_oDialog.null;  
+                this.oDialog.close();
+                this.oDialog.destroy();
             },
-            Mail_onSendEmail:function(){
-                
+            Mail_onSendEmail: function () {
+
 
             },
             EOD_onPressBackBtn: function () {
-                this.EOD_commonOpenDialog("TCB_oDialog", "sap.kt.com.minihrsolution.fragment.CommonBack");
+                this.EOD_commonOpenDialog( "sap.kt.com.minihrsolution.fragment.CommonBack");
 
             },
             onConfirmBack: function () {
                 this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" })
-                this.TCB_oDialog.close();
+                this.oDialog.close();
             },
             onCancel: function () {
-                this.TCB_oDialog.close();
+                this.oDialog.close();
             },
             onDialogClose: function () {
-                this.TCB_oDialog.destroy();
-                this.TCB_oDialog = null;
+                this.oDialog.destroy();
+                this.oDialog = null;
             },
             EOUF_onPressMerge: function () {
                 var oModel = this.getView().getModel("employeeModel");

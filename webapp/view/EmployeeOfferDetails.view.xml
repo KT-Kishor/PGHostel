@@ -175,38 +175,37 @@
 											<Text text="{employeeModel>/EmployeeEmail}" />
 											<core:Title text="{i18n>monthlyComponents}" />
 											<Label text="{i18n>basicSalary}" />
-											<Text text="INR {employeeModel>/BasicSalary}" />
+											<Text text="{path:'employeeModel>/BasicSalary',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>hra}" />
-											<Text text="INR {employeeModel>/HRA}" />
+											<Text text="{path:'employeeModel>/HRA',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>statutoryBonus}" />
-											<Text text="INR {employeeModel>/StatutoryBonus}" />
+											<Text text="{path:'employeeModel>/StatutoryBonus',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>totalMontly}" />
-											<Text text="INR {employeeModel>/TotalMonthly}" />
+											<Text text="{path:'employeeModel>/TotalMonthly',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>totalAnnual}" />
-											<Text text="INR {employeeModel>/TotalmothlyAnnualized}" />
+											<Text text="{path:'employeeModel>/TotalmothlyAnnualized',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<core:Title text="{i18n>retiralsBenefits}" />
 											<Label text="{i18n>tds}" />
-											<Text text="INR {employeeModel>/TDS}" />
+											<Text text="{path:'employeeModel>/TDS',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>medicalInsurancePremium}" />
-											<Text text="INR {employeeModel>/MedicalInsurance}" />
+											<Text text="{path:'employeeModel>/MedicalInsurance',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>gratuity}" />
-											<Text text="INR {employeeModel>/Gratuity}" />
+											<Text text="{path:'employeeModel>/Gratuity',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>totalRetires}" />
-											<Text text="INR {employeeModel>/TotalRetires}" />
-											<core:Title text="{i18n>Variable Components}" />
+											<Text text="{path:'employeeModel>/TotalRetires',formatter:'.Formatter.formatCurrencyInINRText'}" />												<core:Title text="{i18n>Variable Components}" />
 											<Label text="{i18n>performanceBonusSection}" />
-											<Text text="INR {employeeModel>/PerformanceBonus}" />
+											<Text text="{path:'employeeModel>/PerformanceBonus',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>engagementBonus}" />
-											<Text text="INR {employeeModel>/EngagementPB}" />
+											<Text text="{path:'employeeModel>/EngagementPB',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>totalVariableComponents}" />
-											<Text text="INR {employeeModel>/TotalVariablePay}" />
+											<Text text="{path:'employeeModel>/TotalVariablePay',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<core:Title text="{i18n>totalCost}" />
 											<Label text="{i18n>costOfCompany}" />
-											<Text text="INR {employeeModel>/CostofCompany}" />
+											<Text text="{path:'employeeModel>/CostofCompany',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>joiningBonus}" />
-											<Text text="INR {employeeModel>/JoiningBonus}" />
+											<Text text="{path:'employeeModel>/JoiningBonus',formatter:'.Formatter.formatCurrencyInINRText'}" />
 											<Label text="{i18n>totalinr}" />
-											<Text text="INR {employeeModel>/Total}" />
+											<Text text="{path:'employeeModel>/Total',formatter:'.Formatter.formatCurrencyInINRText'}" />
 										</f:content>
 									</f:SimpleForm>
 								</WizardStep>
