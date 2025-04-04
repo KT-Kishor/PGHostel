@@ -259,10 +259,13 @@ sap.ui.define([
         }
         var sCustomerID = oSelectedItem.getBindingContext("CreateCustomerModel").getProperty("ID");
         var that = this;
-        MessageBox.confirm("Are you sure you want to delete this customer data?", {
-            title: "Confirm Deletion",
-            onClose: function (oAction) {
-                if (oAction === MessageBox.Action.OK) {
+        MessageBox.confirm(
+          this.i18nModel.getText("confirmDeleteCustomerMessage"), 
+          {
+              title: this.i18nModel.getText("msgBoxConfirm"),
+              actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+              onClose: function(action) {
+                  if (action === MessageBox.Action.YES) {
                 that.ajaxDeleteWithJQuery("/ManageCustomer", { filters: { ID: sCustomerID } }).then(() => {
                 MessageToast.show(that.i18nModel.getText("msgCustomerDeleteSuccess"));
                 that._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
