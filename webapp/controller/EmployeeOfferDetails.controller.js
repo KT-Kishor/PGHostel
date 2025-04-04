@@ -346,36 +346,41 @@ sap.ui.define([
                     this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
                     await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
 
+                    
                     var oPDFModel = this.getView().getModel("PDFData");
                     oPDFModel.setProperty("/Type", "EmployeeOffer");
                     oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
                     oPDFModel.setProperty("/EmpRole", oEmpModel.Designation);
-                    oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", pincode");
-                    oPDFModel.setProperty("/EmpPinCode", "123456");
-                    oPDFModel.setProperty("/CreateDate", oEmpModel.OfferReleaseDate);
-                    oPDFModel.setProperty("/JoiningDate", oEmpModel.JoiningDate);
-                    oPDFModel.setProperty("/EmpCTC", oEmpModel.CostofCompany);
+                    oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", " + oEmpModel.PinCode);
+                    oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.OfferReleaseDate));
+                    oPDFModel.setProperty("/JoiningDate", Formatter.formatDate(oEmpModel.JoiningDate));
+                    oPDFModel.setProperty("/EmpCTC", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.CostofCompany));
                     if (oEmpModel.EmploymentBond == "0" || oEmpModel.EmploymentBond == "") {
                         oPDFModel.setProperty("/BondCondition", "18 employment months");
                     }
                     else {
                         oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond years");
                     }
-                    oPDFModel.setProperty("/MonthlyComponents/0/Text", oEmpModel.TotalmothlyAnnualized);
-                    oPDFModel.setProperty("/MonthlyComponents/1/Text", oEmpModel.BasicSalary);
-                    oPDFModel.setProperty("/MonthlyComponents/2/Text", oEmpModel.HRA);
-                    oPDFModel.setProperty("/MonthlyComponents/3/Text", oEmpModel.StatutoryBonus);
-                    oPDFModel.setProperty("/MonthlyComponents/4/Text", oEmpModel.TotalMonthly);
-                    oPDFModel.setProperty("/Retrials/0/Text", oEmpModel.TotalRetires);
-                    oPDFModel.setProperty("/Retrials/1/Text", oEmpModel.MedicalInsurance);
-                    oPDFModel.setProperty("/Retrials/2/Text", oEmpModel.Gratuity);
-                    oPDFModel.setProperty("/VariableComponents/0/Text", oEmpModel.TotalVariablePay);
-                    oPDFModel.setProperty("/VariableComponents/1/Text", oEmpModel.PerformanceBonus);
-                    oPDFModel.setProperty("/VariableComponents/2/Text", oEmpModel.EngagementPB);
-                    oPDFModel.setProperty("/TotalDeductions/1/Text", oEmpModel.TDS);
-                    oPDFModel.setProperty("/TotalDeductions/2/Text", oEmpModel.PF || "");
-                    oPDFModel.setProperty("/TotalDeductions/3/Text", oEmpModel.EPF || "");
-                    oPDFModel.setProperty("/Notes/0/Text", oEmpModel.JoiningBonus);
+                    oPDFModel.setProperty("/MonthlyComponents/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalmothlyAnnualized));
+                    oPDFModel.setProperty("/MonthlyComponents/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.BasicSalary));
+                    oPDFModel.setProperty("/MonthlyComponents/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.HRA));
+                    oPDFModel.setProperty("/MonthlyComponents/3/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.StatutoryBonus));
+                    oPDFModel.setProperty("/MonthlyComponents/4/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalMonthly));
+                    oPDFModel.setProperty("/Retrials/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalRetires));
+                    oPDFModel.setProperty("/Retrials/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.MedicalInsurance));
+                    oPDFModel.setProperty("/Retrials/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Gratuity));
+                    oPDFModel.setProperty("/VariableComponents/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalVariablePay));
+                    oPDFModel.setProperty("/VariableComponents/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.PerformanceBonus));
+                    oPDFModel.setProperty("/VariableComponents/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.EngagementPB));
+                    oPDFModel.setProperty("/TotalDeductions/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TDS));
+                    oPDFModel.setProperty("/TotalDeductions/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.PF || ""));
+                    oPDFModel.setProperty("/TotalDeductions/3/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.EPF || ""));
+                    if(oEmpModel.JoiningBonus == "0"){
+                        oPDFModel.setProperty("/Notes/0/Text", "0");
+                    }
+                    else{
+                        oPDFModel.setProperty("/Notes/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.JoiningBonus));
+                    }
 
                     var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                     oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);

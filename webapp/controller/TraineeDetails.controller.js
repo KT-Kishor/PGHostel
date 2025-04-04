@@ -326,11 +326,10 @@ sap.ui.define([
                     oPDFModel.setProperty("/Type", "TraineeOffer");
                     oPDFModel.setProperty("/EmpName", oEmpModel.NameSalutation + " " + oEmpModel.TraineeName);
                     oPDFModel.setProperty("/EmpRole", "Trainee");
-                    oPDFModel.setProperty("/CreateDate", oEmpModel.ReleaseDate);
-                    oPDFModel.setProperty("/TrainingStartDate", oEmpModel.JoiningDate);
-                    oPDFModel.setProperty("/TraineePeroid", oEmpModel.EndDate);
+                    oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.ReleaseDate));
+                    oPDFModel.setProperty("/TrainingStartDate", Formatter.formatDate(oEmpModel.JoiningDate));
                     oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
-                    oPDFModel.setProperty("/Stipend", oEmpModel.Stipend);
+                    oPDFModel.setProperty("/Stipend", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Stipend));
                     if (oEmpModel.Stipend == 0 || oEmpModel.Stipend == "") {
                         oPDFModel.setProperty("/StipendSkipLine", 5);
                     }

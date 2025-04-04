@@ -3,13 +3,13 @@
     "EmpName": "(Employee Name)",
     "EmpRole": "(Employee Role)",
     "EmpAddress": "(Employee Address)",
-    "EmpPinCode": "(Employee Pin Code)",
     "CreateDate": "(Offer Create Date)",
     "JoiningDate": "(Employee Joining Date)",
     "EmpCTC": "(CTC of Employee)",
     "BondCondition":"(Condition of Bond)",
     "SectorType": "(Type of Sector)",
     "CompanyLogoHeader": "../image/KT_Logo.png",
+    "CompanyBackImage": "../image/logo.png",
 
     "PageHeader": "Salary Breakup",
     "Title": "Annexure 1",
@@ -122,8 +122,11 @@
 
     "AgreementDate" : "02/04/2025",
     "AgreementEndDate": "30/09/2025",
-    "ClientCompanyName" : "Google",
+    "ClientCompanyName" : "Google Inc.",
     "ClientCompanyAddress" : "No. 3, Old Madras Rd, Sadanandanagar, Bennigana Halli, Bengaluru, Karnataka 560016",
-    "ClientName" : "Mr. Pavan Kadam",
-    "AgreementDuration" : "12"
+    "ClientName" : "Mr. Sundar Pichai",
+    "ClientRole": "CEO",
+    "AgreementDuration" : "12",
+
+    "temp": " ${oCompanyModel.companyName} ${oCompanyModel.longAddress} ${oCompanyModel.designation} ${oCompanyModel.headOfCompany} ${oModel.ClientCompanyName} ${oModel.AgreementDate} ${oModel.ClientCompanyAddress} ${oModel.AgreementEndDate} ${oModel.AgreementDuration} ${oCompanyModel.branch}"
 }

@@ -2,9 +2,10 @@ sap.ui.define([
     "./BaseController",
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
+    "../utils/CommonAgreementPDF",
     "sap/m/MessageToast",
 ],
-    function (BaseController, utils, JSONModel, MessageToast) {
+    function (BaseController, utils, JSONModel, jsPDF, MessageToast) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSAEdit", {
             onInit: function () {
@@ -54,7 +55,81 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
 
-            }
+            },
+
+            async MsaE_onPressMerge() {
+                var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
+                var oPDFCondNDAModel = this.getView().getModel("PDFNDAModel");
+                var oPDFCondMSAModel = this.getView().getModel("PDFMSAModel");
+                if (oCoModel && oPDFCondNDAModel && oPDFCondMSAModel){
+                    oCoModel.destroy();
+                    oPDFCondNDAModel.destroy();
+                    oPDFCondMSAModel.destroy();
+                    this.getView().setModel(null, "CompanyCodeDetailsModel");
+                    this.getView().setModel(null, "PDFNDAModel");
+                    this.getView().setModel(null, "PDFMSAModel");
+                }
+
+                try {
+                    this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
+                    this._fetchCommonData("PDFCondition", "PDFNDAModel", { Type: "NDA" });
+                    this._fetchCommonData("PDFCondition", "PDFMSAModel", { Type: "MSA" });
+                    await this._waitForModels(["CompanyCodeDetailsModel", "PDFNDAModel", "PDFMSAModel"], 200, 5000);
+
+                    var oPDFModel = this.getView().getModel("PDFData");
+                    var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                    var oPDFNDAModel = this.getView().getModel("PDFNDAModel").getData();
+                    var oPDFMSAModel = this.getView().getModel("PDFMSAModel").getData();
+                    if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                        MessageToast.show("Company Logo or Model not found.");
+                        return;
+                    }
+
+                    if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+                        var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+                        var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
+                        if (logoBase64 && signBase64) {
+                            oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
+                            oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+                        }
+                    }
+
+                    if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                        if (typeof jsPDF !== "undefined" && typeof jsPDF._GenerateAgreementPDF === "function") {
+                            sap.ui.core.BusyIndicator.show(0);
+                            jsPDF._GenerateAgreementPDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFNDAModel, oPDFMSAModel);
+                        } else {
+                            console.error("Error: jsPDF._GenerateAgreementPDF function not found.");
+                        }
+                    }
+
+                } catch (error) {
+                    console.error("Error waiting for models:", error);
+                }
+            },
+
+            _waitForModels(modelNames, interval = 200, timeout = 5000) {
+                return new Promise((resolve, reject) => {
+                    const startTime = Date.now();
+
+                    const checkModels = () => {
+                        let allLoaded = modelNames.every(modelName => {
+                            let model = this.getView().getModel(modelName);
+                            return model && model.getData() && Object.keys(model.getData()).length > 0;
+                        });
+
+                        if (allLoaded) {
+                            resolve(); // ✅ Proceed when models have data
+                        } else if (Date.now() - startTime > timeout) {
+                            reject(new Error("Timeout waiting for models: " + modelNames.join(", ")));
+                        } else {
+                            setTimeout(checkModels, interval);
+                        }
+                    };
+
+                    checkModels();
+                });
+            },
 
 
 
