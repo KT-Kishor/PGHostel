@@ -153,16 +153,18 @@ sap.ui.define(
                           endDate: `${selectedYear}-12-31`}
                        });
                        await that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData }); 
-                      that.oDialog.close();
                       MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
+                      that.oDialog.close();
+                      that._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31` });
                     }
                   },
                 }
             );
             } else {
                 await this.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
-                this.oDialog.close();
                 MessageToast.show(this.i18nModel.getText("uploadSuccessfull"));
+                this.oDialog.close();
+                this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31` });
             }
         } catch (error) {
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));

@@ -123,11 +123,15 @@ sap.ui.define([
         },
 
         MC_ValidateCommonFields: function (oEvent) {
+          var oInput = oEvent.getSource();
           utils._LCvalidateMandatoryField(oEvent);
+          if (oInput.getValue()==="") oInput.setValueState("None");
         },
 
         MC_ValidateLUTNo: function (oEvent) {
+          var oInput = oEvent.getSource();
           utils._LCvalidateLutNumber(oEvent);
+          if (oInput.getValue()==="") oInput.setValueState("None");
         },
 
         MC_ValidateGstNumber: function (oEvent) {
@@ -159,15 +163,21 @@ sap.ui.define([
         },
 
         MC_ValidateMobileNo: function (oEvent) {
+          var oInput = oEvent.getSource();
           utils._LCvalidateMobileNumber(oEvent);
+          if (oInput.getValue()==="") oInput.setValueState("None");
         },
-
+      
         MC_ValidatePanCard: function (oEvent) {
+          var oInput = oEvent.getSource();
           utils._LCvalidatePanCard(oEvent);
+          if (oInput.getValue()==="") oInput.setValueState("None"); 
         },
 
         MC_ValidateEmail: function (oEvent) {
+          var oInput = oEvent.getSource();
           utils._LCvalidateEmail(oEvent);
+          if (oInput.getValue()==="") oInput.setValueState("None");
         },
 
         MC_onPressSubmit: async function () {
