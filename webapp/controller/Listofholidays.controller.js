@@ -79,7 +79,7 @@ sap.ui.define(
             var sheetName = workbook.SheetNames[0];
             var sheet = workbook.Sheets[sheetName];
             var excelData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-            if (excelData.length > 0) {
+            if (!excelData.length) {
               MessageToast.show(this.i18nModel.getText("noDatainFile"));
               sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
               oFileUploader.clear(); // Clear FileUploader
