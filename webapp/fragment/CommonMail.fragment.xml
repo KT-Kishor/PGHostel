@@ -2,10 +2,9 @@
     xmlns="sap.m"
     xmlns:f="sap.ui.layout.form"
     xmlns:u="sap.ui.unified"
-    xmlns:rich="sap.ui.richtexteditor"
     xmlns:core="sap.ui.core">
-    <Dialog title="Send Mail" contentWidth="80%" >
-        <f:SimpleForm editable="true" visible="{loginModel>/sendEmailForm}" layout="ResponsiveGridLayout">
+    <Dialog title="Send Mail" contentWidth="60%" >
+        <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
             <f:content>
                 <MessageStrip
                     text="{i18n>sendMailFragMsg}"
@@ -14,26 +13,18 @@
                     class="sapUiTinyMarginBottom">
                 </MessageStrip>
                 <Label text="{i18n>fileUploader}" required="true"/>
-                <HBox width="100%" justifyContent="Start" alignItems="Center">
-                    <VBox width="20%">
-                        <u:FileUploader                                       
-                            name="myFileUpload"
-                            multiple="true"
-                            uploadUrl="upload/"
-                            tooltip="{i18n>toolTipMsgSM}"
-                            change="handleUploadPress"
-                            buttonOnly="true"                    
-                            uploadComplete="handleUploadComplete"/>
-                    </VBox>
-                    <VBox width="80%" >
-                        <Text text="{TextDisplay>/name}"></Text>
-                    </VBox>
-                </HBox>
+                        <u:FileUploader
+                id="Mail_id_FileUploader"
+                width="300px"
+                buttonText="{i18n>fileupload}"
+                change="Mail_onUpload"
+                icon="sap-icon://upload"/> 
+            
                 <Label text="{i18n>toMailText}" required="true"/>
-                <Input id="Mail_id_Text" change="onEmailChange" editable="false"/>
+                <Input id="Mail_id_Text" editable="false"/>
 
                 <Label text="{i18n>ccMailText}" required="true"/>
-                <TextArea id="CCMail_TextArea" value="{CCMailModel>/0/emails}" maxLength="600" liveChange="TD_validateEmail"/>
+                <TextArea id="CCMail_TextArea" value="{CCMailModel>/0/emails}" maxLength="600" liveChange="Mail_onEmailChange"/>
             </f:content>
         </f:SimpleForm>
 

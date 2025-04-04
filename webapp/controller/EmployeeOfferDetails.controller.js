@@ -303,6 +303,7 @@ sap.ui.define([
                 this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail",oModel.EmployeeEmail);
             },
             Mail_onPressClose: function () {
+                sap.ui.getCore().byId("Mail_id_Text").setValueState("None");
                 this.oDialog.close();
                 this.oDialog.destroy();
             },

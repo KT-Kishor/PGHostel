@@ -54,6 +54,7 @@ sap.ui.define([
                     this.getModelData(this.sArgPara);
                 }
                 this._makeDatePickersReadOnly(["TD_id_JoiningDate", "TD_id_ReleaseDate", "TU_id_JoinDate", "TU_id_RelDate"]);
+                this._fileSelected = false;
             },
             getModelData: function (sArgPara) {
                 var oModel = this.getOwnerComponent().getModel("traineeModel");
@@ -276,16 +277,35 @@ sap.ui.define([
             TD_onPressMerge: function () {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
-            },
-         
-            
+            } ,               
             Mail_onPressClose: function () {
                 this.oDialog.destroy();
                 this.oDialog = null;  
                 this.oDialog.close();
             },
+    
+            Mail_onUpload: function (oEvent) {
+                const aFiles = oEvent.getParameter("files"); 
+                if (aFiles && aFiles.length > 0) {
+                    this._fileSelected = true;
+                } else {
+                    this._fileSelected = false;
+                }
+                this._validateSendButton();
+            },
+            _validateSendButton: function () {
+                const sendBtn = sap.ui.getCore().byId("SendMail_Button");
+                const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID"); 
+                const isValid = this._fileSelected && isEmailValid;
+                sendBtn.setEnabled(isValid);
+            },
             
-
+            Mail_onEmailChange: function (oEvent) {
+                this._validateSendButton();
+            },
+            
+            
+          
             async offerGeneratingPdfFunction(oModel) {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
                 var oPDFCondModel = this.getView().getModel("PDFConditionModel");
