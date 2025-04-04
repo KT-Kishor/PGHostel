@@ -25,62 +25,83 @@ sap.ui.define([
         //common Dialog Function
         manageCustomerDetails: function (bIsEdit) {
           var oModel;
-          var data = {save: false,submit: true, CC_id_CustInput: false, selectedIndex: 0,};
+          var data = {save: false, submit: true, CC_id_CustInput: false, selectedIndex: 0};
           var visibleData = new JSONModel(data);
           this.getView().setModel(visibleData, "visiblePlay");
-          // If editing, get the selected data from the table
           if (bIsEdit) {
-            var oVisiableModel = this.getView().getModel("visiblePlay");
-            oVisiableModel.setProperty("/save", true);
-            oVisiableModel.setProperty("/submit", false);
-            var oTable = this.byId("MC_id_CustTable").getSelectedItem();
-            if (oTable === null) {
-              return MessageBox.error(this.i18nModel.getText("msgCustomer2"));
-            } else {
-              var oData = oTable.getBindingContext("CreateCustomerModel").getObject();
-              if (oData.GST)
-                this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", true);
-              if (oData.type === "IGST") {
-                this.getView().getModel("visiblePlay").setProperty("/selectedIndex", 1);
+              var oVisiableModel = this.getView().getModel("visiblePlay");
+              oVisiableModel.setProperty("/save", true);
+              oVisiableModel.setProperty("/submit", false);
+              var oTable = this.byId("MC_id_CustTable").getSelectedItem();
+              if (oTable === null) {
+                  return MessageBox.error(this.i18nModel.getText("msgCustomer2"));
+              } else {
+            var oData = oTable.getBindingContext("CreateCustomerModel").getObject();
+            this._originalCustomerData = JSON.parse(JSON.stringify(oData));
+                  if (oData.GST)
+                      this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", true);
+                  if (oData.type === "IGST") {
+                      this.getView().getModel("visiblePlay").setProperty("/selectedIndex", 1);
+                  }
+                  this.gstValue = oData.value;
+                  oModel = new JSONModel(oData);
               }
-              this.gstValue = oData.value;
-              oModel = new JSONModel(oData);
-            }
           } else {
-            var oData  = {
-              companyName: "",
-              name: "",
-              PAN: "",
-              GST: "",
-              address: "",
-              mailID: "",
-              mobileNo: "",
-              LUT: "",
-              type: "",
-              value: "0",
-              salutation: "Mr.",
-              customerEmail: "",
-            };
-            oModel = new JSONModel(oData);
+              this._originalCustomerData = null;
+              var oData = {
+                  companyName: "",
+                  name: "",
+                  PAN: "",
+                  GST: "",
+                  address: "",
+                  mailID: "",
+                  mobileNo: "",
+                  LUT: "",
+                  type: "",
+                  value: "0",
+                  salutation: "Mr.",
+                  customerEmail: "",
+              };
+              oModel = new JSONModel(oData);
           }
           this.getView().setModel(oModel, "CustomerModel");
-          // open the dialog
           if (!this.oDialog) {
-            sap.ui.core.Fragment.load({
-              name: "sap.kt.com.minihrsolution.fragment.CreateCustomer",
-              controller: this,
-            }).then(
-              function (oDialog) {
-                this.oDialog = oDialog;
-                this.getView().addDependent(this.oDialog);
-                this._resetDialogFields(); // Reset values
-                this.oDialog.open();
-              }.bind(this)
-            );
+              sap.ui.core.Fragment.load({
+                  name: "sap.kt.com.minihrsolution.fragment.CreateCustomer",
+                  controller: this,
+              }).then(
+                  function (oDialog) {
+                      this.oDialog = oDialog;
+                      this.getView().addDependent(this.oDialog);
+                      this._resetDialogFields(bIsEdit); 
+                      this.oDialog.open();
+                  }.bind(this)
+              );
           } else {
-            this._resetDialogFields(); // Reset values
-            this.oDialog.open();
+              this._resetDialogFields(bIsEdit);
+              this.oDialog.open();
           }
+      },
+      
+      _resetDialogFields: function (bIsEdit) {
+          sap.ui.getCore().byId("MC_id_CustCompanyName").setValueState("None");
+          sap.ui.getCore().byId("MC_id_CustCustomerName").setValueState("None");
+          sap.ui.getCore().byId("MC_id_CustomGst").setValueState("None");
+          sap.ui.getCore().byId("MC_id_CustomPan").setValueState("None");
+          sap.ui.getCore().byId("MC_id_CustMail").setValueState("None");
+          sap.ui.getCore().byId("MC_id_FinanceEmail").setValueState("None");
+          sap.ui.getCore().byId("MC_id_CustMob").setValueState("None");
+          sap.ui.getCore().byId("MC_id_CustAddress").setValueState("None");
+          if (bIsEdit && this._originalCustomerData) {
+          this.getView().getModel("CustomerModel").setData(JSON.parse(JSON.stringify(this._originalCustomerData)));}
+      },
+      
+        MC_onPressClose: function () {
+            var oVisibleModel = this.getView().getModel("visiblePlay");
+            var bIsEdit = oVisibleModel.getProperty("/save");
+            this._resetDialogFields(bIsEdit);
+            this.oDialog.close();
+            this.byId("MC_id_CustTable").removeSelections(true);
         },
 
         onRadioButtonChange: function () {
@@ -103,23 +124,6 @@ sap.ui.define([
         // Call the function for edit Customer
         MC_onEditCustomerDetails: function () {
           this.manageCustomerDetails(true);
-        },
-
-        _resetDialogFields: function () {
-          sap.ui.getCore().byId("MC_id_CustCompanyName").setValueState("None");
-          sap.ui.getCore().byId("MC_id_CustCustomerName").setValueState("None");
-          sap.ui.getCore().byId("MC_id_CustomGst").setValueState("None");
-          sap.ui.getCore().byId("MC_id_CustomPan").setValueState("None");
-          sap.ui.getCore().byId("MC_id_CustMail").setValueState("None");
-          sap.ui.getCore().byId("MC_id_FinanceEmail").setValueState("None");
-          sap.ui.getCore().byId("MC_id_CustMob").setValueState("None");
-          sap.ui.getCore().byId("MC_id_CustAddress").setValueState("None");
-        },
-
-        MC_onPressClose: function () {
-          this._resetDialogFields(); // Reset values
-          this.oDialog.close();
-          this.byId("MC_id_CustTable").removeSelections(true);
         },
 
         MC_ValidateCommonFields: function (oEvent) {
@@ -229,23 +233,25 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
+            var oCustomerModel = this.getView().getModel("CustomerModel");
+            var oUpdatedData = oCustomerModel.getData();
             var oTable = this.byId("MC_id_CustTable");
             var oSelectedItem = oTable.getSelectedItem();
             if (!oSelectedItem) {
                 MessageToast.show(this.i18nModel.getText("selectCustomerToUpdate"));
                 return; 
             }
-            var oData = oSelectedItem.getBindingContext("CreateCustomerModel").getObject();
+            var sCustomerId = oSelectedItem.getBindingContext("CreateCustomerModel").getProperty("ID");
             var isValid = true;
-            if (oData.PAN && !utils._LCvalidatePanCard(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) { isValid = false; }
-            if (oData.GST && !utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID")) { isValid = false; }
-            if (oData.mobileNo && !utils._LCvalidateMobileNumber(sap.ui.getCore().byId("MC_id_CustMob"), "ID")) { isValid = false; }
-            if (oData.LUT && !utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID")) { isValid = false; }
+            if (oUpdatedData.PAN && !utils._LCvalidatePanCard(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) { isValid = false}
+            if (oUpdatedData.GST && !utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID")) {  isValid = false}
+            if (oUpdatedData.mobileNo && !utils._LCvalidateMobileNumber(sap.ui.getCore().byId("MC_id_CustMob"), "ID")) { isValid = false }
+            if (oUpdatedData.LUT && !utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID")) { isValid = false}
             if (!isValid) {
                 MessageToast.show(this.i18nModel.getText("mandetoryChecks"));
                 return;
             }
-            var requestData = {filters: { ID: oSelectedItem.getBindingContext("CreateCustomerModel").getProperty("ID") },data: oSelectedItem.getBindingContext("CreateCustomerModel").getObject()};
+            var requestData = {filters: { ID: sCustomerId }, data: oUpdatedData};
             var response = await this.ajaxUpdateWithJQuery("/ManageCustomer", requestData);
             if (response.success === true) {
                 oTable.removeSelections(true);
@@ -253,7 +259,7 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("msgCustomer4"));
                 this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
             } else {
-                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+              MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             }
         } catch (error) {
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
