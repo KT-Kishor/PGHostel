@@ -102,6 +102,10 @@ sap.ui.define(
           BusyIndicator.show(0);
           this.getRouter().navTo("RouteSchemeUpload");
         },
+
+        SUD_onFieldLiveChange: function (oEvent) {
+          utils._LCvalidateMandatoryField(oEvent);
+        },
         SUD_onhandleEdit_SavePress: function () {
           var oView = this.getView();
           var oModel = oView.getModel("detailModel");
@@ -113,7 +117,21 @@ sap.ui.define(
             return;
           }
 
-          if (oData.isCreateMode && !this.validateRequiredFields()) {
+          if (
+            utils._LCvalidateMandatoryField(this.byId("SUD_id_Model"), "ID") &&
+            utils._LCvalidateMandatoryField(
+              this.byId("SUD_id_Variant"),
+              "ID"
+            ) &&
+            utils._LCvalidateMandatoryField(
+              this.byId("SUD_id_Transmission"),
+              "ID"
+            ) &&
+            utils._LCvalidateMandatoryField(this.byId("SUD_id_Color"), "ID") &&
+            utils._LCvalidateMandatoryField(this.byId("SUD_id_Fuel"), "ID")
+          ) {
+          } else {
+            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
           }
 
@@ -187,35 +205,31 @@ sap.ui.define(
           });
         },
 
-        SUD_onFieldLiveChange: function (oEvent) {
-          utils._LCvalidateMandatoryField(oEvent);
-        },
+        // validateRequiredFields: function () {
+        //   var that = this;
+        //   var bValid = true;
 
-        validateRequiredFields: function () {
-          var that = this;
-          var bValid = true;
+        //   var aRequiredFields = [
+        //     this.byId("SUD_id_Model"),
+        //     this.byId("SUD_id_Variant"),
+        //     this.byId("SUD_id_Transmission"),
+        //     this.byId("SUD_id_Color"),
+        //     this.byId("SUD_id_Fuel"),
+        //   ];
 
-          var aRequiredFields = [
-            this.byId("SUD_id_Model"),
-            this.byId("SUD_id_Variant"),
-            this.byId("SUD_id_Transmission"),
-            this.byId("SUD_id_Color"),
-            this.byId("SUD_id_Fuel"),
-          ];
+        //   aRequiredFields.forEach(function (oField) {
+        //     if (!utils._LCvalidateMandatoryField(oField, "ID")) {
+        //       bValid = false;
+        //     }
+        //   });
 
-          aRequiredFields.forEach(function (oField) {
-            if (!utils._LCvalidateMandatoryField(oField, "ID")) {
-              bValid = false;
-            }
-          });
+        //   if (!bValid) {
+        //     MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+        //     return false; // Stop saving
+        //   }
 
-          if (!bValid) {
-            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
-            return false; // Stop saving
-          }
-
-          return true; // Proceed with saving
-        },
+        //   return true; // Proceed with saving
+        // },
         //formate
         SUD_onFieldChange: function (oEvent) {
           var oSchemeSource = oEvent.getSource();

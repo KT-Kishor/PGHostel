@@ -104,7 +104,6 @@ sap.ui.define(
         },
 
         LP_onLogin: function () {
-          this.getRouter().navTo("RouteTilePage")
           var that = this;
           var oView = this.getView();
           var oLoginModel = this.getView().getModel("LoginModel");

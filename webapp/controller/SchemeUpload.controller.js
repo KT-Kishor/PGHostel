@@ -34,61 +34,33 @@ sap.ui.define(
         //for Search
         SU_onSearch: function () {
           BusyIndicator.show(0);
-
-          var oView = this.getView();
-          var oFilterBar = oView.byId("SU_id_Filterbar");
-          var aFilters = [];
+          var oFilterBar = this.getView().byId("SU_id_Filterbar");
           var sUrl =
             "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade";
+          var aFilters = [];
+          var oCompanyComboBox = this.byId("SU_id_ModelComboBox");
+          oCompanyComboBox.setValueState("None");
 
-          // Handle mandatory Model ComboBox
-          var oModelComboBox = oView.byId("SU_id_ModelComboBox");
-          var sModelSelectedKey = oModelComboBox.getSelectedKey();
-
-          if (!sModelSelectedKey) {
-            oModelComboBox.setValueState("Error");
-            BusyIndicator.hide();
-            MessageToast.show("Please select a model");
-            return;
-          }
-
-          oModelComboBox.setValueState("None");
-          aFilters.push("model=" + encodeURIComponent(sModelSelectedKey));
-
-          // Iterate over FilterBar controls, skip "Model" since we already handled it
           oFilterBar.getFilterGroupItems().forEach(function (oItem) {
             var oControl = oItem.getControl();
-            var sName = oItem.getName();
-
-            // Skip model filter (already handled above)
-            if (sName === "Model") {
-              return;
-            }
-
-            var sValue;
-            if (
-              oControl instanceof sap.m.ComboBox ||
-              oControl instanceof sap.m.Select
-            ) {
-              sValue = oControl.getSelectedKey();
-            } else if (oControl instanceof sap.m.DatePicker) {
-              sValue = oControl.getDateValue()?.toISOString().split("T")[0];
-            } else {
-              sValue = oControl.getValue();
-            }
+            var sValue = oControl.getSelectedKey
+              ? oControl.getSelectedKey()
+              : null;
 
             if (sValue) {
               aFilters.push(
-                encodeURIComponent(sName) + "=" + encodeURIComponent(sValue)
+                encodeURIComponent(oItem.getName()) +
+                  "=" +
+                  encodeURIComponent(sValue)
               );
             }
           });
 
-          // Append filters to URL
           if (aFilters.length) {
-            sUrl += (sUrl.includes("?") ? "&" : "?") + aFilters.join("&");
+            sUrl += "?" + aFilters.join("&");
           }
 
+          // Call backend via AJAX
           this.CommomReadCall(sUrl);
           BusyIndicator.hide();
         },
@@ -309,7 +281,7 @@ sap.ui.define(
                   success: function () {
                     BusyIndicator.hide();
                     oTable.removeSelections();
-                    that.CommomReadCall("");
+                    that.SU_onSearch();
                     MessageToast.show(
                       that.i18nModel.getText("msgSchemeDeleted")
                     );
