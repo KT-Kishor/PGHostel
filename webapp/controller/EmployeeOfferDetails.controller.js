@@ -43,6 +43,10 @@ sap.ui.define([
                     "TotalMonthly": "",
                     "TotalmothlyAnnualized": "",
                     "TDS": "",
+                    "PF": "",
+                    "EPF": "",
+                    "TotalDeduction": "",
+                    "NoticePeriod": "",
                     "MedicalInsurance": "",
                     "Gratuity": "",
                     "TotalRetires": "",
@@ -58,7 +62,7 @@ sap.ui.define([
                     "PinCode": ""
                 }
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
-                var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
+                var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false,pfVisibility:false });
                 this.getView().setModel(oViewModel, "viewModel");
                 this.byId("EOD_id_Joindate").setMinDate(new Date());
                 ["EOD_id_Name", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_PinCode"].forEach(function (ids) {
@@ -97,6 +101,7 @@ sap.ui.define([
                 }
             },
             updateCallForEmployeeOffer: function (oViewModel) {
+                var that=this;
                 var oModel = this.getView().getModel("employeeModel").getData();
                 oModel.Status = oModel.Status === "Rejected" ? "Submitted" : oModel.Status;
                 oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
@@ -107,13 +112,14 @@ sap.ui.define([
                     }
                 }
                 this.ajaxUpdateWithJQuery("EmployeeOffer", oModel).then((oData) => {
-                    if (oData.results) {
+                    if (oData.success) {
                         oViewModel.setProperty("/editable", false);
                         oViewModel.setProperty("/isEditMode", true);
                         oViewModel.setProperty("/isCTCVisible", false);
                         sap.ui.core.BusyIndicator.hide();
-                        MessageToast.show(this.i18nModel.getText("offerUpdateSucc"));
-                        this.getRouter().navTo("RouteEmployeeOffer");
+                        MessageToast.show(that.i18nModel.getText("offerUpdateSucc"));
+                     //this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
+
                     }
                 }).catch((oError) => {
                     sap.ui.core.BusyIndicator.hide();
@@ -126,8 +132,10 @@ sap.ui.define([
                 });
                 this.ajaxReadWithJQuery("EmployeeOffer", queryString).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    var index = offerData[0].TDS.split(" ")[1] !== "0" ? 0 : (offerData[0].TDS.split(" ")[1] === "0" ? 1 : 2);
+                    var index = offerData[0].PF !== "0" ? 1 :  0 ;
                     this.byId("EOUF_id_RadioButTds").setSelectedIndex(index);
+                    if(index === 1) this.getView().getModel("viewModel").setProperty("/pfVisiblity", true);
+                    else this.getView().getModel("viewModel").setProperty("/pfVisiblity", false);
                     this.getView().setModel(new JSONModel(offerData[0]), "employeeModel");
                     sap.ui.core.BusyIndicator.hide();
                     var oViewModel = this.getView().getModel("viewModel");
@@ -216,7 +224,7 @@ sap.ui.define([
                         "data": oModel
                     }
                     this.ajaxCreateWithJQuery("EmployeeOffer", oModel).then((oData) => {
-                        if (oData.results) {
+                        if (oData.success) {
 
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
@@ -265,6 +273,8 @@ sap.ui.define([
             EOD_onTDSCheckboxChange: function () {
                 var ID = (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") ? "EOD_id_RadioButTds" : "EOUF_id_RadioButTds";
                 var oTdsVal = this.byId(ID).getAggregation("buttons")[this.byId(ID).getSelectedIndex()].getProperty("text");
+                if(oTdsVal === "PF") this.getView().getModel("viewModel").setProperty("/pfVisiblity", true);
+                else this.getView().getModel("viewModel").setProperty("/pfVisiblity", false);
                 if (this.getView().getModel("employeeModel").getProperty("/CTC"))
                     this._calculateSalaryComponents(oTdsVal);
             },

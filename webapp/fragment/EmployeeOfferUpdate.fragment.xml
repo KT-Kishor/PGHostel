@@ -156,9 +156,13 @@
 										<m:Label text="{i18n>salaryType}"/>
 										<m:RadioButtonGroup id="EOUF_id_RadioButTds" columns="3"  editable="{viewModel>/editable}" select="EOD_onTDSCheckboxChange">
 												<m:RadioButton  text="{i18n>tds}" />
-												<m:RadioButton  text="{i18n>noTds}" />
+												<!-- <m:RadioButton  text="{i18n>noTds}" /> -->
 												<m:RadioButton  text="{i18n>pf}" />
 										</m:RadioButtonGroup>
+										<m:Label text="{i18n>eplyePF}" class="boldBlackText" />
+                                        <m:Input value="{employeeModel>/PF}" editable="false" visible="{viewModel>/pfVisiblity}"/>
+                                        <m:Label text="{i18n>eplyrPF}" class="boldBlackText" />
+                                        <m:Input value="{employeeModel>/EPF}" editable="false" visible="{viewModel>/pfVisiblity}" />
 										<!-- Joining Bonus input field -->
                                         <m:Label text="{i18n>joiningBonus}" class="boldBlackText" />
 										<m:Input value="{employeeModel>/JoiningBonus}" editable="{viewModel>/editable}" placeholder="{i18n>joiningBonus}" 

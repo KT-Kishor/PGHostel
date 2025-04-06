@@ -89,7 +89,7 @@
 											<Label text="{i18n>salaryType}"/>
 											<RadioButtonGroup id="EOD_id_RadioButTds" columns="3" select="EOD_onTDSCheckboxChange">
 												<RadioButton id="EOD_id_Tds" text="{i18n>tds}" />
-												<RadioButton id="EOD_id_NoTds" text="{i18n>noTds}" />
+												<!-- <RadioButton id="EOD_id_NoTds" text="{i18n>noTds}" /> -->
 												<RadioButton id="EOD_id_Pf" text="{i18n>pf}" />
 											</RadioButtonGroup>
 											<Label text="{i18n>bond}" required="true" />
@@ -107,7 +107,7 @@
 									</f:SimpleForm>
 								</WizardStep>
 								<WizardStep  title="{i18n>ctcCalculation}"  validated="true" id="EDO_id_WizardStepT">
-									<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="2" columnsL="4" columnsXL="4">
+									<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="2" columnsL="4" columnsXL="5">
 										<f:content>
 											<core:Title text="{i18n>monthlyComponents}" />
 											<Label text="{i18n>basicSalary}" />
@@ -122,7 +122,11 @@
 											<Text text="INR {employeeModel>/TotalmothlyAnnualized}"  />
 											<core:Title text="{i18n>retiralsBenefits}" />
 											<Label text="{i18n>tds}" />
-											<Text text="INR {employeeModel>/TDS}"  />
+											<Text text="{employeeModel>/TDS}" />
+											<Label text="{i18n>eplyePF}" visible="{viewModel>/pfVisiblity}" />
+											<Text text="{employeeModel>/PF}" visible="{viewModel>/pfVisiblity}"/>
+											<Label text="{i18n>eplyrPF}" visible="{viewModel>/pfVisiblity}"/>
+											<Text text="{employeeModel>/EPF}" visible="{viewModel>/pfVisiblity}" />
 											<Label text="{i18n>medicalInsurance}" />
 											<Text text="INR {employeeModel>/MedicalInsurance}"  />
 											<Label text="{i18n>gratuity}" />

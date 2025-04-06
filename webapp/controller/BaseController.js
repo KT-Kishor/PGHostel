@@ -209,7 +209,7 @@ sap.ui.define([
       var oModel = this.getView().getModel("employeeModel");
       var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",", ""));
       var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus").replaceAll(",", ""));
-      var BasicSalary, TDS;
+      var BasicSalary, TDS, PF = 0, EPF = 0;
       // Calculate various salary components
       BasicSalary = (CTC * 0.49) / 12;           // Monthly Basic Salary from 49% of CTC
       var houseRentAllowance = (CTC * 0.49) / 12 * 0.50;     // 50% of Basic Salary
@@ -221,15 +221,21 @@ sap.ui.define([
       var MedicalInsurance = BasicSalary * 0.4; // Medical Insurance at 40% of Basic
       var Gratuity = (BasicSalary * 15) / 26;    // Gratuity calculation
       var TotalRetires = TDS + MedicalInsurance + Gratuity;
-      var PerformanceBonus = (CTC * 5) / 100;  //5% of CTC as PerformanceBonus 
-      var EngagementPB = (CTC * 5) / 100;   // 5% of CTC as EngagementPB 
+      var PerformanceBonus = (CTC * 5) / 100;  //5% of CTC as PerformanceBonus
+      var EngagementPB = (CTC * 5) / 100;   // 5% of CTC as EngagementPB
       var TotalVariablePay = PerformanceBonus + EngagementPB;
+      var TotalDeduction = TDS + PF; // Total Deductions
       if (isTDSIncluded === "No TDS" || isTDSIncluded === "PF") {
-        PerformanceBonus += (TDS / 2)
-        EngagementPB += (TDS / 2);
-        TotalVariablePay = PerformanceBonus + EngagementPB
-        TDS = 0;
-        TotalRetires = TDS + MedicalInsurance + Gratuity;
+        // PerformanceBonus += (TDS / 2)
+        // EngagementPB += (TDS / 2);
+        // TotalVariablePay = PerformanceBonus + EngagementPB
+        TDS = 0; // Set TDS to 0 if not included
+        PF = (BasicSalary * 0.13); // PF calculation
+        EPF = (BasicSalary * 0.12);
+        TotalRetires = EPF + MedicalInsurance + Gratuity;
+        TotalDeduction = TDS + PF + EPF; // Total Deductions
+        TotalMontly = TotalMontly - TotalDeduction;
+        TotalmothlyAnnualized = TotalMontly * 12
       }
       var CostofCompany = TotalmothlyAnnualized + TotalRetires + TotalVariablePay;
       var Total = CostofCompany + parseInt(joiningBonus);
@@ -248,6 +254,8 @@ sap.ui.define([
       oModel.setProperty("/TotalVariablePay", (Math.round(TotalVariablePay)));
       oModel.setProperty("/CostofCompany", (Math.round(CostofCompany)));
       oModel.setProperty("/Total", (Math.round(Total)));
+      oModel.setProperty("/PF", PF);
+      oModel.setProperty("/EPF", EPF);
     },
 
     //Date picker common function 

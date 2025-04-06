@@ -183,6 +183,10 @@ sap.ui.define([
                   }
             },
             OEF_onPressClose:function(){
+                const fields = ["OEF_id_CompanyMail", "OEF_id_DateofBirth", "OEF_id_Mobile"];
+                fields.forEach(field => {
+                    sap.ui.getCore().byId(field).setValueState("None");
+                });
                 this.oDialog.close();
             },
             validateDate: function (oEvent) {
@@ -215,8 +219,8 @@ sap.ui.define([
                     if (oData.results) {
                         sap.ui.core.BusyIndicator.hide();
                         var sSuccessMessage = (oStatus === "OnBoarded")
-                        ? this.i18nModel.getText("successEmpOnboard")
-                        : this.i18nModel.getText("successEmpReject");
+                        ? this.i18nModel.getText("onBoardSuccess")
+                        : this.i18nModel.getText("offerEmpReject");
                         MessageToast.show(sSuccessMessage);
                         this.oDialog.close();
                         this.readCallForEmployeeOffer("");
