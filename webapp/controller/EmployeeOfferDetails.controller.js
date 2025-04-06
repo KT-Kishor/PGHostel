@@ -24,9 +24,9 @@ sap.ui.define([
                 this._fetchCommonData("Currency", "CurrencyModel");
                 this._fetchCommonData("CompanyEmails", "CCMailModel", {
                     applicationName: "EmployeeOffer"
-                  });
+                });
 
-                  var jsonData = {
+                var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",
                     "ConsultantAddress": "",
@@ -280,7 +280,7 @@ sap.ui.define([
                 this.offerGeneratingPdfFunction(oModel);
             },
 
-            EOD_commonOpenDialog: function (FragmentName,EmployeeEmail) {
+            EOD_commonOpenDialog: function (FragmentName) {
                 if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
                         name: FragmentName,
@@ -289,30 +289,103 @@ sap.ui.define([
                         this.oDialog = dialog;
                         this.getView().addDependent(this.oDialog);
                         this.oDialog.open();
-                        if(EmployeeEmail !== "ConfirmationDia")
-                         sap.ui.getCore().byId("Mail_id_Text").setValue(EmployeeEmail);
                     }).bind(this);
                 } else {
                     this.oDialog.open();
-                    if(EmployeeEmail !== "ConfirmationDia")
-                        sap.ui.getCore().byId("Mail_id_Text").setValue(EmployeeEmail);
                 }
             },
-            EOUF_onSendEmail:function(){
-                var oModel = this.getView().getModel("employeeModel").getData();
-                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail",oModel.EmployeeEmail);
-            },
+            EOUF_onSendEmail: function () {
+                var oUploaderDataModel = new JSONModel({
+                    isEmailValid: true,
+                    ToEmail: this.getView().getModel("employeeModel").getData().EmployeeEmail,
+                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
+                    name: "",
+                    mimeType: "",
+                    content: "",
+                    isFileUploaded: false,
+                    button: false
+                });
+                this.getView().setModel(oUploaderDataModel, "UploaderData");
+                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
+            
+        },
             Mail_onPressClose: function () {
-                sap.ui.getCore().byId("Mail_id_Text").setValueState("None");
+                this.oDialog.destroy();
+                this.oDialog = null;
+                this.oDialog.close();
+            },
+            Mail_onUpload: function (oEvent) {
+                var oFileUploader = oEvent.getSource();
+                var oFiles = oFileUploader.oFileUpload.files; // Get all selected files
+                var oModelEmail = this.getView().getModel("UploaderData");
+                if (!oFiles.length) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("noFileSelected"));
+                    return;
+                }
+                // Get existing attachments
+                var attachments = oModelEmail.getProperty("/attachments") || [];
+                var existingFileNames = oModelEmail.getProperty("/name") || "";
+                var uploadedFileNames = existingFileNames ? existingFileNames.split(", ") : [];
+                Array.from(oFiles).forEach((oFile) => {
+                    // Check for duplicate file names
+                    if (uploadedFileNames.includes(oFile.name)) {
+                        sap.m.MessageToast.show(this.i18nModel.getText("fileAlreadyUploaded", [oFile.name]));
+                        return; // Skip duplicate files
+                    }
+                    var oReader = new FileReader();
+                    oReader.onload = (e) => {
+                        var sFileBinary = e.target.result.split(",")[1]; // Extract base64 content
+                        // Update attachments in the UploaderData model
+                        attachments.push({
+                            name: oFile.name,
+                            mimeType: oFile.type,
+                            content: sFileBinary,
+                        });
+                        oModelEmail.setProperty("/attachments", attachments);
+                        oModelEmail.setProperty("/isFileUploaded", true);
+                        // Update the TextDisplay model for file names
+                        uploadedFileNames.push(oFile.name);
+                        oModelEmail.setProperty("/name", uploadedFileNames.join(", "));
+                        // Show success message for each file
+                        sap.m.MessageToast.show(this.i18nModel.getText("uploadSuccessfull", [oFile.name]));
+                        this._validateSendButton();
+                    };
+                    oReader.onerror = () => {
+                        sap.m.MessageToast.show(this.i18nModel.getText("fileReadError", [oFile.name]))
+                    };
+                    // Read the file content
+                    oReader.readAsDataURL(oFile);
+                });
+                oFileUploader.setValue("");
+            },
+            _validateSendButton: function () {
+                const sendBtn = sap.ui.getCore().byId("SendMail_Button");
+                const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
+                sendBtn.setEnabled(isEmailValid);
+            },
+
+            Mail_onEmailChange: function (oEvent) {
+                this._validateSendButton();
+            },
+            Mail_onSendEmail: function () {
+                var oModel = this.getView().getModel("employeeModel").getData();
+                var oPayload = {
+                    "EmployeeName": oModel.EmployeeName,
+                    "toEmailID": oModel.EmployeeEmail,
+                    "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
+                };
+                this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload).then((oData) => {
+                    sap.ui.core.BusyIndicator.hide();
+
+                }).catch((oError) => {
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    sap.ui.core.BusyIndicator.hide();
+                });
                 this.oDialog.close();
                 this.oDialog.destroy();
             },
-            Mail_onSendEmail: function () {
-
-
-            },
             EOD_onPressBackBtn: function () {
-                this.EOD_commonOpenDialog( "sap.kt.com.minihrsolution.fragment.CommonBack");
+                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonBack");
 
             },
             onConfirmBack: function () {
@@ -333,108 +406,108 @@ sap.ui.define([
             async offerGeneratingPdfFunction(oModel) {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
                 var oPDFCondModel = this.getView().getModel("PDFConditionModel");
-                if (oCoModel && oPDFCondModel) {
-                    oCoModel.destroy();
-                    oPDFCondModel.destroy();
-                    this.getView().setModel(null, "CompanyCodeDetailsModel");
-                    this.getView().setModel(null, "PDFConditionModel");
-                }
-                var oEmpModel = oModel.getData();
+                if(oCoModel && oPDFCondModel) {
+            oCoModel.destroy();
+            oPDFCondModel.destroy();
+            this.getView().setModel(null, "CompanyCodeDetailsModel");
+            this.getView().setModel(null, "PDFConditionModel");
+        }
+        var oEmpModel = oModel.getData();
 
-                try {
-                    this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
-                    this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
-                    await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
+        try {
+            this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
+            this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
+            await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
 
-                    
-                    var oPDFModel = this.getView().getModel("PDFData");
-                    oPDFModel.setProperty("/Type", "EmployeeOffer");
-                    oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
-                    oPDFModel.setProperty("/EmpRole", oEmpModel.Designation);
-                    oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", " + oEmpModel.PinCode);
-                    oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.OfferReleaseDate));
-                    oPDFModel.setProperty("/JoiningDate", Formatter.formatDate(oEmpModel.JoiningDate));
-                    oPDFModel.setProperty("/EmpCTC", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.CostofCompany));
-                    if (oEmpModel.EmploymentBond == "0" || oEmpModel.EmploymentBond == "") {
-                        oPDFModel.setProperty("/BondCondition", "18 employment months");
-                    }
-                    else {
-                        oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond years");
-                    }
-                    oPDFModel.setProperty("/MonthlyComponents/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalmothlyAnnualized));
-                    oPDFModel.setProperty("/MonthlyComponents/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.BasicSalary));
-                    oPDFModel.setProperty("/MonthlyComponents/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.HRA));
-                    oPDFModel.setProperty("/MonthlyComponents/3/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.StatutoryBonus));
-                    oPDFModel.setProperty("/MonthlyComponents/4/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalMonthly));
-                    oPDFModel.setProperty("/Retrials/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalRetires));
-                    oPDFModel.setProperty("/Retrials/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.MedicalInsurance));
-                    oPDFModel.setProperty("/Retrials/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Gratuity));
-                    oPDFModel.setProperty("/VariableComponents/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalVariablePay));
-                    oPDFModel.setProperty("/VariableComponents/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.PerformanceBonus));
-                    oPDFModel.setProperty("/VariableComponents/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.EngagementPB));
-                    oPDFModel.setProperty("/TotalDeductions/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TDS));
-                    oPDFModel.setProperty("/TotalDeductions/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.PF || ""));
-                    oPDFModel.setProperty("/TotalDeductions/3/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.EPF || ""));
-                    if(oEmpModel.JoiningBonus == "0"){
-                        oPDFModel.setProperty("/Notes/0/Text", "0");
-                    }
-                    else{
-                        oPDFModel.setProperty("/Notes/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.JoiningBonus));
-                    }
 
-                    var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-                    oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
-                    oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
-                    var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
-
-                    if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                        MessageToast.show("Company Logo or Model not found.");
-                        return;
-                    }
-
-                    if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
-                        var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
-                        var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
-                        if (logoBase64 && signBase64) {
-                            oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
-                            oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
-                        }
-                    }
-
-                    if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
-                        if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
-                            jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
-                        } else {
-                            console.error("Error: jsPDF._GeneratePDF function not found.");
-                        }
-                    }
-
-                } catch (error) {
-                    console.error("Error waiting for models:", error);
-                }
-            },
-
-            _waitForModels(modelNames, interval = 200, timeout = 5000) {
-                return new Promise((resolve, reject) => {
-                    const startTime = Date.now();
-
-                    const checkModels = () => {
-                        let allLoaded = modelNames.every(modelName => {
-                            let model = this.getView().getModel(modelName);
-                            return model && model.getData() && Object.keys(model.getData()).length > 0;
-                        });
-
-                        if (allLoaded) {
-                            resolve(); // ✅ Proceed when models have data
-                        } else if (Date.now() - startTime > timeout) {
-                            reject(new Error("Timeout waiting for models: " + modelNames.join(", ")));
-                        } else {
-                            setTimeout(checkModels, interval);
-                        }
-                    };
-
-                    checkModels();
-                });
+            var oPDFModel = this.getView().getModel("PDFData");
+            oPDFModel.setProperty("/Type", "EmployeeOffer");
+            oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
+            oPDFModel.setProperty("/EmpRole", oEmpModel.Designation);
+            oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", " + oEmpModel.PinCode);
+            oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.OfferReleaseDate));
+            oPDFModel.setProperty("/JoiningDate", Formatter.formatDate(oEmpModel.JoiningDate));
+            oPDFModel.setProperty("/EmpCTC", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.CostofCompany));
+            if (oEmpModel.EmploymentBond == "0" || oEmpModel.EmploymentBond == "") {
+                oPDFModel.setProperty("/BondCondition", "18 employment months");
             }
+            else {
+                oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond years");
+            }
+            oPDFModel.setProperty("/MonthlyComponents/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalmothlyAnnualized));
+            oPDFModel.setProperty("/MonthlyComponents/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.BasicSalary));
+            oPDFModel.setProperty("/MonthlyComponents/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.HRA));
+            oPDFModel.setProperty("/MonthlyComponents/3/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.StatutoryBonus));
+            oPDFModel.setProperty("/MonthlyComponents/4/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalMonthly));
+            oPDFModel.setProperty("/Retrials/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalRetires));
+            oPDFModel.setProperty("/Retrials/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.MedicalInsurance));
+            oPDFModel.setProperty("/Retrials/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Gratuity));
+            oPDFModel.setProperty("/VariableComponents/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalVariablePay));
+            oPDFModel.setProperty("/VariableComponents/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.PerformanceBonus));
+            oPDFModel.setProperty("/VariableComponents/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.EngagementPB));
+            oPDFModel.setProperty("/TotalDeductions/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TDS));
+            oPDFModel.setProperty("/TotalDeductions/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.PF || ""));
+            oPDFModel.setProperty("/TotalDeductions/3/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.EPF || ""));
+            if (oEmpModel.JoiningBonus == "0") {
+                oPDFModel.setProperty("/Notes/0/Text", "0");
+            }
+            else {
+                oPDFModel.setProperty("/Notes/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.JoiningBonus));
+            }
+
+            var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+            oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
+            oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
+            var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
+
+            if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                MessageToast.show("Company Logo or Model not found.");
+                return;
+            }
+
+            if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+                var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+                var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
+                if (logoBase64 && signBase64) {
+                    oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
+                    oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+                }
+            }
+
+            if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                    jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                } else {
+                    console.error("Error: jsPDF._GeneratePDF function not found.");
+                }
+            }
+
+        } catch (error) {
+            console.error("Error waiting for models:", error);
+        }
+    },
+
+    _waitForModels(modelNames, interval = 200, timeout = 5000) {
+    return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+
+        const checkModels = () => {
+            let allLoaded = modelNames.every(modelName => {
+                let model = this.getView().getModel(modelName);
+                return model && model.getData() && Object.keys(model.getData()).length > 0;
+            });
+
+            if (allLoaded) {
+                resolve(); // ✅ Proceed when models have data
+            } else if (Date.now() - startTime > timeout) {
+                reject(new Error("Timeout waiting for models: " + modelNames.join(", ")));
+            } else {
+                setTimeout(checkModels, interval);
+            }
+        };
+
+        checkModels();
+    });
+}
         });
     });

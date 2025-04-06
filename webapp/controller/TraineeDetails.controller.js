@@ -20,7 +20,7 @@ sap.ui.define([
                 this._fetchCommonData("EmployeeDetails", "empModel");
                 this._fetchCommonData("CompanyEmails", "CCMailModel", {
                     applicationName: "Trainee"
-                  });
+                });
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -81,7 +81,7 @@ sap.ui.define([
                 }
             },
             TUF_onPressback: function () {
-                this.getRouter().navTo("RouteTrainee",{value:"TraineeDetails"});
+                this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
             },
             // Reset wizard to initial state
             T_onResetWizard: function () {
@@ -157,7 +157,7 @@ sap.ui.define([
                                     type: "Accept",
                                     press: function () {
                                         oDialog.close();
-                                        this.getRouter().navTo("RouteTrainee",{value:"TraineeDetails"});
+                                        this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                                     }.bind(this)
                                 }),
                                 endButton: new sap.m.Button({
@@ -166,7 +166,7 @@ sap.ui.define([
                                     press: function () {
                                         this.TD_onPressMerge();
                                         oDialog.close();
-                                        this.getRouter().navTo("RouteTrainee",{value:"TraineeDetails"});
+                                        this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                                     }.bind(this)
                                 }),
                                 afterClose: function () {
@@ -237,7 +237,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 });
             },
-            TD_commonOpenDialog: function (fragmentName,TraineeEmail) {
+            TD_commonOpenDialog: function (fragmentName) {
                 if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -246,25 +246,31 @@ sap.ui.define([
                         this.oDialog = dialog;
                         this.getView().addDependent(this.oDialog);
                         this.oDialog.open();
-                        if(TraineeEmail !== "ConfirmationDia")
-                        sap.ui.getCore().byId("Mail_id_Text").setValue(TraineeEmail);
                     }).bind(this);
                 } else {
                     this.oDialog.open();
-                    if(TraineeEmail !== "ConfirmationDia")
-                        sap.ui.getCore().byId("Mail_id_Text").setValue(TraineeEmail);
                 }
             },
-            
+
             TU_onSendEmail: function () {
-                var oModel = this.getView().getModel("oTraineeDetails").getData();
-                this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail",oModel.TraineeEmail);
+                var oUploaderDataModel = new JSONModel({
+                    isEmailValid: true,
+                    ToEmail: this.getView().getModel("oTraineeDetails").getData().TraineeEmail,  // Ensure correct property access
+                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
+                    name: "",
+                    mimeType: "",
+                    content: "",
+                    isFileUploaded: false,
+                    button: false
+                });
+                this.getView().setModel(oUploaderDataModel, "UploaderData");
+                this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
             },
             TD_onPressback: function () {
-                this.TD_commonOpenDialog( "sap.kt.com.minihrsolution.fragment.CommonBack","ConfirmationDia");
+                this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonBack");
             },
             onConfirmBack: function () {
-               this.getRouter().navTo("RouteTrainee",{value:"TraineeDetails"})
+                this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" })
                 this.oDialog.close();
             },
             onCancel: function () {
@@ -272,44 +278,107 @@ sap.ui.define([
             },
             onDialogClose: function () {
                 this.oDialog.destroy();
-                this.oDialog = null;   
+                this.oDialog = null;
             },
             TD_onPressMerge: function () {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
-            } ,               
+            },
             Mail_onPressClose: function () {
                 this.oDialog.destroy();
-                this.oDialog = null;  
+                this.oDialog = null;
                 this.oDialog.close();
             },
-    
+
             Mail_onUpload: function (oEvent) {
-                const aFiles = oEvent.getParameter("files"); 
-                if (aFiles && aFiles.length > 0) {
-                    this._fileSelected = true;
-                } else {
-                    this._fileSelected = false;
+                var oFileUploader = oEvent.getSource();
+                var oFiles = oFileUploader.oFileUpload.files; // Get all selected files
+                var oModelEmail = this.getView().getModel("UploaderData");
+                if (!oFiles.length) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("noFileSelected"));
+                    return;
                 }
-                this._validateSendButton();
+                // Get existing attachments
+                var attachments = oModelEmail.getProperty("/attachments") || [];
+                var existingFileNames = oModelEmail.getProperty("/name") || "";
+                var uploadedFileNames = existingFileNames ? existingFileNames.split(", ") : [];
+                Array.from(oFiles).forEach((oFile) => {
+                    // Check for duplicate file names
+                    if (uploadedFileNames.includes(oFile.name)) {
+                        sap.m.MessageToast.show(this.i18nModel.getText("fileAlreadyUploaded", [oFile.name]));
+                        return; // Skip duplicate files
+                    }
+                    var oReader = new FileReader();
+                    oReader.onload = (e) => {
+                        var sFileBinary = e.target.result.split(",")[1]; // Extract base64 content
+                        // Update attachments in the UploaderData model
+                        attachments.push({
+                            name: oFile.name,
+                            mimeType: oFile.type,
+                            content: sFileBinary,
+                        });
+                        oModelEmail.setProperty("/attachments", attachments);
+                        oModelEmail.setProperty("/isFileUploaded", true);
+                        // Update the TextDisplay model for file names
+                        uploadedFileNames.push(oFile.name);
+                        oModelEmail.setProperty("/name", uploadedFileNames.join(", "));
+                        // Show success message for each file
+                        sap.m.MessageToast.show(this.i18nModel.getText("uploadSuccessfull", [oFile.name]));
+                        this._validateSendButton();
+                    };
+                    oReader.onerror = () => {
+                        sap.m.MessageToast.show(this.i18nModel.getText("fileReadError", [oFile.name]))
+                    };
+                    // Read the file content
+                    oReader.readAsDataURL(oFile);
+                });
+                oFileUploader.setValue("");
+
             },
             _validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
-                const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID"); 
-                const isValid = this._fileSelected && isEmailValid;
-                sendBtn.setEnabled(isValid);
+                const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
+                sendBtn.setEnabled(isEmailValid);
             },
-            
+
             Mail_onEmailChange: function (oEvent) {
                 this._validateSendButton();
             },
-            
-            
-          
+            Mail_onSendEmail: function () {
+                var oModel = this.getView().getModel("oTraineeDetails").getData();
+                var oPayload = {
+                    "TraineeName": oModel.TraineeName,
+                    "toEmailID": oModel.TraineeEmail,
+                    "JoiningDate": oModel.JoiningDate,
+                    "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
+                };
+                //   var attachments = this.getView().getModel("UploaderData");
+                //   var uploadedFiles = attachments.oData.attachments;
+                //   // Prepare the email data
+                //   var jsonAllData = {
+                //     "data": {
+                //       "To": [attachments.oData.ToEmail],
+                //       "CC": attachments.oData.CCEmail.split(','),
+                //       "Name": uploadedFiles.map(file => file.name),
+                //       "Content": uploadedFiles.map(file => file.content),
+                //       "Mime_type": uploadedFiles.map(file => file.mimeType)
+                //     },
+                //     "Type": "Employee"
+                //   };
+                this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload).then((oData) => {
+                    sap.ui.core.BusyIndicator.hide();
+
+                }).catch((oError) => {
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    sap.ui.core.BusyIndicator.hide();
+                });
+                this.oDialog.close();
+                this.oDialog.destroy();
+            },
             async offerGeneratingPdfFunction(oModel) {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
                 var oPDFCondModel = this.getView().getModel("PDFConditionModel");
-                if (oCoModel && oPDFCondModel){
+                if (oCoModel && oPDFCondModel) {
                     oCoModel.destroy();
                     oPDFCondModel.destroy();
                     this.getView().setModel(null, "CompanyCodeDetailsModel");
@@ -388,8 +457,8 @@ sap.ui.define([
                     checkModels();
                 });
             },
-            
-           
+
+
 
 
         });
