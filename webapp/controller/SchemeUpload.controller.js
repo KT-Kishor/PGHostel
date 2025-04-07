@@ -27,42 +27,26 @@ sap.ui.define(
         _RouteAppVisibility: function () {
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().setModel(new JSONModel({ isFileValid: false })); //for createfragmentsubmit button
+          this.getView()
+            .getModel("LoginModel")
+            .setProperty("/HeaderName", this.i18nModel.getText("schemeupload"));
           this.CommomReadCall("");
           this.MainModel = new JSONModel({ items: [] }); // Store table data
           // Fetch data on initialization
         },
         //for Search
         SU_onSearch: function () {
-          BusyIndicator.show(0);
-          var oFilterBar = this.getView().byId("SU_id_Filterbar");
-          var sUrl =
-            "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade";
-          var aFilters = [];
-          var oCompanyComboBox = this.byId("SU_id_ModelComboBox");
-          oCompanyComboBox.setValueState("None");
-
-          oFilterBar.getFilterGroupItems().forEach(function (oItem) {
-            var oControl = oItem.getControl();
-            var sValue = oControl.getSelectedKey
-              ? oControl.getSelectedKey()
-              : null;
-
-            if (sValue) {
-              aFilters.push(
-                encodeURIComponent(oItem.getName()) +
-                  "=" +
-                  encodeURIComponent(sValue)
-              );
+          var aFilterItems = this.byId("SU_id_Filterbar").getFilterGroupItems();
+          var params = {};
+          aFilterItems.forEach(function (oItem) {
+            var oControl = oItem.getControl(); // Get the associated control
+            var sValue = oItem.getName();
+            if (oControl && oControl.getValue()) {
+              params[sValue] = oControl.getValue();
             }
           });
-
-          if (aFilters.length) {
-            sUrl += "?" + aFilters.join("&");
-          }
-
-          // Call backend via AJAX
-          this.CommomReadCall(sUrl);
-          BusyIndicator.hide();
+          this._fetchCommonData("SchemeUploade", "ModelOnly", params);
+          this.CommomReadCall(params);
         },
 
         SU_onClear: function () {
@@ -75,6 +59,21 @@ sap.ui.define(
               oControl.setValue("");
             }
           });
+        },
+        SU_onModelChange: function (oEvent) {
+          var oVariantComboBox = this.getView().byId("SU_id_Variant1");
+          var oTransmissionComboBox = this.getView().byId(
+            "SU_id_Transmission1"
+          );
+
+          if (oVariantComboBox) {
+            oVariantComboBox.setSelectedKey(""); // Clear selection
+            oVariantComboBox.setValue(""); // Clear displayed text
+          }
+          if (oTransmissionComboBox) {
+            oTransmissionComboBox.setSelectedKey(""); // Clear selection
+            oTransmissionComboBox.setValue(""); // Clear displayed text
+          }
         },
         // goto Tilepage
         onPressback: function () {
@@ -311,7 +310,6 @@ sap.ui.define(
           }
 
           sap.ui.core.BusyIndicator.show(0);
-
           // Format Data
           var formattedData = that._uploadedExcelData.map((row) => ({
             Variant: row["Variant"] || "",
@@ -357,9 +355,11 @@ sap.ui.define(
             MessageToast.show("Scheme saved successfully!");
 
             // Update UI Model after successful save
-
             that.getView().setModel(that.MainModel, "MainModel");
             that.MainModel.refresh(true);
+            that.CommomReadCall("");
+            oFileUploader.setValue(""); // Reset file uploader
+            that.oDialog.close();
           } else {
             sap.ui.core.BusyIndicator.hide();
             oFileUploader.setValue(""); // Reset file uploader
@@ -367,13 +367,6 @@ sap.ui.define(
             if (that.oDialog) that.oDialog.close();
             MessageToast.show("Failed to save data. Please try again.");
           }
-          //  catch (error) {
-          //   MessageToast.show("Error uploading data. Please try again.");
-          //   console.error("Upload Error:", error);
-          // }
-          //  finally {
-
-          // }
         },
         CommomReadCall: function (filter) {
           this.ajaxReadWithJQuery("SchemeUploade", filter)
@@ -381,10 +374,41 @@ sap.ui.define(
               var offerData = Array.isArray(oData.data)
                 ? oData.data
                 : [oData.data];
+              // Set full result to MainModel
               this.getView().setModel(
                 new JSONModel({ results: offerData }),
                 "MainModel"
               );
+              // Deduplicate for each ComboBox
+              const getUnique = (arr, key) => {
+                const seen = new Set();
+                return arr
+                  .filter((item) => {
+                    if (item[key] && !seen.has(item[key])) {
+                      seen.add(item[key]);
+                      return true;
+                    }
+                    return false;
+                  })
+                  .map((item) => ({ [key]: item[key] }));
+              };
+
+              const uniqueModels = getUnique(offerData, "Model");
+              const uniqueVariants = getUnique(offerData, "Variant");
+              const uniqueTransmissions = getUnique(offerData, "Transmission");
+              this.getView().setModel(
+                new JSONModel({ results: uniqueModels }),
+                "ModelOnly"
+              );
+              this.getView().setModel(
+                new JSONModel({ results: uniqueVariants }),
+                "VariantOnly"
+              );
+              this.getView().setModel(
+                new JSONModel({ results: uniqueTransmissions }),
+                "TransmissionOnly"
+              );
+
               sap.ui.core.BusyIndicator.hide();
             })
             .catch((oError) => {
@@ -394,6 +418,7 @@ sap.ui.define(
               );
             });
         },
+
         //Navigate to new page with data
         SU_onItemPress: function (oEvent) {
           var oSelectedContext = oEvent

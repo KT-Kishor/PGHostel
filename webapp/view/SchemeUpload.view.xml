@@ -33,14 +33,14 @@
                             <ComboBox
                             showClearIcon="true"
                                 name="Model"
-                                items="{MainModel>/results}"
+                                items="{ModelOnly>/results}"
                                 id="SU_id_ModelComboBox"
                                 enabled="true"
                                 change="SU_onModelChange"
                             >
                                 <core:Item
-                                    key="{MainModel>Model}"
-                                    text="{MainModel>Model}"
+                                    key="{ModelOnly>Model}"
+                                    text="{ModelOnly>Model}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -57,11 +57,11 @@
                                 name="Variant"
                                 id="SU_id_Variant1"
                                 enabled="true"
-                                items="{MainModel>/results}"
+                                items="{VariantOnly>/results}"
                             >
                                 <core:Item
-                                    key="{MainModel>Variant}"
-                                    text="{MainModel>Variant}"
+                                    key="{VariantOnly>Variant}"
+                                    text="{VariantOnly>Variant}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -78,12 +78,12 @@
                             showClearIcon="true"
                                 name="Transmission"
                                 id="SU_id_Transmission1"
-                                items="{MainModel>/results}"
+                                items="{TransmissionOnly>/results}"
                                 enabled="true"
                             >
                                 <core:Item
-                                    key="{MainModel>Transmission}"
-                                    text="{MainModel>Transmission}"
+                                    key="{TransmissionOnly>Transmission}"
+                                    text="{TransmissionOnly>Transmission}"
                                 />
                             </ComboBox>
                         </fb:control>
