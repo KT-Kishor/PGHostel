@@ -23,7 +23,7 @@ sap.ui.define(
             var loginModel = that.getOwnerComponent().getModel("LoginModel");
             that.userId = loginModel.getProperty("/EmployeeID");
             that.Type = loginModel.getProperty("/Role");
-            that._fetchCommonData("Leaves", "LeaveModel", { EmployeeID: that.userId });
+            that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId });
             that._fetchCommonData("LeaveType", "leaveTypeModel", { type: "Employee" });
             that.getView().getModel("LoginModel").setProperty("/HeaderName", "Leave Application");
             that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
@@ -37,7 +37,7 @@ sap.ui.define(
       onShowMore: function (oEvent) {
         var oBindingContext = oEvent.getSource().getBindingContext("Leave");
         if (!oBindingContext) {
-            sap.m.MessageToast.show("No data available.");
+           MessageToast.show("No data available.");
             return;
         }
         var sFullText = oBindingContext.getProperty("managerRemark") || "No remarks available";
@@ -238,21 +238,21 @@ sap.ui.define(
                   this.ajaxCreateWithJQuery("Leaves", { data: oData })
                   .then((response) => {
                   if (response.success === true) {
-                  sap.m.MessageToast.show(this.i18nModel.getText("msgCustomer3"));
+                  MessageToast.show(this.i18nModel.getText("msgCustomer3"));
                   this.oDialog.close();
                   this._fetchCommonData("Leaves", "LeaveModel", {});
                           } else {
-                              sap.m.MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                              MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                           }
                       })
                       .catch((error) => {
-                          sap.m.MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                          MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                       });
               } else {
-                  sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                  MessageToast.show(this.i18nModel.getText("mandetoryFields"));
               }
           } catch (error) {
-              sap.m.MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+              MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
       }      
       }

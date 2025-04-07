@@ -59,9 +59,9 @@
 			</f:content>
 		</f:SimpleForm>
 		<HBox justifyContent="End" >
-			<Button text="{i18n>save}" type="Emphasized" press="MC_onPressSave" class="submit" visible="{visiblePlay>/save}"></Button>
-			<Button text="{i18n>submit}" type="Emphasized" press="MC_onPressSubmit" class="submit"  visible="{visiblePlay>/submit}"></Button>
-			<Button text="{i18n>close}" press="MC_onPressClose" class="sendMail"></Button>
+			<Button text="{i18n>save}" type="Accept" press="MC_onPressSave" class="submit" visible="{visiblePlay>/save}"></Button>
+			<Button text="{i18n>submit}" type="Accept" press="MC_onPressSubmit" class="submit"  visible="{visiblePlay>/submit}"></Button>
+			<Button text="{i18n>close}" press="MC_onPressClose" class="sendMail" type="Negative"></Button>
 		</HBox>
 	</Dialog>
 </core:FragmentDefinition>

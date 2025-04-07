@@ -19,7 +19,7 @@
 				</fb:FilterGroupItem>
 			</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="MC_id_CustTable" mode="SingleSelectLeft" 
+			<Table id="MC_id_CustTable" mode="SingleSelectLeft" selectionChange="MC_onTableSelectionChange"
 			 items="{path: 'CreateCustomerModel>/'}"
 			 growing="true"
              growingThreshold="100"
@@ -28,11 +28,11 @@
 					<OverflowToolbar>
 						<Title id="MC_id_Title" text="{i18n>custDetails} ({= ${CreateCustomerModel>/}.length })"/>
 						<ToolbarSpacer/>
-						<Button icon="sap-icon://add-employee" tooltip="{i18n>custAddButToolTip}" press="MC_onAddCustomerDetails" />
+						<Button icon="sap-icon://add-employee" type="Accept" text="{i18n>addCustomerBtn}" tooltip="{i18n>custAddButToolTip}" press="MC_onAddCustomerDetails" />
 						<ToolbarSeparator />
-						<Button icon="sap-icon://edit" tooltip="{i18n>custEditButToolTip}" press="MC_onEditCustomerDetails" />
+						<Button icon="sap-icon://edit" text="{i18n>custEditButToolTip}" type="Neutral" tooltip="{i18n>custEditButToolTip}" press="MC_onEditCustomerDetails" />
 						<ToolbarSeparator />
-						<Button icon="sap-icon://delete" tooltip="{i18n>custDeleteToolTip}" press="MC_onDeleteAddCustomer" />
+						<Button icon="sap-icon://delete" type="Negative" text="{i18n>custDeleteToolTip}" tooltip="{i18n>custDeleteToolTip}" press="MC_onDeleteAddCustomer" />
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
@@ -40,7 +40,7 @@
 						<Text text="{i18n>companyName}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>name}" />
+						<Text text="{i18n>customerName}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>gstNo}" />
@@ -62,7 +62,7 @@
 					<ColumnListItem>
 						<cells>
 							<Text text="{CreateCustomerModel>companyName}" />
-							<Text text="{CreateCustomerModel>name}" />
+							<Text text="{CreateCustomerModel>salutation}{CreateCustomerModel>name}" />
 							<Text text="{CreateCustomerModel>GST}" />
 							<Text text="{CreateCustomerModel>type}" />
 							<Text text="{CreateCustomerModel>value}" />

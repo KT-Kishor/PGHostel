@@ -162,7 +162,7 @@ sap.ui.define([
           } else {
             visiModel.setProperty("/CC_id_CustInput", false);
             oInput.setValueState("Error");
-            oInput.setValueStateText(this.i18nModel.getText("msgCustomer14"));
+            oInput.setValueStateText(this.i18nModel.getText("gstNoValueState"));
           }
         },
 
@@ -266,34 +266,51 @@ sap.ui.define([
         }
      },
     
-      MC_onDeleteAddCustomer: function () {
-        var oTable = this.byId("MC_id_CustTable");
-        var oSelectedItem = oTable.getSelectedItem();
-        if (!oSelectedItem) {
-            MessageBox.error(this.i18nModel.getText("deleteCustomer"));
-            return;
-        }
-        var sCustomerID = oSelectedItem.getBindingContext("CreateCustomerModel").getProperty("ID");
-        var that = this;
-        MessageBox.confirm(
-          this.i18nModel.getText("confirmDeleteCustomerMessage"), 
-          {
-              title: this.i18nModel.getText("msgBoxConfirm"),
-              actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-              onClose: function(action) {
-                  if (action === MessageBox.Action.YES) {
-                that.ajaxDeleteWithJQuery("/ManageCustomer", { filters: { ID: sCustomerID } }).then(() => {
-                MessageToast.show(that.i18nModel.getText("msgCustomerDeleteSuccess"));
-                that.MC_onClear()
-                that._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
-                }).catch((error) => {
-                  MessageToast.show(error.responseText);
-              });
-            }
+     MC_onDeleteAddCustomer: function () {
+      var oTable = this.byId("MC_id_CustTable");
+      var oSelectedItem = oTable.getSelectedItem();
+      if (!oSelectedItem) {
+          MessageBox.error(this.i18nModel.getText("deleteCustomer"));
+          return;
+      }
+      var sCustomerID = oSelectedItem.getBindingContext("CreateCustomerModel").getProperty("ID");
+      var that = this;
+      var oDialog = new sap.m.Dialog({
+          title: this.i18nModel.getText("msgBoxConfirm"),
+          type: sap.m.DialogType.Message,
+          icon: "sap-icon://warning",
+          state: sap.ui.core.ValueState.Warning,
+          content: new sap.m.Text({
+            text: this.i18nModel.getText("confirmDeleteCustomerMessage")
+          }),
+          beginButton: new sap.m.Button({
+              text: this.i18nModel.getText("OkButton"),
+              type: sap.m.ButtonType.Accept,
+              press: function () {
+              oDialog.close();
+              that.ajaxDeleteWithJQuery("/ManageCustomer", { filters: { ID: sCustomerID } }).then(() => {
+              MessageToast.show(that.i18nModel.getText("msgCustomerDeleteSuccess"));
+              that.MC_onClear();
+              that._fetchCommonData("ManageCustomer","CreateCustomerModel",{});
+            }).catch((error) => {
+              MessageToast.show(error.responseText);
+            });
           }
-        });
-     },
-    
+          }),
+          endButton: new sap.m.Button({
+          text:  this.i18nModel.getText("CancelButton"),
+          type: sap.m.ButtonType.Reject,
+          press: function () {
+            oDialog.close();
+          }
+          }),
+          afterClose: function () {
+              oDialog.destroy();
+          }
+      });
+      oDialog.open();
+    },
+  
      MC_onClear: function () {
           var oComboBox = this.getView().byId("MC_id_CompanyName");
           if (oComboBox) {
