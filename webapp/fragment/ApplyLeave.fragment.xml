@@ -32,7 +32,7 @@
 				<!-- Leave Type -->
 				<Label text="{i18n>type}" required="true"/>
 				<Select items="{leaveTypeModel>/}" selectedKey="{LeaveTempModel>/typeOfLeave}">
-				<core:Item key="{leaveTypeModel>id}" text="{leaveTypeModel>name}" />
+				<core:Item key="{leaveTypeModel>name}" text="{leaveTypeModel>name}" />
 				</Select>
 				<VBox>
 					<!-- From Date -->
@@ -44,7 +44,7 @@
 					<DatePicker minDate="{LeaveTempModel>/MinToDate}" id="AL_id_ToDate" value="{LeaveTempModel>/toDate}" displayFormat="dd/MM/yyyy" maxDate="{LeaveTempModel>/maxDate}" 
                 valueFormat="dd/MM/yyyy" change="AL_ValidateToDate" valueStateText="{i18n>dateValueState}"  liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend"/>
 					<!-- Half Day CheckBox -->
-					<CheckBox text="{i18n>halfDay}" select="onHalfDaySelect" selected="{LeaveTempModel>/HalfDay}"/>
+					<CheckBox text="{i18n>halfDay}" select="onHalfDaySelect" selected="{LeaveTempModel>/halfDay}"/>
 				</VBox>
 				<!-- Number of Days -->
 				<Label text="{i18n>noOfDays}"/>
@@ -55,10 +55,15 @@
 			</f:content>
 		</f:SimpleForm>
 		<!-- Buttons for Submit and Close actions -->
-		<FlexBox justifyContent="End">
-			<Button text="{i18n>submit}" type="Emphasized" press="AL_onPressSubmit" class="sendMail" visible="{LeaveTempModel>/Submit}"/>
-			<Button text="{i18n>save}" type="Emphasized" press="AL_onPressSave" class="sendMail" visible="{LeaveTempModel>/Save}"/>
-			<Button text="{i18n>close}" class="sendMail" press="AL_onPressClose" />
-		</FlexBox>
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+	<Button text="{i18n>submit}" type="Accept" press="AL_onPressSubmit"
+        class="sendMail" visible="{= !${LeaveTempModel>/isUpdate} }"/>
+    <Button text="{i18n>save}" type="Accept" press="AL_onPressSave"
+        class="sendMail" visible="{= ${LeaveTempModel>/isUpdate} }"/>
+    <Button text="{i18n>close}" class="sendMail" press="AL_onPressClose" type="Negative"/>
+			</Toolbar>
+		</footer>
 	</Dialog>
 </core:FragmentDefinition>
