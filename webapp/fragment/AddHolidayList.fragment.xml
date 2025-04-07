@@ -37,8 +37,9 @@
                 width="300px"
                 buttonText="{i18n>fileupload}"
                 fileType="xlsx"
-                placeholder="Choose an Excel file"
+                placeholder="{i18n>placeHolderExcel}"
                 change="LOH_onUpload"
+                sameFilenameAllowed="true"
                 icon="sap-icon://upload"/> 
 			</f:content>
 		</f:SimpleForm>
