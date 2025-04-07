@@ -47,7 +47,7 @@
                     
                     <Label
                         text="{i18n>vehicleModel}"
-                        required="{= ${detailModel>/isCreateMode} ? true : false }"
+                        required="{detailModel>/isCreateMode}"
                     />
                     <Input
                         id="SUD_id_Model"
@@ -59,7 +59,7 @@
                     />
                     <Label
                         text="{i18n>vehicleVariant}"
-                        required="{= ${detailModel>/isCreateMode} ? true : false }"
+                       required="{detailModel>/isCreateMode}"
                     />
                     <Input
                         id="SUD_id_Variant"
@@ -70,7 +70,7 @@
                     />
                     <Label
                         text="{i18n>vehicleTransmission}"
-                      required="{= ${detailModel>/isCreateMode} ? true : false }"
+                      required="{detailModel>/isCreateMode}"
                     />
                     <Input
                         id="SUD_id_Transmission"
@@ -81,7 +81,7 @@
                     />
                     <Label
                         text="{i18n>vehicleColor}"
-                      required="{= ${detailModel>/isCreateMode} ? true : false }"
+                     required="{detailModel>/isCreateMode}"
                     />
                     <Input
                         id="SUD_id_Color"
@@ -93,7 +93,7 @@
                     />
                     <Label
                         text="{i18n>vehicleFuel}"
-                      required="{= ${detailModel>/isCreateMode} ? true : false }"
+                     required="{detailModel>/isCreateMode}"
                     />
                     <Input
                         id="SUD_id_Fuel"
@@ -240,7 +240,7 @@
     icon="{= ${detailModel>/isCreateMode} ? '' : (${detailModel>/isEditable} ? '' : 'sap-icon://edit') }"
     press="SUD_onhandleEdit_SavePress"
     type="{= ${detailModel>/isCreateMode} ? 'Accept' : (${detailModel>/isEditable} ? 'Accept' : 'Neutral') }"
-    visible="true"
+    visible="{= ${detailModel>/isCreateMode} || ${detailModel>/showEditButton} }"
 />
 
                 </contentRight>

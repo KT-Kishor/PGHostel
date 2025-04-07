@@ -361,7 +361,7 @@ sap.ui.define(
                 oModel.setData(resetData);
                 oModel.refresh(true);
                 that.oDialog.close();
-                MessageToast.show("");
+                MessageToast.show("Data saved successfully!");
               },
               error: function (xhr, status, error) {
                 MessageToast.show("Error saving data. Please try again.");

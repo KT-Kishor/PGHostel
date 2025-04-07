@@ -52,6 +52,7 @@ sap.ui.define(
               DiscountOffers: "",
               isEditable: true,
               isCreateMode: true, // Make fields editable
+              showEditButton: true,
             };
             var oModel = new JSONModel(oModelData);
             this.getView().setModel(oModel, "detailModel");
@@ -228,8 +229,9 @@ sap.ui.define(
               if (response && response.ID) {
                 oModel.setProperty("/ID", response.ID);
               }
-
+              oModel.setProperty("/isCreateMode", false);
               oModel.setProperty("/isEditable", false);
+              oModel.setProperty("/showEditButton", false);
               oView.byId("SUD_id_Edit").setText("Edit");
             },
             error: function (jqXHR) {
