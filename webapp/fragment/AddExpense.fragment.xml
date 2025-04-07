@@ -50,13 +50,13 @@
 				</ComboBox>
 				<!-- Cost Center -->
 				<Label text="{i18n>expCostCenter}" required="true"/>
-				<Select items="{costCenterModel>/results}" id="exp-id-CostCenter" selectedKey="{CreateExpenseModel>/CostCenter}" >
-					<core:Item key="{costCenterModel>Value}" text="{costCenterModel>Value}" />
+				<Select items="{Costcenter>/Costcenter}" id="exp-id-CostCenter" selectedKey="{CreateExpenseModel>/CostCenter}" >
+					<core:Item key="{Costcenter>Value}" text="{Costcenter>Value}" />
 				</Select>
 				<!-- Trip Type -->
 				<Label text="{i18n>expExpenseType}" required="true"/>
-				<Select items="{ExpenseTypeModel>/}" id="exp-Id-ExpenseType" selectedKey="{CreateExpenseModel>/TripType}" change="onChangeExpenseType">
-					<core:Item key="{ExpenseTypeModel>itemName}" text="{ExpenseTypeModel>itemName}" />
+				<Select items="{TripType>/}" id="exp-Id-ExpenseType" selectedKey="{CreateExpenseModel>/TripType}" change="onChangeExpenseType">
+					<core:Item key="{TripType>Name}" text="{TripType>Name}" />
 				</Select>
 				<Label text="{i18n>expEmployeeRemark}" required="true"/>
 				<TextArea liveChange="onChangeEmployeeRemark" valueStateText="{i18n>expValStaEmployeeRemark}" id="exp-Id-EmployeeRemark" rows="2" value="{CreateExpenseModel>/Comments}" placeholder="{i18n>expValStaEmployeeRemark}" maxLength="1000" />

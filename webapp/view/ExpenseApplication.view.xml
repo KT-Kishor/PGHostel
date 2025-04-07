@@ -18,8 +18,8 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="EmployeeID" showClearIcon="true" items="" id="Exp_id_EmployeeName">
-							<core:Item key="" text=""/>
+						<ComboBox name="EmployeeID" showSecondaryValues="true" showClearIcon="true" items="{EmpModel>/data}" id="Exp_id_EmployeeName">
+							<core:ListItem key="{EmpModel>EmployeeID}" text="{EmpModel>EmployeeID}" additionalText="{EmpModel>EmployeeName}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
@@ -37,9 +37,9 @@
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-				<fb:FilterGroupItem name="Destination" id="Exp_id_DestinationFilter" label="{i18n>expDestination}" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="Destination" label="{i18n>expDestination}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Destination" showSecondaryValues="true" showClearIcon="true" items="{BaseLocationModel>/}">
+						<ComboBox name="Destination" id="Exp_id_DestinationFilter" showSecondaryValues="true" showClearIcon="true" items="{BaseLocationModel>/}">
 							<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 						</ComboBox>
 					</fb:control>
@@ -103,8 +103,8 @@
 							<Text text="{ExpenseModel>Destination}" />
 							<Text text="{path:'ExpenseModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" />
 							<Text text="{path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />
-							<Text text="{ExpenseModel>Status}" />
-							<!-- <ObjectStatus text="{ExpenseModel>Status}" inverted="true" state="" /> -->
+							<!-- <Text text="{ExpenseModel>Status}" /> -->
+							<ObjectStatus text="{ExpenseModel>Status}" inverted="true" state="{path:'ExpenseModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
 							<Button icon="sap-icon://delete" visible="{= ${Status} === 'Draft' }" press="onPressDeleteExpense" />
 						</cells>
 					</ColumnListItem>

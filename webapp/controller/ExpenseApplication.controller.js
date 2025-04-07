@@ -15,8 +15,9 @@ sap.ui.define([
 			this._fetchCommonData("Country", "CountryModel");
 			this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
 		},
-
+		
 		_onRouteMatched: function (oEvent) {
+			this._fetchCommonData("Expense", "FilterExpenseModel");
 			this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 			this.Exp_onSearch();
 			var View = new JSONModel({ SaveBtn: false, SubmitBtn: false });
@@ -34,8 +35,8 @@ sap.ui.define([
 				Country: "",
 				Source: "",
 				Destination: "",
-				CostCenter: "",
-				TripType: "Hotel",
+				CostCenter: "Kalpavriksha Technologies Kalaburagi",
+				TripType: "Customer Facing",
 				Comments: "",
 				Status: "Draft"
 			});

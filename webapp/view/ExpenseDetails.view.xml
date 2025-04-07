@@ -56,10 +56,10 @@
 										<m:Input  value="{FilteredExpenseModel>/0/EmployeeName}" editable="false" />
 										<!-- Total Amount -->
 										<m:Label text="{i18n>totalAmount}"/>
-										<m:Input  value="{path:'FilteredExpenseModel>/0/TotalAmount',formatter:'.Formatter.numberFormater'}" editable="false" />
+										<m:Input value="{path:'FilteredExpenseModel>/0/TotalAmount', formatter: '.Formatter.fromatNumber'}" editable="false" />
 										<!-- Reimbursement Amount -->
 										<m:Label text="{i18n>expReimbursementAmount}"/>
-										<m:Input  value="{path:'FilteredExpenseModel>/0/ReimbursementAmount',formatter: '.Formatter.numberFormater'}" editable="false" />
+										<m:Input value="{path:'FilteredExpenseModel>/0/ReimbursementAmount', formatter: '.Formatter.fromatNumber'}" editable="false" />
 										<!-- Status -->
 										<m:Label text="{i18n>expStatus}"/>
 										<m:Input  value="{FilteredExpenseModel>/0/Status}"  editable="false" />
@@ -157,10 +157,11 @@
 												<m:cells>
 													<m:Text text="{ItemExpenseModel>IndexNo}" />
 													<m:Text text="{ItemExpenseModel>ItemType}" />
-													<m:Text text="{ItemExpenseModel>ForeignAmount}" />
+													<m:Text text="{path:'ItemExpenseModel>ForeignAmount', formatter: '.Formatter.fromatNumber'}" />
 													<m:Text text="{ItemExpenseModel>ExpenseDate}" />
-													<m:Text text="{ItemExpenseModel>ExpenseAmount}" />
-													<m:Text text="{ItemExpenseModel>ModeOfPayment}" />
+													<m:Text text="{path:'ItemExpenseModel>ExpenseAmount', formatter: '.Formatter.fromatNumber'}" />
+													<!-- <m:Text text="{ItemExpenseModel>ModeOfPayment}" /> -->
+													<m:ObjectStatus inverted="true" text="{ItemExpenseModel>ModeOfPayment}" state="{path: 'ItemExpenseModel>ModeOfPayment', formatter: '.Formatter.formatObjectStatus'}" />
 													<m:Text text="{ItemExpenseModel>Comments}" />													
 												</m:cells>
 											</m:ColumnListItem>

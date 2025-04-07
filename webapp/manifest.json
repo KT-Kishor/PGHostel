@@ -97,6 +97,11 @@
                 "uri": "model/ModeOfPayment.json",
                 "preload": true
             },
+            "Costcenter": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Costcenter.json",
+                "preload": true
+            },
             "MyInbox": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/MyInbox.json",
