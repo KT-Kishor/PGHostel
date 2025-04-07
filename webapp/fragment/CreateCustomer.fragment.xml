@@ -32,22 +32,21 @@
                     liveChange="MC_ValidateCommonFields"/>
 				<Label text="{i18n>customerName}" required="true"/>
 				<layout:HorizontalLayout>
-					<Select 
-                        id="MC_id_CompNameSalutation" 
-                        selectedKey="{CustomerModel>/salutation}"
-                        items="{Salutation>/salutation}" 
-                        width="100px">
-						<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
-					</Select>
-					<Input 
-                        id="MC_id_CustCustomerName" 
-                        value="{CustomerModel>/name}" 
-                        maxLength="20" 
-                        width="166%"
-                        placeholder="{i18n>placeholderCustName}" 
-                        liveChange="MC_ValidateCommonFields" 
-                        valueStateText="{i18n>placeholderCustName}"/>
-				</layout:HorizontalLayout>
+                    <Select 
+                         id="MC_id_CompNameSalutation" 
+                         selectedKey="{CustomerModel>/salutation}"
+                         items="{Salutation>/salutation}">
+                         <core:Item key="{Salutation>text}" text="{Salutation>text}"/>
+                    </Select>
+                    <Input 
+                         id="MC_id_CustCustomerName" 
+                         value="{CustomerModel>/name}" 
+                         maxLength="20"
+                         placeholder="{i18n>placeholderCustName}" 
+                         liveChange="MC_ValidateCommonFields" 
+                         valueStateText="{i18n>placeholderCustName}"
+                         class="sapUiSmallMarginBegin"/>
+                    </layout:HorizontalLayout>
 				<!-- PAN Card -->
 				<Label text="{i18n>panCardCommon}"/>
 				<Input value="{CustomerModel>/PAN}" 
