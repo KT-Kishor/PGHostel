@@ -294,6 +294,7 @@ sap.ui.define(
               text: this.i18nModel.getText("CancelButton"),
               type: sap.m.ButtonType.Reject,
               press: function () {
+                that.byId("SU_id_Quotationtable").removeSelections(true);
                 oDialog.close();
               },
             }),
@@ -356,6 +357,7 @@ sap.ui.define(
             that.MainModel.refresh(true);
             that.CommomReadCall("");
             oFileUploader.setValue(""); // Reset file uploader
+            that.SU_onClear();
             that.oDialog.close();
           } else {
             sap.ui.core.BusyIndicator.hide();
