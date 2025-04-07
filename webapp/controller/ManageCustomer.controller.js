@@ -284,6 +284,7 @@ sap.ui.define([
                   if (action === MessageBox.Action.YES) {
                 that.ajaxDeleteWithJQuery("/ManageCustomer", { filters: { ID: sCustomerID } }).then(() => {
                 MessageToast.show(that.i18nModel.getText("msgCustomerDeleteSuccess"));
+                that.MC_onClear()
                 that._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
                 }).catch((error) => {
                   MessageToast.show(error.responseText);
