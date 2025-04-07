@@ -130,6 +130,7 @@ sap.ui.define([
                         press: function () {
                             if (status === "OnBoarded") {
                                 const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({
+                                    ID: oSelectedData.ID,
                                     Salutation: oSelectedData.Salutation,
                                     EmployeeName: oSelectedData.ConsultantName,
                                     Role: " ",
@@ -140,12 +141,35 @@ sap.ui.define([
                                     BaseLocation: oSelectedData.BaseLocation,
                                     AppraisalDate: oSelectedData.JoiningDate,
                                     Designation: oSelectedData.Designation,
-                                    EmpOfferID: oSelectedData.ID,
+                                    BranchCode: oSelectedData.BranchCode,
                                     MobileNo: "",
                                     Manager: "",
                                     ManagerName: "",
                                     BloodGroup: "",
                                     EmployeeStatus: "Active",
+                                    JoiningDate: oSelectedData.JoiningDate,
+                                    CTC: oSelectedData.CTC,
+                                    JoiningBonus: oSelectedData.JoiningBonus ,
+                                    BasicSalary: oSelectedData.BasicSalary,
+                                    HRA: oSelectedData.HRA,
+                                    StatutoryBonus: oSelectedData.StatutoryBonus,
+                                    TotalMontly: oSelectedData.TotalMontly,
+                                    TotalmothlyAnnualized: oSelectedData.TotalmothlyAnnualized,
+                                    TDS: oSelectedData.TDS,
+                                    MedicalInsurance: oSelectedData.MedicalInsurance ,
+                                    Gratuity: oSelectedData.Gratuity ,
+                                    TotalRetires: oSelectedData.TotalRetires ,
+                                    PerformanceBonus: oSelectedData.PerformanceBonus ,
+                                    EngagementPB: oSelectedData.EngagementPB ,
+                                    TotalVariablePay: oSelectedData.TotalVariablePay ,
+                                    CostofCompany: oSelectedData.CostofCompany ,
+                                    Total: oSelectedData.Total ,
+                                    HikePercentage: oSelectedData.HikePercentage ,
+                                    AppraisalDate: oSelectedData.AppraisalDate ,
+                                    EffectiveDate: oSelectedData.EffectiveDate ,
+                                    PF: oSelectedData.PF,
+                                    EPF: oSelectedData.EPF,
+                                    TotalDeduction: oSelectedData.TotalDeduction
                                 });
                                 that.getView().setModel(oEmployeeDetailsModel, "oEmpolyeeDetailsModel");
                                 that._commonFragmentOpenOffer(that, "OnboardEmployee");
@@ -168,7 +192,7 @@ sap.ui.define([
                 });
                 oDialog.open();
             },
-            _commonFragmentOpenOffer:function(){
+            _commonFragmentOpenOffer:function(name, fragmentName) {
                 if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
                       name: "sap.kt.com.minihrsolution.fragment.OnboardEmployee",
@@ -201,26 +225,43 @@ sap.ui.define([
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
                 if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID")) {
-                  this.updateCallForEmployeeOffer("OnBoarded")
-                }
-                else {
-                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    
+                    var oPayload = {
+                        tableName: "EmployeeDetails",
+                        data: oModel
+                    };
+                    this.ajaxCreateWithJQuery("EmployeeDetails", oPayload)
+                        .then((oData) => {
+                            sap.ui.core.BusyIndicator.hide();
+                            if (oData.success) {
+                                MessageToast.show(this.i18nModel.getText("onboardingSuccessful"));
+                            } else {
+                                MessageToast.show(this.i18nModel.getText("mandatoryFields"));
+                            }
+                        })
+                        .catch((error) => {
+                            sap.ui.core.BusyIndicator.hide();
+                            MessageToast.show(this.i18nModel.getText("onboardingFailed"));
+                        });
+                } else {
+                    MessageToast.show(this.i18nModel.getText("validationFailed"));
                 }
             },
-            updateCallForEmployeeOffer : function(oStatus){
+            updateCallForEmployeeOffer: function(oStatus) {
                 this.oSelectedRow.Status = oStatus;
                 var oModelOffer = {
                     "data": this.oSelectedRow,
-                    "filters":{
-                        "ID":this.oSelectedRow.ID
+                    "filters": {
+                        "ID": this.oSelectedRow.ID
                     }
-                }
-                this.ajaxUpdateWithJQuery("EmployeeOffer",oModelOffer).then((oData) => {
-                    if (oData.results) {
+                };
+                // First call for EmployeeOffer
+                this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer).then((oData) => {
+                    if (oData.success) {
                         sap.ui.core.BusyIndicator.hide();
-                        var sSuccessMessage = (oStatus === "OnBoarded")
-                        ? this.i18nModel.getText("onBoardSuccess")
-                        : this.i18nModel.getText("offerEmpReject");
+                        var sSuccessMessage = (oStatus === "OnBoarded") 
+                            ? this.i18nModel.getText("onBoardSuccess") 
+                            : this.i18nModel.getText("offerEmpReject");
                         MessageToast.show(sSuccessMessage);
                         this.oDialog.close();
                         this.readCallForEmployeeOffer("");
