@@ -116,7 +116,26 @@ sap.ui.define(
           }
         },
         onConfirmBack: function () {
+          var oView = this.getView();
           this.getRouter().navTo("RouteSchemeUpload");
+          var eleSetting = [
+            "SUD_id_Model",
+            "SUD_id_Variant",
+            "SUD_id_Transmission",
+            "SUD_id_Color",
+            "SUD_id_Fuel",
+          ];
+          eleSetting.forEach(function (id) {
+            var element = oView.byId(id);
+            if (element) {
+              element.setValueState("None");
+              element.setValueStateText("");
+            }
+          });
+
+          this.oDialog.close();
+        },
+        onCancel: function () {
           this.oDialog.close();
         },
 

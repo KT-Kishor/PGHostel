@@ -187,7 +187,6 @@ sap.ui.define(
             oSheet.destroy();
           });
         },
-
         createColumnConfig: function () {
           return [
             { label: "Model", property: "Model", type: "string" },
@@ -245,58 +244,66 @@ sap.ui.define(
           ];
         },
         SU_onDeletepress: function () {
-          var that = this;
           var oTable = this.byId("SU_id_Quotationtable");
           var oSelectedItem = oTable.getSelectedItem();
-
           if (!oSelectedItem) {
-            MessageToast.show(that.i18nModel.getText("msgSelectRow"));
+            MessageBox.error(this.i18nModel.getText("msgSelectRow"));
             return;
           }
-
-          var oContext = oSelectedItem.getBindingContext("MainModel");
-          var sID = oContext.getProperty("ID");
-
-          MessageBox.confirm(that.i18nModel.getText("msgBoxConfirmDelete"), {
-            title: that.i18nModel.getText("msgBoxConfirm"),
-            onClose: function (oAction) {
-              if (oAction === MessageBox.Action.OK) {
+          var sID = oSelectedItem
+            .getBindingContext("MainModel")
+            .getProperty("ID");
+          var that = this;
+          var oDialog = new sap.m.Dialog({
+            title: this.i18nModel.getText("msgBoxConfirm"),
+            type: sap.m.DialogType.Message,
+            icon: "sap-icon://warning",
+            state: sap.ui.core.ValueState.Warning,
+            content: new sap.m.Text({
+              text: this.i18nModel.getText("msgBoxConfirmDelete"),
+            }),
+            beginButton: new sap.m.Button({
+              text: this.i18nModel.getText("OkButton"),
+              type: sap.m.ButtonType.Accept,
+              press: function () {
+                oDialog.close();
                 BusyIndicator.show();
-
-                $.ajax({
-                  url: "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade",
-                  type: "DELETE",
-                  headers: {
-                    "Content-Type": "application/json",
-                    name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                    password:
-                      "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-                  },
-                  data: JSON.stringify({
-                    filters: {
-                      ID: sID,
-                    },
-                  }),
-                  success: function () {
-                    BusyIndicator.hide();
+                that
+                  .ajaxDeleteWithJQuery(
+                    "/SchemeUploade",
+                    { filters: { ID: sID } },
+                    {}
+                  )
+                  .then(() => {
                     oTable.removeSelections();
                     that.SU_onSearch();
                     MessageToast.show(
                       that.i18nModel.getText("msgSchemeDeleted")
                     );
-                  },
-                  error: function (jqXHR) {
+                  })
+                  .catch((error) => {
                     BusyIndicator.hide();
                     var errorMessage =
-                      jqXHR.responseJSON?.error ||
+                      error.responseJSON?.error ||
                       that.i18nModel.getText("quoschemeerrordeelterow");
                     MessageToast.show(errorMessage);
-                  },
-                });
-              }
+                  });
+              },
+            }),
+            endButton: new sap.m.Button({
+              text: this.i18nModel.getText("CancelButton"),
+              type: sap.m.ButtonType.Reject,
+              press: function () {
+                oDialog.close();
+              },
+            }),
+            afterClose: function () {
+              oDialog.destroy();
             },
           });
+          oDialog.open();
         },
+
         FUS_onCreateDialogSubmit: async function () {
           var that = this;
           var oFileUploader = sap.ui.getCore().byId("idFileUploader");
@@ -337,19 +344,9 @@ sap.ui.define(
           }));
 
           // Send data to backend
-          var response = await $.ajax({
-            url: "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade", // Check the correct URL
-            type: "POST",
-            contentType: "application/json", // Ensure proper JSON content type
-            dataType: "json", // Expect JSON response
-            data: JSON.stringify({ data: formattedData }), // Convert to JSON string
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u", // Ensure backend understands JSON
-            },
+          var response = await that.ajaxCreateWithJQuery("SchemeUploade", {
+            data: formattedData,
           });
-
           if (response.success) {
             sap.ui.core.BusyIndicator.hide();
             MessageToast.show("Scheme saved successfully!");

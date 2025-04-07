@@ -52,7 +52,7 @@
                     <Input
                         id="SUD_id_Model"
                         value="{detailModel>/Model}"
-                        editable="{detailModel>/isEditable}"
+                        editable="{= ${detailModel>/isCreateMode} ? true : false }"
                         liveChange="SUD_onFieldLiveChange"
                         maxLength="99"
                         valueStateText="enter model"
@@ -64,7 +64,7 @@
                     <Input
                         id="SUD_id_Variant"
                         value="{detailModel>/Variant}"
-                        editable="{detailModel>/isEditable}"
+                        editable="{= ${detailModel>/isCreateMode} ? true : false }"
                         liveChange="SUD_onFieldLiveChange"
                         maxLength="99"
                     />
@@ -75,7 +75,7 @@
                     <Input
                         id="SUD_id_Transmission"
                         value="{detailModel>/Transmission}"
-                        editable="{detailModel>/isEditable}"
+                        editable="{= ${detailModel>/isCreateMode} ? true : false }"
                         liveChange="SUD_onFieldLiveChange"
                         maxLength="49"
                     />
@@ -86,7 +86,7 @@
                     <Input
                         id="SUD_id_Color"
                         value="{detailModel>/Color}"
-                        editable="{detailModel>/isEditable}"
+                        editable="{= ${detailModel>/isCreateMode} ? true : false }"
                         liveChange="SUD_onFieldLiveChange"
                         valueStateText=""
                         maxLength="19"
@@ -98,7 +98,7 @@
                     <Input
                         id="SUD_id_Fuel"
                         value="{detailModel>/Fuel}"
-                        editable="{detailModel>/isEditable}"
+                        editable="{= ${detailModel>/isCreateMode} ? true : false }"
                         liveChange="SUD_onFieldLiveChange"
                         maxLength="19"
                     />
