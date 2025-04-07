@@ -329,6 +329,12 @@ sap.ui.define(
         TileV_onPressManageSchemeUpload: function () {
           this.getRouter().navTo("RouteSchemeUpload");
         },
+        TileV_onPressIncomeAsset: function () {
+          this.getRouter().navTo("RouteIncomeAsset");
+        },
+        TileV_onPressAssetAssignment: function () {
+          this.getRouter().navTo("RouteAssetAssignment");
+        },
       }
     );
   }

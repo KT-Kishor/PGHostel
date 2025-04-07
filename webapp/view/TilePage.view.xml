@@ -196,6 +196,22 @@
 						<ImageContent src="sap-icon://time-off" />
 					</TileContent>
 				</GenericTile>
+
+				<GenericTile  visible="{modelTileVisible>/ManagePayroll}"
+					class="sapUiMediumMargin"
+					 header="{i18n>headerIncomeAsset}" press="TileV_onPressIncomeAsset">
+					 <TileContent  unit="{i18n>createmaintain}">
+						 <ImageContent src="sap-icon://time-off" />
+					 </TileContent>
+				 </GenericTile>
+
+				 <GenericTile  visible="{modelTileVisible>/ManagePayroll}"
+					class="sapUiMediumMargin"
+					 header="{i18n>headerAssignment}" press="TileV_onPressAssetAssignment">
+					 <TileContent  unit="{i18n>createmaintain}">
+						 <ImageContent src="sap-icon://time-off" />
+					 </TileContent>
+				 </GenericTile>
 			</FlexBox>
 		</layout:VerticalLayout>
 		<footer>

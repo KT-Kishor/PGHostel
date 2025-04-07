@@ -448,6 +448,22 @@
                         "TargetSchemeUploadDetails"
                     ]
                    
+                },
+                {
+                    "name": "RouteIncomeAsset",
+                    "pattern": "IncomeAsset",
+                    "target": [
+                        "TargetIncomeAsset"
+                    ]
+                   
+                },
+                {
+                    "name": "RouteAssetAssignment",
+                    "pattern": "AssetAssignment",
+                    "target": [
+                        "TargetAssetAssignment"
+                    ]
+                   
                 }
 
             ],
@@ -712,6 +728,20 @@
                     "clearControlAggregation": false,
                     "viewId": "SchemeuploadDetails",
                     "viewName": "SchemeuploadDetails"
+                },
+                "TargetIncomeAsset": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "IncomeAsset",
+                    "viewName": "IncomeAsset"
+                },
+                "TargetAssetAssignment": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "AssetAssignment",
+                    "viewName": "AssetAssignment"
                 }
 
             }

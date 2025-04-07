@@ -355,6 +355,7 @@ sap.ui.define([
                 };
              
                 this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload).then((oData) => {
+                    MessageToast.show(this.i18nModel.getText("emailSuccess"));
                     sap.ui.core.BusyIndicator.hide();
 
                 }).catch((oError) => {

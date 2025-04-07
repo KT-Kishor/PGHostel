@@ -59,7 +59,7 @@ sap.ui.define([
                     "Currency": "",
                     "EmployeeEmail": "",
                     "Year": "",
-                    "PinCode": ""
+                    "PinCode": "",
                 }
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false,pfVisibility:false });
@@ -347,9 +347,10 @@ sap.ui.define([
                         var sFileBinary = e.target.result.split(",")[1]; // Extract base64 content
                         // Update attachments in the UploaderData model
                         attachments.push({
-                            name: oFile.name,
-                            mimeType: oFile.type,
+                            filename: oFile.name,
+                            contentType: oFile.type,
                             content: sFileBinary,
+                            encoding: "base64"
                         });
                         oModelEmail.setProperty("/attachments", attachments);
                         oModelEmail.setProperty("/isFileUploaded", true);
@@ -380,7 +381,7 @@ sap.ui.define([
             Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("employeeModel").getData();
                 var oPayload = {
-                    "EmployeeName": oModel.EmployeeName,
+                    "EmployeeName": oModel.ConsultantName,
                     "toEmailID": oModel.EmployeeEmail,
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                 };

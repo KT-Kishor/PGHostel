@@ -38,6 +38,8 @@
 						<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 					</items>
 				</Select>
+				<Label text="{i18n>branchCode}" />
+				<Input value="{oEmpolyeeDetailsModel>/BranchCode}" editable="false"/>
 				<Label text="{i18n>companyMailid}" required="true"/>
 				<Input value="{oEmpolyeeDetailsModel>/CompanyEmailID}" id="OEF_id_CompanyMail" maxLength="50" liveChange="validateEmail" placeholder="{i18n>companyMailid}"/>
 				<Label text="{i18n>permanentAddress}" />
