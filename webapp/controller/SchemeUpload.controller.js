@@ -30,7 +30,7 @@ sap.ui.define(
           this.getView()
             .getModel("LoginModel")
             .setProperty("/HeaderName", this.i18nModel.getText("schemeupload"));
-          this.CommomReadCall("");
+          this.SU_onSearch();
           this.MainModel = new JSONModel({ items: [] }); // Store table data
           // Fetch data on initialization
         },

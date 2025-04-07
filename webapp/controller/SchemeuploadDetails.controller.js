@@ -3,20 +3,11 @@ sap.ui.define(
     "./BaseController",
     "sap/m/MessageToast",
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageBox",
     "sap/ui/core/BusyIndicator",
     "../utils/validation",
     "../model/formatter",
   ],
-  (
-    Controller,
-    MessageToast,
-    JSONModel,
-    MessageBox,
-    BusyIndicator,
-    utils,
-    Formatter
-  ) => {
+  (Controller, MessageToast, JSONModel, BusyIndicator, utils, Formatter) => {
     "use strict";
     return Controller.extend(
       "sap.kt.com.minihrsolution.controller.SchemeuploadDetails",
@@ -97,10 +88,36 @@ sap.ui.define(
             });
           }
         },
-
+        TD_commonOpenDialog: function (fragmentName) {
+          if (!this.oDialog) {
+            sap.ui.core.Fragment.load({
+              name: fragmentName,
+              controller: this,
+            })
+              .then((dialog) => {
+                this.oDialog = dialog;
+                this.getView().addDependent(this.oDialog);
+                this.oDialog.open();
+              })
+              .bind(this);
+          } else {
+            this.oDialog.open();
+          }
+        },
         SUD_onhandleBackPress: function () {
-          BusyIndicator.show(0);
+          var oModel = this.getView().getModel("detailModel");
+          var isCreateMode = oModel && oModel.getProperty("/isCreateMode");
+          if (isCreateMode) {
+            this.TD_commonOpenDialog(
+              "sap.kt.com.minihrsolution.fragment.CommonBack"
+            );
+          } else {
+            this.getRouter().navTo("RouteSchemeUpload");
+          }
+        },
+        onConfirmBack: function () {
           this.getRouter().navTo("RouteSchemeUpload");
+          this.oDialog.close();
         },
 
         SUD_onFieldLiveChange: function (oEvent) {
@@ -205,31 +222,6 @@ sap.ui.define(
           });
         },
 
-        // validateRequiredFields: function () {
-        //   var that = this;
-        //   var bValid = true;
-
-        //   var aRequiredFields = [
-        //     this.byId("SUD_id_Model"),
-        //     this.byId("SUD_id_Variant"),
-        //     this.byId("SUD_id_Transmission"),
-        //     this.byId("SUD_id_Color"),
-        //     this.byId("SUD_id_Fuel"),
-        //   ];
-
-        //   aRequiredFields.forEach(function (oField) {
-        //     if (!utils._LCvalidateMandatoryField(oField, "ID")) {
-        //       bValid = false;
-        //     }
-        //   });
-
-        //   if (!bValid) {
-        //     MessageToast.show(that.i18nModel.getText("mandetoryFields"));
-        //     return false; // Stop saving
-        //   }
-
-        //   return true; // Proceed with saving
-        // },
         //formate
         SUD_onFieldChange: function (oEvent) {
           var oSchemeSource = oEvent.getSource();
@@ -242,7 +234,6 @@ sap.ui.define(
           } else {
             schemerawValue = parseFloat(schemerawValue);
           }
-
           // Ensure schemerawValue is not NaN
           if (isNaN(schemerawValue)) {
             schemerawValue = 0;
@@ -250,7 +241,6 @@ sap.ui.define(
           var formattedValue = schemerawValue.toFixed(2);
           var schemeBindingPath = oSchemeSource.getBinding("value").getPath();
           var oModel = this.getView().getModel("detailModel");
-
           // Update the model with the validated numeric value
           oModel.setProperty(schemeBindingPath, formattedValue);
           oModel.refresh(true);

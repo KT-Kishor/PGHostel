@@ -239,7 +239,7 @@
     text="{= ${detailModel>/isCreateMode} ? ${i18n>save} : (${detailModel>/isEditable} ? ${i18n>save} : ${i18n>edit}) }"
     icon="{= ${detailModel>/isCreateMode} ? '' : (${detailModel>/isEditable} ? '' : 'sap-icon://edit') }"
     press="SUD_onhandleEdit_SavePress"
-    type="Transparent"
+    type="{= ${detailModel>/isCreateMode} ? 'Accept' : (${detailModel>/isEditable} ? 'Accept' : 'Neutral') }"
     visible="true"
 />
 
