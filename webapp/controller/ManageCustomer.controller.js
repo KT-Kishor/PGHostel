@@ -338,7 +338,9 @@ sap.ui.define([
               }
             }
           });
-          this._fetchCommonData("ManageCustomer","CreateCustomerModel",params);
+          this.byId("MC_id_CustTable").removeSelections(true);
+          this.MC_onTableSelectionChange();
+          this._fetchCommonData("ManageCustomer","CreateCustomerModel",params);  
         },
 
         MC_onTableSelectionChange: function () {

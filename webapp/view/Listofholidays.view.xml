@@ -28,7 +28,7 @@
                     placeholder="yyyy"/>
 						</filterbar:control>
 					</filterbar:FilterGroupItem>
-			</filterbar:filterGroupItems>
+				</filterbar:filterGroupItems>
 			</filterbar:FilterBar>
 			<Table
                  growingScrollToLoad="true"
@@ -76,17 +76,17 @@
 							<Text text="{path:'HolidayModel>Date' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{HolidayModel>Day}"/>
 							<ObjectStatus 
-    state="{= ${HolidayModel>Karnataka} === '✓' ? 'Success' : 'Error'}" 
-    icon="{= ${HolidayModel>Karnataka} === '✓' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= parseInt(${HolidayModel>Karnataka}) === 1 ? 'Success' : 'Error'}" 
+    icon="{= parseInt(${HolidayModel>Karnataka}) === 1 ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 							<ObjectStatus 
-    state="{= ${HolidayModel>OtherStates} === '✓' ? 'Success' : 'Error'}" 
-    icon="{= ${HolidayModel>OtherStates} === '✓' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= parseInt(${HolidayModel>OtherStates}) === 1 ? 'Success' : 'Error'}" 
+    icon="{= parseInt(${HolidayModel>OtherStates}) === 1 ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 							<ObjectStatus 
-    state="{= ${HolidayModel>Maharashtra} === '✓' ? 'Success' : 'Error'}" 
-    icon="{= ${HolidayModel>Maharashtra} === '✓' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= parseInt(${HolidayModel>Maharashtra}) === 1 ? 'Success' : 'Error'}" 
+    icon="{= parseInt(${HolidayModel>Maharashtra}) === 1 ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 							<ObjectStatus 
-    state="{= ${HolidayModel>Delhi} === '✓' ? 'Success' : 'Error'}" 
-    icon="{= ${HolidayModel>Delhi} === '✓' ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
+    state="{= parseInt(${HolidayModel>Delhi}) === 1 ? 'Success' : 'Error'}" 
+    icon="{= parseInt(${HolidayModel>Delhi}) === 1 ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}" />
 						</cells>
 					</ColumnListItem>
 				</items>
