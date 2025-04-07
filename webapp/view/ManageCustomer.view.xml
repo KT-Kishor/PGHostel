@@ -28,11 +28,11 @@
 					<OverflowToolbar>
 						<Title id="MC_id_Title" text="{i18n>custDetails} ({= ${CreateCustomerModel>/}.length })"/>
 						<ToolbarSpacer/>
-						<Button icon="sap-icon://add-employee" type="Accept" text="{i18n>addCustomerBtn}" tooltip="{i18n>custAddButToolTip}" press="MC_onAddCustomerDetails" />
+						<Button icon="sap-icon://add-employee" type="Accept" text="{i18n>addCustomerBtn}" tooltip="{i18n>custAddButToolTip}" press="MC_onAddCustomerDetails" id="MC_id_AddCustomer" />
 						<ToolbarSeparator />
-						<Button icon="sap-icon://edit" text="{i18n>custEditButToolTip}" type="Neutral" tooltip="{i18n>custEditButToolTip}" press="MC_onEditCustomerDetails" />
+						<Button icon="sap-icon://edit" text="{i18n>custEditButToolTip}" type="Neutral" tooltip="{i18n>custEditButToolTip}" press="MC_onEditCustomerDetails" id="MC_id_EditCustomer"/>
 						<ToolbarSeparator />
-						<Button icon="sap-icon://delete" type="Negative" text="{i18n>custDeleteToolTip}" tooltip="{i18n>custDeleteToolTip}" press="MC_onDeleteAddCustomer" />
+						<Button icon="sap-icon://delete" type="Negative" text="{i18n>custDeleteToolTip}" tooltip="{i18n>custDeleteToolTip}" press="MC_onDeleteAddCustomer" id="MC_id_DeleteCustomer" />
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>

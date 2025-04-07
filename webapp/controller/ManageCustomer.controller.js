@@ -8,7 +8,7 @@ sap.ui.define([
   function (BaseController, JSONModel, MessageToast, utils,MessageBox)  {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.ManageCustomer", {
-      GST_PATTERN: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{3}$/,
+      GST_PATTERN: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]{1}[Z][0-9A-Z]{1}$/,
       onInit: function () {
         this.getRouter().getRoute("RouteManageCustomer").attachMatched(this._onRouteMatched, this);
       },
@@ -17,6 +17,7 @@ sap.ui.define([
         this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         this.byId("MC_id_CustTable").removeSelections(true);
+        this.MC_onTableSelectionChange();
         this.getView().getModel("LoginModel").setProperty("/HeaderName", 
         this.i18nModel.getText("headerCustomer"));
         this.MC_onSearch();
@@ -102,6 +103,7 @@ sap.ui.define([
             this._resetDialogFields(bIsEdit);
             this.oDialog.close();
             this.byId("MC_id_CustTable").removeSelections(true);
+            this.MC_onTableSelectionChange();
         },
 
         onRadioButtonChange: function () {
@@ -257,6 +259,7 @@ sap.ui.define([
                 oTable.removeSelections(true);
                 this.oDialog.close();
                 MessageToast.show(this.i18nModel.getText("msgCustomer4"));
+                this.MC_onTableSelectionChange();
                 this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
             } else {
               MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -292,6 +295,7 @@ sap.ui.define([
               MessageToast.show(that.i18nModel.getText("msgCustomerDeleteSuccess"));
               that.MC_onClear();
               that._fetchCommonData("ManageCustomer","CreateCustomerModel",{});
+              that.byId("MC_id_AddCustomer").setEnabled(true);
             }).catch((error) => {
               MessageToast.show(error.responseText);
             });
@@ -302,6 +306,8 @@ sap.ui.define([
           type: sap.m.ButtonType.Reject,
           press: function () {
             oDialog.close();
+            that.byId("MC_id_CustTable").removeSelections(true);
+            that.MC_onTableSelectionChange();
           }
           }),
           afterClose: function () {
@@ -334,6 +340,19 @@ sap.ui.define([
           });
           this._fetchCommonData("ManageCustomer","CreateCustomerModel",params);
         },
+
+        MC_onTableSelectionChange: function () {
+          var aSelectedItems = this.byId("MC_id_CustTable").getSelectedItems();
+          if (aSelectedItems.length > 0) { 
+              this.byId("MC_id_AddCustomer").setEnabled(false);
+              this.byId("MC_id_EditCustomer").setEnabled(true);
+              this.byId("MC_id_DeleteCustomer").setEnabled(true);
+          } else {
+              this.byId("MC_id_AddCustomer").setEnabled(true);
+              this.byId("MC_id_EditCustomer").setEnabled(true);
+              this.byId("MC_id_DeleteCustomer").setEnabled(true);
+          }
+       },
 
         onPressback: function () {
           this.getRouter().navTo("RouteTilePage");

@@ -2,66 +2,134 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
-	xmlns:core="sap.ui.core" >
-	<Dialog 
-        title="{i18n>custDetails}">
-		<f:SimpleForm 
-            id="MC_id_SimpleFormAddToolbar"
+	xmlns:core="sap.ui.core"
+	xmlns:layout="sap.ui.layout">
+	<Dialog title="{i18n>custDetails}" contentWidth="42%">
+		<f:SimpleForm
             editable="true"
-			layout="ResponsiveGridLayout"
-			labelSpanXL="4"
-			labelSpanL="3"
-			labelSpanM="4"
-			labelSpanS="12"
-			emptySpanXL="0"
-			emptySpanL="4"
-			emptySpanM="0"
-			emptySpanS="0"
-			columnsXL="2"
-			columnsL="1"
-			columnsM="1">
+            layout="ResponsiveGridLayout"
+            labelSpanXL="3"
+            labelSpanL="3"
+            labelSpanM="3"
+            labelSpanS="12"
+            adjustLabelSpan="false"
+            emptySpanXL="1"
+            emptySpanL="1"
+            emptySpanM="1"
+            emptySpanS="1"
+            columnsXL="1"
+            columnsL="1"
+            columnsM="1"
+            singleContainerFullSize="false">
 			<f:content>
-				<Label text="{i18n>companyName}"  />
-				<Input id="MC_id_CustCompanyName" liveChange="MC_ValidateCommonFields"  value="{CustomerModel>/companyName}" required="true" maxLength="50" placeholder="{i18n>companyNamePlace}" valueStateText="{i18n>placeCompany}"/>
+				<Label text="{i18n>companyName}" />
+				<Input id="MC_id_CustCompanyName" 
+                    value="{CustomerModel>/companyName}" 
+                    required="true" 
+                    maxLength="50" 
+                    placeholder="{i18n>companyNamePlace}"
+                    valueStateText="{i18n>placeCompany}"
+                    liveChange="MC_ValidateCommonFields"/>
 				<Label text="{i18n>customerName}" required="true"/>
-				<HBox width="100%" justifyContent="Start" alignItems="Center">
-					<VBox width="22%">
-						<Select id="MC_id_CompNameSalutation" selectedKey="{CustomerModel>/salutation}"
-                                  items="{Salutation>/salutation}" width="100%">
-							<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
-						</Select>
-					</VBox>
-					<VBox width="78%">
-						<Input id="MC_id_CustCustomerName" value="{CustomerModel>/name}" maxLength="20" placeholder="{i18n>placeholderCustName}" liveChange="MC_ValidateCommonFields" valueStateText="{i18n>placeholderCustName}" />
-					</VBox>
-				</HBox>
+				<layout:HorizontalLayout>
+					<Select 
+                        id="MC_id_CompNameSalutation" 
+                        selectedKey="{CustomerModel>/salutation}"
+                        items="{Salutation>/salutation}" 
+                        width="100px">
+						<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
+					</Select>
+					<Input 
+                        id="MC_id_CustCustomerName" 
+                        value="{CustomerModel>/name}" 
+                        maxLength="20" 
+                        width="166%"
+                        placeholder="{i18n>placeholderCustName}" 
+                        liveChange="MC_ValidateCommonFields" 
+                        valueStateText="{i18n>placeholderCustName}"/>
+				</layout:HorizontalLayout>
+				<!-- PAN Card -->
 				<Label text="{i18n>panCardCommon}"/>
-				<Input value="{CustomerModel>/PAN}" placeholder="{i18n>panCardPlaceholder}" maxLength="10" id="MC_id_CustomPan" liveChange="MC_ValidatePanCard" valueStateText="{i18n>panCardValueState}" />
+				<Input value="{CustomerModel>/PAN}" 
+                    placeholder="{i18n>panCardPlaceholder}" 
+                    maxLength="10" 
+                    id="MC_id_CustomPan" 
+                    liveChange="MC_ValidatePanCard" 
+                    valueStateText="{i18n>panCardValueState}"/>
+				<!-- GST Number -->
 				<Label text="{i18n>gstNo}"/>
-				<Input value="{CustomerModel>/GST}" maxLength="15" placeholder="{i18n>placeholderGST}" id="MC_id_CustomGst"  liveChange="MC_ValidateGstNumber" valueStateText="{i18n>gstNoValueState}" />
+				<Input value="{CustomerModel>/GST}" 
+                    maxLength="15" 
+                    placeholder="{i18n>placeholderGST}" 
+                    id="MC_id_CustomGst"  
+                    liveChange="MC_ValidateGstNumber" 
+                    valueStateText="{i18n>gstNoValueState}"/>
+				<!-- Type (CGST/IGST) -->
 				<Label text="{i18n>type}" labelFor="groupC" />
-				<RadioButtonGroup visible="{visiblePlay>/CC_id_CustInput}" select="onRadioButtonChange"  id="MC_id_groupCustGst" columns="2" selectedIndex="{visiblePlay>/selectedIndex}">
+				<RadioButtonGroup 
+                    visible="{visiblePlay>/CC_id_CustInput}" 
+                    select="onRadioButtonChange"  
+                    id="MC_id_groupCustGst" 
+                    columns="2" 
+                    selectedIndex="{visiblePlay>/selectedIndex}">
 					<RadioButton text="{i18n>cgst}" />
 					<RadioButton text="{i18n>igst}" />
 				</RadioButtonGroup>
+				<!-- Customer Value -->
 				<Label visible="{visiblePlay>/CC_id_CustInput}" text="{i18n>custValue}" />
-				<Input visible="{visiblePlay>/CC_id_CustInput}" id="CC_id_custValue" value="{CustomerModel>/value}" maxLength="5" />
+				<Input visible="{visiblePlay>/CC_id_CustInput}" 
+                    id="CC_id_custValue" 
+                    value="{CustomerModel>/value}" 
+                    maxLength="5" />
+				<!-- Email -->
 				<Label text="{i18n>email}" required="true" />
-				<Input value="{CustomerModel>/mailID}" placeholder="{i18n>placeEmailId}" id="MC_id_CustMail"  maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
+				<Input value="{CustomerModel>/mailID}" 
+                    placeholder="{i18n>placeEmailId}" 
+                    id="MC_id_CustMail"  
+                    maxLength="190" 
+                    liveChange="MC_ValidateEmail" 
+                    valueStateText="{i18n>emailValueState}" />
+				<!-- Customer Email -->
 				<Label text="{i18n>customerEmail}" required="true"/>
-				<Input value="{CustomerModel>/customerEmail}" id="MC_id_FinanceEmail" placeholder="{i18n>placeholderFinanceEmail}" maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
+				<Input value="{CustomerModel>/customerEmail}" 
+                    id="MC_id_FinanceEmail" 
+                    placeholder="{i18n>placeholderFinanceEmail}" 
+                    maxLength="190" 
+                    liveChange="MC_ValidateEmail" 
+                    valueStateText="{i18n>emailValueState}" />
+				<!-- Mobile Number -->
 				<Label text="{i18n>mobileNo}"/>
-				<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="10" liveChange="MC_ValidateMobileNo" valueStateText="{i18n>mobileNoValueState}" />
-				<Label text="{i18n>custLut}"/>
-				<Input value="{CustomerModel>/LUT}" maxLength="16" placeholder="{i18n>placeholderLUT}" liveChange="MC_ValidateLUTNo" valueStateText="{i18n>placeholderLUT}" id="MC_id_LUTNo"/>
+				<Input value="{CustomerModel>/mobileNo}" 
+                    id="MC_id_CustMob" 
+                    placeholder="{i18n>placeholderMobileNo}" 
+                    maxLength="10" 
+                    liveChange="MC_ValidateMobileNo" 
+                    valueStateText="{i18n>mobileNoValueState}" />
+				<!-- LUT Number -->
+				<Label text="{i18n>LUT}"/>
+				<Input value="{CustomerModel>/LUT}" 
+                    maxLength="16" 
+                    placeholder="{i18n>placeholderLUT}" 
+                    liveChange="MC_ValidateLUTNo" 
+                    valueStateText="{i18n>placeholderLUT}" 
+                    id="MC_id_LUTNo"/>
+				<!-- Address -->
 				<Label text="{i18n>address}" required="true" />
-				<TextArea id="MC_id_CustAddress" value="{CustomerModel>/address}" placeholder="{i18n>addressPlaceholder}" maxLength="200" liveChange="MC_ValidateCommonFields" valueStateText="{i18n>addressValueState}" ></TextArea>
+				<TextArea id="MC_id_CustAddress" 
+                    value="{CustomerModel>/address}" 
+                    placeholder="{i18n>addressPlaceholder}" 
+                    maxLength="200" 
+                    liveChange="MC_ValidateCommonFields" 
+                    valueStateText="{i18n>addressValueState}"/>
 			</f:content>
 		</f:SimpleForm>
-		<HBox justifyContent="End" >
-			<Button text="{i18n>save}" type="Accept" press="MC_onPressSave" class="submit" visible="{visiblePlay>/save}"></Button>
-			<Button text="{i18n>submit}" type="Accept" press="MC_onPressSubmit" class="submit"  visible="{visiblePlay>/submit}"></Button>
-			<Button text="{i18n>close}" press="MC_onPressClose" class="sendMail" type="Negative"></Button>
-		</HBox>
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Button text="{i18n>save}" type="Accept" press="MC_onPressSave" class="submit" visible="{visiblePlay>/save}"/>
+				<Button text="{i18n>submit}" type="Accept" press="MC_onPressSubmit" class="submit" visible="{visiblePlay>/submit}"/>
+				<Button text="{i18n>close}" press="MC_onPressClose" class="sendMail" type="Negative"/>
+			</Toolbar>
+		</footer>
 	</Dialog>
 </core:FragmentDefinition>
