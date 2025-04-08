@@ -12,6 +12,12 @@ sap.ui.define([
       return sap.ui.core.UIComponent.getRouterFor(this);
     },
 
+
+    getI18nText: function (sKey, aParams) {
+      const oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+      return oResourceBundle.getText(sKey, aParams);
+    },
+
     calculateDateDifference: function (endDate, sStatus) {
       var thresholdDays = 30;
       if (!endDate) return "None";
@@ -310,5 +316,83 @@ sap.ui.define([
 
       return btoa(binary); // Convert binary string to Base64
     },
+
+    handleFileUpload: function (
+      oEvent,
+      oContext,
+      sModelName,
+      sAttachmentPath,
+      sNamePath,
+      sUploadFlagPath,
+      sSuccessTextKey,
+      sDuplicateTextKey,
+      sNoFileKey,
+      sErrorKey,
+      fnValidateCallback
+    ) {
+      var that = this;
+      const oFileUploader = oEvent.getSource();
+      const oFiles = oFileUploader.oFileUpload.files;
+      const oModel = oContext.getView().getModel(sModelName);
+
+      // No file selected
+      if (!oFiles.length) {
+        sap.m.MessageToast.show(oContext.getI18nText(sNoFileKey));
+        return;
+      }
+
+      let attachments = oModel.getProperty(sAttachmentPath) || [];
+      let uploadedFileNames = oModel.getProperty(sNamePath)
+        ? oModel.getProperty(sNamePath).split(", ")
+        : [];
+
+      Array.from(oFiles).forEach((oFile) => {
+        if (uploadedFileNames.includes(oFile.name)) {
+          sap.m.MessageToast.show(oContext.getI18nText(sDuplicateTextKey, [oFile.name]));
+          return;
+        }
+
+        const oReader = new FileReader();
+
+        oReader.onload = (e) => {
+          const sFileBinary = e.target.result.split(",")[1];
+
+          attachments.push({
+            filename: oFile.name,
+            contentType: oFile.type,
+            content: sFileBinary,
+            encoding: "base64"
+          });
+
+          oModel.setProperty(sAttachmentPath, attachments);
+          oModel.setProperty(sUploadFlagPath, true);
+
+          uploadedFileNames.push(oFile.name);
+          oModel.setProperty(sNamePath, uploadedFileNames.join(", "));
+
+          sap.m.MessageToast.show(oContext.getI18nText(sSuccessTextKey, [oFile.name]));
+
+          // Re-validate button
+          if (typeof fnValidateCallback === "function") {
+            fnValidateCallback.call(oContext);
+          }
+        };
+
+        oReader.onerror = () => {
+          sap.m.MessageToast.show(oContext.getI18nText(sErrorKey, [oFile.name]));
+        };
+
+        oReader.readAsDataURL(oFile);
+      });
+
+      // Clear uploader for next selection
+      oFileUploader.setValue("");
+    }
+
+
+
+
+
+
   })
 });

@@ -54,7 +54,7 @@ sap.ui.define([
                     this.getModelData(this.sArgPara);
                 }
                 this._makeDatePickersReadOnly(["TD_id_JoiningDate", "TD_id_ReleaseDate", "TU_id_JoinDate", "TU_id_RelDate"]);
-                this._fileSelected = false;
+                this.getView().byId("TD_id_Submit").setEnabled(false);
             },
             getModelData: function (sArgPara) {
                 var oModel = this.getOwnerComponent().getModel("traineeModel");
@@ -187,6 +187,7 @@ sap.ui.define([
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 if (oModel.Currency === "") this.getView().getModel("oTraineeDetails").setProperty("/Currency", this.byId("TD_id_Currency").getSelectedKey())
                 if (oModel.TrainingDuration === "") this.getView().getModel("oTraineeDetails").setProperty("/TrainingDuration", this.byId("TD_id_TDuration").getSelectedKey())
+                    this.getView().byId("TD_id_Submit").setEnabled(true);
             },
 
             //Edit/save button visibility 
@@ -251,7 +252,6 @@ sap.ui.define([
                     this.oDialog.open();
                 }
             },
-
             TU_onSendEmail: function () {
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
@@ -265,7 +265,7 @@ sap.ui.define([
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
                 this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
-                this._validateSendButton();
+                this.validateSendButton();
 
             },
             TD_onPressback: function () {
@@ -282,10 +282,7 @@ sap.ui.define([
                 this.oDialog.destroy();
                 this.oDialog = null;
             },
-            TD_onPressMerge: function () {
-                var oModel = this.getView().getModel("oTraineeDetails");
-                this.offerGeneratingPdfFunction(oModel);
-            },
+        
             Mail_onPressClose: function () {
                 this.oDialog.destroy();
                 this.oDialog = null;
@@ -293,61 +290,30 @@ sap.ui.define([
             },
 
             Mail_onUpload: function (oEvent) {
-                var oFileUploader = oEvent.getSource();
-                var oFiles = oFileUploader.oFileUpload.files; // Get all selected files
-                var oModelEmail = this.getView().getModel("UploaderData");
-                if (!oFiles.length) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("noFileSelected"));
-                    return;
-                }
-                // Get existing attachments
-                var attachments = oModelEmail.getProperty("/attachments") || [];
-                var existingFileNames = oModelEmail.getProperty("/name") || "";
-                var uploadedFileNames = existingFileNames ? existingFileNames.split(", ") : [];
-                Array.from(oFiles).forEach((oFile) => {
-                    // Check for duplicate file names
-                    if (uploadedFileNames.includes(oFile.name)) {
-                        sap.m.MessageToast.show(this.i18nModel.getText("fileAlreadyUploaded", [oFile.name]));
-                        return; // Skip duplicate files
-                    }
-                    var oReader = new FileReader();
-                    oReader.onload = (e) => {
-                        var sFileBinary = e.target.result.split(",")[1]; // Extract base64 content
-                        // Update attachments in the UploaderData model
-                        attachments.push({
-                            filename: oFile.name,
-                            contentType: oFile.type,
-                            content: sFileBinary,
-                            encoding: "base64"
-                        });
-                        oModelEmail.setProperty("/attachments", attachments);
-                        oModelEmail.setProperty("/isFileUploaded", true);
-                        // Update the TextDisplay model for file names
-                        uploadedFileNames.push(oFile.name);
-                        oModelEmail.setProperty("/name", uploadedFileNames.join(", "));
-                        // Show success message for each file
-                        sap.m.MessageToast.show(this.i18nModel.getText("uploadSuccessfull", [oFile.name]));
-                        this._validateSendButton();
-                    };
-                    oReader.onerror = () => {
-                        sap.m.MessageToast.show(this.i18nModel.getText("fileReadError", [oFile.name]))
-                    };
-                    // Read the file content
-                    oReader.readAsDataURL(oFile);
-                });
-                oFileUploader.setValue("");
-
+                this.handleFileUpload(
+                    oEvent,
+                    this,                      // context
+                    "UploaderData",            // model name
+                    "/attachments",            // path to attachment array
+                    "/name",                   // path to comma-separated file names
+                    "/isFileUploaded",         // boolean flag path
+                    "uploadSuccessfull",       // i18n success key
+                    "fileAlreadyUploaded",     // i18n duplicate key
+                    "noFileSelected",          // i18n no file selected
+                    "fileReadError",           // i18n file read error
+                    () => this.validateSendButton()               
+                 );
             },
-            _validateSendButton: function () {
+            
+            validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                 const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
                 const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
                 sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
             
-
-            Mail_onEmailChange: function (oEvent) {
-                this._validateSendButton();
+            Mail_onEmailChange: function () {
+                this.validateSendButton(); // Reuse from BaseController
             },
             Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
@@ -369,6 +335,11 @@ sap.ui.define([
                     sap.ui.core.BusyIndicator.hide();
                 });
                 this.oDialog.close();
+            },
+
+            TD_onPressMerge: function () {
+                var oModel = this.getView().getModel("oTraineeDetails");
+                this.offerGeneratingPdfFunction(oModel);
             },
             async offerGeneratingPdfFunction(oModel) {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
