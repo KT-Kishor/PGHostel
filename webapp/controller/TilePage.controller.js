@@ -261,10 +261,12 @@ sap.ui.define(
         },
 
         TileV_onpressTrainee: function () {
-          this.getRouter().navTo("RouteTrainee",{value:"Trainee"});
+          this.getRouter().navTo("RouteTrainee", { value: "Trainee" });
         },
         TileV_onPressOffer: function () {
-          this.getRouter().navTo("RouteEmployeeOffer",{valueEmp:"EmployeeOffer"});
+          this.getRouter().navTo("RouteEmployeeOffer", {
+            valueEmp: "EmployeeOffer",
+          });
         },
         TileV_onpresslistofholidays: function () {
           this.getRouter().navTo("RouteListofholidays");
@@ -327,7 +329,9 @@ sap.ui.define(
           this.getRouter().navTo("RouteExpensePage");
         },
         TileV_onPressManageSchemeUpload: function () {
-          this.getRouter().navTo("RouteSchemeUpload");
+          this.getRouter().navTo("RouteSchemeUpload", {
+            value: "SchemeUpload",
+          });
         },
         TileV_onPressIncomeAsset: function () {
           this.getRouter().navTo("RouteIncomeAsset");

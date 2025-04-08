@@ -24,15 +24,20 @@ sap.ui.define(
             .getRoute("RouteSchemeUpload")
             .attachMatched(this._RouteAppVisibility, this);
         },
-        _RouteAppVisibility: function () {
+        _RouteAppVisibility: function (oEvent) {
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().setModel(new JSONModel({ isFileValid: false })); //for createfragmentsubmit button
           this.getView()
             .getModel("LoginModel")
             .setProperty("/HeaderName", this.i18nModel.getText("schemeupload"));
-          this.SU_onSearch();
           this.MainModel = new JSONModel({ items: [] }); // Store table data
-          // Fetch data on initialization
+          this.oValue = oEvent.getParameter("arguments").value;
+          if (this.oValue === "SchemeUpload") {
+            this.CommomReadCall("");
+            this.SU_onClear();
+          } else {
+            this.SU_onSearch();
+          }
         },
         //for Search
         SU_onSearch: function () {
