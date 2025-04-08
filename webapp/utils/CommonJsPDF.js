@@ -2,6 +2,7 @@ sap.ui.define([], function () {
     "use strict";
     return {
         _GeneratePDF: function (oModel, oCompanyModel, content) {
+            setTimeout(function () {
             var { jsPDF } = window.jspdf;
             var doc = new jsPDF({
                 unit: "mm",
@@ -14,27 +15,34 @@ sap.ui.define([], function () {
             var pageWidth = doc.internal.pageSize.getWidth();
             var pageHeight = doc.internal.pageSize.getHeight();
             var margin = 25; // left and right margin
-            var paraMargin = 13; // left margin for paragraphs
+            var paraMargin = 6; // left margin for paragraphs
             var topMargin = 30;
             var footerHeight = 25; // reserve 25 units at the bottom for footer
             var maxWidth = pageWidth - 2 * margin; // usable width
             var pageMiddle = pageWidth / 2;
-
             let currentYPosition = 10; // Initial Y Position
+            const backImgX = (pageWidth - 100) / 2; // Center horizontally
+            const backImgY = (pageHeight - 100) / 2; // Center vertically
+            const bottomLimit = pageHeight - footerHeight;
+            let currentY;
 
             function checkPageBreak(currentYPosition) {
-                const bottomLimit = pageHeight - footerHeight;
 
                 if (currentYPosition >= bottomLimit) {
                     doc.addPage(); // Add a new page if the current position exceeds the limit
                     doc.addImage(oModel.CompanyLogoHeader, "PNG", 145, 8, 45, 10);
+                    doc.setGState(new doc.GState({ opacity: 0.2 }));
+                    doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                    doc.setGState(new doc.GState({ opacity: 1 }));
                     currentYPosition = topMargin; // Reset to top margin on the new page
                 }
                 return currentYPosition; // Return updated Y position
             }
 
             doc.addImage(oCompanyModel.companylogo64, "PNG", margin, currentYPosition, 45, 45);
-
+            doc.setGState(new doc.GState({ opacity: 0.2 }));
+            doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+            doc.setGState(new doc.GState({ opacity: 1 }));
             doc.setFontSize(12);
 
             let addressLines = doc.splitTextToSize(
@@ -159,7 +167,7 @@ sap.ui.define([], function () {
                 let title4 = new Function("oModel", `return ${content[3].Title};`)(oModel);
                 doc.text(title4, margin, title4Y);
 
-                let currentY = title4Y + 11; // Start initial Y position
+                currentY = title4Y + 11; // Start initial Y position
                 doc.setFont("times", "bold");
 
                 const maxPoints = 25; // Loop limit to handle up to 25 points
@@ -169,8 +177,10 @@ sap.ui.define([], function () {
                     currentY += 3; // Add extra spacing between points
                     currentY = checkPageBreak(currentY);
                     // Add Point Number and Point Title
+                    doc.setTextColor(0, 111, 191);
                     doc.text(`${content[i - 1].PointNo}.`, margin + (paraMargin - 6), currentY);
                     doc.text(content[i - 1].PointTitle, margin + paraMargin, currentY);
+                    doc.setTextColor(0, 0, 0);
 
                     doc.setFont("times", "normal");
                     currentY += 11; // Increment Y position for the content section
@@ -222,13 +232,18 @@ sap.ui.define([], function () {
             }
 
             if (oModel.Type === "EmployeeOffer") {
-                doc.addPage();
-                contentafterTitleContentY = topMargin-10;
+                if (contentafterTitleContentY > bottomLimit - 90) {
+                    doc.addPage();
+                    doc.addImage(oModel.CompanyLogoHeader, "PNG", 145, 8, 45, 10);
+                    doc.setGState(new doc.GState({ opacity: 0.2 }));
+                    doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                    doc.setGState(new doc.GState({ opacity: 1 }));
+                    contentafterTitleContentY = topMargin;
+                }
             }
 
             doc.setFont("times", "bold").setFontSize(12);
             let forCoNameY = contentafterTitleContentY + 10;
-            forCoNameY = checkPageBreak(forCoNameY);
             doc.text(`For ${oCompanyModel.companyName}.`, margin, forCoNameY);
 
             let coSignY = forCoNameY + 5;
@@ -244,27 +259,26 @@ sap.ui.define([], function () {
             let acceptTCVisY = headofCoRoleY + 15;
             if (oModel.Type === "EmployeeOffer") {
                 let acceptTCY = acceptTCVisY;
-                acceptTCY = checkPageBreak(acceptTCY);
                 doc.text("I have read and accept the terms and conditions:", margin, acceptTCY);
                 acceptTCVisY = acceptTCY + 15;
             }
 
             let cNameY = acceptTCVisY;
-            cNameY = checkPageBreak(cNameY);
             doc.text("Candidate Name: .................................................", margin, cNameY);
 
             let cJoinDate = cNameY + 11;
-            cJoinDate = checkPageBreak(cJoinDate);
             doc.text("Date of Joining: ...................................................", margin, cJoinDate);
 
             let cSignY = cJoinDate + 11;
-            cSignY = checkPageBreak(cSignY);
             doc.text("Signature: ............................................................", margin, cSignY);
 
 
             if (oModel.Type === "EmployeeOffer") {
                 doc.addPage();
                 doc.addImage(oModel.CompanyLogoHeader, "PNG", 145, 8, 45, 10);
+                doc.setGState(new doc.GState({ opacity: 0.2 }));
+                doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                doc.setGState(new doc.GState({ opacity: 1 }));
 
                 let salPageHeader = oModel.PageHeader;
                 doc.setFont("times", "bold").setFontSize(14);
@@ -311,7 +325,6 @@ sap.ui.define([], function () {
                     doc.text(headers[i - 1].Title, margin + 5, headerY);
 
                     // Draw Text with normal font
-                    doc.setFont("helvetica", "normal");
                     doc.text(headers[i - 1].Text, pageMiddle + 10, headerY);
 
                     // Increment Y position for the next header (adjust as per line height)
@@ -556,8 +569,8 @@ sap.ui.define([], function () {
                     doc.text(`${salNotes[0].Title} ${salNotes[0].Text}`, margin, salNoteText0Y);
                 }
             }
-            
             doc.save(`${oModel.EmpName} Offer Letter.pdf`);
+            sap.ui.core.BusyIndicator.hide();}, 1000);
         }
     };
 });

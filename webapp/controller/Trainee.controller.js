@@ -255,12 +255,12 @@ sap.ui.define([
                     <p>We wish ${empName} all the best in future endeavors and career pursuits.</p>
                     <h3>Details of the Internship:</h3>
                     <div style="margin-left: 10px;">
-                        <p style="margin: 3px 0;"><b>• Intern's Name:</b> ${empName}</p>
-                        <p style="margin: 3px 0;"><b>• Position:</b> ${role}</p>
-                        <p style="margin: 3px 0;"><b>• Internship Duration:</b> ${joinDate} to ${endDate}</p>
-                        <p style="margin: 3px 0;"><b>• Department:</b> ${department}</p>
-                        <p style="margin: 3px 0;"><b>• Supervisor:</b> ${supervisor}</p>
-                        <p style="margin: 3px 0;"><b>• Project/Tasks:</b> ${projectName}</p>
+                        <p style="margin: 3px 0;"><b>• Intern's Name: ${empName}</b></p>
+                        <p style="margin: 3px 0;"><b>• Position: ${role}</b></p>
+                        <p style="margin: 3px 0;"><b>• Internship Duration: ${joinDate} to ${endDate}</b></p>
+                        <p style="margin: 3px 0;"><b>• Department: ${department}</b></p>
+                        <p style="margin: 3px 0;"><b>• Supervisor: ${supervisor}</b></p>
+                        <p style="margin: 3px 0;"><b>• Project/Tasks: ${projectName}</b></p>
                     </div>
                     <p>We at <b>Kalpavriksha Technologies</b> thank ${empName} for the valuable contributions made to our organization and wish success in all future endeavors.</p>
                 </div>`;

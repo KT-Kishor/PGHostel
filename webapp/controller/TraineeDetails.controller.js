@@ -357,6 +357,7 @@ sap.ui.define([
                     this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "TraineeOffer" });
                     await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
 
+                    sap.ui.core.BusyIndicator.show(0);
                     var oPDFModel = this.getView().getModel("PDFData");
                     oPDFModel.setProperty("/Type", "TraineeOffer");
                     oPDFModel.setProperty("/EmpName", oEmpModel.NameSalutation + " " + oEmpModel.TraineeName);
@@ -397,6 +398,7 @@ sap.ui.define([
                     }
 
                 } catch (error) {
+                    sap.ui.core.BusyIndicator.hide();
                     console.error("Error waiting for models:", error);
                 }
             }
