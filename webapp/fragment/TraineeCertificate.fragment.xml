@@ -1,50 +1,117 @@
 <core:FragmentDefinition
-	xmlns="sap.m"
-	xmlns:f="sap.ui.layout.form"
-	xmlns:core="sap.ui.core" >
-	<Dialog 
-        title="{i18n>generateCertificate}">
-		<f:SimpleForm 
-			editable="true"
-			layout="ResponsiveGridLayout"
-			labelSpanXL="3"
-			labelSpanL="3"
-			labelSpanM="3"
-			labelSpanS="12"
-			adjustLabelSpan="false"
-			emptySpanXL="4"
-			emptySpanL="4"
-			emptySpanM="4"
-			emptySpanS="0"
-			columnsXL="1"
-			columnsL="1"
-			columnsM="1"
-			singleContainerFullSize="false" >
-			<f:content>
-				<Label text="{i18n>traineeName}"  />
-				<Input value="{traineeModel>NameSalutation} {traineeModel>TraineeName}"  editable="false"/>
-				<Label text="{i18n>reportingManager}" />
-				<Input value="{traineeModel>ReportingManagerSalutation} {traineeModel>ReportingManager}"   editable="false"/>
-				<Label text="{i18n>role}" required="true" />
-				<Select id="TCF_id_Role"  items="{DesignationModel>/}" selectedKey="{traineeModel>Role}">
-					<core:Item key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}"/>
-				</Select>
-				<Label text="{i18n>joiningDate}"  />
-				<DatePicker value="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}"
-                 displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="false"  id="TCF_id_JoiningDate" />
-				<Label text="{i18n>endDate}" required="true"/>
-				<DatePicker   displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"  id="TCF_id_EndDate" value="{path:'traineeModel>EndDate' ,formatter:'.Formatter.formatDate'}"  minDate="{traineeModel>EndDate}" />
-				<Label text="{i18n>department}"  required="true" />
-				<Select id="TCF_id_Department"  items="{Departmentmodel>/}" selectedKey="{traineeModel>Department}">
-					<core:Item key="{Departmentmodel>departmentName}" text="{Departmentmodel>departmentName}"/>
-				</Select>
-				<Label text="{i18n>projectName}"  required="true" />
-				<TextArea id="TCF_id_ProjectName" rows="2" liveChange="T_ValidateCommonFields" value="{traineeModel>ProjectName}" maxLength="100" valueStateText="{i18n>projectValueState}" placeholder="{i18n>projectValueState}" />
-			</f:content>
-		</f:SimpleForm>
-		<HBox justifyContent="End" >
-			<Button text="{i18n>downloadcCertificate}" type="Accept" press="TCF_onPressDownload" class="submit"  />
-			<Button text="{i18n>close}" press="TCF_onPressCloseDialog" class="sendMail" type="Reject"/>
-		</HBox>
-	</Dialog>
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:rich="sap.ui.richtexteditor"
+>
+    <Dialog
+        title="{i18n>generateCertificate}"
+        contentWidth="85%"
+        contentHeight="75%"
+    >
+        <f:SimpleForm
+            editable="true"
+            layout="ColumnLayout"
+            labelSpanXL="3"
+            labelSpanL="3"
+            labelSpanM="3"
+            labelSpanS="12"
+            adjustLabelSpan="false"
+            emptySpanXL="0"
+            emptySpanL="0"
+            emptySpanM="0"
+            emptySpanS="0"
+            columnsXL="4"
+            columnsL="3"
+            columnsM="2"
+            singleContainerFullSize="false"
+        >
+            <f:content>
+                <Label text="{i18n>traineeName}" />
+                <Input
+                    value="{traineeModel>NameSalutation} {traineeModel>TraineeName}"
+                    editable="false"
+                />
+                <Label
+                    text="{i18n>department}"
+                    required="true"
+                />
+                <Select
+                    id="TCF_id_Department"
+                    items="{Departmentmodel>/}"
+                    selectedKey="{traineeModel>Department}"
+					editable="{= !${PDFData>/PreviewFlag} }"
+                >
+                    <core:Item
+                        key="{Departmentmodel>departmentName}"
+                        text="{Departmentmodel>departmentName}"
+                    />
+                </Select>
+                <Label text="{i18n>joiningDate}" />
+                <DatePicker
+                    value="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                    editable="false"
+                    id="TCF_id_JoiningDate"
+                />
+                <Label
+                    text="{i18n>endDate}"
+                    required="true"
+                />
+                <DatePicker
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                    id="TCF_id_EndDate"
+                    value="{path:'traineeModel>EndDate' ,formatter:'.Formatter.formatDate'}"
+                    minDate="{traineeModel>EndDate}"
+					editable="{= !${PDFData>/PreviewFlag} }"
+                />
+                <Label text="{i18n>reportingManager}" />
+                <Input
+                    value="{traineeModel>ReportingManagerSalutation} {traineeModel>ReportingManager}"
+                    editable="false"
+                />
+                <Label
+                    text="{i18n>projectName}"
+                    required="true"
+                />
+                <Input
+                    id="TCF_id_ProjectName"
+                    liveChange="T_ValidateCommonFields"
+                    value="{traineeModel>ProjectName}"
+                    maxLength="60"
+                    valueStateText="{i18n>projectValueState}"
+                    placeholder="{i18n>projectValueState}"
+					editable="{= !${PDFData>/PreviewFlag} }"
+                />
+            </f:content>
+        </f:SimpleForm>
+        <rich:RichTextEditor
+            id="myRTE"
+            width="100%"
+            height="70vh"
+            showGroupFontStyle="true"
+            showGroupTextAlign="true"
+            showGroupStructure="true"
+            value="{PDFData>/editorText}"
+			visible="true"
+        />
+        <beginButton>
+            <Button
+                text="{= ${PDFData>/PreviewFlag} ? ${i18n>downloadcCertificate} : 'Preview Certificate'}"
+                type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Neutral'}"
+                press=".onPressHandlePreview"
+                class="submit"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>close}"
+                press="TCF_onPressCloseDialog"
+                class="sendMail"
+                type="Reject"
+            />
+        </endButton>
+    </Dialog>
 </core:FragmentDefinition>

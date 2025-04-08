@@ -4,9 +4,10 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
+    "../utils/TraineeCertificatePDF",
     "../model/formatter"
 ],
-    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, jsPDF, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Trainee", {
             Formatter: Formatter,
@@ -216,35 +217,81 @@ sap.ui.define([
             },
     
             TCF_onPressCloseDialog: function () {
+                this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
+                this.getView().getModel("PDFData").setProperty("/editorText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValueState("None");
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValue("");
                 this.TC_oDialog.close();
             },
+            onPressHandlePreview: function() {
+                const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
+            
+                if (bPreviewFlag) {
+                    this.TCF_onPressDownload();
+                } else {
+                    this.TCF_onPressPreview();
+                }
+            },
+            
             //download certificate
+            TCF_onPressPreview: function () {
+                if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("TCF_id_ProjectName"), "ID")) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+                let oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
+                let oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
+                var empName = oTraineeModel.NameSalutation + " " + oTraineeModel.TraineeName;
+                var joinDate = Formatter.formatDate(oTraineeModel.JoiningDate);
+                var endDate = sap.ui.getCore().byId("TCF_id_EndDate").getValue();
+                var role = "Trainee";
+                var department = sap.ui.getCore().byId("TCF_id_Department").getSelectedKey();
+                var projectName = oTraineeModel.ProjectName;
+                var supervisor = oTraineeModel.ReportingManagerSalutation + " " + oTraineeModel.ReportingManager;
+                var data = `
+                <div style="text-align: justify;">
+                    <p>This is to certify that <b>${empName}</b> has successfully completed an internship at <b>Kalpavriksha Technologies</b> from <b>${joinDate}</b> to <b>${endDate}</b>.</p> 
+                    <p>During this period, ${empName} was assigned the role of <b>${role}</b> in the ${department} department and worked on the <b>${projectName}</b>. The performance, skills, and dedication demonstrated by ${empName} during the internship have been highly commendable.</p>
+                    <p>We wish ${empName} all the best in future endeavors and career pursuits.</p>
+                    <h3>Details of the Internship:</h3>
+                    <div style="margin-left: 10px;">
+                        <p style="margin: 3px 0;"><b>• Intern's Name:</b> ${empName}</p>
+                        <p style="margin: 3px 0;"><b>• Position:</b> ${role}</p>
+                        <p style="margin: 3px 0;"><b>• Internship Duration:</b> ${joinDate} to ${endDate}</p>
+                        <p style="margin: 3px 0;"><b>• Department:</b> ${department}</p>
+                        <p style="margin: 3px 0;"><b>• Supervisor:</b> ${supervisor}</p>
+                        <p style="margin: 3px 0;"><b>• Project/Tasks:</b> ${projectName}</p>
+                    </div>
+                    <p>We at <b>Kalpavriksha Technologies</b> thank ${empName} for the valuable contributions made to our organization and wish success in all future endeavors.</p>
+                </div>`;
+
+                this.getView().getModel("PDFData").setProperty("/editorText", data);
+                this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
+            },
             TCF_onPressDownload: function () {
                 try {
-                    // Validate mandatory field
-                    if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("TCF_id_ProjectName"), "ID")) {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        return;
-                    }
                     // Get selected trainee's data from the table
                     let oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                     let oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
+                    this.getView().getModel("PDFData").setProperty("/CreateDate", Formatter.formatDate(oTraineeModel.ReleaseDate));
                     // Create the updated trainee data
                     const oUpdatedData = {
                         ID: oTraineeModel.ID,
                         Department: sap.ui.getCore().byId("TCF_id_Department").getSelectedKey(),
                         ProjectName: oTraineeModel.ProjectName,
                         EndDate: oTraineeModel.EndDate,
-                        Role: sap.ui.getCore().byId("TCF_id_Role").getSelectedKey(),
+                        Role: "Trainee",
                         Status: "Training Completed",
                     };
                     sap.ui.core.BusyIndicator.show(0);
                     this.updateCallForTrainee(oUpdatedData, "downloadSucess");
                     this.byId("T_id_Download").setVisible(false);
+                    this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
+                    let htmlContent = sap.ui.getCore().byId("myRTE").getValue(); 
+                    this.generateCertificatePDF(htmlContent);
                     sap.ui.core.BusyIndicator.hide();
                     this.TC_oDialog.close();
+                    this.getView().getModel("PDFData").setProperty("/editorText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
                 } catch (oError) {
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -373,6 +420,41 @@ sap.ui.define([
                     sap.ui.core.BusyIndicator.hide();
                 });
                 this.oDialog.close();
-            },
+            }, 
+            
+            async generateCertificatePDF(content) {
+                var oModel = this.getView().getModel("PDFData").getData();
+                var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
+                if (oCoModel) {
+                    oCoModel.destroy();
+                    this.getView().setModel(null, "CompanyCodeDetailsModel");
+                }
+                try {
+                    this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
+                    await this._waitForModels(["CompanyCodeDetailsModel"], 200, 5000);
+                    var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                    if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                        MessageToast.show("Company Logo or Model not found.");
+                        return;
+                    }
+                    if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+                        var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+                        var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
+                        if (logoBase64 && signBase64) {
+                            oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
+                            oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+                        }
+                    }
+                    if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                        if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                            jsPDF._GeneratePDF(content, oCompanyDetailsModel, oModel);
+                        } else {
+                            console.error("Error: jsPDF._GeneratePDF function not found.");
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error waiting for models:", error);
+                }
+            }
         });
     });

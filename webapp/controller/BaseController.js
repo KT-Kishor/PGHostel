@@ -387,12 +387,29 @@ sap.ui.define([
 
       // Clear uploader for next selection
       oFileUploader.setValue("");
+    },
+
+    _waitForModels(modelNames, interval = 200, timeout = 5000) {
+      return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+
+        const checkModels = () => {
+          let allLoaded = modelNames.every(modelName => {
+            let model = this.getView().getModel(modelName);
+            return model && model.getData() && Object.keys(model.getData()).length > 0;
+          });
+
+          if (allLoaded) {
+            resolve(); // ✅ Proceed when models have data
+          } else if (Date.now() - startTime > timeout) {
+            reject(new Error("Timeout waiting for models: " + modelNames.join(", ")));
+          } else {
+            setTimeout(checkModels, interval);
+          }
+        };
+
+        checkModels();
+      });
     }
-
-
-
-
-
-
   })
 });
