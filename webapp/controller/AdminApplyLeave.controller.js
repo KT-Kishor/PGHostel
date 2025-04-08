@@ -40,7 +40,7 @@ sap.ui.define(
            MessageToast.show("No data available.");
             return;
         }
-        var sFullText = oBindingContext.getProperty("managerRemark") || "No remarks available";
+        var sFullText = oBindingContext.getProperty("managerRemark")
         var oDialog = new sap.m.Dialog({
             title: this.getView().getModel("i18n").getProperty("managerRemarks"),
             content: new sap.ui.core.HTML({ content: `<p>${sFullText}</p>` }),
@@ -51,6 +51,99 @@ sap.ui.define(
         });
         oDialog.open();
       },
+
+      onMarkCalendarDatesAndLeaves: function () {
+        var that = this;
+        this.oDatePicker.removeAllSpecialDates(); 
+        var leaveRecords = that.getView().getModel("LeaveModel").getData(); 
+        var holidays = that.getView().getModel("HolidayModel").getData(); 
+        var holidaySet = new Set(holidays.map(function (holiday) {
+            return new Date(holiday.Date).toDateString(); 
+        }));
+
+         function parseDate(dateStr) {
+          var parts = dateStr.split('/');
+          return new Date(parts[2], parts[1] - 1, parts[0]);
+       }
+    
+        var appliedLeaves = [];
+        var yearStart = new Date(new Date().getFullYear(), 0, 1);
+        var yearEnd = new Date(new Date().getFullYear(), 11, 31);
+    
+        leaveRecords.forEach(function (record) {
+            if (record["Status"] !== "Rejected") {
+              var fromDate = parseDate(that.Formatter.formatDate(record.fromDate));
+              var toDate = parseDate(that.Formatter.formatDate(record.toDate));
+              
+                if (fromDate && toDate) {
+                    for (var d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
+                        appliedLeaves.push({
+                            date: new Date(d),
+                            employeeId: record["employeeID"]
+                        });
+                    }
+                }
+            }
+        });
+    
+        var appliedLeavesSet = new Set(appliedLeaves.map(leave => leave.date.toDateString()));
+    
+        for (var d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
+            var day = d.getDay();
+            var isWeekend = (day === 0 || day === 6);
+            var isHoliday = holidaySet.has(d.toDateString());
+            var isAppliedLeave = appliedLeavesSet.has(d.toDateString());
+    
+            var dateRange = new sap.ui.unified.DateTypeRange({
+                startDate: new Date(d),
+                endDate: new Date(d)
+            });
+    
+            if (isHoliday) {
+                dateRange.setType("Type04");
+                dateRange.setTooltip("Holiday");
+            } else if (isWeekend) {
+                dateRange.setType("Type09");
+                dateRange.setTooltip("Weekend");
+            } else if (isAppliedLeave) {
+                dateRange.setType("Type05");
+                dateRange.setTooltip("Applied Leave");
+            } else {
+                dateRange.setType("Type06");
+                dateRange.setTooltip("Working Day");
+            }
+            this.oDatePicker.addSpecialDate(dateRange);
+        }
+        that.appliedLeavesSet = appliedLeavesSet;
+    },
+    
+    onInitializeLegend: function (oEvent) {
+        this.oDatePicker = oEvent.getSource();
+        if (this.oDatePicker) {
+            var oLegend = new sap.ui.unified.CalendarLegend({
+                items: [
+                    new sap.ui.unified.CalendarLegendItem({
+                        type: "Type04",
+                        text: "Holiday"
+                    }),
+                    new sap.ui.unified.CalendarLegendItem({
+                        type: "Type09",
+                        text: "Weekend"
+                    }),
+                    new sap.ui.unified.CalendarLegendItem({
+                        type: "Type06",
+                        text: "Working Day"
+                    }),
+                    new sap.ui.unified.CalendarLegendItem({
+                        type: "Type05",
+                        text: "Applied Leaves"
+                    })
+                ]
+            });
+            this.oDatePicker.setLegend(oLegend); 
+            this.onMarkCalendarDatesAndLeaves(); 
+        }
+    },
     
         AL_onPressApplyLeave: function () {
           var oView = this.getView();
@@ -79,11 +172,8 @@ sap.ui.define(
          },
 
           AL_onPressUpdate: function () {
+            var oView = this.getView();
             var oTable = this.byId("AL_id_LeaveTableStandard").getSelectedItem();
-            if (!oTable) {
-                MessageBox.error(this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("leaveEditSelectRowMess"));
-                return;
-            }
             var oModelData = oTable.getBindingContext("LeaveModel");
             oModelData = oModelData.getObject();
             var currentYear = new Date().getFullYear();
@@ -105,8 +195,8 @@ sap.ui.define(
                 isUpdate: true,
             };
             var oLeaveTempModel = new JSONModel(leaveJson);
-            this.getView().setModel(oLeaveTempModel, "LeaveTempModel");
-            this.openLeaveDialog(this.getView());
+            oView.setModel(oLeaveTempModel, "LeaveTempModel");
+            this.openLeaveDialog(oView);
         },
 
         // Open the leave dialog fragment
@@ -212,13 +302,13 @@ sap.ui.define(
         var from = this.onFormatDate(fromDate);
         var to = this.onFormatDate(toDate);
 
-          for (var d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
-              if (this.appliedLeavesSet.has(d.toDateString())) {
-                  return true;
-              }
-          }
-          return false;
-      },
+        for (var d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+            if (this.appliedLeavesSet.has(d.toDateString())) {
+                return true;
+            }
+        }
+        return false;
+    },
 
       onValidation: function () {
         var oLeaveModel = this.getView().getModel("LeaveTempModel");
@@ -283,7 +373,7 @@ sap.ui.define(
                   this.ajaxCreateWithJQuery("Leaves", { data: oData })
                   .then((response) => {
                   if (response.success === true) {
-                  MessageToast.show(this.i18nModel.getText("msgCustomer3"));
+                  MessageToast.show(this.i18nModel.getText("leaveSubmitted"));
                   this.oDialog.close();
                   this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
                   } else {
@@ -323,7 +413,7 @@ sap.ui.define(
                 var requestData = {filters: { ID: oData.ID }, data: oData};
                 this.ajaxUpdateWithJQuery("Leaves", requestData).then((response) => {
                 if (response.success === true) {
-                MessageToast.show(this.i18nModel.getText("msgCustomer4"));
+                MessageToast.show(this.i18nModel.getText("leaveUpdatedSuccess"));
                 this.oDialog.close();
                 this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
             } else {
@@ -338,8 +428,51 @@ sap.ui.define(
         } catch (error) {
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
         }
-      },    
-      }
+      },  
+      
+      onSelectionChange: function (oEvent) {
+        var oSelectedItem = oEvent.getParameter("listItem");
+        var oContext = oSelectedItem.getBindingContext("LeaveModel");
+        var sStatus = oContext.getProperty("status"); 
+        var oUpdateButton = this.byId("AL_id_Updatebtn");
+        var bVisible = sStatus === "Submitted";
+        oUpdateButton.setVisible(bVisible);
+      },
+
+      AL_onSearch: function () {
+        var that = this;
+        var aFilterItems = this.byId("AL_id_leavefilterbar").getFilterGroupItems();
+        var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+        var params = {};
+    
+        aFilterItems.forEach(function (oItem) {
+            var oControl = oItem.getControl();
+            var sValue = oItem.getName();
+    
+            if (oControl) {
+                if (oControl.isA("sap.m.DateRangeSelection")) {
+                    var oFromDate = oControl.getDateValue();
+                    var oToDate = oControl.getSecondDateValue();
+                    if (oFromDate && oToDate) {
+                        params["FromDate"] = oDateFormat.format(oFromDate);
+                        params["ToDate"] = oDateFormat.format(oToDate);
+                    }
+                } else if (oControl.getValue()) {
+                    params[sValue] = oControl.getValue();
+                }
+            }
+        });
+    
+        that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId, ...params });
+    },
+    
+    AL_onClear : function () {
+        this.byId("AL_id_DateRangeSelection").setDateValue(null);
+        this.byId("AL_id_DateRangeSelection").setSecondDateValue(null);
+        var oComboBox = this.getView().byId("AL_id_TypeOfLeavecombo");
+        oComboBox.setSelectedKey("");
+      }   
+      },
     );
   }
 );

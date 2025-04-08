@@ -12,10 +12,11 @@
                 id="AL_id_leavefilterbar"
                 persistencyKey="myPersKey"
                 useToolbar="false"
-                clear="onClear"
+                clear="AL_onClear"
                 showClearOnFB="true"
-                search=".onSearch"
-                filterChange=".onFilterChange">
+                search="AL_onSearch"
+                filterChange=".onFilterChange"
+                showFilterConfiguration="false">
 				<filterbar:filterGroupItems>
 					<filterbar:FilterGroupItem name="Name" label="{i18n>dateRange}"
             groupName="Group1"
@@ -23,8 +24,8 @@
 						<filterbar:control>
 							<DateRangeSelection
                 id="AL_id_DateRangeSelection"
-                dateValue="{oFilteredModel>/FromDate}"
-                secondDateValue="{oFilteredModel>/ToDate}"
+                dateValue="{LeaveModel>/fromDate}"
+                secondDateValue="{LeaveModel>/toDate}"
                 valueFormat="yyyy-MM-dd"
                 displayFormat="dd/MM/yyyy"
                 change="onSelectionChange"/>
@@ -38,7 +39,7 @@
 						<filterbar:control>
 							<ComboBox
                 id="AL_id_TypeOfLeavecombo"
-                value="{oFilteredModel>/TypeOfLeave}"
+                value="{LeaveModel>/typeOfLeave}"
 				showClearIcon="true"
 				valueStateText="{i18n>selectTypeOfLeave}"
                 items="{leaveTypeModel>/}">
