@@ -10,7 +10,7 @@
 				<pages >
 					<Page>
 						<content>
-							<Wizard id="EOD_id_Wizard" finishButtonText="{i18n>submit}" showNextButton="true">
+							<Wizard id="EOD_id_Wizard" finishButtonText="{i18n>review}" showNextButton="true">
 								<WizardStep id="EOD_id_WizardStep"   complete="EOD_onStep2" title="{i18n>basicDetails}" validated="true">
 									<f:SimpleForm editable="true" layout="ColumnLayout" 	labelSpanXL="4"
 			labelSpanL="4"
@@ -106,7 +106,7 @@
 										</f:content>
 									</f:SimpleForm>
 								</WizardStep>
-								<WizardStep  title="{i18n>ctcCalculation}"  validated="true" id="EDO_id_WizardStepT">
+								<WizardStep  title="{i18n>ctcCalculation}"  validated="true" id="EDO_id_WizardStepT" complete="EOD_onStep3">
 									<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="2" columnsL="4" columnsXL="5">
 										<f:content>
 											<core:Title text="{i18n>monthlyComponents}" />
@@ -151,7 +151,7 @@
 									</f:SimpleForm>
 								</WizardStep>
 								<!-- Review wizard step with simple form -->
-								<WizardStep  complete="EOD_onSubmitData"  title="{i18n>review}" validated="true">
+								<WizardStep   title="{i18n>review}" validated="true" >
 									<f:SimpleForm  editable="false"  layout="ColumnLayout"  title="{i18n>bothEmpDetails}" columnsM="2" columnsL="4" columnsXL="4">
 										<f:content>
 											<core:Title text="{i18n>basicDetails}" />
@@ -219,6 +219,16 @@
 				</pages>
 			</NavContainer>
 		</content>
+		<footer>
+			<Bar>
+				<contentLeft>
+					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+				</contentLeft>
+				<contentRight>
+					<Button text="{i18n>submit}" press="EOD_onSubmitData" id="EOD_id_Submit" type="Success"  enabled="false"/>
+				</contentRight>
+			</Bar>
+		</footer>
 	</Page>
 	<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.EmployeeOfferUpdate" type="XML" />
 </mvc:View>
