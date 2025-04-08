@@ -18,20 +18,20 @@ sap.ui.define(
         },
 
         _onRouteMatched: function () {
-            var that = this;
-            that.oModel = that.getOwnerComponent().getModel();
-            var loginModel = that.getOwnerComponent().getModel("LoginModel");
-            that.userId = loginModel.getProperty("/EmployeeID");
-            that.Type = loginModel.getProperty("/Role");
-            that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId });
-            that._fetchCommonData("LeaveType", "leaveTypeModel", { type: "Employee" });
-            that.getView().getModel("LoginModel").setProperty("/HeaderName", "Leave Application");
-            that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
-            that.byId("AL_id_LeaveBarChart").setVisible(false);
-            that.byId("AL_id_LeaveTableStandard").setVisible(true);
-            that.byId("AL_id_leavefilterbar").setVisible(true);
-            that.byId("AL_id_LeaveYear").setValue(new Date().getFullYear());
-           
+        var that = this;
+        that.oModel = that.getOwnerComponent().getModel();
+        var loginModel = that.getOwnerComponent().getModel("LoginModel");
+        that.userId = loginModel.getProperty("/EmployeeID");
+        that.Type = loginModel.getProperty("/Role");
+        that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId });
+        that._fetchCommonData("LeaveType", "leaveTypeModel", { type: "Employee" });
+        that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
+        that.getView().getModel("LoginModel").setProperty("/HeaderName", that.i18nModel.getText("leaveApplication"));
+        that.byId("AL_id_LeaveBarChart").setVisible(false);
+        that.byId("AL_id_LeaveTableStandard").setVisible(true);
+        that.byId("AL_id_leavefilterbar").setVisible(true);
+        that.byId("AL_id_LeaveYear").setValue(new Date().getFullYear());
+        that._fetchCommonData("ListOfHolidays", "HolidayModel", {});   
         },
 
       onShowMore: function (oEvent) {
@@ -50,7 +50,7 @@ sap.ui.define(
             })
         });
         oDialog.open();
-    },
+      },
     
         AL_onPressApplyLeave: function () {
           var oView = this.getView();
@@ -92,8 +92,8 @@ sap.ui.define(
                 employeeID: oModelData.employeeID,
                 employeeName: oModelData.employeeName,
                 email: oModelData.email,
-                fromDate: oModelData.fromDate,
-                toDate: oModelData.toDate,
+                fromDate: this.Formatter.formatDate(oModelData.fromDate),
+                toDate: this.Formatter.formatDate(oModelData.toDate),
                 NoofDays: oModelData.NoofDays,
                 typeOfLeave: oModelData.typeOfLeave,
                 comments: oModelData.comments,
@@ -102,9 +102,8 @@ sap.ui.define(
                 halfDay: oModelData.halfDay === "false" ? false : true,
                 managerRemark: oModelData.ManagerRemark,
                 maxDate: new Date(currentYear, 11, 31),
-                isUpdate: true, // Flag to indicate an update
+                isUpdate: true,
             };
-
             var oLeaveTempModel = new JSONModel(leaveJson);
             this.getView().setModel(oLeaveTempModel, "LeaveTempModel");
             this.openLeaveDialog(this.getView());
@@ -119,78 +118,91 @@ sap.ui.define(
               }).then(function (oDialog) {
                   this.oDialog = oDialog;
                   oView.addDependent(this.oDialog);
-                  this._FragmentDatePickersReadOnly(["AL_id_FromDate", "AL_id_ToDate"]);
+                  this._resetDialogFields(); 
                   this.oDialog.open();
               }.bind(this));
           } else {
-              this._FragmentDatePickersReadOnly(["AL_id_FromDate", "AL_id_ToDate"]);
-              this.oDialog.open();
+            this._resetDialogFields(); 
+            this.oDialog.open();
           }
       },
+
+      _resetDialogFields: function () {
+        this._FragmentDatePickersReadOnly(["AL_id_FromDate", "AL_id_ToDate"]);
+        sap.ui.getCore().byId("AL_id_FromDate").setValueState("None");
+        sap.ui.getCore().byId("AL_id_ToDate").setValueState("None");
+        sap.ui.getCore().byId("AL_id_LeaveComments").setValueState("None");
+       },
       
         // Close the leave dialog fragment
         AL_onPressClose: function () {
           this.oDialog.close();
-          sap.ui.getCore().byId("AL_id_FromDate").setValueState("None");
-          sap.ui.getCore().byId("AL_id_ToDate").setValueState("None");
-          sap.ui.getCore().byId("AL_id_LeaveComments").setValueState("None");
         },
 
         onFormatDate: function (dateString) {
             var parts = dateString.split('/');
-            return new Date(parts[2], parts[1] - 1, parts[0]); 
+            return new Date(parts[2], parts[1] - 1, parts[0]);
         },
-
+        
         onLiveChange: function () {
-          var oLeaveModel = this.getView().getModel("LeaveTempModel");
-          var sFromDate = oLeaveModel.getProperty("/fromDate");
-          var sToDate = oLeaveModel.getProperty("/toDate");
-          var isHalfDay = oLeaveModel.getProperty("/halfDay");
+            var oLeaveModel = this.getView().getModel("LeaveTempModel");
+            var sFromDate = oLeaveModel.getProperty("/fromDate");
+            var sToDate = oLeaveModel.getProperty("/toDate");
+            var isHalfDay = oLeaveModel.getProperty("/halfDay");
+        
+            var LeaveModel = this.getView().getModel("LeaveModel").getData();
+            var filterData = LeaveModel.filter((item) => {
+                return item.ID === oLeaveModel.getData().ID;
+            });
+        
+            if (sFromDate === sToDate) {
+                var noOfDays = isHalfDay ? "0.5" : "1";
+                oLeaveModel.setProperty("/NoofDays", noOfDays);
+                if (filterData.length !== 0) {
+                    filterData[0].NoofDays = noOfDays;
+                }
+                return;
+            }
+        
+            var holidays = this.getView().getModel("HolidayModel").getData();
+            var sNoofDays = this.calculateBusinessDays(sFromDate, sToDate, holidays);
+            if (isHalfDay) {
+                sNoofDays -= 0.5;
+            }
+        
+            oLeaveModel.setProperty("/NoofDays", sNoofDays.toString());
+            if (filterData.length !== 0) {
+                filterData[0].NoofDays = oLeaveModel.getProperty("/NoofDays");
+            }
+        },
+        
+        calculateBusinessDays: function (startDate, endDate, holidays) {
+            var start = this.onFormatDate(startDate);
+            var end = this.onFormatDate(endDate);
+            var holidaySet = new Set(holidays.map(function (holiday) {
+                var holidayDate = this.Formatter.formatDate(holiday.Date);
+                var dateObject = this.onFormatDate(holidayDate); 
+                return dateObject.toDateString(); 
+            }, this));
 
-          var LeaveModel = this.getView().getModel("LeaveModel").getData();
-          var filterData = LeaveModel.filter((item) => {
-              return item.ID === oLeaveModel.getData().ID;
-          });
+            var diff = end - start;
+            var totalDays = Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1;
+            var businessDays = 0;
 
-          if (sFromDate === sToDate) {
-              var noOfDays = isHalfDay ? "0.5" : "1";
-              oLeaveModel.setProperty("/NoofDays", noOfDays);
-              if (filterData.length !== 0) {
-                  filterData[0].NoofDays = noOfDays;
-              }
-              return;
-          }
+            for (var i = 0; i < totalDays; i++) {
+                var currentDate = new Date(start);
+                currentDate.setDate(start.getDate() + i);
+                var dayOfWeek = currentDate.getDay();
+                var dateString = currentDate.toDateString();
 
-          var sNoofDays = this.calculateBusinessDays(sFromDate, sToDate);
-          if (isHalfDay) {
-              sNoofDays -= 0.5;
-          }
-
-          oLeaveModel.setProperty("/NoofDays", sNoofDays.toString());
-          if (filterData.length !== 0) {
-              filterData[0].NoofDays = oLeaveModel.getProperty("/NoofDays");
-          }
-      },
-
-      calculateBusinessDays: function (startDate, endDate) {
-        var start = this.onFormatDate(startDate);
-        var end = this.onFormatDate(endDate);
-          var diff = end - start;
-          var totalDays = Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1;
-          var businessDays = 0;
-
-          for (var i = 0; i < totalDays; i++) {
-              var currentDate = new Date(start);
-              currentDate.setDate(start.getDate() + i);
-              var dayOfWeek = currentDate.getDay();
-              if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                  businessDays++;
-              }
-          }
-          return businessDays;
-      },
-
-      onHalfDaySelect: function () {
+                if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidaySet.has(dateString)) {
+                    businessDays++;
+                }
+            }
+            return businessDays;
+        },
+         
+        onHalfDaySelect: function () {
           var oLeaveModel = this.getView().getModel("LeaveTempModel");
           oLeaveModel.setProperty("/halfDay", !!oLeaveModel.getProperty("/halfDay"));
           this.onLiveChange();
@@ -256,9 +268,11 @@ sap.ui.define(
                   utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
                   utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
               ) {
-                  var oData = this.getView().getModel("LeaveTempModel").getData();
-                  oData.status = "Submitted";
-                  oData.halfDay = oData.halfDay.toString();
+                var oData = this.getView().getModel("LeaveTempModel").getData();
+                oData.status = "Submitted";
+                oData.halfDay = oData.halfDay.toString();
+                oData.fromDate = new Date( sap.ui.getCore().byId("AL_id_FromDate").getDateValue().getTime() -  sap.ui.getCore().byId("AL_id_FromDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                oData.toDate = new Date( sap.ui.getCore().byId("AL_id_ToDate").getDateValue().getTime() -  sap.ui.getCore().byId("AL_id_ToDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
                   delete oData.Save;
                   delete oData.Submit;
                   delete oData.MinToDate;
@@ -271,7 +285,7 @@ sap.ui.define(
                   if (response.success === true) {
                   MessageToast.show(this.i18nModel.getText("msgCustomer3"));
                   this.oDialog.close();
-                  this._fetchCommonData("Leaves", "LeaveModel", {});
+                  this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
                   } else {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                   }
@@ -288,21 +302,17 @@ sap.ui.define(
 
       AL_onPressSave: function () {  
         try {
-            // Validate required fields before proceeding
             if (
                 utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
                 utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
             ) {
-                // Get selected row data from LeaveTempModel
                 var oLeaveTempModel = this.getView().getModel("LeaveTempModel");
                 var oData = oLeaveTempModel.getData();
-    
-                // Convert halfDay value to string format for backend compatibility
                 oData.halfDay = oData.halfDay.toString();
-                oData.status = "Submitted"; // Update status to Submitted
-    
-                // Remove frontend-specific properties
+                oData.status = "Submitted";
+                oData.fromDate = new Date( sap.ui.getCore().byId("AL_id_FromDate").getDateValue().getTime() -  sap.ui.getCore().byId("AL_id_FromDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                oData.toDate = new Date( sap.ui.getCore().byId("AL_id_ToDate").getDateValue().getTime() -  sap.ui.getCore().byId("AL_id_ToDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0]; 
                 delete oData.Save;
                 delete oData.Submit;
                 delete oData.MinToDate;
@@ -310,35 +320,25 @@ sap.ui.define(
                 delete oData.maxDate;
                 delete oData.minDate;
                 delete oData.isUpdate;
-    
-                // Prepare request payload
-                var requestData = {
-                    filters: { ID: oData.ID }, // Filtering by Leave ID
-                    data: oData
-                };
-    
-                // Perform AJAX update request
-                this.ajaxUpdateWithJQuery("Leaves", requestData)
-                    .then((response) => {
-                        if (response.success === true) {
-                            MessageToast.show(this.i18nModel.getText("msgCustomer4"));
-                            this.oDialog.close(); // Close the dialog after successful update
-                            this._fetchCommonData("Leaves", "LeaveModel", {}); // Refresh leave data
-                        } else {
-                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                        }
-                    })
-                    .catch((error) => {
-                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                    });
-    
+                var requestData = {filters: { ID: oData.ID }, data: oData};
+                this.ajaxUpdateWithJQuery("Leaves", requestData).then((response) => {
+                if (response.success === true) {
+                MessageToast.show(this.i18nModel.getText("msgCustomer4"));
+                this.oDialog.close();
+                this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
             } else {
-                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             }
+            }).catch((error) => {
+            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+         });
+        } else {
+        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+        }
         } catch (error) {
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
         }
-    },    
+      },    
       }
     );
   }

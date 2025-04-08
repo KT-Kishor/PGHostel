@@ -13,9 +13,7 @@ sap.ui.define(
       {
         Formatter: Formatter,
         onInit: function () {
-          this.getRouter()
-            .getRoute("RouteListofholidays")
-            .attachMatched(this._onRouteMatched, this);
+        this.getRouter().getRoute("RouteListofholidays").attachMatched(this._onRouteMatched, this);
         },
 
         _onRouteMatched: function (oEvent) {
@@ -26,20 +24,14 @@ sap.ui.define(
             endDate: `${new Date().getFullYear()}-12-31`,
           });
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          this.getView()
-            .getModel("LoginModel")
-            .setProperty(
-              "/HeaderName",
-              this.i18nModel.getText("headerListOfHolidays")
-            );
+          this.getView().getModel("LoginModel").setProperty("/HeaderName",
+          this.i18nModel.getText("headerListOfHolidays"));
         },
 
         onSearch: function () {
           var selectedYear = this.byId("LOH_id_Holidays").getValue();
           this._fetchCommonData("ListOfHolidays?", "HolidayModel", {
-            startDate: `${selectedYear}-01-01`,
-            endDate: `${selectedYear}-12-31`,
-          });
+          startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31`});
         },
 
         LOH_onOpenImport: function () {
@@ -66,10 +58,7 @@ sap.ui.define(
         },
 
         _resetDialogFields: function () {
-          sap.ui
-            .getCore()
-            .byId("ALH_id_Date")
-            .setValue(new Date().getFullYear() + 1);
+          sap.ui.getCore().byId("ALH_id_Date").setValue(new Date().getFullYear() + 1);
           this._FragmentDatePickersReadOnly(["ALH_id_Date"]);
           sap.ui.getCore().byId("ALH_id_LocFileUpload").clear();
           sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
@@ -79,15 +68,8 @@ sap.ui.define(
           var oFileUploader = e.getSource();
           var file = e.getParameter("files") && e.getParameter("files")[0];
           var selectedYear = sap.ui.getCore().byId("ALH_id_Date").getValue();
-          var expectedColumns = [
-            "Name",
-            "Date",
-            "Day",
-            "Karnataka",
-            "OtherStates",
-            "Maharashtra",
-            "Delhi",
-          ];
+          var expectedColumns = ["Name","Date","Day","Karnataka","OtherStates",
+          "Maharashtra","Delhi",];
           var that = this;
           if (!file) {
             sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
@@ -120,20 +102,15 @@ sap.ui.define(
                 oFileUploader.clear();
                 return;
               }
-
               var invalidData = excelData.slice(1).some((row) => {
                 return [3, 4, 5, 6].some(
-                  (index) => row[index] !== 0 && row[index] !== 1
-                );
+                  (index) => row[index] !== 0 && row[index] !== 1 );
               });
-
               if (invalidData) {
-                MessageToast.show(
-                  that.i18nModel.getText("InvalidColStateFormat")
-                );
-                sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
-                oFileUploader.clear();
-                return;
+              MessageToast.show(that.i18nModel.getText("InvalidColStateFormat"));
+              sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
+              oFileUploader.clear();
+              return;
               }
               var invalidYear = excelData.slice(1).some((row) => {
                 var dateValue = row[1];
@@ -142,12 +119,10 @@ sap.ui.define(
                 return rowYear !== parseInt(selectedYear, 10);
               });
               if (invalidYear) {
-                MessageToast.show(
-                  that.i18nModel.getText("IncorrectDataOfExcel")
-                );
-                sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
-                oFileUploader.clear();
-                return;
+              MessageToast.show(that.i18nModel.getText("IncorrectDataOfExcel"));
+              sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
+              oFileUploader.clear();
+              return;
               }
               that._uploadedExcelData = excelData;
               sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(true);
@@ -161,11 +136,12 @@ sap.ui.define(
         },
 
         excelDateToJSDate: function (serial) {
-          var excelEpoch = new Date(1899, 11, 30); // Excel's base date (Dec 30, 1899)
-          return new Date(excelEpoch.getTime() + serial * 86400000); // Convert serial number to date
-        },
-
-        LOH_onPressSubmit: async function (oEvent) {
+          var excelEpoch = new Date(Date.UTC(1899, 11, 30)); 
+          var date = new Date(excelEpoch.getTime() + serial * 86400000); 
+          return date;
+      },
+      
+       LOH_onPressSubmit: async function () {
           try {
             var that = this;
             var selectedYear = sap.ui.getCore().byId("ALH_id_Date").getValue();
@@ -194,22 +170,18 @@ sap.ui.define(
                   onClose: async function (sAction) {
                     if (sAction === MessageBox.Action.YES) {
                       await that.ajaxDeleteWithJQuery("ListOfHolidays", {
-                        filters: {
-                          startDate: `${selectedYear}-01-01`,
-                          endDate: `${selectedYear}-12-31`,
-                        },
+                        filters: {startDate: `${selectedYear}-01-01`,
+                        endDate: `${selectedYear}-12-31`},
                       });
                       await that.ajaxCreateWithJQuery("ListOfHolidays", {
                         data: formattedData,
                       });
-                      MessageToast.show(
-                        that.i18nModel.getText("uploadSuccessfull")
-                      );
-                      that.oDialog.close();
-                      that._fetchCommonData("ListOfHolidays?", "HolidayModel", {
-                        startDate: `${selectedYear}-01-01`,
-                        endDate: `${selectedYear}-12-31`,
-                      });
+                    MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
+                    that.oDialog.close();
+                    that._fetchCommonData("ListOfHolidays?", "HolidayModel", {
+                    startDate: `${selectedYear}-01-01`,
+                    endDate: `${selectedYear}-12-31`,
+                    });
                     }
                   },
                 }
