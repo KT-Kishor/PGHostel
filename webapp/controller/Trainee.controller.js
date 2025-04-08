@@ -19,7 +19,7 @@ sap.ui.define([
                 this._fetchCommonData("Designation", "DesignationModel");
                 this._fetchCommonData("Department", "Departmentmodel");
                 ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
-                ["T_id_Download", "T_id_EmpOnBoard"].forEach(id => this.byId(id)?.setVisible(false));
+                ["T_id_Download", "T_id_EmpOnBoard","T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
                 this.oValue = oEvent.getParameter("arguments").value;
                 if (this.oValue === "Trainee") {
@@ -99,6 +99,7 @@ sap.ui.define([
                     this.byId("T_id_Download").setVisible(isCertificateVisible);
                     var isEmpOnBoardVisible = sStatus === "Training Completed";
                     this.byId("T_id_EmpOnBoard").setVisible(isEmpOnBoardVisible);
+                    this.byId("T_id_Cermail").setVisible(isEmpOnBoardVisible);
                     var isOtherButtonsVisible = sStatus !== "Training Completed";
                     this.byId("T_id_OnboardBtn").setVisible(isOtherButtonsVisible);
                     this.byId("T_id_RejectBtn").setVisible(isOtherButtonsVisible);
@@ -211,7 +212,7 @@ sap.ui.define([
                 // Open the dialog
                 this.TC_commonOpenDialog("TC_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate", "TCF_id_EndDate");
             },
-
+    
             TCF_onPressCloseDialog: function () {
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValueState("None");
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValue("");
@@ -247,6 +248,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
+         
             T_onBoardTrainee: function () {
                 var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                 var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();

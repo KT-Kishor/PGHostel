@@ -265,6 +265,8 @@ sap.ui.define([
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
                 this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
+                this._validateSendButton();
+
             },
             TD_onPressback: function () {
                 this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonBack");
