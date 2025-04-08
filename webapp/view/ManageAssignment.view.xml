@@ -6,25 +6,23 @@
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
  >
-	<Page  >
+	<Page>
 		<headerContent>
 			        <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 		</headerContent>
 		<content>
 				<fb:FilterBar  class="sapUiTinyMargin" id="MA_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Assignment ID" label="{i18n>assignmentId}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Assignment ID" label="{i18n>assignmentid}" groupName="Group1" visibleInFilterBar="true" >
 					<fb:control>
-						<ComboBox selectionChange="" showClearIcon="true" items="" >
-							<core:Item key="" text=""/>
+						<ComboBox showClearIcon="true" items="{TaskModel>/}"  showSecondaryValues="true" >
+							<core:ListItem key="{TaskModel>TaskID}" text="{TaskModel>TaskID}" additionalText="{TaskModel>TaskName}"/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Start Date" label="{i18n>startDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox   items="" showClearIcon="true" id="MA_id_StartDate">
-								<core:Item key="" text=""/>
-							</ComboBox>
+							 <DateRangeSelection id="MA_id_StartDate" valueFormat="yyyy-MM-dd"  displayFormat="dd/MM/yyyy"  />	
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="End Date" label="{i18n>endDate}" groupName="Group1" visibleInFilterBar="true">
@@ -35,7 +33,7 @@
 	
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"  items="" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="MA_id_TaskTable"  items="{TaskModel>/}" growing="true"  growingThreshold="50" mode="SingleSelectLeft" alternateRowColors="true">
 			 <headerToolbar>
                 <OverflowToolbar >
                     <Title text="{i18n>tileAssignmentFooter}"/>
@@ -43,7 +41,7 @@
                     <ToolbarSpacer/>
 
 					<Button  tooltip="{i18n>assignEmp}" press="MA_onEmpTask"  icon="sap-icon://activity-assigned-to-goal" id="MA_id_AssignB" visible="false"/>
-						<Button  icon="sap-icon://edit"  press="MA_onEditTask" tooltip="{i18n>editTaskTitle}" id="MA_id_EditTaskB" visible="false" />
+						<Button  icon="sap-icon://edit"  press="MA_onEditTask" tooltip="{i18n>editTaskTitle}" id="MA_id_EditTaskB" text="{i18n>edit}" visible="true" />
 						<Button  icon="sap-icon://create-entry-time"  type="Accept" press="MA_onCreateTask"  text="{i18n>createTask}"/>
 				
                    </OverflowToolbar>
@@ -67,13 +65,16 @@
 					
 				</columns>
 				<items>
-					<ColumnListItem>
+					<ColumnListItem
+					 press="MA_onItemPress"
+                        type="Navigation"
+					 >
 						<cells>
-							<Text text="{}"/>
-							<Text text="{}"/>
-							<Text text="{}"/>
-							<Text text="{}"/>
-							<Text text="{}"/>
+							<Text text="{TaskModel>TaskName}"/>
+							<Text text="{TaskModel>TaskType}"/>
+							<Text text="{TaskModel>TaskTypeDescription}"/>
+							<Text text="{TaskModel>StartDate}"/>
+							<Text text="{TaskModel>EndDate}"/>
 							</cells>
 					</ColumnListItem>
 				</items>

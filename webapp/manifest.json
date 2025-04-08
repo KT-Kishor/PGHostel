@@ -38,7 +38,8 @@
             "minUI5Version": "1.133.0",
             "libs": {
                 "sap.m": {},
-                "sap.ui.core": {}
+                "sap.ui.core": {},
+                "sap.ui.richtexteditor": {}
             }
         },
         "contentDensities": {
@@ -125,6 +126,11 @@
             "Salutation": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Salutation.json",
+                "preload": true
+            },
+            "TaskType": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/TaskType.json",
                 "preload": true
             },
             "Months": {

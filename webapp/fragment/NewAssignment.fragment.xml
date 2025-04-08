@@ -2,35 +2,25 @@
     xmlns="sap.m"
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core">
-    <Dialog class="sapUiSmallMarginBegin" id="idTaskDialog">
+    <Dialog class="sapUiSmallMarginBegin" id="idTaskDialog" >
         <f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12"
             adjustLabelSpan="false" emptySpanXL="4" emptySpanL="4" emptySpanM="4" emptySpanS="0" columnsXL="1"
             columnsL="1" columnsM="1" singleContainerFullSize="false">
             <f:content>
-                <Label text="{i18n>employeeID}"  visible="{visiblePlay>/empId}" required="true"/>
-                <MultiComboBox 
-    selectedKeys="{newTaskModel>/EmployeeIDs}" 
-    showSecondaryValues="true"
-     width="100%"  
-    id="NAF_id_EmpId"
-    visible="{visiblePlay>/empId}"
-    change="AT_ValidateCommonFields"
-    items="{idModel>/results}">
-    <core:ListItem key="{idModel>ID}" text="{idModel>ID}" additionalText="{idModel>EmployeeName}"/>
-</MultiComboBox>
                 <Label text="{i18n>taskName}" required="true"/>
-                <Input value="{newTaskModel>/TaskName}" id="NA_id_TaskName" liveChange="AT_ValidateCommonFields" maxLength="100" valueStateText="{i18n>taskNameValueState}"/>
+                <Input value="{EditTaskModel>/TaskName}" id="FNA_id_TaskName" liveChange="AT_ValidateCommonFields" maxLength="99" valueStateText="{i18n>taskNameValueState}"/>
+
                 <Label text="{i18n>taskType}" required="true"/>
-                <Select id="idTasktype" items="{TaskJsonModel>/results}" selectedKey="{newTaskModel>/TaskType}" visible="{visiblePlay>/showTaskType}" change="AT_onChangeTaskType"  >
-                    <core:Item key="{TaskJsonModel>Value}" text="{TaskJsonModel>Value}"/>
+                <Select id="FNA_id_Tasktype" items="{TaskType>/Task}" selectedKey="{EditTaskModel>/TaskType}" visible="{visiblePlay>/showTaskType}" change="AT_onChangeTaskType" >
+                    <core:Item key="{TaskType>Task}" text="{TaskType>Task}"/>
                 </Select>
-                <Label text="{i18n>description}" required="true" id="NAF_id_Ldesc"/>
-                <Input value="{newTaskModel>/TaskTypeDescription}" id="NAF_id_Description" liveChange="AT_ValidateCommonFields"  visible="{visiblePlay>/showTaskDescription}" maxLength="50" valueStateText="{i18n>taskDescription}"/>
+                <Label text="{i18n>description}" required="true" id="FNA_id_Ldesc"/>
+                <Input value="{EditTaskModel>/TaskTypeDescription}" id="NAF_id_Description" liveChange="AT_ValidateCommonFields"  visible="{visiblePlay>/showTaskDescription}" maxLength="50" valueStateText="{i18n>taskDescription}"/>
                 <Label text="{i18n>startDate}" required="true"/>
                 <DatePicker minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"
                     change="AT_validateDate"
-                    value="{newTaskModel>/StartDate}"
+                    value="{EditTaskModel>/StartDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     id="NAF_id_StartDate"
@@ -40,26 +30,25 @@
                     minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"
                     change="AT_validateDate"
-                    value="{newTaskModel>/EndDate}"
+                    value="{EditTaskModel>/EndDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     id="NAF_id_EndDate"
                     valueStateText="{i18n>dateValueState}"/>
-                <Label text="{i18n>hours}" required="true" visible="{visiblePlay>/showHoursWorked}" />
+                <Label text="{i18n>hours}" required="true" visible="false" />
                 <TimePicker 
     value="{newTaskModel>/HoursWorked}" 
     id="NAF_id_HoursWorked" 
     displayFormat="HH" 
     valueFormat="HH" 
-    visible="{visiblePlay>/showHoursWorked}"
+    visible="false"
     change="AT_ValidateCommonFields"
      valueStateText="{i18n>hoursLimit}"/>
             </f:content>
             <HBox justifyContent="End">
-                <!-- <Button text="{i18n>save}" type="Emphasized" press="onEditSaveTask" class="submit" visible="{visiblePlay>/save}"></Button> -->
-                <Button text="{i18n>submit}" type="Accept" press="NAF_onSubmitTask" class="submit" visible="{visiblePlay>/submit}"></Button>
-                <!-- <Button id="idEmployeeAssignButton" type="Emphasized" text="{i18n>assignButton}" press="onPressEmployeeAssign" visible="{visiblePlay>/showEmployeeAssignButton}" class="submit"/> -->
-                <Button text="{i18n>close}" press="NAF_onTaskClose" class="sendMail" type="Reject"></Button>
+                <Button text="{i18n>save}" type="Emphasized" press="MA_onPressSave" class="submit" visible="{visiblePlay>/save}"/>
+                <Button text="{i18n>submit}" type="Accept" press="NAF_onSubmitTask" class="submit" visible="{visiblePlay>/submit}"/>
+                <Button text="{i18n>close}" press="NAF_onTaskClose" class="sendMail" type="Reject"/>
             </HBox>
         </f:SimpleForm>
     </Dialog>
