@@ -18,6 +18,8 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._fetchCommonData("Designation", "DesignationModel");
                 this._fetchCommonData("Department", "Departmentmodel");
+                this._fetchCommonData("CompanyEmails", "CCMailModel", {
+                    applicationName: "Trainee"});
                 ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
                 ["T_id_Download", "T_id_EmpOnBoard","T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
@@ -293,6 +295,84 @@ sap.ui.define([
                         }
                     }
                 });
+            },
+            T_OpenDialog: function (fragmentName) {
+                if (!this.oDialog) {
+                    sap.ui.core.Fragment.load({
+                        name: fragmentName,
+                        controller: this
+                    }).then(dialog => {
+                        this.oDialog = dialog;
+                        this.getView().addDependent(this.oDialog);
+                        this.oDialog.open();
+                    }).bind(this);
+                } else {
+                    this.oDialog.open();
+                }
+            },
+            T_onCerMail: function () {
+                var oUploaderDataModel = new JSONModel({
+                    isEmailValid: true,
+                    toEmailID: this.getView().getModel("traineeModel").getData()[0].TraineeEmail,  // Ensure correct property access
+                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
+                    name: "",
+                    mimeType: "",
+                    content: "",
+                    isFileUploaded: false,
+                    button: false
+                });
+                this.getView().setModel(oUploaderDataModel, "UploaderData");
+                this.T_OpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
+                this.validateSendButton();
+
+            },
+            Mail_onPressClose: function () {
+                this.oDialog.destroy();
+                this.oDialog = null;
+                this.oDialog.close();
+            },
+
+            Mail_onUpload: function (oEvent) {
+                this.handleFileUpload(
+                    oEvent,
+                    this,                      // context
+                    "UploaderData",            // model name
+                    "/attachments",            // path to attachment array
+                    "/name",                   // path to comma-separated file names
+                    "/isFileUploaded",         // boolean flag path
+                    "uploadSuccessfull",       // i18n success key
+                    "fileAlreadyUploaded",     // i18n duplicate key
+                    "noFileSelected",          // i18n no file selected
+                    "fileReadError",           // i18n file read error
+                    () => this.validateSendButton()               
+                 );
+            },    
+            validateSendButton: function () {
+                const sendBtn = sap.ui.getCore().byId("SendMail_Button");
+                const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
+                const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
+                sendBtn.setEnabled(isEmailValid && isFileUploaded);
+            },            
+            Mail_onEmailChange: function () {
+                this.validateSendButton(); // Reuse from BaseController
+            },
+            Mail_onSendEmail: function () {
+                var oModel = this.getView().getModel("traineeModel").getData();
+                var oPayload = {
+                    "TraineeName": oModel.TraineeName,
+                    "toEmailID": oModel.TraineeEmail,
+                    "CC":this.getView().getModel("CCMailModel").getData()[0].emails,
+                    "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
+                }; 
+                this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload).then((oData) => {
+                    MessageToast.show(this.i18nModel.getText("certificateSuccess"));
+                    sap.ui.core.BusyIndicator.hide();
+
+                }).catch((oError) => {
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    sap.ui.core.BusyIndicator.hide();
+                });
+                this.oDialog.close();
             },
         });
     });
