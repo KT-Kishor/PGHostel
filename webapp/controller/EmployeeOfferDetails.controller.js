@@ -25,7 +25,6 @@ sap.ui.define([
                 this._fetchCommonData("CompanyEmails", "CCMailModel", {
                     applicationName: "EmployeeOffer"
                 });
-
                 var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",
@@ -225,7 +224,6 @@ sap.ui.define([
                     }
                     this.ajaxCreateWithJQuery("EmployeeOffer", oModel).then((oData) => {
                         if (oData.success) {
-
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
                                 type: sap.m.DialogType.Message,
@@ -252,14 +250,12 @@ sap.ui.define([
                                     oDialog.destroy();
                                 }
                             });
-
                             oDialog.open();
                         }
                     }).catch((oError) => {
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         sap.ui.core.BusyIndicator.hide();
                     });
-
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
@@ -289,7 +285,6 @@ sap.ui.define([
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);
             },
-
             EOD_commonOpenDialog: function (FragmentName) {
                 if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
@@ -316,8 +311,7 @@ sap.ui.define([
                     button: false
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
-                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
-            
+                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");        
         },
             Mail_onPressClose: function () {
                 this.oDialog.destroy();
@@ -372,9 +366,9 @@ sap.ui.define([
             _validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                 const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
-                sendBtn.setEnabled(isEmailValid);
+                const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
+                sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
-
             Mail_onEmailChange: function (oEvent) {
                 this._validateSendButton();
             },
@@ -387,13 +381,13 @@ sap.ui.define([
                 };
                 this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload).then((oData) => {
                     sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show(this.i18nModel.getText("emailSuccess"));
 
                 }).catch((oError) => {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     sap.ui.core.BusyIndicator.hide();
                 });
                 this.oDialog.close();
-                this.oDialog.destroy();
             },
             EOD_onPressBackBtn: function () {
                 this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonBack");

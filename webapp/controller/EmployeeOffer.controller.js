@@ -17,20 +17,19 @@ sap.ui.define([
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
-                if(this.oValue==="EmployeeOffer"){
-                 this.readCallForEmployeeOffer("Initial");
-                 this.EO_onPressClear();
+                if (this.oValue === "EmployeeOffer") {
+                    this.readCallForEmployeeOffer("Initial");
+                    this.EO_onPressClear();
                 }
-                else{
-                 this.EO_onSearch(); 
+                else {
+                    this.EO_onSearch();
                 }
-               
-             },
+            },
             readCallForEmployeeOffer: function (filter) {
                 this.ajaxReadWithJQuery("EmployeeOffer", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModel");
-                    if(filter === "Initial"){
+                    if (filter === "Initial") {
                         offerData = [...new Map(offerData.filter(item => item.ConsultantName && item.ConsultantName.trim() !== "").map(item => [item.ConsultantName.trim(), item])).values()];
                         this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModelInitial");
                     }
@@ -55,8 +54,9 @@ sap.ui.define([
                     oParValue = oEvent.getSource().getBindingContext("EmployeeOfferModel").getModel().getData()[oEvent.getSource().getBindingContextPath().split("/")[1]].ID
                     value = "UpdateOffer";
                 }
-                this.getRouter().navTo("RouteEmployeeOfferDetails", { sParOffer: oParValue ,
-                    sParEmployee : value
+                this.getRouter().navTo("RouteEmployeeOfferDetails", {
+                    sParOffer: oParValue,
+                    sParEmployee: value
                 });
             },
             EO_onOnboardPress: function () {
@@ -73,16 +73,16 @@ sap.ui.define([
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" })
                 var params = {};
                 aFilterItems.forEach(function (oItem) {
-                  var oControl = oItem.getControl(); // Get the associated control
-                  var sValue = oItem.getName();
-                  if (oControl && oControl.getValue()) {
-                    if (sValue === "JoiningDate") {
-                        params["startDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
-                        params["endDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1])); 
-                    }else{
-                        params[sValue] = oControl.getValue();
+                    var oControl = oItem.getControl(); // Get the associated control
+                    var sValue = oItem.getName();
+                    if (oControl && oControl.getValue()) {
+                        if (sValue === "JoiningDate") {
+                            params["startDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
+                            params["endDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
+                        } else {
+                            params[sValue] = oControl.getValue();
+                        }
                     }
-                }
                 });
                 this.readCallForEmployeeOffer(params);
             },
@@ -90,34 +90,32 @@ sap.ui.define([
             onRejectEmployee: function () {
                 this.updateCallForEmployeeOffer("Rejected");
             },
-            EO_onPressClear:function(){
+            EO_onPressClear: function () {
                 var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
                 aFilterItems.forEach(function (oItem) {
-                  var oControl = oItem.getControl(); // Get the associated control
-                  if (oControl) {
-                    if (oControl.setValue) {
-                      oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
+                    var oControl = oItem.getControl(); // Get the associated control
+                    if (oControl) {
+                        if (oControl.setValue) {
+                            oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
+                        }
+                        if (oControl.setSelectedKey) {
+                            oControl.setSelectedKey(""); // Reset selection for dropdowns
+                        }
+                        if (oControl.setSelected) {
+                            oControl.setSelected(false); // Reset selection for Checkboxes
+                        }
                     }
-                    if (oControl.setSelectedKey) {
-                      oControl.setSelectedKey(""); // Reset selection for dropdowns
-                    }
-                    if (oControl.setSelected) {
-                      oControl.setSelected(false); // Reset selection for Checkboxes
-                    }
-                  }
                 });
             },
             onHandleEmployeeAction: function (status, actionMethod) {
                 var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
-                this.oSelectedRow = oSelectedData;    
-
+                this.oSelectedRow = oSelectedData;
                 var sName = oSelectedData.Salutation + " " + oSelectedData.ConsultantName;
                 var that = this;
                 // Confirm message
                 var sMessage = (status === "OnBoarded")
                     ? that.i18nModel.getText("confirmOnboard", [sName])
                     : that.i18nModel.getText("confirmReject", [sName]);
-            
                 var oDialog = new sap.m.Dialog({
                     title: (status === "OnBoarded")
                         ? that.i18nModel.getText("confirmTitleOnboard")
@@ -136,6 +134,7 @@ sap.ui.define([
                                     Role: " ",
                                     DateOfBirth: "",
                                     CompanyEmailID: "",
+                                    EmployeeEmail: oSelectedData.EmployeeEmail,
                                     PermanentAddress: oSelectedData.ConsultantAddress,
                                     CorrespondenceAddress: oSelectedData.ConsultantAddress,
                                     BaseLocation: oSelectedData.BaseLocation,
@@ -149,24 +148,21 @@ sap.ui.define([
                                     EmployeeStatus: "Active",
                                     JoiningDate: oSelectedData.JoiningDate,
                                     CTC: oSelectedData.CTC,
-                                    JoiningBonus: oSelectedData.JoiningBonus ,
+                                    JoiningBonus: oSelectedData.JoiningBonus,
                                     BasicSalary: oSelectedData.BasicSalary,
                                     HRA: oSelectedData.HRA,
                                     StatutoryBonus: oSelectedData.StatutoryBonus,
                                     TotalMontly: oSelectedData.TotalMontly,
                                     TotalmothlyAnnualized: oSelectedData.TotalmothlyAnnualized,
                                     TDS: oSelectedData.TDS,
-                                    MedicalInsurance: oSelectedData.MedicalInsurance ,
-                                    Gratuity: oSelectedData.Gratuity ,
-                                    TotalRetires: oSelectedData.TotalRetires ,
-                                    PerformanceBonus: oSelectedData.PerformanceBonus ,
-                                    EngagementPB: oSelectedData.EngagementPB ,
-                                    TotalVariablePay: oSelectedData.TotalVariablePay ,
-                                    CostofCompany: oSelectedData.CostofCompany ,
-                                    Total: oSelectedData.Total ,
-                                    HikePercentage: oSelectedData.HikePercentage ,
-                                    AppraisalDate: oSelectedData.AppraisalDate ,
-                                    EffectiveDate: oSelectedData.EffectiveDate ,
+                                    MedicalInsurance: oSelectedData.MedicalInsurance,
+                                    Gratuity: oSelectedData.Gratuity,
+                                    TotalRetires: oSelectedData.TotalRetires,
+                                    PerformanceBonus: oSelectedData.PerformanceBonus,
+                                    EngagementPB: oSelectedData.EngagementPB,
+                                    TotalVariablePay: oSelectedData.TotalVariablePay,
+                                    CostofCompany: oSelectedData.CostofCompany,
+                                    Total: oSelectedData.Total,
                                     PF: oSelectedData.PF,
                                     EPF: oSelectedData.EPF,
                                     TotalDeduction: oSelectedData.TotalDeduction
@@ -192,21 +188,21 @@ sap.ui.define([
                 });
                 oDialog.open();
             },
-            _commonFragmentOpenOffer:function(name, fragmentName) {
+            _commonFragmentOpenOffer: function (name, fragmentName) {
                 if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
-                      name: "sap.kt.com.minihrsolution.fragment.OnboardEmployee",
-                      controller: this
+                        name: "sap.kt.com.minihrsolution.fragment.OnboardEmployee",
+                        controller: this
                     }).then(dialog => {
-                      this.oDialog = dialog;
-                      this.getView().addDependent(this.oDialog);
-                      this.oDialog.open();
+                        this.oDialog = dialog;
+                        this.getView().addDependent(this.oDialog);
+                        this.oDialog.open();
                     })
-                  } else {
+                } else {
                     this.oDialog.open();
-                  }
+                }
             },
-            OEF_onPressClose:function(){
+            OEF_onPressClose: function () {
                 const fields = ["OEF_id_CompanyMail", "OEF_id_DateofBirth", "OEF_id_Mobile"];
                 fields.forEach(field => {
                     sap.ui.getCore().byId(field).setValueState("None");
@@ -225,7 +221,6 @@ sap.ui.define([
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
                 if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID")) {
-                    
                     var oPayload = {
                         tableName: "EmployeeDetails",
                         data: oModel
@@ -234,7 +229,9 @@ sap.ui.define([
                         .then((oData) => {
                             sap.ui.core.BusyIndicator.hide();
                             if (oData.success) {
-                                MessageToast.show(this.i18nModel.getText("onboardingSuccessful"));
+                                MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
+                                this.oDialog.close();
+                                this.readCallForEmployeeOffer("");
                             } else {
                                 MessageToast.show(this.i18nModel.getText("mandatoryFields"));
                             }
@@ -243,11 +240,9 @@ sap.ui.define([
                             sap.ui.core.BusyIndicator.hide();
                             MessageToast.show(this.i18nModel.getText("onboardingFailed"));
                         });
-                } else {
-                    MessageToast.show(this.i18nModel.getText("validationFailed"));
                 }
             },
-            updateCallForEmployeeOffer: function(oStatus) {
+            updateCallForEmployeeOffer: function (oStatus) {
                 this.oSelectedRow.Status = oStatus;
                 var oModelOffer = {
                     "data": this.oSelectedRow,
@@ -259,8 +254,8 @@ sap.ui.define([
                 this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer).then((oData) => {
                     if (oData.success) {
                         sap.ui.core.BusyIndicator.hide();
-                        var sSuccessMessage = (oStatus === "OnBoarded") 
-                            ? this.i18nModel.getText("onBoardSuccess") 
+                        var sSuccessMessage = (oStatus === "OnBoarded")
+                            ? this.i18nModel.getText("onBoardSuccess")
                             : this.i18nModel.getText("offerEmpReject");
                         MessageToast.show(sSuccessMessage);
                         this.oDialog.close();

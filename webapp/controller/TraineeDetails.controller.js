@@ -339,8 +339,10 @@ sap.ui.define([
             _validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                 const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
-                sendBtn.setEnabled(isEmailValid);
+                const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
+                sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
+            
 
             Mail_onEmailChange: function (oEvent) {
                 this._validateSendButton();
@@ -350,7 +352,9 @@ sap.ui.define([
                 var oPayload = {
                     "TraineeName": oModel.TraineeName,
                     "toEmailID": oModel.TraineeEmail,
-                    "JoiningDate": oModel.JoiningDate,
+                    "JoiningDate": Formatter.formatDate(oModel.JoiningDate),
+                    // "CC": this.getView().getModel("UploaderData").getProperty("/CCEmail"),
+                    "CC":this.getView().getModel("CCMailModel").getData()[0].emails,
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                 };
              
@@ -363,7 +367,6 @@ sap.ui.define([
                     sap.ui.core.BusyIndicator.hide();
                 });
                 this.oDialog.close();
-                this.oDialog.destroy();
             },
             async offerGeneratingPdfFunction(oModel) {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
