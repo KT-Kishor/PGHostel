@@ -6,10 +6,10 @@ sap.ui.define([
 	"sap/m/MessageToast",
 	"../model/formatter",
 	"sap/m/MessageBox"
-], function (Controller, BusyIndicator, JSONModel, utils, MessageToast,Formatter,MessageBox) {
+], function (Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, MessageBox) {
 	"use strict";
 	return Controller.extend("sap.kt.com.minihrsolution.controller.ExpenseDetails", {
-		Formatter:Formatter,
+		Formatter: Formatter,
 		onInit: function () {
 			this.getRouter().getRoute("RouteExpensDetails").attachMatched(this._onRouteMatched, this);
 			this._fetchCommonData("Currency", "CurrencyModel");
@@ -17,14 +17,14 @@ sap.ui.define([
 
 		_onRouteMatched: async function (oEvent) {
 			this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-			this.ExpenseID = oEvent.getParameter("arguments").sPath;			
-			this._fetchCommonData("Expense", "FilteredExpenseModel",{ExpenseID:this.ExpenseID});
+			this.ExpenseID = oEvent.getParameter("arguments").sPath;
+			this._fetchCommonData("Expense", "FilteredExpenseModel", { ExpenseID: this.ExpenseID });
 
 			var viewModel = new JSONModel({ isEditMode: false, status: true, editable: false, enable: true, enableDelete: true });
 			this.getView().setModel(viewModel, "viewModel");
 			this.LoginModel = this.getView().getModel("LoginModel");
 
-			await this._fetchCommonData("ItemExpense", "ItemExpenseModel", { EmployeeID: this.LoginModel.getProperty("/EmployeeID"), ExpenseID:this.ExpenseID});
+			await this._fetchCommonData("ItemExpense", "ItemExpenseModel", { EmployeeID: this.LoginModel.getProperty("/EmployeeID"), ExpenseID: this.ExpenseID });
 			this.IndexNoIncreent();
 
 			this.ViewModel = this.getView().getModel("viewModel");
@@ -205,7 +205,7 @@ sap.ui.define([
 						const oCreateResponse = await this.ajaxCreateWithJQuery("ItemExpense", oData);
 						if (oCreateResponse) {
 							MessageToast.show(this.i18nModel.getText("offerSuccess"));
-							await this._fetchCommonData("ItemExpense", "ItemExpenseModel", { EmployeeID: this.LoginModel.getProperty("/EmployeeID"),ExpenseID:this.ExpenseID });
+							await this._fetchCommonData("ItemExpense", "ItemExpenseModel", { EmployeeID: this.LoginModel.getProperty("/EmployeeID"), ExpenseID: this.ExpenseID });
 							this.IndexNoIncreent();
 							this.ExpenseItem.close();
 							BusyIndicator.hide();
@@ -247,7 +247,7 @@ sap.ui.define([
 					};
 					this.ajaxUpdateWithJQuery("ItemExpense", oData).then((oData) => {
 						if (oData) {
-							this._fetchCommonData("ItemExpense", "ItemExpenseModel", { EmployeeID: this.LoginModel.getProperty("/EmployeeID"),ExpenseID:this.ExpenseID });
+							this._fetchCommonData("ItemExpense", "ItemExpenseModel", { EmployeeID: this.LoginModel.getProperty("/EmployeeID"), ExpenseID: this.ExpenseID });
 							this.ExpenseItem.close();
 							BusyIndicator.hide();
 							MessageToast.show("Update")
@@ -266,17 +266,17 @@ sap.ui.define([
 
 		onPressExpenseItemDelete: function (oEvent) {
 			var ExpID = this.SelectedData.ItemID;
-			this.ajaxDeleteWithJQuery("/ItemExpense", { filters: { ItemID : ExpID } }).then(() => {
+			this.ajaxDeleteWithJQuery("/ItemExpense", { filters: { ItemID: ExpID } }).then(() => {
 				MessageToast.show(this.i18nModel.getText("msgCustomerDeleteSuccess"));
-				this._fetchCommonData("ItemExpense", "ItemExpenseModel", { EmployeeID: this.LoginModel.getProperty("/EmployeeID"),ExpenseID:this.ExpenseID });
+				this._fetchCommonData("ItemExpense", "ItemExpenseModel", { EmployeeID: this.LoginModel.getProperty("/EmployeeID"), ExpenseID: this.ExpenseID });
 			}).catch((error) => {
 				MessageToast.show(error.responseText);
 			});
 		},
 
-		ExpenseTotalCalculation: async function(){
-			await this._fetchCommonData("ExpenseTotalCalculation", "", {ExpenseID:this.ExpenseID});
-			await this._fetchCommonData("Expense", "FilteredExpenseModel",{ExpenseID:this.ExpenseID});
+		ExpenseTotalCalculation: async function () {
+			await this._fetchCommonData("ExpenseTotalCalculation", "", { ExpenseID: this.ExpenseID });
+			await this._fetchCommonData("Expense", "FilteredExpenseModel", { ExpenseID: this.ExpenseID });
 		},
 
 		onPressSubmitExpenseItems: function () {
@@ -284,81 +284,79 @@ sap.ui.define([
 			var oModelData = that.getView().getModel("FilteredExpenseModel").getData()[0];
 			// Check if Total Amount is valid
 			if (oModelData.TotalAmount <= 0) {
-			  MessageBox.error(that.i18nModel.getText("expenseTotalAmountMess"));
-			  return;
+				MessageBox.error(that.i18nModel.getText("expenseTotalAmountMess"));
+				return;
 			}
 			var itemExpenses = that.getView().getModel("ItemExpenseModel").getData();
-	
+
 			// Validate Travel Allowance and Per Diem Declaration
 			if (oModelData.TravelAllowance === 'Yes') {
-			  var hasPerDiemDeclaration = itemExpenses.some(function (item) {
-				return item.ItemType === "Peridiem Declaration";
-			  });
-	
-			  if (!hasPerDiemDeclaration) {
-				MessageBox.error(that.i18nModel.getText("expensePerdiemDeclarationValidation"));
-				return;
-			  }
+				var hasPerDiemDeclaration = itemExpenses.some(function (item) {
+					return item.ItemType === "Peridiem Declaration";
+				});
+
+				if (!hasPerDiemDeclaration) {
+					MessageBox.error(that.i18nModel.getText("expensePerdiemDeclarationValidation"));
+					return;
+				}
 			}
 			// Checkbox for confirmation
 			var checkbox = new sap.m.CheckBox({
-			  text: that.i18nModel.getText("expenseSubmittedMess"),
-			  selected: false
+				text: that.i18nModel.getText("expenseSubmittedMess"),
+				selected: false
 			});
 			// Dialog for submission confirmation
 			var dialog = new sap.m.Dialog({
-			  title: that.i18nModel.getText("confirmTitle"),
-			  type: sap.m.DialogType.Message,
-			  content: [checkbox],
-			  beginButton: new sap.m.Button({
-				text: "OK",
-				type: "Emphasized",
-				press: function () {
-				  if (checkbox.getSelected()) {
-					var inboxData = {"data":{
-						"ID": oModelData.ExpenseID,
-						"EmpID": oModelData.EmployeeID,
-						"EmpName": oModelData.EmployeeName,
-						"Type": "Expense",
-						"SubType": oModelData.TripType,
-						"StartDate": oModelData.ExpStartDate,
-						"EndDate": oModelData.ExpEndDate,
-						"SubmittedDate": that.Formatter.formatDate(new Date()),
-						"EmpComment": oModelData.Comments,
-						"Status": oModelData.Status === "Send back by account" ? "Send to account" : "Submitted",                     
-						"ManagerName": "",
-						"ManagerEmailID": "",
-						"ManagerComment": oModelData.ManagerRemark,
-						"AccountRemark": oModelData.AccountingRemark
-					  },
-					  "filters": {
-						"ExpenseID": oModel.getData()[0].ExpenseID
-					}}
-					this.ajaxUpdateWithJQuery("Expense", inboxData).then((oData) => {
-						if (oData) {
-							dialog.close();							
-							MessageToast.show("Update")
+				title: that.i18nModel.getText("confirmTitle"),
+				type: sap.m.DialogType.Message,
+				content: [checkbox],
+				beginButton: new sap.m.Button({
+					text: "OK",
+					type: "Emphasized",
+					press: function () {
+						if (checkbox.getSelected()) {
+							var inboxData = {
+								"data": {
+									"ExpenseID": oModelData.ExpenseID,
+									"EmployeeID": oModelData.EmployeeID,
+									"EmployeeName": oModelData.EmployeeName,
+									"Type": "Expense",
+									"TripType": oModelData.TripType,
+									"ExpStartDate": oModelData.ExpStartDate,
+									"ExpEndDate": oModelData.ExpEndDate,
+									"SubmittedDate": that.Formatter.formatDate(new Date()),
+									"Comments": oModelData.Comments,
+									"Status": oModelData.Status === "Send back by account" ? "Send to account" : "Submitted",
+									"ManagerRemark": oModelData.ManagerRemark,
+									"AccountingRemark": oModelData.AccountingRemark,
+									"FolderID": `https://workplace.zoho.in/#workdrive_app/home/63sop752ea6e63ddd4a8880466f5ae509b85a/privatespace/sharedwithme/allusers/${oModelData.FolderID}`
+								},
+								"filters": {"ExpenseID": oModelData.ExpenseID}}
+							that.ajaxUpdateWithJQuery("Expense", inboxData).then((oData) => {
+								if (oData) {
+									dialog.close();
+									MessageToast.show("Update")
+								}
+							}).catch((oError) => {
+								sap.ui.core.BusyIndicator.hide();
+								MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+							})
+						} else {
+							MessageToast.show(that.i18nModel.getText("checkboxUnselectedMessage"));
 						}
-					}).catch((oError) => {
-						sap.ui.core.BusyIndicator.hide();
-						MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-					})
-				  } else {
-					MessageToast.show(that.i18nModel.getText("checkboxUnselectedMessage"));
-				  }
+					}
+				}),
+				endButton: new sap.m.Button({
+					text: "Cancel",
+					press: function () {
+						dialog.close();
+					}
+				}),
+				afterClose: function () {
+					dialog.destroy();
 				}
-			  }),
-			  endButton: new sap.m.Button({
-				text: "Cancel",
-				press: function () {
-				  dialog.close();
-				}
-			  }),
-			  afterClose: function () {
-				dialog.destroy();
-			  }
 			});
 			dialog.open();
-		  },
+		},
 	});
 });
