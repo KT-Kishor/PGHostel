@@ -49,6 +49,7 @@
 				<Label text="{i18n>dateOfBirth}" required="true" />
 				<DatePicker 
                  id="OEF_id_DateofBirth"
+				 value="{oEmpolyeeDetailsModel>/DateOfBirth}"
                  change="validateDate"
 	             displayFormat="dd/MM/yyyy"
 				 valueFormat="dd/MM/yyyy" />
@@ -64,7 +65,7 @@
 				id="OEF_id_Manager"
 				items="{EmployeeModel>/}"
 				filterSecondaryValues="true">
-					<core:ListItem key="{EmployeeModel>EmployeeID}" text="{EmployeeModel>employeeName}" additionalText="{EmployeeModel>EmployeeID}"/>
+					<core:ListItem key="{EmployeeModel>EmployeeID}" text="{EmployeeModel>EmployeeName}" additionalText="{EmployeeModel>EmployeeID}"/>
 				</ComboBox>
 			</f:content>
 		</f:SimpleForm>

@@ -145,7 +145,7 @@ sap.ui.define([
                         "data": oModel
                     };
                     this.ajaxCreateWithJQuery("Trainee", oPayload).then((oData) => {
-                        sap.ui.core.BusyIndicator.hide();
+                        BusyIndicator.hide();
                         if (oData.success) {
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
@@ -177,7 +177,7 @@ sap.ui.define([
                         }
                     }).catch((oError) => {
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                        sap.ui.core.BusyIndicator.hide();
+                        BusyIndicator.hide();
                     });
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -230,11 +230,11 @@ sap.ui.define([
                         oViewModel.setProperty("/isEditMode", true);
                         oViewModel.setProperty("/isVisiable", true);
                         oViewModel.setProperty("editBut", true);
-                        sap.ui.core.BusyIndicator.hide();
+                        BusyIndicator.hide();
                         MessageToast.show(this.i18nModel.getText("traineeDataUpdated"));
                     }
                 }).catch((oError) => {
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 });
             },
@@ -281,39 +281,28 @@ sap.ui.define([
             onDialogClose: function () {
                 this.oDialog.destroy();
                 this.oDialog = null;
-            },
-        
+            },        
             Mail_onPressClose: function () {
                 this.oDialog.destroy();
                 this.oDialog = null;
                 this.oDialog.close();
             },
-
             Mail_onUpload: function (oEvent) {
                 this.handleFileUpload(
                     oEvent,
-                    this,                      // context
-                    "UploaderData",            // model name
-                    "/attachments",            // path to attachment array
-                    "/name",                   // path to comma-separated file names
-                    "/isFileUploaded",         // boolean flag path
-                    "uploadSuccessfull",       // i18n success key
-                    "fileAlreadyUploaded",     // i18n duplicate key
-                    "noFileSelected",          // i18n no file selected
-                    "fileReadError",           // i18n file read error
+                    this,                     
+                    "UploaderData", "/attachments", "/name","/isFileUploaded",  "uploadSuccessfull",  "fileAlreadyUploaded",  "noFileSelected", "fileReadError", 
                     () => this.validateSendButton()               
                  );
             },
-            
             validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                 const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
                 const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
                 sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
-            
             Mail_onEmailChange: function () {
-                this.validateSendButton(); // Reuse from BaseController
+                this.validateSendButton(); 
             },
             Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
@@ -321,25 +310,25 @@ sap.ui.define([
                     "TraineeName": oModel.TraineeName,
                     "toEmailID": oModel.TraineeEmail,
                     "JoiningDate": Formatter.formatDate(oModel.JoiningDate),
-                    // "CC": this.getView().getModel("UploaderData").getProperty("/CCEmail"),
-                    "CC":this.getView().getModel("CCMailModel").getData()[0].emails,
+                    "CC": this.getView().getModel("CCMailModel").getData()[0].emails,
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                 };
-             
                 this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload).then((oData) => {
+                    this.getView().getModel("oTraineeDetails").setProperty("/Status", "Offer Sent");
+                    this.updateCallForTrainee(this.getView().getModel("viewModel"));
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
-                    sap.ui.core.BusyIndicator.hide();
-
+                    BusyIndicator.hide();
                 }).catch((oError) => {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                 });
                 this.oDialog.close();
             },
-
             TD_onPressMerge: function () {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
+                this.getView().getModel("oTraineeDetails").setProperty("/Status", "PDF Generated");
+                this.updateCallForTrainee(this.getView().getModel("viewModel"));
             },
             async offerGeneratingPdfFunction(oModel) {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
@@ -357,7 +346,7 @@ sap.ui.define([
                     this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "TraineeOffer" });
                     await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
 
-                    sap.ui.core.BusyIndicator.show(0);
+                    BusyIndicator.show(0);
                     var oPDFModel = this.getView().getModel("PDFData");
                     oPDFModel.setProperty("/Type", "TraineeOffer");
                     oPDFModel.setProperty("/EmpName", oEmpModel.NameSalutation + " " + oEmpModel.TraineeName);
@@ -398,7 +387,7 @@ sap.ui.define([
                     }
 
                 } catch (error) {
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                     console.error("Error waiting for models:", error);
                 }
             }

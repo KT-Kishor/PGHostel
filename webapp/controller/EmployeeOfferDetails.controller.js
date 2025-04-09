@@ -55,13 +55,14 @@ sap.ui.define([
                     "CostofCompany": "",
                     "Total": "",
                     "Status": "",
-                    "Currency": "",
+                    "Currency": "INR",
                     "EmployeeEmail": "",
                     "Year": "",
                     "PinCode": "",
+                     "Department":""
                 }
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
-                var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false });
+                var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false,});
                 this.getView().setModel(oViewModel, "viewModel");
                 this.byId("EOD_id_Joindate").setMinDate(new Date());
                 ["EOD_id_Name", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_PinCode"].forEach(function (ids) {
@@ -82,7 +83,9 @@ sap.ui.define([
                 }
                 this.getView().byId("EOD_id_PageCrate").setVisible(createPage);
                 this.getView().byId("EODF_id_PageUpdate").setVisible(updatePage);
-                this.getView().byId("EOD_id_Submit").setEnabled(false)
+                this.getView().byId("EOD_id_Submit").setEnabled(false);
+                this._makeDatePickersReadOnly(["EOD_id_Reldate", "EOD_id_Joindate", "EOUF_id_Reldate", "EOUF_id_Joindate"]);
+
             },
             EOUF_onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");
@@ -116,13 +119,13 @@ sap.ui.define([
                         oViewModel.setProperty("/editable", false);
                         oViewModel.setProperty("/isEditMode", true);
                         oViewModel.setProperty("/isCTCVisible", false);
-                        sap.ui.core.BusyIndicator.hide();
+                        BusyIndicatorr.hide();
                         MessageToast.show(that.i18nModel.getText("offerUpdateSucc"));
                         //this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
 
                     }
                 }).catch((oError) => {
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicatorr.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 })
             },
@@ -137,7 +140,7 @@ sap.ui.define([
                     if (index === 1) this.getView().getModel("viewModel").setProperty("/pfVisiblity", true);
                     else this.getView().getModel("viewModel").setProperty("/pfVisiblity", false);
                     this.getView().setModel(new JSONModel(offerData[0]), "employeeModel");
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicatorr.hide();
                     var oViewModel = this.getView().getModel("viewModel");
                     if (offerData[0].Status === "OnBoarded") {
                         oViewModel.setProperty("/isVisiable", false);
@@ -150,7 +153,7 @@ sap.ui.define([
                         oViewModel.setProperty("editBut", true);
                     }
                 }).catch((oError) => {
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicatorr.hide();
                     MessageBox.error(this.i18nModel.getText("commonErrorMessage"))
                 })
             },
@@ -255,7 +258,7 @@ sap.ui.define([
                         }
                     }).catch((oError) => {
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                        sap.ui.core.BusyIndicator.hide();
+                        BusyIndicatorr.hide();
                     });
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -357,12 +360,14 @@ sap.ui.define([
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                 };
                 this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload).then((oData) => {
-                    sap.ui.core.BusyIndicator.hide();
-                    MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                    this.getView().getModel("employeeModel").setProperty("/Status", "Offer Sent");
+                    this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"));
+                    MessageToast.show(this.i18nModel.getText("emailSuccess"));    
+                    BusyIndicatorr.hide();
 
                 }).catch((oError) => {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicatorr.hide();
                 });
                 this.oDialog.close();
             },
@@ -384,6 +389,8 @@ sap.ui.define([
             EOUF_onPressMerge: function () {
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);
+                this.getView().getModel("employeeModel").setProperty("/Status", "PDF Generated");
+                this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"));
             },
             async offerGeneratingPdfFunction(oModel) {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
@@ -401,7 +408,7 @@ sap.ui.define([
                     this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
                     await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
 
-                    sap.ui.core.BusyIndicator.show(0);
+                    BusyIndicatorr.show(0);
                     var oPDFModel = this.getView().getModel("PDFData");
                     oPDFModel.setProperty("/Type", "EmployeeOffer");
                     oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
@@ -465,7 +472,7 @@ sap.ui.define([
                     }
 
                 } catch (error) {
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicatorr.hide();
                     console.error("Error waiting for models:", error);
                 }
             },

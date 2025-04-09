@@ -26,15 +26,13 @@
 			columnsM="2"
 			singleContainerFullSize="false">
 										<f:content>
-											<Label text="{i18n>consultantName}" required="true" />
+											<Label text="{i18n>salutation}" required="true" />
 											<Select
                                              selectedKey="{employeeModel>/Salutation}"
                                              items="{Salutation>/salutation}">
 												<core:Item key="{Salutation>text}" text="{Salutation>text}" />
-												<layoutData>
-													<l:GridData span="XL2 L2 M2 S3" />
-												</layoutData>
 											</Select>
+											<Label text="{i18n>consultantName}" required="true" />
 											<Input
                                              value="{employeeModel>/ConsultantName}"
                                              placeholder="{i18n>consultantName}"

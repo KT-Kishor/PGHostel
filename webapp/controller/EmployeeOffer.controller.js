@@ -24,6 +24,7 @@ sap.ui.define([
                 else {
                     this.EO_onSearch();
                 }
+                this.byId("OEF_id_DateofBirth").setMaxDate(new Date());
             },
             readCallForEmployeeOffer: function (filter) {
                 this.ajaxReadWithJQuery("EmployeeOffer", filter).then((oData) => {
@@ -131,6 +132,7 @@ sap.ui.define([
                                     ID: oSelectedData.ID,
                                     Salutation: oSelectedData.Salutation,
                                     EmployeeName: oSelectedData.ConsultantName,
+                                    JoiningDate: oSelectedData.JoiningDate,
                                     Role: " ",
                                     DateOfBirth: "",
                                     CompanyEmailID: "",
@@ -142,7 +144,7 @@ sap.ui.define([
                                     Designation: oSelectedData.Designation,
                                     BranchCode: oSelectedData.BranchCode,
                                     MobileNo: "",
-                                    Manager: "",
+                                    ManagerID: "",
                                     ManagerName: "",
                                     BloodGroup: "",
                                     EmployeeStatus: "Active",
@@ -152,7 +154,7 @@ sap.ui.define([
                                     BasicSalary: oSelectedData.BasicSalary,
                                     HRA: oSelectedData.HRA,
                                     StatutoryBonus: oSelectedData.StatutoryBonus,
-                                    TotalMontly: oSelectedData.TotalMontly,
+                                    TotalMonthly: oSelectedData.TotalMonthly,
                                     TotalmothlyAnnualized: oSelectedData.TotalmothlyAnnualized,
                                     TDS: oSelectedData.TDS,
                                     MedicalInsurance: oSelectedData.MedicalInsurance,
@@ -165,7 +167,9 @@ sap.ui.define([
                                     Total: oSelectedData.Total,
                                     PF: oSelectedData.PF,
                                     EPF: oSelectedData.EPF,
-                                    TotalDeduction: oSelectedData.TotalDeduction
+                                    TotalDeduction: oSelectedData.TotalDeduction,
+                                    EmploymentBond: oSelectedData.EmploymentBond
+
                                 });
                                 that.getView().setModel(oEmployeeDetailsModel, "oEmpolyeeDetailsModel");
                                 that._commonFragmentOpenOffer(that, "OnboardEmployee");
@@ -196,6 +200,7 @@ sap.ui.define([
                     }).then(dialog => {
                         this.oDialog = dialog;
                         this.getView().addDependent(this.oDialog);
+                        sap.ui.getCore().byId("OEF_id_DateofBirth").setMaxDate(new Date());
                         this.oDialog.open();
                     })
                 } else {

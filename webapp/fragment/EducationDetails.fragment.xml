@@ -1,7 +1,7 @@
 <c:FragmentDefinition
 	xmlns="sap.m"
 	xmlns:c="sap.ui.core">
-	<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"  items=""   growing="true"  growingThreshold="50"  alternateRowColors="true">
+	<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"  items="{path:'sEducationModel>/'}"   growing="true"  growingThreshold="50"  alternateRowColors="true">
 		<headerToolbar>
 			<OverflowToolbar >
 				<Title text="{i18n>educationalDetails}"/>
@@ -33,11 +33,11 @@
 		<items>
 			<ColumnListItem >
 				<cells>
-					<Text text="{CollegeName}"/>
-					<Text text="{Degree}"/>
-					<Text text="{Grade}"/>
-					<Text text="{EducationStartDate}"/>
-					<Text text="{EducationEndDate}"/>
+					<Text text="{sEducationModel>CollegeName}"/>
+					<Text text="{sEducationModel>Degree}"/>
+					<Text text="{sEducationModel>Grade}"/>
+					<Text text="{sEducationModel>EducationStartDate}"/>
+					<Text text="{sEducationModel>EducationEndDate}"/>
 				</cells>
 			</ColumnListItem>
 		</items>

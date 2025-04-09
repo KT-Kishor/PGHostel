@@ -13,7 +13,6 @@ sap.ui.define([
             Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
-
             },
             _onRouteMatched: function (oEvent) {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -42,7 +41,6 @@ sap.ui.define([
                         offerData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "")
                             .map(item => [item.TraineeName.trim(), item])).values()];
                         this.getView().setModel(new JSONModel(offerData), "traineeModelInitial");
-
                         let reportingManagerData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "")
                             .map(item => [item.ReportingManager.trim(), item])).values()];
                         this.getView().setModel(new JSONModel(reportingManagerData), "traineeModelInitial");
@@ -90,7 +88,6 @@ sap.ui.define([
                     this[dialogProperty].open();
                 }
             },
-
             T_onTableSelectionChange: function (oEvent) {
                 var oSelectedItem = oEvent.getParameter("listItem");
                 if (oSelectedItem) {
@@ -173,7 +170,6 @@ sap.ui.define([
                 });
                 dialog.open();
             },
-
             _handleReject: function (oContext) {
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
                 this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
@@ -215,7 +211,6 @@ sap.ui.define([
                 // Open the dialog
                 this.TC_commonOpenDialog("TC_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate", "TCF_id_EndDate");
             },
-    
             TCF_onPressCloseDialog: function () {
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                 this.getView().getModel("PDFData").setProperty("/editorText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
@@ -225,7 +220,6 @@ sap.ui.define([
             },
             onPressHandlePreview: function() {
                 const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
-            
                 if (bPreviewFlag) {
                     this.TCF_onPressDownload();
                 } else {
@@ -378,19 +372,10 @@ sap.ui.define([
                 this.oDialog = null;
                 this.oDialog.close();
             },
-
             Mail_onUpload: function (oEvent) {
                 this.handleFileUpload(
-                    oEvent,
-                    this,                      // context
-                    "UploaderData",            // model name
-                    "/attachments",            // path to attachment array
-                    "/name",                   // path to comma-separated file names
-                    "/isFileUploaded",         // boolean flag path
-                    "uploadSuccessfull",       // i18n success key
-                    "fileAlreadyUploaded",     // i18n duplicate key
-                    "noFileSelected",          // i18n no file selected
-                    "fileReadError",           // i18n file read error
+                    oEvent, this, 
+                    "UploaderData","/attachments",  "/name",  "/isFileUploaded",   "uploadSuccessfull",  "fileAlreadyUploaded",    "noFileSelected",   "fileReadError", 
                     () => this.validateSendButton()               
                  );
             },    
@@ -401,7 +386,7 @@ sap.ui.define([
                 sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },            
             Mail_onEmailChange: function () {
-                this.validateSendButton(); // Reuse from BaseController
+                this.validateSendButton(); 
             },
             Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("traineeModel").getData();
@@ -414,7 +399,6 @@ sap.ui.define([
                 this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload).then((oData) => {
                     MessageToast.show(this.i18nModel.getText("certificateSuccess"));
                     sap.ui.core.BusyIndicator.hide();
-
                 }).catch((oError) => {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     sap.ui.core.BusyIndicator.hide();
