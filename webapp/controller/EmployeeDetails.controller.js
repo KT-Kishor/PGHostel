@@ -9,6 +9,7 @@ sap.ui.define([
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Employee Details");
+                this._fetchCommonData("EmployeeDetails", "sEmployeeDetails");
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
@@ -17,8 +18,6 @@ sap.ui.define([
                 this.getRouter().navTo("RouteLoginPage");
             },
             
-
-
 
         });
     });

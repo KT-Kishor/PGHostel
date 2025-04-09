@@ -28,7 +28,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="ED_id_EmpDetailsTable" class="sapUiTinyMargin" items=""  busyIndicatorDelay="0"  width="auto"
+			<Table id="ED_id_EmpDetailsTable" class="sapUiTinyMargin" items="{path:'sEmployeeDetails>/'}"  busyIndicatorDelay="0"  width="auto"
                    growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar >
@@ -64,14 +64,14 @@
 				<items>
 					<ColumnListItem type="Navigation" press="ED_onPressEmployeeRow">
 						<cells>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
+							<Text text="{sEmployeeDetails>EmployeeID}"/>
+							<Text text="{sEmployeeDetails>EmployeeName}"/>
+							<Text text="{sEmployeeDetails>Role}"/>
+							<Text text="{sEmployeeDetails>Designation}"/>
+							<Text text="{sEmployeeDetails>DateOfBirth}"/>
+							<Text text="{sEmployeeDetails>CompanyEmailID}"/>
+							<Text text="{sEmployeeDetails>ManagerName} {sEmployeeDetails>ManagerID}"/>
+							<Text text="{sEmployeeDetails>BaseLocation}"/>
 						</cells>
 					</ColumnListItem>
 				</items>

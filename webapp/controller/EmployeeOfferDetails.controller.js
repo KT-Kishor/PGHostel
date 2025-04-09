@@ -3,9 +3,10 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "../utils/CommonJsPDF",
-    "../model/formatter"
+    "../model/formatter",
+    "sap/ui/core/BusyIndicator"
 ],
-    function (BaseController, utils, JSONModel, MessageToast, MessageBox, jsPDF, Formatter) {
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, jsPDF, Formatter,) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOfferDetails", {
             Formatter: Formatter,
@@ -119,13 +120,13 @@ sap.ui.define([
                         oViewModel.setProperty("/editable", false);
                         oViewModel.setProperty("/isEditMode", true);
                         oViewModel.setProperty("/isCTCVisible", false);
-                        BusyIndicatorr.hide();
+                        BusyIndicator.hide();
                         MessageToast.show(that.i18nModel.getText("offerUpdateSucc"));
                         //this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
 
                     }
                 }).catch((oError) => {
-                    BusyIndicatorr.hide();
+                    BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 })
             },
@@ -140,7 +141,7 @@ sap.ui.define([
                     if (index === 1) this.getView().getModel("viewModel").setProperty("/pfVisiblity", true);
                     else this.getView().getModel("viewModel").setProperty("/pfVisiblity", false);
                     this.getView().setModel(new JSONModel(offerData[0]), "employeeModel");
-                    BusyIndicatorr.hide();
+                    BusyIndicator.hide();
                     var oViewModel = this.getView().getModel("viewModel");
                     if (offerData[0].Status === "OnBoarded") {
                         oViewModel.setProperty("/isVisiable", false);
@@ -153,7 +154,7 @@ sap.ui.define([
                         oViewModel.setProperty("editBut", true);
                     }
                 }).catch((oError) => {
-                    BusyIndicatorr.hide();
+                    BusyIndicator.hide();
                     MessageBox.error(this.i18nModel.getText("commonErrorMessage"))
                 })
             },
@@ -258,7 +259,7 @@ sap.ui.define([
                         }
                     }).catch((oError) => {
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                        BusyIndicatorr.hide();
+                        BusyIndicator.hide();
                     });
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -363,11 +364,11 @@ sap.ui.define([
                     this.getView().getModel("employeeModel").setProperty("/Status", "Offer Sent");
                     this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"));
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));    
-                    BusyIndicatorr.hide();
+                    BusyIndicator.hide();
 
                 }).catch((oError) => {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                    BusyIndicatorr.hide();
+                    BusyIndicator.hide();
                 });
                 this.oDialog.close();
             },
@@ -408,7 +409,7 @@ sap.ui.define([
                     this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
                     await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
 
-                    BusyIndicatorr.show(0);
+                    BusyIndicator.show(0);
                     var oPDFModel = this.getView().getModel("PDFData");
                     oPDFModel.setProperty("/Type", "EmployeeOffer");
                     oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
@@ -472,7 +473,7 @@ sap.ui.define([
                     }
 
                 } catch (error) {
-                    BusyIndicatorr.hide();
+                    BusyIndicator.hide();
                     console.error("Error waiting for models:", error);
                 }
             },

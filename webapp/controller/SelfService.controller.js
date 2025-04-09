@@ -7,7 +7,7 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteSelfService").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: function () {
+            _onRouteMatched: function () {                
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
                 this._fetchCommonData("Designation", "sDesignationModel");
                 this._fetchCommonData("BaseLocation", "sBaseLocationModel");
@@ -21,6 +21,33 @@ sap.ui.define([
                 this.getView().setModel(oViewModel, "viewModel");
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle()
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "My Details");
+                    var eduModel = new JSONModel({
+                      EmployeeID: this.EmployeeID,
+                      CollegeName: "",
+                      DegreeName: "",
+                      EducationStartDate: "",
+                      EducationEndDate: "",
+                      Grade: "",
+                      GradeType: "",
+                    });
+                    this.getView().setModel(eduModel, "educationModel");
+                    var empModel = new JSONModel({
+                      EmployeeID: this.EmployeeID,
+                      CompanyName: "",
+                      Designation: "",
+                      EmploymentStartDate: "",
+                      EmploymentEndDate: "",
+                      OfficeAddress: "",
+                      RCNameI: "",
+                      RCAddressI: "",
+                      RCMailI: "",
+                      RCMobileI: "",
+                      RCNameII: "",
+                      RCAddressII: "",
+                      RCMailII: "",
+                      RCMobileII: ""
+                    });
+                    this.getView().setModel(empModel, "employmentModel");
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
@@ -158,7 +185,7 @@ sap.ui.define([
             AddEd_onSubmitEdDetails: function () {
                 try {
                     if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && this._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID")) {
-                        var oModel = this.getView().getModel("oTraineeDetails").getData();
+                        var oModel = this.getView().getModel("educationModel").getData()[0];
                         var oPayload = {
                             tableName: "EducationalDetails",
                             data: oModel
