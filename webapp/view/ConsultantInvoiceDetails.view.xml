@@ -39,7 +39,7 @@
 											id="CI_id_Cont" 
 											showSecondaryValues="true" 
 											placeholder="Select Contract ID" 
-											change="onChangeContractDetails" 
+											change="CI_onChangeContractDetails" 
 											width="{= ${visiablityPlay>/copyBtn} || ${visiablityPlay>/pasteBtn} ? '300px' : '500px'}"
 											items="{contractModel>/contractDetails}">
 											<core:ListItem 
@@ -131,18 +131,18 @@
 										<m:TextArea value="{ConsultantInvoiceModel>/ConsultantAddress}" maxLength="120" id="CI_id_InputConsultantAddress" liveChange="CID_ValidateCommonFields" valueStateText="{i18n>validConsultantAddressMsg}" rows="3" editable="{visiablityPlay>/editable}"/>
 
 										<m:Label text="{i18n>gstNo}"/>
-										<m:Input value="{ConsultantInvoiceModel>/GSTNO}" id="CI_id_InputGSTNO"  liveChange="CID_ValidateGstNumber" maxLength="15" valueStateText="{i18n>gstNoValueState}"  change="onChangeGstNo" editable="{visiablityPlay>/editable}"/>
+										<m:Input value="{ConsultantInvoiceModel>/GSTNO}" id="CI_id_InputGSTNO"  liveChange="CID_ValidateGstNumber" maxLength="15" valueStateText="{i18n>gstNoValueState}"  change="CI_onChangeGstNo" editable="{visiablityPlay>/editable}"/>
 										
 										<m:Label text="{i18n>type}" required="{ConsultantInvoiceModel>/GSTValid}"/>
-										<m:CheckBox text="{i18n>cgst}" id="CI_id_CheckboxCGST" selected="{ConsultantInvoiceModel>/CGSTSelected}" select="onSelectCGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
-										<m:CheckBox text="{i18n>igst}" id="CI_id_CheckboxIGST" selected="{ConsultantInvoiceModel>/IGSTSelected}" select="onSelectIGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
+										<m:CheckBox text="{i18n>cgst}" id="CI_id_CheckboxCGST" selected="{ConsultantInvoiceModel>/CGSTSelected}" select="CI_onSelectCGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
+										<m:CheckBox text="{i18n>igst}" id="CI_id_CheckboxIGST" selected="{ConsultantInvoiceModel>/IGSTSelected}" select="CI_onSelectIGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
 
 										<m:Label text="{i18n>percentage}" required="{ConsultantInvoiceModel>/GSTValid}" />
-										<m:Input value="{ConsultantInvoiceModel>/Percentage}" liveChange="onPercentageChange"  editable="{ConsultantInvoiceModel>/GSTValid}" maxLength="10"/>
+										<m:Input value="{ConsultantInvoiceModel>/Percentage}" liveChange="CI_onPercentageChange"  editable="{ConsultantInvoiceModel>/GSTValid}" maxLength="10"/>
 
 										<m:Label text="{i18n>currency}" required="true"/>
 										<m:Select items="{currencyModel>/results}"
-												selectedKey="{ConsultantInvoiceModel>/Currency}" width="100%" editable="{visiablityPlay>/editable}" change="onCurrencyChange">
+												selectedKey="{ConsultantInvoiceModel>/Currency}" width="100%" editable="{visiablityPlay>/editable}" change="CI_onCurrencyChange">
 											<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
 										</m:Select>
 									</f:content>
@@ -197,13 +197,13 @@
             <m:Column width="300px">
                 <m:Text text="{i18n>item}" />
             </m:Column>
-            <m:Column>
+            <m:Column id="CI_id_ColumnGST">
                 <m:Text text="{i18n>SAC}" />
             </m:Column>
             <m:Column>
                 <m:Text text="{i18n>GSTCalculation}" />
             </m:Column>
-            <m:Column>
+            <m:Column id="CI_id_GSTCalc">
                 <m:Text text="{i18n>days}" />
             </m:Column>
             <m:Column>
@@ -231,19 +231,19 @@
                     </m:ComboBox>
                 </m:cells>
                 <m:cells>
-                    <m:ComboBox value="{GSTCalculation}" selectedKey="1" editable="{ConsultantInvoiceModel>/GSTValid}" change="onChangeGSTCalculation">
+                    <m:ComboBox value="{GSTCalculation}" selectedKey="1" editable="{ConsultantInvoiceModel>/GSTValid}" change="CI_onChangeGSTCalculation">
                         <core:Item key="{i18n>yes}" text="{i18n>yes}"/>
                         <core:Item key="{i18n>no}" text="{i18n>no}"/>
                     </m:ComboBox>
                 </m:cells>
                 <m:cells>
-                    <m:Input value="{Days}" editable="{visiablityPlay>/editable}" change="onInputChange"  maxLength="10" textAlign="End"/>
+                    <m:Input value="{Days}" editable="{visiablityPlay>/editable}" change="CI_onInputChange"  maxLength="10" textAlign="End"/>
                 </m:cells>
                 <m:cells>
-                    <m:Input value="{UnitPrice}" editable="{visiablityPlay>/editable}" change="onInputChange" maxLength="10" textAlign="End"/>
+                    <m:Input value="{UnitPrice}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End"/>
                 </m:cells>
                 <m:cells>
-                    <m:Input id="CI_id_DiscountInput" value="{Discount}" editable="{visiablityPlay>/editable}" liveChange="onchangeDiscount" maxLength="10" textAlign="End"/>
+                    <m:Input id="CI_id_DiscountInput" value="{Discount}" editable="{visiablityPlay>/editable}" liveChange="CI_onchangeDiscount" maxLength="10" textAlign="End"/>
                 </m:cells>
                 <m:cells>
                     <m:Input value="{path:'Total',formatter: '.Formatter.numberFormater'}" editable="false" textAlign="End"/>

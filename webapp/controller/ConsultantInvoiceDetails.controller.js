@@ -18,7 +18,7 @@ sap.ui.define(
 
         _onRouteMatched: function (oEvent) {
           this._makeDatePickersReadOnly(["CI_id_InDate", "CI_id_PaybyInv"]);
-          this.i18nModelMess = this.getView().getModel('i18n').getResourceBundle();
+          this.i18nModel = this.getView().getModel('i18n').getResourceBundle();
           var sPath = oEvent.getParameter("arguments").sPath;
           var oPath = oEvent.getParameter("arguments").oPath;
           this.decodedPath = decodeURIComponent(decodeURIComponent(sPath));

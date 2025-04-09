@@ -12,8 +12,8 @@
 		<Panel headerText="{i18n>titleInBox}" >
 			<OverflowToolbar>
 				<Label text="{i18n>type}" />
-				<ComboBox showSecondaryValues="true" items="{leaveTypeModel>/results}" id="AL_id_TypeOfLeave" selectedKey="{selectedModel>/selectedType}" change="AL_onChangeLeaveType" width="200px">
-					<core:Item key="{leaveTypeModel>ID}" text="{leaveTypeModel>Name}" />
+				<ComboBox showSecondaryValues="true" id="AL_id_TypeOfLeave" items="{leaveTypeModel>/}" selectedKey="{selectedModel>/selectedType}" change="AL_onChangeLeaveType" width="200px">
+				<core:Item key="{leaveTypeModel>name}" text="{leaveTypeModel>name}" />
 				</ComboBox>
 				<ToolbarSeparator />
 				<Label text="Year" id="AL_id_YearLabel" />
@@ -57,12 +57,12 @@
 							<com:content>								
 								<viz:VizFrame height="21rem" width="50rem" id="AL_id_VizFrame6" uiConfig="{applicationSet:'fiori'}" vizType="{MonthlyBar>/type}">
 									<viz:dataset>
-										<viz.data:FlattenedDataset data="{leaveData>/chartData}">
+										<viz.data:FlattenedDataset data="{firstLeaveData>/chartData}">
 											<viz.data:dimensions>
-												<viz.data:DimensionDefinition name="LeaveType" value="{leaveData>LeaveStatus}" />
+												<viz.data:DimensionDefinition name="LeaveType" value="{firstLeaveData>LeaveStatus}" />
 											</viz.data:dimensions>
 											<viz.data:measures>
-												<viz.data:MeasureDefinition name="No of Days" value="{leaveData>Count}" />
+												<viz.data:MeasureDefinition name="No of Days" value="{firstLeaveData>Count}" />
 											</viz.data:measures>
 										</viz.data:FlattenedDataset>
 									</viz:dataset>
@@ -104,12 +104,12 @@
 							<com:content>								
 								<viz:VizFrame height="21rem" width="50rem" id="AL_id_VizFrameAll" uiConfig="{applicationSet:'fiori'}" vizType="{MonthlyBar>/AllStatus}">
 									<viz:dataset>
-										<viz.data:FlattenedDataset data="{LeaveAllStatus>/chartData}">
+										<viz.data:FlattenedDataset data="{secondLeaveData>/chartData}">
 											<viz.data:dimensions>
-												<viz.data:DimensionDefinition name="LeaveType" value="{LeaveAllStatus>LeaveStatus}" />
+												<viz.data:DimensionDefinition name="LeaveType" value="{secondLeaveData>LeaveStatus}" />
 											</viz.data:dimensions>
 											<viz.data:measures>
-												<viz.data:MeasureDefinition name="No of Days" value="{LeaveAllStatus>Count}" />
+												<viz.data:MeasureDefinition name="No of Days" value="{secondLeaveData>Count}" />
 											</viz.data:measures>
 										</viz.data:FlattenedDataset>
 									</viz:dataset>
