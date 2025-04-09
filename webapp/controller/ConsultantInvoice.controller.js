@@ -14,7 +14,7 @@ sap.ui.define(
         },
 
         _onRouteMatched:function(oEvent){
-          this.getView().getModel("LoginModel").setProperty("/HeaderName", "Consultant Invoice Application"); 
+          this.getView().getModel("LoginModel").setProperty("/HeaderName",  this.getView().getModel("i18n").getResourceBundle().getText("consultantInvoice")); 
         },
 
         CI_onPressAddInvoice: function () {
@@ -23,11 +23,11 @@ sap.ui.define(
         },
 
         onPressback: function () {
-          this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+          this.getRouter().navTo("RouteTilePage");
         },
 
         onLogout: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+            this.getRouter().navTo("RouteLoginPage");
         },
       }
     );

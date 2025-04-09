@@ -1,13 +1,14 @@
 sap.ui.define(
-  [
-    "./BaseController", //call base controller
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
-    "../utils/validation",
-    "../model/formatter",
-  ],
-  function (
-    BaseController, JSONModel, MessageToast,utils,Formatter) {
+    [
+      "./BaseController", //call base controller
+      "sap/ui/model/json/JSONModel",
+      "sap/m/MessageToast",
+      "../utils/validation",
+      "../model/formatter",
+       "sap/m/MessageBox"
+    ],
+    function (
+      BaseController, JSONModel, MessageToast,utils,Formatter,MessageBox) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.AdminApplyLeave",
@@ -351,84 +352,102 @@ sap.ui.define(
           this.getRouter().navTo("RouteLoginPage");
         },
 
-        AL_onPressSubmit: function () {
-          try {
-              if (
-                  utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
-                  utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
-                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
-              ) {
-                var oData = this.getView().getModel("LeaveTempModel").getData();
-                oData.status = "Submitted";
-                oData.halfDay = oData.halfDay.toString();
-                oData.fromDate = new Date( sap.ui.getCore().byId("AL_id_FromDate").getDateValue().getTime() -  sap.ui.getCore().byId("AL_id_FromDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
-                oData.toDate = new Date( sap.ui.getCore().byId("AL_id_ToDate").getDateValue().getTime() -  sap.ui.getCore().byId("AL_id_ToDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
-                  delete oData.Save;
-                  delete oData.Submit;
-                  delete oData.MinToDate;
-                  delete oData.ManagerRemark;
-                  delete oData.maxDate;
-                  delete oData.minDate;
-                  delete oData.isUpdate;
-                  this.ajaxCreateWithJQuery("Leaves", { data: oData })
-                  .then((response) => {
-                  if (response.success === true) {
-                  MessageToast.show(this.i18nModel.getText("leaveSubmitted"));
-                  this.oDialog.close();
-                  this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
-                  } else {
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                  }
-                }).catch((error) => {
-                  MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-              });
-              } else {
-                  MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-              }
-          } catch (error) {
-              MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-          }
-      },
-
-      AL_onPressSave: function () {  
-        try {
-            if (
-                utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
-                utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
-            ) {
-                var oLeaveTempModel = this.getView().getModel("LeaveTempModel");
-                var oData = oLeaveTempModel.getData();
-                oData.halfDay = oData.halfDay.toString();
-                oData.status = "Submitted";
-                oData.fromDate = new Date( sap.ui.getCore().byId("AL_id_FromDate").getDateValue().getTime() -  sap.ui.getCore().byId("AL_id_FromDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0];
-                oData.toDate = new Date( sap.ui.getCore().byId("AL_id_ToDate").getDateValue().getTime() -  sap.ui.getCore().byId("AL_id_ToDate").getDateValue().getTimezoneOffset() * 60000).toISOString().split("T")[0]; 
-                delete oData.Save;
-                delete oData.Submit;
-                delete oData.MinToDate;
-                delete oData.managerRemark;
-                delete oData.maxDate;
-                delete oData.minDate;
-                delete oData.isUpdate;
-                var requestData = {filters: { ID: oData.ID }, data: oData};
-                this.ajaxUpdateWithJQuery("Leaves", requestData).then((response) => {
-                if (response.success === true) {
-                MessageToast.show(this.i18nModel.getText("leaveUpdatedSuccess"));
+        AL_handleLeaveAction: function (actionType) {
+            try {
+                if (
+                    utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
+                    utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
+                ) {
+                    var oLeaveTempModel = this.getView().getModel("LeaveTempModel");
+                    var oData = oLeaveTempModel.getData();
+                    oData.halfDay = oData.halfDay.toString();
+                    oData.status = "Submitted";
+                    
+                    var fromDateParts = oData.fromDate.split("/").map(Number);
+                    var startDate = new Date(fromDateParts[2], fromDateParts[1] - 1, fromDateParts[0]);
+                    var toDateParts = oData.toDate.split("/").map(Number);
+                    var endDate = new Date(toDateParts[2], toDateParts[1] - 1, toDateParts[0]);
+        
+                if (fromDateParts[2] !== toDateParts[2]) {
+                return MessageBox.error(this.i18nModelMess.getText("leaveSameYear"));
+                }
+        
+                if (oData.fromDate === oData.toDate) {
+                var isValid = true;
+                var holidays = this.getView().getModel("HolidayModel").getData(); 
+                holidays.forEach((holiday) => {
+                if (new Date(holiday.date).getTime() === startDate.getTime()) {
+                    isValid = false;
+                    }
+                });
+                if (!isValid) {
+                return MessageBox.error(this.i18nModel.getText("holidaysMess"));
+                }
+                }
+        
+                if (parseFloat(oData.NoofDays) <= 2) {
+                var isFromDateWeekend = (startDate.getDay() === 0 || startDate.getDay() === 6);
+                var isToDateWeekend = (endDate.getDay() === 0 || endDate.getDay() === 6);
+                if (isFromDateWeekend && isToDateWeekend) {
+                return MessageBox.error(this.i18nModel.getText("holidaysMess"));
+                }
+                }
+        
+                if (this.isLeaveAlreadyApplied(oData.fromDate, oData.toDate)) {
+                return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
+                 }
+        
+                    oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                    oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+        
+                    delete oData.Save;
+                    delete oData.Submit;
+                    delete oData.MinToDate;
+                    delete oData.ManagerRemark;
+                    delete oData.maxDate;
+                    delete oData.minDate;
+                    delete oData.isUpdate;
+        
+                    if (actionType === "Submit") {
+                        this.ajaxCreateWithJQuery("Leaves", { data: oData })
+                            .then(response => {
+                                this._handleResponse(response, "leaveSubmitted");
+                            })
+                            .catch(() => MessageToast.show(this.i18nModel.getText("commonErrorMessage")));
+                    } else if (actionType === "Save") {
+                        var requestData = { filters: { ID: oData.ID }, data: oData };
+                        this.ajaxUpdateWithJQuery("Leaves", requestData)
+                            .then(response => {
+                                this._handleResponse(response, "leaveUpdatedSuccess");
+                            })
+                            .catch(() => MessageToast.show(this.i18nModel.getText("commonErrorMessage")));
+                    }
+                } else {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                }
+            } catch (error) {
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+            }
+        },
+        
+        _handleResponse: function (response, successMessageKey) {
+            if (response.success === true) {
+                MessageToast.show(this.i18nModel.getText(successMessageKey));
                 this.oDialog.close();
                 this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
             } else {
-             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             }
-            }).catch((error) => {
-            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-         });
-        } else {
-        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-        }
-        } catch (error) {
-            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-        }
-      },  
+        },
+        
+        AL_onPressSubmit: function () {
+            this.AL_handleLeaveAction("Submit");
+        },
+        
+        AL_onPressSave: function () {
+            this.AL_handleLeaveAction("Save");
+        },
       
       onSelectionChange: function (oEvent) {
         var oSelectedItem = oEvent.getParameter("listItem");

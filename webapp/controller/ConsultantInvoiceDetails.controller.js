@@ -17,62 +17,27 @@ sap.ui.define(
         },
 
         _onRouteMatched: function (oEvent) {
+          this._makeDatePickersReadOnly(["CI_id_InDate", "CI_id_PaybyInv"]);
+          this.i18nModelMess = this.getView().getModel('i18n').getResourceBundle();
           var sPath = oEvent.getParameter("arguments").sPath;
           var oPath = oEvent.getParameter("arguments").oPath;
           this.decodedPath = decodeURIComponent(decodeURIComponent(sPath));
           this.decodedEmployeeID = decodeURIComponent(oPath);
+          this.Discount = true;
+          this.UnitAmount = true;
           var oInvoiceModel = new JSONModel({
-            EmployeeID: "",
-            ConsultantName: "",
-            InvoiceTo: "",
-            InvoiceAddress: "",
-            InvoiceNo: "",
-            InvoiceDate: "",
-            ConsultantAddress: "",
-            GSTNO: "",
-            CompanyGSTNO: "",
-            MobileNo: "",
-            CGST: false,
-            SGST: false,
-            IGST: false,
-            BankName: "",
-            AccountName: "",
-            AccountNo: "",
-            IFSCCode: "",
-            PayBy: "",
-            GSTValid: false,
-            CGSTSelected: false,
-            IGSTSelected: false,
-            Percentage: "",
-            Currency: "INR",
-            Attachment: "",
-            name: "",
-            mimeType: "",
-          });
-          this.getView().setModel(oInvoiceModel, "ConsultantInvoiceModel");
+            EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",
+            InvoiceNo: "", InvoiceDate: "", ConsultantAddress: "", GSTNO: "",
+            CompanyGSTNO: "", MobileNo: "", CGST: false, SGST: false, IGST: false,
+            BankName: "", AccountName: "", AccountNo: "", IFSCCode: "", PayBy: "",
+            GSTValid: false, CGSTSelected: false, IGSTSelected: false, Percentage: "", Currency: "INR", Attachment: "", name: "", mimeType: ""});
+            this.getView().setModel(oInvoiceModel, "ConsultantInvoiceModel");
 
           var oInvoiceItemModel = new JSONModel({
-            SlNo: "",
-            EmployeeID: "",
-            Item: "",
-            Days: "",
-            SAC: "",
-            UnitPrice: "",
-            Total: "",
-            SubTotal: "",
-            TotalSum: "",
-            Currency: "INR",
-          });
-          this.getView().setModel(oInvoiceItemModel, "oModelDataPro");
+            SlNo: "", EmployeeID: "", Item: "", Days: "", SAC: "", UnitPrice: "", Total: "", SubTotal: "", TotalSum: "",Currency: "INR"});
+            this.getView().setModel(oInvoiceItemModel, "oModelDataPro");
 
-          var visibilityPlay = new JSONModel({
-            createVisi: true,
-            editVisi: false,
-            editable: true,
-            invBtn: true,
-            pasteBtn: true,
-            merge: false,
-          });
+          var visibilityPlay = new JSONModel({createVisi: true, editVisi: false,editable: true,invBtn: true,pasteBtn: true, merge: false});
           this.getView().setModel(visibilityPlay, "visiablityPlay");
         },
 
@@ -121,12 +86,12 @@ sap.ui.define(
                   utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
                   utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID")) {
               } else {
-                  sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered value");
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
               }
           } catch (error) {
-              sap.m.MessageToast.show("Technical error, please contact the administrator");
+            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
-      },
+       },
       }
     );
   }
