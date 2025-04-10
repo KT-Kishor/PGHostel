@@ -27,10 +27,15 @@ sap.ui.define([
                     isRoleMode: false, Max: new Date(), isVisitMode: true, isIdMode: true,
                 });
                 this.getView().setModel(oViewModel, "viewModel");
-
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle()
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "My Details");
-                
+                var idsToDisable = ["EdF_id_EduEdit", "EdF_id_EduDelete", "EMF_id_EmpEdit", "EMF_id_EmpDelete"];
+                idsToDisable.forEach(function (id) {
+                    this.byId(id).setEnabled(false);
+                }.bind(this));
+
+            },
+            SS_commonEduFunction() {
                 var eduModel = new JSONModel({
                     EmployeeID: this.EmployeeID,
                     CollegeName: "",
@@ -41,7 +46,8 @@ sap.ui.define([
                     GradeType: "",
                 });
                 this.getView().setModel(eduModel, "educationModel");
-
+            },
+            SS_commonEmpFunction() {
                 var empModel = new JSONModel({
                     EmployeeID: this.EmployeeID,
                     CompanyName: "",
@@ -59,11 +65,6 @@ sap.ui.define([
                     RCMobileII: ""
                 });
                 this.getView().setModel(empModel, "employmentModel");
-                var idsToDisable = ["EdF_id_EduEdit", "EdF_id_EduDelete", "EMF_id_EmpEdit", "EMF_id_EmpDelete"];
-                idsToDisable.forEach(function (id) {
-                    this.byId(id).setEnabled(false);
-                }.bind(this));
-
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
@@ -92,8 +93,9 @@ sap.ui.define([
             //Education dialog open
             EdF_AddEdu: function () {
                 var oViewModel = this.getView().getModel("viewModel");
-                oViewModel.setProperty("/fragmentSubmit", true); 
-                oViewModel.setProperty("/fragmentSave", false); 
+                oViewModel.setProperty("/fragmentSubmit", true);
+                oViewModel.setProperty("/fragmentSave", false);
+                this.SS_commonEduFunction();
                 this.SS_commonOpenDialog("SEd_oDialog", "sap.kt.com.minihrsolution.fragment.AddEducation", ["AddEd_id_StartEdu", "AddEd_id_EndEdu"]);
             },
             //Date change validation function
@@ -219,12 +221,12 @@ sap.ui.define([
             },
             //Education detail create call
             saveEducationDetails: function (bIsCreate) {
-                try {            
+                try {
                     const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") &&
                         utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType");
-            
+
                     if (!isValid) {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
@@ -238,11 +240,11 @@ sap.ui.define([
                     oModel.EducationEndDate = sap.ui.getCore().byId("AddEd_id_EndEdu").getDateValue() || "";
                     oModel.EducationStartDate = this.Formatter.convertToISODateFormat(oModel.EducationStartDate);
                     oModel.EducationEndDate = this.Formatter.convertToISODateFormat(oModel.EducationEndDate);
-            
+
                     let oPayload;
                     let fnCall;
                     let sSuccessMessage;
-            
+
                     if (bIsCreate) {
                         oPayload = {
                             "tableName": "EducationalDetails",
@@ -259,14 +261,15 @@ sap.ui.define([
                         };
                         fnCall = this.ajaxUpdateWithJQuery("EducationalDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("eduDataupdate");
+                        this.setEnabledByIds(["AddEd_id_GradeType", "AddEd_id_Grade"], false);
                     }
-            
+
                     fnCall.then((oData) => {
                         if (oData.success) {
                             sap.ui.core.BusyIndicator.hide();
                             MessageToast.show(sSuccessMessage);
                             this.SEd_oDialog.close();
-                            this.getView().getModel("educationModel").setData({})
+                            this.SS_commonEduFunction()
                             this._fetchCommonData("EducationalDetails", "sEducationModel", {
                                 EmployeeID: this.EmployeeID
                             });
@@ -275,24 +278,22 @@ sap.ui.define([
                         }
                     }).catch((error) => {
                         sap.ui.core.BusyIndicator.hide();
-                        console.error("Error during save operation:", error);
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     });
-            
+
                 } catch (error) {
                     sap.ui.core.BusyIndicator.hide();
-                    console.error("Unexpected error in saveEducationDetails:", error);
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
             AddEd_onSubmitEdDetails: function () {
                 this.saveEducationDetails(true); // create mode
             },
-            
+
             AddEd_onUpdateEdDetails: function () {
                 this.saveEducationDetails(false); // update mode
             },
-                
+
             // Common function to enable/disable elements by their IDs
             setEnabledByIds: function (ids, isEnabled) {
                 var that = this;
@@ -316,7 +317,7 @@ sap.ui.define([
                     var oData = oSelectedItem.getBindingContext("sEducationModel").getObject();
                     this.getView().getModel("educationModel").setData(oData);
                     var oViewModel = this.getView().getModel("viewModel");
-                    oViewModel.setProperty("/fragmentSubmit", false); 
+                    oViewModel.setProperty("/fragmentSubmit", false);
                     oViewModel.setProperty("/fragmentSave", true);
                     this.SS_commonOpenDialog("SEd_oDialog", "sap.kt.com.minihrsolution.fragment.AddEducation", ["AddEd_id_StartEdu", "AddEd_id_EndEdu"]);
                 } else {
@@ -325,7 +326,6 @@ sap.ui.define([
 
             },
 
-            
             //Employment detail create call
             AddEmp_onSubmitEmp: function () {
                 try {
@@ -373,11 +373,9 @@ sap.ui.define([
                 }
             },
 
-
-
             SS_onDownloadTerminateLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
-                var date = Formatter.formatDate(new Date()); 
+                var date = Formatter.formatDate(new Date());
                 var empName = oEmpModel.Salutation + " " + oEmpModel.EmployeeName;
                 var empDesig = oEmpModel.Designation;
                 this.getView().getModel("PDFData").setProperty("/CreateDate", date);
@@ -397,7 +395,7 @@ sap.ui.define([
             SS_onDownloadExperienceLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var today = new Date();
-                var date = Formatter.formatDate(today); 
+                var date = Formatter.formatDate(today);
                 var twoMonthsLater = new Date(today.setMonth(today.getMonth() + 2));
                 var relievingDate = Formatter.formatDate(twoMonthsLater);
                 var joiningDate = Formatter.formatDate(oEmpModel.JoiningDate);
@@ -419,13 +417,13 @@ sap.ui.define([
 
             FCR_onDownloadPDF: function () {
                 this.SSRTE_oDialog.close();
-                let htmlContent = sap.ui.getCore().byId("FCR_id_RTE").getValue(); 
+                let htmlContent = sap.ui.getCore().byId("FCR_id_RTE").getValue();
                 this.generateCertificatePDF(htmlContent);
             },
 
             FCR_onCloseDialog: function () {
                 this.SSRTE_oDialog.close();
             }
-           
+
         });
     });
