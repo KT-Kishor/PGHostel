@@ -15,19 +15,62 @@ sap.ui.define(
             .getRoute("RouteAssignTask")
             .attachMatched(this._onRouteMatched, this);
         },
+        // _onRouteMatched: function (oEvent) {
+        //   const oArgs = oEvent.getParameter("arguments").taskData;
+        //   var oModel = this.getView().getModel("TaskModel").getData()[
+        //     parseInt(oArgs)
+        //   ];
+        //   var AssignModel = new JSONModel(oModel);
+        //   this.getView().setModel(AssignModel, "AssignModel");
+
+        //   // this._fetchCommonData("AssignedTask", "AssignModel", {
+        //   //   TaskID: oArgs,
+        //   // });
+
+        //   // if (oArgs && oArgs.taskData) {
+        //   //   try {
+        //   //     const taskData = JSON.parse(decodeURIComponent(oArgs.taskData));
+        //   //     const taskModel = new JSONModel(taskData);
+        //   //     this.getView().setModel(taskModel, "taskAssigned");
+
+        //   //     // Use TaskID instead
+        //   //     if (taskData.TaskID) {
+        //   //       this.CommonReadcall({ TaskID: taskData.TaskID });
+        //   //     } else {
+        //   //       MessageToast.show("TaskID missing.");
+        //   //     }
+        //   //   } catch (err) {
+        //   //     console.error("Parse error", err);
+        //   //   }
+        //   // }
+        //   this.readCallForAllLoginDetails();
+        // },
         _onRouteMatched: function (oEvent) {
-          this._fetchCommonData("AssignedTask", "AssignModel", {});
-          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          const oArgs = oEvent.getParameter("arguments");
-          this.readCallForAllLoginDetails("");
-          if (oArgs && oArgs.taskData) {
-            try {
-              const taskData = JSON.parse(decodeURIComponent(oArgs.taskData));
-              const taskModel = new JSONModel(taskData);
-              this.getView().setModel(taskModel, "taskAssigned");
-            } catch (err) {
-              console.error("Error parsing task data", err);
+          const sTaskID = oEvent.getParameter("arguments").taskID;
+
+          // Fetch task details for ObjectHeader
+          this._fetchTaskDetails(sTaskID);
+
+          // Fetch assigned tasks for table
+          this.CommonReadcall({ TaskID: sTaskID });
+        },
+
+        _fetchTaskDetails: async function (sTaskID) {
+          try {
+            const response = await this.ajaxReadWithJQuery("NewTask", {
+              TaskID: sTaskID,
+            });
+            if (response.success) {
+              const oTaskDetails = Array.isArray(response.data)
+                ? response.data[0]
+                : response.data;
+              this.getView().setModel(
+                new JSONModel(oTaskDetails),
+                "TaskDetailsModel"
+              );
             }
+          } catch (error) {
+            MessageToast.show("Error loading task details");
           }
         },
         readCallForAllLoginDetails: function (filter) {
@@ -183,19 +226,17 @@ sap.ui.define(
               "AssignedTask",
               params
             );
-            console.log("API Response:", response);
-            if (response.success === true) {
-              // Ensure data is an array
+            if (response.success) {
               const taskData = Array.isArray(response.data)
                 ? response.data
                 : [response.data];
-              const oModel = new JSONModel(taskData);
-              this.getView().setModel(oModel, "AssignModel");
+              this.getView().setModel(new JSONModel(taskData), "AssignModel");
             }
           } catch (error) {
-            MessageToast.show("Request failed");
+            MessageToast.show("Error loading assigned tasks");
           }
         },
+
         //Submit the task details
         FAT_onSubmitTask: async function () {
           const oData = this.getView().getModel("EditTaskModel").getData();
@@ -284,6 +325,18 @@ sap.ui.define(
             this._fetchCommonData("AssignedTask", "AssignModel", {});
           } else {
             MessageToast.show("Failed to update task.");
+          }
+        },
+        AT_onstartDatevalidateDate: function (oEvent) {
+          const oStartDate = oEvent.getSource().getDateValue(); // get selected start date
+          const oEndDatePicker = sap.ui.getCore().byId("FAT_id_EndDate");
+
+          if (oEndDatePicker) {
+            let oEndDate = oEndDatePicker.getDateValue();
+            oEndDatePicker.setMinDate(oStartDate);
+            if (oEndDate && oEndDate < oStartDate) {
+              oEndDatePicker.setDateValue(null);
+            }
           }
         },
       }

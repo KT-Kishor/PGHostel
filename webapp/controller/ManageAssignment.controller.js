@@ -21,9 +21,6 @@ sap.ui.define(
           this.getView()
             .getModel("LoginModel")
             .setProperty("/HeaderName", "Create New Assignment");
-          // if (!this.getView().getModel("TaskModel")) {
-          //   this.getView().setModel(new JSONModel([]), "TaskModel");
-          // }
         },
         onPressback: function () {
           this.getRouter().navTo("RouteTilePage");
@@ -110,6 +107,9 @@ sap.ui.define(
         AT_ValidateCommonFields: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
+        AT_validateDate: function (oEvent) {
+          utils._LCvalidateDate(oEvent);
+        },
 
         NAF_onSubmitTask: async function () {
           const oData = this.getView().getModel("EditTaskModel").getData();
@@ -122,7 +122,12 @@ sap.ui.define(
             utils._LCvalidateMandatoryField(
               sap.ui.getCore().byId("NAF_id_Description"),
               "ID"
-            )
+            ) &&
+            utils._LCvalidateDate(
+              sap.ui.getCore().byId("NAF_id_StartDate"),
+              "ID"
+            ) &&
+            utils._LCvalidateDate(sap.ui.getCore().byId("NAF_id_EndDate"), "ID")
           ) {
           } else {
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -204,16 +209,12 @@ sap.ui.define(
         },
 
         MA_onItemPress: function (oEvent) {
-          const oSelectedTask = oEvent
+          const oSelectedItem = oEvent
             .getSource()
             .getBindingContext("TaskModel")
             .getObject();
-          const oRouter = this.getRouter();
-
-          // Encode the task data as a URI component to pass as a route parameter
-          const taskDataStr = encodeURIComponent(JSON.stringify(oSelectedTask));
-          oRouter.navTo("RouteAssignTask", {
-            taskData: taskDataStr,
+          this.getRouter().navTo("RouteAssignTask", {
+            taskID: oSelectedItem.TaskID, // Pass actual TaskID
           });
         },
       }

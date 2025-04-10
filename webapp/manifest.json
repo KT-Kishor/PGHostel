@@ -402,7 +402,7 @@
                 },
                 {
                     "name": "RouteAssignTask",
-                    "pattern": "AssignTask/{taskData}",
+                    "pattern": "AssignTask/{taskID}",
                     "target": [
                         "TargetAssignTask"
                     ]

@@ -5,12 +5,33 @@
     xmlns:fb="sap.ui.comp.filterbar">  
 	<Page showNavButton="true" title="{i18n>tileAssignmentFooter}" navButtonPress="AT_onPressback">
 		<content>
-	<ObjectHeader responsive="true" backgroundDesign="Translucent" class="sapUiResponsivePadding--header"> 
-    <ObjectAttribute title="{i18n>taskName}" text="{taskAssigned>/TaskName}" class="taskNameColor"/> 
-    <ObjectAttribute title="{i18n>description}" text="{taskAssigned>/TaskTypeDescription}  -  {taskAssigned>/TaskType}" class="taskNameColor" /> 
-    <ObjectAttribute title="{i18n>startDate}" text="{taskAssigned>/StartDate}"  class="sapUiSmallMarginEnd taskNameColor" textDirection="LTR" /> 
-    <ObjectAttribute title="{i18n>endDate}" text="{taskAssigned>/EndDate}"   class="sapUiSmallMarginEnd taskNameColor" textDirection="LTR" /> 
-    </ObjectHeader>
+	<ObjectHeader responsive="true" 
+  backgroundDesign="Translucent" 
+  class="sapUiResponsivePadding--header"
+  binding="{TaskDetailsModel>/}"> <!-- Bind to task details model -->
+  
+  <ObjectAttribute 
+    title="{i18n>taskName}" 
+    text="{TaskDetailsModel>TaskName}" 
+    class="taskNameColor"/>
+    
+  <ObjectAttribute 
+    title="{i18n>description}" 
+    text="{TaskDetailsModel>TaskTypeDescription}  -  {TaskDetailsModel>TaskType}" 
+    class="taskNameColor" />
+    
+  <ObjectAttribute 
+    title="{i18n>startDate}" 
+    text="{path: 'TaskDetailsModel>StartDate', type: 'sap.ui.model.type.Date'}" 
+    class="sapUiSmallMarginEnd taskNameColor" 
+    textDirection="LTR" />
+    
+  <ObjectAttribute 
+    title="{i18n>endDate}" 
+    text="{path: 'TaskDetailsModel>EndDate', type: 'sap.ui.model.type.Date'}" 
+    class="sapUiSmallMarginEnd taskNameColor" 
+    textDirection="LTR" />
+</ObjectHeader>
 	
 				<fb:FilterBar  class="sapUiTinyMargin" id="AT_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="FAT_onPressClear" showClearOnFB="true" search="FAT_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad">
 				<fb:filterGroupItems>
