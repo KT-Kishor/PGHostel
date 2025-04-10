@@ -8,7 +8,19 @@ sap.ui.define([], function () {
             }
             return sDate;
         },
-
+        convertToISODateFormat: function (oDate) {
+            if (!oDate) return "";
+            if (typeof oDate === "string") {
+                oDate = new Date(oDate);
+            }
+            if (!(oDate instanceof Date) || isNaN(oDate)) return "";
+            const year = oDate.getFullYear();
+            const month = String(oDate.getMonth() + 1).padStart(2, "0");
+            const day = String(oDate.getDate()).padStart(2, "0");
+            return `${year}-${month}-${day}`;
+        },
+        
+        
         formatCurrency: function (value, code) {
             var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
                 currencyCode: false 

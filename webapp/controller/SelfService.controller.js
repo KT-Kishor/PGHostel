@@ -30,6 +30,7 @@ sap.ui.define([
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle()
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "My Details");
+                
                 var eduModel = new JSONModel({
                     EmployeeID: this.EmployeeID,
                     CollegeName: "",
@@ -40,6 +41,7 @@ sap.ui.define([
                     GradeType: "",
                 });
                 this.getView().setModel(eduModel, "educationModel");
+
                 var empModel = new JSONModel({
                     EmployeeID: this.EmployeeID,
                     CompanyName: "",
@@ -216,42 +218,81 @@ sap.ui.define([
                 }
             },
             //Education detail create call
-            AddEd_onSubmitEdDetails: function () {
-                try {
-                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType")) {
-                        var oModel = this.getView().getModel("educationModel").getData();
-                        oModel.EmployeeID = this.EmployeeID;
-                        oModel.EducationStartDate = this.Formatter.convertToISODateFormat(oModel.EducationStartDate)
-                        oModel.EducationEndDate = this.Formatter.convertToISODateFormat(oModel.EducationEndDate);
-                        oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey();
-                        oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey();
-                        oModel = {
+            saveEducationDetails: function (bIsCreate) {
+                try {            
+                    const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") &&
+                        utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") &&
+                        utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") &&
+                        utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType");
+            
+                    if (!isValid) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
+                    // Get and prepare model data
+                    let oModel = this.getView().getModel("educationModel").getData();
+                    oModel.EmployeeID = this.EmployeeID;
+                    oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey() || "";
+                    oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey() || "";
+                    oModel.EducationStartDate = sap.ui.getCore().byId("AddEd_id_StartEdu").getDateValue() || "";
+                    oModel.EducationEndDate = sap.ui.getCore().byId("AddEd_id_EndEdu").getDateValue() || "";
+                    oModel.EducationStartDate = this.Formatter.convertToISODateFormat(oModel.EducationStartDate);
+                    oModel.EducationEndDate = this.Formatter.convertToISODateFormat(oModel.EducationEndDate);
+            
+                    let oPayload;
+                    let fnCall;
+                    let sSuccessMessage;
+            
+                    if (bIsCreate) {
+                        oPayload = {
                             "tableName": "EducationalDetails",
                             "data": oModel
                         };
-                        this.ajaxCreateWithJQuery("EducationalDetails", oModel).then((oData) => {
-                            if (oData.success) {
-                                sap.ui.core.BusyIndicator.hide();
-                                MessageToast.show(this.i18nModel.getText("eduDataSaved"));
-                                this.SEd_oDialog.close();
-                                this._fetchCommonData("EducationalDetails", "sEducationModel", {
-                                    EmployeeID: this.EmployeeID
-                                });
-                            } else {
-                                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                            }
-                        }).catch((error) => {
-                            sap.ui.core.BusyIndicator.hide();
-                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                        });
+                        fnCall = this.ajaxCreateWithJQuery("EducationalDetails", oPayload);
+                        sSuccessMessage = this.i18nModel.getText("eduDataSaved");
                     } else {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        oPayload = {
+                            "data": oModel,
+                            "filters": {
+                                "ID": oModel.ID
+                            }
+                        };
+                        fnCall = this.ajaxUpdateWithJQuery("EducationalDetails", oPayload);
+                        sSuccessMessage = this.i18nModel.getText("eduDataupdate");
                     }
+            
+                    fnCall.then((oData) => {
+                        if (oData.success) {
+                            sap.ui.core.BusyIndicator.hide();
+                            MessageToast.show(sSuccessMessage);
+                            this.SEd_oDialog.close();
+                            this.getView().getModel("educationModel").setData({})
+                            this._fetchCommonData("EducationalDetails", "sEducationModel", {
+                                EmployeeID: this.EmployeeID
+                            });
+                        } else {
+                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                        }
+                    }).catch((error) => {
+                        sap.ui.core.BusyIndicator.hide();
+                        console.error("Error during save operation:", error);
+                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    });
+            
                 } catch (error) {
                     sap.ui.core.BusyIndicator.hide();
+                    console.error("Unexpected error in saveEducationDetails:", error);
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
+            AddEd_onSubmitEdDetails: function () {
+                this.saveEducationDetails(true); // create mode
+            },
+            
+            AddEd_onUpdateEdDetails: function () {
+                this.saveEducationDetails(false); // update mode
+            },
+                
             // Common function to enable/disable elements by their IDs
             setEnabledByIds: function (ids, isEnabled) {
                 var that = this;
@@ -283,43 +324,7 @@ sap.ui.define([
                 }
 
             },
-            AddEd_onUpdateEdDetails: function () {
-                try {
-                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") &&
-                        utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") &&
-                        utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") &&
-                        utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType")) {
-                        var oModel = this.getView().getModel("educationModel").getData();
-                        oModel.EmployeeID = this.EmployeeID;
-                        oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey();
-                        oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey();
-                        oModel = {
-                            "data": oModel,
-                            "filters": {
-                                "ID": oModel.ID
-                            }
-                        };
-                        this.ajaxUpdateWithJQuery("EducationalDetails", oModel).then((oData) => {
-                            if (oData.success) {
-                                MessageToast.show(this.i18nModel.getText("eduDataupdate"));
-                                this.SEd_oDialog.close();
-                                this._fetchCommonData("EducationalDetails", "sEducationModel", {
-                                    EmployeeID: this.EmployeeID
-                                });
-                            } else {
-                                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                            }
-                        }).catch((error) => {
-                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                        });
-            
-                    } else {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                    }
-                } catch (error) {
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                }
-            },
+
             
             //Employment detail create call
             AddEmp_onSubmitEmp: function () {
