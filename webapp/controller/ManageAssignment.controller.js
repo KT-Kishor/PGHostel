@@ -21,6 +21,9 @@ sap.ui.define(
           this.getView()
             .getModel("LoginModel")
             .setProperty("/HeaderName", "Create New Assignment");
+          // if (!this.getView().getModel("TaskModel")) {
+          //   this.getView().setModel(new JSONModel([]), "TaskModel");
+          // }
         },
         onPressback: function () {
           this.getRouter().navTo("RouteTilePage");
@@ -88,6 +91,17 @@ sap.ui.define(
             this.oTaskDialog.open();
           }
         },
+        MA_onPressClear: function () {
+          var oFilterBar = this.getView().byId("MA_id_FilterBar");
+          oFilterBar.getFilterGroupItems().forEach(function (oItem) {
+            var oControl = oItem.getControl();
+            if (oControl.setSelectedKey) {
+              oControl.setSelectedKey("");
+            } else if (oControl.setValue) {
+              oControl.setValue("");
+            }
+          });
+        },
         NAF_onTaskClose: function () {
           if (this.oTaskDialog) {
             this.oTaskDialog.close();
@@ -97,26 +111,6 @@ sap.ui.define(
           utils._LCvalidateMandatoryField(oEvent);
         },
 
-        // AT_validateDate:function(){
-        //   utils._LCvalidateDate(oEvent); // Base validation
-        //   this.validateStep(); // Step validation
-        //   var oOfferDateId = oEvent.getSource().getId().split("--")[2];
-        //   var releaseDate, joinDateVa;
-        //   if (oOfferDateId === "TD_id_ReleaseDate" || oOfferDateId === "TU_id_RelDate") {
-        //       joinDateVa = oOfferDateId === "TD_id_ReleaseDate" ? "TD_id_JoiningDate" : "TU_id_JoinDate";
-        //       releaseDate = oEvent.getSource().getDateValue();
-        //       if (releaseDate) {
-        //           var oJoinDatePicker = this.byId(joinDateVa);
-        //           var joinDate = oJoinDatePicker.getDateValue();
-        //           oJoinDatePicker.setMinDate(releaseDate);
-        //           if (joinDate && joinDate < releaseDate) {
-        //               oJoinDatePicker.setValue("");
-        //           } else {
-        //               oJoinDatePicker.setValueState("None");
-        //           }
-        //       }
-        //   }
-        // },
         NAF_onSubmitTask: async function () {
           const oData = this.getView().getModel("EditTaskModel").getData();
           // Simple validation
@@ -180,9 +174,47 @@ sap.ui.define(
             MessageToast.show("Failed to update task.");
           }
         },
+        MA_onSearch: function () {
+          var aFilterItems = this.byId("MA_id_FilterBar").getFilterGroupItems();
+          var params = {};
+          aFilterItems.forEach(function (oItem) {
+            var oControl = oItem.getControl();
+            var sValue = oItem.getName();
+            if (oControl && oControl.getValue()) {
+              params[sValue] = oControl.getValue();
+            }
+          });
+          this._fetchCommonData("NewTask", "TaskModel", params);
+          this.CommonReadcall(params);
+        },
+        CommonReadcall: async function (params) {
+          try {
+            const response = await this.ajaxReadWithJQuery("NewTask", params);
+            if (response.success === true) {
+              // Ensure data is an array
+              const taskData = Array.isArray(response.data)
+                ? response.data
+                : [response.data];
+              const oModel = new JSONModel(taskData);
+              this.getView().setModel(oModel, "TaskModel");
+            }
+          } catch (error) {
+            MessageToast.show("Request failed");
+          }
+        },
 
-        MA_onItemPress: function () {
-          this.getRouter().navTo("RouteAssignTask");
+        MA_onItemPress: function (oEvent) {
+          const oSelectedTask = oEvent
+            .getSource()
+            .getBindingContext("TaskModel")
+            .getObject();
+          const oRouter = this.getRouter();
+
+          // Encode the task data as a URI component to pass as a route parameter
+          const taskDataStr = encodeURIComponent(JSON.stringify(oSelectedTask));
+          oRouter.navTo("RouteAssignTask", {
+            taskData: taskDataStr,
+          });
         },
       }
     );

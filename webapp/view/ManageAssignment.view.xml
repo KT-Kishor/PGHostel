@@ -11,21 +11,21 @@
 			        <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 		</headerContent>
 		<content>
-				<fb:FilterBar  class="sapUiTinyMargin" id="MA_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+				<fb:FilterBar  class="sapUiTinyMargin" id="MA_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="MA_onPressClear" showClearOnFB="true" search="MA_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Assignment ID" label="{i18n>assignmentid}" groupName="Group1" visibleInFilterBar="true" >
+					<fb:FilterGroupItem name="TaskName" label="{i18n>assignmentid}" groupName="Group1" visibleInFilterBar="true" >
 					<fb:control>
 						<ComboBox showClearIcon="true" items="{TaskModel>/}"  showSecondaryValues="true" >
-							<core:ListItem key="{TaskModel>TaskID}" text="{TaskModel>TaskID}" additionalText="{TaskModel>TaskName}"/>
+							<core:ListItem key="{TaskModel>TaskID}" text="{TaskModel>TaskName}" additionalText="{TaskModel>TaskID}"/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-				<fb:FilterGroupItem name="Start Date" label="{i18n>startDate}" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="StartDate" label="{i18n>startDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
 							 <DateRangeSelection id="MA_id_StartDate" valueFormat="yyyy-MM-dd"  displayFormat="dd/MM/yyyy"  />	
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="End Date" label="{i18n>endDate}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="EndDate" label="{i18n>endDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
                     <DateRangeSelection id="MA_id_EndDate" valueFormat="yyyy-MM-dd"  displayFormat="dd/MM/yyyy"  />						
 					</fb:control>
@@ -36,13 +36,13 @@
 			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="MA_id_TaskTable"  items="{TaskModel>/}" growing="true"  growingThreshold="50" mode="SingleSelectLeft" alternateRowColors="true">
 			 <headerToolbar>
                 <OverflowToolbar >
-                    <Title text="{i18n>tileAssignmentFooter}"/>
+                    <Title text="Assignment Details ({= ${TaskModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
 
 					<Button  tooltip="{i18n>assignEmp}" press="MA_onEmpTask"  icon="sap-icon://activity-assigned-to-goal" id="MA_id_AssignB" visible="false"/>
-						<Button  icon="sap-icon://edit"  press="MA_onEditTask" tooltip="{i18n>editTaskTitle}" id="MA_id_EditTaskB" text="{i18n>edit}" visible="true" />
 						<Button  icon="sap-icon://create-entry-time"  type="Accept" press="MA_onCreateTask"  text="{i18n>createTask}"/>
+						<Button  icon="sap-icon://edit"  press="MA_onEditTask" tooltip="{i18n>editTaskTitle}" id="MA_id_EditTaskB" text="{i18n>edit}" visible="true" />
 				
                    </OverflowToolbar>
             </headerToolbar>

@@ -7,15 +7,16 @@
             adjustLabelSpan="false" emptySpanXL="4" emptySpanL="4" emptySpanM="4" emptySpanS="0" columnsXL="1"
             columnsL="1" columnsM="1" singleContainerFullSize="false">
             <f:content>
+            
                 <Label text="{i18n>taskName}" required="true"/>
                 <Input value="{EditTaskModel>/TaskName}" id="FNA_id_TaskName" liveChange="AT_ValidateCommonFields" maxLength="99" valueStateText="{i18n>taskNameValueState}"/>
 
-                <Label text="{i18n>taskType}" required="true"/>
-                <Select id="FNA_id_Tasktype" items="{TaskType>/Task}" selectedKey="{EditTaskModel>/TaskType}" visible="{visiblePlay>/showTaskType}" change="AT_onChangeTaskType" >
+                <Label text="{i18n>taskType}" required="true" visible="{= !${visiblePlay>/isAssignmentMode} }"/>
+                <Select id="FNA_id_Tasktype" items="{TaskType>/Task}" selectedKey="{EditTaskModel>/TaskType}" change="AT_onChangeTaskType" >
                     <core:Item key="{TaskType>Task}" text="{TaskType>Task}"/>
                 </Select>
-                <Label text="{i18n>description}" required="true" id="FNA_id_Ldesc"/>
-                <Input value="{EditTaskModel>/TaskTypeDescription}" id="NAF_id_Description" liveChange="AT_ValidateCommonFields"  visible="{visiblePlay>/showTaskDescription}" maxLength="50" valueStateText="{i18n>taskDescription}"/>
+                <Label text="{i18n>description}" required="true" id="FNA_id_Ldesc" visible="{= !${visiblePlay>/isAssignmentMode} }"/>
+                <Input value="{EditTaskModel>/TaskTypeDescription}" id="NAF_id_Description" liveChange="AT_ValidateCommonFields"  maxLength="50" valueStateText="{i18n>taskDescription}"/>
                 <Label text="{i18n>startDate}" required="true"/>
                 <DatePicker minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"
@@ -35,15 +36,7 @@
                     valueFormat="dd/MM/yyyy"
                     id="NAF_id_EndDate"
                     valueStateText="{i18n>dateValueState}"/>
-                <Label text="{i18n>hours}" required="true" visible="false" />
-                <TimePicker 
-    value="{newTaskModel>/HoursWorked}" 
-    id="NAF_id_HoursWorked" 
-    displayFormat="HH" 
-    valueFormat="HH" 
-    visible="false"
-    change="AT_ValidateCommonFields"
-     valueStateText="{i18n>hoursLimit}"/>
+               
             </f:content>
             <HBox justifyContent="End">
                 <Button text="{i18n>save}" type="Emphasized" press="MA_onPressSave" class="submit" visible="{visiblePlay>/save}"/>

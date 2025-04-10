@@ -18,6 +18,7 @@
                 clear="SU_onClear"
                 showClearOnFB="true"
                 search="SU_onSearch"
+                showFilterConfiguration="false"
                 filterChange="SU_onFilterChange"
                 afterVariantLoad="SU_onAfterVariantLoad"
                 class="sapUiTinyMargin"

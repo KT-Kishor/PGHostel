@@ -113,12 +113,16 @@ sap.ui.define(
               "sap.kt.com.minihrsolution.fragment.CommonBack"
             );
           } else {
-            this.getRouter().navTo("RouteSchemeUpload");
+            this.getRouter().navTo("RouteSchemeUpload", {
+              value: "SchemeUpload",
+            });
           }
         },
         onConfirmBack: function () {
           var oView = this.getView();
-          this.getRouter().navTo("RouteSchemeUpload");
+          this.getRouter().navTo("RouteSchemeUpload", {
+            value: "SchemeUpload",
+          });
           var eleSetting = [
             "SUD_id_Model",
             "SUD_id_Variant",
