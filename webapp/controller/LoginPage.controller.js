@@ -155,6 +155,8 @@ sap.ui.define(
                   oLoginModel.setProperty("/EmailID", userData.EmailID);
                   oLoginModel.setProperty("/Role", userData.Role);
                   oLoginModel.setProperty("/FolderID", response.FolderID);
+                  oLoginModel.setProperty("/EducationalandDocumentsDetailFolderID", userData.EducationalandDocumentsDetailFolderID);
+                  oLoginModel.setProperty("/EducationalandDocumentsDetailFolderID", userData.EmploymentDetailFolderID);
                   // Navigate
                   this.getRouter().navTo("RouteTilePage");
                   MessageToast.show(this.i18nModel.getText("logsuccess"));

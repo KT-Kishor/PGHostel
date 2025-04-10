@@ -11,6 +11,8 @@ sap.ui.define([
             },
             _onRouteMatched: function () {
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
+                this.EduFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/FolderID");
+                this.EmpFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmploymentDetailFolderID");
                 this._fetchCommonData("Designation", "sDesignationModel");
                 this._fetchCommonData("BaseLocation", "sBaseLocationModel");
                 this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
@@ -119,6 +121,11 @@ sap.ui.define([
             EmpF_onAddEmp: function () {
                 this.SS_commonOpenDialog("SEmp_oDialog", "sap.kt.com.minihrsolution.fragment.AddEmployment", ["AddEmp_id_StartDate", "AddEmp_id_EndDate"]);
             },
+            EdF_EduAttachment: function () {
+                var folderUrl = `https://workplace.zoho.in/#workdrive_app/home/63sop752ea6e63ddd4a8880466f5ae509b85a/privatespace/sharedwithme/allusers/${this.EduFolderID}`;
+                window.open(folderUrl, "_blank");
+
+            },
             //Employment dialog close
             AddEmp_onClose: function () {
                 this.SEmp_oDialog.close();
@@ -219,6 +226,29 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
+            EDF_onSelectionChange: function (oEvent) {
+                const aSelectedIndices = oEvent.getSource().getSelectedItems();
+                if (aSelectedIndices.length > 0) {
+                    this.setEnabledByIds(["EdF_id_EduEdit", "EdF_id_EduDelete"], true);
+                } else {
+                    this.setEnabledByIds(["EdF_id_EduEdit", "EdF_id_EduDelete"], false);
+                }
+
+            },
+            EDF_EditEducation: function () {
+                var oSelectedItem = this.byId("EdF_id_EduTable").getSelectedItem();
+                if (oSelectedItem) {
+                    var oData = oSelectedItem.getBindingContext("sEducationModel").getObject();
+                    this.getView().getModel("educationModel").setData(oData);
+                    var oViewModel = this.getView().getModel("viewModel");
+                    oViewModel.setProperty("/fragmentSubmit", false);
+                    oViewModel.setProperty("/fragmentSave", true);
+                    this.SS_commonOpenDialog("SEd_oDialog", "sap.kt.com.minihrsolution.fragment.AddEducation", ["AddEd_id_StartEdu", "AddEd_id_EndEdu"]);
+                } else {
+                    MessageToast.show(this.i18nModel.getText("selectRow"));
+                }
+
+            },
             //Education detail create call
             saveEducationDetails: function (bIsCreate) {
                 try {
@@ -301,29 +331,50 @@ sap.ui.define([
                     that.byId(id).setEnabled(isEnabled);
                 });
             },
-
-            EDF_onSelectionChange: function (oEvent) {
-                const aSelectedIndices = oEvent.getSource().getSelectedItems();
-                if (aSelectedIndices.length > 0) {
-                    this.setEnabledByIds(["EdF_id_EduEdit", "EdF_id_EduDelete"], true);
-                } else {
-                    this.setEnabledByIds(["EdF_id_EduEdit", "EdF_id_EduDelete"], false);
-                }
-
-            },
-            EDF_EditEducation: function () {
+            //Education detail delete call
+            EdF_DeletEdu: function () {
                 var oSelectedItem = this.byId("EdF_id_EduTable").getSelectedItem();
-                if (oSelectedItem) {
-                    var oData = oSelectedItem.getBindingContext("sEducationModel").getObject();
-                    this.getView().getModel("educationModel").setData(oData);
-                    var oViewModel = this.getView().getModel("viewModel");
-                    oViewModel.setProperty("/fragmentSubmit", false);
-                    oViewModel.setProperty("/fragmentSave", true);
-                    this.SS_commonOpenDialog("SEd_oDialog", "sap.kt.com.minihrsolution.fragment.AddEducation", ["AddEd_id_StartEdu", "AddEd_id_EndEdu"]);
-                } else {
-                    MessageToast.show(this.i18nModel.getText("selectRow"));
+                if (!oSelectedItem) {
+                    MessageBox.error(this.i18nModel.getText("deleteCustomer"));
+                    return;
                 }
-
+                var sID = oSelectedItem.getBindingContext("sEducationModel").getObject().ID
+                var that = this;
+                var oDialog = new sap.m.Dialog({
+                    title: this.i18nModel.getText("msgBoxConfirm"),
+                    type: sap.m.DialogType.Message,
+                    icon: "sap-icon://warning",
+                    state: sap.ui.core.ValueState.Warning,
+                    content: new sap.m.Text({
+                        text: this.i18nModel.getText("confirmDeleteCustomerMessage")
+                    }),
+                    beginButton: new sap.m.Button({
+                        text: this.i18nModel.getText("OkButton"),
+                        type: sap.m.ButtonType.Accept,
+                        press: function () {
+                            oDialog.close();
+                            that.ajaxDeleteWithJQuery("/EducationalDetails", { filters: { ID: sID } }).then(() => {
+                                MessageToast.show(that.i18nModel.getText("eduDataDelete"));
+                                that._fetchCommonData("EducationalDetails", "sEducationModel", {
+                                    EmployeeID: that.EmployeeID
+                                });
+                            }).catch((error) => {
+                                MessageToast.show(error.responseText);
+                            });
+                        }
+                    }),
+                    endButton: new sap.m.Button({
+                        text: this.i18nModel.getText("CancelButton"),
+                        type: sap.m.ButtonType.Reject,
+                        press: function () {
+                            oDialog.close();
+                        }
+                    }),
+                    afterClose: function () {
+                        oDialog.destroy();
+                    }
+                });
+                oDialog.open();
             },
 
             //Employment detail create call
