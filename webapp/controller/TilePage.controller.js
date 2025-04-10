@@ -16,31 +16,11 @@ sap.ui.define(
             .getRoute("RouteTilePage")
             .attachMatched(this._onRouteMatched, this);
         },
-        _onRouteMatched: function () {
-          var that = this;
+        _onRouteMatched: async function () {
+          this._fetchCommonData("AllLoginDetails", "EmpModel");
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          this.API = "https://www.rest.kalpavrikshatechnologies.com";
-          BusyIndicator.show(0);
-          $.ajax({
-            url: this.API + "/AllLoginDetails",
-            type: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
-            success: function (data) {
-              BusyIndicator.hide();
-              var oModel = new JSONModel(data);
-              this.getOwnerComponent().setModel(oModel, "EmpModel");
-            }.bind(this),
-            error: function (err) {
-              BusyIndicator.hide();
-              MessageToast.show(that.i18nModel.getText("commomerror"));
-            }.bind(this),
-          });
         },
+
         RP_onUseridpress: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
@@ -61,25 +41,20 @@ sap.ui.define(
 
           if (!selectedKey) {
             oEmpCombo.setValueState("Error");
-
             return;
           } else {
             oEmpCombo.setValueState("None");
           }
-
           var oEmpModel = this.getView().getModel("EmpModel"); // Fetch employee model
           if (!oEmpModel) {
             MessageToast.show(that.i18nModel.getText("noemp"));
             return;
           }
-
-          var aEmployees = oEmpModel.getProperty("/data"); // Get employee data array
-
+          var aEmployees = oEmpModel.getProperty("/"); // Get employee data array
           // Find selected employee by EmployeeID
           var selectedEmployee = aEmployees.find(function (emp) {
             return emp.EmployeeID === selectedKey;
           });
-
           if (selectedEmployee) {
             // Ensure FragmentModel exists
             var oFragmentModel = this.getView().getModel("FragmentModel");
@@ -87,7 +62,6 @@ sap.ui.define(
               oFragmentModel = new JSONModel({});
               this.getView().setModel(oFragmentModel, "FragmentModel");
             }
-
             // Set EmployeeID and EmployeeName in the model
             oFragmentModel.setProperty(
               "/EmployeeID",
@@ -97,12 +71,10 @@ sap.ui.define(
               "/EmployeeName",
               selectedEmployee.EmployeeName
             );
-
             // Automatically populate the username field
             var oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
             oUserNameInput.setValue(selectedEmployee.EmployeeName);
             oUserNameInput.setValueState("None");
-
             // Clear password fields
             sap.ui
               .getCore()
@@ -118,16 +90,13 @@ sap.ui.define(
             MessageToast.show(that.i18nModel.getText("empnotfound"));
           }
         },
-
         TP_onupdatepress: function () {
           var oView = this.getView();
-
           // Ensure user selection is reset before opening
           var oFragmentModel = this.getView().getModel("FragmentModel");
           if (oFragmentModel) {
             oFragmentModel.setData({ EmployeeID: "", EmployeeName: "" });
           }
-
           if (!this.oDialog) {
             sap.ui.core.Fragment.load({
               name: "sap.kt.com.minihrsolution.fragment.ResetPassword",
@@ -151,11 +120,9 @@ sap.ui.define(
             .setSelectedKey("")
             .setValueState("None");
           var oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
-
           // Reset all input fields
           oUserNameInput.setValue("");
           oUserNameInput.setValueState("None");
-
           sap.ui
             .getCore()
             .byId("RP_id_NewPW")
@@ -172,78 +139,61 @@ sap.ui.define(
             this.oDialog.close();
           }
         },
-        RP_onPressSetSave: function () {
-          var that = this;
-          var oUserIdInput = sap.ui.getCore().byId("RP_id_userid");
-          var oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
-          var oNewPwInput = sap.ui.getCore().byId("RP_id_NewPW");
-          var oConfirmPwInput = sap.ui.getCore().byId("RP_id_ConfirmPW");
-
-          var frgUserId = oUserIdInput.getValue().trim();
-          var newPassword = oNewPwInput.getValue().trim();
-          var confirmPassword = oConfirmPwInput.getValue().trim();
-
-          // Run validation checks
+        RP_onPressSetSave: async function () {
+          const oUserIdInput = sap.ui.getCore().byId("RP_id_userid");
+          const oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
+          const oNewPwInput = sap.ui.getCore().byId("RP_id_NewPW");
+          const oConfirmPwInput = sap.ui.getCore().byId("RP_id_ConfirmPW");
+          const frgUserId = oUserIdInput.getValue().trim();
+          const newPassword = oNewPwInput.getValue().trim();
+          const confirmPassword = oConfirmPwInput.getValue().trim();
+          // Validate inputs
           if (
             !utils._LCvalidateMandatoryField(oUserIdInput, "ID") ||
             !utils._LCvalidateName(oUserNameInput, "ID") ||
             !utils._LCvalidatePassword(oNewPwInput, "ID") ||
             !utils._LCvalidateMandatoryField(oConfirmPwInput, "ID")
           ) {
-            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
-            return; // Stops execution if validation fails
-          }
-
-          if (newPassword !== confirmPassword) {
-            MessageToast.show(that.i18nModel.getText("misPasswords"));
+            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
           }
+          if (newPassword !== confirmPassword) {
+            MessageToast.show(this.i18nModel.getText("misPasswords"));
+            return;
+          }
+          try {
+            const response = await this.ajaxUpdateWithJQuery("LoginDetails", {
+              data: {
+                Password: newPassword,
+              },
+              filters: {
+                EmployeeID: frgUserId,
+              },
+            });
 
-          var requestData = {
-            data: {
-              Password: newPassword,
-            },
-            filters: {
-              EmployeeID: frgUserId,
-            },
-          };
-
-          $.ajax({
-            url: this.API + "/LoginDetails",
-            type: "PUT",
-            contentType: "application/json",
-            data: JSON.stringify(requestData), // Send data in the request body
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
-            success: function (response) {
-              // Clear all input fields after successful save
+            if (response.success === true) {
               oUserIdInput.setValue("");
               oUserNameInput.setValue("");
               oNewPwInput.setValue("");
               oConfirmPwInput.setValue("");
 
-              // Refresh the model
-              var oModel = this.getView().getModel("EmpModel");
+              const oModel = this.getView().getModel("EmpModel");
               if (oModel) {
                 oModel.refresh(true);
               }
 
-              // Close dialog if it exists
               if (this.oDialog) {
                 this.oDialog.close();
               }
 
-              MessageToast.show(that.i18nModel.getText("updatepassword"));
-            }.bind(this),
-            error: function (err) {
-              MessageToast.show("An error occurred: " + err.responseText);
-            }.bind(this),
-          });
+              MessageToast.show(this.i18nModel.getText("updatepassword"));
+            } else {
+              MessageToast.show("Failed to update password.");
+            }
+          } catch (err) {
+            MessageToast.show("An error occurred: " + err.message);
+          }
         },
-
         //password visibility change
         RP_onTogglePasswordVisibility: function (oEvent) {
           var oInput = oEvent.getSource();
