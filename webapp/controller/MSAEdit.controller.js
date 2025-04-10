@@ -108,31 +108,50 @@ sap.ui.define([
                 }
             },
 
-            _waitForModels(modelNames, interval = 200, timeout = 5000) {
-                return new Promise((resolve, reject) => {
-                    const startTime = Date.now();
+            async MsaE_onPressMergeSow() {
+                var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
+                var oPDFCondSOWModel = this.getView().getModel("PDFSOWModel");
+                if (oCoModel && oPDFCondSOWModel){
+                    oCoModel.destroy();
+                    oPDFCondSOWModel.destroy();
+                    this.getView().setModel(null, "CompanyCodeDetailsModel");
+                    this.getView().setModel(null, "PDFSOWModel");
+                }
+                
+                try {
+                    this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
+                    this._fetchCommonData("PDFCondition", "PDFSOWModel", { Type: "SOW" });
+                    await this._waitForModels(["CompanyCodeDetailsModel", "PDFSOWModel"], 200, 5000);
 
-                    const checkModels = () => {
-                        let allLoaded = modelNames.every(modelName => {
-                            let model = this.getView().getModel(modelName);
-                            return model && model.getData() && Object.keys(model.getData()).length > 0;
-                        });
+                    var oPDFModel = this.getView().getModel("PDFData");
+                    var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                    var oPDFSOWModel = this.getView().getModel("PDFSOWModel").getData();
+                    if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                        MessageToast.show("Company Logo or Model not found.");
+                        return;
+                    }
 
-                        if (allLoaded) {
-                            resolve(); // ✅ Proceed when models have data
-                        } else if (Date.now() - startTime > timeout) {
-                            reject(new Error("Timeout waiting for models: " + modelNames.join(", ")));
-                        } else {
-                            setTimeout(checkModels, interval);
+                    if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+                        var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+                        var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
+                        if (logoBase64 && signBase64) {
+                            oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
+                            oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
                         }
-                    };
+                    }
 
-                    checkModels();
-                });
-            },
+                    if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                        if (typeof jsPDF !== "undefined" && typeof jsPDF._GenerateSOWPDF === "function") {
+                            sap.ui.core.BusyIndicator.show(0);
+                            jsPDF._GenerateSOWPDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFSOWModel);
+                        } else {
+                            console.error("Error: jsPDF._GenerateSOWPDF function not found.");
+                        }
+                    }
 
-
-
-
+                } catch (error) {
+                    console.error("Error waiting for models:", error);
+                }
+            }
         });
     });

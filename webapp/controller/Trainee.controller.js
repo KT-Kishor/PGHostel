@@ -4,10 +4,9 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-    "../utils/TraineeCertificatePDF",
     "../model/formatter"
 ],
-    function (BaseController, utils, JSONModel, MessageToast, MessageBox, jsPDF, Formatter) {
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Trainee", {
             Formatter: Formatter,
@@ -213,12 +212,12 @@ sap.ui.define([
             },
             TCF_onPressCloseDialog: function () {
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
-                this.getView().getModel("PDFData").setProperty("/editorText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+                this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValueState("None");
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValue("");
                 this.TC_oDialog.close();
             },
-            onPressHandlePreview: function() {
+            TCF_onPressHandlePreview: function() {
                 const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
                 if (bPreviewFlag) {
                     this.TCF_onPressDownload();
@@ -259,7 +258,7 @@ sap.ui.define([
                     <p>We at <b>Kalpavriksha Technologies</b> thank ${empName} for the valuable contributions made to our organization and wish success in all future endeavors.</p>
                 </div>`;
 
-                this.getView().getModel("PDFData").setProperty("/editorText", data);
+                this.getView().getModel("PDFData").setProperty("/RTEText", data);
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
             },
             TCF_onPressDownload: function () {
@@ -268,6 +267,7 @@ sap.ui.define([
                     let oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                     let oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
                     this.getView().getModel("PDFData").setProperty("/CreateDate", Formatter.formatDate(oTraineeModel.ReleaseDate));
+                    this.getView().getModel("PDFData").setProperty("/CertificateTitle", "TRAINEE CERTIFICATE");
                     // Create the updated trainee data
                     const oUpdatedData = {
                         ID: oTraineeModel.ID,
@@ -285,7 +285,7 @@ sap.ui.define([
                     this.generateCertificatePDF(htmlContent);
                     sap.ui.core.BusyIndicator.hide();
                     this.TC_oDialog.close();
-                    this.getView().getModel("PDFData").setProperty("/editorText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+                    this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview</b> to Preview the Certificate</p>");
                 } catch (oError) {
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -404,41 +404,6 @@ sap.ui.define([
                     sap.ui.core.BusyIndicator.hide();
                 });
                 this.oDialog.close();
-            }, 
-            
-            async generateCertificatePDF(content) {
-                var oModel = this.getView().getModel("PDFData").getData();
-                var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
-                if (oCoModel) {
-                    oCoModel.destroy();
-                    this.getView().setModel(null, "CompanyCodeDetailsModel");
-                }
-                try {
-                    this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
-                    await this._waitForModels(["CompanyCodeDetailsModel"], 200, 5000);
-                    var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-                    if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                        MessageToast.show("Company Logo or Model not found.");
-                        return;
-                    }
-                    if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
-                        var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
-                        var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
-                        if (logoBase64 && signBase64) {
-                            oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
-                            oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
-                        }
-                    }
-                    if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
-                        if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
-                            jsPDF._GeneratePDF(content, oCompanyDetailsModel, oModel);
-                        } else {
-                            console.error("Error: jsPDF._GeneratePDF function not found.");
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error waiting for models:", error);
-                }
             }
         });
     });

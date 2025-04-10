@@ -284,6 +284,58 @@ sap.ui.define([
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", true);
                 }
             },
+
+            SS_onDownloadTerminateLetter: function () {
+                var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var date = Formatter.formatDate(new Date()); 
+                var empName = oEmpModel.Salutation + " " + oEmpModel.EmployeeName;
+                var empDesig = oEmpModel.Designation;
+                this.getView().getModel("PDFData").setProperty("/CreateDate", date);
+                this.getView().getModel("PDFData").setProperty("/CertificateTitle", "TERMINATION LETTER");
+                var data = `
+                <div style="text-align: justify;">
+                    <p>This is to formally notify that <b>${empName}</b>, has been terminated from the services of <b>Kalpavriksha Technologies</b> with effect from <b>${date}</b> due to reasons communicated during prior discussions. During their tenure as <b>${empDesig}</b>, we have reviewed the performance and discussed areas of concern in detail.</p> 
+                    <p>Despite efforts to resolve these concerns, we find it necessary to discontinue the employment relationship effective immediately. Please ensure that all company assets and materials in your possession are returned by the specified date. You are reminded of your obligation to maintain confidentiality and abide by other terms of the employment agreement.</p>
+                    <p>Kindly acknowledge the copy of the document for office records. We look forward to a fruitful association.</p>
+                    <p>We wish you the best of luck in your future endeavors</p>
+                </div>`;
+
+                this.getView().getModel("PDFData").setProperty("/RTEText", data);
+                this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
+            },
+
+            SS_onDownloadExperienceLetter: function () {
+                var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var today = new Date();
+                var date = Formatter.formatDate(today); 
+                var twoMonthsLater = new Date(today.setMonth(today.getMonth() + 2));
+                var relievingDate = Formatter.formatDate(twoMonthsLater);
+                var joiningDate = Formatter.formatDate(oEmpModel.JoiningDate);
+                var empName = oEmpModel.Salutation + " " + oEmpModel.EmployeeName;
+                var empID = oEmpModel.EmployeeID;
+                var empDesig = oEmpModel.Designation;
+                this.getView().getModel("PDFData").setProperty("/CreateDate", date);
+                this.getView().getModel("PDFData").setProperty("/CertificateTitle", "RELEAVING AND EXPERIENCE LETTER");
+                var data = `
+                <div style="text-align: justify;">
+                    <p> This is to certify that <b>${empName}</b> with Employee ID <b>${empID}</b> has worked with our company <b>Kalpavriksha Technologies</b> as a <b>${empDesig}</b> from <b>${joiningDate}</b> to <b>${date}</b>. During his tenure with us, his contributions to the organization are highly appreciated. He possesses good moral values and the right attitude</p> 
+                    <p>With reference to your resignation, you stand relieved from the services of Kalpavriksha Technologies with effect from the close of working hours <b>${relievingDate}</b>. We would like you to continue to be bound by the conditions of confidentiality and other relevant terms of the employment agreement you signed with Kalpavriksha Technologies</p>
+                    <p>Wishing you all the best in your future endeavors</p>
+                </div>`;
+
+                this.getView().getModel("PDFData").setProperty("/RTEText", data);
+                this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
+            },
+
+            FCR_onDownloadPDF: function () {
+                this.SSRTE_oDialog.close();
+                let htmlContent = sap.ui.getCore().byId("FCR_id_RTE").getValue(); 
+                this.generateCertificatePDF(htmlContent);
+            },
+
+            FCR_onCloseDialog: function () {
+                this.SSRTE_oDialog.close();
+            }
            
         });
     });

@@ -1,8 +1,9 @@
 sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/model/json/JSONModel",
+  "../utils/TraineeCertificatePDF",
   "../model/formatter"
-], function (Controller, JSONModel, Formatter) {
+], function (Controller, JSONModel, jsPDF, Formatter) {
   "use strict";
 
   return Controller.extend("sap.kt.ktofferletter.products.controller.BaseController", {
@@ -261,7 +262,7 @@ sap.ui.define([
       oModel.setProperty("/CostofCompany", (Math.round(CostofCompany)));
       oModel.setProperty("/Total", (Math.round(Total)));
       oModel.setProperty("/PF", (Math.round(PF)));
-      oModel.setProperty("/EPF",(Math.Round(EPF)));
+      oModel.setProperty("/EPF", (Math.Round(EPF)));
     },
 
     //Date picker common function 
@@ -410,6 +411,45 @@ sap.ui.define([
 
         checkModels();
       });
+    },
+
+    async generateCertificatePDF(content) {
+      var oModel = this.getView().getModel("PDFData").getData();
+      var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
+      if (oCoModel) {
+        oCoModel.destroy();
+        this.getView().setModel(null, "CompanyCodeDetailsModel");
+      }
+      try {
+        this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
+        await this._waitForModels(["CompanyCodeDetailsModel"], 200, 5000);
+
+        sap.ui.core.BusyIndicator.show(0);
+        var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+        if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+          MessageToast.show("Company Logo or Model not found.");
+          return;
+        }
+        if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+          var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+          var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
+          if (logoBase64 && signBase64) {
+            oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
+            oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+          }
+        }
+        if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+          if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+            jsPDF._GeneratePDF(content, oCompanyDetailsModel, oModel);
+          } else {
+            console.error("Error: jsPDF._GeneratePDF function not found.");
+          }
+        }
+      } catch (error) {
+        sap.ui.core.BusyIndicator.hide();
+        sap.m.MessageToast.show("Error generating PDF: " + error.message);
+        console.error("Error waiting for models:", error);
+      }
     }
   })
 });

@@ -94,14 +94,14 @@
             showGroupFontStyle="true"
             showGroupTextAlign="true"
             showGroupStructure="true"
-            value="{PDFData>/editorText}"
+            value="{PDFData>/RTEText}"
 			visible="true"
         />
         <beginButton>
             <Button
-                text="{= ${PDFData>/PreviewFlag} ? ${i18n>downloadcCertificate} : 'Preview Certificate'}"
+                text="{= ${PDFData>/PreviewFlag} ? ${i18n>downloadcCertificate} : ${i18n>preview} }"
                 type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Neutral'}"
-                press=".onPressHandlePreview"
+                press="TCF_onPressHandlePreview"
                 class="submit"
             />
         </beginButton>

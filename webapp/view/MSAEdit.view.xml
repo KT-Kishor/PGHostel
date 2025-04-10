@@ -126,7 +126,7 @@
 											<m:ToolbarSeparator />
 											<m:Button id="MsaE_id_SowEmailBut" text="{i18n>tileFooter}" enabled="false" press="MsaE_onPressSendEmailSOW"/>
 											<m:ToolbarSeparator />
-											<m:Button id="MsaE_id_SowMergeBut" text="{i18n>GeneratePDF}" enabled="false" press="MsaE_onPressMergeSow"/>
+											<m:Button id="MsaE_id_SowMergeBut" text="{i18n>GeneratePDF}" enabled="true" press="MsaE_onPressMergeSow"/>
 											<m:ToolbarSeparator />
 											<m:Button icon="sap-icon://edit" enabled="false" id="MsaE_id_UpdateSow" press="MsaE_onPressUpdateSOW"/>
 										</m:OverflowToolbar>

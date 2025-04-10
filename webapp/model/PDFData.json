@@ -127,7 +127,38 @@
     "ClientRole": "CEO",
     "AgreementDuration": "12",
 
+    "SOWCreateDate": "01/04/2025",
+    "SOWStartDate": "02/04/2025",
+    "SOWEndDate": "30/09/2025",
+    "TableData": [
+        {
+            "SlNo": "1",
+            "Name": "John Doe",
+            "Role": "Software Engineer",
+            "StartDate": "02/04/2025",
+            "EndDate": "30/09/2025",
+            "RateCard": "10000 + GST"
+        },
+        {
+            "SlNo": "2",
+            "Name": "Jane Smith",
+            "Role": "Data Analyst",
+            "StartDate": "02/04/2025",
+            "EndDate": "30/09/2025",
+            "RateCard": "12000 + GST"
+        },
+        {
+            "SlNo": "3",
+            "Name": "Alice Johnson",
+            "Role": "Project Manager",
+            "StartDate": "02/04/2025",
+            "EndDate": "30/09/2025",
+            "RateCard": "15000 + GST"
+        }
+    ],
+    
     "PreviewFlag": false,
-    "editorText": "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>",
-    "CertiifcateTitle": "TO WHOMESOEVER IT MAY CONCERN"
+    "RTEText": "<p>Please click on <b>Preview</b> to Preview the Certificate</p>",
+    "CertificateTitle" : "(Certificate Title)",
+    "CertificateSubTitle": "TO WHOMESOEVER IT MAY CONCERN"
 }

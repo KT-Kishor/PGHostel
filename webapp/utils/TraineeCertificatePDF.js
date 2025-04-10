@@ -28,14 +28,22 @@ sap.ui.define([], function () {
             let dateY = topMargin+10;
             doc.text(oModel.CreateDate, maxWidth, dateY);
 
-            doc.setFont("times", "bold").setFontSize(12.5);
-            let titleText = oModel.CertiifcateTitle;
+            doc.setFont("times", "bold").setFontSize(12);
+            let titleText = oModel.CertificateTitle;
             let titletextWidth = doc.getTextWidth(titleText);
             let titleX = (pageWidth - titletextWidth) / 2;
-            let titleY = dateY + 20;
+            let titleY = dateY + 18;
             doc.text(titleText, titleX, titleY);
             doc.setLineWidth(0.4);
             doc.line(titleX, titleY + 1, titleX + titletextWidth + 1, titleY + 1);
+
+            let subTitleText = oModel.CertificateSubTitle;
+            let subTitletextWidth = doc.getTextWidth(subTitleText);
+            let subTitleX = (pageWidth - subTitletextWidth) / 2;
+            let subTitleY = titleY + 10;
+            doc.text(subTitleText, subTitleX, subTitleY);
+            doc.setLineWidth(0.4);
+            doc.line(subTitleX, subTitleY + 1, subTitleX + subTitletextWidth + 1, subTitleY + 1);
 
             let mmToPx = (mm) => mm * (96 / 48);
             let containerWidthPx = mmToPx(maxWidth);
@@ -49,7 +57,7 @@ sap.ui.define([], function () {
             container.style.padding = "0";
             document.body.appendChild(container);
             
-            let rteY = titleY + 5;
+            let rteY = subTitleY + 5;
             doc.html(container, {
                 x: margin,
                 y: rteY,
@@ -97,7 +105,8 @@ sap.ui.define([], function () {
                     doc.text(lutNo, lutX, bottomLimit+ 20.5);
 
                     document.body.removeChild(container);
-                    doc.save("RTE_Content.pdf");
+                    doc.save(`${oModel.CertificateTitle}.pdf`);
+                    sap.ui.core.BusyIndicator.hide();
                 }
             });
 
