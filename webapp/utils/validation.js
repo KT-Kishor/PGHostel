@@ -61,8 +61,7 @@ sap.ui.define([], function () {
 
     // Amount validation function
     _LCvalidateAmount: function (oEvent, type) {
-      var oInput =
-        type === "ID" ? (oInput = oEvent) : (oInput = oEvent.getSource());
+      var oInput = type === "ID" ? (oInput = oEvent) : (oInput = oEvent.getSource());
       var value = oInput.getValue().trim();
       var cleanedValue = value.replace(/[^0-9.]/g, "");
       var parts = cleanedValue.split(".");
@@ -70,11 +69,15 @@ sap.ui.define([], function () {
         cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
       }
       oInput.setValue(cleanedValue);
+      if (parseFloat(cleanedValue) <= 0) {
+        oInput.setValueState("Error");
+        return false;
+      }
       if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
         oInput.setValueState("Error");
         return false;
       } else {
-        oInput.setValueState("None");
+        oInput.setValueState("None"); 
         return true;
       }
     },

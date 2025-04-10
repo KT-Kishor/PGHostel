@@ -44,7 +44,7 @@
 					<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 				</ComboBox>
 				<!-- Destination -->
-				<Label text="{i18n>expDestination}" required="{ExpenseType>/required}"/>
+				<Label text="{i18n>expDestination}" required="{viewModel>/required}"/>
 				<ComboBox change="onChangeDestination" valueStateText="{i18n>expValStaDestination}" id="exp-Id-Destination" items="{BaseLocationModel>/}"  value="{CreateExpenseModel>/Destination}"  >
 					<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{CreateExpenseModel>branchCode}"/>
 				</ComboBox>
@@ -60,7 +60,6 @@
 				</Select>
 				<Label text="{i18n>expEmployeeRemark}" required="true"/>
 				<TextArea liveChange="onChangeEmployeeRemark" valueStateText="{i18n>expValStaEmployeeRemark}" id="exp-Id-EmployeeRemark" rows="2" value="{CreateExpenseModel>/Comments}" placeholder="{i18n>expValStaEmployeeRemark}" maxLength="1000" />
-				<!-- <rich:RichTextEditor change="onLiveValidation" value="{CreateExpenseModel>/Comments}"/> -->
 			</f:content>
 		</f:SimpleForm>
 		<!-- Buttons for Submit and Close actions -->

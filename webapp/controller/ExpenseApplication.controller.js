@@ -17,10 +17,11 @@ sap.ui.define([
 		},
 		
 		_onRouteMatched: function (oEvent) {
+			// this.commonLoginFunction("Expense");
 			this._fetchCommonData("Expense", "FilterExpenseModel");
 			this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 			this.Exp_onSearch();
-			var View = new JSONModel({ SaveBtn: false, SubmitBtn: false });
+			var View = new JSONModel({ SaveBtn: false, SubmitBtn: false , required: true});
 			this.getOwnerComponent().setModel(View, "viewModel");
 			this.ViewModel = this.getView().getModel("viewModel");
 			this.LoginModel = this.getView().getModel("LoginModel");
@@ -42,7 +43,7 @@ sap.ui.define([
 			});
 			this.getOwnerComponent().setModel(oModel, "CreateExpenseModel");
 			this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
-			BusyIndicator.hide();
+			// BusyIndicator.hide();
 		},
 		onPressback: function () {
 			this.getRouter().navTo("RouteTilePage");
@@ -73,7 +74,8 @@ sap.ui.define([
 
 		onPressSubmit: function () {
 			try {
-				if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-ExpenseName"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-EndDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Country"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Source"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Destination"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-EmployeeRemark"), "ID")) {
+				if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-ExpenseName"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-EndDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Country"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Source"), "ID") && (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Destination"), "ID"): true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-EmployeeRemark"), "ID")) {
+
 					BusyIndicator.show();
 					var oData = {
 						"data": this.getView().getModel("CreateExpenseModel").getData()
@@ -141,27 +143,43 @@ sap.ui.define([
 		},
 
 		onPressDeleteExpense: function (oEvent) {
+			BusyIndicator.show(0);
 			var ExpID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
 			this.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: ExpID } }).then(() => {
 				MessageToast.show(this.i18nModel.getText("msgCustomerDeleteSuccess"));
 				this._fetchCommonData("Expense", "ExpenseModel");
+				BusyIndicator.hide();
 			}).catch((error) => {
 				MessageToast.show(error.responseText);
 			});
 		},
 
-		Exp_onSearch: function () {
-			var aFilterItems = this.byId("Exp-id-FilterBar").getFilterGroupItems();
-			var params = {};
-			aFilterItems.forEach(function (oItem) {
-			  var oControl = oItem.getControl(); // Get the associated control
-			  var sValue = oItem.getName();
-			  if (oControl && oControl.getValue()) {				
-				params[sValue] = oControl.getValue();				
+		Exp_onSearch: async function () {
+			try {
+				BusyIndicator.show(0);		
+				const aFilterItems = this.byId("Exp-id-FilterBar").getFilterGroupItems();
+				const params = {};
+		
+				aFilterItems.forEach(function (oItem) {
+					const oControl = oItem.getControl();
+					const sKey = oItem.getName();
+		
+					if (oControl && typeof oControl.getValue === "function") {
+						const sValue = oControl.getValue().trim();
+		
+						if (sValue) {
+							params[sKey] = sValue;
+						}
+					}
+				});
+				await this._fetchCommonData("Expense", "ExpenseModel", params);					
+		
+			} catch (error) {
+				MessageToast.show("An error occurred during search.");
+			} finally {
+				BusyIndicator.hide();
 			}
-			});
-			this._fetchCommonData("Expense", "ExpenseModel", params);
-		},				
+		},						
 		
 		Exp_onPressClear:function(){
 			this.byId("Exp_id_EmployeeName").setSelectedKey("");
@@ -169,7 +187,16 @@ sap.ui.define([
 			this.byId("Exp_id_SourceFilter").setSelectedKey("");
 			this.byId("Exp_id_DestinationFilter").setSelectedKey("");
 			this.byId("Exp_id_StatusFilter").setSelectedKey("");
-		}
+		},
+
+		onChangeExpenseType: function (oEvent) {
+			if (oEvent.getSource()._getSelectedItemText() !== 'Customer Facing') {
+			  this.ViewModel.setProperty("/required", false);
+			  this.getView().getModel("CreateExpenseModel").getData().Destination = "";
+			} else {
+			  this.ViewModel.setProperty("/required", true);
+			}
+		  },  
 
 
 	});

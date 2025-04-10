@@ -105,7 +105,7 @@
 							<Text text="{path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />
 							<!-- <Text text="{ExpenseModel>Status}" /> -->
 							<ObjectStatus text="{ExpenseModel>Status}" inverted="true" state="{path:'ExpenseModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
-							<Button icon="sap-icon://delete" visible="{= ${Status} === 'Draft' }" press="onPressDeleteExpense" />
+							<Button icon="sap-icon://delete" visible="{= ${ExpenseModel>Status} === 'Draft' }" press="onPressDeleteExpense" />
 						</cells>
 					</ColumnListItem>
 				</items>

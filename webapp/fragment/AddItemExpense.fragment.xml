@@ -29,31 +29,29 @@
 					</Select>
 					<!-- Mode Of Payment -->
 					<Label text="{i18n>expModeOfPayment}" required="true"/>
-					<Select  items="{ModeOfPayment>/}" selectedKey="{ExpenseCreateModel>/ModeOfPayment}" enabled="{EnableModel>/enable}">
+					<Select items="{ModeOfPayment>/}" selectedKey="{ExpenseCreateModel>/ModeOfPayment}" enabled="{viewModel>/enable}">
 						<core:Item key="{ModeOfPayment>Code}" text="{ModeOfPayment>Code}" />
 					</Select>
 					<!-- Expense Date -->
 					<Label text="{i18n>expDetExpenseDate}" required="true" />
-					<DatePicker minDate="{FilteredExpenseModel>/MinDate}" id="ExpDet_id_ExpenseDate"  maxDate="{FilteredExpenseModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{ExpenseCreateModel>/ExpenseDate}"  />
+					<DatePicker minDate="{viewModel>/MinDate}" id="ExpDet_id_ExpenseDate"  maxDate="{viewModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{ExpenseCreateModel>/ExpenseDate}"  />
 					<!-- Expense Amount -->
 					<Label text="{i18n>expDetExpenseAmount}" required="true"/>
 					<HBox width="100%">
 						<VBox width="70%">
-							<Input id="ExpDet_id_Amount" valueState="None" value="{ExpenseCreateModel>/ExpenseAmount}" liveChange="LC_ExpAmount" placeholder="{i18n>placeAmount}" enabled="{EnableModel>/enable}" maxLength="15"/>
+							<Input id="ExpDet_id_Amount" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ExpenseAmount}" liveChange="LC_ExpAmount" placeholder="{i18n>placeAmount}" enabled="{viewModel>/enable}" maxLength="15"/>
 						</VBox>
 						<VBox width="30%">
-							<Select items="{CurrencyModel>/}" change="onChangeCurrency" selectedKey="{ExpenseCreateModel>/Currency}"  id="idCurrency" enabled="{EnableModel>/enable}">
+							<Select items="{CurrencyModel>/}" change="onChangeCurrency" selectedKey="{ExpenseCreateModel>/Currency}"  id="idCurrency" enabled="{viewModel>/enable}">
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
 						</VBox>
 					</HBox>
 					<!-- Conversion Rate -->
-					<Label text="{i18n>expConversionRate}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }"/>
-					<Input id="ExpDet_id_ConvertionRate" valueState="None" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="onChangeConverstionRate"/>
-					<!-- ForeignAmount Label -->
-					<!-- <Label text="{i18n>expenseForeignAmount}" visible="{ExpenseCreateModel>/DisplayForeignAmount}" />					 -->
+					<Label text="{i18n>expConversionRate}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" required="true" />
+					<Input id="ExpDet_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="onChangeConverstionRate"/>									
 					<Label text="{i18n>comments}" required="true" ></Label>
-					<TextArea id="ExpDet_id_Comments"  liveChange="LC_ExpComments" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
+					<TextArea id="ExpDet_id_Comments" valueStateText="{i18n>enterComments}" liveChange="LC_ExpComments" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
 				</f:content>
 			</f:SimpleForm>
 		</VBox>
