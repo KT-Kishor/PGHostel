@@ -1,53 +1,58 @@
 sap.ui.define([
-    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",
+    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast", "../model/formatter"
+
 ],
-    function (BaseController, utils, JSONModel, MessageToast) {
+    function (BaseController, utils, JSONModel, MessageToast, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.SelfService", {
+            Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteSelfService").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: function () {                
+            _onRouteMatched: function () {
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
                 this._fetchCommonData("Designation", "sDesignationModel");
                 this._fetchCommonData("BaseLocation", "sBaseLocationModel");
                 this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
-                    EmployeeID: this.EmployeeID});    
+                    EmployeeID: this.EmployeeID
+                });
                 this._fetchCommonData("EducationalDetails", "sEducationModel", {
-                    EmployeeID: this.EmployeeID});    
+                    EmployeeID: this.EmployeeID
+                });
                 this._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
-                    EmployeeID: this.EmployeeID});    
+                    EmployeeID: this.EmployeeID
+                });
                 var oViewModel = new JSONModel({ isEditMode: false, Max: new Date() });
                 this.getView().setModel(oViewModel, "viewModel");
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle()
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "My Details");
-                    var eduModel = new JSONModel({
-                      EmployeeID: this.EmployeeID,
-                      CollegeName: "",
-                      DegreeName: "",
-                      EducationStartDate: "",
-                      EducationEndDate: "",
-                      Grade: "",
-                      GradeType: "",
-                    });
-                    this.getView().setModel(eduModel, "educationModel");
-                    var empModel = new JSONModel({
-                      EmployeeID: this.EmployeeID,
-                      CompanyName: "",
-                      Designation: "",
-                      EmploymentStartDate: "",
-                      EmploymentEndDate: "",
-                      OfficeAddress: "",
-                      RCNameI: "",
-                      RCAddressI: "",
-                      RCMailI: "",
-                      RCMobileI: "",
-                      RCNameII: "",
-                      RCAddressII: "",
-                      RCMailII: "",
-                      RCMobileII: ""
-                    });
-                    this.getView().setModel(empModel, "employmentModel");
+                var eduModel = new JSONModel({
+                    EmployeeID: this.EmployeeID,
+                    CollegeName: "",
+                    DegreeName: "",
+                    EducationStartDate: "",
+                    EducationEndDate: "",
+                    Grade: "",
+                    GradeType: "",
+                });
+                this.getView().setModel(eduModel, "educationModel");
+                var empModel = new JSONModel({
+                    EmployeeID: this.EmployeeID,
+                    CompanyName: "",
+                    Designation: "",
+                    EmploymentStartDate: "",
+                    EmploymentEndDate: "",
+                    OfficeAddress: "",
+                    RCNameI: "",
+                    RCAddressI: "",
+                    RCMailI: "",
+                    RCMobileI: "",
+                    RCNameII: "",
+                    RCAddressII: "",
+                    RCMailII: "",
+                    RCMobileII: ""
+                });
+                this.getView().setModel(empModel, "employmentModel");
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
@@ -55,6 +60,7 @@ sap.ui.define([
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
+            //Common dialog open function
             SS_commonOpenDialog: function (dialogProperty, fragmentName, datePickerIds = []) {
                 if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
@@ -76,6 +82,7 @@ sap.ui.define([
             EdF_AddEdu: function () {
                 this.SS_commonOpenDialog("SEd_oDialog", "sap.kt.com.minihrsolution.fragment.AddEducation", ["AddEd_id_StartEdu", "AddEd_id_EndEdu"]);
             },
+            //Date change validation function
             onStartDateChange: function (oEvent) {
                 let oStartDate = oEvent.getSource().getDateValue();
                 let oEndDatePicker = sap.ui.getCore().byId("AddEd_id_EndEdu");
@@ -88,12 +95,10 @@ sap.ui.define([
                     }
                 }
             },
-
             //Education dialog close
             AddEd_onCloseDial: function () {
                 this.SEd_oDialog.close();
             },
-
             //Employment dialog open
             EmpF_onAddEmp: function () {
                 this.SS_commonOpenDialog("SEmp_oDialog", "sap.kt.com.minihrsolution.fragment.AddEmployment", ["AddEmp_id_StartDate", "AddEmp_id_EndDate"]);
@@ -102,6 +107,7 @@ sap.ui.define([
             AddEmp_onClose: function () {
                 this.SEmp_oDialog.close();
             },
+            //validation function calling from base controller
             SS_validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
             },
@@ -135,6 +141,20 @@ sap.ui.define([
             SS_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
             },
+            SS_validateGrade: function (oEvent) {
+                var sGradeTypeId = "AddEd_id_GradeType";
+                var oGradeField = oEvent.getSource();
+                if (oGradeField && sap.ui.getCore().byId(sGradeTypeId)) {
+                    utils._LCvalidateGrade(oGradeField, "ID", sGradeTypeId);
+                }
+            },
+            SS_validateGradeType: function () {
+                var oGradeField = sap.ui.getCore().byId("AddEd_id_Grade");
+                if (oGradeField) {
+                    utils._LCvalidateGrade(oGradeField, "ID", "AddEd_id_GradeType");
+                }
+            },
+            //Edit buttton visibility
             SS_onEditPress: function () {
                 var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
                 if (isEditMode) {
@@ -145,6 +165,7 @@ sap.ui.define([
                     this.getView().getModel("viewModel").setProperty("/isEditMode", true);
                 }
             },
+            //Basic detail update call
             SS_onSavePress: function () {
                 try {
                     if (utils._LCvalidateDate(this.byId("SS_id_Dob"), "ID") && utils._LCvalidateMandatoryField(this.byId("SS_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(this.byId("SS_id_CAdress"), "ID") && utils._LCvalidateMobileNumber(this.byId("SS_id_MobileNo"), "ID") && utils._LCvalidateName(this.byId("SS_id_AcName"), "ID") && utils._LCvalidateAccountNo(this.byId("SS_id_Acno"), "ID") &&
@@ -182,18 +203,26 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
+            //Education detail create call
             AddEd_onSubmitEdDetails: function () {
                 try {
-                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && this._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID")) {
-                        var oModel = this.getView().getModel("educationModel").getData()[0];
-                        var oPayload = {
-                            tableName: "EducationalDetails",
-                            data: oModel
+                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType")) {
+                        var oModel = this.getView().getModel("educationModel").getData();
+                        oModel.EmployeeID = this.EmployeeID;
+                        oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey();
+                        oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey();
+                        oModel = {
+                            "tableName": "EducationalDetails",
+                            "data": oModel
                         };
-                        this.ajaxCreateWithJQuery("EducationalDetails", oPayload).then((oData) => {
-                            sap.ui.core.BusyIndicator.hide();
+                        this.ajaxCreateWithJQuery("EducationalDetails", oModel).then((oData) => {
                             if (oData.success) {
+                                sap.ui.core.BusyIndicator.hide();
                                 MessageToast.show(this.i18nModel.getText("eduDataSaved"));
+                                this.SEd_oDialog.close();
+                                this._fetchCommonData("EducationalDetails", "sEducationModel", {
+                                    EmployeeID: this.EmployeeID
+                                });
                             } else {
                                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                             }
@@ -209,12 +238,12 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
-
+            //Employment detail create call
             AddEmp_onSubmitEmp: function () {
                 try {
                     if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID") && utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressI"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID") &&
                         utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID") && utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressII"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID")) {
-                        var oModel = this.getView().getModel("oTraineeDetails").getData();
+                        var oModel = this.getView().getModel("employmentModel").getData();
                         var oPayload = {
                             tableName: "EmploymentDetails",
                             data: oModel
@@ -223,6 +252,7 @@ sap.ui.define([
                             sap.ui.core.BusyIndicator.hide();
                             if (oData.success) {
                                 MessageToast.show(this.i18nModel.getText("empDataSaved"));
+                                this.SEmp_oDialog.close();
                             } else {
                                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                             }
@@ -254,47 +284,6 @@ sap.ui.define([
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", true);
                 }
             },
-            _LCvalidateGrade: function (oEvent, type) {
-                var oField = (type === "ID") ? oEvent : oEvent.getSource();
-                if (!oField) return false;
-
-                var sGradeValue = oField.getValue().trim();
-
-                // Allow only numeric input (restrict typing letters)
-                var cleanValue = sGradeValue.replace(/[^0-9.]/g, ''); // Remove all non-numeric characters except the period
-                oField.setValue(cleanValue); // Update the field with the cleaned value
-
-                // Allow only numbers with up to two decimal places
-                var regex = /^\d{1,5}(\.\d{1,2})?$/;
-                if (!regex.test(cleanValue) || isNaN(cleanValue)) {
-                    oField.setValueState("Error");
-                    oField.setValueStateText("Please enter a valid numeric value with up to two decimal places.");
-                    return false;
-                }
-
-                var fGrade = parseFloat(cleanValue);
-                var sGradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey();
-
-                var bIsValid = false;
-                if (sGradeType === "Percentage") {
-                    bIsValid = fGrade > 0 && fGrade <= 100;
-                } else if (sGradeType === "CGPA") {
-                    bIsValid = fGrade > 0 && fGrade <= 10;
-                }
-
-                if (bIsValid) {
-                    oField.setValueState("None");
-                    return true;
-                } else {
-                    oField.setValueState("Error");
-                    var sErrorMsg = (sGradeType === "Percentage")
-                        ? "Grade must be between 0 and 100 for Percentage."
-                        : "Grade must be between 0 and 10 for CGPA.";
-                    oField.setValueStateText(sErrorMsg);
-                    return false;
-                }
-            }
-
-
+           
         });
     });

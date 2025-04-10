@@ -226,7 +226,7 @@ sap.ui.define([
                     oModel = {
                         "tableName": "EmployeeOffer",
                         "data": oModel
-                    }
+                    };
                     this.ajaxCreateWithJQuery("EmployeeOffer", oModel).then((oData) => {
                         if (oData.success) {
                             var oDialog = new sap.m.Dialog({

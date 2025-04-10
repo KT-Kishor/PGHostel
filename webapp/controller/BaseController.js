@@ -260,8 +260,8 @@ sap.ui.define([
       oModel.setProperty("/TotalVariablePay", (Math.round(TotalVariablePay)));
       oModel.setProperty("/CostofCompany", (Math.round(CostofCompany)));
       oModel.setProperty("/Total", (Math.round(Total)));
-      oModel.setProperty("/PF", PF);
-      oModel.setProperty("/EPF", EPF);
+      oModel.setProperty("/PF", (Math.round(PF)));
+      oModel.setProperty("/EPF",(Math.Round(EPF)));
     },
 
     //Date picker common function 

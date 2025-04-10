@@ -309,5 +309,48 @@ sap.ui.define([], function () {
         return true;
       }
     },
+    _LCvalidateGrade: function (oEventOrField, type, sGradeTypeId) {
+      var oField = (type === "ID") ? oEventOrField : oEventOrField.getSource();
+      if (!oField) return false;
+  
+      var sGradeValue = oField.getValue().trim();
+      var cleanValue = sGradeValue.replace(/[^0-9.]/g, '');
+      oField.setValue(cleanValue);
+  
+      if (!cleanValue) {
+          oField.setValueState("Error");
+          return false;
+      }
+  
+      var regex = /^\d{1,5}(\.\d{1,2})?$/;
+      if (!regex.test(cleanValue) || isNaN(cleanValue)) {
+          oField.setValueState("Error");
+          oField.setValueStateText("Enter a valid number with up to 2 decimal places.");
+          return false;
+      }
+  
+      var fGrade = parseFloat(cleanValue);
+      var sGradeType = sap.ui.getCore().byId(sGradeTypeId)?.getSelectedKey() || "";
+      var bIsValid = false;
+  
+      if (sGradeType === "Percentage") {
+          bIsValid = fGrade >= 0 && fGrade <= 100;
+      } else if (sGradeType === "CGPA") {
+          bIsValid = fGrade >= 0 && fGrade <= 10;
+      }
+  
+      if (bIsValid) {
+          oField.setValueState("None");
+          return true;
+      } else {
+          oField.setValueState("Error");
+          var sErrorMsg = (sGradeType === "Percentage")
+              ? "Grade must be between 0 and 100 for Percentage."
+              : "Grade must be between 0 and 10 for CGPA.";
+          oField.setValueStateText(sErrorMsg);
+          return false;
+      }
+  }
   };
+  
 });

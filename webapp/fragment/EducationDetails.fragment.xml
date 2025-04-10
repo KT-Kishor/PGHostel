@@ -21,7 +21,7 @@
 				<Text text="{i18n>degree}" />
 			</Column>
 			<Column minScreenWidth="Tablet" demandPopin="true">
-				<Text text="{i18n>geade}" />
+				<Text text="{i18n>grade}" />
 			</Column>
 			<Column demandPopin="true">
 				<Text text="{i18n>startDate}" />
@@ -34,10 +34,10 @@
 			<ColumnListItem >
 				<cells>
 					<Text text="{sEducationModel>CollegeName}"/>
-					<Text text="{sEducationModel>Degree}"/>
+					<Text text="{sEducationModel>DegreeName}"/>
 					<Text text="{sEducationModel>Grade}"/>
-					<Text text="{sEducationModel>EducationStartDate}"/>
-					<Text text="{sEducationModel>EducationEndDate}"/>
+					<Text text="{path:'sEducationModel>EducationStartDate' ,formatter:'.Formatter.formatDate'}"/>
+					<Text text="{path:'sEducationModel>EducationEndDate', formatter:'.Formatter.formatDate'}"/>
 				</cells>
 			</ColumnListItem>
 		</items>
