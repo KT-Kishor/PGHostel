@@ -1,5 +1,4 @@
-sap.ui.define(
-  [
+sap.ui.define([
     "./BaseController",
     "sap/ui/core/BusyIndicator",
     "sap/ui/model/json/JSONModel",
@@ -10,9 +9,7 @@ sap.ui.define(
   ],
   function (Controller,BusyIndicator,JSONModel,utils,MessageToast,Formatter,MessageBox) {
     "use strict";
-    return Controller.extend(
-      "sap.kt.com.minihrsolution.controller.ExpenseDetails",
-      {
+    return Controller.extend("sap.kt.com.minihrsolution.controller.ExpenseDetails",{
         Formatter: Formatter,
         onInit: function () {
           this.getRouter().getRoute("RouteExpensDetails").attachMatched(this._onRouteMatched, this);
@@ -34,7 +31,6 @@ sap.ui.define(
 
           this.ViewModel = this.getView().getModel("viewModel");
           this.FilteredExpenseModel = this.getView().getModel("FilteredExpenseModel").getData();
-          // this.ItemExpenseModel = this.getView().getModel("ItemExpenseModel").getData();
 
           if (this.FilteredExpenseModel[0].Status === "Submitted" || this.FilteredExpenseModel[0].Status === "Send to account") {
             this.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
@@ -214,7 +210,9 @@ sap.ui.define(
                   this.ViewModel.setProperty("/isEditMode", false);
                   this.ViewModel.setProperty("/enable", true);
                   this.ViewModel.setProperty("/enableDelete", true);
-                  MessageToast.show("Update");
+                  MessageToast.show(this.i18nModel.getText("expenseUpdateMess"));
+                }else{
+                  MessageToast.show(this.i18nModel.getText("expenseUpdateMessFailed"));
                 }
               })
               .catch((oError) => {
@@ -264,12 +262,14 @@ sap.ui.define(
             try {
               const oCreateResponse = await this.ajaxCreateWithJQuery("ItemExpense",oData);
               if (oCreateResponse) {
-                MessageToast.show(this.i18nModel.getText("offerSuccess"));
+                MessageToast.show(this.i18nModel.getText("expenseCreatedMess"));
                 this.IndexNoIncreent();
                 this.ViewModel.setProperty("/enable", true);
                 this.ExpenseItem.close();
                 this.ExpenseTotalCalculation();
                 BusyIndicator.hide();
+              }else{
+                MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
               }
             } catch (oError) {
               BusyIndicator.hide();
@@ -280,8 +280,7 @@ sap.ui.define(
           }
         },
 
-        async onPressSaveExpense() {
-          try {
+        async onPressSaveExpense() {         
             var oModel = this.getView().getModel("ExpenseCreateModel").getData();
             var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
             if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"),"ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"),"ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"),"ID") && (oModel.Currency !== "INR"? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"),"ID"): true)) {
@@ -310,43 +309,34 @@ sap.ui.define(
                     this.IndexNoIncreent();
                     this.ExpenseTotalCalculation();
                     this.ExpenseItem.close();
-                    MessageToast.show("Update");
+                    MessageToast.show(this.i18nModel.getText("expenseUpdateMess"));
                     BusyIndicator.hide();
+                  }else{
+                    MessageToast.show(this.i18nModel.getText("expenseUpdateMessFailed"));
                   }
                 })
                 .catch((oError) => {
                   sap.ui.core.BusyIndicator.hide();
-                  MessageToast.show(
-                    this.i18nModel.getText("commonErrorMessage")
-                  );
+                  MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 });
             } else {
               MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-            }
-          } catch (error) {
-            console.log(error);
-          }
+            }         
         },
 
         onPressExpenseItemDelete: async function (oEvent) {
           try {
             if (this.byId("exp_Id_ExpenseTable").getSelectedItem() === null) {
-              MessageToast.show(
-                this.i18nModel.getText("expenseDeleteSelectRowMess")
-              );
+              MessageToast.show(this.i18nModel.getText("expenseDeleteSelectRowMess"));
               return;
             }
             var ExpID = this.SelectedData.ItemID;
-            await this.ajaxDeleteWithJQuery("/ItemExpense", {
-              filters: { ItemID: ExpID },
-            });
-            MessageToast.show(
-              this.i18nModel.getText("msgCustomerDeleteSuccess")
-            );
+            await this.ajaxDeleteWithJQuery("/ItemExpense", {filters: { ItemID: ExpID },});
+            MessageToast.show(this.i18nModel.getText("expenseDeleteMess"));
             this.IndexNoIncreent();
             this.ExpenseTotalCalculation();
           } catch (error) {
-            MessageToast.show(error.responseText || "Error occurred");
+            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
         },
 
@@ -416,24 +406,20 @@ sap.ui.define(
                     },
                     filters: { ExpenseID: oModelData.ExpenseID },
                   };
-                  that
-                    .ajaxUpdateWithJQuery("Expense", inboxData)
-                    .then((oData) => {
+                  that.ajaxUpdateWithJQuery("Expense", inboxData).then((oData) => {
                       if (oData) {
                         this.ViewModel.setProperty("/status", false);
-                        this.byId("exp_Id_ExpenseTable").setMode(
-                          sap.m.ListMode.None
-                        );
+                        this.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
                         dialog.close();
-                        MessageToast.show("Update");
+                        MessageToast.show(that.i18nModel.getText("expenseSubmittedStatus"));
+                      }else{
+                        MessageToast.show(this.i18nModel.getText("expenseSubmittedStatusFailed"));
                       }
                     })
                     .catch((oError) => {
                       dialog.close();
                       sap.ui.core.BusyIndicator.hide();
-                      MessageToast.show(
-                        this.i18nModel.getText("commonErrorMessage")
-                      );
+                      MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     });
                 } else {
                   MessageToast.show(
@@ -468,6 +454,26 @@ sap.ui.define(
           var oModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
           var folderUrl = `https://workplace.zoho.in/#workdrive_app/home/63sop752ea6e63ddd4a8880466f5ae509b85a/privatespace/sharedwithme/allusers/${oModel.FolderID}`;
           window.open(folderUrl, "_blank");
+        },
+
+        onPressNewFolder:async function(){
+          var oData={
+            "data": {
+              FolderID:this.LoginModel.getProperty("/FolderID"),
+              FolderName:`${this.FilteredExpenseModel[0].ExpenseName} ${this.FilteredExpenseModel[0].ExpStartDate} to ${this.FilteredExpenseModel[0].ExpEndDate}`,
+              ExpenseID: this.ExpenseID
+            }
+          }
+          try {
+            const oCreateResponse = await this.ajaxCreateWithJQuery("NewFolder",oData);
+            if (oCreateResponse) {
+              MessageToast.show(this.i18nModel.getText("expenseFolderCreate"));   
+              await this._fetchCommonData("Expense", "FilteredExpenseModel", { ExpenseID: this.ExpenseID });                   
+            }
+          } catch (oError) {
+            BusyIndicator.hide();
+            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+          }
         }
       });
   });

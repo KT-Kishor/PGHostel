@@ -123,8 +123,8 @@
 											<m:Button icon="sap-icon://add" tooltip="{i18n>expenseAddTooltip}" press="onPressAddExpenseItem" visible="{viewModel>/status}" id="idAddExpBtn" enabled="{viewModel>/enable}" />											
 											<m:Button icon="sap-icon://edit" tooltip="{i18n>expenseEditTooltip}" press="onPressExpenseItemEdit" id="idExpenseItemEdit"  visible="{viewModel>/status}" enabled="{viewModel>/enableDelete}" />											
 											<m:Button icon="sap-icon://delete" tooltip="{i18n>expenseDeleteTooltip}" press="onPressExpenseItemDelete" visible="{viewModel>/status}"  id="idExpDeleteBtn" enabled="{viewModel>/enable}" />											
-											<m:Button icon="sap-icon://attachment" press="onPressOpenFolder" visible="{= ${FilteredExpenseModel>/FolderID} === ''?false:true}"  />										
-											<m:Button icon="sap-icon://add-folder" press="onPressNewFolder" visible="{= ${FilteredExpenseModel>/FolderID} === ''?true:false}"  />											
+											<m:Button icon="sap-icon://attachment" press="onPressOpenFolder" visible="{= ${FilteredExpenseModel>/0/FolderID} === '' ? false : true}"  />										
+											<m:Button icon="sap-icon://add-folder" press="onPressNewFolder" visible="{= ${FilteredExpenseModel>/0/FolderID} === '' ? true : false}"  />											
 											<m:Button icon="sap-icon://download" press="onPressExpenseDownload" visible="{viewModel>/status}" />
 										</m:OverflowToolbar>
 									</m:headerToolbar>

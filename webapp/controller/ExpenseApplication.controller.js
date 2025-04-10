@@ -43,7 +43,6 @@ sap.ui.define([
 			});
 			this.getOwnerComponent().setModel(oModel, "CreateExpenseModel");
 			this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
-			// BusyIndicator.hide();
 		},
 		onPressback: function () {
 			this.getRouter().navTo("RouteTilePage");
@@ -72,8 +71,7 @@ sap.ui.define([
 			this.Expense.close();
 		},
 
-		onPressSubmit: function () {
-			try {
+		onPressSubmit: function () {			
 				if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-ExpenseName"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-EndDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Country"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Source"), "ID") && (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Destination"), "ID"): true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-EmployeeRemark"), "ID")) {
 
 					BusyIndicator.show();
@@ -82,21 +80,19 @@ sap.ui.define([
 					}
 					this.ajaxCreateWithJQuery("Expense", oData).then((oData) => {
 						if (oData) {
-							MessageToast.show(this.i18nModel.getText("offerSuccess"));
+							MessageToast.show(this.i18nModel.getText("expenseCreatedMess"));
 							this._fetchCommonData("Expense", "ExpenseModel");
 							this.Expense.close();
 							BusyIndicator.hide();
 						}
 					}).catch((oError) => {
 						BusyIndicator.hide();
-						MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+						MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
 					})
 				} else {
 					BusyIndicator.hide();
-					MessageToast.show("Please fill all mandatory fields");
-				}
-			} catch (error) {
-			}
+					MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+				}			
 		},
 
 		onCheckExpenseDetails: function (oEvent) {
@@ -146,7 +142,7 @@ sap.ui.define([
 			BusyIndicator.show(0);
 			var ExpID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
 			this.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: ExpID } }).then(() => {
-				MessageToast.show(this.i18nModel.getText("msgCustomerDeleteSuccess"));
+				MessageToast.show(this.i18nModel.getText("expenseDeleteMess"));
 				this._fetchCommonData("Expense", "ExpenseModel");
 				BusyIndicator.hide();
 			}).catch((error) => {
@@ -175,7 +171,7 @@ sap.ui.define([
 				await this._fetchCommonData("Expense", "ExpenseModel", params);					
 		
 			} catch (error) {
-				MessageToast.show("An error occurred during search.");
+				MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
 			} finally {
 				BusyIndicator.hide();
 			}
