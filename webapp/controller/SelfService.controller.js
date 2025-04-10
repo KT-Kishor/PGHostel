@@ -22,8 +22,12 @@ sap.ui.define([
                 this._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
                     EmployeeID: this.EmployeeID
                 });
-                var oViewModel = new JSONModel({ isEditMode: false, Max: new Date() });
+                var oViewModel = new JSONModel({
+                    fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false,
+                    isRoleMode: false, Max: new Date(), isVisitMode: true, isIdMode: true,
+                });
                 this.getView().setModel(oViewModel, "viewModel");
+
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle()
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "My Details");
                 var eduModel = new JSONModel({
@@ -53,6 +57,11 @@ sap.ui.define([
                     RCMobileII: ""
                 });
                 this.getView().setModel(empModel, "employmentModel");
+                var idsToDisable = ["EdF_id_EduEdit", "EdF_id_EduDelete", "EMF_id_EmpEdit", "EMF_id_EmpDelete"];
+                idsToDisable.forEach(function (id) {
+                    this.byId(id).setEnabled(false);
+                }.bind(this));
+
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
@@ -80,6 +89,9 @@ sap.ui.define([
 
             //Education dialog open
             EdF_AddEdu: function () {
+                var oViewModel = this.getView().getModel("viewModel");
+                oViewModel.setProperty("/fragmentSubmit", true); 
+                oViewModel.setProperty("/fragmentSave", false); 
                 this.SS_commonOpenDialog("SEd_oDialog", "sap.kt.com.minihrsolution.fragment.AddEducation", ["AddEd_id_StartEdu", "AddEd_id_EndEdu"]);
             },
             //Date change validation function
@@ -209,6 +221,8 @@ sap.ui.define([
                     if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType")) {
                         var oModel = this.getView().getModel("educationModel").getData();
                         oModel.EmployeeID = this.EmployeeID;
+                        oModel.EducationStartDate = this.Formatter.convertToISODateFormat(oModel.EducationStartDate)
+                        oModel.EducationEndDate = this.Formatter.convertToISODateFormat(oModel.EducationEndDate);
                         oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey();
                         oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey();
                         oModel = {
@@ -238,6 +252,75 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
+            // Common function to enable/disable elements by their IDs
+            setEnabledByIds: function (ids, isEnabled) {
+                var that = this;
+                ids.forEach(function (id) {
+                    that.byId(id).setEnabled(isEnabled);
+                });
+            },
+
+            EDF_onSelectionChange: function (oEvent) {
+                const aSelectedIndices = oEvent.getSource().getSelectedItems();
+                if (aSelectedIndices.length > 0) {
+                    this.setEnabledByIds(["EdF_id_EduEdit", "EdF_id_EduDelete"], true);
+                } else {
+                    this.setEnabledByIds(["EdF_id_EduEdit", "EdF_id_EduDelete"], false);
+                }
+
+            },
+            EDF_EditEducation: function () {
+                var oSelectedItem = this.byId("EdF_id_EduTable").getSelectedItem();
+                if (oSelectedItem) {
+                    var oData = oSelectedItem.getBindingContext("sEducationModel").getObject();
+                    this.getView().getModel("educationModel").setData(oData);
+                    var oViewModel = this.getView().getModel("viewModel");
+                    oViewModel.setProperty("/fragmentSubmit", false); 
+                    oViewModel.setProperty("/fragmentSave", true);
+                    this.SS_commonOpenDialog("SEd_oDialog", "sap.kt.com.minihrsolution.fragment.AddEducation", ["AddEd_id_StartEdu", "AddEd_id_EndEdu"]);
+                } else {
+                    MessageToast.show(this.i18nModel.getText("selectRow"));
+                }
+
+            },
+            AddEd_onUpdateEdDetails: function () {
+                try {
+                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") &&
+                        utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") &&
+                        utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") &&
+                        utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType")) {
+                        var oModel = this.getView().getModel("educationModel").getData();
+                        oModel.EmployeeID = this.EmployeeID;
+                        oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey();
+                        oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey();
+                        oModel = {
+                            "data": oModel,
+                            "filters": {
+                                "ID": oModel.ID
+                            }
+                        };
+                        this.ajaxUpdateWithJQuery("EducationalDetails", oModel).then((oData) => {
+                            if (oData.success) {
+                                MessageToast.show(this.i18nModel.getText("eduDataupdate"));
+                                this.SEd_oDialog.close();
+                                this._fetchCommonData("EducationalDetails", "sEducationModel", {
+                                    EmployeeID: this.EmployeeID
+                                });
+                            } else {
+                                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                            }
+                        }).catch((error) => {
+                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                        });
+            
+                    } else {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    }
+                } catch (error) {
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                }
+            },
+            
             //Employment detail create call
             AddEmp_onSubmitEmp: function () {
                 try {
@@ -284,6 +367,8 @@ sap.ui.define([
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", true);
                 }
             },
+
+
 
             SS_onDownloadTerminateLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
