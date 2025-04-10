@@ -53,12 +53,12 @@
 							<Input value="{msaModelWizart>/CompanyHeadPosition}" placeholder="{i18n>placeHedaPosition}" maxLength="50" id="MsaD_id_HeadPosition" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeHedaPosition}" />
 
 							<Label text="{i18n>contractPeriod}" required="true" />
-							<Select id="MsaD_id_ContractPeriod" items="{contractwarrantyModel>/results}" selectedKey="{msaModelWizart>/ContractPeriod}">
-								<core:Item key="{contractwarrantyModel>Months}" text="{contractwarrantyModel>Months}" />
+							<Select id="MsaD_id_ContractPeriod" items="{ContractPeriod>/ContractPeriod}" selectedKey="{msaModelWizart>/ContractPeriod}">
+								<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 							</Select>
 
 							<Label text="{i18n>createMSADate}" required="true" />
-							<DatePicker id="MsaD_id_CreateMSADate" value="" change="MsaD_validateDate" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}" />
+							<DatePicker displayFormat="dd/MM/yyyy" id="MsaD_id_CreateMSADate" value="{msaModelWizart>/CreateMSADate}" change="MsaD_validateDate" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}" />
 
 							<Label text="{i18n>panCardReg}" required="true" />
 							<Input  value="{msaModelWizart>/PANCard}"  placeholder="{i18n>placePanCardReg}" id="MsaD_id_PanCard" liveChange="MsaD_ValidateCommonFields"  maxLength="50" valueStateText="{i18n>placePanCardReg}" />
@@ -70,8 +70,8 @@
 							<TextArea value="{msaModelWizart>/Address}" placeholder="{i18n>placeAddress}" id="MsaD_id_Address"  liveChange="MsaD_ValidateCommonFields"  maxLength="120" valueStateText="{i18n>addressValueState}"/>
 							
 							<Label text="{i18n>paymentterms}" required="true"></Label>
-							<Select  items="{ContractpaymentModel>/results}" selectedKey="{msaModelWizart>/PaymentTerms}" id="MsaD_id_PaymentTerms" >
-								<core:Item key="{ContractpaymentModel>Days}" text="{ContractpaymentModel>Days}" />
+							<Select  items="{ContractpaymentModel>/}" selectedKey="{msaModelWizart>/PaymentTerms}" id="MsaD_id_PaymentTerms" >
+								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</Select>
 						</f:content>
 					</f:SimpleForm>

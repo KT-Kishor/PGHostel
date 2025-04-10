@@ -21,7 +21,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="MSA_id_Table" class="sapUiTinyMargin" items=""  busyIndicatorDelay="0"  width="auto"
+			<Table id="MSA_id_Table" class="sapUiTinyMargin" items="{MSADisplayModel>/}"  busyIndicatorDelay="0"  width="auto"
                     growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				 <headerToolbar>
                 <OverflowToolbar >
@@ -53,12 +53,11 @@
 				<items>
 					<ColumnListItem >
 						<cells>
-						    <Text text="{}"/>							
-							<Text text="{}"/>
-							<Text text="{}"/>
-							<Text text="{}"/>
-							<Text text="{}"/>
-
+						    <Text text="{MSADisplayModel>CompanyName}"/>							
+							<Text text="{MSADisplayModel>PanCard}"/>
+							<Text text="{MSADisplayModel>CompanyHeadName}"/>
+							<Text text="{MSADisplayModel>CompanyHeadPosition}"/>
+							<Text text="{MSADisplayModel>CreateMSADate}"/>
 						</cells>
 					</ColumnListItem>
 				</items>

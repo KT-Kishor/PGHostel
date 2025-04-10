@@ -167,6 +167,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TrainingDuration.json",
                 "preload": true
+            },
+            "ContractPeriod": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/ContractPeriod.json",
+                "preload": true
             }
         },
         "resources": {

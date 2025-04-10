@@ -1,18 +1,16 @@
 sap.ui.define([
-    "./BaseController",
-    "../utils/validation",
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
+    "./BaseController",  
+    "sap/ui/core/BusyIndicator",  
 ],
-    function (BaseController, utils, JSONModel, MessageToast) {
+    function (BaseController,BusyIndicator) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSA", {
             onInit: function () {
                 this.getRouter().getRoute("RouteMSA").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: function () {
-                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            _onRouteMatched: async function () {
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");
+                this.MSA_onSearch();
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
@@ -26,8 +24,34 @@ sap.ui.define([
             },
             MSA_EditMsaDetails:function(){
                 this.getRouter().navTo("RouteMSAEdit")
-            }
+            },
+
+            MSA_onSearch: async function () {
+                try {
+                    BusyIndicator.show(0);		
+                    const aFilterItems = this.byId("MSA_id_AdminFilter").getFilterGroupItems();
+                    const params = {};
             
+                    aFilterItems.forEach(function (oItem) {
+                        const oControl = oItem.getControl();
+                        const sKey = oItem.getName();
+            
+                        if (oControl && typeof oControl.getValue === "function") {
+                            const sValue = oControl.getValue().trim();
+            
+                            if (sValue) {
+                                params[sKey] = sValue;
+                            }
+                        }
+                    });
+                    await this._fetchCommonData("MSADetails", "MSADisplayModel", params);					
+            
+                } catch (error) {
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                } finally {
+                    BusyIndicator.hide();
+                }
+            },
 
         });
     });

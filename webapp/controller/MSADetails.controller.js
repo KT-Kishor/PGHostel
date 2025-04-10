@@ -9,10 +9,26 @@ sap.ui.define([
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSADetails", {
             onInit: function () {
                 this.getRouter().getRoute("RouteMSADetails").attachMatched(this._onRouteMatched, this);
+                this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
             },
             _onRouteMatched: function () {
                 this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                
+                  var oModelMSA = new JSONModel({
+                    CompanyName: "",
+                    CreateMSADate: new Date(),
+                    PANCard: "",
+                    Address: "",
+                    CompanyHeadName: "",
+                    CompanyHeadPosition: "",
+                    MSAEmail: "",
+                    PaymentTerms: "30 Days",
+                    ContractPeriod: "12 Months",
+                    Salutation: "Mr.",
+                    Status: "New"
+                  });
+                  this.getView().setModel(oModelMSA, "msaModelWizart");
             },
             MsaD_onBack: function () {
                 this.getRouter().navTo("RouteMSA");
