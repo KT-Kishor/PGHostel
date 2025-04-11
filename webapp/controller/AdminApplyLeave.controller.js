@@ -41,16 +41,14 @@ sap.ui.define(
             
             that._fetchCommonData("ListOfHolidays", "HolidayModel", {});   
             that.BarDisplayFunction("All In One Leave", that.userId);
-            that.MonthBarDisplayFunction("All In One Leave", that.userId);
-            that.YearlyBarDisplayFunction(that.userId);
         
-            // if (that.Role !== "Trainee") {
-            //     that.MonthBarDisplayFunction("All In One Leave", that.userId);
-            //     that.YearlyBarDisplayFunction(that.userId);
-            //     that.EmployeeDetReadCall("EmployeeDetails", "ID", that.userId);
-            // } else {
-            //     that.EmployeeDetReadCall("Trainee", "TraineeId", that.userId);
-            // }
+            if (that.Type !== "Trainee") {
+                that.MonthBarDisplayFunction("All In One Leave", that.userId);
+                that.YearlyBarDisplayFunction(that.userId);
+                that.EmployeeDetReadCall("EmployeeDetails", {"EmployeeID": that.userId});
+            } else {
+                that.EmployeeDetReadCall("Trainee", {"TraineeID": that.userId});
+            }
         
             var barDataModel = new JSONModel({ Name: 'line', type: 'column', AllStatus: 'column' });
             that.getView().setModel(barDataModel, "MonthlyBar");
@@ -83,8 +81,8 @@ sap.ui.define(
                 let oSecondChartModel = new JSONModel({ chartData: secondChartData });
                 this.getView().setModel(oSecondChartModel, "secondLeaveData");
         
-                this._configureChart("AL_id_VizFrame6", oFirstChartModel, "Current Available Leave Quota");
-                this._configureChart("AL_id_VizFrameAll", oSecondChartModel, "Yearly Leave Quota");
+                this._configureFirstChart("AL_id_VizFrame6", oFirstChartModel, "Current Available Leave Quota");
+                this._configureSecondChart("AL_id_VizFrameAll", oSecondChartModel, "Yearly Leave Quota");
         
             } catch (error) {
                 sap.ui.core.BusyIndicator.hide();
@@ -92,10 +90,9 @@ sap.ui.define(
             }
         },
         
-        _configureChart: function (chartId, oModel, titleText) {
+        _configureFirstChart: function (chartId, oModel, titleText) {
             let oVizFrame = this.getView().byId(chartId);
             if (!oVizFrame) return; 
-        
             oVizFrame.setModel(oModel);
             oVizFrame.setVizProperties({
                 legend: {
@@ -122,12 +119,52 @@ sap.ui.define(
                                 dataContext: { LeaveType: "Quota" },
                                 properties: { color: "#4c79e0" },
                                 "displayName": "Quota"
+                            },
+                        ]
+                    }
+                }
+            });
+            let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null; 
+            let oPopOver = popoverId ? this.getView().byId(popoverId) : null;
+            if (oPopOver) {
+                oPopOver.connect(oVizFrame.getVizUid());
+            }
+        },
+
+        _configureSecondChart: function (chartId, oModel, titleText) {
+            let oVizFrame = this.getView().byId(chartId);
+            if (!oVizFrame) return; 
+            oVizFrame.setModel(oModel);
+            oVizFrame.setVizProperties({
+                legend: {
+                    title: { visible: true, text: "All Measures" }
+                },
+                title: {
+                    visible: true,
+                    text: titleText
+                },
+                plotArea: {
+                    dataPointStyle: {
+                        rules: [
+                            {
+                                dataContext: { LeaveType: "Submitted" },
+                                properties: { color: "#fc7b03" },
+                                "displayName": "Submitted"
+                            },
+                            {
+                                dataContext: { LeaveType: "Approved" },
+                                properties: { color: "#4CAF50" },
+                                "displayName": "Approved"
+                            },
+                            {
+                                dataContext: { LeaveType: "All Quota" },
+                                properties: { color: "#4c79e0" },
+                                "displayName": "Quota"
                             }
                         ]
                     }
                 }
             });
-        
             let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null; 
             let oPopOver = popoverId ? this.getView().byId(popoverId) : null;
             if (oPopOver) {
@@ -141,10 +178,8 @@ sap.ui.define(
                 sap.ui.core.BusyIndicator.show(0);
                 let oData = await this.ajaxCreateWithJQuery("/MonthyBarChart", jsonData);
                 sap.ui.core.BusyIndicator.hide();
-        
                 let oLeaveModel = new JSONModel({ chartData: oData.results });
                 this.getView().setModel(oLeaveModel, "MonthleaveData");
-        
                 var oVizFrame = this.getView().byId("AL_id_VizFrame");
                 oVizFrame.setVizProperties({
                     legend: {
@@ -157,9 +192,7 @@ sap.ui.define(
                         text: "Monthly Approved Leave"
                     }
                 });
-        
                 oVizFrame.setModel(oLeaveModel);
-        
                 var oPopOver = this.getView().byId("AL_id_PopOver");
                 oPopOver.connect(oVizFrame.getVizUid());
             } catch (error) {
@@ -174,10 +207,8 @@ sap.ui.define(
                 sap.ui.core.BusyIndicator.show(0);
                 let oData = await this.ajaxCreateWithJQuery("/YearlyBarChart", jsonData);
                 sap.ui.core.BusyIndicator.hide();
-        
                 let rawData = oData.results;
                 let result = [];
-        
                 rawData.forEach(item => {
                     let yearEntry = result.find(entry => entry.Year === item.Year);
                     if (!yearEntry) {
@@ -186,10 +217,8 @@ sap.ui.define(
                     }
                     yearEntry[item.LeaveType.replace(/\s+/g, '')] = item.Count;
                 });
-        
                 let oLeaveModel = new JSONModel({ chartData: result });
                 this.getView().setModel(oLeaveModel, "YearleaveData");
-        
                 var oVizFrame = this.getView().byId("AL_id_VizFrameYear");
                 oVizFrame.setVizProperties({
                     legend: {
@@ -202,9 +231,7 @@ sap.ui.define(
                         text: "Yearly Approved Leave"
                     }
                 });
-        
                 oVizFrame.setModel(oLeaveModel);
-        
                 var oPopOver = this.getView().byId("AL_id_PopOver");
                 oPopOver.connect(oVizFrame.getVizUid());
             } catch (error) {
@@ -213,36 +240,29 @@ sap.ui.define(
             }
         },
         
-        // EmployeeDetReadCall: async function (entity, filterField, value) {
-        //     sap.ui.core.BusyIndicator.show(0);
-        //     try {
-        //         let filter = {};
-        //         filter[filterField] = value;
-        
-        //         let data = await this.ajaxReadWithJQuery("/" + entity, filter);
-        //         sap.ui.core.BusyIndicator.hide();
-        
-        //         if (data.results.length > 0) {
-        //             let joiningDateField = (entity === "Trainee") ? "JoiningDate" : "AppraisalDate";
-        //             this.JoiningDate = data.results[0][joiningDateField].split("/").map(Number);
-        
-        //             let addYears = [];
-        //             let nowYear = new Date().getFullYear();
-        //             let smallestYear = this.JoiningDate[2];
-        //             let length = nowYear - smallestYear;
-        
-        //             for (let i = 0; i <= length; i++) {
-        //                 addYears.push(smallestYear + i);
-        //             }
-        
-        //             let yearModel = new JSONModel({ items: addYears });
-        //             this.getView().setModel(yearModel, "YearModel");
-        //         }
-        //     } catch (error) {
-        //         sap.ui.core.BusyIndicator.hide();
-        //         sap.m.MessageToast.show("Error fetching employee details.");
-        //     }
-        // },
+        EmployeeDetReadCall: async function (entity, value) {
+            sap.ui.core.BusyIndicator.show(0);
+            try {
+                let data = await this.ajaxReadWithJQuery(entity, value);
+                sap.ui.core.BusyIndicator.hide();
+                if (data.data.length > 0) {
+                    let joiningDateField = (entity === "Trainee") ? "JoiningDate" : "AppraisalDate";
+                    this.JoiningDate = data.data[0][joiningDateField].split("/").map(Number);
+                    let addYears = [];
+                    let nowYear = new Date().getFullYear();
+                    let smallestYear = this.JoiningDate[2];
+                    let length = nowYear - smallestYear;
+                    for (let i = 0; i <= length; i++) {
+                        addYears.push(smallestYear + i);
+                    }
+                    let yearModel = new JSONModel({ items: addYears });
+                    this.getView().setModel(yearModel, "YearModel");
+                }
+            } catch (error) {
+                sap.ui.core.BusyIndicator.hide();
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+            }
+        },
     
         AL_onPressPie: function () {
             this.getView().getModel("MonthlyBar").setProperty("/type", "pie");
@@ -258,14 +278,14 @@ sap.ui.define(
 
         AL_onChangeLeaveType: function (oEvent) {
             var year = this.byId("AL_id_LeaveYear").getValue()
-            this.BarDisplayFunction(oEvent.getSource().getValue(), this.userId + "/" + year);
-            this.MonthBarDisplayFunction(oEvent.getSource().getValue(), this.userId + "/" + year);
+            this.BarDisplayFunction(oEvent.getSource().getValue(), this.userId, year);
+            this.MonthBarDisplayFunction(oEvent.getSource().getValue(), this.userId, year);
         },
 
         AL_onChangeYears: function (oEvent) {
             var type = this.byId("AL_id_TypeOfLeave").getValue();
-            this.BarDisplayFunction(type, this.userId + "/" + oEvent.getSource().getValue());
-            this.MonthBarDisplayFunction(type, this.userId + "/" + oEvent.getSource().getValue());
+            this.BarDisplayFunction(type, this.userId, oEvent.getSource().getValue());
+            this.MonthBarDisplayFunction(type, this.userId, oEvent.getSource().getValue());
         },
 
         AL_onPressBarChart: function () {
@@ -444,6 +464,7 @@ sap.ui.define(
               MinToDate: null,
               managerRemark: "",
               maxDate: new Date(currentYear, 11, 31),
+              minDate: new Date(this.JoiningDate[2], this.JoiningDate[1] - 1, this.JoiningDate[0]),
               isUpdate: false,
           };
           var oLeaveTempModel = new JSONModel(leaveJson);
@@ -472,6 +493,7 @@ sap.ui.define(
                 halfDay: oModelData.halfDay === "false" ? false : true,
                 managerRemark: oModelData.ManagerRemark,
                 maxDate: new Date(currentYear, 11, 31),
+                minDate: new Date(this.JoiningDate[2], this.JoiningDate[1] - 1, this.JoiningDate[0]),
                 isUpdate: true,
             };
             var oLeaveTempModel = new JSONModel(leaveJson);
@@ -642,65 +664,105 @@ sap.ui.define(
                     var oData = oLeaveTempModel.getData();
                     oData.halfDay = oData.halfDay.toString();
                     oData.status = "Submitted";
-                    
+        
                     var fromDateParts = oData.fromDate.split("/").map(Number);
                     var startDate = new Date(fromDateParts[2], fromDateParts[1] - 1, fromDateParts[0]);
                     var toDateParts = oData.toDate.split("/").map(Number);
                     var endDate = new Date(toDateParts[2], toDateParts[1] - 1, toDateParts[0]);
         
-                if (fromDateParts[2] !== toDateParts[2]) {
-                return MessageBox.error(this.i18nModelMess.getText("leaveSameYear"));
-                }
-        
-                if (oData.fromDate === oData.toDate) {
-                var isValid = true;
-                var holidays = this.getView().getModel("HolidayModel").getData(); 
-                holidays.forEach((holiday) => {
-                if (new Date(holiday.date).getTime() === startDate.getTime()) {
-                    isValid = false;
+                    if (fromDateParts[2] !== toDateParts[2]) {
+                        return MessageBox.error(this.i18nModelMess.getText("leaveSameYear"));
                     }
-                });
-                if (!isValid) {
-                return MessageBox.error(this.i18nModel.getText("holidaysMess"));
-                }
-                }
         
-                if (parseFloat(oData.NoofDays) <= 2) {
-                var isFromDateWeekend = (startDate.getDay() === 0 || startDate.getDay() === 6);
-                var isToDateWeekend = (endDate.getDay() === 0 || endDate.getDay() === 6);
-                if (isFromDateWeekend && isToDateWeekend) {
-                return MessageBox.error(this.i18nModel.getText("holidaysMess"));
-                }
-                }
+                    if (oData.fromDate === oData.toDate) {
+                        var isValid = true;
+                        var holidays = this.getView().getModel("HolidayModel").getData();
+                        holidays.forEach((holiday) => {
+                            if (new Date(holiday.date).getTime() === startDate.getTime()) {
+                                isValid = false;
+                            }
+                        });
+                        if (!isValid) {
+                            return MessageBox.error(this.i18nModel.getText("holidaysMess"));
+                        }
+                    }
         
-                if (this.isLeaveAlreadyApplied(oData.fromDate, oData.toDate)) {
-                return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
-                 }
+                    if (parseFloat(oData.NoofDays) <= 2) {
+                        var isFromDateWeekend = (startDate.getDay() === 0 || startDate.getDay() === 6);
+                        var isToDateWeekend = (endDate.getDay() === 0 || endDate.getDay() === 6);
+                        if (isFromDateWeekend && isToDateWeekend) {
+                            return MessageBox.error(this.i18nModel.getText("holidaysMess"));
+                        }
+                    }
         
-                    oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
-                    oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                    if (this.isLeaveAlreadyApplied(oData.fromDate, oData.toDate)) {
+                        return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
+                    }
         
-                    delete oData.Save;
-                    delete oData.Submit;
-                    delete oData.MinToDate;
-                    delete oData.ManagerRemark;
-                    delete oData.maxDate;
-                    delete oData.minDate;
-                    delete oData.isUpdate;
+                    var LeaveModel = this.getView().getModel("LeaveModel").getData();
+                    var currentYear = this.currentYear;
         
-                    if (actionType === "Submit") {
-                        this.ajaxCreateWithJQuery("Leaves", { data: oData })
-                            .then(response => {
-                                this._handleResponse(response, "leaveSubmitted");
-                            })
-                            .catch(() => MessageToast.show(this.i18nModel.getText("commonErrorMessage")));
-                    } else if (actionType === "Save") {
-                        var requestData = { filters: { ID: oData.ID }, data: oData };
-                        this.ajaxUpdateWithJQuery("Leaves", requestData)
-                            .then(response => {
-                                this._handleResponse(response, "leaveUpdatedSuccess");
-                            })
-                            .catch(() => MessageToast.show(this.i18nModel.getText("commonErrorMessage")));
+                    function parseDate(dateStr) {
+                        const [day, month, year] = dateStr.split("/").map(Number);
+                        return new Date(year, month - 1, day);
+                    }
+        
+                    var filteredData = LeaveModel.filter((item) => {
+                        if (item.typeOfLeave !== "All In One Leave") return false;
+                        
+                        var fromDate = parseDate(this.Formatter.formatDate(item.fromDate));
+                        var toDate = parseDate(this.Formatter.formatDate(item.toDate));
+                        var startOfYear = new Date(currentYear, 0, 1);
+                        var endOfYear = new Date(currentYear, 11, 31);
+        
+                        return fromDate >= startOfYear && toDate <= endOfYear;
+                    });
+        
+                    filteredData = filteredData.filter((item) => item.status !== "Rejected");
+        
+                    var totalNoofDays = filteredData.reduce((total, item) => {
+                        return total + parseFloat(item.NoofDays || 0);
+                    }, 0);
+        
+                    totalNoofDays = totalNoofDays + parseFloat(oData.NoofDays);
+        
+                    var oLeaveModel = this.getView().getModel("secondLeaveData");
+                    var leaveData = oLeaveModel.getProperty("/chartData");
+        
+                    var quotaLeave = leaveData.find(function (leave) {
+                        return leave.LeaveStatus === "All Quota";
+                    });
+        
+                    if (oData.typeOfLeave === "LOP" || totalNoofDays <= quotaLeave.Count) {
+                        oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                        oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+        
+                        delete oData.Save;
+                        delete oData.Submit;
+                        delete oData.MinToDate;
+                        delete oData.ManagerRemark;
+                        delete oData.maxDate;
+                        delete oData.minDate;
+                        delete oData.isUpdate;
+        
+                        sap.ui.core.BusyIndicator.show(0);
+        
+                        if (actionType === "Submit") {
+                            this.ajaxCreateWithJQuery("Leaves", { data: oData })
+                                .then(response => {
+                                    this._handleResponse(response, "leaveSubmitted");
+                                })
+                                .catch(() => MessageToast.show(this.i18nModel.getText("commonErrorMessage")));
+                        } else if (actionType === "Save") {
+                            var requestData = { filters: { ID: oData.ID }, data: oData };
+                            this.ajaxUpdateWithJQuery("Leaves", requestData)
+                                .then(response => {
+                                    this._handleResponse(response, "leaveUpdatedSuccess");
+                                })
+                                .catch(() => MessageToast.show(this.i18nModel.getText("commonErrorMessage")));
+                        }
+                    } else {
+                        return MessageBox.error(this.i18nModel.getText("quotaExceeded"));
                     }
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
