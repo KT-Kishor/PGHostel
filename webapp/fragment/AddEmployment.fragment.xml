@@ -16,8 +16,8 @@
 				<Label text="{i18n>companyName}" required="true"/>
 				<Input value="{employmentModel>/CompanyName}" id="AddEmp_id_Company" placeholder="{i18n>companyName}" maxLength="50" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>companyNameValueState}"/>
 				<Label text="{i18n>designation}" required="true" />
-				<ComboBox items="" id="AddEmp_id_Desig" change="SS_ValidateCommonFields" valueStateText="{i18n>designationValueState}">
-					<core:Item key="{Designation>DesignationName}" text="{Designation>DesignationName}" />
+				<ComboBox items="{sDesignationModel>/}" id="AddEmp_id_Desig" change="SS_ValidateCommonFields" valueStateText="{i18n>designationValueState}" selectedKey="{employmentModel>Designation}" showSecondaryValues="true" placeholder="{i18n>plaseDesignation}" maxLength="50">
+					<core:Item key="{sDesignationModel>designationName}" text="{sDesignationModel>designationName}" />
 				</ComboBox>
 				<Label text="{i18n>companyAddress}" required="true"/>
 				<TextArea value="{employmentModel>/OfficeAddress}" id="AddEmp_id_OfcAddress" placeholder="{i18n>companyAddress}" maxLength="120"  liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}"/>
@@ -68,7 +68,7 @@
 				<Label text="{i18n>rcNameII}" required="true" />
 				<Select
                                     
-                                               selectedKey="{employmentModel>/RCISal}"
+                                               selectedKey="{employmentModel>/RCIISal}"
                                                items="{Salutation>/salutation}" id="AdEmp_id_RCSalII"
                                                width="100%">
 					<!-- Binding the key and text of the Select control to the NameSalutation model -->
@@ -83,12 +83,12 @@
 				<Label text="{i18n>rcMailIdII}" required="true" />
 				<Input value="{employmentModel>/RCIIEmailID}" id="AdEmp_id_RCMailII" liveChange="SS_validateEmail" placeholder="{i18n>placeEmailId}" maxLength="50" valueStateText="{i18n>emailValueState}"/>
 				<Label text="{i18n>rcMobileNoII}" required="true"  />
-				<Input value="{employmentModel>/RCMIIMobileNo}" maxLength="10" id="AdEmp_id_RCMobileII"  liveChange="SS_validateMobileNo" placeholder="{i18n>placeholderMobileNo}" valueStateText="{i18n>mobileNoValueState}" />
+				<Input value="{employmentModel>/RCIIMobileNo}" maxLength="10" id="AdEmp_id_RCMobileII"  liveChange="SS_validateMobileNo" placeholder="{i18n>placeholderMobileNo}" valueStateText="{i18n>mobileNoValueState}" />
 			</f:content>
 		</f:SimpleForm>
 		<FlexBox justifyContent="End">
-			<Button text="{i18n>submit}" id="AddEmp_id_Submit" type="Accept" press="AddEmp_onSubmitEmp" class="submit" visible="{viewModel>/fragmentSave}" ></Button>
-			<!-- <Button text="{i18n>save}" type="Accept" id="AddEmp_id_Save" press="AddEmp_onUpdateEmp" class="submit" visible="{viewModel>/fragmentSubmit}"></Button> -->
+			<Button text="{i18n>submit}" id="AddEmp_id_Submit" type="Accept" press="AddEmp_onSubmitEmpDetails" class="submit" visible="{viewModel>/fragmentSubmit}" ></Button>
+			<Button text="{i18n>save}" type="Accept" id="AddEmp_id_Save" press="AddEmp_onUpdateEmpDetails" class="submit" visible="{viewModel>/fragmentSave}"></Button>
 			<Button text="{i18n>close}" press="AddEmp_onClose" class="sendMail" type="Reject"></Button>
 		</FlexBox>
 	</Dialog>

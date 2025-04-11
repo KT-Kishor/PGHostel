@@ -54,17 +54,19 @@ sap.ui.define([
                     EmployeeID: this.EmployeeID,
                     CompanyName: "",
                     Designation: "",
-                    EmploymentStartDate: "",
-                    EmploymentEndDate: "",
+                    StartDate: "",
+                    EndDate: "",
                     OfficeAddress: "",
-                    RCNameI: "",
-                    RCAddressI: "",
-                    RCMailI: "",
-                    RCMobileI: "",
-                    RCNameII: "",
-                    RCAddressII: "",
-                    RCMailII: "",
-                    RCMobileII: ""
+                    RCISal: "",
+                    RCIName: "",
+                    RCIAddress: "",
+                    RCIEmailID: "",
+                    RCIMobileNo: "",
+                    RCIISal: "",
+                    RCIIName: "",
+                    RCIIAddress: "",
+                    RCIIEmailID: "",
+                    RCIIMobileNo: "",
                 });
                 this.getView().setModel(empModel, "employmentModel");
             },
@@ -118,13 +120,20 @@ sap.ui.define([
                 this.SEd_oDialog.close();
             },
             //Employment dialog open
-            EmpF_onAddEmp: function () {
+            EmpF_onAddEmployment: function () {
+                var oViewModel = this.getView().getModel("viewModel");
+                oViewModel.setProperty("/fragmentSubmit", true);
+                oViewModel.setProperty("/fragmentSave", false);
+                this.SS_commonEmpFunction();
                 this.SS_commonOpenDialog("SEmp_oDialog", "sap.kt.com.minihrsolution.fragment.AddEmployment", ["AddEmp_id_StartDate", "AddEmp_id_EndDate"]);
             },
             EdF_EduAttachment: function () {
                 var folderUrl = `https://workplace.zoho.in/#workdrive_app/home/63sop752ea6e63ddd4a8880466f5ae509b85a/privatespace/sharedwithme/allusers/${this.EduFolderID}`;
                 window.open(folderUrl, "_blank");
-
+            },
+            EdF_EmpAttachment: function () {
+                var folderUrl = `https://workplace.zoho.in/#workdrive_app/home/63sop752ea6e63ddd4a8880466f5ae509b85a/privatespace/sharedwithme/allusers/${this.EmpFolderID}`;
+                window.open(folderUrl, "_blank");
             },
             //Employment dialog close
             AddEmp_onClose: function () {
@@ -247,7 +256,6 @@ sap.ui.define([
                 } else {
                     MessageToast.show(this.i18nModel.getText("selectRow"));
                 }
-
             },
             //Education detail create call
             saveEducationDetails: function (bIsCreate) {
@@ -291,7 +299,7 @@ sap.ui.define([
                         };
                         fnCall = this.ajaxUpdateWithJQuery("EducationalDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("eduDataupdate");
-                        this.setEnabledByIds(["AddEd_id_GradeType", "AddEd_id_Grade"], false);
+                        this.setEnabledByIds(["EdF_id_EduEdit", "EdF_id_EduDelete"], false);
                     }
 
                     fnCall.then((oData) => {
@@ -377,36 +385,143 @@ sap.ui.define([
                 oDialog.open();
             },
 
-            //Employment detail create call
-            AddEmp_onSubmitEmp: function () {
+            //Employment detail create calls
+            saveEmploymentDetails: function (bIsCreate) {
                 try {
-                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID") && utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressI"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID") &&
-                        utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID") && utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressII"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID")) {
-                        var oModel = this.getView().getModel("employmentModel").getData();
-                        var oPayload = {
-                            tableName: "EmploymentDetails",
-                            data: oModel
-                        };
-                        this.ajaxCreateWithJQuery("EmploymentDetails", oPayload).then((oData) => {
-                            sap.ui.core.BusyIndicator.hide();
-                            if (oData.success) {
-                                MessageToast.show(this.i18nModel.getText("empDataSaved"));
-                                this.SEmp_oDialog.close();
-                            } else {
-                                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                            }
-                        }).catch((error) => {
-                            sap.ui.core.BusyIndicator.hide();
-                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-
-                        });
-                    } else {
+                    const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID") && utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressI"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID") &&
+                        utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID") && utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressII"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID");
+                    if (!isValid) {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
                     }
+                    // Get and prepare model data
+                    let oModel = this.getView().getModel("employmentModel").getData();
+                    oModel.EmployeeID = this.EmployeeID;
+                    oModel.Designation = sap.ui.getCore().byId("AddEmp_id_Desig").getValue() || "";
+                    oModel.RCISal = sap.ui.getCore().byId("AddEmp_id_SalI").getSelectedKey() || "";
+                    oModel.RCIISal = sap.ui.getCore().byId("AdEmp_id_RCSalII").getSelectedKey() || "";
+                    oModel.StartDate = sap.ui.getCore().byId("AddEmp_id_StartDate").getDateValue() || "";
+                    oModel.EndDate = sap.ui.getCore().byId("AddEmp_id_EndDate").getDateValue() || "";
+                    oModel.StartDate = this.Formatter.convertToISODateFormat(oModel.StartDate);
+                    oModel.EndDate = this.Formatter.convertToISODateFormat(oModel.EndDate);
+                    
+                    let oPayload;
+                    let fnCall;
+                    let sSuccessMessage;
+
+                    if (bIsCreate) {
+                        oPayload = {
+                            "tableName": "EmploymentDetails",
+                            "data": oModel
+                        };
+                        fnCall = this.ajaxCreateWithJQuery("EmploymentDetails", oPayload);
+                        sSuccessMessage = this.i18nModel.getText("empDataSaved");
+                    } else {
+                        oPayload = {
+                            "data": oModel,
+                            "filters": {
+                                "ID": oModel.ID
+                            }
+                        };
+                        fnCall = this.ajaxUpdateWithJQuery("EmploymentDetails", oPayload);
+                        sSuccessMessage = this.i18nModel.getText("empDataupdate");
+                    }
+                    fnCall.then((oData) => {
+                        if (oData.success) {
+                            sap.ui.core.BusyIndicator.hide();
+                            MessageToast.show(sSuccessMessage);
+                            this.SEmp_oDialog.close();
+                            this.SS_commonEmpFunction()
+                            this._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
+                                EmployeeID: this.EmployeeID
+                            });
+                            this.setEnabledByIds(["EMF_id_EmpEdit", "EMF_id_EmpDelete"], false);
+                        } else {
+                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                        }
+                    }).catch((error) => {
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    });
+
                 } catch (error) {
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
+            },
+            AddEmp_onSubmitEmpDetails: function () {
+                this.saveEmploymentDetails(true); // create mode
+            },
+
+            AddEmp_onUpdateEmpDetails: function () {
+                this.saveEmploymentDetails(false); // update mode
+            },
+            EmpF_onSelectionChange: function (oEvent) {
+                const aSelectedIndices = oEvent.getSource().getSelectedItems();
+                if (aSelectedIndices.length > 0) {
+                    this.setEnabledByIds(["EmpF_id_EmpEdit", "EmpF_id_EmpDelete"], true);
+                } else {
+                    this.setEnabledByIds(["EmpF_id_EmpEdit", "EmpF_id_EmpDelete"], false);
+                }
+
+            },
+            EmpF_onEditEmployment: function () {
+                var oSelectedItem = this.byId("EmpF_id_EmpTable").getSelectedItem();
+                if (oSelectedItem) {
+                    var oData = oSelectedItem.getBindingContext("sEmploymentModel").getObject();
+                    this.getView().getModel("employmentModel").setData(oData);
+                    var oViewModel = this.getView().getModel("viewModel");
+                    oViewModel.setProperty("/fragmentSubmit", false);
+                    oViewModel.setProperty("/fragmentSave", true);
+                    this.SS_commonOpenDialog("SEmp_oDialog", "sap.kt.com.minihrsolution.fragment.AddEmployment", ["AddEmp_id_StartDate", "AddEmp_id_EndDate"]);
+                } else {
+                    MessageToast.show(this.i18nModel.getText("selectRow"));
+                }
+            },
+            //Employment detail delete call
+            EmpF_onDeletEmployment: function () {
+                var oSelectedItem = this.byId("EmpF_id_EmpTable").getSelectedItem();
+                if (!oSelectedItem) {
+                    MessageBox.error(this.i18nModel.getText("deleteCustomer"));
+                    return;
+                }
+                var sID = oSelectedItem.getBindingContext("sEmploymentModel").getObject().ID
+                var that = this;
+                var oDialog = new sap.m.Dialog({
+                    title: this.i18nModel.getText("msgBoxConfirm"),
+                    type: sap.m.DialogType.Message,
+                    icon: "sap-icon://warning",
+                    state: sap.ui.core.ValueState.Warning,
+                    content: new sap.m.Text({
+                        text: this.i18nModel.getText("confirmDeleteCustomerMessage")
+                    }),
+                    beginButton: new sap.m.Button({
+                        text: this.i18nModel.getText("OkButton"),
+                        type: sap.m.ButtonType.Accept,
+                        press: function () {
+                            oDialog.close();
+                            that.ajaxDeleteWithJQuery("/EmploymentDetails", { filters: { ID: sID } }).then(() => {
+                                MessageToast.show(that.i18nModel.getText("empDataDelete"));
+                                that._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
+                                    EmployeeID: that.EmployeeID
+                                });
+                            }).catch((error) => {
+                                MessageToast.show(error.responseText);
+                            });
+                        }
+                    }),
+                    endButton: new sap.m.Button({
+                        text: this.i18nModel.getText("CancelButton"),
+                        type: sap.m.ButtonType.Reject,
+                        press: function () {
+                            oDialog.close();
+                        }
+                    }),
+                    afterClose: function () {
+                        oDialog.destroy();
+                    }
+                });
+                oDialog.open();
             },
 
             SS_onTabSelect: async function (oEvent) {
