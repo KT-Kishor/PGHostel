@@ -60,7 +60,8 @@ sap.ui.define([
                     "EmployeeEmail": "",
                     "Year": "",
                     "PinCode": "",
-                     "Department":""
+                    "Department":"",
+                    "VariablePay": "10",
                 }
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false,});

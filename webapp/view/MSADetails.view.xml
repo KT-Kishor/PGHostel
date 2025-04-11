@@ -109,7 +109,7 @@
 							<Label text="{i18n>contractPeriod}" />
 							<Text text="{msaModelWizart>/ContractPeriod}" />
 							<Label text="{i18n>createMSADate}" />
-							<Text text="{path :'msaModelWizart>/CreateMSADate','type': 'sap.ui.model.type.Date', 'formatOptions': {'pattern': 'dd/M/yyyy'}}" />
+							<Text text="{msaModelWizart>/CreateMSADate}" />
 							<Label text="{i18n>panCardReg}" />
 							<Text text="{msaModelWizart>/PANCard}" />
 							<Label text="{i18n>emailId}" />

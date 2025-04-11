@@ -46,54 +46,53 @@
 									<f:toolbar>
 											<m:Toolbar>												
 												<m:ToolbarSpacer />
-												<m:Button  text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" 
-                    press="MsaE_onEditOrSavePress" />
-					<m:Button text="{i18n>tileFooter}" enabled="{simpleForm>/isEnabled}" press="MsaE_onSendEmailMSA" />
-					<m:Button text="{i18n>tileUnit}" enabled="{simpleForm>/isEnabled}"  press="MsaE_onPressMerge"  />
+												<m:Button  text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" press="MsaE_onEditOrSavePress" />
+												<m:Button text="{i18n>tileFooter}" enabled="{simpleForm>/isEnabled}" press="MsaE_onSendEmailMSA" />
+												<m:Button text="{i18n>tileUnit}" enabled="{simpleForm>/isEnabled}"  press="MsaE_onPressMerge"  />
 											</m:Toolbar>
 										</f:toolbar>
 									<!-- Form content: Labels and Input fields for MSA data -->
 									<f:content>
 										<m:Label text="{i18n>companyName}" required="true"/>
-										<m:Input liveChange="onLiveChange"  id="MsaE_id_CompanyName" maxLength="50" value="{FilteredMsaModel>/CompanyName}" editable="{simpleForm>/editable}" />
+										<m:Input liveChange="Msa_LC_CompanyName" id="MsaE_id_CompanyName" maxLength="50" value="{FilteredMsaModel>/0/CompanyName}" editable="{simpleForm>/editable}" />
 										
 										<m:Label text="{i18n>companyHeadName}" required="true" />
 										<m:HBox width="100%" justifyContent="Start" alignItems="Center">
 											<m:VBox width="20%">
-												<m:Select selectedKey="{FilteredMsaModel>/Salutation}"
+												<m:Select selectedKey="{FilteredMsaModel>/0/Salutation}"
 												items="{Salutation>/salutation}" width="100%" editable="{simpleForm>/editable}">
 														<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 												</m:Select>
 											</m:VBox>
 											<m:VBox width="78%">
-												<m:Input  liveChange="onLiveChange" id="MsaE_id_MsaHead" value="{FilteredMsaModel>/CompanyHeadName}" editable="{simpleForm>/editable}" maxLength="50" class="sapUiTinyMarginBegin"/>
+												<m:Input  liveChange="Msa_LC_CompanyHeadName" id="MsaE_id_MsaHead" value="{FilteredMsaModel>/0/CompanyHeadName}" editable="{simpleForm>/editable}" maxLength="50" class="sapUiTinyMarginBegin"/>
 											</m:VBox>
 										</m:HBox>
 
 										<m:Label text="{i18n>companyHeadPosition}" required="true"/>
-										<m:Input  liveChange="onLiveChange" value="{FilteredMsaModel>/CompanyHeadPosition}" id="MsaE_id_HeadPosition" editable="{simpleForm>/editable}" maxLength="50" />
+										<m:Input  liveChange="Msa_LC_HeadPosition" value="{FilteredMsaModel>/0/CompanyHeadPosition}" id="MsaE_id_HeadPosition" editable="{simpleForm>/editable}" maxLength="50" />
 
 										<m:Label text="{i18n>contractPeriod}" required="true"/>
-										<m:Select items="{contractwarrantyModel>/results}" selectedKey="{FilteredMsaModel>/ContractPeriod}" editable="{simpleForm>/editable}">
-											<core:Item key="{contractwarrantyModel>Months}" text="{contractwarrantyModel>Months}" />
+										<m:Select items="{ContractPeriod>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ContractPeriod}" editable="{simpleForm>/editable}">
+											<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 										</m:Select>
 
 										<m:Label text="{i18n>createMSADate}" required="true"/>
-										<m:DatePicker value="{FilteredMsaModel>/CreateMSADate}" editable="{simpleForm>/editable}" id="MsaE_id_CreateMSADate" displayFormat="dd/MM/yyyy"  valueFormat="dd/MM/yyyy"/>
+										<m:DatePicker change="Msa_ChangeMsaDate" value="{FilteredMsaModel>/0/CreateMSADate}" editable="{simpleForm>/editable}" id="MsaE_id_CreateMSADate" displayFormat="dd/MM/yyyy"  valueFormat="dd/MM/yyyy"/>
 
 										<!-- Input for PAN card, includes a liveChange event -->
 										<m:Label text="{i18n>panCard}" required="true"/>
-										<m:Input  id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/PANCard}" editable="{simpleForm>/editable}" liveChange="onLiveChange"/>
+										<m:Input id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/0/PanCard}" editable="{simpleForm>/editable}" liveChange="Msa_LC_PanCard"/>
 
 										<m:Label text="{i18n>emailId}" required="true"/>
-										<m:TextArea  maxLength="500" id="MsaE_id_MSAEmail" value="{FilteredMsaModel>/MSAEmail}" editable="{simpleForm>/editable}" change="onchangeEmail" />																																							
+										<m:TextArea liveChange="Msa_LC_EmailID"  maxLength="500" id="MsaE_id_MSAEmail" value="{FilteredMsaModel>/0/MsaEmail}" editable="{simpleForm>/editable}" />																																							
 
 										<m:Label text="{i18n>Address}" required="true"/>
-										<m:TextArea  id="MsaE_id_MsaAddress" value="{FilteredMsaModel>/Address}" maxLength="120" editable="{simpleForm>/editable}" liveChange="onLiveChangeAddress"/>
+										<m:TextArea  id="MsaE_id_MsaAddress" value="{FilteredMsaModel>/0/Address}" maxLength="120" editable="{simpleForm>/editable}" liveChange="Msa_LC_Address"/>
 
 										<m:Label text="{i18n>paymentterms}" required="true"/>
-										<m:Select items="{ContractpaymentModel>/results}" selectedKey="{FilteredMsaModel>/PaymentTerms}" editable="{simpleForm>/editable}">
-											<core:Item key="{ContractpaymentModel>Days}" text="{ContractpaymentModel>Days}" />
+										<m:Select items="{ContractpaymentModel>/}" selectedKey="{FilteredMsaModel>/0/PaymentTerms}" editable="{simpleForm>/editable}">
+											<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 										</m:Select>																				
 
 									</f:content>
@@ -120,15 +119,15 @@
 											<m:ToolbarSeparator />
 											<m:Button text="{i18n>inactive}" id="Msa_id_InactiveBtn" press="MsaE_onPressSOWActive"/>
 											<m:ToolbarSeparator />
-											<m:Button enabled="true" id="MsaE_id_RelesedBtn" press="MsaE_onPressRelesedSow" text="{i18n>ReleaseBtn}" />
+											<m:Button id="MsaE_id_RelesedBtn" press="MsaE_onPressRelesedSow" text="{i18n>ReleaseBtn}" />
 											<m:ToolbarSeparator />
-											<m:Button text="{i18n>ExpendBtn}" id="MsaE_id_ExpendBtn" press="MasE_onPressExpendSow" enabled="false"/>											
+											<m:Button text="{i18n>ExpendBtn}" id="MsaE_id_ExpendBtn" press="MasE_onPressExpendSow"/>											
 											<m:ToolbarSeparator />
-											<m:Button id="MsaE_id_SowEmailBut" text="{i18n>tileFooter}" enabled="false" press="MsaE_onPressSendEmailSOW"/>
+											<m:Button id="MsaE_id_SowEmailBut" text="{i18n>tileFooter}" press="MsaE_onPressSendEmailSOW"/>
 											<m:ToolbarSeparator />
-											<m:Button id="MsaE_id_SowMergeBut" text="{i18n>GeneratePDF}" enabled="true" press="MsaE_onPressMergeSow"/>
+											<m:Button id="MsaE_id_SowMergeBut" text="{i18n>GeneratePDF}" press="MsaE_onPressMergeSow"/>
 											<m:ToolbarSeparator />
-											<m:Button icon="sap-icon://edit" enabled="false" id="MsaE_id_UpdateSow" press="MsaE_onPressUpdateSOW"/>
+											<m:Button icon="sap-icon://edit" id="MsaE_id_UpdateSow" press="MsaE_onPressUpdateSOW"/>
 										</m:OverflowToolbar>
 										</m:headerToolbar>
 

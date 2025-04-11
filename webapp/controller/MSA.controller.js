@@ -7,6 +7,7 @@ sap.ui.define([
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSA", {
             onInit: function () {
                 this.getRouter().getRoute("RouteMSA").attachMatched(this._onRouteMatched, this);
+                this._fetchCommonData("ManageCustomer", "CompanyNameModel");
             },
             _onRouteMatched: async function () {
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");
@@ -22,13 +23,17 @@ sap.ui.define([
                 this.getRouter().navTo("RouteMSADetails");
                 
             },
-            MSA_EditMsaDetails:function(){
-                this.getRouter().navTo("RouteMSAEdit")
+                       
+            OnPressNavigationMsaDet:function(oEvent){
+                BusyIndicator.show(0);
+                var MsaID = oEvent.getSource().getBindingContext("MSADisplayModel").getProperty("MsaID");
+                this.getRouter().navTo("RouteMSAEdit",{sPath:MsaID})
             },
 
             MSA_onSearch: async function () {
                 try {
-                    BusyIndicator.show(0);		
+                    var oTable = this.byId("MSA_id_Table");
+                    oTable.setBusy(true);
                     const aFilterItems = this.byId("MSA_id_AdminFilter").getFilterGroupItems();
                     const params = {};
             
@@ -49,7 +54,7 @@ sap.ui.define([
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
-                    BusyIndicator.hide();
+                    oTable.setBusy(false); 
                 }
             },
 

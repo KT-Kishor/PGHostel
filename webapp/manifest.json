@@ -444,7 +444,7 @@
                 },
                 {
                     "name": "RouteMSAEdit",
-                    "pattern": "MSAEdit",
+                    "pattern": "MSAEdit/{sPath}",
                     "target": [
                         "TargetMSAEdit"
                     ]

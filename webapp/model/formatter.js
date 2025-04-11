@@ -161,5 +161,15 @@ sap.ui.define([], function () {
             return consultantName || salutation;
         },
 
+        YearlyToMontlyConv: function (value) {
+            var Data = parseFloat(value);
+            if (isNaN(Data)) {
+              return "INR 0";
+            }
+            var monthlyValue = Data / 12;
+            return "INR " +  Math.round(monthlyValue);
+          }
+          
+
     }
 });

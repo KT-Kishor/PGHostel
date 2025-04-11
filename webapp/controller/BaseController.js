@@ -212,58 +212,66 @@ sap.ui.define([
         });
       });
     },
+
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
+    
+      // Convert and fetch values
       var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",", ""));
+      var VariableData = parseFloat(oModel.getProperty("/VariablePay"));
       var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus").replaceAll(",", ""));
-      var BasicSalary, TDS, PF = 0, EPF = 0;
-      // Calculate various salary components
-      BasicSalary = (CTC * 0.49) / 12;           // Monthly Basic Salary from 49% of CTC
-      var houseRentAllowance = (CTC * 0.49) / 12 * 0.50;     // 50% of Basic Salary
-      var StatutoryBonus = (CTC * 0.49) / 12 * 0.09575;   // 9.575% of Basic Salary
-      var TotalMontly = BasicSalary + houseRentAllowance + StatutoryBonus;  // Total Monthly Salary
-      var TotalmothlyAnnualized = TotalMontly * 12;   // Annualized Monthly Salary
-      TDS = TotalMontly * 0.1 * 12;  // Annual TDS at 10% of Basic Salary
-
-      var MedicalInsurance = BasicSalary * 0.4; // Medical Insurance at 40% of Basic
-      var Gratuity = (BasicSalary * 15) / 26;    // Gratuity calculation
-      var TotalRetires = TDS + MedicalInsurance + Gratuity;
-      var PerformanceBonus = (CTC * 5) / 100;  //5% of CTC as PerformanceBonus
-      var EngagementPB = (CTC * 5) / 100;   // 5% of CTC as EngagementPB
-      var TotalVariablePay = PerformanceBonus + EngagementPB;
-      var TotalDeduction = TDS + PF; // Total Deductions
-      if (isTDSIncluded === "No TDS" || isTDSIncluded === "PF") {
-        // PerformanceBonus += (TDS / 2)
-        // EngagementPB += (TDS / 2);
-        // TotalVariablePay = PerformanceBonus + EngagementPB
-        TDS = 0; // Set TDS to 0 if not included
-        PF = (BasicSalary * 0.13); // PF calculation
-        EPF = (BasicSalary * 0.12);
-        TotalRetires = EPF + MedicalInsurance + Gratuity;
-        TotalDeduction = TDS + PF + EPF; // Total Deductions
-        TotalMontly = TotalMontly - TotalDeduction;
-        TotalmothlyAnnualized = TotalMontly * 12
+      var VariablePay = CTC * VariableData / 100;
+       
+      var BasicSalary, HRA, EmployeerPF, MedicalInsurance, Gratuity, SpecailAllowance, Total;
+      var DeductionPF, IncomeTax_TDS, DeductionTotal, GrossPay;
+    
+      if (isTDSIncluded === "TDS") {
+        BasicSalary = CTC * 40 / 100;
+        HRA = BasicSalary * 40 / 100;
+        EmployeerPF = 0;
+        MedicalInsurance = BasicSalary * 40 / 100;
+        Gratuity = BasicSalary * 4.81 / 100;
+        SpecailAllowance = CTC - (BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity);
+        Total = BasicSalary + HRA  + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
+    
+        DeductionPF = 0;
+        IncomeTax_TDS = CTC * 10 / 100;
+        DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
+        GrossPay = (Total - DeductionTotal);
+    
+      } else {
+        var newCTC = CTC - VariablePay;
+        BasicSalary = newCTC * 40 / 100;
+        HRA = BasicSalary * 40 / 100;
+        EmployeerPF = BasicSalary * 13 / 100;
+        MedicalInsurance = BasicSalary * 40 / 100;
+        Gratuity = BasicSalary * 4.81 / 100;
+        SpecailAllowance = newCTC - (BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity);
+        Total = BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity + SpecailAllowance;
+    
+        DeductionPF = BasicSalary * 12 / 100;
+        IncomeTax_TDS = CTC * 10 / 100;
+        DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
+        GrossPay = (Total - DeductionTotal);
       }
-      var CostofCompany = TotalmothlyAnnualized + TotalRetires + TotalVariablePay;
-      var Total = CostofCompany + parseInt(joiningBonus);
-      // Set calculated values in the model with formatting
-      oModel.setProperty("/BasicSalary", (Math.round(BasicSalary)));
-      oModel.setProperty("/HRA", (Math.round(houseRentAllowance)));
-      oModel.setProperty("/StatutoryBonus", (Math.round(StatutoryBonus)));
-      oModel.setProperty("/TotalMonthly", (Math.round(TotalMontly)));
-      oModel.setProperty("/TotalmothlyAnnualized", (Math.round(TotalmothlyAnnualized)));
-      oModel.setProperty("/TDS", (Math.round(TDS)));
-      oModel.setProperty("/MedicalInsurance", (Math.round(MedicalInsurance)));
-      oModel.setProperty("/Gratuity", (Math.round(Gratuity)));
-      oModel.setProperty("/TotalRetires", (Math.round(TotalRetires)));
-      oModel.setProperty("/PerformanceBonus", (Math.round(PerformanceBonus)));
-      oModel.setProperty("/EngagementPB", (Math.round(EngagementPB)));
-      oModel.setProperty("/TotalVariablePay", (Math.round(TotalVariablePay)));
-      oModel.setProperty("/CostofCompany", (Math.round(CostofCompany)));
-      oModel.setProperty("/Total", (Math.round(Total)));
-      oModel.setProperty("/PF", (Math.round(PF)));
-      oModel.setProperty("/EPF", (Math.Round(EPF)));
-    },
+    
+      // Set model properties
+      oModel.setProperty("/BasicSalary", Math.round(BasicSalary));
+      oModel.setProperty("/HRA", Math.round(HRA));
+      oModel.setProperty("/EmployeerPF", Math.round(EmployeerPF));
+      oModel.setProperty("/MedicalInsurance", Math.round(MedicalInsurance));
+      oModel.setProperty("/Gratuity", Math.round(Gratuity));
+      oModel.setProperty("/SpecailAllowance", Math.round(SpecailAllowance));
+      oModel.setProperty("/Total", Math.round(Total));
+    
+      oModel.setProperty("/PF", Math.round(DeductionPF));
+      oModel.setProperty("/PT", Math.round(2400));
+      oModel.setProperty("/TDS", Math.round(IncomeTax_TDS));
+      oModel.setProperty("/TotalDeduction", Math.round(DeductionTotal));
+      oModel.setProperty("/GrossPay", Math.round(GrossPay));
+
+      oModel.setProperty("/TotalVariablePay", Math.round(VariablePay));
+    },    
 
     //Date picker common function 
     _makeDatePickersReadOnly: function (aIds) {

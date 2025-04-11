@@ -2,11 +2,14 @@ sap.ui.define([
     "./BaseController",
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
+    "sap/m/MessageToast",   
+    "../model/formatter",
+    "sap/m/MessageBox"
 ],
-    function (BaseController, utils, JSONModel, MessageToast) {
+    function (BaseController, utils, JSONModel, MessageToast,Formatter,MessageBox) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSADetails", {
+            Formatter:Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteMSADetails").attachMatched(this._onRouteMatched, this);
                 this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
@@ -17,7 +20,7 @@ sap.ui.define([
                 
                   var oModelMSA = new JSONModel({
                     CompanyName: "",
-                    CreateMSADate: new Date(),
+                    CreateMSADate: this.Formatter.formatDate(new Date()),
                     PANCard: "",
                     Address: "",
                     CompanyHeadName: "",
@@ -26,12 +29,21 @@ sap.ui.define([
                     PaymentTerms: "30 Days",
                     ContractPeriod: "12 Months",
                     Salutation: "Mr.",
-                    Status: "New"
-                  });
-                  this.getView().setModel(oModelMSA, "msaModelWizart");
+                    Status: "New",
+                    MsaContractPeriodEndDate: ""
+                  });  
+                  this.getView().setModel(oModelMSA, "msaModelWizart");               
             },
+            
             MsaD_onBack: function () {
-                this.getRouter().navTo("RouteMSA");
+                this.getRouter().navTo("RouteMSA");               
+                this.byId("MsaD_id_CompanyName").setValueState("None");
+                this.byId("MsaD_id_HeadName").setValueState("None");
+                this.byId("MsaD_id_HeadPosition").setValueState("None");
+                this.byId("MsaD_id_CreateMSADate").setValueState("None");
+                this.byId("MsaD_id_Email").setValueState("None");
+                this.byId("MsaD_id_Address").setValueState("None");
+                this.byId("MsaD_id_PanCard").setValueState("None");
             },
             MsaD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
@@ -62,17 +74,48 @@ sap.ui.define([
                 }
             },
 
-            MsaD_reviewSubmit: function (oEvent) {
+            MsaD_reviewSubmit: async function () {
+                const oWizard = this.byId("MsaD_id_Wizard");
+                if (!oWizard.getSteps()[0].getValidated()) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+            
                 try {
-                    if (this.byId("MsaD_id_Wizard").getSteps()[0].getValidated()) {
-                        MessageToast.show(this.i18nModel.getText("msaSubmitted"));
+                    sap.ui.core.BusyIndicator.show(0);            
+                    const oModelData = this.getView().getModel("msaModelWizart").getData();
+                    const [day, month, year] = oModelData.CreateMSADate.split('/');
+                    const assignmentEndDate = new Date(year, month - 1, day);
+            
+                    const contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]);
+                    assignmentEndDate.setMonth(assignmentEndDate.getMonth() + contractPeriod);
+            
+                    oModelData.MsaContractPeriodEndDate = assignmentEndDate.toISOString().split('T')[0];
+            
+                    const oCreateResponse = await this.ajaxCreateWithJQuery("MSADetails", { data: oModelData });
+            
+                    if (oCreateResponse) {
+                        MessageBox.success(this.getView().getModel("i18n").getResourceBundle().getText("msaCreatedMsg"), {
+                            icon: MessageBox.Icon.SUCCESS,
+                            title: "Success",
+                            actions: [sap.m.MessageBox.Action.OK, "Generate PDF"],
+                            onClose: (sAction) => {
+                                sap.ui.core.BusyIndicator.hide();
+                                if (sAction === "OK") {
+                                    this.getRouter().navTo("RouteMSA");
+                                }
+                                // You can trigger PDF generation logic if needed here
+                            }
+                        });
                     } else {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
                     }
-                } catch (error) {
+                } catch (oError) {
+                    sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
-            }
+            }            
 
         });
     });

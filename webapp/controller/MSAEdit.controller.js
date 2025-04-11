@@ -4,58 +4,245 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "../utils/CommonAgreementPDF",
     "sap/m/MessageToast",
+    "sap/ui/core/BusyIndicator",
 ],
-    function (BaseController, utils, JSONModel, jsPDF, MessageToast) {
-        "use strict";
-        return BaseController.extend("sap.kt.com.minihrsolution.controller.MSAEdit", {
-            onInit: function () {
-                this.getRouter().getRoute("RouteMSAEdit").attachMatched(this._onRouteMatched, this);
-            },
-            _onRouteMatched: function () {
-                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            },
-            MsaE_onBack: function () {
-                this.getRouter().navTo("RouteMSA");
-            },
+function(BaseController, utils, JSONModel, jsPDF, MessageToast, BusyIndicator) {
+    "use strict";
+    return BaseController.extend("sap.kt.com.minihrsolution.controller.MSAEdit", {
+        onInit: function() {
+            this.getRouter().getRoute("RouteMSAEdit").attachMatched(this._onRouteMatched, this);
+            this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+        },
 
-            MsaE_onPressCreateSow: function () {
-                if (!this.SOW_oDialog) {
-                    sap.ui.core.Fragment.load({
-                        name: "sap.kt.com.minihrsolution.fragment.SowDetails",
-                        controller: this,
-                    }).then(function (SOW_oDialog) {
-                        this.SOW_oDialog = SOW_oDialog;
-                        this.getView().addDependent(this.SOW_oDialog);
-                        this.SOW_oDialog.open();
-                    }.bind(this));
+        _onRouteMatched: async function(oEvent) {
+            this.MSAID = oEvent.getParameter("arguments").sPath;
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            await this.MSADetailsReadCall();
+
+            var editable = new JSONModel({editable: false,isEnabled: true,Mode:"Delete",save:false,submitBtn:false,ExpendBtn:false,RelesedBtn:false});
+            this.getView().setModel(editable, "simpleForm");
+
+            this.SimpleFormModel = this.getView().getModel("simpleForm");
+            var oModelDataPro = new JSONModel();
+            this.getView().setModel(oModelDataPro, "oModelDataPro");
+            var oSowCreateModel = new JSONModel();
+            this.getView().setModel(oSowCreateModel, "sowCreateModel");
+            BusyIndicator.hide();
+        },
+
+        MSADetailsReadCall: async function() {
+            BusyIndicator.show(0);
+            try {
+                await this._fetchCommonData("MSADetails", "FilteredMsaModel", {
+                    MsaID: this.MSAID
+                });
+            } catch (error) {
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+            } finally {
+                BusyIndicator.hide();
+            }
+        },
+
+        MsaE_onBack: function() {
+            this.getRouter().navTo("RouteMSA");
+        },       
+
+        SOW_onCloseFrag: function() {
+            this.SOW_oDialog.close();
+        },
+        MsaE_validateDate: function(oEvent) {
+            utils._LCvalidateDate(oEvent);
+        },
+        MsaE_ValidateCommonFields: function(oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        MsaE_onEditOrSavePress: function() {
+            if (this.SimpleFormModel.getProperty("/editable")) {
+                this.onPressSave();
+            } else {
+                this.SimpleFormModel.setProperty("/editable", true);
+                this.SimpleFormModel.setProperty("/isEnabled", false);
+            }
+        },
+
+        Msa_LC_CompanyName:function(oEvent){
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        Msa_LC_CompanyHeadName:function(oEvent){
+            utils._LCvalidateName(oEvent);
+        },
+
+        Msa_LC_HeadPosition:function(oEvent){
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+        
+        Msa_ChangeMsaDate:function(oEvent){
+            utils._LCvalidateDate(oEvent);
+        },
+        
+        Msa_LC_PanCard:function(oEvent){
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+        
+        Msa_LC_EmailID:function(oEvent){
+            utils._LCvalidateEmail(oEvent);
+        },
+        
+        Msa_LC_Address:function(oEvent){
+            utils._LCvalidateMandatoryField(oEvent);            
+        },
+
+        onPressSave: async function() {
+            if (utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_CompanyName"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_HeadPosition"), "ID") && utils._LCvalidateName(this.getView().byId("MsaE_id_MsaHead"), "ID") && utils._LCvalidateDate(this.getView().byId("MsaE_id_CreateMSADate"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaPanCard"), "ID") && utils._LCvalidateEmail(this.getView().byId("MsaE_id_MSAEmail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaAddress"), "ID")) {
+                var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
+                var oData = {
+                    "data": oModel,
+                    "filters": {
+                        "MsaID": oModel.MsaID
+                    }
+                }
+                await this.ajaxUpdateWithJQuery("MSADetails", oData).then((oData) => {
+                        if (oData) {
+                            this.SimpleFormModel.setProperty("/editable", false);
+                            this.SimpleFormModel.setProperty("/isEnabled", true);
+                            MessageToast.show(this.i18nModel.getText("msaupdateSuccess"));
+                            BusyIndicator.hide();
+                        } else {
+                            MessageToast.show(this.i18nModel.getText("msaupdateFailed"));
+                        }
+                    })
+                    .catch((oError) => {
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    })
+            } else {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+            }
+        },
+
+        SOW_onSubmitFrag: function() {
+            try {
+                if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID")) {
+                    MessageToast.show(this.i18nModel.getText("sowSuccess"));
                 } else {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                }
+            } catch {
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+            }
+
+        },
+
+        FragmentOpen: function() {
+            if (!this.SOW_oDialog) {
+                sap.ui.core.Fragment.load({
+                    name: "sap.kt.com.minihrsolution.fragment.SowDetails",
+                    controller: this,
+                }).then(function(SOW_oDialog) {
+                    this.SOW_oDialog = SOW_oDialog;
+                    this.getView().addDependent(this.SOW_oDialog);
                     this.SOW_oDialog.open();
-                }
-            },
-            SOW_onCloseFrag: function () {
-                this.SOW_oDialog.close();
-            },
-            MsaE_validateDate: function (oEvent) {
-                utils._LCvalidateDate(oEvent);
-            },
-            MsaE_ValidateCommonFields: function (oEvent) {
-                utils._LCvalidateMandatoryField(oEvent);
-            },
+                }.bind(this));
+            } else {
+                this.SOW_oDialog.open();
+            }
+        },
 
-            SOW_onSubmitFrag: function () {
-                try {
-                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID")) {
-                        MessageToast.show(this.i18nModel.getText("sowSuccess"));
-                    }
-                    else {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                    }
-                }
-                catch {
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                }
+        SOW_onAddConsultant:function(){           
+            var oModelPro = this.getView().getModel("oModelDataPro");
+            this.SNoValue = this.SNoValue + 1;    
+            var oDataPro = oModelPro.getProperty("/");    
+            oDataPro.push({
+              "IndexNo": String(this.SNoValue),
+              "SNo": globalThis.crypto.randomUUID(),
+              "ConsultantName": "",
+              "Designation": "",
+              "Rate": "",
+              "Salutation": "Mr.",
+              "Currency": "INR",
+              "PerDay": "Per Day",
+              "Status": "New"
+            });    
+            oModelPro.setProperty("/", oDataPro);
+        },       
 
-            },
+        onPressDeleteModeCreateSow: function (oEvent) {
+            var oModel = this.getView().getModel("oModelDataPro");
+            var oContext = oEvent.getParameter("listItem").getBindingContext("oModelDataPro");
+            var sIndex = oContext.getPath().split("/")[1];
+        
+            var aData = oModel.getData();
+            aData.splice(sIndex, 1);
+        
+            aData.forEach(function (item, index) {
+                item.IndexNo = index + 1;
+            });
+        
+            oModel.setData(aData);
+            this.SNoValue = aData.length;
+        },        
+
+        MsaE_onPressCreateSow:function(){
+            this.SimpleFormModel.setProperty("/save", true);
+            this.SimpleFormModel.setProperty("/submitBtn", false);
+            this.SimpleFormModel.setProperty("/ExpendBtn", false);
+            this.SimpleFormModel.setProperty("/RelesedBtn", false);
+            this.FragmentOpen();
+            var jsonProData = [];
+            this.SNoValue = 0;
+            this.getView().getModel("oModelDataPro").setData(jsonProData);
+
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var result = ""
+            for (var i = 0; i < 10; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }        
+            var jsonSow = {
+            MsaID: this.msaValue,
+            Description: "",
+            SowID: result,
+            StartDate: "",
+            EndDate: "",
+            Currency: "INR"
+            };
+
+            this.getView().getModel("sowCreateModel").setData(jsonSow);
+            var oView = this.getView();
+        },
+
+        MsaE_onPressRelesedSow:function(){
+            this.SimpleFormModel.setProperty("/save", false);
+            this.SimpleFormModel.setProperty("/submitBtn", false);
+            this.SimpleFormModel.setProperty("/ExpendBtn", false);
+            this.SimpleFormModel.setProperty("/RelesedBtn", true);
+            this.FragmentOpen();
+        },
+
+        MasE_onPressExpendSow:function(){
+            this.SimpleFormModel.setProperty("/save", false);
+            this.SimpleFormModel.setProperty("/submitBtn", false);
+            this.SimpleFormModel.setProperty("/ExpendBtn", true);
+            this.SimpleFormModel.setProperty("/RelesedBtn", false);
+            this.FragmentOpen();
+        },
+
+        MsaE_onPressUpdateSOW:function(){
+            this.SimpleFormModel.setProperty("/save", false);
+            this.SimpleFormModel.setProperty("/submitBtn", true);
+            this.SimpleFormModel.setProperty("/ExpendBtn", false);
+            this.SimpleFormModel.setProperty("/RelesedBtn", false);
+            this.FragmentOpen();
+        },
+
+        SOW_onSaveFrag:function(){
+            try{
+                
+            }catch(error){
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+            }
+        },
 
             async MsaE_onPressMerge() {
                 var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
