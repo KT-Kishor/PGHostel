@@ -350,7 +350,21 @@ sap.ui.define([], function () {
           oField.setValueStateText(sErrorMsg);
           return false;
       }
-  }
+  },
+  
+  _LCvalidateTimeLimit: function (oEvent, type) {
+    var oField = type === "ID" ? oEvent : oEvent.getSource();
+    if (!oField) return false; 
+    var value = parseFloat(oField.getValue());  
+    if (isNaN(value) || value < 0 || value > 8) {
+      oField.setValueState("Error");
+      return false;
+    } else {
+      oField.setValueState("None");
+      return true;
+    }
+  },
+  
   };
   
 });

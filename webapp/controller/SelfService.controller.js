@@ -11,6 +11,7 @@ sap.ui.define([
             },
             _onRouteMatched: function () {
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
+                this.byId("SS_id_IconTab").setSelectedKey("employeeDetailsKey");
                 this.EduFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/FolderID");
                 this.EmpFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmploymentDetailFolderID");
                 this._fetchCommonData("Designation", "sDesignationModel");
@@ -24,18 +25,16 @@ sap.ui.define([
                 this._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
                     EmployeeID: this.EmployeeID
                 });
-                var oViewModel = new JSONModel({
+                var viewModel = new JSONModel({
                     fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false,
                     isRoleMode: false, Max: new Date(), isVisitMode: true, isIdMode: true,
                 });
-                this.getView().setModel(oViewModel, "viewModel");
+                this.getView().setModel(viewModel, "viewModel");
+                this.ViewModel = this.getView().getModel("viewModel");
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle()
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "My Details");
-                var idsToDisable = ["EdF_id_EduEdit", "EdF_id_EduDelete", "EMF_id_EmpEdit", "EMF_id_EmpDelete"];
-                idsToDisable.forEach(function (id) {
-                    this.byId(id).setEnabled(false);
-                }.bind(this));
-
+                this.setEduButtonsEnabled(false);
+                this.setEmpButtonsEnabled(false);
             },
             SS_commonEduFunction() {
                 var eduModel = new JSONModel({
@@ -70,6 +69,7 @@ sap.ui.define([
                 });
                 this.getView().setModel(empModel, "employmentModel");
             },
+
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
@@ -96,9 +96,8 @@ sap.ui.define([
 
             //Education dialog open
             EdF_AddEdu: function () {
-                var oViewModel = this.getView().getModel("viewModel");
-                oViewModel.setProperty("/fragmentSubmit", true);
-                oViewModel.setProperty("/fragmentSave", false);
+                this.ViewModel.setProperty("/fragmentSubmit", true);
+                this.ViewModel.setProperty("/fragmentSave", false);
                 this.SS_commonEduFunction();
                 this.SS_commonOpenDialog("SEd_oDialog", "sap.kt.com.minihrsolution.fragment.AddEducation", ["AddEd_id_StartEdu", "AddEd_id_EndEdu"]);
             },
@@ -115,15 +114,25 @@ sap.ui.define([
                     }
                 }
             },
+            setEduButtonsEnabled: function (bEnabled) {
+                this.byId("EdF_id_EduEdit").setEnabled(bEnabled);
+                this.byId("EdF_id_EduDelete").setEnabled(bEnabled);
+            },
+            setEmpButtonsEnabled: function (bEnabled) {
+                this.byId("EMF_id_EmpEdit").setEnabled(bEnabled);
+                this.byId("EMF_id_EmpDelete").setEnabled(bEnabled);
+            },
+
             //Education dialog close
             AddEd_onCloseDial: function () {
                 this.SEd_oDialog.close();
+                this.byId("EdF_id_EduTable").removeSelections(true);
+                this.setEduButtonsEnabled(false);
             },
             //Employment dialog open
             EmpF_onAddEmployment: function () {
-                var oViewModel = this.getView().getModel("viewModel");
-                oViewModel.setProperty("/fragmentSubmit", true);
-                oViewModel.setProperty("/fragmentSave", false);
+                this.ViewModel.setProperty("/fragmentSubmit", true);
+                this.ViewModel.setProperty("/fragmentSave", false);
                 this.SS_commonEmpFunction();
                 this.SS_commonOpenDialog("SEmp_oDialog", "sap.kt.com.minihrsolution.fragment.AddEmployment", ["AddEmp_id_StartDate", "AddEmp_id_EndDate"]);
             },
@@ -138,6 +147,8 @@ sap.ui.define([
             //Employment dialog close
             AddEmp_onClose: function () {
                 this.SEmp_oDialog.close();
+                this.byId("EmpF_id_EmpTable").removeSelections(true);
+                this.setEmpButtonsEnabled(false);
             },
             //validation function calling from base controller
             SS_validateMobileNo: function (oEvent) {
@@ -238,20 +249,19 @@ sap.ui.define([
             EDF_onSelectionChange: function (oEvent) {
                 const aSelectedIndices = oEvent.getSource().getSelectedItems();
                 if (aSelectedIndices.length > 0) {
-                    this.setEnabledByIds(["EdF_id_EduEdit", "EdF_id_EduDelete"], true);
-                } else {
-                    this.setEnabledByIds(["EdF_id_EduEdit", "EdF_id_EduDelete"], false);
-                }
+                    this.setEduButtonsEnabled(true);
 
+                } else {
+                    this.setEduButtonsEnabled(false);
+                }
             },
             EDF_EditEducation: function () {
                 var oSelectedItem = this.byId("EdF_id_EduTable").getSelectedItem();
                 if (oSelectedItem) {
                     var oData = oSelectedItem.getBindingContext("sEducationModel").getObject();
                     this.getView().getModel("educationModel").setData(oData);
-                    var oViewModel = this.getView().getModel("viewModel");
-                    oViewModel.setProperty("/fragmentSubmit", false);
-                    oViewModel.setProperty("/fragmentSave", true);
+                    this.ViewModel.setProperty("/fragmentSubmit", false);
+                    this.ViewModel.setProperty("/fragmentSave", true);
                     this.SS_commonOpenDialog("SEd_oDialog", "sap.kt.com.minihrsolution.fragment.AddEducation", ["AddEd_id_StartEdu", "AddEd_id_EndEdu"]);
                 } else {
                     MessageToast.show(this.i18nModel.getText("selectRow"));
@@ -264,7 +274,6 @@ sap.ui.define([
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") &&
                         utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType");
-
                     if (!isValid) {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
@@ -299,14 +308,15 @@ sap.ui.define([
                         };
                         fnCall = this.ajaxUpdateWithJQuery("EducationalDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("eduDataupdate");
-                        this.setEnabledByIds(["EdF_id_EduEdit", "EdF_id_EduDelete"], false);
+                        this.setEduButtonsEnabled(false);
                     }
-
                     fnCall.then((oData) => {
                         if (oData.success) {
                             sap.ui.core.BusyIndicator.hide();
                             MessageToast.show(sSuccessMessage);
                             this.SEd_oDialog.close();
+                            this.setEduButtonsEnabled(false);
+                            this.byId("EdF_id_EduTable").removeSelections(true);
                             this.SS_commonEduFunction()
                             this._fetchCommonData("EducationalDetails", "sEducationModel", {
                                 EmployeeID: this.EmployeeID
@@ -318,7 +328,6 @@ sap.ui.define([
                         sap.ui.core.BusyIndicator.hide();
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     });
-
                 } catch (error) {
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -327,25 +336,13 @@ sap.ui.define([
             AddEd_onSubmitEdDetails: function () {
                 this.saveEducationDetails(true); // create mode
             },
-
             AddEd_onUpdateEdDetails: function () {
                 this.saveEducationDetails(false); // update mode
             },
 
-            // Common function to enable/disable elements by their IDs
-            setEnabledByIds: function (ids, isEnabled) {
-                var that = this;
-                ids.forEach(function (id) {
-                    that.byId(id).setEnabled(isEnabled);
-                });
-            },
             //Education detail delete call
             EdF_DeletEdu: function () {
                 var oSelectedItem = this.byId("EdF_id_EduTable").getSelectedItem();
-                if (!oSelectedItem) {
-                    MessageBox.error(this.i18nModel.getText("deleteCustomer"));
-                    return;
-                }
                 var sID = oSelectedItem.getBindingContext("sEducationModel").getObject().ID
                 var that = this;
                 var oDialog = new sap.m.Dialog({
@@ -354,7 +351,7 @@ sap.ui.define([
                     icon: "sap-icon://warning",
                     state: sap.ui.core.ValueState.Warning,
                     content: new sap.m.Text({
-                        text: this.i18nModel.getText("confirmDeleteCustomerMessage")
+                        text: this.i18nModel.getText("deletConfirmation")
                     }),
                     beginButton: new sap.m.Button({
                         text: this.i18nModel.getText("OkButton"),
@@ -362,10 +359,11 @@ sap.ui.define([
                         press: function () {
                             oDialog.close();
                             that.ajaxDeleteWithJQuery("/EducationalDetails", { filters: { ID: sID } }).then(() => {
-                                MessageToast.show(that.i18nModel.getText("eduDataDelete"));
+                                MessageToast.show(that.i18nModel.getText("eduDataDeletSuucess"));
                                 that._fetchCommonData("EducationalDetails", "sEducationModel", {
                                     EmployeeID: that.EmployeeID
                                 });
+                                that.setEduButtonsEnabled(false);
                             }).catch((error) => {
                                 MessageToast.show(error.responseText);
                             });
@@ -376,6 +374,8 @@ sap.ui.define([
                         type: sap.m.ButtonType.Reject,
                         press: function () {
                             oDialog.close();
+                            that.byId("EdF_id_EduTable").removeSelections(true);
+                            that.setEduButtonsEnabled(false);
                         }
                     }),
                     afterClose: function () {
@@ -404,7 +404,7 @@ sap.ui.define([
                     oModel.EndDate = sap.ui.getCore().byId("AddEmp_id_EndDate").getDateValue() || "";
                     oModel.StartDate = this.Formatter.convertToISODateFormat(oModel.StartDate);
                     oModel.EndDate = this.Formatter.convertToISODateFormat(oModel.EndDate);
-                    
+
                     let oPayload;
                     let fnCall;
                     let sSuccessMessage;
@@ -431,7 +431,9 @@ sap.ui.define([
                             sap.ui.core.BusyIndicator.hide();
                             MessageToast.show(sSuccessMessage);
                             this.SEmp_oDialog.close();
-                            this.SS_commonEmpFunction()
+                            this.byId("EmpF_id_EmpTable").removeSelections(true);
+                            this.setEmpButtonsEnabled(false);
+                            this.SS_commonEmpFunction();
                             this._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
                                 EmployeeID: this.EmployeeID
                             });
@@ -459,20 +461,18 @@ sap.ui.define([
             EmpF_onSelectionChange: function (oEvent) {
                 const aSelectedIndices = oEvent.getSource().getSelectedItems();
                 if (aSelectedIndices.length > 0) {
-                    this.setEnabledByIds(["EmpF_id_EmpEdit", "EmpF_id_EmpDelete"], true);
+                    this.setEmpButtonsEnabled(true);
                 } else {
-                    this.setEnabledByIds(["EmpF_id_EmpEdit", "EmpF_id_EmpDelete"], false);
+                    this.setEmpButtonsEnabled(false);
                 }
-
             },
             EmpF_onEditEmployment: function () {
                 var oSelectedItem = this.byId("EmpF_id_EmpTable").getSelectedItem();
                 if (oSelectedItem) {
                     var oData = oSelectedItem.getBindingContext("sEmploymentModel").getObject();
                     this.getView().getModel("employmentModel").setData(oData);
-                    var oViewModel = this.getView().getModel("viewModel");
-                    oViewModel.setProperty("/fragmentSubmit", false);
-                    oViewModel.setProperty("/fragmentSave", true);
+                    this.ViewModel.setProperty("/fragmentSubmit", false);
+                    this.ViewModel.setProperty("/fragmentSave", true);
                     this.SS_commonOpenDialog("SEmp_oDialog", "sap.kt.com.minihrsolution.fragment.AddEmployment", ["AddEmp_id_StartDate", "AddEmp_id_EndDate"]);
                 } else {
                     MessageToast.show(this.i18nModel.getText("selectRow"));
@@ -481,10 +481,6 @@ sap.ui.define([
             //Employment detail delete call
             EmpF_onDeletEmployment: function () {
                 var oSelectedItem = this.byId("EmpF_id_EmpTable").getSelectedItem();
-                if (!oSelectedItem) {
-                    MessageBox.error(this.i18nModel.getText("deleteCustomer"));
-                    return;
-                }
                 var sID = oSelectedItem.getBindingContext("sEmploymentModel").getObject().ID
                 var that = this;
                 var oDialog = new sap.m.Dialog({
@@ -493,7 +489,7 @@ sap.ui.define([
                     icon: "sap-icon://warning",
                     state: sap.ui.core.ValueState.Warning,
                     content: new sap.m.Text({
-                        text: this.i18nModel.getText("confirmDeleteCustomerMessage")
+                        text: this.i18nModel.getText("deletConfirmation")
                     }),
                     beginButton: new sap.m.Button({
                         text: this.i18nModel.getText("OkButton"),
@@ -501,10 +497,11 @@ sap.ui.define([
                         press: function () {
                             oDialog.close();
                             that.ajaxDeleteWithJQuery("/EmploymentDetails", { filters: { ID: sID } }).then(() => {
-                                MessageToast.show(that.i18nModel.getText("empDataDelete"));
+                                MessageToast.show(that.i18nModel.getText("empDataDeleteSuccess"));
                                 that._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
                                     EmployeeID: that.EmployeeID
                                 });
+                                that.setEmpButtonsEnabled(false);
                             }).catch((error) => {
                                 MessageToast.show(error.responseText);
                             });
@@ -515,6 +512,8 @@ sap.ui.define([
                         type: sap.m.ButtonType.Reject,
                         press: function () {
                             oDialog.close();
+                            that.byId("EmpF_id_EmpTable").removeSelections(true);
+                            that.setEmpButtonsEnabled(false);
                         }
                     }),
                     afterClose: function () {
