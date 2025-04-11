@@ -1,0 +1,18 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+>
+    <Dialog id="unassignDialog" title="{i18n>unAssign}" afterClose="onDialogClose">
+        <VBox class="sapUiResponsiveMargin">
+            <Label text="{i18n>date}" showColon="true"/>
+            <DatePicker id="unassignDate" width="100%" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" />
+        </VBox>
+        <beginButton>
+            <Button text="{i18n>save}" type="Accept" press="onSaveUnassign"/>
+        </beginButton>
+        <endButton>
+            <Button text="{i18n>cancel}" type="Reject" press="onCancelUnassign"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
+

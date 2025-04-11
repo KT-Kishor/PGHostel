@@ -209,7 +209,7 @@
 					class="sapUiMediumMargin"
 					 header="{i18n>headerAssignment}" press="TileV_onPressAssetAssignment">
 					 <TileContent  unit="{i18n>createmaintain}">
-						 <ImageContent src="sap-icon://time-off" />
+						 <ImageContent src="sap-icon://activity-assigned-to-goal" />
 					 </TileContent>
 				 </GenericTile>
 			</FlexBox>

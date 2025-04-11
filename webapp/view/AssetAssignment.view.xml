@@ -1,10 +1,219 @@
 <mvc:View
-	controllerName=""
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"
-	xmlns:c="sap.ui.core"
-	displayBlock="true"
-	height="100%"
-	busyIndicatorDelay="0"
+    controllerName="sap.kt.com.minihrsolution.controller.AssetAssignment"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
 >
+    <Page id="AA_id_Page">
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.kt.com.minihrsolution.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+        <fb:FilterBar
+            id="AA_id_FilterBarAsset"
+            persistencyKey="myPersKey"
+            useToolbar="false"
+            clear="AA_onPressClear"
+            showClearOnFB="true"
+            search="AA_onSearch"
+            filterChange="AA_onFilterChange"
+            showFilterConfiguration="false"
+            afterVariantLoad=".onAfterVariantLoad"
+        >
+            <fb:filterGroupItems>
+                <fb:FilterGroupItem
+                    name="EmployeeName"
+                    label="{i18n>employeeName}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            name="EmployeeName"
+                            showClearIcon="true"
+                            id="AA_id_EmployeeName"
+                            items="{assetModelInitial>/}"
+                        >
+                            <core:ListItem
+                                key="{assetModelInitial>EmployeeName}"
+                                text="{assetModelInitial>EmployeeName}"
+                            />
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+                <fb:FilterGroupItem
+                    name="Type"
+                    label="{i18n>type}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            name="Type"
+                            showClearIcon="true"
+                            id="AA_id_Type"
+                            items="{uniqueTypeModel>/}"
+                        >
+                            <core:ListItem
+                                key="{uniqueTypeModel>Type}"
+                                text="{uniqueTypeModel>Type}"
+                            />
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+
+                <fb:FilterGroupItem
+                    name="Branch"
+                    label="{i18n>branch}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            items="{uniqueBranchModel>/}"
+                            showClearIcon="true"
+                            id="AA_id_Branch"
+                        >
+                            <core:ListItem
+                                key="{uniqueBranchModel>Branch}"
+                                text="{uniqueBranchModel>Branch}"
+                                additionalText="{uniqueBranchModel>branchCode}"
+                            />
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+
+                <fb:FilterGroupItem
+                    name="AssignedDate"
+                    label="{i18n>assignedDate}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <DatePicker
+                            id="AA_id_Date"
+                            placeholder="dd/MM/yyyy"
+                            change="AA_handleChange"
+                            displayFormat="dd/MM/yyyy"
+                            valueFormat="yyyy-MM-dd"
+                        />
+                    </fb:control>
+                </fb:FilterGroupItem>
+            </fb:filterGroupItems>
+        </fb:FilterBar>
+        <Table
+            alternateRowColors="false"
+            id="AA_id_AssestTable"
+            items="{path:'assetModel>/'}"
+            class="sapUiResponsiveMargin"
+            width="auto"
+            mode="SingleSelectLeft"
+        >
+            <headerToolbar>
+                <OverflowToolbar>
+                    <Title  
+                        text="{i18n>assetData} ({= ${assetModel>/}.length})"
+                    />
+                    <ToolbarSpacer />
+                    <Button
+                        icon="sap-icon://add"
+                        text="{i18n>assign}"
+                        type="Accept"
+                        press="AA_onPressAssign"
+                    />
+                    <Button
+                        icon="sap-icon://edit"
+                        type="Neutral"
+                        press="AA_onPressEdit"
+                        text="{i18n>update}"
+                    />
+                    <Button
+                        icon="sap-icon://cancel"
+                        type="Negative"
+                        press="AA_onOpenUnassign"
+                        text="{i18n>un-Assign}"
+                    />
+                </OverflowToolbar>
+            </headerToolbar>
+            <columns>
+                <Column>
+                    <Text text="{i18n>employeeID}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>employeeName}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>type}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>model}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>equipmentNumber}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>serialNumber}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>assignedBy}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>branch}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>assignedDate}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>assetValue}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>status}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>returnDate}" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem class="tableRow">
+                    <cells>
+                        <Text text="{assetModel>EmployeeId}" />
+                        <Text text="{assetModel>EmployeeName}" />
+                        <Text text="{assetModel>Type}" />
+                        <Text text="{assetModel>Model}" />
+                        <Text text="{assetModel>EquipmentNumber}" />
+                        <Text text="{assetModel>SerialNumber}" />
+                        <Text text="{assetModel>AssignedBy}" />
+                        <Text text="{assetModel>Branch}" />
+                        <Text
+                            text="{path:'assetModel>AssignedDate',formatter:'.Formatter.formatDate'}"
+                        />
+                        <Text
+                            text="{path:'assetModel>AssignedValue',formatter:'.Formatter.formatCurrencyInINRText'}"
+                        />
+                        <ObjectStatus
+                            inverted="true"
+                            state="{= ${assetModel>Status} === 'Assigned' ? 'Success' : 'Error' }"
+                            text="{assetModel>Status}"
+                        />
+                        <Text
+                            text="{path:'assetModel>ReturnDate',formatter:'.Formatter.formatDate'}"
+                        />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <footer>
+            <Bar>
+                <contentLeft>
+                    <core:Fragment
+                        fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
+                        type="XML"
+                    />
+                </contentLeft>
+            </Bar>
+        </footer>
+    </Page>
 </mvc:View>

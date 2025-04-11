@@ -1,0 +1,53 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="idValueHelpDialog"
+        title="{i18n>selectEquipmentDetails}"
+        contentWidth="50%"
+    >
+        <content>
+            <Table
+                id="idVHDTable"
+                items="{incomeModel>/}"
+            >
+            <columns>
+                    <Column>
+                        <Text text="{i18n>model}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>equipmentNumber}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>serialNumber}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>assetValue}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem
+                        type="Active"
+                        press=".onVHDPick"
+                    >
+                        <cells>
+                            <Text text="{incomeModel>Model}" />
+                            <Text text="{incomeModel>EqNo}" />
+                            <Text text="{incomeModel>SlNo}" />
+                            <Text text="{incomeModel>AssetValue}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <beginButton>
+            <Button
+                text="{i18n>close}"
+                type="Negative"
+                press=".onVHDClose"
+            />
+        </beginButton>
+    </Dialog>
+</core:FragmentDefinition>
+
