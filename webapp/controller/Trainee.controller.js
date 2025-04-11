@@ -290,8 +290,7 @@ sap.ui.define([
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
-            },
-         
+            },         
             T_onBoardTrainee: function () {
                 var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                 var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();

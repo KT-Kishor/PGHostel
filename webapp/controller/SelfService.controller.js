@@ -12,6 +12,8 @@ sap.ui.define([
             _onRouteMatched: function () {
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
                 this.byId("SS_id_IconTab").setSelectedKey("employeeDetailsKey");
+                this.SS_commonEduFunction();
+                this.SS_commonEmpFunction();
                 this.EduFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/FolderID");
                 this.EmpFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmploymentDetailFolderID");
                 this._fetchCommonData("Designation", "sDesignationModel");
@@ -119,8 +121,8 @@ sap.ui.define([
                 this.byId("EdF_id_EduDelete").setEnabled(bEnabled);
             },
             setEmpButtonsEnabled: function (bEnabled) {
-                this.byId("EMF_id_EmpEdit").setEnabled(bEnabled);
-                this.byId("EMF_id_EmpDelete").setEnabled(bEnabled);
+                this.byId("EmpF_id_EmpEdit").setEnabled(bEnabled);
+                this.byId("EmpF_id_EmpDelete").setEnabled(bEnabled);
             },
 
             //Education dialog close
@@ -128,6 +130,9 @@ sap.ui.define([
                 this.SEd_oDialog.close();
                 this.byId("EdF_id_EduTable").removeSelections(true);
                 this.setEduButtonsEnabled(false);
+                const ids = ["AddEd_id_College", "AddEd_id_StartEdu", "AddEd_id_EndEdu", "AddEd_id_Grade"];
+                ids.forEach((id) => { sap.ui.getCore().byId(id).setValueState("None"); });
+                this._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: this.EmployeeID });
             },
             //Employment dialog open
             EmpF_onAddEmployment: function () {
@@ -149,6 +154,9 @@ sap.ui.define([
                 this.SEmp_oDialog.close();
                 this.byId("EmpF_id_EmpTable").removeSelections(true);
                 this.setEmpButtonsEnabled(false);
+                const ids = ["AddEmp_id_Company", "AddEmp_id_Desig", "AddEmp_id_OfcAddress", "AddEmp_id_StartDate", "AddEmp_id_EndDate", "AdEmp_id_RCNameI", "AdEmp_id_RCAddressI", "AdEmp_id_RCMailI", "AdEmp_id_RCMobileI", "AdEmp_id_RCSalII", "AdEmp_id_RCNameII", "AdEmp_id_RCAddressII", "AdEmp_id_RCMailII", "AdEmp_id_RCMobileII"];
+                ids.forEach((id) => { sap.ui.getCore().byId(id).setValueState("None"); });
+                this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID });
             },
             //validation function calling from base controller
             SS_validateMobileNo: function (oEvent) {
@@ -397,7 +405,7 @@ sap.ui.define([
                     // Get and prepare model data
                     let oModel = this.getView().getModel("employmentModel").getData();
                     oModel.EmployeeID = this.EmployeeID;
-                    oModel.Designation = sap.ui.getCore().byId("AddEmp_id_Desig").getValue() || "";
+                    oModel.Designation = sap.ui.getCore().byId("AddEmp_id_Desig").getValue();
                     oModel.RCISal = sap.ui.getCore().byId("AddEmp_id_SalI").getSelectedKey() || "";
                     oModel.RCIISal = sap.ui.getCore().byId("AdEmp_id_RCSalII").getSelectedKey() || "";
                     oModel.StartDate = sap.ui.getCore().byId("AddEmp_id_StartDate").getDateValue() || "";
@@ -523,6 +531,52 @@ sap.ui.define([
                 oDialog.open();
             },
 
+            //Reference details
+            EmpF_onReferenceDetails: function () {
+                var that = this;
+                var oTable = this.byId("EmpF_id_EmpTable");
+                var aSelectedContexts = oTable.getSelectedContexts();
+                if (aSelectedContexts.length === 0) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("selectRowToEdit"));
+                    return;
+                }
+                var dataModel = aSelectedContexts[0].getObject();
+                // Prepare formatted reference details HTML
+                var formattedReferenceData = `
+                    <div style="padding-left: 15px; padding-right: 15px;">
+                        <p><b>Name:</b> ${dataModel.RCISal} ${dataModel.RCIName}</p>
+                        <p><b>Contact Address:</b> ${dataModel.RCIAddress}</p>
+                        <p><b>Email:</b> ${dataModel.RCIEmailID}</p>
+                        <p><b>Mobile No:</b> ${dataModel.RCIMobileNo}</p>
+                        <br/>
+                        <p><b>Name:</b> ${dataModel.RCIISal} ${dataModel.RCIIName}</p>
+                        <p><b>Contact Address:</b> ${dataModel.RCIIAddress}</p>
+                        <p><b>Email:</b> ${dataModel.RCIIEmailID}</p>
+                        <p><b>Mobile No:</b> ${dataModel.RCIIMobileNo}</p>
+                    </div>`;
+                // Create a dialog to display the reference details
+                var oDialog = new sap.m.Dialog({
+                    title: "Reference Details",
+                    draggable: false,
+                    resizable: false,
+                    contentWidth: "500px",
+                    contentHeight: "400px",
+                    verticalScrolling: true,
+                    content: new sap.ui.core.HTML({
+                        content: formattedReferenceData
+                    }),
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            oDialog.close();
+                            oTable.removeSelections(true);
+                            that.setEmpButtonsEnabled(false);
+
+                        }
+                    })
+                });
+                oDialog.open();
+            },
             SS_onTabSelect: async function (oEvent) {
                 if (oEvent.getParameter("key") === "educationDetailKey") {
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
