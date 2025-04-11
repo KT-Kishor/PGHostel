@@ -118,7 +118,7 @@
 										<viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="LeaveType" />
 									</viz:feeds>
 									<viz:dependents>
-										<viz:Popover id="Al_id_PieChartAll" />
+										<viz:Popover id="AL_id_PieChartAll" />
 									</viz:dependents>
 								</viz:VizFrame>
 							</com:content>
