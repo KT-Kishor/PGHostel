@@ -322,7 +322,7 @@ sap.ui.define(
             return;
           }
 
-          sap.ui.core.BusyIndicator.show(0);
+          BusyIndicator.show(0);
           // Format Data
           var formattedData = that._uploadedExcelData.map((row) => ({
             Variant: row["Variant"] || "",
@@ -354,7 +354,7 @@ sap.ui.define(
             data: formattedData,
           });
           if (response.success) {
-            sap.ui.core.BusyIndicator.hide();
+            BusyIndicator.hide();
             MessageToast.show("Scheme saved successfully!");
 
             // Update UI Model after successful save
@@ -365,7 +365,7 @@ sap.ui.define(
             that.SU_onClear();
             that.oDialog.close();
           } else {
-            sap.ui.core.BusyIndicator.hide();
+            BusyIndicator.hide();
             oFileUploader.setValue(""); // Reset file uploader
             that._uploadedExcelData = null;
             if (that.oDialog) that.oDialog.close();
@@ -413,10 +413,10 @@ sap.ui.define(
                 "TransmissionOnly"
               );
 
-              sap.ui.core.BusyIndicator.hide();
+              BusyIndicator.hide();
             })
             .catch((oError) => {
-              sap.ui.core.BusyIndicator.hide();
+              BusyIndicator.hide();
               MessageBox.error(
                 this.i18nModel.getText("commonReadingDataError")
               );

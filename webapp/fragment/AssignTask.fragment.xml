@@ -10,20 +10,30 @@
             
                 <Label text="{i18n>employeeID}" required="true" visible="{visiblePlay>/isAssignmentMode}" />
                 <MultiComboBox 
-                 id="FAT_id_EmployeeID" width="490px" change="FAT_onchangeEmpId" valueStateText="{i18n>taskNameValueState}" selectedKeys="{EditTaskModel>/EmployeeID}"   items="{LoginDetailsModel>/}" visible="{visiblePlay>/isAssignmentMode}" showSecondaryValues="true" >
-                
-                    <core:ListItem key="{LoginDetailsModel>EmployeeID}" text="{LoginDetailsModel>EmployeeID}" additionalText= "{LoginDetailsModel>EmployeeName}"/>
-                    </MultiComboBox>
-                <Label text="{i18n>taskName}" />
+    id="FAT_id_EmployeeID" 
+    width="490px" 
+    selectionChange="FAT_onchangeEmpId"
+    selectedKeys="{EditTaskModel>/EmployeeID}"
+    items="{LoginDetailsModel>/}"
+    showSecondaryValues="true"
+    editable="{= !${visiblePlay>/isEditMode} }">
+    <core:ListItem 
+        key="{LoginDetailsModel>EmployeeID}" 
+        text="{LoginDetailsModel>EmployeeID}" 
+        additionalText="{LoginDetailsModel>EmployeeName}"/>
+</MultiComboBox>
+                <Label text="{i18n>taskName}"/>
                 <Input value="{TaskDetailsModel>/TaskName}" id="FAT_id_TaskName" liveChange="AT_ValidateCommonFields" maxLength="99" valueStateText="{i18n>taskNameValueState}" editable="false"/>
+                <Label text="{i18n>tsakid}" />
+                <Input value="{TaskDetailsModel>/TaskID}" id="FAT_id_TaskID"  maxLength="99" valueStateText="{i18n>taskNameValueState}" editable="false"/>
 
                 
                
                 <Label text="{i18n>startDate}" required="true"/>
                 <DatePicker
-                  
+                  maxDate="{newTaskModel>/maxDate}"
                     change="AT_onstartDatevalidateDate"
-                    value="{newTaskModel>/StartDate}"
+                    value="{EditTaskModel>/StartDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     id="FAT_id_StartDate"
@@ -46,7 +56,7 @@
     displayFormat="HH" 
     valueFormat="HH" 
     visible="{visiblePlay>/isAssignmentMode}"
-    change="AT_ValidateCommonFields"
+    change="AT_ValidateHournFields"
      valueStateText="{i18n>hoursLimit}"/>
     
             </f:content>

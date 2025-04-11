@@ -22,20 +22,20 @@
     
   <ObjectAttribute 
     title="{i18n>startDate}" 
-    text="{path: 'TaskDetailsModel>StartDate', type: 'sap.ui.model.type.Date'}" 
+    text="{TaskDetailsModel>StartDate}" 
     class="sapUiSmallMarginEnd taskNameColor" 
     textDirection="LTR" />
     
   <ObjectAttribute 
     title="{i18n>endDate}" 
-    text="{path: 'TaskDetailsModel>EndDate', type: 'sap.ui.model.type.Date'}" 
+    text="{TaskDetailsModel>EndDate}" 
     class="sapUiSmallMarginEnd taskNameColor" 
     textDirection="LTR" />
 </ObjectHeader>
 	
 				<fb:FilterBar  class="sapUiTinyMargin" id="AT_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="FAT_onPressClear" showClearOnFB="true" search="FAT_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad">
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeId}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
     <fb:control>
         <ComboBox 
             id="FilterEmployeeId"
@@ -54,7 +54,7 @@
 			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"  items="{AssignModel>/}" growing="true"  growingThreshold="50" mode="SingleSelectLeft" alternateRowColors="true" id="AT_id_TaskTable">
 			 <headerToolbar>
                 <OverflowToolbar>
-                <Title text="{i18n>tileAssignmentFooter}"/>
+                <Title text="{i18n>tileAssignmentFooter}({= ${AssignModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
 					    <Button  text="Assign Employee" press="AT_onAssignEmpTask"  icon="sap-icon://employee-lookup" id="AT_id_Assign" type="Accept"/>
@@ -88,7 +88,7 @@
 						<cells>
 							<Text text="{AssignModel>TaskName}"/>
 							<Text text="{AssignModel>EmployeeID}"/>
-							<Text text="{AssignModel>EmployeeName}"/>
+							<Text text="{LoginDetailsModel>EmployeeName}"/>
 							<Text text="{AssignModel>StartDate}"/>
 							<Text text="{AssignModel>EndDate}"/>
 							<Text text="{AssignModel>HoursWorked}"/>

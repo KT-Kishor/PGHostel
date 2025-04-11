@@ -19,8 +19,8 @@
 				</fb:FilterGroupItem>
 			</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="MC_id_CustTable" mode="SingleSelectLeft" selectionChange="MC_onTableSelectionChange"
-			 items="{path: 'CreateCustomerModel>/'}"
+			<Table id="MC_id_CustTable" mode="SingleSelectLeft" 
+			 items="{CreateCustomerModel>/}"
 			 growing="true"
              growingThreshold="100"
              alternateRowColors="true">

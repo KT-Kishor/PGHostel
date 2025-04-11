@@ -160,11 +160,11 @@ sap.ui.define(
           }
 
           const oData = this.getView().getModel("EditTaskModel").getData();
-          const sTaskId = oSelectedItem
+          const oTaskId = oSelectedItem
             .getBindingContext("TaskModel")
             .getProperty("TaskID");
 
-          const requestData = { filters: { TaskID: sTaskId }, data: oData };
+          const requestData = { filters: { TaskID: oTaskId }, data: oData };
 
           const response = await this.ajaxUpdateWithJQuery(
             "/NewTask",
