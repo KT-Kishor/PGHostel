@@ -38,12 +38,11 @@
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.EmploymentDetails" type="XML"/>
 					</IconTabFilter>
 					<IconTabFilter
-			        design="Horizontal"
 					key="salaryKey"
+			        design="Horizontal"
 			        text="{i18n>salaryDetails}"
 				    icon="sap-icon://money-bills">
 						<VBox id="SS_id_FormsContainer" />
-						<!-- <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.SalaryDetails" type="XML"/> -->
 					</IconTabFilter>
 					<IconTabFilter text="{i18n>paySlip}"  icon="sap-icon://simple-payment" design="Horizontal" key="paySlipKey"></IconTabFilter>
 				</items>

@@ -27,6 +27,9 @@ sap.ui.define([
                 this._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
                     EmployeeID: this.EmployeeID
                 });
+                this._fetchCommonData("SalaryDetails", "sSalaryModel", {
+                    EmployeeID: this.EmployeeID
+                });
                 var viewModel = new JSONModel({
                     fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false,
                     isRoleMode: false, Max: new Date(), isVisitMode: true, isIdMode: true,
@@ -258,7 +261,6 @@ sap.ui.define([
                 const aSelectedIndices = oEvent.getSource().getSelectedItems();
                 if (aSelectedIndices.length > 0) {
                     this.setEduButtonsEnabled(true);
-
                 } else {
                     this.setEduButtonsEnabled(false);
                 }
@@ -295,11 +297,9 @@ sap.ui.define([
                     oModel.EducationEndDate = sap.ui.getCore().byId("AddEd_id_EndEdu").getDateValue() || "";
                     oModel.EducationStartDate = this.Formatter.convertToISODateFormat(oModel.EducationStartDate);
                     oModel.EducationEndDate = this.Formatter.convertToISODateFormat(oModel.EducationEndDate);
-
                     let oPayload;
                     let fnCall;
                     let sSuccessMessage;
-
                     if (bIsCreate) {
                         oPayload = {
                             "tableName": "EducationalDetails",
@@ -350,49 +350,29 @@ sap.ui.define([
 
             //Education detail delete call
             EdF_DeletEdu: function () {
-                var oSelectedItem = this.byId("EdF_id_EduTable").getSelectedItem();
-                var sID = oSelectedItem.getBindingContext("sEducationModel").getObject().ID
-                var that = this;
-                var oDialog = new sap.m.Dialog({
-                    title: this.i18nModel.getText("msgBoxConfirm"),
-                    type: sap.m.DialogType.Message,
-                    icon: "sap-icon://warning",
-                    state: sap.ui.core.ValueState.Warning,
-                    content: new sap.m.Text({
-                        text: this.i18nModel.getText("deletConfirmation")
-                    }),
-                    beginButton: new sap.m.Button({
-                        text: this.i18nModel.getText("OkButton"),
-                        type: sap.m.ButtonType.Accept,
-                        press: function () {
-                            oDialog.close();
-                            that.ajaxDeleteWithJQuery("/EducationalDetails", { filters: { ID: sID } }).then(() => {
-                                MessageToast.show(that.i18nModel.getText("eduDataDeletSuucess"));
-                                that._fetchCommonData("EducationalDetails", "sEducationModel", {
-                                    EmployeeID: that.EmployeeID
-                                });
-                                that.setEduButtonsEnabled(false);
-                            }).catch((error) => {
-                                MessageToast.show(error.responseText);
-                            });
-                        }
-                    }),
-                    endButton: new sap.m.Button({
-                        text: this.i18nModel.getText("CancelButton"),
-                        type: sap.m.ButtonType.Reject,
-                        press: function () {
-                            oDialog.close();
-                            that.byId("EdF_id_EduTable").removeSelections(true);
+                var that = this; 
+                var oSelectedItem = this.byId("EdF_id_EduTable").getSelectedItem(); 
+                var oContext = oSelectedItem.getBindingContext("sEducationModel").getProperty("ID");
+                // Use common confirmation dialog
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("msgBoxConfirm"),         
+                    this.i18nModel.getText("deletConfirmation"),     
+                    function () {                         
+                        that.ajaxDeleteWithJQuery("/EducationalDetails", { filters: { ID: oContext } }).then(() => {
+                            sap.m.MessageToast.show(that.i18nModel.getText("eduDataDeletSuucess"));
+                            that._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: that.EmployeeID });
                             that.setEduButtonsEnabled(false);
-                        }
-                    }),
-                    afterClose: function () {
-                        oDialog.destroy();
+                        }).catch((error) => {
+                            sap.m.MessageToast.show(error.responseText);
+                        });
+                    },
+                    function () {                                    // On Cancel
+                        that.byId("EdF_id_EduTable").removeSelections(true);
+                        that.setEduButtonsEnabled(false);
                     }
-                });
-                oDialog.open();
+                );
             },
-
+            
             //Employment detail create calls
             saveEmploymentDetails: function (bIsCreate) {
                 try {
@@ -412,11 +392,9 @@ sap.ui.define([
                     oModel.EndDate = sap.ui.getCore().byId("AddEmp_id_EndDate").getDateValue() || "";
                     oModel.StartDate = this.Formatter.convertToISODateFormat(oModel.StartDate);
                     oModel.EndDate = this.Formatter.convertToISODateFormat(oModel.EndDate);
-
                     let oPayload;
                     let fnCall;
                     let sSuccessMessage;
-
                     if (bIsCreate) {
                         oPayload = {
                             "tableName": "EmploymentDetails",
@@ -442,10 +420,7 @@ sap.ui.define([
                             this.byId("EmpF_id_EmpTable").removeSelections(true);
                             this.setEmpButtonsEnabled(false);
                             this.SS_commonEmpFunction();
-                            this._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
-                                EmployeeID: this.EmployeeID
-                            });
-                            this.setEnabledByIds(["EMF_id_EmpEdit", "EMF_id_EmpDelete"], false);
+                            this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID});
                         } else {
                             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         }
@@ -453,7 +428,6 @@ sap.ui.define([
                         sap.ui.core.BusyIndicator.hide();
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     });
-
                 } catch (error) {
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -488,49 +462,32 @@ sap.ui.define([
             },
             //Employment detail delete call
             EmpF_onDeletEmployment: function () {
-                var oSelectedItem = this.byId("EmpF_id_EmpTable").getSelectedItem();
-                var sID = oSelectedItem.getBindingContext("sEmploymentModel").getObject().ID
-                var that = this;
-                var oDialog = new sap.m.Dialog({
-                    title: this.i18nModel.getText("msgBoxConfirm"),
-                    type: sap.m.DialogType.Message,
-                    icon: "sap-icon://warning",
-                    state: sap.ui.core.ValueState.Warning,
-                    content: new sap.m.Text({
-                        text: this.i18nModel.getText("deletConfirmation")
-                    }),
-                    beginButton: new sap.m.Button({
-                        text: this.i18nModel.getText("OkButton"),
-                        type: sap.m.ButtonType.Accept,
-                        press: function () {
-                            oDialog.close();
-                            that.ajaxDeleteWithJQuery("/EmploymentDetails", { filters: { ID: sID } }).then(() => {
-                                MessageToast.show(that.i18nModel.getText("empDataDeleteSuccess"));
-                                that._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
-                                    EmployeeID: that.EmployeeID
-                                });
-                                that.setEmpButtonsEnabled(false);
-                            }).catch((error) => {
-                                MessageToast.show(error.responseText);
+                var that = this;  
+                var oSelectedItem = this.byId("EmpF_id_EmpTable").getSelectedItem(); 
+                var oContext = oSelectedItem.getBindingContext("sEmploymentModel").getProperty("ID");
+                // Show common confirmation dialog
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("msgBoxConfirm"), 
+                    this.i18nModel .getText("deletConfirmation"),
+                    function () {  
+                        that.ajaxDeleteWithJQuery("/EmploymentDetails", { filters: { ID: oContext } }).then(() => {
+                            sap.m.MessageToast.show(that.i18nModel.getText("empDataDeleteSuccess"));
+                            that._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
+                                EmployeeID: that.EmployeeID
                             });
-                        }
-                    }),
-                    endButton: new sap.m.Button({
-                        text: this.i18nModel.getText("CancelButton"),
-                        type: sap.m.ButtonType.Reject,
-                        press: function () {
-                            oDialog.close();
-                            that.byId("EmpF_id_EmpTable").removeSelections(true);
                             that.setEmpButtonsEnabled(false);
-                        }
-                    }),
-                    afterClose: function () {
-                        oDialog.destroy();
+                        }).catch((error) => {
+                            sap.m.MessageToast.show(error.responseText);
+                        });
+                    },
+                    function () {
+                        that.byId("EmpF_id_EmpTable").removeSelections(true);
+                        that.setEmpButtonsEnabled(false);
                     }
-                });
-                oDialog.open();
+                );
             },
-
+            
+    
             //Reference details
             EmpF_onReferenceDetails: function () {
                 var that = this;
@@ -577,6 +534,149 @@ sap.ui.define([
                 });
                 oDialog.open();
             },
+
+            //Display the salary details
+            displaySalaryDetails: function (salaryDetails) {
+                var oVBox = this.getView().byId("SS_id_FormsContainer");
+                oVBox.removeAllItems(); // Clear previous content
+
+                salaryDetails.forEach(
+                    function (detail, index) {
+                        var appraisalDate = detail.AppraisalDate
+                            ? detail.AppraisalDate
+                            : new Date().toLocaleDateString();
+                        var effectiveDate = detail.EffectiveDate
+                            ? detail.EffectiveDate
+                            : new Date().toLocaleDateString();
+                        var sTitleText = `Appraisal Date: ${appraisalDate}, Effective Date: ${effectiveDate} - Yearly Gross: INR ${this.Formatter.IndiaNumberFormatter(
+                            detail.Gross
+                        )}`;
+
+                        // Using a Panel for better responsiveness
+                        var oPanel = new sap.m.Panel({
+                            expandable: true,
+                            expanded: true,
+                            headerToolbar: new sap.m.Toolbar({
+                                content: [
+                                    new sap.m.Text({
+                                        text: sTitleText,
+                                        wrapping: true,
+                                        maxLines: 2,
+                                        class: "responsiveTitle",
+                                    }),
+                                ],
+                            }),
+                            content: [
+                                new sap.ui.layout.form.SimpleForm({
+                                    layout: "ResponsiveGridLayout",
+                                    editable: false,
+                                    columnsM: 2,
+                                    columnsL: 2,
+                                    columnsXL: 2,
+                                    content: [
+                                        new sap.ui.core.Title({
+                                            text: this.i18nModel.getText("empOfmonthlyCalculation"),
+                                        }),
+                                        new sap.m.Label({
+                                            text: this.i18nModel.getText("empOfbasicSalary"),
+                                        }),
+                                        new sap.m.Text({
+                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
+                                                detail.MonthBasic
+                                            )}`,
+                                        }),
+                                        new sap.m.Label({
+                                            text: this.i18nModel.getText("empOfhra"),
+                                        }),
+                                        new sap.m.Text({
+                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
+                                                detail.MonthHRA
+                                            )}`,
+                                        }),
+                                        new sap.m.Label({
+                                            text: this.i18nModel.getText("empOftaDa"),
+                                        }),
+                                        new sap.m.Text({
+                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
+                                                detail.MonthTADA
+                                            )}`,
+                                        }),
+                                        new sap.m.Label({
+                                            text: this.i18nModel.getText("empOfothers"),
+                                        }),
+                                        new sap.m.Text({
+                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
+                                                detail.MonthOthers
+                                            )}`,
+                                        }),
+                                        new sap.m.Label({
+                                            text: this.i18nModel.getText("empOfmonthlyTotal"),
+                                        }),
+                                        new sap.m.Text({
+                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
+                                                detail.MonthTotal
+                                            )}`,
+                                        }),
+
+                                        new sap.ui.core.Title({
+                                            text: this.i18nModel.getText("empOfyearlyCalculation"),
+                                        }),
+                                        new sap.m.Label({
+                                            text: this.i18nModel.getText("empOfbasicSalary"),
+                                        }),
+                                        new sap.m.Text({
+                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
+                                                detail.YearBasic
+                                            )}`,
+                                        }),
+                                        new sap.m.Label({
+                                            text: this.i18nModel.getText("empOfhra"),
+                                        }),
+                                        new sap.m.Text({
+                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
+                                                detail.YearHRA
+                                            )}`,
+                                        }),
+                                        new sap.m.Label({
+                                            text: this.i18nModel.getText("empOftaDa"),
+                                        }),
+                                        new sap.m.Text({
+                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
+                                                detail.YearTADA
+                                            )}`,
+                                        }),
+                                        new sap.m.Label({
+                                            text: this.i18nModel.getText("empOfothers"),
+                                        }),
+                                        new sap.m.Text({
+                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
+                                                detail.YearOthers
+                                            )}`,
+                                        }),
+                                        new sap.m.Label({
+                                            text: this.i18nModel.getText("empOfyearlyTotal"),
+                                        }),
+                                        new sap.m.Text({
+                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
+                                                detail.YearTotal
+                                            )}`,
+                                        }),
+                                    ],
+                                }),
+                            ],
+                        });
+                        // Wrapper VBox for spacing
+                        var oWrapperVBox = new sap.m.VBox({
+                            items: [oPanel],
+                            layoutData: new sap.m.FlexItemData({
+                                styleClass: "marginBottom", // Apply CSS margin
+                            }),
+                        });
+                        oVBox.addItem(oWrapperVBox);
+                    }.bind(this)
+                );
+            },
+
             SS_onTabSelect: async function (oEvent) {
                 if (oEvent.getParameter("key") === "educationDetailKey") {
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);

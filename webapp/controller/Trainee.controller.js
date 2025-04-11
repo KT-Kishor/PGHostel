@@ -19,7 +19,8 @@ sap.ui.define([
                 this._fetchCommonData("Department", "Departmentmodel");
                 this._fetchCommonData("CompanyEmails", "CCMailModel", {
                     applicationName: "Trainee"});
-                ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
+                this.byId("T_id_OnboardBtnT").setEnabled(false);
+                this.byId("T_id_RejectBtnT").setEnabled(false);
                 ["T_id_Download", "T_id_EmpOnBoard","T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
                 this.oValue = oEvent.getParameter("arguments").value;
@@ -135,44 +136,33 @@ sap.ui.define([
             },
             onHandleTraineeAction: function (action) {
                 var that = this;
-                var oContext = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel");            
-                var message = (action === "onboard")
-                    ? this.i18nModel.getText("OnboardMessage", [oContext.getProperty("NameSalutation"), oContext.getProperty("TraineeName")])
-                    : this.i18nModel.getText("RejectMessage", [oContext.getProperty("NameSalutation"), oContext.getProperty("TraineeName")]);
-                var dialog = new sap.m.Dialog({
-                    title: this.i18nModel.getText("ConfirmActionTitle"),
-                    type: "Message",
-                    content: new sap.m.Text({ text: message }),
-                    beginButton: new sap.m.Button({
-                        text: this.i18nModel.getText("OkButton"),
-                        type: "Accept",
-                        press: function () {
-                            if (action === "onboard") {
-                                // Open the OnboardTrainee fragment
-                                that.TC_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee", "");
-                            } else if (action === "reject") {
-                                that._handleReject(oContext);
-                            }
-                            dialog.close();
+                var oContext = this.byId("T_id_TraineeTable").getSelectedItem()?.getBindingContext("traineeModel");
+                if (!oContext) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("SelectTraineeMessage"));
+                    return;
+                }
+                var sName = oContext.getProperty("NameSalutation") + " " + oContext.getProperty("TraineeName");
+                var sMessage = (action === "onboard")
+                    ? this.i18nModel.getText("OnboardMessage", [sName])
+                    : this.i18nModel.getText("RejectMessage", [sName]);
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("ConfirmActionTitle"), 
+                    sMessage,                              
+                    function () {                         
+                        if (action === "onboard") {
+                            that.TC_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee", "");
+                        } else if (action === "reject") {
+                            that._handleReject(oContext);
                         }
-                    }),
-                    endButton: new sap.m.Button({
-                        text: this.i18nModel.getText("CancelButton"),
-                        type: "Reject",
-                        press: function () {
-                            dialog.close();
-                        }
-                    }),
-                    afterClose: function () {
-                        dialog.destroy();
                     }
-                });
-                dialog.open();
+                );
             },
+            
             _handleReject: function (oContext) {
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
                 this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
-                ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
+                this.byId("T_id_OnboardBtn").setEnabled(false);
+                this.byId("T_id_RejectBtn").setEnabled(false);
             },
             OTF_onPressOnboard: function () {
                 try {
@@ -183,7 +173,8 @@ sap.ui.define([
                         // Prepare Data for Update Call
                         this.updateCallForTrainee(oContext.getObject(), "traineeOnboardSucess");
                         this.TOb_oDialog.close();
-                        ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
+                        this.byId("T_id_OnboardBtn").setEnabled(false);
+                        this.byId("T_id_RejectBtn").setEnabled(false);
                     } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }

@@ -458,6 +458,43 @@ sap.ui.define([
         sap.m.MessageToast.show("Error generating PDF: " + error.message);
         console.error("Error waiting for models:", error);
       }
-    }
+    },
+    //common confirmation dialog box
+    showConfirmationDialog: function (sTitle, sMessage, fnOnConfirm, fnOnCancel, sOkText, sCancelText) {
+      var oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+  
+      var dialog = new sap.m.Dialog({
+          title: sTitle,
+          type: "Message",
+          content: new sap.m.Text({ text: sMessage }),
+          beginButton: new sap.m.Button({
+              text: sOkText || oResourceBundle.getText("OkButton"),
+              type: "Accept",
+              press: function () {
+                  if (typeof fnOnConfirm === "function") {
+                      fnOnConfirm();
+                  }
+                  dialog.close();
+              }
+          }),
+          endButton: new sap.m.Button({
+              text: sCancelText || oResourceBundle.getText("CancelButton"),
+              type: "Reject",
+              press: function () {
+                  if (typeof fnOnCancel === "function") {
+                      fnOnCancel();
+                  } else {
+                      sap.m.MessageToast.show(oResourceBundle.getText("ActionCancelledMessage"));
+                  }
+                  dialog.close();
+              }
+          }),
+          afterClose: function () {
+              dialog.destroy();
+          }
+      });
+  
+      dialog.open();
+  }
   })
 });
