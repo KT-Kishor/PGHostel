@@ -172,8 +172,6 @@ sap.ui.define(
         },
 
         FAT_onTaskClose: function () {
-          const oTable = this.byId("AT_id_TaskTable");
-          oTable.removeSelections();
           if (this.oTaskDialog) {
             this.oTaskDialog.close();
           }
@@ -210,9 +208,29 @@ sap.ui.define(
               params
             );
             if (response.success) {
-              const taskData = Array.isArray(response.data)
+              let taskData = Array.isArray(response.data)
                 ? response.data
                 : [response.data];
+
+              const aEmployees =
+                this.getView().getModel("LoginDetailsModel")?.getData() || [];
+
+              // Enrich data with EmployeeName
+              taskData = taskData.map((task) => {
+                if (task.EmployeeID) {
+                  const empIDs = task.EmployeeID.split(",");
+                  const names = empIDs
+                    .map((id) => {
+                      const emp = aEmployees.find((e) => e.EmployeeID === id);
+                      return emp ? emp.EmployeeName : "";
+                    })
+                    .filter((name) => name !== "")
+                    .join(", ");
+                  task.EmployeeName = names;
+                }
+                return task;
+              });
+
               this.getView().setModel(new JSONModel(taskData), "AssignModel");
             }
           } catch (error) {
@@ -309,11 +327,11 @@ sap.ui.define(
           const oData = { ...oEditModel.getData() }; // Clone data to prevent reference issues
           const oTaskId = oSelectedItem
             .getBindingContext("AssignModel")
-            .getProperty("TaskID");
+            .getProperty("EmployeeID");
 
           try {
             const response = await this.ajaxUpdateWithJQuery("/AssignedTask", {
-              filters: { TaskID: oTaskId },
+              filters: { EmployeeID: oTaskId },
               data: oData,
             });
 
@@ -321,9 +339,10 @@ sap.ui.define(
               MessageToast.show("Task updated successfully!");
 
               // 1. Refresh the entire table data
-              this._fetchCommonData("AssignedTask", "AssignModel", {});
-
-              this.CommonReadcall();
+              this._fetchCommonData("AssignedTask", "AssignModel", {
+                EmployeeID: oTaskId,
+              });
+              this.CommonReadcall({ EmployeeID: oTaskId });
 
               // 3. Clear selection and close dialog
               oTable.removeSelections();

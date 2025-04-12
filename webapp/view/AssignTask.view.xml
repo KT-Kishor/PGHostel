@@ -88,7 +88,7 @@
 						<cells>
 							<Text text="{AssignModel>TaskName}"/>
 							<Text text="{AssignModel>EmployeeID}"/>
-							<Text text="{LoginDetailsModel>EmployeeName}"/>
+							<Text text="{AssignModel>EmployeeName}"/>
 							<Text text="{AssignModel>StartDate}"/>
 							<Text text="{AssignModel>EndDate}"/>
 							<Text text="{AssignModel>HoursWorked}"/>

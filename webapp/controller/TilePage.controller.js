@@ -97,19 +97,19 @@ sap.ui.define(
           if (oFragmentModel) {
             oFragmentModel.setData({ EmployeeID: "", EmployeeName: "" });
           }
-          if (!this.oDialog) {
+          if (!this.oUpdatePass) {
             sap.ui.core.Fragment.load({
               name: "sap.kt.com.minihrsolution.fragment.ResetPassword",
               controller: this,
             }).then(
-              function (oDialog) {
-                this.oDialog = oDialog;
-                oView.addDependent(this.oDialog);
-                this.oDialog.open();
+              function (oUpdatePass) {
+                this.oUpdatePass = oUpdatePass;
+                oView.addDependent(this.oUpdatePass);
+                this.oUpdatePass.open();
               }.bind(this)
             );
           } else {
-            this.oDialog.open();
+            this.oUpdatePass.open();
           }
         },
         RP_onPressCanclePW: function () {
@@ -135,8 +135,8 @@ sap.ui.define(
             .setValueState("None");
 
           // Close dialog
-          if (this.oDialog) {
-            this.oDialog.close();
+          if (this.oUpdatePass) {
+            this.oUpdatePass.close();
           }
         },
         RP_onPressSetSave: async function () {
@@ -182,8 +182,8 @@ sap.ui.define(
                 oModel.refresh(true);
               }
 
-              if (this.oDialog) {
-                this.oDialog.close();
+              if (this.oUpdatePass) {
+                this.oUpdatePass.close();
               }
 
               MessageToast.show(this.i18nModel.getText("updatepassword"));

@@ -100,6 +100,9 @@ sap.ui.define(
           });
         },
         NAF_onTaskClose: function () {
+          const oTable = this.byId("MA_id_TaskTable");
+          oTable.removeSelections(true); // Clear selection
+
           if (this.oTaskDialog) {
             this.oTaskDialog.close();
           }

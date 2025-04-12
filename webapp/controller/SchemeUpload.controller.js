@@ -71,13 +71,11 @@ sap.ui.define(
             "SU_id_Transmission1"
           );
 
-          if (oVariantComboBox) {
+          if (oVariantComboBox && oTransmissionComboBox) {
             oVariantComboBox.setSelectedKey(""); // Clear selection
             oVariantComboBox.setValue(""); // Clear displayed text
-          }
-          if (oTransmissionComboBox) {
             oTransmissionComboBox.setSelectedKey(""); // Clear selection
-            oTransmissionComboBox.setValue(""); // Clear displayed text
+            oTransmissionComboBox.setValue("");
           }
         },
         // goto Tilepage
@@ -107,6 +105,7 @@ sap.ui.define(
           oFileUploader.setValue("");
         },
         FUS_onUpload: function (e) {
+          var that = this;
           var file = e.getParameter("files") && e.getParameter("files")[0];
           var oModel = this.getView().getModel();
           if (file) {
@@ -119,8 +118,8 @@ sap.ui.define(
           var fileType = file.name.split(".").pop().toLowerCase();
 
           if (!validTypes.includes(fileType)) {
-            MessageToast.show(
-              "Invalid file type! Please upload an Excel (.xlsx) file."
+            MessageToast.show(that.i18nModel.getText("msgvalidfiletype")
+
             );
             return;
           }

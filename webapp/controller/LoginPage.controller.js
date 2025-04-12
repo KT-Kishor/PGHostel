@@ -15,6 +15,7 @@ sap.ui.define(
             .getRoute("RouteLoginPage")
             .attachMatched(this._onRouteMatched, this);
           var model = new JSONModel({
+            // for Database connection
             url: "https://www.rest.kalpavrikshatechnologies.com/",
             headers: {
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
@@ -31,18 +32,10 @@ sap.ui.define(
           var oView = this.getView();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           oView.byId("Lp_id_PasswordRadio").setSelected(true);
-          var eleSetting = [
-            "Lp_id_PasswordLabel",
-            "Lp_id_PasswordInput",
-            "Lp_id_ForgotPasswordLink",
-          ];
-          eleSetting.forEach(function (id) {
-            var element = oView.byId(id);
-            if (element) {
-              element.setVisible(true);
-            }
-          });
-          oView.byId("Lp_id_ForgotPasswordLink").setValue("");
+          oView.byId("Lp_id_PasswordLabel").setVisible(true);
+          oView.byId("Lp_id_PasswordInput").setVisible(true);
+          oView.byId("Lp_id_ForgotPasswordLink").setVisible(true);
+
         },
         onpresshome: function () {
           this.getRouter().navTo("RouteHomePage");
@@ -90,7 +83,7 @@ sap.ui.define(
           if (response && response.success === true) {
             oOtpInput.setVisible(true);
             oOtpLabel.setVisible(true);
-            oOtpButton.setText("Resend OTP");
+            oOtpButton.setText(this.i18nModel.getText("msgresndotp"));
             MessageToast.show(this.i18nModel.getText("sentOTP"));
           } else {
             MessageToast.show(this.i18nModel.getText("errorMsguser"));
@@ -105,7 +98,6 @@ sap.ui.define(
           const userName = oView.byId("Lp_id_Username").getValue().trim();
           const userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
           const password = oView.byId("Lp_id_PasswordInput").getValue().trim();
-
           const isOtpLogin = oView.byId("Lp_id_OtpRadio").getSelected();
           const isPasswordLogin = oView
             .byId("Lp_id_PasswordRadio")
@@ -116,7 +108,6 @@ sap.ui.define(
             MessageToast.show(this.i18nModel.getText("checkOTP"));
             return;
           }
-
           // Mandatory field validations
           if (
             utils._LCvalidateMandatoryField(oView.byId("Lp_id_Userid"), "ID") &&
@@ -155,8 +146,14 @@ sap.ui.define(
                   oLoginModel.setProperty("/EmailID", userData.EmailID);
                   oLoginModel.setProperty("/Role", userData.Role);
                   oLoginModel.setProperty("/FolderID", response.FolderID);
-                  oLoginModel.setProperty("/EducationalandDocumentsDetailFolderID", userData.EducationalandDocumentsDetailFolderID);
-                  oLoginModel.setProperty("/EducationalandDocumentsDetailFolderID", userData.EmploymentDetailFolderID);
+                  oLoginModel.setProperty(
+                    "/EducationalandDocumentsDetailFolderID",
+                    userData.EducationalandDocumentsDetailFolderID
+                  );
+                  oLoginModel.setProperty(
+                    "/EducationalandDocumentsDetailFolderID",
+                    userData.EmploymentDetailFolderID
+                  );
                   // Navigate
                   this.getRouter().navTo("RouteTilePage");
                   MessageToast.show(this.i18nModel.getText("logsuccess"));
@@ -192,7 +189,6 @@ sap.ui.define(
                 ? JSON.parse(error.responseText).message
                 : "Login failed due to an unexpected error.";
               MessageToast.show(errorMsg);
-              console.error("Login error:", error);
             }
           } else {
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -255,15 +251,15 @@ sap.ui.define(
         },
         LP_onForgotPassword: function () {
           var oView = this.getView();
-          if (!this.oDialog) {
+          if (!this.oPassforgot) {
             sap.ui.core.Fragment.load({
               name: "sap.kt.com.minihrsolution.fragment.Sendmail",
               controller: this,
             }).then(
-              function (oDialog) {
-                this.oDialog = oDialog;
-                oView.addDependent(this.oDialog);
-                this.oDialog.open();
+              function (oPassforgot) {
+                this.oPassforgot = oPassforgot;
+                oView.addDependent(this.oPassforgot);
+                this.oPassforgot.open();
                 sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(false);
                 oView.byId("Lp_id_Userid").setValue("").setValueState("None");
                 oView.byId("Lp_id_Username").setValue("").setValueState("None");
@@ -274,44 +270,28 @@ sap.ui.define(
               }.bind(this)
             );
           } else {
-            this.oDialog.open();
+            this.oPassforgot.open();
             sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(false);
             oView.byId("Lp_id_Userid").setValue("").setValueState("None");
             oView.byId("Lp_id_Username").setValue("").setValueState("None");
           }
         },
         SM_onPressCancle: function () {
-          var oUserIdInput = sap.ui.getCore().byId("FSM_id_userIdInput");
-          var oUserNameInput = sap.ui.getCore().byId("FSM_id_userNameInput");
-          var otpInput = sap.ui.getCore().byId("FSM_id_otpInput");
-          var oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
+          var oUserIdInput = sap.ui.getCore().byId("FSM_id_userIdInput").setValue("").setValueState("None");
+          var oUserNameInput = sap.ui.getCore().byId("FSM_id_userNameInput").setValue("").setValueState("None");
+          var otpInput = sap.ui.getCore().byId("FSM_id_otpInput").setValue("").setValueState("None");
+          var oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput").setValue("").setValueState("None");
           var oConfirmPwInput = sap.ui
             .getCore()
-            .byId("FSM_id_confirmPasswordInput");
-
-          // Reset values
-          oUserIdInput.setValue("");
-          oUserNameInput.setValue("");
-          otpInput.setValue("");
-          oNewPwInput.setValue("");
-          oConfirmPwInput.setValue("");
-
-          // Reset value states
-          oUserIdInput.setValueState("None");
-          oUserNameInput.setValueState("None");
-          otpInput.setValueState("None");
-          oNewPwInput.setValueState("None");
-          oConfirmPwInput.setValueState("None");
-
+            .byId("FSM_id_confirmPasswordInput").setValue("").setValueState("None");
           // Hide OTP, new password, and confirm password fields
           otpInput.setVisible(false);
           oNewPwInput.setVisible(false);
           oConfirmPwInput.setVisible(false);
 
-          this.oDialog.close();
+          this.oPassforgot.close();
         },
         SM_onChangeSendOTP: async function () {
-          const that = this;
           const userfrgId = sap.ui
             .getCore()
             .byId("FSM_id_userIdInput")
@@ -475,8 +455,8 @@ sap.ui.define(
             oNewPwInput.setValue("").setVisible(false);
             oConfirmPwInput.setValue("").setVisible(false);
 
-            if (this.oDialog) {
-              this.oDialog.close();
+            if (this.oPassforgot) {
+              this.oPassforgot.close();
             }
 
             MessageToast.show(this.i18nModel.getText("updatepassword"));
