@@ -11,9 +11,9 @@ sap.ui.define([
     "use strict";
     return Controller.extend("sap.kt.com.minihrsolution.controller.ExpenseDetails",{
         Formatter: Formatter,
-        onInit: function () {
+        onInit:async function () {
           this.getRouter().getRoute("RouteExpensDetails").attachMatched(this._onRouteMatched, this);
-          this._fetchCommonData("Currency", "CurrencyModel");
+          await this._fetchCommonData("Currency", "CurrencyModel");
         },
 
         _onRouteMatched: async function (oEvent) {
@@ -192,7 +192,7 @@ sap.ui.define([
           utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onPressSave: function () {
+        onPressSave:async function () {
           if (
             utils._LCvalidateMandatoryField(this.byId("Exp_id_Source"), "ID") &&
             (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"),"ID") : true) && utils._LCvalidateMandatoryField(this.byId("Exp_id_Country"),"ID") && utils._LCvalidateMandatoryField(this.byId("Exp_id_EmpRemark"), "ID")) {
@@ -203,7 +203,7 @@ sap.ui.define([
                 ExpenseID: oModel.getData()[0].ExpenseID,
               },
             };
-            this.ajaxUpdateWithJQuery("Expense", oData)
+            await this.ajaxUpdateWithJQuery("Expense", oData)
               .then((oData) => {
                 if (oData) {
                   this.ViewModel.setProperty("/editable", false);
@@ -216,7 +216,7 @@ sap.ui.define([
                 }
               })
               .catch((oError) => {
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
               });
           } else {

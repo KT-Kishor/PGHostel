@@ -9,16 +9,16 @@ sap.ui.define([
 	"use strict";
 	return Controller.extend("sap.kt.com.minihrsolution.controller.ExpenseApplication", {
 		Formatter:Formatter,
-		onInit: function () {
-			this.getRouter().getRoute("RouteExpensePage").attachMatched(this._onRouteMatched, this);
-			this._fetchCommonData("BaseLocation", "BaseLocationModel");
-			this._fetchCommonData("Country", "CountryModel");
-			this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
+		onInit:async function () {
+			await this.getRouter().getRoute("RouteExpensePage").attachMatched(this._onRouteMatched, this);
+			await this._fetchCommonData("BaseLocation", "BaseLocationModel");
+			await this._fetchCommonData("Country", "CountryModel");
+			await this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
 		},
 		
-		_onRouteMatched: function (oEvent) {
+		_onRouteMatched:async function (oEvent) {
 			// this.commonLoginFunction("Expense");
-			this._fetchCommonData("Expense", "FilterExpenseModel");
+			await this._fetchCommonData("Expense", "FilterExpenseModel");
 			this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 			this.Exp_onSearch();
 			var View = new JSONModel({ SaveBtn: false, SubmitBtn: false , required: true});
@@ -51,7 +51,7 @@ sap.ui.define([
 			this.getRouter().navTo("RouteLoginPage");
 		},
 
-		onPressAddExpense: function (expense) {
+		onPressAddExpense: function () {
 			var oView = this.getView();
 			if (!this.Expense) {
 				this.Expense = sap.ui.core.Fragment.load({
@@ -71,14 +71,14 @@ sap.ui.define([
 			this.Expense.close();
 		},
 
-		onPressSubmit: function () {			
+		onPressSubmit: async function () {			
 				if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-ExpenseName"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-EndDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Country"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Source"), "ID") && (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Destination"), "ID"): true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-EmployeeRemark"), "ID")) {
 
 					BusyIndicator.show();
 					var oData = {
 						"data": this.getView().getModel("CreateExpenseModel").getData()
 					}
-					this.ajaxCreateWithJQuery("Expense", oData).then((oData) => {
+					await this.ajaxCreateWithJQuery("Expense", oData).then((oData) => {
 						if (oData) {
 							MessageToast.show(this.i18nModel.getText("expenseCreatedMess"));
 							this._fetchCommonData("Expense", "ExpenseModel");
@@ -138,10 +138,10 @@ sap.ui.define([
 			this.getRouter().navTo("RouteLoginPage");
 		},
 
-		onPressDeleteExpense: function (oEvent) {
+		onPressDeleteExpense:async function (oEvent) {
 			BusyIndicator.show(0);
 			var ExpID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
-			this.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: ExpID } }).then(() => {
+			await this.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: ExpID } }).then(() => {
 				MessageToast.show(this.i18nModel.getText("expenseDeleteMess"));
 				this._fetchCommonData("Expense", "ExpenseModel");
 				BusyIndicator.hide();
