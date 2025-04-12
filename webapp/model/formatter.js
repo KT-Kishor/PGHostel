@@ -22,11 +22,16 @@ sap.ui.define([], function () {
         
         
         formatCurrency: function (value, code) {
-            var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
-                currencyCode: false 
-            });
-            return oCurrencyFormat.format(value) + " " + code;
+            if (value || value === 0) {
+                var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
+                    currencyCode: false // hides the currency code like "INR"
+                });
+                var formatted = oCurrencyFormat.format(value);
+                return code ? formatted + " " + code : formatted;
+            }
+            return "";
         },
+        
         formatCurrencyInINRText: function (sValue) {
             if (sValue || sValue === 0) {
                 return "INR" + " " + parseFloat(sValue).toLocaleString('en-IN');

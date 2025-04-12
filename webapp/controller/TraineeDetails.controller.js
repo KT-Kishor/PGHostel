@@ -119,6 +119,7 @@ sap.ui.define([
                         oJoinDatePicker.setMinDate(releaseDate);
                         if (joinDate && joinDate < releaseDate) {
                             oJoinDatePicker.setValue("");
+                            oJoinDatePicker.setValueState("Error");
                         } else {
                             oJoinDatePicker.setValueState("None");
                         }

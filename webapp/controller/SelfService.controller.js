@@ -18,18 +18,7 @@ sap.ui.define([
                 this.EmpFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmploymentDetailFolderID");
                 this._fetchCommonData("Designation", "sDesignationModel");
                 this._fetchCommonData("BaseLocation", "sBaseLocationModel");
-                this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
-                    EmployeeID: this.EmployeeID
-                });
-                this._fetchCommonData("EducationalDetails", "sEducationModel", {
-                    EmployeeID: this.EmployeeID
-                });
-                this._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
-                    EmployeeID: this.EmployeeID
-                });
-                this._fetchCommonData("SalaryDetails", "sSalaryModel", {
-                    EmployeeID: this.EmployeeID
-                });
+                this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                 var viewModel = new JSONModel({
                     fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false,
                     isRoleMode: false, Max: new Date(), isVisitMode: true, isIdMode: true,
@@ -110,7 +99,6 @@ sap.ui.define([
             onStartDateChange: function (oEvent) {
                 let oStartDate = oEvent.getSource().getDateValue();
                 let oEndDatePicker = sap.ui.getCore().byId("AddEd_id_EndEdu");
-
                 if (oEndDatePicker) {
                     let oEndDate = oEndDatePicker.getDateValue();
                     oEndDatePicker.setMinDate(oStartDate);
@@ -350,14 +338,14 @@ sap.ui.define([
 
             //Education detail delete call
             EdF_DeletEdu: function () {
-                var that = this; 
-                var oSelectedItem = this.byId("EdF_id_EduTable").getSelectedItem(); 
+                var that = this;
+                var oSelectedItem = this.byId("EdF_id_EduTable").getSelectedItem();
                 var oContext = oSelectedItem.getBindingContext("sEducationModel").getProperty("ID");
                 // Use common confirmation dialog
                 this.showConfirmationDialog(
-                    this.i18nModel.getText("msgBoxConfirm"),         
-                    this.i18nModel.getText("deletConfirmation"),     
-                    function () {                         
+                    this.i18nModel.getText("msgBoxConfirm"),
+                    this.i18nModel.getText("deletConfirmation"),
+                    function () {
                         that.ajaxDeleteWithJQuery("/EducationalDetails", { filters: { ID: oContext } }).then(() => {
                             sap.m.MessageToast.show(that.i18nModel.getText("eduDataDeletSuucess"));
                             that._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: that.EmployeeID });
@@ -372,7 +360,7 @@ sap.ui.define([
                     }
                 );
             },
-            
+
             //Employment detail create calls
             saveEmploymentDetails: function (bIsCreate) {
                 try {
@@ -420,7 +408,7 @@ sap.ui.define([
                             this.byId("EmpF_id_EmpTable").removeSelections(true);
                             this.setEmpButtonsEnabled(false);
                             this.SS_commonEmpFunction();
-                            this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID});
+                            this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID });
                         } else {
                             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         }
@@ -462,14 +450,14 @@ sap.ui.define([
             },
             //Employment detail delete call
             EmpF_onDeletEmployment: function () {
-                var that = this;  
-                var oSelectedItem = this.byId("EmpF_id_EmpTable").getSelectedItem(); 
+                var that = this;
+                var oSelectedItem = this.byId("EmpF_id_EmpTable").getSelectedItem();
                 var oContext = oSelectedItem.getBindingContext("sEmploymentModel").getProperty("ID");
                 // Show common confirmation dialog
                 this.showConfirmationDialog(
-                    this.i18nModel.getText("msgBoxConfirm"), 
-                    this.i18nModel .getText("deletConfirmation"),
-                    function () {  
+                    this.i18nModel.getText("msgBoxConfirm"),
+                    this.i18nModel.getText("deletConfirmation"),
+                    function () {
                         that.ajaxDeleteWithJQuery("/EmploymentDetails", { filters: { ID: oContext } }).then(() => {
                             sap.m.MessageToast.show(that.i18nModel.getText("empDataDeleteSuccess"));
                             that._fetchCommonData("EmploymentDetails", "sEmploymentModel", {
@@ -486,8 +474,8 @@ sap.ui.define([
                     }
                 );
             },
-            
-    
+
+
             //Reference details
             EmpF_onReferenceDetails: function () {
                 var that = this;
@@ -676,13 +664,16 @@ sap.ui.define([
                     }.bind(this)
                 );
             },
-
+            //On icon tab select function
             SS_onTabSelect: async function (oEvent) {
                 if (oEvent.getParameter("key") === "educationDetailKey") {
+                    this._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: this.EmployeeID });
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
                 } else if (oEvent.getParameter("key") === "employmentKey") {
+                    this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID });
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
                 } else if (oEvent.getParameter("key") === "salaryKey") {
+                    this._fetchCommonData("SalaryDetails", "sSalaryModel", { EmployeeID: this.EmployeeID });
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
                 } else if (oEvent.getParameter("key") === "paySlipKey") {
                     this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);

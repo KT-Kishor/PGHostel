@@ -145,7 +145,7 @@ sap.ui.define([
             //confirmation dialog function for trainee onboard and reject
             onHandleTraineeAction: function (action) {
                 var that = this;
-                var oContext = this.byId("T_id_TraineeTable").getSelectedItem()?.getBindingContext("traineeModel");
+                var oContext = this.byId("T_id_TraineeTable").getSelectedItem()?.getBindingContext("traineeModel"); 
                 if (!oContext) {
                     MessageToast.show(this.i18nModel.getText("SelectTraineeMessage"));
                     return;
@@ -154,24 +154,36 @@ sap.ui.define([
                 var sMessage = (action === "onboard")
                     ? this.i18nModel.getText("OnboardMessage", [sName])
                     : this.i18nModel.getText("RejectMessage", [sName]);
+            
                 this.showConfirmationDialog(
                     this.i18nModel.getText("ConfirmActionTitle"),
                     sMessage,
                     function () {
+                        // On Confirm
                         if (action === "onboard") {
-                            that.T_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee",);
+                            that.T_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee");
                         } else if (action === "reject") {
                             that._handleReject(oContext);
                         }
+                        // Clear selection after confirm
+                        that.byId("T_id_TraineeTable").removeSelections(true);
+                    },
+                    function () {
+                        // On Cancel: also clear selection
+                        that.byId("T_id_TraineeTable").removeSelections(true);
+                        that.byId("T_id_OnboardBtn").setEnabled(false);
+                        that.byId("T_id_RejectBtn").setEnabled(false);
                     }
                 );
             },
+            
             //Reject trainee function
             _handleReject: function (oContext) {
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
                 this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
+                this.byId("T_id_TraineeTable").removeSelections(true);
             },
             //Onboard trainee function
             OTF_onPressOnboard: function () {

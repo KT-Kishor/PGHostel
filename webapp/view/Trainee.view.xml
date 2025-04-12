@@ -83,7 +83,7 @@
 						<cells>
 						    <Text text="{traineeModel>NameSalutation} {traineeModel>TraineeName}"/>							
 							<Text text="{traineeModel>ReportingManagerSalutation} {traineeModel>ReportingManager}"/>
-							<Text text="{traineeModel>Stipend} {traineeModel>Currency}"/>
+							<Text text="{path:'traineeModel>Stipend', formatter: '.Formatter.formatCurrency'} {traineeModel>Currency}"/>
 							<Text text="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{traineeModel>TrainingDuration}"/>
 							<Text text="{traineeModel>TraineeEmail}"/>
