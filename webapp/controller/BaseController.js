@@ -484,7 +484,7 @@ sap.ui.define([
                   if (typeof fnOnCancel === "function") {
                       fnOnCancel();
                   } else {
-                      sap.m.MessageToast.show(oResourceBundle.getText("ActionCancelledMessage"));
+                      //sap.m.MessageToast.show(oResourceBundle.getText("ActionCancelledMessage"));
                   }
                   dialog.close();
               }

@@ -1,6 +1,6 @@
 sap.ui.define([
-    "./BaseController",
-    "../utils/validation",
+    "./BaseController",//calling base controller
+    "../utils/validation", //calling validation function
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "../model/formatter",
@@ -18,9 +18,7 @@ sap.ui.define([
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
                 this._fetchCommonData("Currency", "CurrencyModel");
                 this._fetchCommonData("EmployeeDetails", "empModel");
-                this._fetchCommonData("CompanyEmails", "CCMailModel", {
-                    applicationName: "Trainee"
-                });
+                this._fetchCommonData("CompanyEmails", "CCMailModel", {applicationName: "Trainee"});//CC mailId read call
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -53,9 +51,10 @@ sap.ui.define([
                     this.getView().byId("TUF_id_pageTrainee").setVisible(true);
                     this.getModelData(this.sArgPara);
                 }
-                this._makeDatePickersReadOnly(["TD_id_JoiningDate", "TD_id_ReleaseDate", "TU_id_JoinDate", "TU_id_RelDate"]);
+                this._makeDatePickersReadOnly(["TD_id_JoiningDate", "TD_id_ReleaseDate", "TU_id_JoinDate", "TU_id_RelDate"]); //make date pickers read only
                 this.getView().byId("TD_id_Submit").setEnabled(false);
             },
+            //for edit case reading data from model
             getModelData: function (sArgPara) {
                 var oModel = this.getOwnerComponent().getModel("traineeModel");
                 var aFilteredData = oModel.getData().filter(function (oTrainee) {
@@ -80,6 +79,7 @@ sap.ui.define([
                     MessageBox.error(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
+            //navigation to trainee view
             TUF_onPressback: function () {
                 this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
             },
@@ -89,18 +89,22 @@ sap.ui.define([
                 oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
                 oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
             },
+            //validate name function
             TD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
                 this.validateStep();
             },
+            //validate email function
             TD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
                 this.validateStep();
             },
+            //validate amount function
             TD_validateAmount: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
                 this.validateStep();
             },
+            //validate date function
             TD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent); // Base validation
                 this.validateStep(); // Step validation
@@ -121,6 +125,7 @@ sap.ui.define([
                     }
                 }
             },
+            //wizard step validation function
             validateStep: function () {
                 // Check if all fields have values
                 var allFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getValue() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_Stipend").getValue() && this.byId("TD_id_Currency").getSelectedKey() && this.getView().byId("TD_id_ReleaseDate").getValue() && this.getView().byId("TD_id_JoiningDate").getValue();
@@ -183,6 +188,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
+            //second step validation function
             TD_StepTwo: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 if (oModel.Currency === "") this.getView().getModel("oTraineeDetails").setProperty("/Currency", this.byId("TD_id_Currency").getSelectedKey())
@@ -238,20 +244,22 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 });
             },
-            TD_commonOpenDialog: function (fragmentName) {
-                if (!this.oDialog) {
+            // common function for opening dialog
+            TD_commonOpenDialog: function (dialogProperty, fragmentName) {
+                if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
-                        controller: this
-                    }).then(dialog => {
-                        this.oDialog = dialog;
-                        this.getView().addDependent(this.oDialog);
-                        this.oDialog.open();
-                    }).bind(this);
+                        controller: this,
+                    }).then(function (oDialog) {
+                        this[dialogProperty] = oDialog;
+                        this.getView().addDependent(this[dialogProperty]);
+                        this[dialogProperty].open();
+                    }.bind(this));
                 } else {
-                    this.oDialog.open();
+                    this[dialogProperty].open();
                 }
             },
+            //Mail dialog open function
             TU_onSendEmail: function () {
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
@@ -264,29 +272,33 @@ sap.ui.define([
                     button: false
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
-                this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
+                this.TD_commonOpenDialog("TU_oDialogMail","sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
-
             },
+            //back function
             TD_onPressback: function () {
-                this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonBack");
+                this.TD_commonOpenDialog("TU_oDialogBack", "sap.kt.com.minihrsolution.fragment.CommonBack");
             },
+            //close back dialog function confirmation
             onConfirmBack: function () {
                 this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" })
-                this.oDialog.close();
+                this.TU_oDialogBack.close();
             },
+            //cancel back dialog function
             onCancel: function () {
-                this.oDialog.close();
+                this.TU_oDialogBack.close();
             },
             onDialogClose: function () {
-                this.oDialog.destroy();
-                this.oDialog = null;
-            },        
+                this.TU_oDialogBack.destroy();
+                this.TU_oDialogBack = null;
+            }, 
+            //  Mail dialog close function    
             Mail_onPressClose: function () {
-                this.oDialog.destroy();
-                this.oDialog = null;
-                this.oDialog.close();
+                this.TU_oDialogMail.destroy();
+                this.TU_oDialogMail = null;
+                this.TU_oDialogMail.close();
             },
+            //File upload function
             Mail_onUpload: function (oEvent) {
                 this.handleFileUpload(
                     oEvent,
@@ -295,15 +307,18 @@ sap.ui.define([
                     () => this.validateSendButton()               
                  );
             },
+            //validate button function
             validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                 const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
                 const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
                 sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
+            //mail id change function
             Mail_onEmailChange: function () {
                 this.validateSendButton(); 
             },
+            //mail send function
             Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 var oPayload = {
@@ -322,8 +337,9 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     BusyIndicator.hide();
                 });
-                this.oDialog.close();
+                this.TU_oDialogMail.close();
             },
+            //PDF generation function
             TD_onPressMerge: function () {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);

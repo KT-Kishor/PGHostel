@@ -1,12 +1,13 @@
+
 sap.ui.define([
-    "./BaseController",
-    "../utils/validation",
+    "./BaseController", //call base controller
+    "../utils/validation", // call validation function
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-    "../model/formatter"
-],
-    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
+    "../model/formatter",
+    "sap/ui/core/BusyIndicator"],
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter, BusyIndicator) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Trainee", {
             Formatter: Formatter,
@@ -17,11 +18,10 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._fetchCommonData("Designation", "DesignationModel");
                 this._fetchCommonData("Department", "Departmentmodel");
-                this._fetchCommonData("CompanyEmails", "CCMailModel", {
-                    applicationName: "Trainee"});
-                this.byId("T_id_OnboardBtnT").setEnabled(false);
-                this.byId("T_id_RejectBtnT").setEnabled(false);
-                ["T_id_Download", "T_id_EmpOnBoard","T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
+                this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" }); // common company emails read call
+                this.byId("T_id_OnboardBtn").setEnabled(false);
+                this.byId("T_id_RejectBtn").setEnabled(false);
+                ["T_id_Download", "T_id_EmpOnBoard", "T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
                 this.oValue = oEvent.getParameter("arguments").value;
                 if (this.oValue === "Trainee") {
@@ -32,37 +32,42 @@ sap.ui.define([
                     this.T_onSearch();
                 }
             },
-
+            //read call for trainee
             readCallForTrainee: function (filter) {
                 this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
                     if (filter === "Initial") {
                         offerData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "")
-                            .map(item => [item.TraineeName.trim(), item])).values()];
+                            .map(item => [item.TraineeName.trim(), item])).values()]; // removing duplicates
                         this.getView().setModel(new JSONModel(offerData), "traineeModelInitial");
                         let reportingManagerData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "")
                             .map(item => [item.ReportingManager.trim(), item])).values()];
                         this.getView().setModel(new JSONModel(reportingManagerData), "traineeModelInitial");
                     }
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                 }).catch((oError) => {
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                     MessageBox.error(this.i18nModel.getText("commonReadingDataError"))
                 });
             },
+            //validation function for mandatory fields
             T_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
+            //validation function for email
             T_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
             },
+            //validation function for date
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
+            //validation function for date
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
+            //Trainee creation button
             T_onPressAddTrainee: function (oEvent) {
                 var oParValue;
                 if (oEvent.getSource().getId().lastIndexOf("T_id_AddBtn") !== -1) {
@@ -72,7 +77,8 @@ sap.ui.define([
                 }
                 this.getRouter().navTo("RouteTraineeDetails", { sParTrainee: oParValue });
             },
-            TC_commonOpenDialog: function (dialogProperty, fragmentName, datePickerId) {
+            // common open the dialog function
+            T_commonOpenDialog: function (dialogProperty, fragmentName, ) {
                 if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -80,14 +86,13 @@ sap.ui.define([
                     }).then(function (oDialog) {
                         this[dialogProperty] = oDialog;
                         this.getView().addDependent(this[dialogProperty]);
-                        this._FragmentDatePickersReadOnly([datePickerId]);
                         this[dialogProperty].open();
                     }.bind(this));
                 } else {
-                    this._FragmentDatePickersReadOnly([datePickerId]);
                     this[dialogProperty].open();
                 }
             },
+            //Trainee table selection change function for button visibility
             T_onTableSelectionChange: function (oEvent) {
                 var oSelectedItem = oEvent.getParameter("listItem");
                 if (oSelectedItem) {
@@ -105,6 +110,7 @@ sap.ui.define([
                     this.byId("T_id_RejectBtn").setVisible(isOtherButtonsVisible);
                 }
             },
+            //update call for trainee
             updateCallForTrainee: function (oTraineeData, text) {
                 var that = this;
                 if (oTraineeData.Status === "OnBoarded") {
@@ -116,29 +122,32 @@ sap.ui.define([
                         "ID": oTraineeData.ID
                     }
                 };
-                sap.ui.core.BusyIndicator.show(0);
+                BusyIndicator.show(0);
                 this.ajaxUpdateWithJQuery("Trainee", oModelOffer).then((oData) => {
                     MessageToast.show(that.i18nModel.getText(text))
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                     if (oData.results) {
                         that.readCallForTrainee("");
                     }
                 }).catch((oError) => {
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                     MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
                 });
             },
+            //trainee onboard confirmation 
             T_onOnboardPress: function () {
                 this.onHandleTraineeAction("onboard");
             },
+            //trainee reject confirmation
             T_onRejectPress: function () {
                 this.onHandleTraineeAction("reject");
             },
+            //confirmation dialog function for trainee onboard and reject
             onHandleTraineeAction: function (action) {
                 var that = this;
                 var oContext = this.byId("T_id_TraineeTable").getSelectedItem()?.getBindingContext("traineeModel");
                 if (!oContext) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("SelectTraineeMessage"));
+                    MessageToast.show(this.i18nModel.getText("SelectTraineeMessage"));
                     return;
                 }
                 var sName = oContext.getProperty("NameSalutation") + " " + oContext.getProperty("TraineeName");
@@ -146,24 +155,25 @@ sap.ui.define([
                     ? this.i18nModel.getText("OnboardMessage", [sName])
                     : this.i18nModel.getText("RejectMessage", [sName]);
                 this.showConfirmationDialog(
-                    this.i18nModel.getText("ConfirmActionTitle"), 
-                    sMessage,                              
-                    function () {                         
+                    this.i18nModel.getText("ConfirmActionTitle"),
+                    sMessage,
+                    function () {
                         if (action === "onboard") {
-                            that.TC_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee", "");
+                            that.T_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee",);
                         } else if (action === "reject") {
                             that._handleReject(oContext);
                         }
                     }
                 );
             },
-            
+            //Reject trainee function
             _handleReject: function (oContext) {
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
                 this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
             },
+            //Onboard trainee function
             OTF_onPressOnboard: function () {
                 try {
                     if (utils._LCvalidateEmail(sap.ui.getCore().byId("OTF_id_TraineeMail"), "ID")) {
@@ -182,11 +192,13 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
+            //Close the  onboarding dialog function
             OTF_onPressClose: function () {
                 sap.ui.getCore().byId("OTF_id_TraineeMail").setValueState("None");
                 sap.ui.getCore().byId("OTF_id_TraineeMail").setValue("");
                 this.TOb_oDialog.close();
             },
+            //Trainee  certificate  dialog function
             T_onCertDownload: function () {
                 var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                 var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
@@ -199,8 +211,9 @@ sap.ui.define([
                 var oTraineeContext = oSelectedItem.getBindingContext("traineeModel");
                 this.getView().setBindingContext(oTraineeContext, "traineeModel");
                 // Open the dialog
-                this.TC_commonOpenDialog("TC_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate", "TCF_id_EndDate");
+                this.T_commonOpenDialog("TC_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate", "TCF_id_EndDate");
             },
+            //Close the certificate dialog function
             TCF_onPressCloseDialog: function () {
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                 this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
@@ -208,7 +221,8 @@ sap.ui.define([
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValue("");
                 this.TC_oDialog.close();
             },
-            TCF_onPressHandlePreview: function() {
+            //Preview and download certificate function
+            TCF_onPressHandlePreview: function () {
                 const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
                 if (bPreviewFlag) {
                     this.TCF_onPressDownload();
@@ -216,7 +230,7 @@ sap.ui.define([
                     this.TCF_onPressPreview();
                 }
             },
-            
+
             //download certificate
             TCF_onPressPreview: function () {
                 if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("TCF_id_ProjectName"), "ID")) {
@@ -252,6 +266,7 @@ sap.ui.define([
                 this.getView().getModel("PDFData").setProperty("/RTEText", data);
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
             },
+            //generate PDF function
             TCF_onPressDownload: function () {
                 try {
                     // Get selected trainee's data from the table
@@ -268,20 +283,21 @@ sap.ui.define([
                         Role: "Trainee",
                         Status: "Training Completed",
                     };
-                    sap.ui.core.BusyIndicator.show(0);
+                    BusyIndicator.show(0);
                     this.updateCallForTrainee(oUpdatedData, "downloadSucess");
                     this.byId("T_id_Download").setVisible(false);
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
-                    let htmlContent = sap.ui.getCore().byId("myRTE").getValue(); 
+                    let htmlContent = sap.ui.getCore().byId("myRTE").getValue();
                     this.generateCertificatePDF(htmlContent);
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                     this.TC_oDialog.close();
                     this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview</b> to Preview the Certificate</p>");
                 } catch (oError) {
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
-            },         
+            },
+            //Trainee onboard function        
             T_onBoardTrainee: function () {
                 var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                 var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
@@ -290,6 +306,7 @@ sap.ui.define([
                     sParEmployee: oTraineeModel.NameSalutation
                 });
             },
+            //Trainee search function for filtering
             T_onSearch: function () {
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
@@ -306,7 +323,7 @@ sap.ui.define([
                         }
                     }
                 });
-                this.readCallForTrainee(params);
+                this.readCallForTrainee(params);// read call for trainee after filter
             },
 
             //clear the filterbar
@@ -327,24 +344,12 @@ sap.ui.define([
                     }
                 });
             },
-            T_OpenDialog: function (fragmentName) {
-                if (!this.oDialog) {
-                    sap.ui.core.Fragment.load({
-                        name: fragmentName,
-                        controller: this
-                    }).then(dialog => {
-                        this.oDialog = dialog;
-                        this.getView().addDependent(this.oDialog);
-                        this.oDialog.open();
-                    }).bind(this);
-                } else {
-                    this.oDialog.open();
-                }
-            },
+         
+            //Traniee certificate mail function
             T_onCerMail: function () {
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
-                    toEmailID: this.getView().getModel("traineeModel").getData()[0].TraineeEmail,  // Ensure correct property access
+                    ToEmail: this.getView().getModel("traineeModel").getData()[0].TraineeEmail,  // Ensure correct property access
                     CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
                     name: "",
                     mimeType: "",
@@ -353,47 +358,52 @@ sap.ui.define([
                     button: false
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
-                this.T_OpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
+                this.T_commonOpenDialog("T_MailDialog", "sap.kt.com.minihrsolution.fragment.CommonMail",);
                 this.validateSendButton();
 
             },
+            //Close the mail dialog function
             Mail_onPressClose: function () {
-                this.oDialog.destroy();
-                this.oDialog = null;
-                this.oDialog.close();
+                this.T_MailDialog.destroy();
+                this.T_MailDialog = null;
+                this.T_MailDialog.close();
             },
+            //Handle the file upload function
             Mail_onUpload: function (oEvent) {
                 this.handleFileUpload(
-                    oEvent, this, 
-                    "UploaderData","/attachments",  "/name",  "/isFileUploaded",   "uploadSuccessfull",  "fileAlreadyUploaded",    "noFileSelected",   "fileReadError", 
-                    () => this.validateSendButton()               
-                 );
-            },    
+                    oEvent, this,
+                    "UploaderData", "/attachments", "/name", "/isFileUploaded", "uploadSuccessfull", "fileAlreadyUploaded", "noFileSelected", "fileReadError",
+                    () => this.validateSendButton()
+                );
+            },
+            //validation for send button
             validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                 const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
                 const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
                 sendBtn.setEnabled(isEmailValid && isFileUploaded);
-            },            
-            Mail_onEmailChange: function () {
-                this.validateSendButton(); 
             },
+            //validation for email change        
+            Mail_onEmailChange: function () {
+                this.validateSendButton();
+            },
+            //send mail function
             Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("traineeModel").getData();
                 var oPayload = {
                     "TraineeName": oModel.TraineeName,
                     "toEmailID": oModel.TraineeEmail,
-                    "CC":this.getView().getModel("CCMailModel").getData()[0].emails,
+                    "CC": this.getView().getModel("CCMailModel").getData()[0].emails,
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
-                }; 
+                };
                 this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload).then((oData) => {
                     MessageToast.show(this.i18nModel.getText("certificateSuccess"));
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                 }).catch((oError) => {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                 });
-                this.oDialog.close();
+                this.T_MailDialog.close();
             }
         });
     });
