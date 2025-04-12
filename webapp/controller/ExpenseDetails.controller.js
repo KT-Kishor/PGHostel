@@ -64,7 +64,7 @@ sap.ui.define([
           this.getView().getModel("ItemExpenseModel").setData(modelData);
         },
 
-        onPressExpenseDownload: function () {
+        Exp_Det_onPressExpenseDownload: function () {
           let fileUrl =window.location.href.split("index")[0] +"/Perdiem_DeclarationForm.doc";
           sap.m.URLHelper.redirect(fileUrl, true);
         },
@@ -90,7 +90,7 @@ sap.ui.define([
           }
         },
 
-        Exp_onChangeExpanesItem: function (oEvent) {
+        Exp_Det_onChangeExpanesItem: function (oEvent) {
           this.SelectedData = oEvent.getSource().getSelectedItem().getBindingContext("ItemExpenseModel").getObject();
           if (this.SelectedData.ItemType === "Peridiem") {
             this.ViewModel.setProperty("/enable", true);
@@ -101,7 +101,7 @@ sap.ui.define([
           }
         },
 
-        onPressAddExpenseItem: function () {
+        Exp_Det_onPressAddExpenseItem: function () {
           this.ViewModel.setProperty("/SubmitBtn", true);
           this.ViewModel.setProperty("/enable", true);
           this.ViewModel.setProperty("/SaveBtn", false);
@@ -125,11 +125,9 @@ sap.ui.define([
           this.openFragment();
         },
 
-        onPressExpenseItemEdit: function () {
+        Exp_Det_onPressExpenseItemEdit: function () {
           if (this.byId("exp_Id_ExpenseTable").getSelectedItem() === null) {
-            return MessageToast.show(
-              this.i18nModel.getText("expenseEditSelectRowMess")
-            );
+            return MessageToast.show(this.i18nModel.getText("expenseEditSelectRowMess"));
           }
           this.ViewModel.setProperty("/SubmitBtn", false);
           this.ViewModel.setProperty("/SaveBtn", true);
@@ -153,18 +151,18 @@ sap.ui.define([
           this.getView().setModel(oExpenseCreateModel, "ExpenseCreateModel");
         },
 
-        onPressClose: function () {
+        Exp_Det_onPressClose: function () {
           sap.ui.getCore().byId("ExpDet_id_Amount").setValueState("None");
           sap.ui.getCore().byId("ExpDet_id_ConvertionRate").setValueState("None");
           sap.ui.getCore().byId("ExpDet_id_Comments").setValueState("None");
           this.ExpenseItem.close();
         },
 
-        onPressBackBtn: function () {
+        Exp_Det_onPressBackBtn: function () {
           this.getRouter().navTo("RouteExpensePage");
         },
 
-        onEditOrSavePress: function () {
+        Exp_Det_onEditOrSavePress: function () {
           var isEditMode = this.ViewModel.getProperty("/isEditMode");
           if (isEditMode) {
             this.onPressSave();
@@ -224,7 +222,7 @@ sap.ui.define([
           }
         },
 
-        onItemTypeChange: function (oEvent) {
+        Exp_Frg_onItemTypeChange: function (oEvent) {
           var oText = oEvent.getSource().getSelectedItem().getText();
           if (oText === "Peridiem Declaration") {
             this.ViewModel.setProperty("/enable", false);
@@ -233,15 +231,9 @@ sap.ui.define([
           }
         },
 
-        async onPressSubmit() {
+        async Exp_Det_onPressSubmit() {
           var oModel = this.getView().getModel("ExpenseCreateModel").getData();
-          if (
-            utils._LCvalidateDate(
-              sap.ui.getCore().byId("ExpDet_id_ExpenseDate"),
-              "ID"
-            ) &&
-            (oModel.ItemType !== "Peridiem Declaration"
-              ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"),"ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"),"ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"),"ID") : true)) {
+          if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"),"ID") && (oModel.ItemType !== "Peridiem Declaration"? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"),"ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"),"ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"),"ID") : true)) {
             var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
             if (oModel.Currency !== "INR") this.onChangeConverstionRate();
 
@@ -280,7 +272,7 @@ sap.ui.define([
           }
         },
 
-        async onPressSaveExpense() {         
+        async Exp_Det_onPressSaveExpense() {         
             var oModel = this.getView().getModel("ExpenseCreateModel").getData();
             var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
             if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"),"ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"),"ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"),"ID") && (oModel.Currency !== "INR"? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"),"ID"): true)) {
@@ -299,9 +291,7 @@ sap.ui.define([
                   ItemType: oModel.ItemType,
                   ModeOfPayment: oModel.ModeOfPayment,
                 },
-                filters: {
-                  ItemID: this.SelectedData.ItemID,
-                },
+                filters: {ItemID: this.SelectedData.ItemID,},
               };
               await this.ajaxUpdateWithJQuery("ItemExpense", oData)
                 .then((oData) => {
@@ -316,7 +306,7 @@ sap.ui.define([
                   }
                 })
                 .catch((oError) => {
-                  sap.ui.core.BusyIndicator.hide();
+                  BusyIndicator.hide();
                   MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 });
             } else {
@@ -324,11 +314,10 @@ sap.ui.define([
             }         
         },
 
-        onPressExpenseItemDelete: async function (oEvent) {
+        Exp_Det_onPressExpenseItemDelete: async function (oEvent) {
           try {
             if (this.byId("exp_Id_ExpenseTable").getSelectedItem() === null) {
-              MessageToast.show(this.i18nModel.getText("expenseDeleteSelectRowMess"));
-              return;
+              return MessageToast.show(this.i18nModel.getText("expenseDeleteSelectRowMess"));
             }
             var ExpID = this.SelectedData.ItemID;
             await this.ajaxDeleteWithJQuery("/ItemExpense", {filters: { ItemID: ExpID },});
@@ -341,21 +330,16 @@ sap.ui.define([
         },
 
         ExpenseTotalCalculation: async function () {
-          await this._fetchCommonData("ExpenseTotalCalculation", "", {
-            ExpenseID: this.ExpenseID,
-          });
-          await this._fetchCommonData("Expense", "FilteredExpenseModel", {
-            ExpenseID: this.ExpenseID,
-          });
+          await this._fetchCommonData("ExpenseTotalCalculation", "", {ExpenseID: this.ExpenseID});
+          await this._fetchCommonData("Expense", "FilteredExpenseModel", {ExpenseID: this.ExpenseID});
         },
 
-        onPressSubmitExpenseItems: function () {
+        Exp_Det_onPressSubmitExpenseItems: function () {
           var that = this;
           var oModelData = that.getView().getModel("FilteredExpenseModel").getData()[0];
           // Check if Total Amount is valid
           if (oModelData.TotalAmount <= 0) {
-            MessageBox.error(that.i18nModel.getText("expenseTotalAmountMess"));
-            return;
+            return MessageBox.error(that.i18nModel.getText("expenseTotalAmountMess"));           
           }
           var itemExpenses = that.getView().getModel("ItemExpenseModel").getData();
 
@@ -366,10 +350,7 @@ sap.ui.define([
             });
 
             if (!hasPerDiemDeclaration) {
-              MessageBox.error(
-                that.i18nModel.getText("expensePerdiemDeclarationValidation")
-              );
-              return;
+              return MessageBox.error(that.i18nModel.getText("expensePerdiemDeclarationValidation"));
             }
           }
           // Checkbox for confirmation
@@ -441,7 +422,7 @@ sap.ui.define([
           dialog.open();
         },
 
-        onChangeConverstionRate: function (oEvent) {
+        Exp_Frg_onChangeConverstionRate: function (oEvent) {
           var oModel = this.getView().getModel("ExpenseCreateModel");
           var oModelExpenseCreate = oModel.getData();
           if (oModelExpenseCreate.Currency !== "INR") {
@@ -450,13 +431,13 @@ sap.ui.define([
           }
         },
 
-        onPressOpenFolder: function () {
+        Exp_Det_onPressOpenFolder: function () {
           var oModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
           var folderUrl = `https://workplace.zoho.in/#workdrive_app/home/63sop752ea6e63ddd4a8880466f5ae509b85a/privatespace/sharedwithme/allusers/${oModel.FolderID}`;
           window.open(folderUrl, "_blank");
         },
 
-        onPressNewFolder:async function(){
+        Exp_Det_onPressNewFolder:async function(){
           var oData={
             "data": {
               FolderID:this.LoginModel.getProperty("/FolderID"),

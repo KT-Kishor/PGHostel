@@ -9,7 +9,7 @@
 	busyIndicatorDelay="0"
 >
 
-<m:Page id="id_Expense_Details" title="{i18n>expDetails}" navButtonPress="onPressBackBtn" showNavButton="true">
+<m:Page id="id_Expense_Details" title="{i18n>expDetails}" navButtonPress="Exp_Det_onPressBackBtn" showNavButton="true">
 	<ObjectPageLayout 
             enableLazyLoading="true"
             beforeNavigate="onBeforeNavigate"
@@ -44,7 +44,7 @@
 											<m:Toolbar>												
 												<m:ToolbarSpacer />
 												<m:Button  text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" 
-                    press="onEditOrSavePress" visible="{viewModel>/status}"  />
+                    press="Exp_Det_onEditOrSavePress" visible="{viewModel>/status}"  />
 											</m:Toolbar>
 										</f:toolbar>
 									<!-- <f:content> -->
@@ -115,17 +115,17 @@
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="" titleUppercase="false">
 							<blocks>
-								<m:Table id="exp_Id_ExpenseTable" items="{ItemExpenseModel>/}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" mode="SingleSelectLeft" selectionChange="Exp_onChangeExpanesItem" >
+								<m:Table id="exp_Id_ExpenseTable" items="{ItemExpenseModel>/}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" mode="SingleSelectLeft" selectionChange="Exp_Det_onChangeExpanesItem" >
 									<m:headerToolbar>
 										<m:OverflowToolbar>
 											<m:ToolbarSpacer />
 											<m:ToolbarSeparator />
-											<m:Button icon="sap-icon://add" tooltip="{i18n>expenseAddTooltip}" press="onPressAddExpenseItem" visible="{viewModel>/status}" id="idAddExpBtn" enabled="{viewModel>/enable}" />											
-											<m:Button icon="sap-icon://edit" tooltip="{i18n>expenseEditTooltip}" press="onPressExpenseItemEdit" id="idExpenseItemEdit"  visible="{viewModel>/status}" enabled="{viewModel>/enableDelete}" />											
-											<m:Button icon="sap-icon://delete" tooltip="{i18n>expenseDeleteTooltip}" press="onPressExpenseItemDelete" visible="{viewModel>/status}"  id="idExpDeleteBtn" enabled="{viewModel>/enable}" />											
-											<m:Button icon="sap-icon://attachment" press="onPressOpenFolder" visible="{= ${FilteredExpenseModel>/0/FolderID} === '' ? false : true}"  />										
-											<m:Button icon="sap-icon://add-folder" press="onPressNewFolder" visible="{= ${FilteredExpenseModel>/0/FolderID} === '' ? true : false}"  />											
-											<m:Button icon="sap-icon://download" press="onPressExpenseDownload" visible="{viewModel>/status}" />
+											<m:Button icon="sap-icon://add" tooltip="{i18n>expenseAddTooltip}" press="Exp_Det_onPressAddExpenseItem" visible="{viewModel>/status}" id="idAddExpBtn" enabled="{viewModel>/enable}" />											
+											<m:Button icon="sap-icon://edit" tooltip="{i18n>expenseEditTooltip}" press="Exp_Det_onPressExpenseItemEdit" id="idExpenseItemEdit"  visible="{viewModel>/status}" enabled="{viewModel>/enableDelete}" />											
+											<m:Button icon="sap-icon://delete" tooltip="{i18n>expenseDeleteTooltip}" press="Exp_Det_onPressExpenseItemDelete" visible="{viewModel>/status}"  id="idExpDeleteBtn" enabled="{viewModel>/enable}" />											
+											<m:Button icon="sap-icon://attachment" press="Exp_Det_onPressOpenFolder" visible="{= ${FilteredExpenseModel>/0/FolderID} === '' ? false : true}"  />										
+											<m:Button icon="sap-icon://add-folder" press="Exp_Det_onPressNewFolder" visible="{= ${FilteredExpenseModel>/0/FolderID} === '' ? true : false}"  />											
+											<m:Button icon="sap-icon://download" press="Exp_Det_onPressExpenseDownload" visible="{viewModel>/status}" />
 										</m:OverflowToolbar>
 									</m:headerToolbar>
 										<m:columns>
@@ -188,7 +188,7 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </m:contentLeft>
 				<m:contentRight>					
-					<m:Button text="{i18n>submit}" type="Emphasized" press="onPressSubmitExpenseItems" visible="{viewModel>/status}" id="idExpenseSubmit" enabled="{viewModel>/enable}" />
+					<m:Button text="{i18n>submit}" type="Emphasized" press="Exp_Det_onPressSubmitExpenseItems" visible="{viewModel>/status}" id="idExpenseSubmit" enabled="{viewModel>/enable}" />
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

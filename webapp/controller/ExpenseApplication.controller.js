@@ -51,7 +51,7 @@ sap.ui.define([
 			this.getRouter().navTo("RouteLoginPage");
 		},
 
-		onPressAddExpense: function () {
+		Exp_onPressAddExpense: function () {
 			var oView = this.getView();
 			if (!this.Expense) {
 				this.Expense = sap.ui.core.Fragment.load({
@@ -67,11 +67,11 @@ sap.ui.define([
 			}
 		},
 
-		onPressClose: function () {
+		Exp_Frg_onPressClose: function () {
 			this.Expense.close();
 		},
 
-		onPressSubmit: async function () {			
+		Exp_Frg_onPressSubmit: async function () {			
 				if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-ExpenseName"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-EndDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Country"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Source"), "ID") && (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Destination"), "ID"): true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-EmployeeRemark"), "ID")) {
 
 					BusyIndicator.show();
@@ -95,41 +95,41 @@ sap.ui.define([
 				}			
 		},
 
-		onCheckExpenseDetails: function (oEvent) {
+		Exp_onCheckExpenseDetails: function (oEvent) {
 			BusyIndicator.show(0);
 			var ExpenseID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
 			this.getRouter().navTo("RouteExpensDetails", { sPath: ExpenseID.replaceAll("/", "") });
 		},
 
-		onLiveExpenseName: function (oEvent) {
+		Exp_onLiveExpenseName: function (oEvent) {
 			utils._LCvalidateName(oEvent, "oEvent");
 		},
 
-		onDatePickerChange: function (oEvent) {
+		Exp_onDatePickerChange: function (oEvent) {
 			utils._LCvalidateDate(oEvent, "oEvent");
 		},
 
-		onEndDateChange: function (oEvent) {
+		Exp_onEndDateChange: function (oEvent) {
 			utils._LCvalidateDate(oEvent, "oEvent");
 		},
 
-		onChangeCountry: function (oEvent) {
+		Exp_onChangeCountry: function (oEvent) {
 			utils._LCvalidateMandatoryField(oEvent, "oEvent");
 		},
 
-		onChangeSource: function (oEvent) {
+		Exp_onChangeSource: function (oEvent) {
 			utils._LCvalidateMandatoryField(oEvent, "oEvent");
 		},
 
-		onChangeDestination: function (oEvent) {
+		Exp_onChangeDestination: function (oEvent) {
 			utils._LCvalidateMandatoryField(oEvent, "oEvent");
 		},
 
-		onChangeEmployeeRemark: function (oEvent) {
+		Exp_onChangeEmployeeRemark: function (oEvent) {
 			utils._LCvalidateMandatoryField(oEvent, "oEvent");
 		},
 
-		onPressExpenseDownload: function () {
+		Exp_onPressExpenseDownload: function () {
 			let fileUrl = window.location.href.split("index")[0] + "/Perdiem_DeclarationForm.doc";
 			sap.m.URLHelper.redirect(fileUrl, true)
 		},
@@ -138,7 +138,7 @@ sap.ui.define([
 			this.getRouter().navTo("RouteLoginPage");
 		},
 
-		onPressDeleteExpense:async function (oEvent) {
+		Exp_onPressDeleteExpense:async function (oEvent) {
 			BusyIndicator.show(0);
 			var ExpID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
 			await this.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: ExpID } }).then(() => {
@@ -185,7 +185,7 @@ sap.ui.define([
 			this.byId("Exp_id_StatusFilter").setSelectedKey("");
 		},
 
-		onChangeExpenseType: function (oEvent) {
+		Exp_onChangeExpenseType: function (oEvent) {
 			if (oEvent.getSource()._getSelectedItemText() !== 'Customer Facing') {
 			  this.ViewModel.setProperty("/required", false);
 			  this.getView().getModel("CreateExpenseModel").getData().Destination = "";

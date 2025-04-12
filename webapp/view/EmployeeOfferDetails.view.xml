@@ -114,10 +114,10 @@
 									<l:VerticalLayout  width="100%">
 										<l:BlockLayout background="Dashboard">
 											<l:BlockLayoutRow >
-												<l:BlockLayoutCell>
+												<l:BlockLayoutCell title="Monthly">
 													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
 														<f:content>
-															<core:Title text="{i18n>monthlyComponents}" />
+															<core:Title text="Components (INR)" />
 															<Label text="{i18n>basicSalary}" />
 															<Text text="{path:'employeeModel>/BasicSalary',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															<Label text="{i18n>hra}" />
@@ -133,7 +133,7 @@
 															<Label text="{i18n>Total}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/Total',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 
-															<core:Title text="Monthly Total Deduction" />
+															<core:Title text="Total Deduction" />
 															<Label text="Provident Fund" />
 															<Text text="{path:'employeeModel>/PF',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<Label text="Performance Tax" />
@@ -143,21 +143,21 @@
 															<Label text="Deduction Total" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/TotalDeduction',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 
-															<core:Title text="Monthly Variable Pay"/>
+															<core:Title text="Variable Pay"/>
 															<Label text="Deduction Total" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/TotalVariablePay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															
-															<core:Title text="Monthly Gross Pay"/>
+															<core:Title text="Gross Pay"/>
 															<Label text="Gross Total" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/GrossPay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 														</f:content>
 													</f:SimpleForm>
 												</l:BlockLayoutCell>
 
-												<l:BlockLayoutCell>
+												<l:BlockLayoutCell title="Yearly">
 													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
 														<f:content>											
-															<core:Title text="Yearly Components (INR)" />
+															<core:Title text="Components (INR)" />
 															<Label text="{i18n>basicSalary}" />
 															<Text text="INR {employeeModel>/BasicSalary}"  />
 															<Label text="{i18n>hra}" />
@@ -173,7 +173,7 @@
 															<Label text="{i18n>Total}" class="boldBlackText" />
 															<Text text="INR {employeeModel>/Total}"  />															
 
-															<core:Title text="Yearly Total Deduction"/>
+															<core:Title text="Total Deduction"/>
 															<Label text="Provident Fund" />
 															<Text text="INR {employeeModel>/PF}"/>
 															<Label text="Performance Tax" />
@@ -183,11 +183,11 @@
 															<Label text="Deduction Total" class="boldBlackText" />
 															<Text text="INR {employeeModel>/TotalDeduction}"/>															
 
-															<core:Title text="Yearly Variable Pay"/>
+															<core:Title text="Variable Pay"/>
 															<Label text="Deduction Total" class="boldBlackText" />
 															<Text text="INR {employeeModel>/TotalVariablePay}"/>
 
-															<core:Title text="Yearly Gross Pay"/>
+															<core:Title text="Gross Pay"/>
 															<Label text="Gross Total" class="boldBlackText"/>
 															<Text text="INR {employeeModel>/GrossPay}"/>
 														</f:content>
@@ -214,7 +214,7 @@
 												</l:BlockLayoutCell>
 												
 											</l:BlockLayoutRow>											
-											
+																						
 										</l:BlockLayout>
 									</l:VerticalLayout>
 								</WizardStep>

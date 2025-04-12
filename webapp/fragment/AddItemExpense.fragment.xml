@@ -24,7 +24,7 @@
 					<Input value="{ExpenseCreateModel>/IndexNo}" editable="false" />
 					<!-- Item Type -->
 					<Label text="{i18n>expDetItemType}" required="true"/>
-					<Select  items="{ExpenseTypeModel>/}" change="onItemTypeChange"  selectedKey="{ExpenseCreateModel>/ItemType}">
+					<Select  items="{ExpenseTypeModel>/}" change="Exp_Frg_onItemTypeChange"  selectedKey="{ExpenseCreateModel>/ItemType}">
 						<core:Item key="{ExpenseTypeModel>itemName}" text="{ExpenseTypeModel>itemName}" />
 					</Select>
 					<!-- Mode Of Payment -->
@@ -49,7 +49,7 @@
 					</HBox>
 					<!-- Conversion Rate -->
 					<Label text="{i18n>expConversionRate}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" required="true" />
-					<Input id="ExpDet_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="onChangeConverstionRate"/>									
+					<Input id="ExpDet_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="Exp_Frg_onChangeConverstionRate"/>									
 					<Label text="{i18n>comments}" required="true" ></Label>
 					<TextArea id="ExpDet_id_Comments" valueStateText="{i18n>enterComments}" liveChange="LC_ExpComments" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
 				</f:content>
@@ -58,9 +58,9 @@
 		<footer>
     <Toolbar>
         <ToolbarSpacer /> <!-- This pushes the buttons to the right -->
-        <Button text="{i18n>submit}" type="Emphasized" press="onPressSubmit" visible="{viewModel>/SubmitBtn}" />
-        <Button text="{i18n>save}" type="Emphasized" press="onPressSaveExpense" visible="{viewModel>/SaveBtn}" />
-        <Button text="{i18n>close}" class="spaceBetween sendMail" press="onPressClose" />
+        <Button text="{i18n>submit}" type="Emphasized" press="Exp_Det_onPressSubmit" visible="{viewModel>/SubmitBtn}" />
+        <Button text="{i18n>save}" type="Emphasized" press="Exp_Det_onPressSaveExpense" visible="{viewModel>/SaveBtn}" />
+        <Button text="{i18n>close}" class="spaceBetween sendMail" press="Exp_Det_onPressClose" />
     </Toolbar>
 </footer>
 

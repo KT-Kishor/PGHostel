@@ -60,8 +60,8 @@
                     <Title id="title" text="Expense Details"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
-                   <Button icon="sap-icon://add-employee" tooltip="{i18n>expenseAddTooltip}" press="onPressAddExpense" />
-					<Button icon="sap-icon://download" press="onPressExpenseDownload" />
+                   <Button icon="sap-icon://add-employee" tooltip="{i18n>expenseAddTooltip}" press="Exp_onPressAddExpense" />
+					<Button icon="sap-icon://download" press="Exp_onPressExpenseDownload" />
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
@@ -94,7 +94,7 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem type="Navigation" press="onCheckExpenseDetails">
+					<ColumnListItem type="Navigation" press="Exp_onCheckExpenseDetails">
 						<cells>
 							<Text text="{ExpenseModel>EmployeeID}" />
 							<Text text="{ExpenseModel>EmployeeName}" />
@@ -105,7 +105,7 @@
 							<Text text="{path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />
 							<!-- <Text text="{ExpenseModel>Status}" /> -->
 							<ObjectStatus text="{ExpenseModel>Status}" inverted="true" state="{path:'ExpenseModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
-							<Button icon="sap-icon://delete" visible="{= ${ExpenseModel>Status} === 'Draft' }" press="onPressDeleteExpense" />
+							<Button icon="sap-icon://delete" visible="{= ${ExpenseModel>Status} === 'Draft' }" press="Exp_onPressDeleteExpense" />
 						</cells>
 					</ColumnListItem>
 				</items>
