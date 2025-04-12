@@ -195,7 +195,7 @@ sap.ui.define(
         //Exports the holiday list to an Excel file
         LOH_onExport: function () {
           var oModel = this.byId("LOH_id_HolidayTable").getModel("HolidayModel").getData();
-          if (oModel.length > 0) {
+          if (!oModel || oModel.length === 0) {
             MessageToast.show(that.i18nModel.getText("noData"));
             return;
           }

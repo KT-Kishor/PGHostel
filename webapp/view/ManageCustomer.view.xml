@@ -10,7 +10,7 @@
 		<content>
 			<fb:FilterBar id="MC_id_CompanyFilter" persistencyKey="myPersKey" useToolbar="false" clear="MC_onClear" showClearOnFB="true" search="MC_onSearch" filterChange=".onFilterChange" showFilterConfiguration="false">
 				<fb:filterGroupItems>
-				<fb:FilterGroupItem name="companyName" label="{i18n>companyName}" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="companyName" label="{i18n>companyName}" groupName="ManageCustomerGroup" visibleInFilterBar="true">
 					<fb:control>
 					<ComboBox items="{CreateCustomerModel>/}" id="MC_id_CompanyName" showClearIcon="true">
 					<core:ListItem key="{CreateCustomerModel>/companyName}" text="{CreateCustomerModel>companyName}" />
@@ -78,7 +78,6 @@
 				<contentLeft>
 					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</contentLeft>
-				<contentRight></contentRight>
 			</Bar>
 		</footer>
 	</Page>
