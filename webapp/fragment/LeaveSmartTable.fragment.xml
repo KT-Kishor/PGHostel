@@ -11,8 +11,8 @@
 			class="sapUiResponsiveContentPadding centeredTable">
 			<headerToolbar>
 				<Toolbar>
-				 <Title id="Al_id_Title" text="{i18n>appliedLeave}"/>
-					<ToolbarSpacer/>
+				 <Title id="Al_id_Title" text="{i18n>appliedLeave} ({= ${LeaveModel>/}.length })"/>
+					<ToolbarSpacer/> 
 					<ToolbarSeparator/>
 					<Button icon="sap-icon://vertical-bar-chart" press="AL_onPressBarChart" tooltip="{i18n>openBarCharts}" />
 					<Button icon="sap-icon://create-leave-request" tooltip="{i18n>applyLeave}" press="AL_onPressApplyLeave"/>

@@ -1,10 +1,10 @@
 sap.ui.define(
   [
-    "./BaseController", //call base controller
-    "../model/formatter",
-    "sap/ui/export/Spreadsheet",
-    "sap/m/MessageToast",
-    "sap/m/MessageBox",
+    "./BaseController", // Import BaseController 
+    "../model/formatter", // Import formatter utility
+    "sap/ui/export/Spreadsheet", // Import Spreadsheet for Excel export functionality
+    "sap/m/MessageToast", // Import MessageToast for notifications
+    "sap/m/MessageBox", // Import MessageBox for alerts/confirmations
   ],
   function (BaseController, Formatter, Spreadsheet, MessageToast, MessageBox) {
     "use strict";
@@ -16,16 +16,17 @@ sap.ui.define(
         this.getRouter().getRoute("RouteListofholidays").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: function (oEvent) {
+        _onRouteMatched: async function (oEvent) {
+          // Set current year in the holidays input field
           this.byId("LOH_id_Holidays").setValue(new Date().getFullYear());
+          // Make date pickers read-only
           this._makeDatePickersReadOnly(["LOH_id_Holidays"]);
-          this._fetchCommonData("ListOfHolidays?", "HolidayModel", {
-            startDate: `${new Date().getFullYear()}-01-01`,
-            endDate: `${new Date().getFullYear()}-12-31`,
-          });
+          // Fetch holiday data for current year
+          await this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31`});
+          // Get i18n resource bundle
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          this.getView().getModel("LoginModel").setProperty("/HeaderName",
-          this.i18nModel.getText("headerListOfHolidays"));
+          // Set header name in LoginModel
+          this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerListOfHolidays"));
         },
 
         onSearch: function () {
@@ -34,84 +35,80 @@ sap.ui.define(
           startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31`});
         },
 
+        // Opens the import dialog for holiday list
         LOH_onOpenImport: function () {
           var that = this;
-          if (!this.oDialog) {
+          if (!this.oHolidayDialog) {
             sap.ui.core.Fragment.load({
               name: "sap.kt.com.minihrsolution.fragment.AddHolidayList",
               controller: this,
-            }).then(function (oDialog) {
-              that.oDialog = oDialog;
-              that.getView().addDependent(that.oDialog);
+            }).then(function (oHolidayDialog) {
+              that.oHolidayDialog = oHolidayDialog;
+              that.getView().addDependent(that.oHolidayDialog);
               that._resetDialogFields(); // Reset values
-              that.oDialog.open();
+              that.oHolidayDialog.open();   // Open dialog
             });
           } else {
-            this._resetDialogFields(); // Reset values
-            this.oDialog.open();
+            this._resetDialogFields();  // Reset fields and open existing dialog
+            this.oHolidayDialog.open();
           }
         },
 
         LOH_onPressClose: function () {
-          this._resetDialogFields(); // Reset values
-          this.oDialog.close();
+          this.oHolidayDialog.close(); //Closes the holiday dialog
         },
 
         _resetDialogFields: function () {
+          // Set default year (next year)
           sap.ui.getCore().byId("ALH_id_Date").setValue(new Date().getFullYear() + 1);
+          // Make date pickers read-only
           this._FragmentDatePickersReadOnly(["ALH_id_Date"]);
+          // Clear file uploader
           sap.ui.getCore().byId("ALH_id_LocFileUpload").clear();
-          sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
         },
 
         LOH_onUpload: function (e) {
           var oFileUploader = e.getSource();
           var file = e.getParameter("files") && e.getParameter("files")[0];
           var selectedYear = sap.ui.getCore().byId("ALH_id_Date").getValue();
+          // Expected columns in the Excel file
           var expectedColumns = ["Name","Date","Day","Karnataka","OtherStates",
-          "Maharashtra","Delhi",];
+                                 "Maharashtra","Delhi"];
           var that = this;
-          if (!file) {
-            sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
-            return;
-          }
+          // File reader to process the uploaded file
           var reader = new FileReader();
           reader.onload = function (event) {
             try {
+              // Read Excel file
               var data = new Uint8Array(event.target.result);
               var workbook = XLSX.read(data, { type: "array" });
               var sheetName = workbook.SheetNames[0];
               var sheet = workbook.Sheets[sheetName];
               var excelData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+              // Check if file has data
               if (!excelData.length) {
                 MessageToast.show(that.i18nModel.getText("noDatainFile"));
-                sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
                 oFileUploader.clear();
                 return;
               }
+              // Validate column headers
               var fileHeaders = excelData[0].map((header) => header.trim());
-              if (
-                !expectedColumns.every(
-                  (col, index) => col === fileHeaders[index]
-                )
-              ) {
-                MessageToast.show(
-                  that.i18nModel.getText("fileColumnOrderFormat")
-                );
-                sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
+              if (!expectedColumns.every((col, index) => col === fileHeaders[index])) {
+                MessageToast.show(that.i18nModel.getText("fileColumnOrderFormat"));
                 oFileUploader.clear();
                 return;
               }
+              // Validate state data (0 or 1)
               var invalidData = excelData.slice(1).some((row) => {
                 return [3, 4, 5, 6].some(
                   (index) => row[index] !== 0 && row[index] !== 1 );
               });
               if (invalidData) {
-              MessageToast.show(that.i18nModel.getText("InvalidColStateFormat"));
-              sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
-              oFileUploader.clear();
-              return;
+                MessageToast.show(that.i18nModel.getText("InvalidColStateFormat"));
+                oFileUploader.clear();
+                return;
               }
+              // Validate year matches selected year
               var invalidYear = excelData.slice(1).some((row) => {
                 var dateValue = row[1];
                 var jsDate = that.excelDateToJSDate(dateValue);
@@ -119,16 +116,14 @@ sap.ui.define(
                 return rowYear !== parseInt(selectedYear, 10);
               });
               if (invalidYear) {
-              MessageToast.show(that.i18nModel.getText("IncorrectDataOfExcel"));
-              sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
-              oFileUploader.clear();
-              return;
+                MessageToast.show(that.i18nModel.getText("IncorrectDataOfExcel"));
+                oFileUploader.clear();
+                return;
               }
+              // Store valid data for submission
               that._uploadedExcelData = excelData;
-              sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(true);
             } catch (error) {
               MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
-              sap.ui.getCore().byId("ALH_id_SubmitButton").setEnabled(false);
               oFileUploader.clear();
             }
           };
@@ -146,7 +141,7 @@ sap.ui.define(
             var that = this;
             var selectedYear = sap.ui.getCore().byId("ALH_id_Date").getValue();
             if (!this._uploadedExcelData) {
-              MessageToast.show(this.i18nModel.getText("noDataToUpload"));
+              MessageToast.show(that.i18nModel.getText("uploadExcel"));
               return;
             }
             var formattedData = this._uploadedExcelData.slice(1).map((row) => ({
@@ -158,10 +153,12 @@ sap.ui.define(
               Maharashtra: row[5],
               Delhi: row[6],
             }));
+             // Check for existing data
             var existingData = await this.ajaxReadWithJQuery("ListOfHolidays", {
               startDate: `${selectedYear}-01-01`,
               endDate: `${selectedYear}-12-31`,
             });
+            // If data exists, confirm before overwriting
             if (existingData.data.length > 0) {
               MessageBox.confirm(
                 `Previous data for ${selectedYear} will be deleted. Do you want to continue?`,
@@ -169,39 +166,55 @@ sap.ui.define(
                   actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                   onClose: async function (sAction) {
                     if (sAction === MessageBox.Action.YES) {
-                      await that.ajaxDeleteWithJQuery("ListOfHolidays", {
-                        filters: {startDate: `${selectedYear}-01-01`,
-                        endDate: `${selectedYear}-12-31`},
-                      });
-                      await that.ajaxCreateWithJQuery("ListOfHolidays", {
-                        data: formattedData,
-                      });
+                       // Delete existing data
+                     await that.ajaxDeleteWithJQuery("ListOfHolidays", {filters: {startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31`}});
+                    // Create new data
+                    await that.ajaxCreateWithJQuery("ListOfHolidays", {data: formattedData});
                     MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
-                    that.oDialog.close();
-                    that._fetchCommonData("ListOfHolidays?", "HolidayModel", {
-                    startDate: `${selectedYear}-01-01`,
-                    endDate: `${selectedYear}-12-31`,
-                    });
+                    that.oHolidayDialog.close();
+                    // Refresh view with new data
+                    await that._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31`});
                     }
                   },
                 }
               );
             } else {
-              await this.ajaxCreateWithJQuery("ListOfHolidays", {
-                data: formattedData,
-              });
+              // No existing data, just create new
+              await this.ajaxCreateWithJQuery("ListOfHolidays", {data: formattedData});
               MessageToast.show(this.i18nModel.getText("uploadSuccessfull"));
-              this.oDialog.close();
-              this._fetchCommonData("ListOfHolidays?", "HolidayModel", {
-                startDate: `${selectedYear}-01-01`,
-                endDate: `${selectedYear}-12-31`,
-              });
+              this.oHolidayDialog.close();
+              // Refresh view with new data
+              this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`,
+              endDate: `${selectedYear}-12-31`});
             }
           } catch (error) {
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
         },
 
+        //Exports the holiday list to an Excel file
+        LOH_onExport: function () {
+          var oModel = this.byId("LOH_id_HolidayTable").getModel("HolidayModel").getData();
+          if (oModel.length > 0) {
+            MessageToast.show(that.i18nModel.getText("noData"));
+            return;
+          }
+          // Configure export settings
+          const aCols = this.createColumnConfig();
+          const oSettings = {
+            workbook: { columns: aCols, hierarchyLevel: "Level" },
+            dataSource: oModel,
+            fileName: "List_Of_Holidays.xlsx",
+            worker: false,
+          };
+           // Create and build spreadsheet
+          const oSheet = new sap.ui.export.Spreadsheet(oSettings);
+          oSheet.build().finally(function () {
+            oSheet.destroy();
+          });
+        },
+
+        //Creates column configuration for Excel export
         createColumnConfig: function () {
           return [
             { label: "Name", property: "Name", type: "string" },
@@ -214,33 +227,12 @@ sap.ui.define(
           ];
         },
 
-        LOH_onExport: function () {
-          const oModel = this.byId("LOH_id_HolidayTable")
-            .getModel("HolidayModel")
-            .getData();
-          if (!oModel || oModel.length === 0) {
-            MessageToast.show(that.i18nModel.getText("noData"));
-            return;
-          }
-          const aCols = this.createColumnConfig();
-          const oSettings = {
-            workbook: { columns: aCols, hierarchyLevel: "Level" },
-            dataSource: oModel,
-            fileName: "List_Of_Holidays.xlsx",
-            worker: false,
-          };
-          const oSheet = new sap.ui.export.Spreadsheet(oSettings);
-          oSheet.build().finally(function () {
-            oSheet.destroy();
-          });
-        },
-
         onPressback: function () {
-          this.getRouter().navTo("RouteTilePage");
+          this.getRouter().navTo("RouteTilePage"); // Navigate back to the tile page
         },
 
         onLogout: function () {
-          this.getRouter().navTo("RouteLoginPage");
+          this.getRouter().navTo("RouteLoginPage"); // Navigate to the login page
         },
       }
     );

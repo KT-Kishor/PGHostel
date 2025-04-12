@@ -17,7 +17,7 @@
 					<filterbar:FilterGroupItem 
             name="YearPicker" 
             label="{i18n>year}" 
-            groupName="Group1"
+            groupName="HolidayGroup"
             visibleInFilterBar="true">
 						<filterbar:control>
 							<DatePicker 
@@ -97,7 +97,6 @@
 				<contentLeft>
 					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</contentLeft>
-				<contentRight></contentRight>
 			</Bar>
 		</footer>
 	</Page>

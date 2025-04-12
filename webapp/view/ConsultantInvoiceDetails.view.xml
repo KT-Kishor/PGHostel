@@ -131,7 +131,7 @@
 										<m:TextArea value="{ConsultantInvoiceModel>/ConsultantAddress}" maxLength="120" id="CI_id_InputConsultantAddress" liveChange="CID_ValidateCommonFields" valueStateText="{i18n>validConsultantAddressMsg}" rows="3" editable="{visiablityPlay>/editable}"/>
 
 										<m:Label text="{i18n>gstNo}"/>
-										<m:Input value="{ConsultantInvoiceModel>/GSTNO}" id="CI_id_InputGSTNO"  liveChange="CID_ValidateGstNumber" maxLength="15" valueStateText="{i18n>gstNoValueState}"  change="CI_onChangeGstNo" editable="{visiablityPlay>/editable}"/>
+										<m:Input value="{ConsultantInvoiceModel>/GSTNO}" id="CI_id_InputGSTNO"  liveChange="CID_ValidateConsultantGstNumber" maxLength="15" valueStateText="{i18n>gstNoValueState}"  change="CI_onChangeGstNo" editable="{visiablityPlay>/editable}"/>
 										
 										<m:Label text="{i18n>type}" required="{ConsultantInvoiceModel>/GSTValid}"/>
 										<m:CheckBox text="{i18n>cgst}" id="CI_id_CheckboxCGST" selected="{ConsultantInvoiceModel>/CGSTSelected}" select="CI_onSelectCGST" editable="{ConsultantInvoiceModel>/GSTValid}" />
@@ -141,9 +141,9 @@
 										<m:Input value="{ConsultantInvoiceModel>/Percentage}" liveChange="CI_onPercentageChange"  editable="{ConsultantInvoiceModel>/GSTValid}" maxLength="10"/>
 
 										<m:Label text="{i18n>currency}" required="true"/>
-										<m:Select items="{currencyModel>/results}"
+										<m:Select items="{CurrencyModel>/}"
 												selectedKey="{ConsultantInvoiceModel>/Currency}" width="100%" editable="{visiablityPlay>/editable}" change="CI_onCurrencyChange">
-											<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
+											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
 									</f:content>
 								</f:SimpleForm>
@@ -200,10 +200,10 @@
             <m:Column id="CI_id_ColumnGST">
                 <m:Text text="{i18n>SAC}" />
             </m:Column>
-            <m:Column>
+            <m:Column id="CI_id_GSTCalc">
                 <m:Text text="{i18n>GSTCalculation}" />
             </m:Column>
-            <m:Column id="CI_id_GSTCalc">
+            <m:Column>
                 <m:Text text="{i18n>days}" />
             </m:Column>
             <m:Column>
@@ -220,38 +220,37 @@
         <m:items>
             <m:ColumnListItem>
                 <m:cells>
-                    <m:Input value="{IndexNo}" editable="false" />
+                    <m:Input value="{ConsultantInvoiceModel>IndexNo}" editable="false" />
                 </m:cells>
                 <m:cells>
-                    <m:Input value="{Item}" editable="{visiablityPlay>/editable}" maxLength="60"/>
+                    <m:Input value="{ConsultantInvoiceModel>Item}" editable="{visiablityPlay>/editable}" maxLength="60"/>
                 </m:cells>
                 <m:cells>
-                    <m:ComboBox showSecondaryValues="true" items="{InvoiceSACModel>/results}" value="{SAC}" editable="{ConsultantInvoiceModel>/GSTValid}" selectedKey="1">
-                        <core:ListItem key="{InvoiceSACModel>ID}" additionalText="{InvoiceSACModel>Description}" text="{InvoiceSACModel>SAC}" />
+                    <m:ComboBox showSecondaryValues="true" items="{InvoiceSACModel>/}" value="{SAC}" editable="{ConsultantInvoiceModel>/GSTValid}" selectedKey="1">
+                        <core:ListItem key="{InvoiceSACModel>id}" additionalText="{InvoiceSACModel>description}" text="{InvoiceSACModel>sac}" />
                     </m:ComboBox>
                 </m:cells>
                 <m:cells>
-                    <m:ComboBox value="{GSTCalculation}" selectedKey="1" editable="{ConsultantInvoiceModel>/GSTValid}" change="CI_onChangeGSTCalculation">
+                    <m:ComboBox value="{ConsultantInvoiceModel>GSTCalculation}" selectedKey="1" editable="{ConsultantInvoiceModel>/GSTValid}" change="CI_onChangeGSTCalculation">
                         <core:Item key="{i18n>yes}" text="{i18n>yes}"/>
                         <core:Item key="{i18n>no}" text="{i18n>no}"/>
                     </m:ComboBox>
                 </m:cells>
                 <m:cells>
-                    <m:Input value="{Days}" editable="{visiablityPlay>/editable}" change="CI_onInputChange"  maxLength="10" textAlign="End"/>
+                    <m:Input value="{ConsultantInvoiceModel>Days}"  editable="{visiablityPlay>/editable}" change="CI_onInputChange"  maxLength="10" textAlign="End"/>
                 </m:cells>
                 <m:cells>
-                    <m:Input value="{UnitPrice}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End"/>
+                    <m:Input value="{ConsultantInvoiceModel>UnitPrice}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End"/>
                 </m:cells>
                 <m:cells>
-                    <m:Input id="CI_id_DiscountInput" value="{Discount}" editable="{visiablityPlay>/editable}" liveChange="CI_onchangeDiscount" maxLength="10" textAlign="End"/>
+                    <m:Input id="CI_id_DiscountInput" value="{ConsultantInvoiceModel>Discount}" editable="{visiablityPlay>/editable}" liveChange="CI_onchangeDiscount" maxLength="10" textAlign="End"/>
                 </m:cells>
                 <m:cells>
-                    <m:Input value="{path:'Total',formatter: '.Formatter.numberFormater'}" editable="false" textAlign="End"/>
+                    <m:Input value="{path:'ConsultantInvoiceModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End"/>
                 </m:cells>
             </m:ColumnListItem>
         </m:items>
     </m:Table>
-
 									<m:FlexBox class="custom-flexbox" direction="Column">
 										<m:VBox class="custom-vbox">
 											<!-- Sub Total(Non-Taxable) -->
@@ -259,7 +258,7 @@
 												<m:Label text="{i18n>subTotal} ({i18n>NonTaxable}) ({ConsultantInvoiceModel>/Currency}) :" 
                 class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                 visible="{= ${oModelDataPro>/TotalSum} > 0}" />
-												<m:Text text="{path:'oModelDataPro>/SubTotalNotGST',formatter: '.Formatter.numberFormater'}"
+												<m:Text text="{path:'oModelDataPro>/SubTotalNotGST',formatter: '.Formatter.fromatNumber'}"
                 id="CI_id_SubTo"
                 class="amountText"
                 textAlign="End"
@@ -269,7 +268,7 @@
 											<m:HBox justifyContent="SpaceBetween" visible="{= ${oModelDataPro>/SubTotal} > 0  }"  >
 												<m:Label text="{i18n>subTotal} ({i18n>Taxable}) ({ConsultantInvoiceModel>/Currency}) :" 
                 class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"/>
-												<m:Text text="{path:'oModelDataPro>/SubTotal',formatter: '.Formatter.numberFormater'}"
+												<m:Text text="{path:'oModelDataPro>/SubTotal',formatter: '.Formatter.fromatNumber'}"
                 id="CI_id_Subtotal"
                 class="amountText" 
                 textAlign="End"/>
@@ -279,7 +278,7 @@
 												<m:Label text="{= 'CGST ( ' + (${oModelDataPro>/CGSTPercentage} || ${ConsultantInvoiceModel>/Percentage}) + ' % ) : '}"
                 visible="{= ${oModelDataPro>/CGSTVisible} === true || ${ConsultantInvoiceModel>/CGSTVisible} === true}"
                 class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
-												<m:Text text="{path:'oModelDataPro>/CGST',formatter: '.Formatter.numberFormater'}"
+												<m:Text text="{path:'oModelDataPro>/CGST',formatter: '.Formatter.fromatNumber'}"
                 class="amountText"
                 textAlign="End"
                 visible="{= ${oModelDataPro>/CGSTVisible} === true || ${ConsultantInvoiceModel>/CGSTVisible} === true}" />
@@ -289,7 +288,7 @@
 												<m:Label text="{= 'SGST ( ' + (${oModelDataPro>/SGSTPercentage} || ${ConsultantInvoiceModel>/Percentage}) + ' % ) : '}"
                 visible="{= ${oModelDataPro>/SGSTVisible} === true || ${ConsultantInvoiceModel>/SGSTVisible} === true}"
                 class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
-												<m:Text text="{path:'oModelDataPro>/SGST',formatter: '.Formatter.numberFormater'}"
+												<m:Text text="{path:'oModelDataPro>/SGST',formatter: '.Formatter.fromatNumber'}"
                 class="amountText"
                 textAlign="End"
                 visible="{= ${oModelDataPro>/SGSTVisible} === true || ${ConsultantInvoiceModel>/SGSTVisible} === true}" />
@@ -299,7 +298,7 @@
 												<m:Label text="{= 'IGST ( ' + (${oModelDataPro>/IGSTPercentage} || ${ConsultantInvoiceModel>/Percentage}) + ' % ) : '}"
                 visible="{= ${oModelDataPro>/IGSTVisible} === true || ${ConsultantInvoiceModel>/IGSTVisible} === true}"
                 class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
-												<m:Text text="{path:'oModelDataPro>/IGST',formatter: '.Formatter.numberFormater'}"
+												<m:Text text="{path:'oModelDataPro>/IGST',formatter: '.Formatter.fromatNumber'}"
                 class="amountText"
                 textAlign="End"
                 visible="{= ${oModelDataPro>/IGSTVisible} === true || ${ConsultantInvoiceModel>/IGSTVisible} === true}" />
@@ -309,7 +308,7 @@
 												<m:Label text="{= ${i18n>total} + ' ( ' + ${ConsultantInvoiceModel>/Currency} + ' ) : '}"
                 class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                 visible="{= ${oModelDataPro>/TotalSum} > 0}" />
-												<m:Text text="{path:'oModelDataPro>/TotalSum',formatter: '.Formatter.numberFormater'}"
+												<m:Text text="{path:'oModelDataPro>/TotalSum',formatter: '.Formatter.fromatNumber'}"
                 id="CI_id_TotalAmount"
                 class="amountText"
                 textAlign="End"
