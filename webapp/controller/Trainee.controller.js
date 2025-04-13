@@ -5,7 +5,7 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-    "../model/formatter",
+    "../model/formatter", // call formatter function
     "sap/ui/core/BusyIndicator"],
     function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter, BusyIndicator) {
         "use strict";
@@ -14,11 +14,8 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: function (oEvent) {
-                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this._fetchCommonData("Designation", "DesignationModel");
-                this._fetchCommonData("Department", "Departmentmodel");
-                this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" }); // common company emails read call
+            _onRouteMatched:async function (oEvent) {
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); 
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
                 ["T_id_Download", "T_id_EmpOnBoard", "T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
@@ -26,11 +23,14 @@ sap.ui.define([
                 this.oValue = oEvent.getParameter("arguments").value;
                 if (this.oValue === "Trainee") {
                     this.readCallForTrainee("Initial");
-                    this.T_onPressClear();
+                    this.T_onPressClear();// clear the filter bar
                 }
                 else {
-                    this.T_onSearch();
+                    this.T_onSearch();// filter function for trainee 
                 }
+                await this._fetchCommonData("Designation", "DesignationModel");
+                await this._fetchCommonData("Department", "Departmentmodel");
+                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" }); // common company emails read call
             },
             //read call for trainee
             readCallForTrainee: function (filter) {
@@ -70,15 +70,17 @@ sap.ui.define([
             //Trainee creation button
             T_onPressAddTrainee: function (oEvent) {
                 var oParValue;
+                // Check if the button pressed is the "Add Trainee" button by looking at its ID
                 if (oEvent.getSource().getId().lastIndexOf("T_id_AddBtn") !== -1) {
                     oParValue = "CreateTraineeFlag"
                 } else {
+                    // Else navigation to existing trainee details
                     oParValue = oEvent.getSource().getBindingContext("traineeModel").getModel().getData()[oEvent.getSource().getBindingContextPath().split("/")[1]].ID
                 }
                 this.getRouter().navTo("RouteTraineeDetails", { sParTrainee: oParValue });
             },
             // common open the dialog function
-            T_commonOpenDialog: function (dialogProperty, fragmentName, ) {
+            T_commonOpenDialog: function (dialogProperty, fragmentName,) {
                 if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -145,7 +147,7 @@ sap.ui.define([
             //confirmation dialog function for trainee onboard and reject
             onHandleTraineeAction: function (action) {
                 var that = this;
-                var oContext = this.byId("T_id_TraineeTable").getSelectedItem()?.getBindingContext("traineeModel"); 
+                var oContext = this.byId("T_id_TraineeTable").getSelectedItem()?.getBindingContext("traineeModel");
                 if (!oContext) {
                     MessageToast.show(this.i18nModel.getText("SelectTraineeMessage"));
                     return;
@@ -154,7 +156,7 @@ sap.ui.define([
                 var sMessage = (action === "onboard")
                     ? this.i18nModel.getText("OnboardMessage", [sName])
                     : this.i18nModel.getText("RejectMessage", [sName]);
-            
+
                 this.showConfirmationDialog(
                     this.i18nModel.getText("ConfirmActionTitle"),
                     sMessage,
@@ -176,7 +178,7 @@ sap.ui.define([
                     }
                 );
             },
-            
+
             //Reject trainee function
             _handleReject: function (oContext) {
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
@@ -356,7 +358,7 @@ sap.ui.define([
                     }
                 });
             },
-         
+
             //Traniee certificate mail function
             T_onCerMail: function () {
                 var oUploaderDataModel = new JSONModel({
