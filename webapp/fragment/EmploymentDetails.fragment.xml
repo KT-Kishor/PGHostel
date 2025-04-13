@@ -35,8 +35,8 @@
 				<cells>
 					<Text text="{sEmploymentModel>CompanyName}"/>
 					<Text text="{sEmploymentModel>Designation}"/>
-					<Text text="{sEmploymentModel>StartDate}"/>
-					<Text text="{sEmploymentModel>EndDate}"/>
+					<Text text="{path:'sEmploymentModel>StartDate',formatter:'.Formatter.formatDate'}"/>
+					<Text text="{path:'sEmploymentModel>EndDate',formatter:'Formtter.formatDate'}"/>
 					<Text text="{sEmploymentModel>OfficeAddress}"/>
 				</cells>
 			</ColumnListItem>

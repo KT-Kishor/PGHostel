@@ -9,18 +9,17 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteSelfService").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: function () {
+            _onRouteMatched: async function () {
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
                 this.byId("SS_id_IconTab").setSelectedKey("employeeDetailsKey");
                 this.SS_commonEduFunction();
                 this.SS_commonEmpFunction();
                 this.EduFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/FolderID");
                 this.EmpFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmploymentDetailFolderID");
-                this._fetchCommonData("Designation", "sDesignationModel");
-                this._fetchCommonData("BaseLocation", "sBaseLocationModel");
-                this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
-                var viewModel = new JSONModel({
-                    fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false,
+                await this._fetchCommonData("Designation", "sDesignationModel");
+                await this._fetchCommonData("BaseLocation", "sBaseLocationModel");
+                await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
+                var viewModel = new JSONModel({ fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false,
                     isRoleMode: false, Max: new Date(), isVisitMode: true, isIdMode: true,
                 });
                 this.getView().setModel(viewModel, "viewModel");
@@ -354,7 +353,7 @@ sap.ui.define([
                             sap.m.MessageToast.show(error.responseText);
                         });
                     },
-                    function () {                                    // On Cancel
+                    function () {      // On Cancel
                         that.byId("EdF_id_EduTable").removeSelections(true);
                         that.setEduButtonsEnabled(false);
                     }
