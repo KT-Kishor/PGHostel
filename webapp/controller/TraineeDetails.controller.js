@@ -18,7 +18,7 @@ sap.ui.define([
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("EmployeeDetails", "empModel");
-                await this._fetchCommonData("CompanyEmails", "CCMailModel", {applicationName: "Trainee"});//CC mailId read call
+                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });//CC mailId read call
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
 
@@ -131,14 +131,15 @@ sap.ui.define([
             validateStep: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
-                oModel.TrainingDuration = this.byId("TD_id_TDuration").getSelectedKey();    
+                oModel.TrainingDuration = this.byId("TD_id_TDuration").getSelectedKey();
                 // Check if all fields have values
-                var allFieldsFilled = oModel.TraineeName && oModel.ReportingManager && oModel.TraineeEmail && oModel.Stipend && oModel.Currency && oModel.TrainingDuration && oModel.ReleaseDate && oModel.JoiningDate ;
+                var allFieldsFilled = oModel.TraineeName && oModel.ReportingManager && oModel.TraineeEmail && oModel.Stipend && oModel.Currency && oModel.TrainingDuration && oModel.ReleaseDate && oModel.JoiningDate;
                 if (allFieldsFilled) {
                     var isValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCvalidateTraineeAmount(this.getView().byId("TD_id_Stipend"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
                     this.byId("TD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
+                    this.byId("TD_id_StepOne").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
                 }
             },
             //Submit trainee deatails 
@@ -174,7 +175,14 @@ sap.ui.define([
                                     type: "Reject",
                                     press: function () {
                                         this.TD_onPressMerge();
+                                        this.getView().getModel("oTraineeDetails").setProperty("/Status", "PDF Generated");
+                                        // this.ajaxCreateWithJQuery("Trainee", {
+                                        //     tableName: "Trainee",
+                                        //     data: this.getView().getModel("oTraineeDetails").getData()
+                                        // })
+
                                         oDialog.close();
+
                                         this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                                     }.bind(this)
                                 }),
@@ -212,13 +220,15 @@ sap.ui.define([
             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
-                              delete oModel.EndDate
+                delete oModel.EndDate
+                oModel.ReleaseDate=this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");;
+                oModel.JoiningDate=this.byId("TU_id_JoinDate").getValue().split("/").reverse().join("-");
+
                 // Check and update the status if it is 'Rejected'
                 if (oModel.Status === "Rejected") {
                     oModel.Status = "Submitted";
                 }
                 oModel.TrainingDuration = this.byId("TU_id_TDuration").getSelectedKey();
-                this.getView().getModel("oTraineeDetails").refresh(true);
                 oModel = {
                     "data": oModel,
                     "filters": {
@@ -234,6 +244,8 @@ sap.ui.define([
                         oViewModel.setProperty("editBut", true);
                         BusyIndicator.hide();
                         MessageToast.show(this.i18nModel.getText("traineeDataUpdated"));
+                        this.getView().getModel("oTraineeDetails").refresh(true);
+
                     }
                 }).catch((oError) => {
                     BusyIndicator.hide();
@@ -241,7 +253,7 @@ sap.ui.define([
                 });
             },
             // common function for opening dialog
-            TD_commonOpenDialog: function ( fragmentName) {
+            TD_commonOpenDialog: function (fragmentName) {
                 if (!this.TU_oDialogMail) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -268,7 +280,7 @@ sap.ui.define([
                     button: false
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
-                this.TD_commonOpenDialog( "sap.kt.com.minihrsolution.fragment.CommonMail");
+                this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
             },
             //back function
@@ -280,7 +292,7 @@ sap.ui.define([
                         this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                     }.bind(this)
                 );
-            },     
+            },
             //  Mail dialog close function    
             Mail_onPressClose: function () {
                 this.TU_oDialogMail.destroy();
