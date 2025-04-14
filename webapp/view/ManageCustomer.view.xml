@@ -63,7 +63,7 @@
 					<ColumnListItem>
 						<cells>
 							<Text text="{CreateCustomerModel>companyName}" />
-							<Text text="{CreateCustomerModel>salutation}{CreateCustomerModel>name}" />
+							<Text text="{CreateCustomerModel>salutation} {CreateCustomerModel>name}" />
 							<Text text="{CreateCustomerModel>GST}" />
 							<Text text="{CreateCustomerModel>type}" />
 							<Text text="{CreateCustomerModel>value}" />
@@ -76,9 +76,9 @@
 		</content>
 		<footer>
 			<Bar>
-				<contentLeft>
-					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
-				</contentLeft>
+			  <contentLeft>
+				 <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML"/>
+			  </contentLeft>
 			</Bar>
 		</footer>
 	</Page>
