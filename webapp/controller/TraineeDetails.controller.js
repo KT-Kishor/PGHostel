@@ -16,11 +16,12 @@ sap.ui.define([
             },
             _onRouteMatched: async function (oEvent) {
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
-                this.byId("TD_id_ReviewPanel").setVisible(false)
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("EmployeeDetails", "empModel");
-                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });//CC mailId read call
+                await this._fetchCommonData("CompanyEmails", "CCMailModel", {applicationName: "Trainee"});//CC mailId read call
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
+                this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
+
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.T_onResetWizard();
                 var jsonData = {
@@ -92,22 +93,22 @@ sap.ui.define([
             //validate name function
             TD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
-                this.TD_ReviewStep();
+                this.validateStep();
             },
             //validate email function
             TD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
-                this.TD_ReviewStep();
+                this.validateStep();
             },
             //validate amount function
             TD_validateAmount: function (oEvent) {
-                utils._LCvalidateAmount(oEvent);
-                this.TD_ReviewStep();
+                utils._LCvalidateTraineeAmount(oEvent);
+                this.validateStep();
             },
             //validate date function
             TD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent); // Base validation
-                this.TD_ReviewStep(); // Step validation
+                this.validateStep(); // Step validation
                 var oOfferDateId = oEvent.getSource().getId().split("--")[2];
                 var releaseDate, joinDateVa;
                 if (oOfferDateId === "TD_id_ReleaseDate" || oOfferDateId === "TU_id_RelDate") {
@@ -127,50 +128,39 @@ sap.ui.define([
                 }
             },
             //wizard step validation function
-            TD_ReviewStep: function () {
+            validateStep: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
-                oModel.Currency = this.getView().byId("TD_id_Currency").getSelectedKey();
-                oModel.TrainingDuration = this.getView().byId("TD_id_TDuration").getSelectedKey();
-                var allFieldsFilled = oModel.TraineeName && oModel.ReportingManager && oModel.TraineeEmail && oModel.Stipend && oModel.Currency && oModel.TrainingDuration && oModel.ReleaseDate && oModel.JoiningDate;
+                oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
+                oModel.TrainingDuration = this.byId("TD_id_TDuration").getSelectedKey();    
+                // Check if all fields have values
+                var allFieldsFilled = oModel.TraineeName && oModel.ReportingManager && oModel.TraineeEmail && oModel.Stipend && oModel.Currency && oModel.TrainingDuration && oModel.ReleaseDate && oModel.JoiningDate ;
                 if (allFieldsFilled) {
-                    var isValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCvalidateAmount(this.getView().byId("TD_id_Stipend"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
-                    this.getView().byId("TD_id_ReviewPanel").setVisible(isValid);
-                    this.byId("TD_id_Submit").setEnabled(isValid)
+                    var isValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCvalidateTraineeAmount(this.getView().byId("TD_id_Stipend"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
+                    this.byId("TD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
-                    this.getView().byId("TD_id_ReviewPanel").setVisible(false);
-                    this.getView().byId("TD_id_Submit").setEnabled(false)
-
+                    this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 }
             },
-
             //Submit trainee deatails 
             TD_onSubmitData: function (oEvent) {
-                try {
+                if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.Status = "Submitted";
-                    if (oModel.ReleaseDate && oModel.ReleaseDate.includes("/")) {
-                        oModel.ReleaseDate = oModel.ReleaseDate.split("/").reverse().join('-');
-                    }
-                    if (oModel.JoiningDate && oModel.JoiningDate.includes("/")) {
-                        oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join('-');
-                    }
+                    oModel.ReleaseDate = oModel.ReleaseDate.split("/").reverse().join('-');
+                    oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join('-');
                     var oPayload = {
                         "tableName": "Trainee",
                         "data": oModel
                     };
-                    sap.ui.core.BusyIndicator.show(0);
-                    // Call the AJAX function to submit the data
                     this.ajaxCreateWithJQuery("Trainee", oPayload).then((oData) => {
-                        sap.ui.core.BusyIndicator.hide();
+                        BusyIndicator.hide();
                         if (oData.success) {
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
                                 type: sap.m.DialogType.Message,
                                 state: sap.ui.core.ValueState.Success,
-                                content: new sap.m.Text({
-                                    text: this.i18nModel.getText("traineeDataSubmitted")
-                                }),
+                                content: new sap.m.Text({ text: this.i18nModel.getText("traineeDataSubmitted") }),
                                 beginButton: new sap.m.Button({
                                     text: "OK",
                                     type: "Accept",
@@ -193,20 +183,24 @@ sap.ui.define([
                                 }
                             });
                             oDialog.open();
-                        } else {
-                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         }
-                    })
-                } catch (error) {
-                    sap.ui.core.BusyIndicator.hide();
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    }).catch((oError) => {
+                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                        BusyIndicator.hide();
+                    });
+                } else {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
+            },
+            //second step validation function
+            TD_StepTwo: function () {
+                this.getView().byId("TD_id_Submit").setEnabled(true);
             },
 
             //Edit/save button visibility function
             TU_onEditOrSavePress: function () {
                 if (this.viewModel.getProperty("/editable")) {
-                    var isValid = utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") && utils._LCvalidateAmount(this.getView().byId("TU_id_Stipend"), "ID");
+                    var isValid = utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") && utils._LCvalidateTraineeAmount(this.getView().byId("TU_id_Stipend"), "ID");
                     // Save the changes
                     if (isValid) this.updateCallForTrainee(this.viewModel);
                     else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -218,7 +212,7 @@ sap.ui.define([
             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
-                delete oModel.EndDate
+                              delete oModel.EndDate
                 // Check and update the status if it is 'Rejected'
                 if (oModel.Status === "Rejected") {
                     oModel.Status = "Submitted";
@@ -247,7 +241,7 @@ sap.ui.define([
                 });
             },
             // common function for opening dialog
-            TD_commonOpenDialog: function (fragmentName) {
+            TD_commonOpenDialog: function ( fragmentName) {
                 if (!this.TU_oDialogMail) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -274,7 +268,7 @@ sap.ui.define([
                     button: false
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
-                this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
+                this.TD_commonOpenDialog( "sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
             },
             //back function
@@ -286,7 +280,7 @@ sap.ui.define([
                         this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                     }.bind(this)
                 );
-            },
+            },     
             //  Mail dialog close function    
             Mail_onPressClose: function () {
                 this.TU_oDialogMail.destroy();
@@ -396,8 +390,6 @@ sap.ui.define([
                     BusyIndicator.hide();
                     console.error("Error waiting for models:", error);
                 }
-            },
-
-
+            }
         });
     });
