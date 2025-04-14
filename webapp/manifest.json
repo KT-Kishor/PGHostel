@@ -423,7 +423,7 @@
                 },
                 {
                     "name": "RouteManageCustomer",
-                    "pattern": "ManageCustomer",
+                    "pattern": "ManageCustomer/{value}",
                     "target": [
                         "TargetManageCustomer"
                     ]

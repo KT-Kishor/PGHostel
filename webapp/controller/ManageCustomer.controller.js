@@ -13,20 +13,21 @@ sap.ui.define([
         this.getRouter().getRoute("RouteManageCustomer").attachMatched(this._onRouteMatched, this);
       },
 
-      _onRouteMatched: function () {
-        BusyIndicator.show(0);
-        this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {}) // Fetch customer data
-          .then(() => {
+      _onRouteMatched: function (oEvent) {
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
         this.byId("MC_id_CustTable").removeSelections(true); // Clear table selection
-        this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText    ("headerCustomer")); // Set header name
-        BusyIndicator.hide();// Hide busy indicator
-        }).catch((error) => {
-          BusyIndicator.hide();
-          MessageToast.show(error.message || error.responseText);
-          });
-        },
-      
+        this.getView().getModel("LoginModel").setProperty("/HeaderName", 
+        this.i18nModel.getText("headerCustomer")); // Set header name
+        this.oValue = oEvent.getParameter("arguments").value;
+        if (this.oValue === "ManageCustomer") {
+          this.readCallForManageCustomer("Initial");
+          this.MC_onClear();// clear the filter bar
+       }
+       else {
+        this.MC_onSearch();// filter function for trainee 
+      }
+      },
+ 
         //common Dialog Function
         manageCustomerDetails: function (bIsEdit) {
           var oModel;
@@ -350,25 +351,34 @@ sap.ui.define([
           if (oComboBox) oComboBox.setSelectedKey(""); // Clear combo box selection
         },
 
-        // Search Customer Table by Filter Bar Values
-        MC_onSearch: function (oEvent) {
-          var oFilterBar = oEvent.getSource();
-          var aFilterItems = oFilterBar.getFilterGroupItems();
+        MC_onSearch: function () {
+          var aFilterItems = this.byId("MC_id_CompanyFilter").getFilterGroupItems();
           var params = {};
           aFilterItems.forEach(function (oItem) {
-            var oControl = oItem.getControl();
-            if (oControl && oControl.getValue) {
-              var sKey = oItem.getName();
-              var sValue = oControl.getValue();
-              if (sValue) params[sKey] = sValue;
-            }
+              var oControl = oItem.getControl();
+              if (oControl && oControl.getValue) {
+                  var sKey = oItem.getName();
+                  var sValue = oControl.getValue();
+                  if (sValue) params[sKey] = sValue;
+              }
           });
-          this.byId("MC_id_AddCustomer").setEnabled(true); // Enable Add Customer button
-          this._fetchCommonData("ManageCustomer", "CreateCustomerModel", params).then(function() {
-          }).catch(function(error) {
-              MessageToast.show(error.message || error.responseText);
+          this.readCallForManageCustomer(params);
+      },
+      
+      readCallForManageCustomer: function (filter) {
+          this.ajaxReadWithJQuery("ManageCustomer", filter).then((oData) => {
+              var companyData = Array.isArray(oData.data) ? oData.data : [oData.data];
+              this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(companyData), "CreateCustomerModel");
+              if (filter === "Initial") {
+                  var offerData = [...new Map(companyData.filter(item => item.companyName).map(item => [item.companyName.trim(), item])).values()];
+                  this.getView().setModel(new sap.ui.model.json.JSONModel(offerData), "CreateCustomerModelInitial");
+              }
+              sap.ui.core.BusyIndicator.hide();
+          }).catch((error) => {
+              sap.ui.core.BusyIndicator.hide();
+              sap.m.MessageToast.show(error.message || error.responseText);
           });
-        },
+      },
         
         // Handle Table Row Selection - Enable/Disable Buttons
         MC_onTableSelectionChange: function () {

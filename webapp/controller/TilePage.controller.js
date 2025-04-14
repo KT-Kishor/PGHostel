@@ -238,7 +238,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteLoginPage");
         },
         TileV_onpressAddCustomer: function () {
-          this.getRouter().navTo("RouteManageCustomer");
+          this.getRouter().navTo("RouteManageCustomer", { value: "ManageCustomer" });
         },
         TileV_onpressMSA: function () {
           this.getRouter().navTo("RouteMSA");

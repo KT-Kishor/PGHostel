@@ -12,8 +12,8 @@
 				<fb:filterGroupItems>
 				<fb:FilterGroupItem name="companyName" label="{i18n>companyName}" groupName="ManageCustomerGroup" visibleInFilterBar="true">
 					<fb:control>
-					<ComboBox items="{CreateCustomerModel>/}" id="MC_id_CompanyName" showClearIcon="true">
-					<core:ListItem key="{CreateCustomerModel>/companyName}" text="{CreateCustomerModel>companyName}" />
+					<ComboBox items="{CreateCustomerModelInitial>/}" id="MC_id_CompanyName" showClearIcon="true">
+						<core:ListItem key="{CreateCustomerModelInitial>/companyName}" text="{CreateCustomerModelInitial>companyName}" />
 					</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>

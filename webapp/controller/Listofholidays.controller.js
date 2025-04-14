@@ -22,7 +22,7 @@ sap.ui.define(
           this.byId("LOH_id_Holidays").setValue(new Date().getFullYear());
           // Make date pickers read-only
           this._makeDatePickersReadOnly(["LOH_id_Holidays"]);
-          // Fetch holiday data for current year using then-catch
+          // Fetch holiday data for current year 
           this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31`}).then(() => {
           // Get i18n resource bundle
           that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
@@ -34,14 +34,14 @@ sap.ui.define(
         },
         
         onSearch: function () {
-          var selectedYear = this.byId("LOH_id_Holidays").getValue();
+          var selectedYear = this.byId("LOH_id_Holidays").getValue(); // Get selected year from input field
           var currentYear = new Date().getFullYear();
-          if (selectedYear > currentYear) {
+          if (selectedYear > currentYear) { // Check if selected year is in the future
               MessageToast.show(this.i18nModel.getText("futureHolidays"));
               return;
           }
           this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`,
-          endDate: `${selectedYear}-12-31`}).then(() => {
+          endDate: `${selectedYear}-12-31`}).then(() => { // Fetch holiday data for selected year
           }).catch(function (error) {
               MessageToast.show(error.message || error.responseText);
           });
