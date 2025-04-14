@@ -11,6 +11,7 @@
         </headerContent>
         <content>
             <filterbar:FilterBar
+                id="Q_id_FilterBar"
                 useToolbar="false"
                 clear="Q_onPressClear"
                 showClearOnFB="true"
@@ -37,9 +38,10 @@
                                 }"
                                 selectionChange="Q_onBranchFilterChange"
                             >
-                                <core:Item
-                                    key="{Quotation>City}"
-                                    text="{Quotation>City}"
+                                <core:ListItem
+                                    key="{Quotation>city}"
+                                    text="{Quotation>city}"
+                                    additionalText="{Quotation>branchCode}"
                                 />
                             </ComboBox>
                         </filterbar:control>
@@ -57,7 +59,7 @@
                                 name="QIBy"
                                 editable="{Quotation>/isEditable}"
                                 items="{
-                                    path: 'Quotation>/SelfServiceData',
+                                    path: 'EmpModel>/',
                                     sorter: {
                                         path: 'Branch',
                                         descending: false,
@@ -66,9 +68,10 @@
                                     length: 1000
                                 }"
                             >
-                                <core:Item
-                                    key="{Quotation>EmployeeName}"
-                                    text="{Quotation>EmployeeName}"
+                                <core:ListItem
+                                    key="{EmpModel>EmployeeName}"
+                                    text="{EmpModel>EmployeeName}"
+                                    additionalText="{EmpModel>EmployeeID}"
                                 />
                             </ComboBox>
                         </filterbar:control>
@@ -219,7 +222,7 @@
                     <ColumnListItem
                         vAlign="Middle"
                         type="Navigation"
-                        press="onRowPress"
+                        press="Q_onRowPress"
                     >
                         <cells>
                             <Text text="{Quotation>QuotationIssuedBy}" />

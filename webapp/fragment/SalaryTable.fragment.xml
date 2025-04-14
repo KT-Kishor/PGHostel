@@ -21,13 +21,13 @@
                 <filterbar:control>
                     <ComboBox
                         showClearIcon="true"
-                        id="GS_id_FilterBranch"
+                        id="FST_id_FilterBranch"
                         name="Branch"
                         items="{
                                 path: 'Payroll>/BaseLocationData',
                                 length: 1000
                             }"
-                        change=".GS_onEnableImport"
+                        change=".FST_onEnableImport"
                     >
                         <core:Item
                             key="{Payroll>City}"
@@ -44,7 +44,7 @@
             >
                 <filterbar:control>
                     <DatePicker
-                        id="GS_id_MonthYearPicker"
+                        id="FST_id_MonthYearPicker"
                         value="{
                                 path: '',
                                 type: 'sap.ui.model.type.Date',
@@ -54,7 +54,7 @@
                             }"
                         displayFormat="MM-yyyy"
                         placeholder="MM-yyyy"
-                        change=".GS_onEnableImport"
+                        change=".FST_onEnableImport"
                     />
                 </filterbar:control>
             </filterbar:FilterGroupItem>
@@ -67,14 +67,14 @@
                 <filterbar:control>
                     <u:FileUploader
                         class="salUploadBtn"
-                        id="GS_id_ImportBtn"
+                        id="FST_id_ImportBtn"
                         buttonText="{i18n>import}"
                         sameFilenameAllowed="true"
                         buttonOnly="true"
                         fileType="XLSX,xlsx,XLS,xls"
                         style="Emphasized"
                         icon="sap-icon://sys-next-page"
-                        change="GS_onUpload"
+                        change="FST_onUpload"
                     />
                 </filterbar:control>
             </filterbar:FilterGroupItem>

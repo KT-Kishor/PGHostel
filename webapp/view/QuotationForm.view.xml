@@ -217,21 +217,21 @@
                                     />
                                     <m:ComboBox
                                         width="auto"
-                                        id="QF_id_CoCodes"
-                                        selectedKey="{Quotation>/CompanyCode}"
+                                        id="QF_id_BranchCodes"
+                                        selectedKey="{Quotation>/BaseLocationData}"
                                         items="{
                                             path: 'Quotation>/allCompanyCodeDetails',
                                             length: 1000
                                         }"
-                                        change="QF_onCompanyCodeChange"
+                                        change="QF_onBranchCodeChange"
                                         editable="{= ${Quotation>/AddCase} ? true : false }"
                                         showSecondaryValues="true"
-                                        visible="{= ${UserDetails>/Role} === 'Admin' || ${UserDetails>/Role} === 'CEO' || ${UserDetails>/Role} === 'GM' ? true : false }"
+                                        visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'CEO' ? true : false }"
                                     >
                                         <core:ListItem
-                                            key="{Quotation>CompanyCode}"
-                                            text="{Quotation>CompanyCode}"
-                                            additionalText="{Quotation>Branch}"
+                                            key="{Quotation>branchCode}"
+                                            text="{Quotation>branchCode}"
+                                            additionalText="{Quotation>city}"
                                         />
                                     </m:ComboBox>
                                     <m:Label

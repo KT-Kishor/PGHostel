@@ -99,10 +99,11 @@ sap.ui.define([
       }
     },
 
-    _fetchCommonData: async function (entityName, modelName, filter = "") {
+    _fetchCommonData: async function (entityName, modelName, filter = "", busyIds = []) {
+      busyIds.forEach(id => this.setBusyOnId(id, true));
       let url = this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;
       sap.ui.core.BusyIndicator.show(0);
-
+      var that = this;
       try {
         const data = await new Promise((resolve, reject) => {
           $.ajax({
@@ -111,40 +112,57 @@ sap.ui.define([
             headers: this.getOwnerComponent().getModel("LoginModel").getData().headers,
             data: filter,
             success: function (data) {
+              if (data) {
+                var oModel = new JSONModel(data.data);
+                this.getOwnerComponent().setModel(oModel, modelName);
+                busyIds.forEach(id => this.setBusyOnId(id, false));
+              }
               resolve(data);
-            },
+            }.bind(this),
             error: function (err) {
+              busyIds.forEach(id => that.setBusyOnId(id, false));
               reject(err);
             }
           });
         });
 
         sap.ui.core.BusyIndicator.hide();
-        if (data) {
-          var oModel = new JSONModel(data.data);
-          this.getOwnerComponent().setModel(oModel, modelName);
-        }
       } catch (error) {
+        busyIds.forEach(id => this.setBusyOnId(id, false));
         sap.ui.core.BusyIndicator.hide();
         sap.m.MessageToast.show(error.responseJSON?.message || "Technical error, please contact the administrator");
       }
     },
 
+    setBusyOnId: function (id, busy) {
+      const ctrl = this.byId(id) || sap.ui.getCore().byId(id);
+      if (ctrl) {
+        ctrl.setBusy(busy);
+      } else {
+        console.error("Invalid ID:", id);
+      }
+    },
+
     //Common read call for all the app
-    async ajaxReadWithJQuery(sUrl, filter) {
+    async ajaxReadWithJQuery(sUrl, filter, busyIds = []) {
+      var that = this;
+      // Set busy(true) on all controls
+      busyIds.forEach(id => this.setBusyOnId(id, true));
       sap.ui.core.BusyIndicator.show(0);
-      var queryString = new URLSearchParams(filter).toString();
+      const queryString = new URLSearchParams(filter).toString();
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl + "?" + queryString,
           method: "GET",
           headers: this.getView().getModel("LoginModel").getData().headers,
-          success: function (data) {
+          success: (data) => {
             sap.ui.core.BusyIndicator.hide();
+            busyIds.forEach(id => that.setBusyOnId(id, false));
             resolve(data);
           },
-          error: function (error) {
+          error: (error) => {
             sap.ui.core.BusyIndicator.hide();
+            busyIds.forEach(id => that.setBusyOnId(id, false));
             reject(error);
           }
         });
@@ -215,16 +233,16 @@ sap.ui.define([
 
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
-    
+
       // Convert and fetch values
       var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",", ""));
       var VariableData = parseFloat(oModel.getProperty("/VariablePay"));
       var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus").replaceAll(",", ""));
       var VariablePay = CTC * VariableData / 100;
-       
+
       var BasicSalary, HRA, EmployeerPF, MedicalInsurance, Gratuity, SpecailAllowance, Total;
       var DeductionPF, IncomeTax_TDS, DeductionTotal, GrossPay;
-    
+
       if (isTDSIncluded === "TDS") {
         BasicSalary = CTC * 40 / 100;
         HRA = BasicSalary * 40 / 100;
@@ -232,13 +250,13 @@ sap.ui.define([
         MedicalInsurance = BasicSalary * 40 / 100;
         Gratuity = BasicSalary * 4.81 / 100;
         SpecailAllowance = CTC - (BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity);
-        Total = BasicSalary + HRA  + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
-    
+        Total = BasicSalary + HRA + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
+
         DeductionPF = 0;
         IncomeTax_TDS = CTC * 10 / 100;
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
-    
+
       } else {
         var newCTC = CTC - VariablePay;
         BasicSalary = newCTC * 40 / 100;
@@ -248,13 +266,13 @@ sap.ui.define([
         Gratuity = BasicSalary * 4.81 / 100;
         SpecailAllowance = newCTC - (BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity);
         Total = BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity + SpecailAllowance;
-    
+
         DeductionPF = BasicSalary * 12 / 100;
         IncomeTax_TDS = CTC * 10 / 100;
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
       }
-    
+
       // Set model properties
       oModel.setProperty("/BasicSalary", Math.round(BasicSalary));
       oModel.setProperty("/HRA", Math.round(HRA));
@@ -263,7 +281,7 @@ sap.ui.define([
       oModel.setProperty("/Gratuity", Math.round(Gratuity));
       oModel.setProperty("/SpecailAllowance", Math.round(SpecailAllowance));
       oModel.setProperty("/Total", Math.round(Total));
-    
+
       oModel.setProperty("/PF", Math.round(DeductionPF));
       oModel.setProperty("/PT", Math.round(2400));
       oModel.setProperty("/TDS", Math.round(IncomeTax_TDS));
@@ -271,7 +289,7 @@ sap.ui.define([
       oModel.setProperty("/GrossPay", Math.round(GrossPay));
 
       oModel.setProperty("/TotalVariablePay", Math.round(VariablePay));
-    },    
+    },
 
     //Date picker common function 
     _makeDatePickersReadOnly: function (aIds) {
@@ -462,39 +480,107 @@ sap.ui.define([
     //common confirmation dialog box
     showConfirmationDialog: function (sTitle, sMessage, fnOnConfirm, fnOnCancel, sOkText, sCancelText) {
       var oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-  
+
       var dialog = new sap.m.Dialog({
-          title: sTitle,
-          type: "Message",
-          content: new sap.m.Text({ text: sMessage }),
-          beginButton: new sap.m.Button({
-              text: sOkText || oResourceBundle.getText("OkButton"),
-              type: "Accept",
-              press: function () {
-                  if (typeof fnOnConfirm === "function") {
-                      fnOnConfirm();
-                  }
-                  dialog.close();
-              }
-          }),
-          endButton: new sap.m.Button({
-              text: sCancelText || oResourceBundle.getText("CancelButton"),
-              type: "Reject",
-              press: function () {
-                  if (typeof fnOnCancel === "function") {
-                      fnOnCancel();
-                  } else {
-                      //sap.m.MessageToast.show(oResourceBundle.getText("ActionCancelledMessage"));
-                  }
-                  dialog.close();
-              }
-          }),
-          afterClose: function () {
-              dialog.destroy();
+        title: sTitle,
+        type: "Message",
+        content: new sap.m.Text({ text: sMessage }),
+        beginButton: new sap.m.Button({
+          text: sOkText || oResourceBundle.getText("OkButton"),
+          type: "Accept",
+          press: function () {
+            if (typeof fnOnConfirm === "function") {
+              fnOnConfirm();
+            }
+            dialog.close();
           }
+        }),
+        endButton: new sap.m.Button({
+          text: sCancelText || oResourceBundle.getText("CancelButton"),
+          type: "Reject",
+          press: function () {
+            if (typeof fnOnCancel === "function") {
+              fnOnCancel();
+            } else {
+              //sap.m.MessageToast.show(oResourceBundle.getText("ActionCancelledMessage"));
+            }
+            dialog.close();
+          }
+        }),
+        afterClose: function () {
+          dialog.destroy();
+        }
       });
-  
+
       dialog.open();
-  }
+    },
+
+    _initMessagePopover: function () {
+      var i18n = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+      this.oMessagePopover = new MessagePopover({
+        items: [
+          new MessageItem({ type: "Information", title: "P - Present", description: i18n.getText("forP") }),
+          new MessageItem({ type: "Information", title: "A - Absent", description: i18n.getText("forA") }),
+          new MessageItem({ type: "Information", title: "H - Half-Day", description: i18n.getText("forH") }),
+          new MessageItem({ type: "Information", title: "LA - Late", description: i18n.getText("forLA") }),
+          new MessageItem({ type: "Information", title: "L - Leave", description: i18n.getText("forL") }),
+          new MessageItem({ type: "Information", title: "SP - Present on Sunday", description: i18n.getText("forSP") }),
+          new MessageItem({ type: "Information", title: "SA - Absent on Sunday", description: i18n.getText("forSA") }),
+          new MessageItem({ type: "Information", title: "SH - Half-Day on Sunday", description: i18n.getText("forSH") }),
+          new MessageItem({ type: "Information", title: "SLA - Late on Sunday", description: i18n.getText("forSLA") }),
+          new MessageItem({ type: "Information", title: "SL - Leave on Sunday", description: i18n.getText("forSL") })
+        ]
+      });
+      this.getView().addDependent(this.oMessagePopover);
+    },
+
+    FST_onEnableImport: function () {
+      var branch = oCore.byId("FST_id_FilterBranch");
+      var date = oCore.byId("FST_id_MonthYearPicker");
+      if (!branch.getValue() || !date.getValue()) {
+        oCore.byId("FST_id_ImportBtn").setEnabled(false);
+      }
+      else {
+        oCore.byId("FST_id_ImportBtn").setEnabled(true);
+      }
+    },
+
+    updateDaysInColumns: function (pickerYear, pickerMonth) {
+      var daysInMonth = new Date(pickerYear, pickerMonth, 0).getDate(); // Get number of days in the month
+      for (var day = 1; day <= daysInMonth; day++) {
+        var date = new Date(pickerYear, pickerMonth - 1, day); // JS months are 0-indexed
+        var weekday = date.toLocaleString('en-US', { weekday: 'short' }); // e.g., Sun, Mon
+        var text = day + "\n" + weekday;
+        var columnId = "idDay" + day;
+        var oColumnText = sap.ui.getCore().byId(columnId);
+        if (oColumnText) {
+          oColumnText.setText(text);
+        }
+      }
+    },
+
+    resetColumnHeaders: function () {
+      for (var i = 1; i <= 31; i++) {
+        var columnId = "idDay" + i;
+        var oColumnText = sap.ui.getCore().byId(columnId);
+        if (oColumnText) {
+          oColumnText.setText(i.toString());
+        }
+      }
+    },
+
+    _commonGETCall: async function (sEntity, sModelName, oFilter, aFields) {
+      try {
+        var response = await this.ajaxReadWithJQuery(sEntity, oFilter, aFields);
+        if (response.success) {
+          this.oModel.setProperty("/" + sModelName, response.data);
+        } else {
+          MessageToast.show(this.i18nModel.getText("msgFailedToFetch"));
+        }
+      }
+      catch (e) {
+        console.error(e);
+      }
+    }
   })
 });

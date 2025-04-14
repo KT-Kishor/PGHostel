@@ -1,5 +1,13 @@
 {
-    "RowCount": 0,
+    "TableData": null,
+
+    "TableRowCount": 0,
     "ShowOnPayroll": false,
-    "ShowOnGenerate": false
+    "ShowOnGenerate": false,
+    "isSELVisible": false,
+    "isExcelMismatch": false,
+
+    "FilterBranch": null,
+    "FilterMonth": null,
+    "FilterYear": null
 }

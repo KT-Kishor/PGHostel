@@ -1,40 +1,142 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller"
-], (BaseController) => {
-    "use strict";
+  "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast", "../model/formatter", "sap/ui/core/BusyIndicator"
+], (BaseController, utils, JSONModel, MessageToast, Formatter, BusyIndicator) => {
+  "use strict";
 
-    return BaseController.extend("sap.kt.com.minihrsolution.controller.Quotation", {
-        onInit: function() {
-            this.getOwnerComponent().getRouter().getRoute("RouteQuotation").attachMatched(this._onRouteMatched, this);
-        },
+  return BaseController.extend("sap.kt.com.minihrsolution.controller.Quotation", {
+    Formatter: Formatter,
+    onInit: function () {
+      this.getOwnerComponent().getRouter().getRoute("RouteQuotation").attachMatched(this._onRouteMatched, this);
+    },
 
-        _onRouteMatched: function () {
-            this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
-        },
+    _onRouteMatched: function () {
+      var oView = this.getView();
+      this.oCore = sap.ui.getCore();
+      this.oModel = oView.getModel("Quotation");
+      this.oLoginModel = oView.getModel("LoginModel");
+      this._makeDatePickersReadOnly(["Q_id_QDate"]);
+      this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
-        onPressback: function () {
-          this.getRouter().navTo("RouteTilePage");
-        },
-  
-        onLogout: function () {
-          this.getRouter().navTo("RouteLoginPage");
-        },
+      if (!this.oLoginModel) {
+        this.getRouter().navTo("RouteLoginPage");
+        return;
+      }
+      this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
+      this.oModel.setProperty("/QuotationFormData", {});
+      this.oModel.setProperty("/MasterEdit", true);
+      if (this.oModel.getProperty("/setDefFilter")) {
+        this.getView().byId("Q_id_Status").setSelectedKey("New");
+        this.getView().byId("Q_id_IssuedBy").setValue(this.oLoginModel.getProperty("/EmployeeName"));
+        this.getView().byId("Q_id_FilterBranch").setValue(this.oLoginModel.getProperty("/Branch"));
+      }
+      var sRole = this.oLoginModel.getProperty("/Role");
+      if (sRole === "Admin" || sRole === "CEO") {
+        this.oModel.setProperty("/isEditable", true);
+      } else {
+        this.oModel.setProperty("/isEditable", false);
+      }
+      this.oModel.setProperty("/VisibleStatus", false);
+      var aData = this.oModel.getProperty("/QTableData");
+      this.oModel.setProperty("/RowCount", aData ? aData.length : 0);
+      var oBinding = this.oModel.bindList("/QTableData");
+      oBinding.attachChange(function () {
+        this.oModel.setProperty("/RowCount", oBinding.getLength());
+      });
 
-        Q_onPressDashboard: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteDashboard");
-        },
+      this._commonGETCall("BaseLocation", "BaseLocationData", {}, ["Q_id_FilterBranch"]);
+      this.Q_onSearch();
+      BusyIndicator.hide();
+    },
 
-        Q_onPressCreate: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteQuotationForm");
-        },
+    onPressback: function () {
+      this.getRouter().navTo("RouteTilePage");
+    },
 
-        Q_onFilterPinChange: function () {
-          var data = this.getView().byId("Q_id_FilterPinCode");
-          var sValue = data.getValue();
-          if (sValue.length > 6) {
-            sValue = sValue.slice(0, 6);
-            data.setValue(sValue);
+    onLogout: function () {
+      this.getRouter().navTo("RouteLoginPage");
+    },
+
+    Q_onPressDashboard: function () {
+      this.getOwnerComponent().getRouter().navTo("RouteDashboard");
+    },
+
+    Q_onPressCreate: function () {
+      BusyIndicator.show(0);
+      var today = new Date();
+      this.oModel.setProperty("/setDefFilter", false);
+      this.oModel.setProperty("/QuotationFormData/QuotationIssuedBy", this.oLoginModel.getProperty("/EmployeeName"));
+      this.oModel.setProperty("/QuotationFormData/EmployeeMobile", this.oLoginModel.getProperty("/CellNumber"));
+      this.oModel.setProperty("/QuotationFormData/BranchCode", this.oLoginModel.getProperty("/BranchCode"));
+      this.oModel.setProperty("/QuotationFormData/Branch", this.oLoginModel.getProperty("/Branch"));
+      this.oModel.setProperty("/QuotationFormData/QuotationDate", today);
+      this.oModel.setProperty("/QuotationFormData/ValidUpto", new Date(today.getFullYear(), today.getMonth() + 1, 0));
+      this.oModel.setProperty("/Status", "New");
+      this.oModel.setProperty("/AddCase", true);
+      this.oModel.setProperty("/ShowCase", false);
+      this.getRouter().navTo("RouteQuotationForm");
+    },
+
+    Q_onFilterPinChange: function () {
+      var data = this.getView().byId("Q_id_FilterPinCode");
+      var sValue = data.getValue();
+      if (sValue.length > 6) {
+        sValue = sValue.slice(0, 6);
+        data.setValue(sValue);
+      }
+    },
+
+    Q_onSearch: function () {
+      var aFilterItems = this.byId("Q_id_FilterBar").getFilterGroupItems();
+      var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
+      var params = {};
+      aFilterItems.forEach(function (oItem) {
+        var oControl = oItem.getControl();
+        var sValue = oItem.getName();
+        if (oControl && oControl.getValue()) {
+          if (sValue === "QDate") {
+            params["startDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
+            params["endDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
+          } else {
+            params[sValue] = oControl.getValue();
           }
-        },
-    });
+        }
+      });
+      this._commonGETCall("Quotations", "QTableData", params, ["Q_id_Table"]);
+    },
+
+    onPressClear: async function () {
+      var sRole = this.oLoginModel.getProperty("/Role");
+      var fValues;
+      if (sRole === "Admin" || sRole === "CEO") {
+        fValues = ["Q_id_FilterBranch", "Q_id_QDate", "Q_id_IssuedBy", "Q_id_FilterPinCode", "Q_id_Status"];
+      } else {
+        fValues = ["Q_id_QDate", "Q_id_FilterPinCode", "Q_id_Status"];
+      }
+      fValues.forEach((field) => {
+        if (field === "Q_id_QDate") {
+          var oDatePicker = oView.byId("idQDate");
+          if (oDatePicker) {
+            oDatePicker.setValue("");
+          }
+        } else {
+          var oComboBox = oView.byId(field);
+          if (oComboBox) {
+            oComboBox.setSelectedKey("");
+          }
+        }
+      });
+    },
+
+    Q_onRowPress: function (oEvent) {
+      BusyIndicator.show(0);
+      this.oModel.setProperty("/setDefFilter", false);
+      this.oModel.setProperty("/MasterEdit", false);
+      this.oModel.setProperty("/isEditable", false);
+      this.oModel.setProperty("/AddCase", false);
+      this.oModel.setProperty("/ShowCase", true);
+      var oSelectedData = oEvent.getSource().getBindingContext("Quotation").getObject();
+      this.oModel.setProperty("/QuotationFormData/", oSelectedData);
+      this.getRouter().navTo("RouteQuotationForm");
+    }
+  });
 });

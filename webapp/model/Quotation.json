@@ -2,25 +2,18 @@
     "QTableData": null,
     "BaseLocationData": null,
     "CompanyDetailsData": null,
-    "SelfServiceData": null,
+    "EmployeeData": null,
     "CompanyCodeData": null,
     "ModelList":null,
     "VariantList":null,
     "allCompanyCodeDetails": null,
-    "Records":null,
-    "PayRollRules":null,
-    "GetPayrollData":null,
+    "QuotationFormData": {},
 
     "StatusList": [
         { "key": "New", "text": "New" },
         { "key": "Booked", "text": "Booked" },
         { "key": "Cancelled", "text": "Cancelled" }
     ],
-
-    "FilterCompany": null,
-    "FilterBranch": null,
-    "FilterMonth": null,
-    "FilterYear": null,
     
     "Company": "",
     "CompanyCode": "",
@@ -67,16 +60,13 @@
     "TotalOnRoad": "",
     
     "RowCount": 0,
-    "setDefFilter": false,
+    "setDefFilter": true,
     "isEditable": true,
-    "isCoEdit": true,
     "MasterEdit": true,
     "EnableSubmit": true,
     "VisibleStatus": false,
     "ShowCase": true,
     "AddCase": true,
-    "isSELVisible": false,
-    "isExcelMismatch": false,
     "FontStyle":"helvetica",
 
     "Logo": "../image/logo.jpg",
