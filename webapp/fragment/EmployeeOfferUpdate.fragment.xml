@@ -66,12 +66,11 @@
 										<!-- Joining Date Field with DatePicker control -->
 										<m:Label text="{i18n>offerReleaseDate}" required="true" />
 											<m:DatePicker id="EOUF_id_Reldate" editable="{viewModel>/editable}" placeholder="{i18n>offerReleaseDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
-                                             value= "{employeeModel>/OfferReleaseDate}"
+                                             value= "{path:'employeeModel>/OfferReleaseDate',formatter:'.Formatter.formatDate'}"
                                              change="EOD_validateDate" class="sapUiSmallMarginBottom" valueStateText="{i18n>dateValueState}"/>
 											<m:Label text="{i18n>joiningDate}" required="true" />
-											<m:DatePicker id="EOUF_id_Joindate" editable="{viewModel>/editable}" placeholder="{i18n>joiningDate}" 
-                                            value="{employeeModel>/JoiningDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
-                                            change="EOD_validateDate" class="sapUiSmallMarginBottom disableInput" valueStateText="{i18n>dateValueState}"/>
+											<m:DatePicker id="EOUF_id_Joindate" editable="{viewModel>/editable}" placeholder="{i18n>joiningDate}" minDate="{viewModel>/maxDate}"
+                                            value="{path:'employeeModel>/JoiningDate',formatter:'.Formatter.formatDate'}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" class="sapUiSmallMarginBottom disableInput" valueStateText="{i18n>dateValueState}"/>
 									    
 										<!-- Consultant Address TextArea -->
 										<m:Label text="{i18n>consultantAddress}" required="true" />
@@ -101,78 +100,147 @@
 				<ObjectPageSection  title="{i18n>salaryDetails}">
 					<subSections>
 						<ObjectPageSubSection >
-							<blocks>
-								<!-- Salary Details Form -->
-								<f:SimpleForm 
-                                              editable="true"
-                                              layout="ColumnLayout"
-                                              columnsM="3"
-                                              columnsL="3"
-                                              columnsXL="3">
-									<f:content>
-										<!-- Basic Salary  -->
-										<m:Label text="{i18n>basicSalary}" />
-										<m:Input value="{employeeModel>/BasicSalary}" editable="false" />
-										<!-- HRA  -->
-										<m:Label text="{i18n>hra}" />
-										<m:Input value="{employeeModel>/HRA}" editable="false" />
-										<!-- Statutory Bonus  -->
-										<m:Label text="{i18n>statutoryBonus}" />
-										<m:Input value="{employeeModel>/StatutoryBonus}" editable="false" />
-										<!-- Total Monthly salary -->
-										<m:Label text="{i18n>totalMonthly}" class="boldBlackText" />
-										<m:Input value="{employeeModel>/TotalMonthly}" editable="false" />
-										<!-- Total Monthly salary annualized -->
-										<m:Label text="{i18n>totalMonthlyAnnualized}" class="boldBlackText" />
-										<m:Input value="{employeeModel>/TotalmothlyAnnualized}" editable="false" />
-										<!-- Row 2 -->
-										<!-- TDS  -->
-										<m:Label text="{i18n>tds}" />
-										<m:Input value="{employeeModel>/TDS}" editable="false"  />
-										<!-- Medical Insurance  -->
-										<m:Label text="{i18n>medicalInsurance}" />
-										<m:Input value="{employeeModel>/MedicalInsurance}" editable="false" />
-										<!-- Gratuity  -->
-										<m:Label text="{i18n>gratuity}" />
-										<m:Input value="{employeeModel>/Gratuity}" editable="false" />
-										<!-- Total Retirement Benefits -->
-										<m:Label text="{i18n>totalRetires}" class="boldBlackText" />
-										<m:Input value="{employeeModel>/TotalRetires}" editable="false" />
-										<!-- Performance Bonus  -->
-										<m:Label text="{i18n>performanceBonus}" />
-										<m:Input value="{employeeModel>/PerformanceBonus}" editable="false" />
-										<!-- Row 3 -->
-										<!-- Engagement Performance Bonus  -->
-										<m:Label text="{i18n>engagementPB}" />
-										<m:Input value="{employeeModel>/EngagementPB}" editable="false" />
-										<!-- Total Variable Pay -->
-										<m:Label text="{i18n>totalVariablePay}" class="boldBlackText" />
-										<m:Input value="{employeeModel>/TotalVariablePay}" editable="false" />
-										<!-- Cost of Company  -->
-										<m:Label text="{i18n>costOfCompany}" class="boldBlackText" />
-										<m:Input value="{employeeModel>/CostofCompany}" editable="false" />
-										<m:Label text="{i18n>ctc}" required="true"/>
-										<m:Input value="{employeeModel>/CTC}" editable="{viewModel>/editable}" id="EOUF_id_CTC" placeholder="{i18n>placeCtc}" 
-                                             liveChange="EOD_validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}" />
-										<m:Label text="{i18n>salaryType}"/>
-										<m:RadioButtonGroup id="EOUF_id_RadioButTds" columns="3"  editable="{viewModel>/editable}" select="EOD_onTDSCheckboxChange">
-												<m:RadioButton  text="{i18n>tds}" />
-												<!-- <m:RadioButton  text="{i18n>noTds}" /> -->
-												<m:RadioButton  text="{i18n>pf}" />
-										</m:RadioButtonGroup>
-										<m:Label text="{i18n>eplyePF}" class="boldBlackText" />
-                                        <m:Input value="{employeeModel>/PF}" editable="false" visible="{viewModel>/pfVisiblity}"/>
-                                        <m:Label text="{i18n>eplyrPF}" class="boldBlackText" />
-                                        <m:Input value="{employeeModel>/EPF}" editable="false" visible="{viewModel>/pfVisiblity}" />
-										<!-- Joining Bonus input field -->
-                                        <m:Label text="{i18n>joiningBonus}" class="boldBlackText" />
-										<m:Input value="{employeeModel>/JoiningBonus}" editable="{viewModel>/editable}" placeholder="{i18n>joiningBonus}" 
+							<blocks>							
+							<l:VerticalLayout  width="100%">
+										<l:BlockLayout background="Dashboard">
+										<l:BlockLayoutRow >
+												<l:BlockLayoutCell>
+													<m:FlexBox direction="Row" justifyContent="Start" wrap="Wrap">														
+														<m:VBox class="summaryBox">
+															<m:Label text="CTC" />
+															<m:Input value="{employeeModel>/CTC}" editable="{viewModel>/editable}" id="EOUF_id_CTC" placeholder="{i18n>placeCtc}" 
+                                             liveChange="EOD_validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}"/>
+														</m:VBox>
+														<m:VBox class="summaryBox">
+															<m:Label text="{i18n>joiningBonus}" />
+															<m:Input value="{employeeModel>/JoiningBonus}" editable="{viewModel>/editable}" placeholder="{i18n>joiningBonus}" 
                                             liveChange="EOD_validateAmount" maxLength="10" id="EOUF_id_Bonus" valueStateText="{i18n>ammountValuState}" />
-											<!-- Total salary -->
-										<m:Label text="{i18n>totalinr}" class="boldBlackText" />
-										<m:Input value="{employeeModel>/Total}" editable="false" />
-									</f:content>
-								</f:SimpleForm>
+														</m:VBox>
+														<m:VBox class="summaryBox">
+															<m:Label text="Variable Pay Percentage" />
+															<m:Input value="{employeeModel>/VariablePercentage}" editable="{viewModel>/editable}" placeholder="{i18n>joiningBonus}" 
+                                            liveChange="EOD_validateAmount" maxLength="2" id="EOUF_id_VariablePerc" valueStateText="{i18n>ammountValuState}" />
+														</m:VBox>
+														<m:VBox class="summaryBox">
+															<m:Label text="{i18n>salaryType}"/>
+															<m:RadioButtonGroup id="EOUF_id_RadioButTds" columns="3"  editable="{viewModel>/editable}" select="EOD_onTDSCheckboxChange">
+																	<m:RadioButton  text="{i18n>tds}" />
+																	<!-- <m:RadioButton  text="{i18n>noTds}" /> -->
+																	<m:RadioButton  text="{i18n>pf}" />
+															</m:RadioButtonGroup>
+														</m:VBox>
+													</m:FlexBox>
+												</l:BlockLayoutCell>											
+											</l:BlockLayoutRow>	
+											<l:BlockLayoutRow >
+												<l:BlockLayoutCell title="Monthly" width="2">
+													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
+														<f:content>
+															<core:Title text="Components (INR)" />
+															<m:Label text="{i18n>basicSalary}" />
+															<m:Text text="{path:'employeeModel>/BasicSalary',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+															<m:Label text="{i18n>hra}" />
+															<m:Text text="{path:'employeeModel>/HRA',formatter:'.Formatter.YearlyToMontlyConv'}"  />
+															<m:Label text="Employer PF" />
+															<m:Text text="{path:'employeeModel>/EmployerPF',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+															<m:Label text="{i18n>medicalInsurance}" />
+															<m:Text text="{path:'employeeModel>/MedicalInsurance',formatter:'.Formatter.YearlyToMontlyConv'}"  />
+															<m:Label text="{i18n>gratuity}" />
+															<m:Text text="{path:'employeeModel>/Gratuity',formatter:'.Formatter.YearlyToMontlyConv'}"  />
+															<m:Label text="Specail Allowance" />
+															<m:Text text="{path:'employeeModel>/SpecailAllowance',formatter:'.Formatter.YearlyToMontlyConv'}"  />
+															<m:Label text="{i18n>Total}" class="boldBlackText" />
+															<m:Text text="{path:'employeeModel>/Total',formatter:'.Formatter.YearlyToMontlyConv'}"  />
+
+															<core:Title text="Total Deduction" />
+															<m:Label text="Provident Fund" />
+															<m:Text text="{path:'employeeModel>/EmployeePF',formatter:'.Formatter.YearlyToMontlyConv'}"  />
+															<m:Label text="Performance Tax" />
+															<m:Text text="{path:'employeeModel>/PT',formatter:'.Formatter.YearlyToMontlyConv'}"  />
+															<m:Label text="Income Tax (TDS)" />
+															<m:Text text="{path:'employeeModel>/IncomeTax',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+															<m:Label text="Deduction Total" class="boldBlackText" />
+															<m:Text text="{path:'employeeModel>/TotalDeduction',formatter:'.Formatter.YearlyToMontlyConv'}"  />
+
+															<core:Title text="Variable Pay"/>
+															<m:Label text="Variable Pay Total" class="boldBlackText" />
+															<m:Text text="{path:'employeeModel>/VariablePay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+															
+															<core:Title text="Gross Pay"/>
+															<m:Label text="Gross Total" class="boldBlackText" />
+															<m:Text text="{path:'employeeModel>/GrossPay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+														</f:content>
+													</f:SimpleForm>
+												</l:BlockLayoutCell>
+
+												<l:BlockLayoutCell title="Yearly" width="2">
+													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
+														<f:content>											
+															<core:Title text="Components (INR)" />
+															<m:Label text="{i18n>basicSalary}" />
+															<m:Text text="INR {path:'employeeModel>/BasicSalary',formatter: '.Formatter.fromatNumber'}"/>
+															<m:Label text="{i18n>hra}" />
+															<m:Text text="INR {path:'employeeModel>/HRA',formatter: '.Formatter.fromatNumber'}"  />
+															<m:Label text="Employer PF" />
+															<m:Text text="INR {path:'employeeModel>/EmployerPF',formatter: '.Formatter.fromatNumber'}"/>
+															<m:Label text="{i18n>medicalInsurance}" />
+															<m:Text text="INR {path:'employeeModel>/MedicalInsurance',formatter: '.Formatter.fromatNumber'}"  />
+															<m:Label text="{i18n>gratuity}" />
+															<m:Text text="INR {path:'employeeModel>/Gratuity',formatter: '.Formatter.fromatNumber'}"  />
+															<m:Label text="Specail Allowance" />
+															<m:Text text="INR {path:'employeeModel>/SpecailAllowance',formatter: '.Formatter.fromatNumber'}"  />
+															<m:Label text="{i18n>Total}" class="boldBlackText" />
+															<m:Text text="INR {path:'employeeModel>/Total',formatter: '.Formatter.fromatNumber'}"  />															
+
+															<core:Title text="Total Deduction"/>
+															<m:Label text="Provident Fund" />
+															<m:Text text="INR {path:'employeeModel>/EmployeePF',formatter: '.Formatter.fromatNumber'}"/>
+															<m:Label text="Performance Tax" />
+															<m:Text text="INR {path:'employeeModel>/PT',formatter: '.Formatter.fromatNumber'}"/>
+															<m:Label text="Income Tax (TDS)" />
+															<m:Text text="INR {path:'employeeModel>/IncomeTax',formatter: '.Formatter.fromatNumber'}"/>
+															<m:Label text="Deduction Total" class="boldBlackText" />
+															<m:Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}"/>															
+
+															<core:Title text="Variable Pay"/>
+															<m:Label text="Variable Pay Total" class="boldBlackText" />
+															<m:Text text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}"/>
+
+															<core:Title text="Gross Pay"/>
+															<m:Label text="Gross Total" class="boldBlackText"/>
+															<m:Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}"/>
+														</f:content>
+													</f:SimpleForm>
+												</l:BlockLayoutCell>
+											</l:BlockLayoutRow>
+											<l:BlockLayoutRow >
+												<l:BlockLayoutCell title="Summary" width="2">
+													<m:FlexBox direction="Row" justifyContent="Start" wrap="Wrap">
+														<m:VBox class="summaryBox">
+															<m:Label text="Yearly Gross Pay" />
+															<m:Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}" />
+														</m:VBox>
+														<m:VBox class="summaryBox">
+															<m:Label text="Yearly Deduction" />
+															<m:Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}" />
+														</m:VBox>
+														<m:VBox class="summaryBox">
+															<m:Label text="Variable Pay" />
+															<m:Text text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}" />
+														</m:VBox>
+														<m:VBox class="summaryBox">
+															<m:Label text="Joining Bonus" />
+															<m:Text text="INR {path:'employeeModel>/JoiningBonus',formatter: '.Formatter.fromatNumber'}" />
+														</m:VBox>
+														<m:VBox class="summaryBox">
+															<m:Label text="Cost Of Company" />
+															<m:Text text="INR {path:'employeeModel>/CostofCompany',formatter: '.Formatter.fromatNumber'}" />
+														</m:VBox>
+													</m:FlexBox>
+												</l:BlockLayoutCell>											
+											</l:BlockLayoutRow>																															
+										</l:BlockLayout>
+									</l:VerticalLayout>								
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>

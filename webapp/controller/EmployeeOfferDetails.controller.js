@@ -6,7 +6,7 @@ sap.ui.define([
     "../model/formatter",
     "sap/ui/core/BusyIndicator"
 ],
-    function (BaseController, utils, JSONModel, MessageToast, MessageBox, jsPDF, Formatter,) {
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, jsPDF, Formatter,BusyIndicator) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOfferDetails", {
             Formatter: Formatter,
@@ -38,30 +38,23 @@ sap.ui.define([
                     "JoiningBonus": "0",
                     "BaseLocation": "",
                     "BasicSalary": "",
-                    "HRA": "",
-                    "StatutoryBonus": "",
-                    "TotalMonthly": "",
-                    "TotalmothlyAnnualized": "",
-                    "TDS": "",
-                    "PF": "",
-                    "EPF": "",
+                    "HRA": "",                   
+                    "IncomeTax": "",
+                    "EmployeePF": "",
+                    "EmployerPF": "",
                     "TotalDeduction": "",
                     "NoticePeriod": "",
                     "MedicalInsurance": "",
-                    "Gratuity": "",
-                    "TotalRetires": "",
-                    "PerformanceBonus": "",
-                    "EngagementPB": "",
-                    "TotalVariablePay": "",
+                    "Gratuity": "",                                                        
                     "CostofCompany": "",
                     "Total": "",
                     "Status": "",
                     "Currency": "INR",
-                    "EmployeeEmail": "",
-                    "Year": "",
+                    "EmployeeEmail": "",                    
                     "PinCode": "",
                     "Department":"",
-                    "VariablePay": "10",
+                    "VariablePay": "",
+                    "VariablePercentage": "10"
                 }
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false,});
@@ -94,7 +87,7 @@ sap.ui.define([
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
                     var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") &&
-                        utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_Bonus"), "ID");
+                        utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_Bonus"), "ID")  && utils._LCvalidateAmount(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
                     if (isValid) this.updateCallForEmployeeOffer(oViewModel);
                     else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -110,6 +103,8 @@ sap.ui.define([
                 var oModel = this.getView().getModel("employeeModel").getData();
                 oModel.Status = oModel.Status === "Rejected" ? "Submitted" : oModel.Status;
                 oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
+                oModel.JoiningDate = this.byId("EOUF_id_Joindate").getValue().split("/").reverse().join("-");
+                oModel.OfferReleaseDate = this.byId("EOUF_id_Reldate").getValue().split("/").reverse().join("-");
                 oModel = {
                     "data": oModel,
                     "filters": {
@@ -137,13 +132,14 @@ sap.ui.define([
                 });
                 this.ajaxReadWithJQuery("EmployeeOffer", queryString).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    var index = offerData[0].PF !== "0" ? 1 : 0;
+                    var index = offerData[0].EmployeePF !== "0" ? 1 : 0;
                     this.byId("EOUF_id_RadioButTds").setSelectedIndex(index);
                     if (index === 1) this.getView().getModel("viewModel").setProperty("/pfVisiblity", true);
                     else this.getView().getModel("viewModel").setProperty("/pfVisiblity", false);
                     this.getView().setModel(new JSONModel(offerData[0]), "employeeModel");
                     BusyIndicator.hide();
                     var oViewModel = this.getView().getModel("viewModel");
+                    oViewModel.setProperty("/maxDate", new Date(offerData[0].OfferReleaseDate));
                     if (offerData[0].Status === "OnBoarded") {
                         oViewModel.setProperty("/isVisiable", false);
                         oViewModel.setProperty("/ediBut", false);
@@ -185,7 +181,8 @@ sap.ui.define([
                     var joinDateVa = oOfferDateId === "EOD_id_Reldate" ? "EOD_id_Joindate" : "EOUF_id_Joindate";
                     releaseDate = this.byId(oOfferDateId).getDateValue();
                     this.byId(joinDateVa).setValue("");
-                    this.byId(joinDateVa).setMinDate(releaseDate);
+                    // this.byId(joinDateVa).setMinDate();
+                    this.getView().getModel("viewModel").setProperty("/maxDate", releaseDate);
                 }
             },
             EOD_ValidateCommonFields: function (oEvent) {
@@ -198,12 +195,12 @@ sap.ui.define([
             //Step validation
             validateStep: function () {
                 // Check if all fields have values
-                var allFieldsFilled = this.getView().byId("EOD_id_Name").getValue() && this.getView().byId("EOD_id_Reldate").getValue() &&
-                    this.getView().byId("EOD_id_mail").getValue() && this.getView().byId("EOD_id_Address").getValue() && this.getView().byId("EOD_id_CTC").getValue() && this.getView().byId("EOD_id_Bonus").getValue()
+                var allFieldsFilled = this.getView().byId("EOD_id_Name").getValue() && this.getView().byId("EOD_id_Reldate").getValue() && this.getView().byId("EOD_id_mail").getValue() && this.getView().byId("EOD_id_Address").getValue() && this.getView().byId("EOD_id_CTC").getValue() && this.getView().byId("EOD_id_Bonus").getValue() && this.getView().byId("EOUF_id_VariablePerc").getValue();
                 if (allFieldsFilled) {
                     // Validate each field directly
                     var isValid = utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") &&
-                        utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_Bonus"), "ID");
+                        utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_VariablePerc"), "ID");
+                        this.byId("EOD_id_WizardStep").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
@@ -221,11 +218,13 @@ sap.ui.define([
             EOD_onSubmitData: function () {
                 if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("employeeModel").getData();
+                    delete oModel.VariablePercentage;
                     oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();
+                    oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join("-");
+                    oModel.OfferReleaseDate = oModel.OfferReleaseDate.split("/").reverse().join("-");
                     oModel.Status = "Submitted";
-                    oModel = {
-                        "tableName": "EmployeeOffer",
+                    oModel = {                        
                         "data": oModel
                     };
                     this.ajaxCreateWithJQuery("EmployeeOffer", oModel).then((oData) => {
@@ -281,15 +280,14 @@ sap.ui.define([
                     this._calculateSalaryComponents(oTdsVal);
             },
             EOD_onStep2: function () {
+                this.getView().byId("EOD_id_Submit").setEnabled(true);
                 var oTdsVal = this.byId("EOD_id_RadioButTds").getAggregation("buttons")[this.byId("EOD_id_RadioButTds").getSelectedIndex()].getProperty("text");
                 this._calculateSalaryComponents(oTdsVal);
                 var oModel = this.getView().getModel("employeeModel").getData();
                 if (oModel.BaseLocation === "") this.getView().getModel("employeeModel").setProperty("/BaseLocation", this.byId("EOD_id_Location").getSelectedKey())
-                if (oModel.Designation === "") this.getView().getModel("employeeModel").setProperty("/Designation", this.byId("EOD_id_Designation").getSelectedKey())
-            },
-            EOD_onStep3: function () {
-                this.getView().byId("EOD_id_Submit").setEnabled(true);
-            },
+                    if (oModel.Designation === "") this.getView().getModel("employeeModel").setProperty("/Designation", this.byId("EOD_id_Designation").getSelectedKey())
+                this.byId("container-sap.kt.com.minihrsolution---EmployeeOfferDetails--EDO_id_WizardStepT-nextButton").setVisible(false);
+            },            
             EOUF_onPressMerge: function () {
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);

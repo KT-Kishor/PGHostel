@@ -78,7 +78,7 @@
 							<Text text="{EmployeeOfferModel>Designation}"/>
 							<Text text="{EmployeeOfferModel>BaseLocation}"/>
 							<Text text="{path: 'EmployeeOfferModel>CTC' ,formatter: '.Formatter.formatCurrencyInINRText'}"/>
-							<Text text="{EmployeeOfferModel>JoiningDate}"/>
+							<Text text="{path:'EmployeeOfferModel>JoiningDate',formatter: '.Formatter.formatDate'}"/>
 							<ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true"
                         state="{path:'EmployeeOfferModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
 						</cells>

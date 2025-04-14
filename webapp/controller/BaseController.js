@@ -233,16 +233,16 @@ sap.ui.define([
 
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
-
+    
       // Convert and fetch values
       var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",", ""));
-      var VariableData = parseFloat(oModel.getProperty("/VariablePay"));
+      var VariableData = parseFloat(oModel.getProperty("/VariablePercentage"));
       var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus").replaceAll(",", ""));
       var VariablePay = CTC * VariableData / 100;
-
+       
       var BasicSalary, HRA, EmployeerPF, MedicalInsurance, Gratuity, SpecailAllowance, Total;
       var DeductionPF, IncomeTax_TDS, DeductionTotal, GrossPay;
-
+    
       if (isTDSIncluded === "TDS") {
         BasicSalary = CTC * 40 / 100;
         HRA = BasicSalary * 40 / 100;
@@ -250,13 +250,13 @@ sap.ui.define([
         MedicalInsurance = BasicSalary * 40 / 100;
         Gratuity = BasicSalary * 4.81 / 100;
         SpecailAllowance = CTC - (BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity);
-        Total = BasicSalary + HRA + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
-
+        Total = BasicSalary + HRA  + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
+    
         DeductionPF = 0;
         IncomeTax_TDS = CTC * 10 / 100;
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
-
+    
       } else {
         var newCTC = CTC - VariablePay;
         BasicSalary = newCTC * 40 / 100;
@@ -266,30 +266,31 @@ sap.ui.define([
         Gratuity = BasicSalary * 4.81 / 100;
         SpecailAllowance = newCTC - (BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity);
         Total = BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity + SpecailAllowance;
-
+    
         DeductionPF = BasicSalary * 12 / 100;
         IncomeTax_TDS = CTC * 10 / 100;
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
       }
-
+    var CostToCompany = GrossPay + DeductionTotal + VariablePay + joiningBonus;
       // Set model properties
       oModel.setProperty("/BasicSalary", Math.round(BasicSalary));
       oModel.setProperty("/HRA", Math.round(HRA));
-      oModel.setProperty("/EmployeerPF", Math.round(EmployeerPF));
+      oModel.setProperty("/EmployerPF", Math.round(EmployeerPF));
       oModel.setProperty("/MedicalInsurance", Math.round(MedicalInsurance));
       oModel.setProperty("/Gratuity", Math.round(Gratuity));
       oModel.setProperty("/SpecailAllowance", Math.round(SpecailAllowance));
       oModel.setProperty("/Total", Math.round(Total));
-
-      oModel.setProperty("/PF", Math.round(DeductionPF));
+    
+      oModel.setProperty("/EmployeePF", Math.round(DeductionPF));
       oModel.setProperty("/PT", Math.round(2400));
-      oModel.setProperty("/TDS", Math.round(IncomeTax_TDS));
+      oModel.setProperty("/IncomeTax", Math.round(IncomeTax_TDS));
       oModel.setProperty("/TotalDeduction", Math.round(DeductionTotal));
       oModel.setProperty("/GrossPay", Math.round(GrossPay));
 
-      oModel.setProperty("/TotalVariablePay", Math.round(VariablePay));
-    },
+      oModel.setProperty("/VariablePay", Math.round(VariablePay));
+      oModel.setProperty("/CostofCompany", Math.round(CostToCompany));
+    }, 
 
     //Date picker common function 
     _makeDatePickersReadOnly: function (aIds) {

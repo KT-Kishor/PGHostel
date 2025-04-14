@@ -570,3 +570,8 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   border: none;
   margin-left: 20px;
 }
+
+.summaryBox {
+	width: 190px;
+	margin: 8px;
+}

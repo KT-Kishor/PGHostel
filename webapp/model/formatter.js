@@ -169,10 +169,20 @@ sap.ui.define([], function () {
         YearlyToMontlyConv: function (value) {
             var Data = parseFloat(value);
             if (isNaN(Data)) {
-              return "INR 0";
+              return "INR 0.00";
             }
+            var oFormatOptions = {
+                groupingBaseSize:3,
+                groupingSize:2,
+                minIntegerDigits: 1,                
+                minFractionDigits: 2,
+                maxFractionDigits: 2  
+            };
+            
+            var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
+            // return oFloatFormat.format(numericValue);
             var monthlyValue = Data / 12;
-            return "INR " +  Math.round(monthlyValue);
+            return "INR " +  oFloatFormat.format(monthlyValue);
           }
           
 
