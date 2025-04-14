@@ -10,7 +10,7 @@
 				<pages >
 					<Page>
 						<content>
-							<Wizard id="EOD_id_Wizard" finishButtonText="{i18n>review}">
+							<Wizard id="EOD_id_Wizard">
 								<WizardStep id="EOD_id_WizardStep"   complete="EOD_onStep2" title="{i18n>basicDetails}" validated="true">
 									<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4"
 			labelSpanL="4"
@@ -114,80 +114,80 @@
 									<l:VerticalLayout  width="100%">
 										<l:BlockLayout background="Dashboard">
 											<l:BlockLayoutRow >
-												<l:BlockLayoutCell title="Monthly" width="2">
+												<l:BlockLayoutCell title="{i18n>rateMonthly}" width="2">
 													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
 														<f:content>
-															<core:Title text="Components (INR)" />
+															<core:Title text="{i18n>monthlyComponents}" />
 															<Label text="{i18n>basicSalary}" />
 															<Text text="{path:'employeeModel>/BasicSalary',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															<Label text="{i18n>hra}" />
 															<Text text="{path:'employeeModel>/HRA',formatter:'.Formatter.YearlyToMontlyConv'}"  />
-															<Label text="Employer PF" />
+															<Label text="{i18n>eplyrPF}" />
 															<Text text="{path:'employeeModel>/EmployerPF',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															<Label text="{i18n>medicalInsurance}" />
 															<Text text="{path:'employeeModel>/MedicalInsurance',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<Label text="{i18n>gratuity}" />
 															<Text text="{path:'employeeModel>/Gratuity',formatter:'.Formatter.YearlyToMontlyConv'}"  />
-															<Label text="Specail Allowance" />
+															<Label text="{i18n>SpecailAllowance}" />
 															<Text text="{path:'employeeModel>/SpecailAllowance',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<Label text="{i18n>Total}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/Total',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 
-															<core:Title text="Total Deduction" />
-															<Label text="Provident Fund" />
+															<core:Title text="{i18n>totalDeductionAmount}" />
+															<Label text="{i18n>providentFund}" />
 															<Text text="{path:'employeeModel>/EmployeePF',formatter:'.Formatter.YearlyToMontlyConv'}"  />
-															<Label text="Performance Tax" />
+															<Label text="{i18n>performanceTax}" />
 															<Text text="{path:'employeeModel>/PT',formatter:'.Formatter.YearlyToMontlyConv'}"  />
-															<Label text="Income Tax (TDS)" />
+															<Label text="{i18n>incomeTax}" />
 															<Text text="{path:'employeeModel>/IncomeTax',formatter:'.Formatter.YearlyToMontlyConv'}"/>
-															<Label text="Deduction Total" class="boldBlackText" />
+															<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/TotalDeduction',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 
-															<core:Title text="Variable Pay"/>
-															<Label text="Variable Pay Total" class="boldBlackText" />
+															<core:Title text="{i18n>EmpOfferVariablePay}"/>
+															<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/VariablePay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															
-															<core:Title text="Gross Pay"/>
-															<Label text="Gross Total" class="boldBlackText" />
+															<core:Title text="{i18n>grossPay}"/>
+															<Label text="{i18n>grossPayTotal}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/GrossPay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 														</f:content>
 													</f:SimpleForm>
 												</l:BlockLayoutCell>
 
-												<l:BlockLayoutCell title="Yearly" width="2">
+												<l:BlockLayoutCell title="{i18n>yearly}" width="2">
 													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
 														<f:content>											
-															<core:Title text="Components (INR)" />
+															<core:Title text="{i18n>monthlyComponents}" />
 															<Label text="{i18n>basicSalary}" />
 															<Text text="INR {path:'employeeModel>/BasicSalary',formatter: '.Formatter.fromatNumber'}"/>
 															<Label text="{i18n>hra}" />
 															<Text text="INR {path:'employeeModel>/HRA',formatter: '.Formatter.fromatNumber'}"  />
-															<Label text="Employer PF" />
+															<Label text="{i18n>eplyrPF}" />
 															<Text text="INR {path:'employeeModel>/EmployerPF',formatter: '.Formatter.fromatNumber'}"/>
 															<Label text="{i18n>medicalInsurance}" />
 															<Text text="INR {path:'employeeModel>/MedicalInsurance',formatter: '.Formatter.fromatNumber'}"  />
 															<Label text="{i18n>gratuity}" />
 															<Text text="INR {path:'employeeModel>/Gratuity',formatter: '.Formatter.fromatNumber'}"  />
-															<Label text="Specail Allowance" />
+															<Label text="{i18n>SpecailAllowance}" />
 															<Text text="INR {path:'employeeModel>/SpecailAllowance',formatter: '.Formatter.fromatNumber'}"  />
 															<Label text="{i18n>Total}" class="boldBlackText" />
 															<Text text="INR {path:'employeeModel>/Total',formatter: '.Formatter.fromatNumber'}"  />															
 
-															<core:Title text="Total Deduction"/>
-															<Label text="Provident Fund" />
+															<core:Title text="{i18n>totalDeductionAmount}"/>
+															<Label text="{i18n>providentFund}" />
 															<Text text="INR {path:'employeeModel>/EmployeePF',formatter: '.Formatter.fromatNumber'}"/>
-															<Label text="Performance Tax" />
+															<Label text="{i18n>performanceTax}" />
 															<Text text="INR {path:'employeeModel>/PT',formatter: '.Formatter.fromatNumber'}"/>
-															<Label text="Income Tax (TDS)" />
+															<Label text="{i18n>incomeTax}" />
 															<Text text="INR {path:'employeeModel>/IncomeTax',formatter: '.Formatter.fromatNumber'}"/>
-															<Label text="Deduction Total" class="boldBlackText" />
+															<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 															<Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}"/>															
 
-															<core:Title text="Variable Pay"/>
-															<Label text="Variable Pay Total" class="boldBlackText" />
+															<core:Title text="{i18n>EmpOfferVariablePay}"/>
+															<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
 															<Text text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}"/>
 
-															<core:Title text="Gross Pay"/>
+															<core:Title text="{i18n>grossPay}"/>
 															<Label text="Gross Total" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}"/>
 														</f:content>
@@ -195,26 +195,26 @@
 												</l:BlockLayoutCell>
 											</l:BlockLayoutRow>
 											<l:BlockLayoutRow >
-												<l:BlockLayoutCell title="Summary" width="2">
+												<l:BlockLayoutCell title="{i18n>summary}" width="2">
 													<FlexBox direction="Row" justifyContent="Start" wrap="Wrap">
 														<VBox class="summaryBox">
-															<Label text="Yearly Gross Pay" />
+															<Label text="{i18n>yearlyGrossPay}" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}" />
 														</VBox>
 														<VBox class="summaryBox">
-															<Label text="Yearly Deduction" />
+															<Label text="{i18n>yearlyDeduction}" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}" />
 														</VBox>
 														<VBox class="summaryBox">
-															<Label text="Variable Pay" />
+															<Label text="{i18n>EmpOfferVariablePay}" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}" />
 														</VBox>
 														<VBox class="summaryBox">
-															<Label text="Joining Bonus" />
+															<Label text="{i18n>joiningBonus}" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/JoiningBonus',formatter: '.Formatter.fromatNumber'}" />
 														</VBox>
 														<VBox class="summaryBox">
-															<Label text="Cost Of Company" />
+															<Label text="{i18n>costOfCompany}" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/CostofCompany',formatter: '.Formatter.fromatNumber'}" />
 														</VBox>
 													</FlexBox>

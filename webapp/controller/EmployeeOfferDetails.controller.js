@@ -217,8 +217,7 @@ sap.ui.define([
             //Submit the data
             EOD_onSubmitData: function () {
                 if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
-                    var oModel = this.getView().getModel("employeeModel").getData();
-                    delete oModel.VariablePercentage;
+                    var oModel = this.getView().getModel("employeeModel").getData();                   
                     oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();
                     oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join("-");
