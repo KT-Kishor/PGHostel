@@ -27,7 +27,7 @@ sap.ui.define(
             that.Type = loginModel.getProperty("/Role");
             
             // Fetch leave data
-           await that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId });
+            await that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId });
             // Fetch leave type data
             await that._fetchCommonData("LeaveType", "leaveTypeModel", { type: "Employee" });
             
@@ -273,7 +273,7 @@ sap.ui.define(
                 if (data.data.length > 0) {
                     // Determine joining date field based on entity type
                     let joiningDateField = (entity === "Trainee") ? "JoiningDate" : "AppraisalDate";
-                    this.JoiningDate = data.data[0][joiningDateField].split("/").map(Number);
+                    this.JoiningDate = this.Formatter.formatDate(data.data[0][joiningDateField]).split("/").map(Number);
                     let addYears = [];
                     let nowYear = new Date().getFullYear();
                     let smallestYear = this.JoiningDate[2];
@@ -695,6 +695,7 @@ sap.ui.define(
             var toDateYear = sValue.split('/')[2];
             if (formDataYear === toDateYear) {
                 this.currentYear = toDateYear;
+                // this.BarDisplayFunctionAllStatus("All In One Leave", this.userId + "/" + toDateYear);
             }
             this.onLiveChange();
             return !!this.getView().getModel("LeaveTempModel").getProperty("/ToDate");
