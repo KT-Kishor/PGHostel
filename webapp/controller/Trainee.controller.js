@@ -97,6 +97,7 @@ sap.ui.define([
             //Trainee table selection change function for button visibility
             T_onTableSelectionChange: function (oEvent) {
                 var oSelectedItem = oEvent.getParameter("listItem");
+                this.SelectedData = oSelectedItem.getBindingContext("traineeModel").getObject();
                 if (oSelectedItem) {
                     var sStatus = oSelectedItem.getBindingContext("traineeModel").getProperty("Status");
                     var isDisabled = sStatus === "OnBoarded" || sStatus === "Rejected";
@@ -128,9 +129,9 @@ sap.ui.define([
                 this.ajaxUpdateWithJQuery("Trainee", oModelOffer).then((oData) => {
                     MessageToast.show(that.i18nModel.getText(text))
                     BusyIndicator.hide();
-                    if (oData.results) {
-                        that.readCallForTrainee("");
-                    }
+                    // if (oData.results) {
+                    //     that.readCallForTrainee("");
+                    // }
                 }).catch((oError) => {
                     BusyIndicator.hide();
                     MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
@@ -188,24 +189,28 @@ sap.ui.define([
                 this.byId("T_id_TraineeTable").removeSelections(true);
             },
             //Onboard trainee function
-            OTF_onPressOnboard: function () {
+            OTF_onPressOnboard: function (oTraineeData) {
                 try {
                     if (utils._LCvalidateEmail(sap.ui.getCore().byId("OTF_id_TraineeMail"), "ID")) {
-                        var oContext = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel");
-                        // Update UI Model
-                        oContext.getModel().setProperty(oContext.getPath() + "/Status", "OnBoarded");
-                        // Prepare Data for Update Call
-                        this.updateCallForTrainee(oContext.getObject(), "traineeOnboardSucess");
-                        this.TOb_oDialog.close();
+                        var oTraineeData = this.SelectedData;
+                        oTraineeData.Status = "OnBoarded"; 
+                        this.updateCallForTrainee(oTraineeData, "traineeOnboardSucess");
+                        this.getView().getModel("traineeModel").setProperty("/Status", "OnBoarded");
+                        this.OTF_onPressClose();
+                        // Clear selection and disable buttons
+                        this.byId("T_id_TraineeTable").removeSelections(true);
                         this.byId("T_id_OnboardBtn").setEnabled(false);
                         this.byId("T_id_RejectBtn").setEnabled(false);
                     } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
-                } catch {
+                } catch (e) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
+            
+            
+            
             //Close the  onboarding dialog function
             OTF_onPressClose: function () {
                 sap.ui.getCore().byId("OTF_id_TraineeMail").setValueState("None");
