@@ -23,7 +23,8 @@
 			 items="{CreateCustomerModel>/}"
 			 growing="true"
              growingThreshold="100"
-             alternateRowColors="true">
+             alternateRowColors="true"
+			 selectionChange="MC_onTableSelectionChange">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title id="MC_id_Title" text="{i18n>custDetails} ({= ${CreateCustomerModel>/}.length })"/>

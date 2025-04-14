@@ -25,62 +25,49 @@ sap.ui.define(
             var loginModel = that.getOwnerComponent().getModel("LoginModel");
             that.userId = loginModel.getProperty("/EmployeeID");
             that.Type = loginModel.getProperty("/Role");
-            
+            that.currentYear = new Date().getFullYear();
             // Fetch leave data
             await that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId });
             // Fetch leave type data
             await that._fetchCommonData("LeaveType", "leaveTypeModel", { type: "Employee" });
-            
             // Set up i18n and header
             that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
             that.getView().getModel("LoginModel").setProperty("/HeaderName", that.i18nModel.getText("leaveApplication"));
-            
             // Initialize UI controls visibility
             that.byId("AL_id_LeaveBarChart").setVisible(false);
             that.byId("AL_id_LeaveTableStandard").setVisible(true);
             that.byId("AL_id_leavefilterbar").setVisible(true);
             that.byId("AL_id_LeaveYear").setValue(new Date().getFullYear());
-
             // Set up model for selected type
             var oJson = new JSONModel({ selectedType: 1 })
             that.getView().setModel(oJson, "selectedModel");
-            
             // Fetch holidays data
             await that._fetchCommonData("ListOfHolidays", "HolidayModel", {});   
             // Display initial bar chart
-            await that.BarDisplayFunction("All In One Leave", that.userId);
-        
+            await that.BarDisplayFunction("All In One Leave",  that.currentYear, that.userId);
             // Fetch additional data based on user type
             if (that.Type !== "Trainee") {
-                that.MonthBarDisplayFunction("All In One Leave", that.userId);
+                that.MonthBarDisplayFunction("All In One Leave",  that.currentYear,  that.userId);
                 await that.YearlyBarDisplayFunction(that.userId);
                 await  that.EmployeeDetReadCall("EmployeeDetails", {"EmployeeID": that.userId});
             } else {
                 await that.EmployeeDetReadCall("Trainee", {"TraineeID": that.userId});
             }
-        
             // Set up model for monthly bar chart
             var barDataModel = new JSONModel({ Name: 'line', type: 'column', AllStatus: 'column' });
             that.getView().setModel(barDataModel, "MonthlyBar");
         },
         
         // Function to display bar chart data
-        BarDisplayFunction: async function (leaveType, userId) {
-            let jsonData = {
-                "data": {
-                    "EmployeeID": userId,
-                    "selectYear": new Date().getFullYear(),
-                    "LeaveType": leaveType
-                }
-            };
-        
+        BarDisplayFunction: async function (leaveType,selectedYear,userId) {
+          let jsonData = {"data": {"EmployeeID": userId,"selectYear": selectedYear,"LeaveType": leaveType}
+        };
             try {
                 // Show busy indicator
                 sap.ui.core.BusyIndicator.show(0);
                 // Fetch data from backend
-                let oData = await this.ajaxCreateWithJQuery("/LeavesFirstBarChart", jsonData);
+                let oData = await this.ajaxCreateWithJQuery("LeavesFirstBarChart", jsonData);
                 sap.ui.core.BusyIndicator.hide();
-        
                 // Filter data for first chart
                 let firstChartData = oData.results.filter(item => 
                     ["Submitted", "Approved", "Quota"].includes(item.LeaveStatus)
@@ -89,18 +76,16 @@ sap.ui.define(
                 let secondChartData = oData.results.filter(item => 
                     ["Submitted", "Approved", "All Quota"].includes(item.LeaveStatus)
                 );
-        
                 // Set models for charts
                 let oFirstChartModel = new JSONModel({ chartData: firstChartData });
                 this.getView().setModel(oFirstChartModel, "firstLeaveData");
-        
+
                 let oSecondChartModel = new JSONModel({ chartData: secondChartData });
                 this.getView().setModel(oSecondChartModel, "secondLeaveData");
-        
+
                 // Configure charts
                 this._configureFirstChart("AL_id_VizFrame6", oFirstChartModel, "Current Available Leave Quota");
                 this._configureSecondChart("AL_id_VizFrameAll", oSecondChartModel, "Yearly Leave Quota");
-        
             } catch (error) {
                 sap.ui.core.BusyIndicator.hide();
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -113,17 +98,10 @@ sap.ui.define(
             if (!oVizFrame) return; 
             oVizFrame.setModel(oModel);
             oVizFrame.setVizProperties({
-                legend: {
-                    title: { visible: true, text: "All Measures" }
-                },
-                title: {
-                    visible: true,
-                    text: titleText
-                },
-                plotArea: {
-                    dataPointStyle: {
-                        rules: [
-                            {
+                legend: {title: { visible: true, text: "All Measures" }},
+                title:  {visible: true, text: titleText},
+                plotArea: {dataPointStyle: {
+                rules: [    {
                                 dataContext: { LeaveType: "Submitted" },
                                 properties: { color: "#fc7b03" },
                                 "displayName": "Submitted"
@@ -156,16 +134,10 @@ sap.ui.define(
             if (!oVizFrame) return; 
             oVizFrame.setModel(oModel);
             oVizFrame.setVizProperties({
-                legend: {
-                    title: { visible: true, text: "All Measures" }
-                },
-                title: {
-                    visible: true,
-                    text: titleText
-                },
-                plotArea: {
-                    dataPointStyle: {
-                        rules: [
+                legend: {title: { visible: true, text: "All Measures" }},
+                title:  {visible: true, text: titleText},
+                plotArea: { dataPointStyle: {
+                   rules: [
                             {
                                 dataContext: { LeaveType: "Submitted" },
                                 properties: { color: "#fc7b03" },
@@ -194,25 +166,18 @@ sap.ui.define(
         },
         
         // Function to display monthly bar chart
-        MonthBarDisplayFunction: async function (leaveType, userId) {
-            let jsonData = { "data": { "EmployeeID": userId, "selectYear": new Date().getFullYear(), "LeaveType": leaveType } };
+        MonthBarDisplayFunction: async function (leaveType,selectedYear,userId) {
+            let jsonData = { "data": { "EmployeeID": userId, "selectYear":selectedYear, "LeaveType": leaveType } };
             try {
                 sap.ui.core.BusyIndicator.show(0);
-                let oData = await this.ajaxCreateWithJQuery("/MonthyBarChart", jsonData);
+                let oData = await this.ajaxCreateWithJQuery("MonthyBarChart", jsonData);
                 sap.ui.core.BusyIndicator.hide();
                 let oLeaveModel = new JSONModel({ chartData: oData.results });
                 this.getView().setModel(oLeaveModel, "MonthleaveData");
                 var oVizFrame = this.getView().byId("AL_id_VizFrame");
                 oVizFrame.setVizProperties({
-                    legend: {
-                        title: {
-                            visible: true,
-                        }
-                    },
-                    title: {
-                        visible: true,
-                        text: "Monthly Approved Leave"
-                    }
+                    legend: { title: { visible: true}},
+                    title: {visible: true, text: "Monthly Approved Leave"}
                 });
                 oVizFrame.setModel(oLeaveModel);
                 var oPopOver = this.getView().byId("AL_id_PopOver");
@@ -228,7 +193,7 @@ sap.ui.define(
             let jsonData = { "data": { "EmployeeID": userId } };
             try {
                 sap.ui.core.BusyIndicator.show(0);
-                let oData = await this.ajaxCreateWithJQuery("/YearlyBarChart", jsonData);
+                let oData = await this.ajaxCreateWithJQuery("YearlyBarChart", jsonData);
                 sap.ui.core.BusyIndicator.hide();
                 let rawData = oData.results;
                 let result = [];
@@ -245,15 +210,8 @@ sap.ui.define(
                 this.getView().setModel(oLeaveModel, "YearleaveData");
                 var oVizFrame = this.getView().byId("AL_id_VizFrameYear");
                 oVizFrame.setVizProperties({
-                    legend: {
-                        title: {
-                            visible: true,
-                        }
-                    },
-                    title: {
-                        visible: true,
-                        text: "Yearly Approved Leave"
-                    }
+                    legend: { title: { visible: true}},
+                    title:  { visible: true, text: "Yearly Approved Leave"}
                 });
                 oVizFrame.setModel(oLeaveModel);
                 var oPopOver = this.getView().byId("AL_id_PopOver");
@@ -269,28 +227,28 @@ sap.ui.define(
             sap.ui.core.BusyIndicator.show(0);
             try {
                 let data = await this.ajaxReadWithJQuery(entity, value);
-                sap.ui.core.BusyIndicator.hide();
-                if (data.data.length > 0) {
-                    // Determine joining date field based on entity type
+                if (data && data.data && data.data.length > 0) {
                     let joiningDateField = (entity === "Trainee") ? "JoiningDate" : "AppraisalDate";
                     this.JoiningDate = this.Formatter.formatDate(data.data[0][joiningDateField]).split("/").map(Number);
                     let addYears = [];
                     let nowYear = new Date().getFullYear();
                     let smallestYear = this.JoiningDate[2];
                     let length = nowYear - smallestYear;
-                    // Create array of years from joining to current year
                     for (let i = 0; i <= length; i++) {
                         addYears.push(smallestYear + i);
                     }
                     let yearModel = new JSONModel({ items: addYears });
                     this.getView().setModel(yearModel, "YearModel");
+                } else {
+                    MessageToast.show("No employee data found or joining date is missing.");
                 }
             } catch (error) {
-                sap.ui.core.BusyIndicator.hide();
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+            } finally {
+                sap.ui.core.BusyIndicator.hide(); // Hide busy indicator
             }
         },
-    
+         
         // Chart type change handlers
         AL_onPressPie: function () {
             this.getView().getModel("MonthlyBar").setProperty("/type", "pie");
@@ -304,18 +262,18 @@ sap.ui.define(
             this.getView().getModel("MonthlyBar").setProperty("/type", "line");
         },
 
-        // Leave type change handler
-        AL_onChangeLeaveType: function (oEvent) {
+         // Leave type change handler
+         AL_onChangeLeaveType: function (oEvent) {
             var year = this.byId("AL_id_LeaveYear").getValue()
-            this.BarDisplayFunction(oEvent.getSource().getValue(), this.userId, year);
-            this.MonthBarDisplayFunction(oEvent.getSource().getValue(), this.userId, year);
+            this.BarDisplayFunction(oEvent.getSource().getValue(), year, this.userId);
+            this.MonthBarDisplayFunction(oEvent.getSource().getValue(), year, this.userId);
         },
 
         // Year change handler
         AL_onChangeYears: function (oEvent) {
             var type = this.byId("AL_id_TypeOfLeave").getValue();
-            this.BarDisplayFunction(type, this.userId, oEvent.getSource().getValue());
-            this.MonthBarDisplayFunction(type, this.userId, oEvent.getSource().getValue());
+            this.BarDisplayFunction(type, oEvent.getSource().getValue(), this.userId);
+            this.MonthBarDisplayFunction(type, oEvent.getSource().getValue(), this.userId);
         },
 
         // Show bar chart view
@@ -396,22 +354,18 @@ sap.ui.define(
             var holidaySet = new Set(holidays.map(function (holiday) {
                 return new Date(holiday.Date).toDateString(); 
             }));
-
             function parseDate(dateStr) {
                 var parts = dateStr.split('/');
                 return new Date(parts[2], parts[1] - 1, parts[0]);
             }
-        
             var appliedLeaves = [];
             var yearStart = new Date(new Date().getFullYear(), 0, 1);
             var yearEnd = new Date(new Date().getFullYear(), 11, 31);
-        
             // Process leave records
             leaveRecords.forEach(function (record) {
                 if (record["Status"] !== "Rejected") {
                     var fromDate = parseDate(that.Formatter.formatDate(record.fromDate));
-                    var toDate = parseDate(that.Formatter.formatDate(record.toDate));
-                
+                    var toDate = parseDate(that.Formatter.formatDate(record.toDate));    
                     if (fromDate && toDate) {
                         // Create date range for each day of leave
                         for (var d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
@@ -423,21 +377,17 @@ sap.ui.define(
                     }
                 }
             });
-        
             var appliedLeavesSet = new Set(appliedLeaves.map(leave => leave.date.toDateString()));
-        
             // Mark each day of the year with appropriate type
             for (var d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
                 var day = d.getDay();
                 var isWeekend = (day === 0 || day === 6);
                 var isHoliday = holidaySet.has(d.toDateString());
                 var isAppliedLeave = appliedLeavesSet.has(d.toDateString());
-        
                 var dateRange = new sap.ui.unified.DateTypeRange({
                     startDate: new Date(d),
                     endDate: new Date(d)
                 });
-        
                 // Set type and tooltip based on day type
                 if (isHoliday) {
                     dateRange.setType("Type04");
@@ -659,7 +609,6 @@ sap.ui.define(
         isLeaveAlreadyApplied: function (fromDate, toDate) {
             var from = this.onFormatDate(fromDate);
             var to = this.onFormatDate(toDate);
-
             // Check each day in the range
             for (var d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
                 if (this.appliedLeavesSet.has(d.toDateString())) {

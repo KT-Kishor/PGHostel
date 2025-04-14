@@ -16,7 +16,6 @@ sap.ui.define([
         this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {}); // Fetch customer data
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
         this.byId("MC_id_CustTable").removeSelections(true); // Clear table selection
-        this.MC_onTableSelectionChange(); // Update button states
         this.getView().getModel("LoginModel").setProperty("/HeaderName", 
         this.i18nModel.getText("headerCustomer")); // Set header name
         this.MC_onSearch(); // Search customer table
@@ -285,52 +284,34 @@ sap.ui.define([
           var oTable = this.byId("MC_id_CustTable");
           var oSelectedItem = oTable.getSelectedItem();
           if (!oSelectedItem) {
-            MessageBox.error(this.i18nModel.getText("deleteCustomer"));
-            return;
+              MessageBox.error(this.i18nModel.getText("deleteCustomer"));
+              return;
           }
           var sCustomerID = oSelectedItem.getBindingContext("CreateCustomerModel").getProperty("ID");
           var that = this;
-          // Confirm Deletion Dialog
-          var oManageCustomerDialog = new sap.m.Dialog({
-            title: this.i18nModel.getText("msgBoxConfirm"),
-            type: sap.m.DialogType.Message,
-            icon: "sap-icon://warning",
-            state: sap.ui.core.ValueState.Warning,
-            content: new sap.m.Text({
-              text: this.i18nModel.getText("confirmDeleteCustomerMessage")
-            }),
-            beginButton: new sap.m.Button({
-              text: this.i18nModel.getText("OkButton"),
-              type: sap.m.ButtonType.Accept,
-              press: function () {
-                oManageCustomerDialog.close();
-                // Send delete request
-                that.ajaxDeleteWithJQuery("/ManageCustomer", { filters: { ID: sCustomerID } }).then(() => {
-                  MessageToast.show(that.i18nModel.getText("msgCustomerDeleteSuccess"));
-                  that.MC_onClear();
-                  that._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
-                  that.byId("MC_id_AddCustomer").setEnabled(true);
-                }).catch((error) => {
-                  MessageToast.show(error.responseText);
-                });
+          // Use common confirmation dialog
+          this.showConfirmationDialog(
+              this.i18nModel.getText("msgBoxConfirm"), // Dialog title
+              this.i18nModel.getText("confirmDeleteCustomerMessage"), // Dialog message
+              // onConfirm callback
+              function () {
+                  that.ajaxDeleteWithJQuery("/ManageCustomer", { filters: { ID: sCustomerID } }).then(() => {
+                      MessageToast.show(that.i18nModel.getText("msgCustomerDeleteSuccess"));
+                      that.MC_onClear();
+                      that._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
+                      that.byId("MC_id_AddCustomer").setEnabled(true);
+                  }).catch((error) => {
+                      MessageToast.show(error.responseText);
+                  });
+              },
+              // onCancel callback
+              function () {
+                  that.byId("MC_id_CustTable").removeSelections(true);
+                  that.MC_onTableSelectionChange();
               }
-            }),
-            endButton: new sap.m.Button({
-              text: this.i18nModel.getText("CancelButton"),
-              type: sap.m.ButtonType.Reject,
-              press: function () {
-                oManageCustomerDialog.close();
-                that.byId("MC_id_CustTable").removeSelections(true);
-                that.MC_onTableSelectionChange();
-              }
-            }),
-            afterClose: function () {
-              oManageCustomerDialog.destroy();
-            }
-          });
-          oManageCustomerDialog.open();
+          );
         },
-
+      
         // Clear Customer Form Selection
         MC_onClear: function () {
           var oComboBox = this.getView().byId("MC_id_CompanyName");
