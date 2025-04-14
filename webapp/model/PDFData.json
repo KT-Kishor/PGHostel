@@ -23,9 +23,9 @@
             "Text": "(Branch of Company)"
         }
     ],
-    "MonthlyComponents": [
+    "YearlyComponents": [
         {
-            "Title": "TOTAL: Monthly Components",
+            "Title": "TOTAL: Yearly Components",
             "Text": "Amount Value"
         },
         {
@@ -37,21 +37,11 @@
             "Text": "Amount Value"
         },
         {
-            "Title": "Statutory Bonus",
+            "Title": "Employer PF",
             "Text": "Amount Value"
         },
         {
-            "Title": "TOTAL: Monthly",
-            "Text": "Amount Value"
-        }
-    ],
-    "Retrials": [
-        {
-            "Title": "TOTAL: Retrials",
-            "Text": "Amount Value"
-        },
-        {
-            "Title": "Medical Insurance Premium",
+            "Title": "Medical Insurance",
             "Text": "Amount Value"
         },
         {
@@ -59,35 +49,37 @@
             "Text": "Amount Value"
         }
     ],
-    "VariableComponents": [
-        {
-            "Title": "TOTAL: Variable Components",
-            "Text": "Amount Value"
-        },
-        {
-            "Title": "Performance Bonus",
-            "Text": "Amount Value"
-        },
-        {
-            "Title": "Engagement PB (paid monthly) @ 100%",
-            "Text": "Amount Value"
-        }
-    ],
-    "TotalDeductions": [
+    "Deductions": [
         {
             "Title": "TOTAL: Deductions",
             "Text": "Amount Value"
         },
         {
-            "Title": "TDS",
+            "Title": "Income Tax (TDS)",
             "Text": "Amount Value"
         },
         {
-            "Title": "PF",
+            "Title": "Provident Fund",
             "Text": "Amount Value"
         },
         {
-            "Title": "EPF",
+            "Title": "Performance Tax",
+            "Text": "Amount Value"
+        }
+    ],
+    "VariableComponents": [
+        {
+            "Title": "TOTAL: Variable Pay",
+            "Text": "Amount Value"
+        }
+    ],
+    "GrossPay": [
+        {
+            "Title": "TOTAL: Gross Pay Yearly",
+            "Text": "Amount Value"
+        },
+        {
+            "Title": "TOTAL: Gross Pay Monthly",
             "Text": "Amount Value"
         }
     ],

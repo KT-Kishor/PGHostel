@@ -334,29 +334,29 @@ sap.ui.define([], function () {
                 doc.setLineWidth(1);
                 doc.line(margin, headerY, pageWidth - margin, headerY);
 
-                let monthlyCompTitleY = headerY + 5;
+                let yearlyCompTitleY = headerY + 5;
                 doc.setFont("helvetica", "bold");
-                let monthlyCompTitle = "Monthly Components (in INR)";
-                let monthlyCompTitleWidth = doc.getTextWidth(monthlyCompTitle);
-                let monthlyCompTitleX = (pageWidth - monthlyCompTitleWidth) / 2;
-                let monthlyCompTitleBotLineY = monthlyCompTitleY + 2;
-                doc.line(margin, monthlyCompTitleBotLineY, pageWidth - margin, monthlyCompTitleBotLineY);
+                let yearlyCompTitle = "Yearly Components";
+                let yearlyCompTitleWidth = doc.getTextWidth(yearlyCompTitle);
+                let yearlyCompTitleX = (pageWidth - yearlyCompTitleWidth) / 2;
+                let yearlyCompTitleBotLineY = yearlyCompTitleY + 2;
+                doc.line(margin, yearlyCompTitleBotLineY, pageWidth - margin, yearlyCompTitleBotLineY);
                 doc.setLineWidth(0.5);
                 doc.setFillColor(191, 191, 191);
-                doc.rect(margin, headerY, maxWidth, monthlyCompTitleBotLineY - headerY, 'F');
-                doc.text(monthlyCompTitle, monthlyCompTitleX, monthlyCompTitleY);
+                doc.rect(margin, headerY, maxWidth, yearlyCompTitleBotLineY - headerY, 'F');
+                doc.text(yearlyCompTitle, yearlyCompTitleX, yearlyCompTitleY);
 
                 doc.setFont("helvetica", "normal");
-                var monthlyComponents = oModel.MonthlyComponents;
-                let monCurrentY = monthlyCompTitleBotLineY + 5;  // Initial Y position
+                var yearlyComponents = oModel.YearlyComponents;
+                let monCurrentY = yearlyCompTitleBotLineY + 5;  // Initial Y position
 
-                for (let i = 1; i <= monthlyComponents.length-1; i++) {
+                for (let i = 1; i <= yearlyComponents.length-1; i++) {
 
                     // Draw Title on the left
-                    doc.text(monthlyComponents[i].Title, margin + 3, monCurrentY);
+                    doc.text(yearlyComponents[i].Title, margin + 3, monCurrentY);
 
                     // Draw Text on the right, aligned to the right side
-                    let compText = monthlyComponents[i].Text;
+                    let compText = yearlyComponents[i].Text;
                     let compTextWidth = doc.getTextWidth(compText);
                     let compTextX = pageWidth - compTextWidth - margin - 3;
                     doc.text(compText, compTextX, monCurrentY);
@@ -371,8 +371,8 @@ sap.ui.define([], function () {
 
                 doc.setFont("helvetica", "bold");
                 let monComp0Y = monCurrentY;
-                doc.text(monthlyComponents[0].Title, margin + 3, monComp0Y);
-                let monComp0Text = monthlyComponents[0].Text;
+                doc.text(yearlyComponents[0].Title, margin + 3, monComp0Y);
+                let monComp0Text = yearlyComponents[0].Text;
                 let monComp0TextWidth = doc.getTextWidth(monComp0Text);
                 let monComp0TextX = pageWidth - monComp0TextWidth - margin - 3;
                 doc.text(monComp0Text, monComp0TextX, monComp0Y);
@@ -380,60 +380,60 @@ sap.ui.define([], function () {
                 doc.setLineWidth(1);
                 doc.line(margin, monComp0BotLineY, pageWidth - margin, monComp0BotLineY);
 
-                let retrialsTitleY = monComp0BotLineY + 5;
-                let retrialsTitle = "Retrials & Other Benefits (in INR)";
-                let retrialsTitleWidth = doc.getTextWidth(retrialsTitle);
-                let retrialsTitleX = (pageWidth - retrialsTitleWidth) / 2;
-                let retrialsTitleBotLineY = retrialsTitleY + 2;
-                doc.line(margin, retrialsTitleBotLineY, pageWidth - margin, retrialsTitleBotLineY);
+                let deductionsTitleY = monComp0BotLineY + 5;
+                let deductionsTitle = "Deductions";
+                let deductionsTitleWidth = doc.getTextWidth(deductionsTitle);
+                let deductionsTitleX = (pageWidth - deductionsTitleWidth) / 2;
+                let deductionsTitleBotLineY = deductionsTitleY + 2;
+                doc.line(margin, deductionsTitleBotLineY, pageWidth - margin, deductionsTitleBotLineY);
                 doc.setLineWidth(0.5);
                 doc.setFillColor(191, 191, 191);
-                doc.rect(margin, monComp0BotLineY, maxWidth, retrialsTitleBotLineY - monComp0BotLineY, 'F');
-                doc.text(retrialsTitle, retrialsTitleX, retrialsTitleY);
+                doc.rect(margin, monComp0BotLineY, maxWidth, deductionsTitleBotLineY - monComp0BotLineY, 'F');
+                doc.text(deductionsTitle, deductionsTitleX, deductionsTitleY);
 
                 doc.setFont("helvetica", "normal");
-                var retrials = oModel.Retrials;
-                let retCurrentY = retrialsTitleBotLineY + 5;  // Initial Y position
+                var deductions = oModel.Deductions;
+                let dedCurrentY = deductionsTitleBotLineY + 5;  // Initial Y position
 
-                for (let i = 1; i <= retrials.length-1; i++) {
+                for (let i = 1; i <= deductions.length-1; i++) {
 
                     // Draw Title on the left
-                    doc.text(retrials[i].Title, margin + 3, retCurrentY);
+                    doc.text(deductions[i].Title, margin + 3, dedCurrentY);
 
                     // Draw Text on the right, aligned to the right side
-                    let compText = retrials[i].Text;
+                    let compText = deductions[i].Text;
                     let compTextWidth = doc.getTextWidth(compText);
                     let compTextX = pageWidth - compTextWidth - margin - 3;
-                    doc.text(compText, compTextX, retCurrentY);
+                    doc.text(compText, compTextX, dedCurrentY);
 
                     // Draw a line under each item
-                    let botLineY = retCurrentY + 2;
+                    let botLineY = dedCurrentY + 2;
                     doc.line(margin, botLineY, pageWidth - margin, botLineY);
 
                     // Increment Y position for the next item
-                    retCurrentY = botLineY + 5;
+                    dedCurrentY = botLineY + 5;
                 }
 
                 doc.setFont("helvetica", "bold");
-                let retrials0Y = retCurrentY;
-                doc.text(retrials[0].Title, margin + 3, retrials0Y);
-                let retrials0Text = retrials[0].Text;
-                let retrials0TextWidth = doc.getTextWidth(retrials0Text);
-                let retrials0TextX = pageWidth - retrials0TextWidth - margin - 3;
-                doc.text(retrials0Text, retrials0TextX, retrials0Y);
-                let retrials0BotLineY = retrials0Y + 2;
+                let deductions0Y = dedCurrentY;
+                doc.text(deductions[0].Title, margin + 3, deductions0Y);
+                let deductions0Text = deductions[0].Text;
+                let deductions0TextWidth = doc.getTextWidth(deductions0Text);
+                let deductions0TextX = pageWidth - deductions0TextWidth - margin - 3;
+                doc.text(deductions0Text, deductions0TextX, deductions0Y);
+                let deductions0BotLineY = deductions0Y + 2;
                 doc.setLineWidth(1);
-                doc.line(margin, retrials0BotLineY, pageWidth - margin, retrials0BotLineY);
+                doc.line(margin, deductions0BotLineY, pageWidth - margin, deductions0BotLineY);
 
-                let varCompTitleY = retrials0BotLineY + 5;
-                let varCompTitle = "Variable Components (in INR)";
+                let varCompTitleY = deductions0BotLineY + 5;
+                let varCompTitle = "Variable Components";
                 let varCompTitleWidth = doc.getTextWidth(varCompTitle);
                 let varCompTitleX = (pageWidth - varCompTitleWidth) / 2;
                 let varCompTitleBotLineY = varCompTitleY + 2;
                 doc.line(margin, varCompTitleBotLineY, pageWidth - margin, varCompTitleBotLineY);
                 doc.setLineWidth(0.5);
                 doc.setFillColor(191, 191, 191);
-                doc.rect(margin, retrials0BotLineY, maxWidth, varCompTitleBotLineY - retrials0BotLineY, 'F');
+                doc.rect(margin, deductions0BotLineY, maxWidth, varCompTitleBotLineY - deductions0BotLineY, 'F');
                 doc.text(varCompTitle, varCompTitleX, varCompTitleY);
 
                 doc.setFont("helvetica", "normal");
@@ -470,51 +470,50 @@ sap.ui.define([], function () {
                 doc.setLineWidth(1);
                 doc.line(margin, varComp0BotLineY, pageWidth - margin, varComp0BotLineY);
 
-                let deductionTitleY = varComp0BotLineY + 5;
-                let deductionTitle = "Deductions (in INR)";
-                let deductionTitleWidth = doc.getTextWidth(deductionTitle);
-                let deductionTitleX = (pageWidth - deductionTitleWidth) / 2;
-                let deductionTitleBotLineY = deductionTitleY + 2;
-                doc.line(margin, deductionTitleBotLineY, pageWidth - margin, deductionTitleBotLineY);
+                let grossTitleY = varComp0BotLineY + 5;
+                let grossTitle = "Gross Pay";
+                let grossTitleWidth = doc.getTextWidth(grossTitle);
+                let grossTitleX = (pageWidth - grossTitleWidth) / 2;
+                let grossTitleBotLineY = grossTitleY + 2;
+                doc.line(margin, grossTitleBotLineY, pageWidth - margin, grossTitleBotLineY);
                 doc.setLineWidth(0.5);
                 doc.setFillColor(191, 191, 191);
-                doc.rect(margin, varComp0BotLineY, maxWidth, deductionTitleBotLineY - varComp0BotLineY, 'F');
-                doc.text(deductionTitle, deductionTitleX, deductionTitleY);
+                doc.rect(margin, varComp0BotLineY, maxWidth, grossTitleBotLineY - varComp0BotLineY, 'F');
+                doc.text(grossTitle, grossTitleX, grossTitleY);
 
-                doc.setFont("helvetica", "normal");
-                var deduction = oModel.TotalDeductions;
-                let deductionCurrentY = deductionTitleBotLineY + 5;  // Initial Y position
+                var gross = oModel.GrossPay;
+                let grossCurrentY = grossTitleBotLineY + 5;  // Initial Y position
 
-                for (let i = 1; i <= deduction.length-1; i++) {
+                for (let i = 1; i <= gross.length-1; i++) {
 
                     // Draw Title on the left
-                    doc.text(deduction[i].Title, margin + 3, deductionCurrentY);
+                    doc.text(gross[i].Title, margin + 3, grossCurrentY);
 
                     // Draw Text on the right, aligned to the right side
-                    let compText = deduction[i].Text;
+                    let compText = gross[i].Text;
                     let compTextWidth = doc.getTextWidth(compText);
                     let compTextX = pageWidth - compTextWidth - margin - 3;
-                    doc.text(compText, compTextX, deductionCurrentY);
+                    doc.text(compText, compTextX, grossCurrentY);
 
                     // Draw a line under each item
-                    let botLineY = deductionCurrentY + 2;
+                    let botLineY = grossCurrentY + 2;
                     doc.line(margin, botLineY, pageWidth - margin, botLineY);
 
                     // Increment Y position for the next item
-                    deductionCurrentY = botLineY + 5;
+                    grossCurrentY = botLineY + 5;
                 }
 
                 doc.setFont("helvetica", "bold");
-                let deduction0Y = deductionCurrentY;
-                doc.text(deduction[0].Title, margin + 3, deduction0Y);
-                let deduction0Text = deduction[0].Text;
-                let deduction0TextWidth = doc.getTextWidth(deduction0Text);
-                let deduction0TextX = pageWidth - deduction0TextWidth - margin - 3;
-                doc.text(deduction0Text, deduction0TextX, deduction0Y);
-                let deduction0BotLineY = deduction0Y + 2;
-                doc.line(margin, deduction0BotLineY, pageWidth - margin, deduction0BotLineY);
+                let gross0Y = grossCurrentY;
+                doc.text(gross[0].Title, margin + 3, gross0Y);
+                let gross0Text = gross[0].Text;
+                let gross0TextWidth = doc.getTextWidth(gross0Text);
+                let gross0TextX = pageWidth - gross0TextWidth - margin - 3;
+                doc.text(gross0Text, gross0TextX, gross0Y);
+                let gross0BotLineY = gross0Y + 2;
+                doc.line(margin, gross0BotLineY, pageWidth - margin, gross0BotLineY);
 
-                let grossPayLineTopY = deduction0BotLineY + 7;
+                let grossPayLineTopY = gross0BotLineY + 7;
                 doc.setLineWidth(1);
                 doc.line(margin, grossPayLineTopY, pageWidth - margin, grossPayLineTopY);
 
@@ -532,10 +531,10 @@ sap.ui.define([], function () {
                 doc.text(grossPayText, grossPayTextX, grossPayY);
                 doc.setTextColor(0, 0, 0);
 
-                doc.line(pageMiddle + 10, monthlyCompTitleBotLineY, pageMiddle + 10, monComp0BotLineY);
-                doc.line(pageMiddle + 10, retrialsTitleBotLineY, pageMiddle + 10, retrials0BotLineY);
+                doc.line(pageMiddle + 10, yearlyCompTitleBotLineY, pageMiddle + 10, monComp0BotLineY);
+                doc.line(pageMiddle + 10, deductionsTitleBotLineY, pageMiddle + 10, deductions0BotLineY);
                 doc.line(pageMiddle + 10, varCompTitleBotLineY, pageMiddle + 10, varComp0BotLineY);
-                doc.line(pageMiddle + 10, deductionTitleBotLineY, pageMiddle + 10, grossPayBotLineY);
+                doc.line(pageMiddle + 10, grossTitleBotLineY, pageMiddle + 10, grossPayBotLineY);
                 doc.line(margin, topLineY, margin, grossPayBotLineY);
                 doc.line(pageWidth - margin, topLineY, pageWidth - margin, grossPayBotLineY);
 
