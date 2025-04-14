@@ -24,9 +24,6 @@ sap.ui.define(
         RP_onUseridpress: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
-        RP_onUsername: function (oEvent) {
-          utils._LCvalidateName(oEvent);
-        },
         RP_onChangnewpass: function (oEvent) {
           utils._LCvalidatePassword(oEvent);
         },
@@ -76,16 +73,8 @@ sap.ui.define(
             oUserNameInput.setValue(selectedEmployee.EmployeeName);
             oUserNameInput.setValueState("None");
             // Clear password fields
-            sap.ui
-              .getCore()
-              .byId("RP_id_NewPW")
-              .setValue("")
-              .setValueState("None");
-            sap.ui
-              .getCore()
-              .byId("RP_id_ConfirmPW")
-              .setValue("")
-              .setValueState("None");
+            sap.ui.getCore().byId("RP_id_NewPW").setValue("").setValueState("None");
+            sap.ui.getCore().byId("RP_id_ConfirmPW").setValue("").setValueState("None");
           } else {
             MessageToast.show(that.i18nModel.getText("empnotfound"));
           }
@@ -113,27 +102,13 @@ sap.ui.define(
           }
         },
         RP_onPressCanclePW: function () {
-          sap.ui
-            .getCore()
-            .byId("RP_id_userid")
-            .setValue("")
-            .setSelectedKey("")
-            .setValueState("None");
+          sap.ui.getCore().byId("RP_id_userid").setValue("").setSelectedKey("").setValueState("None");
           var oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
           // Reset all input fields
           oUserNameInput.setValue("");
           oUserNameInput.setValueState("None");
-          sap.ui
-            .getCore()
-            .byId("RP_id_NewPW")
-            .setValue("")
-            .setValueState("None");
-          sap.ui
-            .getCore()
-            .byId("RP_id_ConfirmPW")
-            .setValue("")
-            .setValueState("None");
-
+          sap.ui.getCore().byId("RP_id_NewPW").setValue("").setValueState("None");
+          sap.ui.getCore().byId("RP_id_ConfirmPW").setValue("").setValueState("None");
           // Close dialog
           if (this.oUpdatePass) {
             this.oUpdatePass.close();
@@ -144,13 +119,12 @@ sap.ui.define(
           const oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
           const oNewPwInput = sap.ui.getCore().byId("RP_id_NewPW");
           const oConfirmPwInput = sap.ui.getCore().byId("RP_id_ConfirmPW");
-          const frgUserId = oUserIdInput.getValue().trim();
-          const newPassword = oNewPwInput.getValue().trim();
-          const confirmPassword = oConfirmPwInput.getValue().trim();
+          const frgUserId = oUserIdInput.getValue();
+          const newPassword = oNewPwInput.getValue();
+          const confirmPassword = oConfirmPwInput.getValue();
           // Validate inputs
           if (
             !utils._LCvalidateMandatoryField(oUserIdInput, "ID") ||
-            !utils._LCvalidateName(oUserNameInput, "ID") ||
             !utils._LCvalidatePassword(oNewPwInput, "ID") ||
             !utils._LCvalidateMandatoryField(oConfirmPwInput, "ID")
           ) {
@@ -170,18 +144,12 @@ sap.ui.define(
                 EmployeeID: frgUserId,
               },
             });
-
             if (response.success === true) {
-              oUserIdInput.setValue("");
-              oUserNameInput.setValue("");
-              oNewPwInput.setValue("");
-              oConfirmPwInput.setValue("");
-
+              oUserIdInput.setValue(""); oUserNameInput.setValue(""); oNewPwInput.setValue(""); oConfirmPwInput.setValue("");
               const oModel = this.getView().getModel("EmpModel");
               if (oModel) {
                 oModel.refresh(true);
               }
-
               if (this.oUpdatePass) {
                 this.oUpdatePass.close();
               }

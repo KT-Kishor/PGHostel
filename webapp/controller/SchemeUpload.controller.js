@@ -27,9 +27,7 @@ sap.ui.define(
         _RouteAppVisibility: function (oEvent) {
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().setModel(new JSONModel({ isFileValid: false })); //for createfragmentsubmit button
-          this.getView()
-            .getModel("LoginModel")
-            .setProperty("/HeaderName", this.i18nModel.getText("schemeupload"));
+          this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("schemeupload"));
           this.MainModel = new JSONModel({ items: [] }); // Store table data
           this.oValue = oEvent.getParameter("arguments").value;
           if (this.oValue === "SchemeUpload") {
@@ -53,7 +51,6 @@ sap.ui.define(
           this._fetchCommonData("SchemeUploade", "ModelOnly", params);
           this.CommomReadCall(params);
         },
-
         SU_onClear: function () {
           var oFilterBar = this.getView().byId("SU_id_Filterbar");
           oFilterBar.getFilterGroupItems().forEach(function (oItem) {
@@ -95,10 +92,8 @@ sap.ui.define(
             );
             this.getView().addDependent(this.oDialog);
           }
-
           this.oDialog.open();
         },
-
         FUS_onCreateDialogCancel: function () {
           this.oDialog.close();
           var oFileUploader = sap.ui.getCore().byId("idFileUploader");
@@ -112,14 +107,12 @@ sap.ui.define(
             oModel.setProperty("/isFileValid", true);
             this._import(file);
           }
-
           // Validate file type
           var validTypes = ["xlsx"];
           var fileType = file.name.split(".").pop().toLowerCase();
 
           if (!validTypes.includes(fileType)) {
             MessageToast.show(that.i18nModel.getText("msgvalidfiletype")
-
             );
             return;
           }
@@ -127,26 +120,21 @@ sap.ui.define(
         _import: function (file) {
           var that = this;
           var excelData = [];
-
           if (file && window.FileReader) {
             var reader = new FileReader();
             reader.onload = function (e) {
               var data = e.target.result;
               var workbook = XLSX.read(data, { type: "binary" });
-
               workbook.SheetNames.forEach(function (sheetName) {
                 excelData = XLSX.utils.sheet_to_row_object_array(
                   workbook.Sheets[sheetName]
                 );
               });
-
               that._uploadedExcelData = excelData;
-
               // **Update MainModel to reflect the data in the UI**
               that.MainModel.setProperty("/items", excelData);
               that.MainModel.refresh(true); // Ensure UI updates
             };
-
             reader.onerror = function (ex) {
               MessageToast.show(
                 that.i18nModel.getText("quoSchemereadingfileerror"),
@@ -163,21 +151,17 @@ sap.ui.define(
             MessageToast.show("Table not found");
             return;
           }
-
           const oModel = oTable.getModel("MainModel");
           if (!oModel) {
             MessageToast.show("Model not found");
             return;
           }
-
           const oData = oModel.getData();
           const aResults = oData.results;
-
           if (!Array.isArray(aResults) || aResults.length === 0) {
             MessageToast.show(this.i18nModel.getText("noData"));
             return;
           }
-
           const aCols = this.createColumnConfig();
           const oSettings = {
             workbook: { columns: aCols, hierarchyLevel: "Level" },
@@ -185,7 +169,6 @@ sap.ui.define(
             fileName: "QuotationScheme.xlsx",
             worker: false,
           };
-
           const oSheet = new Spreadsheet(oSettings);
           oSheet.build().finally(() => {
             oSheet.destroy();
@@ -200,119 +183,50 @@ sap.ui.define(
             { label: "Fuel", property: "Fuel", type: "string" },
             { label: "BoardPlate", property: "BoardPlate", type: "string" },
             { label: "Ex-showroom", property: "EXShowroom", type: "number" },
-            {
-              label: "Consumer Scheme",
-              property: "ConsumerScheme",
-              type: "number",
-            },
-            {
-              label: "Ex-Showroom  after Scheme",
-              property: "EXShowroomAfterScheme",
-              type: "number",
-            },
+            { label: "Consumer Scheme", property: "ConsumerScheme", type: "number", },
+            { label: "Ex-Showroom  after Scheme", property: "EXShowroomAfterScheme", type: "number", },
             { label: "TCS  1%", property: "TCS1Perc", type: "number" },
             { label: "ROAD TAX", property: "ROADTAX", type: "number" },
-            {
-              label: "Regular Insurance",
-              property: "Regular Insurance",
-              type: "number",
-            },
-            {
-              label: "Add On Insurance",
-              property: "AddOnInsurance",
-              type: "number",
-            },
+            { label: "Regular Insurance", property: "Regular Insurance", type: "number", },
+            { label: "Add On Insurance", property: "AddOnInsurance", type: "number", },
             { label: "Temp Charges", property: "Temp Charges", type: "number" },
             { label: "RegHypCHARGE", property: "RegHypCharge", type: "number" },
-            {
-              label: "Shield of trust 4YR45K",
-              property: "ShieldOfTrust4YR45K",
-              type: "number",
-            },
-            {
-              label: "EXTD Warranty FOR 4YR80K",
-              property: "EXTDWarrantyFOR4YR80K",
-              type: "number",
-            },
+            { label: "Shield of trust 4YR45K", property: "ShieldOfTrust4YR45K", type: "number", },
+            { label: "EXTD Warranty FOR 4YR80K", property: "EXTDWarrantyFOR4YR80K", type: "number", },
             { label: "RSA", property: "RSA", type: "number" },
             { label: "STD Fittings", property: "STDFittings", type: "number" },
             { label: "FAST TAG", property: "FastTag", type: "number" },
             { label: "VAS", property: "VAS", type: "number" },
-            {
-              label: "Discountoffers",
-              property: "DiscountOffers",
-              type: "number",
-            },
+            { label: "Discountoffers", property: "DiscountOffers", type: "number", },
             { label: "Make", property: "Make", type: "string" },
             { label: "Emission", property: "Emission", type: "string" },
           ];
         },
+        //for delete
         SU_onDeletepress: function () {
-          var oTable = this.byId("SU_id_Quotationtable");
-          var oSelectedItem = oTable.getSelectedItem();
-          if (!oSelectedItem) {
-            MessageBox.error(this.i18nModel.getText("msgSelectRow"));
-            return;
-          }
-          var sID = oSelectedItem
-            .getBindingContext("MainModel")
-            .getProperty("ID");
           var that = this;
-          var oDialog = new sap.m.Dialog({
-            title: this.i18nModel.getText("msgBoxConfirm"),
-            type: sap.m.DialogType.Message,
-            icon: "sap-icon://warning",
-            state: sap.ui.core.ValueState.Warning,
-            content: new sap.m.Text({
-              text: this.i18nModel.getText("msgBoxConfirmDelete"),
-            }),
-            beginButton: new sap.m.Button({
-              text: this.i18nModel.getText("OkButton"),
-              type: sap.m.ButtonType.Accept,
-              press: function () {
-                oDialog.close();
-                BusyIndicator.show();
-                that
-                  .ajaxDeleteWithJQuery(
-                    "/SchemeUploade",
-                    { filters: { ID: sID } },
-                    {}
-                  )
-                  .then(() => {
-                    oTable.removeSelections();
-                    that.SU_onSearch();
-                    MessageToast.show(
-                      that.i18nModel.getText("msgSchemeDeleted")
-                    );
-                  })
-                  .catch((error) => {
-                    BusyIndicator.hide();
-                    var errorMessage =
-                      error.responseJSON?.error ||
-                      that.i18nModel.getText("quoschemeerrordeelterow");
-                    MessageToast.show(errorMessage);
-                  });
-              },
-            }),
-            endButton: new sap.m.Button({
-              text: this.i18nModel.getText("CancelButton"),
-              type: sap.m.ButtonType.Reject,
-              press: function () {
-                that.byId("SU_id_Quotationtable").removeSelections(true);
-                oDialog.close();
-              },
-            }),
-            afterClose: function () {
-              oDialog.destroy();
+          var oSelectedItem = this.byId("SU_id_Quotationtable").getSelectedItem();
+          var oContext = oSelectedItem.getBindingContext("MainModel").getProperty("ID");
+          // Use common confirmation dialog
+          this.showConfirmationDialog(
+            this.i18nModel.getText("msgBoxConfirm"),
+            this.i18nModel.getText("msgBoxConfirmDelete"),
+            function () {
+              that.ajaxDeleteWithJQuery("/SchemeUploade", { filters: { ID: oContext } }).then(() => {
+                MessageToast.show(that.i18nModel.getText("msgSchemeDeleted"));
+                that.CommomReadCall("");
+              }).catch((error) => {
+                MessageToast.show(error.responseText);
+              });
             },
-          });
-          oDialog.open();
+            function () {      // On Cancel
+              that.byId("SU_id_Quotationtable").removeSelections(true);
+            }
+          );
         },
-
         FUS_onCreateDialogSubmit: async function () {
           var that = this;
           var oFileUploader = sap.ui.getCore().byId("idFileUploader");
-
           if (
             !that._uploadedExcelData ||
             that._uploadedExcelData.length === 0
@@ -320,7 +234,6 @@ sap.ui.define(
             MessageToast.show("No Data In Excel");
             return;
           }
-
           BusyIndicator.show(0);
           // Format Data
           var formattedData = that._uploadedExcelData.map((row) => ({
@@ -395,7 +308,6 @@ sap.ui.define(
                   })
                   .map((item) => ({ [key]: item[key] }));
               };
-
               const uniqueModels = getUnique(offerData, "Model");
               const uniqueVariants = getUnique(offerData, "Variant");
               const uniqueTransmissions = getUnique(offerData, "Transmission");
@@ -421,7 +333,6 @@ sap.ui.define(
               );
             });
         },
-
         //Navigate to new page with data
         SU_onItemPress: function (oEvent) {
           var oSelectedContext = oEvent
@@ -430,7 +341,6 @@ sap.ui.define(
           if (!oSelectedContext) {
             return;
           }
-
           var oData = oSelectedContext.getObject();
           if (!oData) {
             return;

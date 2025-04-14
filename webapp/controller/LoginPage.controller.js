@@ -14,7 +14,7 @@ sap.ui.define(
           this.getRouter()
             .getRoute("RouteLoginPage")
             .attachMatched(this._onRouteMatched, this);
-          var model = new JSONModel({
+          const model = new JSONModel({
             // for Database connection
             url: "https://www.rest.kalpavrikshatechnologies.com/",
             headers: {
@@ -23,19 +23,42 @@ sap.ui.define(
                 "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
               "Content-Type": "application/json",
             },
-            isRadioVisible: false, // Initially, radio buttons are hidden
+            isRadioVisible: false,
           });
-
           this.getOwnerComponent().setModel(model, "LoginModel");
         },
         _onRouteMatched: function () {
-          var oView = this.getView();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          oView.byId("Lp_id_PasswordRadio").setSelected(true);
-          oView.byId("Lp_id_PasswordLabel").setVisible(true);
-          oView.byId("Lp_id_PasswordInput").setVisible(true);
-          oView.byId("Lp_id_ForgotPasswordLink").setVisible(true);
+          var oLoginModel = new JSONModel({
+            "userId": "",
+            "userName": "",
+            "password": "",
+            "otp": "",
+            "isPasswordSelected": true,
+            "isOtpSelected": false,
+            "isPasswordVisible": true,
+            "isOtpVisible": false,
+            "isSendOtpVisible": false,
+            "isForgotPasswordVisible": true,
+            "sendOtpText": "Send OTP",
+            "passwordValueState": "None",
 
+            "frgUserId": "",
+            "frgUserIdValueState": "None",
+            "frgUserName": "",
+            "frgUserNameValueState": "None",
+            "frgOtp": "",
+            "frgOtpValueState": "None",
+            "frgOtpVisible": false,
+            "frgNewPassword": "",
+            "frgNewPasswordValueState": "None",
+            "frgNewPasswordVisible": false,
+            "frgConfirmPassword": "",
+            "frgConfirmPasswordValueState": "None",
+            "frgConfirmPasswordVisible": false
+          });
+          this.getView().setModel(oLoginModel, "LoginViewModel");
+          //this.LoginModel = oLoginModel;
         },
         onpresshome: function () {
           this.getRouter().navTo("RouteHomePage");
@@ -54,337 +77,163 @@ sap.ui.define(
           utils._LCvalidateMandatoryField(oEvent);
         },
         //for OTPsend
-        LP_onOtppress: async function () {
-          const oView = this.getView();
-          const userId = oView.byId("Lp_id_Userid").getValue().trim();
-          const userName = oView.byId("Lp_id_Username").getValue().trim();
-          const oOtpInput = oView.byId("Lp_id_CaptchaInput");
-          const oOtpLabel = oView.byId("Lp_id_OtpLabel");
-          const oOtpButton = oView.byId("idbtnsendotp");
-
+        LP_onOtppress: function () {
+          const oModel = this.getView().getModel("LoginViewModel");
           // Validation
           if (
-            utils._LCvalidateMandatoryField(oView.byId("Lp_id_Userid"), "ID") &&
-            utils._LCvalidateName(oView.byId("Lp_id_Username"), "ID")
+            !utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") ||
+            !utils._LCvalidateName(this.byId("Lp_id_Username"), "ID")
           ) {
-            // Proceed
-          } else {
             MessageToast.show(this.i18nModel.getText("validateUser"));
             return;
           }
-
-          // Send OTP using same structure as NAF_onSubmitTask
-          const response = await this.ajaxCreateWithJQuery("SendOTP", {
-            EmployeeID: userId,
-            EmployeeName: userName,
-            Type: "OTP",
-          });
-
-          if (response && response.success === true) {
-            oOtpInput.setVisible(true);
-            oOtpLabel.setVisible(true);
-            oOtpButton.setText(this.i18nModel.getText("msgresndotp"));
-            MessageToast.show(this.i18nModel.getText("sentOTP"));
-          } else {
-            MessageToast.show(this.i18nModel.getText("errorMsguser"));
-          }
-        },
-
-        LP_onLogin: async function () {
-          const oView = this.getView();
-          const oLoginModel = oView.getModel("LoginModel");
-
-          const userId = oView.byId("Lp_id_Userid").getValue().trim();
-          const userName = oView.byId("Lp_id_Username").getValue().trim();
-          const userOtp = oView.byId("Lp_id_CaptchaInput").getValue().trim();
-          const password = oView.byId("Lp_id_PasswordInput").getValue().trim();
-          const isOtpLogin = oView.byId("Lp_id_OtpRadio").getSelected();
-          const isPasswordLogin = oView
-            .byId("Lp_id_PasswordRadio")
-            .getSelected();
-
-          // OTP is required when OTP login selected
-          if (isOtpLogin && userOtp === "") {
-            MessageToast.show(this.i18nModel.getText("checkOTP"));
-            return;
-          }
-          // Mandatory field validations
-          if (
-            utils._LCvalidateMandatoryField(oView.byId("Lp_id_Userid"), "ID") &&
-            utils._LCvalidateName(oView.byId("Lp_id_Username"), "ID") &&
-            (!isPasswordLogin ||
-              utils._LCvalidateMandatoryField(
-                oView.byId("Lp_id_PasswordInput"),
-                "ID"
-              ))
-          ) {
-            try {
-              const response = await this.ajaxReadWithJQuery("LoginDetails", {
-                EmployeeID: userId,
-                EmployeeName: userName,
-                OTP: isOtpLogin ? userOtp : "",
-                Password: isPasswordLogin ? password : "",
-              });
-
-              if (
-                response.success === true &&
-                response.data &&
-                response.data.length > 0
-              ) {
-                const userData = response.data[0];
-
-                if (
-                  userId === userData.EmployeeID &&
-                  userName === userData.EmployeeName
-                ) {
-                  // Save to model
-                  oLoginModel.setProperty("/EmployeeID", userData.EmployeeID);
-                  oLoginModel.setProperty(
-                    "/EmployeeName",
-                    userData.EmployeeName
-                  );
-                  oLoginModel.setProperty("/EmailID", userData.EmailID);
-                  oLoginModel.setProperty("/Role", userData.Role);
-                  oLoginModel.setProperty("/FolderID", response.FolderID);
-                  oLoginModel.setProperty(
-                    "/EducationalandDocumentsDetailFolderID",
-                    userData.EducationalandDocumentsDetailFolderID
-                  );
-                  oLoginModel.setProperty(
-                    "/EducationalandDocumentsDetailFolderID",
-                    userData.EmploymentDetailFolderID
-                  );
-                  // Navigate
-                  this.getRouter().navTo("RouteTilePage");
-                  MessageToast.show(this.i18nModel.getText("logsuccess"));
-
-                  // Reset fields
-                  oView.byId("Lp_id_Userid").setValue("");
-                  oView.byId("Lp_id_Username").setValue("");
-                  oView
-                    .byId("Lp_id_CaptchaInput")
-                    .setValue("")
-                    .setVisible(false);
-                  oView
-                    .byId("Lp_id_PasswordInput")
-                    .setValue("")
-                    .setVisible(false);
-                  oView
-                    .byId("idbtnsendotp")
-                    .setText("Send OTP")
-                    .setVisible(false);
-                  oView.byId("Lp_id_OtpLabel").setVisible(false);
-                  oView.byId("Lp_id_PasswordLabel").setVisible(false);
-                  oView.byId("Lp_id_ForgotPasswordLink").setVisible(false);
-                  oView.byId("Lp_id_OtpRadio").setSelected(false);
-                  oView.byId("Lp_id_PasswordRadio").setSelected(false);
+          // Send OTP via AJAX
+          try {
+            this.ajaxCreateWithJQuery("SendOTP", {
+              EmployeeID: oModel.getProperty("/userId"),
+              EmployeeName: oModel.getProperty("/userName"),
+              Type: "OTP"
+            })
+              .then((response) => {
+                if (response && response.success === true) {
+                  oModel.setProperty("/isOtpVisible", true);
+                  oModel.setProperty("/isSendOtpVisible", true);
+                  oModel.setProperty("/sendOtpText", this.i18nModel.getText("msgresndotp"));
+                  MessageToast.show(this.i18nModel.getText("sentOTP"));
                 } else {
                   MessageToast.show(this.i18nModel.getText("errorMsguser"));
                 }
-              } else {
-                MessageToast.show(this.i18nModel.getText("loginFailed"));
-              }
-            } catch (error) {
-              const errorMsg = error?.responseText
-                ? JSON.parse(error.responseText).message
-                : "Login failed due to an unexpected error.";
-              MessageToast.show(errorMsg);
-            }
-          } else {
-            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+              })
+              .catch((error) => {
+                MessageToast.show(this.i18nModel.getText("errorMsguser"));
+              });
+          } catch (err) {
+            // Fallback error (in case .then/.catch block fails)
+            MessageToast.show(this.i18nModel.getText("errorMsguser"));
           }
         },
-
-        onLoginOptionChange: function (oEvent) {
-          var sSelectedButtonId = oEvent.getSource().getId();
-          var oView = this.getView();
-          // Get references to UI elements
-          var oPasswordInput = oView.byId("Lp_id_PasswordInput");
-          var oPasswordLabel = oView.byId("Lp_id_PasswordLabel");
-          var oForgotPasswordLink = oView.byId("Lp_id_ForgotPasswordLink");
-          var oSendotp = oView.byId("idbtnsendotp");
-          var oOtpInput = oView.byId("Lp_id_CaptchaInput");
-          var oOtpLabel = oView.byId("Lp_id_OtpLabel");
-
-          if (sSelectedButtonId.includes("Lp_id_PasswordRadio")) {
-            // Show password field and forgot password link
-            oPasswordInput.setVisible(true);
-            oPasswordLabel.setVisible(true);
-            oForgotPasswordLink.setVisible(true);
-
-            // Hide OTP field
-            oOtpInput.setVisible(false);
-            oOtpLabel.setVisible(false);
-            oSendotp.setVisible(false);
-          } else {
-            // Show OTP input field
-            oSendotp.setVisible(true);
-
-            // Hide password field and forgot password link
-            oPasswordInput.setVisible(false);
-            oPasswordLabel.setVisible(false);
-            oForgotPasswordLink.setVisible(false);
+        LP_onLogin: function () {
+          this.getRouter().navTo("RouteTilePage");
+          const oLoginModel = this.getView().getModel("LoginModel");
+          const oVM = this.getView().getModel("LoginViewModel");
+          // Validate User ID and Name
+          if (
+            !utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") ||
+            !utils._LCvalidateName(this.byId("Lp_id_Username"), "ID")
+          ) {
+            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+            return;
           }
-          if (sSelectedButtonId.includes("Lp_id_OtpRadio")) {
-            this.oView.byId("Lp_id_Userid").setValueState("None");
-            this.oView.byId("Lp_id_Username").setValueState("None");
-            this.oView
-              .byId("Lp_id_PasswordInput")
-              .setValue("")
-              .setValueState("None");
+          // Validate OTP if selected
+          if (oVM.getProperty("/isOtpSelected") && !oVM.getProperty("/otp")) {
+            MessageToast.show(this.i18nModel.getText("checkOTP"));
+            return;
+          }
+          // Validate Password if selected
+          if (oVM.getProperty("/isPasswordSelected")) {
+            const isPasswordValid = utils._LCvalidateMandatoryField(this.byId("Lp_id_PasswordInput"), "ID");
+            if (!isPasswordValid) {
+              MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+              return;
+            }
+          }
+          // Backend call using then-catch
+          try {
+            this.ajaxReadWithJQuery("LoginDetails", {
+              EmployeeID: oVM.getProperty("/userId"),
+              EmployeeName: oVM.getProperty("/userName"),
+              OTP: oVM.getProperty("/isOtpSelected") ? oVM.getProperty("/otp") : "",
+              Password: oVM.getProperty("/isPasswordSelected") ? oVM.getProperty("/password") : ""
+            })
+              .then((response) => {
+                if (response?.success && response.data?.length > 0) {
+                  const userData = response.data[0];
+                  if (
+                    oVM.getProperty("/userId") === userData.EmployeeID &&
+                    oVM.getProperty("/userName") === userData.EmployeeName
+                  ) {
+                    // Save to LoginModel
+                    oLoginModel.setProperty("/EmployeeID", userData.EmployeeID);
+                    oLoginModel.setProperty("/EmployeeName", userData.EmployeeName);
+                    oLoginModel.setProperty("/EmailID", userData.EmailID);
+                    oLoginModel.setProperty("/Role", userData.Role);
+                    oLoginModel.setProperty("/FolderID", response.FolderID);
+                    oLoginModel.setProperty("/EducationalandDocumentsDetailFolderID", userData.EducationalandDocumentsDetailFolderID);
+                    oLoginModel.setProperty("/EmploymentDetailFolderID", userData.EmploymentDetailFolderID);
+                    // Reset LoginViewModel
+                    oVM.setProperty("/userId", ""); oVM.setProperty("/userName", ""); oVM.setProperty("/otp", ""); oVM.setProperty("/password", ""); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isPasswordVisible", false); oVM.setProperty("/isSendOtpVisible", false); oVM.setProperty("/sendOtpText", this.i18nModel.getText("sendOtp")); oVM.setProperty("/isOtpSelected", false); oVM.setProperty("/isPasswordSelected", false); oVM.setProperty("/isForgotPasswordVisible", false);
+                    // Navigate
+                    this.getRouter().navTo("RouteTilePage");
+                  } else {
+                    MessageToast.show(this.i18nModel.getText("errorMsguser"));
+                  }
+                } else {
+                  const backendMsg = response?.message || this.i18nModel.getText("loginFailed");
+                  MessageToast.show(backendMsg);
+                }
+              })
+              .catch((error) => {
+                const errorMsg = error?.responseText
+                  ? JSON.parse(error.responseText).message
+                  : this.i18nModel.getText("loginFailed");
+                MessageToast.show(errorMsg);
+              });
+          } catch (e) {
+            MessageToast.show(this.i18nModel.getText("loginFailed"));
+          }
+        },
+        onLoginOptionChange: function (oEvent) {
+          const oVM = this.getView().getModel("LoginViewModel");
+          if (oEvent.getSource().getId().includes("PasswordRadio")) {
+            // User selected password login
+            oVM.setProperty("/isPasswordVisible", true); oVM.setProperty("/isForgotPasswordVisible", true); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isSendOtpVisible", false); oVM.setProperty("/isPasswordSelected", true); oVM.setProperty("/isOtpSelected", false);
           } else {
-            this.oView.byId("Lp_id_Userid").setValueState("None");
-            this.oView.byId("Lp_id_Username").setValueState("None");
-            this.oView
-              .byId("Lp_id_PasswordInput")
-              .setValue("")
-              .setValueState("None");
+            // User selected OTP login
+            oVM.setProperty("/userIdValueState", "None"); oVM.setProperty("/userNameValueState", "None"); oVM.setProperty("/password", ""); oVM.setProperty("/passwordValueState", "None"); oVM.setProperty("/isPasswordVisible", false); oVM.setProperty("/isForgotPasswordVisible", false); oVM.setProperty("/isSendOtpVisible", true); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isPasswordSelected", false); oVM.setProperty("/isOtpSelected", true);
           }
         },
         //Password login change event
         LP_onpasswordchange: function () {
           this.LP_onLogin();
         },
-        //OTP login change event
+        // //OTP login change event
         LP_onOTPchange: function () {
           this.LP_onLogin();
         },
         LP_onForgotPassword: function () {
-          var oView = this.getView();
+          const oVM = this.getView().getModel("LoginViewModel");
+          const resetFields = () => {
+            sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(true);
+            sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(true);
+            sap.ui.getCore().byId("FSM_id_otpInput").setEditable(true); oVM.setProperty("/userId", ""); oVM.setProperty("/userIdValueState", "None"); oVM.setProperty("/userName", ""); oVM.setProperty("/userNameValueState", "None"); oVM.setProperty("/password", ""); oVM.setProperty("/passwordValueState", "None");
+            // Disable save button in fragment
+            sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(true);;
+          };
           if (!this.oPassforgot) {
             sap.ui.core.Fragment.load({
               name: "sap.kt.com.minihrsolution.fragment.Sendmail",
               controller: this,
-            }).then(
-              function (oPassforgot) {
-                this.oPassforgot = oPassforgot;
-                oView.addDependent(this.oPassforgot);
-                this.oPassforgot.open();
-                sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(false);
-                oView.byId("Lp_id_Userid").setValue("").setValueState("None");
-                oView.byId("Lp_id_Username").setValue("").setValueState("None");
-                oView
-                  .byId("Lp_id_PasswordInput")
-                  .setValue("")
-                  .setValueState("None");
-              }.bind(this)
-            );
+            }).then((oPassforgot) => {
+              this.oPassforgot = oPassforgot;
+              this.getView().addDependent(this.oPassforgot);
+              this.oPassforgot.open();
+              //resetFields();
+            });
           } else {
             this.oPassforgot.open();
-            sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(false);
-            oView.byId("Lp_id_Userid").setValue("").setValueState("None");
-            oView.byId("Lp_id_Username").setValue("").setValueState("None");
+            resetFields();
           }
         },
+        // Close the dialog when the cancel button is pressed
         SM_onPressCancle: function () {
-          var oUserIdInput = sap.ui.getCore().byId("FSM_id_userIdInput").setValue("").setValueState("None");
-          var oUserNameInput = sap.ui.getCore().byId("FSM_id_userNameInput").setValue("").setValueState("None");
-          var otpInput = sap.ui.getCore().byId("FSM_id_otpInput").setValue("").setValueState("None");
-          var oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput").setValue("").setValueState("None");
-          var oConfirmPwInput = sap.ui
-            .getCore()
-            .byId("FSM_id_confirmPasswordInput").setValue("").setValueState("None");
-          // Hide OTP, new password, and confirm password fields
-          otpInput.setVisible(false);
-          oNewPwInput.setVisible(false);
-          oConfirmPwInput.setVisible(false);
-
-          this.oPassforgot.close();
-        },
-        SM_onChangeSendOTP: async function () {
-          const userfrgId = sap.ui
-            .getCore()
-            .byId("FSM_id_userIdInput")
-            .getValue()
-            .trim();
-          const userfrgName = sap.ui
-            .getCore()
-            .byId("FSM_id_userNameInput")
-            .getValue()
-            .trim();
-          const otplabel = sap.ui.getCore().byId("FSM_id_frgotp");
-          const otpInput = sap.ui.getCore().byId("FSM_id_otpInput");
-          const newpasslabel = sap.ui.getCore().byId("FSM_id_frgnewpass");
-          const newpassinput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
-          const confirmpasslabel = sap.ui.getCore().byId("FSM_id_frgconpass");
-          const conpassinput = sap.ui
-            .getCore()
-            .byId("FSM_id_confirmPasswordInput");
-
-          // Basic validation
-          if (!userfrgId || !userfrgName) {
-            MessageToast.show(this.i18nModel.getText("validateUser"));
-            return;
-          }
-
-          // Make API call using ajaxCreateWithJQuery
-          const response = await this.ajaxCreateWithJQuery("SendOTP", {
-            EmployeeID: userfrgId,
-            EmployeeName: userfrgName,
-            Type: "OTP",
-          });
-
-          if (response.success === true) {
-            MessageToast.show(this.i18nModel.getText("sentOTP"));
-
-            // Show OTP input
-            otplabel.setVisible(true);
-            otpInput.setVisible(true);
-            otpInput.setValue("");
-
-            // Hide password reset fields
-            newpasslabel.setVisible(false);
-            confirmpasslabel.setVisible(false);
-            newpassinput.setVisible(false);
-            conpassinput.setVisible(false);
-          } else {
-            MessageToast.show(this.i18nModel.getText("errorMsguser"));
-          }
-        },
-
-        SM_onChangeOTP: async function () {
-          const frgUserId = sap.ui
-            .getCore()
-            .byId("FSM_id_userIdInput")
-            .getValue()
-            .trim();
-          const frgUserName = sap.ui
-            .getCore()
-            .byId("FSM_id_userNameInput")
-            .getValue()
-            .trim();
-          const otpValue = sap.ui
-            .getCore()
-            .byId("FSM_id_otpInput")
-            .getValue()
-            .trim();
-          const newpasslabel = sap.ui.getCore().byId("FSM_id_frgnewpass");
-          const newpassinput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
-          const confirmpasslabel = sap.ui.getCore().byId("FSM_id_frgconpass");
-          const conpassinput = sap.ui
-            .getCore()
-            .byId("FSM_id_confirmPasswordInput");
-
-          if (!otpValue) {
-            MessageToast.show(this.i18nModel.getText("rqForotp"));
-            return;
-          }
-          const response = await this.ajaxReadWithJQuery("LoginDetails", {
-            EmployeeID: frgUserId,
-            EmployeeName: frgUserName,
-            OTP: otpValue,
-          });
-
-          if (response.success === true) {
-            sap.ui.getCore().byId("FSM_id_SaveBTN").setEnabled(true);
-            MessageToast.show(this.i18nModel.getText("verifiedOTP"));
-
-            newpasslabel.setVisible(true);
-            newpassinput.setVisible(true);
-            confirmpasslabel.setVisible(true);
-            conpassinput.setVisible(true);
-          } else {
-            MessageToast.show(this.i18nModel.getText("invalidOTP"));
+          const oFragModel = this.getView().getModel("LoginViewModel");
+          // Reset all values and value states in the model
+          oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserIdValueState", "None"); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgUserNameValueState", "None"); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpValueState", "None"); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgNewPasswordValueState", "None");
+          oFragModel.setProperty("/frgNewPasswordVisible", false);
+          oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgConfirmPasswordValueState", "None"); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
+          // Close the dialog
+          if (this.oPassforgot) {
+            this.oPassforgot.close();
           }
         },
         SM_onTogglePasswordVisibility: function (oEvent) {
@@ -411,59 +260,125 @@ sap.ui.define(
           var sCurrentValue = oInput.getValue();
           oInput.setValue(sCurrentValue);
         },
-        SM_onPressSave: async function () {
-          const oUserIdInput = sap.ui.getCore().byId("FSM_id_userIdInput");
-          const oUserNameInput = sap.ui.getCore().byId("FSM_id_userNameInput");
-          const oOtpInput = sap.ui.getCore().byId("FSM_id_otpInput");
-          const oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
-          const oConfirmPwInput = sap.ui
-            .getCore()
-            .byId("FSM_id_confirmPasswordInput");
+        FSM_username: function (oEvent) {
+          utils._LCvalidateName(oEvent);
+        },
+        FSM_userID: function (oEvent) {
+          utils._LCvalidateMandatoryField(oEvent);
+        },
 
-          const frgUserId = oUserIdInput.getValue().trim();
-          const newPassword = oNewPwInput.getValue().trim();
-          const confirmPassword = oConfirmPwInput.getValue().trim();
-          // Validation
-          if (
-            !utils._LCvalidateMandatoryField(oUserIdInput, "ID") ||
-            !utils._LCvalidateName(oUserNameInput, "ID") ||
-            !utils._LCvalidatePassword(oNewPwInput, "ID") ||
-            !utils._LCvalidatePassword(oConfirmPwInput, "ID")
-          ) {
-            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+        SM_onPressSave: function () {
+          const oFragModel = this.getView().getModel("LoginViewModel");
+          // Send OTP
+          if (!oFragModel.getProperty("/frgOtpVisible")) {
+            if (
+              !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FSM_id_userIdInput"), "ID") ||
+              !utils._LCvalidateName(sap.ui.getCore().byId("FSM_id_userNameInput"), "ID")
+            ) {
+              MessageToast.show(this.i18nModel.getText("validateUser"));
+              return;
+            }
+            try {
+              this.ajaxCreateWithJQuery("SendOTP", {
+                EmployeeID: oFragModel.getProperty("/frgUserId"),
+                EmployeeName: oFragModel.getProperty("/frgUserName"),
+                Type: "OTP"
+              })
+                .then((response) => {
+                  if (response.success === true) {
+                    MessageToast.show(this.i18nModel.getText("sentOTP"));
+                    oFragModel.setProperty("/frgOtpVisible", true);
+                    oFragModel.setProperty("/frgOtp", "");
+                  } else {
+                    MessageToast.show(this.i18nModel.getText("errorMsguser"));
+                  }
+                })
+                .catch(() => {
+                  MessageToast.show(this.i18nModel.getText("errorMsguser"));
+                });
+            } catch (error) {
+              MessageToast.show(this.i18nModel.getText("errorMsguser"));
+            }
             return;
           }
+          // Verify OTP
+          if (oFragModel.getProperty("/frgOtpVisible") && !oFragModel.getProperty("/frgOtpVerified")) {
+            if (!oFragModel.getProperty("/frgOtp")) {
+              MessageToast.show(this.i18nModel.getText("rqForotp"));
+              return;
+            }
+            try {
+              this.ajaxReadWithJQuery("LoginDetails", {
+                EmployeeID: oFragModel.getProperty("/frgUserId"),
+                EmployeeName: oFragModel.getProperty("/frgUserName"),
+                OTP: oFragModel.getProperty("/frgOtp")
+              })
+                .then((response) => {
+                  if (response.success === true) {
+                    MessageToast.show(this.i18nModel.getText("verifiedOTP"));
 
-          if (newPassword !== confirmPassword) {
-            MessageToast.show(this.i18nModel.getText("misPasswords"));
+                    sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(false); sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(false);
+                    sap.ui.getCore().byId("FSM_id_otpInput").setEditable(false); oFragModel.setProperty("/frgOtpVerified", true); oFragModel.setProperty("/frgNewPasswordVisible", true); oFragModel.setProperty("/frgConfirmPasswordVisible", true); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", "");
+                  } else {
+                    MessageToast.show(this.i18nModel.getText("invalidOTP"));
+                  }
+                })
+                .catch(() => {
+                  MessageToast.show(this.i18nModel.getText("invalidOTP"));
+                });
+            } catch (error) {
+              MessageToast.show(this.i18nModel.getText("invalidOTP"));
+            }
             return;
           }
-          const response = await this.ajaxUpdateWithJQuery("LoginDetails", {
-            data: {
-              Password: newPassword,
-            },
-            filters: {
-              EmployeeID: frgUserId,
-            },
-          });
+          // Set New Password
+          if (oFragModel.getProperty("/frgOtpVerified")) {
+            const oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
+            const oConfirmPwInput = sap.ui.getCore().byId("FSM_id_confirmPasswordInput");
 
-          if (response.success === true) {
-            // Clear fields
-            oUserIdInput.setValue("");
-            oUserNameInput.setValue("");
-            oOtpInput.setValue("").setVisible(false);
-            oNewPwInput.setValue("").setVisible(false);
-            oConfirmPwInput.setValue("").setVisible(false);
-
-            if (this.oPassforgot) {
-              this.oPassforgot.close();
+            if (
+              !utils._LCvalidatePassword(oNewPwInput, "ID") ||
+              !utils._LCvalidatePassword(oConfirmPwInput, "ID")
+            ) {
+              MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+              return;
             }
 
-            MessageToast.show(this.i18nModel.getText("updatepassword"));
-          } else {
-            MessageToast.show("An error occurred: " + response.message);
+            if (oFragModel.getProperty("/frgNewPassword") !== oFragModel.getProperty("/frgConfirmPassword")) {
+              MessageToast.show(this.i18nModel.getText("misPasswords"));
+              return;
+            }
+            try {
+              this.ajaxUpdateWithJQuery("LoginDetails", {
+                data: {
+                  Password: oFragModel.getProperty("/frgNewPassword")
+                },
+                filters: {
+                  EmployeeID: oFragModel.getProperty("/frgUserId")
+                }
+              })
+                .then((response) => {
+                  if (response.success === true) {
+                    MessageToast.show(this.i18nModel.getText("updatepassword"));
+                    // Reset form state
+                    sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(true);
+                    sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(true);
+                    sap.ui.getCore().byId("FSM_id_otpInput").setEditable(true); oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
+                    if (this.oPassforgot) {
+                      this.oPassforgot.close();
+                    }
+                  } else {
+                    MessageToast.show("An error occurred: " + response.message);
+                  }
+                })
+                .catch(() => {
+                  MessageToast.show(this.i18nModel.getText("loginFailed"));
+                });
+            } catch (error) {
+              MessageToast.show(this.i18nModel.getText("loginFailed"));
+            }
           }
-        },
+        }
       }
     );
   }

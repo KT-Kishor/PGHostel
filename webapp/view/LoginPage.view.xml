@@ -19,29 +19,27 @@
                 title="{i18n>loginDetails}" singleContainerFullSize="false" >
 					<form:content>
 						<Label text="{i18n>userId}" required="true"/>
-						<Input placeholder="{i18n>placeUserId}"  valueStateText="{i18n>placeUserId}" liveChange="LP_onValidateUserId" id="Lp_id_Userid" value="{loginModel>/userIds}" maxLength="50" />
+						<Input placeholder="{i18n>placeUserId}" valueState="{LoginViewModel>/userIdValueState}"  valueStateText="{i18n>placeUserId}" liveChange="LP_onValidateUserId" id="Lp_id_Userid" value="{LoginViewModel>/userId}"  maxLength="5" />
 						
 						<Label text="{i18n>userName}" required="true"/>
-						<Input placeholder="{i18n>placeUserName}" valueStateText="{i18n>placeUserName}" liveChange="LP_onValidateUsername" id="Lp_id_Username"  value="{loginModel>/userNames}"  maxLength="50" />
+						<Input placeholder="{i18n>placeUserName}" valueStateText="{i18n>placeUserName}" liveChange="LP_onValidateUsername" valueState="{LoginViewModel>/userNameValueState}" id="Lp_id_Username"  value="{LoginViewModel>/userName}"  maxLength="50" />
 						
 						<Label text="{i18n>headloginwith}" />
 <HBox alignItems="End" justifyContent="Start" >
-    <RadioButton id="Lp_id_PasswordRadio" text="{i18n>btnpass}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd "/>
-    <RadioButton id="Lp_id_OtpRadio" text="{i18n>btnotp}" groupName="loginOption" select="onLoginOptionChange" class="otpclass  sapUiTinyMarginEnd"/>
-	<Button text="{i18n>sendOtp}" press="LP_onOtppress" id="idbtnsendotp" type="Ghost" class="Login" width="8rem" visible="false" />
+    <RadioButton id="Lp_id_PasswordRadio" text="{i18n>btnpass}" groupName="loginOption" select="onLoginOptionChange" class="sapUiTinyMarginEnd " selected="{LoginViewModel>/isPasswordSelected}"/>
+    <RadioButton id="Lp_id_OtpRadio" text="{i18n>btnotp}"  groupName="loginOption"  select="onLoginOptionChange" class="otpclass  sapUiTinyMarginEnd" selected="{LoginViewModel>/isOtpSelected}" />
+	<Button text="{LoginViewModel>/sendOtpText}" press="LP_onOtppress" id="idbtnsendotp" type="Ghost" class="Login" width="8rem" visible="{LoginViewModel>/isSendOtpVisible}"  />
 </HBox>
-						 
 						<!-- OTP Input Field -->
-						<Label text="{i18n>btnotp}" id="Lp_id_OtpLabel" visible="false" required="true" />
-						<Input value="{loginModel>/enteredCaptcha}" id="Lp_id_CaptchaInput" class="sapUiTinyMarginEnd" change="LP_onOTPchange"
-                            placeholder="{i18n>placeOtp}" visible="{LoginModel>/isRadioVisible}"  maxLength="6"/>
-                          
+						<Label text="{i18n>btnotp}" id="Lp_id_OtpLabel" visible="{LoginViewModel>/isOtpVisible}"  required="true" />
+						<Input value="{LoginViewModel>/otp}" id="Lp_id_CaptchaInput" class="sapUiTinyMarginEnd" submit="LP_onOTPchange"
+                            placeholder="{i18n>placeOtp}"  visible="{LoginViewModel>/isOtpVisible}"  maxLength="6"/>
 						<!-- Password Input Field (Initially Hidden) -->
-						<Label text="{i18n>btnpass}" id="Lp_id_PasswordLabel" visible="false" required="true" />
-						<Input id="Lp_id_PasswordInput" liveChange="LP_onpresPassword"  type="Password" placeholder="{i18n>placepass}" valueStateText="{i18n>placepass}" visible="false" valueHelpIconSrc="sap-icon://show" valueHelpRequest="LP_onTogglePasswordVisibility" change="LP_onpasswordchange" showValueHelp="true"  maxLength="20"/>
-
-						<!-- Forgot Password Link (Initially Hidden) -->
-						<Link text="{i18n>forgotPass}" press="LP_onForgotPassword" id="Lp_id_ForgotPasswordLink" visible="false"/>
+						<Label text="{i18n>btnpass}" id="Lp_id_PasswordLabel" visible="{LoginViewModel>/isPasswordVisible}"  required="true" />
+						<Input id="Lp_id_PasswordInput" liveChange="LP_onpresPassword"  type="Password" placeholder="{i18n>placepass}" valueStateText="{i18n>placepass}"  visible="{LoginViewModel>/isPasswordVisible}" valueState="{LoginViewModel>/passwordValueState}" valueHelpIconSrc="sap-icon://show" valueHelpRequest="LP_onTogglePasswordVisibility" 
+						value="{LoginViewModel>/password}" submit="LP_onpasswordchange" showValueHelp="true"  maxLength="20"/>
+						<!-- Forgot Password Link  -->
+						<Link text="{i18n>forgotPass}" press="LP_onForgotPassword" id="Lp_id_ForgotPasswordLink" visible="{LoginViewModel>/isForgotPasswordVisible}"  />
 						
 						<HBox alignContent="Center" justifyContent="End">
 							<Button text="{i18n>btnLogin}" press="LP_onLogin" icon="sap-icon://key" type="Emphasized" class="Login" width="8rem"/>
