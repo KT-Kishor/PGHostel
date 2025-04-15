@@ -31,9 +31,9 @@
 					<core:Item key="{RoleModel>role}" text="{RoleModel>role}" />
 				</Select>
 				<Label text="{i18n>joiningDate}" />
-				<Input editable="false"  value="{oEmpolyeeDetailsModel>/AppraisalDate}"/>
+					<DatePicker  value="{ path: 'oEmpolyeeDetailsModel>/JoiningDate',formatter:'.Formatter.formatDate' }"  editable="false"   displayFormat="dd/MM/yyyy"     valueFormat="dd/MM/yyyy"  />
 				<Label text="{i18n>baseLocation}" required="true"/>
-			   <Select items="{BaseLocationModel>/}"  showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}">
+			   <Select items="{BaseLocationModel>/}"  showSecondaryValues="true" selectedKey="{oEmpolyeeDetailsModel>/BaseLocation}">
 					<items>
 						<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 					</items>

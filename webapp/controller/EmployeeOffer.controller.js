@@ -111,87 +111,86 @@ sap.ui.define([
             onHandleEmployeeAction: function (status, actionMethod) {
                 var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
                 this.oSelectedRow = oSelectedData;
+            
                 var sName = oSelectedData.Salutation + " " + oSelectedData.ConsultantName;
                 var that = this;
-                // Confirm message
+            
+                // Build message and title
                 var sMessage = (status === "OnBoarded")
                     ? that.i18nModel.getText("confirmOnboard", [sName])
                     : that.i18nModel.getText("confirmReject", [sName]);
-                var oDialog = new sap.m.Dialog({
-                    title: (status === "OnBoarded")
-                        ? that.i18nModel.getText("confirmTitleOnboard")
-                        : that.i18nModel.getText("confirmTitleReject"),
-                    type: "Message",
-                    content: new sap.m.Text({ text: sMessage }),
-                    beginButton: new sap.m.Button({
-                        text: that.i18nModel.getText("OkButton"),
-                        type: "Accept", // Green Button
-                        press: function () {
-                            if (status === "OnBoarded") {
-                                const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({
-                                    ID: oSelectedData.ID,
-                                    Salutation: oSelectedData.Salutation,
-                                    EmployeeName: oSelectedData.ConsultantName,
-                                    JoiningDate: oSelectedData.JoiningDate,
-                                    Role: " ",
-                                    DateOfBirth: "",
-                                    CompanyEmailID: "",
-                                    EmployeeEmail: oSelectedData.EmployeeEmail,
-                                    PermanentAddress: oSelectedData.ConsultantAddress,
-                                    CorrespondenceAddress: oSelectedData.ConsultantAddress,
-                                    BaseLocation: oSelectedData.BaseLocation,
-                                    AppraisalDate: oSelectedData.JoiningDate,
-                                    Designation: oSelectedData.Designation,
-                                    BranchCode: oSelectedData.BranchCode,
-                                    MobileNo: "",
-                                    ManagerID: "",
-                                    ManagerName: "",
-                                    BloodGroup: "",
-                                    EmployeeStatus: "Active",
-                                    JoiningDate: oSelectedData.JoiningDate,
-                                    CTC: oSelectedData.CTC,
-                                    JoiningBonus: oSelectedData.JoiningBonus,
-                                    BasicSalary: oSelectedData.BasicSalary,
-                                    HRA: oSelectedData.HRA,
-                                    StatutoryBonus: oSelectedData.StatutoryBonus,
-                                    TotalMonthly: oSelectedData.TotalMonthly,
-                                    TotalmothlyAnnualized: oSelectedData.TotalmothlyAnnualized,
-                                    TDS: oSelectedData.TDS,
-                                    MedicalInsurance: oSelectedData.MedicalInsurance,
-                                    Gratuity: oSelectedData.Gratuity,
-                                    TotalRetires: oSelectedData.TotalRetires,
-                                    PerformanceBonus: oSelectedData.PerformanceBonus,
-                                    EngagementPB: oSelectedData.EngagementPB,
-                                    TotalVariablePay: oSelectedData.TotalVariablePay,
-                                    CostofCompany: oSelectedData.CostofCompany,
-                                    Total: oSelectedData.Total,
-                                    PF: oSelectedData.PF,
-                                    EPF: oSelectedData.EPF,
-                                    TotalDeduction: oSelectedData.TotalDeduction,
-                                    EmploymentBond: oSelectedData.EmploymentBond
-
-                                });
-                                that.getView().setModel(oEmployeeDetailsModel, "oEmpolyeeDetailsModel");
-                                that._commonFragmentOpenOffer(that, "OnboardEmployee");
-                            } else {
-                                that[actionMethod]();
-                            }
-                            oDialog.close();
+            
+                var sTitle = (status === "OnBoarded")
+                    ? that.i18nModel.getText("confirmTitleOnboard")
+                    : that.i18nModel.getText("confirmTitleReject");
+            
+                // Call reusable confirmation dialog
+                that.showConfirmationDialog(
+                    sTitle,
+                    sMessage,
+                    function () { // onConfirm
+                        if (status === "OnBoarded") {
+                            const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({
+                                ID: oSelectedData.ID,
+                                Salutation: oSelectedData.Salutation,
+                                EmployeeName: oSelectedData.ConsultantName,
+                                JoiningDate: oSelectedData.JoiningDate,
+                                Role: " ",
+                                DateOfBirth: "",
+                                CompanyEmailID: "",
+                                EmployeeEmail: oSelectedData.EmployeeEmail,
+                                PermanentAddress: oSelectedData.ConsultantAddress,
+                                CorrespondenceAddress: oSelectedData.ConsultantAddress,
+                                BaseLocation: oSelectedData.BaseLocation,
+                                AppraisalDate: oSelectedData.JoiningDate,
+                                Designation: oSelectedData.Designation,
+                                BranchCode: oSelectedData.BranchCode,
+                                MobileNo: "",
+                                ManagerID: "",
+                                ManagerName: "",
+                                BloodGroup: "",
+                                EmployeeStatus: "Active",
+                                JoiningDate: oSelectedData.JoiningDate,
+                                CTC: oSelectedData.CTC,
+                                JoiningBonus: oSelectedData.JoiningBonus,
+                                BasicSalary: oSelectedData.BasicSalary,
+                                HRA: oSelectedData.HRA,
+                                IncomeTax:oSelectedData.IncomeTax,
+                                MedicalInsurance: oSelectedData.MedicalInsurance,
+                                Gratuity: oSelectedData.Gratuity,
+                                TotalRetires: oSelectedData.TotalRetires,
+                                PerformanceBonus: oSelectedData.PerformanceBonus,
+                                EngagementPB: oSelectedData.EngagementPB,
+                                VariablePay: oSelectedData.VariablePay,
+                                CostofCompany: oSelectedData.CostofCompany,
+                                Total: oSelectedData.Total,
+                                EmployeePF: oSelectedData.EmployeePF,
+                                EmployerPF: oSelectedData.EmployerPF,
+                                TotalDeduction: oSelectedData.TotalDeduction,
+                                EmploymentBond: oSelectedData.EmploymentBond,
+                                SpecailAllowance:oSelectedData.SpecailAllowance,
+                                PT:oSelectedData.PT,
+                                GrossPay:oSelectedData.GrossPay,
+                                VariablePercentage	:oSelectedData.VariablePercentage,
+                                GrossPayMontly: oSelectedData.GrossPayMontly,	
+                                HikePercentage:oSelectedData.HikePercentage
+                            });
+                            that.getView().setModel(oEmployeeDetailsModel, "oEmpolyeeDetailsModel");
+                            that._commonFragmentOpenOffer(that, "OnboardEmployee");
+                        } else {
+                            that[actionMethod]();
                         }
-                    }),
-                    endButton: new sap.m.Button({
-                        text: that.i18nModel.getText("CancelButton"),
-                        type: "Reject", // Red Button
-                        press: function () {
-                            oDialog.close();
-                        }
-                    }),
-                    afterClose: function () {
-                        oDialog.destroy();
-                    }
-                });
-                oDialog.open();
+                    },
+                    function () {
+                        that.byId("EO_id_TableEOffer").removeSelections(true);
+                        that.byId("EO_id_OnboardBtn").setEnabled(false);
+                        that.byId("EO_id_RejectBtn").setEnabled(false);
+                    },
+                    that.i18nModel.getText("OkButton"),
+                    that.i18nModel.getText("CancelButton")
+                );
             },
+            
             _commonFragmentOpenOffer: function (name, fragmentName) {
                 if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
@@ -213,6 +212,8 @@ sap.ui.define([
                     sap.ui.getCore().byId(field).setValueState("None");
                 });
                 this.oDialog.close();
+                this.byId("EO_id_TableEOffer").removeSelections(true);
+
             },
             validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
@@ -225,6 +226,7 @@ sap.ui.define([
             },
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
+                oModel.DateOfBirth=oModel.DateOfBirth.split("/").reverse().join('-')
                 if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID")) {
                     var oPayload = {
                         tableName: "EmployeeDetails",
