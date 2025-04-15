@@ -226,11 +226,11 @@ sap.ui.define([
                   return;
               }
               // Submit data 
-              this.ajaxCreateWithJQuery("ManageCustomer", { data: oData }).then(function(response) {
+             await this.ajaxCreateWithJQuery("ManageCustomer", { data: oData }).then(function(response) {
                   if (response && response.success === true) {
                       MessageToast.show(this.i18nModel.getText("msgCustomer3"));
                       this.oManageCustomerDialog.close();
-                      return this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
+                      return this.readCallForManageCustomer("Initial");
                   } else {
                       MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                   }
@@ -285,13 +285,13 @@ sap.ui.define([
               // Send update request
               var requestData = { filters: { ID: sCustomerId }, data: oUpdatedData };
               sap.ui.core.BusyIndicator.show(0);
-              this.ajaxUpdateWithJQuery("/ManageCustomer", requestData).then(function(response) {
+              await this.ajaxUpdateWithJQuery("/ManageCustomer", requestData).then(function(response) {
                   if (response.success === true) {
                       oTable.removeSelections(true);
                       this.oManageCustomerDialog.close();
                       MessageToast.show(this.i18nModel.getText("msgCustomer4"));
                       this.MC_onTableSelectionChange();
-                      return this._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});
+                      return this.readCallForManageCustomer("Initial");
                   } else {
                       MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                   }
@@ -325,7 +325,7 @@ sap.ui.define([
               sap.ui.core.BusyIndicator.show(0);
               that.ajaxDeleteWithJQuery("/ManageCustomer", { filters: { ID: sCustomerID } }).then(() => {
                 // Refresh the customer data after deletion
-                return that._fetchCommonData("ManageCustomer", "CreateCustomerModel", {});}).then(() => {
+                return that.readCallForManageCustomer("Initial");}).then(() => {
                   sap.ui.core.BusyIndicator.hide();
                   MessageToast.show(that.i18nModel.getText("msgCustomerDeleteSuccess"));
                   that.byId("MC_id_AddCustomer").setEnabled(true);
@@ -351,7 +351,7 @@ sap.ui.define([
           if (oComboBox) oComboBox.setSelectedKey(""); // Clear combo box selection
         },
 
-        MC_onSearch: function () {
+        MC_onSearch: async function () {
           var aFilterItems = this.byId("MC_id_CompanyFilter").getFilterGroupItems();
           var params = {};
           aFilterItems.forEach(function (oItem) {
@@ -362,16 +362,16 @@ sap.ui.define([
                   if (sValue) params[sKey] = sValue;
               }
           });
-          this.readCallForManageCustomer(params);
+         await this.readCallForManageCustomer(params);
       },
       
-      readCallForManageCustomer: function (filter) {
-          this.ajaxReadWithJQuery("ManageCustomer", filter).then((oData) => {
+      readCallForManageCustomer: async function (filter) {
+        await this.ajaxReadWithJQuery("ManageCustomer", filter).then((oData) => {
               var companyData = Array.isArray(oData.data) ? oData.data : [oData.data];
-              this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(companyData), "CreateCustomerModel");
+              this.getOwnerComponent().setModel(new JSONModel(companyData), "CreateCustomerModel");
               if (filter === "Initial") {
-                  var offerData = [...new Map(companyData.filter(item => item.companyName).map(item => [item.companyName.trim(), item])).values()];
-                  this.getView().setModel(new sap.ui.model.json.JSONModel(offerData), "CreateCustomerModelInitial");
+                  var customererData = [...new Map(companyData.filter(item => item.companyName).map(item => [item.companyName.trim(), item])).values()];
+                  this.getView().setModel(new JSONModel(customererData), "CreateCustomerModelInitial");
               }
               sap.ui.core.BusyIndicator.hide();
           }).catch((error) => {

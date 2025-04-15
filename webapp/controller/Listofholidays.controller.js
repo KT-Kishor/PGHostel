@@ -23,7 +23,7 @@ sap.ui.define(
           // Make date pickers read-only
           this._makeDatePickersReadOnly(["LOH_id_Holidays"]);
           // Fetch holiday data for current year 
-          this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31`}).then(() => {
+          await this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31`}).then(() => {
           // Get i18n resource bundle
           that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
           // Set header name in LoginModel
@@ -33,14 +33,14 @@ sap.ui.define(
           });
         },
         
-        onSearch: function () {
+        onSearch: async function () {
           var selectedYear = this.byId("LOH_id_Holidays").getValue(); // Get selected year from input field
           var currentYear = new Date().getFullYear();
           if (selectedYear > currentYear) { // Check if selected year is in the future
               MessageToast.show(this.i18nModel.getText("futureHolidays"));
               return;
           }
-          this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`,
+          await this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`,
           endDate: `${selectedYear}-12-31`}).then(() => { // Fetch holiday data for selected year
           }).catch(function (error) {
               MessageToast.show(error.message || error.responseText);
@@ -149,7 +149,7 @@ sap.ui.define(
           var excelEpoch = new Date(Date.UTC(1899, 11, 30)); 
           var date = new Date(excelEpoch.getTime() + serial * 86400000); 
           return date;
-      },
+        },
       
         LOH_onPressSubmit: async function () {
           try {
@@ -169,17 +169,17 @@ sap.ui.define(
               Delhi: row[6],
             }));
             // Check for existing data
-            this.ajaxReadWithJQuery("ListOfHolidays", {startDate: `${selectedYear}-01-01`,
+            await this.ajaxReadWithJQuery("ListOfHolidays", {startDate: `${selectedYear}-01-01`,
               endDate: `${selectedYear}-12-31`}).then((existingData) => {
              if (existingData.data.length > 0) {
                 MessageBox.confirm(
                   `Previous data for ${selectedYear} will be deleted. Do you want to continue?`,
                   {
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                    onClose: function (sAction) {
+                    onClose: async function (sAction) {
                       if (sAction === MessageBox.Action.YES) {
                         // Delete existing data
-                        that.ajaxDeleteWithJQuery("ListOfHolidays", {
+                        await that.ajaxDeleteWithJQuery("ListOfHolidays", {
                           filters: {startDate: `${selectedYear}-01-01`,endDate: `${selectedYear}-12-31`},}).then(() => {
                             // Create new data
                             return that.ajaxCreateWithJQuery("ListOfHolidays", {data: formattedData, });
