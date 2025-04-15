@@ -61,10 +61,22 @@ sap.ui.define([
                 var aFilteredData = oModel.getData().filter(function (oTrainee) {
                     return oTrainee.ID === sArgPara;
                 });
+            
                 if (aFilteredData.length > 0) {
                     var traineeData = aFilteredData[0];
-                    this.byId("TU_id_JoinDate").setMinDate(new Date(aFilteredData[0].ReleaseDate));
+            
+                    // Set Join Date minDate
+                    this.byId("TU_id_JoinDate").setMinDate(new Date(traineeData.ReleaseDate));
+            
+                    // Set trainee details model
                     this.getView().setModel(new JSONModel(traineeData), "oTraineeDetails");
+                    if (traineeData.Stipend === "0") {
+                        this.byId("TU_id_StipendRadio").setSelectedIndex(1); 
+                    } else {
+                        this.byId("TU_id_StipendRadio").setSelectedIndex(0); 
+                    } 
+            
+                    // Handle visibility and edit button
                     if (traineeData.Status === "OnBoarded" || traineeData.Status === "Training Completed") {
                         this.viewModel.setProperty("/isVisiable", false);
                         this.viewModel.setProperty("/editBut", false);
@@ -73,12 +85,13 @@ sap.ui.define([
                         this.viewModel.setProperty("/editBut", true);
                     } else if (traineeData.Status === "Submitted") {
                         this.viewModel.setProperty("/isVisiable", true);
-                        this.viewModel.setProperty("editBut", true);
+                        this.viewModel.setProperty("/editBut", true); // Fixed missing slash
                     }
                 } else {
                     MessageBox.error(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
+            
             //navigation to trainee view
             TUF_onPressback: function () {
                 this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
