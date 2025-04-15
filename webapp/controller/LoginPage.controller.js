@@ -140,7 +140,7 @@ sap.ui.define(
               EmployeeID: oVM.getProperty("/userId"),
               EmployeeName: oVM.getProperty("/userName"),
               OTP: oVM.getProperty("/isOtpSelected") ? oVM.getProperty("/otp") : "",
-              Password: oVM.getProperty("/isPasswordSelected") ? oVM.getProperty("/password") : ""
+              Password: oVM.getProperty("/isPasswordSelected") ? encodeURIComponent(oVM.getProperty("/password")) : ""
             }).then((response) => {
               if (response?.success && response.data?.length > 0) {
                 const userData = response.data[0];
@@ -355,7 +355,7 @@ sap.ui.define(
             try {
               this.ajaxUpdateWithJQuery("LoginDetails", {
                 data: {
-                  Password: oFragModel.getProperty("/frgNewPassword"),
+                  Password: encodeURIComponent(oFragModel.getProperty("/frgNewPassword")),
                 },
                 filters: {
                   EmployeeID: oFragModel.getProperty("/frgUserId")
