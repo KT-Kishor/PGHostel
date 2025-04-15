@@ -95,7 +95,6 @@ sap.ui.define(
               Type: "OTP"
             }).then((response) => {
               if (response && response.success === true) {
-
                 oModel.setProperty("/isOtpVisible", true);
                 oModel.setProperty("/isSendOtpVisible", true);
                 oModel.setProperty("/sendOtpText", this.i18nModel.getText("msgresndotp"));
@@ -104,7 +103,7 @@ sap.ui.define(
                 MessageToast.show(this.i18nModel.getText("errorMsguser"));
               }
             }).catch((error) => {
-              MessageToast.show(this.i18nModel.getText("errorMsguser"));
+              MessageToast.show(this.i18nModel.getText(error.responseJSON.message));
             });
           } catch (err) {
             // Fallback error (in case .then/.catch block fails)
@@ -142,11 +141,16 @@ sap.ui.define(
               EmployeeID: oVM.getProperty("/userId"),
               EmployeeName: oVM.getProperty("/userName"),
               OTP: oVM.getProperty("/isOtpSelected") ? oVM.getProperty("/otp") : "",
-              Password: oVM.getProperty("/isPasswordSelected") ? btoa(oVM.getProperty("/password")) : ""
+              Password: oVM.getProperty("/isPasswordSelected") ? oVM.getProperty("/password") : ""
             })
               .then((response) => {
                 if (response?.success && response.data?.length > 0) {
                   const userData = response.data[0];
+                  var timeDifference = new Date().getTime() - new Date(userData.TimeDate).getTime();
+                  if (timeDifference <= 6000) {
+                    MessageToast.show(this.i18nModel.getText("loginTimeOut"));
+                    return;
+                  }
                   if (
                     oVM.getProperty("/userId") === userData.EmployeeID &&
                     oVM.getProperty("/userName") === userData.EmployeeName
@@ -159,6 +163,7 @@ sap.ui.define(
                     oLoginModel.setProperty("/FolderID", response.FolderID);
                     oLoginModel.setProperty("/EducationalandDocumentsDetailFolderID", userData.EducationalandDocumentsDetailFolderID);
                     oLoginModel.setProperty("/EmploymentDetailFolderID", userData.EmploymentDetailFolderID);
+                    oLoginModel.setProperty("/", userData.EmployeeID);
                     // Reset LoginViewModel
                     oVM.setProperty("/userId", ""); oVM.setProperty("/userName", ""); oVM.setProperty("/otp", ""); oVM.setProperty("/password", ""); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isPasswordVisible", false); oVM.setProperty("/isSendOtpVisible", false); oVM.setProperty("/sendOtpText", this.i18nModel.getText("sendOtp")); oVM.setProperty("/isOtpSelected", false); oVM.setProperty("/isPasswordSelected", false); oVM.setProperty("/isForgotPasswordVisible", false);
                     // Navigate
@@ -166,6 +171,7 @@ sap.ui.define(
                   } else {
                     MessageToast.show(this.i18nModel.getText("errorMsguser"));
                   }
+
                 } else {
                   const backendMsg = response?.message || this.i18nModel.getText("loginFailed");
                   MessageToast.show(backendMsg);
@@ -349,7 +355,7 @@ sap.ui.define(
             try {
               this.ajaxUpdateWithJQuery("LoginDetails", {
                 data: {
-                  Password: btoa(oFragModel.getProperty("/frgNewPassword")),
+                  Password: oFragModel.getProperty("/frgNewPassword"),
                 },
                 filters: {
                   EmployeeID: oFragModel.getProperty("/frgUserId")
