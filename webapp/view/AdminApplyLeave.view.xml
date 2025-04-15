@@ -21,13 +21,13 @@
 					 <filterbar:FilterGroupItem
                     name="dateRange"
                     label="{i18n>dateRange}"
-                    groupName="Group1"
+                    groupName="LeaveGroup"
                     visibleInFilterBar="true">
                     <filterbar:control>
                         <DateRangeSelection
                             id="AL_id_DateRangeSelection"
-                            dateValue="{LeaveModel>/fromDate}"
-                            secondDateValue="{LeaveModel>/toDate}"
+                            dateValue="{LeaveFilterModel>/fromDate}"
+                            secondDateValue="{LeaveFilterModel>/toDate}"
                             valueFormat="yyyy-MM-dd"
                             displayFormat="dd/MM/yyyy"
                             change="onSelectionChange"/>
@@ -36,12 +36,12 @@
 					<filterbar:FilterGroupItem
             name="typeOfLeave"
             label="{i18n>typeOfLeave}"
-            groupName="Group1"
+            groupName="LeaveGroup"
             visibleInFilterBar="true">
 						<filterbar:control>
 							<ComboBox
                 id="AL_id_TypeOfLeavecombo"
-                value="{LeaveModel>/typeOfLeave}"
+                value="{LeaveFilterModel>/typeOfLeave}"
 				showClearIcon="true"
 				valueStateText="{i18n>selectTypeOfLeave}"
                 items="{leaveTypeModel>/}">
@@ -57,10 +57,8 @@
 		<footer>
             <Bar>
                 <contentLeft>
-                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                  <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML"/>
                 </contentLeft>
-                <contentRight>
-                </contentRight>
             </Bar>
         </footer>
 	</Page>

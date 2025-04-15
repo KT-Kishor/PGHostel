@@ -19,7 +19,7 @@
                 title="{i18n>loginDetails}" singleContainerFullSize="false" >
 					<form:content>
 						<Label text="{i18n>userId}" required="true"/>
-						<Input placeholder="{i18n>placeUserId}" valueState="{LoginViewModel>/userIdValueState}"  valueStateText="{i18n>placeUserId}" liveChange="LP_onValidateUserId" id="Lp_id_Userid" value="{LoginViewModel>/userId}"  maxLength="5" />
+						<Input placeholder="{i18n>placeUserId}" valueState="{LoginViewModel>/userIdValueState}"  valueStateText="{i18n>placeUserId}" liveChange="LP_onValidateUserId" id="Lp_id_Userid" value="{LoginViewModel>/userId}"  maxLength="7" />
 						
 						<Label text="{i18n>userName}" required="true"/>
 						<Input placeholder="{i18n>placeUserName}" valueStateText="{i18n>placeUserName}" liveChange="LP_onValidateUsername" valueState="{LoginViewModel>/userNameValueState}" id="Lp_id_Username"  value="{LoginViewModel>/userName}"  maxLength="50" />

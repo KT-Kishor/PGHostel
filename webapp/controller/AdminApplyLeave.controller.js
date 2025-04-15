@@ -26,6 +26,11 @@ sap.ui.define(
             that.userId = loginModel.getProperty("/EmployeeID");
             that.Type = loginModel.getProperty("/Role");
             that.currentYear = new Date().getFullYear();
+            // Initialize UI controls visibility
+            that.byId("AL_id_LeaveBarChart").setVisible(false);
+            that.byId("AL_id_LeaveTableStandard").setVisible(true);
+            that.byId("AL_id_leavefilterbar").setVisible(true);
+            that.byId("AL_id_LeaveYear").setValue(new Date().getFullYear());
             // Fetch leave data
             await that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId });
             // Fetch leave type data
@@ -33,29 +38,22 @@ sap.ui.define(
             // Set up i18n and header
             that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
             that.getView().getModel("LoginModel").setProperty("/HeaderName", that.i18nModel.getText("leaveApplication"));
-            // Initialize UI controls visibility
-            that.byId("AL_id_LeaveBarChart").setVisible(false);
-            that.byId("AL_id_LeaveTableStandard").setVisible(true);
-            that.byId("AL_id_leavefilterbar").setVisible(true);
-            that.byId("AL_id_LeaveYear").setValue(new Date().getFullYear());
             // Set up model for selected type
             var oJson = new JSONModel({ selectedType: 1 })
             that.getView().setModel(oJson, "selectedModel");
             // Fetch holidays data
-            await that._fetchCommonData("ListOfHolidays", "HolidayModel", {});   
-            // Display initial bar chart
-            await that.BarDisplayFunction("All In One Leave",  that.currentYear, that.userId);
-            // Fetch additional data based on user type
-            if (that.Type !== "Trainee") {
-                that.MonthBarDisplayFunction("All In One Leave",  that.currentYear,  that.userId);
-                await that.YearlyBarDisplayFunction(that.userId);
+            await that._fetchCommonData("ListOfHolidays", "HolidayModel", {});  
+              // Display initial bar chart
+              await that.BarDisplayFunction("All In One Leave",  that.currentYear, that.userId)
+             // Set up model for monthly bar chart
+             var barDataModel = new JSONModel({ Name: 'line', type: 'column', AllStatus: 'column' });
+             that.getView().setModel(barDataModel, "MonthlyBar");
+             // Fetch additional data based on user type
+             if (that.Type !== "Trainee") {
                 await  that.EmployeeDetReadCall("EmployeeDetails", {"EmployeeID": that.userId});
             } else {
                 await that.EmployeeDetReadCall("Trainee", {"TraineeID": that.userId});
             }
-            // Set up model for monthly bar chart
-            var barDataModel = new JSONModel({ Name: 'line', type: 'column', AllStatus: 'column' });
-            that.getView().setModel(barDataModel, "MonthlyBar");
         },
         
         // Function to display bar chart data
@@ -63,8 +61,6 @@ sap.ui.define(
           let jsonData = {"data": {"EmployeeID": userId,"selectYear": selectedYear,"LeaveType": leaveType}
         };
             try {
-                // Show busy indicator
-                sap.ui.core.BusyIndicator.show(0);
                 // Fetch data from backend
                 let oData = await this.ajaxCreateWithJQuery("LeavesFirstBarChart", jsonData);
                 sap.ui.core.BusyIndicator.hide();
@@ -87,7 +83,6 @@ sap.ui.define(
                 this._configureFirstChart("AL_id_VizFrame6", oFirstChartModel, "Current Available Leave Quota");
                 this._configureSecondChart("AL_id_VizFrameAll", oSecondChartModel, "Yearly Leave Quota");
             } catch (error) {
-                sap.ui.core.BusyIndicator.hide();
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             }
         },
@@ -224,7 +219,6 @@ sap.ui.define(
         
         // Function to fetch employee details
         EmployeeDetReadCall: async function (entity, value) {
-            sap.ui.core.BusyIndicator.show(0);
             try {
                 let data = await this.ajaxReadWithJQuery(entity, value);
                 if (data && data.data && data.data.length > 0) {
@@ -244,9 +238,7 @@ sap.ui.define(
                 }
             } catch (error) {
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-            } finally {
-                sap.ui.core.BusyIndicator.hide(); // Hide busy indicator
-            }
+            } 
         },
          
         // Chart type change handlers
@@ -277,7 +269,7 @@ sap.ui.define(
         },
 
         // Show bar chart view
-        AL_onPressBarChart: function () {
+        AL_onPressBarChart: async function () {
             this.byId("AL_id_LeaveBarChart").setVisible(true);
             this.byId("AL_id_LeaveTableStandard").setVisible(false);
             this.byId("AL_id_leavefilterbar").setVisible(false);
@@ -287,11 +279,15 @@ sap.ui.define(
                 this.byId("AL_id_YearlyChart").setVisible(false);
                 this.byId("AL_id_LeaveYear").setVisible(false);
                 this.byId("AL_id_YearLabel").setVisible(false);
+                await this.BarDisplayFunction("All In One Leave",  this.currentYear, this.userId);
             }else{
                 this.byId("AL_id_MonthlyChart").setVisible(true);
                 this.byId("AL_id_YearlyChart").setVisible(true);
                 this.byId("AL_id_LeaveYear").setVisible(true);
                 this.byId("AL_id_YearLabel").setVisible(true);
+                await this.BarDisplayFunction("All In One Leave",  this.currentYear, this.userId);
+                await this.MonthBarDisplayFunction("All In One Leave",  this.currentYear,  this.userId);
+                await this.YearlyBarDisplayFunction(this.userId);
             }
         },
 
@@ -300,13 +296,6 @@ sap.ui.define(
             this.byId("AL_id_LeaveBarChart").setVisible(false);
             this.byId("AL_id_LeaveTableStandard").setVisible(true);
             this.byId("AL_id_leavefilterbar").setVisible(true);
-            this.BarDisplayFunction("All In One Leave", this.userId);
-            this.byId("AL_id_TypeOfLeave").setValue("All In One Leave");
-            this.byId("AL_id_LeaveYear").setValue(new Date().getFullYear());
-            if (this.Type !== "Trainee") {
-                this.MonthBarDisplayFunction("All In One Leave", this.userId);
-                this.YearlyBarDisplayFunction(this.userId);
-            }
         },
 
         // Chart display mode handlers
@@ -335,7 +324,7 @@ sap.ui.define(
             }
             var sFullText = oBindingContext.getProperty("managerRemark")
             var oDialog = new sap.m.Dialog({
-                title: this.getView().getModel("i18n").getProperty("managerRemarks"),
+                title: this.getView().getModel("i18n").getProperty("managerRemarksLeave"),
                 content: new sap.ui.core.HTML({ content: `<p>${sFullText}</p>` }),
                 beginButton: new sap.m.Button({
                     text: "Close",
@@ -666,7 +655,7 @@ sap.ui.define(
                 ) {
                     var oLeaveTempModel = this.getView().getModel("LeaveTempModel");
                     var oData = oLeaveTempModel.getData();
-                    oData.halfDay = oData.halfDay.toString();
+                    oData.halfDay = oData.halfDay;
                     oData.status = "Submitted";
         
                     // Parse dates
@@ -675,9 +664,16 @@ sap.ui.define(
                     var toDateParts = oData.toDate.split("/").map(Number);
                     var endDate = new Date(toDateParts[2], toDateParts[1] - 1, toDateParts[0]);
         
-                    // Validate year consistency
-                    if (fromDateParts[2] !== toDateParts[2]) {
-                        return MessageBox.error(this.i18nModelMess.getText("leaveSameYear"));
+                    // Allow last year leave only until Jan 31 of current year
+                    var currentDate = new Date();
+                    var jan31 = new Date(currentDate.getFullYear(), 0, 31); // Jan is month 0
+
+                    var isFromLastYear = fromDateParts[2] === currentDate.getFullYear() - 1;
+                    var isToLastYear = toDateParts[2] === currentDate.getFullYear() - 1;
+                    var isCurrentYear = fromDateParts[2] === currentDate.getFullYear() && toDateParts[2] === currentDate.getFullYear();
+
+                    if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
+                        return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
                     }
         
                     // Check if leave is on holiday
@@ -767,15 +763,12 @@ sap.ui.define(
                             this.ajaxCreateWithJQuery("Leaves", { data: oData })
                                 .then(response => {
                                     this._handleResponse(response, "leaveSubmitted");
-                                })
-                                .catch(() => MessageToast.show(this.i18nModel.getText("commonErrorMessage")));
+                                }).catch(() =>  MessageToast.show(error.message || error.responseText));
                         } else if (actionType === "Save") {
                             var requestData = { filters: { ID: oData.ID }, data: oData };
-                            this.ajaxUpdateWithJQuery("Leaves", requestData)
-                                .then(response => {
+                            this.ajaxUpdateWithJQuery("Leaves", requestData).then(response => {
                                     this._handleResponse(response, "leaveUpdatedSuccess");
-                                })
-                                .catch(() => MessageToast.show(this.i18nModel.getText("commonErrorMessage")));
+                                }).catch(() =>  MessageToast.show(error.message || error.responseText));
                         }
                     } else {
                         return MessageBox.error(this.i18nModel.getText("quotaExceeded"));
@@ -784,7 +777,7 @@ sap.ui.define(
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             } catch (error) {
-                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                MessageToast.show(error.message || error.responseText);
             }
         },
         
@@ -824,13 +817,10 @@ sap.ui.define(
         AL_onSearch: async function () {
             var aFilterItems = this.byId("AL_id_leavefilterbar").getFilterGroupItems();
             var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
-
             var params = {};
-
             aFilterItems.forEach(function (oItem) {
                 var oControl = oItem.getControl();
                 var sFilterName = oItem.getName();
-
                 if (oControl) {
                     if (oControl.isA("sap.m.DateRangeSelection")) {
                         var oFromDate = oControl.getDateValue();
@@ -844,7 +834,7 @@ sap.ui.define(
                     } else if (oControl.isA("sap.m.ComboBox")) {
                         var oSelectedItem = oControl.getSelectedItem();
                         if (oSelectedItem) {
-                            params[sFilterName] = oSelectedItem.getProperty("text");
+                            params[sFilterName] = oSelectedItem.getText(); 
                         }
                     } else if (oControl.getValue && oControl.getValue()) {
                         params[sFilterName] = oControl.getValue();
@@ -853,7 +843,7 @@ sap.ui.define(
             });
             await this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId, ...params });
         },
-
+        
         // Clear filters in leave filter bar
         AL_onClear : function () {
             this.byId("AL_id_DateRangeSelection").setDateValue(null);
