@@ -35,11 +35,13 @@
                             name="EmployeeName"
                             showClearIcon="true"
                             id="AA_id_EmployeeName"
-                            items="{assetModelInitial>/}"
+                            items="{EmpModel>/}"
                         >
                             <core:ListItem
-                                key="{assetModelInitial>EmployeeName}"
-                                text="{assetModelInitial>EmployeeName}"
+                                key="{EmpModel>EmployeeName}"
+                                text="{EmpModel>EmployeeName}"
+                                additionalText="{EmpModel>EmployeeID}"
+
                             />
                         </ComboBox>
                     </fb:control>
@@ -55,32 +57,32 @@
                             name="Type"
                             showClearIcon="true"
                             id="AA_id_Type"
-                            items="{uniqueTypeModel>/}"
+                            items="{assetType>/}"
                         >
                             <core:ListItem
-                                key="{uniqueTypeModel>Type}"
-                                text="{uniqueTypeModel>Type}"
+                                key="{assetType>Type}"
+                                text="{assetType>Type}"
                             />
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
 
                 <fb:FilterGroupItem
-                    name="Branch"
-                    label="{i18n>branch}"
+                    name="Status"
+                    label="{i18n>status}"
                     groupName="Group1"
                     visibleInFilterBar="true"
                 >
                     <fb:control>
                         <ComboBox
-                            items="{uniqueBranchModel>/}"
+                            items="{BaseLocationModel>/}"
                             showClearIcon="true"
-                            id="AA_id_Branch"
+                            id="AA_id_Status"
                         >
                             <core:ListItem
-                                key="{uniqueBranchModel>Branch}"
-                                text="{uniqueBranchModel>Branch}"
-                                additionalText="{uniqueBranchModel>branchCode}"
+                                key="{BaseLocationModel>city}"
+                                text="{BaseLocationModel>city}"
+                                additionalText="{BaseLocationModel>branchCode}"
                             />
                         </ComboBox>
                     </fb:control>
@@ -107,17 +109,31 @@
         <Table
             alternateRowColors="false"
             id="AA_id_AssestTable"
-            items="{path:'assetModel>/'}"
+            items="{
+                path: 'assetModel>/',
+                sorter: {
+						path: 'Type',
+						descending: false,
+						group: true
+					}
+            }"
             class="sapUiResponsiveMargin"
             width="auto"
             mode="SingleSelectLeft"
         >
             <headerToolbar>
                 <OverflowToolbar>
-                    <Title  
+                    <Title
                         text="{i18n>assetData} ({= ${assetModel>/}.length})"
                     />
                     <ToolbarSpacer />
+                    <Button
+                        icon="sap-icon://excel-attachment"
+                        press="AA_onExport"
+                        type="Ghost"
+                        text="{i18n>download}"
+                    />
+
                     <Button
                         icon="sap-icon://add"
                         text="{i18n>assign}"
@@ -128,10 +144,10 @@
                         icon="sap-icon://edit"
                         type="Neutral"
                         press="AA_onPressEdit"
-                        text="{i18n>update}"
+                        text="{i18n>update}" visible="false"
                     />
                     <Button
-                        icon="sap-icon://cancel"
+                        icon="sap-icon://clear-all"
                         type="Negative"
                         press="AA_onOpenUnassign"
                         text="{i18n>un-Assign}"
@@ -139,12 +155,12 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-                <Column>
+                <!-- <Column>
                     <Text text="{i18n>employeeID}" />
                 </Column>
                 <Column>
                     <Text text="{i18n>employeeName}" />
-                </Column>
+                </Column> -->
                 <Column>
                     <Text text="{i18n>type}" />
                 </Column>
@@ -179,8 +195,9 @@
             <items>
                 <ColumnListItem class="tableRow">
                     <cells>
-                        <Text text="{assetModel>EmployeeId}" />
-                        <Text text="{assetModel>EmployeeName}" />
+                    <ObjectIdentifier 
+                           title="{assetModel>EmployeeId}" 
+                           text="{assetModel>EmployeeName}" /> 
                         <Text text="{assetModel>Type}" />
                         <Text text="{assetModel>Model}" />
                         <Text text="{assetModel>EquipmentNumber}" />
@@ -198,9 +215,11 @@
                             state="{= ${assetModel>Status} === 'Assigned' ? 'Success' : 'Error' }"
                             text="{assetModel>Status}"
                         />
-                        <Text
-                            text="{path:'assetModel>ReturnDate',formatter:'.Formatter.formatDate'}"
-                        />
+                      <Text
+                        text="{= ${assetModel>ReturnDate} === '1899-11-30T00:00:00.000Z' || !${assetModel>ReturnDate} ? '' : ${assetModel>ReturnDate}.substring(8,10) + '/' + ${assetModel>ReturnDate}.substring(5,7) + '/' + ${assetModel>ReturnDate}.substring(0,4) }"
+                    />
+
+
                     </cells>
                 </ColumnListItem>
             </items>

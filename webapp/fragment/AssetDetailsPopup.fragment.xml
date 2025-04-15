@@ -1,18 +1,18 @@
 <core:FragmentDefinition
-	xmlns="sap.m"
-	xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
 >
     <Dialog
-        id="idValueHelpDialog"
+        id="FDP_id_ValueHelpDialog"
         title="{i18n>selectEquipmentDetails}"
         contentWidth="50%"
     >
         <content>
             <Table
-                id="idVHDTable"
+                id="FDP_id_VHDTable"
                 items="{incomeModel>/}"
             >
-            <columns>
+                <columns>
                     <Column>
                         <Text text="{i18n>model}" />
                     </Column>
@@ -50,4 +50,3 @@
         </beginButton>
     </Dialog>
 </core:FragmentDefinition>
-
