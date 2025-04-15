@@ -304,6 +304,8 @@ sap.ui.define([
                     };
                     BusyIndicator.show(0);
                     this.updateCallForTrainee(oUpdatedData, "downloadSucess");
+                    this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject().Status = "Training Completed"             
+                    this.byId("T_id_TraineeTable").removeSelections(true);
                     this.byId("T_id_Download").setVisible(false);
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                     let htmlContent = sap.ui.getCore().byId("myRTE").getValue();
@@ -417,6 +419,7 @@ sap.ui.define([
                 };
                 this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload).then((oData) => {
                     MessageToast.show(this.i18nModel.getText("certificateSuccess"));
+                    that.byId("T_id_TraineeTable").removeSelections(true);
                     BusyIndicator.hide();
                 }).catch((oError) => {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));

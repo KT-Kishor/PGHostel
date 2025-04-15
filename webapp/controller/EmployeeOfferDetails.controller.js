@@ -371,20 +371,15 @@ sap.ui.define([
                 this.oDialog.close();
             },
             EOD_onPressBackBtn: function () {
-                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonBack");
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("ConfirmActionTitle"),
+                    this.i18nModel.getText("backConfirmation"),
+                    function () {
+                        this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
+                    }.bind(this)
+                );
+            },
 
-            },
-            onConfirmBack: function () {
-                this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" })
-                this.oDialog.close();
-            },
-            onCancel: function () {
-                this.oDialog.close();
-            },
-            onDialogClose: function () {
-                this.oDialog.destroy();
-                this.oDialog = null;
-            },
             EOUF_onPressMerge: function () {
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);

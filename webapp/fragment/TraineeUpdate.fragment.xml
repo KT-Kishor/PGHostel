@@ -80,9 +80,9 @@
 										<m:DatePicker   id="TU_id_JoinDate"   value="{ path: 'oTraineeDetails>/JoiningDate',formatter:'.Formatter.formatDate' }"  editable="{viewModel>/editable}"  displayFormat="dd/MM/yyyy"     valueFormat="dd/MM/yyyy" 
                                     change="TD_validateDate" valueStateText="{i18n>dateValueState}" />
 										<m:Label text="{i18n>stipend}" required="true" />
-										<m:RadioButtonGroup id="TU_id_StipendRadio" columns="2" select="onUpdateSelectionChange" selectedIndex="0">
+										<m:RadioButtonGroup id="TU_id_StipendRadio" columns="2" select="onUpdateSelectionChange" >
 											<m:buttons>
-												<m:RadioButton text="{i18n>yes}"    editable="{viewModel>/editable}" />
+												<m:RadioButton text="{i18n>yes}"  editable="{viewModel>/editable}" />
 												<m:RadioButton text="{i18n>no}"  editable="{viewModel>/editable}"  />
 											</m:buttons>
 										</m:RadioButtonGroup>

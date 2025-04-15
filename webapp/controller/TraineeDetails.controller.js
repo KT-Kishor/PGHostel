@@ -155,6 +155,8 @@ sap.ui.define([
 
             //Submit trainee deatails 
             TD_onSubmitData: function (oEvent) {
+                var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
+                if (sStipendText === "Yes")  utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
                 if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
