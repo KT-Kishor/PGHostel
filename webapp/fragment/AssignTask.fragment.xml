@@ -24,7 +24,7 @@
 </MultiComboBox>
                 <Label text="{i18n>taskName}"/>
                 <Input value="{TaskDetailsModel>/TaskName}" id="FAT_id_TaskName" liveChange="AT_ValidateCommonFields" maxLength="99" valueStateText="{i18n>taskNameValueState}" editable="false"/>
-                <Label text="{i18n>tsakid}" />
+                <Label text="{i18n>taskid}" />
                 <Input value="{TaskDetailsModel>/TaskID}" id="FAT_id_TaskID"  maxLength="99" valueStateText="{i18n>taskNameValueState}" editable="false"/>
 
                 

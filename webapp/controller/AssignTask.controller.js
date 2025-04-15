@@ -18,11 +18,10 @@ sap.ui.define(
 
         _onRouteMatched: function (oEvent) {
           const sTaskID = oEvent.getParameter("arguments").taskID;
-
-          // Fetch task details for ObjectHeader
+          // Save the taskID to the controller
+          this._currentTaskID = sTaskID;
           this._fetchTaskDetails(sTaskID);
-          this.readCallForAllLoginDetails(); //Emplyees Detail
-          // Fetch assigned tasks for table
+          this.readCallForAllLoginDetails();
           this.CommonReadcall({ TaskID: sTaskID });
         },
 
@@ -49,34 +48,22 @@ sap.ui.define(
 
           this.ajaxReadWithJQuery("AllLoginDetails", filter)
             .then((oData) => {
-              let loginData = Array.isArray(oData.data)
-                ? oData.data
-                : [oData.data];
+              let loginData = Array.isArray(oData.data) ? oData.data : [oData.data];
 
               // Set full data model
               this.getView().setModel(
-                new JSONModel(loginData),
-                "LoginDetailsModel"
+                new JSONModel(loginData), "LoginDetailsModel"
               );
 
               // If "Initial", filter unique entries by LoginID or another field
               if (filter === "Initial") {
-                const uniqueLoginData = [
-                  ...new Map(
-                    loginData
-                      .filter(
-                        (item) => item.LoginID && item.LoginID.trim() !== ""
-                      )
-                      .map((item) => [item.LoginID.trim(), item])
-                  ).values(),
-                ];
+                const uniqueLoginData = [...new Map(loginData.filter((item) => item.LoginID && item.LoginID.trim() !== ""
+                ).map((item) => [item.LoginID.trim(), item])).values(),];
 
                 this.getView().setModel(
-                  new JSONModel(uniqueLoginData),
-                  "AllLoginDetailsModelInitial"
+                  new JSONModel(uniqueLoginData), "AllLoginDetailsModelInitial"
                 );
               }
-
               sap.ui.core.BusyIndicator.hide();
             })
             .catch((oError) => {
@@ -112,7 +99,6 @@ sap.ui.define(
 
         manageTaskDetails: function (bIsEdit) {
           const oView = this.getView();
-
           // Add 'isEditMode' to track edit state (true = edit mode, false = create mode)
           const oVisibleModel = new JSONModel({
             save: false,
@@ -134,9 +120,7 @@ sap.ui.define(
               return MessageToast.show("Please select a task to edit");
             }
 
-            const oData = oSelectedItem
-              .getBindingContext("AssignModel")
-              .getObject();
+            const oData = oSelectedItem.getBindingContext("AssignModel").getObject();
             this._originalTaskData = JSON.parse(JSON.stringify(oData));
             oModel = new JSONModel(oData);
           } else {
@@ -177,15 +161,21 @@ sap.ui.define(
           }
         },
         FAT_onSearch: function () {
-          var aFilterItems = this.byId("AT_id_FilterBar").getFilterGroupItems();
-          var params = {};
+          const aFilterItems = this.byId("AT_id_FilterBar").getFilterGroupItems();
+          const params = {
+            // Always include the current task ID
+            TaskID: this._currentTaskID
+          };
+
           aFilterItems.forEach(function (oItem) {
-            var oControl = oItem.getControl();
-            var sValue = oItem.getName();
+            const oControl = oItem.getControl();
+            const sValue = oItem.getName();
             if (oControl && oControl.getValue()) {
               params[sValue] = oControl.getValue();
             }
           });
+
+          // Use the merged params 
           this._fetchCommonData("AssignedTask", "AssignModel", params);
           this.CommonReadcall(params);
         },
@@ -208,9 +198,7 @@ sap.ui.define(
               params
             );
             if (response.success) {
-              let taskData = Array.isArray(response.data)
-                ? response.data
-                : [response.data];
+              let taskData = Array.isArray(response.data) ? response.data : [response.data];
 
               const aEmployees =
                 this.getView().getModel("LoginDetailsModel")?.getData() || [];
@@ -219,13 +207,10 @@ sap.ui.define(
               taskData = taskData.map((task) => {
                 if (task.EmployeeID) {
                   const empIDs = task.EmployeeID.split(",");
-                  const names = empIDs
-                    .map((id) => {
-                      const emp = aEmployees.find((e) => e.EmployeeID === id);
-                      return emp ? emp.EmployeeName : "";
-                    })
-                    .filter((name) => name !== "")
-                    .join(", ");
+                  const names = empIDs.map((id) => {
+                    const emp = aEmployees.find((e) => e.EmployeeID === id);
+                    return emp ? emp.EmployeeName : "";
+                  }).filter((name) => name !== "").join(", ");
                   task.EmployeeName = names;
                 }
                 return task;
@@ -241,83 +226,80 @@ sap.ui.define(
         //Submit the task details
         FAT_onSubmitTask: async function () {
           const oData = this.getView().getModel("EditTaskModel").getData();
-          const aEmployees = this.getView()
-            .getModel("LoginDetailsModel")
-            .getData(); // Get all employees
+          const aEmployees = this.getView().getModel("LoginDetailsModel").getData();
 
           // Validate all fields
           if (
-            !utils._LCvalidationComboBox(
-              sap.ui.getCore().byId("FAT_id_EmployeeID"),
-              "ID"
-            ) ||
-            !utils._LCvalidateDate(
-              sap.ui.getCore().byId("FAT_id_StartDate"),
-              "ID"
-            ) ||
-            !utils._LCvalidateDate(
-              sap.ui.getCore().byId("FAT_id_EndDate"),
-              "ID"
-            ) ||
-            !utils._LCvalidateTimeLimit(
-              sap.ui.getCore().byId("FAT_id_HoursWorked"),
-              "ID"
-            )
+            !utils._LCvalidationComboBox(sap.ui.getCore().byId("FAT_id_EmployeeID"), "ID") ||
+            !utils._LCvalidateDate(sap.ui.getCore().byId("FAT_id_StartDate"), "ID") ||
+            !utils._LCvalidateDate(sap.ui.getCore().byId("FAT_id_EndDate"), "ID") ||
+            !utils._LCvalidateTimeLimit(sap.ui.getCore().byId("FAT_id_HoursWorked"), "ID")
           ) {
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
           }
 
-          // Get selected EmployeeIDs and map to names
-          const aSelectedIDs = sap.ui
-            .getCore()
-            .byId("FAT_id_EmployeeID")
-            .getSelectedKeys()
+          const aSelectedIDs = sap.ui.getCore().byId("FAT_id_EmployeeID").getSelectedKeys()
             .filter((key) => key.trim() !== "");
 
-          // Lookup names from LoginDetailsModel
-          const aSelectedNames = aSelectedIDs
-            .map((id) => {
-              const oEmployee = aEmployees.find((emp) => emp.EmployeeID === id);
-              return oEmployee ? oEmployee.EmployeeName : "";
-            })
-            .filter((name) => name !== "");
+          const sTaskID = sap.ui.getCore().byId("FAT_id_TaskID").getValue();
 
-          // Update data with IDs and Names
+          //  Get ONLY existing assignments for the current TaskID
+          await this.CommonReadcall({ TaskID: sTaskID }); // This should filter by TaskID at backend or read logic
+          const aAssignedTasks = this.getView().getModel("AssignModel").getData() || [];
+
+          //  Only keep EmployeeIDs assigned to the same task
+          let existingEmployeeIDs = [];
+          aAssignedTasks.forEach(task => {
+            if (task.TaskID === sTaskID && task.EmployeeID) {
+              const ids = task.EmployeeID.split(",").map(id => id.trim());
+              existingEmployeeIDs = existingEmployeeIDs.concat(ids);
+            }
+          });
+
+          //  Check for duplicate assignment to the same task
+          const hasDuplicates = aSelectedIDs.some(id => existingEmployeeIDs.includes(id));
+          if (hasDuplicates) {
+            MessageToast.show("One or more selected employees are already assigned to this task.");
+            this.oTaskDialog.close();
+            return;
+          }
+
+          // Prepare names
+          const aSelectedNames = aSelectedIDs.map((id) => {
+            const oEmployee = aEmployees.find((emp) => emp.EmployeeID === id);
+            return oEmployee ? oEmployee.EmployeeName : "";
+          }).filter(name => name);
+
+          // Set payload
           oData.EmployeeID = aSelectedIDs.join(",");
-          oData.EmployeeName = aSelectedNames.join(","); // Add names to payload
-
-          // Add other data
-          oData.HoursWorked = sap.ui
-            .getCore()
-            .byId("FAT_id_HoursWorked")
-            .getValue();
+          oData.EmployeeName = aSelectedNames.join(",");
+          oData.HoursWorked = sap.ui.getCore().byId("FAT_id_HoursWorked").getValue();
           oData.TaskName = sap.ui.getCore().byId("FAT_id_TaskName").getValue();
-          oData.TaskID = sap.ui.getCore().byId("FAT_id_TaskID").getValue();
-          oData.StartDate = sap.ui
-            .getCore()
-            .byId("FAT_id_StartDate")
-            .getValue();
+          oData.TaskID = sTaskID;
+          oData.StartDate = sap.ui.getCore().byId("FAT_id_StartDate").getValue();
           oData.EndDate = sap.ui.getCore().byId("FAT_id_EndDate").getValue();
 
-          // Save to backend
-          const response = await this.ajaxCreateWithJQuery("AssignedTask", {
-            data: oData,
-          });
+          // AJAX create
+          const response = await this.ajaxCreateWithJQuery("AssignedTask", { data: oData });
 
           if (response.success) {
             MessageToast.show("Task Assigned successfully!");
-            this._fetchCommonData("AssignedTask", "AssignModel", {}); // Refresh table
-            this.CommonReadcall();
+            await this._fetchCommonData("AssignedTask", "AssignModel", { TaskID: sTaskID });
+            await this.CommonReadcall({ TaskID: sTaskID });
             this.oTaskDialog.close();
           } else {
             MessageToast.show("Failed to Assign task.");
           }
         },
+        //Update the task details
         MA_onPressSave: async function () {
           const oTable = this.byId("AT_id_TaskTable");
           const oSelectedItem = oTable.getSelectedItem();
-
+          const params = {
+            // Always include the current task ID
+            TaskID: this._currentTaskID
+          };
           if (!oSelectedItem) {
             MessageToast.show("Please select a task to update.");
             return;
@@ -325,9 +307,7 @@ sap.ui.define(
 
           const oEditModel = this.getView().getModel("EditTaskModel");
           const oData = { ...oEditModel.getData() }; // Clone data to prevent reference issues
-          const oTaskId = oSelectedItem
-            .getBindingContext("AssignModel")
-            .getProperty("EmployeeID");
+          const oTaskId = oSelectedItem.getBindingContext("AssignModel").getProperty("EmployeeID");
 
           try {
             const response = await this.ajaxUpdateWithJQuery("/AssignedTask", {
@@ -339,11 +319,9 @@ sap.ui.define(
               MessageToast.show("Task updated successfully!");
 
               // 1. Refresh the entire table data
-              this._fetchCommonData("AssignedTask", "AssignModel", {
-                EmployeeID: oTaskId,
-              });
-              this.CommonReadcall({ EmployeeID: oTaskId });
-
+              this._fetchCommonData("AssignedTask", "AssignModel", params);
+              this.FAT_onSearch()
+              this.CommonReadcall(params);
               // 3. Clear selection and close dialog
               oTable.removeSelections();
               this.oTaskDialog.close();

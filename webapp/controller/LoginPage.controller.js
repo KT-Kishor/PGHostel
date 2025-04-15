@@ -111,6 +111,7 @@ sap.ui.define(
           }
         },
         LP_onLogin: function () {
+          // this.getRouter().navTo("RouteTilePage");
           const oLoginModel = this.getView().getModel("LoginModel");
           const oVM = this.getView().getModel("LoginViewModel");
           // Validate User ID and Name
@@ -140,18 +141,18 @@ sap.ui.define(
               EmployeeID: oVM.getProperty("/userId"),
               EmployeeName: oVM.getProperty("/userName"),
               OTP: oVM.getProperty("/isOtpSelected") ? oVM.getProperty("/otp") : "",
-              Password: oVM.getProperty("/isPasswordSelected") ? encodeURIComponent(oVM.getProperty("/password")) : ""
+              Password: oVM.getProperty("/isPasswordSelected") ? btoa(oVM.getProperty("/password")) : ""
             }).then((response) => {
               if (response?.success && response.data?.length > 0) {
                 const userData = response.data[0];
 
                 if (oVM.getProperty("/isOtpSelected")) {
-                  var timeDifference = new Date().getTime() - new Date(userData.TimeDate).getTime();
-                  if (timeDifference <= 6000) {
-                    return MessageToast.show(this.i18nModel.getText("loginTimeOut"));
+                  var timeDifference = new Date().getTime() - new Date(parseInt(userData.TimeDate)).getTime();
+                  if (timeDifference <= 1200000) {
+                    MessageToast.show(this.i18nModel.getText("loginTimeOut"));
+                    return;
                   }
                 }
-
                 if (
                   oVM.getProperty("/userId") === userData.EmployeeID &&
                   oVM.getProperty("/userName") === userData.EmployeeName
@@ -355,7 +356,7 @@ sap.ui.define(
             try {
               this.ajaxUpdateWithJQuery("LoginDetails", {
                 data: {
-                  Password: encodeURIComponent(oFragModel.getProperty("/frgNewPassword")),
+                  Password: btoa(oFragModel.getProperty("/frgNewPassword")),
                 },
                 filters: {
                   EmployeeID: oFragModel.getProperty("/frgUserId")
@@ -373,12 +374,11 @@ sap.ui.define(
                 } else {
                   MessageToast.show("An error occurred: " + response.message);
                 }
-              })
-                .catch(() => {
-                  MessageToast.show(this.i18nModel.getText("loginFailed"));
-                });
+              }).catch(() => {
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+              });
             } catch (error) {
-              MessageToast.show(this.i18nModel.getText("loginFailed"));
+              MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             }
           }
         }

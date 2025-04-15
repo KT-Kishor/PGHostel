@@ -118,10 +118,7 @@ sap.ui.define(
           const oData = this.getView().getModel("EditTaskModel").getData();
           // Simple validation
           if (
-            utils._LCvalidateMandatoryField(
-              sap.ui.getCore().byId("FNA_id_TaskName"),
-              "ID"
-            ) &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FNA_id_TaskName"), "ID") &&
             utils._LCvalidateMandatoryField(
               sap.ui.getCore().byId("NAF_id_Description"),
               "ID"
@@ -154,14 +151,12 @@ sap.ui.define(
           }
         },
         MA_onPressSave: async function () {
-          const oTable = this.byId("MA_id_TaskTable");
-          const oSelectedItem = oTable.getSelectedItem();
+          const oSelectedItem = this.byId("MA_id_TaskTable").getSelectedItem();
 
           if (!oSelectedItem) {
             MessageToast.show("Please select a task to update.");
             return;
           }
-
           const oData = this.getView().getModel("EditTaskModel").getData();
           const oTaskId = oSelectedItem
             .getBindingContext("TaskModel")
@@ -169,8 +164,7 @@ sap.ui.define(
 
           const requestData = { filters: { TaskID: oTaskId }, data: oData };
 
-          const response = await this.ajaxUpdateWithJQuery(
-            "/NewTask",
+          const response = await this.ajaxUpdateWithJQuery("/NewTask",
             requestData
           );
 
@@ -178,6 +172,7 @@ sap.ui.define(
             MessageToast.show("Task updated successfully!");
             this.oTaskDialog.close();
             this._fetchCommonData("NewTask", "TaskModel", {});
+            this.CommonReadcall()
           } else {
             MessageToast.show("Failed to update task.");
           }
