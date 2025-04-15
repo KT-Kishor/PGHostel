@@ -60,20 +60,34 @@
 							<Label text="{i18n>emailId}" required="true" />
 							<Input value="{oTraineeDetails>/TraineeEmail}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>stipend}" required="true" />
-							<Input value="{oTraineeDetails>/Stipend}" maxLength="15" placeholder="{i18n>placeStipend}" id="TD_id_Stipend" liveChange="TD_validateAmount" valueStateText="{i18n>ammountValuState}"/>
-							<Select items="{CurrencyModel>/}"  selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" width="100%" class="marginLeft">
+							<RadioButtonGroup id="TD_id_StipendRadio" columns="2" select="onStipendSelectionChange" selectedIndex="0">
+								<buttons>
+									<RadioButton text="{i18n>yes}"  selected="true"/>
+									<RadioButton text="{i18n>no}" />
+								</buttons>
+							</RadioButtonGroup>
+							<Label id="TD_id_StipendLabel" text="{i18n>stipend}" required="true" />
+							<Input value="{oTraineeDetails>/Stipend}" 
+									   type="Number"
+									   placeholder="{i18n>placeStipend}" 
+									   id="TD_id_Stipend" 
+									   liveChange="TD_validateAmount" 
+									   valueStateText="{i18n>ammountValuState}"/>
+							<Select items="{CurrencyModel>/}" 
+										selectedKey="{oTraineeDetails>/Currency}" 
+										id="TD_id_Currency" 
+										width="100%" 
+										class="marginLeft">
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
 							<Label text="{i18n>traineeDuration}" required="true" />
-								<Select items="{TrainingDurationModel>/duration}"  selectedKey="{oTraineeDetails>/TrainingDuration}" id="TD_id_TDuration" width="100%" class="marginLeft">
-									<core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
-								</Select>
+							<Select items="{TrainingDurationModel>/duration}"  selectedKey="{oTraineeDetails>/TrainingDuration}" id="TD_id_TDuration" width="100%" class="marginLeft">
+								<core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
+							</Select>
 							<Label text="{i18n>releaseDateT}"   required="true" />
 							<DatePicker  value="{oTraineeDetails>/ReleaseDate}" id="TD_id_ReleaseDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>joiningDate}"   required="true" />
 							<DatePicker value="{oTraineeDetails>/JoiningDate}" id="TD_id_JoiningDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
-								
-							
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
@@ -106,15 +120,12 @@
 							<Text text="{oTraineeDetails>/Stipend} "/>
 							<Label text="{i18n>currency}" />
 							<Text text="{oTraineeDetails>/Currency}"/>
-
 							<Label text="{i18n>releaseDate}" />
 							<Text text="{oTraineeDetails>/ReleaseDate}"/>
 							<Label text="{i18n>joiningDate}" />
 							<Text text="{oTraineeDetails>/JoiningDate}"/>
-
 							<Label text="{i18n>traineeDuration}" />
 							<Text text="{oTraineeDetails>/TrainingDuration}"/>
-
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>

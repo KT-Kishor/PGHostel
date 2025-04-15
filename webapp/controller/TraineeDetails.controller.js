@@ -21,7 +21,6 @@ sap.ui.define([
                 await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });//CC mailId read call
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
-
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.T_onResetWizard();
                 var jsonData = {
@@ -93,22 +92,22 @@ sap.ui.define([
             //validate name function
             TD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
-                this.validateStep();
+                this.TD_validateStep();
             },
             //validate email function
             TD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
-                this.validateStep();
+                this.TD_validateStep();
             },
             //validate amount function
             TD_validateAmount: function (oEvent) {
-                utils._LCvalidateTraineeAmount(oEvent);
-                this.validateStep();
+                utils._LCvalidateAmount(oEvent);
+                this.TD_validateStep();
             },
             //validate date function
             TD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent); // Base validation
-                this.validateStep(); // Step validation
+                this.TD_validateStep(); // Step validation
                 var oOfferDateId = oEvent.getSource().getId().split("--")[2];
                 var releaseDate, joinDateVa;
                 if (oOfferDateId === "TD_id_ReleaseDate" || oOfferDateId === "TU_id_RelDate") {
@@ -128,20 +127,32 @@ sap.ui.define([
                 }
             },
             //wizard step validation function
-            validateStep: function () {
+            TD_validateStep: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                 oModel.TrainingDuration = this.byId("TD_id_TDuration").getSelectedKey();
-                // Check if all fields have values
-                var allFieldsFilled = oModel.TraineeName && oModel.ReportingManager && oModel.TraineeEmail && oModel.Stipend && oModel.Currency && oModel.TrainingDuration && oModel.ReleaseDate && oModel.JoiningDate;
+                var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
+                // Required fields check (stipend is checked only if "Yes" is selected)
+                var allFieldsFilled = oModel.TraineeName && oModel.ReportingManager && oModel.TraineeEmail && oModel.TrainingDuration &&
+                    oModel.ReleaseDate && oModel.JoiningDate &&(sStipendText === "No" || (oModel.Stipend && oModel.Currency));
                 if (allFieldsFilled) {
-                    var isValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCvalidateTraineeAmount(this.getView().byId("TD_id_Stipend"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
-                    this.byId("TD_id_Wizard").getSteps()[0].setValidated(isValid);
+                    let bValid =
+                        utils._LCvalidateName(this.byId("TD_id_Name"), "ID") &&
+                        utils._LCvalidateName(this.byId("TD_id_ReportingManager"), "ID") &&
+                        utils._LCvalidateEmail(this.byId("TD_id_EmailID"), "ID") &&
+                        utils._LCvalidateDate(this.byId("TD_id_ReleaseDate"), "ID") &&
+                        utils._LCvalidateDate(this.byId("TD_id_JoiningDate"), "ID");
+                    // Validate stipend only if "Yes" is selected
+                    if (sStipendText === "Yes") {
+                        bValid = bValid && utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
+                    }
+                    this.byId("TD_id_Wizard").getSteps()[0].setValidated(bValid);
                 } else {
                     this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                     this.byId("TD_id_StepOne").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
                 }
             },
+
             //Submit trainee deatails 
             TD_onSubmitData: function (oEvent) {
                 if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
@@ -208,22 +219,33 @@ sap.ui.define([
             //Edit/save button visibility function
             TU_onEditOrSavePress: function () {
                 if (this.viewModel.getProperty("/editable")) {
-                    var isValid = utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") && utils._LCvalidateName(this.getView().byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") && utils._LCvalidateTraineeAmount(this.getView().byId("TU_id_Stipend"), "ID");
-                    // Save the changes
-                    if (isValid) this.updateCallForTrainee(this.viewModel);
-                    else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    var oView = this.getView();
+                    var sStipendSelectedText = oView.byId("TU_id_StipendRadio").getSelectedButton().getText();
+                    // Perform stipend validation only if "Yes" is selected
+                    var bIsStipendValid = true;
+                    if (sStipendSelectedText === "Yes") {
+                        bIsStipendValid = utils._LCvalidateAmount(oView.byId("TU_id_Stipend"), "ID");
+                    }
+                    var isValid = 
+                        utils._LCvalidateName(oView.byId("TU_id_Name"), "ID") &&utils._LCvalidateName(oView.byId("TU_id_Manager"), "ID") &&utils._LCvalidateEmail(oView.byId("TU_id_TraineeMail"), "ID") && bIsStipendValid;
+                    // Save the changes if all validations pass
+                    if (isValid) {
+                        this.updateCallForTrainee(this.viewModel);
+                    } else {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    }
                 } else {
                     this.viewModel.setProperty("/editable", true);
                     this.viewModel.setProperty("/isEditMode", false);
                 }
             },
+            
             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 delete oModel.EndDate
-                oModel.ReleaseDate=this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");;
-                oModel.JoiningDate=this.byId("TU_id_JoinDate").getValue().split("/").reverse().join("-");
-
+                oModel.ReleaseDate = this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");;
+                oModel.JoiningDate = this.byId("TU_id_JoinDate").getValue().split("/").reverse().join("-");
                 // Check and update the status if it is 'Rejected'
                 if (oModel.Status === "Rejected") {
                     oModel.Status = "Submitted";
@@ -245,7 +267,6 @@ sap.ui.define([
                         BusyIndicator.hide();
                         MessageToast.show(this.i18nModel.getText("traineeDataUpdated"));
                         this.getView().getModel("oTraineeDetails").refresh(true);
-
                     }
                 }).catch((oError) => {
                     BusyIndicator.hide();
@@ -301,10 +322,7 @@ sap.ui.define([
             },
             //File upload function
             Mail_onUpload: function (oEvent) {
-                this.handleFileUpload(
-                    oEvent,
-                    this,
-                    "UploaderData", "/attachments", "/name", "/isFileUploaded", "uploadSuccessfull", "fileAlreadyUploaded", "noFileSelected", "fileReadError",
+                this.handleFileUpload( oEvent, this, "UploaderData", "/attachments", "/name", "/isFileUploaded", "uploadSuccessfull", "fileAlreadyUploaded", "noFileSelected", "fileReadError",
                     () => this.validateSendButton()
                 );
             },
@@ -402,6 +420,33 @@ sap.ui.define([
                     BusyIndicator.hide();
                     console.error("Error waiting for models:", error);
                 }
-            }
+            },
+            handleStipendSelection: function (sSelectedText, sStipendId, sCurrencyId, sModelName, sCurrencyPath) {
+                var oModel =  this.getView().getModel(sModelName || "oTraineeDetails");  
+                if (sSelectedText === "No") {
+                    this.getView().byId(sStipendId).setVisible(false);
+                    this.getView().byId(sCurrencyId).setVisible(false);
+                    this.getView().byId(sStipendId).setValue("0");
+                    if (oModel && sCurrencyPath) {
+                        oModel.setProperty(sCurrencyPath, "INR");
+                    }
+                } else {
+                    this.getView().byId(sStipendId).setVisible(true);
+                    this.getView().byId(sCurrencyId).setVisible(true);
+                    this.getView().byId(sStipendId).setValue("");
+                }
+                if (this.TD_validateStep) {
+                    this.TD_validateStep();
+                }
+            },
+            onStipendSelectionChange: function (oEvent) {
+                var sSelectedText = oEvent.getSource().getSelectedButton().getText();
+                this.handleStipendSelection( sSelectedText, "TD_id_Stipend",  "TD_id_Currency", "oTraineeDetails", "/Currency" );
+            },
+            onUpdateSelectionChange: function (oEvent) {
+                var sSelectedText = oEvent.getSource().getSelectedButton().getText();
+                var sSelectedText = oEvent.getSource().getSelectedButton().getText();
+                this.handleStipendSelection( sSelectedText, "TU_id_Stipend",  "TU_id_Currency", "oTraineeDetails", "/Currency" );
+            },
         });
     });
