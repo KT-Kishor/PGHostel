@@ -111,7 +111,6 @@ sap.ui.define(
           }
         },
         LP_onLogin: function () {
-          this.getRouter().navTo("RouteTilePage");
           const oLoginModel = this.getView().getModel("LoginModel");
           const oVM = this.getView().getModel("LoginViewModel");
           // Validate User ID and Name
@@ -142,46 +141,47 @@ sap.ui.define(
               EmployeeName: oVM.getProperty("/userName"),
               OTP: oVM.getProperty("/isOtpSelected") ? oVM.getProperty("/otp") : "",
               Password: oVM.getProperty("/isPasswordSelected") ? oVM.getProperty("/password") : ""
-            })
-              .then((response) => {
-                if (response?.success && response.data?.length > 0) {
-                  const userData = response.data[0];
+            }).then((response) => {
+              if (response?.success && response.data?.length > 0) {
+                const userData = response.data[0];
+
+                if (oVM.getProperty("/isOtpSelected")) {
                   var timeDifference = new Date().getTime() - new Date(userData.TimeDate).getTime();
                   if (timeDifference <= 6000) {
-                    MessageToast.show(this.i18nModel.getText("loginTimeOut"));
-                    return;
+                    return MessageToast.show(this.i18nModel.getText("loginTimeOut"));
                   }
-                  if (
-                    oVM.getProperty("/userId") === userData.EmployeeID &&
-                    oVM.getProperty("/userName") === userData.EmployeeName
-                  ) {
-                    // Save to LoginModel 
-                    oLoginModel.setProperty("/EmployeeID", userData.EmployeeID);
-                    oLoginModel.setProperty("/EmployeeName", userData.EmployeeName);
-                    oLoginModel.setProperty("/EmailID", userData.EmailID);
-                    oLoginModel.setProperty("/Role", userData.Role);
-                    oLoginModel.setProperty("/FolderID", response.FolderID);
-                    oLoginModel.setProperty("/EducationalandDocumentsDetailFolderID", userData.EducationalandDocumentsDetailFolderID);
-                    oLoginModel.setProperty("/EmploymentDetailFolderID", userData.EmploymentDetailFolderID);
-                    oLoginModel.setProperty("/", userData.EmployeeID);
-                    // Reset LoginViewModel
-                    oVM.setProperty("/userId", ""); oVM.setProperty("/userName", ""); oVM.setProperty("/otp", ""); oVM.setProperty("/password", ""); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isPasswordVisible", false); oVM.setProperty("/isSendOtpVisible", false); oVM.setProperty("/sendOtpText", this.i18nModel.getText("sendOtp")); oVM.setProperty("/isOtpSelected", false); oVM.setProperty("/isPasswordSelected", false); oVM.setProperty("/isForgotPasswordVisible", false);
-                    // Navigate
-                    this.getRouter().navTo("RouteTilePage");
-                  } else {
-                    MessageToast.show(this.i18nModel.getText("errorMsguser"));
-                  }
-
-                } else {
-                  const backendMsg = response?.message || this.i18nModel.getText("loginFailed");
-                  MessageToast.show(backendMsg);
                 }
-              }).catch((error) => {
-                const errorMsg = error?.responseText
-                  ? JSON.parse(error.responseText).message
-                  : this.i18nModel.getText("loginFailed");
-                MessageToast.show(errorMsg);
-              });
+
+                if (
+                  oVM.getProperty("/userId") === userData.EmployeeID &&
+                  oVM.getProperty("/userName") === userData.EmployeeName
+                ) {
+                  // Save to LoginModel 
+                  oLoginModel.setProperty("/EmployeeID", userData.EmployeeID);
+                  oLoginModel.setProperty("/EmployeeName", userData.EmployeeName);
+                  oLoginModel.setProperty("/EmailID", userData.EmailID);
+                  oLoginModel.setProperty("/Role", userData.Role);
+                  oLoginModel.setProperty("/FolderID", response.FolderID);
+                  oLoginModel.setProperty("/EducationalandDocumentsDetailFolderID", userData.EducationalandDocumentsDetailFolderID);
+                  oLoginModel.setProperty("/EmploymentDetailFolderID", userData.EmploymentDetailFolderID);
+
+                  // Reset LoginViewModel
+                  oVM.setProperty("/userId", ""); oVM.setProperty("/userName", ""); oVM.setProperty("/otp", ""); oVM.setProperty("/password", ""); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isPasswordVisible", false); oVM.setProperty("/isSendOtpVisible", false); oVM.setProperty("/sendOtpText", this.i18nModel.getText("sendOtp")); oVM.setProperty("/isOtpSelected", false); oVM.setProperty("/isPasswordSelected", false); oVM.setProperty("/isForgotPasswordVisible", false);
+                  // Navigate
+                  this.getRouter().navTo("RouteTilePage");
+                } else {
+                  MessageToast.show(this.i18nModel.getText("errorMsguser"));
+                }
+              } else {
+                const backendMsg = response?.message || this.i18nModel.getText("loginFailed");
+                MessageToast.show(backendMsg);
+              }
+            }).catch((error) => {
+              const errorMsg = error?.responseText
+                ? JSON.parse(error.responseText).message
+                : this.i18nModel.getText("loginFailed");
+              MessageToast.show(errorMsg);
+            });
           } catch (e) {
             MessageToast.show(this.i18nModel.getText("loginFailed"));
           }

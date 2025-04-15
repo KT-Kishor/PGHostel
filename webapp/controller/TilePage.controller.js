@@ -24,6 +24,9 @@ sap.ui.define(
         RP_onUseridpress: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
+        RP_onUsername: function (oEvent) {
+          utils._LCvalidateName(oEvent);
+        },
         RP_onChangnewpass: function (oEvent) {
           utils._LCvalidatePassword(oEvent);
         },
@@ -125,6 +128,7 @@ sap.ui.define(
           // Validate inputs
           if (
             !utils._LCvalidateMandatoryField(oUserIdInput, "ID") ||
+            !utils._LCvalidateName(oUserNameInput, "ID") ||
             !utils._LCvalidatePassword(oNewPwInput, "ID") ||
             !utils._LCvalidateMandatoryField(oConfirmPwInput, "ID")
           ) {
