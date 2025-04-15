@@ -93,20 +93,19 @@ sap.ui.define(
               EmployeeID: oModel.getProperty("/userId"),
               EmployeeName: oModel.getProperty("/userName"),
               Type: "OTP"
-            })
-              .then((response) => {
-                if (response && response.success === true) {
-                  oModel.setProperty("/isOtpVisible", true);
-                  oModel.setProperty("/isSendOtpVisible", true);
-                  oModel.setProperty("/sendOtpText", this.i18nModel.getText("msgresndotp"));
-                  MessageToast.show(this.i18nModel.getText("sentOTP"));
-                } else {
-                  MessageToast.show(this.i18nModel.getText("errorMsguser"));
-                }
-              })
-              .catch((error) => {
+            }).then((response) => {
+              if (response && response.success === true) {
+
+                oModel.setProperty("/isOtpVisible", true);
+                oModel.setProperty("/isSendOtpVisible", true);
+                oModel.setProperty("/sendOtpText", this.i18nModel.getText("msgresndotp"));
+                MessageToast.show(this.i18nModel.getText("sentOTP"));
+              } else {
                 MessageToast.show(this.i18nModel.getText("errorMsguser"));
-              });
+              }
+            }).catch((error) => {
+              MessageToast.show(this.i18nModel.getText("errorMsguser"));
+            });
           } catch (err) {
             // Fallback error (in case .then/.catch block fails)
             MessageToast.show(this.i18nModel.getText("errorMsguser"));
@@ -143,7 +142,7 @@ sap.ui.define(
               EmployeeID: oVM.getProperty("/userId"),
               EmployeeName: oVM.getProperty("/userName"),
               OTP: oVM.getProperty("/isOtpSelected") ? oVM.getProperty("/otp") : "",
-              Password: oVM.getProperty("/isPasswordSelected") ? oVM.getProperty("/password") : ""
+              Password: oVM.getProperty("/isPasswordSelected") ? btoa(oVM.getProperty("/password")) : ""
             })
               .then((response) => {
                 if (response?.success && response.data?.length > 0) {
@@ -152,7 +151,7 @@ sap.ui.define(
                     oVM.getProperty("/userId") === userData.EmployeeID &&
                     oVM.getProperty("/userName") === userData.EmployeeName
                   ) {
-                    // Save to LoginModel
+                    // Save to LoginModel 
                     oLoginModel.setProperty("/EmployeeID", userData.EmployeeID);
                     oLoginModel.setProperty("/EmployeeName", userData.EmployeeName);
                     oLoginModel.setProperty("/EmailID", userData.EmailID);
@@ -171,8 +170,7 @@ sap.ui.define(
                   const backendMsg = response?.message || this.i18nModel.getText("loginFailed");
                   MessageToast.show(backendMsg);
                 }
-              })
-              .catch((error) => {
+              }).catch((error) => {
                 const errorMsg = error?.responseText
                   ? JSON.parse(error.responseText).message
                   : this.i18nModel.getText("loginFailed");
@@ -351,26 +349,25 @@ sap.ui.define(
             try {
               this.ajaxUpdateWithJQuery("LoginDetails", {
                 data: {
-                  Password: oFragModel.getProperty("/frgNewPassword")
+                  Password: btoa(oFragModel.getProperty("/frgNewPassword")),
                 },
                 filters: {
                   EmployeeID: oFragModel.getProperty("/frgUserId")
                 }
-              })
-                .then((response) => {
-                  if (response.success === true) {
-                    MessageToast.show(this.i18nModel.getText("updatepassword"));
-                    // Reset form state
-                    sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(true);
-                    sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(true);
-                    sap.ui.getCore().byId("FSM_id_otpInput").setEditable(true); oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
-                    if (this.oPassforgot) {
-                      this.oPassforgot.close();
-                    }
-                  } else {
-                    MessageToast.show("An error occurred: " + response.message);
+              }).then((response) => {
+                if (response.success === true) {
+                  MessageToast.show(this.i18nModel.getText("updatepassword"));
+                  // Reset form state
+                  sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(true);
+                  sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(true);
+                  sap.ui.getCore().byId("FSM_id_otpInput").setEditable(true); oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
+                  if (this.oPassforgot) {
+                    this.oPassforgot.close();
                   }
-                })
+                } else {
+                  MessageToast.show("An error occurred: " + response.message);
+                }
+              })
                 .catch(() => {
                   MessageToast.show(this.i18nModel.getText("loginFailed"));
                 });
