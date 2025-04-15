@@ -102,7 +102,6 @@ sap.ui.define([
     _fetchCommonData: async function (entityName, modelName, filter = "", busyIds = []) {
       busyIds.forEach(id => this.setBusyOnId(id, true));
       let url = this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;
-      sap.ui.core.BusyIndicator.show(0);
       var that = this;
       try {
         const data = await new Promise((resolve, reject) => {
@@ -126,10 +125,8 @@ sap.ui.define([
           });
         });
 
-        sap.ui.core.BusyIndicator.hide();
       } catch (error) {
         busyIds.forEach(id => this.setBusyOnId(id, false));
-        sap.ui.core.BusyIndicator.hide();
         sap.m.MessageToast.show(error.responseJSON?.message || "Technical error, please contact the administrator");
       }
     },
@@ -233,16 +230,16 @@ sap.ui.define([
 
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
-    
+
       // Convert and fetch values
       var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",", ""));
       var VariableData = parseFloat(oModel.getProperty("/VariablePercentage"));
       var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus").replaceAll(",", ""));
       var VariablePay = CTC * VariableData / 100;
-       
+
       var BasicSalary, HRA, EmployeerPF, MedicalInsurance, Gratuity, SpecailAllowance, Total;
       var DeductionPF, IncomeTax_TDS, DeductionTotal, GrossPay;
-    
+
       if (isTDSIncluded === "TDS") {
         BasicSalary = CTC * 40 / 100;
         HRA = BasicSalary * 40 / 100;
@@ -250,13 +247,13 @@ sap.ui.define([
         MedicalInsurance = BasicSalary * 40 / 100;
         Gratuity = BasicSalary * 4.81 / 100;
         SpecailAllowance = CTC - (BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity);
-        Total = BasicSalary + HRA  + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
-    
+        Total = BasicSalary + HRA + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
+
         DeductionPF = 0;
         IncomeTax_TDS = CTC * 10 / 100;
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
-    
+
       } else {
         var newCTC = CTC - VariablePay;
         BasicSalary = newCTC * 40 / 100;
@@ -266,13 +263,13 @@ sap.ui.define([
         Gratuity = BasicSalary * 4.81 / 100;
         SpecailAllowance = newCTC - (BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity);
         Total = BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity + SpecailAllowance;
-    
+
         DeductionPF = BasicSalary * 12 / 100;
         IncomeTax_TDS = CTC * 10 / 100;
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
       }
-    var CostToCompany = GrossPay + DeductionTotal + VariablePay + joiningBonus;
+      var CostToCompany = GrossPay + DeductionTotal + VariablePay + joiningBonus;
       // Set model properties
       oModel.setProperty("/BasicSalary", Math.round(BasicSalary));
       oModel.setProperty("/HRA", Math.round(HRA));
@@ -281,7 +278,7 @@ sap.ui.define([
       oModel.setProperty("/Gratuity", Math.round(Gratuity));
       oModel.setProperty("/SpecailAllowance", Math.round(SpecailAllowance));
       oModel.setProperty("/Total", Math.round(Total));
-    
+
       oModel.setProperty("/EmployeePF", Math.round(DeductionPF));
       oModel.setProperty("/PT", Math.round(2400));
       oModel.setProperty("/IncomeTax", Math.round(IncomeTax_TDS));
@@ -291,7 +288,7 @@ sap.ui.define([
 
       oModel.setProperty("/VariablePay", Math.round(VariablePay));
       oModel.setProperty("/CostofCompany", Math.round(CostToCompany));
-    }, 
+    },
 
     //Date picker common function 
     _makeDatePickersReadOnly: function (aIds) {
@@ -418,65 +415,30 @@ sap.ui.define([
       oFileUploader.setValue("");
     },
 
-    _waitForModels(modelNames, interval = 200, timeout = 5000) {
-      return new Promise((resolve, reject) => {
-        const startTime = Date.now();
-
-        const checkModels = () => {
-          let allLoaded = modelNames.every(modelName => {
-            let model = this.getView().getModel(modelName);
-            return model && model.getData() && Object.keys(model.getData()).length > 0;
-          });
-
-          if (allLoaded) {
-            resolve(); // ✅ Proceed when models have data
-          } else if (Date.now() - startTime > timeout) {
-            reject(new Error("Timeout waiting for models: " + modelNames.join(", ")));
-          } else {
-            setTimeout(checkModels, interval);
-          }
-        };
-
-        checkModels();
-      });
-    },
-
     async generateCertificatePDF(content) {
       var oModel = this.getView().getModel("PDFData").getData();
-      var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
-      if (oCoModel) {
-        oCoModel.destroy();
-        this.getView().setModel(null, "CompanyCodeDetailsModel");
+      sap.ui.core.BusyIndicator.show(0);
+      await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+      var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+      if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+        MessageToast.show("Company Logo or Model not found.");
+        return;
       }
-      try {
-        this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
-        await this._waitForModels(["CompanyCodeDetailsModel"], 200, 5000);
-
-        sap.ui.core.BusyIndicator.show(0);
-        var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-        if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-          MessageToast.show("Company Logo or Model not found.");
-          return;
+      if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+        var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+        var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
+        if (logoBase64 && signBase64) {
+          oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
+          oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
         }
-        if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
-          var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
-          var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
-          if (logoBase64 && signBase64) {
-            oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
-            oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
-          }
+      }
+      if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+        if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+          jsPDF._GeneratePDF(content, oCompanyDetailsModel, oModel);
+        } else {
+          sap.ui.core.BusyIndicator.hide();
+          console.error("Error: jsPDF._GeneratePDF function not found.");
         }
-        if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
-          if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
-            jsPDF._GeneratePDF(content, oCompanyDetailsModel, oModel);
-          } else {
-            console.error("Error: jsPDF._GeneratePDF function not found.");
-          }
-        }
-      } catch (error) {
-        sap.ui.core.BusyIndicator.hide();
-        sap.m.MessageToast.show("Error generating PDF: " + error.message);
-        console.error("Error waiting for models:", error);
       }
     },
     //common confirmation dialog box

@@ -13,20 +13,26 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteQuotationForm").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: function () {
+        _onRouteMatched: async function () {
             var oView = this.getView();
             this.oCore = sap.ui.getCore();
             this.oModel = oView.getModel("Quotation");
             this.oLoginModel = oView.getModel("LoginModel");
             this._makeDatePickersReadOnly(["QF_id_VehVariant"]);
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-
+            
             if (!this.oLoginModel) {
                 this.getRouter().navTo("RouteLoginPage");
                 return;
             }
+            var response = await this.ajaxCreateWithJQuery("UniqueScheme", {data: {}});
+            if (response.success) {
+                this.oModel.setProperty("/ModelList", response.results);
+            } else {
+                MessageToast.show(this.i18nModel.getText("msgSchemeDetailErrorSave"));
+            }
             oView.byId("QF_id_PDFBtn").setEnabled(true);
-            this._commonGETCall("CompanyCodeDetails", "CompanyCodeDetails", { /*branchCode: this.oModel.getProperty("/QuotationFormData/BranchCode")*/ }, ["QF_id_Page"]);
+            this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { /* Asim did this code he is great branchCode: this.oModel.getProperty("/QuotationFormData/BranchCode")*/ }, ["QF_id_Page"]);
         },
 
         QF_onNavBack: function () {
@@ -35,7 +41,7 @@ sap.ui.define([
 
         QF_onBranchCodeChange: function () {
             var sSelectedValue = this.getView().byId("QF_id_BranchCodes").getValue();
-            this._commonGETCall("CompanyCodeDetails", "CompanyCodeDetails", { branchCode: sSelectedValue }, ["QF_id_Page"]);
+            this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: sSelectedValue }, ["QF_id_Page"]);
             this.oModel.setProperty("/CompanyCode", sSelectedValue);
             this.oModel.setProperty("/Branch", sSelectedValue.getAdditionalText());
         },
@@ -76,9 +82,14 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        QF_onModelSelectionChange: function (oEvent) {
+        QF_onModelSelectionChange: async function (oEvent) {
             var selectedKey = oEvent.getParameter("selectedItem").getKey();
-            this._commonGETCall("SchemeUploade", "VariantList", { Model: selectedKey }, ["QF_id_VehVariant"]);
+            var response = await this.ajaxCreateWithJQuery("UniqueScheme", {filters: {Model: selectedKey}});
+            if (response.success) {
+                this.oModel.setProperty("/VariantList", response.results);
+            } else {
+                MessageToast.show(this.i18nModel.getText("msgSchemeDetailErrorSave"));
+            }
         },
 
         QF_onVariantChange: function (oEvent) {
@@ -124,7 +135,7 @@ sap.ui.define([
         },
 
         VVF_onVariantSelect: function (oEvent) {
-            var oContext = oEvent.getSource().getBindingContext("QData").getObject();
+            var oContext = oEvent.getSource().getBindingContext("Quotation").getObject();
             var oOldData = this.oModel.getProperty("/QuotationFormData");
             var oNewData = Object.assign({}, oOldData, oContext);
             this.oModel.setProperty("/QuotationFormData", oNewData);
@@ -133,7 +144,7 @@ sap.ui.define([
             this._onCloseDialog();
         },
 
-        _onCloseDialog: function () {
+        VVF_onCloseDialog: function () {
             this.oCore.byId("VVF_id_SearchField").setValue("");
             var oBinding = this.oCore.byId("VVF_id_Table").getBinding("items");
             if (oBinding) oBinding.filter([]);
@@ -184,7 +195,7 @@ sap.ui.define([
         QF_onPressSubmit: async function () {
             try {
                 if (this._checkValidation()) {
-                    var response = await this.ajaxCreateWithJQuery("Quotations", {
+                    var response = await this.ajaxCreateWithJQuery("A_Quotations", {
                         data: JSON.stringify(this.oModel.getProperty("/QuotationFormData")),
                     });
                     if (response.success) {
@@ -255,10 +266,10 @@ sap.ui.define([
                     var data = {
                         "data": this.oModel.getProperty("/QuotationFormData"),
                         "filters": {
-                            "ID": this.oModel.getProperty("/QuotationNumber")
+                            "QuotationNumber": this.oModel.getProperty("/QuotationNumber")
                         }
                     };
-                    var response = await this.ajaxUpdateWithJQuery("Quotations", {
+                    var response = await this.ajaxUpdateWithJQuery("A_Quotations", {
                         data: JSON.stringify(data),
                     });
                     if (!response.success) {
@@ -280,7 +291,8 @@ sap.ui.define([
         },
 
         _checkValidation: function () {
-            return (utils._LCvalidateName(oView.byId("QF_id_CustomerName"), "ID") &&
+            var oView = this.getView();
+            if (utils._LCvalidateName(oView.byId("QF_id_CustomerName"), "ID") &&
             utils._LCvalidateMobileNumber(oView.byId("QF_id_CustMobile"), "ID") &&
             utils._LCvalidateEmail(oView.byId("QF_id_CustEmail"), "ID") &&
             utils._LCvalidateAadharCard(oView.byId("QF_id_CustAadhar"), "ID") &&
@@ -290,7 +302,9 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oView.byId("QF_id_CustAddress"), "ID") &&
             utils._LCvalidateMandatoryField(oView.byId("QF_id_VehModel"), "ID") &&
             utils._LCvalidateMandatoryField(oView.byId("QF_id_VehVariant"), "ID"))
+            { return true } 
+            else 
+            { return false }
         }
-
     });
 });

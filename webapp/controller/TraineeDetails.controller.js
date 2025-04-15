@@ -61,21 +61,21 @@ sap.ui.define([
                 var aFilteredData = oModel.getData().filter(function (oTrainee) {
                     return oTrainee.ID === sArgPara;
                 });
-            
+
                 if (aFilteredData.length > 0) {
                     var traineeData = aFilteredData[0];
-            
+
                     // Set Join Date minDate
                     this.byId("TU_id_JoinDate").setMinDate(new Date(traineeData.ReleaseDate));
-            
+
                     // Set trainee details model
                     this.getView().setModel(new JSONModel(traineeData), "oTraineeDetails");
                     if (traineeData.Stipend === "0") {
-                        this.byId("TU_id_StipendRadio").setSelectedIndex(1); 
+                        this.byId("TU_id_StipendRadio").setSelectedIndex(1);
                     } else {
-                        this.byId("TU_id_StipendRadio").setSelectedIndex(0); 
-                    } 
-            
+                        this.byId("TU_id_StipendRadio").setSelectedIndex(0);
+                    }
+
                     // Handle visibility and edit button
                     if (traineeData.Status === "OnBoarded" || traineeData.Status === "Training Completed") {
                         this.viewModel.setProperty("/isVisiable", false);
@@ -91,7 +91,7 @@ sap.ui.define([
                     MessageBox.error(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
-            
+
             //navigation to trainee view
             TUF_onPressback: function () {
                 this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
@@ -147,7 +147,7 @@ sap.ui.define([
                 var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
                 // Required fields check (stipend is checked only if "Yes" is selected)
                 var allFieldsFilled = oModel.TraineeName && oModel.ReportingManager && oModel.TraineeEmail && oModel.TrainingDuration &&
-                    oModel.ReleaseDate && oModel.JoiningDate &&(sStipendText === "No" || (oModel.Stipend && oModel.Currency));
+                    oModel.ReleaseDate && oModel.JoiningDate && (sStipendText === "No" || (oModel.Stipend && oModel.Currency));
                 if (allFieldsFilled) {
                     let bValid =
                         utils._LCvalidateName(this.byId("TD_id_Name"), "ID") &&
@@ -169,7 +169,7 @@ sap.ui.define([
             //Submit trainee deatails 
             TD_onSubmitData: function (oEvent) {
                 var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
-                if (sStipendText === "Yes")  utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
+                if (sStipendText === "Yes") utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
                 if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
@@ -241,8 +241,8 @@ sap.ui.define([
                     if (sStipendSelectedText === "Yes") {
                         bIsStipendValid = utils._LCvalidateAmount(oView.byId("TU_id_Stipend"), "ID");
                     }
-                    var isValid = 
-                        utils._LCvalidateName(oView.byId("TU_id_Name"), "ID") &&utils._LCvalidateName(oView.byId("TU_id_Manager"), "ID") &&utils._LCvalidateEmail(oView.byId("TU_id_TraineeMail"), "ID") && bIsStipendValid;
+                    var isValid =
+                        utils._LCvalidateName(oView.byId("TU_id_Name"), "ID") && utils._LCvalidateName(oView.byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(oView.byId("TU_id_TraineeMail"), "ID") && bIsStipendValid;
                     // Save the changes if all validations pass
                     if (isValid) {
                         this.updateCallForTrainee(this.viewModel);
@@ -254,7 +254,7 @@ sap.ui.define([
                     this.viewModel.setProperty("/isEditMode", false);
                 }
             },
-            
+
             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
@@ -337,7 +337,7 @@ sap.ui.define([
             },
             //File upload function
             Mail_onUpload: function (oEvent) {
-                this.handleFileUpload( oEvent, this, "UploaderData", "/attachments", "/name", "/isFileUploaded", "uploadSuccessfull", "fileAlreadyUploaded", "noFileSelected", "fileReadError",
+                this.handleFileUpload(oEvent, this, "UploaderData", "/attachments", "/name", "/isFileUploaded", "uploadSuccessfull", "fileAlreadyUploaded", "noFileSelected", "fileReadError",
                     () => this.validateSendButton()
                 );
             },
@@ -381,63 +381,50 @@ sap.ui.define([
                 this.updateCallForTrainee(this.viewModel);
                 this.getView().getModel("oTraineeDetails").refresh(true);
             },
+
             async offerGeneratingPdfFunction(oModel) {
-                var oCoModel = this.getView().getModel("CompanyCodeDetailsModel");
-                var oPDFCondModel = this.getView().getModel("PDFConditionModel");
-                if (oCoModel && oPDFCondModel) {
-                    oCoModel.destroy();
-                    oPDFCondModel.destroy();
-                    this.getView().setModel(null, "CompanyCodeDetailsModel");
-                    this.getView().setModel(null, "PDFConditionModel");
-                }
                 var oEmpModel = oModel.getData();
-                try {
-                    this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchcode: "KLB01" });
-                    this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "TraineeOffer" });
-                    await this._waitForModels(["CompanyCodeDetailsModel", "PDFConditionModel"], 200, 5000);
-                    BusyIndicator.show(0);
-                    var oPDFModel = this.getView().getModel("PDFData");
-                    oPDFModel.setProperty("/Type", "TraineeOffer");
-                    oPDFModel.setProperty("/EmpName", oEmpModel.NameSalutation + " " + oEmpModel.TraineeName);
-                    oPDFModel.setProperty("/EmpRole", "Trainee");
-                    oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.ReleaseDate));
-                    oPDFModel.setProperty("/TrainingStartDate", Formatter.formatDate(oEmpModel.JoiningDate));
-                    oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
-                    oPDFModel.setProperty("/Stipend", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Stipend));
-                    if (oEmpModel.Stipend == 0 || oEmpModel.Stipend == "") {
-                        oPDFModel.setProperty("/StipendSkipLine", 5);
+                BusyIndicator.show(0);
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { BranchCode: oEmpModel.BranchCode });
+                await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "TraineeOffer" });
+                var oPDFModel = this.getView().getModel("PDFData");
+                oPDFModel.setProperty("/Type", "TraineeOffer");
+                oPDFModel.setProperty("/EmpName", oEmpModel.NameSalutation + " " + oEmpModel.TraineeName);
+                oPDFModel.setProperty("/EmpRole", "Trainee");
+                oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.ReleaseDate));
+                oPDFModel.setProperty("/TrainingStartDate", Formatter.formatDate(oEmpModel.JoiningDate));
+                oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
+                oPDFModel.setProperty("/Stipend", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Stipend));
+                if (oEmpModel.Stipend == 0 || oEmpModel.Stipend == "") {
+                    oPDFModel.setProperty("/StipendSkipLine", 5);
+                }
+                else {
+                    oPDFModel.setProperty("/StipendSkipLine", null);
+                }
+                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
+                if (!oCompanyDetailsModel || !oCompanyDetailsModel.Companylogo) {
+                    MessageToast.show("Company Logo or Model not found.");
+                    return;
+                }
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.Companylogo?.data);
+                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.Signature?.data);
+                    if (logoBase64 && signBase64) {
+                        oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
+                        oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
                     }
-                    else {
-                        oPDFModel.setProperty("/StipendSkipLine", null);
+                }
+                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                    if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                        jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                    } else {
+                        console.error("Error: jsPDF._GeneratePDF function not found.");
                     }
-                    var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-                    var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
-                    if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                        MessageToast.show("Company Logo or Model not found.");
-                        return;
-                    }
-                    if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
-                        var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
-                        var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
-                        if (logoBase64 && signBase64) {
-                            oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
-                            oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
-                        }
-                    }
-                    if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
-                        if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
-                            jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
-                        } else {
-                            console.error("Error: jsPDF._GeneratePDF function not found.");
-                        }
-                    }
-                } catch (error) {
-                    BusyIndicator.hide();
-                    console.error("Error waiting for models:", error);
                 }
             },
             handleStipendSelection: function (sSelectedText, sStipendId, sCurrencyId, sModelName, sCurrencyPath) {
-                var oModel =  this.getView().getModel(sModelName || "oTraineeDetails");  
+                var oModel = this.getView().getModel(sModelName || "oTraineeDetails");
                 if (sSelectedText === "No") {
                     this.getView().byId(sStipendId).setVisible(false);
                     this.getView().byId(sCurrencyId).setVisible(false);
@@ -456,12 +443,12 @@ sap.ui.define([
             },
             onStipendSelectionChange: function (oEvent) {
                 var sSelectedText = oEvent.getSource().getSelectedButton().getText();
-                this.handleStipendSelection( sSelectedText, "TD_id_Stipend",  "TD_id_Currency", "oTraineeDetails", "/Currency" );
+                this.handleStipendSelection(sSelectedText, "TD_id_Stipend", "TD_id_Currency", "oTraineeDetails", "/Currency");
             },
             onUpdateSelectionChange: function (oEvent) {
                 var sSelectedText = oEvent.getSource().getSelectedButton().getText();
                 var sSelectedText = oEvent.getSource().getSelectedButton().getText();
-                this.handleStipendSelection( sSelectedText, "TU_id_Stipend",  "TU_id_Currency", "oTraineeDetails", "/Currency" );
+                this.handleStipendSelection(sSelectedText, "TU_id_Stipend", "TU_id_Currency", "oTraineeDetails", "/Currency");
             },
         });
     });

@@ -27,7 +27,7 @@ sap.ui.define([
       if (this.oModel.getProperty("/setDefFilter")) {
         this.getView().byId("Q_id_Status").setSelectedKey("New");
         this.getView().byId("Q_id_IssuedBy").setValue(this.oLoginModel.getProperty("/EmployeeName"));
-        this.getView().byId("Q_id_FilterBranch").setValue(this.oLoginModel.getProperty("/Branch"));
+        this.getView().byId("Q_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/BranchCode"));
       }
       var sRole = this.oLoginModel.getProperty("/Role");
       if (sRole === "Admin" || sRole === "CEO") {
@@ -65,12 +65,11 @@ sap.ui.define([
       var today = new Date();
       this.oModel.setProperty("/setDefFilter", false);
       this.oModel.setProperty("/QuotationFormData/QuotationIssuedBy", this.oLoginModel.getProperty("/EmployeeName"));
-      this.oModel.setProperty("/QuotationFormData/EmployeeMobile", this.oLoginModel.getProperty("/CellNumber"));
-      this.oModel.setProperty("/QuotationFormData/BranchCode", this.oLoginModel.getProperty("/BranchCode"));
-      this.oModel.setProperty("/QuotationFormData/Branch", this.oLoginModel.getProperty("/Branch"));
+      this.oModel.setProperty("/QuotationFormData/EmployeeMobile", this.oLoginModel.getProperty("/MobileNo"));
+      this.oModel.setProperty("/QuotationFormData/BranchCode", this.oLoginModel.getProperty("/BranchCode"));;
       this.oModel.setProperty("/QuotationFormData/QuotationDate", today);
       this.oModel.setProperty("/QuotationFormData/ValidUpto", new Date(today.getFullYear(), today.getMonth() + 1, 0));
-      this.oModel.setProperty("/Status", "New");
+      this.oModel.setProperty("/QuotationFormData/Status", "New");
       this.oModel.setProperty("/AddCase", true);
       this.oModel.setProperty("/ShowCase", false);
       this.getRouter().navTo("RouteQuotationForm");
@@ -101,10 +100,10 @@ sap.ui.define([
           }
         }
       });
-      this._commonGETCall("Quotations", "QTableData", params, ["Q_id_Table"]);
+      this._commonGETCall("A_Quotations", "QTableData", params, ["Q_id_Table"]);
     },
 
-    onPressClear: async function () {
+    Q_onPressClear: async function () {
       var sRole = this.oLoginModel.getProperty("/Role");
       var fValues;
       if (sRole === "Admin" || sRole === "CEO") {

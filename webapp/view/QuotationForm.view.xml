@@ -104,7 +104,7 @@
                             />
                             <m:Text width="5px" />
                             <m:Link
-                                text="{Quotation>/CompanyCodeData/mobile}"
+                                text="{Quotation>/CompanyCodeData/0/mobileNo}"
                             />
                         </layout:HorizontalLayout>
                         <layout:HorizontalLayout
@@ -115,7 +115,7 @@
                                 text="{i18n>email} "
                             />
                             <m:Text width="5px" />
-                            <m:Link text="{Quotation>/CompanyCodeData/email}" />
+                            <m:Link text="{Quotation>/CompanyCodeData/0/carrerEmail}" />
                         </layout:HorizontalLayout>
                         <layout:HorizontalLayout
                             visible="true"
@@ -127,8 +127,8 @@
                             />
                             <m:Text width="5px" />
                             <m:Link
-                                text="kalpavrikshatechnologies.com"
-                                href="https://kalpavrikshatechnologies.com"
+                                text="{Quotation>/CompanyCodeData/0/website}"
+                                href="https://{Quotation>/CompanyCodeData/0/website}"
                                 target="_blank"
                             />
                         </layout:HorizontalLayout>
@@ -136,7 +136,7 @@
                             class="sapUiSmallMarginBeginEnd"
                         >
                             <m:Label
-                                text="{i18n>gstNo}: {Quotation>/CompanyCodeData/GSTIN}"
+                                text="{i18n>gstNo}: {Quotation>/CompanyCodeData/0/gstin}"
                             />
                         </layout:HorizontalLayout>
                     </layout:VerticalLayout>
@@ -145,7 +145,7 @@
                         class="sapUiSmallMarginBeginEnd sapUiMediumMarginEnd sapUiSmallMarginBottom"
                     >
                         <m:Label
-                            text="#111, Karekal layout, Sharanbasaveshwar Nagar, Near Naganhalli Railway Over Bridge, Gulbarga, Karnataka 585102, IN"
+                            text="{Quotation>/CompanyCodeData/0/longAddress}"
                             width="300px"
                             wrapping="true"
                             wrappingType="Normal"
@@ -160,7 +160,7 @@
                             <m:ObjectStatus
                                 title="{i18n>status}"
                                 visible="{= ${Quotation>/VisibleStatus} ? false : true }"
-                                text="{Quotation>/Status}"
+                                text="{Quotation>/QuotationFormData/Status}"
                                 inverted="true"
                                 state="{= ${Quotation>/Status} === 'New' ? 'Information' : 
                                         ${Quotation>/Status} === 'Booked' ? 'Success' :
@@ -197,7 +197,7 @@
                                         showColon="true"
                                     />
                                     <m:Input
-                                        value="{Quotation>/QuotationIssuedBy}"
+                                        value="{Quotation>/QuotationFormData/QuotationIssuedBy}"
                                         editable="false"
                                     />
                                     <m:Label
@@ -207,7 +207,7 @@
                                     <m:Input
                                         id="QF_id_EmpMobile"
                                         editable="{Quotation>/MasterEdit}"
-                                        value="{Quotation>/EmployeeMobile}"
+                                        value="{Quotation>/QuotationFormData/EmployeeMobile}"
                                         liveChange=".QF_onEmpMobileChange"
                                         type="Number"
                                     />
@@ -215,14 +215,11 @@
                                         text="{i18n>coCode} "
                                         showColon="true"
                                     />
-                                    <m:ComboBox
+                                    <m:Select
                                         width="auto"
                                         id="QF_id_BranchCodes"
-                                        selectedKey="{Quotation>/BaseLocationData}"
-                                        items="{
-                                            path: 'Quotation>/allCompanyCodeDetails',
-                                            length: 1000
-                                        }"
+                                        selectedKey="{Quotation>/QuotationFormData/BranchCode}"
+                                        items="{Quotation>/BaseLocationData}"
                                         change="QF_onBranchCodeChange"
                                         editable="{= ${Quotation>/AddCase} ? true : false }"
                                         showSecondaryValues="true"
@@ -233,7 +230,7 @@
                                             text="{Quotation>branchCode}"
                                             additionalText="{Quotation>city}"
                                         />
-                                    </m:ComboBox>
+                                    </m:Select>
                                     <m:Label
                                         text="{i18n>status} "
                                         showColon="true"
@@ -241,7 +238,7 @@
                                     />
                                     <m:Select
                                         visible="{Quotation>/VisibleStatus}"
-                                        selectedKey="{Quotation>/Status}"
+                                        selectedKey="{Quotation>/QuotationFormData/Status}"
                                         items="{
                                             path: 'Quotation>/StatusList'
                                         }"
@@ -271,7 +268,7 @@
                                         text="{i18n>qNumber} "
                                     />
                                     <m:Input
-                                        value="{Quotation>/QuotationNumber}"
+                                        value="{Quotation>/QuotationFormData/QuotationNumber}"
                                         editable="false"
                                         visible="{Quotation>/ShowCase}"
                                     />
@@ -283,6 +280,9 @@
                                     <m:DatePicker
                                         id="QF_id_CreateDate"
                                         editable="false"
+                                        value="{Quotation>/QuotationFormData/QuotationDate}"
+                                        displayFormat="dd/MM/yyyy"
+                                        valueFormat="dd/MM/yyyy"
                                     />
 
                                     <m:Label
@@ -292,7 +292,7 @@
                                     <m:DatePicker
                                         id="QF_id_ValidUpto"
                                         editable="false"
-                                        value="{Quotation>/ValidUpto}"
+                                        value="{Quotation>/QuotationFormData/ValidUpto}"
                                         displayFormat="dd/MM/yyyy"
                                         valueFormat="dd/MM/yyyy"
                                     />
@@ -304,7 +304,7 @@
                                     <m:Input
                                         id="QF_id_CustomerName"
                                         editable="{Quotation>/MasterEdit}"
-                                        value="{Quotation>/CustomerName}"
+                                        value="{Quotation>/QuotationFormData/CustomerName}"
                                         liveChange=".QF_onNameChange"
                                         required="true"
                                         maxLength="25"
@@ -318,7 +318,7 @@
                                     <m:Input
                                         id="QF_id_CustMobile"
                                         editable="{Quotation>/MasterEdit}"
-                                        value="{Quotation>/CustMobile}"
+                                        value="{Quotation>/QuotationFormData/CustMobile}"
                                         required="true"
                                         type="Number"
                                         liveChange=".QF_onMobileChange"
@@ -332,7 +332,7 @@
                                     <m:Input
                                         id="QF_id_CustEmail"
                                         editable="{Quotation>/MasterEdit}"
-                                        value="{Quotation>/CustEmail}"
+                                        value="{Quotation>/QuotationFormData/CustEmail}"
                                         liveChange=".QF_onEmailChange"
                                         maxLength="49"
                                         valueStateText="{i18n>emailValueState}"
@@ -345,7 +345,7 @@
                                     <m:Input
                                         id="QF_id_CustAadhar"
                                         editable="{Quotation>/MasterEdit}"
-                                        value="{Quotation>/CustAadhar}"
+                                        value="{Quotation>/QuotationFormData/CustAadhar}"
                                         liveChange=".QF_onAadharChange"
                                         type="Number"
                                         valueStateText="{i18n>aadharNoValueState}"
@@ -358,7 +358,7 @@
                                     <m:Input
                                         id="QF_id_CustPanNumber"
                                         editable="{Quotation>/MasterEdit}"
-                                        value="{Quotation>/CustPanNumber}"
+                                        value="{Quotation>/QuotationFormData/CustPanNumber}"
                                         liveChange=".QF_onPanChange"
                                         maxLength="10"
                                         valueStateText="{i18n>panCardValueState}"
@@ -371,7 +371,7 @@
                                     <m:Input
                                         id="QF_id_CustGSTNo"
                                         editable="{Quotation>/MasterEdit}"
-                                        value="{Quotation>/CustGSTNo}"
+                                        value="{Quotation>/QuotationFormData/CustGSTNo}"
                                         liveChange=".QF_onGSTChange"
                                         maxLength="15"
                                         valueStateText="{i18n>gstNoValueState}"
@@ -384,7 +384,7 @@
                                     <m:TextArea
                                         id="QF_id_CustAddress"
                                         editable="{Quotation>/MasterEdit}"
-                                        value="{Quotation>/CustAddress}"
+                                        value="{Quotation>/QuotationFormData/CustAddress}"
                                         change=".QF_onAddressChange"
                                         rows="4"
                                         required="true"
@@ -399,7 +399,7 @@
                                     <m:Input
                                         id="QF_id_CustPinCode"
                                         editable="{Quotation>/MasterEdit}"
-                                        value="{Quotation>/CustPinCode}"
+                                        value="{Quotation>/QuotationFormData/CustPinCode}"
                                         liveChange=".QF_onPinChange"
                                         required="true"
                                         type="Number"
@@ -441,7 +441,7 @@
                                             editable="{Quotation>/MasterEdit}"
                                             id="QF_id_VehModel"
                                             change=".QF_onModelSelect"
-                                            value="{Quotation>/Model}"
+                                            value="{Quotation>/QuotationFormData/Model}"
                                             selectedKey=""
                                             items="{
                                                 path: 'Quotation>/ModelList',
@@ -452,8 +452,8 @@
                                             valueStateText="{i18n>modelValueState}"
                                         >
                                             <core:Item
-                                                key="{Quotation>}"
-                                                text="{Quotation>}"
+                                                key="{Quotation>Model}"
+                                                text="{Quotation>Model}"
                                             />
                                         </m:ComboBox>
 
@@ -465,7 +465,7 @@
                                             editable="{Quotation>/MasterEdit}"
                                             id="QF_id_VehVariant"
                                             change=".QF_onVariantChange"
-                                            value="{Quotation>/Variant}"
+                                            value="{Quotation>/QuotationFormData/Variant}"
                                             showValueHelp="true"
                                             valueHelpRequest="QF_onOpenValueHelpDialog"
                                             required="true"
@@ -477,7 +477,7 @@
                                             text="{i18n>vehicleTransmission} "
                                         />
                                         <m:Input
-                                            value="{Quotation>/Transmission}"
+                                            value="{Quotation>/QuotationFormData/Transmission}"
                                             editable="false"
                                         />
 
@@ -486,7 +486,7 @@
                                             text="{i18n>vehicleFuel} "
                                         />
                                         <m:Input
-                                            value="{Quotation>/Fuel}"
+                                            value="{Quotation>/QuotationFormData/Fuel}"
                                             editable="false"
                                         />
 
@@ -496,7 +496,7 @@
                                         />
                                         <m:Input
                                             editable="false"
-                                            value="{Quotation>/Color}"
+                                            value="{Quotation>/QuotationFormData/Color}"
                                         />
 
                                         <m:Label
@@ -504,7 +504,7 @@
                                             text="{i18n>vehicleBoardPlate} "
                                         />
                                         <m:Input
-                                            value="{Quotation>/BoardPlate}"
+                                            value="{Quotation>/QuotationFormData/BoardPlate}"
                                             editable="false"
                                         />
 
@@ -513,7 +513,7 @@
                                             text="{i18n>vehicleMake} "
                                         />
                                         <m:Input
-                                            value="{Quotation>/Make}"
+                                            value="{Quotation>/QuotationFormData/Make}"
                                             editable="false"
                                         />
 
@@ -522,7 +522,7 @@
                                             text="{i18n>vehicleEmission} "
                                         />
                                         <m:Input
-                                            value="{Quotation>/Emission}"
+                                            value="{Quotation>/QuotationFormData/Emission}"
                                             editable="false"
                                         />
                                     </f:content>
@@ -547,7 +547,7 @@
                                             text="{i18n>vehicleExShowroom} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/ExShowroom', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/ExShowroom', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -558,7 +558,7 @@
                                             text="{i18n>vehicleTCS} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/TCS1Perc', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/TCS1Perc', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -569,7 +569,7 @@
                                             text="{i18n>insurance} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/AddOnInsurance', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/AddOnInsurance', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -580,7 +580,7 @@
                                             text="{i18n>vehicleRoadTax} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/ROADTAX', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/ROADTAX', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -591,7 +591,7 @@
                                             text="{i18n>regHyp} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/RegHypCharge', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/RegHypCharge', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -602,7 +602,7 @@
                                             text="{i18n>vehicleFastTag} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/FastTag', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/FastTag', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -613,7 +613,7 @@
                                             text="{i18n>stdFitAcc} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/STDFittings', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/STDFittings', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/MasterEdit}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -624,9 +624,9 @@
                                             text="{i18n>extWarranty} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/EXTDWarrantyFOR4YR80K', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/EXTDWarrantyFOR4YR80K', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/MasterEdit}"
-                                            visible="{= ${Quotation>/CompanyCodeData/Company} === 'Hyundai' ? true : false }"
+                                            visible="{= ${Quotation>/CompanyCodeData/0/Company} === 'Hyundai' ? true : false }"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
                                         />
@@ -636,7 +636,7 @@
                                             text="{i18n>sot} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/ShieldOfTrust4YR45K', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/ShieldOfTrust4YR45K', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/MasterEdit}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -647,7 +647,7 @@
                                             text="{i18n>vehicleVAS} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/VAS', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/VAS', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/MasterEdit}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -658,7 +658,7 @@
                                             text="{i18n>vehicleRSA} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/RSA', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/RSA', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -669,7 +669,7 @@
                                             text="{i18n>schemeDiscount} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/ConsumerScheme', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/ConsumerScheme', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -680,9 +680,9 @@
                                             text="{i18n>exShowDiscount} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/ExShowroomAfterScheme', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/ExShowroomAfterScheme', formatter: '.formatter.fromatNumber' }"
                                             editable="false"
-                                            visible="{= ${Quotation>/CompanyCodeData/Company} === 'Hyundai' ? false : true }"
+                                            visible="{= ${Quotation>/CompanyCodeData/0/Company} === 'Hyundai' ? false : true }"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
                                         />
@@ -692,7 +692,7 @@
                                             text="{i18n>discountOffers} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/DiscountOffers', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/DiscountOffers', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -703,7 +703,7 @@
                                             text="{i18n>onRoad} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/TotalOnRoad', formatter: '.formatter.IndiaNumberFormatter' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/TotalOnRoad', formatter: '.formatter.fromatNumber' }"
                                             editable="false"
                                         />
                                     </f:content>
