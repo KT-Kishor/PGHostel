@@ -383,8 +383,8 @@ sap.ui.define([
             //Close the mail dialog function
             Mail_onPressClose: function () {
                 this.T_MailDialog.destroy();
-                // this.T_MailDialog = null;
-                // this.T_MailDialog.close();
+                this.T_MailDialog = null;
+                this.T_MailDialog.close();
             },
             //Handle the file upload function
             Mail_onUpload: function (oEvent) {

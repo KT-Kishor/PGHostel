@@ -352,8 +352,8 @@ sap.ui.define([
             //  Mail dialog close function    
             Mail_onPressClose: function () {
                 this.TU_oDialogMail.destroy();
-                // this.TU_oDialogMail = null;
-                // this.TU_oDialogMail.close();
+                this.TU_oDialogMail = null;
+                this.TU_oDialogMail.close();
             },
             //File upload function
             Mail_onUpload: function (oEvent) {
