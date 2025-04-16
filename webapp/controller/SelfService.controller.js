@@ -10,6 +10,7 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteSelfService").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function () {
+                this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
                 this.byId("SS_id_IconTab").setSelectedKey("employeeDetailsKey");
                 this.SS_commonEduFunction();
@@ -691,7 +692,7 @@ sap.ui.define([
                 this.getView().getModel("PDFData").setProperty("/CertificateTitle", "TERMINATION LETTER");
                 var data = `
                 <div style="text-align: justify;">
-                    <p>This is to formally notify that <b>${empName}</b>, has been terminated from the services of <b>Kalpavriksha Technologies</b> with effect from <b>${date}</b> due to reasons communicated during prior discussions. During their tenure as <b>${empDesig}</b>, we have reviewed the performance and discussed areas of concern in detail.</p> 
+                    <p>This is to formally notify that <b>${empName}</b>, has been terminated from the services of <b>${this.companyName}</b> with effect from <b>${date}</b> due to reasons communicated during prior discussions. During their tenure as <b>${empDesig}</b>, we have reviewed the performance and discussed areas of concern in detail.</p> 
                     <p>Despite efforts to resolve these concerns, we find it necessary to discontinue the employment relationship effective immediately. Please ensure that all company assets and materials in your possession are returned by the specified date. You are reminded of your obligation to maintain confidentiality and abide by other terms of the employment agreement.</p>
                     <p>Kindly acknowledge the copy of the document for office records. We look forward to a fruitful association.</p>
                     <p>We wish you the best of luck in your future endeavors</p>
@@ -712,11 +713,11 @@ sap.ui.define([
                 var empID = oEmpModel.EmployeeID;
                 var empDesig = oEmpModel.Designation;
                 this.getView().getModel("PDFData").setProperty("/CreateDate", date);
-                this.getView().getModel("PDFData").setProperty("/CertificateTitle", "RELEAVING AND EXPERIENCE LETTER");
+                this.getView().getModel("PDFData").setProperty("/CertificateTitle", "RELIEVING AND EXPERIENCE LETTER");
                 var data = `
                 <div style="text-align: justify;">
-                    <p> This is to certify that <b>${empName}</b> with Employee ID <b>${empID}</b> has worked with our company <b>Kalpavriksha Technologies</b> as a <b>${empDesig}</b> from <b>${joiningDate}</b> to <b>${date}</b>. During his tenure with us, his contributions to the organization are highly appreciated. He possesses good moral values and the right attitude</p> 
-                    <p>With reference to your resignation, you stand relieved from the services of Kalpavriksha Technologies with effect from the close of working hours <b>${relievingDate}</b>. We would like you to continue to be bound by the conditions of confidentiality and other relevant terms of the employment agreement you signed with Kalpavriksha Technologies</p>
+                    <p> This is to certify that <b>${empName}</b> with Employee ID <b>${empID}</b> has worked with our company <b>${this.companyName}</b> as a <b>${empDesig}</b> from <b>${joiningDate}</b> to <b>${date}</b>. During his tenure with us, his contributions to the organization are highly appreciated. He possesses good moral values and the right attitude</p> 
+                    <p>With reference to your resignation, you stand relieved from the services of ${this.companyName} with effect from the close of working hours <b>${relievingDate}</b>. We would like you to continue to be bound by the conditions of confidentiality and other relevant terms of the employment agreement you signed with ${this.companyName}</p>
                     <p>Wishing you all the best in your future endeavors</p>
                 </div>`;
 
@@ -727,7 +728,7 @@ sap.ui.define([
             FCR_onDownloadPDF: function () {
                 this.SSRTE_oDialog.close();
                 let htmlContent = sap.ui.getCore().byId("FCR_id_RTE").getValue();
-                this.generateCertificatePDF(htmlContent);
+                this.generateCertificatePDF(htmlContent, this.getView().getModel("sEmployeeModel").getData()[0].BranchCode);
             },
 
             FCR_onCloseDialog: function () {

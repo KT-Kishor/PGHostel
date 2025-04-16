@@ -14,6 +14,7 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched:async function (oEvent) {
+                this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); 
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
@@ -260,7 +261,7 @@ sap.ui.define([
                 var supervisor = oTraineeModel.ReportingManagerSalutation + " " + oTraineeModel.ReportingManager;
                 var data = `
                 <div style="text-align: justify;">
-                    <p>This is to certify that <b>${empName}</b> has successfully completed an internship at <b>Kalpavriksha Technologies</b> from <b>${joinDate}</b> to <b>${endDate}</b>.</p> 
+                    <p>This is to certify that <b>${empName}</b> has successfully completed an internship at <b>${this.companyName}</b> from <b>${joinDate}</b> to <b>${endDate}</b>.</p> 
                     <p>During this period, ${empName} was assigned the role of <b>${role}</b> in the ${department} department and worked on the <b>${projectName}</b>. The performance, skills, and dedication demonstrated by ${empName} during the internship have been highly commendable.</p>
                     <p>We wish ${empName} all the best in future endeavors and career pursuits.</p>
                     <h3>Details of the Internship:</h3>
@@ -272,7 +273,7 @@ sap.ui.define([
                         <p style="margin: 3px 0;"><b>• Supervisor: ${supervisor}</b></p>
                         <p style="margin: 3px 0;"><b>• Project/Tasks: ${projectName}</b></p>
                     </div>
-                    <p>We at <b>Kalpavriksha Technologies</b> thank ${empName} for the valuable contributions made to our organization and wish success in all future endeavors.</p>
+                    <p>We at <b>${this.companyName}</b> thank ${empName} for the valuable contributions made to our organization and wish success in all future endeavors.</p>
                 </div>`;
 
                 this.getView().getModel("PDFData").setProperty("/RTEText", data);
