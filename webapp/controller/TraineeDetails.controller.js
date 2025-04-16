@@ -16,11 +16,10 @@ sap.ui.define([
             _onRouteMatched: async function (oEvent) {
                 BusyIndicator.show(0)
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
-                await this._fetchCommonData("Currency", "CurrencyModel");
-                await this._fetchCommonData("EmployeeDetails", "empModel");
+                await this._fetchCommonData("Currency", "CurrencyModel");                
                 await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });//CC mailId read call
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-
+                this.TD_readEmployeeData("")
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -89,7 +88,21 @@ sap.ui.define([
                 } else {
                     MessageBox.error(this.i18nModel.getText("commonErrorMessage"));
                 }
+                
             },
+            TD_readEmployeeData: async function (filter) {
+                await this.ajaxReadWithJQuery("EmployeeDetails", filter,[]).then((oData) => {
+                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                     this.getOwnerComponent().setModel(new JSONModel(offerData), "empModel");
+                         offerData = [...new Map(offerData.filter(item => item.ManagerName && item.ManagerName.trim() !== "")
+                             .map(item => [item.ManagerName.trim(), item])).values()];
+                           this.getView().setModel(new JSONModel(offerData), "empModel")
+                     BusyIndicator.hide();
+                 }).catch((error) => {
+                     sap.ui.core.BusyIndicator.hide();
+                     sap.m.MessageToast.show(error.message || error.responseText);
+                 });
+             },
 
             //navigation to trainee view
             TUF_onPressback: function () {
