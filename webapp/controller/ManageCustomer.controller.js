@@ -362,6 +362,7 @@ sap.ui.define([
                   if (sValue) params[sKey] = sValue;
               }
           });
+          this.byId("MC_id_AddCustomer").setEnabled(true);
          await this.readCallForManageCustomer(params);
       },
       
