@@ -14,10 +14,13 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTraineeDetails").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
+                BusyIndicator.show(0)
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("EmployeeDetails", "empModel");
                 await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });//CC mailId read call
+                await this._fetchCommonData("BaseLocation", "BaseLocationModel");
+
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -53,6 +56,7 @@ sap.ui.define([
                 }
                 this._makeDatePickersReadOnly(["TD_id_JoiningDate", "TD_id_ReleaseDate", "TU_id_JoinDate", "TU_id_RelDate"]); //make date pickers read only
                 this.getView().byId("TD_id_Submit").setEnabled(false);
+                BusyIndicator.hide()
             },
             //for edit case reading data from model
             getModelData: function (sArgPara) {
@@ -138,11 +142,12 @@ sap.ui.define([
             TD_validateStep: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
+                oModel.BaseLocation = this.byId("TD_id_Location").getSelectedKey();
                 oModel.TrainingDuration = this.byId("TD_id_TDuration").getSelectedKey();
                 var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
                 // Required fields check (stipend is checked only if "Yes" is selected)
                 var allFieldsFilled = oModel.TraineeName && oModel.ReportingManager && oModel.TraineeEmail && oModel.TrainingDuration &&
-                    oModel.ReleaseDate && oModel.JoiningDate && (sStipendText === "No" || (oModel.Stipend && oModel.Currency));
+                    oModel.ReleaseDate && oModel.JoiningDate && (sStipendText === "No" || (oModel.Stipend && oModel.Currency) && oModel.BaseLocation);
                 if (allFieldsFilled) {
                     let bValid =
                         utils._LCvalidateName(this.byId("TD_id_Name"), "ID") &&
@@ -168,6 +173,8 @@ sap.ui.define([
                 if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
+                    oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
+                    oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TD_id_Location").getSelectedKey();
                     oModel.Status = "Submitted";
                     oModel.ReleaseDate = oModel.ReleaseDate.split("/").reverse().join('-');
                     oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join('-');
@@ -252,7 +259,7 @@ sap.ui.define([
             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
-                delete oModel.EndDate
+                oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
                 oModel.ReleaseDate = this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");;
                 oModel.JoiningDate = this.byId("TU_id_JoinDate").getValue().split("/").reverse().join("-");
                 // Check and update the status if it is 'Rejected'

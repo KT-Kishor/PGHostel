@@ -106,6 +106,12 @@
 										<m:Select items="{TrainingDurationModel>/duration}"  selectedKey="{TrainingDurationModel>/TrainingDuration}" id="TU_id_TDuration" width="100%" class="marginLeft" editable="{viewModel>/editable}">
 											<core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
 										</m:Select>
+										<m:Label text="{i18n>baseLocation}" required="true" />
+											<m:Select items="{BaseLocationModel>/}" id="TU_id_Location" showSecondaryValues="true" selectedKey="{oTraineeDetails>/BaseLocation}" editable="{viewModel>/editable}">
+											   <m:items>
+												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+											   </m:items>
+										   </m:Select>
 										<m:Label text="{i18n>status}" required="true" />
 										<m:Input value="{oTraineeDetails>/Status}" editable="false" enabled="true" class="onClassTarineStatus" maxLength="50" />
 									</f:content>

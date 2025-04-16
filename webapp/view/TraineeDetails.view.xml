@@ -88,6 +88,12 @@
 							<DatePicker  value="{oTraineeDetails>/ReleaseDate}" id="TD_id_ReleaseDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>joiningDate}"   required="true" />
 							<DatePicker value="{oTraineeDetails>/JoiningDate}" id="TD_id_JoiningDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
+								<Label text="{i18n>baseLocation}" required="true" />
+									<Select items="{BaseLocationModel>/}" id="TD_id_Location" showSecondaryValues="true" selectedKey="{oTraineeDetails>/BaseLocation}">
+									   <items>
+										   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+									   </items>
+								   </Select>
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
@@ -126,6 +132,8 @@
 							<Text text="{oTraineeDetails>/JoiningDate}"/>
 							<Label text="{i18n>traineeDuration}" />
 							<Text text="{oTraineeDetails>/TrainingDuration}"/>
+							<Label text="{i18n>baseLocation}" />
+							<Text text="{oTraineeDetails>/BaseLocation}"/>
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
