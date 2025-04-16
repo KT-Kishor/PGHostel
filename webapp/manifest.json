@@ -172,6 +172,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/ContractPeriod.json",
                 "preload": true
+            },
+            "AssetAssignmentStatus": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/AssetAssignmentStatus.json",
+                "preload": true
             }
         },
         "resources": {

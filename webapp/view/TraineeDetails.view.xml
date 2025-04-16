@@ -5,7 +5,7 @@
 	xmlns:core="sap.ui.core">
 	<Page id="TD_id_PageCreate" title="{i18n>headerTrainee}" navButtonPress="TD_onPressback" showNavButton="true">
 		<content>
-			<Wizard id="TD_id_Wizard" complete="TD_onWizardComplete"	showNextButton="true"  showFinishButton="false" finishButtonText="{i18n>review}">
+			<Wizard id="TD_id_Wizard" showNextButton="true" >
 				<WizardStep id="TD_id_StepOne" title="{i18n>traineeDetails}" validated="true" complete="TD_StepTwo">
 					<f:SimpleForm 
             layout="ResponsiveGridLayout"
@@ -91,7 +91,7 @@
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
-				<WizardStep 
+				<WizardStep id="TD_id_StepTwo"
                             title="{i18n>review}"
                             validated="true">
 					<f:SimpleForm                    

@@ -1,4 +1,3 @@
-
 sap.ui.define([
     "./BaseController",//calling base controller
     "../utils/validation", //calling validation function
@@ -61,21 +60,17 @@ sap.ui.define([
                 var aFilteredData = oModel.getData().filter(function (oTrainee) {
                     return oTrainee.ID === sArgPara;
                 });
-
                 if (aFilteredData.length > 0) {
                     var traineeData = aFilteredData[0];
-
                     // Set Join Date minDate
                     this.byId("TU_id_JoinDate").setMinDate(new Date(traineeData.ReleaseDate));
-
                     // Set trainee details model
                     this.getView().setModel(new JSONModel(traineeData), "oTraineeDetails");
-                    if (traineeData.Stipend === "0") {
+                    if (traineeData.Stipend === "0") { //radio button selection checking condition 
                         this.byId("TU_id_StipendRadio").setSelectedIndex(1);
                     } else {
                         this.byId("TU_id_StipendRadio").setSelectedIndex(0);
                     }
-
                     // Handle visibility and edit button
                     if (traineeData.Status === "OnBoarded" || traineeData.Status === "Training Completed") {
                         this.viewModel.setProperty("/isVisiable", false);
@@ -85,7 +80,7 @@ sap.ui.define([
                         this.viewModel.setProperty("/editBut", true);
                     } else if (traineeData.Status === "Submitted") {
                         this.viewModel.setProperty("/isVisiable", true);
-                        this.viewModel.setProperty("/editBut", true); // Fixed missing slash
+                        this.viewModel.setProperty("/editBut", true);
                     }
                 } else {
                     MessageBox.error(this.i18nModel.getText("commonErrorMessage"));
@@ -206,9 +201,7 @@ sap.ui.define([
                                         //     tableName: "Trainee",
                                         //     data: this.getView().getModel("oTraineeDetails").getData()
                                         // })
-
                                         oDialog.close();
-
                                         this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                                     }.bind(this)
                                 }),
@@ -218,9 +211,9 @@ sap.ui.define([
                             });
                             oDialog.open();
                         }
-                    }).catch((oError) => {
-                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                        BusyIndicator.hide();
+                    }).catch((error) => {
+                        sap.ui.core.BusyIndicator.hide();
+                        sap.m.MessageToast.show(error.message || error.responseText);
                     });
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -229,6 +222,7 @@ sap.ui.define([
             //second step validation function
             TD_StepTwo: function () {
                 this.getView().byId("TD_id_Submit").setEnabled(true);
+                this.byId("TD_id_StepTwo").getParent().setShowNextButton(false);
             },
 
             //Edit/save button visibility function
@@ -283,9 +277,9 @@ sap.ui.define([
                         MessageToast.show(this.i18nModel.getText("traineeDataUpdated"));
                         this.getView().getModel("oTraineeDetails").refresh(true);
                     }
-                }).catch((oError) => {
-                    BusyIndicator.hide();
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                }).catch((error) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    sap.m.MessageToast.show(error.message || error.responseText);
                 });
             },
             // common function for opening dialog
@@ -305,9 +299,14 @@ sap.ui.define([
             },
             //Mail dialog open function
             TU_onSendEmail: function () {
+                var oTraineeEmail = this.getView().getModel("oTraineeDetails").getData().TraineeEmail;
+                if (!oTraineeEmail || oTraineeEmail.length === 0) {
+                    MessageBox.error("To Email is missing");
+                    return;
+                }
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
-                    ToEmail: this.getView().getModel("oTraineeDetails").getData().TraineeEmail,  // Ensure correct property access
+                    ToEmail: oTraineeEmail,
                     CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
                     name: "",
                     mimeType: "",
@@ -319,6 +318,7 @@ sap.ui.define([
                 this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
             },
+
             //back function
             TD_onPressback: function () {
                 this.showConfirmationDialog(
@@ -332,8 +332,8 @@ sap.ui.define([
             //  Mail dialog close function    
             Mail_onPressClose: function () {
                 this.TU_oDialogMail.destroy();
-                this.TU_oDialogMail = null;
-                this.TU_oDialogMail.close();
+                // this.TU_oDialogMail = null;
+                // this.TU_oDialogMail.close();
             },
             //File upload function
             Mail_onUpload: function (oEvent) {
@@ -367,9 +367,9 @@ sap.ui.define([
                     this.updateCallForTrainee(this.viewModel);
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
                     BusyIndicator.hide();
-                }).catch((oError) => {
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                    BusyIndicator.hide();
+                }).catch((error) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    sap.m.MessageToast.show(error.message || error.responseText);
                 });
                 this.TU_oDialogMail.close();
             },

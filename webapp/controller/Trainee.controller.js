@@ -1,4 +1,3 @@
-
 sap.ui.define([
     "./BaseController", //call base controller
     "../utils/validation", // call validation function
@@ -33,8 +32,8 @@ sap.ui.define([
                 await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" }); // common company emails read call
             },
             //read call for trainee
-            readCallForTrainee: function (filter) {
-                this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
+            readCallForTrainee: async function (filter) {
+               await this.ajaxReadWithJQuery("Trainee", filter,[]).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
                     if (filter === "Initial") {
@@ -46,9 +45,9 @@ sap.ui.define([
                         this.getView().setModel(new JSONModel(reportingManagerData), "traineeModelInitial");
                     }
                     BusyIndicator.hide();
-                }).catch((oError) => {
-                    BusyIndicator.hide();
-                    MessageBox.error(this.i18nModel.getText("commonReadingDataError"))
+                }).catch((error) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    sap.m.MessageToast.show(error.message || error.responseText);
                 });
             },
             //validation function for mandatory fields
@@ -129,12 +128,9 @@ sap.ui.define([
                 this.ajaxUpdateWithJQuery("Trainee", oModelOffer).then((oData) => {
                     MessageToast.show(that.i18nModel.getText(text))
                     BusyIndicator.hide();
-                    // if (oData.results) {
-                    //     that.readCallForTrainee("");
-                    // }
-                }).catch((oError) => {
-                    BusyIndicator.hide();
-                    MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
+                }).catch((error) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show(error.message || error.responseText);
                 });
             },
             //trainee onboard confirmation 
@@ -157,7 +153,6 @@ sap.ui.define([
                 var sMessage = (action === "onboard")
                     ? this.i18nModel.getText("OnboardMessage", [sName])
                     : this.i18nModel.getText("RejectMessage", [sName]);
-
                 this.showConfirmationDialog(
                     this.i18nModel.getText("ConfirmActionTitle"),
                     sMessage,
@@ -204,13 +199,11 @@ sap.ui.define([
                     } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
-                } catch (e) {
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                } catch (error) {
+                    MessageToast.show(error.message || error.responseText);
                 }
             },
-            
-            
-            
+          
             //Close the  onboarding dialog function
             OTF_onPressClose: function () {
                 sap.ui.getCore().byId("OTF_id_TraineeMail").setValueState("None");
@@ -304,7 +297,7 @@ sap.ui.define([
                     };
                     BusyIndicator.show(0);
                     this.updateCallForTrainee(oUpdatedData, "downloadSucess");
-                    this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject().Status = "Training Completed"             
+                   // this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject().Status = "Training Completed"             
                     this.byId("T_id_TraineeTable").removeSelections(true);
                     this.byId("T_id_Download").setVisible(false);
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
@@ -365,29 +358,33 @@ sap.ui.define([
                     }
                 });
             },
-
             //Traniee certificate mail function
             T_onCerMail: function () {
+                var oTraineeEmail = this.getView().getModel("traineeModel").getData()[0].TraineeEmail;
+                if (!oTraineeEmail || oTraineeEmail.length === 0) {
+                    MessageBox.error("To Email is missing");
+                    return;
+                }
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
-                    ToEmail: this.getView().getModel("traineeModel").getData()[0].TraineeEmail,  // Ensure correct property access
+                    ToEmail:oTraineeEmail,
                     CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
                     name: "",
                     mimeType: "",
                     content: "",
                     isFileUploaded: false,
                     button: false
-                });
+                });  
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
-                this.T_commonOpenDialog("T_MailDialog", "sap.kt.com.minihrsolution.fragment.CommonMail",);
+                this.T_commonOpenDialog("T_MailDialog", "sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
-
             },
+            
             //Close the mail dialog function
             Mail_onPressClose: function () {
                 this.T_MailDialog.destroy();
-                this.T_MailDialog = null;
-                this.T_MailDialog.close();
+                // this.T_MailDialog = null;
+                // this.T_MailDialog.close();
             },
             //Handle the file upload function
             Mail_onUpload: function (oEvent) {

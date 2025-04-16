@@ -24,13 +24,13 @@ sap.ui.define([], function () {
     _LCvalidateEmail: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
       if (!oField) return false;
-      var sValue = oField.getValue().trim();
+      var sValue = oField.getValue();
       if (!sValue) {
         oField.setValueState("Error");
         return false;
       }
       // Split emails by comma, semicolon, or space
-      var aEmails = sValue.split(/[,;]+/).map(email => email.trim()).filter(email => email);
+      var aEmails = sValue.split(/[,;]+/).map(email => email).filter(email => email);
       var regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       var bAllValid = aEmails.every(email => regex.test(email));
       if (!bAllValid) {
@@ -62,7 +62,7 @@ sap.ui.define([], function () {
     // Amount validation function
     _LCvalidateAmount: function (oEvent, type) {
       var oInput = type === "ID" ? (oInput = oEvent) : (oInput = oEvent.getSource());
-      var value = oInput.getValue().trim();
+      var value = oInput.getValue();
       var cleanedValue = value.replace(/[^0-9.]/g, "");
       var parts = cleanedValue.split(".");
       if (parts.length === 2) {
@@ -232,7 +232,7 @@ sap.ui.define([], function () {
     _LCvalidateMandatoryField: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
       if (!oField) return false;
-      if (!oField.getValue().trim()) {
+      if (!oField.getValue()) {
         oField.setValueState("Error");
         return false;
       } else {
