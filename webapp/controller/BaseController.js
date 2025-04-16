@@ -415,12 +415,13 @@ sap.ui.define([
       oFileUploader.setValue("");
     },
 
-    async generateCertificatePDF(content) {
+    async generateCertificatePDF(content, branchCode) {
       var oModel = this.getView().getModel("PDFData").getData();
       sap.ui.core.BusyIndicator.show(0);
-      await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+      await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: branchCode });
       var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
       if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+        sap.ui.core.BusyIndicator.hide();
         MessageToast.show("Company Logo or Model not found.");
         return;
       }
@@ -434,6 +435,7 @@ sap.ui.define([
       }
       if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
         if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+          sap.ui.core.BusyIndicator.show(0);
           jsPDF._GeneratePDF(content, oCompanyDetailsModel, oModel);
         } else {
           sap.ui.core.BusyIndicator.hide();

@@ -53,7 +53,7 @@ sap.ui.define([], function () {
                     doc.setFont("times", "normal").setFontSize(11);
 
                     let titleContentY = titleY + 10; // Initial Y position after titleY
-                    const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
+                    const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
                     const boldWordList = boldWords.join(" ").split(" ");
 
                     for (let i = 0; i < 10; i++) {

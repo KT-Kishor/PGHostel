@@ -302,7 +302,7 @@ sap.ui.define([
                     this.byId("T_id_Download").setVisible(false);
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                     let htmlContent = sap.ui.getCore().byId("myRTE").getValue();
-                    this.generateCertificatePDF(htmlContent);
+                    this.generateCertificatePDF(htmlContent, oTraineeModel.BranchCode);
                     BusyIndicator.hide();
                     this.TC_oDialog.close();
                     this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview</b> to Preview the Certificate</p>");

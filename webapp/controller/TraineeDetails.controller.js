@@ -34,7 +34,8 @@ sap.ui.define([
                     "JoiningDate": "",
                     "TraineeEmail": "",
                     "Currency": "",
-                    "TrainingDuration": ""
+                    "TrainingDuration": "",
+                    "BaseLocation": ""
                 };
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, isCTCVisible: false });
@@ -403,9 +404,9 @@ sap.ui.define([
             },
 
             async offerGeneratingPdfFunction(oModel) {
-                var oEmpModel = oModel.getData();
                 BusyIndicator.show(0);
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { BranchCode: oEmpModel.BranchCode });
+                var oEmpModel = oModel.getData();
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "TraineeOffer" });
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/Type", "TraineeOffer");
@@ -423,13 +424,14 @@ sap.ui.define([
                 }
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
-                if (!oCompanyDetailsModel || !oCompanyDetailsModel.Companylogo) {
+                if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                    BusyIndicator.hide();
                     MessageToast.show("Company Logo or Model not found.");
                     return;
                 }
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
-                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.Companylogo?.data);
-                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.Signature?.data);
+                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
                     if (logoBase64 && signBase64) {
                         oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
                         oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
@@ -437,8 +439,10 @@ sap.ui.define([
                 }
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                        BusyIndicator.show(0);
                         jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
                     } else {
+                        BusyIndicator.hide();
                         console.error("Error: jsPDF._GeneratePDF function not found.");
                     }
                 }

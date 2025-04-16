@@ -390,7 +390,7 @@ sap.ui.define([
             async offerGeneratingPdfFunction(oModel) {
                 var oEmpModel = oModel.getData();
                 BusyIndicator.show(0);
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { BranchCode: oEmpModel.BranchCode });
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/Type", "EmployeeOffer");
@@ -427,14 +427,14 @@ sap.ui.define([
                 }
 
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-                oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
-                oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
-                var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
-
                 if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                    BusyIndicator.hide();
                     MessageToast.show("Company Logo or Model not found.");
                     return;
                 }
+                oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
+                oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
+                var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
 
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
                     var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
@@ -447,8 +447,10 @@ sap.ui.define([
 
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                        BusyIndicator.show(0);
                         jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
                     } else {
+                        BusyIndicator.hide();
                         console.error("Error: jsPDF._GeneratePDF function not found.");
                     }
                 }
