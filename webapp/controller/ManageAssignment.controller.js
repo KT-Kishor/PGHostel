@@ -119,24 +119,15 @@ sap.ui.define(
           // Simple validation
           if (
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FNA_id_TaskName"), "ID") &&
-            utils._LCvalidateMandatoryField(
-              sap.ui.getCore().byId("NAF_id_Description"),
-              "ID"
-            ) &&
-            utils._LCvalidateDate(
-              sap.ui.getCore().byId("NAF_id_StartDate"),
-              "ID"
-            ) &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("NAF_id_Description"), "ID") &&
+            utils._LCvalidateDate(sap.ui.getCore().byId("NAF_id_StartDate"), "ID") &&
             utils._LCvalidateDate(sap.ui.getCore().byId("NAF_id_EndDate"), "ID")
           ) {
           } else {
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
           }
-          var TaskType = sap.ui
-            .getCore()
-            .byId("FNA_id_Tasktype")
-            .getSelectedKey();
+          var TaskType = sap.ui.getCore().byId("FNA_id_Tasktype").getSelectedKey();
           oData.TaskType = TaskType;
 
           const response = await this.ajaxCreateWithJQuery("NewTask", {
@@ -158,9 +149,7 @@ sap.ui.define(
             return;
           }
           const oData = this.getView().getModel("EditTaskModel").getData();
-          const oTaskId = oSelectedItem
-            .getBindingContext("TaskModel")
-            .getProperty("TaskID");
+          const oTaskId = oSelectedItem.getBindingContext("TaskModel").getProperty("TaskID");
 
           const requestData = { filters: { TaskID: oTaskId }, data: oData };
 

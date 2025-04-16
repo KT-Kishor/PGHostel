@@ -174,17 +174,17 @@ sap.ui.define(
                   MessageToast.show(this.i18nModel.getText("errorMsguser"));
                 }
               } else {
-                const backendMsg = response?.message || this.i18nModel.getText("loginFailed");
+                const backendMsg = response?.message || this.i18nModel.getText("commonErrorMessage");
                 MessageToast.show(backendMsg);
               }
             }).catch((error) => {
               const errorMsg = error?.responseText
                 ? JSON.parse(error.responseText).message
-                : this.i18nModel.getText("loginFailed");
+                : this.i18nModel.getText("commonErrorMessage");
               MessageToast.show(errorMsg);
             });
           } catch (e) {
-            MessageToast.show(this.i18nModel.getText("loginFailed"));
+            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
         },
         onLoginOptionChange: function (oEvent) {
@@ -205,6 +205,7 @@ sap.ui.define(
         LP_onOTPchange: function () {
           this.LP_onLogin();
         },
+        // Forgot Password button event
         LP_onForgotPassword: function () {
           const oVM = this.getView().getModel("LoginViewModel");
           const resetFields = () => {
