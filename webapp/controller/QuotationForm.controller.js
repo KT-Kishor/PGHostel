@@ -4,11 +4,13 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
+    "../model/formatter",
     "sap/ui/core/BusyIndicator"
-], (BaseController, utils, MessageToast, Filter, FilterOperator, BusyIndicator) => {
+], (BaseController, utils, MessageToast, Filter, FilterOperator, formatter, BusyIndicator) => {
     "use strict";
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.QuotationForm", {
+        formatter: formatter,
         onInit() {
             this.getOwnerComponent().getRouter().getRoute("RouteQuotationForm").attachMatched(this._onRouteMatched, this);
         },
@@ -18,7 +20,7 @@ sap.ui.define([
             this.oCore = sap.ui.getCore();
             this.oModel = oView.getModel("Quotation");
             this.oLoginModel = oView.getModel("LoginModel");
-            this._makeDatePickersReadOnly(["QF_id_VehVariant"]);
+            this._makeDatePickersReadOnly(["QF_id_VehVariant", "QF_id_BranchCodes"]);
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             
             if (!this.oLoginModel) {
@@ -32,7 +34,8 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("msgSchemeDetailErrorSave"));
             }
             oView.byId("QF_id_PDFBtn").setEnabled(true);
-            this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { /* Asim did this code he is great branchCode: this.oModel.getProperty("/QuotationFormData/BranchCode")*/ }, ["QF_id_Page"]);
+            BusyIndicator.hide();
+            this.QF_onBranchCodeChange();
         },
 
         QF_onNavBack: function () {
@@ -40,10 +43,10 @@ sap.ui.define([
         },
 
         QF_onBranchCodeChange: function () {
-            var sSelectedValue = this.getView().byId("QF_id_BranchCodes").getValue();
-            this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: sSelectedValue }, ["QF_id_Page"]);
-            this.oModel.setProperty("/CompanyCode", sSelectedValue);
-            this.oModel.setProperty("/Branch", sSelectedValue.getAdditionalText());
+            var sSelectedValue = this.getView().byId("QF_id_BranchCodes").getSelectedItem();
+            this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: sSelectedValue.getKey() }, ["QF_id_HeaderContent"]);
+            this.oModel.setProperty("/QuotationFormData/CompanyCode", sSelectedValue.getKey());
+            this.oModel.setProperty("/QuotationFormData/Branch", sSelectedValue.getAdditionalText());
         },
 
         QF_onNameChange: function (oEvent) {
@@ -78,13 +81,9 @@ sap.ui.define([
             utils._LCvalidatePinCode(oEvent);
         },
 
-        QF_onModelSelect: function (oEvent) {
-            utils._LCvalidateMandatoryField(oEvent);
-        },
-
         QF_onModelSelectionChange: async function (oEvent) {
             var selectedKey = oEvent.getParameter("selectedItem").getKey();
-            var response = await this.ajaxCreateWithJQuery("UniqueScheme", {filters: {Model: selectedKey}});
+            var response = await this.ajaxCreateWithJQuery("UniqueScheme", {filters: {Model: selectedKey}}, ["QF_id_VehVariant"]);
             if (response.success) {
                 this.oModel.setProperty("/VariantList", response.results);
             } else {
@@ -141,7 +140,7 @@ sap.ui.define([
             this.oModel.setProperty("/QuotationFormData", oNewData);
             this.getView().byId("QF_id_VehVariant").setValueState("None");
             this._calculateOnRoad();
-            this._onCloseDialog();
+            this.VVF_onCloseDialog();
         },
 
         VVF_onCloseDialog: function () {
@@ -171,35 +170,41 @@ sap.ui.define([
 
         _calculateOnRoad: function () {
             var exShowroomAfterScheme =
-                (parseFloat(this.oModel.getProperty("/ExShowroom")) || 0) -
-                (parseFloat(this.oModel.getProperty("/ConsumerScheme")) || 0);
-            this.oModel.setProperty("/ExShowroomAfterScheme", exShowroomAfterScheme);
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/EXShowroom")) || 0) -
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/ConsumerScheme")) || 0);
+            this.oModel.setProperty("/QuotationFormData/EXShowroomAfterScheme", exShowroomAfterScheme);
 
             var totalOnRoad =
-                (parseFloat(this.oModel.getProperty("/ExShowroomAfterScheme")) || 0) +
-                (parseFloat(this.oModel.getProperty("/TCS1Perc")) || 0) +
-                (parseFloat(this.oModel.getProperty("/ROADTAX")) || 0) +
-                (parseFloat(this.oModel.getProperty("/AddOnInsurance")) || 0) +
-                (parseFloat(this.oModel.getProperty("/RegHypCharge")) || 0) +
-                (parseFloat(this.oModel.getProperty("/ShieldOfTrust4YR45K")) || 0) +
-                (parseFloat(this.oModel.getProperty("/EXTDWarrantyFOR4YR80K")) || 0) +
-                (parseFloat(this.oModel.getProperty("/STDFittings")) || 0) +
-                (parseFloat(this.oModel.getProperty("/FastTag")) || 0) +
-                (parseFloat(this.oModel.getProperty("/VAS")) || 0) +
-                (parseFloat(this.oModel.getProperty("/RSA")) || 0) -
-                (parseFloat(this.oModel.getProperty("/DiscountOffers")) || 0);
-            this.oModel.setProperty("/TotalOnRoad", totalOnRoad);
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/EXShowroomAfterScheme")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/ENVTax1Perc")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/TCS1Perc")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/ROADTAX")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/AddOnInsurance")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/RegHypCharge")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/ShieldOfTrust4YR45K")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/EXTDWarrantyFOR4YR80K")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/STDFittings")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/FastTag")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/VAS")) || 0) +
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/RSA")) || 0) -
+                (parseFloat(this.oModel.getProperty("/QuotationFormData/DiscountOffers")) || 0);
+            this.oModel.setProperty("/QuotationFormData/TotalOnRoad", totalOnRoad);
             this.oModel.refresh(true);
         },
 
         QF_onPressSubmit: async function () {
+            var oData = this.oModel.getProperty("/QuotationFormData/");
+            oData.QuotationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.QuotationDate);
+            oData.ValidUpto = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.ValidUpto);
+            delete oData.ID;
+            oData.QuotationNumber = "";
             try {
                 if (this._checkValidation()) {
                     var response = await this.ajaxCreateWithJQuery("A_Quotations", {
-                        data: JSON.stringify(this.oModel.getProperty("/QuotationFormData")),
+                        data: JSON.stringify(oData),
                     });
                     if (response.success) {
-                        this.oModel.setProperty("/QuotationNumber", response.data.QuotationNumber);
+                        this.oModel.setProperty("/QuotationFormData/QuotationNumber", response.data.QuotationNumber);
                         this._submitSuccess();
                     } else {
                         MessageToast.show(that.i18nModel.getText("msgSchemeDetailErrorSave"));
@@ -266,7 +271,7 @@ sap.ui.define([
                     var data = {
                         "data": this.oModel.getProperty("/QuotationFormData"),
                         "filters": {
-                            "QuotationNumber": this.oModel.getProperty("/QuotationNumber")
+                            "QuotationNumber": this.oModel.getProperty("/QuotationFormData/QuotationNumber")
                         }
                     };
                     var response = await this.ajaxUpdateWithJQuery("A_Quotations", {
@@ -294,6 +299,7 @@ sap.ui.define([
             var oView = this.getView();
             if (utils._LCvalidateName(oView.byId("QF_id_CustomerName"), "ID") &&
             utils._LCvalidateMobileNumber(oView.byId("QF_id_CustMobile"), "ID") &&
+            utils._LCvalidateMobileNumber(oView.byId("QF_id_EmpMobile"), "ID") &&
             utils._LCvalidateEmail(oView.byId("QF_id_CustEmail"), "ID") &&
             utils._LCvalidateAadharCard(oView.byId("QF_id_CustAadhar"), "ID") &&
             utils._LCvalidatePanCard(oView.byId("QF_id_CustPanNumber"), "ID") &&

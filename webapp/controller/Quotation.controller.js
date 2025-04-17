@@ -66,7 +66,7 @@ sap.ui.define([
       this.oModel.setProperty("/setDefFilter", false);
       this.oModel.setProperty("/QuotationFormData/QuotationIssuedBy", this.oLoginModel.getProperty("/EmployeeName"));
       this.oModel.setProperty("/QuotationFormData/EmployeeMobile", this.oLoginModel.getProperty("/MobileNo"));
-      this.oModel.setProperty("/QuotationFormData/BranchCode", this.oLoginModel.getProperty("/BranchCode"));;
+      this.oModel.setProperty("/QuotationFormData/BranchCode", this.oLoginModel.getProperty("/BranchCode"));
       this.oModel.setProperty("/QuotationFormData/QuotationDate", today);
       this.oModel.setProperty("/QuotationFormData/ValidUpto", new Date(today.getFullYear(), today.getMonth() + 1, 0));
       this.oModel.setProperty("/QuotationFormData/Status", "New");
@@ -112,17 +112,7 @@ sap.ui.define([
         fValues = ["Q_id_QDate", "Q_id_FilterPinCode", "Q_id_Status"];
       }
       fValues.forEach((field) => {
-        if (field === "Q_id_QDate") {
-          var oDatePicker = oView.byId("idQDate");
-          if (oDatePicker) {
-            oDatePicker.setValue("");
-          }
-        } else {
-          var oComboBox = oView.byId(field);
-          if (oComboBox) {
-            oComboBox.setSelectedKey("");
-          }
-        }
+        this.getView().byId(field).setValue("");
       });
     },
 

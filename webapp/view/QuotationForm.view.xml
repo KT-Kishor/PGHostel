@@ -53,18 +53,12 @@
                     </snappedHeading>
 
                     <expandedContent>
-                        <m:Text
-                            visible="true"
-                            text="A future of Tomorrow"
-                        />
+                        <m:Text text="A future of Tomorrow"/>
                     </expandedContent>
 
                     <snappedContent>
                         <layout:VerticalLayout>
-                            <m:Text
-                                visible="true"
-                                text="A future of Tomorrow"
-                            />
+                            <m:Text text="A future of Tomorrow"/>
                             <layout:HorizontalLayout class="sapUiTinyMarginTop">
                                 <m:Label
                                     text="{i18n>qIssuedBy} "
@@ -72,7 +66,7 @@
                                 />
                                 <m:Text
                                     class="sapUiTinyMarginBegin"
-                                    text="Me, 9876543210"
+                                    text="{Quotation>/QuotationFormData/QuotationIssuedBy}, {Quotation>/QuotationFormData/EmployeeMobile}"
                                 />
                             </layout:HorizontalLayout>
                         </layout:VerticalLayout>
@@ -82,6 +76,8 @@
 
             <headerContent>
                 <m:FlexBox
+                    busyIndicatorDelay="0"
+                    id="QF_id_HeaderContent"
                     wrap="Wrap"
                     fitContainer="true"
                 >
@@ -115,12 +111,11 @@
                                 text="{i18n>email} "
                             />
                             <m:Text width="5px" />
-                            <m:Link text="{Quotation>/CompanyCodeData/0/carrerEmail}" />
+                            <m:Link
+                                text="{Quotation>/CompanyCodeData/0/carrerEmail}"
+                            />
                         </layout:HorizontalLayout>
-                        <layout:HorizontalLayout
-                            visible="true"
-                            class="sapUiSmallMarginBeginEnd"
-                        >
+                        <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
                             <m:Label
                                 showColon="true"
                                 text="{i18n>website} "
@@ -162,9 +157,9 @@
                                 visible="{= ${Quotation>/VisibleStatus} ? false : true }"
                                 text="{Quotation>/QuotationFormData/Status}"
                                 inverted="true"
-                                state="{= ${Quotation>/Status} === 'New' ? 'Information' : 
-                                        ${Quotation>/Status} === 'Booked' ? 'Success' :
-                                        ${Quotation>/Status} === 'Cancelled' ? 'Error' : 'None'}"
+                                state="{= ${Quotation>/QuotationFormData/Status} === 'New' ? 'Information' : 
+                                        ${Quotation>/QuotationFormData/Status} === 'Booked' ? 'Success' :
+                                        ${Quotation>/QuotationFormData/Status} === 'Cancelled' ? 'Error' : 'None'}"
                             />
                         </layout:HorizontalLayout>
                     </layout:VerticalLayout>
@@ -208,14 +203,14 @@
                                         id="QF_id_EmpMobile"
                                         editable="{Quotation>/MasterEdit}"
                                         value="{Quotation>/QuotationFormData/EmployeeMobile}"
-                                        liveChange=".QF_onEmpMobileChange"
+                                        liveChange=".QF_onMobileChange"
                                         type="Number"
                                     />
                                     <m:Label
                                         text="{i18n>coCode} "
                                         showColon="true"
                                     />
-                                    <m:Select
+                                    <m:ComboBox
                                         width="auto"
                                         id="QF_id_BranchCodes"
                                         selectedKey="{Quotation>/QuotationFormData/BranchCode}"
@@ -230,11 +225,10 @@
                                             text="{Quotation>branchCode}"
                                             additionalText="{Quotation>city}"
                                         />
-                                    </m:Select>
+                                    </m:ComboBox>
                                     <m:Label
                                         text="{i18n>status} "
                                         showColon="true"
-                                        visible="{Quotation>/VisibleStatus}"
                                     />
                                     <m:Select
                                         visible="{Quotation>/VisibleStatus}"
@@ -280,9 +274,9 @@
                                     <m:DatePicker
                                         id="QF_id_CreateDate"
                                         editable="false"
-                                        value="{Quotation>/QuotationFormData/QuotationDate}"
+                                        value="{ path: 'Quotation>/QuotationFormData/QuotationDate', formatter: '.formatter.formatDate' }"
                                         displayFormat="dd/MM/yyyy"
-                                        valueFormat="dd/MM/yyyy"
+                                        valueFormat="yyyy-MM-dd"
                                     />
 
                                     <m:Label
@@ -292,9 +286,9 @@
                                     <m:DatePicker
                                         id="QF_id_ValidUpto"
                                         editable="false"
-                                        value="{Quotation>/QuotationFormData/ValidUpto}"
+                                        value="{ path: 'Quotation>/QuotationFormData/ValidUpto', formatter: '.formatter.formatDate' }"
                                         displayFormat="dd/MM/yyyy"
-                                        valueFormat="dd/MM/yyyy"
+                                        valueFormat="yyyy-MM-dd"
                                     />
 
                                     <m:Label
@@ -333,6 +327,7 @@
                                         id="QF_id_CustEmail"
                                         editable="{Quotation>/MasterEdit}"
                                         value="{Quotation>/QuotationFormData/CustEmail}"
+                                        required="true"
                                         liveChange=".QF_onEmailChange"
                                         maxLength="49"
                                         valueStateText="{i18n>emailValueState}"
@@ -346,6 +341,7 @@
                                         id="QF_id_CustAadhar"
                                         editable="{Quotation>/MasterEdit}"
                                         value="{Quotation>/QuotationFormData/CustAadhar}"
+                                        required="true"
                                         liveChange=".QF_onAadharChange"
                                         type="Number"
                                         valueStateText="{i18n>aadharNoValueState}"
@@ -353,12 +349,13 @@
 
                                     <m:Label
                                         showColon="true"
-                                        text="{i18n>pan} "
+                                        text="{i18n>panCardCommon} "
                                     />
                                     <m:Input
                                         id="QF_id_CustPanNumber"
                                         editable="{Quotation>/MasterEdit}"
                                         value="{Quotation>/QuotationFormData/CustPanNumber}"
+                                        required="true"
                                         liveChange=".QF_onPanChange"
                                         maxLength="10"
                                         valueStateText="{i18n>panCardValueState}"
@@ -366,12 +363,13 @@
 
                                     <m:Label
                                         showColon="true"
-                                        text="{i18n>GSTIN} "
+                                        text="{i18n>gstNo} "
                                     />
                                     <m:Input
                                         id="QF_id_CustGSTNo"
                                         editable="{Quotation>/MasterEdit}"
                                         value="{Quotation>/QuotationFormData/CustGSTNo}"
+                                        required="true"
                                         liveChange=".QF_onGSTChange"
                                         maxLength="15"
                                         valueStateText="{i18n>gstNoValueState}"
@@ -440,7 +438,7 @@
                                         <m:ComboBox
                                             editable="{Quotation>/MasterEdit}"
                                             id="QF_id_VehModel"
-                                            change=".QF_onModelSelect"
+                                            change=".QF_onAddressChange"
                                             value="{Quotation>/QuotationFormData/Model}"
                                             selectedKey=""
                                             items="{
@@ -462,6 +460,7 @@
                                             text="{i18n>vehicleVariant} "
                                         />
                                         <m:Input
+                                            busyIndicatorDelay="0"
                                             editable="{Quotation>/MasterEdit}"
                                             id="QF_id_VehVariant"
                                             change=".QF_onVariantChange"
@@ -547,7 +546,7 @@
                                             text="{i18n>vehicleExShowroom} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/QuotationFormData/ExShowroom', formatter: '.formatter.fromatNumber' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/EXShowroom', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -566,10 +565,10 @@
 
                                         <m:Label
                                             showColon="true"
-                                            text="{i18n>insurance} "
+                                            text="{i18n>vehicleENVTax} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/QuotationFormData/AddOnInsurance', formatter: '.formatter.fromatNumber' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/ENVTax1Perc', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -581,6 +580,17 @@
                                         />
                                         <m:Input
                                             value="{ path: 'Quotation>/QuotationFormData/ROADTAX', formatter: '.formatter.fromatNumber' }"
+                                            editable="{Quotation>/isEditable}"
+                                            change=".QF_onPriceChange"
+                                            maxLength="15"
+                                        />
+
+                                        <m:Label
+                                            showColon="true"
+                                            text="{i18n>insurance} "
+                                        />
+                                        <m:Input
+                                            value="{ path: 'Quotation>/QuotationFormData/AddOnInsurance', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/isEditable}"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
@@ -626,7 +636,6 @@
                                         <m:Input
                                             value="{ path: 'Quotation>/QuotationFormData/EXTDWarrantyFOR4YR80K', formatter: '.formatter.fromatNumber' }"
                                             editable="{Quotation>/MasterEdit}"
-                                            visible="{= ${Quotation>/CompanyCodeData/0/Company} === 'Hyundai' ? true : false }"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
                                         />
@@ -680,9 +689,8 @@
                                             text="{i18n>exShowDiscount} "
                                         />
                                         <m:Input
-                                            value="{ path: 'Quotation>/QuotationFormData/ExShowroomAfterScheme', formatter: '.formatter.fromatNumber' }"
+                                            value="{ path: 'Quotation>/QuotationFormData/EXShowroomAfterScheme', formatter: '.formatter.fromatNumber' }"
                                             editable="false"
-                                            visible="{= ${Quotation>/CompanyCodeData/0/Company} === 'Hyundai' ? false : true }"
                                             change=".QF_onPriceChange"
                                             maxLength="15"
                                         />
@@ -717,7 +725,10 @@
         <m:footer>
             <m:Bar>
                 <m:contentLeft>
-                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                    <core:Fragment
+                        fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
+                        type="XML"
+                    />
                 </m:contentLeft>
                 <m:contentRight>
                     <m:Button

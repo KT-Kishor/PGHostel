@@ -145,7 +145,6 @@ sap.ui.define([
       var that = this;
       // Set busy(true) on all controls
       busyIds.forEach(id => this.setBusyOnId(id, true));
-      sap.ui.core.BusyIndicator.show(0);
       const queryString = new URLSearchParams(filter).toString();
       return new Promise((resolve, reject) => {
         $.ajax({
@@ -153,12 +152,10 @@ sap.ui.define([
           method: "GET",
           headers: this.getView().getModel("LoginModel").getData().headers,
           success: (data) => {
-            sap.ui.core.BusyIndicator.hide();
             busyIds.forEach(id => that.setBusyOnId(id, false));
             resolve(data);
           },
           error: (error) => {
-            sap.ui.core.BusyIndicator.hide();
             busyIds.forEach(id => that.setBusyOnId(id, false));
             reject(error);
           }
