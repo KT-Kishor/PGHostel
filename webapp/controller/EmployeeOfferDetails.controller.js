@@ -103,6 +103,7 @@ sap.ui.define([
                 var oModel = this.getView().getModel("employeeModel").getData();
                 oModel.Status = oModel.Status === "Rejected" ? "Submitted" : oModel.Status;
                 oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
+                oModel.Department= this.getView().byId("EOUF_id_Designation").getSelectedItem().getAdditionalText();
                 oModel.JoiningDate = this.byId("EOUF_id_Joindate").getValue().split("/").reverse().join("-");
                 oModel.OfferReleaseDate = this.byId("EOUF_id_Reldate").getValue().split("/").reverse().join("-");
                 oModel = {
@@ -229,6 +230,7 @@ sap.ui.define([
                 if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("employeeModel").getData();
                     oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
+                    oModel.Department= this.getView().byId("EOD_id_Designation").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();
                     oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join("-");
                     oModel.OfferReleaseDate = oModel.OfferReleaseDate.split("/").reverse().join("-");
