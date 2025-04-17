@@ -248,6 +248,8 @@ sap.ui.define(
             EXShowroomAfterScheme: row["Ex-Showroom  after Scheme"] || "",
             TCS1Perc: row["TCS  1%"] || "",
             ROADTAX: row["ROAD TAX"] || "",
+            RegularInsurance: row["Regular Insurance"] || "",
+            ENVTax1Perc: row["ENV Tax 1%"] || "",
             AddOnInsurance: row["Add On Insurance"] || "",
             RegHypCharge: row["RegHypCHARGE"] || "",
             ShieldOfTrust4YR45K: row["Shield of trust 4YR45K"] || "",

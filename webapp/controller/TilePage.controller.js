@@ -142,7 +142,7 @@ sap.ui.define(
           try {
             const response = await this.ajaxUpdateWithJQuery("LoginDetails", {
               data: {
-                Password: newPassword,
+                Password: btoa(newPassword),
               },
               filters: {
                 EmployeeID: frgUserId,

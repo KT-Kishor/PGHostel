@@ -148,7 +148,7 @@ sap.ui.define(
 
                 if (oVM.getProperty("/isOtpSelected")) {
                   var timeDifference = new Date().getTime() - new Date(parseInt(userData.TimeDate)).getTime();
-                  if (timeDifference <= 1200000) {
+                  if (timeDifference >= 1200000) {
                     MessageToast.show(this.i18nModel.getText("loginTimeOut"));
                     return;
                   }
@@ -225,7 +225,7 @@ sap.ui.define(
               this.oPassforgot = oPassforgot;
               this.getView().addDependent(this.oPassforgot);
               this.oPassforgot.open();
-              //resetFields();
+              resetFields();
             });
           } else {
             this.oPassforgot.open();
@@ -235,15 +235,26 @@ sap.ui.define(
         // Close the dialog when the cancel button is pressed
         SM_onPressCancle: function () {
           const oFragModel = this.getView().getModel("LoginViewModel");
+
           // Reset all values and value states in the model
-          oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserIdValueState", "None"); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgUserNameValueState", "None"); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpValueState", "None"); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgNewPasswordValueState", "None");
-          oFragModel.setProperty("/frgNewPasswordVisible", false);
-          oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgConfirmPasswordValueState", "None"); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
+          oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserIdValueState", "None"); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgUserNameValueState", "None"); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpValueState", "None"); oFragModel.setProperty("/frgOtpVisible", false);
+          oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgNewPasswordValueState", "None");
+          oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgConfirmPasswordValueState", "None"); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
+          // Reset value states on input fields themselves
+          const oNewPasswordInput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
+          const oConfirmPasswordInput = sap.ui.getCore().byId("FSM_id_confirmPasswordInput");
+          if (oNewPasswordInput) {
+            oNewPasswordInput.setValueState("None");
+          }
+          if (oConfirmPasswordInput) {
+            oConfirmPasswordInput.setValueState("None");
+          }
           // Close the dialog
           if (this.oPassforgot) {
             this.oPassforgot.close();
           }
         },
+
         SM_onTogglePasswordVisibility: function (oEvent) {
           var oInput = oEvent.getSource();
           var sType = oInput.getType() === "Password" ? "Text" : "Password";
@@ -277,7 +288,8 @@ sap.ui.define(
 
         SM_onPressSave: function () {
           const oFragModel = this.getView().getModel("LoginViewModel");
-          // Send OTP
+
+          // Step 1: Validate User ID & Username, then send OTP
           if (!oFragModel.getProperty("/frgOtpVisible")) {
             if (
               !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FSM_id_userIdInput"), "ID") ||
@@ -286,103 +298,103 @@ sap.ui.define(
               MessageToast.show(this.i18nModel.getText("validateUser"));
               return;
             }
+
             try {
               this.ajaxCreateWithJQuery("SendOTP", {
                 EmployeeID: oFragModel.getProperty("/frgUserId"),
                 EmployeeName: oFragModel.getProperty("/frgUserName"),
                 Type: "OTP"
-              })
-                .then((response) => {
-                  if (response.success === true) {
-                    MessageToast.show(this.i18nModel.getText("sentOTP"));
-                    oFragModel.setProperty("/frgOtpVisible", true);
-                    oFragModel.setProperty("/frgOtp", "");
-                  } else {
-                    MessageToast.show(this.i18nModel.getText("errorMsguser"));
-                  }
-                })
-                .catch(() => {
+              }).then((response) => {
+                if (response.success === true) {
+                  MessageToast.show(this.i18nModel.getText("sentOTP"));
+                  oFragModel.setProperty("/frgOtpVisible", true);
+                  oFragModel.setProperty("/frgOtp", "");
+                  oFragModel.setProperty("/frgOtpVerified", false); // Reset OTP verification flag
+                } else {
                   MessageToast.show(this.i18nModel.getText("errorMsguser"));
-                });
+                }
+              }).catch(() => {
+                MessageToast.show(this.i18nModel.getText("errorMsguser"));
+              });
             } catch (error) {
               MessageToast.show(this.i18nModel.getText("errorMsguser"));
             }
             return;
           }
-          // Verify OTP
-          if (oFragModel.getProperty("/frgOtpVisible") && !oFragModel.getProperty("/frgOtpVerified")) {
+
+          // Step 2: Verify OTP and reset password validation logic
+          if (!oFragModel.getProperty("/frgOtpVerified")) {
             if (!oFragModel.getProperty("/frgOtp")) {
               MessageToast.show(this.i18nModel.getText("rqForotp"));
               return;
             }
+
             try {
               this.ajaxReadWithJQuery("LoginDetails", {
                 EmployeeID: oFragModel.getProperty("/frgUserId"),
                 EmployeeName: oFragModel.getProperty("/frgUserName"),
                 OTP: oFragModel.getProperty("/frgOtp")
-              })
-                .then((response) => {
-                  if (response.success === true) {
-                    MessageToast.show(this.i18nModel.getText("verifiedOTP"));
+              }).then((response) => {
+                if (response.success === true) {
+                  MessageToast.show(this.i18nModel.getText("verifiedOTP"));
+                  sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(false);
+                  sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(false);
+                  sap.ui.getCore().byId("FSM_id_otpInput").setEditable(false);
+                  oFragModel.setProperty("/frgOtpVerified", true); oFragModel.setProperty("/frgNewPasswordVisible", true); oFragModel.setProperty("/frgConfirmPasswordVisible", true);
 
-                    sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(false); sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(false);
-                    sap.ui.getCore().byId("FSM_id_otpInput").setEditable(false); oFragModel.setProperty("/frgOtpVerified", true); oFragModel.setProperty("/frgNewPasswordVisible", true); oFragModel.setProperty("/frgConfirmPasswordVisible", true); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", "");
-                  } else {
-                    MessageToast.show(this.i18nModel.getText("invalidOTP"));
-                  }
-                })
-                .catch(() => {
+
+                } else {
                   MessageToast.show(this.i18nModel.getText("invalidOTP"));
-                });
+                  oFragModel.setProperty("/frgOtpVerified", false); // Ensure unsuccessful verification doesn't trigger password step
+                }
+              }).catch(() => {
+                MessageToast.show(this.i18nModel.getText("invalidOTP"));
+                oFragModel.setProperty("/frgOtpVerified", false);
+              });
             } catch (error) {
               MessageToast.show(this.i18nModel.getText("invalidOTP"));
+              oFragModel.setProperty("/frgOtpVerified", false);
             }
             return;
           }
-          // Set New Password
-          if (oFragModel.getProperty("/frgOtpVerified")) {
-            const oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
-            const oConfirmPwInput = sap.ui.getCore().byId("FSM_id_confirmPasswordInput");
 
-            if (
-              !utils._LCvalidatePassword(oNewPwInput, "ID") ||
-              !utils._LCvalidatePassword(oConfirmPwInput, "ID")
-            ) {
-              MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-              return;
-            }
+          // Step 3: Validate Passwords & Update
+          const oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
+          const oConfirmPwInput = sap.ui.getCore().byId("FSM_id_confirmPasswordInput");
 
-            if (oFragModel.getProperty("/frgNewPassword") !== oFragModel.getProperty("/frgConfirmPassword")) {
-              MessageToast.show(this.i18nModel.getText("misPasswords"));
-              return;
-            }
-            try {
-              this.ajaxUpdateWithJQuery("LoginDetails", {
-                data: {
-                  Password: btoa(oFragModel.getProperty("/frgNewPassword")),
-                },
-                filters: {
-                  EmployeeID: oFragModel.getProperty("/frgUserId")
+          if (!utils._LCvalidatePassword(oNewPwInput, "ID") || !utils._LCvalidatePassword(oConfirmPwInput, "ID")) {
+            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+            return;
+          }
+
+          if (oFragModel.getProperty("/frgNewPassword") !== oFragModel.getProperty("/frgConfirmPassword")) {
+            MessageToast.show(this.i18nModel.getText("misPasswords"));
+            return;
+          }
+
+          try {
+            this.ajaxUpdateWithJQuery("LoginDetails", {
+              data: { Password: btoa(oFragModel.getProperty("/frgNewPassword")) },
+              filters: { EmployeeID: oFragModel.getProperty("/frgUserId") }
+            }).then((response) => {
+              if (response.success === true) {
+                MessageToast.show(this.i18nModel.getText("updatepassword"));
+
+                // Reset form state after successful password update
+                oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserName", "");
+                oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
+
+                if (this.oPassforgot) {
+                  this.oPassforgot.close();
                 }
-              }).then((response) => {
-                if (response.success === true) {
-                  MessageToast.show(this.i18nModel.getText("updatepassword"));
-                  // Reset form state
-                  sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(true);
-                  sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(true);
-                  sap.ui.getCore().byId("FSM_id_otpInput").setEditable(true); oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
-                  if (this.oPassforgot) {
-                    this.oPassforgot.close();
-                  }
-                } else {
-                  MessageToast.show("An error occurred: " + response.message);
-                }
-              }).catch(() => {
-                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-              });
-            } catch (error) {
+              } else {
+                MessageToast.show("An error occurred: " + response.message);
+              }
+            }).catch(() => {
               MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-            }
+            });
+          } catch (error) {
+            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
         }
       }

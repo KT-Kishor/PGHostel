@@ -153,6 +153,13 @@
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
                     />
+                    <Label text="{i18n>schEnvtax}" />
+                    <Input
+                        value="{ path: 'detailModel>/ENVTax1Perc', formatter: '.Formatter.fromatNumber' }"
+                        change="SUD_onFieldChange"
+                        editable="{detailModel>/isEditable}"
+                        maxLength="14"
+                    />
                     <Label text="{i18n>vehicleRoadTax}" />
                     <Input
                         change="SUD_onFieldChange"
@@ -164,6 +171,12 @@
                     <Input
                         change="SUD_onFieldChange"
                         value="{ path: 'detailModel>/AddOnInsurance', formatter: '.Formatter.fromatNumber' }"
+                        editable="{detailModel>/isEditable}"
+                        maxLength="14"
+                    /><Label text="{i18n>schRegularinsurance}" />
+                    <Input
+                        change="SUD_onFieldChange"
+                        value="{ path: 'detailModel>/RegularInsurance', formatter: '.Formatter.fromatNumber' }"
                         editable="{detailModel>/isEditable}"
                         maxLength="14"
                     />
