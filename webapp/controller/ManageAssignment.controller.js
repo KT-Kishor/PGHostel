@@ -4,23 +4,21 @@ sap.ui.define(
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "../utils/validation",
+    "sap/ui/core/BusyIndicator",
   ],
-  function (BaseController, JSONModel, MessageToast, utils) {
+  function (BaseController, JSONModel, MessageToast, utils, BusyIndicator) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.ManageAssignment",
       {
         onInit: function () {
-          this.getRouter()
-            .getRoute("RouteManageAssignment")
-            .attachMatched(this._onRouteMatched, this);
+          this.getRouter().getRoute("RouteManageAssignment").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: function () {
           this._fetchCommonData("NewTask", "TaskModel", {});
+          this.CommonReadcall()
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          this.getView()
-            .getModel("LoginModel")
-            .setProperty("/HeaderName", "Create New Assignment");
+          this.getView().getModel("LoginModel").setProperty("/HeaderName", "Create New Assignment");
         },
         onPressback: function () {
           this.getRouter().navTo("RouteTilePage");
@@ -54,9 +52,7 @@ sap.ui.define(
               return MessageToast.show("Please select a task to edit");
             }
 
-            const oData = oSelectedItem
-              .getBindingContext("TaskModel")
-              .getObject();
+            const oData = oSelectedItem.getBindingContext("TaskModel").getObject();
             this._originalTaskData = JSON.parse(JSON.stringify(oData)); // deep copy
             oModel = new JSONModel(oData);
           } else {
@@ -129,15 +125,17 @@ sap.ui.define(
           }
           var TaskType = sap.ui.getCore().byId("FNA_id_Tasktype").getSelectedKey();
           oData.TaskType = TaskType;
-
+          BusyIndicator.show(0);
           const response = await this.ajaxCreateWithJQuery("NewTask", {
             data: oData,
           });
           if (response.success === true) {
+            BusyIndicator.hide();
             MessageToast.show("Task created successfully!");
             this.oTaskDialog.close();
             this._fetchCommonData("NewTask", "TaskModel", {});
           } else {
+            BusyIndicator.hide();
             MessageToast.show("Failed to create task.");
           }
         },
@@ -152,17 +150,19 @@ sap.ui.define(
           const oTaskId = oSelectedItem.getBindingContext("TaskModel").getProperty("TaskID");
 
           const requestData = { filters: { TaskID: oTaskId }, data: oData };
-
+          BusyIndicator.show(0);
           const response = await this.ajaxUpdateWithJQuery("/NewTask",
             requestData
           );
 
           if (response.success === true) {
+            BusyIndicator.hide();
             MessageToast.show("Task updated successfully!");
             this.oTaskDialog.close();
             this._fetchCommonData("NewTask", "TaskModel", {});
             this.CommonReadcall()
           } else {
+            BusyIndicator.hide();
             MessageToast.show("Failed to update task.");
           }
         },
@@ -181,8 +181,10 @@ sap.ui.define(
         },
         CommonReadcall: async function (params) {
           try {
+            BusyIndicator.show(0);
             const response = await this.ajaxReadWithJQuery("NewTask", params);
             if (response.success === true) {
+              BusyIndicator.hide();
               // Ensure data is an array
               const taskData = Array.isArray(response.data)
                 ? response.data
@@ -191,15 +193,13 @@ sap.ui.define(
               this.getView().setModel(oModel, "TaskModel");
             }
           } catch (error) {
+            BusyIndicator.hide();
             MessageToast.show("Request failed");
           }
         },
 
         MA_onItemPress: function (oEvent) {
-          const oSelectedItem = oEvent
-            .getSource()
-            .getBindingContext("TaskModel")
-            .getObject();
+          const oSelectedItem = oEvent.getSource().getBindingContext("TaskModel").getObject();
           this.getRouter().navTo("RouteAssignTask", {
             taskID: oSelectedItem.TaskID, // Pass actual TaskID
           });

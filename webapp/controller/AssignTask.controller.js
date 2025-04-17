@@ -4,16 +4,15 @@ sap.ui.define(
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
+    "sap/ui/core/BusyIndicator",
   ],
-  function (BaseController, utils, JSONModel, MessageToast) {
+  function (BaseController, utils, JSONModel, MessageToast, BusyIndicator) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.AssignTask",
       {
         onInit: function () {
-          this.getRouter()
-            .getRoute("RouteAssignTask")
-            .attachMatched(this._onRouteMatched, this);
+          this.getRouter().getRoute("RouteAssignTask").attachMatched(this._onRouteMatched, this);
         },
 
         _onRouteMatched: function (oEvent) {
@@ -27,10 +26,12 @@ sap.ui.define(
 
         _fetchTaskDetails: async function (sTaskID) {
           try {
+            BusyIndicator.show();
             const response = await this.ajaxReadWithJQuery("NewTask", {
               TaskID: sTaskID,
             });
             if (response.success) {
+              BusyIndicator.hide();
               const oTaskDetails = Array.isArray(response.data)
                 ? response.data[0]
                 : response.data;
@@ -40,13 +41,14 @@ sap.ui.define(
               );
             }
           } catch (error) {
+            BusyIndicator.hide();
             MessageToast.show("Error loading task details");
           }
         },
-        readCallForAllLoginDetails: function (filter) {
-          sap.ui.core.BusyIndicator.show();
-
-          this.ajaxReadWithJQuery("AllLoginDetails", filter)
+        readCallForAllLoginDetails: async function (filter) {
+          BusyIndicator.show();
+          // Fetch all login details
+          await this.ajaxReadWithJQuery("AllLoginDetails", filter)
             .then((oData) => {
               let loginData = Array.isArray(oData.data) ? oData.data : [oData.data];
 
@@ -64,10 +66,10 @@ sap.ui.define(
                   new JSONModel(uniqueLoginData), "AllLoginDetailsModelInitial"
                 );
               }
-              sap.ui.core.BusyIndicator.hide();
+              BusyIndicator.hide();
             })
             .catch((oError) => {
-              sap.ui.core.BusyIndicator.hide();
+              BusyIndicator.hide();
               MessageToast.show("Error while reading All Login Details");
             });
         },
@@ -191,11 +193,13 @@ sap.ui.define(
 
         CommonReadcall: async function (params) {
           try {
+            BusyIndicator.show();
             const response = await this.ajaxReadWithJQuery(
               "AssignedTask",
               params
             );
             if (response.success) {
+              BusyIndicator.hide();
               let taskData = Array.isArray(response.data) ? response.data : [response.data];
 
               const aEmployees =
@@ -217,6 +221,7 @@ sap.ui.define(
               this.getView().setModel(new JSONModel(taskData), "AssignModel");
             }
           } catch (error) {
+            BusyIndicator.hide();
             MessageToast.show("Error loading assigned tasks");
           }
         },
@@ -281,10 +286,11 @@ sap.ui.define(
               StartDate: sStartDate,
               EndDate: sEndDate
             };
-
+            BusyIndicator.show(0);
             const response = await this.ajaxCreateWithJQuery("AssignedTask", { data: payload });
 
             if (response.success) {
+              BusyIndicator.hide();
               successCount++;
             }
           }
@@ -317,12 +323,14 @@ sap.ui.define(
           const oTaskId = oSelectedItem.getBindingContext("AssignModel").getProperty("EmployeeID");
 
           try {
+            BusyIndicator.show(0);
             const response = await this.ajaxUpdateWithJQuery("/AssignedTask", {
               filters: { EmployeeID: oTaskId },
               data: oData,
             });
 
             if (response.success) {
+              BusyIndicator.hide();
               MessageToast.show("Task updated successfully!");
 
               // 1. Refresh the entire table data
@@ -333,9 +341,11 @@ sap.ui.define(
               oTable.removeSelections();
               this.oTaskDialog.close();
             } else {
+              BusyIndicator.hide();
               MessageToast.show("Update failed: " + (response.message || ""));
             }
           } catch (error) {
+            BusyIndicator.hide();
             MessageToast.show("Error updating task: " + error.message);
           }
         },

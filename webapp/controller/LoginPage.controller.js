@@ -4,8 +4,9 @@ sap.ui.define(
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "../utils/validation",
+    "sap/ui/core/BusyIndicator"
   ],
-  function (BaseController, JSONModel, MessageToast, utils) {
+  function (BaseController, JSONModel, MessageToast, utils, BusyIndicator) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.LoginPage",
@@ -77,7 +78,7 @@ sap.ui.define(
           utils._LCvalidateMandatoryField(oEvent);
         },
         //for OTPsend
-        LP_onOtppress: function () {
+        LP_onOtppress: async function () {
           const oModel = this.getView().getModel("LoginViewModel");
           // Validation
           if (
@@ -88,15 +89,18 @@ sap.ui.define(
             return;
           }
           // Send OTP via AJAX
+          BusyIndicator.show(0);
           try {
-            this.ajaxCreateWithJQuery("SendOTP", {
+            await this.ajaxCreateWithJQuery("SendOTP", {
               EmployeeID: oModel.getProperty("/userId"),
               EmployeeName: oModel.getProperty("/userName"),
               Type: "OTP"
             }).then((response) => {
               if (response && response.success === true) {
+                BusyIndicator.hide();
                 oModel.setProperty("/isOtpVisible", true);
                 oModel.setProperty("/isSendOtpVisible", true);
+                oModel.setProperty("/otp", "");
                 oModel.setProperty("/sendOtpText", this.i18nModel.getText("msgresndotp"));
                 MessageToast.show(this.i18nModel.getText("sentOTP"));
               } else {
@@ -148,11 +152,14 @@ sap.ui.define(
 
                 if (oVM.getProperty("/isOtpSelected")) {
                   var timeDifference = new Date().getTime() - new Date(parseInt(userData.TimeDate)).getTime();
-                  if (timeDifference >= 1200000) {
-                    MessageToast.show(this.i18nModel.getText("loginTimeOut"));
+
+
+                  if (timeDifference >= 120000) {
+                    MessageToast.show(this.i18nModel.getText("loginTimeOut")); // "OTP expired"
                     return;
                   }
                 }
+
                 if (
                   oVM.getProperty("/userId") === userData.EmployeeID &&
                   oVM.getProperty("/userName") === userData.EmployeeName
@@ -286,7 +293,7 @@ sap.ui.define(
           utils._LCvalidateMandatoryField(oEvent);
         },
 
-        SM_onPressSave: function () {
+        SM_onPressSave: async function () {
           const oFragModel = this.getView().getModel("LoginViewModel");
 
           // Step 1: Validate User ID & Username, then send OTP
@@ -300,20 +307,24 @@ sap.ui.define(
             }
 
             try {
-              this.ajaxCreateWithJQuery("SendOTP", {
+              BusyIndicator.show(0);
+              await this.ajaxCreateWithJQuery("SendOTP", {
                 EmployeeID: oFragModel.getProperty("/frgUserId"),
                 EmployeeName: oFragModel.getProperty("/frgUserName"),
                 Type: "OTP"
               }).then((response) => {
                 if (response.success === true) {
+                  BusyIndicator.hide();
                   MessageToast.show(this.i18nModel.getText("sentOTP"));
                   oFragModel.setProperty("/frgOtpVisible", true);
                   oFragModel.setProperty("/frgOtp", "");
                   oFragModel.setProperty("/frgOtpVerified", false); // Reset OTP verification flag
                 } else {
+                  BusyIndicator.hide();
                   MessageToast.show(this.i18nModel.getText("errorMsguser"));
                 }
               }).catch(() => {
+                BusyIndicator.hide();
                 MessageToast.show(this.i18nModel.getText("errorMsguser"));
               });
             } catch (error) {
@@ -330,24 +341,26 @@ sap.ui.define(
             }
 
             try {
-              this.ajaxReadWithJQuery("LoginDetails", {
+              BusyIndicator.show(0);
+              await this.ajaxReadWithJQuery("LoginDetails", {
                 EmployeeID: oFragModel.getProperty("/frgUserId"),
                 EmployeeName: oFragModel.getProperty("/frgUserName"),
                 OTP: oFragModel.getProperty("/frgOtp")
               }).then((response) => {
                 if (response.success === true) {
+                  BusyIndicator.hide();
                   MessageToast.show(this.i18nModel.getText("verifiedOTP"));
                   sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(false);
                   sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(false);
                   sap.ui.getCore().byId("FSM_id_otpInput").setEditable(false);
                   oFragModel.setProperty("/frgOtpVerified", true); oFragModel.setProperty("/frgNewPasswordVisible", true); oFragModel.setProperty("/frgConfirmPasswordVisible", true);
-
-
                 } else {
+                  BusyIndicator.hide();
                   MessageToast.show(this.i18nModel.getText("invalidOTP"));
                   oFragModel.setProperty("/frgOtpVerified", false); // Ensure unsuccessful verification doesn't trigger password step
                 }
               }).catch(() => {
+                BusyIndicator.hide();
                 MessageToast.show(this.i18nModel.getText("invalidOTP"));
                 oFragModel.setProperty("/frgOtpVerified", false);
               });
@@ -373,11 +386,13 @@ sap.ui.define(
           }
 
           try {
-            this.ajaxUpdateWithJQuery("LoginDetails", {
+            BusyIndicator.show(0);
+            await this.ajaxUpdateWithJQuery("LoginDetails", {
               data: { Password: btoa(oFragModel.getProperty("/frgNewPassword")) },
               filters: { EmployeeID: oFragModel.getProperty("/frgUserId") }
             }).then((response) => {
               if (response.success === true) {
+                BusyIndicator.hide();
                 MessageToast.show(this.i18nModel.getText("updatepassword"));
 
                 // Reset form state after successful password update
@@ -388,9 +403,11 @@ sap.ui.define(
                   this.oPassforgot.close();
                 }
               } else {
+                BusyIndicator.hide();
                 MessageToast.show("An error occurred: " + response.message);
               }
             }).catch(() => {
+              BusyIndicator.hide();
               MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             });
           } catch (error) {

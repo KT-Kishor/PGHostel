@@ -85,17 +85,17 @@ sap.ui.define(
         },
         //open uploadBox
         SU_onUploadpress: function () {
-          if (!this.oDialog) {
-            this.oDialog = sap.ui.xmlfragment(
+          if (!this.oSchemeUploadDialog) {
+            this.oSchemeUploadDialog = sap.ui.xmlfragment(
               "sap.kt.com.minihrsolution.fragment.Uploadscheme",
               this
             );
-            this.getView().addDependent(this.oDialog);
+            this.getView().addDependent(this.oSchemeUploadDialog);
           }
-          this.oDialog.open();
+          this.oSchemeUploadDialog.open();
         },
         FUS_onCreateDialogCancel: function () {
-          this.oDialog.close();
+          this.oSchemeUploadDialog.close();
           var oFileUploader = sap.ui.getCore().byId("idFileUploader");
           oFileUploader.setValue("");
         },
@@ -200,6 +200,8 @@ sap.ui.define(
             { label: "Discountoffers", property: "DiscountOffers", type: "number", },
             { label: "Make", property: "Make", type: "string" },
             { label: "Emission", property: "Emission", type: "string" },
+            { label: "Regular Insurance", property: "RegularInsurance", type: "number" },
+            { label: "ENV Tax 1%", property: "ENVTax1Perc", type: "number" },
           ];
         },
         //for delete
@@ -211,8 +213,10 @@ sap.ui.define(
           this.showConfirmationDialog(
             this.i18nModel.getText("msgBoxConfirm"),
             this.i18nModel.getText("msgBoxConfirmDelete"),
-            function () {
-              that.ajaxDeleteWithJQuery("/SchemeUploade", { filters: { ID: oContext } }).then(() => {
+            async function () {
+              BusyIndicator.show(0);
+              await that.ajaxDeleteWithJQuery("/SchemeUploade", { filters: { ID: oContext } }).then(() => {
+                BusyIndicator.hide();
                 MessageToast.show(that.i18nModel.getText("msgSchemeDeleted"));
                 that.CommomReadCall("");
               }).catch((error) => {
@@ -234,7 +238,7 @@ sap.ui.define(
             MessageToast.show("No Data In Excel");
             return;
           }
-          BusyIndicator.show(0);
+
           // Format Data
           var formattedData = that._uploadedExcelData.map((row) => ({
             Variant: row["Variant"] || "",
@@ -264,6 +268,7 @@ sap.ui.define(
           }));
 
           // Send data to backend
+          BusyIndicator.show(0);
           var response = await that.ajaxCreateWithJQuery("SchemeUploade", {
             data: formattedData,
           });
@@ -277,17 +282,18 @@ sap.ui.define(
             that.CommomReadCall("");
             oFileUploader.setValue(""); // Reset file uploader
             that.SU_onClear();
-            that.oDialog.close();
+            that.oSchemeUploadDialog.close();
           } else {
             BusyIndicator.hide();
             oFileUploader.setValue(""); // Reset file uploader
             that._uploadedExcelData = null;
-            if (that.oDialog) that.oDialog.close();
+            if (that.oSchemeUploadDialog) that.oSchemeUploadDialog.close();
             MessageToast.show("Failed to save data. Please try again.");
           }
         },
-        CommomReadCall: function (filter) {
-          this.ajaxReadWithJQuery("SchemeUploade", filter)
+        CommomReadCall: async function (filter) {
+          BusyIndicator.show(0);
+          await this.ajaxReadWithJQuery("SchemeUploade", filter)
             .then((oData) => {
               var offerData = Array.isArray(oData.data)
                 ? oData.data
@@ -328,7 +334,7 @@ sap.ui.define(
 
               BusyIndicator.hide();
             })
-            .catch((oError) => {
+            .catch((Error) => {
               BusyIndicator.hide();
               MessageBox.error(
                 this.i18nModel.getText("commonReadingDataError")

@@ -18,7 +18,6 @@ sap.ui.define(
             .getRoute("RouteSchemeUploadDetails")
             .attachMatched(this._onObjectMatched, this);
         },
-
         _onObjectMatched: function (oEvent) {
           BusyIndicator.hide();
           var that = this;
@@ -91,33 +90,21 @@ sap.ui.define(
             });
           }
         },
-        TD_commonOpenDialog: function (fragmentName) {
-          if (!this.oDialog) {
-            sap.ui.core.Fragment.load({
-              name: fragmentName,
-              controller: this,
-            })
-              .then((dialog) => {
-                this.oDialog = dialog;
-                this.getView().addDependent(this.oDialog);
-                this.oDialog.open();
-              })
-              .bind(this);
-          } else {
-            this.oDialog.open();
-          }
-        },
+
         SUD_onhandleBackPress: function () {
           var oModel = this.getView().getModel("detailModel");
           var isCreateMode = oModel && oModel.getProperty("/isCreateMode");
           if (isCreateMode) {
-            this.TD_commonOpenDialog(
-              "sap.kt.com.minihrsolution.fragment.CommonBack"
+            this.showConfirmationDialog(
+              this.i18nModel.getText("ConfirmActionTitle"),
+              this.i18nModel.getText("backConfirmation"),
+              function () {
+                this.getRouter().navTo("RouteSchemeUpload", { value: "SchemeUpload" });
+                this.onConfirmBack()
+              }.bind(this)
             );
           } else {
-            this.getRouter().navTo("RouteSchemeUpload", {
-              value: "SchemeUpload",
-            });
+            this.getRouter().navTo("RouteSchemeUpload", { value: "SchemeUpload" })
           }
         },
         onConfirmBack: function () {
@@ -140,10 +127,10 @@ sap.ui.define(
             }
           });
 
-          this.oDialog.close();
+          this.oSchemeDetailsDialog.close();
         },
         onCancel: function () {
-          this.oDialog.close();
+          this.oSchemeDetailsDialog.close();
         },
 
         SUD_onFieldLiveChange: function (oEvent) {
