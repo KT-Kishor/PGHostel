@@ -88,7 +88,7 @@
 										</m:RadioButtonGroup>
 										<m:Label id="TU_id_StipendLabel" text="{i18n>stipend}" required="true" />
 										<m:Input value="{oTraineeDetails>/Stipend}" 
-                                             type="Number"
+                                             maxLength="15"
                                              editable="{viewModel>/editable}" 
                                                placeholder="{i18n>placeStipend}" 
                                                id="TU_id_Stipend" 

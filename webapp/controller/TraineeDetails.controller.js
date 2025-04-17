@@ -184,7 +184,7 @@ sap.ui.define([
             TD_onSubmitData: function (oEvent) {
                 var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
                 if (sStipendText === "Yes") utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
-                if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
+              if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
@@ -216,30 +216,48 @@ sap.ui.define([
                                     text: "Generate PDF",
                                     type: "Reject",
                                     press: function () {
-                                        this.TD_onPressMerge();
-                                        this.getView().getModel("oTraineeDetails").setProperty("/Status", "PDF Generated");
-                                        // this.ajaxCreateWithJQuery("Trainee", {
-                                        //     tableName: "Trainee",
-                                        //     data: this.getView().getModel("oTraineeDetails").getData()
-                                        // })
-                                        oDialog.close();
-                                        this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
+                                        this.TD_onPressMerge("create");
+
+                                            var  oUpdatePayload = {
+                                            "data": {Status:"PDF Generated"},
+                                            "filters": {
+                                                "ID": oData.ID
+                                            }
+                                        };
+                                        sap.ui.core.BusyIndicator.show();
+                                        this.ajaxUpdateWithJQuery("Trainee", oUpdatePayload).then((oData) => {
+                                                sap.ui.core.BusyIndicator.hide();
+                                                if (oData.success) {
+                                                    sap.m.MessageToast.show("PDF generated and status updated!");
+                                                    oDialog.close();
+                                                    this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
+                                                    // this.getView().getModel("oTraineeDetails").refresh(true);
+                                                }
+                                            })
+                                            .catch((err) => {
+                                                sap.ui.core.BusyIndicator.hide();
+                                                sap.m.MessageToast.show("Failed to update status: " + (err.message || err.responseText));
+                                            });
                                     }.bind(this)
                                 }),
+            
                                 afterClose: function () {
                                     oDialog.destroy();
                                 }
                             });
+            
                             oDialog.open();
                         }
                     }).catch((error) => {
                         sap.ui.core.BusyIndicator.hide();
                         sap.m.MessageToast.show(error.message || error.responseText);
                     });
+                    
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
+            
             //second step validation function
             TD_StepTwo: function () {
                 this.getView().byId("TD_id_Submit").setEnabled(true);
@@ -395,11 +413,13 @@ sap.ui.define([
                 this.TU_oDialogMail.close();
             },
             //PDF generation function
-            TD_onPressMerge: function () {
+            TD_onPressMerge: function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
                 this.getView().getModel("oTraineeDetails").setProperty("/Status", "PDF Generated");
-                this.updateCallForTrainee(this.viewModel);
+                if(value !== "create"){
+                    this.updateCallForTrainee(this.viewModel);
+                }
                 this.getView().getModel("oTraineeDetails").refresh(true);
             },
 

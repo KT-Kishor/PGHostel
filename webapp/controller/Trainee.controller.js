@@ -13,12 +13,13 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched:async function (oEvent) {
+            _onRouteMatched: async function (oEvent) {
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
-                this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); 
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 await this._fetchCommonData("Designation", "DesignationModel");
                 await this._fetchCommonData("Department", "Departmentmodel");
-                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" }); // common company emails read call
+                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });
+                // common company emails read call
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
                 ["T_id_Download", "T_id_EmpOnBoard", "T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
@@ -31,11 +32,10 @@ sap.ui.define([
                 else {
                     this.T_onSearch();// filter function for trainee 
                 }
-               
             },
             //read call for trainee
             readCallForTrainee: async function (filter) {
-               await this.ajaxReadWithJQuery("Trainee", filter,[]).then((oData) => {
+                await this.ajaxReadWithJQuery("Trainee", filter, ["T_id_TraineeTable"]).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
                     if (filter === "Initial") {
@@ -45,6 +45,7 @@ sap.ui.define([
                         let reportingManagerData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "")
                             .map(item => [item.ReportingManager.trim(), item])).values()];
                         this.getView().setModel(new JSONModel(reportingManagerData), "traineeModelInitial");
+                        this.getView().getModel("traineeModelInitial").refresh(true);
                     }
                     BusyIndicator.hide();
                 }).catch((error) => {
@@ -190,7 +191,7 @@ sap.ui.define([
                 try {
                     if (utils._LCvalidateEmail(sap.ui.getCore().byId("OTF_id_TraineeMail"), "ID")) {
                         var oTraineeData = this.SelectedData;
-                        oTraineeData.Status = "OnBoarded"; 
+                        oTraineeData.Status = "OnBoarded";
                         this.updateCallForTrainee(oTraineeData, "traineeOnboardSucess");
                         this.getView().getModel("traineeModel").setProperty("/Status", "OnBoarded");
                         this.OTF_onPressClose();
@@ -205,7 +206,7 @@ sap.ui.define([
                     MessageToast.show(error.message || error.responseText);
                 }
             },
-          
+
             //Close the  onboarding dialog function
             OTF_onPressClose: function () {
                 sap.ui.getCore().byId("OTF_id_TraineeMail").setValueState("None");
@@ -299,7 +300,7 @@ sap.ui.define([
                     };
                     BusyIndicator.show(0);
                     this.updateCallForTrainee(oUpdatedData, "downloadSucess");
-                   // this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject().Status = "Training Completed"             
+                    // this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject().Status = "Training Completed"             
                     this.byId("T_id_TraineeTable").removeSelections(true);
                     this.byId("T_id_Download").setVisible(false);
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
@@ -340,6 +341,17 @@ sap.ui.define([
                     }
                 });
                 this.readCallForTrainee(params);// read call for trainee after filter
+                var oTable = this.byId("T_id_TraineeTable");
+                if (oTable && oTable.removeSelections) {
+                    oTable.removeSelections(true); // Clear all selections
+                }
+                this.byId("T_id_OnboardBtn").setEnabled(false);
+                this.byId("T_id_RejectBtn").setEnabled(false);
+                this.byId("T_id_OnboardBtn").setVisible(true);
+                this.byId("T_id_RejectBtn").setVisible(true);
+                this.byId("T_id_Download").setVisible(false);
+                this.byId("T_id_EmpOnBoard").setVisible(false);
+                this.byId("T_id_Cermail").setVisible(false);
             },
 
             //clear the filterbar
@@ -369,19 +381,19 @@ sap.ui.define([
                 }
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
-                    ToEmail:oTraineeEmail,
+                    ToEmail: oTraineeEmail,
                     CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
                     name: "",
                     mimeType: "",
                     content: "",
                     isFileUploaded: false,
                     button: false
-                });  
+                });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
                 this.T_commonOpenDialog("T_MailDialog", "sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
             },
-            
+
             //Close the mail dialog function
             Mail_onPressClose: function () {
                 this.T_MailDialog.destroy();
@@ -409,16 +421,16 @@ sap.ui.define([
             },
             //send mail function
             Mail_onSendEmail: function () {
-                var oModel = this.getView().getModel("traineeModel").getData();
+                var oModel = this.getView().getModel("traineeModel").getData()[0];
                 var oPayload = {
                     "TraineeName": oModel.TraineeName,
                     "toEmailID": oModel.TraineeEmail,
                     "CC": this.getView().getModel("CCMailModel").getData()[0].emails,
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                 };
-                this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload).then((oData) => {
+                this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload,["T_id_TraineeTable"]).then((oData) => {
                     MessageToast.show(this.i18nModel.getText("certificateSuccess"));
-                    that.byId("T_id_TraineeTable").removeSelections(true);
+                    this.byId("T_id_TraineeTable").removeSelections(true);
                     BusyIndicator.hide();
                 }).catch((oError) => {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));

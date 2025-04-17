@@ -68,7 +68,7 @@
 							</RadioButtonGroup>
 							<Label id="TD_id_StipendLabel" text="{i18n>stipend}" required="true" />
 							<Input value="{oTraineeDetails>/Stipend}" 
-									   type="Number"
+									   maxLength="15"
 									   placeholder="{i18n>placeStipend}" 
 									   id="TD_id_Stipend" 
 									   liveChange="TD_validateAmount" 
