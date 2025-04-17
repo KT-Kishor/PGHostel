@@ -67,6 +67,7 @@ sap.ui.define([
       this.oModel.setProperty("/QuotationFormData/QuotationIssuedBy", this.oLoginModel.getProperty("/EmployeeName"));
       this.oModel.setProperty("/QuotationFormData/EmployeeMobile", this.oLoginModel.getProperty("/MobileNo"));
       this.oModel.setProperty("/QuotationFormData/BranchCode", this.oLoginModel.getProperty("/BranchCode"));
+      this.oModel.setProperty("/QuotationFormData/CustGSTNo", "22AAAAA0000A1Z5");
       this.oModel.setProperty("/QuotationFormData/QuotationDate", today);
       this.oModel.setProperty("/QuotationFormData/ValidUpto", new Date(today.getFullYear(), today.getMonth() + 1, 0));
       this.oModel.setProperty("/QuotationFormData/Status", "New");

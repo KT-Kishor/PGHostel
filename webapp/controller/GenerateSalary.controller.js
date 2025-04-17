@@ -16,30 +16,29 @@ sap.ui.define(
       },
 
       _onRouteMatched: function () {
-        this.oView = this.getView();
         this.oCore = sap.ui.getCore();
-        this.oLoginModel = oView.getModel("LoginModel");
-        this.oModel = oView.getModel("Payroll");
-        this.i18nModel = oView.getModel("i18n").getResourceBundle();
+        this.oLoginModel = this.getView().getModel("LoginModel");
+        this.oModel = this.getView().getModel("Payroll");
+        this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         this._FragmentDatePickersReadOnly(["FST_id_MonthYearPicker", "FST_id_FilterBranch"]);
 
-        if (!oLoginModel) {
+        if (!this.oLoginModel) {
           this.getRouter().navTo("RouteLoginPage");
           return;
         }
-        oCore.byId("FST_id_FilterBranch").setSelectedKey(oLoginModel.getProperty("/city"));
-        oLoginModel.setProperty("/HeaderName", "Generate Salary");
-        oModel.setProperty("/ShowOnGenerate", true);
-        oModel.setProperty("/ShowOnPayroll", false);
-        oModel.setProperty("/TableData", null);
+        this.oCore.byId("FST_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/city"));
+        this.oLoginModel.setProperty("/HeaderName", "Generate Salary");
+        this.oModel.setProperty("/ShowOnGenerate", true);
+        this.oModel.setProperty("/ShowOnPayroll", false);
+        this.oModel.setProperty("/TableData", null);
         this.resetColumnHeaders();
-        oModel.setProperty("/isSELVisible", false);
-        oCore.byId("FST_id_MonthYearPicker").setValue("");
-        var aData = oModel.getProperty("/TableData");
-        oModel.setProperty("/TableRowCount", aData ? aData.length : 0);
-        var oBinding = oModel.bindList("/TableData");
+        this.oModel.setProperty("/isSELVisible", false);
+        this.oCore.byId("FST_id_MonthYearPicker").setValue("");
+        var aData = this.oModel.getProperty("/TableData");
+        this.oModel.setProperty("/TableRowCount", aData ? aData.length : 0);
+        var oBinding = this.oModel.bindList("/TableData");
         oBinding.attachChange(function () {
-          oModel.setProperty("/TableRowCount", oBinding.getLength());
+          this.oModel.setProperty("/TableRowCount", oBinding.getLength());
         });
 
         this._fetchCommonData("BaseLocation", "oBranchModel", {}, ["FST_id_FilterBranch"]);
@@ -57,21 +56,21 @@ sap.ui.define(
       },
 
       onUpload: function (e) {
-        oModel.setProperty("/isExcelMismatch", false);
+        this.oModel.setProperty("/isExcelMismatch", false);
         var file = e.getParameter("files") && e.getParameter("files")[0];
         if (file) {
-          var employeeName = oLoginModel.getProperty("/EmployeeName");
-          var branch = oCore.byId("FST_id_FilterBranch").getValue();
-          var oDate = oCore.byId("FST_id_MonthYearPicker").getDateValue();
+          var employeeName = this.oLoginModel.getProperty("/EmployeeName");
+          var branch = this.oCore.byId("FST_id_FilterBranch").getValue();
+          var oDate = this.oCore.byId("FST_id_MonthYearPicker").getDateValue();
           var pickerMonth = String(oDate.getMonth() + 1).padStart(2, '0');
           var pickerYear = String(oDate.getFullYear());
           this.updateDaysInColumns(pickerYear, pickerMonth);
           var reader = new FileReader();
-          var ruleData = oModel.getProperty("/oRuleModel");
-          var excelMismatch = oModel.getProperty("/isExcelMismatch");
-          oModel.setProperty("/FilterBranch", branch);
-          oModel.setProperty("/FilterMonth", pickerMonth);
-          oModel.setProperty("/FilterYear", pickerYear);
+          var ruleData = this.oModel.getProperty("/oRuleModel");
+          var excelMismatch = this.oModel.getProperty("/isExcelMismatch");
+          this.oModel.setProperty("/FilterBranch", branch);
+          this.oModel.setProperty("/FilterMonth", pickerMonth);
+          this.oModel.setProperty("/FilterYear", pickerYear);
 
           reader.onload = (e) => {
             var data = e.target.result;
@@ -101,10 +100,10 @@ sap.ui.define(
 
                 if (month != pickerMonth || year != pickerYear) {
                   MessageToast.show(this.i18nModel.getText("msgUploadCorrectExcel"));
-                  oModel.setProperty("/isExcelMismatch", true);
-                  oModel.setProperty("/TableData", null);
+                  this.oModel.setProperty("/isExcelMismatch", true);
+                  this.oModel.setProperty("/TableData", null);
                   this.resetColumnHeaders();
-                  oModel.setProperty("/isSELVisible", false);
+                  this.oModel.setProperty("/isSELVisible", false);
                   BusyIndicator.hide();
                   return;
                 }
@@ -162,10 +161,10 @@ sap.ui.define(
                     MessageToast.show(this.i18nModel.getText("msgUploadCorrectExcel"));
                   }
 
-                  oModel.setProperty("/isExcelMismatch", true);
-                  oModel.setProperty("/TableData", null);
+                  this.oModel.setProperty("/isExcelMismatch", true);
+                  this.oModel.setProperty("/TableData", null);
                   this.resetColumnHeaders();
-                  oModel.setProperty("/isSELVisible", false);
+                  this.oModel.setProperty("/isSELVisible", false);
                   BusyIndicator.hide();
                   return; // Exit the entire function
                 }
@@ -236,8 +235,8 @@ sap.ui.define(
       },
 
       _salaryCalculation: async function (records) {
-        var month = oModel.getProperty("/FilterMonth");
-        var year = oModel.getProperty("/FilterYear");
+        var month = this.oModel.getProperty("/FilterMonth");
+        var year = this.oModel.getProperty("/FilterYear");
         records.forEach(record => {
           var payDays = (record.TotalPresent + record.TotalLate + (record.TotalHalf / 2) + record.TotalAbsent + record.TotalSunA)
             - (parseInt((record.TotalLate / 3)) * 0.5);
@@ -258,7 +257,7 @@ sap.ui.define(
 
         var employeeCodes = encodeURIComponent(JSON.stringify(records.map(record => record["EmpCode"])));
         await this._fetchCommonData("SalaryDetailsFunction", "oEmpSalaryModel", { Month: month, Year: year, EmployeeID: employeeCodes }, []);
-        var empSalaryData = oModel.getProperty("/oEmpSalaryModel");
+        var empSalaryData = this.oModel.getProperty("/oEmpSalaryModel");
         for (let i = 0; i < records.length; i++) {
           let record = records[i];
 
@@ -267,10 +266,10 @@ sap.ui.define(
 
           // **Check if Employee Salary is found**
           if (!empSal) {
-            oModel.setProperty("/isExcelMismatch", true);
-            oModel.setProperty("/Records", null);
+            this.oModel.setProperty("/isExcelMismatch", true);
+            this.oModel.setProperty("/Records", null);
             that.resetColumnHeaders();
-            oModel.setProperty("/isSELVisible", false);
+            this.oModel.setProperty("/isSELVisible", false);
             BusyIndicator.hide();
             let isEmpCodeMissing = !empSalaryData.some(sal => parseInt(sal.EmployeeID, 10) === record.EmpCode);
             if (isEmpCodeMissing) {
@@ -365,9 +364,9 @@ sap.ui.define(
             "ChangedBy": record["ChangedBy"] ? record["ChangedBy"].toString() : "",
           };
         });
-        oModel.setProperty("/TableData", records);
-        oModel.setProperty("/isSELVisible", true);
-        oView.byId("GS_id_BtnSave").setEnabled(true);
+        this.oModel.setProperty("/TableData", records);
+        this.oModel.setProperty("/isSELVisible", true);
+        this.getView().byId("GS_id_BtnSave").setEnabled(true);
         BusyIndicator.hide();
       },
 
@@ -400,7 +399,7 @@ sap.ui.define(
       resetColumnHeaders: function () {
         for (var i = 1; i <= 31; i++) {
           var columnId = "idDay" + i;
-          var oColumnText = oView.byId(columnId);
+          var oColumnText = this.getView().byId(columnId);
           if (oColumnText) {
             oColumnText.setText(i.toString());
           }
@@ -410,10 +409,10 @@ sap.ui.define(
       onPressSave: async function () {
         BusyIndicator.show(0);
         var response = await this.ajaxCreateWithJQuery("PayRoll", {
-          data: JSON.stringify(oModel.getProperty("/TableData")),
+          data: JSON.stringify(this.oModel.getProperty("/TableData")),
         });
         if (response.success) {
-          oView.byId("GS_id_BtnSave").setEnabled(false);
+          this.getView().byId("GS_id_BtnSave").setEnabled(false);
           this._onExportSalary();
           BusyIndicator.hide();
           MessageToast.show(this.i18nModel.getText("msgSalUploadSuccess"));
@@ -421,7 +420,7 @@ sap.ui.define(
           BusyIndicator.hide();
           try {
             if ((response.error.responseJSON.error).substring(0, 15) === "Duplicate entry") {
-              oView.byId("GS_id_BtnSave").setEnabled(false);
+              this.getView().byId("GS_id_BtnSave").setEnabled(false);
               MessageToast.show(this.i18nModel.getText("msgDataExistsInDB"));
             }
             else {
@@ -429,16 +428,16 @@ sap.ui.define(
             }
           }
           catch (e) {
-            MessageToast.show(that.i18nModel.getText("commanMessage"));
+            MessageToast.show(this.i18nModel.getText("commanMessage"));
           }
         }
       },
 
       _onExportSalary: function () {
-        var branch = oModel.getProperty("/FilterBranch");
-        var month = oModel.getProperty("/FilterMonth");
-        var year = oModel.getProperty("/FilterYear");
-        const aData = oModel.getProperty("/TableData");
+        var branch = this.oModel.getProperty("/FilterBranch");
+        var month = this.oModel.getProperty("/FilterMonth");
+        var year = this.oModel.getProperty("/FilterYear");
+        const aData = this.oModel.getProperty("/TableData");
         var worksheet = XLSX.utils.json_to_sheet(aData);
         var workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");

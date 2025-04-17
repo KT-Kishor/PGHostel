@@ -207,7 +207,7 @@
                                         type="Number"
                                     />
                                     <m:Label
-                                        text="{i18n>coCode} "
+                                        text="{i18n>branchCode} "
                                         showColon="true"
                                     />
                                     <m:ComboBox

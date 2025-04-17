@@ -45,7 +45,7 @@ sap.ui.define([
         QF_onBranchCodeChange: function () {
             var sSelectedValue = this.getView().byId("QF_id_BranchCodes").getSelectedItem();
             this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: sSelectedValue.getKey() }, ["QF_id_HeaderContent"]);
-            this.oModel.setProperty("/QuotationFormData/CompanyCode", sSelectedValue.getKey());
+            this.oModel.setProperty("/QuotationFormData/BranchCode", sSelectedValue.getKey());
             this.oModel.setProperty("/QuotationFormData/Branch", sSelectedValue.getAdditionalText());
         },
 
@@ -197,11 +197,10 @@ sap.ui.define([
             oData.QuotationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.QuotationDate);
             oData.ValidUpto = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.ValidUpto);
             delete oData.ID;
-            oData.QuotationNumber = "";
             try {
                 if (this._checkValidation()) {
                     var response = await this.ajaxCreateWithJQuery("A_Quotations", {
-                        data: JSON.stringify(oData),
+                        data: JSON.stringify({ data: oData }),
                     });
                     if (response.success) {
                         this.oModel.setProperty("/QuotationFormData/QuotationNumber", response.data.QuotationNumber);

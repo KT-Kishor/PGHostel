@@ -16,31 +16,30 @@ sap.ui.define(
       },
 
       _onRouteMatched: function () {
-        this.oView = this.getView();
         this.oCore = sap.ui.getCore();
-        this.oLoginModel = oView.getModel("LoginModel");
-        this.oModel = oView.getModel("Payroll");
-        this.i18nModel = oView.getModel("i18n").getResourceBundle();
+        this.oLoginModel = this.getView().getModel("LoginModel");
+        this.oModel = this.getView().getModel("Payroll");
+        this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         this._FragmentDatePickersReadOnly(["FST_id_MonthYearPicker", "FST_id_FilterBranch"]);
 
-        if (!oLoginModel) {
+        if (!this.oLoginModel) {
           this.getRouter().navTo("RouteLoginPage");
           return;
         }
-        oCore.byId("FST_id_FilterBranch").setSelectedKey(oLoginModel.getProperty("/city"));
-        this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Payroll Data");
-        oModel.setProperty("/ShowOnGenerate", false);
-        oModel.setProperty("/ShowOnPayroll", true);
-        oModel.setProperty("/TableData", null);
+        this.oCore.byId("FST_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/city"));
+        this.oLoginModel.setProperty("/HeaderName", "Manage Payroll Data");
+        this.oModel.setProperty("/ShowOnGenerate", false);
+        this.oModel.setProperty("/ShowOnPayroll", true);
+        this.oModel.setProperty("/TableData", null);
         this.resetColumnHeaders();
-        oModel.setProperty("/isSELVisible", false);
+        this.oModel.setProperty("/isSELVisible", false);
         this.getView().byId("MP_id_UpdateSalBtn").setEnabled(true);
-        oCore.byId("FST_id_MonthYearPicker").setValue("");
-        var aData = oModel.getProperty("/TableData");
-        oModel.setProperty("/TableRowCount", aData ? aData.length : 0);
-        var oBinding = oModel.bindList("/TableData");
+        this.oCore.byId("FST_id_MonthYearPicker").setValue("");
+        var aData = this.oModel.getProperty("/TableData");
+        this.oModel.setProperty("/TableRowCount", aData ? aData.length : 0);
+        var oBinding = this.oModel.bindList("/TableData");
         oBinding.attachChange(function () {
-          oModel.setProperty("/TableRowCount", oBinding.getLength());
+          this.oModel.setProperty("/TableRowCount", oBinding.getLength());
         });
 
         this._fetchCommonData("BaseLocation", "oBranchModel", {}, ["FST_id_FilterBranch"]);
@@ -59,23 +58,23 @@ sap.ui.define(
 
       MP_onPressGo: async function () {
         BusyIndicator.show(0);
-        oModel.setProperty("/isExcelMismatch", false);
-        var branch = oCore.byId("FST_id_FilterBranch").getValue();
-        var oDate = oCore.byId("FST_id_MonthYearPicker").getDateValue();
+        this.oModel.setProperty("/isExcelMismatch", false);
+        var branch = this.oCore.byId("FST_id_FilterBranch").getValue();
+        var oDate = this.oCore.byId("FST_id_MonthYearPicker").getDateValue();
         var pickerMonth = String(oDate.getMonth() + 1).padStart(2, '0');
         var pickerYear = String(oDate.getFullYear());
         this.updateDaysInColumns(pickerYear, pickerMonth);
-        oModel.setProperty("/FilterBranch", branch);
-        oModel.setProperty("/FilterMonth", pickerMonth);
-        oModel.setProperty("/FilterYear", pickerYear);
+        this.oModel.setProperty("/FilterBranch", branch);
+        this.oModel.setProperty("/FilterMonth", pickerMonth);
+        this.oModel.setProperty("/FilterYear", pickerYear);
         this._fetchCommonData("PayRoll", "oPayrollModel", { Branch: branch, Month: pickerMonth, Year: pickerYear }, []);
-        var oData = oModel.getProperty("/oPayrollModel");
+        var oData = this.oModel.getProperty("/oPayrollModel");
         if (!oData || oData.length === 0) {
           BusyIndicator.hide();
           MessageToast.show(this.i18nModel.getText("msgDataNotExistsInDB"));
-          oModel.setProperty("/TableData", null);
+          this.oModel.setProperty("/TableData", null);
           this.resetColumnHeaders();
-          oModel.setProperty("/isSELVisible", false);
+          this.oModel.setProperty("/isSELVisible", false);
         }
         else {
           this._sortAndFormatRecords(oData);
@@ -152,10 +151,10 @@ sap.ui.define(
             "ChangedBy": record["ChangedBy"] ? record["ChangedBy"].toString() : "",
           };
         });
-        oModel.setProperty("/TableData", records);
-        oModel.setProperty("/isSELVisible", true);
-        oView.byId("MP_id_UpdateSalBtn").setEnabled(true);
-        oView.byId("MP_id_DeleteBtn").setEnabled(true);
+        this.oModel.setProperty("/TableData", records);
+        this.oModel.setProperty("/isSELVisible", true);
+        this.getView().byId("MP_id_UpdateSalBtn").setEnabled(true);
+        this.getView().byId("MP_id_DeleteBtn").setEnabled(true);
         BusyIndicator.hide();
       },
 
@@ -164,7 +163,7 @@ sap.ui.define(
         var file = e.getParameter("files") && e.getParameter("files")[0];
         if (file) {
           var reader = new FileReader();
-          var payrollData = oModel.getProperty("/TableData");
+          var payrollData = this.oModel.getProperty("/TableData");
           reader.onload = (e) => {
             var data = e.target.result;
             var workbook = XLSX.read(data, { type: "binary" });
@@ -196,7 +195,7 @@ sap.ui.define(
             }
             sheetData = sheetData.map(row => {
               row["Status"] = "Paid";
-              row["ChangedBy"] = oLoginModel.getProperty("/EmployeeName");
+              row["ChangedBy"] = this.oLoginModel.getProperty("/EmployeeName");
               return row;
             });
             this._updateData(sheetData);
@@ -214,8 +213,8 @@ sap.ui.define(
           data: JSON.stringify(sheetData),
         });
         if (response.success) {
-          oModel.setProperty("/TableData", sheetData);
-          oView.byId("MP_id_UpdateSalBtn").setEnabled(false);
+          this.oModel.setProperty("/TableData", sheetData);
+          this.getView().byId("MP_id_UpdateSalBtn").setEnabled(false);
           MessageToast.show(this.i18nModel.getText("msgSalUploadSuccess"));
         } else {
           MessageToast.show(this.i18nModel.getText("msgSchemeUploadFailed"));
@@ -223,10 +222,10 @@ sap.ui.define(
       },
 
       onPressExport: function () {
-        var branch = oModel.getProperty("/FilterBranch");
-        var month = oModel.getProperty("/FilterMonth");
-        var year = oModel.getProperty("/FilterYear");
-        const aData = oModel.getProperty("/TableData");
+        var branch = this.oModel.getProperty("/FilterBranch");
+        var month = this.oModel.getProperty("/FilterMonth");
+        var year = this.oModel.getProperty("/FilterYear");
+        const aData = this.oModel.getProperty("/TableData");
         var worksheet = XLSX.utils.json_to_sheet(aData);
         var workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -249,11 +248,11 @@ sap.ui.define(
                 type: "Accept",
                 press: async function () {
                   that._oWarningDialog.close();
-                  await that.ajaxDeleteWithJQuery("Payroll", { filters: { Company: oModel.getProperty("/FilterCompany"), Branch: oModel.getProperty("/FilterBranch"), Month: oModel.getProperty("/FilterMonth"), Year: oModel.getProperty("/FilterYear") } });
+                  await that.ajaxDeleteWithJQuery("Payroll", { filters: { Company: this.oModel.getProperty("/FilterCompany"), Branch: this.oModel.getProperty("/FilterBranch"), Month: this.oModel.getProperty("/FilterMonth"), Year: this.oModel.getProperty("/FilterYear") } });
                   if (response.success) {
-                    oModel.setProperty("/TableData", null);
+                    this.oModel.setProperty("/TableData", null);
                     that.resetColumnHeaders();
-                    oModel.setProperty("/isSELVisible", false);
+                    this.oModel.setProperty("/isSELVisible", false);
                     MessageToast.show(that.i18nModel.getText("hikeDelete"));
                   } else {
                     MessageToast.show(that.i18nModel.getText("msgSchemeUploadFailed"));
