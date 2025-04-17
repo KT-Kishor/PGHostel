@@ -16,6 +16,9 @@ sap.ui.define([
             _onRouteMatched:async function (oEvent) {
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); 
+                await this._fetchCommonData("Designation", "DesignationModel");
+                await this._fetchCommonData("Department", "Departmentmodel");
+                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" }); // common company emails read call
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
                 ["T_id_Download", "T_id_EmpOnBoard", "T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
@@ -28,9 +31,7 @@ sap.ui.define([
                 else {
                     this.T_onSearch();// filter function for trainee 
                 }
-                await this._fetchCommonData("Designation", "DesignationModel");
-                await this._fetchCommonData("Department", "Departmentmodel");
-                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" }); // common company emails read call
+               
             },
             //read call for trainee
             readCallForTrainee: async function (filter) {

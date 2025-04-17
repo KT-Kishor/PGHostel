@@ -73,7 +73,7 @@
 											<TextArea value="{employeeModel>/ConsultantAddress}" placeholder="{i18n>consultantAddress}" liveChange="EOD_ValidateCommonFields"
                                             id="EOD_id_Address" maxLength="120" valueStateText="{i18n>addressValueState}"/>
 											<Label text="{i18n>pinCode}" required="true" />
-											<Input value="{employeeModel>/PinCode}" placeholder="{i18n>enterPinCode}" id="EOD_id_PinCode" liveChange="EOD_validatePinCode"/>
+											<Input value="{employeeModel>/PinCode}" placeholder="{i18n>enterPinCode}" id="EOD_id_PinCode" liveChange="EOD_validatePinCode" valueStateText="{i18n>enterPinCode}"/>
 											<Label text="{i18n>ctc}" required="true" />
 		
 											<Input value="{employeeModel>/CTC}" id="EOD_id_CTC" placeholder="{i18n>placeCtc}" 
@@ -88,11 +88,10 @@
 
 											<Label text="{i18n>joiningBonus}" required="true" />
 											<Input value="{employeeModel>/JoiningBonus}" placeholder="{i18n>joiningBonus}" 
-                                             liveChange="EOD_validateAmount" maxLength="10" id="EOD_id_Bonus" valueStateText="{i18n>ammountValuState}" />
+                                             liveChange="EOD_validateJoiningBonus" maxLength="10" id="EOD_id_Bonus" valueStateText="{i18n>ammountValuState}" />
 											<Label text="{i18n>salaryType}"/>
 											<RadioButtonGroup id="EOD_id_RadioButTds" columns="3" select="EOD_onTDSCheckboxChange">
 												<RadioButton id="EOD_id_Tds" text="{i18n>tds}" />
-												<!-- <RadioButton id="EOD_id_NoTds" text="{i18n>noTds}" /> -->
 												<RadioButton id="EOD_id_Pf" text="{i18n>pf}" />
 											</RadioButtonGroup>
 											<Label text="{i18n>bond}" required="true" />

@@ -81,7 +81,26 @@ sap.ui.define([], function () {
         return true;
       }
     },
-
+    _LCvalidateJoiningBonus: function (oEvent, type) {
+      var oInput = type === "ID" ? oEvent : oEvent.getSource();
+      var value = oInput.getValue();
+      var cleanedValue = value.replace(/[^0-9.]/g, "");
+      var parts = cleanedValue.split(".");
+      // Limit to 2 decimal places
+      if (parts.length === 2) {
+        cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
+      }  
+      oInput.setValue(cleanedValue);
+      // Allow 0 or positive decimal numbers
+      if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
+        oInput.setValueState("Error");
+        return false;
+      } else {
+        oInput.setValueState("None");
+        return true;
+      }
+    },
+    
     // PAN card validation function
     _LCvalidatePanCard: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();

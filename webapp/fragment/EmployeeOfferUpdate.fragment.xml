@@ -114,7 +114,7 @@
 														<m:VBox class="summaryBox">
 															<m:Label text="{i18n>joiningBonus}" />
 															<m:Input value="{employeeModel>/JoiningBonus}" editable="{viewModel>/editable}" placeholder="{i18n>joiningBonus}" 
-                                            liveChange="EOD_validateAmount" maxLength="10" id="EOUF_id_Bonus" valueStateText="{i18n>ammountValuState}" />
+                                            liveChange="EOD_validateJoiningBonus" maxLength="10" id="EOUF_id_Bonus" valueStateText="{i18n>ammountValuState}" />
 														</m:VBox>
 														<m:VBox class="summaryBox">
 															<m:Label text="Variable Pay Percentage" />
