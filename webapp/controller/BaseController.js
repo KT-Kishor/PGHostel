@@ -163,8 +163,9 @@ sap.ui.define([
       });
     },
     //Common create call for all the app
-    async ajaxCreateWithJQuery(sUrl, oPayLoad) {
-      sap.ui.core.BusyIndicator.show(0);
+    async ajaxCreateWithJQuery(sUrl, oPayLoad, busyIds = []) {
+      var that = this;
+      busyIds.forEach(id => this.setBusyOnId(id, true));
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
@@ -172,11 +173,11 @@ sap.ui.define([
           data: JSON.stringify(oPayLoad),
           headers: this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
-            sap.ui.core.BusyIndicator.hide();
+            busyIds.forEach(id => that.setBusyOnId(id, false));
             resolve(data);
           },
           error: function (error) {
-            sap.ui.core.BusyIndicator.hide();
+            busyIds.forEach(id => that.setBusyOnId(id, false));
             reject(error);
           }
         });
@@ -184,7 +185,6 @@ sap.ui.define([
     },
     //Common update call for all the app
     async ajaxUpdateWithJQuery(sUrl, oPayLoad) {
-      sap.ui.core.BusyIndicator.show(0);
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
@@ -192,11 +192,9 @@ sap.ui.define([
           data: JSON.stringify(oPayLoad),
           headers: this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
-            sap.ui.core.BusyIndicator.hide();
             resolve(data);
           },
           error: function (error) {
-            sap.ui.core.BusyIndicator.hide();
             reject(error);
           }
         });
@@ -204,7 +202,6 @@ sap.ui.define([
     },
     //Common delete call for all the app
     async ajaxDeleteWithJQuery(sUrl, oPayLoad) {
-      sap.ui.core.BusyIndicator.show(0);
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,

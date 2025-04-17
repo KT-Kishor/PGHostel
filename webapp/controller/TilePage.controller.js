@@ -19,6 +19,7 @@ sap.ui.define(
         _onRouteMatched: async function () {
           this._fetchCommonData("AllLoginDetails", "EmpModel");
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+          this.getView().getModel("Quotation").setProperty("/setDefFilter", true);
         },
 
         RP_onUseridpress: function (oEvent) {

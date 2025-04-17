@@ -81,8 +81,8 @@ sap.ui.define([
             utils._LCvalidatePinCode(oEvent);
         },
 
-        QF_onModelSelectionChange: async function (oEvent) {
-            var selectedKey = oEvent.getParameter("selectedItem").getKey();
+        QF_onModelSelectionChange: async function () {
+            var selectedKey = this.oModel.getProperty("/QuotationFormData/Model");
             var response = await this.ajaxCreateWithJQuery("UniqueScheme", {filters: {Model: selectedKey}}, ["QF_id_VehVariant"]);
             if (response.success) {
                 this.oModel.setProperty("/VariantList", response.results);
@@ -200,10 +200,9 @@ sap.ui.define([
             try {
                 if (this._checkValidation()) {
                     var response = await this.ajaxCreateWithJQuery("A_Quotations", {
-                        data: JSON.stringify({ data: oData }),
+                        data: oData,
                     });
                     if (response.success) {
-                        this.oModel.setProperty("/QuotationFormData/QuotationNumber", response.data.QuotationNumber);
                         this._submitSuccess();
                     } else {
                         MessageToast.show(that.i18nModel.getText("msgSchemeDetailErrorSave"));
@@ -255,7 +254,7 @@ sap.ui.define([
             this.QF_oSuccessDialog.open();
         },
 
-        onPressEdit: async function () {
+        QF_onPressEdit: async function () {
             var sRole = this.oLoginModel.getProperty("/Role");
             var edits = this.oModel.getProperty("/isEditable");
             var masteredits = this.oModel.getProperty("/MasterEdit");
@@ -265,32 +264,40 @@ sap.ui.define([
             } else {
                 this.oModel.setProperty("/MasterEdit", !masteredits);
             }
-            if (masteredits === true) {
+            if (masteredits) {
                 if (this._checkValidation()) {
-                    var data = {
-                        "data": this.oModel.getProperty("/QuotationFormData"),
-                        "filters": {
-                            "QuotationNumber": this.oModel.getProperty("/QuotationFormData/QuotationNumber")
+                    var oData = this.oModel.getProperty("/QuotationFormData/");
+                    oData.QuotationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(new Date(oData.QuotationDate));
+                    oData.ValidUpto = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(new Date(oData.ValidUpto));
+                    try{
+                        var response = await this.ajaxUpdateWithJQuery("A_Quotations", {
+                            data: oData,
+                            filters: {
+                                "QuotationNumber": this.oModel.getProperty("/QuotationFormData/QuotationNumber")
+                            }
+                        });
+                        if (response.success) {
+                            MessageToast.show(this.i18nModel.getText("Quotation Updated Successfully"));
                         }
-                    };
-                    var response = await this.ajaxUpdateWithJQuery("A_Quotations", {
-                        data: JSON.stringify(data),
-                    });
-                    if (!response.success) {
-                        MessageToast.show(that.i18nModel.getText("msgSchemeDetailErrorSave"));
+                        else{
+                            MessageToast.show(this.i18nModel.getText("An error occured while updating Quotation"));                            
+                        }
+                    }
+                    catch (error) {
+                        console.log(error);
+                        MessageToast.show(this.i18nModel.getText("An error occured while updating Quotation"));   
                     }
                     this.getView().byId("QF_id_PDFBtn").setEnabled(true);
                     this.oModel.setProperty("/VisibleStatus", false);
                 } else {
-                    this.QF_onVariantChange();
-                    MessageToast.show(this.i18nModel.getText("msgSchemeDetailsMandatory"));
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     this.oModel.setProperty("/MasterEdit", masteredits);
                     this.oModel.setProperty("/isEditable", edits);
                 }
             } else {
                 this.getView().byId("QF_id_PDFBtn").setEnabled(false);
                 this.oModel.setProperty("/VisibleStatus", true);
-                this._commonGETCall("SchemeUploade", "VariantList", { Model: this.oModel.getProperty("/QuotationFormData/Model") }, ["QF_id_VehVariant"]);
+                this.QF_onModelSelectionChange();
             }
         },
 

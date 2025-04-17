@@ -88,8 +88,8 @@
                                 id="Q_id_QDate"
                                 name="QuotationDate"
                                 delimiter="to"
-                                displayFormat="dd/MM/yyyy"
-                                valueFormat="dd/MM/yyyy"
+                                displayFormat="yyyy-MM-dd"
+                                valueFormat="yyyy-MM-dd"
                                 change="Q_onFilterChange"
                             />
                         </filterbar:control>
@@ -230,12 +230,12 @@
                             <Text text="{Quotation>QuotationNumber}" />
                             <Text text="{Quotation>Branch}" />
                             <Text
-                                text="{ path: 'Quotation>QuotationDate', formatter: '.formatter.DateFormatter' }"
+                                text="{ path: 'Quotation>QuotationDate', formatter: '.Formatter.formatDate' }"
                             />
                             <Text text="{Quotation>CustomerName}" />
                             <Text text="{Quotation>CustPinCode}" />
                             <Text
-                                text="{ path: 'Quotation>TotalOnRoad', formatter: '.formatter.IndiaNumberFormatter' }"
+                                text="{ path: 'Quotation>TotalOnRoad', formatter: '.Formatter.fromatNumber' }"
                             />
                             <ObjectStatus
                                 inverted="true"
