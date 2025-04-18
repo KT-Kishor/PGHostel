@@ -250,6 +250,7 @@ sap.ui.define([
                                     type: "Accept",
                                     press: function () {
                                         oDialog.close();
+                                        this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);  
                                         this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
                                     }.bind(this)
                                 }),
@@ -259,6 +260,7 @@ sap.ui.define([
                                     press: function () {
                                         this.EOUF_onPressMerge();
                                         oDialog.close();
+                                        this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true); 
                                         this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
                                     }.bind(this)
                                 }),
