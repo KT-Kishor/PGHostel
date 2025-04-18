@@ -10,16 +10,7 @@
 >
 
 <m:Page id="id_Expense_Details" title="{i18n>expDetails}" navButtonPress="Exp_Det_onPressBackBtn" showNavButton="true">
-	<ObjectPageLayout 
-            enableLazyLoading="true"
-            beforeNavigate="onBeforeNavigate"
-            useIconTabBar="true"
-            showTitleInHeaderContent="true"
-            upperCaseAnchorBar="false"
-            headerContentPinnable="false"
-            sectionChange="onSectionChange"
-			id="objectPageLayoutExpence"
-            class="sapUiSmallmarginResponsive">
+	<ObjectPageLayout enableLazyLoading="true" beforeNavigate="onBeforeNavigate" useIconTabBar="true" showTitleInHeaderContent="true" upperCaseAnchorBar="false" headerContentPinnable="false" sectionChange="onSectionChange" id="objectPageLayoutExpence" class="sapUiSmallmarginResponsive">
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
 					<expandedHeading>
@@ -35,11 +26,7 @@
 					<subSections>
 						<ObjectPageSubSection titleUppercase="false" title="{i18n>expBasicInformation}">
 							<blocks>
-								<f:SimpleForm 
-                                            editable="true" layout="ColumnLayout"
-              labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
-              adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"
-              emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
+								<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 											<f:toolbar>
 											<m:Toolbar>												
 												<m:ToolbarSpacer />
@@ -74,10 +61,10 @@
 										<m:Input value="{FilteredExpenseModel>/0/ExpenseName}" editable="false" />
 										<!-- Start Date -->
 										<m:Label text="{i18n>startDate}"/>
-										<m:DatePicker  displayFormat="dd/MM/yyyy"  value="{FilteredExpenseModel>/0/ExpStartDate}" editable="false"  />
+										<m:DatePicker displayFormat="dd/MM/yyyy" value="{path:'FilteredExpenseModel>/0/ExpStartDate',formatter: '.Formatter.formatDate'}" editable="false"  />
 										<!-- EndDate -->
 										<m:Label text="{i18n>endDate}"/>
-										<m:DatePicker  displayFormat="dd/MM/yyyy" value="{FilteredExpenseModel>/0/ExpEndDate}" editable="false" />										
+										<m:DatePicker displayFormat="dd/MM/yyyy" value="{path:'FilteredExpenseModel>/0/ExpEndDate',formatter: '.Formatter.formatDate'}" editable="false" />										
 										<!-- Source -->
 										<m:Label text="{i18n>expSource}" required="true"/>
 										<m:ComboBox id="Exp_id_Source" valueStateText="{i18n>expValStaSource}"  change="onLiveAllValidation" items="{BaseLocationModel>/}"  value="{FilteredExpenseModel>/0/Source}" editable="{viewModel>/editable}">
@@ -97,18 +84,17 @@
 										<m:Label text="{i18n>expCountry}" required="true"/>
 										<m:ComboBox id="Exp_id_Country" valueStateText="{i18n>expValStaCountry}" change="onLiveAllValidation" items="{path:'CountryModel>/',length:1000}" value="{FilteredExpenseModel>/0/Country}" editable="{viewModel>/editable}">
 											<core:ListItem key="{CountryModel>id}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
-										</m:ComboBox>
+										</m:ComboBox>										
 
-										<m:Label text="{i18n>managerRemarksLeave}" />
-										<m:Text text="{= ${FilteredExpenseModel>/0/ManagerRemark}.length > 80 ? ${FilteredExpenseModel>/0/ManagerRemark}.substring(0, 80) + '...' : ${FilteredExpenseModel>/0/ManagerRemark}}" wrapping="false" />
-										<m:Link text="{i18n>showMore}" press="onPressManagerRemarks" visible="{= ${FilteredExpenseModel>/0/ManagerRemark}.length > 80}" />
-
-										<m:Label text="{i18n>expAccountantRemark}" />
+										<m:Label text="{i18n>managerRemarksLeave}" />										
+										<m:Button icon="sap-icon://display-more" text="{i18n>View}" press="AL_onShowEmployeeComments" />
+										
+										<!-- <m:Label text="{i18n>expAccountantRemark}" />
 										<m:Text id="textRemark" text="{= ${FilteredExpenseModel>/0/AccountingRemark}.length > 80 ? ${FilteredExpenseModel>/0/AccountingRemark}.substring(0, 80) + '...' : ${FilteredExpenseModel>/0/AccountingRemark}}" wrapping="false" />
 										<m:Link text="{i18n>showMore}" press="onPressAccountantRemark" visible="{= ${FilteredExpenseModel>/0/AccountingRemark}.length > 80}" />
 
 										<m:Label text="{i18n>expEmployeeRemark}" required="true"/>
-										<m:TextArea id="Exp_id_EmpRemark" valueStateText="{i18n>expValStaEmployeeRemark}" liveChange="onLiveAllValidation" rows="4" value="{FilteredExpenseModel>/0/Comments}"  editable="{viewModel>/editable}" maxLength="1000"/>
+										<m:TextArea id="Exp_id_EmpRemark" valueStateText="{i18n>expValStaEmployeeRemark}" liveChange="onLiveChangeEmployeeRemark" rows="4" value="{FilteredExpenseModel>/0/Comments}"  editable="{viewModel>/editable}" maxLength="1000"/> -->
 									<!-- </f:content> -->
 								</f:SimpleForm>
 							</blocks>
@@ -129,25 +115,25 @@
 										</m:OverflowToolbar>
 									</m:headerToolbar>
 										<m:columns>
-											<m:Column>
+											<m:Column demandPopin="true">
 												<m:Label text="{i18n>itemID}" />
 											</m:Column>
-											<m:Column>
+											<m:Column demandPopin="true">
 												<m:Label text="{i18n>expDetItemType}" />
 											</m:Column>
-											<m:Column>
+											<m:Column  minScreenWidth="Desktop" demandPopin="true">
 												<m:Label text="{i18n>expDetForeignAmount}" />
 											</m:Column>
-											<m:Column>
+											<m:Column  minScreenWidth="Desktop" demandPopin="true">
 												<m:Label text="{i18n>expDetExpenseDate}" />
 											</m:Column>
-											<m:Column>
+											<m:Column minScreenWidth="Desktop" demandPopin="true">
 												<m:Label text="{i18n>expDetExpenseAmount}" />
 											</m:Column>
-											<m:Column>
+											<m:Column minScreenWidth="Desktop" demandPopin="true">
 												<m:Label text="{i18n>expModeOfPayment}" />
 											</m:Column>
-											<m:Column>
+											<m:Column minScreenWidth="Desktop" demandPopin="true">
 												<m:Label text="{i18n>comments}" />
 											</m:Column>
 										</m:columns>
@@ -156,7 +142,6 @@
 												<m:cells>
 													<m:Text text="{ItemExpenseModel>IndexNo}" />
 													<m:Text text="{ItemExpenseModel>ItemType}" />
-													<!-- <m:Text text="INR {path:'ItemExpenseModel>ForeignAmount', formatter: '.Formatter.fromatNumber'}" /> -->
 													<m:VBox alignItems="Center">
 														<m:HBox >
 															<m:Text text="{ItemExpenseModel>Currency} {path:'ItemExpenseModel>ForeignAmount',formatter:'.Formatter.fromatNumber'}" />
@@ -165,11 +150,11 @@
 															<m:Text text="{i18n>expConversionRate} : {path:'ItemExpenseModel>ConversionRate',formatter:'.Formatter.fromatNumber'}" visible="{= ${ItemExpenseModel>Currency} !== 'INR'}" />
 														</m:HBox>
 													</m:VBox>
-													<m:Text text="{ItemExpenseModel>ExpenseDate}" />
-													<m:Text text="{path:'ItemExpenseModel>ExpenseAmount', formatter: '.Formatter.fromatNumber'}" />
-													<!-- <m:Text text="{ItemExpenseModel>ModeOfPayment}" /> -->
+													<m:Text text="{path:'ItemExpenseModel>ExpenseDate',formatter: '.Formatter.formatDate'}" />
+													<m:Text text="{path:'ItemExpenseModel>ExpenseAmount', formatter: '.Formatter.fromatNumber'}" />												
 													<m:ObjectStatus inverted="true" text="{ItemExpenseModel>ModeOfPayment}" state="{path: 'ItemExpenseModel>ModeOfPayment', formatter: '.Formatter.formatObjectStatus'}" />
-													<m:Text text="{ItemExpenseModel>Comments}" />													
+													<!-- <m:Text text="{ItemExpenseModel>Comments}" />													 -->
+													<m:Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" />
 												</m:cells>
 											</m:ColumnListItem>
 										</m:items>

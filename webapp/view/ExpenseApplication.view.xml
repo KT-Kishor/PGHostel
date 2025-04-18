@@ -10,7 +10,6 @@
 <Page >
     <headerContent>
 	    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
-
 		</headerContent>
 
     <content>
@@ -18,7 +17,7 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="EmployeeID" showSecondaryValues="true" showClearIcon="true" items="{EmpModel>/data}" id="Exp_id_EmployeeName">
+						<ComboBox name="EmployeeID" showSecondaryValues="true" showClearIcon="true" items="{EmpModel>/}" id="Exp_id_EmployeeName">
 							<core:ListItem key="{EmpModel>EmployeeID}" text="{EmpModel>EmployeeID}" additionalText="{EmpModel>EmployeeName}" />
 						</ComboBox>
 					</fb:control>
@@ -65,31 +64,31 @@
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
-					<Column>
+					<Column demandPopin="true">
 						<Label text="{i18n>employeeName}" />
 					</Column>
-					<Column>
+					<Column demandPopin="true">
 						<Label text="{i18n>expExpenseName}" />
 					</Column>
-					<Column>
+					<Column  minScreenWidth="Desktop" demandPopin="true">
 						<Label text="{i18n>startDate}" />
 					</Column>
-					<Column>
+					<Column  minScreenWidth="Desktop" demandPopin="true">
 						<Label text="{i18n>endDate}" />
 					</Column>
-					<Column>
+					<Column  demandPopin="true">
 						<Label text="{i18n>expDestination}" />
 					</Column>
-					<Column>
+					<Column  minScreenWidth="Desktop" demandPopin="true">
 						<Label text="{i18n>totalAmount}" />
 					</Column>
-					<Column>
+					<Column  minScreenWidth="Desktop" demandPopin="true">
 						<Label text="{i18n>expReimbursementAmount}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Label text="{i18n>status}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Label text="" />
 					</Column>
 				</columns>
@@ -98,12 +97,11 @@
 						<cells>
 							<Text text="{ExpenseModel>EmployeeID}" />
 							<Text text="{ExpenseModel>EmployeeName}" />
-							<Text text="{ExpenseModel>ExpStartDate}" />
-							<Text text="{ExpenseModel>ExpEndDate}" />
+							<Text text="{path:'ExpenseModel>ExpStartDate',formatter: '.Formatter.formatDate'}" />
+							<Text text="{path:'ExpenseModel>ExpEndDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{ExpenseModel>Destination}" />
 							<Text text="{path:'ExpenseModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" />
-							<Text text="{path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />
-							<!-- <Text text="{ExpenseModel>Status}" /> -->
+							<Text text="{path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />						
 							<ObjectStatus text="{ExpenseModel>Status}" inverted="true" state="{path:'ExpenseModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
 							<Button icon="sap-icon://delete" visible="{= ${ExpenseModel>Status} === 'Draft' }" press="Exp_onPressDeleteExpense" />
 						</cells>

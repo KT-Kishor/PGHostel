@@ -6,8 +6,10 @@ sap.ui.define([
     "sap/m/MessageToast",
     "../model/formatter",
     "sap/m/MessageBox",
+    "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
+    "sap/suite/ui/commons/TimelineItem" //Import TimelineItem for individual comments
   ],
-  function (Controller,BusyIndicator,JSONModel,utils,MessageToast,Formatter,MessageBox) {
+  function (Controller,BusyIndicator,JSONModel,utils,MessageToast,Formatter,MessageBox,Timeline,TimelineItem) {
     "use strict";
     return Controller.extend("sap.kt.com.minihrsolution.controller.ExpenseDetails",{
         Formatter: Formatter,
@@ -42,27 +44,44 @@ sap.ui.define([
           } else {
             this.ViewModel.setProperty("/status", false);
           }
-          if (this.FilteredExpenseModel[0].TripType !== "Customer Facing") {
-            this.ViewModel.setProperty("/required", false);
-          }
+          if (this.FilteredExpenseModel[0].TripType !== "Customer Facing") this.ViewModel.setProperty("/required", false);          
 
           this.ExpenseTotalCalculation();
           BusyIndicator.hide();
         },
 
-        IndexNoIncreent: async function () {
-          await this._fetchCommonData("ItemExpense", "ItemExpenseModel", {EmployeeID: this.LoginModel.getProperty("/EmployeeID"),ExpenseID: this.ExpenseID,});
-          let modelData = this.getView().getModel("ItemExpenseModel").getData();
-          if (!Array.isArray(modelData) || modelData.length === 0) {
-            this.IndexNo = 0;
-            return;
-          }
-          modelData.forEach((item, index) => {
-            item.IndexNo = index + 1;
-            this.IndexNo = index + 1;
+        IndexNoIncreent: function () {
+          var that = this;
+          var oView = this.getView();
+                
+          oView.setBusy(true);
+        
+          this._fetchCommonData("ItemExpense", "ItemExpenseModel", {
+            EmployeeID: this.LoginModel.getProperty("/EmployeeID"),
+            ExpenseID: this.ExpenseID
+          })
+          .then(function () {
+            let modelData = oView.getModel("ItemExpenseModel").getData();
+        
+            if (!Array.isArray(modelData) || modelData.length === 0) {
+              that.IndexNo = 0;
+              return;
+            }
+        
+            modelData.forEach((item, index) => {
+              item.IndexNo = index + 1;
+              that.IndexNo = index + 1;
+            });
+        
+            oView.getModel("ItemExpenseModel").setData(modelData);
+          })
+          .catch(function (error) {         
+            that.IndexNo = 0;
+          })
+          .finally(function () {          
+            oView.setBusy(false);
           });
-          this.getView().getModel("ItemExpenseModel").setData(modelData);
-        },
+        },             
 
         Exp_Det_onPressExpenseDownload: function () {
           let fileUrl =window.location.href.split("index")[0] +"/Perdiem_DeclarationForm.doc";
@@ -136,7 +155,7 @@ sap.ui.define([
             IndexNo: this.SelectedData.IndexNo,
             ItemID: this.SelectedData.ItemID,
             ItemType: this.SelectedData.ItemType,
-            ExpenseAmount: this.SelectedData.ExpenseAmount,
+            ExpenseAmount: this.SelectedData.Currency === "INR" ? this.SelectedData.ExpenseAmount : this.SelectedData.ForeignAmount,
             Currency: this.SelectedData.Currency,
             Attachment: this.SelectedData.Attachment,
             ModeOfPayment: this.SelectedData.ModeOfPayment,
@@ -189,12 +208,20 @@ sap.ui.define([
         LC_ExpComments: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
+        
+        onLiveChangeEmployeeRemark:function(oEvent){
+          utils._LCvalidateMandatoryField(oEvent);
+        },
 
         onPressSave:async function () {
           if (
             utils._LCvalidateMandatoryField(this.byId("Exp_id_Source"), "ID") &&
             (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"),"ID") : true) && utils._LCvalidateMandatoryField(this.byId("Exp_id_Country"),"ID") && utils._LCvalidateMandatoryField(this.byId("Exp_id_EmpRemark"), "ID")) {
+            BusyIndicator.show(0);
             var oModel = this.getView().getModel("FilteredExpenseModel");
+            oModel.getData()[0].ExpStartDate = oModel.getData()[0].ExpStartDate.split("T")[0];
+            oModel.getData()[0].ExpEndDate = oModel.getData()[0].ExpEndDate.split("T")[0];
+            delete oModel.getData()[0].Comments;
             var oData = {
               data: oModel.getData()[0],
               filters: {
@@ -209,8 +236,10 @@ sap.ui.define([
                   this.ViewModel.setProperty("/enable", true);
                   this.ViewModel.setProperty("/enableDelete", true);
                   MessageToast.show(this.i18nModel.getText("expenseUpdateMess"));
+                  BusyIndicator.hide();
                 }else{
                   MessageToast.show(this.i18nModel.getText("expenseUpdateMessFailed"));
+                  BusyIndicator.hide();
                 }
               })
               .catch((oError) => {
@@ -234,8 +263,9 @@ sap.ui.define([
         async Exp_Det_onPressSubmit() {
           var oModel = this.getView().getModel("ExpenseCreateModel").getData();
           if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"),"ID") && (oModel.ItemType !== "Peridiem Declaration"? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"),"ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"),"ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"),"ID") : true)) {
+            BusyIndicator.show(0);
             var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
-            if (oModel.Currency !== "INR") this.onChangeConverstionRate();
+            if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
 
             var oData = {
               data: {
@@ -262,6 +292,7 @@ sap.ui.define([
                 BusyIndicator.hide();
               }else{
                 MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
+                BusyIndicator.hide();
               }
             } catch (oError) {
               BusyIndicator.hide();
@@ -276,7 +307,8 @@ sap.ui.define([
             var oModel = this.getView().getModel("ExpenseCreateModel").getData();
             var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
             if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"),"ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"),"ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"),"ID") && (oModel.Currency !== "INR"? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"),"ID"): true)) {
-              if (oModel.Currency !== "INR") this.onChangeConverstionRate();
+              BusyIndicator.show(0);
+              if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
 
               var oData = {
                 data: {
@@ -303,6 +335,7 @@ sap.ui.define([
                     BusyIndicator.hide();
                   }else{
                     MessageToast.show(this.i18nModel.getText("expenseUpdateMessFailed"));
+                    BusyIndicator.hide();
                   }
                 })
                 .catch((oError) => {
@@ -316,14 +349,14 @@ sap.ui.define([
 
         Exp_Det_onPressExpenseItemDelete: async function (oEvent) {
           try {
-            if (this.byId("exp_Id_ExpenseTable").getSelectedItem() === null) {
-              return MessageToast.show(this.i18nModel.getText("expenseDeleteSelectRowMess"));
-            }
+            if (this.byId("exp_Id_ExpenseTable").getSelectedItem() === null) { return MessageToast.show(this.i18nModel.getText("expenseDeleteSelectRowMess")); }
+            BusyIndicator.show(0);
             var ExpID = this.SelectedData.ItemID;
             await this.ajaxDeleteWithJQuery("/ItemExpense", {filters: { ItemID: ExpID },});
             MessageToast.show(this.i18nModel.getText("expenseDeleteMess"));
             this.IndexNoIncreent();
             this.ExpenseTotalCalculation();
+            BusyIndicator.hide();
           } catch (error) {
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
@@ -368,6 +401,7 @@ sap.ui.define([
               type: "Emphasized",
               press: function () {
                 if (checkbox.getSelected()) {
+                  BusyIndicator.show(0);
                   var inboxData = {
                     data: {
                       ExpenseID: oModelData.ExpenseID,
@@ -393,13 +427,15 @@ sap.ui.define([
                         this.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
                         dialog.close();
                         MessageToast.show(that.i18nModel.getText("expenseSubmittedStatus"));
+                        BusyIndicator.hide();
                       }else{
                         MessageToast.show(this.i18nModel.getText("expenseSubmittedStatusFailed"));
+                        BusyIndicator.hide();
                       }
                     })
                     .catch((oError) => {
                       dialog.close();
-                      sap.ui.core.BusyIndicator.hide();
+                      BusyIndicator.hide();
                       MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     });
                 } else {
@@ -455,6 +491,69 @@ sap.ui.define([
             BusyIndicator.hide();
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
-        }
+        },
+
+        onShowMore: function (oEvent) {
+          var oBindingContext = oEvent.getSource().getBindingContext("ItemExpenseModel");
+          var sFullText = oBindingContext.getObject().Comments;
+
+          var formattedReferenceData = `
+              <div style="padding: 15px; word-wrap: break-word; max-width: 100%; overflow-wrap: anywhere;">
+                  <p>${sFullText}</p>
+              </div>`;
+
+          var oDialog = new sap.m.Dialog({
+              title: this.getView().getModel("i18n").getProperty("comments"),
+              draggable: true,
+              resizable: true,
+              contentWidth: "500px",
+              contentHeight: "auto",
+              content: new sap.ui.core.HTML({ content: formattedReferenceData }),
+              beginButton: new sap.m.Button({
+                  text: this.getView().getModel("i18n").getProperty("close"),
+                  press: function () {oDialog.close()}
+              })
+          });
+          oDialog.open();
+      },
+
+      AL_onShowEmployeeComments: function(oEvent) {
+        var aData = this.getView().getModel("FilteredExpenseModel").getData();
+        var oData = Array.isArray(aData) && aData.length > 0 ? aData[0] : {};
+        var aComments = oData.comments || [];
+     var aTimelineItems = aComments.map(function(oComment) {
+         return new TimelineItem({
+             dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
+             title: oComment.CommentedBy || "Anonymous",
+             text: oComment.Comment || "No comment provided",
+             userNameClickable: false,
+             icon: "sap-icon://comment"
+         });
+     });
+     var oTimeline = new Timeline({
+         showHeader: false,
+         enableBusyIndicator: false,
+         width: "100%",
+         sortOldestFirst: true,
+         enableDoubleSided: false,
+         content: aTimelineItems
+     });
+     var oDialog = new sap.m.Dialog({
+         title: "Expense Comments",
+         contentWidth: "25rem",
+         contentHeight: "15rem",
+         draggable: true,
+         resizable: true,
+         content: [oTimeline],
+         endButton: new sap.m.Button({
+             text: "Close",
+             press: function() {
+                 oDialog.close();
+                 oDialog.destroy();
+             }
+         })
+     });
+     oDialog.open();
+ },
       });
   });

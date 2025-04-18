@@ -26,7 +26,7 @@
 				<DatePicker id="exp-Id-StartDate" valueStateText="{i18n>expValStaStartDate}" value="{CreateExpenseModel>/ExpStartDate}" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" maxDate="" change="Exp_onDatePickerChange"/>
 				<!-- End Date -->
 				<Label text="{i18n>endDate}" required="true" />
-				<DatePicker id="exp-Id-EndDate" valueStateText="{i18n>expValStaEndDate}" value="{CreateExpenseModel>/ExpEndDate}" minDate="" maxDate="" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Exp_onEndDateChange" />
+				<DatePicker id="exp-Id-EndDate" valueStateText="{i18n>expValStaEndDate}" value="{CreateExpenseModel>/ExpEndDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Exp_onEndDateChange" />
 				<!-- Travel Allowance -->
 				<Label text="{i18n>expTravelAllowance}" required="true"></Label>
 				<Select id="exp-Id-TravelAllowance" showSecondaryValues="true"  selectedKey="{CreateExpenseModel>/TravelAllowance}">
