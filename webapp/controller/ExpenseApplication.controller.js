@@ -89,6 +89,7 @@ sap.ui.define([
         },
 
         Exp_Frg_onPressSubmit: async function() {
+            var that = this;
             try {
                 // Validate mandatory fields
                 const isValid =
@@ -105,32 +106,28 @@ sap.ui.define([
                 if (!isValid) {
                     return MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
-
-                BusyIndicator.show();
+               this.byId("exp_Id_ExpenseTable").setBusy(true);
 
                 // Get and format model data
                 const oModel = this.getView().getModel("CreateExpenseModel").getData();
                 oModel.ExpStartDate = oModel.ExpStartDate.split("/").reverse().join("-");
                 oModel.ExpEndDate = oModel.ExpEndDate.split("/").reverse().join("-");
 
-                const oResponse = await this.ajaxCreateWithJQuery("Expense", {
-                    data: oModel
-                });
+                const oResponse = await that.ajaxCreateWithJQuery("Expense", {data: oModel});
                 if (oResponse) {
-                    MessageToast.show(this.i18nModel.getText("expenseCreatedMess"));
-                    await this._fetchCommonData("ExpenseTotalCalculation", "", {
-                        ExpenseID: oResponse.ExpenseID
-                    });
-                    await this._fetchCommonData("Expense", "ExpenseModel");
-                    this.getView().getModel("FilterExpenseModel").getData() = this.getView().getModel("ExpenseModel").getData();
-                    this.Expense.close();
+                    that.Expense.close();
+                    await that._fetchCommonData("ExpenseTotalCalculation", "", {ExpenseID: oResponse.ExpenseID});
+                    await that._fetchCommonData("Expense", "ExpenseModel");
+                    that.getView().getModel("FilterExpenseModel").setData(
+                        that.getView().getModel("ExpenseModel").getData());
+                    MessageToast.show(that.i18nModel.getText("expenseCreatedMess"));
                 } else {
-                    MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
+                    MessageToast.show(that.i18nModel.getText("expenseCreatedMessFailed"));
                 }
             } catch (oError) {
-                MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
+                MessageToast.show(that.i18nModel.getText("expenseCreatedMessFailed"));
             } finally {
-                BusyIndicator.hide();
+                that.byId("exp_Id_ExpenseTable").setBusy(false);
             }
         },
 
@@ -190,13 +187,13 @@ sap.ui.define([
         },
 
         Exp_onPressDeleteExpense: async function (oEvent) {
-            BusyIndicator.show(0);
+            this.byId("exp_Id_ExpenseTable").setBusy(true);
             var that = this;
             this.showConfirmationDialog(
                 this.i18nModel.getText("msgBoxConfirm"),
                 this.i18nModel.getText("commonMesBoxConfirmDelete"),
                 async function () {
-                    BusyIndicator.show(0);
+                    that.byId("exp_Id_ExpenseTable").setBusy(true);
                     const expenseID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
                     try {
                         await that.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: expenseID } });
@@ -205,10 +202,10 @@ sap.ui.define([
                     } catch (error) {
                         MessageToast.show(error.responseText || "Error deleting expense");
                     } finally {
-                        BusyIndicator.hide();
+                        that.byId("exp_Id_ExpenseTable").setBusy(false);
                     }
                 },
-                function () {BusyIndicator.hide()})
+                function () { that.byId("exp_Id_ExpenseTable").setBusy(false);})
         },        
 
         Exp_onSearch: async function() {

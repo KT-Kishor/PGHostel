@@ -24,7 +24,7 @@
 					<subSections>
 						<ObjectPageSubSection titleUppercase="false" title="{i18n>expBasicInformation}">
 							<blocks>
-								<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
+								<f:SimpleForm id="Exp_Det_id_DimpleForm" editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 											<f:toolbar>
 											<m:Toolbar>												
 												<m:ToolbarSpacer />
@@ -46,7 +46,7 @@
 										<m:Label text="{i18n>expReimbursementAmount}"/>
 										<m:Input value="{path:'FilteredExpenseModel>/0/ReimbursementAmount', formatter: '.Formatter.fromatNumber'}" editable="false" />
 										<!-- Status -->
-										<m:Label text="{i18n>expStatus}"/>
+										<m:Label text="{i18n>status}"/>
 										<m:Input  value="{FilteredExpenseModel>/0/Status}"  editable="false" />
 										<!-- Trip Type -->
 										<m:Label text="{i18n>expExpenseType}"/>
