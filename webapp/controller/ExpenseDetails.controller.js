@@ -453,7 +453,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                                     ExpStartDate: oModelData.ExpStartDate,
                                     ExpEndDate: oModelData.ExpEndDate,
                                     SubmittedDate: that.Formatter.formatDate(new Date()),
-                                    Comments: oModelData.Comments,
+                                    Comments: oModelData.comments[0].Comment,
                                     TotalAmount: oModelData.TotalAmount,
                                     Status: oModelData.Status === "Send back by account" ? "Send to account" : "Submitted",
                                     ManagerRemark: oModelData.ManagerRemark,
