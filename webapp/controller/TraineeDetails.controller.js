@@ -209,6 +209,7 @@ sap.ui.define([
                                     type: "Accept",
                                     press: function () {
                                         oDialog.close();
+                                        this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);  
                                         this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                                     }.bind(this)
                                 }),
@@ -230,6 +231,7 @@ sap.ui.define([
                                                 if (oData.success) {
                                                     sap.m.MessageToast.show("PDF generated and status updated!");
                                                     oDialog.close();
+                                                    this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);  
                                                     this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                                                     // this.getView().getModel("oTraineeDetails").refresh(true);
                                                 }

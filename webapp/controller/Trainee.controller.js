@@ -308,7 +308,7 @@ sap.ui.define([
                     };
                     BusyIndicator.show(0);
                     this.updateCallForTrainee(oUpdatedData, "downloadSucess");
-                    // this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject().Status = "Training Completed"             
+                    this.readCallForTrainee("")
                     this.byId("T_id_TraineeTable").removeSelections(true);
                     this.byId("T_id_Download").setVisible(false);
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
