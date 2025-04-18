@@ -75,14 +75,13 @@
                 >
                     <fb:control>
                         <ComboBox
-                            items="{Status>/}"
+                            items="{AssetAssignmentStatus>/}"
                             showClearIcon="true"
                             id="AA_id_Status"
                         >
                             <core:ListItem
-                                key="{BaseLocationModel>city}"
-                                text="{BaseLocationModel>city}"
-                                additionalText="{BaseLocationModel>branchCode}"
+                                key="{AssetAssignmentStatus>ID}"    
+                                text="{AssetAssignmentStatus>Value}"
                             />
                         </ComboBox>
                     </fb:control>
@@ -138,6 +137,7 @@
                         text="{i18n>assign}"
                         type="Accept"
                         press="AA_onPressAssign"
+                        id="AA_AssignBtn"
                     />
                     <Button
                         icon="sap-icon://edit"
