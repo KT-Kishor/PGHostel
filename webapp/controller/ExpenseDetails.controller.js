@@ -132,7 +132,7 @@ sap.ui.define([
             ExpenseAmount: "0",
             Currency: "INR",
             ModeOfPayment: "Employee",
-            ExpenseDate: this.getView().getModel("FilteredExpenseModel").getData()[0].ExpEndDate,
+            ExpenseDate: this.Formatter.formatDate(this.getView().getModel("FilteredExpenseModel").getData()[0].ExpEndDate),
             Comments: "",
             Submit: true,
             Save: false,
@@ -159,7 +159,7 @@ sap.ui.define([
             Currency: this.SelectedData.Currency,
             Attachment: this.SelectedData.Attachment,
             ModeOfPayment: this.SelectedData.ModeOfPayment,
-            ExpenseDate: this.SelectedData.ExpenseDate,
+            ExpenseDate: this.Formatter.formatDate(this.SelectedData.ExpenseDate),
             Comments: this.SelectedData.Comments,
             ConversionRate: this.SelectedData.ConversionRate,
             ForeignAmount: this.SelectedData.ForeignAmount,
@@ -275,7 +275,7 @@ sap.ui.define([
                 Currency: oModel.Currency,
                 EmployeeID: FilterModel.EmployeeID,
                 ExpenseAmount:oModel.Currency !== "INR" ? oModel.TotalAmount : oModel.ExpenseAmount,
-                ExpenseDate: oModel.ExpenseDate,
+                ExpenseDate: oModel.ExpenseDate.split("/").reverse().join("-"),
                 ForeignAmount: oModel.ExpenseAmount,
                 ItemType: oModel.ItemType,
                 ModeOfPayment: oModel.ModeOfPayment,
@@ -318,7 +318,7 @@ sap.ui.define([
                   Currency: oModel.Currency,
                   EmployeeID: FilterModel.EmployeeID,
                   ExpenseAmount:oModel.Currency !== "INR"? oModel.TotalAmount : oModel.ExpenseAmount,
-                  ExpenseDate: oModel.ExpenseDate,
+                  ExpenseDate: oModel.ExpenseDate.split("/").reverse().join("-"),
                   ForeignAmount: oModel.ExpenseAmount,
                   ItemType: oModel.ItemType,
                   ModeOfPayment: oModel.ModeOfPayment,
@@ -423,8 +423,8 @@ sap.ui.define([
                   };
                   that.ajaxUpdateWithJQuery("Expense", inboxData).then((oData) => {
                       if (oData) {
-                        this.ViewModel.setProperty("/status", false);
-                        this.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
+                        that.ViewModel.setProperty("/status", false);
+                        that.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
                         dialog.close();
                         MessageToast.show(that.i18nModel.getText("expenseSubmittedStatus"));
                         BusyIndicator.hide();
@@ -436,7 +436,7 @@ sap.ui.define([
                     .catch((oError) => {
                       dialog.close();
                       BusyIndicator.hide();
-                      MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                      MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
                     });
                 } else {
                   MessageToast.show(

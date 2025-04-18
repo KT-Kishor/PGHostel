@@ -84,17 +84,17 @@
 										<m:Label text="{i18n>expCountry}" required="true"/>
 										<m:ComboBox id="Exp_id_Country" valueStateText="{i18n>expValStaCountry}" change="onLiveAllValidation" items="{path:'CountryModel>/',length:1000}" value="{FilteredExpenseModel>/0/Country}" editable="{viewModel>/editable}">
 											<core:ListItem key="{CountryModel>id}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
-										</m:ComboBox>										
-
-										<m:Label text="{i18n>managerRemarksLeave}" />										
-										<m:Button icon="sap-icon://display-more" text="{i18n>View}" press="AL_onShowEmployeeComments" />
+										</m:ComboBox>																			
 										
 										<!-- <m:Label text="{i18n>expAccountantRemark}" />
 										<m:Text id="textRemark" text="{= ${FilteredExpenseModel>/0/AccountingRemark}.length > 80 ? ${FilteredExpenseModel>/0/AccountingRemark}.substring(0, 80) + '...' : ${FilteredExpenseModel>/0/AccountingRemark}}" wrapping="false" />
-										<m:Link text="{i18n>showMore}" press="onPressAccountantRemark" visible="{= ${FilteredExpenseModel>/0/AccountingRemark}.length > 80}" />
+										<m:Link text="{i18n>showMore}" press="onPressAccountantRemark" visible="{= ${FilteredExpenseModel>/0/AccountingRemark}.length > 80}" /> -->
 
 										<m:Label text="{i18n>expEmployeeRemark}" required="true"/>
-										<m:TextArea id="Exp_id_EmpRemark" valueStateText="{i18n>expValStaEmployeeRemark}" liveChange="onLiveChangeEmployeeRemark" rows="4" value="{FilteredExpenseModel>/0/Comments}"  editable="{viewModel>/editable}" maxLength="1000"/> -->
+										<m:TextArea id="Exp_id_EmpRemark" valueStateText="{i18n>expValStaEmployeeRemark}" liveChange="onLiveChangeEmployeeRemark" rows="4" value="{FilteredExpenseModel>/0/comments/0/Comment}"  editable="{viewModel>/editable}" maxLength="1000"/>
+
+										<m:Label text="{i18n>comments}" />										
+										<m:Button icon="sap-icon://display-more" text="{i18n>View}" press="AL_onShowEmployeeComments" />
 									<!-- </f:content> -->
 								</f:SimpleForm>
 							</blocks>

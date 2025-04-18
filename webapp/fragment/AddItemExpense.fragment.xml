@@ -34,7 +34,7 @@
 					</Select>
 					<!-- Expense Date -->
 					<Label text="{i18n>expDetExpenseDate}" required="true" />
-					<DatePicker minDate="{viewModel>/MinDate}" id="ExpDet_id_ExpenseDate"  maxDate="{viewModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{path:'ExpenseCreateModel>/ExpenseDate',formatter: '.Formatter.formatDate'}"/>
+					<DatePicker minDate="{viewModel>/MinDate}" id="ExpDet_id_ExpenseDate"  maxDate="{viewModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{ExpenseCreateModel>/ExpenseDate}"/>
 					<!-- Expense Amount -->
 					<Label text="{i18n>expDetExpenseAmount}" required="true"/>
 					<HBox width="100%">
