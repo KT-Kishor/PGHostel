@@ -410,8 +410,8 @@ sap.ui.define([
                 }).catch((error) => {
                     sap.m.MessageToast.show(error.message || error.responseText);
                 });
-                this.TU_oDialogMail.close();
-            },
+                this.Mail_onPressClose ();         
+             },
             //PDF generation function
             TD_onPressMerge: function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");

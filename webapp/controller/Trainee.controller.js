@@ -445,7 +445,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     BusyIndicator.hide();
                 });
-                this.T_MailDialog.close();
+                this.Mail_onPressClose();
             }
         });
     });
