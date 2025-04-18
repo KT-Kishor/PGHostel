@@ -1,12 +1,12 @@
-{
-    "assetStatus": [
+
+     [
       {
         "ID": 1,
         "Value": "Assigned"
       },
       {
         "ID": 2,
-        "Value": "UnAssigned"
+        "Value": "Unassigned"
       }
-    ]
-  }
+    
+     ]

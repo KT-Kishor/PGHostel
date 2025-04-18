@@ -25,14 +25,14 @@
         >
             <fb:filterGroupItems>
                 <fb:FilterGroupItem
-                    name="EmployeeName"
+                    name="AssignEmployeeName"
                     label="{i18n>employeeName}"
                     groupName="Group1"
                     visibleInFilterBar="true"
                 >
                     <fb:control>
                         <ComboBox
-                            name="EmployeeName"
+                            name="AssignEmployeeName"
                             showClearIcon="true"
                             id="AA_id_EmployeeName"
                             items="{EmpModel>/}"
@@ -75,7 +75,7 @@
                 >
                     <fb:control>
                         <ComboBox
-                            items="{BaseLocationModel>/}"
+                            items="{Status>/}"
                             showClearIcon="true"
                             id="AA_id_Status"
                         >
@@ -95,9 +95,8 @@
                     visibleInFilterBar="true"
                 >
                     <fb:control>
-                        <DatePicker
+                        <DateRangeSelection
                             id="AA_id_Date"
-                            placeholder="dd/MM/yyyy"
                             change="AA_handleChange"
                             displayFormat="dd/MM/yyyy"
                             valueFormat="yyyy-MM-dd"
@@ -155,15 +154,15 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-                <!-- <Column>
-                    <Text text="{i18n>employeeID}" />
+                 <Column>
+                    <Text text="{i18n>assignEmployeeID}" />
                 </Column>
-                <Column>
-                    <Text text="{i18n>employeeName}" />
-                </Column> -->
-                <Column>
+               <Column>
+                    <Text text="{i18n>assignEmployeeName}" />
+                </Column>
+                 <Column>
                     <Text text="{i18n>type}" />
-                </Column>
+                </Column> 
                 <Column>
                     <Text text="{i18n>model}" />
                 </Column>
@@ -174,10 +173,10 @@
                     <Text text="{i18n>serialNumber}" />
                 </Column>
                 <Column>
-                    <Text text="{i18n>assignedBy}" />
+                    <Text text="{i18n>assignedByEmployeeName}" />
                 </Column>
                 <Column>
-                    <Text text="{i18n>branch}" />
+                    <Text text="{i18n>assignBranch}" />
                 </Column>
                 <Column>
                     <Text text="{i18n>assignedDate}" />
@@ -194,21 +193,20 @@
             </columns>
             <items>
                 <ColumnListItem class="tableRow">
-                    <cells>
-                    <ObjectIdentifier 
-                           title="{assetModel>EmployeeId}" 
-                           text="{assetModel>EmployeeName}" /> 
+                    <cells>     
+                         <Text text="{assetModel>AssignEmployeeID}" /> 
+                        <Text text="{assetModel>AssignEmployeeName}" /> 
                         <Text text="{assetModel>Type}" />
                         <Text text="{assetModel>Model}" />
                         <Text text="{assetModel>EquipmentNumber}" />
                         <Text text="{assetModel>SerialNumber}" />
-                        <Text text="{assetModel>AssignedBy}" />
-                        <Text text="{assetModel>Branch}" />
+                        <Text text="{assetModel>AssignedByEmployeeName}" />
+                        <Text text="{assetModel>AssignBranch}" />
                         <Text
-                            text="{path:'assetModel>AssignedDate',formatter:'.Formatter.formatDate'}"
+                        text="{= ${assetModel>AssignedDate} === '1899-11-30T00:00:00.000Z' || !${assetModel>AssignedDate} ? '' : ${assetModel>AssignedDate}.substring(8,10) + '/' + ${assetModel>AssignedDate}.substring(5,7) + '/' + ${assetModel>AssignedDate}.substring(0,4) }"
                         />
                         <Text
-                            text="{path:'assetModel>AssignedValue',formatter:'.Formatter.formatCurrencyInINRText'}"
+                            text="{path:'assetModel>AssetValue',formatter:'.Formatter.formatCurrencyInINRText'}"
                         />
                         <ObjectStatus
                             inverted="true"

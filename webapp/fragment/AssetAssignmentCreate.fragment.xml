@@ -26,9 +26,8 @@
                     id="FAA_id_employeeID"
                     showSecondaryValues="true"
                     items="{EmpModel>/}"
-                    editable="{viewModel>isIdMode}"
                     change="FAS_onchange"
-                    value="{myform>/formData/data/EmployeeId}"
+                    value="{myform>/formData/data/AssignEmployeeID}"
                 >
                     <core:ListItem
                         key="{EmpModel>EmployeeID}"
@@ -41,7 +40,7 @@
                 <Input
                     editable="false"
                     id="FAA_id_Name"
-                    value="{myform>/formData/data/EmployeeName}"
+                    value="{myform>/formData/data/AssignEmployeeName}"
                 />
 
                 <Label text="{i18n>type}" />
@@ -79,7 +78,7 @@
                     selectionChange=".onBranchChange"
                     change="FAA_onBranchlivechange"
                     items="{BaseLocationModel>/}"
-                    value="{myform>/formData/data/Branch}"
+                    value="{myform>/formData/data/AssignBranch}"
                 >
                     <core:ListItem
                         key="{BaseLocationModel>city}"
@@ -89,14 +88,20 @@
                 </ComboBox>
 
                 <Label text="{i18n>assignedBy}" />
-                <Input
+                <ComboBox
                     required="true"
                     id="FAA_id_AssignedBy"
-                    maxLength="20"
-                    value="{myform>/formData/data/AssignedBy}"
-                    liveChange="AA_validateName"
+                    items="{EmpModel>/}"
+                    showSecondaryValues="true"
+                    value="{myform>/formData/data/AssignedByEmployeeName}"
                     valueStateText="{i18n>commonNameValueState}"
-                />
+                >
+                 <core:ListItem
+                        key="{EmpModel>EmployeeID}"
+                        text="{EmpModel>EmployeeID}"
+                        additionalText="{EmpModel>EmployeeName}"
+                    />
+                </ComboBox>
                 <Label text="{i18n>equipmentNumber}" />
                 <Input
                     required="true"
@@ -118,7 +123,7 @@
                     required="true"
                     editable="false"
                     id="FAA_id_AssetValue"
-                    value="{path:'myform>/formData/data/AssignedValue',formatter:'.Formatter.formatCurrencyInINRText'}"
+                    value="{path:'myform>/formData/data/AssetValue',formatter:'.Formatter.formatCurrencyInINRText'}"
                     liveChange=".onAssetValueChange"
                 />
                 <Label text="{i18n>assignedDate}" />

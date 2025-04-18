@@ -33,8 +33,8 @@
                     >
                         <cells>
                             <Text text="{incomeModel>Model}" />
-                            <Text text="{incomeModel>EqNo}" />
-                            <Text text="{incomeModel>SlNo}" />
+                            <Text text="{incomeModel>EquipmentNumber}" />
+                            <Text text="{incomeModel>SerialNumber}" />
                             <Text text="{incomeModel>AssetValue}" />
                         </cells>
                     </ColumnListItem>
