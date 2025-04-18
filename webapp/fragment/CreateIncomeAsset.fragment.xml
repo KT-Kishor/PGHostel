@@ -1,0 +1,150 @@
+<core:FragmentDefinition
+    xmlns:uxap="sap.uxap"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog title="{i18n>form}">
+        <f:SimpleForm
+            id="FCIA_id_SimpleFormChange354wide"
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="2"
+            singleContainerFullSize="false"
+        >
+            <f:content>
+                <Label text="{i18n>type}" required="true" />
+                <Select id="FCIA_id_type" selectedKey="{CreateIncomeAssetModel>/Type}" items="{oAssetTypeModel>/}">
+                   <core:Item
+                        text="{oAssetTypeModel>Type}"
+                        key="{oAssetTypeModel>Type}"
+                    />
+                </Select>
+
+                <Label text="{i18n>vehicleModel}" required="true" />
+                <Input
+                    id="FCIA_id_model"
+                    value="{CreateIncomeAssetModel>/Model}"
+                    placeholder="Enter model name"
+                    valueStateText="Enter model name"
+                    liveChange="FCIA_onInputLiveChange"
+                    maxLength="15"
+                />
+                 	<Text text="Description"  />
+		          <TextArea id="FCIA_ID_DescriptionTextArea" 
+                  liveChange="FCIA_onDescriptionTextAreaChange"
+                  value="{CreateIncomeAssetModel>/Description}" 
+                  maxLength="60" width="100%" />
+
+                <Label text="{i18n>eqNo}" required="true" />
+                <Input
+                    id="FCIA_id_eqno"
+                    value="{CreateIncomeAssetModel>/EquipmentNumber}"
+                    placeholder="Enter equipment number"
+                    valueStateText="Enter equipment number"
+                    maxLength="25"
+                    liveChange="FCIA_oneqnolivechange"
+                />
+
+                <Label text="{i18n>slNo}" required="true" />
+                <Input
+                    id="FCIA_id_slno"
+                    value="{CreateIncomeAssetModel>/SerialNumber}"
+                    valueStateText="Enter serial number"
+                    placeholder="Enter serial number"
+                    maxLength="25"
+                    liveChange="FCIA_onslnoInputLiveChange"
+           />
+
+                <Label text="{i18n>pickedBy}" required="true" />
+                <Select
+                    id="FCIA_id_pickedby"
+                    selectedKey="{CreateIncomeAssetModel>/PickedEmployeeName}"
+                    showSecondaryValues="true"
+                    items="{EmpModel>/}"
+                >
+                    <core:ListItem
+                        text="{EmpModel>EmployeeName}"
+                        key="{EmpModel>EmployeeName}"
+                        additionalText="{EmpModel>EmployeeID}"
+                    />
+                </Select>
+
+                <Label text="{i18n>date}" required="true" />
+                <DatePicker
+                    id="FCIA_id_Date"
+                    value="{CreateIncomeAssetModel>/AssetCreationDate}"
+                    placeholder="Select date"
+                    change="FCIA_ondatechange"
+                     valueStateText="Select date"
+                    valueFormat="dd/MM/yyyy"
+                    displayFormat="dd/MM/yyyy"
+                />
+                
+
+                <Label text="{i18n>branch}" required="true" />
+                <ComboBox
+                    id="FCIA_id_branch"
+                    placeholder="Select branch"
+                    change="FCIA_onbranchchange"
+                    selectionChange="FCIA_onselectionchange"
+                    valueStateText="Select branch"
+                    value="{CreateIncomeAssetModel>/AssignBranch}"
+                    selectedKey="{CreateIncomeAssetModel>/AssignBranch}"
+                    showSecondaryValues="true"
+                    items="{branchModel>/}"
+                >
+                    <core:ListItem
+                        key="{branchModel>city}" 
+                        text="{branchModel>city}"
+                        additionalText="{branchModel>branchCode}"
+                    />
+                </ComboBox>
+
+                <Label text="{i18n>assetvalue}" />
+                <Input
+                    id="FCIA_id_assetvalue"
+                    value="{CreateIncomeAssetModel>/AssetValue}"
+                    valueStateText="Enter asset value"
+                    placeholder="Enter asset value"
+                    maxLength="15"
+                    liveChange="FCIA_assetammountlivechange"
+                />
+
+                <Label text="{i18n>currency}" required="true" />
+                <Select
+                    id="FCIA_id_currency"
+                    selectedKey="{CreateIncomeAssetModel>/Currency}"
+                    items="{oCurrencyModel>/}"
+                >
+                    <core:Item
+                        text="{oCurrencyModel>currency}"
+                        key="{oCurrencyModel>currency}"
+                    />
+                </Select>
+            </f:content>
+        </f:SimpleForm>
+
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                press="FCIA_onsavebuttonpress"
+                type="Accept"
+            />
+        </beginButton>
+
+        <endButton>
+            <Button
+                text="{i18n>btnCancel}"
+                press="FCIA_onCancelButtonPress"
+                type="Reject"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

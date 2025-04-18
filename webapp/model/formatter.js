@@ -2,22 +2,14 @@ sap.ui.define([], function () {
     "use strict";
     return {  
         formatDate: function (sDate) {
+            // if (!sDate || sDate === "1899-11-30T00:00:00.000Z" ) {
+            //     return "";
+            // }
             if (sDate) {
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" });
                 return oDateFormat.format(new Date(sDate));
             }
             return sDate;
-        },
-        convertToISODateFormat: function (oDate) {
-            if (!oDate) return "";
-            if (typeof oDate === "string") {
-                oDate = new Date(oDate);
-            }
-            if (!(oDate instanceof Date) || isNaN(oDate)) return "";
-            const year = oDate.getFullYear();
-            const month = String(oDate.getMonth() + 1).padStart(2, "0");
-            const day = String(oDate.getDate()).padStart(2, "0");
-            return `${year}-${month}-${day}`;
         },
         
         
@@ -79,7 +71,13 @@ sap.ui.define([], function () {
                 case "Send back by manager":
                     return "Information";       
                 case "Paid":
-                    return "Success";             
+                    return "Success";   
+                case "Unassigned":
+                    return "Warning"  
+                 case "Trashed":
+                        return "Error"
+                case "Assigned":
+                            return "Success"            
                 default:
                     return "Indication01";
             }

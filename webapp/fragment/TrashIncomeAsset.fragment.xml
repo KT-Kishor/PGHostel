@@ -1,0 +1,52 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+>
+	<Dialog title="{i18n>trash}">
+	
+		<f:SimpleForm
+			id="FTIA_id_SimpleFormChange354wi"
+			editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="3"
+			labelSpanM="4"
+			labelSpanS="12"
+			adjustLabelSpan="false"
+			emptySpanXL="0"
+			emptySpanL="4"
+			emptySpanM="0"
+			emptySpanS="0"
+			columnsXL="2"
+			columnsL="1"
+			columnsM="1"
+			singleContainerFullSize="false"
+		>
+
+			<f:content>
+			<Label text="{i18n>trashDate}"/>
+				<DatePicker
+					id="FTIA_id_Date"
+					liveChange="onDateTimePickerLiveChange"
+					valueFormat="yyyy-MM-dd"
+					displayFormat="dd/MM/yyyy "
+				/>
+			</f:content>
+		</f:SimpleForm>
+		<beginButton>
+			<Button
+				text="{i18n>save}"
+				press="FTIA_onsavepress"
+				type="Accept"
+			/>
+		</beginButton>
+		<endButton>
+			<Button
+				text="{i18n>btnCancel}"
+				press="FTIA_onCancelPress"
+				type="Reject"
+			/>
+		</endButton>
+	</Dialog>
+</c:FragmentDefinition>

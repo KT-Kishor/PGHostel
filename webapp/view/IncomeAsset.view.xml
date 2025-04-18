@@ -1,10 +1,265 @@
 <mvc:View
-	controllerName=""
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:c="sap.ui.core"
-	displayBlock="true"
-	height="100%"
-	busyIndicatorDelay="0"
->
+	xmlns:core="sap.ui.core"
+    controllerName="sap.kt.com.minihrsolution.controller.IncomeAsset"
+	xmlns:fb="sap.ui.comp.filterbar"
+    displayBlock="true">
+ <Page
+        id="IA_id_page"
+     >
+    <headerContent>
+	   <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+		</headerContent>
+
+        <fb:FilterBar
+            id="IA_id_FilterbarEmployee"
+            persistencyKey="myPersKey"
+            useToolbar="false"
+            clear="IA_onPressClear"
+            showClearOnFB="true"
+            search="IA_onSearch"
+            filterChange="IA_.onFilterChange"
+            afterVariantLoad="IA_.onAfterVariantLoad"
+            showFilterConfiguration="false"
+        >
+            <fb:filterGroupItems>
+              <fb:FilterGroupItem
+                    name="SlNo"
+                    label="{i18n>slNo}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            id="IA_id_SlNo"
+                            items="{incomeModel>/}"
+                            showClearIcon="true"
+                        >
+                            <items>
+                                <core:Item
+                                    id="IA_id_SlItem"
+                                    text="{incomeModel>SerialNumber}"
+                                    key="{incomeModel>SerialNumber}"
+                                />
+                            </items>
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+                <fb:FilterGroupItem
+                    name="EqNo"
+                    label="{i18n>eqNo}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                    id="filterSlNo"
+                >
+                    <fb:control>
+                        <ComboBox
+                            id="IA_id_EqNo"
+                            items="{incomeModel>/}"
+                            showClearIcon="true"
+                        >
+                            <items>
+                                <core:Item
+                                    id="IA_Eqnoitem"
+                                    text="{incomeModel>EquipmentNumber}"
+                                    key="{incomeModel>EquipmentNumber}"
+                                />
+                            </items>
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+                <fb:FilterGroupItem
+                    name="PikedBy"
+                    label="{i18n>pickedBy}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                    id="filterPickedBy"
+                >
+                    <fb:control>
+                        <ComboBox
+                            id="IA_id_PickedBy"
+                            items="{EmpModel>/}"
+                            showClearIcon="true"
+                            showSecondaryValues="true"
+                        >
+                            <items>
+                                <core:ListItem
+                                  text="{EmpModel>EmployeeName}"
+                                    key="{EmpModel>EmployeeName}"
+                                    additionalText="{EmpModel>EmployeeID}"
+                               />
+                                    </items>
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+                <fb:FilterGroupItem
+                    name="Date"
+                    label="{i18n>date}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                    id="filterDate"
+                >
+                    <fb:control>
+                        <DateRangeSelection
+                            id="idOdataDateComboBox"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="dd/MM/yyyy"
+                        />
+                    </fb:control>
+                </fb:FilterGroupItem>
+              
+                 <fb:FilterGroupItem
+                    name="Status"
+                    label="{i18n>Status}"
+                    groupName="Group"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            id="IA_id_Status"
+                            items="{incomeModel>/}"
+                            showClearIcon="true"
+                        >
+                            <items>
+                                <core:Item
+                                    id="IA_id_Statusitem"
+                                    text="{incomeModel>Status}"
+                                    key="{incomeModel>Status}"
+                                />
+                            </items>
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+                
+            </fb:filterGroupItems>
+        </fb:FilterBar>
+        <Table
+            class="sapUiResponsiveMargin"
+            width="auto"
+            alternateRowColors="true"
+            items="{
+            path:'incomeModel>/',
+             sorter: [{
+                    path: 'Type',
+                        group: true
+                }]}"
+            mode="SingleSelectLeft"
+            id="IA_id_OdataTable"
+        >
+            <headerToolbar>
+                <OverflowToolbar>
+                    <Title
+                        id="IA_TitleID"
+                        text="{i18n>assetDetails} ({=${incomeModel>/}.length})"
+                        level="H1"
+
+                    />
+                    <ToolbarSpacer />
+                          <Button
+                            id="IA_id_Export"
+                            text="{i18n>download}"
+                            icon="sap-icon://download"
+                            press="IA_onExport"
+                            type="Neutral"
+                        />
+
+                    <Button
+                        text="{i18n>create}"
+                        type="Accept"
+                        icon="sap-icon://add"
+                        press="IA_onCreateButtonPress"
+                    />
+                    <Button
+                        text="{i18n>update}"
+                        type="Neutral"
+                        icon="sap-icon://edit"
+                        press="IA_onUpadateButtonPress"
+                    />
+                    <Button
+                        text="{i18n>trash}"
+                        type="Negative"
+                        icon="sap-icon://delete"
+                        press="IA_onTrashButtonPress"
+                    />
+                </OverflowToolbar>
+            </headerToolbar>
+            <columns>
+               <Column>
+                    <Text text="{i18n>vehicleModel}"/>
+                </Column>
+                 <Column>
+                    <Text text="{i18n>pickedBy}"/>
+                </Column>
+                     <Column>
+                    <Text text="{i18n>slNo}"/>
+                </Column>
+                <Column>
+                    <Text text="{i18n>eqNo}"/>
+                </Column>
+               <Column>
+                    <Text text="{i18n>date}"/>
+                </Column>
+                <Column>
+                    <Text text="{i18n>branch}"/>
+                </Column>
+                  <Column>
+                    <Text text="{i18n>status}"/>
+                </Column>
+                <Column>
+                    <Text text="{i18n>trashDate}"/>
+
+                </Column>
+                 <Column>
+                    <Text text="{i18n>assetvalue}"/>
+                </Column>  
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                    <ObjectIdentifier
+						title="{incomeModel>Model}"
+						text="{incomeModel>Description}"/>
+                         <ObjectIdentifier
+						title="{incomeModel>PickedEmployeeName}"
+						text="{incomeModel>EmployeeID}"/>
+                      <Text text="{incomeModel>SerialNumber}"/>
+                        <Text text="{incomeModel>EquipmentNumber}"/>
+                          <Text text="{
+                            path: 'incomeModel>AssetCreationDate',
+                            formatter: '.Formatter.formatDate'
+                        }"/>
+                        <Text text="{incomeModel>AssignBranch}"/>
+                      <ObjectStatus
+                            text="{incomeModel>Status}"
+                            inverted="true"
+                            state="{
+                            path:'incomeModel>Status',
+                            formatter:'.Formatter.formatObjectStatus'
+                            }"
+                        />
+                        <Text text="{
+                        path:'incomeModel>TrashDate',
+                        formatter: '.Formatter.formatDate'
+                        }"/>
+                       
+                         <ObjectNumber
+							number="{
+								parts:[{path:'incomeModel>AssetValue'},{path:'incomeModel>Currency'}],
+								type: 'sap.ui.model.type.Currency',
+								formatOptions: {showMeasure: false}
+							}"
+							unit="{incomeModel>Currency}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <footer>
+			<Bar id="IA_id_FooterBar">
+			    <contentLeft>
+                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+                </contentLeft>
+            </Bar>
+            </footer>
+    </Page>
 </mvc:View>
