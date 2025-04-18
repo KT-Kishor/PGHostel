@@ -115,7 +115,7 @@ sap.ui.define(
           }
         },
         LP_onLogin: function () {
-          // this.getRouter().navTo("RouteTilePage");
+          var oButton = this.byId("LP_id_loginBTn").setBusy(true);
           const oLoginModel = this.getView().getModel("LoginModel");
           const oVM = this.getView().getModel("LoginViewModel");
           // Validate User ID and Name
@@ -123,11 +123,13 @@ sap.ui.define(
             !utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") ||
             !utils._LCvalidateName(this.byId("Lp_id_Username"), "ID")
           ) {
+            oButton.setBusy(false)
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
           }
           // Validate OTP if selected
           if (oVM.getProperty("/isOtpSelected") && !oVM.getProperty("/otp")) {
+            oButton.setBusy(false)
             MessageToast.show(this.i18nModel.getText("checkOTP"));
             return;
           }
@@ -135,25 +137,26 @@ sap.ui.define(
           if (oVM.getProperty("/isPasswordSelected")) {
             const isPasswordValid = utils._LCvalidateMandatoryField(this.byId("Lp_id_PasswordInput"), "ID");
             if (!isPasswordValid) {
+              oButton.setBusy(false)
               MessageToast.show(this.i18nModel.getText("mandetoryFields"));
               return;
             }
           }
           // Backend call using then-catch
           try {
+            oButton.setBusy(true);
             this.ajaxReadWithJQuery("LoginDetails", {
-              EmployeeID: oVM.getProperty("/userId"),
-              EmployeeName: oVM.getProperty("/userName"),
+              EmployeeID: this.byId("Lp_id_Userid").getValue(),
+              EmployeeName: this.byId("Lp_id_Username").getValue(),
               OTP: oVM.getProperty("/isOtpSelected") ? oVM.getProperty("/otp") : "",
-              Password: oVM.getProperty("/isPasswordSelected") ? btoa(oVM.getProperty("/password")) : ""
+              Password: oVM.getProperty("/isPasswordSelected") ? btoa(this.byId("Lp_id_PasswordInput").getValue()) : ""
             }).then((response) => {
               if (response?.success && response.data?.length > 0) {
+                oButton.setBusy(false);
                 const userData = response.data[0];
 
                 if (oVM.getProperty("/isOtpSelected")) {
                   var timeDifference = new Date().getTime() - new Date(parseInt(userData.TimeDate)).getTime();
-
-
                   if (timeDifference >= 120000) {
                     MessageToast.show(this.i18nModel.getText("loginTimeOut")); // "OTP expired"
                     return;
@@ -180,19 +183,23 @@ sap.ui.define(
                   // Navigate
                   this.getRouter().navTo("RouteTilePage");
                 } else {
+                  oButton.setBusy(false)
                   MessageToast.show(this.i18nModel.getText("errorMsguser"));
                 }
               } else {
+                oButton.setBusy(false)
                 const backendMsg = response?.message || this.i18nModel.getText("commonErrorMessage");
                 MessageToast.show(backendMsg);
               }
             }).catch((error) => {
+              oButton.setBusy(false)
               const errorMsg = error?.responseText
                 ? JSON.parse(error.responseText).message
                 : this.i18nModel.getText("commonErrorMessage");
               MessageToast.show(errorMsg);
             });
           } catch (e) {
+            oButton.setBusy(false)
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
         },
@@ -242,7 +249,6 @@ sap.ui.define(
         // Close the dialog when the cancel button is pressed
         SM_onPressCancle: function () {
           const oFragModel = this.getView().getModel("LoginViewModel");
-
           // Reset all values and value states in the model
           oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserIdValueState", "None"); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgUserNameValueState", "None"); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpValueState", "None"); oFragModel.setProperty("/frgOtpVisible", false);
           oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgNewPasswordValueState", "None");
@@ -388,8 +394,8 @@ sap.ui.define(
           try {
             BusyIndicator.show(0);
             await this.ajaxUpdateWithJQuery("LoginDetails", {
-              data: { Password: btoa(oFragModel.getProperty("/frgNewPassword")) },
-              filters: { EmployeeID: oFragModel.getProperty("/frgUserId") }
+              data: { Password: btoa(sap.ui.getCore().byId("FSM_id_newPasswordInput").getValue()) },
+              filters: { EmployeeID: sap.ui.getCore().byId("FSM_id_userIdInput").getValue() }
             }).then((response) => {
               if (response.success === true) {
                 BusyIndicator.hide();

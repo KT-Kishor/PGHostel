@@ -42,7 +42,7 @@
 						<Link text="{i18n>forgotPass}" press="LP_onForgotPassword" id="Lp_id_ForgotPasswordLink" visible="{LoginViewModel>/isForgotPasswordVisible}"  />
 						
 						<HBox alignContent="Center" justifyContent="End">
-							<Button text="{i18n>btnLogin}" press="LP_onLogin" icon="sap-icon://key" type="Emphasized" class="Login" width="8rem"/>
+							<Button text="{i18n>btnLogin}" press="LP_onLogin"  icon="sap-icon://key" type="Emphasized" class="Login" width="8rem" id="LP_id_loginBTn"/>
 						</HBox>
 					</form:content>
 				</form:SimpleForm>

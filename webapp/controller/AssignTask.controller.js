@@ -17,6 +17,7 @@ sap.ui.define(
 
         _onRouteMatched: function (oEvent) {
           const sTaskID = oEvent.getParameter("arguments").taskID;
+          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           // Save the taskID to the controller
           this._currentTaskID = sTaskID;
           this._fetchTaskDetails(sTaskID);
@@ -42,7 +43,7 @@ sap.ui.define(
             }
           } catch (error) {
             BusyIndicator.hide();
-            MessageToast.show("Error loading task details");
+            MessageToast.show(this.i18nModel.getText("smgerrorloading"));
           }
         },
         readCallForAllLoginDetails: async function (filter) {
@@ -70,7 +71,7 @@ sap.ui.define(
             })
             .catch((oError) => {
               BusyIndicator.hide();
-              MessageToast.show("Error while reading All Login Details");
+              MessageToast.show(this.i18nModel.getText("smgerrorlogindetails"));
             });
         },
 
@@ -119,7 +120,7 @@ sap.ui.define(
             const oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-              return MessageToast.show("Please select a task to edit");
+              return MessageToast.show(this.i18nModel.getText("smgforedittask"));
             }
 
             const oData = oSelectedItem.getBindingContext("AssignModel").getObject();
@@ -193,7 +194,7 @@ sap.ui.define(
 
         CommonReadcall: async function (params) {
           try {
-            BusyIndicator.show();
+            BusyIndicator.show(0);
             const response = await this.ajaxReadWithJQuery(
               "AssignedTask",
               params
@@ -222,7 +223,7 @@ sap.ui.define(
             }
           } catch (error) {
             BusyIndicator.hide();
-            MessageToast.show("Error loading assigned tasks");
+            MessageToast.show(this.i18nModel.getText("smgerrorassigntask"));
           }
         },
 
@@ -257,12 +258,11 @@ sap.ui.define(
               existingEmployeeIDs = existingEmployeeIDs.concat(ids);
             }
           });
-
           // Filter out duplicate employee IDs
           const aFilteredIDs = aSelectedIDs.filter(id => !existingEmployeeIDs.includes(id));
 
           if (aFilteredIDs.length === 0) {
-            MessageToast.show("All selected employees are already assigned to this task.");
+            MessageToast.show(this.i18nModel.getText("smgEmptask"));
             this.oTaskDialog.close();
             return;
           }
@@ -286,7 +286,7 @@ sap.ui.define(
               StartDate: sStartDate,
               EndDate: sEndDate
             };
-            BusyIndicator.show(0);
+            BusyIndicator.show();
             const response = await this.ajaxCreateWithJQuery("AssignedTask", { data: payload });
 
             if (response.success) {
@@ -301,7 +301,7 @@ sap.ui.define(
             await this.CommonReadcall({ TaskID: sTaskID });
             this.oTaskDialog.close();
           } else {
-            MessageToast.show("Failed to assign any employee.");
+            MessageToast.show(this.i18nModel.getText("smgFailtoassign"));
           }
         },
 
@@ -314,7 +314,7 @@ sap.ui.define(
             TaskID: this._currentTaskID
           };
           if (!oSelectedItem) {
-            MessageToast.show("Please select a task to update.");
+            MessageToast.show(this.i18nModel.getText("smgSelecttask"));
             return;
           }
 
@@ -331,7 +331,7 @@ sap.ui.define(
 
             if (response.success) {
               BusyIndicator.hide();
-              MessageToast.show("Task updated successfully!");
+              MessageToast.show(this.i18nModel.getText("smgUpdatetask"));
 
               // 1. Refresh the entire table data
               this._fetchCommonData("AssignedTask", "AssignModel", params);

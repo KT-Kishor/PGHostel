@@ -48,7 +48,7 @@ sap.ui.define(
               params[sValue] = oControl.getValue();
             }
           });
-          this._fetchCommonData("SchemeUploade", "ModelOnly", params);
+          // this._fetchCommonData("SchemeUploade", "ModelOnly", params);
           this.CommomReadCall(params);
         },
         SU_onClear: function () {
@@ -189,7 +189,7 @@ sap.ui.define(
             { label: "ROAD TAX", property: "ROADTAX", type: "number" },
             { label: "Regular Insurance", property: "Regular Insurance", type: "number", },
             { label: "Add On Insurance", property: "AddOnInsurance", type: "number", },
-            { label: "Temp Charges", property: "Temp Charges", type: "number" },
+            // { label: "Temp Charges", property: "Temp Charges", type: "number" },
             { label: "RegHypCHARGE", property: "RegHypCharge", type: "number" },
             { label: "Shield of trust 4YR45K", property: "ShieldOfTrust4YR45K", type: "number", },
             { label: "EXTD Warranty FOR 4YR80K", property: "EXTDWarrantyFOR4YR80K", type: "number", },
