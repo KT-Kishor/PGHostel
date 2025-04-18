@@ -186,7 +186,11 @@ sap.ui.define([
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
                 if (sStipendText === "Yes") utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
-                if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
+                if (utils._LCvalidateName(this.byId("TD_id_Name"), "ID") &&
+                utils._LCvalidateName(this.byId("TD_id_ReportingManager"), "ID") &&
+                utils._LCvalidateEmail(this.byId("TD_id_EmailID"), "ID") &&
+                utils._LCvalidateDate(this.byId("TD_id_ReleaseDate"), "ID") &&
+                utils._LCvalidateDate(this.byId("TD_id_JoiningDate"), "ID")) {
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TD_id_Location").getSelectedKey();

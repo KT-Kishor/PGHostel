@@ -257,7 +257,7 @@ sap.ui.define([
                             type: "Accept",
                             press: function () {
                                 that.QF_oSuccessDialog.close();
-                                that.QF_onNavBack();
+                                that.getRouter().navTo("RouteQuotation");
                             },
                         }),
                         new sap.m.Button({

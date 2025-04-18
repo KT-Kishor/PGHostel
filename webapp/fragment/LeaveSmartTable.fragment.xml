@@ -51,7 +51,7 @@
 						<Text text="{LeaveModel>NoofDays}" />
 						<Text text="{LeaveModel>typeOfLeave}" />
 					<ObjectStatus inverted="true" text="{LeaveModel>status}" state="{path: 'LeaveModel>status', formatter: '.Formatter.formatObjectStatus'}" />
-					<CheckBox selected="{= ${LeaveModel>halfDay} === 'true'}" editable="false"/>				
+					<CheckBox selected="{= ${LeaveModel>halfDay} === '1'}" editable="false"/>				
                     <Button icon="sap-icon://display-more" text="{i18n>View}" press="AL_onShowEmployeeComments" />
 					</cells>
 				</ColumnListItem>

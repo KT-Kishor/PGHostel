@@ -445,7 +445,7 @@ sap.ui.define([
     //common confirmation dialog box
     showConfirmationDialog: function (sTitle, sMessage, fnOnConfirm, fnOnCancel, sOkText, sCancelText) {
       var oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-
+    
       var dialog = new sap.m.Dialog({
         title: sTitle,
         type: "Message",
@@ -454,32 +454,41 @@ sap.ui.define([
           text: sOkText || oResourceBundle.getText("OkButton"),
           type: "Accept",
           press: function () {
-            if (typeof fnOnConfirm === "function") {
-              fnOnConfirm();
-            }
+            sap.ui.core.BusyIndicator.show(0); // Show busy indicator
+    
             dialog.close();
+    
+            setTimeout(function () {
+              if (typeof fnOnConfirm === "function") {
+                fnOnConfirm();
+              }
+              sap.ui.core.BusyIndicator.hide(); // Hide busy indicator after logic
+            }, 100); // slight delay to ensure UI updates
           }
         }),
         endButton: new sap.m.Button({
           text: sCancelText || oResourceBundle.getText("CancelButton"),
           type: "Reject",
           press: function () {
-            if (typeof fnOnCancel === "function") {
-              fnOnCancel();
-            } else {
-              //sap.m.MessageToast.show(oResourceBundle.getText("ActionCancelledMessage"));
-            }
             dialog.close();
+    
+            setTimeout(function () {
+              if (typeof fnOnCancel === "function") {
+                sap.ui.core.BusyIndicator.show(0);
+                fnOnCancel();
+                sap.ui.core.BusyIndicator.hide();
+              }
+            }, 100);
           }
         }),
         afterClose: function () {
           dialog.destroy();
         }
       });
-
+    
       dialog.open();
     },
-
+    
     _initMessagePopover: function () {
       var i18n = this.getOwnerComponent().getModel("i18n").getResourceBundle();
       this.oMessagePopover = new sap.m.MessagePopover({
