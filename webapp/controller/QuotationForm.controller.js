@@ -57,7 +57,10 @@ sap.ui.define([
         },
 
         QF_onMobileChange: function (oEvent) {
+            var today = new Date();
             utils._LCvalidateMobileNumber(oEvent);
+            this.oModel.setProperty("/QuotationFormData/QuotationDate", today);
+            this.oModel.setProperty("/QuotationFormData/ValidUpto", new Date(today.getFullYear(), today.getMonth() + 1, 0));
         },
 
         QF_onEmailChange: function (oEvent) {
@@ -337,9 +340,9 @@ sap.ui.define([
                 utils._LCvalidateEmail(oView.byId("QF_id_CustEmail"), "ID") &&
                 utils._LCvalidateAadharCard(oView.byId("QF_id_CustAadhar"), "ID") &&
                 utils._LCvalidatePanCard(oView.byId("QF_id_CustPanNumber"), "ID") &&
-                utils._LCvalidatePinCode(oView.byId("QF_id_CustPinCode"), "ID") &&
                 utils._LCvalidateGstNumber(oView.byId("QF_id_CustGSTNo"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("QF_id_CustAddress"), "ID") &&
+                utils._LCvalidatePinCode(oView.byId("QF_id_CustPinCode"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("QF_id_VehVariant"), "ID")) { return true }
             else { return false }
         },
