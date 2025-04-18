@@ -34,16 +34,13 @@
 					<Text text="{i18n>typeOfLeave}" />
 				</Column>
 				<Column minScreenWidth="Tablet" demandPopin="true">
-					<Text text="{i18n>comments}" />
-				</Column>
-				<Column minScreenWidth="Tablet" demandPopin="true">
 					<Text text="{i18n>status}" />
 				</Column>
 				<Column minScreenWidth="Tablet" demandPopin="true">
 					<Text text="{i18n>halfDay}" />
 				</Column>
 				<Column minScreenWidth="Tablet" demandPopin="true">
-					<Text text="{i18n>managerRemarksLeave}" />
+					<Text text="{i18n>comments}" />
 				</Column>
 			</columns>
 			<items>
@@ -53,10 +50,9 @@
 					<Text text="{path:'LeaveModel>toDate' ,formatter:'.Formatter.formatDate'}" />
 						<Text text="{LeaveModel>NoofDays}" />
 						<Text text="{LeaveModel>typeOfLeave}" />
-						<Text text="{LeaveModel>comments}" />
 					<ObjectStatus inverted="true" text="{LeaveModel>status}" state="{path: 'LeaveModel>status', formatter: '.Formatter.formatObjectStatus'}" />
 					<CheckBox selected="{= ${LeaveModel>halfDay} === 'true'}" editable="false"/>				
-					<Button icon="sap-icon://display-more" text="{i18n>View}" press="onShowMore" />
+                    <Button icon="sap-icon://display-more" text="{i18n>View}" press="AL_onShowEmployeeComments" />
 					</cells>
 				</ColumnListItem>
 			</items>

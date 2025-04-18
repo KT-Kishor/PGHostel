@@ -41,7 +41,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="CI_id-ConsultantInvoiceTable">
+			<Table items="{path: 'ConsultantModel>/'}" id="CI_id_ConsultantInvoiceTable">
 				<headerToolbar>
 					<Toolbar>
 						<Title id="CI_id_TitleInv" text="{i18n>consultantInvoiceDetails}"/>
@@ -81,19 +81,19 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem type="Navigation" press="CI_onPressInvoice">
-						<cells>
-							<Text text="{ConsultantModel>EmployeeID}" />
-							<Text text="{ConsultantModel>ConsultantName}" />
-							<Text text="{ConsultantModel>InvoiceNo}" />
-							<Text text="{ConsultantModel>InvoiceTo}" />
-							<Text text="{ConsultantModel>InvoiceDate}" />
-							<Text text="{ConsultantModel>PayBy}" />
-							<Text text="{ConsultantModel>GSTNO}" />
-							<Text text="{ConsultantModel>TotalSum}" />
-							<Text text="{ConsultantModel>Currency}" />
-						</cells>
-					</ColumnListItem>
+					<ColumnListItem  type="Navigation" press="CI_onPressInvoice">
+					<cells>
+						<Text text="{ConsultantModel>EmployeeID}" />
+						<Text text="{ConsultantModel>ConsultantName}" />
+						<Text text="{ConsultantModel>InvoiceNo}" />
+						<Text text="{ConsultantModel>InvoiceTo}" />
+						<Text text="{path:'ConsultantModel>InvoiceDate' ,formatter:'.Formatter.formatDate'}" />
+						<Text text="{path:'ConsultantModel>PayBy' ,formatter:'.Formatter.formatDate'}" />
+						<Text text="{ConsultantModel>GSTNO}" />
+						<Text text="{ConsultantModel>TotalSum}" />
+						<Text text="{ConsultantModel>Currency}" />
+					</cells>
+				</ColumnListItem>
 				</items>
 			</Table>
 		</content>
