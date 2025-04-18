@@ -4,9 +4,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns="sap.uxap"
 	xmlns:core="sap.ui.core"
-	xmlns:m="sap.m"
-	height="100%"
-	busyIndicatorDelay="0"
+	xmlns:m="sap.m"	
 >
 
 <m:Page id="id_Expense_Details" title="{i18n>expDetails}" navButtonPress="Exp_Det_onPressBackBtn" showNavButton="true">

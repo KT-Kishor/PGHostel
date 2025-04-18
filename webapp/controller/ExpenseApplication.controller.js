@@ -24,7 +24,8 @@ sap.ui.define([
             var View = new JSONModel({
                 SaveBtn: false,
                 SubmitBtn: false,
-                required: true
+                required: true,
+                minDate:new Date()
             });
             this.getOwnerComponent().setModel(View, "viewModel");
             this.ViewModel = this.getView().getModel("viewModel");
@@ -155,14 +156,23 @@ sap.ui.define([
 
         Exp_onChangeCountry: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent, "oEvent");
+            if(oEvent.getSource().getValue()===''){
+                oEvent.getSource().setValueState("None")
+            }
         },
 
         Exp_onChangeSource: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent, "oEvent");
+            if(oEvent.getSource().getValue()===''){
+                oEvent.getSource().setValueState("None")
+            }
         },
 
         Exp_onChangeDestination: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent, "oEvent");
+            if(oEvent.getSource().getValue()===''){
+                oEvent.getSource().setValueState("None")
+            }   
         },
 
         Exp_onChangeEmployeeRemark: function(oEvent) {
@@ -178,21 +188,27 @@ sap.ui.define([
             this.getRouter().navTo("RouteLoginPage");
         },
 
-        Exp_onPressDeleteExpense: async function(oEvent) {
+        Exp_onPressDeleteExpense: async function (oEvent) {
             BusyIndicator.show(0);
-            var ExpID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
-            await this.ajaxDeleteWithJQuery("/Expense", {
-                filters: {
-                    ExpenseID: ExpID
-                }
-            }).then(() => {
-                MessageToast.show(this.i18nModel.getText("expenseDeleteMess"));
-                this._fetchCommonData("Expense", "ExpenseModel");
-                BusyIndicator.hide();
-            }).catch((error) => {
-                MessageToast.show(error.responseText);
-            });
-        },
+            var that = this;
+            this.showConfirmationDialog(
+                this.i18nModel.getText("msgBoxConfirm"),
+                this.i18nModel.getText("commonMesBoxConfirmDelete"),
+                async function () {
+                    BusyIndicator.show(0);
+                    const expenseID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
+                    try {
+                        await that.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: expenseID } });
+                        MessageToast.show(that.i18nModel.getText("expenseDeleteMess")); // <== use 'that' instead of 'this'
+                        that._fetchCommonData("Expense", "ExpenseModel");
+                    } catch (error) {
+                        MessageToast.show(error.responseText || "Error deleting expense");
+                    } finally {
+                        BusyIndicator.hide();
+                    }
+                },
+                function () {BusyIndicator.hide()})
+        },        
 
         Exp_onSearch: async function() {
             try {

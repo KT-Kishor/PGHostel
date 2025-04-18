@@ -64,12 +64,12 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
       IndexNoIncreent: function() {
           var that = this;
           var oView = this.getView();
-
-          oView.setBusy(true);
+          var table = that.byId("exp_Id_ExpenseTable");
+          table.setBusy(true);
 
           this._fetchCommonData("ItemExpense", "ItemExpenseModel", {
-                  EmployeeID: this.LoginModel.getProperty("/EmployeeID"),
-                  ExpenseID: this.ExpenseID
+                  EmployeeID: that.LoginModel.getProperty("/EmployeeID"),
+                  ExpenseID: that.ExpenseID
               })
               .then(function() {
                   let modelData = oView.getModel("ItemExpenseModel").getData();
@@ -90,7 +90,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                   that.IndexNo = 0;
               })
               .finally(function() {
-                  oView.setBusy(false);
+                table.setBusy(false);
               });
       },
 
@@ -266,6 +266,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
           var oText = oEvent.getSource().getSelectedItem().getText();
           if (oText === "Peridiem Declaration") {
               this.ViewModel.setProperty("/enable", false);
+              this.getView().getModel("ExpenseCreateModel").getData().ExpenseAmount = 0;
           } else {
               this.ViewModel.setProperty("/enable", true);
           }
