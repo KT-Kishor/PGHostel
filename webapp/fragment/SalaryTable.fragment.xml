@@ -20,6 +20,7 @@
             >
                 <filterbar:control>
                     <ComboBox
+                        busyIndicatorDelay="0"
                         showClearIcon="true"
                         id="FST_id_FilterBranch"
                         name="Branch"
@@ -28,10 +29,12 @@
                                 length: 1000
                             }"
                         change=".FST_onEnableImport"
+                        showSecondaryValues="true"
                     >
-                        <core:Item
-                            key="{Payroll>City}"
-                            text="{Payroll>City}"
+                        <core:ListItem
+                            key="{Payroll>city}"
+                            text="{Payroll>city}"
+                            additionalText="{Payroll>branchCode}"
                         />
                     </ComboBox>
                 </filterbar:control>
@@ -115,7 +118,7 @@
             <headerToolbar>
                 <OverflowToolbar>
                     <Title
-                        text="{i18n>salTableTitle} ({Payroll>/RowCount})"
+                        text="{i18n>salTableTitle} ({Payroll>/TableRowCount})"
                         level="H2"
                     />
                 </OverflowToolbar>

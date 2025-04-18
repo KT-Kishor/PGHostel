@@ -16,11 +16,7 @@ sap.ui.define([
       this.oLoginModel = oView.getModel("LoginModel");
       this._makeDatePickersReadOnly(["Q_id_QDate"]);
       this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-
-      if (!this.oLoginModel) {
-        this.getRouter().navTo("RouteLoginPage");
-        return;
-      }
+      this.checkLoginModel();
       this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
       this.oModel.setProperty("/QuotationFormData", {});
       this.oModel.setProperty("/MasterEdit", true);

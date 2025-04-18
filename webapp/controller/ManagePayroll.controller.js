@@ -1,8 +1,6 @@
 sap.ui.define(
-  ["./BaseController", "sap/m/MessageToast", "sap/ui/core/BusyIndicator",
-    "sap/m/MessagePopover",
-    "sap/m/MessageItem"],
-  (Controller, MessageToast, BusyIndicator, MessagePopover, MessageItem) => {
+  ["./BaseController", "sap/m/MessageToast", "sap/ui/core/BusyIndicator"],
+  (Controller, MessageToast, BusyIndicator) => {
     "use strict";
 
     return Controller.extend("sap.kt.com.minihrsolution.controller.ManagePayroll", {
@@ -16,7 +14,6 @@ sap.ui.define(
       },
 
       _onRouteMatched: function () {
-        this.oCore = sap.ui.getCore();
         this.oLoginModel = this.getView().getModel("LoginModel");
         this.oModel = this.getView().getModel("Payroll");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -26,7 +23,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteLoginPage");
           return;
         }
-        this.oCore.byId("FST_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/city"));
+        this.byId("FST_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/city"));
         this.oLoginModel.setProperty("/HeaderName", "Manage Payroll Data");
         this.oModel.setProperty("/ShowOnGenerate", false);
         this.oModel.setProperty("/ShowOnPayroll", true);
@@ -34,7 +31,7 @@ sap.ui.define(
         this.resetColumnHeaders();
         this.oModel.setProperty("/isSELVisible", false);
         this.getView().byId("MP_id_UpdateSalBtn").setEnabled(true);
-        this.oCore.byId("FST_id_MonthYearPicker").setValue("");
+        this.byId("FST_id_MonthYearPicker").setValue("");
         var aData = this.oModel.getProperty("/TableData");
         this.oModel.setProperty("/TableRowCount", aData ? aData.length : 0);
         var oBinding = this.oModel.bindList("/TableData");
@@ -42,7 +39,7 @@ sap.ui.define(
           this.oModel.setProperty("/TableRowCount", oBinding.getLength());
         });
 
-        this._fetchCommonData("BaseLocation", "oBranchModel", {}, ["FST_id_FilterBranch"]);
+        this._commonGETCall("BaseLocation", "BaseLocationData", {}, ["FST_id_FilterBranch"]);
         //this.CommonReadcall("GetDepartmentRule", {}, [], "oRuleModel");
         this.FST_onEnableImport();
         BusyIndicator.hide();
@@ -59,8 +56,8 @@ sap.ui.define(
       MP_onPressGo: async function () {
         BusyIndicator.show(0);
         this.oModel.setProperty("/isExcelMismatch", false);
-        var branch = this.oCore.byId("FST_id_FilterBranch").getValue();
-        var oDate = this.oCore.byId("FST_id_MonthYearPicker").getDateValue();
+        var branch = this.byId("FST_id_FilterBranch").getValue();
+        var oDate = this.byId("FST_id_MonthYearPicker").getDateValue();
         var pickerMonth = String(oDate.getMonth() + 1).padStart(2, '0');
         var pickerYear = String(oDate.getFullYear());
         this.updateDaysInColumns(pickerYear, pickerMonth);

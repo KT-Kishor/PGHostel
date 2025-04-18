@@ -5,8 +5,9 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "../model/formatter",
+    "../utils/AutomotiveQuotationPDF",
     "sap/ui/core/BusyIndicator"
-], (BaseController, utils, MessageToast, Filter, FilterOperator, formatter, BusyIndicator) => {
+], (BaseController, utils, MessageToast, Filter, FilterOperator, formatter, jsPDF, BusyIndicator) => {
     "use strict";
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.QuotationForm", {
@@ -22,12 +23,8 @@ sap.ui.define([
             this.oLoginModel = oView.getModel("LoginModel");
             this._makeDatePickersReadOnly(["QF_id_VehVariant", "QF_id_BranchCodes"]);
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            
-            if (!this.oLoginModel) {
-                this.getRouter().navTo("RouteLoginPage");
-                return;
-            }
-            var response = await this.ajaxCreateWithJQuery("UniqueScheme", {data: {}});
+            this.checkLoginModel();
+            var response = await this.ajaxCreateWithJQuery("UniqueScheme", { data: {} });
             if (response.success) {
                 this.oModel.setProperty("/ModelList", response.results);
             } else {
@@ -35,7 +32,8 @@ sap.ui.define([
             }
             oView.byId("QF_id_PDFBtn").setEnabled(true);
             BusyIndicator.hide();
-            this.QF_onBranchCodeChange();
+            this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: this.oModel.getProperty("/QuotationFormData/BranchCode") }, ["QF_id_HeaderContent"]);
+            this.QF_onCallVariant();
         },
 
         QF_onNavBack: function () {
@@ -81,9 +79,23 @@ sap.ui.define([
             utils._LCvalidatePinCode(oEvent);
         },
 
-        QF_onModelSelectionChange: async function () {
-            var selectedKey = this.oModel.getProperty("/QuotationFormData/Model");
-            var response = await this.ajaxCreateWithJQuery("UniqueScheme", {filters: {Model: selectedKey}}, ["QF_id_VehVariant"]);
+        QF_onModelChange: async function () {
+            this.QF_onCallVariant();
+            const properties = [
+                "Variant", "Transmission", "Color", "Fuel", "BoardPlate", "Make", "Emission",
+                "EXShowroom", "TCS1Perc", "ROADTAX", "AddOnInsurance", "TempCharges",
+                "RegHypCharge", "ShieldOfTrust4YR45K", "EXTDWarrantyFOR4YR80K", "STDFittings",
+                "FastTag", "VAS", "RSA", "DiscountOffers", "ConsumerScheme",
+                "EXShowroomAfterScheme", "TotalOnRoad"
+            ];
+            properties.forEach(prop => {
+                this.oModel.setProperty(`/QuotationFormData/${prop}`, "");
+            });
+        },
+
+        QF_onCallVariant: async function () {
+            var selectedKey = this.getView().byId("QF_id_VehModel").getSelectedKey();
+            var response = await this.ajaxCreateWithJQuery("UniqueScheme", { filters: { Model: selectedKey } }, ["QF_id_VehVariant"]);
             if (response.success) {
                 this.oModel.setProperty("/VariantList", response.results);
             } else {
@@ -193,9 +205,11 @@ sap.ui.define([
         },
 
         QF_onPressSubmit: async function () {
+            BusyIndicator.show(0);
             var oData = this.oModel.getProperty("/QuotationFormData/");
             oData.QuotationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.QuotationDate);
             oData.ValidUpto = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.ValidUpto);
+            if(!oData.Branch) { oData.Branch = this.getView().byId("QF_id_BranchCodes").getSelectedItem().getAdditionalText(); }
             delete oData.ID;
             try {
                 if (this._checkValidation()) {
@@ -203,9 +217,10 @@ sap.ui.define([
                         data: oData,
                     });
                     if (response.success) {
+                        this.oModel.setProperty("/QuotationFormData/QuotationNumber", response.QuotationNumber);
                         this._submitSuccess();
                     } else {
-                        MessageToast.show(that.i18nModel.getText("msgSchemeDetailErrorSave"));
+                        MessageToast.show(this.i18nModel.getText("msgSchemeDetailErrorSave"));
                     }
                 }
                 else {
@@ -214,6 +229,7 @@ sap.ui.define([
             } catch (error) {
                 MessageToast.show("Technical error occurred");
             }
+            BusyIndicator.hide();
         },
 
         _submitSuccess: function () {
@@ -243,7 +259,7 @@ sap.ui.define([
                             icon: "sap-icon://pdf-attachment",
                             press: function () {
                                 that.QF_oSuccessDialog.close();
-                                that.onDownloadPDF();
+                                that.QF_onDownloadPDF();
                                 that.QF_onNavBack();
                             },
                         }),
@@ -266,10 +282,13 @@ sap.ui.define([
             }
             if (masteredits) {
                 if (this._checkValidation()) {
+                    BusyIndicator.show(0);
                     var oData = this.oModel.getProperty("/QuotationFormData/");
                     oData.QuotationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(new Date(oData.QuotationDate));
                     oData.ValidUpto = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(new Date(oData.ValidUpto));
-                    try{
+                    if (oData.ID) { delete oData.ID }
+                    if (oData.TempCharges) { delete oData.TempCharges }
+                    try {
                         var response = await this.ajaxUpdateWithJQuery("A_Quotations", {
                             data: oData,
                             filters: {
@@ -279,16 +298,21 @@ sap.ui.define([
                         if (response.success) {
                             MessageToast.show(this.i18nModel.getText("Quotation Updated Successfully"));
                         }
-                        else{
-                            MessageToast.show(this.i18nModel.getText("An error occured while updating Quotation"));                            
+                        else {
+                            MessageToast.show(this.i18nModel.getText("An error occured while updating Quotation"));
+                            this.oModel.setProperty("/MasterEdit", masteredits);
+                            this.oModel.setProperty("/isEditable", edits);
                         }
                     }
                     catch (error) {
                         console.log(error);
-                        MessageToast.show(this.i18nModel.getText("An error occured while updating Quotation"));   
+                        MessageToast.show(this.i18nModel.getText("An error occured while updating Quotation"));
+                        this.oModel.setProperty("/MasterEdit", masteredits);
+                        this.oModel.setProperty("/isEditable", edits);
                     }
                     this.getView().byId("QF_id_PDFBtn").setEnabled(true);
                     this.oModel.setProperty("/VisibleStatus", false);
+                    BusyIndicator.hide();
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     this.oModel.setProperty("/MasterEdit", masteredits);
@@ -297,26 +321,27 @@ sap.ui.define([
             } else {
                 this.getView().byId("QF_id_PDFBtn").setEnabled(false);
                 this.oModel.setProperty("/VisibleStatus", true);
-                this.QF_onModelSelectionChange();
+                this.QF_onCallVariant();
             }
         },
 
         _checkValidation: function () {
             var oView = this.getView();
             if (utils._LCvalidateName(oView.byId("QF_id_CustomerName"), "ID") &&
-            utils._LCvalidateMobileNumber(oView.byId("QF_id_CustMobile"), "ID") &&
-            utils._LCvalidateMobileNumber(oView.byId("QF_id_EmpMobile"), "ID") &&
-            utils._LCvalidateEmail(oView.byId("QF_id_CustEmail"), "ID") &&
-            utils._LCvalidateAadharCard(oView.byId("QF_id_CustAadhar"), "ID") &&
-            utils._LCvalidatePanCard(oView.byId("QF_id_CustPanNumber"), "ID") &&
-            utils._LCvalidatePinCode(oView.byId("QF_id_CustPinCode"), "ID") &&
-            utils._LCvalidateGstNumber(oView.byId("QF_id_CustGSTNo"), "ID") &&
-            utils._LCvalidateMandatoryField(oView.byId("QF_id_CustAddress"), "ID") &&
-            utils._LCvalidateMandatoryField(oView.byId("QF_id_VehModel"), "ID") &&
-            utils._LCvalidateMandatoryField(oView.byId("QF_id_VehVariant"), "ID"))
-            { return true } 
-            else 
-            { return false }
+                utils._LCvalidateMobileNumber(oView.byId("QF_id_CustMobile"), "ID") &&
+                utils._LCvalidateMobileNumber(oView.byId("QF_id_EmpMobile"), "ID") &&
+                utils._LCvalidateEmail(oView.byId("QF_id_CustEmail"), "ID") &&
+                utils._LCvalidateAadharCard(oView.byId("QF_id_CustAadhar"), "ID") &&
+                utils._LCvalidatePanCard(oView.byId("QF_id_CustPanNumber"), "ID") &&
+                utils._LCvalidatePinCode(oView.byId("QF_id_CustPinCode"), "ID") &&
+                utils._LCvalidateGstNumber(oView.byId("QF_id_CustGSTNo"), "ID") &&
+                utils._LCvalidateMandatoryField(oView.byId("QF_id_CustAddress"), "ID") &&
+                utils._LCvalidateMandatoryField(oView.byId("QF_id_VehVariant"), "ID")) { return true }
+            else { return false }
+        },
+
+        QF_onDownloadPDF: function () {
+            jsPDF.onDownloadPDF(this.oModel);
         }
     });
 });

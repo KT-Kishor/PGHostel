@@ -435,25 +435,23 @@
                                             showColon="true"
                                             text="{i18n>vehicleModel} "
                                         />
-                                        <m:ComboBox
+                                        <m:Select
                                             editable="{Quotation>/MasterEdit}"
                                             id="QF_id_VehModel"
-                                            change=".QF_onAddressChange"
-                                            value="{Quotation>/QuotationFormData/Model}"
-                                            selectedKey=""
+                                            change=".QF_onModelChange"
+                                            selectedKey="{Quotation>/QuotationFormData/Model}"
                                             items="{
                                                 path: 'Quotation>/ModelList',
                                                 length: 1000
                                             }"
                                             required="true"
-                                            selectionChange=".QF_onModelSelectionChange"
                                             valueStateText="{i18n>modelValueState}"
                                         >
                                             <core:Item
                                                 key="{Quotation>Model}"
                                                 text="{Quotation>Model}"
                                             />
-                                        </m:ComboBox>
+                                        </m:Select>
 
                                         <m:Label
                                             showColon="true"

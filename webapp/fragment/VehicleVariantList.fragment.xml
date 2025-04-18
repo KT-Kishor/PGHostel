@@ -27,12 +27,19 @@
 
             <Table
                 id="VVF_id_Table"
-                items="{Quotation>/VariantList}"
                 growing="true"
                 growingThreshold="50"
                 growingScrollToLoad="true"
                 alternateRowColors="true"
                 backgroundDesign="Translucent"
+                items="{
+                    path: 'Quotation>/VariantList',
+                    sorter: {
+                        path: 'Model',
+                        descending: false,
+                        group: true
+                    }
+                }"
             >
                 <columns>
                     <Column width="25%">

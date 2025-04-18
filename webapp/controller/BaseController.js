@@ -482,31 +482,33 @@ sap.ui.define([
 
     _initMessagePopover: function () {
       var i18n = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-      this.oMessagePopover = new MessagePopover({
+      this.oMessagePopover = new sap.m.MessagePopover({
         items: [
-          new MessageItem({ type: "Information", title: "P - Present", description: i18n.getText("forP") }),
-          new MessageItem({ type: "Information", title: "A - Absent", description: i18n.getText("forA") }),
-          new MessageItem({ type: "Information", title: "H - Half-Day", description: i18n.getText("forH") }),
-          new MessageItem({ type: "Information", title: "LA - Late", description: i18n.getText("forLA") }),
-          new MessageItem({ type: "Information", title: "L - Leave", description: i18n.getText("forL") }),
-          new MessageItem({ type: "Information", title: "SP - Present on Sunday", description: i18n.getText("forSP") }),
-          new MessageItem({ type: "Information", title: "SA - Absent on Sunday", description: i18n.getText("forSA") }),
-          new MessageItem({ type: "Information", title: "SH - Half-Day on Sunday", description: i18n.getText("forSH") }),
-          new MessageItem({ type: "Information", title: "SLA - Late on Sunday", description: i18n.getText("forSLA") }),
-          new MessageItem({ type: "Information", title: "SL - Leave on Sunday", description: i18n.getText("forSL") })
+          new sap.m.MessageItem({ type: "Information", title: "P - Present", description: i18n.getText("forP") }),
+          new sap.m.MessageItem({ type: "Information", title: "A - Absent", description: i18n.getText("forA") }),
+          new sap.m.MessageItem({ type: "Information", title: "H - Half-Day", description: i18n.getText("forH") }),
+          new sap.m.MessageItem({ type: "Information", title: "LA - Late", description: i18n.getText("forLA") }),
+          new sap.m.MessageItem({ type: "Information", title: "L - Leave", description: i18n.getText("forL") }),
+          new sap.m.MessageItem({ type: "Information", title: "SP - Present on Sunday", description: i18n.getText("forSP") }),
+          new sap.m.MessageItem({ type: "Information", title: "SA - Absent on Sunday", description: i18n.getText("forSA") }),
+          new sap.m.MessageItem({ type: "Information", title: "SH - Half-Day on Sunday", description: i18n.getText("forSH") }),
+          new sap.m.MessageItem({ type: "Information", title: "SLA - Late on Sunday", description: i18n.getText("forSLA") }),
+          new sap.m.MessageItem({ type: "Information", title: "SL - Leave on Sunday", description: i18n.getText("forSL") })
         ]
       });
       this.getView().addDependent(this.oMessagePopover);
     },
 
     FST_onEnableImport: function () {
-      var branch = oCore.byId("FST_id_FilterBranch");
-      var date = oCore.byId("FST_id_MonthYearPicker");
+      var branch = this.byId("FST_id_FilterBranch");
+      var date = this.byId("FST_id_MonthYearPicker");
       if (!branch.getValue() || !date.getValue()) {
-        oCore.byId("FST_id_ImportBtn").setEnabled(false);
+        this.byId("FST_id_ImportBtn").setEnabled(false);
+        this.byId("MP_id_GoBtn").setEnabled(false);
       }
       else {
-        oCore.byId("FST_id_ImportBtn").setEnabled(true);
+        this.byId("FST_id_ImportBtn").setEnabled(true);
+        this.byId("MP_id_GoBtn").setEnabled(true);
       }
     },
 
@@ -545,6 +547,13 @@ sap.ui.define([
       }
       catch (e) {
         console.error(e);
+      }
+    },
+
+    checkLoginModel: function () {
+      if (!this.getView().getModel("LoginModel")) {
+        sap.ui.core.BusyIndicator.hide();
+        this.getRouter().navTo("RouteLoginPage");
       }
     }
   })

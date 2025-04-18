@@ -15,50 +15,6 @@
         { "key": "Cancelled", "text": "Cancelled" }
     ],
     
-    "Company": "",
-    "CompanyCode": "",
-    "Branch": "",
-    "Status":"",
-    "QuotationNumber": "",
-    "QuotationDate": "",
-    "ValidUpto": "",
-    "QuotationIssuedBy": "",
-    "EmployeeMobile": "",
-
-    "CustomerName": "",
-    "CustAddress": "",
-    "CustMobile": "",
-    "CustPanNumber": "",
-    "CustAadhar":"",
-    "CustPinCode":"",
-    "CustGSTNo": "",
-    "CustEmail": "",
-
-    "Model": "",
-    "Variant": "",
-    "Transmission": "",
-    "Color": "",
-    "Fuel": "",
-    "BoardPlate": "",
-    "Make": "",
-    "Emission": "",
-
-    "ExShowroom": "",
-    "TCS1Perc": "",
-    "ROADTAX": "",
-    "AddOnInsurance": "",
-    "RegHypCharge": "",
-    "ShieldOfTrust4YR45K": "",
-    "EXTDWarrantyFOR4YR80K": "",
-    "STDFittings": "",
-    "FastTag": "",
-    "VAS": "",
-    "RSA": "",
-    "DiscountOffers": "",
-    "ConsumerScheme": "",
-    "ExShowroomAfterScheme": "",
-    "TotalOnRoad": "",
-    
     "RowCount": 0,
     "setDefFilter": true,
     "isEditable": true,
@@ -67,20 +23,7 @@
     "VisibleStatus": false,
     "ShowCase": true,
     "AddCase": true,
-    "FontStyle":"helvetica",
 
-    "Logo": "../image/logo.jpg",
-    
-    "MLogo": "../image/Mahindra Logo.png",
-    "HLogo1": "../image/Hyundai Logo.png",
-    "HLogo2": "../image/Shah Hyundai Logo.jpg",
-    "HQRCode": "../image/Hyundai QR.jpg",
-    "MQRCode": "../image/Mahindra QR.png",
-
-    "HLogo": "../image/Hyundai Logo.png",
-    "Template" : "../image/Template.jpeg",
-    "MahindraLogo": "../image/Mahindra.png",
-    "HyundaiLogo": "../image/Hyundai.png",
-    "IDCard": "../image/New ID.png",
-    "ShahTemplate": "../image/Shah Card.jpg"
+    "Logo": "../image/logo.png",
+    "QRCode": ""
 }
