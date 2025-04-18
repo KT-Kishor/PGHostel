@@ -90,8 +90,8 @@ sap.ui.define([
         var sValue = oItem.getName();
         if (oControl && oControl.getValue()) {
           if (sValue === "QuotationDate") {
-            params["startDate"] = oDateFormat.format(new Date(oControl.getValue().split(' to ')[0]));
-            params["endDate"] = oDateFormat.format(new Date(oControl.getValue().split(' to ')[1]));
+            params["QuotationStartDate"] = oDateFormat.format(new Date(oControl.getValue().split(' to ')[0]));
+            params["QuotationEndDate"] = oDateFormat.format(new Date(oControl.getValue().split(' to ')[1]));
           } else {
             params[sValue] = oControl.getValue();
           }

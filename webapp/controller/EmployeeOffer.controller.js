@@ -1,14 +1,20 @@
 sap.ui.define([
-    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel",
+    "./BaseController",
+     "../utils/validation", 
+     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "sap/ui/core/BusyIndicator",
     "../model/formatter"],
-    function (BaseController,validation,JSONModel,MessageToast,MessageBox,BusyIndicator,Formatter) {
+    function (BaseController,utils,JSONModel,MessageToast,MessageBox,BusyIndicator,Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOffer", {
             Formatter: Formatter,
             onInit: function () {
+                var oDateModel = new sap.ui.model.json.JSONModel();
+                var currentDate = new Date();
+                oDateModel.setData({maxDate: currentDate, focusedDate: new Date(2000, 0, 1) });
+                this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
@@ -17,7 +23,7 @@ sap.ui.define([
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
                 this.byId("EO_id_RejectBtn").setEnabled(false);
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 if (this.oValue === "EmployeeOffer") {
                     this.readCallForEmployeeOffer("Initial");
@@ -26,7 +32,6 @@ sap.ui.define([
                 else {
                     this.EO_onSearch();
                 }
-                this.byId("OEF_id_DateofBirth").setMaxDate(new Date());
                 BusyIndicator.hide()
             },
             readCallForEmployeeOffer: async function (filter) {

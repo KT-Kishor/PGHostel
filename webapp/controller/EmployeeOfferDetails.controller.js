@@ -25,6 +25,7 @@ sap.ui.define([
                 await this._fetchCommonData("Designation", "DesignationModel");
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 await this._fetchCommonData("Currency", "CurrencyModel");
+                await this._fetchCommonData("AppVisibility","RoleModel")
                 await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "EmployeeOffer" });
                 var jsonData = {
                     "Salutation": "Mr.",
@@ -86,7 +87,7 @@ sap.ui.define([
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
                     var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") &&
-                        utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_CTC"), "ID") && utils.EOD_validateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_VariablePerc"), "ID");
+                        utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
                     if (isValid) this.updateCallForEmployeeOffer(oViewModel);
                     else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -96,6 +97,9 @@ sap.ui.define([
                     oViewModel.setProperty("/isEditMode", false);
                     oViewModel.setProperty("/isCTCVisible", true);
                 }
+            },
+            EOD_onPressBack: function () {
+                this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
             },
             updateCallForEmployeeOffer: function (oViewModel) {
                 var that = this;

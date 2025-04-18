@@ -22,13 +22,13 @@
 						<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
 					</items>
 				</Select>
-				<Label text="{i18n>employeeRole}" required="true"/>
+				<Label text="{i18n>empRole}" required="true"/>
 				<Select
                  id="selectEmployeeRole"
                  width="100%"
                  selectedKey="{oEmpolyeeDetailsModel>/Role}"
                  items="{RoleModel>/}" >
-					<core:Item key="{RoleModel>role}" text="{RoleModel>role}" />
+					<core:Item key="{RoleModel>Role}" text="{RoleModel>Role}" />
 				</Select>
 				<Label text="{i18n>joiningDate}" />
 					<DatePicker  value="{ path: 'oEmpolyeeDetailsModel>/JoiningDate',formatter:'.Formatter.formatDate' }"  editable="false"   displayFormat="dd/MM/yyyy"     valueFormat="dd/MM/yyyy"  />
@@ -52,7 +52,9 @@
 				 value="{oEmpolyeeDetailsModel>/DateOfBirth}"
                  change="validateDate"
 	             displayFormat="dd/MM/yyyy"
-				 valueFormat="dd/MM/yyyy" />
+				 valueFormat="dd/MM/yyyy"
+				 initialFocusedDateValue="{controller>/focusedDate}"
+				 maxDate="{controller>/maxDate}" />
 				<Label text="{i18n>bloodGroup}"/>
 				<Select  selectedKey="{oEmpolyeeDetailsModel>/BloodGroup}" items="{BloodGroup>/bloodgroup}" id="OEF_id_blood" >
 					<core:Item key="{BloodGroup>Code}" text="{BloodGroup>Code}" />

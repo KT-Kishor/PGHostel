@@ -24,7 +24,7 @@ sap.ui.define([
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
                 ["T_id_Download", "T_id_EmpOnBoard", "T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Trainee Details");
+                this.getView().getModel("LoginModel").setProperty("/HeaderName",this.i18nModel.getText("traineeDetails"));
                 this.oValue = oEvent.getParameter("arguments").value;
                 if (this.oValue === "Trainee") {
                     this.readCallForTrainee("Initial");
