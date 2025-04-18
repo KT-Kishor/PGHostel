@@ -104,9 +104,11 @@ sap.ui.define(
                 oModel.setProperty("/sendOtpText", this.i18nModel.getText("msgresndotp"));
                 MessageToast.show(this.i18nModel.getText("sentOTP"));
               } else {
+                BusyIndicator.hide();
                 MessageToast.show(this.i18nModel.getText("errorMsguser"));
               }
             }).catch((error) => {
+              BusyIndicator.hide();
               MessageToast.show(this.i18nModel.getText(error.responseJSON.message));
             });
           } catch (err) {
@@ -322,6 +324,8 @@ sap.ui.define(
                 if (response.success === true) {
                   BusyIndicator.hide();
                   MessageToast.show(this.i18nModel.getText("sentOTP"));
+                  sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(false);
+                  sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(false);
                   oFragModel.setProperty("/frgOtpVisible", true);
                   oFragModel.setProperty("/frgOtp", "");
                   oFragModel.setProperty("/frgOtpVerified", false); // Reset OTP verification flag

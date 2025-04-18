@@ -202,7 +202,6 @@ sap.ui.define(
             : { data: oPayload };
 
           BusyIndicator.show(0);
-
           $.ajax({
             url: sEndpoint,
             type: sType,
@@ -226,7 +225,7 @@ sap.ui.define(
               }
               oModel.setProperty("/isCreateMode", false);
               oModel.setProperty("/isEditable", false);
-              oModel.setProperty("/showEditButton", false);
+              oModel.setProperty("/showEditButton", bIsUpdate);
               oView.byId("SUD_id_Edit").setText("Edit");
             },
             error: function (jqXHR) {

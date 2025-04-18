@@ -55,7 +55,7 @@
                         editable="{= ${detailModel>/isCreateMode} ? true : false }"
                         liveChange="SUD_onFieldLiveChange"
                         maxLength="99"
-                        valueStateText="enter model"
+                        valueStateText="{i18n>placemodel}"
                     />
                     <Label
                         text="{i18n>vehicleVariant}"
@@ -67,6 +67,7 @@
                         editable="{= ${detailModel>/isCreateMode} ? true : false }"
                         liveChange="SUD_onFieldLiveChange"
                         maxLength="99"
+                        valueStateText="{i18n>placevariant}"
                     />
                     <Label
                         text="{i18n>vehicleTransmission}"
@@ -78,6 +79,7 @@
                         editable="{= ${detailModel>/isCreateMode} ? true : false }"
                         liveChange="SUD_onFieldLiveChange"
                         maxLength="49"
+                        valueStateText="{i18n>placetransmission}"
                     />
                     <Label
                         text="{i18n>vehicleColor}"
@@ -88,7 +90,7 @@
                         value="{detailModel>/Color}"
                         editable="{= ${detailModel>/isCreateMode} ? true : false }"
                         liveChange="SUD_onFieldLiveChange"
-                        valueStateText=""
+                        valueStateText="{i18n>placecolor}"
                         maxLength="19"
                     />
                     <Label
@@ -101,6 +103,7 @@
                         editable="{= ${detailModel>/isCreateMode} ? true : false }"
                         liveChange="SUD_onFieldLiveChange"
                         maxLength="19"
+                        valueStateText="{i18n>placefuel}"
                     />
                     <Label
                         text="{i18n>vehicleBoardPlate}"

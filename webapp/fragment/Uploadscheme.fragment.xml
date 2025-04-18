@@ -2,7 +2,7 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:f="sap.ui.layout.form"
     xmlns:u="sap.ui.unified">
-    <Dialog id="uploadDialog" title="{i18n>}" stretch="false" contentWidth="38rem">
+    <Dialog id="uploadDialog" title="{i18n>schemeupload}" stretch="false" contentWidth="38rem">
          <VBox >
             <MessageStrip
                 text="{i18n>msgstrip}"

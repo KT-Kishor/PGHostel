@@ -48,7 +48,7 @@ sap.ui.define(
               params[sValue] = oControl.getValue();
             }
           });
-          // this._fetchCommonData("SchemeUploade", "ModelOnly", params);
+          this._fetchCommonData("SchemeUploade", "MainModel", params);
           this.CommomReadCall(params);
         },
         SU_onClear: function () {
@@ -189,7 +189,6 @@ sap.ui.define(
             { label: "ROAD TAX", property: "ROADTAX", type: "number" },
             { label: "Regular Insurance", property: "Regular Insurance", type: "number", },
             { label: "Add On Insurance", property: "AddOnInsurance", type: "number", },
-            // { label: "Temp Charges", property: "Temp Charges", type: "number" },
             { label: "RegHypCHARGE", property: "RegHypCharge", type: "number" },
             { label: "Shield of trust 4YR45K", property: "ShieldOfTrust4YR45K", type: "number", },
             { label: "EXTD Warranty FOR 4YR80K", property: "EXTDWarrantyFOR4YR80K", type: "number", },
@@ -236,6 +235,15 @@ sap.ui.define(
             that._uploadedExcelData.length === 0
           ) {
             MessageToast.show("No Data In Excel");
+            return;
+          }
+          //Filter out rows missing 'Model' or 'Variant'
+          var validRows = that._uploadedExcelData.filter((row) => {
+            return row["Model"] && row["Variant"];
+          });
+
+          if (validRows.length === 0) {
+            MessageToast.show("No valid rows found. 'Model' and 'Variant' are required.");
             return;
           }
 
@@ -306,15 +314,13 @@ sap.ui.define(
               // Deduplicate for each ComboBox
               const getUnique = (arr, key) => {
                 const seen = new Set();
-                return arr
-                  .filter((item) => {
-                    if (item[key] && !seen.has(item[key])) {
-                      seen.add(item[key]);
-                      return true;
-                    }
-                    return false;
-                  })
-                  .map((item) => ({ [key]: item[key] }));
+                return arr.filter((item) => {
+                  if (item[key] && !seen.has(item[key])) {
+                    seen.add(item[key]);
+                    return true;
+                  }
+                  return false;
+                }).map((item) => ({ [key]: item[key] }));
               };
               const uniqueModels = getUnique(offerData, "Model");
               const uniqueVariants = getUnique(offerData, "Variant");
@@ -331,7 +337,6 @@ sap.ui.define(
                 new JSONModel({ results: uniqueTransmissions }),
                 "TransmissionOnly"
               );
-
               BusyIndicator.hide();
             })
             .catch((Error) => {
