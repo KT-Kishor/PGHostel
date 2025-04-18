@@ -14,7 +14,6 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteEmployeeOfferDetails").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
-                
                 BusyIndicator.show(0);
                 this.byId("EOD_id_Joindate").setMinDate(new Date());
                 this.sArgPara = oEvent.getParameter("arguments").sParOffer
@@ -26,7 +25,7 @@ sap.ui.define([
                 await this._fetchCommonData("Designation", "DesignationModel");
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 await this._fetchCommonData("Currency", "CurrencyModel");
-                await this._fetchCommonData("CompanyEmails", "CCMailModel", {applicationName: "EmployeeOffer"});
+                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "EmployeeOffer" });
                 var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",
@@ -103,7 +102,7 @@ sap.ui.define([
                 var oModel = this.getView().getModel("employeeModel").getData();
                 oModel.Status = oModel.Status === "Rejected" ? "Submitted" : oModel.Status;
                 oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
-                oModel.Department= this.getView().byId("EOUF_id_Designation").getSelectedItem().getAdditionalText();
+                oModel.Department = this.getView().byId("EOUF_id_Designation").getSelectedItem().getAdditionalText();
                 oModel.JoiningDate = this.byId("EOUF_id_Joindate").getValue().split("/").reverse().join("-");
                 oModel.OfferReleaseDate = this.byId("EOUF_id_Reldate").getValue().split("/").reverse().join("-");
                 oModel = {
@@ -112,7 +111,7 @@ sap.ui.define([
                         "ID": this.sArgPara
                     }
                 }
-                this.ajaxUpdateWithJQuery("EmployeeOffer", oModel).then((oData) => {
+                this.ajaxUpdateWithJQuery("EmployeeOffer", oModel, ["EOU_id_Form"]).then((oData) => {
                     if (oData.success) {
                         oViewModel.setProperty("/editable", false);
                         oViewModel.setProperty("/isEditMode", true);
@@ -129,7 +128,7 @@ sap.ui.define([
                 var queryString = $.param({
                     "ID": sArgPara
                 });
-                this.ajaxReadWithJQuery("EmployeeOffer", queryString).then((oData) => {
+                this.ajaxReadWithJQuery("EmployeeOffer", queryString, ["EODF_id_PageUpdate"]).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     var index = offerData[0].EmployeePF !== "0" ? 1 : 0;
                     this.byId("EOUF_id_RadioButTds").setSelectedIndex(index);
@@ -171,7 +170,7 @@ sap.ui.define([
                 this.EOD_validateStep();
                 this.EOD_onTDSCheckboxChange();
             },
-            EOD_validateJoiningBonus:function(oEvent){
+            EOD_validateJoiningBonus: function (oEvent) {
                 utils._LCvalidateJoiningBonus(oEvent)
             },
             EOD_validateDate: function (oEvent) {
@@ -195,13 +194,9 @@ sap.ui.define([
                     }
                 }
             },
-
             EOD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 this.EOD_validateStep();
-            },
-            EOD_onPressBack: function () {
-                this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
             },
             //Step validation
             EOD_validateStep: function () {
@@ -230,7 +225,7 @@ sap.ui.define([
                 if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("employeeModel").getData();
                     oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
-                    oModel.Department= this.getView().byId("EOD_id_Designation").getSelectedItem().getAdditionalText();
+                    oModel.Department = this.getView().byId("EOD_id_Designation").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();
                     oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join("-");
                     oModel.OfferReleaseDate = oModel.OfferReleaseDate.split("/").reverse().join("-");
@@ -250,7 +245,7 @@ sap.ui.define([
                                     type: "Accept",
                                     press: function () {
                                         oDialog.close();
-                                        this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);  
+                                        this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
                                         this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
                                     }.bind(this)
                                 }),
@@ -259,21 +254,42 @@ sap.ui.define([
                                     type: "Reject",
                                     press: function () {
                                         this.EOUF_onPressMerge();
-                                        oDialog.close();
-                                        this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true); 
-                                        this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
+                                        var oUpdatePayload = {
+                                            "data": { Status: "PDF Generated" },
+                                            "filters": {
+                                                "ID": oData.ID
+                                            }
+                                        };
+                                        sap.ui.core.BusyIndicator.show();
+                                        this.ajaxUpdateWithJQuery("EmployeeOffer", oUpdatePayload).then((oData) => {
+                                            sap.ui.core.BusyIndicator.hide();
+                                            if (oData.success) {
+                                                sap.m.MessageToast.show("PDF generated and status updated!");
+                                                oDialog.close();
+                                                this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
+                                                this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
+                                                // this.getView().getModel("oTraineeDetails").refresh(true);
+                                            }
+                                        })
+                                            .catch((err) => {
+                                                sap.ui.core.BusyIndicator.hide();
+                                                sap.m.MessageToast.show("Failed to update status: " + (err.message || err.responseText));
+                                            });
                                     }.bind(this)
                                 }),
+
                                 afterClose: function () {
                                     oDialog.destroy();
                                 }
                             });
+
                             oDialog.open();
                         }
-                    }).catch((oError) => {
-                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                        BusyIndicator.hide();
+                    }).catch((error) => {
+                        sap.ui.core.BusyIndicator.hide();
+                        sap.m.MessageToast.show(error.message || error.responseText);
                     });
+
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
@@ -300,14 +316,13 @@ sap.ui.define([
                 if (oModel.BaseLocation === "") this.getView().getModel("employeeModel").setProperty("/BaseLocation", this.byId("EOD_id_Location").getSelectedKey())
                 if (oModel.Designation === "") this.getView().getModel("employeeModel").setProperty("/Designation", this.byId("EOD_id_Designation").getSelectedKey())
                 this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(false);
-
-                
             },
             EOUF_onPressMerge: function () {
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);
             },
             EOD_commonOpenDialog: function (FragmentName) {
+                BusyIndicator.show(0)
                 if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
                         name: FragmentName,
@@ -316,9 +331,11 @@ sap.ui.define([
                         this.oDialog = dialog;
                         this.getView().addDependent(this.oDialog);
                         this.oDialog.open();
+                        BusyIndicator.hide();
                     }).bind(this);
                 } else {
                     this.oDialog.open();
+                    BusyIndicator.hide();
                 }
             },
             EOUF_onSendEmail: function () {
@@ -378,9 +395,9 @@ sap.ui.define([
                     "toEmailID": oModel.EmployeeEmail,
                     "CC": this.getView().getModel("CCMailModel").getData()[0].emails,
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
-                    "Designation":oModel.Designation
+                    "Designation": oModel.Designation
                 };
-                this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload).then((oData) => {
+                this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload, ["Mail_id_Form", "EOU_id_Form"]).then((oData) => {
                     this.getView().getModel("employeeModel").setProperty("/Status", "Offer Sent");
                     this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"));
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
@@ -400,6 +417,7 @@ sap.ui.define([
                         this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
                     }.bind(this)
                 );
+                this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);  
             },
 
             EOUF_onPressMerge: function () {

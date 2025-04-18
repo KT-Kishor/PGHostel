@@ -31,7 +31,7 @@
 						<ObjectPageSubSection titleUppercase="false">
 							<blocks>
 								<!-- SimpleForm for displaying and editing Employee details -->
-								<f:SimpleForm 
+								<f:SimpleForm  id="EOU_id_Form"
                                               editable="true"
                                               layout="ColumnLayout"
                                               columnsM="2"

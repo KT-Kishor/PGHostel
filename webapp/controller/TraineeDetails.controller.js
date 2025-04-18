@@ -16,7 +16,7 @@ sap.ui.define([
             _onRouteMatched: async function (oEvent) {
                 BusyIndicator.show(0)
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
-                await this._fetchCommonData("Currency", "CurrencyModel");                
+                await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });//CC mailId read call
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this.TD_readEmployeeData("")
@@ -89,21 +89,21 @@ sap.ui.define([
                 } else {
                     MessageBox.error(this.i18nModel.getText("commonErrorMessage"));
                 }
-                
+
             },
             TD_readEmployeeData: async function (filter) {
-                await this.ajaxReadWithJQuery("EmployeeDetails", filter,[]).then((oData) => {
-                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                     this.getOwnerComponent().setModel(new JSONModel(offerData), "empModel");
-                         offerData = [...new Map(offerData.filter(item => item.ManagerName && item.ManagerName.trim() !== "")
-                             .map(item => [item.ManagerName.trim(), item])).values()];
-                           this.getView().setModel(new JSONModel(offerData), "empModel")
-                     BusyIndicator.hide();
-                 }).catch((error) => {
-                     sap.ui.core.BusyIndicator.hide();
-                     sap.m.MessageToast.show(error.message || error.responseText);
-                 });
-             },
+                await this.ajaxReadWithJQuery("EmployeeDetails", filter, []).then((oData) => {
+                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    this.getOwnerComponent().setModel(new JSONModel(offerData), "empModel");
+                    offerData = [...new Map(offerData.filter(item => item.ManagerName && item.ManagerName.trim() !== "")
+                        .map(item => [item.ManagerName.trim(), item])).values()];
+                    this.getView().setModel(new JSONModel(offerData), "empModel")
+                    BusyIndicator.hide();
+                }).catch((error) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    sap.m.MessageToast.show(error.message || error.responseText);
+                });
+            },
 
             //navigation to trainee view
             TUF_onPressback: function () {
@@ -114,6 +114,7 @@ sap.ui.define([
                 var oWizard = this.getView().byId("TD_id_Wizard");
                 oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
                 oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
+                this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);  
             },
             //validate name function
             TD_validateName: function (oEvent) {
@@ -182,10 +183,10 @@ sap.ui.define([
 
             //Submit trainee deatails 
             TD_onSubmitData: function (oEvent) {
+                var oModel = this.getView().getModel("oTraineeDetails").getData();
                 var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
                 if (sStipendText === "Yes") utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
-              if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
-                    var oModel = this.getView().getModel("oTraineeDetails").getData();
+                if (this.byId("TD_id_Wizard").getSteps()[0].getValidated()) {
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TD_id_Location").getSelectedKey();
@@ -209,8 +210,9 @@ sap.ui.define([
                                     type: "Accept",
                                     press: function () {
                                         oDialog.close();
-                                        this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);  
+                                        this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);
                                         this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
+                                        this.getView().getModel("oTraineeDetails").refresh(true);
                                     }.bind(this)
                                 }),
                                 endButton: new sap.m.Button({
@@ -218,48 +220,44 @@ sap.ui.define([
                                     type: "Reject",
                                     press: function () {
                                         this.TD_onPressMerge("create");
-
-                                            var  oUpdatePayload = {
-                                            "data": {Status:"PDF Generated"},
+                                        var oUpdatePayload = {
+                                            "data": { Status: "PDF Generated" },
                                             "filters": {
                                                 "ID": oData.ID
                                             }
                                         };
                                         sap.ui.core.BusyIndicator.show();
                                         this.ajaxUpdateWithJQuery("Trainee", oUpdatePayload).then((oData) => {
-                                                sap.ui.core.BusyIndicator.hide();
-                                                if (oData.success) {
-                                                    sap.m.MessageToast.show("PDF generated and status updated!");
-                                                    oDialog.close();
-                                                    this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);  
-                                                    this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
-                                                    // this.getView().getModel("oTraineeDetails").refresh(true);
-                                                }
-                                            })
+                                            sap.ui.core.BusyIndicator.hide();
+                                            if (oData.success) {
+                                                sap.m.MessageToast.show("PDF generated and status updated!");
+                                                oDialog.close();
+                                                this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);
+                                                this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
+                                                this.getView().getModel("oTraineeDetails").refresh(true);
+                                            }
+                                        })
                                             .catch((err) => {
                                                 sap.ui.core.BusyIndicator.hide();
                                                 sap.m.MessageToast.show("Failed to update status: " + (err.message || err.responseText));
                                             });
                                     }.bind(this)
                                 }),
-            
                                 afterClose: function () {
                                     oDialog.destroy();
                                 }
                             });
-            
                             oDialog.open();
                         }
                     }).catch((error) => {
                         sap.ui.core.BusyIndicator.hide();
                         sap.m.MessageToast.show(error.message || error.responseText);
                     });
-                    
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
-            
+
             //second step validation function
             TD_StepTwo: function () {
                 this.getView().byId("TD_id_Submit").setEnabled(true);
@@ -308,7 +306,7 @@ sap.ui.define([
                     }
                 };
                 // AJAX call for updating the data
-                this.ajaxUpdateWithJQuery("Trainee", oModel,["TU_id_SimpleForm"]).then((oData) => {
+                this.ajaxUpdateWithJQuery("Trainee", oModel, ["TU_id_SimpleForm"]).then((oData) => {
                     if (oData.success) {
                         oViewModel.setProperty("/editable", false);
                         oViewModel.setProperty("/isEditMode", true);
@@ -369,6 +367,7 @@ sap.ui.define([
                         this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                     }.bind(this)
                 );
+                this.byId("TD_id_StepTwo    ").getParent().setShowNextButton(true);  
             },
             //  Mail dialog close function    
             Mail_onPressClose: function () {
@@ -410,14 +409,14 @@ sap.ui.define([
                 }).catch((error) => {
                     sap.m.MessageToast.show(error.message || error.responseText);
                 });
-                this.Mail_onPressClose ();         
-             },
+                this.Mail_onPressClose();
+            },
             //PDF generation function
             TD_onPressMerge: function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
                 this.getView().getModel("oTraineeDetails").setProperty("/Status", "PDF Generated");
-                if(value !== "create"){
+                if (value !== "create") {
                     this.updateCallForTrainee(this.viewModel);
                 }
                 this.getView().getModel("oTraineeDetails").refresh(true);

@@ -85,7 +85,7 @@ sap.ui.define([
             },
             // common open the dialog function
             T_commonOpenDialog: function (dialogProperty, fragmentName) {
-                sap.ui.core.BusyIndicator.show(0);
+                BusyIndicator.show(0);
                 if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -94,7 +94,7 @@ sap.ui.define([
                         this[dialogProperty] = oDialog;
                         this.getView().addDependent(this[dialogProperty]);
                         this[dialogProperty].open();
-                        sap.ui.core.BusyIndicator.hide();
+                        BusyIndicator.hide();
                     }.bind(this)).catch(function (oError) {
                         BusyIndicator.hide();
                     });
