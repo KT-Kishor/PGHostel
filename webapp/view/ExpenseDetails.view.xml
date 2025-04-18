@@ -28,7 +28,7 @@
 											<f:toolbar>
 											<m:Toolbar>												
 												<m:ToolbarSpacer />
-												<m:Button  text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" 
+												<m:Button type="Neutral" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" 
                     press="Exp_Det_onEditOrSavePress" visible="{viewModel>/status}"  />
 											</m:Toolbar>
 										</f:toolbar>
@@ -171,7 +171,7 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </m:contentLeft>
 				<m:contentRight>					
-					<m:Button text="{i18n>submit}" type="Emphasized" press="Exp_Det_onPressSubmitExpenseItems" visible="{viewModel>/status}" id="idExpenseSubmit" enabled="{viewModel>/enable}" />
+					<m:Button text="{i18n>submit}" type="Accept" press="Exp_Det_onPressSubmitExpenseItems" visible="{viewModel>/status}" id="idExpenseSubmit" enabled="{viewModel>/enable}" />
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

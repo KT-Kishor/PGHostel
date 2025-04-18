@@ -103,7 +103,7 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-EmployeeRemark"), "ID");
 
                 if (!isValid) {
-                    return MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    return MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
 
                 BusyIndicator.show();
@@ -122,6 +122,7 @@ sap.ui.define([
                         ExpenseID: oResponse.ExpenseID
                     });
                     await this._fetchCommonData("Expense", "ExpenseModel");
+                    this.getView().getModel("FilterExpenseModel").getData() = this.getView().getModel("ExpenseModel").getData();
                     this.Expense.close();
                 } else {
                     MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
