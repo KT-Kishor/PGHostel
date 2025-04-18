@@ -271,24 +271,20 @@
                                         showColon="true"
                                         text="{i18n>date} "
                                     />
-                                    <m:DatePicker
+                                    <m:Input
                                         id="QF_id_CreateDate"
                                         editable="false"
                                         value="{ path: 'Quotation>/QuotationFormData/QuotationDate', formatter: '.formatter.formatDate' }"
-                                        displayFormat="dd/MM/yyyy"
-                                        valueFormat="yyyy-MM-dd"
                                     />
 
                                     <m:Label
                                         showColon="true"
                                         text="{i18n>validUpto} "
                                     />
-                                    <m:DatePicker
+                                    <m:Input
                                         id="QF_id_ValidUpto"
                                         editable="false"
                                         value="{ path: 'Quotation>/QuotationFormData/ValidUpto', formatter: '.formatter.formatDate' }"
-                                        displayFormat="dd/MM/yyyy"
-                                        valueFormat="yyyy-MM-dd"
                                     />
 
                                     <m:Label

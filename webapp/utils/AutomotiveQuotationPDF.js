@@ -6,7 +6,6 @@ sap.ui.define([ "../model/formatter",], function (formatter) {
             sap.ui.core.BusyIndicator.show(0);
             const companyName = "Kalpavriksha Automotive LLP";
             const address = oModel.getProperty("/CompanyCodeData/0/longAddress");
-            const pin = oModel.getProperty("/CompanyCodeData/0/pinCode");
             const mobile = oModel.getProperty("/CompanyCodeData/0/mobileNo");
             const email = oModel.getProperty("/CompanyCodeData/0/carrerEmail");
             const website = oModel.getProperty("/CompanyCodeData/0/website");
@@ -36,7 +35,6 @@ sap.ui.define([ "../model/formatter",], function (formatter) {
             const addOnInsurance = formatter.fromatNumber(oModel.getProperty("/QuotationFormData/AddOnInsurance"));
             const regnHyp = formatter.fromatNumber(oModel.getProperty("/QuotationFormData/RegHypCharge"));
             const shieldOfTrust = formatter.fromatNumber(oModel.getProperty("/QuotationFormData/ShieldOfTrust4YR45K"));
-            const extWarranty = formatter.fromatNumber(oModel.getProperty("/QuotationFormData/EXTDWarrantyFOR4YR80K"));
             const stdFitment = formatter.fromatNumber(oModel.getProperty("/QuotationFormData/STDFittings"));
             const fastTag = formatter.fromatNumber(oModel.getProperty("/QuotationFormData/FastTag"));
             const rsa = formatter.fromatNumber(oModel.getProperty("/QuotationFormData/RSA"));
@@ -46,10 +44,10 @@ sap.ui.define([ "../model/formatter",], function (formatter) {
             const exShowroomAfterScheme = formatter.fromatNumber(oModel.getProperty("/QuotationFormData/EXShowroomAfterScheme"));
             const onRoad = formatter.fromatNumber(oModel.getProperty("/QuotationFormData/TotalOnRoad"));
             const city = oModel.getProperty("/CompanyCodeData/0/city");
-            const bankName = oModel.getProperty("/CompanyCodeData/0/BankName");
-            const bankAddress = oModel.getProperty("/CompanyCodeData/0/BankAddress");
-            const accountNo = oModel.getProperty("/CompanyCodeData/0/AccountNo");
-            const ifsc = oModel.getProperty("/CompanyCodeData/0/IFSCCode");
+            const bankName = oModel.getProperty("/CompanyCodeData/0/BankName") || "Children's Bank of India";
+            const bankAddress = oModel.getProperty("/CompanyCodeData/0/BankAddress") || "India, Asia, Earth";
+            const accountNo = oModel.getProperty("/CompanyCodeData/0/AccountNo") || "1234567890";
+            const ifsc = oModel.getProperty("/CompanyCodeData/0/IFSCCode") || "CBIN0001234";
             const validUpto = formatter.formatDate(oModel.getProperty("/QuotationFormData/ValidUpto"))
             const logo = oModel.getProperty("/Logo");
             const qrCode = oModel.getProperty("/QRCode");
@@ -63,7 +61,7 @@ sap.ui.define([ "../model/formatter",], function (formatter) {
                 doc.rect(5, 5, 200, 287);
 
                 //(X, Y, Width, Height)
-                doc.addImage(logo, "PNG", 9, 10, 28, 28);
+                doc.addImage(logo, "PNG", 10.5, 9, 28, 28);
 
                 doc.setLineWidth(0.7);
                 doc.line(44, 8, 44, 38);
@@ -72,14 +70,14 @@ sap.ui.define([ "../model/formatter",], function (formatter) {
                 doc.text(companyName, 48, 14);
 
                 doc.setFontSize(9.4);
-                const wrappedText2 = doc.splitTextToSize(`${address}, ${pin}`, 100);
+                const wrappedText2 = doc.splitTextToSize(`${address}`, 100);
                 const startX2 = 48, startY2 = 23;
                 const lineHeight2 = 4.8;
                 wrappedText2.forEach((line, index) => {
                     doc.text(line, startX2, startY2 + index * lineHeight2);
                 });
-                doc.text(`Cell : ${mobile}`, 48, 32.5);
-                doc.text(`Email : ${email}`, 48, 37);
+                doc.text(`Cell : ${mobile}  |  Email : ${email}`, 48, 32.5);
+                doc.text(`Website : ${website}`, 48, 37);
 
                 doc.setFontSize(11);
                 doc.text(`GSTIN : ${gstin}`, 150, 10);
@@ -90,7 +88,7 @@ sap.ui.define([ "../model/formatter",], function (formatter) {
                 doc.line(5, 40, 205, 40);
 
                 doc.setFontSize(13);
-                doc.text("QUOTATION", 80, 45);
+                doc.text("QUOTATION", 90, 45);
 
                 doc.setFontSize(10);
 
@@ -143,7 +141,7 @@ sap.ui.define([ "../model/formatter",], function (formatter) {
                 doc.text(`Variants : ${variant}`, 17, 99.5);
                 doc.text(`Make : ${make}`, 132, 107.5);
                 doc.text(`Transmission : ${transmission}`, 132, 91.5);
-                doc.text(`Fuel : ${fuel}`, 132, 99.5);
+                doc.text(`Fuel : ${fuel}, ${emission}`, 132, 99.5);
 
                 doc.rect(15, 111, 180, 100);
                 for (let i = 0; i < 13; i++) {
@@ -244,9 +242,9 @@ sap.ui.define([ "../model/formatter",], function (formatter) {
                 doc.line(160, 219, 160, 256);
 
                 doc.setFontSize(10);
-                const wrappedaddress2 = doc.splitTextToSize(`For ${companyName}`, 20);
+                const wrappedaddress2 = doc.splitTextToSize(`For ${companyName}`, 30);
                 const addX2 = 162, addY2 = 224;
-                const lineHeightadd2 = 3;
+                const lineHeightadd2 = 4;
                 wrappedaddress2.forEach((line, index) => {
                     doc.text(line, addX2, addY2 + index * lineHeightadd2);
                 });
@@ -351,7 +349,7 @@ sap.ui.define([ "../model/formatter",], function (formatter) {
 
                 doc.text("9.", 26, 165);
                 doc.text(
-                    "All disputes are subject to ${city} jurisdiction only.",
+                    `All disputes are subject to ${city} jurisdiction only.`,
                     32,
                     165
                 );

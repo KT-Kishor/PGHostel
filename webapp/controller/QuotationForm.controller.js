@@ -33,11 +33,16 @@ sap.ui.define([
             oView.byId("QF_id_PDFBtn").setEnabled(true);
             BusyIndicator.hide();
             this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: this.oModel.getProperty("/QuotationFormData/BranchCode") }, ["QF_id_HeaderContent"]);
-            this.QF_onCallVariant();
+            this.QF_onCallVariant("BOLERO");
+            this._clearErrorStates();
         },
 
         QF_onNavBack: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteQuotation");
+            if(this.oModel.getProperty("/MasterEdit")){
+                this.showConfirmationDialog(this.i18nModel.getText("ConfirmActionTitle"), this.i18nModel.getText("backConfirmation"), function () { this.getRouter().navTo("RouteQuotation"); }.bind(this))
+            } else {
+                this.getRouter().navTo("RouteQuotation");
+            }
         },
 
         QF_onBranchCodeChange: function () {
@@ -80,7 +85,7 @@ sap.ui.define([
         },
 
         QF_onModelChange: async function () {
-            this.QF_onCallVariant();
+            this.QF_onCallVariant(this.getView().byId("QF_id_VehModel").getSelectedKey());
             const properties = [
                 "Variant", "Transmission", "Color", "Fuel", "BoardPlate", "Make", "Emission",
                 "EXShowroom", "TCS1Perc", "ROADTAX", "AddOnInsurance", "TempCharges",
@@ -93,8 +98,7 @@ sap.ui.define([
             });
         },
 
-        QF_onCallVariant: async function () {
-            var selectedKey = this.getView().byId("QF_id_VehModel").getSelectedKey();
+        QF_onCallVariant: async function (selectedKey) {
             var response = await this.ajaxCreateWithJQuery("UniqueScheme", { filters: { Model: selectedKey } }, ["QF_id_VehVariant"]);
             if (response.success) {
                 this.oModel.setProperty("/VariantList", response.results);
@@ -234,7 +238,7 @@ sap.ui.define([
 
         _submitSuccess: function () {
             BusyIndicator.show(0);
-            var pdfText = this.i18nModel.getText("btnGeneratePDF");
+            var pdfText = this.i18nModel.getText("generate");
             var that = this;
             if (!this.QF_oSuccessDialog) {
                 this.QF_oSuccessDialog = new sap.m.Dialog({
@@ -260,7 +264,7 @@ sap.ui.define([
                             press: function () {
                                 that.QF_oSuccessDialog.close();
                                 that.QF_onDownloadPDF();
-                                that.QF_onNavBack();
+                                that.getRouter().navTo("RouteQuotation");
                             },
                         }),
                     ],
@@ -321,7 +325,7 @@ sap.ui.define([
             } else {
                 this.getView().byId("QF_id_PDFBtn").setEnabled(false);
                 this.oModel.setProperty("/VisibleStatus", true);
-                this.QF_onCallVariant();
+                this.QF_onCallVariant(this.getView().byId("QF_id_VehModel").getSelectedKey());
             }
         },
 
@@ -338,6 +342,20 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oView.byId("QF_id_CustAddress"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("QF_id_VehVariant"), "ID")) { return true }
             else { return false }
+        },
+
+        _clearErrorStates: function () {
+            var oView = this.getView();
+            oView.byId("QF_id_CustomerName").setValueState("None");
+            oView.byId("QF_id_CustMobile").setValueState("None");
+            oView.byId("QF_id_EmpMobile").setValueState("None");
+            oView.byId("QF_id_CustEmail").setValueState("None");
+            oView.byId("QF_id_CustAadhar").setValueState("None");
+            oView.byId("QF_id_CustPanNumber").setValueState("None");
+            oView.byId("QF_id_CustPinCode").setValueState("None");
+            oView.byId("QF_id_CustGSTNo").setValueState("None");
+            oView.byId("QF_id_CustAddress").setValueState("None");
+            oView.byId("QF_id_VehVariant").setValueState("None");
         },
 
         QF_onDownloadPDF: function () {
