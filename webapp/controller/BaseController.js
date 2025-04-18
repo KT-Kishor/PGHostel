@@ -184,7 +184,9 @@ sap.ui.define([
       });
     },
     //Common update call for all the app
-    async ajaxUpdateWithJQuery(sUrl, oPayLoad) {
+    async ajaxUpdateWithJQuery(sUrl, oPayLoad, busyIds = []) {
+      var that = this;
+      busyIds.forEach(id => this.setBusyOnId(id, true));
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
@@ -192,9 +194,11 @@ sap.ui.define([
           data: JSON.stringify(oPayLoad),
           headers: this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
+            busyIds.forEach(id => that.setBusyOnId(id, false));
             resolve(data);
           },
           error: function (error) {
+            busyIds.forEach(id => that.setBusyOnId(id, false));
             reject(error);
           }
         });
@@ -202,6 +206,7 @@ sap.ui.define([
     },
     //Common delete call for all the app
     async ajaxDeleteWithJQuery(sUrl, oPayLoad) {
+      sap.ui.core.BusyIndicator.show();
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,

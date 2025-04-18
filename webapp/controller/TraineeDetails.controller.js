@@ -306,7 +306,7 @@ sap.ui.define([
                     }
                 };
                 // AJAX call for updating the data
-                this.ajaxUpdateWithJQuery("Trainee", oModel).then((oData) => {
+                this.ajaxUpdateWithJQuery("Trainee", oModel,["TU_id_SimpleForm"]).then((oData) => {
                     if (oData.success) {
                         oViewModel.setProperty("/editable", false);
                         oViewModel.setProperty("/isEditMode", true);
@@ -401,13 +401,11 @@ sap.ui.define([
                     "CC": this.getView().getModel("CCMailModel").getData()[0].emails,
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                 };
-                this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload).then((oData) => {
+                this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload, ["Mail_id_Form", "TU_id_SimpleForm"]).then((oData) => {
                     this.getView().getModel("oTraineeDetails").setProperty("/Status", "Offer Sent");
                     this.updateCallForTrainee(this.viewModel);
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
-                    BusyIndicator.hide();
                 }).catch((error) => {
-                    sap.ui.core.BusyIndicator.hide();
                     sap.m.MessageToast.show(error.message || error.responseText);
                 });
                 this.TU_oDialogMail.close();

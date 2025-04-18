@@ -14,6 +14,7 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
+                BusyIndicator.show(0)
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 await this._fetchCommonData("Designation", "DesignationModel");
@@ -32,6 +33,7 @@ sap.ui.define([
                 else {
                     this.T_onSearch();// filter function for trainee 
                 }
+                BusyIndicator.hide()
             },
             //read call for trainee
             readCallForTrainee: async function (filter) {
@@ -82,20 +84,26 @@ sap.ui.define([
                 this.getRouter().navTo("RouteTraineeDetails", { sParTrainee: oParValue });
             },
             // common open the dialog function
-            T_commonOpenDialog: function (dialogProperty, fragmentName,) {
+            T_commonOpenDialog: function (dialogProperty, fragmentName) {
+                sap.ui.core.BusyIndicator.show(0);
                 if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
-                        controller: this,
+                        controller: this
                     }).then(function (oDialog) {
                         this[dialogProperty] = oDialog;
                         this.getView().addDependent(this[dialogProperty]);
                         this[dialogProperty].open();
-                    }.bind(this));
+                        sap.ui.core.BusyIndicator.hide();
+                    }.bind(this)).catch(function (oError) {
+                        BusyIndicator.hide();
+                    });
                 } else {
                     this[dialogProperty].open();
+                    BusyIndicator.hide();
                 }
             },
+
             //Trainee table selection change function for button visibility
             T_onTableSelectionChange: function (oEvent) {
                 var oSelectedItem = oEvent.getParameter("listItem");
@@ -374,6 +382,7 @@ sap.ui.define([
             },
             //Traniee certificate mail function
             T_onCerMail: function () {
+                BusyIndicator.show(0)
                 var oTraineeEmail = this.getView().getModel("traineeModel").getData()[0].TraineeEmail;
                 if (!oTraineeEmail || oTraineeEmail.length === 0) {
                     MessageBox.error("To Email is missing");
@@ -428,7 +437,7 @@ sap.ui.define([
                     "CC": this.getView().getModel("CCMailModel").getData()[0].emails,
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                 };
-                this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload,["T_id_TraineeTable"]).then((oData) => {
+                this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload, ["T_id_TraineeTable"]).then((oData) => {
                     MessageToast.show(this.i18nModel.getText("certificateSuccess"));
                     this.byId("T_id_TraineeTable").removeSelections(true);
                     BusyIndicator.hide();

@@ -22,6 +22,7 @@
 						<ObjectPageSubSection  title="{i18n>traineeDetails}" >
 							<blocks>
 								<f:SimpleForm 
+								id="TU_id_SimpleForm"
                             layout="ResponsiveGridLayout"
                             labelSpanXL="3"
                             labelSpanL="3"
@@ -36,6 +37,7 @@
                             columnsL="1"
                             columnsM="1"
                             editable="true"
+							busyIndicatorDelay="0"
                             singleContainerFullSize="false">
 									<f:content>
 										<m:Label text="{i18n>traineeName}" required="true" />
