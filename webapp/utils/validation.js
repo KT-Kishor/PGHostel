@@ -41,7 +41,7 @@ sap.ui.define([], function () {
         return true;
       }
     },
-    
+
 
     // Name validation function
     _LCvalidateName: function (oEvent, type) {
@@ -77,7 +77,7 @@ sap.ui.define([], function () {
         oInput.setValueState("Error");
         return false;
       } else {
-        oInput.setValueState("None"); 
+        oInput.setValueState("None");
         return true;
       }
     },
@@ -89,7 +89,7 @@ sap.ui.define([], function () {
       // Limit to 2 decimal places
       if (parts.length === 2) {
         cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
-      }  
+      }
       oInput.setValue(cleanedValue);
       // Allow 0 or positive decimal numbers
       if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
@@ -100,7 +100,7 @@ sap.ui.define([], function () {
         return true;
       }
     },
-    
+
     // PAN card validation function
     _LCvalidatePanCard: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
@@ -331,81 +331,109 @@ sap.ui.define([], function () {
     _LCvalidateGrade: function (oEventOrField, type, sGradeTypeId) {
       var oField = (type === "ID") ? oEventOrField : oEventOrField.getSource();
       if (!oField) return false;
-  
+
       var sGradeValue = oField.getValue().trim();
       var cleanValue = sGradeValue.replace(/[^0-9.]/g, '');
       oField.setValue(cleanValue);
-  
+
       if (!cleanValue) {
-          oField.setValueState("Error");
-          return false;
+        oField.setValueState("Error");
+        return false;
       }
-  
+
       var regex = /^\d{1,5}(\.\d{1,2})?$/;
       if (!regex.test(cleanValue) || isNaN(cleanValue)) {
-          oField.setValueState("Error");
-          oField.setValueStateText("Enter a valid number with up to 2 decimal places.");
-          return false;
+        oField.setValueState("Error");
+        oField.setValueStateText("Enter a valid number with up to 2 decimal places.");
+        return false;
       }
-  
+
       var fGrade = parseFloat(cleanValue);
       var sGradeType = sap.ui.getCore().byId(sGradeTypeId)?.getSelectedKey() || "";
       var bIsValid = false;
-  
+
       if (sGradeType === "Percentage") {
-          bIsValid = fGrade >= 0 && fGrade <= 100;
+        bIsValid = fGrade >= 0 && fGrade <= 100;
       } else if (sGradeType === "CGPA") {
-          bIsValid = fGrade >= 0 && fGrade <= 10;
+        bIsValid = fGrade >= 0 && fGrade <= 10;
       }
-  
+
       if (bIsValid) {
-          oField.setValueState("None");
-          return true;
+        oField.setValueState("None");
+        return true;
       } else {
-          oField.setValueState("Error");
-          var sErrorMsg = (sGradeType === "Percentage")
-              ? "Grade must be between 0 and 100 for Percentage."
-              : "Grade must be between 0 and 10 for CGPA.";
-          oField.setValueStateText(sErrorMsg);
-          return false;
+        oField.setValueState("Error");
+        var sErrorMsg = (sGradeType === "Percentage")
+          ? "Grade must be between 0 and 100 for Percentage."
+          : "Grade must be between 0 and 10 for CGPA.";
+        oField.setValueStateText(sErrorMsg);
+        return false;
       }
-  },
-  
-  _LCvalidateTimeLimit: function (oEvent, type) {
-    var oField = type === "ID" ? oEvent : oEvent.getSource();
-    if (!oField) return false; 
-    var value = parseFloat(oField.getValue());  
-    if (isNaN(value) || value < 0 || value > 8) {
-      oField.setValueState("Error");
-      return false;
-    } else {
-      oField.setValueState("None");
-      return true;
-    }
-  },
-  _LCvalidateTraineeAmount: function (oEvent, type) {
-    var oInput = type === "ID" ? oEvent : oEvent.getSource();
-    var value = oInput.getValue().trim();
-    var cleanedValue = value.replace(/[^0-9.]/g, "");
+    },
+
+    _LCvalidateTimeLimit: function (oEvent, type) {
+      var oField = type === "ID" ? oEvent : oEvent.getSource();
+      if (!oField) return false;
+      var value = parseFloat(oField.getValue());
+      if (isNaN(value) || value < 0 || value > 8) {
+        oField.setValueState("Error");
+        return false;
+      } else {
+        oField.setValueState("None");
+        return true;
+      }
+    },
+    _LCvalidateTraineeAmount: function (oEvent, type) {
+      var oInput = type === "ID" ? oEvent : oEvent.getSource();
+      var value = oInput.getValue().trim();
+      var cleanedValue = value.replace(/[^0-9.]/g, "");
       var parts = cleanedValue.split(".");
-    if (parts.length === 2) {
-      cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
-    }
-    oInput.setValue(cleanedValue);
+      if (parts.length === 2) {
+        cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
+      }
+      oInput.setValue(cleanedValue);
       if (cleanedValue === "" || isNaN(cleanedValue) || parseFloat(cleanedValue) < 0) {
-      oInput.setValueState("Error");
-      return false;
-    }
+        oInput.setValueState("Error");
+        return false;
+      }
       if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
-      oInput.setValueState("Error");
-      return false;
-    } else {
-      oInput.setValueState("None");
+        oInput.setValueState("Error");
+        return false;
+      } else {
+        oInput.setValueState("None");
+        return true;
+      }
+    },
+
+    _LCstrictValidationComboBox: function (oEvent) {
+      var oComboBox = oEvent.getSource();
+      var sInputValue = oEvent.getParameter("value")?.trim();
+      // If nothing is entered, it's an error
+      if (!sInputValue) {
+        oComboBox.setValueState("Error");
+        oComboBox.setValueStateText("Please select a valid option");
+        return false;
+      }
+      // Get all items from the ComboBox
+      var aItems = oComboBox.getItems();
+      var bMatchFound = false;
+      for (var i = 0; i < aItems.length; i++) {
+        var sText = aItems[i].getText();
+        var sKey = aItems[i].getKey();
+        if (sInputValue === sText || sInputValue === sKey) {
+          bMatchFound = true;
+          break;
+        }
+      }
+      // Set error if no match is found
+      if (!bMatchFound) {
+        oComboBox.setValueState("Error");
+        oComboBox.setValueStateText("Please select a valid option from the list");
+        return false;
+      }
+      // Clear error if match found
+      oComboBox.setValueState("None");
       return true;
-    }
-  }
-  
-  
+    }    
   };
-  
 });
