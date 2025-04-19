@@ -1,8 +1,14 @@
 sap.ui.define([
-    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast", "../model/formatter"
+    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast", "sap/m/MessageBox", "sap/ui/core/BusyIndicator", "../model/formatter"
 
 ],
-    function (BaseController, utils, JSONModel, MessageToast, Formatter) {
+    function (BaseController,
+        utils,
+        JSONModel,
+        MessageToast,
+        MessageBox,
+        BusyIndicator,
+        Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.SelfService", {
             Formatter: Formatter,
@@ -10,6 +16,7 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteSelfService").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function () {
+                BusyIndicator.show(0)
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
                 this.byId("SS_id_IconTab").setSelectedKey("employeeDetailsKey");
@@ -20,7 +27,8 @@ sap.ui.define([
                 await this._fetchCommonData("Designation", "sDesignationModel");
                 await this._fetchCommonData("BaseLocation", "sBaseLocationModel");
                 await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
-                var viewModel = new JSONModel({ fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false,
+                var viewModel = new JSONModel({
+                    fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false,
                     isRoleMode: false, Max: new Date(), isVisitMode: true, isIdMode: true,
                 });
                 this.getView().setModel(viewModel, "viewModel");
@@ -29,7 +37,10 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "My Details");
                 this.setEduButtonsEnabled(false);
                 this.setEmpButtonsEnabled(false);
+                this.SS_CommonID();
+                BusyIndicator.hide()
             },
+
             SS_commonEduFunction() {
                 var eduModel = new JSONModel({
                     EmployeeID: this.EmployeeID,
@@ -70,8 +81,15 @@ sap.ui.define([
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
+            SS_CommonID: function () {
+                const ids = ["SS_id_BloodGroup", "SS_id_Compmail", "SS_id_PAddress", "SS_id_CAdress", "SS_id_BaseL", "SS_id_Desi", "SS_id_Manager", "SS_id_MobileNo", "SS_id_RoleEmpSele", "SS_id_StatusSelf",
+                    "SS_id_AcName", "SS_id_Acno", "SS_id_BankName", "SS_id_Branch", "SS_id_IfcsCode", "SS_id_Address", "SS_id_Pan", "SS_idAdhar", "SS_id_Passport", "SS_id_Voterid", "SS_id_EmeNameF", "SS_id_EmpMoF",
+                    "SS_id_AddF", "SS_id_NameS", "SS_id_EmpMoS", "SS_id_EmpAddS"]
+                ids.forEach((id) => { this.byId(id).setValueState("None"); });
+            },
             //Common dialog open function
             SS_commonOpenDialog: function (dialogProperty, fragmentName, datePickerIds = []) {
+                BusyIndicator.show(0)
                 if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -81,10 +99,12 @@ sap.ui.define([
                         this.getView().addDependent(oDialog);
                         this._FragmentDatePickersReadOnly(datePickerIds);
                         oDialog.open();
+                        BusyIndicator.hide()
                     });
                 } else {
                     this._FragmentDatePickersReadOnly(datePickerIds);
                     this[dialogProperty].open();
+                    BusyIndicator.hide()
                 }
             },
 
@@ -147,7 +167,7 @@ sap.ui.define([
                 this.setEmpButtonsEnabled(false);
                 const ids = ["AddEmp_id_Company", "AddEmp_id_Desig", "AddEmp_id_OfcAddress", "AddEmp_id_StartDate", "AddEmp_id_EndDate", "AdEmp_id_RCNameI", "AdEmp_id_RCAddressI", "AdEmp_id_RCMailI", "AdEmp_id_RCMobileI", "AdEmp_id_RCSalII", "AdEmp_id_RCNameII", "AdEmp_id_RCAddressII", "AdEmp_id_RCMailII", "AdEmp_id_RCMobileII"];
                 ids.forEach((id) => { sap.ui.getCore().byId(id).setValueState("None"); });
-                this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID });
+                this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID }, ["EmpF_id_EmpTable"]);
             },
             //validation function calling from base controller
             SS_validateMobileNo: function (oEvent) {
@@ -210,41 +230,74 @@ sap.ui.define([
             //Basic detail update call
             SS_onSavePress: function () {
                 try {
-                    if (utils._LCvalidateDate(this.byId("SS_id_Dob"), "ID") && utils._LCvalidateMandatoryField(this.byId("SS_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(this.byId("SS_id_CAdress"), "ID") && utils._LCvalidateMobileNumber(this.byId("SS_id_MobileNo"), "ID") && utils._LCvalidateName(this.byId("SS_id_AcName"), "ID") && utils._LCvalidateAccountNo(this.byId("SS_id_Acno"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("SS_id_BankName"), "ID") && utils._LCvalidateMandatoryField(this.byId("SS_id_Branch"), "ID") && utils._LCvalidateIfcCode(this.byId("SS_id_IfcsCode"), "ID") && utils._LCvalidateMandatoryField(this.byId("SS_id_Address"), "ID") && utils._LCvalidatePanCard(this.byId("SS_id_Pan"), "ID") && utils._LCvalidateAadharCard(this.byId("SS_idAdhar"), "ID") && utils._LCvalidatePassport(this.byId("SS_id_Passport"), "ID") &&
-                        utils._LCvalidateVoterId(this.byId("SS_id_Voterid"), "ID") && utils._LCvalidateName(this.byId("SS_id_EmeNameF"), "ID") && utils._LCvalidateMobileNumber(this.byId("SS_id_EmpMoF"), "ID") && utils._LCvalidateMandatoryField(this.byId("SS_id_AddF"), "ID") && utils._LCvalidateName(this.byId("SS_id_NameS"), "ID") && utils._LCvalidateMobileNumber(this.byId("SS_id_EmpMoS"), "ID") && utils._LCvalidateMandatoryField(this.byId("SS_id_EmpAddS"), "ID")) {
-                        sap.ui.core.BusyIndicator.show(0);
-                        var oDataModel = this.getView().getModel("sEmployeeModel").getData()[0];
-                        oDataModel.EmergencyContactPerson1Salutation = this.getView().byId("SS_idEmeSalF").getSelectedKey();
-                        oDataModel.EmergencyContactPerson2Salutation = this.getView().byId("SS_idEmeSalS").getSelectedKey();
-                        oDataModel.EmergencyContactPerson1Realtion = this.getView().byId("SS_idRelF").getSelectedKey();
-                        oDataModel.EmergencyContactPerson2Realtion = this.getView().byId("SS_idRelS").getSelectedKey();
-                        var oPayload = {
-                            data: oDataModel,
-                            filters: {
-                                EmployeeID: this.EmployeeID
-                            }
-                        };
-                        this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload).then((oData) => {
-                            sap.ui.core.BusyIndicator.hide();
-                            if (oData.success) {
-                                MessageToast.show(this.i18nModel.getText("dataSaved"));
-                                this.getView().getModel("viewModel").setProperty("/isEditMode", false);
-                            } else {
+                    const oView = this.getView();
+                    // Validate required fields
+                    if (
+                        utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
+                        utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
+                        utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
+                        utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
+                        utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
+                        utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID") &&
+                        utils._LCvalidateMandatoryField(oView.byId("SS_id_BankName"), "ID") &&
+                        utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") &&
+                        utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") &&
+                        utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") &&
+                        utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID") &&
+                        utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
+                        utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
+                        utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
+                        utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
+                        utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
+                        utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID")
+                    ) {
+                        // Optional fields validation (only if value exists)
+                        const aadhar = oView.byId("SS_idAdhar").getValue().trim();
+                        const passport = oView.byId("SS_id_Passport").getValue().trim();
+                        const voterId = oView.byId("SS_id_Voterid").getValue().trim();
+                        if (
+                            (aadhar === "" || utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID")) &&
+                            (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
+                            (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID"))
+                        ) {
+                            BusyIndicator.show(0);
+                            var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
+                            oDataModel.DateOfBirth=oView.byId("SS_id_Dob").getValue()
+                            oDataModel.DateOfBirth = oDataModel.DateOfBirth.split("/").reverse().join('-');
+                            oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
+                            oDataModel.EmergencyContactPerson2Salutation = oView.byId("SS_idEmeSalS").getSelectedKey();
+                            oDataModel.EmergencyContactPerson1Realtion = oView.byId("SS_idRelF").getSelectedKey();
+                            oDataModel.EmergencyContactPerson2Realtion = oView.byId("SS_idRelS").getSelectedKey();
+                            var oPayload = {
+                                data: oDataModel,
+                                filters: {
+                                    EmployeeID: this.EmployeeID
+                                }
+                            };
+                            this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload, ["SS_id_BSimpleForm"]).then((oData) => {
+                                BusyIndicator.hide();
+                                if (oData.success) {
+                                    MessageToast.show(this.i18nModel.getText("dataSaved"));
+                                    oView.getModel("viewModel").setProperty("/isEditMode", false);
+                                } else {
+                                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                                }
+                            }).catch((oError) => {
+                                BusyIndicator.hide();
                                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                            }
-                        }).catch((oError) => {
-                            sap.ui.core.BusyIndicator.hide();
-                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                        });
+                            });
+                        } else {
+                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        }
                     } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
-                } catch (err) {
-                    sap.ui.core.BusyIndicator.hide();
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                } catch (error) {
+                    BusyIndicator.hide();
+                    MessageToast.show(error.message || error.responseText);
                 }
             },
+
             EDF_onSelectionChange: function (oEvent) {
                 const aSelectedIndices = oEvent.getSource().getSelectedItems();
                 if (aSelectedIndices.length > 0) {
@@ -308,7 +361,7 @@ sap.ui.define([
                     }
                     fnCall.then((oData) => {
                         if (oData.success) {
-                            sap.ui.core.BusyIndicator.hide();
+                            BusyIndicator.hide();
                             MessageToast.show(sSuccessMessage);
                             this.SEd_oDialog.close();
                             this.setEduButtonsEnabled(false);
@@ -321,11 +374,11 @@ sap.ui.define([
                             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         }
                     }).catch((error) => {
-                        sap.ui.core.BusyIndicator.hide();
+                        BusyIndicator.hide();
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     });
                 } catch (error) {
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
@@ -402,7 +455,7 @@ sap.ui.define([
                     }
                     fnCall.then((oData) => {
                         if (oData.success) {
-                            sap.ui.core.BusyIndicator.hide();
+                            BusyIndicator.hide();
                             MessageToast.show(sSuccessMessage);
                             this.SEmp_oDialog.close();
                             this.byId("EmpF_id_EmpTable").removeSelections(true);
@@ -413,11 +466,11 @@ sap.ui.define([
                             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         }
                     }).catch((error) => {
-                        sap.ui.core.BusyIndicator.hide();
+                        BusyIndicator.hide();
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     });
                 } catch (error) {
-                    sap.ui.core.BusyIndicator.hide();
+                    BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
@@ -665,21 +718,45 @@ sap.ui.define([
                 );
             },
             //On icon tab select function
-            SS_onTabSelect: async function (oEvent) {
-                if (oEvent.getParameter("key") === "educationDetailKey") {
-                    this._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: this.EmployeeID });
-                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
-                } else if (oEvent.getParameter("key") === "employmentKey") {
-                    this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID });
-                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
-                } else if (oEvent.getParameter("key") === "salaryKey") {
-                    this._fetchCommonData("SalaryDetails", "sSalaryModel", { EmployeeID: this.EmployeeID });
-                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
-                } else if (oEvent.getParameter("key") === "paySlipKey") {
-                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", false);
+            SS_onTabSelect: function (oEvent) {
+                var oView = this.getView();
+                var oViewModel = oView.getModel("viewModel");
+                var isEditMode = oViewModel.getProperty("/isEditMode");
+                var sKey = oEvent.getParameter("key");
+                if (isEditMode) {
+                    MessageBox.warning(this.i18nModel.getText("tabConfirmation"), {
+                        actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+                        onClose: async (oAction) => {
+                            if (oAction === MessageBox.Action.OK) {
+                                oViewModel.setProperty("/isEditMode", false);
+                                await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
+                                this.SS_CommonID();
+                                await this._handleTabSwitch(sKey);
+                            }
+                        }
+                    });
+                } else {
+                    this._handleTabSwitch(sKey);
                 }
-                else {
-                    this.getView().getModel("viewModel").setProperty("/isEditButtonVisible", true);
+            },
+
+            _handleTabSwitch: async function (sKey) {
+                this.getView().setBusy(true);
+                try {
+                    if (sKey === "educationDetailKey") {
+                        await this._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: this.EmployeeID });
+                    } else if (sKey === "employmentKey") {
+                        await this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID });
+                    } else if (sKey === "salaryKey") {
+                        await this._fetchCommonData("SalaryDetails", "sSalaryModel", { EmployeeID: this.EmployeeID });
+                    } else if (sKey === "paySlipKey") {
+                        // Handle pay slip tab if needed
+                    }
+                } catch (oError) {
+                    sap.ui.core.BusyIndicator.hide();
+                    sap.m.MessageToast.show(oError.message || oError.responseText);
+                } finally {
+                    this.getView().setBusy(false);
                 }
             },
 

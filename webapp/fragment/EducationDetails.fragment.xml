@@ -1,7 +1,7 @@
 <c:FragmentDefinition
 	xmlns="sap.m"
 	xmlns:c="sap.ui.core">
-	<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"  items="{path:'sEducationModel>/'}" id="EdF_id_EduTable"  growing="true"  growingThreshold="50"  alternateRowColors="true" mode="SingleSelectLeft" selectionChange="EDF_onSelectionChange">
+	<Table class="sapUiTinyMargin" growingScrollToLoad="true" busyIndicatorDelay="0" width="auto"  items="{path:'sEducationModel>/'}" id="EdF_id_EduTable"  growing="true"  growingThreshold="50"  alternateRowColors="true" mode="SingleSelectLeft" selectionChange="EDF_onSelectionChange">
 		<headerToolbar>
 			<OverflowToolbar >
 				<Title text="{i18n>educationalDetails} ({= ${sEducationModel>/}.length})"/>

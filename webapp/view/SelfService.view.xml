@@ -14,7 +14,7 @@
 			select="SS_onTabSelect"
 			expanded="{device>/isNoPhone}"
 			selectedKey="employeeDetailsKey"
-			class="sapUiResponsiveContentPadding" >
+			class="sapUiResponsiveContentPadding"  busyIndicatorDelay="0">
 				<items>
 					<IconTabFilter
 					design="Horizontal"
