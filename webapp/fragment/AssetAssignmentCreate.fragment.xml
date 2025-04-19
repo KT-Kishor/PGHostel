@@ -45,7 +45,8 @@
 				<ComboBox
                     id="FAA_id_Type"
                     items="{assetType>/}"
-                    selectionChange=".onTypeSelect"
+                    selectionChange="onStrictValidationComboBox"
+                    editable="false"
                     change="onTypeChange"
                     required="true"
                     selectedKey="{myform>/formData/data/Type}"
@@ -59,9 +60,9 @@
 				<Label text="{i18n>model}" />
 				<Input
                     required="true"
-                    editable="true"
+                    editable="false"
                     id="FAA_id_Model"
-                    liveChange=".onModelChange"
+                    liveChange="onStrictValidationComboBox"
                     value="{myform>/formData/data/Model}"
                     showValueHelp="true"
                     valueHelpRequest="onOpenVHD"
@@ -71,8 +72,8 @@
                     required="true"
                     id="FAA_branch_Id"
                     showSecondaryValues="true"
-                    selectionChange=".onBranchChange"
-                    change="FAA_onBranchlivechange"
+                    change="FAA_onStrictValidationComboBox"
+                    editable="false"
                     items="{BaseLocationModel>/}"
                     value="{myform>/formData/data/AssignBranch}"
                 >
@@ -87,15 +88,16 @@
                     required="true"
                     id="FAA_id_AssignedBy"
                     items="{AdminModel>/}"
+                    change="FAA_onStrictValidationComboBox"
                     showSecondaryValues="true"
                     value="{myform>/formData/data/AssignedByEmployeeName}"
                     valueStateText="{i18n>commonNameValueState}"
                     editable="{= ${LoginModel>/Role} === 'Admin' ?true : false}"
                 >
 					<core:ListItem
-                        key="{AdminModel>EmployeeID}"
-                        text="{AdminModel>EmployeeID}"
-                        additionalText="{AdminModel>EmployeeName}"
+                        key="{AdminModel>EmployeeName}"
+                        text="{AdminModel>EmployeeName}"
+                        additionalText="{AdminModel>EmployeeID}"
                     />
 				</ComboBox>
 				<Label text="{i18n>equipmentNumber}" />

@@ -88,7 +88,7 @@
                 </fb:FilterGroupItem>
 
                 <fb:FilterGroupItem
-                    name="AssignedDate"
+                    name="AssetCreationDate"
                     label="{i18n>assignedDate}"
                     groupName="Group1"
                     visibleInFilterBar="true"
@@ -97,8 +97,8 @@
                         <DateRangeSelection
                             id="AA_id_Date"
                             change="AA_handleChange"
-                            displayFormat="dd/MM/yyyy"
-                            valueFormat="yyyy-MM-dd"
+                            displayFormat="MM/dd/yyyy"
+                            valueFormat="MM/dd/yyyy"
                         />
                     </fb:control>
                 </fb:FilterGroupItem>

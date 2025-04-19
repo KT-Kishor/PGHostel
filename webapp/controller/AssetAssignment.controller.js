@@ -43,8 +43,6 @@ sap.ui.define([
                 this._fetchCommonData("IncomeAsset", "incomeModel");
                 this._fetchCommonData("AssetType", "assetType");
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                // var viewModel = new JSONModel({ isIdMode: true});
-                // this.getView().setModel(viewModel, "viewModel");
 
                 this.AA_CoomonReadCall();
                 this.oLoginModel.setProperty("/HeaderName", "Asset Assignment Details");
@@ -70,9 +68,9 @@ sap.ui.define([
                             new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Assigned"),
                             new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Unassigned")
                         ],
-                        and: false 
+                        and: false
                     });
-                    
+
                     this.byId("AA_id_AssestTable").getBinding("items").filter(filter);
                     sap.ui.core.BusyIndicator.hide();
                 }).catch((oError) => {
@@ -136,9 +134,9 @@ sap.ui.define([
             },
 
 
-            AA_onPressAssign: function () {          
-                var oModel =  new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === "Admin"));
-                this.getView().setModel(oModel,"AdminModel");
+            AA_onPressAssign: function () {
+                var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === "Admin"));
+                this.getView().setModel(oModel, "AdminModel");
                 var oView = this.getView();
                 var oTable = this.byId("AA_id_AssestTable");
                 var oTableSelected = oTable.getSelectedItem();
@@ -172,44 +170,6 @@ sap.ui.define([
 
                 } else {
                     this.FAA_Dialog.open();
-
-                    // if (aSelectedContexts.length > 0) {
-                    //     var oSelectedData = aSelectedContexts[0].getObject();
-
-                    //     if (oSelectedData.Status) {
-                    //         sap.m.MessageToast.show("Selected row can't be assigned.");
-                    //         this.byId("AA_id_AssestTable").removeSelections(true);
-                    //         return;
-                    //     }
-                    // }
-                    // if (!this.FAA_Dialog) {
-                    //     var oView = this.getView();
-                    //     this.FAA_Dialog = sap.ui.core.Fragment.load({
-                    //         name: "sap.kt.com.minihrsolution.fragment.AssetAssignmentCreate",
-                    //         controller: this
-                    //     }).then(function (FAA_Dialog) {
-                    //         this.FAA_Dialog = FAA_Dialog;
-                    //         oView.addDependent(this.FAA_Dialog);
-                    //         this.byId("AA_id_AssestTable").removeSelections(true);
-                    //         this.FAA_Dialog.open();
-                    //     }.bind(this));
-
-                    // } else {
-
-                    //     sap.ui.getCore().byId("FAA_id_employeeID").setSelectedKey("").setValueState("None");
-                    //     sap.ui.getCore().byId("FAA_id_Name").setSelectedKey("")
-                    //     sap.ui.getCore().byId("FAA_id_Type").setSelectedKey("")
-                    //     sap.ui.getCore().byId("FAA_id_Model").setSelectedKey("")
-                    //     sap.ui.getCore().byId("FAA_branch_Id").setSelectedKey("")
-                    //     sap.ui.getCore().byId("FAA_id_AssignedBy").setSelectedKey("")
-                    //     sap.ui.getCore().byId("FAA_id_EquipmentNumber").setSelectedKey("")
-                    //     sap.ui.getCore().byId("FAA_id_SerialNumber").setSelectedKey("")
-                    //     sap.ui.getCore().byId("FAA_id_AssetValue").setSelectedKey("")
-                    //     sap.ui.getCore().byId("FAA_id_AssignedDate").setValue("")
-                    //     this.FAA_Dialog.open();
-                    // }
-                    // this.getView().getModel("LoginModel").setProperty("/formData/data/AssignedByEmployeeName", "");
-                    // this.getView().getModel("myform").setProperty("/formData/data/AssignedDate", new Date());
                 }
             },
 
@@ -232,9 +192,17 @@ sap.ui.define([
 
             onPressSave: async function () {
                 var selected = this.byId("AA_id_AssestTable").getSelectedItem();
+                var bStrictValid = ["FAA_id_employeeID", "FAA_id_AssignedBy"].every(function (sId) {
+                    var oComboBox = sap.ui.getCore().byId(sId);
+                    return utils._LCstrictValidationComboBox({
+                        getSource: function () { return oComboBox; },
+                        getParameter: function () { return oComboBox.getValue(); }
+                    });
+                });
 
                 try {
-                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_employeeID"), "ID") &&
+                    if (bStrictValid &&
+                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_employeeID"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_Type"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_Model"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_branch_Id"), "ID") &&
@@ -242,32 +210,15 @@ sap.ui.define([
                         utils._LCvalidateName(sap.ui.getCore().byId("FAA_id_AssignedBy"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_AssignedDate"), "ID")) {
 
-                            // var oTypeCombo = sap.ui.getCore().byId("FAA_id_Type");
-                            // var oEmpCombo = sap.ui.getCore().byId("FAA_id_employeeID");
-                            // var oBranchCombo = sap.ui.getCore().byId("FAA_branch_Id");
-                            // var oAssignedByCombo = sap.ui.getCore().byId("FAA_id_AssignedBy")
-    
-                            // if (!this.isValidDropdownValue(oTypeCombo) ||
-                            //     !this.isValidDropdownValue(oEmpCombo) ||
-                            //     !this.isValidDropdownValue(oBranchCombo) |
-                            //     !this.isValidDropdownValue(oAssignedByCombo)){
-                            //     MessageToast.show("Please select valid values from dropdowns.");
-                            //     return;
-                            // }
-
                         var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
-                        // var assign = this.getView().byId("FAA_id_AssignedBy").getSelectedKey();
-                        // if(!assign){
-                        //     MessageToast.show("select");
-                        //     return;
-                        // }
                         var oFormFilters = this.getView().getModel("myform").getProperty("/formData/filters");
-                        oFormData.AssignedDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oFormData.AssignedDate);
+                        var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
+                        oFormData.AssignedDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oAssignedDate);
                         oFormData.Status = "Assigned";
                         oFormData.ReturnDate = "";
                         await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oFormData, filters: oFormFilters });
-
                         await this.AA_CoomonReadCall();
+                     
                         this.FAA_Dialog.close();
                         this.byId(AA_id_AssestTable), removeSelections(true)
 
@@ -319,15 +270,10 @@ sap.ui.define([
                     var oControl = oItem.getControl();
                     var sValue = oItem.getName();
                     if (oControl && oControl.getValue()) {
-                        if (sValue === "AssignedDate") {
-                            var oStartDate = oControl.getDateValue();
-                            var oEndDate = oControl.getSecondDateValue();
-                            if (oStartDate && oEndDate) {
-                                params["CreationStartDate"] = oDateFormat.format(oStartDate);
-                                params["CreationEndDate"] = oDateFormat.format(oEndDate);
-                            }
-                        }
-                        else {
+                        if (sValue === "AssetCreationDate") {
+                            params["CreationStartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
+                            params["CreationEndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
+                        } else {
                             params[sValue] = oControl.getValue();
                         }
                     }
@@ -335,54 +281,54 @@ sap.ui.define([
                 this.AA_CoomonReadCall(params);
             },
 
-            AA_onPressEdit: function () {
-                var oView = this.getView();
-                var oTable = this.byId("AA_id_AssestTable");
-                var oTableSelected = oTable.getSelectedItem();
+            // AA_onPressEdit: function () {
+            //     var oView = this.getView();
+            //     var oTable = this.byId("AA_id_AssestTable");
+            //     var oTableSelected = oTable.getSelectedItem();
 
 
 
-                if (!oTableSelected) {
-                    MessageToast.show("pleaseSelectTheRowToUpdate");
-                    return;
-                }
-                // var oSelectedData = oTableSelected.getBindingContext().getObject();
-                var oModel = oView.getModel("assetModel");
-                var oFormModel = oView.getModel("myform");
+            //     if (!oTableSelected) {
+            //         MessageToast.show("pleaseSelectTheRowToUpdate");
+            //         return;
+            //     }
+            //     // var oSelectedData = oTableSelected.getBindingContext().getObject();
+            //     var oModel = oView.getModel("assetModel");
+            //     var oFormModel = oView.getModel("myform");
 
-                var oBindingContext = oTableSelected.getBindingContext("assetModel");
-                if (oBindingContext) {
-                    var oSelectedData = oBindingContext.getObject();
+            //     var oBindingContext = oTableSelected.getBindingContext("assetModel");
+            //     if (oBindingContext) {
+            //         var oSelectedData = oBindingContext.getObject();
 
-                    if (oSelectedData.Status === "Unassigned") {
-                        MessageToast.show("cannotRe-AssignForUn-assigned");
-                        oTable.removeSelections();
-                        return;
-                    }
-                    oFormModel.setProperty("/formData/data", JSON.parse(JSON.stringify(oSelectedData)));
-                    oFormModel.setProperty("/formData/filters", {
-                        ID: oSelectedData.ID
-                    });
-                    // this.getView().getModel("viewModel").setProperty("/isIdMode", false);
-                } else {
-                    return;
-                }
-                if (!this.FAA_Dialog) {
-                    this.FAA_Dialog = sap.ui.core.Fragment.load({
-                        name: "sap.kt.com.minihrsolution.fragment.AssetAssignmentCreate",
-                        controller: this
-                    }).then(function (FAA_Dialog) {
-                        this.FAA_Dialog = FAA_Dialog;
-                        oView.addDependent(this.FAA_Dialog);
+            //         if (oSelectedData.Status === "Unassigned") {
+            //             MessageToast.show("cannotRe-AssignForUn-assigned");
+            //             oTable.removeSelections();
+            //             return;
+            //         }
+            //         oFormModel.setProperty("/formData/data", JSON.parse(JSON.stringify(oSelectedData)));
+            //         oFormModel.setProperty("/formData/filters", {
+            //             ID: oSelectedData.ID
+            //         });
+            //         // this.getView().getModel("viewModel").setProperty("/isIdMode", false);
+            //     } else {
+            //         return;
+            //     }
+            //     if (!this.FAA_Dialog) {
+            //         this.FAA_Dialog = sap.ui.core.Fragment.load({
+            //             name: "sap.kt.com.minihrsolution.fragment.AssetAssignmentCreate",
+            //             controller: this
+            //         }).then(function (FAA_Dialog) {
+            //             this.FAA_Dialog = FAA_Dialog;
+            //             oView.addDependent(this.FAA_Dialog);
 
-                        this.FAA_Dialog.open();
-                    }.bind(this));
+            //             this.FAA_Dialog.open();
+            //         }.bind(this));
 
-                } else {
+            //     } else {
 
-                    this.FAA_Dialog.open();
-                }
-            },
+            //         this.FAA_Dialog.open();
+            //     }
+            // },
 
             AA_onOpenUnassign: function () {
                 var oTableSelected = this.byId("AA_id_AssestTable").getSelectedItem();
@@ -410,6 +356,7 @@ sap.ui.define([
                     } else {
                         MessageToast.show("tableBindingContextNotFound");
                         return;
+
                     }
                 }
                 else {
@@ -423,62 +370,64 @@ sap.ui.define([
 
             },
 
-            FAS_onchange: function () {
-                // Find selected employee by EmployeeID
-                var selectedEmployee = this.getView().getModel("EmpModel").getData().find(function (emp) {
-                    return emp.EmployeeID === sap.ui.getCore().byId("FAA_id_employeeID").getSelectedKey();
-                });
-                this.getView().getModel("myform").setProperty("/formData/data/AssignEmployeeName", selectedEmployee.EmployeeName);
-            },
-
-            onVHDClose: function () {
-                if (this._oValueHelpDialog) {
-                    this._oValueHelpDialog.close();
+            FAS_onchange: function (oEvent) {
+                if (utils._LCstrictValidationComboBox(oEvent)) {
+                    // Find selected employee by EmployeeID
+                    var selectedEmployee = this.getView().getModel("EmpModel").getData().find(function (emp) {
+                        return emp.EmployeeID === sap.ui.getCore().byId("FAA_id_employeeID").getSelectedKey();
+                    });
+                    this.getView().getModel("myform").setProperty("/formData/data/AssignEmployeeName", selectedEmployee.EmployeeName);
                 }
             },
 
-            onVHDPick: function (oEvent) {
-                var oSelectedItem = oEvent.getSource();
-                var oBindingContext = oSelectedItem.getBindingContext("incomeModel");
+            // onVHDClose: function () {
+            //     if (this._oValueHelpDialog) {
+            //         this._oValueHelpDialog.close();
+            //     }
+            // },
 
-                if (!oBindingContext) {
-                    return;
-                }
+            // onVHDPick: function (oEvent) {
+            //     var oSelectedItem = oEvent.getSource();
+            //     var oBindingContext = oSelectedItem.getBindingContext("incomeModel");
 
-                var oSelectedData = oBindingContext.getObject();
+            //     if (!oBindingContext) {
+            //         return;
+            //     }
 
-                var oFrag = sap.ui.getCore();
+            //     var oSelectedData = oBindingContext.getObject();
 
-                oFrag.byId("FAA_id_Model").setValue(oSelectedData.Model);
-                oFrag.byId("FAA_id_Model").setValueState("None");
+            //     var oFrag = sap.ui.getCore();
 
-                var formData = this.getView().getModel("myform");
-                formData.setProperty("/formData/data/EquipmentNumber", oSelectedData.EquipmentNumber);
-                formData.setProperty("/formData/data/SerialNumber", oSelectedData.SerialNumber);
-                formData.setProperty("/formData/filters/EquipmentNumber", oSelectedData.EquipmentNumber);
-                formData.setProperty("/formData/filters/SerialNumber", oSelectedData.SerialNumber);
-                formData.setProperty("/formData/data/AssetValue", (oSelectedData.AssetValue).toString());
+            //     oFrag.byId("FAA_id_Model").setValue(oSelectedData.Model);
+            //     oFrag.byId("FAA_id_Model").setValueState("None");
 
-                oFrag.byId("FDP_id_ValueHelpDialog").close()
-            },
+            //     var formData = this.getView().getModel("myform");
+            //     formData.setProperty("/formData/data/EquipmentNumber", oSelectedData.EquipmentNumber);
+            //     formData.setProperty("/formData/data/SerialNumber", oSelectedData.SerialNumber);
+            //     formData.setProperty("/formData/filters/EquipmentNumber", oSelectedData.EquipmentNumber);
+            //     formData.setProperty("/formData/filters/SerialNumber", oSelectedData.SerialNumber);
+            //     formData.setProperty("/formData/data/AssetValue", (oSelectedData.AssetValue).toString());
 
-            onOpenVHD: function () {
-                var oView = this.getView();
-                var oCore = sap.ui.getCore();
-                var oTypeSelected = oCore.byId("FAA_id_Type").getSelectedKey();
+            //     oFrag.byId("FDP_id_ValueHelpDialog").close()
+            // },
 
-                var allData = this.getView().getModel("incomeModel").getProperty("/");
-                var filteredData = allData.filter(item => item.Type === oTypeSelected);
+            // onOpenVHD: function () {
+            //     var oView = this.getView();
+            //     var oCore = sap.ui.getCore();
+            //     var oTypeSelected = oCore.byId("FAA_id_Type").getSelectedKey();
 
-                var filteredModel = new sap.ui.model.json.JSONModel(filteredData);
-                oView.setModel(filteredModel, "filteredAssetDetails");
+            //     var allData = this.getView().getModel("incomeModel").getProperty("/");
+            //     var filteredData = allData.filter(item => item.Type === oTypeSelected);
 
-                if (!this._oValueHelpDialog) {
-                    this._oValueHelpDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetDetailsPopup", this);
-                    this.getView().addDependent(this._oValueHelpDialog);
-                }
-                this._oValueHelpDialog.open();
-            },
+            //     var filteredModel = new sap.ui.model.json.JSONModel(filteredData);
+            //     oView.setModel(filteredModel, "filteredAssetDetails");
+
+            //     if (!this._oValueHelpDialog) {
+            //         this._oValueHelpDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetDetailsPopup", this);
+            //         this.getView().addDependent(this._oValueHelpDialog);
+            //     }
+            //     this._oValueHelpDialog.open();
+            // },
 
             onSaveUnassign: async function () {
                 var oDate = sap.ui.getCore().byId("FAU_id_unassignDate").getValue();
