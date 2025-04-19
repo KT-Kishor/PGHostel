@@ -21,7 +21,7 @@ sap.ui.define([
             this.oCore = sap.ui.getCore();
             this.oModel = oView.getModel("Quotation");
             this.oLoginModel = oView.getModel("LoginModel");
-            this._makeDatePickersReadOnly(["QF_id_VehVariant", "QF_id_BranchCodes"]);
+            this._makeDatePickersReadOnly(["QF_id_VehVariant"]);
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.checkLoginModel();
             var response = await this.ajaxCreateWithJQuery("UniqueScheme", { data: {} });
@@ -33,23 +33,28 @@ sap.ui.define([
             oView.byId("QF_id_PDFBtn").setEnabled(true);
             BusyIndicator.hide();
             this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: this.oModel.getProperty("/QuotationFormData/BranchCode") }, ["QF_id_HeaderContent"]);
-            this.QF_onCallVariant("BOLERO");
-            this._clearErrorStates();
+            this.oModel.setProperty("/VariantList", []);
+            var aFieldIds = [ "QF_id_BranchCodes", "QF_id_CustomerName", "QF_id_CustMobile", "QF_id_EmpMobile", "QF_id_CustEmail", "QF_id_CustAadhar", "QF_id_CustPanNumber", "QF_id_CustPinCode", "QF_id_CustGSTNo", "QF_id_CustAddress", "QF_id_VehModel", "QF_id_VehVariant"];
+            aFieldIds.forEach(function (sId) {
+                this.getView().byId(sId).setValueState("None");
+            });
         },
 
         QF_onNavBack: function () {
-            if(this.oModel.getProperty("/MasterEdit")){
+            if (this.oModel.getProperty("/MasterEdit")) {
                 this.showConfirmationDialog(this.i18nModel.getText("ConfirmActionTitle"), this.i18nModel.getText("backConfirmation"), function () { this.getRouter().navTo("RouteQuotation"); }.bind(this))
             } else {
                 this.getRouter().navTo("RouteQuotation");
             }
         },
 
-        QF_onBranchCodeChange: function () {
-            var sSelectedValue = this.getView().byId("QF_id_BranchCodes").getSelectedItem();
-            this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: sSelectedValue.getKey() }, ["QF_id_HeaderContent"]);
-            this.oModel.setProperty("/QuotationFormData/BranchCode", sSelectedValue.getKey());
-            this.oModel.setProperty("/QuotationFormData/Branch", sSelectedValue.getAdditionalText());
+        QF_onBranchCodeChange: function (oEvent) {
+            if (utils._LCstrictValidationComboBox(oEvent)) {
+                var sSelectedValue = (oEvent.getSource().getSelectedItem());
+                this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: sSelectedValue.getKey() }, ["QF_id_HeaderContent"]);
+                this.oModel.setProperty("/QuotationFormData/BranchCode", sSelectedValue.getKey());
+                this.oModel.setProperty("/QuotationFormData/Branch", sSelectedValue.getAdditionalText());
+            }
         },
 
         QF_onNameChange: function (oEvent) {
@@ -87,15 +92,13 @@ sap.ui.define([
             utils._LCvalidatePinCode(oEvent);
         },
 
-        QF_onModelChange: async function () {
-            this.QF_onCallVariant(this.getView().byId("QF_id_VehModel").getSelectedKey());
-            const properties = [
-                "Variant", "Transmission", "Color", "Fuel", "BoardPlate", "Make", "Emission",
-                "EXShowroom", "TCS1Perc", "ROADTAX", "AddOnInsurance", "TempCharges",
-                "RegHypCharge", "ShieldOfTrust4YR45K", "EXTDWarrantyFOR4YR80K", "STDFittings",
-                "FastTag", "VAS", "RSA", "DiscountOffers", "ConsumerScheme",
-                "EXShowroomAfterScheme", "TotalOnRoad"
-            ];
+        QF_onModelChange: async function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
+            this.QF_onCallVariant(oEvent.getSource().getSelectedKey());
+        },
+
+        QF_onModelSelectionChange: function () {
+            const properties = ["Variant", "Transmission", "Color", "Fuel", "BoardPlate", "Make", "Emission", "EXShowroom", "TCS1Perc", "ROADTAX", "AddOnInsurance", "TempCharges", "RegHypCharge", "ShieldOfTrust4YR45K", "EXTDWarrantyFOR4YR80K", "STDFittings", "FastTag", "VAS", "RSA", "DiscountOffers", "ConsumerScheme", "EXShowroomAfterScheme", "TotalOnRoad"];
             properties.forEach(prop => {
                 this.oModel.setProperty(`/QuotationFormData/${prop}`, "");
             });
@@ -216,7 +219,7 @@ sap.ui.define([
             var oData = this.oModel.getProperty("/QuotationFormData/");
             oData.QuotationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.QuotationDate);
             oData.ValidUpto = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.ValidUpto);
-            if(!oData.Branch) { oData.Branch = this.getView().byId("QF_id_BranchCodes").getSelectedItem().getAdditionalText(); }
+            if (!oData.Branch) { oData.Branch = this.getView().byId("QF_id_BranchCodes").getSelectedItem().getAdditionalText(); }
             delete oData.ID;
             try {
                 if (this._checkValidation()) {
@@ -328,13 +331,14 @@ sap.ui.define([
             } else {
                 this.getView().byId("QF_id_PDFBtn").setEnabled(false);
                 this.oModel.setProperty("/VisibleStatus", true);
-                this.QF_onCallVariant(this.getView().byId("QF_id_VehModel").getSelectedKey());
+                this.QF_onCallVariant(this.getView().byId("QF_id_VehModel").getValue());
             }
         },
 
         _checkValidation: function () {
             var oView = this.getView();
-            if (utils._LCvalidateName(oView.byId("QF_id_CustomerName"), "ID") &&
+            if (utils._LCstrictValidationComboBox(oView.byId("QF_id_BranchCodes"), "ID") &&
+                utils._LCvalidateName(oView.byId("QF_id_CustomerName"), "ID") &&
                 utils._LCvalidateMobileNumber(oView.byId("QF_id_CustMobile"), "ID") &&
                 utils._LCvalidateMobileNumber(oView.byId("QF_id_EmpMobile"), "ID") &&
                 utils._LCvalidateEmail(oView.byId("QF_id_CustEmail"), "ID") &&
@@ -343,22 +347,9 @@ sap.ui.define([
                 utils._LCvalidateGstNumber(oView.byId("QF_id_CustGSTNo"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("QF_id_CustAddress"), "ID") &&
                 utils._LCvalidatePinCode(oView.byId("QF_id_CustPinCode"), "ID") &&
+                utils._LCstrictValidationComboBox(oView.byId("QF_id_VehModel"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("QF_id_VehVariant"), "ID")) { return true }
             else { return false }
-        },
-
-        _clearErrorStates: function () {
-            var oView = this.getView();
-            oView.byId("QF_id_CustomerName").setValueState("None");
-            oView.byId("QF_id_CustMobile").setValueState("None");
-            oView.byId("QF_id_EmpMobile").setValueState("None");
-            oView.byId("QF_id_CustEmail").setValueState("None");
-            oView.byId("QF_id_CustAadhar").setValueState("None");
-            oView.byId("QF_id_CustPanNumber").setValueState("None");
-            oView.byId("QF_id_CustPinCode").setValueState("None");
-            oView.byId("QF_id_CustGSTNo").setValueState("None");
-            oView.byId("QF_id_CustAddress").setValueState("None");
-            oView.byId("QF_id_VehVariant").setValueState("None");
         },
 
         QF_onDownloadPDF: function () {
