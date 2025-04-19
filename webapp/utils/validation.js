@@ -405,35 +405,21 @@ sap.ui.define([], function () {
       }
     },
 
-    _LCstrictValidationComboBox: function (oEvent) {
-      var oComboBox = oEvent.getSource();
-      var sInputValue = oEvent.getParameter("value")?.trim();
-      // If nothing is entered, it's an error
-      if (!sInputValue) {
-        oComboBox.setValueState("Error");
-        oComboBox.setValueStateText("Please select a valid option");
-        return false;
-      }
-      // Get all items from the ComboBox
+    _LCstrictValidationComboBox: function (oEvent, type) {
+      var oComboBox = type === "ID" ? oEvent : oEvent.getSource();
+      var sValue = oComboBox.getValue();
       var aItems = oComboBox.getItems();
-      var bMatchFound = false;
-      for (var i = 0; i < aItems.length; i++) {
-        var sText = aItems[i].getText();
-        var sKey = aItems[i].getKey();
-        if (sInputValue === sText || sInputValue === sKey) {
-          bMatchFound = true;
-          break;
-        }
-      }
-      // Set error if no match is found
-      if (!bMatchFound) {
+      var bValid = aItems.some(function (oItem) {
+        return oItem.getText() === sValue || oItem.getKey() === sValue;
+      });
+      if (!bValid) {
         oComboBox.setValueState("Error");
         oComboBox.setValueStateText("Please select a valid option from the list");
         return false;
+      } else {
+        oComboBox.setValueState("None");
+        return true;
       }
-      // Clear error if match found
-      oComboBox.setValueState("None");
-      return true;
-    }    
+    }
   };
 });

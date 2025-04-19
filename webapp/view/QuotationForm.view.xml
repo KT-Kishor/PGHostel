@@ -471,6 +471,7 @@
                                             text="{i18n>vehicleTransmission} "
                                         />
                                         <m:Input
+                                            id = "QF_id_VehTransmission"
                                             value="{Quotation>/QuotationFormData/Transmission}"
                                             editable="false"
                                         />

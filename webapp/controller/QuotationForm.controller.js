@@ -36,7 +36,7 @@ sap.ui.define([
             this.oModel.setProperty("/VariantList", []);
             var aFieldIds = [ "QF_id_BranchCodes", "QF_id_CustomerName", "QF_id_CustMobile", "QF_id_EmpMobile", "QF_id_CustEmail", "QF_id_CustAadhar", "QF_id_CustPanNumber", "QF_id_CustPinCode", "QF_id_CustGSTNo", "QF_id_CustAddress", "QF_id_VehModel", "QF_id_VehVariant"];
             aFieldIds.forEach(function (sId) {
-                this.getView().byId(sId).setValueState("None");
+                oView.byId(sId).setValueState("None");
             });
         },
 
@@ -62,10 +62,7 @@ sap.ui.define([
         },
 
         QF_onMobileChange: function (oEvent) {
-            var today = new Date();
             utils._LCvalidateMobileNumber(oEvent);
-            this.oModel.setProperty("/QuotationFormData/QuotationDate", today);
-            this.oModel.setProperty("/QuotationFormData/ValidUpto", new Date(today.getFullYear(), today.getMonth() + 1, 0));
         },
 
         QF_onEmailChange: function (oEvent) {
@@ -217,12 +214,12 @@ sap.ui.define([
         QF_onPressSubmit: async function () {
             BusyIndicator.show(0);
             var oData = this.oModel.getProperty("/QuotationFormData/");
-            oData.QuotationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.QuotationDate);
-            oData.ValidUpto = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.ValidUpto);
-            if (!oData.Branch) { oData.Branch = this.getView().byId("QF_id_BranchCodes").getSelectedItem().getAdditionalText(); }
-            delete oData.ID;
             try {
                 if (this._checkValidation()) {
+                    oData.QuotationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.QuotationDate);
+                    oData.ValidUpto = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oData.ValidUpto);
+                    delete oData.ID;
+                    if (!oData.Branch) { oData.Branch = this.getView().byId("QF_id_BranchCodes").getSelectedItem().getAdditionalText(); }
                     var response = await this.ajaxCreateWithJQuery("A_Quotations", {
                         data: oData,
                     });
@@ -297,7 +294,6 @@ sap.ui.define([
                     oData.QuotationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(new Date(oData.QuotationDate));
                     oData.ValidUpto = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(new Date(oData.ValidUpto));
                     if (oData.ID) { delete oData.ID }
-                    if (oData.TempCharges) { delete oData.TempCharges }
                     try {
                         var response = await this.ajaxUpdateWithJQuery("A_Quotations", {
                             data: oData,
@@ -348,7 +344,8 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oView.byId("QF_id_CustAddress"), "ID") &&
                 utils._LCvalidatePinCode(oView.byId("QF_id_CustPinCode"), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("QF_id_VehModel"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("QF_id_VehVariant"), "ID")) { return true }
+                utils._LCvalidateMandatoryField(oView.byId("QF_id_VehVariant"), "ID") &&
+                utils._LCvalidateMandatoryField(oView.byId("QF_id_VehTransmission"), "ID")) { return true }
             else { return false }
         },
 
