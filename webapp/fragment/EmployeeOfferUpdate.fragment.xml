@@ -49,6 +49,11 @@
 											</m:Select>
 										<m:Label text="{i18n>consultantName}" required="true" />
 										<m:Input id="EOUF_id_Name" value="{employeeModel>/ConsultantName}" editable="{viewModel>/editable}" maxLength="50" liveChange="EOD_validateName" valueStateText="{i18n>nameEmployeeValueState}"/>
+										<m:Label text="{i18n>gender}" required="true" />
+											<m:Select items="{GenderModel>/}" id="EOU_id_Gender" selectedKey="{employeeModel>/GenderModel}" >
+												<core:Item key="{GenderModel>Value}" text="{GenderModel>Value}" />
+											</m:Select>	
+
 										<!-- Designation ComboBox with data from the DesignationModel -->
 										<m:Label text="{i18n>designation}" required="true" />
 										<m:Select items="{DesignationModel>/}" editable="{viewModel>/editable}" id="EOUF_id_Designation" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}">

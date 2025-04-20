@@ -68,6 +68,11 @@
                 "uri": "model/EmployeeStatus.json",
                 "preload": true
             },
+            "TraineeStatus": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/TraineeStatus.json",
+                "preload": true
+            },
             "CollegeGrade": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/CollegeGrade.json",
@@ -177,6 +182,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/AssetAssignmentStatus.json",
                 "preload": true
+            },
+            "GenderModel": {
+                "type":"sap.ui.model.json.JSONModel",
+                "uri":"model/Gender.json",
+                "preload":true
             }
         },
         "resources": {

@@ -1,0 +1,27 @@
+[
+    {
+      "ID": 1,
+      "StatusValue": "OnBoarded"
+    },
+    {
+      "ID": 2,
+      "StatusValue": "Submitted"
+    },
+    {
+      "ID": 3,
+      "StatusValue": "Rejected"
+    },
+    {
+      "ID": 4,
+      "StatusValue": "Offer Sent"
+    },
+    {
+      "ID": 5,
+      "StatusValue": "PDF Generated"
+    },
+    {
+      "ID":6,
+      "StatusValue":"Training Completed"
+        }
+  ]
+  

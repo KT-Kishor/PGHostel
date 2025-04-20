@@ -46,7 +46,11 @@
 													<l:GridData span="XL4 L4 M6 S9" />
 												</layoutData>
 											</Input>
-											<Label text="{i18n>offerReleaseDate}" required="true" />
+											<Label text="{i18n>gender}"/>
+												<Select items="{GenderModel>/}" id="EOD_id_Gender" selectedKey="{employeeModel>/GenderModel}" >
+													<core:Item key="{GenderModel>Value}" text="{GenderModel>Value}" />
+												</Select>											
+												<Label text="{i18n>offerReleaseDate}" required="true" />
 											<DatePicker id="EOD_id_Reldate" placeholder="{i18n>offerReleaseDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
                                              value= "{employeeModel>/OfferReleaseDate}"
                                              change="EOD_validateDate" class="sapUiSmallMarginBottom" valueStateText="{i18n>dateValueState}"/>

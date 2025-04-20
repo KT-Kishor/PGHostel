@@ -31,6 +31,7 @@ sap.ui.define([
                     "Salutation": "Mr.",
                     "ConsultantName": "",
                     "ConsultantAddress": "",
+                    "Gender":"",
                     "Designation": "",
                     "OfferReleaseDate": this.Formatter.formatDate(new Date()),
                     "JoiningDate": "",
@@ -228,6 +229,7 @@ sap.ui.define([
             EOD_onSubmitData: function () {
                 if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
                     var oModel = this.getView().getModel("employeeModel").getData();
+                    oModel.Gender=this.getView().byId("EOD_id_Gender").getSelectedKey()
                     oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.Department = this.getView().byId("EOD_id_Designation").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();

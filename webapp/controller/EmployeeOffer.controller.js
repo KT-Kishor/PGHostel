@@ -143,6 +143,7 @@ sap.ui.define([
                                 ID: oSelectedData.ID,
                                 Salutation: oSelectedData.Salutation,
                                 EmployeeName: oSelectedData.ConsultantName,
+                                Gender:oSelectedData.Gender,
                                 JoiningDate: oSelectedData.JoiningDate,
                                 Role: " ",
                                 DateOfBirth: "",

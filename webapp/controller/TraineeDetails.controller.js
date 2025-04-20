@@ -100,8 +100,8 @@ sap.ui.define([
                     this.getView().setModel(new JSONModel(offerData), "empModel")
                     BusyIndicator.hide();
                 }).catch((error) => {
-                    sap.ui.core.BusyIndicator.hide();
-                    sap.m.MessageToast.show(error.message || error.responseText);
+                    BusyIndicator.hide();
+                    MessageToast.show(error.message || error.responseText);
                 });
             },
 
@@ -201,8 +201,7 @@ sap.ui.define([
                         "tableName": "Trainee",
                         "data": oModel
                     };
-                    this.ajaxCreateWithJQuery("Trainee", oPayload).then((oData) => {
-                        BusyIndicator.hide();
+                    this.ajaxCreateWithJQuery("Trainee", oPayload,["TD_id_Wizard"]).then((oData) => {
                         if (oData.success) {
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
@@ -230,20 +229,17 @@ sap.ui.define([
                                                 "ID": oData.ID
                                             }
                                         };
-                                        sap.ui.core.BusyIndicator.show();
-                                        this.ajaxUpdateWithJQuery("Trainee", oUpdatePayload).then((oData) => {
-                                            sap.ui.core.BusyIndicator.hide();
+                                        this.ajaxUpdateWithJQuery("Trainee", oUpdatePayload,["TD_id_Wizard"]).then((oData) => {
+                                            BusyIndicator.hide();
                                             if (oData.success) {
-                                                sap.m.MessageToast.show("PDF generated and status updated!");
+                                                MessageToast.show("PDF generated and status updated!");
                                                 oDialog.close();
                                                 this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);
                                                 this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                                                 this.getView().getModel("oTraineeDetails").refresh(true);
                                             }
-                                        })
-                                            .catch((err) => {
-                                                sap.ui.core.BusyIndicator.hide();
-                                                sap.m.MessageToast.show("Failed to update status: " + (err.message || err.responseText));
+                                        }).catch((error) => {
+                                                MessageToast.show(error.message || error.responseText);
                                             });
                                     }.bind(this)
                                 }),
@@ -254,20 +250,18 @@ sap.ui.define([
                             oDialog.open();
                         }
                     }).catch((error) => {
-                        sap.ui.core.BusyIndicator.hide();
-                        sap.m.MessageToast.show(error.message || error.responseText);
+                        BusyIndicator.hide();
+                        MessageToast.show(error.message || error.responseText);
                     });
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
-
             //second step validation function
             TD_StepTwo: function () {
                 this.getView().byId("TD_id_Submit").setEnabled(true);
                 this.byId("TD_id_StepTwo").getParent().setShowNextButton(false);
             },
-
             //Edit/save button visibility function
             TU_onEditOrSavePress: function () {
                 if (this.viewModel.getProperty("/editable")) {
@@ -282,7 +276,7 @@ sap.ui.define([
                         utils._LCvalidateName(oView.byId("TU_id_Name"), "ID") && utils._LCvalidateName(oView.byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(oView.byId("TU_id_TraineeMail"), "ID") && bIsStipendValid;
                     // Save the changes if all validations pass
                     if (isValid) {
-                        this.updateCallForTrainee(this.viewModel);
+                        this.updateCallForTrainee(this.viewModel,"traineeDataUpdated");
                     } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
@@ -291,9 +285,8 @@ sap.ui.define([
                     this.viewModel.setProperty("/isEditMode", false);
                 }
             },
-
             //Update trainee deatails 
-            updateCallForTrainee: function (oViewModel) {
+            updateCallForTrainee: function (oViewModel,text) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
                 oModel.ReleaseDate = this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");;
@@ -317,16 +310,19 @@ sap.ui.define([
                         oViewModel.setProperty("/isVisiable", true);
                         oViewModel.setProperty("editBut", true);
                         BusyIndicator.hide();
-                        MessageToast.show(this.i18nModel.getText("traineeDataUpdated"));
+                        if (text && text !== "silent") {
+                            MessageToast.show(this.i18nModel.getText(text));
+                        }                        
                         this.getView().getModel("oTraineeDetails").refresh(true);
                     }
                 }).catch((error) => {
-                    sap.ui.core.BusyIndicator.hide();
-                    sap.m.MessageToast.show(error.message || error.responseText);
+                    BusyIndicator.hide();
+                    MessageToast.show(error.message || error.responseText);
                 });
             },
             // common function for opening dialog
             TD_commonOpenDialog: function (fragmentName) {
+                BusyIndicator.show(0)
                 if (!this.TU_oDialogMail) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -335,9 +331,11 @@ sap.ui.define([
                         this.TU_oDialogMail = TU_oDialogMail;
                         this.getView().addDependent(this.TU_oDialogMail);
                         this.TU_oDialogMail.open();
+                        BusyIndicator.hide()
                     }.bind(this));
                 } else {
                     this.TU_oDialogMail.open();
+                    BusyIndicator.hide()
                 }
             },
             //Mail dialog open function
@@ -361,7 +359,6 @@ sap.ui.define([
                 this.TD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
             },
-
             //back function
             TD_onPressback: function () {
                 this.showConfirmationDialog(
@@ -408,10 +405,10 @@ sap.ui.define([
                 };
                 this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload, ["Mail_id_Form", "TU_id_SimpleForm"]).then((oData) => {
                     this.getView().getModel("oTraineeDetails").setProperty("/Status", "Offer Sent");
-                    this.updateCallForTrainee(this.viewModel);
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                    this.updateCallForTrainee(this.viewModel,"silent");
                 }).catch((error) => {
-                    sap.m.MessageToast.show(error.message || error.responseText);
+                    MessageToast.show(error.message || error.responseText);
                 });
                 this.Mail_onPressClose();
             },
@@ -421,11 +418,10 @@ sap.ui.define([
                 this.offerGeneratingPdfFunction(oModel);
                 this.getView().getModel("oTraineeDetails").setProperty("/Status", "PDF Generated");
                 if (value !== "create") {
-                    this.updateCallForTrainee(this.viewModel);
+                    this.updateCallForTrainee(this.viewModel,"silent");
                 }
                 this.getView().getModel("oTraineeDetails").refresh(true);
             },
-
             async offerGeneratingPdfFunction(oModel) {
                 BusyIndicator.show(0);
                 var oEmpModel = oModel.getData();
@@ -466,7 +462,6 @@ sap.ui.define([
                         jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
                     } else {
                         BusyIndicator.hide();
-                        console.error("Error: jsPDF._GeneratePDF function not found.");
                     }
                 }
             },
