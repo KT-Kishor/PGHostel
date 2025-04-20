@@ -107,6 +107,7 @@
         <Table
             alternateRowColors="false"
             id="AA_id_AssestTable"
+            busyIndicatorDelay="0"
             items="{
                 path: 'assetModel>/',
                 sorter: {

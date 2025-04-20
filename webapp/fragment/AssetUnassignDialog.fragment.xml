@@ -4,6 +4,7 @@
 >
     <Dialog
         id="FAU_id_unassignDialog"
+        busyIndicatorDelay="0"
         title="{i18n>unAssign}"
         afterClose="onDialogClose"
     >

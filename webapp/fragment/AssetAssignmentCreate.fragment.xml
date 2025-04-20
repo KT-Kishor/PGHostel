@@ -9,6 +9,7 @@
     >
 		<f:SimpleForm
             id="FAA_id_FormFrag"
+            busyIndicatorDelay="0"
             editable="true"
             layout="ColumnLayout"
             labelSpanXL="4"
@@ -91,7 +92,6 @@
                     change="FAA_onStrictValidationComboBox"
                     showSecondaryValues="true"
                     value="{myform>/formData/data/AssignedByEmployeeName}"
-                    valueStateText="{i18n>commonNameValueState}"
                     editable="{= ${LoginModel>/Role} === 'Admin' ?true : false}"
                 >
 					<core:ListItem

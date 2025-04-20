@@ -38,6 +38,7 @@ sap.ui.define([
                     },
 
                 });
+                this._makeDatePickersReadOnly(["AA_id_Date"]);
                 this.getView().setModel(form, "myform");
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this._fetchCommonData("IncomeAsset", "incomeModel");
@@ -60,7 +61,7 @@ sap.ui.define([
             },
 
             AA_CoomonReadCall: function (filter) {
-                this.ajaxReadWithJQuery("IncomeAsset", filter).then((oData) => {
+                this.ajaxReadWithJQuery("IncomeAsset", filter, ["AA_id_AssestTable"]).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getView().setModel(new JSONModel(offerData), "assetModel");
                     var filter = new sap.ui.model.Filter({
@@ -152,11 +153,12 @@ sap.ui.define([
                 var oSelectedData = oBindingContext.getObject();
                 this.selectedAssignData = oSelectedData;
                 oFormModel.setProperty("/formData/data", oSelectedData);
+                sap.ui.getCore().byId("FAA_id_employeeID")?.setSelectedKey("");
+                sap.ui.getCore().byId("FAA_id_AssignedBy")?.setSelectedKey("");
                 oFormModel.setProperty("/formData/filters", { SerialNumber: oSelectedData.SerialNumber, EquipmentNumber: oSelectedData.EquipmentNumber });
                 oFormModel.setProperty("/formData/data/AssignedByEmployeeName", this.oLoginModel.getProperty("/EmployeeName"));
                 oFormModel.setProperty("/formData/data/AssignedByEmployeeID", this.oLoginModel.getProperty("/EmployeeID"));
                 oFormModel.setProperty("/formData/data/AssignedDate", new Date());
-
                 if (!this.FAA_Dialog) {
                     var oView = this.getView();
                     this.FAA_Dialog = sap.ui.core.Fragment.load({
@@ -166,10 +168,12 @@ sap.ui.define([
                         this.FAA_Dialog = FAA_Dialog;
                         oView.addDependent(this.FAA_Dialog);
                         this.FAA_Dialog.open();
+                        this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAU_id_unassignDate"]);
                     }.bind(this));
 
                 } else {
                     this.FAA_Dialog.open();
+                    this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate","FAU_id_unassignDate"]);
                 }
             },
 
@@ -216,11 +220,11 @@ sap.ui.define([
                         oFormData.AssignedDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oAssignedDate);
                         oFormData.Status = "Assigned";
                         oFormData.ReturnDate = "";
-                        await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oFormData, filters: oFormFilters });
+                        await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oFormData, filters: oFormFilters }, ["FAA_id_FormFrag"]);
                         await this.AA_CoomonReadCall();
                      
                         this.FAA_Dialog.close();
-                        this.byId(AA_id_AssestTable), removeSelections(true)
+                        this.byId(AA_id_AssestTable).removeSelections(true)
 
                     } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -451,7 +455,7 @@ sap.ui.define([
                         selectedData.Status = "Unassigned";
 
                         var id = selected.getBindingContext("assetModel").getObject().SerialNumber;
-                        await this.ajaxUpdateWithJQuery("IncomeAsset", { data: selectedData, filters: { "SerialNumber": id } });
+                        await this.ajaxUpdateWithJQuery("IncomeAsset", { data: selectedData, filters: { "SerialNumber": id } }, ["FAU_id_unassignDialog"]);
                         this.AA_CoomonReadCall()
                         this._unassignDialog.close();
                         oTableSelected.removeSelections();
