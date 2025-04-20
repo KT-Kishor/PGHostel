@@ -5,7 +5,7 @@
 	xmlns:core="sap.ui.core">
 	<Dialog showHeader="true"  title="{i18n>employmentDetails}" id="AddEmp_id_Dialog" >
 		<f:SimpleForm
-                                        editable="true" layout="ColumnLayout" 
+                                        editable="true" layout="ColumnLayout" id="AddEmp_id_Form"
                                          labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
                                          adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"                           
                                          emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
@@ -28,7 +28,7 @@
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy" 
             id="AddEmp_id_StartDate" 
-            change="SS_validateDate"
+            change="oEmpStartDateChange"
 			valueStateText="{i18n>dateValueState}"/>
 				<Label text="{i18n>endDate}" required="true"/>
 				<DatePicker value="{path:'employmentModel>/EndDate',formatter:'.Formatter.formatDate'}" 
@@ -37,6 +37,7 @@
             valueFormat="dd/MM/yyyy"  
             id="AddEmp_id_EndDate" 
             change="SS_validateDate"
+			minDate="{startDate}" 
 			valueStateText="{i18n>dateValueState}"/>
 			</f:content>
 		</f:SimpleForm>

@@ -72,8 +72,8 @@
 			</f:content>
 		</f:SimpleForm>
 		<HBox justifyContent="End" >
-			<Button text="{i18n>onboard}" type="Emphasized" press="OEF_onPressOnBoard" class="submit" />
-			<Button text="{i18n>close}" press="OEF_onPressClose" class="sendMail"/>
+			<Button text="{i18n>onboard}" type="Accept" press="OEF_onPressOnBoard" class="submit" />
+			<Button text="{i18n>close}" press="OEF_onPressClose" type="Reject" class="sendMail"/>
 		</HBox>
 	</Dialog>
 </core:FragmentDefinition>

@@ -4,6 +4,7 @@
 	xmlns:core="sap.ui.core" >
 	<Dialog title="{i18n>educationalDetails}">
 		<f:SimpleForm 
+		     id="AddEd_id_Form"
 			editable="true"
 			layout="ResponsiveGridLayout"
 			labelSpanXL="3"
