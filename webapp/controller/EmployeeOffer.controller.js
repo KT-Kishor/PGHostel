@@ -1,19 +1,19 @@
 sap.ui.define([
     "./BaseController",
-     "../utils/validation", 
-     "sap/ui/model/json/JSONModel",
+    "../utils/validation",
+    "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "sap/ui/core/BusyIndicator",
     "../model/formatter"],
-    function (BaseController,utils,JSONModel,MessageToast,MessageBox,BusyIndicator,Formatter) {
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, BusyIndicator, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOffer", {
             Formatter: Formatter,
             onInit: function () {
                 var oDateModel = new sap.ui.model.json.JSONModel();
                 var currentDate = new Date();
-                oDateModel.setData({maxDate: currentDate, focusedDate: new Date(2000, 0, 1) });
+                oDateModel.setData({ maxDate: currentDate, focusedDate: new Date(2000, 0, 1) });
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
@@ -95,10 +95,18 @@ sap.ui.define([
                     }
                 });
                 this.readCallForEmployeeOffer(params);
+                this.EO_ButtonVisibility();
             },
             // Update the status to 'Rejected' after confirmation
             onRejectEmployee: function () {
                 this.updateCallForEmployeeOffer("Rejected");
+                this.readCallForEmployeeOffer("");
+                this.EO_ButtonVisibility();
+            },
+            EO_ButtonVisibility: function () {
+                this.byId("EO_id_TableEOffer").removeSelections(true);
+                this.byId("EO_id_OnboardBtn").setEnabled(false);
+                this.byId("EO_id_RejectBtn").setEnabled(false);
             },
             EO_onPressClear: function () {
                 var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
@@ -120,19 +128,15 @@ sap.ui.define([
             onHandleEmployeeAction: function (status, actionMethod) {
                 var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
                 this.oSelectedRow = oSelectedData;
-
                 var sName = oSelectedData.Salutation + " " + oSelectedData.ConsultantName;
                 var that = this;
-
                 // Build message and title
                 var sMessage = (status === "OnBoarded")
                     ? that.i18nModel.getText("confirmOnboard", [sName])
                     : that.i18nModel.getText("confirmReject", [sName]);
-
                 var sTitle = (status === "OnBoarded")
                     ? that.i18nModel.getText("confirmTitleOnboard")
                     : that.i18nModel.getText("confirmTitleReject");
-
                 // Call reusable confirmation dialog
                 that.showConfirmationDialog(
                     sTitle,
@@ -143,7 +147,7 @@ sap.ui.define([
                                 ID: oSelectedData.ID,
                                 Salutation: oSelectedData.Salutation,
                                 EmployeeName: oSelectedData.ConsultantName,
-                                Gender:oSelectedData.Gender,
+                                Gender: oSelectedData.Gender,
                                 JoiningDate: oSelectedData.JoiningDate,
                                 Role: " ",
                                 DateOfBirth: "",
@@ -193,15 +197,12 @@ sap.ui.define([
                         }
                     },
                     function () {
-                        that.byId("EO_id_TableEOffer").removeSelections(true);
-                        that.byId("EO_id_OnboardBtn").setEnabled(false);
-                        that.byId("EO_id_RejectBtn").setEnabled(false);
+                        that.EO_ButtonVisibility();
                     },
                     that.i18nModel.getText("OkButton"),
                     that.i18nModel.getText("CancelButton")
                 );
             },
-
             _commonFragmentOpenOffer: function (name, fragmentName) {
                 BusyIndicator.show(0);
                 if (!this.oDialog) {
@@ -245,19 +246,19 @@ sap.ui.define([
                         tableName: "EmployeeDetails",
                         data: oModel
                     };
-                    this.ajaxCreateWithJQuery("EmployeeDetails", oPayload,["EO_id_TableEOffer"]).then((oData) => {
-                            BusyIndicator.hide();
-                            if (oData.success) {
-                                MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
-                                this.oDialog.close();
-                                this.readCallForEmployeeOffer("");
-                            } else {
-                                MessageToast.show(this.i18nModel.getText("mandatoryFields"));
-                            }
-                        })
+                    this.ajaxCreateWithJQuery("EmployeeDetails", oPayload, ["EO_id_TableEOffer"]).then((oData) => {
+                        BusyIndicator.hide();
+                        if (oData.success) {
+                            MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
+                            this.oDialog.close();
+                            this.readCallForEmployeeOffer("");
+                        } else {
+                            MessageToast.show(this.i18nModel.getText("mandatoryFields"));
+                        }
+                    })
                         .catch((error) => {
                             BusyIndicator.hide();
-                            MessageToast.show(this.i18nModel.getText("onboardingFailed"));
+                            MessageToast.show(error.message || error.responseText);
                         });
                 }
             },
@@ -270,7 +271,7 @@ sap.ui.define([
                     }
                 };
                 // First call for EmployeeOffer
-                this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer,["EO_id_TableEOffer"]).then((oData) => {
+                this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer, ["EO_id_TableEOffer"]).then((oData) => {
                     if (oData.success) {
                         BusyIndicator.hide();
                         var sSuccessMessage = (oStatus === "OnBoarded")
@@ -278,12 +279,11 @@ sap.ui.define([
                             : this.i18nModel.getText("offerEmpReject");
                         MessageToast.show(sSuccessMessage);
                         this.oDialog.close();
-                        this.readCallForEmployeeOffer("");
                     }
-                }).catch((oError) => {
+                }).catch((error) => {
                     BusyIndicator.hide();
                     this.oDialog.close();
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    MessageToast.show(error.message || error.responseText);
                 })
             },
             EO_onSelectionRadRowE: function (oEvent) {
