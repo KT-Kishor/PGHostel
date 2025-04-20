@@ -39,6 +39,7 @@ sap.ui.define([
 
                 });
                 this._makeDatePickersReadOnly(["AA_id_Date"]);
+                this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAU_id_unassignDate"]);
                 this.getView().setModel(form, "myform");
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this._fetchCommonData("IncomeAsset", "incomeModel");
@@ -143,7 +144,7 @@ sap.ui.define([
                 var oTableSelected = oTable.getSelectedItem();
 
                 if (!oTableSelected) {
-                    MessageToast.show("pleaseSelectTheRowToAssign");
+                    MessageToast.show(this.i18nModel.getText("pleaseSelectTheRowToAssign"));
                     return;
                 }
 
@@ -153,8 +154,6 @@ sap.ui.define([
                 var oSelectedData = oBindingContext.getObject();
                 this.selectedAssignData = oSelectedData;
                 oFormModel.setProperty("/formData/data", oSelectedData);
-                sap.ui.getCore().byId("FAA_id_employeeID")?.setSelectedKey("");
-                sap.ui.getCore().byId("FAA_id_AssignedBy")?.setSelectedKey("");
                 oFormModel.setProperty("/formData/filters", { SerialNumber: oSelectedData.SerialNumber, EquipmentNumber: oSelectedData.EquipmentNumber });
                 oFormModel.setProperty("/formData/data/AssignedByEmployeeName", this.oLoginModel.getProperty("/EmployeeName"));
                 oFormModel.setProperty("/formData/data/AssignedByEmployeeID", this.oLoginModel.getProperty("/EmployeeID"));
@@ -168,12 +167,11 @@ sap.ui.define([
                         this.FAA_Dialog = FAA_Dialog;
                         oView.addDependent(this.FAA_Dialog);
                         this.FAA_Dialog.open();
-                        this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAU_id_unassignDate"]);
+                        this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate"]);
                     }.bind(this));
 
                 } else {
                     this.FAA_Dialog.open();
-                    this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate","FAU_id_unassignDate"]);
                 }
             },
 
@@ -194,6 +192,15 @@ sap.ui.define([
 
             },
 
+            FAU_onDateLiveChange: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+
+            },
+
+            FAA_onStrictValidationComboBox:function(oEvent){
+                utils._LCvalidateMandatoryField(oEvent);  
+            },
+
             onPressSave: async function () {
                 var selected = this.byId("AA_id_AssestTable").getSelectedItem();
                 var bStrictValid = ["FAA_id_employeeID", "FAA_id_AssignedBy"].every(function (sId) {
@@ -206,11 +213,8 @@ sap.ui.define([
 
                 try {
                     if (bStrictValid &&
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_employeeID"), "ID") &&
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_Type"), "ID") &&
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_Model"), "ID") &&
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_branch_Id"), "ID") &&
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_AssignedBy"), "ID") &&
+                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FAA_id_employeeID"), "ID") &&
+                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FAA_id_AssignedBy"), "ID") &&
                         utils._LCvalidateName(sap.ui.getCore().byId("FAA_id_AssignedBy"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_AssignedDate"), "ID")) {
 
@@ -224,7 +228,7 @@ sap.ui.define([
                         await this.AA_CoomonReadCall();
                      
                         this.FAA_Dialog.close();
-                        this.byId(AA_id_AssestTable).removeSelections(true)
+                        this.byId("AA_id_AssestTable").removeSelections(true)
 
                     } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -239,6 +243,7 @@ sap.ui.define([
             onPressClose: function () {
                 this.byId("AA_id_AssestTable").removeSelections(true);
                 this.getView().getModel("myform").setProperty("/formData/data", {});
+                sap.ui.getCore().byId("FAA_id_employeeID").revertSelection();
                 sap.ui.getCore().byId("FAA_id_employeeID").setValueState("None");
                 sap.ui.getCore().byId("FAA_id_Type").setValueState("None");
                 sap.ui.getCore().byId("FAA_id_Model").setValueState("None");
@@ -343,7 +348,7 @@ sap.ui.define([
                         var oSelectedData = oBindingContext.getObject();
 
                         if (oSelectedData.Status && oSelectedData.Status === "Unassigned") {
-                            MessageToast.show("thisAssetIsAlreadyUnassignedAndcannotBeUnassignedAgain.");
+                            MessageToast.show(this.i18nModel.getText("thisAssetIsAlreadyUnassignedAndcannotBeUnassignedAgain."));
                             return;
                         }
 
@@ -355,16 +360,18 @@ sap.ui.define([
                         if (!this._unassignDialog) {
                             this._unassignDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetUnassignDialog", this);
                             this.getView().addDependent(this._unassignDialog);
+                            this._FragmentDatePickersReadOnly(["FAU_id_unassignDate"]);
                         }
                         this._unassignDialog.open();
+
                     } else {
-                        MessageToast.show("tableBindingContextNotFound");
+                        MessageToast.show(this.i18nModel.getText("tableBindingContextNotFound"));
                         return;
 
                     }
                 }
                 else {
-                    MessageToast.show("pleaseSelectTheRowToUnassign");
+                    MessageToast.show(this.i18nModel.getText("pleaseSelectTheRowToUnassign"));
                 }
             },
 
@@ -437,29 +444,18 @@ sap.ui.define([
                 var oDate = sap.ui.getCore().byId("FAU_id_unassignDate").getValue();
                 var oTableSelected = this.byId("AA_id_AssestTable");
                 var selected = oTableSelected.getSelectedItem();
-
-                // this.byId("AA_id_AssestTable").removeSelections(true)
-
-                if (!selected) {
-                    // this.getView().byId("AA_id_AssestTable").setBusy(false);
-                    MessageToast.show("pleaseSelectDateToUnassign.");
-                    sap.ui.getCore().byId("FAU_id_unassignDate").setValueState("Error");
-                    return;
-                }
-
                 if (selected) {
                     var context = selected.getBindingContext("assetModel");
                     var selectedData = context.getObject();
-                    if (oDate !== "") {
+                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAU_id_unassignDate"), "ID")) {
                         selectedData.ReturnDate = oDate;
                         selectedData.Status = "Unassigned";
 
                         var id = selected.getBindingContext("assetModel").getObject().SerialNumber;
-                        await this.ajaxUpdateWithJQuery("IncomeAsset", { data: selectedData, filters: { "SerialNumber": id } }, ["FAU_id_unassignDialog"]);
+                        await this.ajaxUpdateWithJQuery("IncomeAsset", { data: selectedData, filters: { "SerialNumber": id, "EquipmentNumber": selected.getBindingContext("assetModel").getObject().EquipmentNumber } }, ["FAU_id_unassignDialog"]);
                         this.AA_CoomonReadCall()
                         this._unassignDialog.close();
                         oTableSelected.removeSelections();
-
                     }
                 }
             },
