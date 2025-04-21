@@ -12,6 +12,7 @@ sap.ui.define([
             _onRouteMatched: async function () {
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");
                 this.MSA_onSearch();
+                BusyIndicator.hide();
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");

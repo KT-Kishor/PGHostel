@@ -30,7 +30,6 @@ sap.ui.define([
             }
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this.Exp_onSearch();
             var View = new JSONModel({
                 SaveBtn: false,
                 SubmitBtn: false,
@@ -42,6 +41,7 @@ sap.ui.define([
             this.LoginModel = this.getView().getModel("LoginModel");
             this.CommonModel();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
+            this.Exp_onSearch();
         },
  // Function to initialize the common model for expense creation
         CommonModel: function() {
@@ -223,7 +223,7 @@ sap.ui.define([
             try {
                 BusyIndicator.show(0);
                 const aFilterItems = this.byId("Exp-id-FilterBar").getFilterGroupItems();
-                const params = {};
+                const params = {"EmployeeID":this.LoginModel.getProperty("/EmployeeID")};
 
                 aFilterItems.forEach(function(oItem) {
                     const oControl = oItem.getControl();

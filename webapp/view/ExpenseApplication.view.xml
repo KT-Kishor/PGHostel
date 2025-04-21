@@ -15,7 +15,7 @@
     <content>
         <fb:FilterBar id="Exp-id-FilterBar" showFilterConfiguration="false" persistencyKey="myPersKey" useToolbar="false" clear="Exp_onPressClear" showClearOnFB="true" search="Exp_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" class="sapUiResponsiveMargin" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="{= ${LoginModel>/Role} === 'Admin' ? true : false}">
 					<fb:control>
 						<ComboBox name="EmployeeID" showSecondaryValues="true" showClearIcon="true" items="{EmpModel>/}" id="Exp_id_EmployeeName">
 							<core:ListItem key="{EmpModel>EmployeeID}" text="{EmpModel>EmployeeID}" additionalText="{EmpModel>EmployeeName}" />
@@ -56,7 +56,7 @@
 			<Table id="exp_Id_ExpenseTable" items="{ExpenseModel>/}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" >
 			 <headerToolbar>
                 <OverflowToolbar >
-                    <Title id="title" text="Expense Details"/>
+                    <Title id="title" text="Expense Details ({= ${ExpenseModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
                    <Button icon="sap-icon://add-employee" tooltip="{i18n>expenseAddTooltip}" press="Exp_onPressAddExpense" />
