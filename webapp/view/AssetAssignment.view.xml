@@ -122,8 +122,8 @@
             <headerToolbar>
                 <OverflowToolbar>
                     <Title
-                        text="{i18n>assetData} ({= ${assetModel>/}.length})"
-                    />
+                        text="{i18n>assetData} ({= ${assetModel>/}.length})" />
+                    
                     <ToolbarSpacer />
                     <Button
                         icon="sap-icon://excel-attachment"
@@ -202,13 +202,15 @@
                         <Text text="{assetModel>Model}" />
                         <Text text="{assetModel>EquipmentNumber}" />
                         <Text text="{assetModel>SerialNumber}" />
-                        <Text text="{assetModel>AssignedByEmployeeName}" />
+                        <ObjectIdentifier 
+                        title="{assetModel>AssignedByEmployeeName}"
+                        text="{assetModel>AssignedByEmployeeID}" />
                         <Text text="{assetModel>AssignBranch}" />
                         <Text
                             text="{= ${assetModel>AssignedDate} === '1899-11-30T00:00:00.000Z' || !${assetModel>AssignedDate} ? '' : ${assetModel>AssignedDate}.substring(8,10) + '/' + ${assetModel>AssignedDate}.substring(5,7) + '/' + ${assetModel>AssignedDate}.substring(0,4) }"
                         />
                         <Text
-                            text="{path:'assetModel>AssetValue',formatter:'.Formatter.formatCurrencyInINRText'}"
+                            text="{assetModel>Currency} {path:'assetModel>AssetValue',formatter:'.Formatter.fromatNumber'}"
                         />  
                         <ObjectStatus
                             inverted="true"
