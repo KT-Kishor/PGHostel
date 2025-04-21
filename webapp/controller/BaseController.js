@@ -293,20 +293,34 @@ sap.ui.define([
     _makeDatePickersReadOnly: function (aIds) {
       var oView = this.getView();
       aIds.forEach(function (sId) {
-        var oDatePicker = oView.byId(sId);
-        if (oDatePicker) {
-          oDatePicker.addEventDelegate({
+        var oControl = oView.byId(sId);
+        if (oControl) {
+          var bIsValueHelp = oControl.getMetadata().getName() === "sap.m.Input" && oControl.getShowValueHelp && oControl.getShowValueHelp();
+    
+          oControl.addEventDelegate({
             onAfterRendering: function () {
-              var datePickerDomRef = oDatePicker.getFocusDomRef();
-              if (datePickerDomRef) {
-                datePickerDomRef.readOnly = true;
-                datePickerDomRef.style.cursor = 'pointer';
+              var oDomRef = oControl.getDomRef("inner");
+              if (oDomRef) {
+                oDomRef.setAttribute("readonly", true); // block typing
+                oDomRef.style.cursor = "pointer";
               }
             }
+          }, oControl);
+    
+          oControl.attachBrowserEvent("click", function () {
+            var oIcon = oControl.getDomRef("icon");
+            if (oIcon) {
+              oIcon.click(); // open calendar or value help
+            }
+          });
+    
+          // Optional: prevent typing via keypress too (extra safe)
+          oControl.attachBrowserEvent("keydown", function (oEvent) {
+            oEvent.preventDefault();
           });
         }
       });
-    },
+    },            
 
     //fragment date picker function
     _FragmentDatePickersReadOnly: function (aIds) {
@@ -315,16 +329,23 @@ sap.ui.define([
         if (oDatePicker) {
           oDatePicker.addEventDelegate({
             onAfterRendering: function () {
-              var datePickerDomRef = oDatePicker.getFocusDomRef();
-              if (datePickerDomRef) {
-                datePickerDomRef.readOnly = true;
-                datePickerDomRef.style.cursor = 'pointer';
+              var oInputDom = oDatePicker.getDomRef("inner");
+              if (oInputDom) {
+                oInputDom.setAttribute("readonly", true); // Prevent typing
+                oInputDom.style.cursor = "pointer";
               }
+            }
+          }, oDatePicker);
+          // Open calendar on click
+          oDatePicker.attachBrowserEvent("click", function () {
+            var oIconDomRef = oDatePicker.getDomRef("icon");
+            if (oIconDomRef) {
+              oIconDomRef.click(); // simulate icon click to open calendar
             }
           });
         }
       });
-    },
+    }, 
 
     _convertBLOBtoBASE64: function (buffer) {
       if (!buffer || buffer.byteLength === 0) {
