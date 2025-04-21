@@ -20,6 +20,7 @@ sap.ui.define(
         },
         _onObjectMatched: function (oEvent) {
           BusyIndicator.hide();
+          this.commonLoginFunction("SchemeUpload");
           var that = this;
           var sData = oEvent.getParameter("arguments").data;
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();

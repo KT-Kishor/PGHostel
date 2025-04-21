@@ -7,14 +7,14 @@ sap.ui.define(
     "sap/m/MessageBox", // Import MessageBox for alerts/confirmations
     "sap/ui/core/BusyIndicator" // Import BusyIndicator for loading indicators
   ],
-  function (BaseController, Formatter, Spreadsheet, MessageToast, MessageBox,BusyIndicator) {
+  function (BaseController, Formatter, Spreadsheet, MessageToast, MessageBox, BusyIndicator) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.Listofholidays",
       {
         Formatter: Formatter,
         onInit: function () {
-        this.getRouter().getRoute("RouteListofholidays").attachMatched(this._onRouteMatched, this);
+          this.getRouter().getRoute("RouteListofholidays").attachMatched(this._onRouteMatched, this);
         },
 
         _onRouteMatched: async function () {
@@ -26,35 +26,37 @@ sap.ui.define(
           // Make date pickers read-only
           this._makeDatePickersReadOnly(["LOH_id_Holidays"]);
           // Fetch holiday data for current year 
-          await this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31`}).then(() => {
-          // Get i18n resource bundle
-          that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
-          // Set header name in LoginModel
-          that.getView().getModel("LoginModel").setProperty("/HeaderName", that.i18nModel.getText("headerListOfHolidays"));
-          BusyIndicator.hide();
-        }).catch((error) => {
+          await this._fetchCommonData("ListOfHolidays?", "HolidayModel", { startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31` }).then(() => {
+            // Get i18n resource bundle
+            that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
+            // Set header name in LoginModel
+            that.getView().getModel("LoginModel").setProperty("/HeaderName", that.i18nModel.getText("headerListOfHolidays"));
+            BusyIndicator.hide();
+          }).catch((error) => {
             BusyIndicator.hide();
             MessageToast.show(error.message || error.responseText);
-        });
+          });
         },
-        
+
         onSearch: async function () {
           var selectedYear = this.byId("LOH_id_Holidays").getValue(); // Get selected year from input field
           var currentYear = new Date().getFullYear();
           if (selectedYear > currentYear) { // Check if selected year is in the future
-              MessageToast.show(this.i18nModel.getText("futureHolidays"));
-              return;
+            MessageToast.show(this.i18nModel.getText("futureHolidays"));
+            return;
           }
           BusyIndicator.show(0); // Show busy indicator
-          await this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`,
-          endDate: `${selectedYear}-12-31` }).then(() => {
+          await this._fetchCommonData("ListOfHolidays?", "HolidayModel", {
+            startDate: `${selectedYear}-01-01`,
+            endDate: `${selectedYear}-12-31`
+          }).then(() => {
             BusyIndicator.hide();
-        }).catch((error) => {
+          }).catch((error) => {
             BusyIndicator.hide();
             MessageToast.show(error.message || error.responseText);
-        });
-      },
-        
+          });
+        },
+
         // Opens the import dialog for holiday list
         LOH_onOpenImport: function () {
           var that = this;
@@ -92,8 +94,8 @@ sap.ui.define(
           var file = e.getParameter("files") && e.getParameter("files")[0];
           var selectedYear = sap.ui.getCore().byId("ALH_id_Date").getValue();
           // Expected columns in the Excel file
-          var expectedColumns = ["Name","Date","Day","Karnataka","OtherStates",
-                                 "Maharashtra","Delhi"];
+          var expectedColumns = ["Name", "Date", "Day", "Karnataka", "OtherStates",
+            "Maharashtra", "Delhi"];
           var that = this;
           // File reader to process the uploaded file
           var reader = new FileReader();
@@ -121,11 +123,11 @@ sap.ui.define(
               // Validate state data (Yes or No)
               var invalidData = excelData.slice(1).some((row) => {
                 return [3, 4, 5, 6].some((index) => {
-                        const value = String(row[index]).trim();
-                        return value !== 'Yes' && value !== 'No';
-                    }
+                  const value = String(row[index]).trim();
+                  return value !== 'Yes' && value !== 'No';
+                }
                 );
-             });
+              });
               if (invalidData) {
                 MessageToast.show(that.i18nModel.getText("InvalidColStateFormat"));
                 oFileUploader.clear();
@@ -154,11 +156,11 @@ sap.ui.define(
         },
 
         excelDateToJSDate: function (serial) {
-          var excelEpoch = new Date(Date.UTC(1899, 11, 30)); 
-          var date = new Date(excelEpoch.getTime() + serial * 86400000); 
+          var excelEpoch = new Date(Date.UTC(1899, 11, 30));
+          var date = new Date(excelEpoch.getTime() + serial * 86400000);
           return date;
         },
-      
+
         LOH_onPressSubmit: async function () {
           try {
             var that = this;
@@ -177,7 +179,8 @@ sap.ui.define(
               Maharashtra: row[5],
               Delhi: row[6],
             }));
-            await this.ajaxReadWithJQuery("ListOfHolidays", {startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31`
+            await this.ajaxReadWithJQuery("ListOfHolidays", {
+              startDate: `${selectedYear}-01-01`, endDate: `${selectedYear}-12-31`
             }).then((existingData) => {
               if (existingData.data.length > 0) {
                 MessageBox.confirm(
@@ -187,14 +190,20 @@ sap.ui.define(
                     onClose: async function (sAction) {
                       if (sAction === MessageBox.Action.YES) {
                         BusyIndicator.show(0);
-                        await that.ajaxDeleteWithJQuery("ListOfHolidays", {filters: {startDate: `${selectedYear}-01-01`,
-                          endDate: `${selectedYear}-12-31`},
+                        await that.ajaxDeleteWithJQuery("ListOfHolidays", {
+                          filters: {
+                            startDate: `${selectedYear}-01-01`,
+                            endDate: `${selectedYear}-12-31`
+                          },
                         }).then(() => {
-                          return that.ajaxCreateWithJQuery("ListOfHolidays", {data: formattedData});}).then(() => {
+                          return that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
+                        }).then(() => {
                           MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
                           that.oHolidayDialog.close();
-                          return that._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`,
-                            endDate: `${selectedYear}-12-31`});
+                          return that._fetchCommonData("ListOfHolidays?", "HolidayModel", {
+                            startDate: `${selectedYear}-01-01`,
+                            endDate: `${selectedYear}-12-31`
+                          });
                         }).catch((error) => {
                           MessageToast.show(error.message || error.responseText);
                         }).finally(() => {
@@ -207,17 +216,20 @@ sap.ui.define(
                   }
                 );
               } else {
-                that.ajaxCreateWithJQuery("ListOfHolidays", {data: formattedData}).then(() => {
+                that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData }).then(() => {
                   MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
                   that.oHolidayDialog.close();
-                  return that._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`,
-                  endDate: `${selectedYear}-12-31`});
+                  return that._fetchCommonData("ListOfHolidays?", "HolidayModel", {
+                    startDate: `${selectedYear}-01-01`,
+                    endDate: `${selectedYear}-12-31`
+                  });
                 }).catch((error) => {
                   MessageToast.show(error.message || error.responseText);
                 }).finally(() => {
                   BusyIndicator.hide();
                 });
-              }}).catch((err) => {
+              }
+            }).catch((err) => {
               BusyIndicator.hide();
               MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
             });
@@ -226,7 +238,7 @@ sap.ui.define(
             MessageToast.show(error.message || error.responseText);
           }
         },
-        
+
         //Exports the holiday list to an Excel file
         LOH_onExport: function () {
           var oModel = this.byId("LOH_id_HolidayTable").getModel("HolidayModel").getData();
@@ -242,7 +254,7 @@ sap.ui.define(
             fileName: "List_Of_Holidays.xlsx",
             worker: false,
           };
-           // Create and build spreadsheet
+          // Create and build spreadsheet
           const oSheet = new sap.ui.export.Spreadsheet(oSettings);
           oSheet.build().finally(function () {
             oSheet.destroy();
@@ -267,7 +279,7 @@ sap.ui.define(
         },
 
         onLogout: function () {
-          this.getRouter().navTo("RouteLoginPage"); // Navigate to the login page
+          this.CommonLogoutFunction(); // Navigate to the login page
         },
       }
     );

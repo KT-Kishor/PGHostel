@@ -25,6 +25,7 @@ sap.ui.define(
             .attachMatched(this._RouteAppVisibility, this);
         },
         _RouteAppVisibility: function (oEvent) {
+          this.commonLoginFunction("SchemeUpload");
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().setModel(new JSONModel({ isFileValid: false })); //for createfragmentsubmit button
           this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("schemeupload"));
@@ -81,7 +82,7 @@ sap.ui.define(
         },
         //for Singout
         onLogout: function () {
-          this.getRouter().navTo("RouteLoginPage");
+          this.CommonLogoutFunction()
         },
         //open uploadBox
         SU_onUploadpress: function () {
@@ -95,6 +96,7 @@ sap.ui.define(
           this.oSchemeUploadDialog.open();
         },
         FUS_onCreateDialogCancel: function () {
+          this.byId("SU_id_Quotationtable").removeSelections(true);
           this.oSchemeUploadDialog.close();
           var oFileUploader = sap.ui.getCore().byId("idFileUploader");
           oFileUploader.setValue("");
