@@ -349,7 +349,7 @@ sap.ui.define([
                         var oSelectedData = oBindingContext.getObject();
 
                         if (oSelectedData.Status && oSelectedData.Status === "Unassigned") {
-                            MessageToast.show(this.i18nModel.getText("thisAssetIsAlreadyUnassignedAndcannotBeUnassignedAgain."));
+                            MessageToast.show(this.i18nModel.getText("thisAssetIsAlreadyUnassignedAndcannotBeUnassignedAgain"));
                             return;
                         }
 
