@@ -13,6 +13,7 @@ sap.ui.define([
             },
             _onRouteMatched: async function () {
                 BusyIndicator.show(0)
+                this.commonLoginFunction("EmployeeDetails");
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
                 this.byId("SS_id_IconTab").setSelectedKey("employeeDetailsKey");
@@ -23,6 +24,7 @@ sap.ui.define([
                 await this._fetchCommonData("Designation", "sDesignationModel");
                 await this._fetchCommonData("BaseLocation", "sBaseLocationModel");
                 await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
+                this.SS_readSalaryDetails(this.EmployeeID);
                 var viewModel = new JSONModel({
                     fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false,
                     isRoleMode: false, Max: new Date(), isVisitMode: true, isIdMode: true, isEditButtonVisible: true
@@ -76,6 +78,7 @@ sap.ui.define([
             },
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
+                this.CommonLogoutFunction();
             },
             SS_CommonID: function () {
                 const ids = ["SS_id_BloodGroup", "SS_id_Compmail", "SS_id_PAddress", "SS_id_CAdress", "SS_id_BaseL", "SS_id_Desi", "SS_id_Manager", "SS_id_MobileNo", "SS_id_RoleEmpSele", "SS_id_StatusSelf",
@@ -575,147 +578,132 @@ sap.ui.define([
                 oDialog.open();
             },
 
+            SS_readSalaryDetails: async function (filter) {
+                try {
+                    const oData = await this.ajaxReadWithJQuery("SalaryDetails", { EmployeeID: this.EmployeeID }, []);
+                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                   // Set entire array to model if needed globally
+                    this.getOwnerComponent().setModel(new JSONModel(offerData), "salaryData");
+                    // Display all salary records
+                    this.displaySalaryDetails(offerData);
+                } catch (error) {
+                    MessageToast.show(error.message || error.responseText);
+                } 
+            },
+            
+
             //Display the salary details
-            displaySalaryDetails: function (salaryDetails) {
+            displaySalaryDetails: function (salaryDetailsArray) {
                 var oVBox = this.getView().byId("SS_id_FormsContainer");
                 oVBox.removeAllItems(); // Clear previous content
-
-                salaryDetails.forEach(
-                    function (detail, index) {
-                        var appraisalDate = detail.AppraisalDate
-                            ? detail.AppraisalDate
-                            : new Date().toLocaleDateString();
-                        var effectiveDate = detail.EffectiveDate
-                            ? detail.EffectiveDate
-                            : new Date().toLocaleDateString();
-                        var sTitleText = `Appraisal Date: ${appraisalDate}, Effective Date: ${effectiveDate} - Yearly Gross: INR ${this.Formatter.IndiaNumberFormatter(
-                            detail.Gross
-                        )}`;
-
-                        // Using a Panel for better responsiveness
-                        var oPanel = new sap.m.Panel({
-                            expandable: true,
-                            expanded: true,
-                            headerToolbar: new sap.m.Toolbar({
-                                content: [
-                                    new sap.m.Text({
-                                        text: sTitleText,
-                                        wrapping: true,
-                                        maxLines: 2,
-                                        class: "responsiveTitle",
-                                    }),
-                                ],
-                            }),
+            
+                salaryDetailsArray.forEach(function (offerData, index) {
+                    var appraisalDate = offerData.AppraisalDate || new Date().toLocaleDateString();
+                    var effectiveDate = offerData.EffectiveDate || new Date().toLocaleDateString();
+            
+                    var sTitleText = `Appraisal Date: ${appraisalDate}, Effective Date: ${effectiveDate} - Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.Gross)}`;
+            
+                    var oPanel = new sap.m.Panel({
+                        expandable: true,
+                        expanded: true,
+                        headerToolbar: new sap.m.Toolbar({
                             content: [
-                                new sap.ui.layout.form.SimpleForm({
-                                    layout: "ResponsiveGridLayout",
-                                    editable: false,
-                                    columnsM: 2,
-                                    columnsL: 2,
-                                    columnsXL: 2,
-                                    content: [
-                                        new sap.ui.core.Title({
-                                            text: this.i18nModel.getText("empOfmonthlyCalculation"),
-                                        }),
-                                        new sap.m.Label({
-                                            text: this.i18nModel.getText("empOfbasicSalary"),
-                                        }),
-                                        new sap.m.Text({
-                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
-                                                detail.MonthBasic
-                                            )}`,
-                                        }),
-                                        new sap.m.Label({
-                                            text: this.i18nModel.getText("empOfhra"),
-                                        }),
-                                        new sap.m.Text({
-                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
-                                                detail.MonthHRA
-                                            )}`,
-                                        }),
-                                        new sap.m.Label({
-                                            text: this.i18nModel.getText("empOftaDa"),
-                                        }),
-                                        new sap.m.Text({
-                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
-                                                detail.MonthTADA
-                                            )}`,
-                                        }),
-                                        new sap.m.Label({
-                                            text: this.i18nModel.getText("empOfothers"),
-                                        }),
-                                        new sap.m.Text({
-                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
-                                                detail.MonthOthers
-                                            )}`,
-                                        }),
-                                        new sap.m.Label({
-                                            text: this.i18nModel.getText("empOfmonthlyTotal"),
-                                        }),
-                                        new sap.m.Text({
-                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
-                                                detail.MonthTotal
-                                            )}`,
-                                        }),
-
-                                        new sap.ui.core.Title({
-                                            text: this.i18nModel.getText("empOfyearlyCalculation"),
-                                        }),
-                                        new sap.m.Label({
-                                            text: this.i18nModel.getText("empOfbasicSalary"),
-                                        }),
-                                        new sap.m.Text({
-                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
-                                                detail.YearBasic
-                                            )}`,
-                                        }),
-                                        new sap.m.Label({
-                                            text: this.i18nModel.getText("empOfhra"),
-                                        }),
-                                        new sap.m.Text({
-                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
-                                                detail.YearHRA
-                                            )}`,
-                                        }),
-                                        new sap.m.Label({
-                                            text: this.i18nModel.getText("empOftaDa"),
-                                        }),
-                                        new sap.m.Text({
-                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
-                                                detail.YearTADA
-                                            )}`,
-                                        }),
-                                        new sap.m.Label({
-                                            text: this.i18nModel.getText("empOfothers"),
-                                        }),
-                                        new sap.m.Text({
-                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
-                                                detail.YearOthers
-                                            )}`,
-                                        }),
-                                        new sap.m.Label({
-                                            text: this.i18nModel.getText("empOfyearlyTotal"),
-                                        }),
-                                        new sap.m.Text({
-                                            text: `INR ${this.Formatter.IndiaNumberFormatter(
-                                                detail.YearTotal
-                                            )}`,
-                                        }),
-                                    ],
-                                }),
-                            ],
-                        });
-                        // Wrapper VBox for spacing
-                        var oWrapperVBox = new sap.m.VBox({
-                            items: [oPanel],
-                            layoutData: new sap.m.FlexItemData({
-                                styleClass: "marginBottom", // Apply CSS margin
-                            }),
-                        });
-                        oVBox.addItem(oWrapperVBox);
-                    }.bind(this)
-                );
+                                new sap.m.Text({
+                                    text: sTitleText,
+                                    wrapping: true,
+                                    maxLines: 2,
+                                    class: "responsiveTitle"
+                                })
+                            ]
+                        }),
+                        content: [
+                            new sap.ui.layout.form.SimpleForm({
+                                layout: "ResponsiveGridLayout",
+                                editable: false,
+                                columnsM: 2,
+                                columnsL: 2,
+                                columnsXL: 2,
+                                content: [
+                                    new sap.ui.core.Title({ text: this.i18nModel.getText("rateMonthly") }),
+                                    new sap.ui.core.Title({ text: this.i18nModel.getText("monthlyComponents") }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.BasicSalary)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("hra") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.HRA)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.EmployerPF)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.MedicalInsurance)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.Gratuity)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.SpecailAllowance)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("Total") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.Total)}` }),
+                                    new sap.ui.core.Title({ text: this.i18nModel.getText("totalDeductionAmount") }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.EmployeePF)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.PT)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.IncomeTax)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.TotalDeduction)}` }),
+                                    new sap.ui.core.Title({ text: this.i18nModel.getText("EmpOfferVariablePay") }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.VariablePay)}` }),
+                                    new sap.ui.core.Title({ text: this.i18nModel.getText("grossPay") }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.GrossPay)}` }),
+            
+                                    // Yearly Data
+                                    new sap.ui.core.Title({ text: this.i18nModel.getText("yearly") }),
+                                    new sap.ui.core.Title({ text: this.i18nModel.getText("monthlyComponents") }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.BasicSalary)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("hra") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.HRA)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployerPF)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.MedicalInsurance)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Gratuity)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.SpecailAllowance)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("Total") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Total)}` }),
+                                    new sap.ui.core.Title({ text: this.i18nModel.getText("totalDeductionAmount") }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployeePF)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.PT)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.IncomeTax)}` }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` }),
+                                    new sap.ui.core.Title({ text: this.i18nModel.getText("EmpOfferVariablePay") }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` }),
+                                    new sap.ui.core.Title({ text: this.i18nModel.getText("grossPay") }),
+                                    new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
+                                ]
+                            })
+                        ]
+                    });
+            
+                    var oWrapperVBox = new sap.m.VBox({
+                        items: [oPanel],
+                        layoutData: new sap.m.FlexItemData({
+                            styleClass: "marginBottom"
+                        })
+                    });
+            
+                    oVBox.addItem(oWrapperVBox);
+                }.bind(this));
             },
+            
             //On icon tab select function
             SS_onTabSelect: function (oEvent) {
                 var oView = this.getView();
@@ -743,7 +731,7 @@ sap.ui.define([
                 this.getView().setBusy(true);
                 try {
                     let oViewModel = this.getView().getModel("viewModel");
-                    oViewModel.setProperty("/isEditButtonVisible", false);            
+                    oViewModel.setProperty("/isEditButtonVisible", false);
                     if (sKey === "employeeDetailsKey") {
                         oViewModel.setProperty("/isEditButtonVisible", true);
                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
@@ -763,7 +751,7 @@ sap.ui.define([
                     this.getView().setBusy(false);
                 }
             },
-            
+
 
             SS_onDownloadTerminateLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
@@ -815,7 +803,6 @@ sap.ui.define([
 
             FCR_onCloseDialog: function () {
                 this.SSRTE_oDialog.close();
-            }
-
+            },
         });
     });

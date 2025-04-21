@@ -7,7 +7,7 @@
 	<Dialog 
         title="{i18n>headerEmpDetails}">
 		<f:SimpleForm
-            editable="true" layout="ColumnLayout"
+            editable="true" layout="ColumnLayout" id="OEF_id_SimpleForm"
             labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
             adjustLabelSpan="false" emptySpanXL="0" columnsXL="2" columnsL="2"
             columnsM="1" singleContainerFullSize="false">
@@ -33,7 +33,7 @@
 				<Label text="{i18n>joiningDate}" />
 					<DatePicker  value="{ path: 'oEmpolyeeDetailsModel>/JoiningDate',formatter:'.Formatter.formatDate' }"  editable="false"   displayFormat="dd/MM/yyyy"     valueFormat="dd/MM/yyyy"  />
 				<Label text="{i18n>baseLocation}" required="true"/>
-			   <Select items="{BaseLocationModel>/}"  showSecondaryValues="true" selectedKey="{oEmpolyeeDetailsModel>/BaseLocation}">
+			   <Select items="{BaseLocationModel>/}"  showSecondaryValues="true" selectedKey="{oEmpolyeeDetailsModel>/BaseLocation}" change="EO_onBaseLocationChange">
 					<items>
 						<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 					</items>

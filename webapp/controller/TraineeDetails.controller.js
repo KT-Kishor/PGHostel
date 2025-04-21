@@ -15,6 +15,7 @@ sap.ui.define([
             },
             _onRouteMatched: async function (oEvent) {
                 BusyIndicator.show(0)
+                this.commonLoginFunction("Trainee");
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });//CC mailId read call

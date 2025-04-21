@@ -15,6 +15,7 @@ sap.ui.define([
             },
             _onRouteMatched: async function (oEvent) {
                 BusyIndicator.show(0);
+                this.commonLoginFunction("EmployeeOffer");
                 this.byId("EOD_id_Joindate").setMinDate(new Date());
                 this.sArgPara = oEvent.getParameter("arguments").sParOffer
                 this.sSalutationArg = oEvent.getParameter("arguments").sParEmployee;

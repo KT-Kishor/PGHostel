@@ -15,6 +15,7 @@ sap.ui.define([
             },
             _onRouteMatched: async function (oEvent) {
                 BusyIndicator.show(0)
+                this.commonLoginFunction("Trainee");
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 await this._fetchCommonData("Designation", "DesignationModel");
@@ -70,6 +71,8 @@ sap.ui.define([
             //validation function for date
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
+                this.CommonLogoutFunction();
+
             },
             //Trainee creation button
             T_onPressAddTrainee: function (oEvent) {

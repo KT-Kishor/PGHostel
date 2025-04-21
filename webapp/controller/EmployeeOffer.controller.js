@@ -18,6 +18,8 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
+                
+                this.commonLoginFunction("EmployeeOffer");
                 BusyIndicator.show(0)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
@@ -32,7 +34,7 @@ sap.ui.define([
                 else {
                     this.EO_onSearch();
                 }
-                BusyIndicator.hide()
+                BusyIndicator.hide();
             },
             readCallForEmployeeOffer: async function (filter) {
                 await this.ajaxReadWithJQuery("EmployeeOffer", filter, ["EO_id_TableEOffer"]).then((oData) => {
@@ -54,6 +56,7 @@ sap.ui.define([
             },
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
+                this.CommonLogoutFunction();
             },
             EO_onPressEmployee: function (oEvent) {
                 var oParValue, value;
@@ -70,7 +73,7 @@ sap.ui.define([
                 });
             },
             EO_onOnboardPress: async function () {
-                await this._fetchCommonData("Designation", "DesignationModel");
+                await this._fetchCommonData("Designation", "DesignationModel",{},["OEF_id_SimpleForm"]);
                 await this._fetchCommonData("AppVisibility", "RoleModel");
                 await this._fetchCommonData("EmployeeDetails", "EmployeeModel");
                 this.onHandleEmployeeAction("OnBoarded", "onBoardEmployee");
@@ -246,8 +249,7 @@ sap.ui.define([
                         tableName: "EmployeeDetails",
                         data: oModel
                     };
-                    this.ajaxCreateWithJQuery("EmployeeDetails", oPayload, ["EO_id_TableEOffer"]).then((oData) => {
-                        BusyIndicator.hide();
+                    this.ajaxCreateWithJQuery("EmployeeDetails", oPayload, ["OEF_id_SimpleForm"]).then((oData) => {
                         if (oData.success) {
                             MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
                             this.oDialog.close();
@@ -296,5 +298,18 @@ sap.ui.define([
                     this.byId("EO_id_RejectBtn").setEnabled(!isDisabled);
                 }
             },
+            EO_onBaseLocationChange: function (oEvent) {
+                var sSelectedKey = oEvent.getSource().getSelectedKey();  
+                var oBaseLocationModel = this.getView().getModel("BaseLocationModel");
+                var aLocations = oBaseLocationModel.getData();
+                var oSelectedLocation = aLocations.find(function (loc) {
+                    return loc.city === sSelectedKey;
+                });
+                if (oSelectedLocation) {
+                    var oEmpModel = this.getView().getModel("oEmpolyeeDetailsModel");
+                    oEmpModel.setProperty("/BranchCode", oSelectedLocation.branchCode);
+                }
+            }
+            
         });
     });
