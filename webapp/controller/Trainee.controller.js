@@ -14,8 +14,8 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
-                BusyIndicator.show(0)
                 this.commonLoginFunction("Trainee");
+                BusyIndicator.show(0)
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 await this._fetchCommonData("Designation", "DesignationModel");
@@ -28,8 +28,8 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("traineeDetails"));
                 this.oValue = oEvent.getParameter("arguments").value;
                 if (this.oValue === "Trainee") {
-                    this.readCallForTrainee("Initial");
-                    this.T_onPressClear();// clear the filter bar
+                   await  this.T_onPressClear();// clear the filter bar
+                    await this.readCallForTrainee("Initial");
                 }
                 else {
                     this.T_onSearch();// filter function for trainee 
@@ -38,24 +38,23 @@ sap.ui.define([
             },
             //read call for trainee
             readCallForTrainee: async function (filter) {
-                await this.ajaxReadWithJQuery("Trainee", filter, ["T_id_TraineeTable"]).then((oData) => {
-                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                try {
+                    const oData = await this.ajaxReadWithJQuery("Trainee", filter, ["T_id_TraineeTable"]);
+                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    // Set main table model
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
                     if (filter === "Initial") {
-                        offerData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "")
-                            .map(item => [item.TraineeName.trim(), item])).values()]; // removing duplicates
-                        this.getView().setModel(new JSONModel(offerData), "traineeModelInitial");
-                        this.getView().getModel("traineeModelInitial").refresh(true);
-                        let reportingManagerData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "")
-                            .map(item => [item.ReportingManager.trim(), item])).values()];
-                        this.getView().setModel(new JSONModel(reportingManagerData), "traineeModelInitial");
+                        // Create dropdown list with unique TraineeName and ReportingManager entries
+                        const dropdownData = [...new Map( offerData .filter(item => item.TraineeName?.trim() || item.ReportingManager?.trim()) .map(item => [(item.TraineeName || item.ReportingManager).trim(), item]) ).values()];
+                        const oDropdownModel = new JSONModel(dropdownData);
+                        this.getView().setModel(oDropdownModel, "traineeModelInitial");
+                        oDropdownModel.refresh(true);
                     }
-                    BusyIndicator.hide();
-                }).catch((error) => {
-                    sap.ui.core.BusyIndicator.hide();
-                    sap.m.MessageToast.show(error.message || error.responseText);
-                });
+                } catch (error) {
+                    MessageToast.show(error.message || error.responseText);
+                }
             },
+             
             //validation function for mandatory fields
             T_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
@@ -366,7 +365,7 @@ sap.ui.define([
             },
 
             //clear the filterbar
-            T_onPressClear: function () {
+            T_onPressClear: async function () {
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
                 aFilterItems.forEach(function (oItem) {
                     var oControl = oItem.getControl(); // Get the associated control

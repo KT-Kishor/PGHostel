@@ -257,7 +257,7 @@
 				<m:contentRight>
 					<!-- Save/Edit and Merge Buttons -->
 					<m:Button text="{= ${viewModel>/editable} ? ${i18n>save} : ${i18n>edit} }"
-                              press="EOUF_onEditOrSavePress"  id="EOUF_id_SaveBut" visible="{= ${viewModel>/ediBut} }" type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Default' }" />
+                              press="EOUF_onEditOrSavePress"  id="EOUF_id_SaveBut" visible="{= ${viewModel>/ediBut} }" type="{= ${viewModel>/isEditMode} ? 'Default' : 'Accept' }" />
 					<m:Button text="{i18n>tileFooter}" press="EOUF_onSendEmail"  id="EOUF_id_EmpmailBut" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}"/>
 					<m:Button text="{i18n>tileUnit}" press="EOUF_onPressMerge" visible="{= ${viewModel>/isVisiable} }" id="EOUF_id_EmpmergeButton" enabled="{viewModel>/isEditMode}" type="Reject"/>
 				</m:contentRight>

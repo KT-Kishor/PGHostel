@@ -12,7 +12,7 @@
 		<content>
 			<fb:FilterBar showFilterConfiguration="false" class="sapUiTinyMargin" id="T_id_Filterbar" persistencyKey="myPersKey" useToolbar="false" clear="T_onPressClear" showClearOnFB="true" search="T_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="TraineeName" label="{i18n>traineeName}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="TraineeName" label="{i18n>traineeName}" groupName="Group1" visibleInFilterBar="true" >
 						<fb:control>
 							<ComboBox  showSecondaryValues= "true"  items="{traineeModelInitial>/}" id="T_id_TraineeName" showClearIcon="true">
 								<core:ListItem key="{traineeModelInitial>TraineeName}" text="{traineeModelInitial>TraineeName}" />
