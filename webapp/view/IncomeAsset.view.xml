@@ -33,14 +33,14 @@
                     <fb:control>
                         <ComboBox
                             id="IA_id_SlNo"
-                            items="{oModelInitial>/}"
+                            items="{incomeModel>/}"
                             showClearIcon="true"
                         >
                             <items>
                                 <core:Item
                                     id="IA_id_SlItem"
-                                    text="{oModelInitial>SerialNumber}"
-                                    key="{oModelInitial>SerialNumber}"
+                                    text="{incomeModel>SerialNumber}"
+                                    key="{incomeModel>SerialNumber}"
                                 />
                             </items>
                         </ComboBox>
@@ -56,14 +56,14 @@
                     <fb:control>
                         <ComboBox
                             id="IA_id_EqNo"
-                            items="{oModelInitial>/}"
+                            items="{incomeModel>/}"
                             showClearIcon="true"
                         >
                             <items>
                                 <core:Item
                                     id="IA_Eqnoitem"
-                                    text="{oModelInitial>EquipmentNumber}"
-                                    key="{oModelInitial>EquipmentNumber}"
+                                    text="{incomeModel>EquipmentNumber}"
+                                    key="{incomeModel>EquipmentNumber}"
                                 />
                             </items>
                         </ComboBox>

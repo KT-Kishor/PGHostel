@@ -20,10 +20,12 @@ sap.ui.define([
                         this.getRouter().getRoute("RouteIncomeAsset").attachMatched(this._onRouteMatched, this);
            },			
            _onRouteMatched:function(){
+            this.commonLoginFunction("IncomeAsset");
                 let loginModel = this.getView().getModel("LoginModel").getData();
               this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+              
                             var model = new JSONModel({
-                                 "Type": "Laptop",
+                                 "Type": "Mouse",
                                  "Model": "",
                                  "Description":"",
                                  "EquipmentNumber": "",
@@ -36,8 +38,8 @@ sap.ui.define([
                                })
                      this.getView().setModel(model, "CreateIncomeAssetModel");
 
-
-              this.IA_CommonReadCall("Initial");
+                    
+                 this.IA_CommonReadCall("");
                  this._fetchCommonData("AssetType", "oAssetTypeModel");
 				this._fetchCommonData("Currency", "oCurrencyModel");
 				this._fetchCommonData("BaseLocation", "branchModel");
@@ -49,30 +51,46 @@ sap.ui.define([
                 this.getRouter().navTo("RouteTilePage");
             },
             onLogout: function () {
-                this.getRouter().navTo("RouteLoginPage");
+                 this.CommonLogoutFunction()
             },
             IA_CommonReadCall: function (filter) {
                 BusyIndicator.show(0)
 				this.ajaxReadWithJQuery("IncomeAsset", filter).then((oData) => {
 					var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
 					this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "incomeModel");
-                    if (filter === "Initial") {
-                        oFCIAerData = [...new Map(oFCIAerData.filter(item => item.SerialNumber && item.SerialNumber.trim() !== "")
-                            .map(item => [item.SerialNumber.trim(), item])).values()]; 
-                    oFCIAerData = [...new Map(oFCIAerData.filter(item => item.EquipmentNumber && item.EquipmentNumber.trim() !== "")
-                            .map(item => [item.EquipmentNumber.trim(), item])).values()]; 
-                        this.getView().setModel(new JSONModel(oFCIAerData), "oModelInitial");
-                        this.getView().getModel("oModelInitial").refresh(true);
-                    }
+                    this._populateUniqueFilterValues(oFCIAerData);
                     BusyIndicator.hide();
                 }).catch((error) => {
                     BusyIndicator.hide();
                     MessageToast.show(error.message || error.responseText);
                 });
             },            
-			
+            _populateUniqueFilterValues: function (data) {
+                let uniqueValues = {
+                        IA_id_EqNo: new Set(),
+                        IA_id_SlNo: new Set(),
+                    };
+        
+                    data.forEach(item => {
+                        uniqueValues.IA_id_EqNo.add(item.EquipmentNumber);  
+                        uniqueValues.IA_id_SlNo.add(item.SerialNumber); 
+                    });
+
+                    let oView = this.getView();
+                    ["IA_id_EqNo", "IA_id_SlNo"].forEach(field => {
+                        let oComboBox = oView.byId(field);
+                        oComboBox.destroyItems();
+                        Array.from(uniqueValues[field]).sort().forEach(value => {
+                            oComboBox.addItem(new sap.ui.core.Item({
+                                key: value,
+                                text: value
+                            }));
+                        });
+                    });
+                }, 
 		
-			IA_onCreateButtonPress: function () {     
+			IA_onCreateButtonPress: function () {  
+                this._onRouteMatched();   
 				var table=this.getView().byId("IA_id_OdataTable")			
 
 				if (!this.FCIA_Dialog) {
@@ -88,8 +106,8 @@ sap.ui.define([
                      sap.ui.getCore().byId("FCIA_id_model").setValue("").setValueState("None")
                      sap.ui.getCore().byId("FCIA_ID_DescriptionTextArea").setValue("").setValueState("None")
                      sap.ui.getCore().byId("FCIA_id_eqno").setValue("").setValueState("None")
-					sap.ui.getCore().byId("FCIA_id_slno").setValue("").setValueState("None")
-                    sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey("")
+					 sap.ui.getCore().byId("FCIA_id_slno").setValue("").setValueState("None")
+                    //  sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey("")
 					 sap.ui.getCore().byId("FCIA_id_Date").setValue("").setValueState("None")
 					 sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("").setValueState("None")
 					sap.ui.getCore().byId("FCIA_id_assetvalue").setValue("").setValueState("None")
@@ -175,6 +193,7 @@ sap.ui.define([
 							await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oPayLoad,filters: { SerialNumber:selectedData.SerialNumber,EquipmentNumber:selectedData.EquipmentNumber} });
 							MessageToast.show(this.i18nModel.getText("msgCustomer4")); 
 						}
+                          
 			              this.IA_onSearch()
                           this.FCIA_Dialog.close();
 			
@@ -228,17 +247,17 @@ sap.ui.define([
                 }.bind(this));
             } else {
                 this.FCIA_Dialog.open();
-
-                sap.ui.getCore().byId("FCIA_id_type").setSelectedKey(data.Type);
-                sap.ui.getCore().byId("FCIA_id_model").setValue(data.Model).setValueState("None");
+                var oCore=sap.ui.getCore()
+                oCore.byId("FCIA_id_type").setSelectedKey(data.Type);
+                oCore.byId("FCIA_id_model").setValue(data.Model).setValueState("None");
                  oModel.setProperty("/Description",data.Description);
-                 sap.ui.getCore().byId("FCIA_id_eqno").setValue(data.EquipmentNumber).setValueState("None");
-                sap.ui.getCore().byId("FCIA_id_slno").setValue(data.SerialNumber).setValueState("None");
+                 oCore.byId("FCIA_id_eqno").setValue(data.EquipmentNumber).setValueState("None");
+                 oCore.byId("FCIA_id_slno").setValue(data.SerialNumber).setValueState("None");
                 oModel.setProperty("/PickedEmployeeName",data.PickedEmployeeName);
-                sap.ui.getCore().byId("FCIA_id_Date").setDateValue(new Date(data.AssetCreationDate)).setValueState("None");
-                sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey(data.AssignBranch).setValueState("None");
-                sap.ui.getCore().byId("FCIA_id_assetvalue").setValue(data.AssetValue).setValueState("None");
-                sap.ui.getCore().byId("FCIA_id_currency").setSelectedKey(data.Currency)
+                oCore.byId("FCIA_id_Date").setDateValue(new Date(data.AssetCreationDate)).setValueState("None");
+                oCore.byId("FCIA_id_branch").setSelectedKey(data.AssignBranch).setValueState("None");
+                oCore.byId("FCIA_id_assetvalue").setValue(data.AssetValue).setValueState("None");
+                oCore.byId("FCIA_id_currency").setSelectedKey(data.Currency)
                 this._FragmentDatePickersReadOnly(["FCIA_id_Date"])
   }
 		},		
@@ -367,33 +386,7 @@ sap.ui.define([
                      this.getView().byId("IA_id_OdataTable").removeSelections();
 				this.FCIA_Dialog.close();
 
-             },
-                
-    //   _populateUniqueFilterValues: function (data) {
-    //             let uniqueValues = {
-    //                     IA_id_EqNo: new Set(),
-    //                     IA_id_SlNo: new Set(),
-    //                     IA_id_Status: new Set()
-    //                 };
-        
-    //                 data.forEach(item => {
-    //                     uniqueValues.IA_id_EqNo.add(item.EquipmentNumber);  
-    //                     uniqueValues.IA_id_SlNo.add(item.SerialNumber); 
-    //                     uniqueValues.IA_id_Status.add(item.Status); 
-    //                 });
-
-    //                 let oView = this.getView();
-    //                 ["IA_id_EqNo", "IA_id_SlNo", "IA_id_Status"].forEach(field => {
-    //                     let oComboBox = oView.byId(field);
-    //                     oComboBox.destroyItems();
-    //                     Array.from(uniqueValues[field]).sort().forEach(value => {
-    //                         oComboBox.addItem(new sap.ui.core.Item({
-    //                             key: value,
-    //                             text: value
-    //                         }));
-    //                     });
-    //                 });
-    //             },               
+             },          
                  IA_onExport: function () {
                     const oTable = this.getView().byId("IA_id_OdataTable");
                     const oModelData = oTable.getModel("incomeModel").getData();
