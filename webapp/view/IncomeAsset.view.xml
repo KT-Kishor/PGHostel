@@ -138,7 +138,6 @@
             class="sapUiResponsiveMargin"
             width="auto"
             alternateRowColors="true"
-            busyIndicatorDelay="0"
             items="{
             path:'incomeModel>/',
              sorter: [{
@@ -223,7 +222,8 @@
 						text="{incomeModel>Description}"/>
                          <ObjectIdentifier
 						title="{incomeModel>PickedEmployeeName}"
-						text="{incomeModel>EmployeeID}"/>
+						text="{incomeModel>PickedEmployeeID}"/>
+
                       <Text text="{incomeModel>SerialNumber}"/>
                         <Text text="{incomeModel>EquipmentNumber}"/>
                           <Text text="{

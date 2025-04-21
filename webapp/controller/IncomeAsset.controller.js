@@ -25,7 +25,7 @@ sap.ui.define([
               this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
               
                             var model = new JSONModel({
-                                 "Type": "Mouse",
+                                 "Type": "",
                                  "Model": "",
                                  "Description":"",
                                  "EquipmentNumber": "",
@@ -33,8 +33,12 @@ sap.ui.define([
                                  "AssetCreationDate": "",
                                  "AssignBranch": "",
                                  "Status": "Unassigned",
+                                 "Currency":"INR",
                                  "TrashDate": "",
-                                 "PickedEmployeeName": loginModel.EmployeeName
+                                 "PickedEmployeeName": loginModel.EmployeeName,
+                                 "PickedEmployeeID":loginModel.EmployeeID
+
+
                                })
                      this.getView().setModel(model, "CreateIncomeAssetModel");
 
@@ -182,6 +186,7 @@ sap.ui.define([
 							"Currency": oModel.Currency,
 							"Status": "Unassigned",
                             "TrashDate": null,
+                            "PickedEmployeeID":oModel.PickedEmployeeID
 						};
                        
 

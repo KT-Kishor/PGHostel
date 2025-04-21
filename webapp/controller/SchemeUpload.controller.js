@@ -245,7 +245,7 @@ sap.ui.define(
           });
 
           if (validRows.length === 0) {
-            MessageToast.show("No valid rows found. 'Model' and 'Variant' are required.");
+            MessageToast.show("No valid columns found");
             return;
           }
 
