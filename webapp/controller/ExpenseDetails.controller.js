@@ -19,6 +19,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
         },
 
         _onRouteMatched: async function(oEvent) {
+            this.commonLoginFunction("Expense");
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.ExpenseID = oEvent.getParameter("arguments").sPath;
             await this._fetchCommonData("Expense", "FilteredExpenseModel", {
@@ -221,10 +222,31 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
             utils._LCvalidateMandatoryField(oEvent);
         },
 
+        Exp_Det_SourceChange:function(oEvent){
+            utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            if(oEvent.getSource().getValue()===''){
+                oEvent.getSource().setValueState("None")
+            }
+        },
+
+        Exp_Det_DestinationChange:function(oEvent){
+            utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            if(oEvent.getSource().getValue()===''){
+                oEvent.getSource().setValueState("None")
+            }
+        },
+
+        Exp_Det_CountryChange:function(oEvent){
+            utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            if(oEvent.getSource().getValue()===''){
+                oEvent.getSource().setValueState("None")
+            }
+        },
+
         onPressSave: async function() {
             if (
-                utils._LCvalidateMandatoryField(this.byId("Exp_id_Source"), "ID") &&
-                (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"), "ID") : true) && utils._LCvalidateMandatoryField(this.byId("Exp_id_Country"), "ID") && utils._LCvalidateMandatoryField(this.byId("Exp_id_EmpRemark"), "ID")) {
+                utils._LCstrictValidationComboBox(this.byId("Exp_id_Source"), "ID") &&
+                (this.ViewModel.getProperty("/required") === true ? utils._LCstrictValidationComboBox(this.byId("Exp_id_Destination"), "ID") : true) && utils._LCstrictValidationComboBox(this.byId("Exp_id_Country"), "ID") && utils._LCvalidateMandatoryField(this.byId("Exp_id_EmpRemark"), "ID")) {
                 this.byId("Exp_Det_id_DimpleForm").setBusy(true);
                 var oModel = this.getView().getModel("FilteredExpenseModel");
                 oModel.getData()[0].ExpStartDate = oModel.getData()[0].ExpStartDate.split("T")[0];

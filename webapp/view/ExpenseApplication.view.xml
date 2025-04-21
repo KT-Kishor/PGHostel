@@ -96,7 +96,7 @@
 					<ColumnListItem type="Navigation" press="Exp_onCheckExpenseDetails">
 						<cells>
 							<Text text="{ExpenseModel>EmployeeID}" />
-							<Text text="{ExpenseModel>EmployeeName}" />
+							<Text text="{ExpenseModel>ExpenseName}" />
 							<Text text="{path:'ExpenseModel>ExpStartDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{path:'ExpenseModel>ExpEndDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{ExpenseModel>Destination}" />

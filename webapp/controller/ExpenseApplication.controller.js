@@ -17,8 +17,18 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function(oEvent) {
-            // this.commonLoginFunction("Expense");
+            this.commonLoginFunction("Expense");
             await this._fetchCommonData("Expense", "FilterExpenseModel");
+            var FilterModel = this.getView().getModel("FilterExpenseModel");
+
+            if (FilterModel) {
+                FilterModel.setData([
+                    ...new Map(
+                        FilterModel.getData().map((item) => [item.ExpenseName, item])
+                    ).values()
+                ]);
+            }
+
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.Exp_onSearch();
             var View = new JSONModel({
@@ -33,7 +43,7 @@ sap.ui.define([
             this.CommonModel();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
         },
-
+ // Function to initialize the common model for expense creation
         CommonModel: function() {
             var oModel = new JSONModel({
                 EmployeeID: this.LoginModel.getProperty("/EmployeeID"),
@@ -52,13 +62,15 @@ sap.ui.define([
             });
             this.getOwnerComponent().setModel(oModel, "CreateExpenseModel");
         },
+         // Navigate back to the tile page
         onPressback: function() {
             this.getRouter().navTo("RouteTilePage");
         },
+         // Logout and navigate to the login page
         onLogout: function() {
             this.getRouter().navTo("RouteLoginPage");
         },
-
+   // Open the "Add Expense" fragment
         Exp_onPressAddExpense: function() {
             this.CommonModel();
             var oView = this.getView();
@@ -75,7 +87,7 @@ sap.ui.define([
                 this.Expense.open();
             }
         },
-
+ // Close the "Add Expense" fragment and reset validation states
         Exp_Frg_onPressClose: function() {
             this.Expense.close();
             var core = sap.ui.getCore();
@@ -87,7 +99,7 @@ sap.ui.define([
             core.byId("exp-Id-Destination").setValueState("None");
             core.byId("exp-Id-EmployeeRemark").setValueState("None");
         },
-
+// Submit the expense after validation
         Exp_Frg_onPressSubmit: async function() {
             var that = this;
             try {
@@ -96,10 +108,10 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-ExpenseName"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-EndDate"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Country"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Source"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-Country"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-Source"), "ID") &&
                     (this.ViewModel.getProperty("/required") === true ?
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Destination"), "ID") :
+                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-Destination"), "ID") :
                         true) &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-EmployeeRemark"), "ID");
 
@@ -118,8 +130,7 @@ sap.ui.define([
                     that.Expense.close();
                     await that._fetchCommonData("ExpenseTotalCalculation", "", {ExpenseID: oResponse.ExpenseID});
                     await that._fetchCommonData("Expense", "ExpenseModel");
-                    that.getView().getModel("FilterExpenseModel").setData(
-                        that.getView().getModel("ExpenseModel").getData());
+                    that.getView().getModel("FilterExpenseModel").setData([...new Map(that.getView().getModel("ExpenseModel").getData().map((item) => [item.ExpenseName, item])).values()]);
                     MessageToast.show(that.i18nModel.getText("expenseCreatedMess"));
                 } else {
                     MessageToast.show(that.i18nModel.getText("expenseCreatedMessFailed"));
@@ -153,21 +164,21 @@ sap.ui.define([
         },
 
         Exp_onChangeCountry: function(oEvent) {
-            utils._LCvalidateMandatoryField(oEvent, "oEvent");
+            utils._LCstrictValidationComboBox(oEvent, "oEvent");
             if(oEvent.getSource().getValue()===''){
                 oEvent.getSource().setValueState("None")
             }
         },
 
         Exp_onChangeSource: function(oEvent) {
-            utils._LCvalidateMandatoryField(oEvent, "oEvent");
+            utils._LCstrictValidationComboBox(oEvent, "oEvent");
             if(oEvent.getSource().getValue()===''){
                 oEvent.getSource().setValueState("None")
             }
         },
 
         Exp_onChangeDestination: function(oEvent) {
-            utils._LCvalidateMandatoryField(oEvent, "oEvent");
+            utils._LCstrictValidationComboBox(oEvent, "oEvent");
             if(oEvent.getSource().getValue()===''){
                 oEvent.getSource().setValueState("None")
             }   
@@ -185,7 +196,7 @@ sap.ui.define([
         onSignout: function() {
             this.getRouter().navTo("RouteLoginPage");
         },
-
+// Delete the Expenase and Expense Item
         Exp_onPressDeleteExpense: async function (oEvent) {
             this.byId("exp_Id_ExpenseTable").setBusy(true);
             var that = this;
@@ -207,7 +218,7 @@ sap.ui.define([
                 },
                 function () { that.byId("exp_Id_ExpenseTable").setBusy(false);})
         },        
-
+//Filter Function
         Exp_onSearch: async function() {
             try {
                 BusyIndicator.show(0);

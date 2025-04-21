@@ -65,12 +65,12 @@
 										<m:DatePicker displayFormat="dd/MM/yyyy" value="{path:'FilteredExpenseModel>/0/ExpEndDate',formatter: '.Formatter.formatDate'}" editable="false" />										
 										<!-- Source -->
 										<m:Label text="{i18n>expSource}" required="true"/>
-										<m:ComboBox id="Exp_id_Source" valueStateText="{i18n>expValStaSource}"  change="onLiveAllValidation" items="{BaseLocationModel>/}"  value="{FilteredExpenseModel>/0/Source}" editable="{viewModel>/editable}">
+										<m:ComboBox id="Exp_id_Source" valueStateText="{i18n>expValStaSource}"  change="Exp_Det_SourceChange" items="{BaseLocationModel>/}"  value="{FilteredExpenseModel>/0/Source}" editable="{viewModel>/editable}">
 											<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 										</m:ComboBox>
 										<!-- Destination -->
 										<m:Label text="{i18n>expDestination}" required="{viewModel>/required}"/>
-										<m:ComboBox  id="Exp_id_Destination" valueStateText="{i18n>expValStaDestination}"  change="onLiveAllValidation" items="{BaseLocationModel>/}" editable="{viewModel>/editable}" value="{FilteredExpenseModel>/0/Destination}">
+										<m:ComboBox  id="Exp_id_Destination" valueStateText="{i18n>expValStaDestination}"  change="Exp_Det_DestinationChange" items="{BaseLocationModel>/}" editable="{viewModel>/editable}" value="{FilteredExpenseModel>/0/Destination}">
 											<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 										</m:ComboBox>
 										<!-- CostCenter -->
@@ -80,7 +80,7 @@
 										</m:Select>																														
 										<!-- Country -->
 										<m:Label text="{i18n>expCountry}" required="true"/>
-										<m:ComboBox id="Exp_id_Country" valueStateText="{i18n>expValStaCountry}" change="onLiveAllValidation" items="{path:'CountryModel>/',length:1000}" value="{FilteredExpenseModel>/0/Country}" editable="{viewModel>/editable}">
+										<m:ComboBox id="Exp_id_Country" valueStateText="{i18n>expValStaCountry}" change="Exp_Det_CountryChange" items="{path:'CountryModel>/',length:1000}" value="{FilteredExpenseModel>/0/Country}" editable="{viewModel>/editable}">
 											<core:ListItem key="{CountryModel>id}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 										</m:ComboBox>																			
 										

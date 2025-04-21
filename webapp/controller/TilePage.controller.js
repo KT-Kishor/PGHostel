@@ -5,21 +5,31 @@ sap.ui.define(
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/ui/core/BusyIndicator",
-  ],
-  function (BaseController, MessageToast, utils, JSONModel, BusyIndicator) {
+  ],function (BaseController, MessageToast, utils, JSONModel, BusyIndicator) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.TilePage",
       {
         onInit: function () {
-          this.getRouter()
-            .getRoute("RouteTilePage")
-            .attachMatched(this._onRouteMatched, this);
+          this.getRouter().getRoute("RouteTilePage").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function () {
           this._fetchCommonData("AllLoginDetails", "EmpModel");
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("Quotation").setProperty("/setDefFilter", true);
+          this.AppVisibilityReadCall();
+        },
+
+        AppVisibilityReadCall: async function(){
+          BusyIndicator.show(0);
+          var LoginModel = this.getView().getModel("LoginModel").getData();
+            await this.ajaxReadWithJQuery("AppVisibility", {Role:LoginModel.Role},[]).then((oData) => {
+              var AppVisiblity = Array.isArray(oData.data) ? oData.data[0] : [oData.data[0]];
+              this.getView().setModel(new JSONModel(AppVisiblity), "AppVisibilityModel");              
+              BusyIndicator.hide();
+          }).catch((oError) => {
+              BusyIndicator.hide();             
+          })
         },
 
         RP_onUseridpress: function (oEvent) {

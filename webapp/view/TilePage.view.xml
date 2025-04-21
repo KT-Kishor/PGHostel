@@ -13,7 +13,7 @@
 		</headerContent>
 		<layout:VerticalLayout >
 			<FlexBox wrap="Wrap" alignItems="Start" justifyContent="Start">
-				<GenericTile visible="{modelTileVisible>/MyInbox}"
+				<GenericTile visible="{= ${AppVisibilityModel>/MyInbox} === '1' ? true : false}"
                     class="sapUiMediumMargin"
                     header="{i18n>headerInbox}" press="TileV_onpressInbox">
 					<TileContent unit="{i18n>tileMyInboxFooter}" >
@@ -21,7 +21,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/GenerateTraineeOffer}"
+				<GenericTile visible="{= ${AppVisibilityModel>/GenerateTraineeOffer} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>headerTrainee}" press="TileV_onpressTrainee"  subheader="{i18n>subhead}">
 					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>SendMail}">
@@ -29,7 +29,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/GenerateEmployeeOffer}"
+				<GenericTile visible="{= ${AppVisibilityModel>/GenerateEmployeeOffer} === '1' ? true : false}"
                     class="sapUiMediumMargin"
                     
                     header="{i18n>headerEmployeeOffer}" press="TileV_onPressOffer"
@@ -39,7 +39,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/GenerateContract}"
+				<GenericTile visible="{= ${AppVisibilityModel>/GenerateContract} === '1' ? true : false}"
                     class="sapUiMediumMargin"
                     header="{i18n>headerContractDetails}" press="TileV_onpressContract"
                     subheader="{i18n>subhead}">
@@ -48,7 +48,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/SelfService}"
+				<GenericTile visible="{= ${AppVisibilityModel>/SelfService} === '1' ? true : false}"
                     class="sapUiMediumMargin"
                     header="{i18n>headerSelfService}" press="TileV_onpressSelfservice"
                       subheader="{i18n>subhead}">
@@ -57,7 +57,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/EmployeeDetail}"
+				<GenericTile visible="{= ${AppVisibilityModel>/EmployeeDetail} === '1' ? true : false}"
                     class="sapUiMediumMargin"
                     header="{i18n>headerEmpDetails}" press="TileV_onpressEmployeeDetails"
                     subheader="{i18n>subheadEmphike}">
@@ -66,7 +66,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/AssignmentTask}"
+				<GenericTile visible="{= ${AppVisibilityModel>/AssignmentTask} === '1' ? true : false}"
                    class="sapUiMediumMargin" 
                     header="{i18n>headerAssignTask}"  subheader="{i18n>subhead}" press="TileV_onpressAssignment">
 					<TileContent  unit="{i18n>tileAssignmentFooter}">
@@ -74,7 +74,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/Timesheet}"
+				<GenericTile visible="{= ${AppVisibilityModel>/Timesheet} === '1' ? true : false}"
                    class="sapUiMediumMargin"  subheader="{i18n>subhead}"
                     header="{i18n>headerTimesheet}" press="TileV_onpresstimesheet">
 					<TileContent  unit="{i18n>tileTimesheetFooter}">
@@ -82,7 +82,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile  visible="{modelTileVisible>/TimeSheetApproval}"
+				<GenericTile  visible="{= ${AppVisibilityModel>/TimeSheetApproval} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>headerTimesheetApproval}" press="TileV_onPressTimesheetApp">
 					<TileContent  unit="{i18n>tileMyInboxFooter}">
@@ -90,7 +90,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/AddCustomer}"
+				<GenericTile visible="{= ${AppVisibilityModel>/AddCustomer} === '1' ? true : false}"
                     class="sapUiMediumMargin"
                     header="{i18n>headerCustomer}" press="TileV_onpressAddCustomer"
                     subheader="{i18n>subhead}">
@@ -99,7 +99,7 @@
 					</TileContent>
 				</GenericTile >
 
-				<GenericTile visible="{modelTileVisible>/GenerateMsaNda}"
+				<GenericTile visible="{= ${AppVisibilityModel>/GenerateMsaNda} === '1' ? true : false}"
                     class="sapUiMediumMargin"
                     header="{i18n>headerMSA}" press="TileV_onpressMSA"
                      subheader="{i18n>subhead}">
@@ -108,7 +108,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/ExpenseApp}"
+				<GenericTile visible="{= ${AppVisibilityModel>/ExpenseApp} === '1' ? true : false}"
                     class="sapUiMediumMargin"
                     header="{i18n>headerExpense}" press="TileV_onpressExpenseApp">
 					<TileContent unit="{i18n>subhead}">
@@ -116,7 +116,7 @@
 					</TileContent>
 				</GenericTile >
 
-				<GenericTile visible="{modelTileVisible>/QuotationApp}"
+				<GenericTile visible="{= ${AppVisibilityModel>/QuotationApp} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>headerQuotation}" press="TileV_onpressQuotation">
 					<TileContent  unit="{i18n>subheader}">
@@ -124,7 +124,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/InvoiceApp}"
+				<GenericTile visible="{= ${AppVisibilityModel>/InvoiceApp} === '1' ? true : false}"
                     class="sapUiMediumMargin"
                     header="{i18n>headerCompanyInvoice}" press="TileV_onpressInvoiceApp">
 					<TileContent unit="{i18n>tileInvoiceFooter}">
@@ -132,7 +132,7 @@
 					</TileContent>
 				</GenericTile >
 
-				<GenericTile visible="{modelTileVisible>/ConsultantInvoice}"
+				<GenericTile visible="{= ${AppVisibilityModel>/ConsultantInvoice} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>headerContractorInvoice}" press="TileV_onpressConsultantInvoice">
 					<TileContent  unit="{i18n>tileInvoiceFooter}">
@@ -140,7 +140,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile  visible="{modelTileVisible>/ListOfHolidays}"
+				<GenericTile  visible="{= ${AppVisibilityModel>/ListOfHolidays} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>headerListOfHolidays}" press="TileV_onpresslistofholidays">
 					<TileContent unit="{i18n>tileLeaveFooter}">
@@ -148,7 +148,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile id="idLeaveGenericTile" visible="{modelTileVisible>/ApplyLeave}"
+				<GenericTile id="idLeaveGenericTile" visible="{= ${AppVisibilityModel>/ApplyLeave} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>headerLeave}" press="TileV_onpressLeave"
                     subheader="{i18n>subhead}">
@@ -157,7 +157,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile visible="{modelTileVisible>/IDCard}"
+				<GenericTile visible="{= ${AppVisibilityModel>/IDCard} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>headerIdCard}" press="TileV_onpressIDCARD"
                     subheader="{i18n>subhead}">
@@ -166,7 +166,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile  visible="{modelTileVisible>/PaySlip}"
+				<GenericTile  visible="{= ${AppVisibilityModel>/PaySlip} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>HeaderPaySlip}" press="TileV_onPressAdminPaySlip">
 					<TileContent  unit="{i18n>tilePaySlipFooter}">
@@ -174,7 +174,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile  visible="{modelTileVisible>/GenerateSalary}"
+				<GenericTile  visible="{= ${AppVisibilityModel>/GenerateSalary} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>headerGenerateSalary}" press="TileV_onPressGenerateSalary">
 					<TileContent  unit="{i18n>tilePaySlipFooter}">
@@ -182,14 +182,14 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile  visible="{modelTileVisible>/ManagePayroll}"
+				<GenericTile  visible="{= ${AppVisibilityModel>/ManagePayroll} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>headerManagePayroll}" press="TileV_onPressManagePayroll">
 					<TileContent  unit="{i18n>tilePaySlipFooter}">
 						<ImageContent src="sap-icon://money-bills" />
 					</TileContent>
 				</GenericTile>
-				<GenericTile  visible="{modelTileVisible>/ManagePayroll}"
+				<GenericTile  visible="{= ${AppVisibilityModel>/SchemeUpload} === '1' ? true : false}"
                    class="sapUiMediumMargin"
                     header="{i18n>schemeupload}" press="TileV_onPressManageSchemeUpload">
 					<TileContent  unit="{i18n>createmaintain}">
@@ -197,7 +197,7 @@
 					</TileContent>
 				</GenericTile>
 
-				<GenericTile  visible="{modelTileVisible>/ManagePayroll}"
+				<GenericTile  visible="{= ${AppVisibilityModel>/IncomeAsset} === '1' ? true : false}"
 					class="sapUiMediumMargin"
 					 header="{i18n>headerIncomeAsset}" press="TileV_onPressIncomeAsset">
 					 <TileContent  unit="{i18n>createmaintain}">
@@ -205,7 +205,7 @@
 					 </TileContent>
 				 </GenericTile>
 
-				 <GenericTile  visible="{modelTileVisible>/ManagePayroll}"
+				 <GenericTile  visible="{= ${AppVisibilityModel>/ManagePayroll} === '1' ? true : false}"
 					class="sapUiMediumMargin"
 					 header="{i18n>headerAssignment}" press="TileV_onPressAssetAssignment">
 					 <TileContent  unit="{i18n>createmaintain}">

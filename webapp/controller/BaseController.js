@@ -42,59 +42,64 @@ sap.ui.define([
     },
 
     commonLoginFunction: function (value) {
-      var oModel = this.getOwnerComponent().getModel("loginModel");
-      var TileModel = this.getView().getModel("modelTileVisible");
+      var oModel = this.getOwnerComponent().getModel("LogiModel");
+      var TileModel = this.getView().getModel("AppVisibilityModel");
       if (value && TileModel) {
-        if (value === "EmployeeOffer" && TileModel.getProperty("/GenerateEmployeeOffer") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "Contract" && TileModel.getProperty("/GenerateContract") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "MSA&SOW" && TileModel.getProperty("/GenerateMsaNda") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "Trainee" && TileModel.getProperty("/GenerateTraineeOffer") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "Holiday" && TileModel.getProperty("/ListOfHolidays") === false) {
-        } else if (value === "ApplyLeave" && TileModel.getProperty("/ApplyLeave") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "MyInbox" && TileModel.getProperty("/MyInbox") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "Expense" && TileModel.getProperty("/ExpenseApp") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "CompanyInvoice" && TileModel.getProperty("/InvoiceApp") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "SelfService" && TileModel.getProperty("/SelfService") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "Customer" && TileModel.getProperty("/AddCustomer") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "IDCard" && TileModel.getProperty("/IDCard") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "ConsultantInvoice" && TileModel.getProperty("/ConsultantInvoice") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "EmployeeDetails" && TileModel.getProperty("/EmployeeDetail") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "Quotation" && TileModel.getProperty("/QuotationApp") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "AssigmentTask" && TileModel.getProperty("/AssignmentTask") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "AssigmentTask" && TileModel.getProperty("/AssignmentTask") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "PaySlip" && TileModel.getProperty("/PaySlip") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "Timesheet" && TileModel.getProperty("/Timesheet") === false) {
-          this.getRouter().navTo("RouteView1");
-        } else if (value === "TimeSheetApproval" && TileModel.getProperty("/TimeSheetApproval") === false) {
-          this.getRouter().navTo("RouteView1");
+        if (value === "EmployeeOffer" && TileModel.getProperty("/GenerateEmployeeOffer") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "Contract" && TileModel.getProperty("/GenerateContract") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "MSA&SOW" && TileModel.getProperty("/GenerateMsaNda") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "Trainee" && TileModel.getProperty("/GenerateTraineeOffer") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "Holiday" && TileModel.getProperty("/ListOfHolidays") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "ApplyLeave" && TileModel.getProperty("/ApplyLeave") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "MyInbox" && TileModel.getProperty("/MyInbox") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "Expense" && TileModel.getProperty("/ExpenseApp") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "CompanyInvoice" && TileModel.getProperty("/InvoiceApp") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "SelfService" && TileModel.getProperty("/SelfService") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "Customer" && TileModel.getProperty("/AddCustomer") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "IDCard" && TileModel.getProperty("/IDCard") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "ConsultantInvoice" && TileModel.getProperty("/ConsultantInvoice") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "EmployeeDetails" && TileModel.getProperty("/EmployeeDetail") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "Quotation" && TileModel.getProperty("/QuotationApp") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "AssigmentTask" && TileModel.getProperty("/AssignmentTask") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "AssigmentTask" && TileModel.getProperty("/AssignmentTask") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "PaySlip" && TileModel.getProperty("/PaySlip") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "Timesheet" && TileModel.getProperty("/Timesheet") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "TimeSheetApproval" && TileModel.getProperty("/TimeSheetApproval") === '0') {
+          this.getRouter().navTo("RouteLoginPage");        
+        } else if (value === "SchemeUpload" && TileModel.getProperty("/SchemeUpload") === '0') {
+          this.getRouter().navTo("RouteLoginPage");        
+        } else if (value === "IncomeAsset" && TileModel.getProperty("/IncomeAsset") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
         }
       }
 
       if (!oModel) {
-        this.getRouter().navTo("RouteView1");
+        this.getRouter().navTo("RouteLoginPage");
         return;
       }
       var userId = oModel.getProperty("/userIds");
       var userName = oModel.getProperty("/userNames");
       if (!userId || !userName) {
-        this.getRouter().navTo("RouteView1");
+        this.getRouter().navTo("RouteLoginPage");
         return;
       }
     },
