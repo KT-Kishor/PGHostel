@@ -575,3 +575,10 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 	width: 190px;
 	margin: 8px;
 }
+.summaryBox {
+  margin: 0.5rem;
+}
+.boldBlackText {
+  font-weight: bold;
+  color: #000;
+}

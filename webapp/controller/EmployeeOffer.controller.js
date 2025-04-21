@@ -242,10 +242,13 @@ sap.ui.define([
             validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
             },
+            validateCombo: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
+            },
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
                 oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-')
-                if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID")) {
+                if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
                     var oPayload = {
                         tableName: "EmployeeDetails",
                         data: oModel

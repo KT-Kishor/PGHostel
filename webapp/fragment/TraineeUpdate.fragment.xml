@@ -58,13 +58,13 @@
 										<m:Label text="{i18n>reportingManager}" required="true" />
 										<m:HBox width="100%" justifyContent="Start" alignItems="Center">
 											<m:VBox width="20%">
-												<m:Select
+												<m:ComboBox
                                                 editable="{viewModel>/editable}"
-                                                selectedKey="{oTraineeDetails>/ReportingManagerSalutation}"
+                                                value="{oTraineeDetails>/ReportingManagerSalutation}"
                                                 items="{Salutation>/salutation}"
-                                                width="100%">
+                                                width="100%" change="TD_validateCombo">
 													<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
-												</m:Select>
+												</m:ComboBox>
 											</m:VBox>
 											<m:VBox width="78%">
 												<m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"  selectionChange=""  value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" editable="{viewModel>/editable}" width="100%" class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">

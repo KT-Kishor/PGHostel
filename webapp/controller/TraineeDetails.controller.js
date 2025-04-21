@@ -122,6 +122,10 @@ sap.ui.define([
                 utils._LCvalidateName(oEvent);
                 this.TD_validateStep();
             },
+            TD_validateCombo: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
+                this.TD_validateStep();
+            },
             //validate email function
             TD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
@@ -167,7 +171,7 @@ sap.ui.define([
                 if (allFieldsFilled) {
                     let bValid =
                         utils._LCvalidateName(this.byId("TD_id_Name"), "ID") &&
-                        utils._LCvalidateName(this.byId("TD_id_ReportingManager"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("TD_id_ReportingManager"), "ID") &&
                         utils._LCvalidateEmail(this.byId("TD_id_EmailID"), "ID") &&
                         utils._LCvalidateDate(this.byId("TD_id_ReleaseDate"), "ID") &&
                         utils._LCvalidateDate(this.byId("TD_id_JoiningDate"), "ID");
@@ -188,12 +192,13 @@ sap.ui.define([
                 var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
                 if (sStipendText === "Yes") utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
                 if (utils._LCvalidateName(this.byId("TD_id_Name"), "ID") &&
-                utils._LCvalidateName(this.byId("TD_id_ReportingManager"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("TD_id_ReportingManager"), "ID") &&
                 utils._LCvalidateEmail(this.byId("TD_id_EmailID"), "ID") &&
                 utils._LCvalidateDate(this.byId("TD_id_ReleaseDate"), "ID") &&
                 utils._LCvalidateDate(this.byId("TD_id_JoiningDate"), "ID")) {
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
+                    oModel.ManagerID = this.getView().byId("TD_id_ReportingManager").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TD_id_Location").getSelectedKey();
                     oModel.Status = "Submitted";
                     oModel.ReleaseDate = oModel.ReleaseDate.split("/").reverse().join('-');
@@ -274,7 +279,7 @@ sap.ui.define([
                         bIsStipendValid = utils._LCvalidateAmount(oView.byId("TU_id_Stipend"), "ID");
                     }
                     var isValid =
-                        utils._LCvalidateName(oView.byId("TU_id_Name"), "ID") && utils._LCvalidateName(oView.byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(oView.byId("TU_id_TraineeMail"), "ID") && bIsStipendValid;
+                        utils._LCvalidateName(oView.byId("TU_id_Name"), "ID") && utils._LCstrictValidationComboBox(oView.byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(oView.byId("TU_id_TraineeMail"), "ID") && bIsStipendValid;
                     // Save the changes if all validations pass
                     if (isValid) {
                         this.updateCallForTrainee(this.viewModel,"traineeDataUpdated");
@@ -290,6 +295,7 @@ sap.ui.define([
             updateCallForTrainee: function (oViewModel,text) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
+                oModel.ManagerID = this.getView().byId("TD_id_ReportingManager").getSelectedItem().getAdditionalText();
                 oModel.ReleaseDate = this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");;
                 oModel.JoiningDate = this.byId("TU_id_JoinDate").getValue().split("/").reverse().join("-");
                 // Check and update the status if it is 'Rejected'

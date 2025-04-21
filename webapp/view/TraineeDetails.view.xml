@@ -52,7 +52,7 @@
 									</Select>
 								</VBox>
 								<VBox width="78%">
-									<ComboBox showSecondaryValues="true"  change="TD_validateName"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">
+									<ComboBox showSecondaryValues="true"  change="TD_validateCombo"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">
 										<core:ListItem key="{empModel>ManagerID}" text="{empModel>ManagerName}" additionalText="{empModel>ManagerID}" />
 									</ComboBox>
 								</VBox>

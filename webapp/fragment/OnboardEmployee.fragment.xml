@@ -62,12 +62,13 @@
 				</Select>
 				<Label text="{i18n>mobileNo}" required="true" />
 				<Input value="{oEmpolyeeDetailsModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo" maxLength="10" id="OEF_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
-				<Label text="{i18n>manager}"/>
+				<Label text="{i18n>manager}" required="true"/>
 				<ComboBox value="{oEmpolyeeDetailsModel>/Manager}"
 				showSecondaryValues= "true"
 				id="OEF_id_Manager"
 				items="{EmployeeModel>/}"
-				filterSecondaryValues="true">
+				filterSecondaryValues="true"
+				change="validateCombo">
 					<core:ListItem key="{EmployeeModel>EmployeeID}" text="{EmployeeModel>EmployeeName}" additionalText="{EmployeeModel>EmployeeID}"/>
 				</ComboBox>
 			</f:content>

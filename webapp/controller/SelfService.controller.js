@@ -240,7 +240,6 @@ sap.ui.define([
                     // Validate required fields
                     if (
                         utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
-                        utils._LCvalidateMandatoryField(oView.byId("SS_id_BloodGroup"), "ID") &&
                         utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
                         utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
                         utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
@@ -592,141 +591,182 @@ sap.ui.define([
                 } 
             },
             
-
-            //Display the salary details
             displaySalaryDetails: function (salaryDetailsArray) {
                 var oVBox = this.getView().byId("SS_id_FormsContainer");
-                oVBox.removeAllItems(); // Clear previous content
+                oVBox.removeAllItems();
             
-                salaryDetailsArray.forEach(function (offerData, index) {
-                    var appraisalDate = offerData.AppraisalDate || new Date().toLocaleDateString();
-                    var effectiveDate = offerData.EffectiveDate || new Date().toLocaleDateString();
-            
+                salaryDetailsArray.forEach(function (offerData) {
+                    var appraisalDate = offerData.AppraisalDate || "";
+                    var effectiveDate = offerData.EffectiveDate || "";
                     var sTitleText = `Appraisal Date: ${appraisalDate}, Effective Date: ${effectiveDate} - Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.Gross)}`;
             
-                    // Monthly SimpleForm
+                    // === Monthly Form ===
                     var oMonthlyForm = new sap.ui.layout.form.SimpleForm({
-                        layout: "ResponsiveGridLayout",
                         editable: false,
+                        layout: "ResponsiveGridLayout",
                         title: this.i18nModel.getText("rateMonthly"),
                         content: [
-                            new sap.ui.core.Title({ text: this.i18nModel.getText("monthlyComponents") }),
                             new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.BasicSalary)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("hra") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.HRA)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.EmployerPF)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.MedicalInsurance)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.Gratuity)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.SpecailAllowance)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("Total") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.Total)}` }),
             
-                            new sap.ui.core.Title({ text: this.i18nModel.getText("totalDeductionAmount") }),
+                            new sap.ui.core.Title({ text: this.i18nModel.getText("Deductions") }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.EmployeePF)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.PT)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.IncomeTax)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.TotalDeduction)}` }),
             
-                            new sap.ui.core.Title({ text: this.i18nModel.getText("EmpOfferVariablePay") }),
                             new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.VariablePay)}` }),
             
-                            new sap.ui.core.Title({ text: this.i18nModel.getText("grossPay") }),
                             new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.GrossPay)}` })
                         ]
                     });
             
-                    // Yearly SimpleForm
+                    // === Yearly Form ===
                     var oYearlyForm = new sap.ui.layout.form.SimpleForm({
-                        layout: "ResponsiveGridLayout",
                         editable: false,
+                        layout: "ResponsiveGridLayout",
                         title: this.i18nModel.getText("yearly"),
                         content: [
-                            new sap.ui.core.Title({ text: this.i18nModel.getText("monthlyComponents") }),
                             new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.BasicSalary)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("hra") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.HRA)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployerPF)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.MedicalInsurance)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Gratuity)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.SpecailAllowance)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("Total") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Total)}` }),
             
-                            new sap.ui.core.Title({ text: this.i18nModel.getText("totalDeductionAmount") }),
+                            new sap.ui.core.Title({ text: this.i18nModel.getText("Deductions") }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployeePF)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.PT)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.IncomeTax)}` }),
+            
                             new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` }),
             
-                            new sap.ui.core.Title({ text: this.i18nModel.getText("EmpOfferVariablePay") }),
                             new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` }),
             
-                            new sap.ui.core.Title({ text: this.i18nModel.getText("grossPay") }),
                             new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
                         ]
                     });
             
-                    // HBox to place Monthly and Yearly forms side by side
-                    var oHBox = new sap.m.HBox({
-                        width: "100%",
+                    // === HBox for Monthly & Yearly ===
+                    var oTopHBox = new sap.m.HBox({
+                        justifyContent: "SpaceAround",
                         items: [
-                            new sap.m.VBox({ width: "50%", items: [oMonthlyForm] }),
-                            new sap.m.VBox({ width: "50%", items: [oYearlyForm] })
+                            oMonthlyForm,
+                            oYearlyForm
                         ]
                     });
             
-                    // Panel wrapping the HBox
+                    // === Summary Section ===
+                    var oSummaryFlex = new sap.m.FlexBox({
+                        direction: "Row",
+                        wrap: "Wrap",
+                        justifyContent: "Start",
+                        items: [
+                            new sap.m.VBox({
+                                width: "200px",
+                                items: [
+                                    new sap.m.Label({ text: this.i18nModel.getText("yearlyGrossPay"), class: "boldBlackText" }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
+                                ]
+                            }),
+                            new sap.m.VBox({
+                                width: "200px",
+                                items: [
+                                    new sap.m.Label({ text: this.i18nModel.getText("yearlyDeduction"), class: "boldBlackText" }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` })
+                                ]
+                            }),
+                            new sap.m.VBox({
+                                width: "200px",
+                                items: [
+                                    new sap.m.Label({ text: this.i18nModel.getText("EmpOfferVariablePay"), class: "boldBlackText" }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` })
+                                ]
+                            }),
+                            new sap.m.VBox({
+                                width: "200px",
+                                items: [
+                                    new sap.m.Label({ text: this.i18nModel.getText("joiningBonus"), class: "boldBlackText" }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.JoiningBonus)}` })
+                                ]
+                            }),
+                            new sap.m.VBox({
+                                width: "200px",
+                                items: [
+                                    new sap.m.Label({ text: this.i18nModel.getText("costOfCompany"), class: "boldBlackText" }),
+                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.CostofCompany)}` })
+                                ]
+                            })
+                        ]
+                    });
+            
                     var oPanel = new sap.m.Panel({
+                        headerText: sTitleText,
                         expandable: true,
                         expanded: true,
-                        headerToolbar: new sap.m.Toolbar({
-                            content: [
-                                new sap.m.Text({
-                                    text: sTitleText,
-                                    wrapping: true,
-                                    maxLines: 2,
-                                    class: "responsiveTitle"
-                                })
-                            ]
-                        }),
-                        content: [oHBox]
+                        content: [
+                            new sap.m.VBox({
+                                items: [oTopHBox, oSummaryFlex]
+                            })
+                        ]
                     });
             
-                    // Wrapper VBox to maintain spacing/margin if needed
-                    var oWrapperVBox = new sap.m.VBox({
-                        items: [oPanel],
-                        layoutData: new sap.m.FlexItemData({
-                            styleClass: "marginBottom"
-                        })
-                    });
-            
-                    oVBox.addItem(oWrapperVBox);
+                    oVBox.addItem(oPanel);
                 }.bind(this));
             },
             
-            
+       
             //On icon tab select function
             SS_onTabSelect: function (oEvent) {
                 var oView = this.getView();
