@@ -14,6 +14,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
     return Controller.extend("sap.kt.com.minihrsolution.controller.ExpenseDetails", {
         Formatter: Formatter,
         onInit: async function() {
+            // Attach route matched event for "RouteExpensDetails"
             this.getRouter().getRoute("RouteExpensDetails").attachMatched(this._onRouteMatched, this);
             await this._fetchCommonData("Currency", "CurrencyModel");
         },

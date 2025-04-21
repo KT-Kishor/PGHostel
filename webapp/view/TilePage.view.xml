@@ -205,7 +205,7 @@
 					 </TileContent>
 				 </GenericTile>
 
-				 <GenericTile  visible="{= ${AppVisibilityModel>/ManagePayroll} === '1' ? true : false}"
+				 <GenericTile  visible="{= ${AppVisibilityModel>/AssetAssignment} === '1' ? true : false}"
 					class="sapUiMediumMargin"
 					 header="{i18n>headerAssignment}" press="TileV_onPressAssetAssignment">
 					 <TileContent  unit="{i18n>createmaintain}">

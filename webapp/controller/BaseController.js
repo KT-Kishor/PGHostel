@@ -42,7 +42,7 @@ sap.ui.define([
     },
 
     commonLoginFunction: function (value) {
-      var oModel = this.getOwnerComponent().getModel("LogiModel");
+      var oModel = this.getOwnerComponent().getModel("LoginModel");
       var TileModel = this.getView().getModel("AppVisibilityModel");
       if (value && TileModel) {
         if (value === "EmployeeOffer" && TileModel.getProperty("/GenerateEmployeeOffer") === '0') {
@@ -88,6 +88,8 @@ sap.ui.define([
         } else if (value === "SchemeUpload" && TileModel.getProperty("/SchemeUpload") === '0') {
           this.getRouter().navTo("RouteLoginPage");        
         } else if (value === "IncomeAsset" && TileModel.getProperty("/IncomeAsset") === '0') {
+          this.getRouter().navTo("RouteLoginPage");        
+        } else if (value === "AssetAssignment" && TileModel.getProperty("/AssetAssignment") === '0') {
           this.getRouter().navTo("RouteLoginPage");
         }
       }
@@ -96,8 +98,8 @@ sap.ui.define([
         this.getRouter().navTo("RouteLoginPage");
         return;
       }
-      var userId = oModel.getProperty("/userIds");
-      var userName = oModel.getProperty("/userNames");
+      var userId = oModel.getProperty("/EmployeeID");
+      var userName = oModel.getProperty("/EmployeeName");
       if (!userId || !userName) {
         this.getRouter().navTo("RouteLoginPage");
         return;
