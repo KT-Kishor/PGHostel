@@ -631,9 +631,13 @@ sap.ui.define(
 
         // Check if leave is already applied for given dates
         isLeaveAlreadyApplied: function (fromDate, toDate) {
+            if (!this.appliedLeavesSet) {
+                return false; // No applied leaves set, return false
+            }
+        
             var from = this.onFormatDate(fromDate);
             var to = this.onFormatDate(toDate);
-            // Check each day in the range
+        
             for (var d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
                 if (this.appliedLeavesSet.has(d.toDateString())) {
                     return true;
@@ -641,6 +645,7 @@ sap.ui.define(
             }
             return false;
         },
+        
 
         // Validation when from date changes
         onValidation: function () {
@@ -687,9 +692,7 @@ sap.ui.define(
 
                     var oLeaveTempModel = this.getView().getModel("LeaveTempModel");
                     var oData = oLeaveTempModel.getData();
-                    oData.halfDay = oData.halfDay;
-                    oData.status = "Submitted";
-        
+                    
                     // Parse dates
                     var fromDateParts = oData.fromDate.split("/").map(Number);
                     var startDate = new Date(fromDateParts[2], fromDateParts[1] - 1, fromDateParts[0]);
@@ -778,6 +781,8 @@ sap.ui.define(
                         // Format dates for backend
                         oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                         oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                        oData.halfDay = oData.halfDay.toString();
+                        oData.status = "Submitted";
         
                         // Clean up data before sending
                         delete oData.Save;
