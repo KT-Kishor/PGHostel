@@ -41,6 +41,15 @@ sap.ui.define([
       }
     },
 
+    CommonLogoutFunction: function () {    
+      var oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+      if (oLoginModel) {
+        oLoginModel.setProperty("/EmployeeID", "");
+        oLoginModel.setProperty("/EmployeeName", "");
+      }    
+      this.getRouter().navTo("RouteLoginPage");
+    },
+
     commonLoginFunction: function (value) {
       var oModel = this.getOwnerComponent().getModel("LoginModel");
       var TileModel = this.getView().getModel("AppVisibilityModel");

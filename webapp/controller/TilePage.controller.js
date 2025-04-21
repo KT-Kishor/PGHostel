@@ -250,7 +250,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteEmployeeDetails");
         },
         TileV_onBackPress: function () {
-          this.getRouter().navTo("RouteLoginPage");
+          this.CommonLogoutFunction();
         },
         TileV_onpressAddCustomer: function () {
           this.getRouter().navTo("RouteManageCustomer", { value: "ManageCustomer" });

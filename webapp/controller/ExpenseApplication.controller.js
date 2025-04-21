@@ -68,7 +68,7 @@ sap.ui.define([
         },
          // Logout and navigate to the login page
         onLogout: function() {
-            this.getRouter().navTo("RouteLoginPage");
+            this.CommonLogoutFunction();
         },
    // Open the "Add Expense" fragment
         Exp_onPressAddExpense: function() {
