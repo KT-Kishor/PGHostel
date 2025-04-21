@@ -378,6 +378,13 @@
                     ]
                 },
                 {
+                    "name": "RouteQuotationDashboard",
+                    "pattern": "QuotationDashboard",
+                    "target": [
+                        "TargetQuotationDashboard"
+                    ]
+                },
+                {
                     "name": "RouteExpensePage",
                     "pattern": "Expense",
                     "target": "TargetExpense"
@@ -656,6 +663,12 @@
                     "clearControlAggregation": false,
                     "viewId": "QuotationForm",
                     "viewName": "QuotationForm"
+                },
+                "TargetQuotationDashboard": {
+                    "viewType": "XML",
+                    "transition": "zoomOut",
+                    "viewId": "QuotationDashboard",
+                    "viewName": "QuotationDashboard"
                 },
                 "TargetExpense": {
                     "viewType": "XML",

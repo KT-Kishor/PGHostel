@@ -71,6 +71,7 @@
                                     },
                                     length: 1000
                                 }"
+                                showSecondaryValues="true"
                             >
                                 <core:ListItem
                                     key="{EmpModel>EmployeeName}"

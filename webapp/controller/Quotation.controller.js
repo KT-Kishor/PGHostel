@@ -53,7 +53,7 @@ sap.ui.define([
     },
 
     Q_onPressDashboard: function () {
-      this.getOwnerComponent().getRouter().navTo("RouteDashboard");
+      this.getRouter().navTo("RouteQuotationDashboard");
     },
 
     Q_onPressCreate: function () {
