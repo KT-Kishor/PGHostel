@@ -16,14 +16,12 @@ sap.ui.define([
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.IncomeAsset", {
             Formatter: Formatter,
-            onInit: function () {
-                this.getRouter().getRoute("RouteIncomeAsset").attachMatched(this._onRouteMatched, this);
- 		},
-			_onRouteMatched:function(){
-                var loginModel = this.getView().getModel("LoginModel").getData();
-
-
-				this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                    onInit: function () {
+                        this.getRouter().getRoute("RouteIncomeAsset").attachMatched(this._onRouteMatched, this);
+           },			
+           _onRouteMatched:function(){
+                let loginModel = this.getView().getModel("LoginModel").getData();
+              this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                             var model = new JSONModel({
                                  "Type": "Laptop",
                                  "Model": "",
@@ -39,32 +37,39 @@ sap.ui.define([
                      this.getView().setModel(model, "CreateIncomeAssetModel");
 
 
-				this.IA_CommonReadCall("IncomeAsset");
-                this._fetchCommonData("AssetType", "oAssetTypeModel");
+              this.IA_CommonReadCall("Initial");
+                 this._fetchCommonData("AssetType", "oAssetTypeModel");
 				this._fetchCommonData("Currency", "oCurrencyModel");
 				this._fetchCommonData("BaseLocation", "branchModel");
 				this._FragmentDatePickersReadOnly(["FCIA_id_Date"])
                 this._fetchCommonData("AllLoginDetails","EmpModel",{})
 
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Income Asset");
-			},
-			onPressback: function () {
+			},			onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
-			IA_CommonReadCall: function (filter) {
+            IA_CommonReadCall: function (filter) {
+                BusyIndicator.show(0)
 				this.ajaxReadWithJQuery("IncomeAsset", filter).then((oData) => {
 					var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
 					this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "incomeModel");
-					this._populateUniqueFilterValues(oFCIAerData);
-					sap.ui.core.BusyIndicator.hide();
-				}).catch((oError) => {
-					sap.ui.core.BusyIndicator.hide();
-					MessageBox.error(this.i18nModel.getText("commonReadingDataError")); 
-				});
-			},
+                    if (filter === "Initial") {
+                        oFCIAerData = [...new Map(oFCIAerData.filter(item => item.SerialNumber && item.SerialNumber.trim() !== "")
+                            .map(item => [item.SerialNumber.trim(), item])).values()]; 
+                    oFCIAerData = [...new Map(oFCIAerData.filter(item => item.EquipmentNumber && item.EquipmentNumber.trim() !== "")
+                            .map(item => [item.EquipmentNumber.trim(), item])).values()]; 
+                        this.getView().setModel(new JSONModel(oFCIAerData), "oModelInitial");
+                        this.getView().getModel("oModelInitial").refresh(true);
+                    }
+                    BusyIndicator.hide();
+                }).catch((error) => {
+                    BusyIndicator.hide();
+                    MessageToast.show(error.message || error.responseText);
+                });
+            },            
 			
 		
 			IA_onCreateButtonPress: function () {     
@@ -294,7 +299,7 @@ sap.ui.define([
                             "Status": "Trashed",
                             "TrashDate": Date
                               };
-                   await  this.ajaxUpdateWithJQuery("IncomeAsset", { data: oPayLoad, filters: { SerialNumber: selectedData.SerialNumber }, });	
+                 await  this.ajaxUpdateWithJQuery("IncomeAsset", { data: oPayLoad, filters: { SerialNumber: selectedData.SerialNumber }, });	
 							MessageToast.show(this.i18nModel.getText("Trashed"));
                             this.IA_CommonReadCall("IncomeAsset")
                       this.TF_Dialog.close();
@@ -305,8 +310,7 @@ sap.ui.define([
                 }
             } else {
 			       MessageToast.show(this.i18nModel.getText("noRowSelected"));
-
-            }
+ }
         },
 
      
@@ -341,13 +345,10 @@ sap.ui.define([
                 filters.Status=status;
             }
             BusyIndicator.show(0);
+         this._fetchCommonData("IncomeAsset", "incomeModel", filters).then(() => {  
 
-         this._fetchCommonData("IncomeAsset", "incomeModel", filters).then(() => {
-            
             const data = this.getView().getModel("incomeModel").getData();
-
-            this._populateUniqueFilterValues(data);
-         }).finally(() => {
+         }).finally(() => { 
             BusyIndicator.hide();
         });
         },        
@@ -357,8 +358,7 @@ sap.ui.define([
 			this.getView().byId("idOdataDateComboBox").setValue("");
 			this.getView().byId("IA_id_SlNo").setSelectedKey("");
 			this.getView().byId("IA_id_Status").setSelectedKey("");
-
-		},
+  },
 			FTIA_onCancelPress: function () {
             this.TF_Dialog.close();
         },
@@ -369,31 +369,31 @@ sap.ui.define([
 
              },
                 
-      _populateUniqueFilterValues: function (data) {
-                let uniqueValues = {
-                        IA_id_EqNo: new Set(),
-                        IA_id_SlNo: new Set(),
-                        IA_id_Status: new Set()
-                    };
+    //   _populateUniqueFilterValues: function (data) {
+    //             let uniqueValues = {
+    //                     IA_id_EqNo: new Set(),
+    //                     IA_id_SlNo: new Set(),
+    //                     IA_id_Status: new Set()
+    //                 };
         
-                    data.forEach(item => {
-                        uniqueValues.IA_id_EqNo.add(item.EquipmentNumber);  
-                        uniqueValues.IA_id_SlNo.add(item.SerialNumber); 
-                        uniqueValues.IA_id_Status.add(item.Status); 
-                    });
+    //                 data.forEach(item => {
+    //                     uniqueValues.IA_id_EqNo.add(item.EquipmentNumber);  
+    //                     uniqueValues.IA_id_SlNo.add(item.SerialNumber); 
+    //                     uniqueValues.IA_id_Status.add(item.Status); 
+    //                 });
 
-                    let oView = this.getView();
-                    ["IA_id_EqNo", "IA_id_SlNo", "IA_id_Status"].forEach(field => {
-                        let oComboBox = oView.byId(field);
-                        oComboBox.destroyItems();
-                        Array.from(uniqueValues[field]).sort().forEach(value => {
-                            oComboBox.addItem(new sap.ui.core.Item({
-                                key: value,
-                                text: value
-                            }));
-                        });
-                    });
-                },               
+    //                 let oView = this.getView();
+    //                 ["IA_id_EqNo", "IA_id_SlNo", "IA_id_Status"].forEach(field => {
+    //                     let oComboBox = oView.byId(field);
+    //                     oComboBox.destroyItems();
+    //                     Array.from(uniqueValues[field]).sort().forEach(value => {
+    //                         oComboBox.addItem(new sap.ui.core.Item({
+    //                             key: value,
+    //                             text: value
+    //                         }));
+    //                     });
+    //                 });
+    //             },               
                  IA_onExport: function () {
                     const oTable = this.getView().byId("IA_id_OdataTable");
                     const oModelData = oTable.getModel("incomeModel").getData();

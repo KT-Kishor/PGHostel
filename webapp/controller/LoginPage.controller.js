@@ -117,6 +117,7 @@ sap.ui.define(
           }
         },
         LP_onLogin: function () {
+          // this.getRouter().navTo("RouteTilePage")
           var oButton = this.byId("LP_id_loginBTn").setBusy(true);
           const oLoginModel = this.getView().getModel("LoginModel");
           const oVM = this.getView().getModel("LoginViewModel");

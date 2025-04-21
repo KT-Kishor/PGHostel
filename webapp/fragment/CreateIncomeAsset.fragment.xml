@@ -8,14 +8,14 @@
         <f:SimpleForm
             id="FCIA_id_SimpleFormChange354wide"
             editable="true"
-            layout="ResponsiveGridLayout"
+            layout="ColumnLayout"
             labelSpanXL="4"
             labelSpanL="3"
             labelSpanM="4"
             labelSpanS="12"
             columnsXL="2"
             columnsL="2"
-            columnsM="2"
+            columnsM="1"
             singleContainerFullSize="false"
         >
             <f:content>
@@ -36,7 +36,7 @@
                     liveChange="FCIA_onInputLiveChange"
                     maxLength="15"
                 />
-                 	<Text text="Description"  />
+                 	<Label text="{i18n>description}" required="true" />
 		          <TextArea id="FCIA_ID_DescriptionTextArea" 
                   liveChange="FCIA_onDescriptionTextAreaChange"
                   value="{CreateIncomeAssetModel>/Description}" 
@@ -107,7 +107,7 @@
                     />
                 </ComboBox>
 
-                <Label text="{i18n>assetvalue}" />
+                <Label text="{i18n>assetvalue}" required="true"/>
                 <Input
                     id="FCIA_id_assetvalue"
                     value="{CreateIncomeAssetModel>/AssetValue}"

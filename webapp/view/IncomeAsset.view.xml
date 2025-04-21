@@ -25,7 +25,7 @@
         >
             <fb:filterGroupItems>
               <fb:FilterGroupItem
-                    name="SlNo"
+                    name="SerialNumber"
                     label="{i18n>slNo}"
                     groupName="Group1"
                     visibleInFilterBar="true"
@@ -33,21 +33,21 @@
                     <fb:control>
                         <ComboBox
                             id="IA_id_SlNo"
-                            items="{incomeModel>/}"
+                            items="{oModelInitial>/}"
                             showClearIcon="true"
                         >
                             <items>
                                 <core:Item
                                     id="IA_id_SlItem"
-                                    text="{incomeModel>SerialNumber}"
-                                    key="{incomeModel>SerialNumber}"
+                                    text="{oModelInitial>SerialNumber}"
+                                    key="{oModelInitial>SerialNumber}"
                                 />
                             </items>
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
                 <fb:FilterGroupItem
-                    name="EqNo"
+                    name="EquipmentNumber"
                     label="{i18n>eqNo}"
                     groupName="Group1"
                     visibleInFilterBar="true"
@@ -56,21 +56,21 @@
                     <fb:control>
                         <ComboBox
                             id="IA_id_EqNo"
-                            items="{incomeModel>/}"
+                            items="{oModelInitial>/}"
                             showClearIcon="true"
                         >
                             <items>
                                 <core:Item
                                     id="IA_Eqnoitem"
-                                    text="{incomeModel>EquipmentNumber}"
-                                    key="{incomeModel>EquipmentNumber}"
+                                    text="{oModelInitial>EquipmentNumber}"
+                                    key="{oModelInitial>EquipmentNumber}"
                                 />
                             </items>
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
                 <fb:FilterGroupItem
-                    name="PikedBy"
+                    name="PikedEmployeeName"
                     label="{i18n>pickedBy}"
                     groupName="Group1"
                     visibleInFilterBar="true"
@@ -118,14 +118,14 @@
                     <fb:control>
                         <ComboBox
                             id="IA_id_Status"
-                            items="{incomeModel>/}"
+                            items="{AssetAssignmentStatus>/}"
                             showClearIcon="true"
                         >
                             <items>
                                 <core:Item
                                     id="IA_id_Statusitem"
-                                    text="{incomeModel>Status}"
-                                    key="{incomeModel>Status}"
+                                    text="{AssetAssignmentStatus>Value}"
+                                    key="{AssetAssignmentStatus>Value}"
                                 />
                             </items>
                         </ComboBox>
@@ -138,6 +138,7 @@
             class="sapUiResponsiveMargin"
             width="auto"
             alternateRowColors="true"
+            busyIndicatorDelay="0"
             items="{
             path:'incomeModel>/',
              sorter: [{
@@ -185,32 +186,32 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-               <Column>
+               <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>vehicleModel}"/>
                 </Column>
-                 <Column>
+                 <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>pickedBy}"/>
                 </Column>
-                     <Column>
+                     <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>slNo}"/>
                 </Column>
-                <Column>
+                <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>eqNo}"/>
                 </Column>
-               <Column>
+               <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>date}"/>
                 </Column>
-                <Column>
+                <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>branch}"/>
                 </Column>
-                  <Column>
+                  <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>status}"/>
                 </Column>
-                <Column>
+                <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>trashDate}"/>
 
                 </Column>
-                 <Column>
+                 <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>assetvalue}"/>
                 </Column>  
             </columns>
