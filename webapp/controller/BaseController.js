@@ -99,6 +99,10 @@ sap.ui.define([
         } else if (value === "IncomeAsset" && TileModel.getProperty("/IncomeAsset") === '0') {
           this.getRouter().navTo("RouteLoginPage");        
         } else if (value === "AssetAssignment" && TileModel.getProperty("/AssetAssignment") === '0') {
+          this.getRouter().navTo("RouteLoginPage");        
+        } else if (value === "A_Quotations" && TileModel.getProperty("/A_Quotations") === '0') {
+          this.getRouter().navTo("RouteLoginPage");        
+        } else if (value === "A_Payroll" && TileModel.getProperty("/A_Payroll") === '0') {
           this.getRouter().navTo("RouteLoginPage");
         }
       }

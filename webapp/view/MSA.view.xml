@@ -10,7 +10,7 @@
 	     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 			</headerContent>
 		<content>
-			<fb:FilterBar  class="sapUiTinyMargin" id="MSA_id_AdminFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+			<fb:FilterBar  class="sapUiTinyMargin" id="MSA_id_AdminFilter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search="MSA_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="Company Name" label="{i18n>companyName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
@@ -56,7 +56,7 @@
 							<Text text="{MSADisplayModel>PanCard}"/>
 							<Text text="{MSADisplayModel>CompanyHeadName}"/>
 							<Text text="{MSADisplayModel>CompanyHeadPosition}"/>
-							<Text text="{MSADisplayModel>CreateMSADate}"/>
+							<Text text="{path:'MSADisplayModel>CreateMSADate',formatter: '.Formatter.formatDate'}"/>
 						</cells>
 					</ColumnListItem>
 				</items>

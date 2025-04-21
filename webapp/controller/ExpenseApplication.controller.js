@@ -194,9 +194,6 @@ sap.ui.define([
             sap.m.URLHelper.redirect(fileUrl, true)
         },
 
-        onSignout: function() {
-            this.getRouter().navTo("RouteLoginPage");
-        },
 // Delete the Expenase and Expense Item
         Exp_onPressDeleteExpense: async function (oEvent) {
             this.byId("exp_Id_ExpenseTable").setBusy(true);

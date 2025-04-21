@@ -76,12 +76,7 @@
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
-				<WizardStep 
-                            nextStep="MasD_id_ThirdStep"
-							complete="MsaD_reviewSubmit"
-                            activate="optionalStepActivation"
-                            title="{i18n>review}"
-                            validated="true">
+				<WizardStep id="MasD_id_ThirdStep" title="{i18n>review}">
 					<f:SimpleForm 
                                 editable="true"
 			layout="ResponsiveGridLayout"
@@ -123,5 +118,15 @@
 				</WizardStep>
 			</Wizard>
 		</content>
+		<footer>
+			<Bar>
+				<contentLeft>
+					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+				</contentLeft>
+				<contentRight>
+					<Button text="{i18n>submit}" press="MsaD_reviewSubmit" id="MsaD_id_Submit" type="Success" enabled="false"/>
+				</contentRight>
+			</Bar>
+		</footer>
 	</Page>
 </mvc:View>

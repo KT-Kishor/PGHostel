@@ -18,11 +18,10 @@ sap.ui.define([
                 this.getRouter().navTo("RouteTilePage");
             },
             onLogout: function () {
-                this.getRouter().navTo("RouteLoginPage");
+                this.CommonLogoutFunction();
             },
             MSA_AddmsaDetails:function(){
-                this.getRouter().navTo("RouteMSADetails");
-                
+                this.getRouter().navTo("RouteMSADetails");                
             },
                        
             OnPressNavigationMsaDet:function(oEvent){
