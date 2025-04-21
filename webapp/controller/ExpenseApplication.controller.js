@@ -109,9 +109,9 @@ sap.ui.define([
                     utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-EndDate"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-Country"), "ID") &&
-                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-Source"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Source"), "ID") &&
                     (this.ViewModel.getProperty("/required") === true ?
-                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-Destination"), "ID") :
+                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Destination"), "ID") :
                         true) &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-EmployeeRemark"), "ID");
 
@@ -169,17 +169,21 @@ sap.ui.define([
             if(oEvent.getSource().getValue()===''){
                 oEvent.getSource().setValueState("None")
             }
+            var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+            var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+            sap.ui.getCore().byId("exp-Id-Source").getBinding("items").filter(oFilter);
+            sap.ui.getCore().byId("exp-Id-Destination").getBinding("items").filter(oFilter);
         },
 
         Exp_onChangeSource: function(oEvent) {
-            utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            utils._LCvalidateMandatoryField(oEvent, "oEvent");
             if(oEvent.getSource().getValue()===''){
                 oEvent.getSource().setValueState("None")
             }
         },
 
         Exp_onChangeDestination: function(oEvent) {
-            utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            utils._LCvalidateMandatoryField(oEvent, "oEvent");
             if(oEvent.getSource().getValue()===''){
                 oEvent.getSource().setValueState("None")
             }   

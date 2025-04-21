@@ -57,6 +57,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                 this.ViewModel.setProperty("/status", false);
             }
             if (this.FilteredExpenseModel[0].TripType !== "Customer Facing") this.ViewModel.setProperty("/required", false);
+            this.CountryAndCity();
             BusyIndicator.hide();
         },
         // Expense Item Index increment and ItemExpense Read call
@@ -221,14 +222,14 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
         },       
         //Source Validation
         Exp_Det_SourceChange:function(oEvent){
-            utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            utils._LCvalidateMandatoryField(oEvent, "oEvent");
             if(oEvent.getSource().getValue()===''){
                 oEvent.getSource().setValueState("None")
             }
         },
         // Destination Validation
         Exp_Det_DestinationChange:function(oEvent){
-            utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            utils._LCvalidateMandatoryField(oEvent, "oEvent");
             if(oEvent.getSource().getValue()===''){
                 oEvent.getSource().setValueState("None")
             }
@@ -238,13 +239,21 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
             utils._LCstrictValidationComboBox(oEvent, "oEvent");
             if(oEvent.getSource().getValue()===''){
                 oEvent.getSource().setValueState("None")
-            }
+            }            
+            this.CountryAndCity();
+        },
+
+        CountryAndCity:function(){
+            var Code = this.getView().getModel("CountryModel").getData().filter((item) => item.countryName === this.byId("Exp_id_Country").getValue());
+            var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, Code[0].code);
+            this.byId("Exp_id_Source").getBinding("items").filter(oFilter);
+            this.byId("Exp_id_Destination").getBinding("items").filter(oFilter);
         },
 
         onPressSave: async function() {
             if (
-                utils._LCstrictValidationComboBox(this.byId("Exp_id_Source"), "ID") &&
-                (this.ViewModel.getProperty("/required") === true ? utils._LCstrictValidationComboBox(this.byId("Exp_id_Destination"), "ID") : true) && utils._LCstrictValidationComboBox(this.byId("Exp_id_Country"), "ID") && utils._LCvalidateMandatoryField(this.byId("Exp_id_EmpRemark"), "ID")) {
+                utils._LCvalidateMandatoryField(this.byId("Exp_id_Source"), "ID") &&
+                (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"), "ID") : true) && utils._LCstrictValidationComboBox(this.byId("Exp_id_Country"), "ID") && utils._LCvalidateMandatoryField(this.byId("Exp_id_EmpRemark"), "ID")) {
                 this.byId("Exp_Det_id_DimpleForm").setBusy(true);
                 var oModel = this.getView().getModel("FilteredExpenseModel");
                 oModel.getData()[0].ExpStartDate = oModel.getData()[0].ExpStartDate.split("T")[0];
