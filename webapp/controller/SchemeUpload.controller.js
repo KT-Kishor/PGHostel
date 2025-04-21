@@ -42,13 +42,13 @@ sap.ui.define(
           var aFilterItems = this.byId("SU_id_Filterbar").getFilterGroupItems();
           var params = {};
           aFilterItems.forEach(function (oItem) {
-            var oControl = oItem.getControl(); // Get the associated control
+            var oControl = oItem.getControl();
             var sValue = oItem.getName();
             if (oControl && oControl.getValue()) {
               params[sValue] = oControl.getValue();
             }
           });
-          this._fetchCommonData("SchemeUploade", "MainModel", params);
+          // Call with filter to update table only
           this.CommomReadCall(params);
         },
         SU_onClear: function () {
@@ -303,40 +303,20 @@ sap.ui.define(
           BusyIndicator.show(0);
           await this.ajaxReadWithJQuery("SchemeUploade", filter)
             .then((oData) => {
-              var offerData = Array.isArray(oData.data)
-                ? oData.data
-                : [oData.data];
-              // Set full result to MainModel
+              var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+
+              // Save the full unfiltered data once (e.g., onInit) — if no filters applied
+              if (!filter || Object.keys(filter).length === 0) {
+                this._fullOfferData = offerData; // Save for ComboBox deduplication
+                this._populateComboBoxModels(offerData);
+              }
+
+              // Always update the table view
               this.getView().setModel(
                 new JSONModel({ results: offerData }),
                 "MainModel"
               );
-              // Deduplicate for each ComboBox
-              const getUnique = (arr, key) => {
-                const seen = new Set();
-                return arr.filter((item) => {
-                  if (item[key] && !seen.has(item[key])) {
-                    seen.add(item[key]);
-                    return true;
-                  }
-                  return false;
-                }).map((item) => ({ [key]: item[key] }));
-              };
-              const uniqueModels = getUnique(offerData, "Model");
-              const uniqueVariants = getUnique(offerData, "Variant");
-              const uniqueTransmissions = getUnique(offerData, "Transmission");
-              this.getView().setModel(
-                new JSONModel({ results: uniqueModels }),
-                "ModelOnly"
-              );
-              this.getView().setModel(
-                new JSONModel({ results: uniqueVariants }),
-                "VariantOnly"
-              );
-              this.getView().setModel(
-                new JSONModel({ results: uniqueTransmissions }),
-                "TransmissionOnly"
-              );
+
               BusyIndicator.hide();
             })
             .catch((Error) => {
@@ -346,6 +326,27 @@ sap.ui.define(
               );
             });
         },
+        _populateComboBoxModels: function (offerData) {
+          const getUnique = (arr, key) => {
+            const seen = new Set();
+            return arr.filter((item) => {
+              if (item[key] && !seen.has(item[key])) {
+                seen.add(item[key]);
+                return true;
+              }
+              return false;
+            }).map((item) => ({ [key]: item[key] }));
+          };
+
+          const uniqueModels = getUnique(offerData, "Model");
+          const uniqueVariants = getUnique(offerData, "Variant");
+          const uniqueTransmissions = getUnique(offerData, "Transmission");
+
+          this.getView().setModel(new JSONModel({ results: uniqueModels }), "ModelOnly");
+          this.getView().setModel(new JSONModel({ results: uniqueVariants }), "VariantOnly");
+          this.getView().setModel(new JSONModel({ results: uniqueTransmissions }), "TransmissionOnly");
+        },
+
         //Navigate to new page with data
         SU_onItemPress: function (oEvent) {
           var oSelectedContext = oEvent
