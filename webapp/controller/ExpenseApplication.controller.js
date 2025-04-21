@@ -18,7 +18,8 @@ sap.ui.define([
 
         _onRouteMatched: async function(oEvent) {
             this.commonLoginFunction("Expense");
-            await this._fetchCommonData("Expense", "FilterExpenseModel");
+            this.LoginModel = this.getView().getModel("LoginModel");
+            await this._fetchCommonData("Expense", "FilterExpenseModel",{"EmployeeID":this.LoginModel.getProperty("/EmployeeID")});
             var FilterModel = this.getView().getModel("FilterExpenseModel");
 
             if (FilterModel) {
@@ -37,8 +38,7 @@ sap.ui.define([
                 minDate:new Date()
             });
             this.getOwnerComponent().setModel(View, "viewModel");
-            this.ViewModel = this.getView().getModel("viewModel");
-            this.LoginModel = this.getView().getModel("LoginModel");
+            this.ViewModel = this.getView().getModel("viewModel");           
             this.CommonModel();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
             this.Exp_onSearch();
@@ -128,8 +128,8 @@ sap.ui.define([
                 const oResponse = await that.ajaxCreateWithJQuery("Expense", {data: oModel});
                 if (oResponse) {
                     that.Expense.close();
+                    await that.Exp_onPressClear();
                     await that._fetchCommonData("ExpenseTotalCalculation", "", {ExpenseID: oResponse.ExpenseID});
-                    // await that._fetchCommonData("Expense", "ExpenseModel");
                     await that.Exp_onSearch();
                     that.getView().getModel("FilterExpenseModel").setData([...new Map(that.getView().getModel("ExpenseModel").getData().map((item) => [item.ExpenseName, item])).values()]);
                     MessageToast.show(that.i18nModel.getText("expenseCreatedMess"));
@@ -247,7 +247,7 @@ sap.ui.define([
             }
         },
 
-        Exp_onPressClear: function() {
+        Exp_onPressClear:async function() {
             this.byId("Exp_id_EmployeeName").setSelectedKey("");
             this.byId("Exp_id_ConsFilterBar").setSelectedKey("");
             this.byId("Exp_id_SourceFilter").setSelectedKey("");

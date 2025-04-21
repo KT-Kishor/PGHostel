@@ -59,7 +59,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
             if (this.FilteredExpenseModel[0].TripType !== "Customer Facing") this.ViewModel.setProperty("/required", false);
             BusyIndicator.hide();
         },
-
+        // Expense Item Index increment and ItemExpense Read call
         IndexNoIncreent: function() {
             var that = this;
             var oView = this.getView();
@@ -92,12 +92,12 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                     table.setBusy(false);
                 });
         },
-
+        //Download Perdiem Declaration
         Exp_Det_onPressExpenseDownload: function() {
             let fileUrl = window.location.href.split("index")[0] + "/Perdiem_DeclarationForm.doc";
             sap.m.URLHelper.redirect(fileUrl, true);
         },
-
+        //Open Fragment in Expeanse Item Create and Update 
         openFragment: function() {
             var oView = this.getView();
             var oModel = oView.getModel("FilteredExpenseModel").getData()[0];
@@ -129,7 +129,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                 this.ViewModel.setProperty("/enableDelete", true);
             }
         },
-
+        //  Create Expense Item
         Exp_Det_onPressAddExpenseItem: function() {
             this.ViewModel.setProperty("/SubmitBtn", true);
             this.ViewModel.setProperty("/enable", true);
@@ -153,7 +153,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
             this.getView().setModel(oExpenseCreateModel, "ExpenseCreateModel");
             this.openFragment();
         },
-
+        //Update Expense Items
         Exp_Det_onPressExpenseItemEdit: function() {
             if (this.byId("exp_Id_ExpenseTable").getSelectedItem() === null) {
                 return MessageToast.show(this.i18nModel.getText("expenseEditSelectRowMess"));
@@ -179,11 +179,12 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
             var oExpenseCreateModel = new JSONModel(jsonExpense);
             this.getView().setModel(oExpenseCreateModel, "ExpenseCreateModel");
         },
-
+        // close Fragment
         Exp_Det_onPressClose: function() {
             sap.ui.getCore().byId("ExpDet_id_Amount").setValueState("None");
             sap.ui.getCore().byId("ExpDet_id_ConvertionRate").setValueState("None");
             sap.ui.getCore().byId("ExpDet_id_Comments").setValueState("None");
+            this.byId("exp_Id_ExpenseTable").removeSelections();
             this.ExpenseItem.close();
         },
 
@@ -206,30 +207,26 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
             this.ViewModel.setProperty("/enable", false);
             this.ViewModel.setProperty("/enableDelete", false);
         },
-
+        //Amount Validation
         LC_ExpAmount: function(oEvent) {
             utils._LCvalidateAmount(oEvent);
         },
-
+        // Conversion Rate validation
         LC_ExpConversionRate: function(oEvent) {
             utils._LCvalidateAmount(oEvent);
         },
-
+        //Comments Validation
         LC_ExpComments: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
-        },
-
-        onLiveChangeEmployeeRemark: function(oEvent) {
-            utils._LCvalidateMandatoryField(oEvent);
-        },
-
+        },       
+        //Source Validation
         Exp_Det_SourceChange:function(oEvent){
             utils._LCstrictValidationComboBox(oEvent, "oEvent");
             if(oEvent.getSource().getValue()===''){
                 oEvent.getSource().setValueState("None")
             }
         },
-
+        // Destination Validation
         Exp_Det_DestinationChange:function(oEvent){
             utils._LCstrictValidationComboBox(oEvent, "oEvent");
             if(oEvent.getSource().getValue()===''){
@@ -473,8 +470,8 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                                     EmployeeName: oModelData.EmployeeName,
                                     Type: "Expense",
                                     TripType: oModelData.TripType,
-                                    ExpStartDate: oModelData.ExpStartDate,
-                                    ExpEndDate: oModelData.ExpEndDate,
+                                    ExpStartDate: oModelData.ExpStartDate.split("T")[0],
+                                    ExpEndDate: oModelData.ExpEndDate.split("T")[0],
                                     SubmittedDate: that.Formatter.formatDate(new Date()),
                                     Comments: oModelData.comments[0].Comment,
                                     TotalAmount: oModelData.TotalAmount,
