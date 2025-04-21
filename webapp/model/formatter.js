@@ -181,8 +181,18 @@ sap.ui.define([], function () {
             // return oFloatFormat.format(numericValue);
             var monthlyValue = Data / 12;
             return "INR " +  oFloatFormat.format(monthlyValue);
-          }
-          
+          },
+          formatGradeWithType: function(sGrade, sGradeType) {
+            if (!sGrade || isNaN(sGrade)) return "";
+            var formattedGrade = parseFloat(sGrade).toFixed(2);
+            if (sGradeType === "Percentage") {
+              return formattedGrade + " %";
+            } else if (sGradeType === "CGPA") {
+              return formattedGrade + " CGPA";
+            } else {
+              return formattedGrade;
+            }
+        }        
 
     }
 });

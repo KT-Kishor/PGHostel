@@ -35,8 +35,8 @@
 				<cells>
 					<Text text="{sEducationModel>CollegeName}"/>
 					<Text text="{sEducationModel>DegreeName}"/>
-					<Text text="{sEducationModel>Grade}"/>
-					<Text text="{path:'sEducationModel>EducationStartDate' ,formatter:'.Formatter.formatDate'}"/>
+					<Text text="{parts: [ { path: 'sEducationModel>Grade' }, { path: 'sEducationModel>GradeType' }],formatter: '.Formatter.formatGradeWithType' }"/>
+					 <Text text="{path:'sEducationModel>EducationStartDate' ,formatter:'.Formatter.formatDate'}"/>
 					<Text text="{path:'sEducationModel>EducationEndDate', formatter:'.Formatter.formatDate'}"/>
 				</cells>
 			</ColumnListItem>
