@@ -240,7 +240,6 @@ sap.ui.define([
                     // Validate required fields
                     if (
                         utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
-                       // utils_LCvalidateMandetoryField(oView.byId("SS_id_BloodGroup"),"ID") &&
                         utils._LCvalidateMandatoryField(oView.byId("SS_id_BloodGroup"), "ID") &&
                         utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
                         utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&

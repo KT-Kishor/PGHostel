@@ -12,13 +12,6 @@
                     showIcon="true"
                     class="sapUiTinyMarginBottom">
                 </MessageStrip>
-                <!-- <Label text="{i18n>fileUploader}" required="true"/>
-                        <u:FileUploader
-                
-                width="300px"
-                buttonText="{i18n>fileupload}"
-            
-                icon="sap-icon://upload"/>  -->
                 <Label text="{i18n>fileUploader}" required="true"/>
                     <HBox width="100%" justifyContent="Start" alignItems="Center">
                         <VBox width="20%">
@@ -40,7 +33,7 @@
                 <Input id="Mail_id_Text" value ="{UploaderData>/ToEmail}" editable="false"/>
 
                 <Label text="{i18n>ccMailText}" required="true"/>
-                <TextArea id="CCMail_TextArea" value ="{UploaderData>/CCEmail}" maxLength="600" liveChange="Mail_onEmailChange"/>
+                <TextArea id="CCMail_TextArea" value ="{UploaderData>/CCEmail}" maxLength="600" liveChange="Mail_onEmailChange" valueStateText="{i18n>emailValueState}"/>
             </f:content>
         </f:SimpleForm>
 

@@ -17,8 +17,7 @@ sap.ui.define([
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: async function (oEvent) {
-                
+            _onRouteMatched: async function (oEvent) {     
                 this.commonLoginFunction("EmployeeOffer");
                 BusyIndicator.show(0)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -216,10 +215,12 @@ sap.ui.define([
                         this.oDialog = dialog;
                         this.getView().addDependent(this.oDialog);
                         sap.ui.getCore().byId("OEF_id_DateofBirth").setMaxDate(new Date());
+                        this._FragmentDatePickersReadOnly(["OEF_id_DateofBirth"]);
                         this.oDialog.open();
                         BusyIndicator.hide();
                     })
                 } else {
+                    this._FragmentDatePickersReadOnly(["OEF_id_DateofBirth"]);
                     this.oDialog.open();
                     BusyIndicator.hide();
                 }
@@ -230,7 +231,7 @@ sap.ui.define([
                     sap.ui.getCore().byId(field).setValueState("None");
                 });
                 this.oDialog.close();
-                this.byId("EO_id_TableEOffer").removeSelections(true);
+                this.EO_ButtonVisibility();
             },
             validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
