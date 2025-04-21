@@ -1,6 +1,7 @@
 sap.ui.define([
-  "sap/ui/core/mvc/Controller"
-], (BaseController) => {
+  "sap/ui/core/mvc/Controller",
+  "sap/m/MessageBox"
+], (BaseController,MessageBox) => {
   "use strict";
 
   return BaseController.extend("sap.kt.com.minihrsolution.controller.App", {
@@ -35,7 +36,7 @@ sap.ui.define([
       if (this.logoutTimer) {
         clearTimeout(this.logoutTimer);
       }
-      this.getView().getModel("loginModel").setData({});
+      this.getView().getModel("LoginModel").setData({});
       MessageBox.information(
         "Your session has expired due to inactivity. Please log in again to continue",
         {
@@ -48,9 +49,9 @@ sap.ui.define([
 
           onClose: function (sAction) {
             if (sAction === sap.m.MessageBox.Action.OK) {
-              this.getView().getModel("loginModel").setData({});
+              this.getView().getModel("LoginModel").setData({});
               // Navigate to the login page
-              this.getOwnerComponent().getRouter().navTo("RouteView1");
+              this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
             }
           }.bind(this) // Bind 'this' to ensure the correct context
         }
@@ -75,9 +76,9 @@ sap.ui.define([
 
           onClose: function (sAction) {
             if (sAction === sap.m.MessageBox.Action.OK) {
-              this.getView().getModel("loginModel").setData({});
+              this.getView().getModel("LoginModel").setData({});
               // Navigate to the login page
-              this.getOwnerComponent().getRouter().navTo("RouteView1");
+              this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
             }
           }.bind(this) // Bind 'this' to ensure the correct context
         });
