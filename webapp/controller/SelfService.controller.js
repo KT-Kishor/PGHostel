@@ -240,6 +240,8 @@ sap.ui.define([
                     // Validate required fields
                     if (
                         utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
+                       // utils_LCvalidateMandetoryField(oView.byId("SS_id_BloodGroup"),"ID") &&
+                        utils._LCvalidateMandatoryField(oView.byId("SS_id_BloodGroup"), "ID") &&
                         utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
                         utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
                         utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
@@ -603,6 +605,100 @@ sap.ui.define([
             
                     var sTitleText = `Appraisal Date: ${appraisalDate}, Effective Date: ${effectiveDate} - Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.Gross)}`;
             
+                    // Monthly SimpleForm
+                    var oMonthlyForm = new sap.ui.layout.form.SimpleForm({
+                        layout: "ResponsiveGridLayout",
+                        editable: false,
+                        title: this.i18nModel.getText("rateMonthly"),
+                        content: [
+                            new sap.ui.core.Title({ text: this.i18nModel.getText("monthlyComponents") }),
+                            new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.BasicSalary)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("hra") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.HRA)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.EmployerPF)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.MedicalInsurance)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.Gratuity)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.SpecailAllowance)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("Total") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.Total)}` }),
+            
+                            new sap.ui.core.Title({ text: this.i18nModel.getText("totalDeductionAmount") }),
+                            new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.EmployeePF)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.PT)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.IncomeTax)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.TotalDeduction)}` }),
+            
+                            new sap.ui.core.Title({ text: this.i18nModel.getText("EmpOfferVariablePay") }),
+                            new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.VariablePay)}` }),
+            
+                            new sap.ui.core.Title({ text: this.i18nModel.getText("grossPay") }),
+                            new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.GrossPay)}` })
+                        ]
+                    });
+            
+                    // Yearly SimpleForm
+                    var oYearlyForm = new sap.ui.layout.form.SimpleForm({
+                        layout: "ResponsiveGridLayout",
+                        editable: false,
+                        title: this.i18nModel.getText("yearly"),
+                        content: [
+                            new sap.ui.core.Title({ text: this.i18nModel.getText("monthlyComponents") }),
+                            new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.BasicSalary)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("hra") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.HRA)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployerPF)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.MedicalInsurance)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Gratuity)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.SpecailAllowance)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("Total") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Total)}` }),
+            
+                            new sap.ui.core.Title({ text: this.i18nModel.getText("totalDeductionAmount") }),
+                            new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployeePF)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.PT)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.IncomeTax)}` }),
+                            new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` }),
+            
+                            new sap.ui.core.Title({ text: this.i18nModel.getText("EmpOfferVariablePay") }),
+                            new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` }),
+            
+                            new sap.ui.core.Title({ text: this.i18nModel.getText("grossPay") }),
+                            new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
+                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
+                        ]
+                    });
+            
+                    // HBox to place Monthly and Yearly forms side by side
+                    var oHBox = new sap.m.HBox({
+                        width: "100%",
+                        items: [
+                            new sap.m.VBox({ width: "50%", items: [oMonthlyForm] }),
+                            new sap.m.VBox({ width: "50%", items: [oYearlyForm] })
+                        ]
+                    });
+            
+                    // Panel wrapping the HBox
                     var oPanel = new sap.m.Panel({
                         expandable: true,
                         expanded: true,
@@ -616,83 +712,10 @@ sap.ui.define([
                                 })
                             ]
                         }),
-                        content: [
-                            new sap.ui.layout.form.SimpleForm({
-                                layout: "ResponsiveGridLayout",
-                                editable: false,
-                                columnsM: 2,
-                                columnsL: 2,
-                                columnsXL: 2,
-                                content: [
-                                    new sap.ui.core.Title({ text: this.i18nModel.getText("rateMonthly") }),
-                                    new sap.ui.core.Title({ text: this.i18nModel.getText("monthlyComponents") }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.BasicSalary)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("hra") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.HRA)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.EmployerPF)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.MedicalInsurance)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.Gratuity)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.SpecailAllowance)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("Total") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.Total)}` }),
-                                    new sap.ui.core.Title({ text: this.i18nModel.getText("totalDeductionAmount") }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.EmployeePF)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.PT)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.IncomeTax)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.TotalDeduction)}` }),
-                                    new sap.ui.core.Title({ text: this.i18nModel.getText("EmpOfferVariablePay") }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.VariablePay)}` }),
-                                    new sap.ui.core.Title({ text: this.i18nModel.getText("grossPay") }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.GrossPay)}` }),
-            
-                                    // Yearly Data
-                                    new sap.ui.core.Title({ text: this.i18nModel.getText("yearly") }),
-                                    new sap.ui.core.Title({ text: this.i18nModel.getText("monthlyComponents") }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.BasicSalary)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("hra") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.HRA)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployerPF)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.MedicalInsurance)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Gratuity)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.SpecailAllowance)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("Total") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Total)}` }),
-                                    new sap.ui.core.Title({ text: this.i18nModel.getText("totalDeductionAmount") }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployeePF)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.PT)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.IncomeTax)}` }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` }),
-                                    new sap.ui.core.Title({ text: this.i18nModel.getText("EmpOfferVariablePay") }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` }),
-                                    new sap.ui.core.Title({ text: this.i18nModel.getText("grossPay") }),
-                                    new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
-                                ]
-                            })
-                        ]
+                        content: [oHBox]
                     });
             
+                    // Wrapper VBox to maintain spacing/margin if needed
                     var oWrapperVBox = new sap.m.VBox({
                         items: [oPanel],
                         layoutData: new sap.m.FlexItemData({
@@ -703,6 +726,7 @@ sap.ui.define([
                     oVBox.addItem(oWrapperVBox);
                 }.bind(this));
             },
+            
             
             //On icon tab select function
             SS_onTabSelect: function (oEvent) {

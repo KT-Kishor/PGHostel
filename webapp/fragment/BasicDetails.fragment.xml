@@ -32,7 +32,7 @@
                                 id="SS_id_Dob" editable="{viewModel>/isEditMode}" initialFocusedDateValue="{controller>/focusedDate}" valueStateText="{i18n>dateValueState}"
 	                             maxDate="{controller>/maxDate}" />
 								<Label text="{i18n>bloodGroup}" required="true" id="SS_id_lb"/>
-								<Select  selectedKey="{sEmployeeModel>/0/BloodGroup}" items="{BloodGroup>/bloodgroup}" id="SS_id_BloodGroup"  editable="{viewModel>/isEditMode}">
+								<Select  selectedKey="{sEmployeeModel>/0/BloodGroup}" items="{BloodGroup>/bloodgroup}" id="SS_id_BloodGroup"  editable="{viewModel>/isEditMode}" change="SS_ValidateCommonFields">
 								<core:Item key="{BloodGroup>Code}" text="{BloodGroup>Code}" />
 								</Select>
 								<Label text="{i18n>companyMailid}"  />
