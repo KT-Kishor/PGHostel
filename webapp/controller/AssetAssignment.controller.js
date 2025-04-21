@@ -38,6 +38,7 @@ sap.ui.define([
                     },
 
                 });
+                this.commonLoginFunction("AssetAssignment");
                 this._makeDatePickersReadOnly(["AA_id_Date"]);
                 this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAU_id_unassignDate"]);
                 this.getView().setModel(form, "myform");
@@ -58,7 +59,7 @@ sap.ui.define([
                 this.getRouter().navTo("RouteTilePage");
             },
             onLogout: function () {
-                this.getRouter().navTo("RouteLoginPage");
+                this.CommonLogoutFunction(); 
             },
 
             AA_CoomonReadCall: function (filter) {
@@ -81,22 +82,22 @@ sap.ui.define([
                 });
             },
 
-            onTypeChange: function (oEvent) {
-                var filter = { "Type": oEvent.getSource().getValue() }
-                this.ajaxReadWithJQuery("IncomeAsset", filter).then((oData) => {
-                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getOwnerComponent().setModel(new JSONModel(offerData), "incomeModel");
-                    var selectedType = oEvent.getSource().getSelectedKey();
-                    sap.ui.getCore().byId("FAA_id_Model").setValue("");
-                    sap.ui.getCore().byId("FAA_id_EquipmentNumber").setValue("");
-                    sap.ui.getCore().byId("FAA_id_SerialNumber").setValue("");
-                    sap.ui.getCore().byId("FAA_id_AssetValue").setValue("");
-                    sap.ui.core.BusyIndicator.hide();
-                }).catch((oError) => {
-                    sap.ui.core.BusyIndicator.hide();
-                    MessageBox.error(this.i18nModel.getText("commonReadingDataError"))
-                });
-            },
+            // onTypeChange: function (oEvent) {
+            //     var filter = { "Type": oEvent.getSource().getValue() }
+            //     this.ajaxReadWithJQuery("IncomeAsset", filter).then((oData) => {
+            //         var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+            //         this.getOwnerComponent().setModel(new JSONModel(offerData), "incomeModel");
+            //         var selectedType = oEvent.getSource().getSelectedKey();
+            //         sap.ui.getCore().byId("FAA_id_Model").setValue("");
+            //         sap.ui.getCore().byId("FAA_id_EquipmentNumber").setValue("");
+            //         sap.ui.getCore().byId("FAA_id_SerialNumber").setValue("");
+            //         sap.ui.getCore().byId("FAA_id_AssetValue").setValue("");
+            //         sap.ui.core.BusyIndicator.hide();
+            //     }).catch((oError) => {
+            //         sap.ui.core.BusyIndicator.hide();
+            //         MessageBox.error(this.i18nModel.getText("commonReadingDataError"))
+            //     });
+            // },
 
             createTableSheet: function () {
                 return [
@@ -279,9 +280,9 @@ sap.ui.define([
                     var oControl = oItem.getControl();
                     var sValue = oItem.getName();
                     if (oControl && oControl.getValue()) {
-                        if (sValue === "AssetCreationDate") {
-                            params["CreationStartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
-                            params["CreationEndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
+                        if (sValue === "AssignedDate") {
+                            params["AssignedStartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
+                            params["AssignedEndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
                         } else {
                             params[sValue] = oControl.getValue();
                         }
