@@ -22,6 +22,8 @@ sap.ui.define(
 
         _onRouteMatched: function () {
             var that = this;
+            that.commonLoginFunction("ApplyLeave"); // Call common login function
+            that._makeDatePickersReadOnly(["AL_id_DateRangeSelection"]);
             BusyIndicator.show(0); // Show busy indicator
             that.oModel = that.getOwnerComponent().getModel();
             var loginModel = that.getOwnerComponent().getModel("LoginModel");
@@ -550,6 +552,7 @@ sap.ui.define(
         // Close the leave dialog fragment
         AL_onPressClose: function () {
           this.oLeaveDialog.close();
+          this.byId("AL_id_LeaveTableStandard").removeSelections(true); // Clear table selection
         },
 
         // Format date string to Date object
@@ -783,7 +786,7 @@ sap.ui.define(
                         oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                         oData.halfDay = oData.halfDay.toString();
                         oData.status = "Submitted";
-        
+                    
                         // Clean up data before sending
                         delete oData.Save;
                         delete oData.Submit;
@@ -829,6 +832,7 @@ sap.ui.define(
             if (response.success === true) {
                 MessageToast.show(this.i18nModel.getText(successMessageKey));
                 this.oLeaveDialog.close();
+                this.byId("AL_id_LeaveTableStandard").removeSelections(true); // Clear table selection
                 // Refresh leave data
                 await this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
             } else {

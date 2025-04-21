@@ -14,6 +14,7 @@ sap.ui.define([
       },
 
       _onRouteMatched: async function (oEvent) {
+        this.commonLoginFunction("Customer"); // Call common login function
         sap.ui.core.BusyIndicator.show(0); // Show busy indicator
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
         this.byId("MC_id_CustTable").removeSelections(true); // Clear table selection

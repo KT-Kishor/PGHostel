@@ -19,6 +19,7 @@ sap.ui.define(
 
         _onRouteMatched: async function () {
           var that = this;
+          this.commonLoginFunction("Holiday"); // Call common login function
           BusyIndicator.show(0); // Show busy indicator
           // Set current year in the holidays input field
           this.byId("LOH_id_Holidays").setValue(new Date().getFullYear());
