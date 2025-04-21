@@ -22,7 +22,7 @@ sap.ui.define(
 
         _onRouteMatched: function () {
             var that = this;
-            BusyIndicator.show(); // Show busy indicator
+            BusyIndicator.show(0); // Show busy indicator
             that.oModel = that.getOwnerComponent().getModel();
             var loginModel = that.getOwnerComponent().getModel("LoginModel");
             that.userId = loginModel.getProperty("/EmployeeID");
@@ -173,7 +173,7 @@ sap.ui.define(
         MonthBarDisplayFunction: async function (leaveType,selectedYear,userId) {
             let jsonData = { "data": { "EmployeeID": userId, "selectYear":selectedYear, "LeaveType": leaveType } };
             try {
-                BusyIndicator.show();
+                BusyIndicator.show(0);
                 let oData = await this.ajaxCreateWithJQuery("MonthyBarChart", jsonData);
                 BusyIndicator.hide();
                 let oLeaveModel = new JSONModel({ chartData: oData.results });
@@ -196,7 +196,7 @@ sap.ui.define(
         YearlyBarDisplayFunction: async function (userId) {
             let jsonData = { "data": { "EmployeeID": userId } };
             try {
-                BusyIndicator.show();
+                BusyIndicator.show(0);
                 let oData = await this.ajaxCreateWithJQuery("YearlyBarChart", jsonData);
                 BusyIndicator.hide();
                 let rawData = oData.results;
@@ -277,7 +277,7 @@ sap.ui.define(
 
        // Show bar chart view
         AL_onPressBarChart: function () {
-            BusyIndicator.show();
+            BusyIndicator.show(0);
             this.byId("AL_id_LeaveBarChart").setVisible(true);
             this.byId("AL_id_LeaveTableStandard").setVisible(false);
             this.byId("AL_id_leavefilterbar").setVisible(false);
@@ -793,7 +793,7 @@ sap.ui.define(
                         delete oData.minDate;
                         delete oData.isUpdate;
         
-                        BusyIndicator.show();
+                        BusyIndicator.show(0);
         
                         // Submit or save based on action type
                         if (actionType === "Submit") {
@@ -885,7 +885,7 @@ sap.ui.define(
                 }
             });
             // Show busy indicator
-            BusyIndicator.show();
+            BusyIndicator.show(0);
             this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId, ...params }).then(() => {
                 BusyIndicator.hide();
             }).catch((error) => {

@@ -19,7 +19,7 @@ sap.ui.define(
 
         _onRouteMatched: async function () {
           var that = this;
-          BusyIndicator.show(); // Show busy indicator
+          BusyIndicator.show(0); // Show busy indicator
           // Set current year in the holidays input field
           this.byId("LOH_id_Holidays").setValue(new Date().getFullYear());
           // Make date pickers read-only
@@ -44,7 +44,7 @@ sap.ui.define(
               MessageToast.show(this.i18nModel.getText("futureHolidays"));
               return;
           }
-          BusyIndicator.show(); // Show busy indicator
+          BusyIndicator.show(0); // Show busy indicator
           await this._fetchCommonData("ListOfHolidays?", "HolidayModel", {startDate: `${selectedYear}-01-01`,
           endDate: `${selectedYear}-12-31` }).then(() => {
             BusyIndicator.hide();
@@ -166,7 +166,7 @@ sap.ui.define(
               MessageToast.show(that.i18nModel.getText("uploadExcel"));
               return;
             }
-            BusyIndicator.show(); // Show busy indicator
+            BusyIndicator.show(0); // Show busy indicator
             var formattedData = this._uploadedExcelData.slice(1).map((row) => ({
               Name: row[0],
               Date: this.excelDateToJSDate(row[1]).toISOString().split("T")[0],
@@ -185,7 +185,7 @@ sap.ui.define(
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                     onClose: async function (sAction) {
                       if (sAction === MessageBox.Action.YES) {
-                        BusyIndicator.show();
+                        BusyIndicator.show(0);
                         await that.ajaxDeleteWithJQuery("ListOfHolidays", {filters: {startDate: `${selectedYear}-01-01`,
                           endDate: `${selectedYear}-12-31`},
                         }).then(() => {

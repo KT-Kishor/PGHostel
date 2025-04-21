@@ -230,7 +230,7 @@ sap.ui.define([
                   MessageToast.show(this.i18nModel.getText("mandetoryChecks"));
                   return;
               }
-              BusyIndicator.show(); // Show busy indicator
+              BusyIndicator.show(0); // Show busy indicator
               // Submit data 
              await this.ajaxCreateWithJQuery("ManageCustomer", { data: oData }).then(function(response) {
                   if (response && response.success === true) {
@@ -290,7 +290,7 @@ sap.ui.define([
               }
               // Send update request
               var requestData = { filters: { ID: sCustomerId }, data: oUpdatedData };
-              BusyIndicator.show();
+              BusyIndicator.show(0);
               await this.ajaxUpdateWithJQuery("/ManageCustomer", requestData).then(function(response) {
                   if (response.success === true) {
                       oTable.removeSelections(true);
@@ -328,7 +328,7 @@ sap.ui.define([
           this.i18nModel.getText("confirmDeleteCustomerMessage"),
             // onConfirm
             function() {
-              BusyIndicator.show();
+              BusyIndicator.show(0);
               that.ajaxDeleteWithJQuery("/ManageCustomer", { filters: { ID: sCustomerID } }).then(() => {
                 // Refresh the customer data after deletion
                 return that.readCallForManageCustomer("Initial");}).then(() => {
@@ -379,7 +379,7 @@ sap.ui.define([
         },
       
       readCallForManageCustomer: async function (filter) {
-        BusyIndicator.show();
+        BusyIndicator.show(0);
         await this.ajaxReadWithJQuery("ManageCustomer", filter).then((oData) => {
               var companyData = Array.isArray(oData.data) ? oData.data : [oData.data];
               this.getOwnerComponent().setModel(new JSONModel(companyData), "CreateCustomerModel");
