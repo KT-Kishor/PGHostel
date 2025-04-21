@@ -129,7 +129,8 @@ sap.ui.define([
                 if (oResponse) {
                     that.Expense.close();
                     await that._fetchCommonData("ExpenseTotalCalculation", "", {ExpenseID: oResponse.ExpenseID});
-                    await that._fetchCommonData("Expense", "ExpenseModel");
+                    // await that._fetchCommonData("Expense", "ExpenseModel");
+                    await that.Exp_onSearch();
                     that.getView().getModel("FilterExpenseModel").setData([...new Map(that.getView().getModel("ExpenseModel").getData().map((item) => [item.ExpenseName, item])).values()]);
                     MessageToast.show(that.i18nModel.getText("expenseCreatedMess"));
                 } else {
