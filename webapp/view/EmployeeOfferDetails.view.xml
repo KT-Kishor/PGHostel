@@ -47,7 +47,7 @@
 												</layoutData>
 											</Input>
 											<Label text="{i18n>gender}"/>
-												<Select items="{GenderModel>/}" id="EOD_id_Gender" selectedKey="{employeeModel>/GenderModel}" >
+												<Select items="{GenderModel>/}" id="EOD_id_Gender" selectedKey="{employeeModel>/Gender}" >
 													<core:Item key="{GenderModel>Value}" text="{GenderModel>Value}" />
 												</Select>											
 												<Label text="{i18n>offerReleaseDate}" required="true" />
