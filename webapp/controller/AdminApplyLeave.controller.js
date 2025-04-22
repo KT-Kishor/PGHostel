@@ -277,16 +277,18 @@ sap.ui.define(
 
                 // Leave type change handler
                 AL_onChangeLeaveType: function (oEvent) {
-                    var year = this.byId("AL_id_LeaveYear").getValue()
-                    this.BarDisplayFunction(oEvent.getSource().getValue(), year, this.userId);
-                    this.MonthBarDisplayFunction(oEvent.getSource().getValue(), year, this.userId);
+                    var year = this.byId("AL_id_LeaveYear").getSelectedKey(); 
+                    var type = oEvent.getSource().getSelectedItem().getText() 
+                    this.BarDisplayFunction(type, year, this.userId);
+                    this.MonthBarDisplayFunction(type, year, this.userId);
                 },
 
                 // Year change handler
                 AL_onChangeYears: function (oEvent) {
-                    var type = this.byId("AL_id_TypeOfLeave").getValue();
-                    this.BarDisplayFunction(type, oEvent.getSource().getValue(), this.userId);
-                    this.MonthBarDisplayFunction(type, oEvent.getSource().getValue(), this.userId);
+                    var type = this.byId("AL_id_TypeOfLeave").getSelectedItem().getText(); 
+                    var year = oEvent.getSource().getSelectedKey() 
+                    this.BarDisplayFunction(type, year, this.userId);
+                    this.MonthBarDisplayFunction(type, year, this.userId);
                 },
 
                 // Show bar chart view
@@ -546,6 +548,7 @@ sap.ui.define(
                 AL_onPressClose: function () {
                     this.oLeaveDialog.close();
                     this.byId("AL_id_LeaveTableStandard").removeSelections(true); // Clear table selection
+                    this.byId("AL_id_Updatebtn").setVisible(false);
                 },
 
                 // Format date string to Date object
@@ -651,14 +654,22 @@ sap.ui.define(
                 },
 
                 // Validate from date
-                AL_ValidateFromDate: function () {
+                AL_ValidateFromDate: function (oEvent) {
+                    const oDate = oEvent.getSource().getDateValue();
+                    if (oDate) {
+                        oEvent.getSource().setValueState("None"); // Clear error state
+                    }
                     this.onValidation();
                     this.onLiveChange();
                     return !!this.getView().getModel("LeaveTempModel").getProperty("/fromDate");
                 },
 
                 // Validate to date
-                AL_ValidateToDate: function () {
+                AL_ValidateToDate: function (oEvent) {
+                    const oDate = oEvent.getSource().getDateValue();
+                    if (oDate) {
+                        oEvent.getSource().setValueState("None"); // Clear error state
+                    }
                     this.onLiveChange();
                     return !!this.getView().getModel("LeaveTempModel").getProperty("/toDate");
                 },
@@ -948,6 +959,7 @@ sap.ui.define(
                         MessageToast.show(this.i18nModel.getText(successMessageKey));
                         this.oLeaveDialog.close();
                         this.byId("AL_id_LeaveTableStandard").removeSelections(true); // Clear table selection
+                        this.byId("AL_id_Updatebtn").setVisible(false);
                         // Refresh leave data
                         await this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
                     } else {

@@ -12,15 +12,21 @@
 		<Panel headerText="{i18n>titleInBox}" >
 			<OverflowToolbar>
 				<Label text="{i18n>type}" />
-				<ComboBox showSecondaryValues="true" id="AL_id_TypeOfLeave" items="{leaveTypeModel>/}"
-                selectedKey="{selectedModel>/selectedType}" change="AL_onChangeLeaveType" width="200px">
-				<core:Item key="{leaveTypeModel>id}" text="{leaveTypeModel>name}" />
-				</ComboBox>
+				<Select id="AL_id_TypeOfLeave"
+						selectedKey="{selectedModel>/selectedType}"
+						change="AL_onChangeLeaveType"
+						width="200px"
+						items="{leaveTypeModel>/}">
+					<core:Item key="{leaveTypeModel>id}" text="{leaveTypeModel>name}" />
+				</Select>
 				<ToolbarSeparator />
 				<Label text="Year" id="AL_id_YearLabel" />
-				<ComboBox items="{YearModel>/items}" change="AL_onChangeYears" id="AL_id_LeaveYear" width="100px">
+				<Select id="AL_id_LeaveYear"
+						change="AL_onChangeYears"
+						width="100px"
+						items="{YearModel>/items}">
 					<core:Item key="{YearModel>}" text="{YearModel>}" />
-				</ComboBox>
+				</Select>
 				<ToolbarSpacer/>
 				<Button id="AL_id_SmartTableCharBut" icon="sap-icon://table-view" tooltip="{i18n>gototable}" press="AL_onPressGoSmartTable" />
 			</OverflowToolbar>
