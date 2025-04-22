@@ -162,6 +162,7 @@ sap.ui.define([
 
         Exp_onEndDateChange: function(oEvent) {
             utils._LCvalidateDate(oEvent, "oEvent");
+            sap.ui.getCore().byId("exp-Id-EndDate").setMinDate(new Date(oEvent.getSource().getValue().split("/").reverse().join('-')));
         },
 
         Exp_onChangeCountry: function(oEvent) {
