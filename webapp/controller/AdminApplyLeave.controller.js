@@ -156,7 +156,7 @@ sap.ui.define(
                             title: { visible: true, text: this.i18nModel.getText("monthlyApprovedLeaveQuota") }
                         });
                         oVizFrame.setModel(oLeaveModel);
-                        var oPopOver = this.getView().byId("AL_id_PopOver");
+                        var oPopOver = this.getView().byId("AL_id_Popover");
                         oPopOver.connect(oVizFrame.getVizUid());
                     } catch (error) {
                         BusyIndicator.hide();
@@ -655,13 +655,17 @@ sap.ui.define(
                             if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
                                 return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
                             }
-                
-                            // Check if leave is on holiday
-                            if (oData.fromDate === oData.toDate) {
+
+                             // Check if leave is on holiday
+                             if (oData.fromDate === oData.toDate) {
                                 var isValid = true;
-                                var holidays = this.getView().getModel("HolidayModel").getData();
+                                var holidays = this.getView().getModel("HolidayModel").getData();  
                                 holidays.forEach((holiday) => {
-                                    if (new Date(holiday.date).getTime() === startDate.getTime()) {
+                                    var holidayDate = new Date(holiday.Date);
+                                    // Normalize both dates to ensure accurate comparison
+                                    holidayDate.setHours(0, 0, 0, 0);
+                                    startDate.setHours(0, 0, 0, 0);
+                                    if (holidayDate.getTime() === startDate.getTime()) {
                                         isValid = false;
                                     }
                                 });
@@ -669,7 +673,7 @@ sap.ui.define(
                                     return MessageBox.error(this.i18nModel.getText("holidaysMess"));
                                 }
                             }
-                
+                            
                             // Check if leave is on weekend
                             if (parseFloat(oData.NoofDays) <= 2) {
                                 var isFromWeekend = (startDate.getDay() === 0 || startDate.getDay() === 6);
@@ -783,11 +787,15 @@ sap.ui.define(
                             }
                 
                             // Check if leave is on holiday
-                            if (oData.fromDate === oData.toDate) {
+                             if (oData.fromDate === oData.toDate) {
                                 var isValid = true;
-                                var holidays = this.getView().getModel("HolidayModel").getData();
+                                var holidays = this.getView().getModel("HolidayModel").getData();  
                                 holidays.forEach((holiday) => {
-                                    if (new Date(holiday.date).getTime() === startDate.getTime()) {
+                                    var holidayDate = new Date(holiday.Date);
+                                    // Normalize both dates to ensure accurate comparison
+                                    holidayDate.setHours(0, 0, 0, 0);
+                                    startDate.setHours(0, 0, 0, 0);
+                                    if (holidayDate.getTime() === startDate.getTime()) {
                                         isValid = false;
                                     }
                                 });
@@ -795,7 +803,7 @@ sap.ui.define(
                                     return MessageBox.error(this.i18nModel.getText("holidaysMess"));
                                 }
                             }
-                
+
                             // Check if leave is on weekend
                             if (parseFloat(oData.NoofDays) <= 2) {
                                 var isFromWeekend = (startDate.getDay() === 0 || startDate.getDay() === 6);

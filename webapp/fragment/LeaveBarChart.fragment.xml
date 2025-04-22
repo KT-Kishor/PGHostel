@@ -164,7 +164,7 @@
 										<viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Month" />
 									</viz:feeds>
 									<viz:dependents>
-										<viz:Popover id="idPopover" />
+										<viz:Popover id="AL_id_Popover" />
 									</viz:dependents>
 								</viz:VizFrame>
 							</com:content>
