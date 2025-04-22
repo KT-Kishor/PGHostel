@@ -28,7 +28,7 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("traineeDetails"));
                 this.oValue = oEvent.getParameter("arguments").value;
                 if (this.oValue === "Trainee") {
-                   await  this.T_onPressClear();// clear the filter bar
+                    await this.T_onPressClear();// clear the filter bar
                     await this.readCallForTrainee("Initial");
                 }
                 else {
@@ -38,23 +38,26 @@ sap.ui.define([
             },
             //read call for trainee
             readCallForTrainee: async function (filter) {
-                try {
-                    const oData = await this.ajaxReadWithJQuery("Trainee", filter, ["T_id_TraineeTable"]);
-                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    // Set main table model
+                await this.ajaxReadWithJQuery("Trainee", filter, ["T_id_TraineeTable"]).then((oData) => {
+                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
                     if (filter === "Initial") {
-                        // Create dropdown list with unique TraineeName and ReportingManager entries
-                        const dropdownData = [...new Map( offerData .filter(item => item.TraineeName?.trim() || item.ReportingManager?.trim()) .map(item => [(item.TraineeName || item.ReportingManager).trim(), item]) ).values()];
-                        const oDropdownModel = new JSONModel(dropdownData);
-                        this.getView().setModel(oDropdownModel, "traineeModelInitial");
-                        oDropdownModel.refresh(true);
+                        const traineeNames = [...new Set(offerData.map(item => item.TraineeName?.trim()).filter(name => !!name))].map(name => ({ TraineeName: name }));
+                        const traineeNameModel = new JSONModel(traineeNames);
+                        this.getView().setModel(traineeNameModel, "traineeNameModel");
+                        // Unique Reporting Managers
+                        const reportingManagers = [...new Set(offerData.map(item => item.ReportingManager?.trim()).filter(manager => !!manager))].map(manager => ({ ReportingManager: manager }));
+                        const reportingManagerModel = new JSONModel(reportingManagers);
+                        this.getView().setModel(reportingManagerModel, "reportingManagerModel");
+                        traineeNameModel.refresh(true);
+                        reportingManagerModel.refresh(true);
                     }
-                } catch (error) {
-                    MessageToast.show(error.message || error.responseText);
-                }
+                    BusyIndicator.hide();
+                }).catch((error) => {
+                    BusyIndicator.hide();
+                    sap.m.MessageToast.show(error.message || error.responseText);
+                });
             },
-             
             //validation function for mandatory fields
             T_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
@@ -292,7 +295,7 @@ sap.ui.define([
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
             },
             //generate PDF function
-            TCF_onPressDownload: function () {
+            TCF_onPressDownload: async function () {
                 try {
                     // Get selected trainee's data from the table
                     let oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
@@ -310,7 +313,7 @@ sap.ui.define([
                     };
                     BusyIndicator.show(0);
                     this.updateCallForTrainee(oUpdatedData, "downloadSucess");
-                    this.readCallForTrainee("");
+                    await this.readCallForTrainee("");
                     this.byId("T_id_TraineeTable").removeSelections(true);
                     this.byId("T_id_Download").setVisible(false);
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
@@ -318,6 +321,9 @@ sap.ui.define([
                     this.generateCertificatePDF(htmlContent, oTraineeModel.BranchCode);
                     BusyIndicator.hide();
                     this.TC_oDialog.close();
+                    this.byId("T_id_TraineeTable").removeSelections(true);
+                    this.byId("T_id_OnboardBtn").setEnabled(false);
+                    this.byId("T_id_RejectBtn").setEnabled(false);
                     this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview</b> to Preview the Certificate</p>");
                 } catch (error) {
                     BusyIndicator.hide();
@@ -334,7 +340,7 @@ sap.ui.define([
                 });
             },
             //Trainee search function for filtering
-            T_onSearch: function () {
+            T_onSearch: async function () {
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                 var params = {};
@@ -350,7 +356,7 @@ sap.ui.define([
                         }
                     }
                 });
-                this.readCallForTrainee(params);// read call for trainee after filter
+                await this.readCallForTrainee(params);// read call for trainee after filter
                 var oTable = this.byId("T_id_TraineeTable");
                 if (oTable && oTable.removeSelections) {
                     oTable.removeSelections(true); // Clear all selections
