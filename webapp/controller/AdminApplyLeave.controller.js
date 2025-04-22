@@ -356,8 +356,8 @@ sap.ui.define(
                     // Process leave records
                     leaveRecords.forEach(function (record) {
                         if (record["Status"] !== "Rejected") {
-                            var fromDate = that.parseDate(that.Formatter.formatDate(record.fromDate));
-                            var toDate = that.parseDate(that.Formatter.formatDate(record.toDate));
+                            var fromDate = that.onFormatDate(that.Formatter.formatDate(record.fromDate));
+                            var toDate = that.onFormatDate(that.Formatter.formatDate(record.toDate));
                             if (fromDate && toDate) {
                                 // Create date range for each day of leave
                                 for (var d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
@@ -511,13 +511,7 @@ sap.ui.define(
                     var parts = dateString.split('/');
                     return new Date(parts[2], parts[1] - 1, parts[0]);
                 },
-
-               // Parse date string to Date object
-                parseDate: function (dateStr) {
-                    const [day, month, year] = dateStr.split("/").map(Number);
-                    return new Date(year, month - 1, day);
-                },
-                
+      
                 // Calculate leave days when dates change
                 onLiveChange: function () {
                     var oLeaveModel = this.getView().getModel("LeaveTempModel");
@@ -697,8 +691,8 @@ sap.ui.define(
                             var filteredData = LeaveModel.filter((item) => {
                                 if (item.typeOfLeave !== "All In One Leave") return false;
 
-                                var fromDate = this.parseDate(this.Formatter.formatDate(item.fromDate));
-                                var toDate = this.parseDate(this.Formatter.formatDate(item.toDate));
+                                var fromDate = this.onFormatDate(this.Formatter.formatDate(item.fromDate));
+                                var toDate = this.onFormatDate(this.Formatter.formatDate(item.toDate));
                                 var startOfYear = new Date(this.currentYear, 0, 1);
                                 var endOfYear = new Date(this.currentYear, 11, 31);
 
@@ -818,8 +812,8 @@ sap.ui.define(
                              var filteredData = LeaveModel.filter((item) => {
                                 if (item.typeOfLeave !== "All In One Leave") return false;
 
-                                var fromDate = this.parseDate(this.Formatter.formatDate(item.fromDate));
-                                var toDate = this.parseDate(this.Formatter.formatDate(item.toDate));
+                                var fromDate = this.onFormatDate(this.Formatter.formatDate(item.fromDate));
+                                var toDate = this.onFormatDate(this.Formatter.formatDate(item.toDate));
                                 var startOfYear = new Date(this.currentYear, 0, 1);
                                 var endOfYear = new Date(this.currentYear, 11, 31);
 
