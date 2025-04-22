@@ -20,9 +20,7 @@ sap.ui.define(
       "sap.kt.com.minihrsolution.controller.SchemeUpload",
       {
         onInit: function () {
-          this.getRouter()
-            .getRoute("RouteSchemeUpload")
-            .attachMatched(this._RouteAppVisibility, this);
+          this.getRouter().getRoute("RouteSchemeUpload").attachMatched(this._RouteAppVisibility, this);
         },
         _RouteAppVisibility: function (oEvent) {
           this.commonLoginFunction("SchemeUpload");

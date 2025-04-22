@@ -14,7 +14,6 @@ sap.ui.define(
         onInit: function () {
           this.getRouter().getRoute("RouteAssignTask").attachMatched(this._onRouteMatched, this);
         },
-
         _onRouteMatched: function (oEvent) {
           const sTaskID = oEvent.getParameter("arguments").taskID;
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -230,7 +229,7 @@ sap.ui.define(
         //Submit the task details
         FAT_onSubmitTask: async function () {
           const oView = this.getView();
-          const oData = oView.getModel("EditTaskModel").getData();
+          // const oData = oView.getModel("EditTaskModel").getData();
           const aEmployees = oView.getModel("LoginDetailsModel").getData();
 
           // Validate all fields
@@ -251,15 +250,9 @@ sap.ui.define(
           const aAssignedTasks = oView.getModel("AssignModel").getData() || [];
 
           // Extract already assigned EmployeeIDs
-          let existingEmployeeIDs = [];
-          aAssignedTasks.forEach(task => {
-            if (task.TaskID === sTaskID && task.EmployeeID) {
-              const ids = task.EmployeeID.split(",").map(id => id.trim());
-              existingEmployeeIDs = existingEmployeeIDs.concat(ids);
-            }
-          });
+          const existingEmployeeIDs = aAssignedTasks.map(task => task.EmployeeID.trim());
           // Filter out duplicate employee IDs
-          const aFilteredIDs = aSelectedIDs.filter(id => !existingEmployeeIDs.includes(id));
+          const aFilteredIDs = aSelectedIDs.filter(id => !existingEmployeeIDs.includes(id.trim()));
 
           if (aFilteredIDs.length === 0) {
             MessageToast.show(this.i18nModel.getText("smgEmptask"));
@@ -296,7 +289,7 @@ sap.ui.define(
           }
 
           if (successCount > 0) {
-            MessageToast.show(`${successCount} employee's assigned successfully!`);
+            MessageToast.show("Employee assigned successfully!");
             await this._fetchCommonData("AssignedTask", "AssignModel", { TaskID: sTaskID });
             await this.CommonReadcall({ TaskID: sTaskID });
             this.oTaskDialog.close();

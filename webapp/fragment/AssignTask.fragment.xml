@@ -27,8 +27,6 @@
                 <Label text="{i18n>taskid}" />
                 <Input value="{TaskDetailsModel>/TaskID}" id="FAT_id_TaskID"  maxLength="99" valueStateText="{i18n>taskNameValueState}" editable="false"/>
 
-                
-               
                 <Label text="{i18n>startDate}" required="true"/>
                 <DatePicker
                   maxDate="{newTaskModel>/maxDate}"
@@ -42,10 +40,9 @@
                 <Label text="{i18n>endDate}" required="true"/>
                 <DatePicker
                     minDate="{newTaskModel>/minDate}"
-                    
                     change="AT_validateDate"
                     value="{EditTaskModel>/EndDate}"
-                    displayFormat="dd/MM/yyyy"
+                    displayFormat="dd/MM/yyyy" 
                     valueFormat="dd/MM/yyyy"
                     id="FAT_id_EndDate"
                     valueStateText="{i18n>dateValueState}"/>

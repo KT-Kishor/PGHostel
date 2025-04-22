@@ -134,6 +134,7 @@ sap.ui.define(
             MessageToast.show("Task created successfully!");
             this.oTaskDialog.close();
             this._fetchCommonData("NewTask", "TaskModel", {});
+            this.CommonReadcall()
           } else {
             BusyIndicator.hide();
             MessageToast.show("Failed to create task.");
@@ -204,6 +205,7 @@ sap.ui.define(
             taskID: oSelectedItem.TaskID, // Pass actual TaskID
           });
         },
+
       }
     );
   }
