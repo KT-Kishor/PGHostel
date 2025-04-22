@@ -92,15 +92,15 @@ sap.ui.define(
                         this.getView().setModel(oSecondChartModel, "secondLeaveData");
 
                         // Configure charts
-                        this._configureFirstChart("AL_id_VizFrame6", oFirstChartModel, this.i18nModel.getText("currentLeaveQuota"));
-                        this._configureSecondChart("AL_id_VizFrameAll", oSecondChartModel, this.i18nModel.getText("yearlyLeaveQuota"));
+                        this._configureChart("AL_id_VizFrame6", oFirstChartModel, this.i18nModel.getText("currentLeaveQuota"));
+                        this._configureChart("AL_id_VizFrameAll", oSecondChartModel, this.i18nModel.getText("yearlyLeaveQuota"));
                     } catch (error) {
                         MessageToast.show(error.message || error.responseText);
                     }
                 },
 
                 // Configure first chart visualization
-                _configureFirstChart: function (chartId, oModel, titleText) {
+                _configureChart: function (chartId, oModel, titleText) {
                     let oVizFrame = this.getView().byId(chartId);
                     if (!oVizFrame) return;
                     oVizFrame.setModel(oModel);
@@ -124,49 +124,16 @@ sap.ui.define(
                                     properties: { color: "#4c79e0" },
                                     "displayName": "Quota"
                                 },
+                                {
+                                    dataContext: { LeaveType: "All Quota" },
+                                    properties: { color: "#4c79e0" },
+                                    "displayName": "Quota"
+                                }
                                 ]
                             }
                         }
                     });
                     // Connect popover if exists
-                    let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null;
-                    let oPopOver = popoverId ? this.getView().byId(popoverId) : null;
-                    if (oPopOver) {
-                        oPopOver.connect(oVizFrame.getVizUid());
-                    }
-                },
-
-                // Configure second chart visualization
-                _configureSecondChart: function (chartId, oModel, titleText) {
-                    let oVizFrame = this.getView().byId(chartId);
-                    if (!oVizFrame) return;
-                    oVizFrame.setModel(oModel);
-                    oVizFrame.setVizProperties({
-                        legend: { title: { visible: true, text: "All Measures" } },
-                        title: { visible: true, text: titleText },
-                        plotArea: {
-                            dataPointStyle: {
-                                rules: [
-                                    {
-                                        dataContext: { LeaveType: "Submitted" },
-                                        properties: { color: "#fc7b03" },
-                                        "displayName": "Submitted"
-                                    },
-                                    {
-                                        dataContext: { LeaveType: "Approved" },
-                                        properties: { color: "#4CAF50" },
-                                        "displayName": "Approved"
-                                    },
-                                    {
-                                        dataContext: { LeaveType: "All Quota" },
-                                        properties: { color: "#4c79e0" },
-                                        "displayName": "Quota"
-                                    }
-                                ]
-                            }
-                        }
-                    });
-                    // Connect popover 
                     let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null;
                     let oPopOver = popoverId ? this.getView().byId(popoverId) : null;
                     if (oPopOver) {
@@ -442,22 +409,10 @@ sap.ui.define(
                     if (this.oDatePicker) {
                         var oLegend = new sap.ui.unified.CalendarLegend({
                             items: [
-                                new sap.ui.unified.CalendarLegendItem({
-                                    type: "Type04",
-                                    text: "Holiday"
-                                }),
-                                new sap.ui.unified.CalendarLegendItem({
-                                    type: "Type09",
-                                    text: "Weekend"
-                                }),
-                                new sap.ui.unified.CalendarLegendItem({
-                                    type: "Type06",
-                                    text: "Working Day"
-                                }),
-                                new sap.ui.unified.CalendarLegendItem({
-                                    type: "Type05",
-                                    text: "Applied Leaves"
-                                })
+                                new sap.ui.unified.CalendarLegendItem({type: "Type04", text: "Holiday"}),
+                                new sap.ui.unified.CalendarLegendItem({type: "Type09", text: "Weekend"}),
+                                new sap.ui.unified.CalendarLegendItem({type: "Type06", text: "Working Day"}),
+                                new sap.ui.unified.CalendarLegendItem({type: "Type05", text: "Applied Leaves"})
                             ]
                         });
                         this.oDatePicker.setLegend(oLegend);
