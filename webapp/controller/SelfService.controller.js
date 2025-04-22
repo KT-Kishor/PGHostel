@@ -397,11 +397,15 @@ sap.ui.define([
             EdF_DeletEdu: function () {
                 var that = this;
                 var oSelectedItem = this.byId("EdF_id_EduTable").getSelectedItem();
+                if (!oSelectedItem) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("selctRowtoDelete"));
+                    return;
+                }
                 var oContext = oSelectedItem.getBindingContext("sEducationModel").getProperty("ID");
                 // Use common confirmation dialog
                 this.showConfirmationDialog(
                     this.i18nModel.getText("msgBoxConfirm"),
-                    this.i18nModel.getText("deletConfirmation"),
+                    this.i18nModel.getText("edudeletConfirmation"),
                     function () {
                         that.ajaxDeleteWithJQuery("/EducationalDetails", { filters: { ID: oContext } }).then(() => {
                             sap.m.MessageToast.show(that.i18nModel.getText("eduDataDeletSuucess"));
@@ -509,11 +513,15 @@ sap.ui.define([
             EmpF_onDeletEmployment: function () {
                 var that = this;
                 var oSelectedItem = this.byId("EmpF_id_EmpTable").getSelectedItem();
+                if (!oSelectedItem) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("selctRowtoDelete"));
+                    return;
+                }
                 var oContext = oSelectedItem.getBindingContext("sEmploymentModel").getProperty("ID");
                 // Show common confirmation dialog
                 this.showConfirmationDialog(
                     this.i18nModel.getText("msgBoxConfirm"),
-                    this.i18nModel.getText("deletConfirmation"),
+                    this.i18nModel.getText("empdeleteConfirmation"),
                     function () {
                         that.ajaxDeleteWithJQuery("/EmploymentDetails", { filters: { ID: oContext } }).then(() => {
                             sap.m.MessageToast.show(that.i18nModel.getText("empDataDeleteSuccess"));
@@ -765,8 +773,7 @@ sap.ui.define([
                     oVBox.addItem(oPanel);
                 }.bind(this));
             },
-            
-       
+             
             //On icon tab select function
             SS_onTabSelect: function (oEvent) {
                 var oView = this.getView();
@@ -774,22 +781,24 @@ sap.ui.define([
                 var isEditMode = oViewModel.getProperty("/isEditMode");
                 var sKey = oEvent.getParameter("key");
                 if (isEditMode) {
-                    MessageBox.warning(this.i18nModel.getText("tabConfirmation"), {
-                        actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
-                        onClose: async (oAction) => {
-                            if (oAction === MessageBox.Action.OK) {
-                                oViewModel.setProperty("/isEditMode", false);
-                                await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
-                                this.SS_CommonID();
-                                await this._handleTabSwitch(sKey);
-                            }
-                        }
-                    });
+                    this.showConfirmationDialog(
+                        this.i18nModel.getText("confirmTitle"),              
+                        this.i18nModel.getText("tabConfirmation"),                  
+                        async () => {                                          
+                            oViewModel.setProperty("/isEditMode", false);
+                            await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
+                            this.SS_CommonID();
+                            await this._handleTabSwitch(sKey);
+                        },
+                        null,                                                         
+                        this.i18nModel.getText("OkButton"),                           
+                        this.i18nModel.getText("CancelButton")                       
+                    );
                 } else {
                     this._handleTabSwitch(sKey);
                 }
             },
-
+            
             _handleTabSwitch: async function (sKey) {
                 this.getView().setBusy(true);
                 try {
@@ -814,8 +823,6 @@ sap.ui.define([
                     this.getView().setBusy(false);
                 }
             },
-
-
             SS_onDownloadTerminateLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var date = Formatter.formatDate(new Date());
