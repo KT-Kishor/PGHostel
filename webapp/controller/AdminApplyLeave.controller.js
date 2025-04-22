@@ -92,55 +92,97 @@ sap.ui.define(
                         this.getView().setModel(oSecondChartModel, "secondLeaveData");
 
                         // Configure charts
-                        this._configureChart("AL_id_VizFrame6", oFirstChartModel, this.i18nModel.getText("currentLeaveQuota"));
-                        this._configureChart("AL_id_VizFrameAll", oSecondChartModel, this.i18nModel.getText("yearlyLeaveQuota"));
+                        this._configureFirstChart("AL_id_VizFrame6", oFirstChartModel, this.i18nModel.getText("currentLeaveQuota"));
+                        this._configureSecondChart("AL_id_VizFrameAll", oSecondChartModel, this.i18nModel.getText("yearlyLeaveQuota"));
+                
                     } catch (error) {
-                        MessageToast.show(error.message || error.responseText);
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     }
                 },
-
-                // Configure first chart visualization
-                _configureChart: function (chartId, oModel, titleText) {
+                
+                _configureFirstChart: function (chartId, oModel, titleText) {
                     let oVizFrame = this.getView().byId(chartId);
-                    if (!oVizFrame) return;
+                    if (!oVizFrame) return; 
                     oVizFrame.setModel(oModel);
                     oVizFrame.setVizProperties({
-                        legend: { title: { visible: true, text: "All Measures" } },
-                        title: { visible: true, text: titleText },
+                        legend: {
+                            title: { visible: true, text: "All Measures" }
+                        },
+                        title: {
+                            visible: true,
+                            text: titleText
+                        },
                         plotArea: {
                             dataPointStyle: {
-                                rules: [{
-                                    dataContext: { LeaveType: "Submitted" },
-                                    properties: { color: "#fc7b03" },
-                                    "displayName": "Submitted"
-                                },
-                                {
-                                    dataContext: { LeaveType: "Approved" },
-                                    properties: { color: "#4CAF50" },
-                                    "displayName": "Approved"
-                                },
-                                {
-                                    dataContext: { LeaveType: "Quota" },
-                                    properties: { color: "#4c79e0" },
-                                    "displayName": "Quota"
-                                },
-                                {
-                                    dataContext: { LeaveType: "All Quota" },
-                                    properties: { color: "#4c79e0" },
-                                    "displayName": "Quota"
-                                }
+                                rules: [
+                                    {
+                                        dataContext: { LeaveType: "Submitted" },
+                                        properties: { color: "#fc7b03" },
+                                        "displayName": "Submitted"
+                                    },
+                                    {
+                                        dataContext: { LeaveType: "Approved" },
+                                        properties: { color: "#4CAF50" },
+                                        "displayName": "Approved"
+                                    },
+                                    {
+                                        dataContext: { LeaveType: "Quota" },
+                                        properties: { color: "#4c79e0" },
+                                        "displayName": "Quota"
+                                    },
                                 ]
                             }
                         }
                     });
-                    // Connect popover if exists
-                    let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null;
+                    let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null; 
                     let oPopOver = popoverId ? this.getView().byId(popoverId) : null;
                     if (oPopOver) {
                         oPopOver.connect(oVizFrame.getVizUid());
                     }
                 },
-
+        
+                _configureSecondChart: function (chartId, oModel, titleText) {
+                    let oVizFrame = this.getView().byId(chartId);
+                    if (!oVizFrame) return; 
+                    oVizFrame.setModel(oModel);
+                    oVizFrame.setVizProperties({
+                        legend: {
+                            title: { visible: true, text: "All Measures" }
+                        },
+                        title: {
+                            visible: true,
+                            text: titleText
+                        },
+                        plotArea: {
+                            dataPointStyle: {
+                                rules: [
+                                    {
+                                        dataContext: { LeaveType: "Submitted" },
+                                        properties: { color: "#fc7b03" },
+                                        "displayName": "Submitted"
+                                    },
+                                    {
+                                        dataContext: { LeaveType: "Approved" },
+                                        properties: { color: "#4CAF50" },
+                                        "displayName": "Approved"
+                                    },
+                                    {
+                                        dataContext: { LeaveType: "All Quota" },
+                                        properties: { color: "#4c79e0" },
+                                        "displayName": "Quota"
+                                    }
+                                ]
+                            }
+                        }
+                    });
+                    let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null; 
+                    let oPopOver = popoverId ? this.getView().byId(popoverId) : null;
+                    if (oPopOver) {
+                        oPopOver.connect(oVizFrame.getVizUid());
+                    }
+                },
+        
                 // Function to display monthly bar chart
                 MonthBarDisplayFunction: async function (leaveType, selectedYear, userId) {
                     let jsonData = { "data": { "EmployeeID": userId, "selectYear": selectedYear, "LeaveType": leaveType } };
@@ -655,7 +697,7 @@ sap.ui.define(
                             if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
                                 return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
                             }
-
+                             
                              // Check if leave is on holiday
                              if (oData.fromDate === oData.toDate) {
                                 var isValid = true;
@@ -673,6 +715,10 @@ sap.ui.define(
                                     return MessageBox.error(this.i18nModel.getText("holidaysMess"));
                                 }
                             }
+
+                            if (parseFloat(oData.NoofDays) <= 0) {
+                                return MessageBox.error(this.i18nModel.getText("invalidNoofDays")); 
+                            }
                             
                             // Check if leave is on weekend
                             if (parseFloat(oData.NoofDays) <= 2) {
@@ -686,6 +732,10 @@ sap.ui.define(
                            // Check if leave is already applied
                             if (this.isLeaveAlreadyApplied(oData.fromDate, oData.toDate)) {
                                 return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
+                            }
+
+                            if (parseFloat(oData.NoofDays) <= 0) {
+                                return MessageBox.error(this.i18nModel.getText("invalidNoofDays")); 
                             }
                 
                             // Calculate used leaves
@@ -775,17 +825,17 @@ sap.ui.define(
                             var toDateParts = oData.toDate.split("/").map(Number);
                             var endDate = new Date(toDateParts[2], toDateParts[1] - 1, toDateParts[0]);
                 
-                            // Allow last year leave only until Jan 31 of current year
-                            var currentDate = new Date();
-                            var jan31 = new Date(currentDate.getFullYear(), 0, 31);
-                            var isFromLastYear = fromDateParts[2] === currentDate.getFullYear() - 1;
-                            var isToLastYear = toDateParts[2] === currentDate.getFullYear() - 1;
-                            var isCurrentYear = fromDateParts[2] === currentDate.getFullYear() && toDateParts[2] === currentDate.getFullYear();
-                
-                            if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
-                                return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
-                            }
-                
+                           // Allow last year leave only until Jan 31 of current year
+                           var currentDate = new Date();
+                           var jan31 = new Date(currentDate.getFullYear(), 0, 31);
+                           var isFromLastYear = fromDateParts[2] === currentDate.getFullYear() - 1;
+                           var isToLastYear = toDateParts[2] === currentDate.getFullYear() - 1;
+                           var isCurrentYear = fromDateParts[2] === currentDate.getFullYear() && toDateParts[2] === currentDate.getFullYear();
+               
+                           if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
+                               return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
+                           }
+                            
                             // Check if leave is on holiday
                              if (oData.fromDate === oData.toDate) {
                                 var isValid = true;
@@ -802,6 +852,10 @@ sap.ui.define(
                                 if (!isValid) {
                                     return MessageBox.error(this.i18nModel.getText("holidaysMess"));
                                 }
+                            }
+
+                            if (parseFloat(oData.NoofDays) <= 0) {
+                                return MessageBox.error(this.i18nModel.getText("invalidNoofDays")); 
                             }
 
                             // Check if leave is on weekend
