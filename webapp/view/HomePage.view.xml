@@ -1,167 +1,152 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.HomePage"
     displayBlock="true"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:l="sap.ui.layout" xmlns:layout="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt" height="100%">
-
-<tnt:ToolPage id="toolPage">
-<tnt:header>
-<tnt:ToolHeader>
-<Avatar src="./image/logo.jpg" displaySize="XS" press=".onAvatarPressed" tooltip="Company Logo"/>
-<Title level="H1" text="{i18n>companynameKT}" class="custom-text" wrapping="false"/>
-<ToolbarSpacer/>
-<Button icon="sap-icon://employee-pane" text="" tooltip="{i18n>tooltipLogin}" press="onpressLogin">
-<layoutData>
-<OverflowToolbarLayoutData priority="NeverOverflow"/>
-</layoutData>
-</Button>
-</tnt:ToolHeader>
-</tnt:header>
-<tnt:subHeader>
-<tnt:ToolHeader id="toolheader">
-<IconTabHeader id="iconTabHeader" select="onTabSelect" mode="Standard">
-<items>
-<IconTabFilter key="idHome" text="Home" id="idhome"/>
-<IconTabFilter key="idAboutUs" text="About Us" id="idabout"/>
-<IconTabFilter key="idAchivement" text="Services"/>
-<IconTabFilter key="idProducts" text="Products"/>
-<IconTabFilter key="idCustomer" text="Our Experties" visible="false"/>
-<IconTabFilter key="idCareer" text="Careers"/>
-<IconTabFilter key="idContact" text="Contact"/>
-<IconTabFilter key="idBookfordemo" text="Book for Demo"/>
-<IconTabFilter key="idTraning" text="Training"/>
-
-</items>
-</IconTabHeader>
-</tnt:ToolHeader>
-</tnt:subHeader>
-<tnt:mainContents>
-<NavContainer id="pageContainer">
-<pages>
-<ScrollContainer id="idHome" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background sapUiTinyMargin">
-<l:Grid defaultSpan="XL12 L12 M12 S12" width="100%" class="position-welcome">
-<VBox class="sapUiLargeMarginTop">
-<Text class="custom-welcome sapUiTinyMarginTopBottom" textAlign="Center" text="Welcome to"/>
-<Text class="custom-welcome sapUiTinyMarginTopBottom" text="Kalpavariksha Technologies"/>
-<Text text="A Future Of Tomorrow" class="custom-tagline sapUiTinyMarginTop sapUiLargeMarginEnd"/>
-<Text class="custom-welcome-desc sapUiMediumMarginTop" textAlign="Left" text="Empowering Innovation Through Technology, where we turn visionary ideas into reality. With cutting-edge solutions and unparalleled expertise, we drive transformation and create value for businesses around the globe."/>
-</VBox>
-</l:Grid>
-</ScrollContainer>
-<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding service-background sapUiTinyMargin">
-<l:Grid defaultSpan="XL7 L7 M12 S12" class="sapUiSmallMarginTop">
-<Text class="custom-aboutus sapUiLargeMarginTop" textAlign="Left" text="Kalpavriksha Technologies, where innovation meets excellence. Founded with a vision to transform the technology landscape to provide services across the globe. Our name, inspired by the mythical wish-fulfilling tree, reflects our commitment to creating technology that meets your every need"/>
-<Text class="custom-aboutus sapUiTinyMarginTop" textAlign="Left" text="Our team comprises seasoned professionals with extensive experience in SAP ECC, S/4 HANA, S/4 HANA Cloud, Rise with SAP"/>
-<Text class="custom-aboutus sapUiTinyMarginTop" textAlign="Left" text="We are efficient resource provider of SAP UI5, Fiori, CAPM, ABAP, RAP, SAP Build App, Build Process Automation, SAC, BW, AI-powered application transformation services for BTP and Functional consultant"/>
-<Text class="custom-aboutus sapUiTinyMarginTop" textAlign="Left" text="From initial consultation to ongoing support, we offer end-to-end services that cover every aspect of your IT needs. Our dedicated support team is always here to assist you"/>
-
-</l:Grid>
-</ScrollContainer>
-<Page id="idAchivement" showHeader="false" class="Servicetab sapUiTinyMargin">
-<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ServiceTab" type="XML"/>
-
-</Page>
-
-<Page id="idProducts" showHeader="false" class=" Products_list sapUiTinyMargin" >
-<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ProductList" type="XML"/>
-  
-</Page>
-<ScrollContainer id="idCustomer" horizontal="false" vertical="true" height="100%" class=" service-background">
-<l:Grid defaultSpan="XL12 L12 M12 S12" class="sapUiMediumMargin">
-<Carousel height="100%">
-<HBox>
-<Avatar src="./image/ai.jpg" displaySize="XL" tooltip="SAP AI" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
-<Text class="custom-text sapUiLargeMarginTop" text="We provide expert consulting services in Artificial Intelligence, offering innovative solutions to integrate AI technologies, optimize business processes, and unlock new opportunities for growth and efficiency."/>
-</HBox>
-<HBox>
-<Avatar src="./image/s4hana.png" displaySize="XL" tooltip="SAP S4 Hana" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
-<Text text="We are delivering SAP S/4HANA solutions to transform your business operations with advanced features and streamlined processes." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
-</HBox>
-<HBox>
-<Avatar src="./image/security.png" displaySize="XL" tooltip="SAP Security" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
-<Text text="Our cloud security services are engineered to provide comprehensive protection and ensure the safety of your information." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
-</HBox>
-<HBox>
-<Avatar src="./image/images.jpg" displaySize="XL" tooltip="SAP UI5 Fiori" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
-<Text text="We specialize in delivering SAP UI5 and Fiori applications that offer a dynamic and responsive user experience, tailored to your specific business requirements." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
-</HBox>
-<HBox>
-<Avatar src="./image/cap.png" displaySize="XL" tooltip="SAP CAP" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
-<Text text="We offer specialized consulting services for SAP Cloud Application Programming (CAP), providing end-to-end support in developing, deploying, and optimizing cloud-native applications to drive innovation and efficiency." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
-</HBox>
-<HBox>
-<Avatar src="./image/abap.jpg" displaySize="XL" tooltip="SAP ABAP" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
-<Text class="custom-text sapUiLargeMarginTop sapUiMediumMargin" text="We deliver advanced ABAP programming to help you develop robust and scalable SAP applications that drive business success."/>
-</HBox>
-<HBox>
-<Avatar src="./image/kyma.png" displaySize="XL" tooltip="SAP KYMA" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
-<Text text="We provide expert consulting services for SAP Kyma, delivering comprehensive solutions for designing, developing, and optimizing cloud-native applications and services." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
-</HBox>
-<HBox>
-<Avatar src="./image/ss.jpg" displaySize="XL" tooltip="SAP Integration Suite" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
-<Text text="We offer specialized consulting services for SAP Integration Suite, delivering comprehensive solutions to seamlessly connect and integrate diverse systems, applications, and data sources, ensuring streamlined operations and enhanced business agility." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
-</HBox>
-</Carousel>
-</l:Grid>
-<l:Grid defaultSpan="XL6 L6 M6 S12" class="sapUiMediumMargin">
-<Carousel>
-<Image src="./image/exper.png" height="100%" width="100%"/>
-</Carousel>
-<Carousel>
-<Image src="./image/sc.jpg" height="100%" width="100%"/>
-</Carousel>
-</l:Grid>
-</ScrollContainer>
-<ScrollContainer id="idCareer" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding career-background sapUiTinyMargin" >
-
-<l:VerticalLayout  width="100%">
-		<l:BlockLayout background="Dashboard">
-			<l:BlockLayoutRow >
-				<l:BlockLayoutCell
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core"
+	xmlns:tnt="sap.tnt" >
+	<tnt:ToolPage id="toolPage">
+		<tnt:header>
+			<tnt:ToolHeader>
+				<Avatar src="./image/logo.jpg" displaySize="XS" tooltip="Company Logo"/>
+				<Title level="H1" text="{i18n>companynameKT}" class="custom-text"/>
+				<ToolbarSpacer/>
+				<Button icon="sap-icon://employee-pane" text="" tooltip="{i18n>tooltipLogin}" press="onpressLogin">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="NeverOverflow"/>
+					</layoutData>
+				</Button>
+			</tnt:ToolHeader>
+		</tnt:header>
+		<tnt:subHeader>
+			<tnt:ToolHeader>
+				<IconTabHeader  select="onTabSelect" >
+					<items>
+						<IconTabFilter key="idHome" text="Home" />
+						<IconTabFilter key="idAboutUs" text="About Us"/>
+						<IconTabFilter key="idAchivement" text="Services"/>
+						<IconTabFilter key="idProducts" text="Products"/>
+						<IconTabFilter key="idBookfordemo" text="Book for Demo"/>
+						<IconTabFilter key="idTraning" text="Training"/>
+						<IconTabFilter key="idCareer" text="Careers"/>
+						<IconTabFilter key="idContact" text="Contact"/>
+						
+					</items>
+				</IconTabHeader>
+			</tnt:ToolHeader>
+		</tnt:subHeader>
+		<tnt:mainContents>
+			<NavContainer id="pageContainer">
+				<pages>
+					<ScrollContainer id="idHome" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background sapUiTinyMargin">
+						<l:Grid defaultSpan="XL12 L12 M12 S12" width="100%" class="position-welcome">
+							<VBox class="sapUiLargeMarginTop">
+								<Text class="custom-welcome sapUiTinyMarginTopBottom" textAlign="Center" text="Welcome to"/>
+								<Text class="custom-welcome sapUiTinyMarginTopBottom" text="Kalpavariksha Technologies"/>
+								<Text text="A Future Of Tomorrow" class="custom-tagline sapUiTinyMarginTop sapUiLargeMarginEnd"/>
+								<Text class="custom-welcome-desc sapUiMediumMarginTop" textAlign="Left" text="Empowering Innovation Through Technology, where we turn visionary ideas into reality. With cutting-edge solutions and unparalleled expertise, we drive transformation and create value for businesses around the globe."/>
+							</VBox>
+						</l:Grid>
+					</ScrollContainer>
+					<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding service-background sapUiTinyMargin">
+						<l:Grid defaultSpan="XL7 L7 M12 S12" class="sapUiSmallMarginTop">
+							<Text class="custom-aboutus sapUiLargeMarginTop" textAlign="Left" text="Kalpavriksha Technologies, where innovation meets excellence. Founded with a vision to transform the technology landscape to provide services across the globe. Our name, inspired by the mythical wish-fulfilling tree, reflects our commitment to creating technology that meets your every need"/>
+							<Text class="custom-aboutus sapUiTinyMarginTop" textAlign="Left" text="Our team comprises seasoned professionals with extensive experience in SAP ECC, S/4 HANA, S/4 HANA Cloud, Rise with SAP"/>
+							<Text class="custom-aboutus sapUiTinyMarginTop" textAlign="Left" text="We are efficient resource provider of SAP UI5, Fiori, CAPM, ABAP, RAP, SAP Build App, Build Process Automation, SAC, BW, AI-powered application transformation services for BTP and Functional consultant"/>
+							<Text class="custom-aboutus sapUiTinyMarginTop" textAlign="Left" text="From initial consultation to ongoing support, we offer end-to-end services that cover every aspect of your IT needs. Our dedicated support team is always here to assist you"/>
+						</l:Grid>
+					</ScrollContainer>
+					<Page id="idAchivement" showHeader="false" class="Servicetab sapUiTinyMargin">
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ServiceTab" type="XML"/>
+					</Page>
+					<Page id="idProducts" showHeader="false" class=" Products_list sapUiTinyMargin" >
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ProductList" type="XML"/>
+					</Page>
+					<ScrollContainer id="idCustomer" horizontal="false" vertical="true" height="100%" class=" service-background">
+						<l:Grid defaultSpan="XL12 L12 M12 S12" class="sapUiMediumMargin">
+							<Carousel height="100%">
+								<HBox>
+									<Avatar src="./image/ai.jpg" displaySize="XL" tooltip="SAP AI" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
+									<Text class="custom-text sapUiLargeMarginTop" text="We provide expert consulting services in Artificial Intelligence, offering innovative solutions to integrate AI technologies, optimize business processes, and unlock new opportunities for growth and efficiency."/>
+								</HBox>
+								<HBox>
+									<Avatar src="./image/s4hana.png" displaySize="XL" tooltip="SAP S4 Hana" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
+									<Text text="We are delivering SAP S/4HANA solutions to transform your business operations with advanced features and streamlined processes." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
+								</HBox>
+								<HBox>
+									<Avatar src="./image/security.png" displaySize="XL" tooltip="SAP Security" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
+									<Text text="Our cloud security services are engineered to provide comprehensive protection and ensure the safety of your information." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
+								</HBox>
+								<HBox>
+									<Avatar src="./image/images.jpg" displaySize="XL" tooltip="SAP UI5 Fiori" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
+									<Text text="We specialize in delivering SAP UI5 and Fiori applications that offer a dynamic and responsive user experience, tailored to your specific business requirements." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
+								</HBox>
+								<HBox>
+									<Avatar src="./image/cap.png" displaySize="XL" tooltip="SAP CAP" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
+									<Text text="We offer specialized consulting services for SAP Cloud Application Programming (CAP), providing end-to-end support in developing, deploying, and optimizing cloud-native applications to drive innovation and efficiency." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
+								</HBox>
+								<HBox>
+									<Avatar src="./image/abap.jpg" displaySize="XL" tooltip="SAP ABAP" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
+									<Text class="custom-text sapUiLargeMarginTop sapUiMediumMargin" text="We deliver advanced ABAP programming to help you develop robust and scalable SAP applications that drive business success."/>
+								</HBox>
+								<HBox>
+									<Avatar src="./image/kyma.png" displaySize="XL" tooltip="SAP KYMA" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
+									<Text text="We provide expert consulting services for SAP Kyma, delivering comprehensive solutions for designing, developing, and optimizing cloud-native applications and services." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
+								</HBox>
+								<HBox>
+									<Avatar src="./image/ss.jpg" displaySize="XL" tooltip="SAP Integration Suite" class="sapUiLargeMarginBegin sapUiLargeMarginTop sapUiMediumMargin"/>
+									<Text text="We offer specialized consulting services for SAP Integration Suite, delivering comprehensive solutions to seamlessly connect and integrate diverse systems, applications, and data sources, ensuring streamlined operations and enhanced business agility." class="custom-text sapUiLargeMarginTop sapUiMediumMargin"/>
+								</HBox>
+							</Carousel>
+						</l:Grid>
+						<l:Grid defaultSpan="XL6 L6 M6 S12" class="sapUiMediumMargin">
+							<Carousel>
+								<Image src="./image/exper.png" height="100%" width="100%"/>
+							</Carousel>
+							<Carousel>
+								<Image src="./image/sc.jpg" height="100%" width="100%"/>
+							</Carousel>
+						</l:Grid>
+					</ScrollContainer>
+					<ScrollContainer id="idCareer" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding career-background sapUiTinyMargin" >
+						<l:VerticalLayout  width="100%">
+							<l:BlockLayout background="Dashboard">
+								<l:BlockLayoutRow >
+									<l:BlockLayoutCell
 					
 					width="2"
 					title="Join Our Team at Kalpavriksha Technologies" >
-					<Text text="Discover Your Future with Us, We believe our people are our greatest asset. We’re always on the lookout for talented individuals who are passionate about technology and eager to drive innovation. If you’re ready to contribute to transformative projects and grow your career, we’d love to hear from you." />
-				</l:BlockLayoutCell>
-                
-			</l:BlockLayoutRow>
-            <l:BlockLayoutRow >
-				<l:BlockLayoutCell
+										<Text text="Discover Your Future with Us, We believe our people are our greatest asset. We’re always on the lookout for talented individuals who are passionate about technology and eager to drive innovation. If you’re ready to contribute to transformative projects and grow your career, we’d love to hear from you." />
+									</l:BlockLayoutCell>
+								</l:BlockLayoutRow>
+								<l:BlockLayoutRow >
+									<l:BlockLayoutCell
 					
 					width="2"
 					title="How to Apply">
-                    <core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;Ready to make an impact? Submit your resume and cover letter to&lt;/div&gt;&lt;a target=&quot;_blank&quot; href=&quot;mailto:careers@kalpavrikshatechnologies.com&quot;&gt;careers@kalpavrikshatechnologies.com&lt;/a&gt;&lt;/div&gt;'>
-			</core:HTML>
-				</l:BlockLayoutCell>
-                <l:BlockLayoutCell
+										<core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;Ready to make an impact? Submit your resume and cover letter to&lt;/div&gt;&lt;a target=&quot;_blank&quot; href=&quot;mailto:careers@kalpavrikshatechnologies.com&quot;&gt;careers@kalpavrikshatechnologies.com&lt;/a&gt;&lt;/div&gt;'></core:HTML>
+									</l:BlockLayoutCell>
+									<l:BlockLayoutCell
 					title="Check for the opportunity"
 					width="2"
 					>
-                    <core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;We look forward to exploring how your skills and experiences can contribute to our success&lt;/div&gt;&lt;a target=&quot;_blank&quot; href=&quot;https://sheet.zohopublic.in/sheet/published/0bg2c414cd1ecc6b24ac8a8608180d4d422ba?mode=embed&quot;&gt;Check Opporunity&lt;/a&gt;&lt;/div&gt;'>
-			</core:HTML>
-				</l:BlockLayoutCell>
-			</l:BlockLayoutRow>
-			
-		</l:BlockLayout>
-	</l:VerticalLayout>
-
-
-</ScrollContainer>
-<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding contact-background sapUiTinyMargin">
-<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ContactPage" type="XML"/>
-
-</ScrollContainer>
-
-<Page id="idBookfordemo" showHeader="false" class="sapUiContentPadding demo-form sapUiTinyMargin" >   
- <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Demoform" type="XML"/>
-</Page>
-
-<ScrollContainer id="idTraning" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding Training-background sapUiTinyMargin">
-<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Training" type="XML"/>
-
-</ScrollContainer>
-</pages>
-</NavContainer>
-</tnt:mainContents>
-</tnt:ToolPage>
+										<core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;We look forward to exploring how your skills and experiences can contribute to our success&lt;/div&gt;&lt;a target=&quot;_blank&quot; href=&quot;https://sheet.zohopublic.in/sheet/published/0bg2c414cd1ecc6b24ac8a8608180d4d422ba?mode=embed&quot;&gt;Check Opporunity&lt;/a&gt;&lt;/div&gt;'></core:HTML>
+									</l:BlockLayoutCell>
+								</l:BlockLayoutRow>
+							</l:BlockLayout>
+						</l:VerticalLayout>
+					</ScrollContainer>
+					<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding contact-background sapUiTinyMargin">
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ContactPage" type="XML"/>
+					</ScrollContainer>
+					<Page id="idBookfordemo" showHeader="false" class="sapUiContentPadding demo-form sapUiTinyMargin" >
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Demoform" type="XML"/>
+					</Page>
+					<ScrollContainer id="idTraning" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding Training-background sapUiTinyMargin">
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Training" type="XML"/>
+					</ScrollContainer>
+				</pages>
+			</NavContainer>
+		</tnt:mainContents>
+	</tnt:ToolPage>
 </mvc:View>

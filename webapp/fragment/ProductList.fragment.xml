@@ -5,10 +5,7 @@
     xmlns:layout="sap.ui.layout"
 >
     <ObjectPageLayout
-        id=""
         upperCaseAnchorBar="false"
-        showHeaderContent="true"
-        alwaysShowContentHeader="true"
     >
         <headerTitle>
             <ObjectPageHeader objectTitle="Our SAP Products" />
@@ -17,8 +14,7 @@
         <headerContent>
             <m:Text
                 class="service-section-text sapUiTinyMargin"
-                text="We offering a comprehensive suite of SAP solutions to help businesses streamline their operations, enhance productivity, and drive growth. Our team of certified SAP consultants is dedicated to delivering solutions that are tailored to your unique business needs"
-            />
+                text="Explore our range of powerful business tools designed to simplify your workflow and boost productivity, including the following solutions." />
         </headerContent>
 
         <sections>
@@ -29,7 +25,13 @@
                 <subSections>
                     <ObjectPageSubSection titleUppercase="false">
                         <blocks>
+                        <m:VBox>
+                        <m:Text
+                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
+                text="Empower your HR team with a modern, intuitive, and scalable platform designed to simplify every stage of the employee lifecycle."
+            />
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
+                            
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headerEmployeeOffer}"
@@ -197,6 +199,7 @@
                                     </m:TileContent>
                                 </m:GenericTile>
                             </layout:HorizontalLayout>
+                            </m:VBox>
                         </blocks>
                     </ObjectPageSubSection>
                 </subSections>
