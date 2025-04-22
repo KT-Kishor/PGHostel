@@ -47,10 +47,10 @@
 												</layoutData>
 											</Input>
 											<Label text="{i18n>gender}"/>
-												<Select items="{GenderModel>/}" id="EOD_id_Gender" selectedKey="{employeeModel>/Gender}" >
-													<core:Item key="{GenderModel>Value}" text="{GenderModel>Value}" />
-												</Select>											
-												<Label text="{i18n>offerReleaseDate}" required="true" />
+											<Select items="{GenderModel>/}" id="EOD_id_Gender" selectedKey="{employeeModel>/Gender}" >
+												<core:Item key="{GenderModel>Value}" text="{GenderModel>Value}" />
+											</Select>
+											<Label text="{i18n>offerReleaseDate}" required="true" />
 											<DatePicker id="EOD_id_Reldate" placeholder="{i18n>offerReleaseDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
                                              value= "{employeeModel>/OfferReleaseDate}"
                                              change="EOD_validateDate" class="sapUiSmallMarginBottom" valueStateText="{i18n>dateValueState}"/>
@@ -60,12 +60,12 @@
                                             change="EOD_validateDate" class="sapUiSmallMarginBottom disableInput" valueStateText="{i18n>dateValueState}"/>
 											<Label text="{i18n>designation}" required="true" />
 											<Select items="{DesignationModel>/}" id="EOD_id_Designation" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}">
-											    <items>
-												<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
+												<items>
+													<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
 												</items>
 											</Select>
 											<Label text="{i18n>baseLocation}" required="true" />
-											 <Select items="{BaseLocationModel>/}" id="EOD_id_Location" showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}">
+											<Select items="{BaseLocationModel>/}" id="EOD_id_Location" showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}">
 												<items>
 													<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 												</items>
@@ -79,17 +79,22 @@
 											<Label text="{i18n>pinCode}" required="true" />
 											<Input value="{employeeModel>/PinCode}" placeholder="{i18n>enterPinCode}" id="EOD_id_PinCode" liveChange="EOD_validatePinCode" valueStateText="{i18n>enterPinCode}"/>
 											<Label text="{i18n>ctc}" required="true" />
-		
 											<Input value="{employeeModel>/CTC}" id="EOD_id_CTC" placeholder="{i18n>placeCtc}" 
                                              liveChange="EOD_validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}" />
 											<Select items="{CurrencyModel>/}" enabled="false" selectedKey="{employeeModel>/Currency}" id="EOD_id_Currency" width="100%" class="marginLeft">
 												<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 											</Select>
-
-											<Label text="{i18n>EmpOfferVariablePay}" required="true" />		
-											<Input value="{employeeModel>/VariablePercentage}" id="EOD_id_VariablePay" placeholder="{i18n>variablePayPer}" liveChange="EOD_validateAmount"
-                                            maxLength="2" valueStateText="{i18n>ammountValuState}" />
-
+											<Label text="{i18n>EmpOfferVariablePay}" required="true" />
+											<Input
+                                             id="EOD_id_VariablePay"
+                                             value="{employeeModel>/VariablePercentage}"
+                                             placeholder="{i18n>variablePayPer}"
+                                             liveChange="EOD_validateAmount"
+                                             maxLength="2"
+                                             showValueHelp="true"
+                                             valueHelpRequest="EOD_onVariablePayInfoPress"
+                                             valueHelpIconSrc="sap-icon://message-information"
+                                             valueStateText="{i18n>ammountValuState}"/>
 											<Label text="{i18n>joiningBonus}" required="true" />
 											<Input value="{employeeModel>/JoiningBonus}" placeholder="{i18n>joiningBonus}" 
                                              liveChange="EOD_validateJoiningBonus" maxLength="10" id="EOD_id_Bonus" valueStateText="{i18n>ammountValuState}" />
@@ -98,10 +103,10 @@
 												<RadioButton id="EOD_id_Tds" text="{i18n>tds}" />
 												<RadioButton id="EOD_id_Pf" text="{i18n>pf}" />
 											</RadioButtonGroup>
-											<Label text="{i18n>bond}" required="true" />
+											<Label text="{i18n>bond}"  />
 											<RadioButtonGroup columns="2" id="EOD_id_Bond" select="EOD_onRadioButtonSelect">
 												<buttons>
-													<RadioButton text="{i18n>yes}"  />
+													<RadioButton text="{i18n>yes}" />
 													<RadioButton text="{i18n>no}"  selected="true" />
 												</buttons>
 											</RadioButtonGroup>
@@ -113,7 +118,6 @@
 									</f:SimpleForm>
 								</WizardStep>
 								<WizardStep title="{i18n>ctcCalculation}" id="EDO_id_WizardStepT">
-									
 									<l:VerticalLayout  width="100%">
 										<l:BlockLayout background="Dashboard">
 											<l:BlockLayoutRow >
@@ -135,7 +139,6 @@
 															<Text text="{path:'employeeModel>/SpecailAllowance',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<Label text="{i18n>Total}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/Total',formatter:'.Formatter.YearlyToMontlyConv'}"  />
-
 															<core:Title text="{i18n>totalDeductionAmount}" />
 															<Label text="{i18n>providentFund}" />
 															<Text text="{path:'employeeModel>/EmployeePF',formatter:'.Formatter.YearlyToMontlyConv'}"  />
@@ -145,21 +148,18 @@
 															<Text text="{path:'employeeModel>/IncomeTax',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/TotalDeduction',formatter:'.Formatter.YearlyToMontlyConv'}"  />
-
 															<core:Title text="{i18n>EmpOfferVariablePay}"/>
 															<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/VariablePay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
-															
 															<core:Title text="{i18n>grossPay}"/>
 															<Label text="{i18n>grossPayTotal}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/GrossPay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 														</f:content>
 													</f:SimpleForm>
 												</l:BlockLayoutCell>
-
 												<l:BlockLayoutCell title="{i18n>yearly}" width="2">
 													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
-														<f:content>											
+														<f:content>
 															<core:Title text="{i18n>monthlyComponents}" />
 															<Label text="{i18n>basicSalary}" />
 															<Text text="INR {path:'employeeModel>/BasicSalary',formatter: '.Formatter.fromatNumber'}"/>
@@ -174,8 +174,7 @@
 															<Label text="{i18n>SpecailAllowance}" />
 															<Text text="INR {path:'employeeModel>/SpecailAllowance',formatter: '.Formatter.fromatNumber'}"  />
 															<Label text="{i18n>Total}" class="boldBlackText" />
-															<Text text="INR {path:'employeeModel>/Total',formatter: '.Formatter.fromatNumber'}"  />															
-
+															<Text text="INR {path:'employeeModel>/Total',formatter: '.Formatter.fromatNumber'}"  />
 															<core:Title text="{i18n>totalDeductionAmount}"/>
 															<Label text="{i18n>providentFund}" />
 															<Text text="INR {path:'employeeModel>/EmployeePF',formatter: '.Formatter.fromatNumber'}"/>
@@ -184,12 +183,10 @@
 															<Label text="{i18n>incomeTax}" />
 															<Text text="INR {path:'employeeModel>/IncomeTax',formatter: '.Formatter.fromatNumber'}"/>
 															<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
-															<Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}"/>															
-
+															<Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}"/>
 															<core:Title text="{i18n>EmpOfferVariablePay}"/>
 															<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
 															<Text text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}"/>
-
 															<core:Title text="{i18n>grossPay}"/>
 															<Label text="Gross Total" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}"/>
@@ -221,11 +218,11 @@
 															<Text text="INR {path:'employeeModel>/CostofCompany',formatter: '.Formatter.fromatNumber'}" />
 														</VBox>
 													</FlexBox>
-												</l:BlockLayoutCell>											
-											</l:BlockLayoutRow>																															
+												</l:BlockLayoutCell>
+											</l:BlockLayoutRow>
 										</l:BlockLayout>
 									</l:VerticalLayout>
-								</WizardStep>								
+								</WizardStep>
 							</Wizard>
 						</content>
 					</Page>

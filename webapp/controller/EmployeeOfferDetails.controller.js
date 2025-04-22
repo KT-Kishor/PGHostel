@@ -92,7 +92,7 @@ sap.ui.define([
                     var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
-                    if (isValid) this.updateCallForEmployeeOffer(oViewModel, "offerUpdateSucc" ,["EOU_id_Form"]);
+                    if (isValid) this.updateCallForEmployeeOffer(oViewModel, "offerUpdateSucc", ["EOU_id_Form"]);
                     else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 } else {
                     // Enable edit mode and make CTC field visible
@@ -397,7 +397,7 @@ sap.ui.define([
             Mail_onEmailChange: function () {
                 this.validateSendButton(); // Reuse from BaseController
             },
-            Mail_onSendEmail:function () {
+            Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("employeeModel").getData();
                 var oPayload = {
                     "EmployeeName": oModel.ConsultantName,
@@ -406,7 +406,7 @@ sap.ui.define([
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                     "Designation": oModel.Designation
                 };
-                  this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload, ["Mail_id_Form", "EOU_id_Form"]).then((oData) => {
+                this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload, ["Mail_id_Form", "EOU_id_Form"]).then((oData) => {
                     this.getView().getModel("employeeModel").setProperty("/Status", "Offer Sent");
                     this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
@@ -428,7 +428,7 @@ sap.ui.define([
                 this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
             },
 
-            EOUF_onPressMerge:async function () {
+            EOUF_onPressMerge: async function () {
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);
                 this.getView().getModel("employeeModel").setProperty("/Status", "PDF Generated");
@@ -499,6 +499,33 @@ sap.ui.define([
                         BusyIndicator.hide();
                     }
                 }
+            },
+            EOD_onVariablePayInfoPress: function (oEvent) {
+                if (!this._oPopover) {
+                    this._oPopover = new sap.m.Popover({
+                        contentWidth: "400px",
+                        contentHeight: "auto",
+                        showHeader: false,
+                        placement: sap.m.PlacementType.Bottom,
+                        content: [
+                            new sap.m.VBox({
+                                alignItems: "Center",
+                                justifyContent: "Center",
+                                width: "100%",
+                                items: [
+                                    new sap.m.Text({
+                                        text: this.i18nModel.getText("variablePayMsg"),
+                                        wrapping: true
+                                    })
+                                ]
+                            }).addStyleClass("customPopoverContent")
+                        ]
+                    });
+                    this.getView().addDependent(this._oPopover);
+                }
+                this._oPopover.openBy(oEvent.getSource());
             }
+
+
         });
     });
