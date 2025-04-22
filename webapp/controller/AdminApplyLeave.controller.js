@@ -350,18 +350,14 @@ sap.ui.define(
                     var holidaySet = new Set(holidays.map(function (holiday) {
                         return new Date(holiday.Date).toDateString();
                     }));
-                    function parseDate(dateStr) {
-                        var parts = dateStr.split('/');
-                        return new Date(parts[2], parts[1] - 1, parts[0]);
-                    }
                     var appliedLeaves = [];
                     var yearStart = new Date(new Date().getFullYear(), 0, 1);
                     var yearEnd = new Date(new Date().getFullYear(), 11, 31);
                     // Process leave records
                     leaveRecords.forEach(function (record) {
                         if (record["Status"] !== "Rejected") {
-                            var fromDate = parseDate(that.Formatter.formatDate(record.fromDate));
-                            var toDate = parseDate(that.Formatter.formatDate(record.toDate));
+                            var fromDate = that.parseDate(that.Formatter.formatDate(record.fromDate));
+                            var toDate = that.parseDate(that.Formatter.formatDate(record.toDate));
                             if (fromDate && toDate) {
                                 // Create date range for each day of leave
                                 for (var d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
@@ -424,7 +420,6 @@ sap.ui.define(
                 AL_onPressApplyLeave: function () {
                     var oView = this.getView();
                     var loginData = this.getOwnerComponent().getModel("LoginModel").getData();
-                    var currentYear = new Date().getFullYear();
                     // Create leave JSON model
                     var leaveJson = {
                         employeeID: loginData.EmployeeID,
@@ -440,7 +435,7 @@ sap.ui.define(
                         halfDay: false,
                         MinToDate: null,
                         managerRemark: "",
-                        maxDate: new Date(currentYear, 11, 31),
+                        maxDate: new Date(this.currentYear, 11, 31),
                         minDate: new Date(this.JoiningDate[2], this.JoiningDate[1] - 1, this.JoiningDate[0]),
                         isUpdate: false,
                     };
@@ -453,9 +448,8 @@ sap.ui.define(
                 AL_onPressUpdate: function () {
                     var oView = this.getView();
                     var oTable = this.byId("AL_id_LeaveTableStandard").getSelectedItem();
-                    var oModelData = oTable.getBindingContext("LeaveModel");
-                    oModelData = oModelData.getObject();
-                    var currentYear = new Date().getFullYear();
+                    var oModelData = oTable.getBindingContext("LeaveModel").getObject();
+                    this.UpdateNoofDays = oModelData.NoofDays;
                     // Create leave JSON model with existing data
                     var leaveJson = {
                         ID: oModelData.ID,
@@ -471,7 +465,7 @@ sap.ui.define(
                         Save: true,
                         halfDay: oModelData.halfDay === "false" ? false : true,
                         managerRemark: oModelData.ManagerRemark,
-                        maxDate: new Date(currentYear, 11, 31),
+                        maxDate: new Date(this.currentYear, 11, 31),
                         minDate: new Date(this.JoiningDate[2], this.JoiningDate[1] - 1, this.JoiningDate[0]),
                         isUpdate: true,
                     };
@@ -489,8 +483,7 @@ sap.ui.define(
                             controller: this,
                         }).then(function (oLeaveDialog) {
                             this.oLeaveDialog = oLeaveDialog;
-                            oView.addDependent(this.oLeaveDialog);
-                            //   this._resetDialogFields(); 
+                            oView.addDependent(this.oLeaveDialog); 
                             this.oLeaveDialog.open();
                         }.bind(this));
                     } else {
@@ -519,6 +512,12 @@ sap.ui.define(
                     return new Date(parts[2], parts[1] - 1, parts[0]);
                 },
 
+               // Parse date string to Date object
+                parseDate: function (dateStr) {
+                    const [day, month, year] = dateStr.split("/").map(Number);
+                    return new Date(year, month - 1, day);
+                },
+                
                 // Calculate leave days when dates change
                 onLiveChange: function () {
                     var oLeaveModel = this.getView().getModel("LeaveTempModel");
@@ -592,10 +591,6 @@ sap.ui.define(
 
                 // Check if leave is already applied for given dates
                 isLeaveAlreadyApplied: function (fromDate, toDate) {
-                    if (!this.appliedLeavesSet) {
-                        return false; // No applied leaves set, return false
-                    }
-
                     var from = this.onFormatDate(fromDate);
                     var to = this.onFormatDate(toDate);
 
@@ -620,58 +615,53 @@ sap.ui.define(
                 },
 
                 // Validate from date
-                AL_ValidateFromDate: function (oEvent) {
+                AL_ValidateFromDate: function () {
                     this.onValidation();
                     this.onLiveChange();
                     return !!this.getView().getModel("LeaveTempModel").getProperty("/fromDate");
                 },
 
                 // Validate to date
-                AL_ValidateToDate: function (oEvent) {
-                    var oDatePicker = oEvent.getSource();
-                    var sValue = oDatePicker.getValue();
-                    var formDataYear = sap.ui.getCore().byId("AL_id_FromDate").getValue().split("/")[2];
-                    var toDateYear = sValue.split('/')[2];
-                    if (formDataYear === toDateYear) {
-                        this.currentYear = toDateYear;
-                        // this.BarDisplayFunctionAllStatus("All In One Leave", this.userId + "/" + toDateYear);
-                    }
+                AL_ValidateToDate: function () {
                     this.onLiveChange();
-                    return !!this.getView().getModel("LeaveTempModel").getProperty("/ToDate");
+                    return !!this.getView().getModel("LeaveTempModel").getProperty("/toDate");
                 },
 
                 // Validate common fields
                 AL_ValidateCommonFields: function (oEvent) {
+                    var oInput = oEvent.getSource();
                     utils._LCvalidateMandatoryField(oEvent);
+                    if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
                 },
 
-                // Common leave action handler (submit or save)
-                AL_handleLeaveAction: function (actionType) {
+                // Submit leave handler
+                AL_onPressSubmit: async function () {
                     try {
                         // Validate fields
-                        if (utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")) {
-
-                            var oLeaveTempModel = this.getView().getModel("LeaveTempModel");
-                            var oData = oLeaveTempModel.getData();
-
+                        if (
+                            utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
+                            utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
+                            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
+                        ) {
+                            var oData = this.getView().getModel("LeaveTempModel").getData();
+                
                             // Parse dates
                             var fromDateParts = oData.fromDate.split("/").map(Number);
                             var startDate = new Date(fromDateParts[2], fromDateParts[1] - 1, fromDateParts[0]);
                             var toDateParts = oData.toDate.split("/").map(Number);
                             var endDate = new Date(toDateParts[2], toDateParts[1] - 1, toDateParts[0]);
-
+                
                             // Allow last year leave only until Jan 31 of current year
                             var currentDate = new Date();
-                            var jan31 = new Date(currentDate.getFullYear(), 0, 31); // Jan is month 0
-
+                            var jan31 = new Date(currentDate.getFullYear(), 0, 31);
                             var isFromLastYear = fromDateParts[2] === currentDate.getFullYear() - 1;
                             var isToLastYear = toDateParts[2] === currentDate.getFullYear() - 1;
                             var isCurrentYear = fromDateParts[2] === currentDate.getFullYear() && toDateParts[2] === currentDate.getFullYear();
-
+                
                             if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
                                 return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
                             }
-
+                
                             // Check if leave is on holiday
                             if (oData.fromDate === oData.toDate) {
                                 var isValid = true;
@@ -685,37 +675,32 @@ sap.ui.define(
                                     return MessageBox.error(this.i18nModel.getText("holidaysMess"));
                                 }
                             }
-
+                
                             // Check if leave is on weekend
                             if (parseFloat(oData.NoofDays) <= 2) {
-                                var isFromDateWeekend = (startDate.getDay() === 0 || startDate.getDay() === 6);
-                                var isToDateWeekend = (endDate.getDay() === 0 || endDate.getDay() === 6);
-                                if (isFromDateWeekend && isToDateWeekend) {
+                                var isFromWeekend = (startDate.getDay() === 0 || startDate.getDay() === 6);
+                                var isToWeekend = (endDate.getDay() === 0 || endDate.getDay() === 6);
+                                if (isFromWeekend && isToWeekend) {
                                     return MessageBox.error(this.i18nModel.getText("holidaysMess"));
                                 }
                             }
-
-                            // Check if leave is already applied
+                
+                           // Check if leave is already applied
                             if (this.isLeaveAlreadyApplied(oData.fromDate, oData.toDate)) {
                                 return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
                             }
-
+                
+                            // Calculate used leaves
                             var LeaveModel = this.getView().getModel("LeaveModel").getData();
-                            var currentYear = this.currentYear;
-
-                            function parseDate(dateStr) {
-                                const [day, month, year] = dateStr.split("/").map(Number);
-                                return new Date(year, month - 1, day);
-                            }
-
+                         
                             // Filter leave data for current year
                             var filteredData = LeaveModel.filter((item) => {
                                 if (item.typeOfLeave !== "All In One Leave") return false;
 
-                                var fromDate = parseDate(this.Formatter.formatDate(item.fromDate));
-                                var toDate = parseDate(this.Formatter.formatDate(item.toDate));
-                                var startOfYear = new Date(currentYear, 0, 1);
-                                var endOfYear = new Date(currentYear, 11, 31);
+                                var fromDate = this.parseDate(this.Formatter.formatDate(item.fromDate));
+                                var toDate = this.parseDate(this.Formatter.formatDate(item.toDate));
+                                var startOfYear = new Date(this.currentYear, 0, 1);
+                                var endOfYear = new Date(this.currentYear, 11, 31);
 
                                 return fromDate >= startOfYear && toDate <= endOfYear;
                             });
@@ -739,13 +724,11 @@ sap.ui.define(
                             });
 
                             if (oData.typeOfLeave === "LOP" || totalNoofDays <= quotaLeave.Count) {
-                                // Format dates for backend
                                 oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.halfDay = oData.halfDay.toString();
                                 oData.status = "Submitted";
-
-                                // Clean up data before sending
+                
                                 delete oData.Save;
                                 delete oData.Submit;
                                 delete oData.MinToDate;
@@ -753,29 +736,21 @@ sap.ui.define(
                                 delete oData.maxDate;
                                 delete oData.minDate;
                                 delete oData.isUpdate;
-
+                
                                 BusyIndicator.show(0);
-
-                                // Submit or save based on action type
-                                if (actionType === "Submit") {
-                                    this.ajaxCreateWithJQuery("Leaves", { data: oData })
-                                        .then(response => {
-                                            BusyIndicator.hide();
-                                            this._handleResponse(response, "leaveSubmitted");
-                                        }).catch(() => MessageToast.show(error.message || error.responseText));
-                                } else if (actionType === "Save") {
-                                    var requestData = { filters: { ID: oData.ID }, data: oData };
-                                    this.ajaxUpdateWithJQuery("Leaves", requestData).then(response => {
+                
+                                // Submit to backend
+                                this.ajaxCreateWithJQuery("Leaves", { data: oData }).then(response => {
                                         BusyIndicator.hide();
-                                        this._handleResponse(response, "leaveUpdatedSuccess");
+                                        this._handleResponse(response, "leaveSubmitted");
                                     }).catch((error) => {
                                         BusyIndicator.hide();
                                         MessageToast.show(error.message || error.responseText);
                                     });
-                                }
                             } else {
                                 return MessageBox.error(this.i18nModel.getText("quotaExceeded"));
                             }
+                
                         } else {
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         }
@@ -785,8 +760,134 @@ sap.ui.define(
                     }
                 },
 
-                // Handle response from backend
-                _handleResponse: async function (response, successMessageKey) {
+                 // Save leave handler
+                AL_onPressSave: async function () {
+                    try {
+                        // Validate fields
+                        if (
+                            utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
+                            utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
+                            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
+                        ) {
+                            var oData = this.getView().getModel("LeaveTempModel").getData();
+                    
+                            // Parse dates
+                            var fromDateParts = oData.fromDate.split("/").map(Number);
+                            var startDate = new Date(fromDateParts[2], fromDateParts[1] - 1, fromDateParts[0]);
+                            var toDateParts = oData.toDate.split("/").map(Number);
+                            var endDate = new Date(toDateParts[2], toDateParts[1] - 1, toDateParts[0]);
+                
+                            // Allow last year leave only until Jan 31 of current year
+                            var currentDate = new Date();
+                            var jan31 = new Date(currentDate.getFullYear(), 0, 31);
+                            var isFromLastYear = fromDateParts[2] === currentDate.getFullYear() - 1;
+                            var isToLastYear = toDateParts[2] === currentDate.getFullYear() - 1;
+                            var isCurrentYear = fromDateParts[2] === currentDate.getFullYear() && toDateParts[2] === currentDate.getFullYear();
+                
+                            if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
+                                return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
+                            }
+                
+                            // Check if leave is on holiday
+                            if (oData.fromDate === oData.toDate) {
+                                var isValid = true;
+                                var holidays = this.getView().getModel("HolidayModel").getData();
+                                holidays.forEach((holiday) => {
+                                    if (new Date(holiday.date).getTime() === startDate.getTime()) {
+                                        isValid = false;
+                                    }
+                                });
+                                if (!isValid) {
+                                    return MessageBox.error(this.i18nModel.getText("holidaysMess"));
+                                }
+                            }
+                
+                            // Check if leave is on weekend
+                            if (parseFloat(oData.NoofDays) <= 2) {
+                                var isFromWeekend = (startDate.getDay() === 0 || startDate.getDay() === 6);
+                                var isToWeekend = (endDate.getDay() === 0 || endDate.getDay() === 6);
+                                if (isFromWeekend && isToWeekend) {
+                                    return MessageBox.error(this.i18nModel.getText("holidaysMess"));
+                                }
+                            }
+                    
+                            // Leave model filtering
+                            var LeaveModel = this.getView().getModel("LeaveModel").getData();
+                           
+                             // Filter leave data for current year
+                             var filteredData = LeaveModel.filter((item) => {
+                                if (item.typeOfLeave !== "All In One Leave") return false;
+
+                                var fromDate = this.parseDate(this.Formatter.formatDate(item.fromDate));
+                                var toDate = this.parseDate(this.Formatter.formatDate(item.toDate));
+                                var startOfYear = new Date(this.currentYear, 0, 1);
+                                var endOfYear = new Date(this.currentYear, 11, 31);
+
+                                return fromDate >= startOfYear && toDate <= endOfYear;
+                            });
+
+                            // Exclude rejected leaves
+                            filteredData = filteredData.filter((item) => item.status !== "Rejected");
+
+                            // Calculate total leave days
+                            var totalNoofDays = filteredData.reduce((total, item) => {
+                            return total + parseFloat(item.NoofDays || 0);
+                            }, 0)
+                    
+                            // Quota model
+                            var oLeaveModel = this.getView().getModel("secondLeaveData");
+                            var leaveData = oLeaveModel.getProperty("/chartData");
+
+                            var quotaLeave = leaveData.find(function (leave) {
+                                return leave.LeaveStatus === "All Quota";
+                            });
+                    
+                            // Final quota check
+                            var valid = true;
+                            if (parseFloat(this.UpdateNoofDays) === parseFloat(oData.NoofDays)) {
+                                valid = true;
+                            } else {
+                                valid = totalNoofDays <= quotaLeave.Count
+                            }
+
+                            // Check leave type and quota
+                            if (oData.typeOfLeave === "LOP" || valid) {
+                                oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                                oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                                oData.halfDay = oData.halfDay.toString();
+                                oData.status = "Submitted";
+                
+                                delete oData.Save;
+                                delete oData.Submit;
+                                delete oData.MinToDate;
+                                delete oData.ManagerRemark;
+                                delete oData.maxDate;
+                                delete oData.minDate;
+                                delete oData.isUpdate;
+                    
+                                BusyIndicator.show(0);
+                    
+                                // Save to backend
+                                var requestData = { filters: { ID: oData.ID }, data: oData };
+                                this.ajaxUpdateWithJQuery("Leaves", requestData).then(response => {
+                                        BusyIndicator.hide();
+                                        this._handleResponse(response, "leaveUpdatedSuccess");
+                                    }).catch((error) => {
+                                        BusyIndicator.hide();
+                                        MessageToast.show(error.message || error.responseText);
+                                    });
+                            } else {
+                                MessageBox.error(this.i18nModel.getText("quotaExceeded"));
+                            }
+                        }
+                    } catch (error) {
+                        BusyIndicator.hide();
+                        MessageToast.show(error.message || error.responseText);
+                    }
+                },
+                
+                 // Handle response from backend
+                 _handleResponse: async function (response, successMessageKey) {
                     if (response.success === true) {
                         MessageToast.show(this.i18nModel.getText(successMessageKey));
                         this.oLeaveDialog.close();
@@ -796,16 +897,6 @@ sap.ui.define(
                     } else {
                         MessageToast.show(error.message || error.responseText);
                     }
-                },
-
-                // Submit leave handler
-                AL_onPressSubmit: function () {
-                    this.AL_handleLeaveAction("Submit");
-                },
-
-                // Save leave handler
-                AL_onPressSave: function () {
-                    this.AL_handleLeaveAction("Save");
                 },
 
                 // Selection change handler for leave table
