@@ -73,9 +73,11 @@
 				</ComboBox>
 			</f:content>
 		</f:SimpleForm>
-		<HBox justifyContent="End" >
-			<Button text="{i18n>onboard}" type="Accept" press="OEF_onPressOnBoard" class="submit" />
+		<beginButton>
+			<Button text="{i18n>onboard}" type="Accept" press="OEF_onPressOnBoard"  />
+		</beginButton>
+		<endButton>
 			<Button text="{i18n>close}" press="OEF_onPressClose" type="Reject" class="sendMail"/>
-		</HBox>
+		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

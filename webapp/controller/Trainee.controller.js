@@ -14,7 +14,8 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
-                this.commonLoginFunction("Trainee");
+                this.checkLoginModel();
+                // this.commonLoginFunction("Trainee");
                 BusyIndicator.show(0)
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -27,37 +28,37 @@ sap.ui.define([
                 ["T_id_Download", "T_id_EmpOnBoard", "T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("traineeDetails"));
                 this.oValue = oEvent.getParameter("arguments").value;
+                BusyIndicator.hide()
                 if (this.oValue === "Trainee") {
-                    await this.T_onPressClear();// clear the filter bar
+                   await  this.T_onPressClear();// clear the filter bar
                     await this.readCallForTrainee("Initial");
                 }
                 else {
                     this.T_onSearch();// filter function for trainee 
                 }
-                BusyIndicator.hide()
             },
             //read call for trainee
             readCallForTrainee: async function (filter) {
-                await this.ajaxReadWithJQuery("Trainee", filter, ["T_id_TraineeTable"]).then((oData) => {
-                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
-                    if (filter === "Initial") {
-                        const traineeNames = [...new Set(offerData.map(item => item.TraineeName?.trim()).filter(name => !!name))].map(name => ({ TraineeName: name }));
-                        const traineeNameModel = new JSONModel(traineeNames);
-                        this.getView().setModel(traineeNameModel, "traineeNameModel");
-                        // Unique Reporting Managers
-                        const reportingManagers = [...new Set(offerData.map(item => item.ReportingManager?.trim()).filter(manager => !!manager))].map(manager => ({ ReportingManager: manager }));
-                        const reportingManagerModel = new JSONModel(reportingManagers);
-                        this.getView().setModel(reportingManagerModel, "reportingManagerModel");
-                        traineeNameModel.refresh(true);
-                        reportingManagerModel.refresh(true);
-                    }
-                    BusyIndicator.hide();
+                await this.ajaxReadWithJQuery("Trainee", filter,["T_id_TraineeTable"]).then((oData) => {
+                  var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                  this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
+                  if (filter === "Initial") {
+                    const traineeNames = [...new Set( offerData.map(item => item.TraineeName?.trim()).filter(name => !!name) )].map(name => ({ TraineeName: name }));
+                      const traineeNameModel = new JSONModel(traineeNames);
+                    this.getView().setModel(traineeNameModel, "traineeNameModel");   
+                    // Unique Reporting Managers
+                    const reportingManagers = [...new Set(offerData.map(item => item.ReportingManager?.trim()).filter(manager => !!manager))].map(manager => ({ ReportingManager: manager }));
+                  const reportingManagerModel = new JSONModel(reportingManagers);
+                    this.getView().setModel(reportingManagerModel, "reportingManagerModel");
+                    traineeNameModel.refresh(true);
+                    reportingManagerModel.refresh(true);
+                  }      
+                  BusyIndicator.hide();
                 }).catch((error) => {
-                    BusyIndicator.hide();
-                    sap.m.MessageToast.show(error.message || error.responseText);
+                  BusyIndicator.hide();
+                  sap.m.MessageToast.show(error.message || error.responseText);
                 });
-            },
+              },
             //validation function for mandatory fields
             T_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);

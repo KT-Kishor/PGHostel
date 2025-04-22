@@ -528,6 +528,7 @@ sap.ui.define([
       });
     
       dialog.open();
+      sap.ui.core.BusyIndicator.hide();
     },
     
     _initMessagePopover: function () {

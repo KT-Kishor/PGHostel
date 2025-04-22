@@ -15,7 +15,8 @@ sap.ui.define([
             },
             _onRouteMatched: async function (oEvent) {
                 BusyIndicator.show(0)
-                this.commonLoginFunction("Trainee");
+                this.checkLoginModel();
+                //this.commonLoginFunction("Trainee");
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });//CC mailId read call
@@ -93,6 +94,7 @@ sap.ui.define([
 
             },
             TD_readEmployeeData: async function (filter) {
+                
                 await this.ajaxReadWithJQuery("EmployeeDetails", filter, []).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "empModel");
@@ -238,7 +240,7 @@ sap.ui.define([
                                         this.ajaxUpdateWithJQuery("Trainee", oUpdatePayload,["TD_id_Wizard"]).then((oData) => {
                                             BusyIndicator.hide();
                                             if (oData.success) {
-                                                MessageToast.show("PDF generated and status updated!");
+                                                MessageToast.show(this.i18nModel.getText("pdfSucces"));
                                                 oDialog.close();
                                                 this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);
                                                 this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
@@ -427,6 +429,7 @@ sap.ui.define([
                 if (value !== "create") {
                     this.updateCallForTrainee(this.viewModel,"silent");
                 }
+                MessageToast.show(this.i18nModel.getText("pdfSucces"));
                 this.getView().getModel("oTraineeDetails").refresh(true);
             },
             async offerGeneratingPdfFunction(oModel) {

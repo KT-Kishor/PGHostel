@@ -35,6 +35,7 @@
                                               editable="true"
                                               layout="ColumnLayout"
                                               columnsM="2"
+											  busyIndicatorDelay="0"
                                               columnsL="2"
                                               columnsXL="2">
 									<f:content>
