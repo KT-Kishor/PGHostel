@@ -41,6 +41,7 @@ sap.ui.define([
             this.ViewModel = this.getView().getModel("viewModel");           
             this.CommonModel();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
+            BusyIndicator.hide();
             this.Exp_onSearch();
         },
  // Function to initialize the common model for expense creation
@@ -82,9 +83,11 @@ sap.ui.define([
                     this.Expense = Expense;
                     oView.addDependent(this.Expense);
                     this.Expense.open();
+                    this._FragmentDatePickersReadOnly(["exp-Id-StartDate","exp-Id-EndDate"])
                 }.bind(this));
             } else {
                 this.Expense.open();
+                this._FragmentDatePickersReadOnly(["exp-Id-StartDate","exp-Id-EndDate"])
             }
         },
  // Close the "Add Expense" fragment and reset validation states
@@ -103,7 +106,7 @@ sap.ui.define([
         Exp_Frg_onPressSubmit: async function() {
             var that = this;
             try {
-                // Validate mandatory fields
+                BusyIndicator.show(0);
                 const isValid =
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-ExpenseName"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") &&
@@ -117,10 +120,7 @@ sap.ui.define([
 
                 if (!isValid) {
                     return MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                }
-               this.byId("exp_Id_ExpenseTable").setBusy(true);
-
-                // Get and format model data
+                }           
                 const oModel = this.getView().getModel("CreateExpenseModel").getData();
                 oModel.ExpStartDate = oModel.ExpStartDate.split("/").reverse().join("-");
                 oModel.ExpEndDate = oModel.ExpEndDate.split("/").reverse().join("-");
@@ -130,6 +130,7 @@ sap.ui.define([
                     that.Expense.close();
                     await that.Exp_onPressClear();
                     await that._fetchCommonData("ExpenseTotalCalculation", "", {ExpenseID: oResponse.ExpenseID});
+                    BusyIndicator.hide();
                     await that.Exp_onSearch();
                     that.getView().getModel("FilterExpenseModel").setData([...new Map(that.getView().getModel("ExpenseModel").getData().map((item) => [item.ExpenseName, item])).values()]);
                     MessageToast.show(that.i18nModel.getText("expenseCreatedMess"));
@@ -139,7 +140,7 @@ sap.ui.define([
             } catch (oError) {
                 MessageToast.show(that.i18nModel.getText("expenseCreatedMessFailed"));
             } finally {
-                that.byId("exp_Id_ExpenseTable").setBusy(false);
+                BusyIndicator.hide();
             }
         },
 
@@ -212,7 +213,7 @@ sap.ui.define([
                     try {
                         await that.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: expenseID } });
                         MessageToast.show(that.i18nModel.getText("expenseDeleteMess")); // <== use 'that' instead of 'this'
-                        that._fetchCommonData("Expense", "ExpenseModel");
+                        that.Exp_onSearch();
                     } catch (error) {
                         MessageToast.show(error.responseText || "Error deleting expense");
                     } finally {
@@ -224,7 +225,8 @@ sap.ui.define([
 //Filter Function
         Exp_onSearch: async function() {
             try {
-                BusyIndicator.show(0);
+                var oTable = this.getView().byId("exp_Id_ExpenseTable");
+                oTable.setEnableBusyIndicator(true);
                 const aFilterItems = this.byId("Exp-id-FilterBar").getFilterGroupItems();
                 const params = {"EmployeeID":this.LoginModel.getProperty("/EmployeeID")};
 
@@ -240,13 +242,11 @@ sap.ui.define([
                         }
                     }
                 });
-                await this._fetchCommonData("Expense", "ExpenseModel", params);
+                await this._fetchCommonData("Expense", "ExpenseModel", params,["exp_Id_ExpenseTable"]);
 
             } catch (error) {
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-            } finally {
-                BusyIndicator.hide();
-            }
+            } 
         },
 
         Exp_onPressClear:async function() {

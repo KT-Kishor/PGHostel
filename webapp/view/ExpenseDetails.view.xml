@@ -99,7 +99,7 @@
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="" titleUppercase="false">
 							<blocks>
-								<m:Table id="exp_Id_ExpenseTable" items="{ItemExpenseModel>/}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" mode="SingleSelectLeft" selectionChange="Exp_Det_onChangeExpanesItem" >
+								<m:Table id="exp_Id_ExpenseTable" items="{ItemExpenseModel>/}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" mode="SingleSelectLeft" selectionChange="Exp_Det_onChangeExpanesItem" busyIndicatorDelay="0" >
 									<m:headerToolbar>
 										<m:OverflowToolbar>
 										<m:Title  text="Expense Item Details ({= ${ItemExpenseModel>/}.length })"/>

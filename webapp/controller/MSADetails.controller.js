@@ -26,11 +26,11 @@ sap.ui.define([
                   var oModelMSA = new JSONModel({
                     CompanyName: "",
                     CreateMSADate: this.Formatter.formatDate(new Date()),
-                    PANCard: "",
+                    PanCard: "",
                     Address: "",
                     CompanyHeadName: "",
                     CompanyHeadPosition: "",
-                    MSAEmail: "",
+                    MsaEmail: "",
                     PaymentTerms: "30 Days",
                     ContractPeriod: "12 Months",
                     Salutation: "Mr.",

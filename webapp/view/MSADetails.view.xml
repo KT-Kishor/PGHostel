@@ -65,10 +65,10 @@
 							<DatePicker valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" id="MsaD_id_CreateMSADate" value="{msaModelWizart>/CreateMSADate}" change="MsaD_validateDate" valueStateText="{i18n>dateValueState}" />
 
 							<Label text="{i18n>panCardReg}" required="true" />
-							<Input  value="{msaModelWizart>/PANCard}"  placeholder="{i18n>placePanCardReg}" id="MsaD_id_PanCard" liveChange="MsaD_ValidateCommonFields"  maxLength="50" valueStateText="{i18n>placePanCardReg}" />
+							<Input  value="{msaModelWizart>/PanCard}"  placeholder="{i18n>placePanCardReg}" id="MsaD_id_PanCard" liveChange="MsaD_ValidateCommonFields"  maxLength="50" valueStateText="{i18n>placePanCardReg}" />
 
 							<Label text="{i18n>emailId}" required="true" />
-							<TextArea  value="{msaModelWizart>/MSAEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" valueStateText="{i18n>emailValueState}" />
+							<TextArea  value="{msaModelWizart>/MsaEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" valueStateText="{i18n>emailValueState}" />
 
 							<Label text="{i18n>address}" required="true" />
 							<TextArea value="{msaModelWizart>/Address}" placeholder="{i18n>placeAddress}" id="MsaD_id_Address"  liveChange="MsaD_ValidateCommonFields"  maxLength="120" valueStateText="{i18n>addressValueState}"/>
@@ -110,9 +110,9 @@
 							<Label text="{i18n>createMSADate}" />
 							<Text text="{msaModelWizart>/CreateMSADate}" />
 							<Label text="{i18n>panCardReg}" />
-							<Text text="{msaModelWizart>/PANCard}" />
+							<Text text="{msaModelWizart>/PanCard}" />
 							<Label text="{i18n>emailId}" />
-							<Text text="{msaModelWizart>/MSAEmail}" />
+							<Text text="{msaModelWizart>/MsaEmail}" />
 							<Label text="{i18n>address}" />
 							<Text text="{msaModelWizart>/Address}" />
 							<Label text="{i18n>paymentterms}" />

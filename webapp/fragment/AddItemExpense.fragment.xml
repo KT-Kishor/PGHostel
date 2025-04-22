@@ -5,7 +5,8 @@
 	<Dialog
         title="{i18n>addItemExpense}">		
 		<VBox>
-			<f:SimpleForm          
+			<f:SimpleForm   
+			id="Exp_id_SimpleFromtwo"      
             editable="true"
 			layout="ResponsiveGridLayout"
 			labelSpanXL="4"

@@ -53,8 +53,22 @@
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 
-			<Table id="exp_Id_ExpenseTable" items="{ExpenseModel>/}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" >
-			 <headerToolbar>
+<Table id="exp_Id_ExpenseTable"
+       items="{
+         path: 'ExpenseModel>/',
+         sorter: {
+           path: 'EmployeeID',
+           descending: false,
+           group: true
+         }
+       }"
+       class="sapUiResponsiveMargin"
+       growing="true"
+       growingThreshold="50"
+       alternateRowColors="true"
+       growingScrollToLoad="true"
+       width="auto"
+       busyIndicatorDelay="0">			 <headerToolbar>
                 <OverflowToolbar >
                     <Title id="title" text="Expense Details ({= ${ExpenseModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
