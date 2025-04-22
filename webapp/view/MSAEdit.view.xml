@@ -14,10 +14,10 @@
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
 					<expandedHeading>
-						<m:Title text="{FilteredMsaModel>/CompanyName}" wrapping="true" width="100%" />
+						<m:Title text="{FilteredMsaModel>/0/CompanyName}" wrapping="true" width="100%" />
 					</expandedHeading>
 					<expandedContent>
-						<m:Label text="{FilteredMsaModel>/PANCard}" wrapping="true" width="100%" />
+						<m:Label text="{FilteredMsaModel>/0/PanCard}" wrapping="true" width="100%" />
 					</expandedContent>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
@@ -46,7 +46,7 @@
 									<f:toolbar>
 											<m:Toolbar>												
 												<m:ToolbarSpacer />
-												<m:Button  text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" press="MsaE_onEditOrSavePress" />
+												<m:Button  text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" type="{= ${simpleForm>/editable} ? 'Accept' : 'Neutral' }" press="MsaE_onEditOrSavePress" />
 												<m:Button text="{i18n>tileFooter}" enabled="{simpleForm>/isEnabled}" press="MsaE_onSendEmailMSA" />
 												<m:Button text="{i18n>tileUnit}" enabled="{simpleForm>/isEnabled}"  press="MsaE_onPressMerge"  />
 											</m:Toolbar>
@@ -77,8 +77,19 @@
 											<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 										</m:Select>
 
+										<m:Label text="{i18n>branch}" required="true" />
+										<m:ComboBox id="MsaE_Id_Branch" change="Msa_onComboBoxChange" editable="{simpleForm>/editable}" valueStateText="{i18n>expValStaSource}" items="{BaseLocationModel>/}" value="{FilteredMsaModel>/0/BranchCode}" showSecondaryValues="true" >
+											<core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>branchCode}" additionalText="{BaseLocationModel>city}" />
+										</m:ComboBox>
+
+										<m:Label text="{i18n>type}" required="true" />
+										<m:RadioButtonGroup editable="{simpleForm>/editable}" id="MsaE_id_Type" columns="5" valueState="Warning" class="sapUiMediumMarginBottom">
+											<m:RadioButton id="RB3-1" text="Recruitment"/>
+											<m:RadioButton id="RB3-2" text="Service"/>
+										</m:RadioButtonGroup>
+
 										<m:Label text="{i18n>createMSADate}" required="true"/>
-										<m:DatePicker change="Msa_ChangeMsaDate" value="{FilteredMsaModel>/0/CreateMSADate}" editable="{simpleForm>/editable}" id="MsaE_id_CreateMSADate" displayFormat="dd/MM/yyyy"  valueFormat="dd/MM/yyyy"/>
+										<m:DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Msa_ChangeMsaDate" value="{path:'FilteredMsaModel>/0/CreateMSADate',formatter: '.Formatter.formatDate'}" editable="{simpleForm>/editable}" id="MsaE_id_CreateMSADate"/>
 
 										<!-- Input for PAN card, includes a liveChange event -->
 										<m:Label text="{i18n>panCard}" required="true"/>

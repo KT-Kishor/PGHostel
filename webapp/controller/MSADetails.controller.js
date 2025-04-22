@@ -13,14 +13,16 @@ sap.ui.define([
             Formatter:Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteMSADetails").attachMatched(this._onRouteMatched, this);
-                this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
             },
             _onRouteMatched: function () {
+                // this.commonLoginFunction("MSA&SOW");
+                this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+                this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(false);
                 this.byId("MsaD_id_Submit").setEnabled(false);
                 this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(false);
-                
+                this.T_onResetWizard();
                   var oModelMSA = new JSONModel({
                     CompanyName: "",
                     CreateMSADate: this.Formatter.formatDate(new Date()),
@@ -33,9 +35,18 @@ sap.ui.define([
                     ContractPeriod: "12 Months",
                     Salutation: "Mr.",
                     Status: "New",
-                    MsaContractPeriodEndDate: ""
+                    MsaContractPeriodEndDate: "",
+                    BranchCode:"",
+                    Type:""
                   });  
                   this.getView().setModel(oModelMSA, "msaModelWizart");               
+            },
+
+            T_onResetWizard: function () {
+                var oWizard = this.getView().byId("MsaD_id_Wizard");
+                oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
+                oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
+                this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);  
             },
             
             MsaD_onBack: function () {
@@ -65,16 +76,20 @@ sap.ui.define([
                 this.validateStep();
             },
 
+            Msa_BranchChange:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent);
+                this.validateStep();
+            },
             validateStep: function () {
                 // Check if all fields have values
                 var allFieldsFilled = this.getView().byId("MsaD_id_CompanyName").getValue() && this.getView().byId("MsaD_id_HeadName").getValue() && this.getView().byId("MsaD_id_HeadPosition").getValue() && this.getView().byId("MsaD_id_CreateMSADate").getValue() && this.getView().byId("MsaD_id_PanCard").getValue() && this.getView().byId("MsaD_id_Email").getValue() && this.getView().byId('MsaD_id_Address').getValue();
                 if (allFieldsFilled) {
                     // Validate each field 
-                    var isValid = utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_CompanyName"), "ID") && utils._LCvalidateName(this.getView().byId("MsaD_id_HeadName"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_HeadPosition"), "ID") && utils._LCvalidateDate(this.getView().byId("MsaD_id_CreateMSADate"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_PanCard"), "ID") && utils._LCvalidateEmail(this.getView().byId("MsaD_id_Email"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_Address"), "ID");
+                    var isValid = utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_CompanyName"), "ID") && utils._LCvalidateName(this.getView().byId("MsaD_id_HeadName"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_HeadPosition"), "ID") && utils._LCvalidateDate(this.getView().byId("MsaD_id_CreateMSADate"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_PanCard"), "ID") && utils._LCvalidateEmail(this.getView().byId("MsaD_id_Email"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_Address"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_Branch"), "ID");
                     this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(isValid);
-                    this.byId("MsaD_id_WizardO").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));                  
                 } else {
                     this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(false);
+                    this.byId("MsaD_id_WizardO").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));                  
                 }
             },
 
@@ -101,6 +116,7 @@ sap.ui.define([
             
                     oModelData.MsaContractPeriodEndDate = assignmentEndDate.toISOString().split('T')[0];
                     oModelData.CreateMSADate = oModelData.CreateMSADate.split("/").reverse().join("-");
+                    oModelData.Type = this.byId("MsaD_id_Type").getSelectedButton().getText();
             
                     const oCreateResponse = await this.ajaxCreateWithJQuery("MSADetails", { data: oModelData });
             
@@ -113,8 +129,9 @@ sap.ui.define([
                                 BusyIndicator.hide();
                                 if (sAction === "OK") {
                                     this.getRouter().navTo("RouteMSA");
+                                    this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
                                 }else{
-
+                                    this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
                                 }                             
                             }
                         });
@@ -122,7 +139,6 @@ sap.ui.define([
                         BusyIndicator.hide();
                         MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
                     }
-                    this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
                 } catch (oError) {
                     BusyIndicator.hide();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));

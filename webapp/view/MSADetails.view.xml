@@ -5,15 +5,8 @@
 	xmlns:core="sap.ui.core"	>
 	<Page id="MsaD_id_Page" title="{i18n>generateMsa}" navButtonPress="MsaD_onBack" showNavButton="true">
 		<content>
-			<Wizard id="MsaD_id_Wizard"	
-					showNextButton="true" finishButtonText="{i18n>submit}"
-                    class="sapUiResponsivePadding--header sapUiResponsivePadding--content">
-				<WizardStep id="MsaD_id_WizardO"
-                            nextStep="MsaD_id_WizardStepT"
-							complete="MsaD_onComplete"
-                            activate="optionalStepActivation"
-                            title="{i18n>msaDetails}"							
-                            validated="true">
+			<Wizard id="MsaD_id_Wizard"	showNextButton="true">
+				<WizardStep id="MsaD_id_WizardO" complete="MsaD_onComplete" title="{i18n>msaDetails}" validated="true">
 					<f:SimpleForm 
             editable="true"
 			layout="ResponsiveGridLayout"
@@ -56,9 +49,20 @@
 							<Select id="MsaD_id_ContractPeriod" items="{ContractPeriod>/ContractPeriod}" selectedKey="{msaModelWizart>/ContractPeriod}">
 								<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 							</Select>
+							
+							<Label text="{i18n>branch}" required="true" />
+							<ComboBox change="Msa_BranchChange" valueStateText="{i18n>expValStaSource}" selectedKey="{LoginModel>/BranchCode}" id="MsaD_id_Branch" items="{BaseLocationModel>/}" value="{msaModelWizart>/BranchCode}" showSecondaryValues="true" >
+								<core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>branchCode}" additionalText="{BaseLocationModel>city}" />
+							</ComboBox>
+
+							<Label text="{i18n>type}" required="true" />
+							<RadioButtonGroup id="MsaD_id_Type" columns="5" valueState="Warning" class="sapUiMediumMarginBottom">
+								<RadioButton id="RB3-1" text="Recruitment"/>
+								<RadioButton id="RB3-2" text="Service"/>
+							</RadioButtonGroup>
 
 							<Label text="{i18n>createMSADate}" required="true" />
-							<DatePicker displayFormat="dd/MM/yyyy" id="MsaD_id_CreateMSADate" value="{msaModelWizart>/CreateMSADate}" change="MsaD_validateDate" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}" />
+							<DatePicker valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" id="MsaD_id_CreateMSADate" value="{msaModelWizart>/CreateMSADate}" change="MsaD_validateDate" valueStateText="{i18n>dateValueState}" />
 
 							<Label text="{i18n>panCardReg}" required="true" />
 							<Input  value="{msaModelWizart>/PANCard}"  placeholder="{i18n>placePanCardReg}" id="MsaD_id_PanCard" liveChange="MsaD_ValidateCommonFields"  maxLength="50" valueStateText="{i18n>placePanCardReg}" />
@@ -76,7 +80,7 @@
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
-				<WizardStep id="MasD_id_ThirdStep" title="{i18n>review}">
+				<WizardStep id="MasD_id_ThirdStep" title="{i18n>review}" validated="true">
 					<f:SimpleForm 
                                 editable="true"
 			layout="ResponsiveGridLayout"

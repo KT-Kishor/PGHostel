@@ -10,6 +10,7 @@ sap.ui.define([
                 this._fetchCommonData("ManageCustomer", "CompanyNameModel");
             },
             _onRouteMatched: async function () {
+                this.commonLoginFunction("MSA&SOW");
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");
                 this.MSA_onSearch();
                 BusyIndicator.hide();

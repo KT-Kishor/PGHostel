@@ -13,10 +13,12 @@ sap.ui.define([
             Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteMSAEdit").attachMatched(this._onRouteMatched, this);
-                this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
             },
 
             _onRouteMatched: async function (oEvent) {
+                // this.commonLoginFunction("MSA&SOW");
+                this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+                this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this.MSAID = oEvent.getParameter("arguments").sPath;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 await this.MSADetailsReadCall();
@@ -35,9 +37,13 @@ sap.ui.define([
             MSADetailsReadCall: async function () {
                 BusyIndicator.show(0);
                 try {
-                    await this._fetchCommonData("MSADetails", "FilteredMsaModel", {
-                        MsaID: this.MSAID
-                    });
+                    var response = await this._fetchCommonData("MSADetails", "FilteredMsaModel", {MsaID: this.MSAID});
+
+                    if (this.getView().getModel("FilteredMsaModel").getData()[0].Type === "Recruitment") {
+                        this.byId("MsaD_id_Type").setSelectedIndex(0); // First RadioButton
+                    } else {
+                        this.byId("MsaD_id_Type").setSelectedIndex(1); // Second RadioButton
+                    } 
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
@@ -80,8 +86,21 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
+            Msa_onComboBoxChange:function(oEvent){
+                utils._LCvalidateMandatoryField(oEvent);
+            },
+
             Msa_ChangeMsaDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
+                const oModelData = this.getView().getModel("FilteredMsaModel").getData()[0];
+                const [day, month, year] = this.byId("MsaE_id_CreateMSADate").getValue().split('/');
+                const assignmentEndDate = new Date(year, month - 1, day);
+        
+                const contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]);
+                assignmentEndDate.setMonth(assignmentEndDate.getMonth() + contractPeriod);
+        
+                oModelData.MsaContractPeriodEndDate = assignmentEndDate.toISOString().split('T')[0];
+                oModelData.CreateMSADate = this.byId("MsaE_id_CreateMSADate").getValue().split("/").reverse().join("-");
             },
 
             Msa_LC_PanCard: function (oEvent) {
@@ -97,8 +116,10 @@ sap.ui.define([
             },
 
             onPressSave: async function () {
-                if (utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_CompanyName"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_HeadPosition"), "ID") && utils._LCvalidateName(this.getView().byId("MsaE_id_MsaHead"), "ID") && utils._LCvalidateDate(this.getView().byId("MsaE_id_CreateMSADate"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaPanCard"), "ID") && utils._LCvalidateEmail(this.getView().byId("MsaE_id_MSAEmail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaAddress"), "ID")) {
+                if (utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_CompanyName"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_HeadPosition"), "ID") && utils._LCvalidateName(this.getView().byId("MsaE_id_MsaHead"), "ID") && utils._LCvalidateDate(this.getView().byId("MsaE_id_CreateMSADate"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaPanCard"), "ID") && utils._LCvalidateEmail(this.getView().byId("MsaE_id_MSAEmail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaAddress"), "ID") && utils._LCvalidateMandatoryField(this.byId("MsaE_Id_Branch","ID"),"ID")) {
                     var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
+                    oModel.Type = this.byId("MsaE_id_Type").getSelectedButton().getText();
+                    
                     var oData = {
                         "data": oModel,
                         "filters": {
