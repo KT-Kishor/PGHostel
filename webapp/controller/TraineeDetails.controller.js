@@ -21,7 +21,8 @@ sap.ui.define([
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });//CC mailId read call
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                this.TD_readEmployeeData("")
+                await this._fetchCommonData("EmployeeDetailsData", "empModel");
+                // this.TD_readEmployeeData("")
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -93,20 +94,20 @@ sap.ui.define([
                 }
 
             },
-            TD_readEmployeeData: async function (filter) {
+            // TD_readEmployeeData: async function (filter) {
                 
-                await this.ajaxReadWithJQuery("EmployeeDetails", filter, []).then((oData) => {
-                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getOwnerComponent().setModel(new JSONModel(offerData), "empModel");
-                    offerData = [...new Map(offerData.filter(item => item.ManagerName && item.ManagerName.trim() !== "")
-                        .map(item => [item.ManagerName.trim(), item])).values()];
-                    this.getView().setModel(new JSONModel(offerData), "empModel")
-                    BusyIndicator.hide();
-                }).catch((error) => {
-                    BusyIndicator.hide();
-                    MessageToast.show(error.message || error.responseText);
-                });
-            },
+            //     await this.ajaxReadWithJQuery("EmployeeDetailsData", filter, []).then((oData) => {
+            //         var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+            //         this.getOwnerComponent().setModel(new JSONModel(offerData), "empModel");
+            //         offerData = [...new Map(offerData.filter(item => item.ManagerName && item.ManagerName.trim() !== "")
+            //             .map(item => [item.ManagerName.trim(), item])).values()];
+            //         this.getView().setModel(new JSONModel(offerData), "empModel")
+            //         BusyIndicator.hide();
+            //     }).catch((error) => {
+            //         BusyIndicator.hide();
+            //         MessageToast.show(error.message || error.responseText);
+            //     });
+            // },
 
             //navigation to trainee view
             TUF_onPressback: function () {
@@ -169,7 +170,7 @@ sap.ui.define([
                 var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
                 // Required fields check (stipend is checked only if "Yes" is selected)
                 var allFieldsFilled = oModel.TraineeName && oModel.ReportingManager && oModel.TraineeEmail && oModel.TrainingDuration &&
-                    oModel.ReleaseDate && oModel.JoiningDate && (sStipendText === "No" || (oModel.Stipend && oModel.Currency) && oModel.BaseLocation);
+                    oModel.ReleaseDate && oModel.JoiningDate && (sStipendText === "NO" || (oModel.Stipend && oModel.Currency) && oModel.BaseLocation);
                 if (allFieldsFilled) {
                     let bValid =
                         utils._LCvalidateName(this.byId("TD_id_Name"), "ID") &&
@@ -178,7 +179,7 @@ sap.ui.define([
                         utils._LCvalidateDate(this.byId("TD_id_ReleaseDate"), "ID") &&
                         utils._LCvalidateDate(this.byId("TD_id_JoiningDate"), "ID");
                     // Validate stipend only if "Yes" is selected
-                    if (sStipendText === "Yes") {
+                    if (sStipendText === "YES") {
                         bValid = bValid && utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
                     }
                     this.byId("TD_id_Wizard").getSteps()[0].setValidated(bValid);
@@ -192,7 +193,7 @@ sap.ui.define([
             TD_onSubmitData: function (oEvent) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
-                if (sStipendText === "Yes") utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
+                if (sStipendText === "YES") utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
                 if (utils._LCvalidateName(this.byId("TD_id_Name"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("TD_id_ReportingManager"), "ID") &&
                 utils._LCvalidateEmail(this.byId("TD_id_EmailID"), "ID") &&
@@ -232,7 +233,7 @@ sap.ui.define([
                                     press: function () {
                                         this.TD_onPressMerge("create");
                                         var oUpdatePayload = {
-                                            "data": { Status: "PDF Generated" },
+                                            "data": { Status: "New" },
                                             "filters": {
                                                 "ID": oData.ID
                                             }
@@ -277,7 +278,7 @@ sap.ui.define([
                     var sStipendSelectedText = oView.byId("TU_id_StipendRadio").getSelectedButton().getText();
                     // Perform stipend validation only if "Yes" is selected
                     var bIsStipendValid = true;
-                    if (sStipendSelectedText === "Yes") {
+                    if (sStipendSelectedText === "YES") {
                         bIsStipendValid = utils._LCvalidateAmount(oView.byId("TU_id_Stipend"), "ID");
                     }
                     var isValid =
@@ -425,7 +426,7 @@ sap.ui.define([
             TD_onPressMerge: function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");
                 this.offerGeneratingPdfFunction(oModel);
-                this.getView().getModel("oTraineeDetails").setProperty("/Status", "PDF Generated");
+                this.getView().getModel("oTraineeDetails").setProperty("/Status", "New");
                 if (value !== "create") {
                     this.updateCallForTrainee(this.viewModel,"silent");
                 }
@@ -477,7 +478,7 @@ sap.ui.define([
             },
             handleStipendSelection: function (sSelectedText, sStipendId, sCurrencyId, sModelName, sCurrencyPath) {
                 var oModel = this.getView().getModel(sModelName || "oTraineeDetails");
-                if (sSelectedText === "No") {
+                if (sSelectedText === "NO") {
                     this.getView().byId(sStipendId).setVisible(false);
                     this.getView().byId(sCurrencyId).setVisible(false);
                     this.getView().byId(sStipendId).setValue("0");

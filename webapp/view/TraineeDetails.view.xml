@@ -53,7 +53,7 @@
 								</VBox>
 								<VBox width="78%">
 									<ComboBox showSecondaryValues="true"  change="TD_validateCombo"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">
-										<core:ListItem key="{empModel>ManagerID}" text="{empModel>ManagerName}" additionalText="{empModel>ManagerID}" />
+										<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}" />
 									</ComboBox>
 								</VBox>
 							</HBox>
@@ -66,7 +66,7 @@
 									<RadioButton text="{i18n>no}" />
 								</buttons>
 							</RadioButtonGroup>
-							<Label id="TD_id_StipendLabel" text="{i18n>stipend}" required="true" />
+							<Label id="TD_id_StipendLabel" text="{i18n>stAmount}" required="true" />
 							<Input value="{oTraineeDetails>/Stipend}" 
 									   maxLength="15"
 									   placeholder="{i18n>placeStipend}" 
@@ -81,9 +81,9 @@
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
 							<Label text="{i18n>traineeDuration}" required="true" />
-							<Select items="{TrainingDurationModel>/duration}"  selectedKey="{oTraineeDetails>/TrainingDuration}" id="TD_id_TDuration" width="100%" class="marginLeft">
-								<core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
-							</Select>
+								<Select items="{TrainingDurationModel>/}" id="TD_id_TDuration" selectedKey="{oTraineeDetails>/TrainingDuration}" width="100%" class="marginLeft">
+									<core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
+								</Select>
 							<Label text="{i18n>releaseDateT}"   required="true" />
 							<DatePicker  value="{oTraineeDetails>/ReleaseDate}" id="TD_id_ReleaseDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>joiningDate}"   required="true" />

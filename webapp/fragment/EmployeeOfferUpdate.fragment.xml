@@ -85,8 +85,8 @@
 											<!-- Employment Bond Year ComboBox -->
 										<m:Label text="{i18n>pinCode}"  required="true" />
 											<m:Input value="{employeeModel>/PinCode}" liveChange="EOD_validatePinCode" editable="{viewModel>/editable}" id="EOUF_id_PinCode"></m:Input>
-										<m:Label text="{i18n>selectYear}" id="EOUF_id_Lyear" visible="false" />
-											<m:Select editable="{viewModel>/editable}" items="{EmployementBond>/bond}" id="EOUF_id_BondCombo" selectedKey="{employeeModel>/Value}" visible="false" change="validateInputs">
+										<m:Label text="{i18n>selectYear}" id="EOUF_id_Lyear" />
+											<m:Select editable="{viewModel>/editable}" items="{EmployementBond>/}" id="EOUF_id_BondCombo" selectedKey="{employeeModel>/EmploymentBond}" >
 												<core:Item key="{EmployementBond>Value}" text="{EmployementBond>Value}" />
 											</m:Select>
 										<!-- Employee Email Input Field -->

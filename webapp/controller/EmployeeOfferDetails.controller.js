@@ -234,8 +234,9 @@ sap.ui.define([
             },
             //Submit the data
             EOD_onSubmitData: async function () {
-                BusyIndicator.show(0)
-                if (this.byId("EOD_id_Wizard").getSteps()[0].getValidated()) {
+                if (utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") &&
+                    utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_VariablePerc"), "ID")) {
+                    BusyIndicator.show()
                     var oModel = this.getView().getModel("employeeModel").getData();
                     oModel.Gender = this.getView().byId("EOD_id_Gender").getSelectedKey()
                     oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
@@ -271,7 +272,7 @@ sap.ui.define([
                                     press: function () {
                                         this.EOUF_onPressMerge();
                                         var oUpdatePayload = {
-                                            "data": { Status: "PDF Generated" },
+                                            "data": { Status: "New" },
                                             "filters": {
                                                 "ID": oData.ID
                                             }
@@ -431,7 +432,7 @@ sap.ui.define([
             EOUF_onPressMerge: async function () {
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);
-                this.getView().getModel("employeeModel").setProperty("/Status", "PDF Generated");
+                this.getView().getModel("employeeModel").setProperty("/Status", "New");
                 await this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
                 MessageToast.show(this.i18nModel.getText("pdfSucces"));
 

@@ -23,7 +23,7 @@ sap.ui.define([
                 BusyIndicator.show(0);
                 await this._fetchCommonData("Designation", "DesignationModel", {}, ["OEF_id_SimpleForm"]);
                 await this._fetchCommonData("AppVisibility", "RoleModel");
-                await this._fetchCommonData("EmployeeDetails", "EmployeeModel");
+                await this._fetchCommonData("EmployeeDetailsData", "EmployeeModel");
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
@@ -244,13 +244,13 @@ sap.ui.define([
             },
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
-                oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-');
-                oModel.ManagerID = sap.ui.getCore().byId("OEF_id_Manager").getSelectedItem().getAdditionalText();
                 if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
                     var oPayload = {
                         tableName: "EmployeeDetails",
                         data: oModel
                     };
+                    oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-');
+                    oModel.ManagerID = sap.ui.getCore().byId("OEF_id_Manager").getSelectedItem().getAdditionalText();
                     this.ajaxCreateWithJQuery("EmployeeDetails", oPayload, ["OEF_id_SimpleForm"]).then((oData) => {
                         if (oData.success) {
                             MessageToast.show(this.i18nModel.getText("onBoardSuccess"));

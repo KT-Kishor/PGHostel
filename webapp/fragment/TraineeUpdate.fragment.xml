@@ -68,7 +68,7 @@
 											</m:VBox>
 											<m:VBox width="78%">
 												<m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"   value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" selectedKey="1" editable="{viewModel>/editable}" width="100%" class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">
-													<core:ListItem key="{empModel>ManagerID}" text="{empModel>ManagerName}" additionalText="{empModel>ManagerID}"  />
+													<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}"  />
 												</m:ComboBox>
 											</m:VBox>
 										</m:HBox>
@@ -88,7 +88,7 @@
 												<m:RadioButton text="{i18n>no}"  editable="{viewModel>/editable}"  />
 											</m:buttons>
 										</m:RadioButtonGroup>
-										<m:Label id="TU_id_StipendLabel" text="{i18n>stipend}" required="true" />
+										<m:Label id="TU_id_StipendLabel" text="{i18n>stAmount}" required="true" />
 										<m:Input value="{oTraineeDetails>/Stipend}" 
                                              maxLength="15"
                                              editable="{viewModel>/editable}" 
@@ -105,7 +105,7 @@
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
 										<m:Label text="{i18n>traineeDuration}" required="true" />
-										<m:Select items="{TrainingDurationModel>/duration}"  selectedKey="{TrainingDurationModel>/TrainingDuration}" id="TU_id_TDuration" width="100%" class="marginLeft" editable="{viewModel>/editable}">
+										<m:Select items="{TrainingDurationModel>/}"  selectedKey="{TrainingDurationModel>/TrainingDuration}" id="TU_id_TDuration" width="100%" class="marginLeft" editable="{viewModel>/editable}">
 											<core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
 										</m:Select>
 										<m:Label text="{i18n>baseLocation}" required="true" />
