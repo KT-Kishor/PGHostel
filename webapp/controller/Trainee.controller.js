@@ -31,28 +31,24 @@ sap.ui.define([
                 BusyIndicator.hide()
                 if (this.oValue === "Trainee") {
                    await  this.T_onPressClear();// clear the filter bar
-                    await this.readCallForTrainee("Initial");
+                    await this.readCallForTrainee("");
                 }
                 else {
                     this.T_onSearch();// filter function for trainee 
                 }
             },
+
             //read call for trainee
             readCallForTrainee: async function (filter) {
                 await this.ajaxReadWithJQuery("Trainee", filter,["T_id_TraineeTable"]).then((oData) => {
                   var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                   this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
-                  if (filter === "Initial") {
-                    const traineeNames = [...new Set( offerData.map(item => item.TraineeName?.trim()).filter(name => !!name) )].map(name => ({ TraineeName: name }));
-                      const traineeNameModel = new JSONModel(traineeNames);
-                    this.getView().setModel(traineeNameModel, "traineeNameModel");   
-                    // Unique Reporting Managers
-                    const reportingManagers = [...new Set(offerData.map(item => item.ReportingManager?.trim()).filter(manager => !!manager))].map(manager => ({ ReportingManager: manager }));
-                  const reportingManagerModel = new JSONModel(reportingManagers);
-                    this.getView().setModel(reportingManagerModel, "reportingManagerModel");
-                    traineeNameModel.refresh(true);
-                    reportingManagerModel.refresh(true);
-                  }      
+                  var oFilterData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "").map(item => [item.TraineeName.trim(), item])).values()];
+                  this.getView().setModel(new JSONModel(oFilterData), "traineeNameModel");
+                  var oFilterData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "").map(item => [item.ReportingManager.trim(), item])).values()];
+                  this.getView().setModel(new JSONModel(oFilterData), "reportingManagerModel");
+                  this.getView().getModel("traineeNameModel").refresh(true);
+                  this.getView().getModel("reportingManagerModel").refresh(true);     
                   BusyIndicator.hide();
                 }).catch((error) => {
                   BusyIndicator.hide();

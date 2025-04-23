@@ -17,11 +17,11 @@ sap.ui.define([
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: async function (oEvent) {     
+            _onRouteMatched: async function (oEvent) {
                 this.checkLoginModel()
                 //this.commonLoginFunction("EmployeeOffer");
                 BusyIndicator.show(0);
-                await this._fetchCommonData("Designation", "DesignationModel",{},["OEF_id_SimpleForm"]);
+                await this._fetchCommonData("Designation", "DesignationModel", {}, ["OEF_id_SimpleForm"]);
                 await this._fetchCommonData("AppVisibility", "RoleModel");
                 await this._fetchCommonData("EmployeeDetails", "EmployeeModel");
 
@@ -32,7 +32,7 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 if (this.oValue === "EmployeeOffer") {
-                    this.readCallForEmployeeOffer("Initial");
+                    this.readCallForEmployeeOffer("");
                     this.EO_onPressClear();
                 }
                 else {
@@ -44,11 +44,9 @@ sap.ui.define([
                 await this.ajaxReadWithJQuery("EmployeeOffer", filter, ["EO_id_TableEOffer"]).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModel");
-                    if (filter === "Initial") {
-                        offerData = [...new Map(offerData.filter(item => item.ConsultantName && item.ConsultantName.trim() !== "").map(item => [item.ConsultantName.trim(), item])).values()];
-                        this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModelInitial");
-                        this.getView().getModel("EmployeeOfferModelInitial").refresh(true);
-                    }
+                    var oFilterData = [...new Map(offerData.filter(item => item.ConsultantName && item.ConsultantName.trim() !== "").map(item => [item.ConsultantName.trim(), item])).values()];
+                    this.getView().setModel(new JSONModel(oFilterData), "EmployeeOfferModelInitial");
+                    this.getView().getModel("EmployeeOfferModelInitial").refresh(true);
                     BusyIndicator.hide();
                 }).catch((oError) => {
                     BusyIndicator.hide();
@@ -177,9 +175,6 @@ sap.ui.define([
                                 IncomeTax: oSelectedData.IncomeTax,
                                 MedicalInsurance: oSelectedData.MedicalInsurance,
                                 Gratuity: oSelectedData.Gratuity,
-                                TotalRetires: oSelectedData.TotalRetires,
-                                PerformanceBonus: oSelectedData.PerformanceBonus,
-                                EngagementPB: oSelectedData.EngagementPB,
                                 VariablePay: oSelectedData.VariablePay,
                                 CostofCompany: oSelectedData.CostofCompany,
                                 Total: oSelectedData.Total,
@@ -306,7 +301,7 @@ sap.ui.define([
                 }
             },
             EO_onBaseLocationChange: function (oEvent) {
-                var sSelectedKey = oEvent.getSource().getSelectedKey();  
+                var sSelectedKey = oEvent.getSource().getSelectedKey();
                 var oBaseLocationModel = this.getView().getModel("BaseLocationModel");
                 var aLocations = oBaseLocationModel.getData();
                 var oSelectedLocation = aLocations.find(function (loc) {
@@ -317,6 +312,6 @@ sap.ui.define([
                     oEmpModel.setProperty("/BranchCode", oSelectedLocation.branchCode);
                 }
             }
-            
+
         });
     });

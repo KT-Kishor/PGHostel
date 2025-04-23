@@ -17,7 +17,7 @@
 				<Label text="{i18n>gender}"  />
 				<Input value=" {oEmpolyeeDetailsModel>/Gender}"   editable="false" />
 				<Label text="{i18n>designation}" required="true"/>
-				<Select items="{DesignationModel>/}" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}">
+				<Select items="{DesignationModel>/}" showSecondaryValues="true" selectedKey="{oEmpolyeeDetailsModel>/Designation}">
 					<items>
 						<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
 					</items>
@@ -63,7 +63,7 @@
 				<Label text="{i18n>mobileNo}" required="true" />
 				<Input value="{oEmpolyeeDetailsModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo" maxLength="10" id="OEF_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
 				<Label text="{i18n>manager}" required="true"/>
-				<ComboBox value="{oEmpolyeeDetailsModel>/Manager}"
+				<ComboBox value="{oEmpolyeeDetailsModel>/ManagerName}"
 				showSecondaryValues= "true"
 				id="OEF_id_Manager"
 				items="{EmployeeModel>/}"
