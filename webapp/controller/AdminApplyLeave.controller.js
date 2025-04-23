@@ -389,21 +389,26 @@ sap.ui.define(
                 onMarkCalendarDatesAndLeaves: function () {
                     var that = this;
                     this.oDatePicker.removeAllSpecialDates();
+                
+                    // Get leave and holiday data
                     var leaveRecords = that.getView().getModel("LeaveModel").getData();
                     var holidays = that.getView().getModel("HolidayModel").getData();
-                    var holidaySet = new Set(holidays.map(function (holiday) {
-                        return new Date(holiday.Date).toDateString();
+                
+                    // Create a map of holiday date string -> holiday name
+                    var holidayMap = new Map(holidays.map(function (holiday) {
+                        return [new Date(holiday.Date).toDateString(), holiday.Name]; 
                     }));
+                
                     var appliedLeaves = [];
                     var yearStart = new Date(new Date().getFullYear(), 0, 1);
                     var yearEnd = new Date(new Date().getFullYear(), 11, 31);
+                
                     // Process leave records
                     leaveRecords.forEach(function (record) {
                         if (record["Status"] !== "Rejected") {
                             var fromDate = that.onFormatDate(that.Formatter.formatDate(record.fromDate));
                             var toDate = that.onFormatDate(that.Formatter.formatDate(record.toDate));
                             if (fromDate && toDate) {
-                                // Create date range for each day of leave
                                 for (var d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
                                     appliedLeaves.push({
                                         date: new Date(d),
@@ -413,21 +418,24 @@ sap.ui.define(
                             }
                         }
                     });
+                
                     var appliedLeavesSet = new Set(appliedLeaves.map(leave => leave.date.toDateString()));
-                    // Mark each day of the year with appropriate type
+                
+                    // Mark each day of the year
                     for (var d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
                         var day = d.getDay();
                         var isWeekend = (day === 0 || day === 6);
-                        var isHoliday = holidaySet.has(d.toDateString());
                         var isAppliedLeave = appliedLeavesSet.has(d.toDateString());
+                        var holidayName = holidayMap.get(d.toDateString());
+                
                         var dateRange = new sap.ui.unified.DateTypeRange({
                             startDate: new Date(d),
                             endDate: new Date(d)
                         });
-                        // Set type and tooltip based on day type
-                        if (isHoliday) {
+                
+                        if (holidayName) {
                             dateRange.setType("Type04");
-                            dateRange.setTooltip("Holiday");
+                            dateRange.setTooltip("Holiday : " + holidayName);
                         } else if (isWeekend) {
                             dateRange.setType("Type09");
                             dateRange.setTooltip("Weekend");
@@ -442,7 +450,7 @@ sap.ui.define(
                     }
                     that.appliedLeavesSet = appliedLeavesSet;
                 },
-
+                
                 // Initialize calendar legend
                 onInitializeLegend: function (oEvent) {
                     this.oDatePicker = oEvent.getSource();
@@ -569,20 +577,10 @@ sap.ui.define(
                         return item.ID === oLeaveModel.getData().ID;
                     });
 
-                    // If single day leave
-                    if (sFromDate === sToDate) {
-                        var noOfDays = isHalfDay ? "0.5" : "1";
-                        oLeaveModel.setProperty("/NoofDays", noOfDays);
-                        if (filterData.length !== 0) {
-                            filterData[0].NoofDays = noOfDays;
-                        }
-                        return;
-                    }
-
                     // Calculate business days excluding weekends and holidays
                     var holidays = this.getView().getModel("HolidayModel").getData();
                     var sNoofDays = this.calculateBusinessDays(sFromDate, sToDate, holidays);
-                    if (isHalfDay) {
+                    if (isHalfDay && sNoofDays > 0) {
                         sNoofDays -= 0.5;
                     }
 
