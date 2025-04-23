@@ -24,7 +24,6 @@ sap.ui.define(
                     var that = this;
                     that.commonLoginFunction("ApplyLeave"); // Call common login function
                     that._makeDatePickersReadOnly(["AL_id_DateRangeSelection"]);
-                    BusyIndicator.show(0); // Show busy indicator
                     that.oModel = that.getOwnerComponent().getModel();
                     var loginModel = that.getOwnerComponent().getModel("LoginModel");
                     that.userId = loginModel.getProperty("/EmployeeID");
@@ -39,7 +38,7 @@ sap.ui.define(
                     that.byId("AL_id_LeaveYear").setValue(that.currentYear);
 
                     // Start chained async calls
-                    that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId }).then(() => {
+                    that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId }, ["AL_id_LeaveTableStandard"]).then(() => {
                         return that._fetchCommonData("LeaveType", "leaveTypeModel", { type: "Employee" });
                     }).then(() => {
                         // Set i18n and header
@@ -1003,9 +1002,7 @@ sap.ui.define(
                             }
                         }
                     });
-                    // Show busy indicator
-                    BusyIndicator.show(0);
-                    this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId, ...params }).then(() => {
+                    this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId, ...params}, ["AL_id_LeaveTableStandard"]).then(() => {
                         BusyIndicator.hide();
                     }).catch((error) => {
                         BusyIndicator.hide();

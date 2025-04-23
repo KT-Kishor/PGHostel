@@ -29,8 +29,7 @@
                             dateValue="{LeaveFilterModel>/fromDate}"
                             secondDateValue="{LeaveFilterModel>/toDate}"
                             valueFormat="yyyy-MM-dd"
-                            displayFormat="dd/MM/yyyy"
-                            change="onSelectionChange"/>
+                            displayFormat="dd/MM/yyyy"/>
                     </filterbar:control>
                 </filterbar:FilterGroupItem>
 					<filterbar:FilterGroupItem
@@ -44,7 +43,8 @@
                 value="{LeaveFilterModel>/typeOfLeave}"
 				showClearIcon="true"
 				valueStateText="{i18n>selectTypeOfLeave}"
-                items="{leaveTypeModel>/}">
+                items="{leaveTypeModel>/}"
+                busyIndicatorDelay="0">
 								<core:Item key="{leaveTypeModel>id}" text="{leaveTypeModel>name}"/>
 							</ComboBox>
 						</filterbar:control>

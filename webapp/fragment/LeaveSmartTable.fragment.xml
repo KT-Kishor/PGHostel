@@ -3,6 +3,7 @@
 		<Table id="AL_id_LeaveTableStandard"
 			mode="SingleSelectLeft"
 			selectionChange="onSelectionChange"
+			 busyIndicatorDelay="0"
 			 width="auto"
              items="{path: 'LeaveModel>/'}"
              growing="true"
