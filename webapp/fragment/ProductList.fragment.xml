@@ -8,28 +8,27 @@
         upperCaseAnchorBar="false"
     >
         <headerTitle>
-            <ObjectPageHeader objectTitle="Our SAP Products" />
+            <ObjectPageHeader objectTitle="{i18n>produtsTitle}" />
         </headerTitle>
 
         <headerContent>
             <m:Text
                 class="service-section-text sapUiTinyMargin"
-                text="Explore our range of powerful business tools designed to simplify your workflow and boost productivity, including the following solutions." />
+                text="{i18n>pHeadercontent}" />
         </headerContent>
 
         <sections>
             <ObjectPageSection
                 titleUppercase="false"
-                title="Mini HR Solution"
-            >
+                title="{i18n>minihrsolution}">
                 <subSections>
                     <ObjectPageSubSection titleUppercase="false">
                         <blocks>
                         <m:VBox>
-                        <m:Text
+                        <m:Text 
                 class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
-                text="Empower your HR team with a modern, intuitive, and scalable platform designed to simplify every stage of the employee lifecycle."
-            />
+                text="{i18n>minihrsolutionDesc}" />
+                            <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
                             
                                 <m:GenericTile
@@ -207,11 +206,16 @@
 
             <ObjectPageSection
                 titleUppercase="false"
-                title="Invoice Solution"
+                title="{i18n>invoicsolution}"
             >
                 <subSections>
                     <ObjectPageSubSection titleUppercase="false">
                         <blocks>
+                        <m:VBox >
+                        <m:Text 
+                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
+                text="{i18n>invoicsolutionDesc}" />
+                            <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
@@ -287,18 +291,66 @@
                                     </m:TileContent>
                                 </m:GenericTile>
                             </layout:HorizontalLayout>
+                            </m:VBox>
                         </blocks>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+            <ObjectPageSection
+                titleUppercase="false"
+                title="{i18n>assetsolution}"
+            >
+                <subSections>
+                    <ObjectPageSubSection titleUppercase="false">
+                        <blocks>
+                        <m:VBox>
+                        <m:Text 
+                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
+                text="{i18n>invoicsolutionDesc}" />
+                            <m:Text/>
+                            <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
+                                <m:GenericTile
+                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
+                                    header="{i18n>headerIncomeAsset}"
+                                    subheader="{i18n>uploadscheme}"
+                                >
+                                    <m:TileContent unit="{i18n>createmaintain}">
+                                        <m:ImageContent
+                                            src="sap-icon://time-off"
+                                        />
+                                    </m:TileContent>
+                                </m:GenericTile>
+                                <m:GenericTile
+                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
+                                    header="{i18n>headerAssignment}"
+                                    
+                                >
+                                
+                                    <m:TileContent unit="{i18n>createmaintain}">
+                                        <m:ImageContent
+                                            src="sap-icon://activity-assigned-to-goal"
+                                        />
+                                    </m:TileContent>
+                                </m:GenericTile>
+                            </layout:HorizontalLayout>
+                            </m:VBox>
+                        </blocks>
+
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
 
             <ObjectPageSection
                 titleUppercase="false"
-                title="Automobile Solution"
-            >
+                title="{i18n>automobilesolution}">
                 <subSections>
                     <ObjectPageSubSection titleUppercase="false">
                         <blocks>
+                        <m:VBox>
+                        <m:Text 
+                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
+                text="{i18n>invoicsolutionDesc}" />
+                            <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
@@ -313,17 +365,15 @@
                                 </m:GenericTile>
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
-                                    header="{i18n>createquotation}"
-                                    
-                                >
+                                    header="{i18n>createquotation}">
                                 
                                     <m:TileContent unit="{i18n>subheader}">
                                         <m:ImageContent
-                                            src="sap-icon://account"
-                                        />
+                                            src="sap-icon://account"/>
                                     </m:TileContent>
                                 </m:GenericTile>
                             </layout:HorizontalLayout>
+                            </m:VBox>
                         </blocks>
                     </ObjectPageSubSection>
                 </subSections>
@@ -331,11 +381,15 @@
 
             <ObjectPageSection
                 titleUppercase="false"
-                title="Payroll Solution"
-            >
+                title="{i18n>payrollSolution}">
                 <subSections>
                     <ObjectPageSubSection titleUppercase="false">
                         <blocks>
+                        <m:VBox>
+                        <m:Text 
+                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
+                text="{i18n>invoicsolutionDesc}" />
+                            <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
@@ -397,17 +451,15 @@
                                  <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headmanagepayroll}"
-                                    subheader="{i18n>subheaderpayroll}"
-                                >
+                                    subheader="{i18n>subheaderpayroll}">
                                     <m:TileContent
-                                        unit="{i18n>footerpayroll}"
-                                    >
+                                        unit="{i18n>footerpayroll}" >
                                         <m:ImageContent
-                                            src="sap-icon://payment-approval"
-                                        />
+                                            src="sap-icon://payment-approval"/>
                                     </m:TileContent>
                                 </m:GenericTile>
                             </layout:HorizontalLayout>
+                            </m:VBox>
                         </blocks>
                     </ObjectPageSubSection>
                 </subSections>

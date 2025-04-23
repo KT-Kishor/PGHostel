@@ -22,12 +22,12 @@
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="StartDate" label="{i18n>startDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							 <DateRangeSelection id="MA_id_StartDate" valueFormat="yyyy-MM-dd"  displayFormat="dd/MM/yyyy"  />	
+							 <DateRangeSelection id="MA_id_StartDate" valueFormat="yyyy-MM-dd"  displayFormat="yyyy-MM-dd"  />	
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="EndDate" label="{i18n>endDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-                    <DateRangeSelection id="MA_id_EndDate" valueFormat="yyyy-MM-dd"  displayFormat="dd/MM/yyyy"  />						
+                    <DateRangeSelection id="MA_id_EndDate" valueFormat="yyyy-MM-dd"  displayFormat="yyyy-MM-dd"  />						
 					</fb:control>
 						</fb:FilterGroupItem>
 	

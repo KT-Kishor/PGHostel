@@ -7,42 +7,38 @@
         
                 <!-- SAP UI5 Section -->
                 <VBox class="content-box"  backgroundDesign="Solid" >
-                    <Text class="custom-trainee-title sapUiTinyMargin " text="Master SAP UI5 for your college project and internship"/>
-                    <Text class="description-text" text="Learn the skills you need to take the next step. Adopting ethical behavior, corporate values, and professional communication."/>
-                    <Text class="highlight-text" text="Kalpavriksha Technologies - Transform Your Career With Expert-led Project Training With Certificate of Internship!"/>
+                    <Text class="custom-trainee-title sapUiTinyMargin " text="{i18n>traineesapui5}"/>
+                    <Text class="description-text" text="{i18n>traineeDes1}"/>
+                    <Text class="highlight-text" text="{i18n>traineeDes2}"/>
                     
-                    <Text class="checkmark-text" text="✅ Hands-on, Project-Based Learning"/>
-                    <Text class="checkmark-text" text="✅ Expert Trainings and Mentorship"/>
-                    <Text class="checkmark-text" text="✅ Job-Ready Skills and Certification"/>
+                    <Text class="checkmark-text" text="✅ {i18n>traineeUi5highlight}"/>
+                    <Text class="checkmark-text" text="✅ {i18n>traineeUi5highlight2}"/>
+                    <Text class="checkmark-text" text="✅ {i18n>traineeUi5highlight3}"/>
                     
-                    <Text class="section-title" text="Training Includes"/>
-                    <Text class="training-text" text="▪ SAP UI5, HANA, and OData Integration"/>
-                    <Text class="training-text" text="▪ Build Responsive Enterprise Applications"/>
-                    <Text class="training-text" text="▪ Real-World Project Portfolio"/>
+                    <Text class="section-title" text="{i18n>traineeInclude}"/>
+                    <Text class="training-text" text="▪ {i18n>traineeInclude1}"/>
+                    <Text class="training-text" text="▪ {i18n>traineeInclude2}"/>
+                    <Text class="training-text" text="▪ {i18n>traineeInclude3}"/>
+                    <HBox justifyContent="End">
+                <Button text="{i18n>careersapply}"  press="onUI5ress" class="big-apply-button sapUiLargeMarginEnd" type="Emphasized"/>
+            </HBox> 
                 </VBox>
-
-                
                 <VBox class="content-box"  backgroundDesign="Solid">
-                    <Text class="custom-trainee-title sapUiTinyMargin " text="Master CAPM for your career Growth and leadership"/>
-                    <Text class="description-text" text="Get certified in CAPM with hands-on experience, live projects, and industry-recognized certification."/>
-                    <Text class="highlight-text" text="Kalpavriksha Technologies - Advance Your Career with CAPM Training and Certification!"/>
+                    <Text class="custom-trainee-title sapUiTinyMargin " text="{i18n>traineeCapmtitle}"/>
+                    <Text class="description-text" text="{i18n>traineeCapmhighlight}"/>
+                    <Text class="highlight-text" text="{i18n>traineeCapmhighlight2}"/>
                     
-                    <Text class="checkmark-text" text="✅ Comprehensive CAPM Training"/>
-                    <Text class="checkmark-text" text="✅ Industry-Recognized Certification"/>
-                    <Text class="checkmark-text" text="✅ Project Management Skills"/>
+                    <Text class="checkmark-text" text="✅ {i18n>traineeCapmDes1}"/>
+                    <Text class="checkmark-text" text="✅ {i18n>traineeCapmDes2}"/>
+                    <Text class="checkmark-text" text="✅ {i18n>traineeCapmDes3}"/>
 
-                    <Text class="section-title" text="Training Includes"/>
-                    <Text class="training-text" text="▪ CAPM Fundamentals and Exam Preparation"/>
-                    <Text class="training-text" text="▪ Agile and Traditional Project Management"/>
-                    <Text class="training-text" text="▪ Real-World Case Studies"/>
+                    <Text class="section-title" text="{i18n>traineeInclude}"/>
+                    <Text class="training-text" text="▪ {i18n>traineeCapminclude}"/>
+                    <Text class="training-text" text="▪ {i18n>traineeCapminclude2}"/>
+                    <Text class="training-text" text="▪ {i18n>traineeCapminclude3}"/>
+                     <HBox justifyContent="End">
+                <Button text="{i18n>careersapply}"  press="onCapmpress" class="big-apply-button sapUiLargeMarginEnd" type="Emphasized"/>
+            </HBox>
                 </VBox>
-
              </l:Grid>
-            <!-- Common Apply Now Button -->
-       <FlexBox alignItems="Center" justifyContent="Center" class="btnclass" >
-            <Button text="Apply Now" class="apply-button" press="Tbtn_onPress" type="Emphasized"/>
-              </FlexBox>
-        
-
-   
 </core:FragmentDefinition>

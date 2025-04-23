@@ -20,7 +20,7 @@
                 <Label text="{i18n>startDate}" required="true"/>
                 <DatePicker minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"
-                    change="AT_validateDate"
+                    change="MA_onstartDatevalidateDate"
                     value="{EditTaskModel>/StartDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"

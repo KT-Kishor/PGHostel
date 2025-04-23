@@ -12,9 +12,7 @@ sap.ui.define(
       "sap.kt.com.minihrsolution.controller.HomePage",
       {
         onInit: function () {
-          this.getRouter()
-            .getRoute("RouteHomePage")
-            .attachMatched(this._onRouteMatched, this);
+          this.getRouter().getRoute("RouteHomePage").attachMatched(this._onRouteMatched, this);
           var oFormData = new JSONModel({
             CustomerName: "",
             CompanyName: "",
@@ -31,8 +29,8 @@ sap.ui.define(
             Name: "",
             CollegeName: "",
             EmailID: "",
+            Course: "",
             MobileNo: "",
-            SelectCourse: "",
             Comments: "",
           });
 
@@ -155,26 +153,6 @@ sap.ui.define(
           var oItem = oEvent.getParameter("item");
           this.byId("pageContainer").to(this.byId(oItem.getKey()));
         },
-
-        onTilePress: function () {
-          var iframe = document.createElement("iframe");
-          iframe.setAttribute("width", "640");
-          iframe.setAttribute("height", "360");
-          iframe.setAttribute(
-            "src",
-            "https://www.youtube.com/embed/PdBkOcrmqbo"
-          );
-          iframe.setAttribute("frameborder", "0");
-          iframe.setAttribute(
-            "allow",
-            "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          );
-          iframe.setAttribute("allowfullscreen", "");
-
-          var oContainer = this.byId("pageContainer").getDomRef();
-          oContainer.innerHTML = ""; // Clear any existing content
-          oContainer.appendChild(iframe);
-        },
         onpressLogin: function () {
           this.getRouter().navTo("RouteLoginPage");
         },
@@ -265,7 +243,8 @@ sap.ui.define(
           }
         },
 
-        Tbtn_onPress: function () {
+        onUI5ress: function () {
+          this.selectedCourse = "SAP UI5"; // Set selected course
           var oView = this.getView();
           if (!this.oDialog) {
             sap.ui.core.Fragment.load({
@@ -282,6 +261,26 @@ sap.ui.define(
             this.oDialog.open();
           }
         },
+
+        onCapmpress: function () {
+          this.selectedCourse = "CAPM"; // Set selected course
+          var oView = this.getView();
+          if (!this.oDialog) {
+            sap.ui.core.Fragment.load({
+              name: "sap.kt.com.minihrsolution.fragment.TraningForm",
+              controller: this,
+            }).then(
+              function (oDialog) {
+                this.oDialog = oDialog;
+                oView.addDependent(this.oDialog);
+                this.oDialog.open();
+              }.bind(this)
+            );
+          } else {
+            this.oDialog.open();
+          }
+        },
+
         FTF_onlivename: function (oEvent) {
           utils._LCvalidateName(oEvent);
         },
@@ -294,76 +293,47 @@ sap.ui.define(
         FTF_onlivemobile: function (oEvent) {
           utils._LCvalidateMobileNumber(oEvent);
         },
-        FTF_onSelectionchange: function (oEvent) {
-          utils._LCvalidationComboBox(oEvent);
-        },
         FTF_onlivecomment: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
 
         FTF_onSubmitForm: function () {
           var oModel = this.getView().getModel("TraineeData");
-          var oData = JSON.parse(JSON.stringify(oModel.getData())); // Deep copy
+          var oData = JSON.parse(JSON.stringify(oModel.getData()));
 
-          // Get MultiComboBox Selected Values
-          var oMultiComboBox = sap.ui.getCore().byId("FTF_idMultiSelectCourse");
-          var aSelectedKeys = oMultiComboBox
-            .getSelectedKeys()
-            .filter((key) => key.trim() !== ""); // Get all selected keys as an array
-
-          // Convert Array to Comma-Separated String
-          oData.SelectCourse = aSelectedKeys.join(", "); // Example: "SAP UI5, HANA, OData"
-
-          var opayload = oData; // Wrap data in an array
-
+          // Add selected course from button press
+          oData.Course = this.selectedCourse || ""; // fallback to empty if not set
           var that = this;
           if (
             utils._LCvalidateName(sap.ui.getCore().byId("FTF_idName"), "ID") &&
-            utils._LCvalidateMandatoryField(
-              sap.ui.getCore().byId("FTF_idClgname"),
-              "ID"
-            ) &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FTF_idClgname"), "ID") &&
             utils._LCvalidateEmail(sap.ui.getCore().byId("FTF_idmail"), "ID") &&
-            utils._LCvalidateMobileNumber(
-              sap.ui.getCore().byId("FTF_idMobnumber"),
-              "ID"
-            ) &&
-            utils._LCvalidationComboBox(
-              sap.ui.getCore().byId("FTF_idMultiSelectCourse"),
-              "ID"
-            ) &&
-            utils._LCvalidateMandatoryField(
-              sap.ui.getCore().byId("FTF_idcomments"),
-              "ID"
-            )
+            utils._LCvalidateMobileNumber(sap.ui.getCore().byId("FTF_idMobnumber"), "ID") &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FTF_idcomments"), "ID")
           ) {
-            //  AJAX Call to Save Data
             $.ajax({
               url: this.API + "/Training",
               type: "POST",
               headers: {
                 "Content-Type": "application/json",
                 name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                password:
-                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+                password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
               },
-              data: JSON.stringify({ data: opayload }), //  Sending formatted data
+              data: JSON.stringify({ data: oData }),
               success: function (response) {
                 var resetData = {
                   Name: "",
                   CollegeName: "",
                   EmailID: "",
                   MobileNo: "",
-                  SelectCourse: [], //  Reset MultiComboBox
                   Comments: "",
                 };
-
                 oModel.setData(resetData);
                 oModel.refresh(true);
                 that.oDialog.close();
-                MessageToast.show("Data saved successfully!");
+                MessageToast.show(that.i18nModel.getText("msgTraineeformSuccess"));
               },
-              error: function (xhr, status, error) {
+              error: function () {
                 MessageToast.show("Error saving data. Please try again.");
               },
             });
@@ -374,14 +344,12 @@ sap.ui.define(
 
         FTF_onCancelform: function () {
           var oModel = this.getView().getModel("TraineeData");
-
           // Reset Data Model
           var resetData = {
             Name: "",
             CollegeName: "",
             EmailID: "",
             MobileNo: "",
-            SelectCourse: [], // Reset MultiComboBox
             Comments: "",
           };
           oModel.setData(resetData);
@@ -394,7 +362,6 @@ sap.ui.define(
             "FTF_idmail",
             "FTF_idMobnumber",
             "FTF_idcomments",
-            "FTF_idMultiSelectCourse",
           ];
 
           aFields.forEach(function (sFieldId) {
@@ -403,7 +370,6 @@ sap.ui.define(
               oField.setValueState("None");
             }
           });
-
           // Close the Dialog
           this.oDialog.close();
         },

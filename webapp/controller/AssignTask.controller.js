@@ -287,7 +287,6 @@ sap.ui.define(
               successCount++;
             }
           }
-
           if (successCount > 0) {
             MessageToast.show("Employee assigned successfully!");
             await this._fetchCommonData("AssignedTask", "AssignModel", { TaskID: sTaskID });
@@ -310,7 +309,6 @@ sap.ui.define(
             MessageToast.show(this.i18nModel.getText("smgSelecttask"));
             return;
           }
-
           const oEditModel = this.getView().getModel("EditTaskModel");
           const oData = { ...oEditModel.getData() }; // Clone data to prevent reference issues
           const oTaskId = oSelectedItem.getBindingContext("AssignModel").getProperty("EmployeeID");

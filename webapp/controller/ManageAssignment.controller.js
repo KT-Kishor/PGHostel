@@ -24,7 +24,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteTilePage");
         },
         onLogout: function () {
-          this.getRouter().navTo("RouteLoginPage");
+          this.CommonLogoutFunction();
         },
         MA_onCreateTask: function () {
           this.manageTaskDetails(false); // false means create
@@ -125,6 +125,8 @@ sap.ui.define(
           }
           var TaskType = sap.ui.getCore().byId("FNA_id_Tasktype").getSelectedKey();
           oData.TaskType = TaskType;
+          oData.StartDate = oData.StartDate.split("/").reverse().join('-');
+          oData.EndDate = oData.EndDate.split("/").reverse().join('-');
           BusyIndicator.show(0);
           const response = await this.ajaxCreateWithJQuery("NewTask", {
             data: oData,
@@ -149,13 +151,11 @@ sap.ui.define(
           }
           const oData = this.getView().getModel("EditTaskModel").getData();
           const oTaskId = oSelectedItem.getBindingContext("TaskModel").getProperty("TaskID");
-
           const requestData = { filters: { TaskID: oTaskId }, data: oData };
           BusyIndicator.show(0);
           const response = await this.ajaxUpdateWithJQuery("/NewTask",
             requestData
           );
-
           if (response.success === true) {
             BusyIndicator.hide();
             MessageToast.show("Task updated successfully!");
@@ -167,19 +167,26 @@ sap.ui.define(
             MessageToast.show("Failed to update task.");
           }
         },
-        MA_onSearch: function () {
+
+        MA_onSearch: async function () {
           var aFilterItems = this.byId("MA_id_FilterBar").getFilterGroupItems();
+          var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
           var params = {};
           aFilterItems.forEach(function (oItem) {
             var oControl = oItem.getControl();
             var sValue = oItem.getName();
             if (oControl && oControl.getValue()) {
-              params[sValue] = oControl.getValue();
+              if (sValue === "StartDate") {
+                params["startDate"] = oDateFormat.format(new Date(oControl.getValue().split(' - ')[0]));
+                params["endDate"] = oDateFormat.format(new Date(oControl.getValue().split(' - ')[1]));
+              } else {
+                params[sValue] = oControl.getValue();
+              }
             }
           });
-          this._fetchCommonData("NewTask", "TaskModel", params);
-          this.CommonReadcall(params);
+          await this.CommonReadcall(params);// read call for trainee after filter
         },
+
         CommonReadcall: async function (params) {
           try {
             BusyIndicator.show(0);
@@ -204,6 +211,18 @@ sap.ui.define(
           this.getRouter().navTo("RouteAssignTask", {
             taskID: oSelectedItem.TaskID, // Pass actual TaskID
           });
+        },
+        MA_onstartDatevalidateDate: function (oEvent) {
+          const oStartDate = oEvent.getSource().getDateValue(); // get selected start date
+          const oEndDatePicker = sap.ui.getCore().byId("NAF_id_EndDate");
+
+          if (oEndDatePicker) {
+            let oEndDate = oEndDatePicker.getDateValue();
+            oEndDatePicker.setMinDate(oStartDate);
+            if (oEndDate && oEndDate < oStartDate) {
+              oEndDatePicker.setDateValue(null);
+            }
+          }
         },
 
       }
