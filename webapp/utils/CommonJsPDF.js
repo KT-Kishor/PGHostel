@@ -26,6 +26,8 @@ sap.ui.define([], function () {
                 const bottomLimit = pageHeight - footerHeight;
                 let currentY;
 
+                doc.setFont("times").setFontSize(12);
+
                 function checkPageBreak(currentYPosition) {
 
                     if (currentYPosition >= bottomLimit) {
@@ -45,11 +47,8 @@ sap.ui.define([], function () {
                 doc.setGState(new doc.GState({ opacity: 1 }));
                 doc.setFontSize(12);
 
-                let addressLines = doc.splitTextToSize(
-                    oCompanyModel.longAddress,
-                    80
-                );
-                let addressY = currentYPosition + 20;
+                let addressLines = doc.splitTextToSize(oCompanyModel.longAddress, 75);
+                let addressY = currentYPosition + 15;
                 addressLines.forEach((line) => {
                     let textWidth = doc.getTextWidth(line); // Measure text width
                     let xPosition = pageWidth - textWidth - margin; // Align to right
@@ -69,8 +68,7 @@ sap.ui.define([], function () {
                 let emailX = pageWidth - carrerEmailWidth - margin;
                 doc.text(carrerEmail, emailX, emailY);
 
-                doc.setFont("times").setFontSize(12);
-                let dateY = emailY + 6.5;
+                let dateY = 65;
                 doc.text(oModel.CreateDate, margin, dateY);
 
                 let currentAfterDateY = dateY;
@@ -325,7 +323,7 @@ sap.ui.define([], function () {
                         doc.text(headers[i - 1].Title, margin + 5, headerY);
 
                         // Draw Text with normal font
-                        doc.text(headers[i - 1].Text, pageMiddle + 10, headerY);
+                        doc.text(`: ${headers[i - 1].Text}`, margin + 25, headerY);
 
                         // Increment Y position for the next header (adjust as per line height)
                         headerY += 8;

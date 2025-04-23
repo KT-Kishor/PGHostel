@@ -104,21 +104,25 @@ sap.ui.define([], function () {
                     }
 
                     currentY = titleContentY; // Start initial Y position
-                    doc.setFont("times", "bold");
+                    doc.setFont("times", "normal");
 
                     for (let i = 1; i <= content.length; i++) {
-                        if (!content[i - 1]?.PointNo || !content[i - 1]?.PointTitle) break; // Break if data is missing to avoid errors
+                        if (!content[i - 1]?.PointNo) break; // Break if data is missing to avoid errors
                         currentY += 2; // Add extra spacing between points
                         currentY = checkPageBreak(currentY);
                         // Add Point Number and Point Title
-                        doc.setTextColor(0, 111, 191);
-                        doc.text(`${content[i - 1].PointNo}.`, margin + (paraMargin - 6), currentY);
-                        doc.text(content[i - 1].PointTitle, margin + paraMargin, currentY);
-                        doc.setTextColor(0, 0, 0);
-
-                        doc.setFont("times", "normal");
-                        currentY += 10; // Increment Y position for the content section
-
+                        if (content[i - 1].PointTitle) {
+                            doc.setFont("times", "bold");
+                            doc.setTextColor(0, 111, 191);
+                            doc.text(`${content[i - 1].PointNo}.`, margin + (paraMargin - 6), currentY);
+                            doc.text(content[i - 1].PointTitle, margin + paraMargin, currentY);
+                            doc.setTextColor(0, 0, 0);
+                            doc.setFont("times", "normal");
+                            currentY += 10; // Increment Y position for the content section
+                        }
+                        else {
+                            doc.text(`${content[i - 1].PointNo}.`, margin + (paraMargin - 6), currentY);
+                        }
                         let pointContentY = currentY;
                         let pointContentTemplate = new Function("oCompanyModel", "oModel", `return ${content[i - 1].PointDesc};`)(oCompanyModel, oModel);
 
@@ -160,7 +164,6 @@ sap.ui.define([], function () {
                         });
 
                         currentY = pointContentY; // Update Y position for the next PointTitle
-                        doc.setFont("times", "bold");
                     }
 
                     let pointContentLastY = currentY + 5;
@@ -172,6 +175,7 @@ sap.ui.define([], function () {
                         doc.setGState(new doc.GState({ opacity: 1 }));
                         pointContentLastY = topMargin;
                     }
+                    doc.setFont("times", "bold");
                     var pointContentLast = `Understood and agreed to by the duly authorized representative of ${oCompanyModel.companyName} and ${oModel.ClientCompanyName}`;
                     let pointContentLastLines = doc.splitTextToSize(pointContentLast, maxWidth);
                     pointContentLastLines.forEach((line) => {

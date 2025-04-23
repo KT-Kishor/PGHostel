@@ -119,6 +119,11 @@
     "ClientRole": "CEO",
     "AgreementDuration": "12",
     "PaymentTerms": "1",
+    "PaymentPerc": "(Payment Percentage)",
+    "FirstHalfPerc": "(First Half Percentage)",
+    "SecondHalfPerc": "(Second Half Percentage)",
+    "CandidateWorkingMonths": "(Candidate Working Months)",
+    "LatePaymentThreshold": "(Late Payment Threshold)",
 
     "SOWCreateDate": "01/04/2025",
     "SOWStartDate": "02/04/2025",
