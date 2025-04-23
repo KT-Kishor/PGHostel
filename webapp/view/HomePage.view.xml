@@ -49,10 +49,10 @@
 					</ScrollContainer>
 					<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding service-background sapUiTinyMargin">
 						<l:Grid defaultSpan="XL7 L7 M12 S12" class="sapUiSmallMarginTop">
-							<Text class="custom-aboutus sapUiLargeMarginTop" textAlign="Left" text="{i18n>aboutUscontent1}"/>
-							<Text class="custom-aboutus sapUiTinyMarginTop" textAlign="Left" text="{i18n>aboutUscontent2}"/>
-							<Text class="custom-aboutus sapUiTinyMarginTop" textAlign="Left" text="{i18n>aboutUscontent3}"/>
-							<Text class="custom-aboutus sapUiTinyMarginTop" textAlign="Left" text="{i18n>aboutUscontent4}"/>
+							<Text class="custom-aboutus " textAlign="Left" text="{i18n>aboutUscontent1}"/>
+							<Text class="custom-aboutus " textAlign="Left" text="{i18n>aboutUscontent2}"/>
+							<Text class="custom-aboutus" textAlign="Left" text="{i18n>aboutUscontent3}"/>
+							<Text class="custom-aboutus" textAlign="Left" text="{i18n>aboutUscontent4}"/>
 						</l:Grid>
 					</ScrollContainer>
 				
@@ -69,7 +69,7 @@
 					
 					width="2"
 					title="{i18n>careersJointeam}" >
-										<Text text="{i18n>careersDes}" />
+										<Text text="{i18n>careersDes}" class="carrer-Des" />
 									</l:BlockLayoutCell>
 								</l:BlockLayoutRow>
 								<l:BlockLayoutRow >

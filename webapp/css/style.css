@@ -171,6 +171,9 @@
 
 }
 
+.carrer-Des{
+  font-family: sans-serif;
+}
 .career-background {
   background-image: url('../image/career1.jpg');
   background-size: cover;
@@ -268,21 +271,38 @@ border-radius: 0.60rem;
 }
 .highlight-text {
   font-size: 16px;
-  font-weight: bold;
+  font-family: sans-serif;
+  color: #2964d9;
+  margin-bottom: 10px;
+  line-height: 1.5rem !important;
+}
+.product-des{
+  margin-left: 18px;
+  font-family: sans-serif;
+  font-size: 16px !important;
+  color: #2964d9;
+}
+
+.products-title{
+  font-size: 20px;
+  /* font-weight: bold; */
   color: #2964d9;
   margin-bottom: 10px;
   line-height: 1.5rem !important;
 }
 .checkmark-text{
   display: block;
-    margin-bottom: 12px
+  margin-bottom: 12px;
+  font-family: sans-serif;
 }
 .training-text{
   margin-left: 0.5rem;
+  font-family: sans-serif;
   margin-bottom: 12px
   }
   .description-text {
     font-size: 16px;
+    font-family: sans-serif;
     line-height: 1.5rem !important;
     color: #555;
     margin-bottom: 10px;
@@ -377,6 +397,7 @@ border-radius: 0.60rem;
 
 .service-section-text {
   line-height: 1.8;
+  font-family: sans-serif;
   font-size: 16px;
 }
 
@@ -399,9 +420,8 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 
 .custom-contact-title {
   font-size: 36px;
-  font-family: fangsong;
+  font-family: Helvetica, sans-serif;
   color: black;
-  font-weight: bold;
   max-width: 700px;
   line-height: 1.8;
 }

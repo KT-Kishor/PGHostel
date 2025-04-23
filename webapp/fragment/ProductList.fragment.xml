@@ -7,13 +7,9 @@
     <ObjectPageLayout
         upperCaseAnchorBar="false"
     >
-        <headerTitle>
-            <ObjectPageHeader objectTitle="{i18n>produtsTitle}" />
-        </headerTitle>
-
         <headerContent>
             <m:Text
-                class="highlight-text sapUiTinyMargin"
+                class="products-title sapUiTinyMargin"
                 text="{i18n>pHeadercontent}" />
         </headerContent>
 
@@ -33,6 +29,20 @@
                             
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
+                                    header="{i18n>headerTrainee}"
+                                    subheader="{i18n>subhead}"
+                                >
+                                    <m:TileContent
+                                        unit="{i18n>GeneratePDF}"
+                                        footer="{i18n>SendMail}"
+                                    >
+                                        <m:ImageContent
+                                            src="sap-icon://employee-approvals"
+                                        />
+                                    </m:TileContent>
+                                </m:GenericTile>
+                                <m:GenericTile
+                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headerEmployeeOffer}"
                                     subheader="{i18n>subhead}"
                                 >
@@ -45,7 +55,6 @@
                                         />
                                     </m:TileContent>
                                 </m:GenericTile>
-
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headerContractDetails}"
@@ -61,20 +70,6 @@
                                     </m:TileContent>
                                 </m:GenericTile>
 
-                                <m:GenericTile
-                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
-                                    header="{i18n>headerTrainee}"
-                                    subheader="{i18n>subhead}"
-                                >
-                                    <m:TileContent
-                                        unit="{i18n>GeneratePDF}"
-                                        footer="{i18n>SendMail}"
-                                    >
-                                        <m:ImageContent
-                                            src="sap-icon://employee-approvals"
-                                        />
-                                    </m:TileContent>
-                                </m:GenericTile>
 
                                 <m:GenericTile
                                     id="idGenericTile"
@@ -217,19 +212,7 @@
                 text="{i18n>invoicsolutionDesc}" />
                             <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
-                                <m:GenericTile
-                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
-                                    header="{i18n>headerQuotation}"
-                                >
-                                    <m:TileContent
-                                        unit="{i18n>subheader}"
-                                    >
-                                        <m:ImageContent
-                                            src="sap-icon://account"
-                                        />
-                                    </m:TileContent>
-                                </m:GenericTile>
-                                <m:GenericTile
+                            <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headerMSA}"
                                     subheader="{i18n>subhead}"
@@ -255,6 +238,31 @@
                                         />
                                     </m:TileContent>
                                 </m:GenericTile>
+                                <m:GenericTile
+                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
+                                    header="{i18n>tilesgeneratePo}"
+                                >
+                                    <m:TileContent
+                                        unit="{i18n>GeneratePDF}"
+                                    >
+                                        <m:ImageContent
+                                            src="sap-icon://add-document"
+                                        />
+                                    </m:TileContent>
+                                </m:GenericTile>
+                                <m:GenericTile
+                                   class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
+                                    header="{i18n>headerQuotation}"
+                                >
+                                    <m:TileContent
+                                        unit="{i18n>subheader}"
+                                    >
+                                        <m:ImageContent
+                                            src="sap-icon://account"
+                                        />
+                                    </m:TileContent>
+                                </m:GenericTile>
+                                
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headerCustomer}"
