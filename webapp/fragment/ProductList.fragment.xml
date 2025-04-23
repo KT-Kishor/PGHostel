@@ -13,7 +13,7 @@
 
         <headerContent>
             <m:Text
-                class="service-section-text sapUiTinyMargin"
+                class="highlight-text sapUiTinyMargin"
                 text="{i18n>pHeadercontent}" />
         </headerContent>
 
@@ -26,10 +26,10 @@
                         <blocks>
                         <m:VBox>
                         <m:Text 
-                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
+                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop highlight-text"
                 text="{i18n>minihrsolutionDesc}" />
                             <m:Text/>
-                            <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
+                            <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
                             
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
@@ -213,10 +213,10 @@
                         <blocks>
                         <m:VBox >
                         <m:Text 
-                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
+                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop highlight-text"
                 text="{i18n>invoicsolutionDesc}" />
                             <m:Text/>
-                            <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
+                            <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headerQuotation}"
@@ -305,14 +305,14 @@
                         <blocks>
                         <m:VBox>
                         <m:Text 
-                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
+                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop highlight-text"
                 text="{i18n>assetsolutionDesc}" />
                             <m:Text/>
-                            <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
+                            <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headerIncomeAsset}"
-                                    subheader="{i18n>uploadscheme}"
+                                    
                                 >
                                     <m:TileContent unit="{i18n>createmaintain}">
                                         <m:ImageContent
@@ -348,10 +348,10 @@
                         <blocks>
                         <m:VBox>
                         <m:Text 
-                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
+                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop highlight-text"
                 text="{i18n>automobilesolutionDesc}" />
                             <m:Text/>
-                            <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
+                            <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>schemeupload}"
@@ -387,10 +387,10 @@
                         <blocks>
                         <m:VBox>
                         <m:Text 
-                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
+                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop highlight-text"
                 text="{i18n>payrollSolutionDesc}" />
                             <m:Text/>
-                            <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
+                            <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>generatesalary}"

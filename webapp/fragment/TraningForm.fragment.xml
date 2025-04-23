@@ -26,7 +26,7 @@
         
         <buttons>
             <Button text="{i18n>submit}" type="Emphasized" press="FTF_onSubmitForm"/>
-            <Button text="{i18n>cancel}" type="Reject" press="FTF_onCancelform"/>
+            <Button text="{i18n>CancelButton}" type="Reject" press="FTF_onCancelform"/>
         </buttons>
     </Dialog>
 

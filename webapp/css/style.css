@@ -301,9 +301,10 @@ border-radius: 0.60rem;
   }
   .custom-trainee-title{
     font-size: 30px;
-    font-family: fangsong;
+    font-family: Helvetica, sans-serif;
     color: black;
-    font-weight: bold;
+    line-height: 1.9;
+    /* font-weight: bold; */
     max-width: 700px;
   }
   .section-title {

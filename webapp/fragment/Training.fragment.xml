@@ -7,7 +7,7 @@
         
                 <!-- SAP UI5 Section -->
                 <VBox class="content-box"  backgroundDesign="Solid" >
-                    <Text class="custom-trainee-title sapUiTinyMargin " text="{i18n>traineesapui5}"/>
+                    <Text class="custom-trainee-title" text="{i18n>traineesapui5}"/>
                     <Text class="description-text" text="{i18n>traineeDes1}"/>
                     <Text class="highlight-text" text="{i18n>traineeDes2}"/>
                     
@@ -24,7 +24,7 @@
             </HBox> 
                 </VBox>
                 <VBox class="content-box"  backgroundDesign="Solid">
-                    <Text class="custom-trainee-title sapUiTinyMargin " text="{i18n>traineeCapmtitle}"/>
+                    <Text class="custom-trainee-title " text="{i18n>traineeCapmtitle}"/>
                     <Text class="description-text" text="{i18n>traineeCapmhighlight}"/>
                     <Text class="highlight-text" text="{i18n>traineeCapmhighlight2}"/>
                     
