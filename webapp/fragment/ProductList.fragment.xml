@@ -306,7 +306,7 @@
                         <m:VBox>
                         <m:Text 
                 class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
-                text="{i18n>invoicsolutionDesc}" />
+                text="{i18n>assetsolutionDesc}" />
                             <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
                                 <m:GenericTile
@@ -349,7 +349,7 @@
                         <m:VBox>
                         <m:Text 
                 class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
-                text="{i18n>invoicsolutionDesc}" />
+                text="{i18n>automobilesolutionDesc}" />
                             <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
                                 <m:GenericTile
@@ -388,7 +388,7 @@
                         <m:VBox>
                         <m:Text 
                 class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop service-section-text"
-                text="{i18n>invoicsolutionDesc}" />
+                text="{i18n>payrollSolutionDesc}" />
                             <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiMediumMargin">
                                 <m:GenericTile
