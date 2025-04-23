@@ -611,11 +611,11 @@ sap.ui.define([
             displaySalaryDetails: function (salaryDetailsArray) {
                 var oVBox = this.getView().byId("SS_id_FormsContainer");
                 oVBox.removeAllItems();
-                salaryDetailsArray.forEach(function (offerData) {      
+                salaryDetailsArray.forEach(function (offerData, index) {
                     var effectiveDate = offerData.EffectiveDate || "";
-                    var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(effectiveDate)} , Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
+                    var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(effectiveDate)}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
             
-                    // === Monthly Form ===
+                    // Monthly Form
                     var oMonthlyForm = new sap.ui.layout.form.SimpleForm({
                         editable: false,
                         layout: "ResponsiveGridLayout",
@@ -664,7 +664,7 @@ sap.ui.define([
                         ]
                     });
             
-                    // === Yearly Form ===
+                    // Yearly Form
                     var oYearlyForm = new sap.ui.layout.form.SimpleForm({
                         editable: false,
                         layout: "ResponsiveGridLayout",
@@ -712,14 +712,13 @@ sap.ui.define([
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
                         ]
                     });
-            
-                    // === HBox for Monthly & Yearly ===
+                    // HBox
                     var oTopHBox = new sap.m.HBox({
                         justifyContent: "SpaceAround",
                         items: [oMonthlyForm, oYearlyForm]
                     });
             
-                    // === Summary Section (in same panel) ===
+                    // Summary
                     var oSummaryFlex = new sap.m.FlexBox({
                         direction: "Row",
                         wrap: "Wrap",
@@ -762,25 +761,30 @@ sap.ui.define([
                             })
                         ]
                     });
-            
+                    // Panel
                     var oPanel = new sap.m.Panel({
-                        headerText: sTitleText,
+                        headerToolbar: new sap.m.Toolbar({
+                            content: [
+                                new sap.m.Title({
+                                    text: sTitleText,
+                                    level: "H4",
+                                    wrapping: true
+                                })
+                            ]
+                        }),
                         expandable: true,
                         expanded: true,
                         content: [
                             new sap.m.VBox({
-                                items: [
-                                    oTopHBox,
-                                    new sap.m.Label({ text: "Summary" }).addStyleClass("boldBlackText"),
-                                    oSummaryFlex
-                                ]
+                                items: [oTopHBox, new sap.m.Label({ text: "Summary" }).addStyleClass("boldBlackText"), oSummaryFlex]
                             })
                         ]
-                    }).addStyleClass("sapUiMediumMarginBottom"); // 👈 Adds space between panels
+                    }).addStyleClass("sapUiSmallMarginBottom"); // Adds spacing between panels
             
                     oVBox.addItem(oPanel);
                 }.bind(this));
-            },
+            },   
+                     
             //On icon tab select function
             SS_onTabSelect: function (oEvent) {
                 var oView = this.getView();
