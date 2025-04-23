@@ -39,8 +39,8 @@
 
 /* text style*/
 .boldBlackText {
-  font-weight: bold;
-  color: black;
+  font-weight: bold !important;
+  color: black !important;
 }
 
 /* text style*/

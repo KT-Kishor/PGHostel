@@ -2,9 +2,7 @@ sap.ui.define([], function () {
     "use strict";
     return {  
         formatDate: function (sDate) {
-            // if (!sDate || sDate === "1899-11-30T00:00:00.000Z" ) {
-            //     return "";
-            // }
+
             if (sDate) {
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" });
                 return oDateFormat.format(new Date(sDate));

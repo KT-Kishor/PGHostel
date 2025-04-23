@@ -193,7 +193,7 @@ sap.ui.define([
                                 VariablePercentage: oSelectedData.VariablePercentage,
                                 GrossPayMontly: oSelectedData.GrossPayMontly,
                                 HikePercentage: oSelectedData.HikePercentage,
-                                EffectiveDate: oSelectedData.EffectiveDate,
+                                EffectiveDate: oSelectedData.JoiningDate,
                             });
                             that.getView().setModel(oEmployeeDetailsModel, "oEmpolyeeDetailsModel");
                             that._commonFragmentOpenOffer(that, "OnboardEmployee");
