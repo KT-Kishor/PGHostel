@@ -27,6 +27,8 @@
 						<ObjectPageSubSection title="{i18n>basicDetails}">
 							<blocks>
 								<f:SimpleForm 
+								busyIndicatorDelay="0"
+								id="MsaEdit_Id_Form"
                                     editable="true"
                                     layout="ResponsiveGridLayout"
 									labelSpanXL="4"
@@ -46,7 +48,7 @@
 									<f:toolbar>
 											<m:Toolbar>												
 												<m:ToolbarSpacer />
-												<m:Button  text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" type="{= ${simpleForm>/editable} ? 'Accept' : 'Neutral' }" press="MsaE_onEditOrSavePress" />
+												<m:Button  text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" type="{= ${simpleForm>/editable} ? 'Accept' : 'Transparent' }" press="MsaE_onEditOrSavePress" />
 												<m:Button text="{i18n>tileFooter}" enabled="{simpleForm>/isEnabled}" press="MsaE_onSendEmailMSA" />
 												<m:Button text="{i18n>tileUnit}" enabled="{simpleForm>/isEnabled}"  press="MsaE_onPressMerge"  />
 											</m:Toolbar>
@@ -112,7 +114,7 @@
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="{i18n>sowDetails}">
 							<blocks>
-								<m:Table  >
+								<m:Table  busyIndicatorDelay="0" id="Sow_Id_ReadTable" >
 								<m:headerToolbar>
 										<m:OverflowToolbar>
 									 <m:Title text="{i18n>sowTitle}"/>

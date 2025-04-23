@@ -17,8 +17,11 @@ sap.ui.define([
 
             _onRouteMatched: async function (oEvent) {
                 // this.commonLoginFunction("MSA&SOW");
-                this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
-                this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                if (!this.getView().getModel("ContractpaymentModel") && !this.getView().getModel("BaseLocationModel")) {
+                    this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+                    this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                }
+
                 this.MSAID = oEvent.getParameter("arguments").sPath;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 await this.MSADetailsReadCall();
@@ -37,8 +40,7 @@ sap.ui.define([
             MSADetailsReadCall: async function () {
                 BusyIndicator.show(0);
                 try {
-                    var response = await this._fetchCommonData("MSADetails", "FilteredMsaModel", {MsaID: this.MSAID});
-
+                    await this._fetchCommonData("MSADetails", "FilteredMsaModel", {MsaID: this.MSAID});
                     if (this.getView().getModel("FilteredMsaModel").getData()[0].Type === "Recruitment") {
                         this.byId("MsaD_id_Type").setSelectedIndex(0); // First RadioButton
                     } else {
@@ -116,6 +118,7 @@ sap.ui.define([
             },
 
             onPressSave: async function () {
+                this.byId("MsaEdit_Id_Form").setBusy(true);
                 if (utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_CompanyName"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_HeadPosition"), "ID") && utils._LCvalidateName(this.getView().byId("MsaE_id_MsaHead"), "ID") && utils._LCvalidateDate(this.getView().byId("MsaE_id_CreateMSADate"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaPanCard"), "ID") && utils._LCvalidateEmail(this.getView().byId("MsaE_id_MSAEmail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaAddress"), "ID") && utils._LCvalidateMandatoryField(this.byId("MsaE_Id_Branch","ID"),"ID")) {
                     var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
                     oModel.Type = this.byId("MsaE_id_Type").getSelectedButton().getText();
@@ -131,31 +134,46 @@ sap.ui.define([
                             this.SimpleFormModel.setProperty("/editable", false);
                             this.SimpleFormModel.setProperty("/isEnabled", true);
                             MessageToast.show(this.i18nModel.getText("msaupdateSuccess"));
-                            BusyIndicator.hide();
+                            this.byId("MsaEdit_Id_Form").setBusy(false);
                         } else {
                             MessageToast.show(this.i18nModel.getText("msaupdateFailed"));
                         }
                     })
                         .catch((oError) => {
-                            sap.ui.core.BusyIndicator.hide();
+                            this.byId("MsaEdit_Id_Form").setBusy(false);
                             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         })
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    this.byId("MsaEdit_Id_Form").setBusy(false);
                 }
             },
 
-            SOW_onSubmitFrag: function () {
-                try {
+            CommonReadCallForSow:function(){
+                var oTable = this.byId("Sow_Id_ReadTable");
+                
+            },
+
+            SOW_onSubmitFrag:async function () {
+                    sap.ui.getCore().byId("SOW_id_oTableCreateSow").setBusy(true);
                     if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID")) {
-                        MessageToast.show(this.i18nModel.getText("sowSuccess"));
-                    } else {
+                        var oModel = this.getView().getModel("oModelDataPro").getData();
+                        await this.ajaxCreateWithJQuery("SowDetails", oModel).then((oData) => {
+                            if (oData.success) {
+                                MessageToast.show(this.i18nModel.getText("sowSuccess"));
+
+                            }else{
+
+                            }    
+                            sap.ui.getCore().byId("SOW_id_oTableCreateSow").setBusy(false);                           
+                        }).catch((error) => {                       
+                        MessageToast.show(error.responseText);
+                        sap.ui.getCore().byId("SOW_id_oTableCreateSow").setBusy(false);
+                    });
+                } else {
+                        sap.ui.getCore().byId("SOW_id_oTableCreateSow").setBusy(false);
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
-                } catch {
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                }
-
             },
 
             FragmentOpen: function () {

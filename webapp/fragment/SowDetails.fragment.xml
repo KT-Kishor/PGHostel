@@ -5,6 +5,7 @@
     <Dialog title="{i18n>createSow}">
     <f:SimpleForm
        id="idSimpleFormSowToolbar"
+       busyIndicatorDelay="0"
         editable="true"
         layout="ColumnLayout"
         labelSpanXL="2"
@@ -30,11 +31,6 @@
             
             <Label text="{i18n>startDate}" class="oSowFragLabel" required="true"/>
             <DatePicker  id="SOW_id_StartDate" value="{sowCreateModel>/StartDate}" visible="{VisibleUpdateModel>/VisibleUpdate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="MsaE_validateDate" valueStateText="{i18n>dateValueState}"/>
-
-           
-            <!-- <Label text="{i18n>sowStartDate}" class="oSowFragLabel" required="true"/>
-            <DatePicker  id="SOW_id_ExtendStartDate" visible="{VisibleUpdateModel>/visibleCreate}" value="" change="onSOWDescription"/>
-             -->
            
              <Label text="{i18n>currency}" class="oSowFragLabel" required="true"/>
              <ComboBox items="{currencyModel>/results}" selectedKey="1" value="{sowCreateModel>/Currency}">
@@ -44,14 +40,10 @@
             <Label text="{i18n>endDate}" class="oSowFragLabel" required="true"/>
             <DatePicker  id="SOW_id_EndDate" visible="{VisibleUpdateModel>/visibleCreate}" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="MsaE_validateDate" valueStateText="{i18n>dateValueState}"
                 value="" />
-
-            <!-- <Label text="{i18n>sowEndDate}" class="oSowFragLabel" required="true"/>
-            <DatePicker  id="SOW_id_ExtendEndDate" change="onSOWDescription" value="{sowCreateModel>/EndDate}" visible="{VisibleUpdateModel>/VisibleUpdate}" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" />
-            -->
         </f:content>
     </f:SimpleForm>
         <VBox class="sapUiSmallMargin sapUiSmallPadding">
-       <Table id="SOW_id_oTableCreateSow" items="{path:'oModelDataPro>/'}"  mode="{simpleForm>/Mode}" delete="onPressDeleteModeCreateSow" selectionChange="SOW_onSelectionChange">
+       <Table busyIndicatorDelay="0" id="SOW_id_oTableCreateSow" items="{path:'oModelDataPro>/'}"  mode="{simpleForm>/Mode}" delete="onPressDeleteModeCreateSow" selectionChange="SOW_onSelectionChange">
     <headerToolbar>
         <Toolbar>
             <Title text="{i18n>ConsultantHeaderDetails}" id="SOW_id_SowDetails" />

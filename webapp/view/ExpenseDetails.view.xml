@@ -28,7 +28,7 @@
 											<f:toolbar>
 											<m:Toolbar>												
 												<m:ToolbarSpacer />
-												<m:Button type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Neutral' }" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" 
+												<m:Button type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Transparent' }" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" 
                     press="Exp_Det_onEditOrSavePress" visible="{viewModel>/status}"  />
 											</m:Toolbar>
 										</f:toolbar>
