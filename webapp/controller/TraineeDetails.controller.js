@@ -377,7 +377,7 @@ sap.ui.define([
                         this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
                     }.bind(this)
                 );
-                this.byId("TD_id_StepTwo    ").getParent().setShowNextButton(true);  
+                this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);  
             },
             //  Mail dialog close function    
             Mail_onPressClose: function () {

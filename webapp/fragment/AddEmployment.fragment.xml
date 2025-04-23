@@ -64,7 +64,7 @@
 				<Label text="{i18n>rcMobileNoI}" required="true" />
 				<Input value="{employmentModel>/RCIMobileNo}"  liveChange="SS_validateMobileNo" maxLength="10" id="AdEmp_id_RCMobileI" placeholder="{i18n>placeholderMobileNo}" valueStateText="{i18n>mobileNoValueState}"/>
 				<core:Title text="{i18n>referenceDetailsII}" />
-				<Label text="{i18n>salutaion}" required="true" />
+				<Label text="{i18n>salutation}" required="true" />
 				<Select
                                     
                                                selectedKey="{employmentModel>/RCIISal}"

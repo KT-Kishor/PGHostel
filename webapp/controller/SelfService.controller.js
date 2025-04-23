@@ -73,8 +73,14 @@ sap.ui.define([
                 this.getView().setModel(empModel, "employmentModel");
             },
 
-            onPressback: function () {
-                this.getRouter().navTo("RouteTilePage");
+            onPressback: function (oEvent) {
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("ConfirmActionTitle"),
+                    this.i18nModel.getText("backConfirmation"),
+                    function () {
+                        this.getRouter().navTo("RouteTilePage");
+                    }.bind(this)
+                );
             },
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
@@ -270,6 +276,7 @@ sap.ui.define([
                             var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
                             oDataModel.DateOfBirth = oView.byId("SS_id_Dob").getValue()
                             oDataModel.DateOfBirth = oDataModel.DateOfBirth.split("/").reverse().join('-');
+                            oDataModel.AHSalutation = oView.byId("SS_idAHSal").getSelectedKey();
                             oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
                             oDataModel.EmergencyContactPerson2Salutation = oView.byId("SS_idEmeSalS").getSelectedKey();
                             oDataModel.EmergencyContactPerson1Realtion = oView.byId("SS_idRelF").getSelectedKey();
@@ -285,6 +292,9 @@ sap.ui.define([
                                 if (oData.success) {
                                     MessageToast.show(this.i18nModel.getText("dataSaved"));
                                     oView.getModel("viewModel").setProperty("/isEditMode", false);
+                                    this.byId("SS_idAdhar").setValueState("None");
+                                    this.byId("SS_id_Passport").setValueState("None");
+                                    this.byId("SS_id_Voterid").setValueState("None");
                                 } else {
                                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                                 }
@@ -590,24 +600,24 @@ sap.ui.define([
                 try {
                     const oData = await this.ajaxReadWithJQuery("SalaryDetails", { EmployeeID: this.EmployeeID }, []);
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                   // Set entire array to model if needed globally
+                    // Set entire array to model if needed globally
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "salaryData");
                     // Display all salary records
                     this.displaySalaryDetails(offerData);
                 } catch (error) {
                     MessageToast.show(error.message || error.responseText);
-                } 
+                }
             },
-            
+
             displaySalaryDetails: function (salaryDetailsArray) {
                 var oVBox = this.getView().byId("SS_id_FormsContainer");
                 oVBox.removeAllItems();
-            
+
                 salaryDetailsArray.forEach(function (offerData) {
                     var appraisalDate = offerData.AppraisalDate || "";
                     var effectiveDate = offerData.EffectiveDate || "";
                     var sTitleText = `Appraisal Date: ${appraisalDate}, Effective Date: ${effectiveDate} - Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.Gross)}`;
-            
+
                     // === Monthly Form ===
                     var oMonthlyForm = new sap.ui.layout.form.SimpleForm({
                         editable: false,
@@ -616,47 +626,47 @@ sap.ui.define([
                         content: [
                             new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.BasicSalary)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("hra") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.HRA)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.EmployerPF)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.MedicalInsurance)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.Gratuity)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.SpecailAllowance)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("Total") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.Total)}` }),
-            
+
                             new sap.ui.core.Title({ text: this.i18nModel.getText("Deductions") }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.EmployeePF)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.PT)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.IncomeTax)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.TotalDeduction)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.VariablePay)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.YearlyToMontlyConv(offerData.GrossPay)}` })
                         ]
                     });
-            
+
                     // === Yearly Form ===
                     var oYearlyForm = new sap.ui.layout.form.SimpleForm({
                         editable: false,
@@ -665,47 +675,47 @@ sap.ui.define([
                         content: [
                             new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.BasicSalary)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("hra") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.HRA)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployerPF)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.MedicalInsurance)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Gratuity)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.SpecailAllowance)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("Total") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Total)}` }),
-            
+
                             new sap.ui.core.Title({ text: this.i18nModel.getText("Deductions") }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployeePF)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.PT)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.IncomeTax)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` }),
-            
+
                             new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
                             new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
                         ]
                     });
-            
+
                     // === HBox for Monthly & Yearly ===
                     var oTopHBox = new sap.m.HBox({
                         justifyContent: "SpaceAround",
@@ -714,7 +724,7 @@ sap.ui.define([
                             oYearlyForm
                         ]
                     });
-            
+
                     // === Summary Section ===
                     var oSummaryFlex = new sap.m.FlexBox({
                         direction: "Row",
@@ -758,7 +768,7 @@ sap.ui.define([
                             })
                         ]
                     });
-            
+
                     var oPanel = new sap.m.Panel({
                         headerText: sTitleText,
                         expandable: true,
@@ -769,11 +779,11 @@ sap.ui.define([
                             })
                         ]
                     });
-            
+
                     oVBox.addItem(oPanel);
                 }.bind(this));
             },
-             
+
             //On icon tab select function
             SS_onTabSelect: function (oEvent) {
                 var oView = this.getView();
@@ -782,23 +792,23 @@ sap.ui.define([
                 var sKey = oEvent.getParameter("key");
                 if (isEditMode) {
                     this.showConfirmationDialog(
-                        this.i18nModel.getText("confirmTitle"),              
-                        this.i18nModel.getText("tabConfirmation"),                  
-                        async () => {                                          
+                        this.i18nModel.getText("confirmTitle"),
+                        this.i18nModel.getText("tabConfirmation"),
+                        async () => {
                             oViewModel.setProperty("/isEditMode", false);
                             await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                             this.SS_CommonID();
                             await this._handleTabSwitch(sKey);
                         },
-                        null,                                                         
-                        this.i18nModel.getText("OkButton"),                           
-                        this.i18nModel.getText("CancelButton")                       
+                        null,
+                        this.i18nModel.getText("OkButton"),
+                        this.i18nModel.getText("CancelButton")
                     );
                 } else {
                     this._handleTabSwitch(sKey);
                 }
             },
-            
+
             _handleTabSwitch: async function (sKey) {
                 this.getView().setBusy(true);
                 try {
