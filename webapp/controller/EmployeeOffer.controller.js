@@ -151,7 +151,7 @@ sap.ui.define([
                                 Salutation: oSelectedData.Salutation,
                                 EmployeeName: oSelectedData.ConsultantName,
                                 Gender: oSelectedData.Gender,
-                                JoiningDate: oSelectedData.JoiningDate,
+                                JoiningDate: oSelectedData.JoiningDate.split('T')[0],
                                 Role: " ",
                                 DateOfBirth: "",
                                 CompanyEmailID: "",
@@ -159,7 +159,7 @@ sap.ui.define([
                                 PermanentAddress: oSelectedData.ConsultantAddress,
                                 CorrespondenceAddress: oSelectedData.ConsultantAddress,
                                 BaseLocation: oSelectedData.BaseLocation,
-                                AppraisalDate: oSelectedData.JoiningDate,
+                                AppraisalDate: oSelectedData.JoiningDate.split('T')[0],
                                 Designation: oSelectedData.Designation,
                                 BranchCode: oSelectedData.BranchCode,
                                 MobileNo: "",
@@ -167,7 +167,6 @@ sap.ui.define([
                                 ManagerName: "",
                                 BloodGroup: "",
                                 EmployeeStatus: "Active",
-                                JoiningDate: oSelectedData.JoiningDate,
                                 CTC: oSelectedData.CTC,
                                 JoiningBonus: oSelectedData.JoiningBonus,
                                 BasicSalary: oSelectedData.BasicSalary,
@@ -188,7 +187,7 @@ sap.ui.define([
                                 VariablePercentage: oSelectedData.VariablePercentage,
                                 GrossPayMontly: oSelectedData.GrossPayMontly,
                                 HikePercentage: oSelectedData.HikePercentage,
-                                EffectiveDate: oSelectedData.JoiningDate,
+                                EffectiveDate: oSelectedData.JoiningDate.split('T')[0],
                             });
                             that.getView().setModel(oEmployeeDetailsModel, "oEmpolyeeDetailsModel");
                             that._commonFragmentOpenOffer(that, "OnboardEmployee");
@@ -245,7 +244,8 @@ sap.ui.define([
             },
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
-                oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-')
+                oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-');
+                oModel.ManagerID = sap.ui.getCore().byId("OEF_id_Manager").getSelectedItem().getAdditionalText();
                 if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
                     var oPayload = {
                         tableName: "EmployeeDetails",
