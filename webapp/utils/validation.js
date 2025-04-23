@@ -387,15 +387,15 @@ sap.ui.define([], function () {
       var oInput = type === "ID" ? oEvent : oEvent.getSource();
       var value = oInput.getValue().trim();
       var cleanedValue = value.replace(/[^0-9.]/g, "");
-      var parts = cleanedValue.split(".");
-      if (parts.length === 2) {
-        cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
-      }
+      // var parts = cleanedValue.split(".");
+      // if (parts.length === 2) {
+      //   cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
+      // }
       oInput.setValue(cleanedValue);
-      if (cleanedValue === "" || isNaN(cleanedValue) || parseFloat(cleanedValue) < 0) {
-        oInput.setValueState("Error");
-        return false;
-      }
+      // if (cleanedValue === "" || isNaN(cleanedValue) || parseFloat(cleanedValue) < 0) {
+      //   oInput.setValueState("Error");
+      //   return false;
+      // }
       if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
         oInput.setValueState("Error");
         return false;

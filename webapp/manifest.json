@@ -187,6 +187,11 @@
                 "type":"sap.ui.model.json.JSONModel",
                 "uri":"model/Gender.json",
                 "preload":true
+            },
+            "SowModel": {
+                "type":"sap.ui.model.json.JSONModel",
+                "uri":"model/SowStatus.json",
+                "preload":true
             }
         },
         "resources": {

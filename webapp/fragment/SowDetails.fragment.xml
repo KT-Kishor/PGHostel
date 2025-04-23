@@ -39,7 +39,7 @@
             
             <Label text="{i18n>endDate}" class="oSowFragLabel" required="true"/>
             <DatePicker  id="SOW_id_EndDate" visible="{VisibleUpdateModel>/visibleCreate}" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="MsaE_validateDate" valueStateText="{i18n>dateValueState}"
-                value="" />
+                value="{sowCreateModel>/EndDate}" />
         </f:content>
     </f:SimpleForm>
         <VBox class="sapUiSmallMargin sapUiSmallPadding">
@@ -85,8 +85,8 @@
                 <Input value="{oModelDataPro>Designation}" maxLength="50" width="100%" />
             </cells>
             <cells >
-               <ComboBox items="{sowModel>/SowStatus}" value="{oModelDataPro>Status}" width="100%">
-                    <core:Item key="{sowModel>ID}" text="{sowModel>Status}" />
+               <ComboBox items="{SowModel>/SowStatus}" value="{oModelDataPro>Status}" width="100%">
+                    <core:Item key="{SowModel>ID}" text="{SowModel>Status}" />
                 </ComboBox>
             </cells>
             <cells>
@@ -95,7 +95,7 @@
                         <Input value="{oModelDataPro>Rate}" maxLength="50" width="100%" type="Number" textAlign="End" id="SOW_id-Rate" liveChange="onRateChange"/>
                     </VBox>                   
                     <VBox width="40%">
-                        <ComboBox items="{RateType>/results}" selectedKey="Per Day" value="{oModelDataPro>PerDay}" width="100%">
+                        <ComboBox items="{RateType>/}" selectedKey="Per Day" value="{oModelDataPro>PerDay}" width="100%">
                             <core:Item key="{RateType>ID}" text="{RateType>RateType}" />                           
                         </ComboBox>
                     </VBox>

@@ -16,7 +16,7 @@ sap.ui.define([
             },
 
             _onRouteMatched: async function (oEvent) {
-                // this.commonLoginFunction("MSA&SOW");
+                this.commonLoginFunction("MSA&SOW");
                 if (!this.getView().getModel("ContractpaymentModel") && !this.getView().getModel("BaseLocationModel")) {
                     this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
                     this._fetchCommonData("BaseLocation", "BaseLocationModel");
@@ -24,17 +24,26 @@ sap.ui.define([
 
                 this.MSAID = oEvent.getParameter("arguments").sPath;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                await this.MSADetailsReadCall();
-
-                var editable = new JSONModel({ editable: false, isEnabled: true, Mode: "Delete", save: false, submitBtn: false, ExpendBtn: false, RelesedBtn: false });
+                
+                var editable = new JSONModel({ editable: false, isEnabled: true, Mode: "Delete", save: false, submitBtn: false, ExpendBtn: false, RelesedBtn: false, Recruitment:true });
                 this.getView().setModel(editable, "simpleForm");
-
+                
                 this.SimpleFormModel = this.getView().getModel("simpleForm");
                 var oModelDataPro = new JSONModel();
                 this.getView().setModel(oModelDataPro, "oModelDataPro");
                 var oSowCreateModel = new JSONModel();
                 this.getView().setModel(oSowCreateModel, "sowCreateModel");
+                this.MSADetailsReadCall();
+                this.CommonReadCallForSow();
                 BusyIndicator.hide();
+            },
+
+            onRadioButtonGroupSelect:function(oEvent){
+                if(oEvent.getSource().getSelectedButton().getText() === 'Recruitment'){
+                    this.SimpleFormModel.setProperty("/Recruitment", true);
+                }else{                    
+                    this.SimpleFormModel.setProperty("/Recruitment", false);
+                }
             },
 
             MSADetailsReadCall: async function () {
@@ -42,9 +51,11 @@ sap.ui.define([
                 try {
                     await this._fetchCommonData("MSADetails", "FilteredMsaModel", {MsaID: this.MSAID});
                     if (this.getView().getModel("FilteredMsaModel").getData()[0].Type === "Recruitment") {
-                        this.byId("MsaD_id_Type").setSelectedIndex(0); // First RadioButton
+                        this.byId("MsaE_id_Type").setSelectedIndex(0); 
+                        this.SimpleFormModel.setProperty("/Recruitment",true);
                     } else {
-                        this.byId("MsaD_id_Type").setSelectedIndex(1); // Second RadioButton
+                        this.byId("MsaE_id_Type").setSelectedIndex(1); // Second RadioButton
+                        this.SimpleFormModel.setProperty("/Recruitment",false);
                     } 
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -149,21 +160,41 @@ sap.ui.define([
                 }
             },
 
-            CommonReadCallForSow:function(){
+            CommonReadCallForSow: async function(){
                 var oTable = this.byId("Sow_Id_ReadTable");
-                
+                oTable.setBusy(true);
+                await this._fetchCommonData("SowDetails", "SowReadModel",{"MsaID":this.MSAID});
+                oTable.setBusy(false);
             },
 
-            SOW_onSubmitFrag:async function () {
+            SOW_onSaveFrag:async function () {
                     sap.ui.getCore().byId("SOW_id_oTableCreateSow").setBusy(true);
                     if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID")) {
-                        var oModel = this.getView().getModel("oModelDataPro").getData();
-                        await this.ajaxCreateWithJQuery("SowDetails", oModel).then((oData) => {
+                        var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
+                        var sowCreateModel = this.getView().getModel("sowCreateModel").getData();
+                        var oJson = { 
+                            "data": oModelDataPro.map(oModelDataPro => ({
+                              "MsaID": sowCreateModel.MsaID,
+                              "SowID": sowCreateModel.SowID,
+                              "Description": sowCreateModel.Description,
+                              "SNo": oModelDataPro.SNo,
+                              "Salutation": oModelDataPro.Salutation,
+                              "ConsultantName": oModelDataPro.ConsultantName,
+                              "Designation": oModelDataPro.Designation,
+                              "StartDate": sowCreateModel.StartDate.split('/').reverse().join('-'),
+                              "EndDate": sowCreateModel.EndDate.split('/').reverse().join('-'),
+                              "Rate": (sowCreateModel.Currency === 'INR') ? oModelDataPro.Rate + " " + sowCreateModel.Currency + " GST " + oModelDataPro.PerDay : oModelDataPro.Rate + " " + sowCreateModel.Currency + " " + oModelDataPro.PerDay,
+                              "Status": "New"
+                            }))
+                          };                          
+
+                        await this.ajaxCreateWithJQuery("SowDetails", oJson).then((oData) => {
                             if (oData.success) {
-                                MessageToast.show(this.i18nModel.getText("sowSuccess"));
-
+                                this.CommonReadCallForSow();
+                                this.SOW_oDialog.close();
+                                MessageToast.show(this.i18nModel.getText("sowSuccess"));                                
                             }else{
-
+                                MessageToast.show(this.i18nModel.getText("sowFailed"));
                             }    
                             sap.ui.getCore().byId("SOW_id_oTableCreateSow").setBusy(false);                           
                         }).catch((error) => {                       
@@ -217,9 +248,7 @@ sap.ui.define([
                 var aData = oModel.getData();
                 aData.splice(sIndex, 1);
 
-                aData.forEach(function (item, index) {
-                    item.IndexNo = index + 1;
-                });
+                aData.forEach(function (item, index) {item.IndexNo = index + 1});
 
                 oModel.setData(aData);
                 this.SNoValue = aData.length;
@@ -241,7 +270,7 @@ sap.ui.define([
                     result += characters.charAt(Math.floor(Math.random() * characters.length));
                 }
                 var jsonSow = {
-                    MsaID: this.msaValue,
+                    MsaID: this.MSAID,
                     Description: "",
                     SowID: result,
                     StartDate: "",
@@ -251,6 +280,14 @@ sap.ui.define([
 
                 this.getView().getModel("sowCreateModel").setData(jsonSow);
                 var oView = this.getView();
+            },
+
+            onPressChangeSow:function(oEvent){
+                this.Selected = oEvent.getSource()
+            },
+
+            MsaE_onPressSOWActive:function(){
+
             },
 
             MsaE_onPressRelesedSow: function () {
@@ -277,7 +314,7 @@ sap.ui.define([
                 this.FragmentOpen();
             },
 
-            SOW_onSaveFrag: function () {
+            SOW_onSubmitFrag: function () {
                 try {
 
                 } catch (error) {
@@ -289,8 +326,10 @@ sap.ui.define([
                 BusyIndicator.show(0);
                 var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oModel.BranchCode });
-                await this._fetchCommonData("PDFCondition", "PDFNDAModel", { Type: "NDA" });
-                await this._fetchCommonData("PDFCondition", "PDFMSAModel", { Type: "MSA" });
+                var msa = "MSA", nda = "NDA";
+                if (oModel.Type === "Recruitment") { msa = "R-MSA"; nda = "R-NDA"; }
+                await this._fetchCommonData("PDFCondition", "PDFNDAModel", { Type: nda });
+                await this._fetchCommonData("PDFCondition", "PDFMSAModel", { Type: msa });
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/AgreementDate", Formatter.formatDate(oModel.CreateMSADate));
                 oPDFModel.setProperty("/AgreementEndDate", Formatter.formatDate(oModel.MsaContractPeriodEndDate));
@@ -300,6 +339,11 @@ sap.ui.define([
                 oPDFModel.setProperty("/ClientRole", oModel.CompanyHeadPosition);
                 oPDFModel.setProperty("/AgreementDuration", oModel.ContractPeriod);
                 oPDFModel.setProperty("/PaymentTerms", oModel.PaymentTerms);
+                oPDFModel.setProperty("/PaymentPerc", oModel.RateCharge);
+                oPDFModel.setProperty("/FirstHalfPerc", oModel.PaymentAdvance);
+                oPDFModel.setProperty("/SecondHalfPerc", oModel.PaymentBalance);
+                oPDFModel.setProperty("/CandidateWorkingMonths", oModel.ReplacementMonth);
+                oPDFModel.setProperty("/LatePaymentThreshold", oModel.ReplacementRefund);
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFNDAModel = this.getView().getModel("PDFNDAModel").getData();
                 var oPDFMSAModel = this.getView().getModel("PDFMSAModel").getData();

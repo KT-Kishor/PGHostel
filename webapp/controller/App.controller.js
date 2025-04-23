@@ -50,7 +50,7 @@ sap.ui.define([
           onClose: function (sAction) {
             if (sAction === sap.m.MessageBox.Action.OK) {
               this.getView().getModel("LoginModel").setData({});
-              // Navigate to the login page
+              window.location.reload(true);
               this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
             }
           }.bind(this) // Bind 'this' to ensure the correct context

@@ -22,6 +22,7 @@ sap.ui.define([
                 this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(false);
                 this.byId("MsaD_id_Submit").setEnabled(false);
                 this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(false);
+                this.byId("MsaD_id_Type").setEditable(true);
                 this.T_onResetWizard();
                   var oModelMSA = new JSONModel({
                     CompanyName: "",
@@ -37,9 +38,25 @@ sap.ui.define([
                     Status: "New",
                     MsaContractPeriodEndDate: "",
                     BranchCode:"",
-                    Type:""
+                    Type:"",
+                    RateCharge:"",
+                    PaymentAdvance:"",
+                    PaymentBalance:"",
+                    ReplacementMonth:"12 Months",
+                    ReplacementRefund:""
                   });  
-                  this.getView().setModel(oModelMSA, "msaModelWizart");               
+                  this.getView().setModel(oModelMSA, "msaModelWizart");   
+                  
+                  var oModel = new JSONModel({Recruitment:false});
+                  this.getView().setModel(oModel,"VisibleModel")
+            },
+
+            onRadioButtonGroupSelect:function(oEvent){
+                if(oEvent.getSource().getSelectedButton().getText() === 'Recruitment'){
+                    this.getView().getModel("VisibleModel").setProperty("/Recruitment", true);
+                }else{
+                    this.getView().getModel("VisibleModel").setProperty("/Recruitment", false);
+                }
             },
 
             T_onResetWizard: function () {
@@ -80,12 +97,37 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oEvent);
                 this.validateStep();
             },
+
+            LC_MSA_RateCharge:function(oEvent){
+                utils._LCvalidateTraineeAmount(oEvent);
+                this.validateStep();
+            },
+
             validateStep: function () {
                 // Check if all fields have values
                 var allFieldsFilled = this.getView().byId("MsaD_id_CompanyName").getValue() && this.getView().byId("MsaD_id_HeadName").getValue() && this.getView().byId("MsaD_id_HeadPosition").getValue() && this.getView().byId("MsaD_id_CreateMSADate").getValue() && this.getView().byId("MsaD_id_PanCard").getValue() && this.getView().byId("MsaD_id_Email").getValue() && this.getView().byId('MsaD_id_Address').getValue();
                 if (allFieldsFilled) {
                     // Validate each field 
-                    var isValid = utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_CompanyName"), "ID") && utils._LCvalidateName(this.getView().byId("MsaD_id_HeadName"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_HeadPosition"), "ID") && utils._LCvalidateDate(this.getView().byId("MsaD_id_CreateMSADate"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_PanCard"), "ID") && utils._LCvalidateEmail(this.getView().byId("MsaD_id_Email"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_Address"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_Branch"), "ID");
+                    var isRecruitment = this.getView().getModel("VisibleModel").getProperty("/Recruitment");
+
+                    var isValid =
+                        utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_CompanyName"), "ID") &&
+                        utils._LCvalidateName(this.getView().byId("MsaD_id_HeadName"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_HeadPosition"), "ID") &&
+                        utils._LCvalidateDate(this.getView().byId("MsaD_id_CreateMSADate"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_PanCard"), "ID") &&
+                        utils._LCvalidateEmail(this.getView().byId("MsaD_id_Email"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_Address"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_Branch"), "ID") &&
+                        (
+                            !isRecruitment || (
+                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_RateCharge"), "ID") &&
+                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayAdvance"), "ID") &&
+                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayBalance"), "ID") &&
+                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_Refund"), "ID")
+                            )
+                        );
+
                     this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(false);
@@ -96,6 +138,7 @@ sap.ui.define([
             MsaD_onComplete:function(){
                 this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(false);
                 this.byId("MsaD_id_Submit").setEnabled(true);
+                this.byId("MsaD_id_Type").setEditable(false);
             },
 
             MsaD_reviewSubmit: async function () {
@@ -117,6 +160,8 @@ sap.ui.define([
                     oModelData.MsaContractPeriodEndDate = assignmentEndDate.toISOString().split('T')[0];
                     oModelData.CreateMSADate = oModelData.CreateMSADate.split("/").reverse().join("-");
                     oModelData.Type = this.byId("MsaD_id_Type").getSelectedButton().getText();
+
+                    if(!this.getView().getModel("VisibleModel").getProperty("/Recruitment")) oModelData.ReplacementMonth = ""
             
                     const oCreateResponse = await this.ajaxCreateWithJQuery("MSADetails", { data: oModelData });
             

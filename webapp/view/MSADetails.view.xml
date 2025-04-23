@@ -25,6 +25,11 @@
 			singleContainerFullSize="false"
 			ariaLabelledBy="Title1">
 						<f:content>
+						<Label text="{i18n>type}" required="true" />
+							<RadioButtonGroup id="MsaD_id_Type" columns="5" valueState="Warning" select="onRadioButtonGroupSelect">
+								<RadioButton id="RB3-1" text="Service"/>
+								<RadioButton id="RB3-2" text="Recruitment"/>
+							</RadioButtonGroup>
 							<Label text="{i18n>companyName}" required="true" />
 							<Input value="{msaModelWizart>/CompanyName}" maxLength="50" placeholder="{i18n>placeCompany}" id="MsaD_id_CompanyName" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeCompany}" />
 
@@ -45,6 +50,33 @@
 							<Label text="{i18n>companyHeadPosition}" required="true" />
 							<Input value="{msaModelWizart>/CompanyHeadPosition}" placeholder="{i18n>placeHedaPosition}" maxLength="50" id="MsaD_id_HeadPosition" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeHedaPosition}" />
 
+
+							<Label text="{i18n>msaRateCharge}" required="true" visible="{VisibleModel>/Recruitment}" ></Label>
+							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="2" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge"  />
+
+							<Label text="Payment" required="true" visible="{VisibleModel>/Recruitment}"></Label>
+							<HBox  width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{VisibleModel>/Recruitment}">
+								<VBox  width="49%">
+									<Input value="{msaModelWizart>/PaymentAdvance}" maxLength="2" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="LC_MSA_RateCharge" valueHelpIconSrc="sap-icon://percent" showValueHelp="true"  />
+								</VBox>
+								<VBox  width="49%">
+									<Input value="{msaModelWizart>/PaymentBalance}" maxLength="2" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="LC_MSA_RateCharge"  />
+								</VBox>							
+							</HBox>
+
+							<Label text="Replacement Gratuity" required="true" visible="{VisibleModel>/Recruitment}"></Label>
+							<HBox  width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{VisibleModel>/Recruitment}">
+								<VBox  width="49%">
+									<Select items="{ContractPeriod>/ContractPeriod}" selectedKey="{msaModelWizart>/ReplacementMonth}" width="100%">
+										<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
+									</Select>
+								</VBox>
+								<VBox  width="49%">
+									<Input value="{msaModelWizart>/ReplacementRefund}" maxLength="2" placeholder="Refund in percentage" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge"  />
+								</VBox>							
+							</HBox>
+							
+
 							<Label text="{i18n>contractPeriod}" required="true" />
 							<Select id="MsaD_id_ContractPeriod" items="{ContractPeriod>/ContractPeriod}" selectedKey="{msaModelWizart>/ContractPeriod}">
 								<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
@@ -53,13 +85,7 @@
 							<Label text="{i18n>branch}" required="true" />
 							<ComboBox change="Msa_BranchChange" valueStateText="{i18n>expValStaSource}" selectedKey="{LoginModel>/BranchCode}" id="MsaD_id_Branch" items="{BaseLocationModel>/}" value="{msaModelWizart>/BranchCode}" showSecondaryValues="true" >
 								<core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>branchCode}" additionalText="{BaseLocationModel>city}" />
-							</ComboBox>
-
-							<Label text="{i18n>type}" required="true" />
-							<RadioButtonGroup id="MsaD_id_Type" columns="5" valueState="Warning" class="sapUiMediumMarginBottom">
-								<RadioButton id="RB3-1" text="Recruitment"/>
-								<RadioButton id="RB3-2" text="Service"/>
-							</RadioButtonGroup>
+							</ComboBox>							
 
 							<Label text="{i18n>createMSADate}" required="true" />
 							<DatePicker valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" id="MsaD_id_CreateMSADate" value="{msaModelWizart>/CreateMSADate}" change="MsaD_validateDate" valueStateText="{i18n>dateValueState}" />
@@ -105,6 +131,18 @@
 							<Text text="{= ${msaModelWizart>/Salutation} + ' ' + ${msaModelWizart>/CompanyHeadName} }" />
 							<Label text="{i18n>companyHeadPosition}" />
 							<Text text="{msaModelWizart>/CompanyHeadPosition}" />
+
+							<Label text="{i18n>msaRateCharge}" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/RateCharge}%" visible="{VisibleModel>/Recruitment}"/>
+							<Label text="Payment Advance" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/PaymentAdvance}%" visible="{VisibleModel>/Recruitment}"/>
+							<Label text="Payment Balance" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/PaymentBalance}%" visible="{VisibleModel>/Recruitment}"/>
+							<Label text="Replacement Gratuity Month" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/ReplacementMonth}%" visible="{VisibleModel>/Recruitment}"/>
+							<Label text="Replacement Gratuity Refund" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/ReplacementRefund}%" visible="{VisibleModel>/Recruitment}"/>
+
 							<Label text="{i18n>contractPeriod}" />
 							<Text text="{msaModelWizart>/ContractPeriod}" />
 							<Label text="{i18n>createMSADate}" />

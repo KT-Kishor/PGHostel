@@ -55,6 +55,11 @@
 										</f:toolbar>
 									<!-- Form content: Labels and Input fields for MSA data -->
 									<f:content>
+										<m:Label text="{i18n>type}" required="true" />
+										<m:RadioButtonGroup editable="{simpleForm>/editable}" id="MsaE_id_Type" columns="5" valueState="Warning" select="onRadioButtonGroupSelect">
+											<m:RadioButton id="RB3-1" text="Recruitment"/>
+											<m:RadioButton id="RB3-2" text="Service"/>
+										</m:RadioButtonGroup>
 										<m:Label text="{i18n>companyName}" required="true"/>
 										<m:Input liveChange="Msa_LC_CompanyName" id="MsaE_id_CompanyName" maxLength="50" value="{FilteredMsaModel>/0/CompanyName}" editable="{simpleForm>/editable}" />
 										
@@ -74,6 +79,32 @@
 										<m:Label text="{i18n>companyHeadPosition}" required="true"/>
 										<m:Input  liveChange="Msa_LC_HeadPosition" value="{FilteredMsaModel>/0/CompanyHeadPosition}" id="MsaE_id_HeadPosition" editable="{simpleForm>/editable}" maxLength="50" />
 
+										
+										<m:Label text="Rate Charge" required="true" visible="{simpleForm>/Recruitment}" ></m:Label>
+										<m:Input value="{FilteredMsaModel>/0/RateCharge}" visible="{simpleForm>/Recruitment}" maxLength="2" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" editable="{simpleForm>/editable}" />
+
+										<m:Label text="Payment" required="true" visible="{simpleForm>/Recruitment}"></m:Label>
+										<m:HBox  width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{simpleForm>/Recruitment}">
+											<m:VBox  width="49%">
+												<m:Input value="{FilteredMsaModel>/0/PaymentAdvance}" maxLength="2" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="LC_MSA_RateCharge" editable="{simpleForm>/editable}" />
+											</m:VBox>
+											<m:VBox  width="49%">
+												<m:Input value="{FilteredMsaModel>/0/PaymentBalance}" maxLength="2" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="LC_MSA_RateCharge"  editable="{simpleForm>/editable}"/>
+											</m:VBox>							
+										</m:HBox>
+
+										<m:Label text="Replacement Gratuity" required="true" visible="{simpleForm>/Recruitment}"></m:Label>
+										<m:HBox  width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{simpleForm>/Recruitment}">
+											<m:VBox  width="49%">
+												<m:Select items="{ContractPeriod>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ReplacementMonth}" width="100%" editable="{simpleForm>/editable}">
+													<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
+												</m:Select>
+											</m:VBox>
+											<m:VBox  width="49%">
+												<m:Input value="{FilteredMsaModel>/0/ReplacementRefund}" maxLength="2" placeholder="Refund in percentage" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge"  editable="{simpleForm>/editable}"/>
+											</m:VBox>							
+										</m:HBox>
+
 										<m:Label text="{i18n>contractPeriod}" required="true"/>
 										<m:Select items="{ContractPeriod>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ContractPeriod}" editable="{simpleForm>/editable}">
 											<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
@@ -82,13 +113,7 @@
 										<m:Label text="{i18n>branch}" required="true" />
 										<m:ComboBox id="MsaE_Id_Branch" change="Msa_onComboBoxChange" editable="{simpleForm>/editable}" valueStateText="{i18n>expValStaSource}" items="{BaseLocationModel>/}" value="{FilteredMsaModel>/0/BranchCode}" showSecondaryValues="true" >
 											<core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>branchCode}" additionalText="{BaseLocationModel>city}" />
-										</m:ComboBox>
-
-										<m:Label text="{i18n>type}" required="true" />
-										<m:RadioButtonGroup editable="{simpleForm>/editable}" id="MsaE_id_Type" columns="5" valueState="Warning" class="sapUiMediumMarginBottom">
-											<m:RadioButton id="RB3-1" text="Recruitment"/>
-											<m:RadioButton id="RB3-2" text="Service"/>
-										</m:RadioButtonGroup>
+										</m:ComboBox>								
 
 										<m:Label text="{i18n>createMSADate}" required="true"/>
 										<m:DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Msa_ChangeMsaDate" value="{path:'FilteredMsaModel>/0/CreateMSADate',formatter: '.Formatter.formatDate'}" editable="{simpleForm>/editable}" id="MsaE_id_CreateMSADate"/>
@@ -114,7 +139,7 @@
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="{i18n>sowDetails}">
 							<blocks>
-								<m:Table  busyIndicatorDelay="0" id="Sow_Id_ReadTable" >
+								<m:Table items="{path:'SowReadModel>/',sorter: {path: 'SowID',descending: false,group: true}}"  busyIndicatorDelay="0" id="Sow_Id_ReadTable"  mode="SingleSelectLeft" selectionChange="onPressChangeSow">
 								<m:headerToolbar>
 										<m:OverflowToolbar>
 									 <m:Title text="{i18n>sowTitle}"/>
@@ -163,10 +188,7 @@
 					</m:Column>
 					<m:Column minScreenWidth="Tablet" demandPopin="true">
 						<m:Text text="{i18n>designation}" />
-					</m:Column>
-					<m:Column minScreenWidth="Tablet" demandPopin="true">
-						<m:Text text="{i18n>rate}" />
-					</m:Column>
+					</m:Column>					
 					<m:Column minScreenWidth="Tablet" demandPopin="true">
 						<m:Text text="{i18n>status}" />
 					</m:Column>
@@ -174,13 +196,13 @@
 				<m:items>
 					<m:ColumnListItem >
 						<m:cells>
-						    <m:Text text="{}"/>							
-							<m:Text text="{}"/>
-							<m:Text text="{}"/>
-							<m:Text text="{}"/>
-							<m:Text text="{}"/>
-							<m:Text text="{}"/>
-							<m:Text text="{}"/>
+						    <m:Text text="{SowReadModel>SowID}"/>							
+							<m:Text text="{SowReadModel>ConsultantName}"/>
+							<m:Text text="{SowReadModel>Description}"/>
+							<m:Text text="{path:'SowReadModel>StartDate',formatter: '.Formatter.formatDate'}"/>
+							<m:Text text="{path:'SowReadModel>EndDate',formatter: '.Formatter.formatDate'}"/>
+							<m:Text text="{SowReadModel>Designation}"/>
+							<m:Text text="{SowReadModel>Status}"/>
 
 						</m:cells>
 					</m:ColumnListItem>
