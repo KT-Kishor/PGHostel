@@ -613,7 +613,7 @@ sap.ui.define([
                 oVBox.removeAllItems();
                 salaryDetailsArray.forEach(function (offerData) {      
                     var effectiveDate = offerData.EffectiveDate || "";
-                    var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${effectiveDate} , Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
+                    var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(effectiveDate)} , Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
             
                     // === Monthly Form ===
                     var oMonthlyForm = new sap.ui.layout.form.SimpleForm({
@@ -769,15 +769,18 @@ sap.ui.define([
                         expanded: true,
                         content: [
                             new sap.m.VBox({
-                                items: [oTopHBox, new sap.m.Label({ text: "Summary" }).addStyleClass("boldBlackText"), oSummaryFlex]
+                                items: [
+                                    oTopHBox,
+                                    new sap.m.Label({ text: "Summary" }).addStyleClass("boldBlackText"),
+                                    oSummaryFlex
+                                ]
                             })
                         ]
-                    });
+                    }).addStyleClass("sapUiMediumMarginBottom"); // 👈 Adds space between panels
             
                     oVBox.addItem(oPanel);
                 }.bind(this));
             },
-            
             //On icon tab select function
             SS_onTabSelect: function (oEvent) {
                 var oView = this.getView();

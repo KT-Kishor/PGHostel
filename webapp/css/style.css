@@ -587,4 +587,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   background-color: lightskyblue !important;
   border-radius: 8px;
 }
+.salaryPanelMargin {
+  margin-bottom: 20px; 
+}
 
