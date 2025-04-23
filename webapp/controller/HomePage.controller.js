@@ -154,6 +154,7 @@ sap.ui.define(
           this.byId("pageContainer").to(this.byId(oItem.getKey()));
         },
         onpressLogin: function () {
+          //sap.m.URLHelper.redirect("https://www.kalpavrikshatechnologies.com/EmployeeLogin", true);
           this.getRouter().navTo("RouteLoginPage");
         },
         //linkdin link
