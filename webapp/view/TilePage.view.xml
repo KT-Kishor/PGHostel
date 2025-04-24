@@ -110,7 +110,7 @@
 
 				<GenericTile visible="{= ${AppVisibilityModel>/ExpenseApp} === '1' ? true : false}"
                     class="sapUiMediumMargin"
-                    header="{i18n>headerExpense}" press="TileV_onpressExpenseApp">
+                    header="{i18n>expCreateBtn}" press="TileV_onpressExpenseApp">
 					<TileContent unit="{i18n>subhead}">
 						<ImageContent src="sap-icon://expense-report" />
 					</TileContent>

@@ -29,7 +29,7 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("traineeDetails"));
                 this.oValue = oEvent.getParameter("arguments").value;
                 BusyIndicator.hide()
-                this.Filter=true;
+                this.Filter = true;
                 if (this.oValue === "Trainee") {
                     await this.T_onPressClear();// clear the filter bar
                     await this.readCallForTrainee("");
@@ -41,24 +41,24 @@ sap.ui.define([
 
             //read call for trainee
             readCallForTrainee: async function (filter) {
-                await this.ajaxReadWithJQuery("Trainee", filter,["T_id_TraineeTable"]).then((oData) => {
-                  var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                  this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
-                  if(this.Filter){
-                  var oFilterData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "").map(item => [item.TraineeName.trim(), item])).values()];
-                  this.getView().setModel(new JSONModel(oFilterData), "traineeNameModel");
-                  var oFilterData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "").map(item => [item.ReportingManager.trim(), item])).values()];
-                  this.getView().setModel(new JSONModel(oFilterData), "reportingManagerModel");
-                  this.getView().getModel("traineeNameModel").refresh(true);
-                  this.getView().getModel("reportingManagerModel").refresh(true);  
-                  this.Filter=true;  
-                  } 
-                  BusyIndicator.hide();
+                await this.ajaxReadWithJQuery("Trainee", filter, ["T_id_TraineeTable"]).then((oData) => {
+                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
+                    if (this.Filter) {
+                        var oFilterData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "").map(item => [item.TraineeName.trim(), item])).values()];
+                        this.getView().setModel(new JSONModel(oFilterData), "traineeNameModel");
+                        var oFilterData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "").map(item => [item.ReportingManager.trim(), item])).values()];
+                        this.getView().setModel(new JSONModel(oFilterData), "reportingManagerModel");
+                        this.getView().getModel("traineeNameModel").refresh(true);
+                        this.getView().getModel("reportingManagerModel").refresh(true);
+                        this.Filter = true;
+                    }
+                    BusyIndicator.hide();
                 }).catch((error) => {
-                  BusyIndicator.hide();
-                  sap.m.MessageToast.show(error.message || error.responseText);
+                    BusyIndicator.hide();
+                    sap.m.MessageToast.show(error.message || error.responseText);
                 });
-              },
+            },
             //validation function for mandatory fields
             T_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
@@ -249,6 +249,9 @@ sap.ui.define([
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValueState("None");
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValue("");
                 this.TC_oDialog.close();
+                this.byId("T_id_TraineeTable").removeSelections(true);
+                this.byId("T_id_OnboardBtn").setEnabled(false);
+                this.byId("T_id_RejectBtn").setEnabled(false);
             },
             //Preview and download certificate function
             TCF_onPressHandlePreview: function () {
@@ -360,7 +363,7 @@ sap.ui.define([
                 if (params && Object.keys(params).length > 0) {
                     this.Filter = false;
                 }
-                
+
                 await this.readCallForTrainee(params);// read call for trainee after filter
                 var oTable = this.byId("T_id_TraineeTable");
                 if (oTable && oTable.removeSelections) {

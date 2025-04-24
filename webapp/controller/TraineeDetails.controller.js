@@ -188,17 +188,20 @@ sap.ui.define([
                     this.byId("TD_id_StepOne").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
                 }
             },
-
             //Submit trainee deatails 
             TD_onSubmitData: function (oEvent) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 var sStipendText = this.byId("TD_id_StipendRadio").getSelectedButton().getText();
-                if (sStipendText === "YES") utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
-                if (utils._LCvalidateName(this.byId("TD_id_Name"), "ID") &&
-                utils._LCstrictValidationComboBox(this.byId("TD_id_ReportingManager"), "ID") &&
-                utils._LCvalidateEmail(this.byId("TD_id_EmailID"), "ID") &&
-                utils._LCvalidateDate(this.byId("TD_id_ReleaseDate"), "ID") &&
-                utils._LCvalidateDate(this.byId("TD_id_JoiningDate"), "ID")) {
+                var bValid = utils._LCvalidateName(this.byId("TD_id_Name"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("TD_id_ReportingManager"), "ID") &&
+                    utils._LCvalidateEmail(this.byId("TD_id_EmailID"), "ID") &&
+                    utils._LCvalidateDate(this.byId("TD_id_ReleaseDate"), "ID") &&
+                    utils._LCvalidateDate(this.byId("TD_id_JoiningDate"), "ID");
+        
+                if (sStipendText === "YES") {
+                    bValid = bValid && utils._LCvalidateAmount(this.byId("TD_id_Stipend"), "ID");
+                }
+                if (bValid) {
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.ManagerID = this.getView().byId("TD_id_ReportingManager").getSelectedItem().getAdditionalText();
@@ -206,11 +209,12 @@ sap.ui.define([
                     oModel.Status = "Submitted";
                     oModel.ReleaseDate = oModel.ReleaseDate.split("/").reverse().join('-');
                     oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join('-');
+            
                     var oPayload = {
                         "tableName": "Trainee",
                         "data": oModel
                     };
-                    this.ajaxCreateWithJQuery("Trainee", oPayload,["TD_id_Wizard"]).then((oData) => {
+                    this.ajaxCreateWithJQuery("Trainee", oPayload, ["TD_id_Wizard"]).then((oData) => {
                         if (oData.success) {
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
@@ -238,7 +242,7 @@ sap.ui.define([
                                                 "ID": oData.ID
                                             }
                                         };
-                                        this.ajaxUpdateWithJQuery("Trainee", oUpdatePayload,["TD_id_Wizard"]).then((oData) => {
+                                        this.ajaxUpdateWithJQuery("Trainee", oUpdatePayload, ["TD_id_Wizard"]).then((oData) => {
                                             BusyIndicator.hide();
                                             if (oData.success) {
                                                 MessageToast.show(this.i18nModel.getText("pdfSucces"));
@@ -248,8 +252,8 @@ sap.ui.define([
                                                 this.getView().getModel("oTraineeDetails").refresh(true);
                                             }
                                         }).catch((error) => {
-                                                MessageToast.show(error.message || error.responseText);
-                                            });
+                                            MessageToast.show(error.message || error.responseText);
+                                        });
                                     }.bind(this)
                                 }),
                                 afterClose: function () {
@@ -262,10 +266,12 @@ sap.ui.define([
                         BusyIndicator.hide();
                         MessageToast.show(error.message || error.responseText);
                     });
+            
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
+            
             //second step validation function
             TD_StepTwo: function () {
                 this.getView().byId("TD_id_Submit").setEnabled(true);
@@ -489,6 +495,8 @@ sap.ui.define([
                     this.getView().byId(sStipendId).setVisible(true);
                     this.getView().byId(sCurrencyId).setVisible(true);
                     this.getView().byId(sStipendId).setValue("");
+                    this.getView().byId(sStipendId).setValueState("None");
+                    
                 }
                 if (this.TD_validateStep) {
                     this.TD_validateStep();
