@@ -1,4 +1,5 @@
-[
+{
+    "relation":[
     {
       "ID": 1,
       "Relationship": "Father"
@@ -32,4 +33,5 @@
       "Relationship": "Guardian"
     }
   ]
+}
   

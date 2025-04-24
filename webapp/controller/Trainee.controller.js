@@ -30,7 +30,7 @@ sap.ui.define([
                 this.oValue = oEvent.getParameter("arguments").value;
                 BusyIndicator.hide()
                 if (this.oValue === "Trainee") {
-                   await  this.T_onPressClear();// clear the filter bar
+                    await this.T_onPressClear();// clear the filter bar
                     await this.readCallForTrainee("");
                 }
                 else {
@@ -358,13 +358,9 @@ sap.ui.define([
                 if (oTable && oTable.removeSelections) {
                     oTable.removeSelections(true); // Clear all selections
                 }
-                this.byId("T_id_OnboardBtn").setEnabled(false);
-                this.byId("T_id_RejectBtn").setEnabled(false);
-                this.byId("T_id_OnboardBtn").setVisible(true);
-                this.byId("T_id_RejectBtn").setVisible(true);
-                this.byId("T_id_Download").setVisible(false);
-                this.byId("T_id_EmpOnBoard").setVisible(false);
-                this.byId("T_id_Cermail").setVisible(false);
+                ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
+                ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setVisible(true));
+                ["T_id_Download", "T_id_EmpOnBoard", "T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
             },
 
             //clear the filterbar

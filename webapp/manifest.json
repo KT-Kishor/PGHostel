@@ -63,6 +63,21 @@
                 "uri": "model/BloodGroup.json",
                 "preload": true
             },
+            "BondModel": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Bond.json",
+                "preload": true
+            },
+            "DurationTraining": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/DurationTraining.json",
+                "preload": true
+            },
+            "RelationModel": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Relations.json",
+                "preload": true
+            },
             "EmployeeStatus": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/EmployeeStatus.json",
@@ -86,16 +101,6 @@
             "Degree": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Degree.json",
-                "preload": true
-            },
-            "EmployeeRelationShip": {
-                "type": "sap.ui.model.json.JSONModel",
-                "uri": "model/EmployeeRelationShip.json",
-                "preload": true
-            },
-            "EmployementBond": {
-                "type": "sap.ui.model.json.JSONModel",
-                "uri": "model/EmploymentBond.json",
                 "preload": true
             },
             "ModeOfPayment": {
@@ -166,11 +171,6 @@
             "TraineeCourse": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Course.json",
-                "preload": true
-            },
-            "TrainingDurationModel": {
-                "type": "sap.ui.model.json.JSONModel",
-                "uri": "model/TrainingDuration.json",
                 "preload": true
             },
             "ContractPeriod": {

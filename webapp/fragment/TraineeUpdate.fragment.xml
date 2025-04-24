@@ -105,8 +105,8 @@
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
 										<m:Label text="{i18n>traineeDuration}" required="true" />
-										<m:Select items="{TrainingDurationModel>/}"  selectedKey="{TrainingDurationModel>/TrainingDuration}" id="TU_id_TDuration" width="100%" class="marginLeft" editable="{viewModel>/editable}">
-											<core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
+										<m:Select  selectedKey="{oTraineeDetails>/TrainingDuration}" items="{DurationTraining>/duration}" id="TU_id_TDuration"  editable="{viewModel>/editable}">
+											<core:Item key="{DurationTraining>Code}" text="{DurationTraining>Code}" />
 										</m:Select>
 										<m:Label text="{i18n>baseLocation}" required="true" />
 											<m:Select items="{BaseLocationModel>/}" id="TU_id_Location" showSecondaryValues="true" selectedKey="{oTraineeDetails>/BaseLocation}" editable="{viewModel>/editable}">

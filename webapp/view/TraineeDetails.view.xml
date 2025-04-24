@@ -81,9 +81,9 @@
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
 							<Label text="{i18n>traineeDuration}" required="true" />
-								<Select items="{TrainingDurationModel>/}" id="TD_id_TDuration" selectedKey="{oTraineeDetails>/TrainingDuration}" width="100%" class="marginLeft">
-									<core:Item key="{TrainingDurationModel>Value}" text="{TrainingDurationModel>Value}" />
-								</Select>
+							<Select  selectedKey="{oTraineeDetails>/TrainingDuration}" items="{DurationTraining>/duration}" id="TD_id_TDuration" >
+								<core:Item key="{DurationTraining>Code}" text="{DurationTraining>Code}" />
+							</Select>
 							<Label text="{i18n>releaseDateT}"   required="true" />
 							<DatePicker  value="{oTraineeDetails>/ReleaseDate}" id="TD_id_ReleaseDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>joiningDate}"   required="true" />

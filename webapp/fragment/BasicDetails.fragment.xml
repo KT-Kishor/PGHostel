@@ -156,8 +156,8 @@
 								<Label text="{i18n>name}" required="true"  />
 								<Input  value="{sEmployeeModel>/0/EmergencyContactPerson1Name}"  editable="{viewModel>/isEditMode}" liveChange="SS_validateName" id="SS_id_EmeNameF" placeholder="{i18n>placeName}" maxLength="50" valueStateText="{i18n>commonNameValueState}"/>
 								<Label text="{i18n>realtion}" required="true" id="SS_id_Rf"/>
-								<Select id="SS_idRelF"  items="{EmployeeRelationShip>/}" selectedKey="{sEmployeeModel>/0/EmergencyContactPerson1Realtion}" editable="{viewModel>/isEditMode}">
-									<core:Item key="{EmployeeRelationShip>Relationship}" text="{EmployeeRelationShip>Relationship}"/>
+								<Select  selectedKey="{sEmployeeModel>/0/EmergencyContactPerson1Realtion}" items="{RelationModel>/relation}" id="SS_idRelF"  editable="{viewModel>/isEditMode}">
+									<core:Item key="{RelationModel>Relationship}" text="{RelationModel>Relationship}" />
 								</Select>
 								<Label text="{i18n>mobileNo}" required="true" id="SS_id_Mf" />
 								<Input value="{sEmployeeModel>/0/EmergencyContactPerson1ContactNo}" placeholder="{i18n>mobileNo}"  editable="{viewModel>/isEditMode}"   maxLength="10" liveChange="SS_validateMobileNo" id="SS_id_EmpMoF" valueStateText="{i18n>mobileNoValueState}"/>
@@ -171,11 +171,11 @@
                                                width="100%">
 									<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 								</Select>
-								<Label text="{i18n>salutation}" required="true" />
+								<Label text="{i18n>name}" required="true" />
 								<Input value="{sEmployeeModel>/0/EmergencyContactPerson2Name}"  editable="{viewModel>/isEditMode}" liveChange="SS_validateName" id="SS_id_NameS" placeholder="{i18n>placeName}" maxLength="50" valueStateText="{i18n>commonNameValueState}"/>
 								<Label text="{i18n>realtion}" required="true" id="SS_id_Rs"/>
-								<Select  id="SS_idRelS" items="{EmployeeRelationShip>/}" selectedKey="{sEmployeeModel>/0/EmergencyContactPerson2Realtion}" editable="{viewModel>/isEditMode}">
-									<core:Item key="{EmployeeRelationShip>Relationship}" text="{EmployeeRelationShip>Relationship}"/>
+								<Select  selectedKey="{sEmployeeModel>/0/EmergencyContactPerson2Realtion}" items="{RelationModel>/relation}" id="SS_idRelS"  editable="{viewModel>/isEditMode}">
+									<core:Item key="{RelationModel>Relationship}" text="{RelationModel>Relationship}" />
 								</Select>
 								<Label text="{i18n>mobileNo}" required="true" id="SS_id_Ms"/>
 								<Input value="{sEmployeeModel>/0/EmergencyContactPerson2ContactNo}" placeholder="{i18n>mobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" liveChange="SS_validateMobileNo" id="SS_id_EmpMoS" valueStateText="{i18n>mobileNoValueState}"/>
