@@ -256,11 +256,18 @@ sap.ui.define([
 
                         var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
                         var oFormFilters = this.getView().getModel("myform").getProperty("/formData/filters");
+                        var originalStatus = this.getView().getModel("myform").getProperty("/formData/data/Status");
                         var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
                         oFormData.AssignedDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oAssignedDate);
                         oFormData.Status = "Assigned";
-                        oFormData.ReturnDate = "";
+                        // oFormData.ReturnDate = "";
+                        if(originalStatus === "Returned"){
+                            oFormData.IsCurrent = 1;
+                            await this.ajaxCreateWithJQuery("IncomeAsset",{ data: oFormData}, ["FAA_id_FormFrag"])
+                        }
+                        else{
                         await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oFormData, filters: oFormFilters }, ["FAA_id_FormFrag"]);
+                        }
                         await this.AA_CoomonReadCall();
 
                         this.FAA_Dialog.close();
@@ -454,6 +461,7 @@ sap.ui.define([
                 formData.setProperty("/formData/data/SerialNumber", oSelectedData.SerialNumber);
                 formData.setProperty("/formData/filters/EquipmentNumber", oSelectedData.EquipmentNumber);
                 formData.setProperty("/formData/filters/SerialNumber", oSelectedData.SerialNumber);
+                formData.setProperty("/formData/data/Status", oSelectedData.Status);
                 formData.setProperty("/formData/data/AssetValue", (oSelectedData.AssetValue).toString());
 
                 oFrag.byId("FDP_id_ValueHelpDialog").close()
@@ -465,11 +473,8 @@ sap.ui.define([
                 var oTypeSelected = oCore.byId("FAA_id_Type").getSelectedKey();
 
                 var allData = this.getView().getModel("incomeModel").getProperty("/");
-                console.log("IncomeModel Data:", allData);
                 var filteredData = allData.filter(item =>
-                    item.Type === oTypeSelected &&
-                    item.Status === "Available" && "Returned"
-
+                    item.Type === oTypeSelected && (item.Status === "Available" || item.Status === "Returned") && (item.Status!=="Transferd")
                 );
 
                 var filteredModel = new sap.ui.model.json.JSONModel(filteredData);
