@@ -47,7 +47,7 @@
 							</VBox>
 						</l:Grid>
 					</ScrollContainer>
-					<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding service-background sapUiTinyMargin">
+					<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Aboutus" type="XML"/>
 					</ScrollContainer>
 				
