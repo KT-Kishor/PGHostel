@@ -82,10 +82,10 @@ sap.ui.define([
             },
             EO_onSearch: function () {
                 var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
-                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" })
+                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                 var params = {};
                 aFilterItems.forEach(function (oItem) {
-                    var oControl = oItem.getControl(); // Get the associated control
+                    var oControl = oItem.getControl();
                     var sValue = oItem.getName();
                     if (oControl && oControl.getValue()) {
                         if (sValue === "JoiningDate") {
