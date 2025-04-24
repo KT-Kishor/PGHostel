@@ -23,6 +23,7 @@ sap.ui.define(
                 _onRouteMatched: function () {
                     var that = this;
                     that.commonLoginFunction("ApplyLeave"); // Call common login function
+                    that.onClearAndSearch("AL_id_leavefilterbar");// Clear and search function
                     that._makeDatePickersReadOnly(["AL_id_DateRangeSelection"]);
                     that.oModel = that.getOwnerComponent().getModel();
                     var loginModel = that.getOwnerComponent().getModel("LoginModel");
@@ -974,41 +975,26 @@ sap.ui.define(
                     oUpdateButton.setVisible(bVisible);
                 },
 
-                // Search handler for leave filter bar
                 AL_onSearch: function () {
                     var aFilterItems = this.byId("AL_id_leavefilterbar").getFilterGroupItems();
-                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                     var params = {};
                     aFilterItems.forEach(function (oItem) {
-                        var oControl = oItem.getControl();
-                        var sFilterName = oItem.getName();
-                        if (oControl) {
-                            if (oControl.isA("sap.m.DateRangeSelection")) {
-                                var oFromDate = oControl.getDateValue();
-                                var oToDate = oControl.getSecondDateValue();
-                                if (oFromDate) {
-                                    params["fromDate"] = oDateFormat.format(oFromDate);
-                                }
-                                if (oToDate) {
-                                    params["toDate"] = oDateFormat.format(oToDate);
-                                }
-                            } else if (oControl.isA("sap.m.ComboBox")) {
-                                var oSelectedItem = oControl.getSelectedItem();
-                                if (oSelectedItem) {
-                                    params[sFilterName] = oSelectedItem.getText();
-                                }
-                            } else if (oControl.getValue && oControl.getValue()) {
-                                params[sFilterName] = oControl.getValue();
-                            }
+                      var oControl = oItem.getControl();
+                      var sValue = oItem.getName();
+                      if (oControl && oControl.getValue()) {
+                        if (sValue === "dateRange") {
+                            var oFromDate = oControl.getDateValue();
+                            var oToDate = oControl.getSecondDateValue();
+                          params["fromDate"] = oDateFormat.format(oFromDate);
+                          params["toDate"] = oDateFormat.format(oToDate);
+                        } else {
+                          params[sValue] = oControl.getValue();
                         }
+                      }
                     });
-                    this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId, ...params}, ["AL_id_LeaveTableStandard"]).then(() => {
-                        BusyIndicator.hide();
-                    }).catch((error) => {
-                        BusyIndicator.hide();
-                        MessageToast.show(error.message || error.responseText);
-                    });
-                },
+                    this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId, ...params}, ["AL_id_LeaveTableStandard"]);
+                  },
 
                 // Clear filters in leave filter bar
                 AL_onClear: function () {

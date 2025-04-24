@@ -9,7 +9,7 @@
 			<Wizard 
                         id="CD_id_Wizard"	
 						showNextButton="true" finishButtonText="{i18n>submit}" >
-				<WizardStep id="CD_idFirststep"
+				<WizardStep id="CD_id_Firststep"
                             title="{i18n>basicDetails}"							
                             validated="true" complete="onComplete">
 					<f:SimpleForm  editable="true" layout="ColumnLayout" columnsM="1" columnsL="2" columnsXL="2">
@@ -39,9 +39,9 @@
 							</RadioButtonGroup>
 							<Label text="{i18n>amount}" required="true" />
 							<Input value="{ContractModelWizart>/Amount}"  id="CD_id_Amount"  placeholder="{i18n>placeAmount}"  liveChange="CD_validateAmount"  maxLength="15" valueStateText="{i18n>ammountValuState}" />
-							<Select items="{currencyModel>/results}"
-									selectedKey="{ContractModelWizart>/Currency}" id="CD_id_Currency" visible="true" class="marginLeft">
-								<core:Item key="{currencyModel>Currency}" text="{currencyModel>Currency}" />
+							<Select items="{CurrencyModel>/}" 
+									selectedKey="{ContractModelWizart>/currency}" id="CD_id_Currency" visible="true" class="marginLeft">
+								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
 						</f:content>
 					</f:SimpleForm>
@@ -58,9 +58,9 @@
 							<Label text="{i18n>contractNo}"/>
 							<Input placeholder="{i18n>ContractNoPlaceholder}" id="CD_id_ConNo" editable="false"/>
 							<Label text="{i18n>endClientHirer}" required="true"/>
-							<ComboBox items="{AddCustomerModel>/results}"  value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName">
-								<core:Item key="{AddCustomerModel>Salutation} {AddCustomerModel>Name}" text="{AddCustomerModel>CompanyName}" />
-							</ComboBox>						
+							<ComboBox items="{CreateCustomerModel>/}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName">
+                            <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
+                            </ComboBox>
 							<Label text="{i18n>locationswhereServices}" required="true"/>
 							<Select id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}">
 								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
@@ -87,25 +87,20 @@
 							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
 							</Select>
 							<Label text="{i18n>warrantyDate}" required="true"/>
-							<Select id="CD_id_Warranty" selectedKey="{ContractModelWizart>/WarrantyDate}" items="{contractwarrantyModel>/results}">
-								<core:Item key="{contractwarrantyModel>Months}" text="{contractwarrantyModel>Months}" />
+							<Select id="CD_id_Warranty" selectedKey="{ContractModelWizart>/Months}" items="{ContractPeriod>/ContractPeriod}">
+								<core:Item key="{ContractPeriod>No}" text="{ContractPeriod>Months}" />
 							</Select>
 							<Label text="{i18n>calloutadditionalratesexpenses}" required="true"/>
 							<Select  id="CD_id_AddRate" selectedKey="{ContractModelWizart>/AdditionalRates}" items="{TravelAllowance>/type}">
 							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
-
 							</Select>
 							<Label text="{i18n>paymentterms}" required="true"/>
-							<Select id="CD_id_PaymentTerms" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/results}">
-								<core:Item key="{ContractpaymentModel>Days}" text="{ContractpaymentModel>Days}" />
+							<Select id="CD_id_PaymentTerms" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/}">
+								<core:Item key="{ContractModelWizart>days}" text="{ContractModelWizart>days}" />
 							</Select>
-							<!-- <Label text="{i18n>status}" required="true"/>
-							<ComboBox selectedKey="{ContractModelWizart>/Status}"  items="{StatusModel>/Status}" id="CD_id_Status" visible="false" change="CD_ValidateCommonFields">
-								<core:Item key="{StatusModel>name}" text="{StatusModel>name}"/>
-							</ComboBox> -->
 							<Label text="{i18n>contractLocation}" required="true"/>
-							<ComboBox id="CD_id_ConLocation" change="CD_ValidateCommonFields"  items="{CityJsonModel>/results}"  value="{ContractModelWizart>/contractLocation}" >
-								<core:Item key="{CityJsonModel>ID}" text="{CityJsonModel>LocationName}" />
+							<ComboBox id="CD_id_ConLocation" change="CD_ValidateCommonFields"  items="{BaseLocationModel>/}" value="{ContractModelWizart>/contractLocation}" >
+								 <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 							</ComboBox>
 						</f:content>
 					</f:SimpleForm>
@@ -134,8 +129,7 @@
 							<Label text="{i18n>ContractNo}"/>
 							<Text text="{ContractModelWizart>/ContractNo}"/>
 							<Label text="{i18n>agreementDate}"/>
-							<Text text="{path:'ContractModelWizart>/AgreementDate','type': 'sap.ui.model.type.Date',
-						    'formatOptions': {'pattern': 'dd/M/yyyy'}}"/>
+							<Text text="{path:'ContractModelWizart>/AgreementDate'}"/>
 							<Label text="{i18n>clientCompanyName}"/>
 							<Text text="{= ${ContractModelWizart>/Salutation} + ' ' + ${ContractModelWizart>/ConsultantName}}"/>
 							<Label text="{i18n>address}"/>
@@ -159,11 +153,9 @@
 							<Label text="{i18n>assignmentStatus}"/>
 							<Text text="{ContractModelWizart>/AssignmentStatus}"/>
 							<Label text="{i18n>StartDate}"/>
-							<Text text="{path : 'ContractModelWizart>/StartDate',type: 'sap.ui.model.type.Date',
-                            formatOptions: { pattern: 'dd/M/yyyy' }}"/>
+							<Text text="{path : 'ContractModelWizart>/StartDate'}"/>
 							<Label text="{i18n>EndDate}"/>
-							<Text text="{path:'ContractModelWizart>/EndDate',type: 'sap.ui.model.type.Date',
-                                formatOptions: {pattern: 'dd/M/yyyy'}}"/>
+							<Text text="{path:'ContractModelWizart>/EndDate'}"/>
 							<Label text="{i18n>specificInsuranceRequirement}"/>
 							<Text text="{ContractModelWizart>/InsuranceRequirement}"/>
 							<Label text="{i18n>warrantyDate}"/>

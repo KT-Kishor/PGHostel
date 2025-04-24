@@ -2,6 +2,6 @@
 {
     "type": [
         { "ID": "1", "text": "Yes" },
-        { "ID": "2", "text": "NO" }    
+        { "ID": "2", "text": "No" }    
     ]
 }

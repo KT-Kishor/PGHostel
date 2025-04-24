@@ -606,6 +606,12 @@ sap.ui.define([
         sap.ui.core.BusyIndicator.hide();
         this.getRouter().navTo("RouteLoginPage");
       }
-    }
+    },
+    onClearAndSearch: function (sFilterBarId) {
+      var oFilterBar = this.byId(sFilterBarId);
+      if (oFilterBar) {
+          oFilterBar.clear(); // Clear all filters in the FilterBar
+      }
+  }
   })
 });

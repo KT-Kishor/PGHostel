@@ -35,6 +35,7 @@
                      id="LOH_id_HolidayTable"
                      width="auto"
                      items="{path: 'HolidayModel>/'}"
+					 busyIndicatorDelay="0"
                      growing="true"
                      growingThreshold="50"
                      alternateRowColors="true">

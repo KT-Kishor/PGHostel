@@ -12,44 +12,53 @@
 
 		</headerContent>
 		<content>
-			<fb:FilterBar  class="sapUiTinyMargin" id="C_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+			<fb:FilterBar  class="sapUiTinyMargin" id="C_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="C_onClearFilters" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false" >
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="Contract No" label="{i18n>contractNo}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox  selectionChange=".onBranchChange" showClearIcon="true" items="" >
-							<core:Item key="{BaseLocation>ID}" text="{BaseLocation>City}"/>
-						</ComboBox>
+						<ComboBox selectionChange=".onBranchChange" showClearIcon="true" items="{ContractModel>/data}">
+                            <core:Item key="{ContractModel>ContractNo}" text="{ContractModel>ContractNo}"/>
+                        </ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Location Service" label="{i18n>locationService}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox   items="" showClearIcon="true" id="C_id_DesiFilter">
-								<core:Item key="{DropDownModel>ConsultantName}" text="{DropDownModel>ConsultantName}"/>
+							<ComboBox   items="{WorkingMode>/location}" showClearIcon="true" id="C_id_DesiFilter">
+								<core:Item key="{WorkingMode>ID}" text="{WorkingMode>Location}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="End Client" label="{i18n>endClient}" groupName="Group1" visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox
+							id="C_id_EndClient"
+							showClearIcon="true"
+							items="{CreateCustomerModel>/}">
+							<core:Item key="{CreateCustomerModel>companyName}" text="{CreateCustomerModel>companyName}" />
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Year" label="{i18n>year}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
                     <DateRangeSelection
                     id="C_id_Year"
-                    valueFormat="yyyy" 
-                    displayFormat="yyyy"
-                    change="onDateChange" />						
+                    valueFormat="yyyy-MM-dd"
+                    displayFormat="dd/MM/yyyy"/>						
 					</fb:control>
 						</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Contract Status" label="{i18n>contractStatus}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox showClearIcon="true" selectionChange=".onSelectionChange" items="{EmployeeOffer>/Status}">
-							<core:Item key="{EmployeeOffer>ID}" text="{EmployeeOffer>Status}"/>
+						<ComboBox showClearIcon="true" selectionChange=".onSelectionChange" items="{AssignmentStatus>/assignmentStatus}">
+							<core:Item key="{AssignmentStatus>ID}" text="{AssignmentStatus>Value}"/>
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="C_idSalary"  items="" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="C_id_Salary"  items="{ContractModel>/}" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0">
 			 <headerToolbar>
                 <OverflowToolbar >
-                    <Title id="" text="{i18n>contractDetails}"/>
+                    <Title id="" text="{i18n>contractDetails}  ({= ${ContractModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
                     <Button text="{i18n>headerContractDetails}" press="C_onPressAddContract" type="Accept"  icon="sap-icon://customer-order-entry"/>
@@ -87,13 +96,15 @@
 				<items>
 					<ColumnListItem >
 						<cells>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<ObjectStatus text="{EmployeeOfferModel>Status}" inverted="true" class="centerText"  />
+							<Text text="{ContractModel>ContractNo}"/>
+							<Text text="{ContractModel>AgreementNo}"/>
+							<Text text="{ContractModel>ConsultantName}"/>
+							<Text text="{ContractModel>LocationService}"/>
+							<Text text="{ContractModel>EndClient}"/>
+							<Text text="{path:'ContractModel>AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" />
+							<Text text="{path:'ContractModel>AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" />
+							<ObjectStatus text="{ContractModel>Status}" inverted="true" class="centerText"  />
+							<Text text="{ContractModel>Comments}"/>
 						</cells>
 					</ColumnListItem>
 				</items>
