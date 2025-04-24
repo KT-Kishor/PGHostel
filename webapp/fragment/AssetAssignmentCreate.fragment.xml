@@ -47,7 +47,6 @@
                     id="FAA_id_Type"
                     items="{assetType>/}"
                     selectionChange="onStrictValidationComboBox"
-                    editable="false"
                     change="onTypeChange"
                     required="true"
                     selectedKey="{myform>/formData/data/Type}"
@@ -61,7 +60,6 @@
 				<Label text="{i18n>model}" />
 				<Input
                     required="true"
-                    editable="false"
                     id="FAA_id_Model"
                     liveChange="onStrictValidationComboBox"
                     value="{myform>/formData/data/Model}"
@@ -74,7 +72,6 @@
                     id="FAA_branch_Id"
                     showSecondaryValues="true"
                     change="FAA_onStrictValidationComboBox"
-                    editable="false"
                     items="{BaseLocationModel>/}"
                     value="{myform>/formData/data/AssignBranch}"
                 >

@@ -10,7 +10,7 @@
         <content>
             <Table
                 id="FDP_id_VHDTable"
-                items="{incomeModel>/}"
+                items="{filteredAssetDetails>/}"
             >
                 <columns>
                     <Column>
@@ -32,10 +32,10 @@
                         press=".onVHDPick"
                     >
                         <cells>
-                            <Text text="{incomeModel>Model}" />
-                            <Text text="{incomeModel>EquipmentNumber}" />
-                            <Text text="{incomeModel>SerialNumber}" />
-                            <Text text="{incomeModel>AssetValue}" />
+                            <Text text="{filteredAssetDetails>Model}" />
+                            <Text text="{filteredAssetDetails>EquipmentNumber}" />
+                            <Text text="{filteredAssetDetails>SerialNumber}" />
+                            <Text text="{filteredAssetDetails>AssetValue}" />
                         </cells>
                     </ColumnListItem>
                 </items>

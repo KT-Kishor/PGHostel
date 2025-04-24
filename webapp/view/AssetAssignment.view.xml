@@ -66,6 +66,22 @@
                     </fb:control>
                 </fb:FilterGroupItem>
 
+               <fb:FilterGroupItem
+                    name="AssignedDate"
+                    label="{i18n>assignedDate}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <DateRangeSelection
+                            id="AA_id_Date"
+                            change="AA_handleChange"
+                            displayFormat="MM/dd/yyyy"
+                            valueFormat="MM/dd/yyyy"
+                        />
+                    </fb:control>
+                </fb:FilterGroupItem>
+
                 <fb:FilterGroupItem
                     name="Status"
                     label="{i18n>status}"
@@ -83,22 +99,6 @@
                                 text="{AssetAssignmentStatus>Value}"
                             />
                         </ComboBox>
-                    </fb:control>
-                </fb:FilterGroupItem>
-
-                <fb:FilterGroupItem
-                    name="AssignedDate"
-                    label="{i18n>assignedDate}"
-                    groupName="Group1"
-                    visibleInFilterBar="true"
-                >
-                    <fb:control>
-                        <DateRangeSelection
-                            id="AA_id_Date"
-                            change="AA_handleChange"
-                            displayFormat="MM/dd/yyyy"
-                            valueFormat="MM/dd/yyyy"
-                        />
                     </fb:control>
                 </fb:FilterGroupItem>
             </fb:filterGroupItems>
@@ -150,20 +150,20 @@
                         icon="sap-icon://clear-all"
                         type="Negative"
                         press="AA_onOpenUnassign"
-                        text="{i18n>un-Assign}"
+                        text="{i18n>return}"
                     />
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-                <!-- <Column>
+                <Column>
                     <Text text="{i18n>assignEmployeeID}" />
                 </Column>
-                <Column>
+               <!--<Column>
                     <Text text="{i18n>assignEmployeeName}" />
                 </Column> -->
-                <Column>
+                <!-- <Column>
                     <Text text="{i18n>type}" />
-                </Column>
+                </Column> -->
                 <Column>
                     <Text text="{i18n>model}" />
                 </Column>
@@ -203,8 +203,8 @@
                         <Text text="{assetModel>EquipmentNumber}" />
                         <Text text="{assetModel>SerialNumber}" />
                         <ObjectIdentifier 
-                        title="{assetModel>AssignedByEmployeeName}"
-                        text="{assetModel>AssignedByEmployeeID}" />
+                        title="{assetModel>AssignedByEmployeeID}"
+                        text="{assetModel>AssignedByEmployeeName}" />
                         <Text text="{assetModel>AssignBranch}" />
                         <Text
                             text="{= ${assetModel>AssignedDate} === '1899-11-30T00:00:00.000Z' || !${assetModel>AssignedDate} ? '' : ${assetModel>AssignedDate}.substring(8,10) + '/' + ${assetModel>AssignedDate}.substring(5,7) + '/' + ${assetModel>AssignedDate}.substring(0,4) }"

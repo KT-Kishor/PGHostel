@@ -1,38 +1,75 @@
 <core:FragmentDefinition
+    xmlns:f="sap.ui.layout.form"
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
 >
     <Dialog
         id="FAU_id_unassignDialog"
         busyIndicatorDelay="0"
-        title="{i18n>unAssign}"
+        contentWidth="25%"
+        title="{i18n>return}"
         afterClose="onDialogClose"
     >
-        <VBox class="sapUiResponsiveMargin">
-            <Label
-                text="{i18n>date}"
-                showColon="true"
-            />
-            <DatePicker
-                id="FAU_id_unassignDate"
-                width="100%"
-                valueFormat="yyyy-MM-dd"
-                displayFormat="dd/MM/yyyy"
-                change="FAU_onDateLiveChange"
-            />
-        </VBox>
+        <f:SimpleForm
+            id="FAU_id_FormFrag"
+            busyIndicatorDelay="0"
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="4"
+            labelSpanM="12"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="2"
+        >
+            <f:content>
+                <Label text="{i18n>date}" />
+                <DatePicker
+                    id="FAU_id_unassignDate"
+                    width="100%"
+                    required="true"
+                    valueFormat="yyyy-MM-dd"
+                    displayFormat="dd/MM/yyyy"
+                    change="FAU_onDateLiveChange"
+                />
+                <!-- <Label text="{i18n>branch}" />
+                <ComboBox
+                    required="true"
+                    id="FAU_id_branch"
+                    showSecondaryValues="true"
+                    change="FAU_onStrictValidationComboBox"
+                    items="{BaseLocationModel>/}"
+                    value="{myform>/formData/data/ReturnBranch}"
+                >
+                    <core:ListItem
+                        key="{BaseLocationModel>city}"
+                        text="{BaseLocationModel>city}"
+                        additionalText="{BaseLocationModel>branchCode}"
+                    />
+                </ComboBox>-->
+                <Label text="{i18n>comments}" />
+                <Input
+                    maxLength="50"
+                    id="FAU_id_Comments"
+                    required="true"
+                    liveChange="FAU_validatecomments"
+                    valueStateText="{i18n>invalid}"
+                />
+            </f:content>
+        </f:SimpleForm>
         <beginButton>
             <Button
                 text="{i18n>save}"
                 type="Accept"
-                press="onSaveUnassign"
+                press="onSaveReturn"
             />
         </beginButton>
         <endButton>
             <Button
                 text="{i18n>cancel}"
                 type="Reject"
-                press="onCancelUnassign"
+                press="onCancelReturn"
             />
         </endButton>
     </Dialog>
