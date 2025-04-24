@@ -8,7 +8,7 @@
         upperCaseAnchorBar="false">
         <headerContent>
             <m:Text
-                class="products-title sapUiTinyMargin"
+                class="products-title sapUiSmallMarginBeginEnd sapUiMediumMarginTopBottom"
                 text="{i18n>pHeadercontent}" />
         </headerContent>
 
@@ -21,7 +21,7 @@
                         <blocks>
                         <m:VBox>
                         <m:Text 
-                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop highlight-text"
+                class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop highlight-text"
                 text="{i18n>minihrsolutionDesc}" />
                             <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
@@ -207,7 +207,7 @@
                         <blocks>
                         <m:VBox >
                         <m:Text 
-                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop highlight-text"
+                class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop highlight-text"
                 text="{i18n>invoicsolutionDesc}" />
                             <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
@@ -312,7 +312,7 @@
                         <blocks>
                         <m:VBox>
                         <m:Text 
-                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop highlight-text"
+                class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop highlight-text"
                 text="{i18n>assetsolutionDesc}" />
                             <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
@@ -355,7 +355,7 @@
                         <blocks>
                         <m:VBox>
                         <m:Text 
-                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop highlight-text"
+                class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop highlight-text"
                 text="{i18n>automobilesolutionDesc}" />
                             <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
@@ -394,7 +394,7 @@
                         <blocks>
                         <m:VBox>
                         <m:Text 
-                class="sapUiLargeMarginBeginEnd sapUiSmallMarginTop highlight-text"
+                class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop highlight-text"
                 text="{i18n>payrollSolutionDesc}" />
                             <m:Text/>
                             <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
