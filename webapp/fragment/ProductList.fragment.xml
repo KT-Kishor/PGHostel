@@ -5,8 +5,7 @@
     xmlns:layout="sap.ui.layout"
 >
     <ObjectPageLayout
-        upperCaseAnchorBar="false"
-    >
+        upperCaseAnchorBar="false">
         <headerContent>
             <m:Text
                 class="products-title sapUiTinyMargin"

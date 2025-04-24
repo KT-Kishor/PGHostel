@@ -109,13 +109,13 @@ sap.ui.define(
                     heading: "Main Contact",
                     elements: [
                       {
-                        label: "WhatsApp Us On",
+                        label: "WhatsApp",
                         value: "+91 9686145959",
                         elementType: "pageLink",
                         pageLinkId: "companyEmployeePageId",
                       },
                       {
-                        label: "Email Us",
+                        label: "Email",
                         value: "accounts@kalpavrikshatechnologies.com",
                         emailSubject: "Subject",
                         elementType: "email",

@@ -4,7 +4,7 @@
 	xmlns="sap.m"
 	xmlns:l="sap.ui.layout"
 	xmlns:core="sap.ui.core"
-	xmlns:tnt="sap.tnt" >
+	xmlns:tnt="sap.tnt">
 	<tnt:ToolPage id="toolPage">
 		<tnt:header>
 			<tnt:ToolHeader>
@@ -59,8 +59,6 @@
 					<Page id="idProducts" showHeader="false" class=" Products_list sapUiTinyMargin" >
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ProductList" type="XML"/>
 					</Page>
-
-
 					<ScrollContainer id="idCareer" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding career-background sapUiTinyMargin" >
 						<l:VerticalLayout  width="100%">
 							<l:BlockLayout background="Dashboard">

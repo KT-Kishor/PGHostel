@@ -4,26 +4,26 @@
     xmlns:m="sap.m"
     xmlns:f="sap.ui.layout.form">
 
-    <l:Grid defaultSpan="L6 M8 S12" vSpacing="2" hSpacing="2" class="sapUiTinyMargin">   
+    <l:Grid defaultSpan="L4 M6 S12" vSpacing="2" hSpacing="2" class="sapUiTinyMargin">   
         <l:content>
                 <f:SimpleForm editable="true" layout="ResponsiveGridLayout"
-                    labelSpanXL="3" labelSpanL="3" labelSpanM="3"  singleContainerFullSize="false">
+                    labelSpanXL="3" labelSpanL="3" labelSpanM="3"   singleContainerFullSize="false" backgroundDesign="Transparent">
                     <f:content>
-                        <m:Label text="{i18n>companyName}" required="true"/>
-                        <m:Input id="idCompanyname" liveChange="validateCompnayname" maxLength="50" value="{formData>/CompanyName}" valueStateText="Invalid entry"/>
-                        <m:Label text="{i18n>customername}" required="true"/>
-                        <m:Input id="idcustomername" liveChange="validateName" maxLength="50" value="{formData>/CustomerName}" valueStateText="Invalid entry"/>
-                        <m:Label text="{i18n>email}" required="true"/>
-                        <m:Input id="idCustmailid" liveChange="validateEmail" maxLength="50" value="{formData>/Email}" type="Email" valueStateText="Enter Valid Email"/>
-                        <m:Label text="{i18n>timeslot}" required="true"/>
-                        <m:DateTimePicker id="idtimeslot" liveChange="ValidateCommonFields" value="{formData>/TimeSlot}" valueFormat="yyyy-MM-dd HH:mm"
+                        <m:Label text="" />
+                        <m:Input id="idCompanyname" placeholder="{i18n>placeCompany}" liveChange="validateCompnayname" maxLength="50" value="{formData>/CompanyName}" valueStateText="Invalid entry"/>
+                        <m:Label text=""/>
+                        <m:Input id="idcustomername" placeholder="{i18n>placeholderCustName}" liveChange="validateName" maxLength="50" value="{formData>/CustomerName}" valueStateText="Invalid entry"/>
+                        <m:Label text=""/>
+                        <m:Input id="idCustmailid" placeholder="{i18n>placeEmailId}" liveChange="validateEmail" maxLength="50" value="{formData>/Email}" type="Email" valueStateText="Enter Valid Email"/>
+                        <m:Label text=""/>
+                        <m:DateTimePicker id="idtimeslot" placeholder="{i18n>placeholdertimeslote}" liveChange="ValidateCommonFields" value="{formData>/TimeSlot}" valueFormat="yyyy-MM-dd HH:mm"
                             displayFormat="dd/MM/yyyy HH:mm" valueStateText="Enter Timeslot"/>
-                        <m:Label text="{i18n>mobilenumber}" required="true"/>
-                        <m:Input id="idmobilenumber" liveChange="validateMobileNo" maxLength="10" value="{formData>/MobileNo}" valueStateText="Enter Atleast 10 digit number" />
-                        <m:Label text="{i18n>address}" required="true"/>
-                        <m:TextArea id="idCustaddress" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Address}" rows="2" valueStateText="Invalid entry" />
-                        <m:Label text="{i18n>comments}" required="true"/>
-                        <m:TextArea id="idcomment" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Comments}" rows="2" valueStateText="Invalid entry" />
+                        <m:Label text=""/>
+                        <m:Input id="idmobilenumber" placeholder="{i18n>placeholderMobileNo}" liveChange="validateMobileNo" maxLength="10" value="{formData>/MobileNo}" valueStateText="Enter Atleast 10 digit number" />
+                        <m:Label text=""/>
+                        <m:TextArea id="idCustaddress" placeholder="{i18n>placeAddress}" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Address}" rows="2" valueStateText="Invalid entry" />
+                        <m:Label text=""/>
+                        <m:TextArea id="idcomment" placeholder="{i18n>enterComments}" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Comments}" rows="2" valueStateText="Invalid entry" />
                         <m:Label text=""/>
                         <m:Button text="{i18n>savebtn}" type="Accept" press="onDemoformSave" />
                     </f:content>
