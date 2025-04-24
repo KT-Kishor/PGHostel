@@ -84,7 +84,7 @@
                                             id="EOUF_id_Address" maxLength="120" valueStateText="{i18n>addressValueState}"/>
 											<!-- Employment Bond Year ComboBox -->
 										<m:Label text="{i18n>pinCode}"  required="true" />
-											<m:Input value="{employeeModel>/PinCode}" liveChange="EOD_validatePinCode" editable="{viewModel>/editable}" id="EOUF_id_PinCode"></m:Input>
+											<m:Input value="{employeeModel>/PinCode}" liveChange="EOD_validatePinCode" editable="{viewModel>/editable}" id="EOUF_id_PinCode" valueStateText="{i18n>enterPinCode}"></m:Input>
 										<m:Label text="{i18n>selectYear}" id="EOUF_id_Lyear" />
 										<m:Select  selectedKey="{employeeModel>/EmploymentBond}" items="{BondModel>/bond}" id="EOUF_id_BondCombo"  editable="{viewModel>/editable}">
 											<core:Item key="{BondModel>Code}" text="{BondModel>Code}" />
@@ -113,17 +113,17 @@
 												<l:BlockLayoutCell>
 													<m:FlexBox direction="Row" justifyContent="Start" wrap="Wrap">														
 														<m:VBox class="summaryBox">
-															<m:Label text="CTC" />
+															<m:Label text="CTC" required="true" />
 															<m:Input value="{employeeModel>/CTC}" editable="{viewModel>/editable}" id="EOUF_id_CTC" placeholder="{i18n>placeCtc}" 
                                              liveChange="EOD_validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}"/>
 														</m:VBox>
 														<m:VBox class="summaryBox">
-															<m:Label text="{i18n>joiningBonus}" />
+															<m:Label text="{i18n>joiningBonus}" required="true"/>
 															<m:Input value="{employeeModel>/JoiningBonus}" editable="{viewModel>/editable}" placeholder="{i18n>joiningBonus}" 
                                             liveChange="EOD_validateJoiningBonus" maxLength="10" id="EOUF_id_Bonus" valueStateText="{i18n>ammountValuState}" />
 														</m:VBox>
 														<m:VBox class="summaryBox">
-															<m:Label text="Variable Pay Percentage" />
+															<m:Label text="{i18n>variablePayPer}" required="true"/>
 															<m:Input value="{employeeModel>/VariablePercentage}" editable="{viewModel>/editable}" placeholder="{i18n>joiningBonus}" 
                                             liveChange="EOD_validateAmount" maxLength="2" id="EOUF_id_VariablePerc" valueStateText="{i18n>ammountValuState}" />
 														</m:VBox>

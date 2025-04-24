@@ -63,7 +63,7 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false, });
                 this.getView().setModel(oViewModel, "viewModel");
-                ["EOD_id_Name", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_PinCode"].forEach(function (ids) {
+                ["EOD_id_Name","EOD_id_Reldate","EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_PinCode"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 if (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") {
@@ -478,7 +478,7 @@ sap.ui.define([
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
                     BusyIndicator.hide();
-                    MessageToast.show("Company Logo or Model not found.");
+                    MessageToast.show("Company not found on selected branch. Please check and try again.");
                     return;
                 }
                 oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);

@@ -104,6 +104,23 @@
                                                 class="marginLeft">
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
+										<m:Label text="{i18n>paidTrainee}" required="true" />
+											<m:RadioButtonGroup id="TU_id_PaidTraineeRadio" columns="2" select="onUpdatePaidTraineeChange">
+												<m:buttons>
+													<m:RadioButton text="{i18n>yes}" editable="{viewModel>/editable}" />
+													<m:RadioButton text="{i18n>no}" editable="{viewModel>/editable}" />
+												</m:buttons>
+											</m:RadioButtonGroup>
+											
+											<m:Label id="TU_id_PaidTraineeLabel" text="{i18n>trainingPaid}" required="true" visible="false" />
+											<m:Input value="{oTraineeDetails>/TrainingPaidAmount}" 
+												   id="TU_id_PaidTraineeAmount" 
+												   placeholder="{i18n>placeAmount}" 
+												   maxLength="10"
+												   visible="false"
+												   editable="{viewModel>/editable}"
+												   liveChange="TD_validateAmount"
+												   valueStateText="{i18n>ammountValuState}" />	
 										<m:Label text="{i18n>traineeDuration}" required="true" />
 										<m:Select  selectedKey="{oTraineeDetails>/TrainingDuration}" items="{DurationTraining>/duration}" id="TU_id_TDuration"  editable="{viewModel>/editable}">
 											<core:Item key="{DurationTraining>Code}" text="{DurationTraining>Code}" />

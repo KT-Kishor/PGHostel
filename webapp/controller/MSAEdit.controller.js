@@ -370,7 +370,7 @@ sap.ui.define([
                 var oPDFMSAModel = this.getView().getModel("PDFMSAModel").getData();
                 if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
                     BusyIndicator.hide();
-                    MessageToast.show("Company Logo or Model not found.");
+                    MessageToast.show("Company not found on selected branch. Please check and try again.");
                     return;
                 }
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
@@ -399,7 +399,7 @@ sap.ui.define([
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFSOWModel = this.getView().getModel("PDFSOWModel").getData();
                 if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                    MessageToast.show("Company Logo or Model not found.");
+                    MessageToast.show("Company not found on selected branch. Please check and try again.");
                     return;
                 }
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
