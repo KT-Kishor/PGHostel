@@ -80,7 +80,7 @@ sap.ui.define([
                     } else { // Stipend condition (YES)
                         this.byId("TU_id_StipendRadio").setSelectedIndex(0);
                     }
-                    if (traineeData.PaidTrainee === "0") { // Paid Trainee condition (NO)
+                    if (traineeData.TrainingPaidAmount === "0") { // Paid Trainee condition (NO)
                         this.byId("TU_id_PaidTraineeRadio").setSelectedIndex(1);
                         this.byId("TU_id_PaidTraineeAmount").setVisible(false); // Hide Paid Amount field if Paid Trainee is NO
                         this.byId("TU_id_PaidTraineeAmount").setValue("0"); // Reset Paid Amount value to 0
