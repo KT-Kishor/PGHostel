@@ -34,10 +34,11 @@
                     placeholder="Enter model name"
                     valueStateText="Enter model name"
                     liveChange="FCIA_onInputLiveChange"
-                    maxLength="15"
+                    maxLength="30"
                 />
                  	<Label text="{i18n>description}" required="true" />
 		          <TextArea id="FCIA_ID_DescriptionTextArea" 
+                  valueStateText="Write a model description"
                   liveChange="FCIA_onDescriptionTextAreaChange"
                   value="{CreateIncomeAssetModel>/Description}" 
                   maxLength="60" width="100%" />
@@ -128,23 +129,56 @@
                         key="{oCurrencyModel>currency}"
                     />
                 </Select>
+                <Label text="TransferDate"/>
+                <DatePicker
+                id="FCIA_id_transferdate"
+                value="{CreateIncomeAssetModel>/TransferDate}"
+                    valueFormat="dd/MM/yyyy"
+                    displayFormat="dd/MM/yyyy"
+                />
+                 <Label text="TransferBranch"/>
+             <ComboBox
+                    id="FCIA_id_transferbranch"
+                    placeholder="Select branch"
+                    change="FCIA_onbranchchange"
+                    selectionChange="FCIA_onselectionchange"
+                    valueStateText="Select branch"
+                    value="{CreateIncomeAssetModel>/TransferBranch}"
+                    selectedKey="{CreateIncomeAssetModel>/TransferBranch}"
+                    showSecondaryValues="true"
+                    items="{branchModel>/}"
+                >
+                    <core:ListItem
+                        key="{branchModel>city}" 
+                        text="{branchModel>city}"
+                        additionalText="{branchModel>branchCode}"
+                    />
+                </ComboBox>
             </f:content>
         </f:SimpleForm>
 
-        <beginButton>
+        <FlexBox justifyContent="End" width="100%">
+        <!-- <beginButton> -->
+            <Button text="Save" 
+             press="FCIA_onsavebuttonpress"
+             type="Accept"
+             />
+        <!-- </beginButton> -->
+        <!-- <beginButton> -->
             <Button
-                text="{i18n>save}"
-                press="FCIA_onsavebuttonpress"
+                text="{i18n>Transfer}"
+                press="FCIA_onTransferbuttonpress"
                 type="Accept"
             />
-        </beginButton>
+        <!-- </beginButton> -->
 
-        <endButton>
+        <!-- <endButton> -->
             <Button
                 text="{i18n>btnCancel}"
                 press="FCIA_onCancelButtonPress"
                 type="Reject"
             />
-        </endButton>
+            </FlexBox>
+        <!-- </endButton> -->
     </Dialog>
 </core:FragmentDefinition>

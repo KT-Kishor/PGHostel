@@ -141,9 +141,10 @@
             items="{
             path:'incomeModel>/',
              sorter: [{
-                    path: 'Type',
+                        path: 'Type',
                         group: true
-                }]}"
+                }]
+                }"
             mode="SingleSelectLeft"
             id="IA_id_OdataTable"
         >
@@ -181,6 +182,18 @@
                         type="Negative"
                         icon="sap-icon://delete"
                         press="IA_onTrashButtonPress"
+                    />
+                      <Button
+                        text="{i18n>Transfer}"
+                        type="Accept"
+                        icon="sap-icon://flight"
+                        press="IA_onTransferButtonPress"
+                    />
+                    <Button
+                        text="{i18n>Picked}"
+                        type="Neutral"
+                        icon="sap-icon://edit"
+                        press="IA_onPickedButtonPress"
                     />
                 </OverflowToolbar>
             </headerToolbar>
