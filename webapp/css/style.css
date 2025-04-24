@@ -151,12 +151,10 @@
 .custom-aboutus {
   font-size: 21px;
   font-family: sans-serif;
-  color: #ffffff;
+  color: #060303;
   font-weight: 500;
   line-height: 1.8;
 }
-
-
 .custom-background {
   background-image: url('../image/costumeback.jpg');
   background-size: cover;
@@ -164,9 +162,21 @@
   background-repeat: no-repeat;
 
 }
-
 .carrer-Des{
   font-family: sans-serif;
+}
+.sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle{
+  font-size: 1.5rem;
+  color: #000103;
+}
+/* .About-us{
+  font-family:Helvetica, sans-serif ;
+  font-weight: bold;
+  font-size: 5px;
+  color: #2964d9;
+} */
+.Aboutus-content{
+  color: #2964d9 !important;
 }
 .career-background {
   background-image: url('../image/career1.jpg');

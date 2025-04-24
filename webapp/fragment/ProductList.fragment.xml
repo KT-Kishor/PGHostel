@@ -94,7 +94,7 @@
                                 </m:GenericTile>
                                 <m:GenericTile
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
-                                    header="{i18n>headerExpense}"
+                                    header="{i18n>expCreateBtn}"
                                 >
                                     <m:TileContent unit="{i18n>subhead}">
                                         <m:ImageContent

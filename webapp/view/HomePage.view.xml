@@ -48,12 +48,7 @@
 						</l:Grid>
 					</ScrollContainer>
 					<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding service-background sapUiTinyMargin">
-						<l:Grid defaultSpan="XL7 L7 M12 S12" class="sapUiSmallMarginTop">
-							<Text class="custom-aboutus " textAlign="Left" text="{i18n>aboutUscontent1}"/>
-							<Text class="custom-aboutus " textAlign="Left" text="{i18n>aboutUscontent2}"/>
-							<Text class="custom-aboutus" textAlign="Left" text="{i18n>aboutUscontent3}"/>
-							<Text class="custom-aboutus" textAlign="Left" text="{i18n>aboutUscontent4}"/>
-						</l:Grid>
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Aboutus" type="XML"/>
 					</ScrollContainer>
 				
 					<Page id="idProducts" showHeader="false" class=" Products_list sapUiTinyMargin" >
