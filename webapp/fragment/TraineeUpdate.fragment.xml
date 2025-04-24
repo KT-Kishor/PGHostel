@@ -105,32 +105,34 @@
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
 										<m:Label text="{i18n>paidTrainee}" required="true" />
-											<m:RadioButtonGroup id="TU_id_PaidTraineeRadio" columns="2" select="onUpdatePaidTraineeChange">
-												<m:buttons>
-													<m:RadioButton text="{i18n>yes}" editable="{viewModel>/editable}" />
-													<m:RadioButton text="{i18n>no}" editable="{viewModel>/editable}" />
-												</m:buttons>
-											</m:RadioButtonGroup>
-											
-											<m:Label id="TU_id_PaidTraineeLabel" text="{i18n>trainingPaid}" required="true" visible="false" />
-											<m:Input value="{oTraineeDetails>/TrainingPaidAmount}" 
+										<m:RadioButtonGroup id="TU_id_PaidTraineeRadio" columns="2" select="onUpdatePaidTraineeChange">
+											<m:buttons>
+												<m:RadioButton text="{i18n>yes}" editable="{viewModel>/editable}" />
+												<m:RadioButton text="{i18n>no}" editable="{viewModel>/editable}" />
+											</m:buttons>
+										</m:RadioButtonGroup>
+										<m:Label id="TU_id_PaidTraineeLabel" text="{i18n>trainingPaid}" required="true" visible="false" />
+										<m:Input value="{oTraineeDetails>/TrainingPaidAmount}" 
 												   id="TU_id_PaidTraineeAmount" 
 												   placeholder="{i18n>placeAmount}" 
 												   maxLength="10"
 												   visible="false"
 												   editable="{viewModel>/editable}"
 												   liveChange="TD_validateAmount"
-												   valueStateText="{i18n>ammountValuState}" />	
+												   valueStateText="{i18n>ammountValuState}" />
+										<m:Select items="{CurrencyModel>/}" selectedKey="{oTraineeDetails>/TrainingAmountCurrency}" id="TU_id_FeeCurrency" width="100%" class="marginLeft" editable="{viewModel>/editable}">
+											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
+										</m:Select>
 										<m:Label text="{i18n>traineeDuration}" required="true" />
 										<m:Select  selectedKey="{oTraineeDetails>/TrainingDuration}" items="{DurationTraining>/duration}" id="TU_id_TDuration"  editable="{viewModel>/editable}">
 											<core:Item key="{DurationTraining>Code}" text="{DurationTraining>Code}" />
 										</m:Select>
 										<m:Label text="{i18n>baseLocation}" required="true" />
-											<m:Select items="{BaseLocationModel>/}" id="TU_id_Location" showSecondaryValues="true" selectedKey="{oTraineeDetails>/BaseLocation}" editable="{viewModel>/editable}">
-											   <m:items>
-												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
-											   </m:items>
-										   </m:Select>
+										<m:Select items="{BaseLocationModel>/}" id="TU_id_Location" showSecondaryValues="true" selectedKey="{oTraineeDetails>/BaseLocation}" editable="{viewModel>/editable}">
+											<m:items>
+												<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+											</m:items>
+										</m:Select>
 										<m:Label text="{i18n>status}" required="true" />
 										<m:Input value="{oTraineeDetails>/Status}" editable="false" enabled="true" class="onClassTarineStatus" maxLength="50" />
 									</f:content>
