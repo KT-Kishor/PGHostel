@@ -14,16 +14,15 @@
     xmlns:viz.data="sap.viz.ui5.data"
     xmlns:layout="sap.ui.layout"
 >
-    <Page id="idPageQuotationDashboard">
+    <Page>
         <headerContent>
             <Button
-                id="idDasboardButton"
-                press="onhandleBackPress"
+                press="QD_onPressBack"
                 type="Transparent"
                 icon="sap-icon://nav-back"
             />
             <Title
-                text="Quotation Dashboard"
+                text="{i18n>qDashboard}"
                 class="boldBlackText"
             />
             <ToolbarSpacer />
@@ -31,14 +30,11 @@
         <content>
             <fb:FilterBar
                 showFilterConfiguration="false"
-                id="idDashboardfilterbar"
+                id="QD_id_FilterBar"
                 persistencyKey="myPersKey"
                 useToolbar="false"
-                clear="ondashboardClear"
                 showClearOnFB="false"
-                search=".onSearch"
-                filterChange=".onFilterChange"
-                afterVariantLoad=".onAfterVariantLoad"
+                search=".QD_onSearch"
             >
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
@@ -46,11 +42,10 @@
                         label="{i18n>qDate}"
                         groupName="Group1"
                         visibleInFilterBar="true"
-                        id="idQuoDashbordCompany"
                     >
                         <fb:control>
                             <DateRangeSelection
-                                id="idDateRangeDashboard"
+                                id="QD_id_DateRange"
                                 name="QuotationDate"
                                 delimiter="to"
                                 displayFormat="yyyy-MM-dd"
@@ -61,11 +56,8 @@
                 </fb:filterGroupItems>
             </fb:FilterBar>
         </content>
-        <VBox id="idLeaveBarChart">
-            <g:GridContainer
-                id="demoGrid"
-                columnsChange=".onGridColumnsChange"
-            >
+        <VBox>
+            <g:GridContainer>
                 <g:layout>
                     <g:GridContainerSettings
                         columnSize="49.5%"
@@ -97,11 +89,9 @@
                     width="auto"
                 >
                     <com:ChartContainer
-                        id="chartContainer"
                         showFullScreen="true"
                         showPersonalization="false"
                         autoAdjustHeight="false"
-                        contentChange="attachContentChange"
                     >
                         <com:dimensionSelectors>
                             <FlexBox
@@ -110,12 +100,12 @@
                             >
                                 <Button
                                     icon="sap-icon://pie-chart"
-                                    press="onPressPie"
+                                    press="QD_onPressPie"
                                 />
                                 <ToolbarSeparator />
                                 <Button
                                     icon="sap-icon://bar-chart"
-                                    press="onPressColumn"
+                                    press="QD_onPressColumn"
                                 />
                             </FlexBox>
                             <ToolbarSeparator />
@@ -128,7 +118,7 @@
                                     <viz:VizFrame
                                         height="21rem"
                                         width="50rem"
-                                        id="idVizFrame1"
+                                        id="QD_id_VizFrame1"
                                         busyIndicatorDelay="0"
                                         uiConfig="{applicationSet:'fiori'}"
                                         vizType="{FirstChart>/type}"
@@ -165,7 +155,7 @@
                                         </viz:feeds>
                                         <viz:dependents>
                                             <viz:Popover
-                                                id="idPopover1"
+                                                id="QD_id_Popover1"
                                                 busyIndicatorDelay="0"
                                             />
                                         </viz:dependents>
@@ -182,11 +172,9 @@
                     width="auto"
                 >
                     <com:ChartContainer
-                        id="chartContainerAll"
                         showFullScreen="true"
                         showPersonalization="false"
                         autoAdjustHeight="false"
-                        contentChange="attachContentChange"
                     >
                         <com:dimensionSelectors>
                             <FlexBox
@@ -195,12 +183,12 @@
                             >
                                 <Button
                                     icon="sap-icon://line-chart"
-                                    press="onPressLine"
+                                    press="QD_onPressLine"
                                 />
                                 <ToolbarSeparator />
                                 <Button
                                     icon="sap-icon://donut-chart"
-                                    press="onPressDonut"
+                                    press="QD_onPressDonut"
                                 />
                             </FlexBox>
                             <ToolbarSeparator />
@@ -213,7 +201,7 @@
                                     <viz:VizFrame
                                         height="21rem"
                                         width="50rem"
-                                        id="idVizFrameAll"
+                                        id="QD_id_VizFrameAll"
                                         busyIndicatorDelay="0"
                                         uiConfig="{applicationSet:'fiori'}"
                                         vizType="{FirstChart>/type1}"
@@ -250,7 +238,7 @@
                                         </viz:feeds>
                                         <viz:dependents>
                                             <viz:Popover
-                                                id="idPieChartAll"
+                                                id="QD_id_PieChartAll"
                                                 busyIndicatorDelay="0"
                                             />
                                         </viz:dependents>
@@ -262,17 +250,14 @@
                 </VBox>
                 <!-- thried Chart -->
                 <VBox
-                    id="idMonthlyChart"
                     height="25rem"
                     class="sapUiResponsiveMargin"
                     width="auto"
                 >
                     <com:ChartContainer
-                        id="chartContainer1"
                         showFullScreen="true"
                         showPersonalization="false"
                         autoAdjustHeight="false"
-                        contentChange="attachContentChange"
                     >
                         <com:dimensionSelectors>
                             <FlexBox
@@ -286,10 +271,10 @@
                                     width="8px"
                                 />
                                 <ComboBox
-                                    id="idSecondQuoIssuedBy"
+                                    id="QD_id_SecondQuoIssuedBy"
                                     class="marginRigth"
-                                    change="onChangeCurrentMonthIssuedByFirst"
-                                    editable="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'GM' || ${LoginModel>/Role} === 'CEO' ? true : false }"
+                                    change="QD_onChangeCurrentMonthIssuedByFirst"
+                                    editable="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'CEO' ? true : false }"
                                     name="Company"
                                     items="{
 										path: 'EmpModel>/',
@@ -317,7 +302,7 @@
                                     <viz:VizFrame
                                         height="21rem"
                                         width="50rem"
-                                        id="idVizFrame"
+                                        id="QD_id_VizFrame"
                                         busyIndicatorDelay="0"
                                         uiConfig="{applicationSet:'fiori'}"
                                         vizType="bar"
@@ -354,7 +339,7 @@
                                         </viz:feeds>
                                         <viz:dependents>
                                             <viz:Popover
-                                                id="idPopover"
+                                                id="QD_id_Popover3"
                                                 busyIndicatorDelay="0"
                                             />
                                         </viz:dependents>
@@ -366,17 +351,14 @@
                 </VBox>
 
                 <VBox
-                    id="idMonthly"
                     height="25rem"
                     class="sapUiResponsiveMargin"
                     width="auto"
                 >
                     <com:ChartContainer
-                        id="chartContaine"
                         showFullScreen="true"
                         showPersonalization="false"
                         autoAdjustHeight="false"
-                        contentChange="attachContentChange"
                     >
                         <com:dimensionSelectors>
                             <FlexBox
@@ -390,10 +372,10 @@
                                     width="8px"
                                 />
                                 <ComboBox
-                                    id="idQuoIssuedByFirst"
-                                    change="onChangeCurrentMonthIssuedBy"
+                                    id="QD_id_QuoIssuedByFirst"
+                                    change="QD_onChangeCurrentMonthIssuedBy"
                                     name="Company"
-                                    editable="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'GM' || ${LoginModel>/Role} === 'CEO' ? true : false }"
+                                    editable="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'CEO' ? true : false }"
                                     items="{
 										path: 'EmpModel>/',
 										sorter: {
@@ -420,7 +402,7 @@
                                     <viz:VizFrame
                                         height="21rem"
                                         width="50rem"
-                                        id="idVizFram"
+                                        id="QD_id_VizFrame2"
                                         busyIndicatorDelay="0"
                                         uiConfig="{applicationSet:'fiori'}"
                                         vizType="{MonthlyBar>/Name}"
@@ -457,7 +439,7 @@
                                         </viz:feeds>
                                         <viz:dependents>
                                             <viz:Popover
-                                                id="idPopove"
+                                                id="QD_id_Popover2"
                                                 busyIndicatorDelay="0"
                                             />
                                         </viz:dependents>

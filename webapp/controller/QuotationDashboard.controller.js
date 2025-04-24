@@ -14,11 +14,13 @@ sap.ui.define([
 
       _onRouteMatched: function () {
         this.checkLoginModel();
+        this._makeDatePickersReadOnly(["QD_id_DateRange"]);
         var FirstModel = new JSONModel({ type: "column", type1: "line" });
+        this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         this.getView().setModel(FirstModel, "FirstChart");
         this.FirstModel = this.getView().getModel("FirstChart");
         this.loginModel = this.getView().getModel("LoginModel");
-        var oDateRange = this.byId("idDateRangeDashboard");
+        var oDateRange = this.byId("QD_id_DateRange");
         var sDateRangeValue = oDateRange.getValue();
         var oToday = new Date();
         var oPastDate = new Date();
@@ -27,20 +29,20 @@ sap.ui.define([
         var sFormattedEndDate = oToday.toISOString().split("T")[0];
         sDateRangeValue = sFormattedStartDate + " to " + sFormattedEndDate;
         oDateRange.setValue(sDateRangeValue);
-        this.getView().byId("idQuoIssuedByFirst").setValue(this.loginModel.getProperty("/EmployeeName"));
-        this.getView().byId("idSecondQuoIssuedBy").setValue(this.loginModel.getProperty("/EmployeeName"));
-        this.onSearch();
-        this.onChangeCurrentMonthIssuedByFirst();
-        this.onChangeCurrentMonthIssuedBy();
+        this.getView().byId("QD_id_QuoIssuedByFirst").setValue(this.loginModel.getProperty("/EmployeeName"));
+        this.getView().byId("QD_id_SecondQuoIssuedBy").setValue(this.loginModel.getProperty("/EmployeeName"));
+        this.QD_onSearch();
+        this.QD_onChangeCurrentMonthIssuedByFirst();
+        this.QD_onChangeCurrentMonthIssuedBy();
       },
 
-      onNavBack: function () {
+      QD_onPressBack: function () {
         BusyIndicator.show(0);
         this.getRouter().navTo("RouteQuotation");
       },
 
-      onSearch: function () {
-        var aFilterItems = this.byId("idDashboardfilterbar").getFilterGroupItems();
+      QD_onSearch: function () {
+        var aFilterItems = this.byId("QD_id_FilterBar").getFilterGroupItems();
         var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
         var params = {};
         aFilterItems.forEach(function (oItem) {
@@ -55,8 +57,8 @@ sap.ui.define([
             }
           }
         });
-        this.CommonReadCall("StatusPieChart", params, "DateRangePieChartModel", "idVizFrameAll", "idPieChartAll", "", "Quotation v/s Branch");
-        this.CommonReadCall("BaseLocationChart", params, "DateRangeBarChartModel", "idVizFrame1", "idPopover1", "Status", "Quotation v/s Status");
+        this.CommonReadCall("StatusPieChart", params, "DateRangePieChartModel", "QD_id_VizFrameAll", "QD_id_PieChartAll", "", "Quotation v/s Branch");
+        this.CommonReadCall("BaseLocationChart", params, "DateRangeBarChartModel", "QD_id_VizFrame1", "QD_id_Popover1", "Status", "Quotation v/s Status");
       },
 
       CommonReadCall: async function (url, params, modelName, Id1, Id2, Text, Title) {
@@ -64,7 +66,7 @@ sap.ui.define([
         if (response.success) {
           var oModel = new JSONModel({ items: response.results });
           this.getView().setModel(oModel, modelName);
-          if (Id1 === "idVizFrame" || Id1 === "idVizFrame1") {
+          if (Id1 === "QD_id_VizFrame" || Id1 === "QD_id_VizFrame1") {
             var oVizFrame = this.getView().byId(Id1);
             oVizFrame.setVizProperties({
               legend: { title: { visible: true, text: Text } },
@@ -113,35 +115,35 @@ sap.ui.define([
             oPopOver.connect(oVizFrame.getVizUid());
           }
         } else {
-          sap.m.MessageToast.show("Error fetching data: " + response.errorMessage);
+          sap.m.MessageToast.show(`${this.i18nModel.getText("commonReadingDataError")}: `+ response.errorMessage);
         }
       },
-      onPressPie: function () {
+      QD_onPressPie: function () {
         this.FirstModel.setProperty("/type", "pie");
       },
 
-      onPressColumn: function () {
+      QD_onPressColumn: function () {
         this.FirstModel.setProperty("/type", "column");
       },
 
-      onPressLine: function () {
+      QD_onPressLine: function () {
         this.FirstModel.setProperty("/type1", "line");
       },
 
-      onPressDonut() {
+      QD_onPressDonut: function() {
         this.FirstModel.setProperty("/type1", "donut");
       },
 
-      onhandleBackPress: function () {
+      QD_onPressBack: function () {
         this.getRouter().navTo("RouteQuotation");
       },
 
-      onChangeCurrentMonthIssuedByFirst: function () {
-        this.CommonReadCall("MonthlyBarChart", { QuotationIssuedBy: this.getView().byId("idSecondQuoIssuedBy").getValue() }, "GetPieChartCurrentMonth", "idVizFrame", "idPopover", "Status", "Current Month Quotation v/s Employee");
+      QD_onChangeCurrentMonthIssuedByFirst: function () {
+        this.CommonReadCall("MonthlyBarChart", { QuotationIssuedBy: this.getView().byId("QD_id_SecondQuoIssuedBy").getValue() }, "GetPieChartCurrentMonth", "QD_id_VizFrame", "QD_id_Popover3", "Status", "Current Month Quotation v/s Employee");
       },
 
-      onChangeCurrentMonthIssuedBy: function () {
-        this.CommonReadCall("QuotationStats", { QuotationIssuedBy: this.getView().byId("idQuoIssuedByFirst").getValue() }, "GetBarChatCurrentMonth", "idVizFram", "idPopove", "Status", "Per Day Quotation v/s Employee");
+      QD_onChangeCurrentMonthIssuedBy: function () {
+        this.CommonReadCall("QuotationStats", { QuotationIssuedBy: this.getView().byId("QD_id_QuoIssuedByFirst").getValue() }, "GetBarChatCurrentMonth", "QD_id_VizFrame2", "QD_id_Popover2", "Status", "Per Day Quotation v/s Employee");
       },
     });
   }

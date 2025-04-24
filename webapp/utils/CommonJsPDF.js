@@ -105,6 +105,7 @@ sap.ui.define([], function () {
 
                 for (let i = 0; i < 10; i++) {
                     if (oModel.StipendSkipLine && i === oModel.StipendSkipLine - 1) continue;
+                    if (oModel.TrainingFeesSkipLine && i === oModel.TrainingFeesSkipLine - 1) continue;
                     if (!content[i]?.TitleContent) break;  // Break the loop if TitleContent doesn't exist
 
                     // Evaluate TitleContent dynamically

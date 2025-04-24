@@ -1,6 +1,6 @@
 sap.ui.define([
-  "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast", "../model/formatter", "sap/ui/core/BusyIndicator"
-], (BaseController, utils, JSONModel, MessageToast, Formatter, BusyIndicator) => {
+  "./BaseController", "../model/formatter", "sap/ui/core/BusyIndicator"
+], (BaseController, Formatter, BusyIndicator) => {
   "use strict";
 
   return BaseController.extend("sap.kt.com.minihrsolution.controller.Quotation", {
@@ -10,14 +10,14 @@ sap.ui.define([
     },
 
     _onRouteMatched: function () {
+      this.checkLoginModel();
       var oView = this.getView();
       this.oCore = sap.ui.getCore();
       this.oModel = oView.getModel("Quotation");
       this.oLoginModel = oView.getModel("LoginModel");
       this._makeDatePickersReadOnly(["Q_id_QDate"]);
       this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-      this.checkLoginModel();
-      this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
+      this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("qPageHeaderTitle"));
       this.oModel.setProperty("/QuotationFormData", {});
       this.oModel.setProperty("/MasterEdit", true);
       if (this.oModel.getProperty("/setDefFilter")) {
@@ -26,11 +26,7 @@ sap.ui.define([
         this.getView().byId("Q_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/BranchCode"));
       }
       var sRole = this.oLoginModel.getProperty("/Role");
-      if (sRole === "Admin" || sRole === "CEO") {
-        this.oModel.setProperty("/isEditable", true);
-      } else {
-        this.oModel.setProperty("/isEditable", false);
-      }
+      this.oModel.setProperty("/isEditable", sRole === "Admin" || sRole === "CEO");
       this.oModel.setProperty("/VisibleStatus", false);
       var aData = this.oModel.getProperty("/QTableData");
       this.oModel.setProperty("/RowCount", aData ? aData.length : 0);
@@ -38,7 +34,6 @@ sap.ui.define([
       oBinding.attachChange(function () {
         this.oModel.setProperty("/RowCount", oBinding.getLength());
       });
-
       this._commonGETCall("BaseLocation", "BaseLocationData", {}, ["Q_id_FilterBranch"]);
       this.Q_onSearch();
       BusyIndicator.hide();
@@ -63,7 +58,6 @@ sap.ui.define([
       this.oModel.setProperty("/QuotationFormData/QuotationIssuedBy", this.oLoginModel.getProperty("/EmployeeName"));
       this.oModel.setProperty("/QuotationFormData/EmployeeMobile", this.oLoginModel.getProperty("/MobileNo"));
       this.oModel.setProperty("/QuotationFormData/BranchCode", this.oLoginModel.getProperty("/BranchCode"));
-      this.oModel.setProperty("/QuotationFormData/CustGSTNo", "22AAAAA0000A1Z5");
       this.oModel.setProperty("/QuotationFormData/QuotationDate", today);
       this.oModel.setProperty("/QuotationFormData/ValidUpto", new Date(today.getFullYear(), today.getMonth() + 1, 0));
       this.oModel.setProperty("/QuotationFormData/Status", "New");

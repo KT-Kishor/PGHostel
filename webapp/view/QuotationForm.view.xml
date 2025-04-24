@@ -53,12 +53,12 @@
                     </snappedHeading>
 
                     <expandedContent>
-                        <m:Text text="A future of Tomorrow"/>
+                        <m:Text text="{i18n>afutureoftomorrow}"/>
                     </expandedContent>
 
                     <snappedContent>
                         <layout:VerticalLayout>
-                            <m:Text text="A future of Tomorrow"/>
+                            <m:Text text="{i18n>afutureoftomorrow}"/>
                             <layout:HorizontalLayout class="sapUiTinyMarginTop">
                                 <m:Label
                                     text="{i18n>qIssuedBy} "
@@ -205,6 +205,7 @@
                                         value="{Quotation>/QuotationFormData/EmployeeMobile}"
                                         liveChange=".QF_onMobileChange"
                                         type="Number"
+                                        valueStateText="{i18n>mobileNoValueState}"
                                     />
                                     <m:Label
                                         text="{i18n>branchCode} "

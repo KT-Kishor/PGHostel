@@ -110,6 +110,8 @@
     "ReportingManager": "(Name of the Reporting Manager)",
     "Stipend": null,
     "StipendSkipLine": null,
+    "TrainingFees": null,
+    "TrainingFeesSkipLine": null,
 
     "AgreementDate": "02/04/2025",
     "AgreementEndDate": "30/09/2025",

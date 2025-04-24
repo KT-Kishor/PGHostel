@@ -231,17 +231,16 @@ sap.ui.define([
                     }
                 }
                 else {
-                    MessageToast.show("Make sure all the mandatory fields are filled and validate the entered value");
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             } catch (error) {
-                MessageToast.show("Technical error occurred");
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             }
             BusyIndicator.hide();
         },
 
         _submitSuccess: function () {
             BusyIndicator.show(0);
-            var pdfText = this.i18nModel.getText("generate");
             var that = this;
             if (!this.QF_oSuccessDialog) {
                 this.QF_oSuccessDialog = new sap.m.Dialog({
@@ -249,11 +248,11 @@ sap.ui.define([
                     type: sap.m.DialogType.Message,
                     state: "Success",
                     content: new sap.m.Text({
-                        text: "Quotation created successfully.",
+                        text: `${that.i18nModel.getText("quotation")} (${that.oModel.getProperty("/QuotationFormData/QuotationNumber")}) ${that.i18nModel.getText("msgCustomer3")}.`,
                     }),
                     buttons: [
                         new sap.m.Button({
-                            text: "OK",
+                            text: that.i18nModel.getText("OkButton"),
                             type: "Accept",
                             press: function () {
                                 that.QF_oSuccessDialog.close();
@@ -261,7 +260,7 @@ sap.ui.define([
                             },
                         }),
                         new sap.m.Button({
-                            text: pdfText,
+                            text: that.i18nModel.getText("generate"),
                             type: "Reject",
                             icon: "sap-icon://pdf-attachment",
                             press: function () {
@@ -302,17 +301,17 @@ sap.ui.define([
                             }
                         });
                         if (response.success) {
-                            MessageToast.show(this.i18nModel.getText("Quotation Updated Successfully"));
+                            MessageToast.show(this.i18nModel.getText("qUpdated"));
                         }
                         else {
-                            MessageToast.show(this.i18nModel.getText("An error occured while updating Quotation"));
+                            MessageToast.show(this.i18nModel.getText("msgTraineeformerror"));
                             this.oModel.setProperty("/MasterEdit", masteredits);
                             this.oModel.setProperty("/isEditable", edits);
                         }
                     }
                     catch (error) {
                         console.log(error);
-                        MessageToast.show(this.i18nModel.getText("An error occured while updating Quotation"));
+                        MessageToast.show(this.i18nModel.getText("msgTraineeformerror"));
                         this.oModel.setProperty("/MasterEdit", masteredits);
                         this.oModel.setProperty("/isEditable", edits);
                     }
