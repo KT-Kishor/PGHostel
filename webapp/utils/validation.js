@@ -405,8 +405,7 @@ sap.ui.define([], function () {
         oInput.setValueState("None");
         return true;
       }
-    }
-    
+    },
 
     _LCstrictValidationComboBox: function (oEvent, type) {
       var oComboBox = type === "ID" ? oEvent : oEvent.getSource();
