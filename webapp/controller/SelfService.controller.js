@@ -767,7 +767,7 @@ sap.ui.define([
                             content: [
                                 new sap.m.Title({
                                     text: sTitleText,
-                                    level: "H4",
+                                    level: "H6",
                                     wrapping: true
                                 })
                             ]

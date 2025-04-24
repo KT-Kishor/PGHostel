@@ -263,7 +263,7 @@ sap.ui.define([
                                     press: function () {
                                         oDialog.close();
                                         this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
-                                        this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
+                                        this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
                                     }.bind(this)
                                 }),
                                 endButton: new sap.m.Button({
@@ -283,7 +283,7 @@ sap.ui.define([
                                                 oDialog.close();
                                                 MessageToast.show(this.i18nModel.getText("pdfSucces"));
                                                 this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
-                                                this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
+                                                this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
                                                 // this.getView().getModel("employeeModel").refresh(true);
                                             }
                                         }).catch((error) => {

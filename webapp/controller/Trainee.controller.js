@@ -29,6 +29,7 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("traineeDetails"));
                 this.oValue = oEvent.getParameter("arguments").value;
                 BusyIndicator.hide()
+                this.Filter=true;
                 if (this.oValue === "Trainee") {
                     await this.T_onPressClear();// clear the filter bar
                     await this.readCallForTrainee("");
@@ -43,12 +44,15 @@ sap.ui.define([
                 await this.ajaxReadWithJQuery("Trainee", filter,["T_id_TraineeTable"]).then((oData) => {
                   var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                   this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
+                  if(this.Filter){
                   var oFilterData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "").map(item => [item.TraineeName.trim(), item])).values()];
                   this.getView().setModel(new JSONModel(oFilterData), "traineeNameModel");
                   var oFilterData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "").map(item => [item.ReportingManager.trim(), item])).values()];
                   this.getView().setModel(new JSONModel(oFilterData), "reportingManagerModel");
                   this.getView().getModel("traineeNameModel").refresh(true);
-                  this.getView().getModel("reportingManagerModel").refresh(true);     
+                  this.getView().getModel("reportingManagerModel").refresh(true);  
+                  this.Filter=true;  
+                  } 
                   BusyIndicator.hide();
                 }).catch((error) => {
                   BusyIndicator.hide();
@@ -353,6 +357,10 @@ sap.ui.define([
                         }
                     }
                 });
+                if (params && Object.keys(params).length > 0) {
+                    this.Filter = false;
+                }
+                
                 await this.readCallForTrainee(params);// read call for trainee after filter
                 var oTable = this.byId("T_id_TraineeTable");
                 if (oTable && oTable.removeSelections) {

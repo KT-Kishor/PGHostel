@@ -223,7 +223,7 @@ sap.ui.define([
                                     press: function () {
                                         oDialog.close();
                                         this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);
-                                        this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
+                                        this.getRouter().navTo("RouteTrainee", { value: "Trainee" });
                                         this.getView().getModel("oTraineeDetails").refresh(true);
                                     }.bind(this)
                                 }),
@@ -244,7 +244,7 @@ sap.ui.define([
                                                 MessageToast.show(this.i18nModel.getText("pdfSucces"));
                                                 oDialog.close();
                                                 this.byId("TD_id_StepTwo").getParent().setShowNextButton(true);
-                                                this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
+                                                this.getRouter().navTo("RouteTrainee", { value: "Trainee" });
                                                 this.getView().getModel("oTraineeDetails").refresh(true);
                                             }
                                         }).catch((error) => {

@@ -38,12 +38,6 @@
 }
 
 /* text style*/
-.boldBlackText {
-  font-weight: bold !important;
-  color: black !important;
-}
-
-/* text style*/
 .boldBlueText {
   font-weight: bold;
   color: blue;
@@ -482,11 +476,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .custom-vbox {
   align-items: flex-end;
   width: 100%;
-}
-
-.boldBlackText {
-  font-weight: bold;
-  color: black;
 }
 
 .rightAlignLabel {
