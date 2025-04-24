@@ -70,8 +70,8 @@ sap.ui.define([], function () {
                     return "Information";       
                 case "Paid":
                     return "Success";   
-                case "Unassigned":
-                    return "Warning"  
+                case "Available":
+                    return "Information"  
                  case "Trashed":
                         return "Error"
                 case "Assigned":

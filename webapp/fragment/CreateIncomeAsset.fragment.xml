@@ -157,11 +157,12 @@
             </f:content>
         </f:SimpleForm>
 
-        <FlexBox justifyContent="End" width="100%">
+        <FlexBox justifyContent="End" width="100%" >
         <!-- <beginButton> -->
             <Button text="Save" 
              press="FCIA_onsavebuttonpress"
              type="Accept"
+             id="FCIA_id_saveButton"
              />
         <!-- </beginButton> -->
         <!-- <beginButton> -->
@@ -169,15 +170,24 @@
                 text="{i18n>Transfer}"
                 press="FCIA_onTransferbuttonpress"
                 type="Accept"
+                id="FCIA_id_transferButton"
             />
         <!-- </beginButton> -->
 
         <!-- <endButton> -->
+         <Button
+                text="{i18n>Picked}"
+                press="FCIA_onpickButtonPress"
+                type="Accept"
+                id="FCIA_id_pickButton"
+            />
             <Button
                 text="{i18n>btnCancel}"
                 press="FCIA_onCancelButtonPress"
                 type="Reject"
+                id="FCIA_id_CancelButton"
             />
+            
             </FlexBox>
         <!-- </endButton> -->
     </Dialog>
