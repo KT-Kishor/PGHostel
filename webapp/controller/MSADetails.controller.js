@@ -49,6 +49,7 @@ sap.ui.define([
                   
                   var oModel = new JSONModel({Recruitment:false});
                   this.getView().setModel(oModel,"VisibleModel")
+                  this.AdvanceBalance = true;
             },
 
             onRadioButtonGroupSelect:function(oEvent){
@@ -66,6 +67,48 @@ sap.ui.define([
                 this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);  
             },
             
+            onPaymentAdvanceInputChange: function(oEvent) {
+                var sAdvanceInput = this.byId("Msa_Id_PayAdvance");
+                var sBalanceInput = this.byId("Msa_Id_PayBalance");
+            
+                var sAdvanceValue = sAdvanceInput.getValue();
+                var sBalanceValue = sBalanceInput.getValue();
+            
+                // Regular expression: Up to 2 digits before decimal, optional 1 digit after
+                var regex = /^(?:\d{1,2})(?:\.\d{1})?$/;
+            
+                var bAdvanceValid = regex.test(sAdvanceValue);
+                var bBalanceValid = regex.test(sBalanceValue);
+            
+                if (!bAdvanceValid || !bBalanceValid) {
+                    sAdvanceInput.setValueState("Error");
+                    sAdvanceInput.setValueStateText("Enter up to 2 digits and 1 decimal place (e.g. 99.9)");
+                    sBalanceInput.setValueState("Error");
+                    sBalanceInput.setValueStateText("Enter up to 2 digits and 1 decimal place (e.g. 99.9)");
+                    this.AdvanceBalance = false;
+                    return;
+                }
+            
+                var nAdvance = parseFloat(sAdvanceValue) || 0;
+                var nBalance = parseFloat(sBalanceValue) || 0;
+                var nTotal = nAdvance + nBalance;
+            
+                if (nTotal > 100) {
+                    this.AdvanceBalance = false;
+                    var sMsg = "Total of Advance and Balance should not exceed 100%";
+                    sAdvanceInput.setValueState("Error");
+                    sAdvanceInput.setValueStateText(sMsg);
+                    sBalanceInput.setValueState("Error");
+                    sBalanceInput.setValueStateText(sMsg);
+                } else {
+                    this.AdvanceBalance = true;
+                    sAdvanceInput.setValueState("None");
+                    sBalanceInput.setValueState("None");
+                }
+                utils._LCvalidateTraineeAmount(oEvent);
+                this.validateStep();
+            },            
+
             MsaD_onBack: function () {
                 this.getRouter().navTo("RouteMSA");               
                 this.byId("MsaD_id_CompanyName").setValueState("None");
@@ -111,22 +154,20 @@ sap.ui.define([
                     var isRecruitment = this.getView().getModel("VisibleModel").getProperty("/Recruitment");
 
                     var isValid =
-                        utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_CompanyName"), "ID") &&
-                        utils._LCvalidateName(this.getView().byId("MsaD_id_HeadName"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_HeadPosition"), "ID") &&
-                        utils._LCvalidateDate(this.getView().byId("MsaD_id_CreateMSADate"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_PanCard"), "ID") &&
-                        utils._LCvalidateEmail(this.getView().byId("MsaD_id_Email"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_Address"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_Branch"), "ID") &&
-                        (
-                            !isRecruitment || (
-                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_RateCharge"), "ID") &&
-                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayAdvance"), "ID") &&
-                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayBalance"), "ID") &&
-                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_Refund"), "ID")
-                            )
-                        );
+                utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_CompanyName"), "ID") &&
+                utils._LCvalidateName(this.getView().byId("MsaD_id_HeadName"), "ID") &&
+                utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_HeadPosition"), "ID") &&
+                utils._LCvalidateDate(this.getView().byId("MsaD_id_CreateMSADate"), "ID") &&
+                utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_PanCard"), "ID") &&
+                utils._LCvalidateEmail(this.getView().byId("MsaD_id_Email"), "ID") &&
+                utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_Address"), "ID") &&
+                utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_Branch"), "ID") &&
+                (
+                    !isRecruitment || (
+                        utils._LCvalidateTraineeAmount(this.byId("Msa_Id_RateCharge"), "ID") &&
+                        utils._LCvalidateTraineeAmount(this.byId("Msa_Id_Refund"), "ID") && this.AdvanceBalance && utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayAdvance"), "ID") &&
+                        utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayBalance"), "ID")
+                    ));
 
                     this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {

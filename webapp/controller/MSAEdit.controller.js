@@ -132,8 +132,27 @@ sap.ui.define([
                 utils._LCvalidateTraineeAmount(oEvent);
                 this.validateStep();
             },
+
+            MsaE_onEditOrSavePress: async function () {
+                if (!this.MSA_oDialog) {
+                    sap.ui.core.Fragment.load({
+                        name: "sap.kt.com.minihrsolution.fragment.MSAUpdate",
+                        controller: this,
+                    }).then(function (MSA_oDialog) {
+                        this.MSA_oDialog = MSA_oDialog;
+                        this.getView().addDependent(this.MSA_oDialog);
+                        this.MSA_oDialog.open();
+                    }.bind(this));
+                } else {
+                    this.MSA_oDialog.open();
+                }
+            },
+
+            MSA_Frg_Close:function(){
+                this.MSA_oDialog.close();
+            },
             
-            onPressSave: async function () {
+            MSA_Frg_Update: async function () {
                 this.byId("MsaEdit_Id_Form").setBusy(true);
                 var isRecruitment = this.SimpleFormModel.getProperty("/Recruitment");
 

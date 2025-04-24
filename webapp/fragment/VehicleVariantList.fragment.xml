@@ -1,10 +1,8 @@
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    id="VVF_id_Fragment"
 >
     <Dialog
-        id="VVF_id_Dialog"
         title="Select Variant"
         contentWidth="85%"
         contentHeight="70%"

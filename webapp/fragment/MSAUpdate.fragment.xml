@@ -1,0 +1,100 @@
+	
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:rich="sap.ui.richtexteditor"
+	xmlns:core="sap.ui.core">
+	<Dialog
+        title="MSA Deatils">
+		<f:SimpleForm id="Exp_id_SimpleFrom"
+            editable="true" layout="ColumnLayout"
+              labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
+              adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"
+              emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
+			<f:content>
+										<Label text="{i18n>type}" required="true" />
+										<RadioButtonGroup editable="false" id="MsaE_id_Type" columns="5" valueState="Warning" select="onRadioButtonGroupSelect">
+											<RadioButton id="RB3-1" text="Recruitment"/>
+											<RadioButton id="RB3-2" text="Service"/>
+										</RadioButtonGroup>
+										<Label text="{i18n>companyName}" required="true"/>
+										<Input liveChange="Msa_LC_CompanyName" id="MsaE_id_CompanyName" maxLength="50" value="{FilteredMsaModel>/0/CompanyName}" editable="{simpleForm>/editable}" />
+										
+										<Label text="{i18n>companyHeadName}" required="true" />
+										<HBox width="100%" justifyContent="Start" alignItems="Center">
+											<VBox width="20%">
+												<Select selectedKey="{FilteredMsaModel>/0/Salutation}"
+												items="{Salutation>/salutation}" width="100%" editable="{simpleForm>/editable}">
+														<core:Item key="{Salutation>text}" text="{Salutation>text}" />
+												</Select>
+											</VBox>
+											<VBox width="78%">
+												<Input  liveChange="Msa_LC_CompanyHeadName" id="MsaE_id_MsaHead" value="{FilteredMsaModel>/0/CompanyHeadName}" editable="{simpleForm>/editable}" maxLength="50" class="sapUiTinyMarginBegin"/>
+											</VBox>
+										</HBox>
+
+										<Label text="{i18n>companyHeadPosition}" required="true"/>
+										<Input  liveChange="Msa_LC_HeadPosition" value="{FilteredMsaModel>/0/CompanyHeadPosition}" id="MsaE_id_HeadPosition" editable="{simpleForm>/editable}" maxLength="50" />
+
+										
+										<Label text="Rate Charge" required="true" visible="{simpleForm>/Recruitment}" ></m:Label>
+										<Input value="{FilteredMsaModel>/0/RateCharge}" visible="{simpleForm>/Recruitment}" maxLength="2" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" editable="false" />
+
+										<Label text="Payment" required="true" visible="{simpleForm>/Recruitment}"></m:Label>
+										<HBox  width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{simpleForm>/Recruitment}">
+											<VBox  width="49%">
+												<Input value="{FilteredMsaModel>/0/PaymentAdvance}" maxLength="2" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="LC_MSA_RateCharge" editable="false" />
+											</VBox>
+											<VBox  width="49%">
+												<Input value="{FilteredMsaModel>/0/PaymentBalance}" maxLength="2" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="LC_MSA_RateCharge"  editable="false"/>
+											</VBox>							
+										</HBox>
+
+										<Label text="Replacement Gratuity" required="true" visible="{simpleForm>/Recruitment}"></m:Label>
+										<HBox  width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{simpleForm>/Recruitment}">
+											<VBox  width="49%">
+												<Select items="{ContractPeriod>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ReplacementMonth}" width="100%" editable="false">
+													<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
+												</Select>
+											</VBox>
+											<VBox  width="49%">
+												<m:Input value="{FilteredMsaModel>/0/ReplacementRefund}" maxLength="2" placeholder="Refund in percentage" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge"  editable="false"/>
+											</VBox>							
+										</HBox>
+
+										<Label text="{i18n>contractPeriod}" required="true"/>
+										<Select items="{ContractPeriod>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ContractPeriod}" editable="{simpleForm>/editable}">
+											<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
+										</Select>
+
+										<Label text="{i18n>branch}" required="true" />
+										<ComboBox id="MsaE_Id_Branch" change="Msa_onComboBoxChange" editable="{simpleForm>/editable}" valueStateText="{i18n>expValStaSource}" items="{BaseLocationModel>/}" value="{FilteredMsaModel>/0/BranchCode}" showSecondaryValues="true" >
+											<core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>branchCode}" additionalText="{BaseLocationModel>city}" />
+										</ComboBox>								
+
+										<Label text="{i18n>createMSADate}" required="true"/>
+										<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Msa_ChangeMsaDate" value="{path:'FilteredMsaModel>/0/CreateMSADate',formatter: '.Formatter.formatDate'}" editable="{simpleForm>/editable}" id="MsaE_id_CreateMSADate"/>
+
+										<Label text="{i18n>panCard}" required="true"/>
+										<Input id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/0/PanCard}" editable="{simpleForm>/editable}" liveChange="Msa_LC_PanCard"/>
+
+										<Label text="{i18n>emailId}" required="true"/>
+										<TextArea liveChange="Msa_LC_EmailID"  maxLength="500" id="MsaE_id_MSAEmail" value="{FilteredMsaModel>/0/MsaEmail}" editable="{simpleForm>/editable}" />																																							
+
+										<Label text="{i18n>Address}" required="true"/>
+										<TextArea  id="MsaE_id_MsaAddress" value="{FilteredMsaModel>/0/Address}" maxLength="120" editable="{simpleForm>/editable}" liveChange="Msa_LC_Address"/>
+
+										<Label text="{i18n>paymentterms}" required="true"/>
+										<Select items="{ContractpaymentModel>/}" selectedKey="{FilteredMsaModel>/0/PaymentTerms}" editable="{simpleForm>/editable}">
+											<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
+										</Select>																				
+
+									</f:content>
+		</f:SimpleForm>
+		<!-- Buttons for Submit and Close actions -->
+		<FlexBox justifyContent="End" width="100%">
+			<Button text="{i18n>save}" type="Accept" press="MSA_Frg_Close" class="sendMail" />
+			<Button text="{i18n>close}" type="Negative" class="sendMail" press="MSA_Frg_Update" />
+		</FlexBox>
+	</Dialog>
+</core:FragmentDefinition>

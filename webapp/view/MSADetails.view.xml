@@ -52,15 +52,15 @@
 
 
 							<Label text="{i18n>msaRateCharge}" required="true" visible="{VisibleModel>/Recruitment}" ></Label>
-							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="3" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge"  />
+							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="3" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}" />
 
 							<Label text="Payment" required="true" visible="{VisibleModel>/Recruitment}"></Label>
 							<HBox  width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{VisibleModel>/Recruitment}">
 								<VBox  width="49%">
-									<Input value="{msaModelWizart>/PaymentAdvance}" maxLength="3" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="LC_MSA_RateCharge" valueHelpIconSrc="sap-icon://percent" showValueHelp="true"  />
+									<Input value="{msaModelWizart>/PaymentAdvance}" maxLength="3" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="onPaymentAdvanceInputChange" valueStateText="{i18n>msaAmountMess}"/>
 								</VBox>
 								<VBox  width="49%">
-									<Input value="{msaModelWizart>/PaymentBalance}" maxLength="3" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="LC_MSA_RateCharge"  />
+									<Input value="{msaModelWizart>/PaymentBalance}" maxLength="3" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="onPaymentAdvanceInputChange" valueStateText="{i18n>msaAmountMess}"/>
 								</VBox>							
 							</HBox>
 
@@ -72,7 +72,7 @@
 									</Select>
 								</VBox>
 								<VBox  width="49%">
-									<Input value="{msaModelWizart>/ReplacementRefund}" maxLength="3" placeholder="Refund in percentage" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge"  />
+									<Input value="{msaModelWizart>/ReplacementRefund}" maxLength="3" placeholder="Refund in percentage" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}" />
 								</VBox>							
 							</HBox>
 							
@@ -139,7 +139,7 @@
 							<Label text="Payment Balance" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/PaymentBalance}%" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="Replacement Gratuity Month" visible="{VisibleModel>/Recruitment}"/>
-							<Text text="{msaModelWizart>/ReplacementMonth}%" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/ReplacementMonth}" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="Replacement Gratuity Refund" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/ReplacementRefund}%" visible="{VisibleModel>/Recruitment}"/>
 
