@@ -87,8 +87,8 @@
 							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
 							</Select>
 							<Label text="{i18n>warrantyDate}" required="true"/>
-							<Select id="CD_id_Warranty" selectedKey="{ContractModelWizart>/Months}" items="{ContractPeriod>/ContractPeriod}">
-								<core:Item key="{ContractPeriod>No}" text="{ContractPeriod>Months}" />
+							<Select id="CD_id_Warranty" selectedKey="{ContractModelWizart>/WarrantyDate}" items="{ContractPeriod>/ContractPeriod}">
+								<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 							</Select>
 							<Label text="{i18n>calloutadditionalratesexpenses}" required="true"/>
 							<Select  id="CD_id_AddRate" selectedKey="{ContractModelWizart>/AdditionalRates}" items="{TravelAllowance>/type}">
@@ -96,7 +96,7 @@
 							</Select>
 							<Label text="{i18n>paymentterms}" required="true"/>
 							<Select id="CD_id_PaymentTerms" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/}">
-								<core:Item key="{ContractModelWizart>days}" text="{ContractModelWizart>days}" />
+								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</Select>
 							<Label text="{i18n>contractLocation}" required="true"/>
 							<ComboBox id="CD_id_ConLocation" change="CD_ValidateCommonFields"  items="{BaseLocationModel>/}" value="{ContractModelWizart>/contractLocation}" >

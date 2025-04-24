@@ -12,11 +12,11 @@
 
 		</headerContent>
 		<content>
-			<fb:FilterBar  class="sapUiTinyMargin" id="C_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="C_onClearFilters" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false" >
+			<fb:FilterBar  class="sapUiTinyMargin" id="C_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="C_onClearFilters" showClearOnFB="true" search="C_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="Contract No" label="{i18n>contractNo}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox selectionChange=".onBranchChange" showClearIcon="true" items="{ContractModel>/data}">
+						<ComboBox selectionChange=".onBranchChange" showClearIcon="true" items="{ContractModel>/}">
                             <core:Item key="{ContractModel>ContractNo}" text="{ContractModel>ContractNo}"/>
                         </ComboBox>
 					</fb:control>
@@ -103,7 +103,7 @@
 							<Text text="{ContractModel>EndClient}"/>
 							<Text text="{path:'ContractModel>AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{path:'ContractModel>AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" />
-							<ObjectStatus text="{ContractModel>Status}" inverted="true" class="centerText"  />
+							<ObjectStatus inverted="true" text="{ContractModel>ContractStatus}"  state="{path: 'ContractModel>ContractStatus', formatter:'.Formatter.formatObjectStatus'}"  class="centerText"/>
 							<Text text="{ContractModel>Comments}"/>
 						</cells>
 					</ColumnListItem>
