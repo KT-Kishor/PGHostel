@@ -383,27 +383,30 @@ sap.ui.define([], function () {
         return true;
       }
     },
+
     _LCvalidateTraineeAmount: function (oEvent, type) {
       var oInput = type === "ID" ? oEvent : oEvent.getSource();
       var value = oInput.getValue().trim();
+    
+      // Remove invalid characters
       var cleanedValue = value.replace(/[^0-9.]/g, "");
-      // var parts = cleanedValue.split(".");
-      // if (parts.length === 2) {
-      //   cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
-      // }
+    
+      // Set cleaned value back to input
       oInput.setValue(cleanedValue);
-      // if (cleanedValue === "" || isNaN(cleanedValue) || parseFloat(cleanedValue) < 0) {
-      //   oInput.setValueState("Error");
-      //   return false;
-      // }
-      if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
+    
+      // Regex: Up to 2 digits before decimal, optional decimal, up to 2 digits after decimal
+      var validFormat = /^(?:\d{1,2})(?:\.\d{1,2})?$/;
+    
+      // Check for value within 0-99.99 range and match regex
+      if (!validFormat.test(cleanedValue) || parseFloat(cleanedValue) > 99.99) {
         oInput.setValueState("Error");
         return false;
       } else {
         oInput.setValueState("None");
         return true;
       }
-    },
+    }
+    
 
     _LCstrictValidationComboBox: function (oEvent, type) {
       var oComboBox = type === "ID" ? oEvent : oEvent.getSource();

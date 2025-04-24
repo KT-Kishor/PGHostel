@@ -83,11 +83,7 @@
 										<m:Select items="{Costcenter>/Costcenter}" selectedKey="{FilteredExpenseModel>/0/CostCenter}"  editable="{viewModel>/editable}">
 											<core:Item key="{Costcenter>Value}" text="{Costcenter>Value}"/>
 										</m:Select>																																																											
-										
-										<!-- <m:Label text="{i18n>expAccountantRemark}" />
-										<m:Text id="textRemark" text="{= ${FilteredExpenseModel>/0/AccountingRemark}.length > 80 ? ${FilteredExpenseModel>/0/AccountingRemark}.substring(0, 80) + '...' : ${FilteredExpenseModel>/0/AccountingRemark}}" wrapping="false" />
-										<m:Link text="{i18n>showMore}" press="onPressAccountantRemark" visible="{= ${FilteredExpenseModel>/0/AccountingRemark}.length > 80}" /> -->
-
+																			
 										<m:Label text="{i18n>expEmployeeRemark}" required="true"/>
 										<m:TextArea id="Exp_id_EmpRemark" valueStateText="{i18n>expValStaEmployeeRemark}" liveChange="onLiveChangeEmployeeRemark" rows="4" value="{FilteredExpenseModel>/0/comments/0/Comment}"  editable="{viewModel>/editable}" maxLength="1000"/>
 

@@ -4,6 +4,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns="sap.uxap"
 	xmlns:core="sap.ui.core"
+	xmlns:layout="sap.ui.layout"
 	xmlns:m="sap.m">
 	<m:Page id="MsaE_id_Page" title="{i18n>msaDetails}" navButtonPress="MsaE_onBack" showNavButton="true">
 		<ObjectPageLayout id="MsaE_id_ObjectPage"
@@ -21,14 +22,65 @@
 					</expandedContent>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
+
+			   <headerContent>
+                <m:FlexBox busyIndicatorDelay="0" id="QF_id_HeaderContent" wrap="Wrap" fitContainer="true">                  
+
+                    <layout:VerticalLayout class="sapUiSmallMarginBottom sapUiSmallMarginEnd">
+
+                        <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
+                            <m:Label text="{i18n>companyHeadName}"/>
+							<m:Text text="{FilteredMsaModel>/0/Salutation}  {FilteredMsaModel>/0/CompanyHeadName}" />
+                           <!-- <m:HBox width="100%" justifyContent="Start" alignItems="Center">
+											<m:VBox width="20%">
+												<m:Select selectedKey="{FilteredMsaModel>/0/Salutation}"
+												items="{Salutation>/salutation}" width="100%" editable="{simpleForm>/editable}">
+														<core:Item key="{Salutation>text}" text="{Salutation>text}" />
+												</m:Select>
+											</m:VBox>
+											<m:VBox width="78%">
+												<m:Input  liveChange="Msa_LC_CompanyHeadName" id="MsaE_id_MsaHead" value="{FilteredMsaModel>/0/CompanyHeadName}" editable="{simpleForm>/editable}" maxLength="50" class="sapUiTinyMarginBegin"/>
+											</m:VBox>
+										</m:HBox> -->
+                        </layout:HorizontalLayout>
+
+                        <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
+                            <m:Label showColon="true" text="{i18n>email} "/>
+                            <m:Text width="5px" />
+                            <m:Link text="{Quotation>/CompanyCodeData/0/carrerEmail}"/>
+                        </layout:HorizontalLayout>
+
+                        <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
+                            <m:Label showColon="true" text="{i18n>website} "/>
+                            <m:Text width="5px" />
+                            <m:Link text="{Quotation>/CompanyCodeData/0/website}" href="https://{Quotation>/CompanyCodeData/0/website}" target="_blank"/>
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
+                            <m:Label text="{i18n>gstNo}: {Quotation>/CompanyCodeData/0/gstin}"/>
+                        </layout:HorizontalLayout>
+                    </layout:VerticalLayout>
+
+                    <layout:VerticalLayout class="sapUiSmallMarginBeginEnd sapUiMediumMarginEnd sapUiSmallMarginBottom" >
+                        <m:Label text="{Quotation>/CompanyCodeData/0/longAddress}" width="300px" wrapping="true" wrappingType="Normal"/>
+                        <layout:HorizontalLayout />
+                    </layout:VerticalLayout>
+
+                    <layout:VerticalLayout class="sapUiTinyMarginBottom sapUiSmallMarginBegin">
+                        <layout:HorizontalLayout>
+                            <m:ObjectStatus title="{i18n>status}"/>
+                        </layout:HorizontalLayout>
+                    </layout:VerticalLayout>
+                </m:FlexBox>
+            </headerContent>
+
 			<sections>
 				<ObjectPageSection>
 					<subSections>
 						<ObjectPageSubSection title="{i18n>basicDetails}">
 							<blocks>
-								<f:SimpleForm 
-								busyIndicatorDelay="0"
-								id="MsaEdit_Id_Form"
+								<!-- <f:SimpleForm 
+									busyIndicatorDelay="0"
+									id="MsaEdit_Id_Form"
                                     editable="true"
                                     layout="ResponsiveGridLayout"
 									labelSpanXL="4"
@@ -53,10 +105,9 @@
 												<m:Button text="{i18n>tileUnit}" enabled="{simpleForm>/isEnabled}"  press="MsaE_onPressMerge"  />
 											</m:Toolbar>
 										</f:toolbar>
-									<!-- Form content: Labels and Input fields for MSA data -->
 									<f:content>
 										<m:Label text="{i18n>type}" required="true" />
-										<m:RadioButtonGroup editable="{simpleForm>/editable}" id="MsaE_id_Type" columns="5" valueState="Warning" select="onRadioButtonGroupSelect">
+										<m:RadioButtonGroup editable="false" id="MsaE_id_Type" columns="5" valueState="Warning" select="onRadioButtonGroupSelect">
 											<m:RadioButton id="RB3-1" text="Recruitment"/>
 											<m:RadioButton id="RB3-2" text="Service"/>
 										</m:RadioButtonGroup>
@@ -81,27 +132,27 @@
 
 										
 										<m:Label text="Rate Charge" required="true" visible="{simpleForm>/Recruitment}" ></m:Label>
-										<m:Input value="{FilteredMsaModel>/0/RateCharge}" visible="{simpleForm>/Recruitment}" maxLength="2" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" editable="{simpleForm>/editable}" />
+										<m:Input value="{FilteredMsaModel>/0/RateCharge}" visible="{simpleForm>/Recruitment}" maxLength="2" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" editable="false" />
 
 										<m:Label text="Payment" required="true" visible="{simpleForm>/Recruitment}"></m:Label>
 										<m:HBox  width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{simpleForm>/Recruitment}">
 											<m:VBox  width="49%">
-												<m:Input value="{FilteredMsaModel>/0/PaymentAdvance}" maxLength="2" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="LC_MSA_RateCharge" editable="{simpleForm>/editable}" />
+												<m:Input value="{FilteredMsaModel>/0/PaymentAdvance}" maxLength="2" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="LC_MSA_RateCharge" editable="false" />
 											</m:VBox>
 											<m:VBox  width="49%">
-												<m:Input value="{FilteredMsaModel>/0/PaymentBalance}" maxLength="2" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="LC_MSA_RateCharge"  editable="{simpleForm>/editable}"/>
+												<m:Input value="{FilteredMsaModel>/0/PaymentBalance}" maxLength="2" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="LC_MSA_RateCharge"  editable="false"/>
 											</m:VBox>							
 										</m:HBox>
 
 										<m:Label text="Replacement Gratuity" required="true" visible="{simpleForm>/Recruitment}"></m:Label>
 										<m:HBox  width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{simpleForm>/Recruitment}">
 											<m:VBox  width="49%">
-												<m:Select items="{ContractPeriod>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ReplacementMonth}" width="100%" editable="{simpleForm>/editable}">
+												<m:Select items="{ContractPeriod>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ReplacementMonth}" width="100%" editable="false">
 													<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 												</m:Select>
 											</m:VBox>
 											<m:VBox  width="49%">
-												<m:Input value="{FilteredMsaModel>/0/ReplacementRefund}" maxLength="2" placeholder="Refund in percentage" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge"  editable="{simpleForm>/editable}"/>
+												<m:Input value="{FilteredMsaModel>/0/ReplacementRefund}" maxLength="2" placeholder="Refund in percentage" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge"  editable="false"/>
 											</m:VBox>							
 										</m:HBox>
 
@@ -118,7 +169,6 @@
 										<m:Label text="{i18n>createMSADate}" required="true"/>
 										<m:DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Msa_ChangeMsaDate" value="{path:'FilteredMsaModel>/0/CreateMSADate',formatter: '.Formatter.formatDate'}" editable="{simpleForm>/editable}" id="MsaE_id_CreateMSADate"/>
 
-										<!-- Input for PAN card, includes a liveChange event -->
 										<m:Label text="{i18n>panCard}" required="true"/>
 										<m:Input id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/0/PanCard}" editable="{simpleForm>/editable}" liveChange="Msa_LC_PanCard"/>
 
@@ -134,7 +184,7 @@
 										</m:Select>																				
 
 									</f:content>
-								</f:SimpleForm>
+								</f:SimpleForm> -->
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection title="{i18n>sowDetails}">

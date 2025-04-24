@@ -128,9 +128,30 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
+            LC_MSA_RateCharge:function(oEvent){
+                utils._LCvalidateTraineeAmount(oEvent);
+                this.validateStep();
+            },
+            
             onPressSave: async function () {
                 this.byId("MsaEdit_Id_Form").setBusy(true);
-                if (utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_CompanyName"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_HeadPosition"), "ID") && utils._LCvalidateName(this.getView().byId("MsaE_id_MsaHead"), "ID") && utils._LCvalidateDate(this.getView().byId("MsaE_id_CreateMSADate"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaPanCard"), "ID") && utils._LCvalidateEmail(this.getView().byId("MsaE_id_MSAEmail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaAddress"), "ID") && utils._LCvalidateMandatoryField(this.byId("MsaE_Id_Branch","ID"),"ID")) {
+                var isRecruitment = this.SimpleFormModel.getProperty("/Recruitment");
+
+                if (utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_CompanyName"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_HeadPosition"), "ID") &&
+                    utils._LCvalidateName(this.getView().byId("MsaE_id_MsaHead"), "ID") &&
+                    utils._LCvalidateDate(this.getView().byId("MsaE_id_CreateMSADate"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaPanCard"), "ID") &&
+                    utils._LCvalidateEmail(this.getView().byId("MsaE_id_MSAEmail"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaAddress"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.byId("MsaE_Id_Branch"), "ID") &&
+                    (!isRecruitment || (
+                            utils._LCvalidateTraineeAmount(this.byId("Msa_Id_RateCharge"), "ID") &&
+                            utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayAdvance"), "ID") &&
+                            utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayBalance"), "ID") &&
+                            utils._LCvalidateTraineeAmount(this.byId("Msa_Id_Refund"), "ID")
+                        ))) {
+
                     var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
                     oModel.Type = this.byId("MsaE_id_Type").getSelectedButton().getText();
                     

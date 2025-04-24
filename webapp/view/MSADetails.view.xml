@@ -52,15 +52,15 @@
 
 
 							<Label text="{i18n>msaRateCharge}" required="true" visible="{VisibleModel>/Recruitment}" ></Label>
-							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="2" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge"  />
+							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="3" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge"  />
 
 							<Label text="Payment" required="true" visible="{VisibleModel>/Recruitment}"></Label>
 							<HBox  width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{VisibleModel>/Recruitment}">
 								<VBox  width="49%">
-									<Input value="{msaModelWizart>/PaymentAdvance}" maxLength="2" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="LC_MSA_RateCharge" valueHelpIconSrc="sap-icon://percent" showValueHelp="true"  />
+									<Input value="{msaModelWizart>/PaymentAdvance}" maxLength="3" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="LC_MSA_RateCharge" valueHelpIconSrc="sap-icon://percent" showValueHelp="true"  />
 								</VBox>
 								<VBox  width="49%">
-									<Input value="{msaModelWizart>/PaymentBalance}" maxLength="2" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="LC_MSA_RateCharge"  />
+									<Input value="{msaModelWizart>/PaymentBalance}" maxLength="3" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="LC_MSA_RateCharge"  />
 								</VBox>							
 							</HBox>
 
@@ -72,7 +72,7 @@
 									</Select>
 								</VBox>
 								<VBox  width="49%">
-									<Input value="{msaModelWizart>/ReplacementRefund}" maxLength="2" placeholder="Refund in percentage" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge"  />
+									<Input value="{msaModelWizart>/ReplacementRefund}" maxLength="3" placeholder="Refund in percentage" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge"  />
 								</VBox>							
 							</HBox>
 							
