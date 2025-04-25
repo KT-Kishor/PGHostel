@@ -329,6 +329,7 @@ sap.ui.define([
             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel, text) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
+                oModel.TrainingPaidAmount= this.byId("TU_id_PaidTraineeAmount").getValue()
                 oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
                 oModel.ManagerID = this.getView().byId("TU_id_Manager").getSelectedKey();
                 oModel.ReleaseDate = this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");;
