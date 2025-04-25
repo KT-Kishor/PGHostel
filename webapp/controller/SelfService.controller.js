@@ -19,7 +19,7 @@ sap.ui.define([
                 this.byId("SS_id_IconTab").setSelectedKey("employeeDetailsKey");
                 this.SS_commonEduFunction();
                 this.SS_commonEmpFunction();
-                this.EduFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/FolderID");
+                this.EduFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EducationalandDocumentsDetailFolderID");
                 this.EmpFolderID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmploymentDetailFolderID");
                 await this._fetchCommonData("Designation", "sDesignationModel");
                 await this._fetchCommonData("BaseLocation", "sBaseLocationModel");
