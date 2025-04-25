@@ -33,9 +33,9 @@ sap.ui.define([
                 this.getView().setModel(oModelDataPro, "oModelDataPro");
                 var oSowCreateModel = new JSONModel();
                 this.getView().setModel(oSowCreateModel, "sowCreateModel");
+                BusyIndicator.hide();
                 this.MSADetailsReadCall();
                 this.CommonReadCallForSow();
-                BusyIndicator.hide();
             },
 
             onRadioButtonGroupSelect:function(oEvent){
@@ -47,20 +47,13 @@ sap.ui.define([
             },
 
             MSADetailsReadCall: async function () {
-                BusyIndicator.show(0);
+               this.byId("QF_id_HeaderContent").setBusy(true);
                 try {
-                    await this._fetchCommonData("MSADetails", "FilteredMsaModel", {MsaID: this.MSAID});
-                    if (this.getView().getModel("FilteredMsaModel").getData()[0].Type === "Recruitment") {
-                        this.byId("MsaE_id_Type").setSelectedIndex(0); 
-                        this.SimpleFormModel.setProperty("/Recruitment",true);
-                    } else {
-                        this.byId("MsaE_id_Type").setSelectedIndex(1); // Second RadioButton
-                        this.SimpleFormModel.setProperty("/Recruitment",false);
-                    } 
+                    await this._fetchCommonData("MSADetails", "FilteredMsaModel", {MsaID: this.MSAID});                    
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
-                    BusyIndicator.hide();
+                    this.byId("QF_id_HeaderContent").setBusy(false);
                 }
             },
 
@@ -134,6 +127,8 @@ sap.ui.define([
             },
 
             MsaE_onEditOrSavePress: async function () {
+                var type = this.getView().getModel("FilteredMsaModel").getData()[0].Type;
+                ( type === "Recruitment") ? this.SimpleFormModel.setProperty("/Recruitment",true) : this.SimpleFormModel.setProperty("/Recruitment",false); 
                 if (!this.MSA_oDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.MSAUpdate",
@@ -142,10 +137,14 @@ sap.ui.define([
                         this.MSA_oDialog = MSA_oDialog;
                         this.getView().addDependent(this.MSA_oDialog);
                         this.MSA_oDialog.open();
-                    }.bind(this));
-                } else {
-                    this.MSA_oDialog.open();
-                }
+                        type !== "Recruitment"
+                        ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
+                        : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0);                        }.bind(this));
+                    } else {
+                        this.MSA_oDialog.open();
+                        type !== "Recruitment"
+                        ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
+                        : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0);                }
             },
 
             MSA_Frg_Close:function(){
@@ -153,27 +152,17 @@ sap.ui.define([
             },
             
             MSA_Frg_Update: async function () {
-                this.byId("MsaEdit_Id_Form").setBusy(true);
-                var isRecruitment = this.SimpleFormModel.getProperty("/Recruitment");
+                sap.ui.getCore().byId("MsaEdit_Id_Form").setBusy(true);
 
-                if (utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_CompanyName"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_HeadPosition"), "ID") &&
-                    utils._LCvalidateName(this.getView().byId("MsaE_id_MsaHead"), "ID") &&
-                    utils._LCvalidateDate(this.getView().byId("MsaE_id_CreateMSADate"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaPanCard"), "ID") &&
-                    utils._LCvalidateEmail(this.getView().byId("MsaE_id_MSAEmail"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.getView().byId("MsaE_id_MsaAddress"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.byId("MsaE_Id_Branch"), "ID") &&
-                    (!isRecruitment || (
-                            utils._LCvalidateTraineeAmount(this.byId("Msa_Id_RateCharge"), "ID") &&
-                            utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayAdvance"), "ID") &&
-                            utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayBalance"), "ID") &&
-                            utils._LCvalidateTraineeAmount(this.byId("Msa_Id_Refund"), "ID")
-                        ))) {
-
-                    var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
-                    oModel.Type = this.byId("MsaE_id_Type").getSelectedButton().getText();
-                    
+                if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_CompanyName"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_HeadPosition"), "ID") &&
+                    utils._LCvalidateName(sap.ui.getCore().byId("MsaE_id_MsaHead"), "ID") &&
+                    utils._LCvalidateDate(sap.ui.getCore().byId("MsaE_id_CreateMSADate"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_MsaPanCard"), "ID") &&
+                    utils._LCvalidateEmail(sap.ui.getCore().byId("MsaE_id_MSAEmail"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_MsaAddress"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_Id_Branch"), "ID")) {
+                        var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
                     var oData = {
                         "data": oModel,
                         "filters": {
@@ -182,21 +171,21 @@ sap.ui.define([
                     }
                     await this.ajaxUpdateWithJQuery("MSADetails", oData).then((oData) => {
                         if (oData) {
-                            this.SimpleFormModel.setProperty("/editable", false);
-                            this.SimpleFormModel.setProperty("/isEnabled", true);
                             MessageToast.show(this.i18nModel.getText("msaupdateSuccess"));
-                            this.byId("MsaEdit_Id_Form").setBusy(false);
+                            sap.ui.getCore().byId("MsaEdit_Id_Form").setBusy(false);
+                            this.MSA_oDialog.close();
                         } else {
                             MessageToast.show(this.i18nModel.getText("msaupdateFailed"));
+                            this.MSA_oDialog.close();
                         }
                     })
                         .catch((oError) => {
-                            this.byId("MsaEdit_Id_Form").setBusy(false);
+                            sap.ui.getCore().byId("MsaEdit_Id_Form").setBusy(false);
                             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         })
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                    this.byId("MsaEdit_Id_Form").setBusy(false);
+                    sap.ui.getCore().byId("MsaEdit_Id_Form").setBusy(false);                 
                 }
             },
 
@@ -317,18 +306,53 @@ sap.ui.define([
                     EndDate: "",
                     Currency: "INR"
                 };
-
                 this.getView().getModel("sowCreateModel").setData(jsonSow);
-                var oView = this.getView();
             },
 
             onPressChangeSow:function(oEvent){
-                this.Selected = oEvent.getSource()
+                this.Selected = oEvent.getParameter("listItem").getBindingContext("SowReadModel").getObject();
             },
 
-            MsaE_onPressSOWActive:function(){
-
-            },
+            MsaE_onPressSOWActive: async function(oEvent) {
+                if(!this.byId("Sow_Id_ReadTable").getSelectedItem()){
+                    return MessageToast.show(this.i18nModel.getText("noRowSelected"))
+                }
+                var oTable = this.byId("Sow_Id_ReadTable");
+                oTable.setBusy(true);
+                var FilterData = this.getView().getModel("SowReadModel").getData().filter((item) => item.SowID === this.Selected.SowID);
+                var Status = oEvent.getSource().getText();
+                var oData = {
+                    "data": FilterData.map((item) => {
+                        return {
+                            "data": {
+                                "Status": Status
+                            },
+                            "filters": {
+                                "SowID": item.SowID 
+                            }
+                        };
+                    })
+                };
+                try {
+                    var responce = await this.ajaxUpdateWithJQuery("SowDetails", oData);
+                    if(responce){
+                        MessageToast.show("Sow updated successfully");
+                        await this.CommonReadCallForSow();
+                    }else{
+                        MessageToast.show("Sow updated failed");
+                        oTable.setBusy(false);
+                    }
+                } catch (error) {
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    oTable.setBusy(false);
+                }
+            },    
+            
+            TableGetData:function(){
+                var SowReadModel = this.getView().getModel("SowReadModel").getData();
+                var FilterData = SowReadModel.filter((item) => item.SowID === this.Selected.SowID);
+                
+            },         
 
             MsaE_onPressRelesedSow: function () {
                 this.SimpleFormModel.setProperty("/save", false);

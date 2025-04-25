@@ -11,24 +11,16 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: async function() {
             await this.getRouter().getRoute("RouteExpensePage").attachMatched(this._onRouteMatched, this);
-            await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-            await this._fetchCommonData("Country", "CountryModel");
-            await this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
         },
-
+        
         _onRouteMatched: async function(oEvent) {
+            if(!this.getView().getModel("BaseLocationModel")){
+                await this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                await this._fetchCommonData("Country", "CountryModel");
+                await this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
+            }
             this.commonLoginFunction("Expense");
             this.LoginModel = this.getView().getModel("LoginModel");
-            await this._fetchCommonData("Expense", "FilterExpenseModel",{"EmployeeID":this.LoginModel.getProperty("/EmployeeID")});
-            var FilterModel = this.getView().getModel("FilterExpenseModel");
-
-            if (FilterModel) {
-                FilterModel.setData([
-                    ...new Map(
-                        FilterModel.getData().map((item) => [item.ExpenseName, item])
-                    ).values()
-                ]);
-            }
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var View = new JSONModel({
@@ -41,9 +33,30 @@ sap.ui.define([
             this.ViewModel = this.getView().getModel("viewModel");           
             this.CommonModel();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
+            this.onChangeEmployeeID();
             BusyIndicator.hide();
-            this.Exp_onSearch();
+            this.Exp_onSearch();            
         },
+
+        onChangeEmployeeID: async function () {
+            var selectedItem = this.byId("Exp_id_EmployeeName").getSelectedItem();
+            var EmployeeID = selectedItem 
+                ? selectedItem.getText() 
+                : this.LoginModel.getProperty("/EmployeeID"); 
+        
+            await this._fetchCommonData("Expense", "FilterExpenseModel", { "EmployeeID": EmployeeID });
+        
+            var FilterModel = this.getView().getModel("FilterExpenseModel");
+        
+            if (FilterModel) {
+                var uniqueData = [
+                    ...new Map(
+                        FilterModel.getData().map(item => [item.ExpenseName, item])
+                    ).values()
+                ];
+                FilterModel.setData(uniqueData);
+            }
+        },        
  // Function to initialize the common model for expense creation
         CommonModel: function() {
             var oModel = new JSONModel({
@@ -131,8 +144,8 @@ sap.ui.define([
                     await that.Exp_onPressClear();
                     await that._fetchCommonData("ExpenseTotalCalculation", "", {ExpenseID: oResponse.ExpenseID});
                     BusyIndicator.hide();
+                    that.onChangeEmployeeID();
                     await that.Exp_onSearch();
-                    that.getView().getModel("FilterExpenseModel").setData([...new Map(that.getView().getModel("ExpenseModel").getData().map((item) => [item.ExpenseName, item])).values()]);
                     MessageToast.show(that.i18nModel.getText("expenseCreatedMess"));
                 } else {
                     MessageToast.show(that.i18nModel.getText("expenseCreatedMessFailed"));
@@ -213,6 +226,7 @@ sap.ui.define([
                     try {
                         await that.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: expenseID } });
                         MessageToast.show(that.i18nModel.getText("expenseDeleteMess")); // <== use 'that' instead of 'this'
+                        that.onChangeEmployeeID();
                         that.Exp_onSearch();
                     } catch (error) {
                         MessageToast.show(error.responseText || "Error deleting expense");

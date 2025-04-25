@@ -69,11 +69,11 @@
                 <HBox width="100%" justifyContent="Start" alignItems="Center">
                     <VBox width="30%">
                         <ComboBox 
-                            items="{NameSalutation>/items}" 
+                            items="{Salutation>/salutation}" 
                             selectedKey="{oModelDataPro>/Salutation}" 
                             value="{oModelDataPro>Salutation}" 
                             width="100%">
-                            <core:Item key="{NameSalutation>Salutationname}" text="{NameSalutation>Salutationname}" />
+                            <core:Item key="{Salutation>text}" text="{Salutation>text}" />
                         </ComboBox>                       
                     </VBox>
                     <VBox width="70%">

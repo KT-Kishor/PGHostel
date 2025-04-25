@@ -17,7 +17,7 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="{= ${LoginModel>/Role} === 'Admin' ? true : false}">
 					<fb:control>
-						<ComboBox name="EmployeeID" showSecondaryValues="true" showClearIcon="true" items="{EmpModel>/}" id="Exp_id_EmployeeName">
+						<ComboBox name="EmployeeID" change="onChangeEmployeeID" showSecondaryValues="true" showClearIcon="true" items="{EmpModel>/}" id="Exp_id_EmployeeName">
 							<core:ListItem key="{EmpModel>EmployeeID}" text="{EmpModel>EmployeeID}" additionalText="{EmpModel>EmployeeName}" />
 						</ComboBox>
 					</fb:control>
@@ -73,8 +73,8 @@
                     <Title id="title" text="Expense Details ({= ${ExpenseModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
-                   <Button icon="sap-icon://add-employee" tooltip="{i18n>expenseAddTooltip}" press="Exp_onPressAddExpense" />
-					<Button icon="sap-icon://download" press="Exp_onPressExpenseDownload" />
+                   <Button icon="sap-icon://add-employee" type="Accept" text="{i18n>expAddBtn}" tooltip="{i18n>expenseAddTooltip}" press="Exp_onPressAddExpense" />
+					<Button icon="sap-icon://download" type="Neutral" text="{i18n>download}" press="Exp_onPressExpenseDownload" />
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>

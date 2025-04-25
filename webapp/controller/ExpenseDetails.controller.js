@@ -33,7 +33,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                 editable: false,
                 enable: true,
                 enableDelete: true,
-                required: false,
+                required: true,
                 SubmitBtn: false,
                 SaveBtn: false,
             });
@@ -193,6 +193,10 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
 
         Exp_Det_onPressBackBtn: function() {
             this.getRouter().navTo("RouteExpensePage");
+            this.byId("Exp_id_Country").setValueState("None");
+            this.byId("Exp_id_Source").setValueState("None");
+            this.byId("Exp_id_Destination").setValueState("None");
+            this.byId("Exp_id_EmpRemark").setValueState("None");
         },
 
         Exp_Det_onEditOrSavePress: function() {
