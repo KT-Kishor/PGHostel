@@ -49,7 +49,7 @@
                     selectionChange="onStrictValidationComboBox"
                     change="onTypeChange"
                     required="true"
-                    selectedKey="{myform>/formData/data/Type}"
+                    value="{myform>/formData/data/Type}"
                 >
 					<core:ListItem
                         key="{assetType>Type}"
@@ -118,7 +118,7 @@
                     required="true"
                     editable="false"
                     id="FAA_id_AssetValue"
-                    value="{path:'myform>/formData/data/AssetValue',formatter:'.Formatter.formatCurrencyInINRText'}"
+                    value="{path:'myform>/formData/data/AssetValue',formatter:'.Formatter.fromatNumber'}"
                     liveChange=".onAssetValueChange"
                 />
 				<Label text="{i18n>assignedDate}" />

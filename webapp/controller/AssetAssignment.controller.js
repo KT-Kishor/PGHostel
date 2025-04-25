@@ -42,7 +42,7 @@ sap.ui.define([
                 });
                 this.commonLoginFunction("AssetAssignment");
                 this._makeDatePickersReadOnly(["AA_id_Date"]);
-                this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAU_id_unassignDate"]);
+                this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAU_id_unassignDate", "FAA_id_Model"]);
                 this.getView().setModel(form, "myform");
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this._fetchCommonData("IncomeAsset", "incomeModel");
@@ -77,6 +77,8 @@ sap.ui.define([
                     });
 
                     this.byId("AA_id_AssestTable").getBinding("items").filter(filter);
+                    var oTableRowCount = this.byId("AA_id_AssestTable").getBinding("items").iLength;
+                    this.byId("AA_id_RowCountText").setText("Asset Data: " + oTableRowCount);
                     sap.ui.core.BusyIndicator.hide();
                 }).catch((oError) => {
                     sap.ui.core.BusyIndicator.hide();
@@ -180,11 +182,15 @@ sap.ui.define([
                         this.FAA_Dialog = FAA_Dialog;
                         oView.addDependent(this.FAA_Dialog);
                         this.FAA_Dialog.open();
-                        this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate"]);
+                        this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate","FAA_id_Model"]);
                     }.bind(this));
 
                 } else {
                     this.FAA_Dialog.open();
+                    sap.ui.getCore().byId("FAA_id_employeeID").setSelectedKey("");
+                    sap.ui.getCore().byId("FAA_id_Type").setSelectedKey("");
+                    sap.ui.getCore().byId("FAA_branch_Id").setSelectedKey("");
+                    sap.ui.getCore().byId("FAA_id_AssignedBy").setSelectedKey("");
                 }
             },
 
@@ -212,6 +218,11 @@ sap.ui.define([
 
             FAA_onStrictValidationComboBox: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
+            },
+
+            onStrictValidationComboBox:function(oEvent){
+                utils._LCvalidateMandatoryField(oEvent);
+
             },
 
             FAU_onStrictValidationComboBox: function (oEvent) {
@@ -255,7 +266,6 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_AssignedDate"), "ID")) {
 
                         var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
-                        var oFormFilters = this.getView().getModel("myform").getProperty("/formData/filters");
                         var originalStatus = this.getView().getModel("myform").getProperty("/formData/data/Status");
                         var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
                         oFormData.AssignedDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oAssignedDate);
@@ -263,10 +273,13 @@ sap.ui.define([
                         // oFormData.ReturnDate = "";
                         if(originalStatus === "Returned"){
                             oFormData.IsCurrent = 1;
+                            if(!oFormData.Currency){
+                                oFormData.Currency = this.getView().getModel("myform").getProperty("/formData/data/Currency")
+                            }
                             await this.ajaxCreateWithJQuery("IncomeAsset",{ data: oFormData}, ["FAA_id_FormFrag"])
                         }
                         else{
-                        await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oFormData, filters: oFormFilters }, ["FAA_id_FormFrag"]);
+                        await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oFormData, filters: {ID: this.getView().getModel("myform").getProperty("/formData/filters/ID") } }, ["FAA_id_FormFrag"]);
                         }
                         await this.AA_CoomonReadCall();
 
@@ -404,7 +417,7 @@ sap.ui.define([
                         if (!this._unassignDialog) {
                             this._unassignDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetUnassignDialog", this);
                             this.getView().addDependent(this._unassignDialog);
-                            this._FragmentDatePickersReadOnly(["FAU_id_unassignDate"]);
+                            this._FragmentDatePickersReadOnly(["FAU_id_unassignDate","FAA_id_Model"]);
                         }
                         this._unassignDialog.open();
 
@@ -459,10 +472,9 @@ sap.ui.define([
                 var formData = this.getView().getModel("myform");
                 formData.setProperty("/formData/data/EquipmentNumber", oSelectedData.EquipmentNumber);
                 formData.setProperty("/formData/data/SerialNumber", oSelectedData.SerialNumber);
-                formData.setProperty("/formData/filters/EquipmentNumber", oSelectedData.EquipmentNumber);
-                formData.setProperty("/formData/filters/SerialNumber", oSelectedData.SerialNumber);
                 formData.setProperty("/formData/data/Status", oSelectedData.Status);
                 formData.setProperty("/formData/data/AssetValue", (oSelectedData.AssetValue).toString());
+                formData.setProperty("/formData/filters/ID", oSelectedData.ID);
 
                 oFrag.byId("FDP_id_ValueHelpDialog").close()
             },
@@ -473,9 +485,7 @@ sap.ui.define([
                 var oTypeSelected = oCore.byId("FAA_id_Type").getSelectedKey();
 
                 var allData = this.getView().getModel("incomeModel").getProperty("/");
-                var filteredData = allData.filter(item =>
-                    item.Type === oTypeSelected && (item.Status === "Available" || item.Status === "Returned") && (item.Status!=="Transferd")
-                );
+                var filteredData = allData.filter(item => item.IsCurrent === "1" && item.Status === "Available" || item.IsCurrent === "1" && item.Status === "Returned");
 
                 var filteredModel = new sap.ui.model.json.JSONModel(filteredData);
                 oView.setModel(filteredModel, "filteredAssetDetails");

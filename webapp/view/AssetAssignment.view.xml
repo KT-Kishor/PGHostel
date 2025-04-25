@@ -104,7 +104,7 @@
             </fb:filterGroupItems>
         </fb:FilterBar>
         <Table
-            alternateRowColors="false"
+            alternateRowColors="true"
             id="AA_id_AssestTable"
             busyIndicatorDelay="0"
             items="{
@@ -122,7 +122,7 @@
             <headerToolbar>
                 <OverflowToolbar>
                     <Title
-                        text="{i18n>assetData} ({= ${assetModel>/}.length})" />
+                        text="{i18n>assetData} Asset Data:0"  id="AA_id_RowCountText" />
                     
                     <ToolbarSpacer />
                     <Button
@@ -193,7 +193,7 @@
                 </Column>
             </columns>
             <items>
-                <ColumnListItem class="tableRow">
+                <ColumnListItem class="tableRow" id="idTableColumnListItem">
                     <cells>
                    <ObjectIdentifier 
                            title="{assetModel>AssignEmployeeID}" 
