@@ -17,13 +17,12 @@ sap.ui.define(
         this.oLoginModel = this.getView().getModel("LoginModel");
         this.oModel = this.getView().getModel("Payroll");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-        this._FragmentDatePickersReadOnly(["FST_id_MonthYearPicker", "FST_id_FilterBranch"]);
 
         if (!this.oLoginModel) {
           this.getRouter().navTo("RouteLoginPage");
           return;
         }
-        this.byId("FST_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/city"));
+        this.byId("FST_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/BranchCode"));
         this.oLoginModel.setProperty("/HeaderName", "Manage Payroll Data");
         this.oModel.setProperty("/ShowOnGenerate", false);
         this.oModel.setProperty("/ShowOnPayroll", true);
@@ -64,8 +63,8 @@ sap.ui.define(
         this.oModel.setProperty("/FilterBranch", branch);
         this.oModel.setProperty("/FilterMonth", pickerMonth);
         this.oModel.setProperty("/FilterYear", pickerYear);
-        this._fetchCommonData("PayRoll", "oPayrollModel", { Branch: branch, Month: pickerMonth, Year: pickerYear }, []);
-        var oData = this.oModel.getProperty("/oPayrollModel");
+        await this._commonGETCall("A_PayRoll", "TableData", { Branch: branch, Month: pickerMonth, Year: pickerYear }, []);
+        var oData = this.oModel.getProperty("/TableData");
         if (!oData || oData.length === 0) {
           BusyIndicator.hide();
           MessageToast.show(this.i18nModel.getText("msgDataNotExistsInDB"));
@@ -79,10 +78,9 @@ sap.ui.define(
       },
 
       _sortAndFormatRecords: function (records) {
-        records.sort((a, b) => (parseInt(a["EmployeeID"], 10) || 0) - (parseInt(b["EmployeeID"], 10) || 0));
+        records.sort((a, b) => a["EmployeeID"] - b["EmployeeID"]);
         records = records.map(record => {
           return {
-            "Company": record["Company"] ? record["Company"].toString() : "",
             "Branch": record["Branch"] ? record["Branch"].toString() : "",
             "Month": record["Month"] ? record["Month"].toString() : "",
             "Year": record["Year"] ? record["Year"].toString() : "",
@@ -167,7 +165,6 @@ sap.ui.define(
             var sheetName = workbook.SheetNames[0];
             var sheetData = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
             var isMismatch = sheetData.some(row => {
-              var company = row["Company"] || "";
               var branch = row["Branch"] || "";
               var month = row["Month"] || "";
               var year = row["Year"] || "";
@@ -175,7 +172,6 @@ sap.ui.define(
               var actualPay = row["ActualPay"] || "";
               var uploadedBy = row["UploadedBy"] || "";
               var matchingRecord = payrollData.find(record =>
-                record["Company"] === company &&
                 record["Branch"] === branch &&
                 record["Month"] === month &&
                 record["Year"] === year &&
@@ -195,30 +191,41 @@ sap.ui.define(
               row["ChangedBy"] = this.oLoginModel.getProperty("/EmployeeName");
               return row;
             });
-            this._updateData(sheetData);
+            var sheetFilters = sheetData.map(row => ({
+              EmployeeID: row["EmployeeID"],
+              Month: row["Month"],
+              Year: row["Year"]
+            }));
+            var combinedData = sheetData.map((data, index) => ({
+              data: data,
+              filters: sheetFilters[index]
+            }));
+            this._updateData(combinedData);
           };
           reader.onerror = () => {
-            MessageToast.show(this.i18nModel.getText("quoSchemefailedtofetch"));
+            MessageToast.show(this.i18nModel.getText("commonReadingDataError"));
             BusyIndicator.hide();
           };
           reader.readAsBinaryString(file);
         }
       },
 
-      _updateData: async function (sheetData) {
-        var response = await this.ajaxUpdateWithJQuery("PayRoll", {
-          data: JSON.stringify(sheetData),
+      _updateData: async function (combinedData) {
+        var response = await this.ajaxUpdateWithJQuery("A_PayRoll", {
+          data: combinedData,
         });
         if (response.success) {
+          BusyIndicator.hide();
           this.oModel.setProperty("/TableData", sheetData);
           this.getView().byId("MP_id_UpdateSalBtn").setEnabled(false);
           MessageToast.show(this.i18nModel.getText("msgSalUploadSuccess"));
         } else {
+          BusyIndicator.hide();
           MessageToast.show(this.i18nModel.getText("msgSchemeUploadFailed"));
         }
       },
 
-      onPressExport: function () {
+      MP_onPressExport: function () {
         var branch = this.oModel.getProperty("/FilterBranch");
         var month = this.oModel.getProperty("/FilterMonth");
         var year = this.oModel.getProperty("/FilterYear");
@@ -229,7 +236,7 @@ sap.ui.define(
         XLSX.writeFile(workbook, `${branch} Salary Data ${month}-${year}.xlsx`);
       },
 
-      onPressDelete: function () {
+      MP_onPressDelete: function () {
         var that = this;
         if (!this._oWarningDialog) {
           this._oWarningDialog = new sap.m.Dialog({
@@ -241,16 +248,16 @@ sap.ui.define(
             }),
             buttons: [
               new sap.m.Button({
-                text: that.i18nModel.getText("ok"),
+                text: that.i18nModel.getText("OkButton"),
                 type: "Accept",
                 press: async function () {
                   that._oWarningDialog.close();
-                  await that.ajaxDeleteWithJQuery("Payroll", { filters: { Company: this.oModel.getProperty("/FilterCompany"), Branch: this.oModel.getProperty("/FilterBranch"), Month: this.oModel.getProperty("/FilterMonth"), Year: this.oModel.getProperty("/FilterYear") } });
+                  var response = await that.ajaxDeleteWithJQuery("A_Payroll", { filters: { Branch: that.oModel.getProperty("/FilterBranch"), Month: that.oModel.getProperty("/FilterMonth"), Year: that.oModel.getProperty("/FilterYear") } });
                   if (response.success) {
-                    this.oModel.setProperty("/TableData", null);
+                    that.oModel.setProperty("/TableData", null);
                     that.resetColumnHeaders();
-                    this.oModel.setProperty("/isSELVisible", false);
-                    MessageToast.show(that.i18nModel.getText("hikeDelete"));
+                    that.oModel.setProperty("/isSELVisible", false);
+                    MessageToast.show(that.i18nModel.getText("salDeleteSuccess"));
                   } else {
                     MessageToast.show(that.i18nModel.getText("msgSchemeUploadFailed"));
                   }

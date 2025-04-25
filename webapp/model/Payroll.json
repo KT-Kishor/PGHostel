@@ -1,6 +1,7 @@
 {
     "TableData": null,
     "BaseLocationData": null,
+    "PayRollRules": null,
 
     "TableRowCount": 0,
     "ShowOnPayroll": false,

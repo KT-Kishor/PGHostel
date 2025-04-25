@@ -4,7 +4,7 @@ sap.ui.define(
     "use strict";
 
     return Controller.extend("sap.kt.com.minihrsolution.controller.GenerateSalary", {
-      onInit: function () {        
+      onInit: function () {
         this._initMessagePopover();
         this.getRouter().getRoute("RouteGenerateSalary").attachMatched(this._onRouteMatched, this);
       },
@@ -23,7 +23,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteLoginPage");
           return;
         }
-        this.byId("FST_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/city"));
+        this.byId("FST_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/BranchCode"));
         this.oLoginModel.setProperty("/HeaderName", "Generate Salary");
         this.oModel.setProperty("/ShowOnGenerate", true);
         this.oModel.setProperty("/ShowOnPayroll", false);
@@ -52,18 +52,20 @@ sap.ui.define(
         this.getRouter().navTo("RouteLoginPage");
       },
 
-      FST_onUpload: function (e) {
+      FST_onUpload: async function (e) {
+        BusyIndicator.show(0);
         this.oModel.setProperty("/isExcelMismatch", false);
         var file = e.getParameter("files") && e.getParameter("files")[0];
         if (file) {
           var employeeName = this.oLoginModel.getProperty("/EmployeeName");
           var branch = this.byId("FST_id_FilterBranch").getValue();
+          await this._commonGETCall("getDepartmentRule", "PayRollRules", { BranchCode: this.byId("FST_id_FilterBranch").getSelectedItem().getAdditionalText() }, []);
           var oDate = this.byId("FST_id_MonthYearPicker").getDateValue();
           var pickerMonth = String(oDate.getMonth() + 1).padStart(2, '0');
           var pickerYear = String(oDate.getFullYear());
           this.updateDaysInColumns(pickerYear, pickerMonth);
           var reader = new FileReader();
-          var ruleData = this.oModel.getProperty("/oRuleModel");
+          var ruleData = this.oModel.getProperty("/PayRollRules");
           var excelMismatch = this.oModel.getProperty("/isExcelMismatch");
           this.oModel.setProperty("/FilterBranch", branch);
           this.oModel.setProperty("/FilterMonth", pickerMonth);
@@ -144,13 +146,13 @@ sap.ui.define(
                 }
 
                 var empRuleFilter = ruleData.filter(rule =>
-                  parseInt(rule.EmployeeID, 10) === parseInt(empCode, 10) && rule.WeekDays === checkWeek
+                  rule.EmployeeID === empCode && rule.WeekDays === checkWeek
                 );
                 var empRule = empRuleFilter.length > 0 ? empRuleFilter[0] : null;
 
                 // **Check if EmployeeID is missing in ruleData**
                 if (!empRule) {
-                  var isEmpCodeMissing = !ruleData.some(rule => parseInt(rule.EmployeeID, 10) === parseInt(empCode, 10));
+                  var isEmpCodeMissing = !ruleData.some(rule => rule.EmployeeID === empCode);
 
                   if (isEmpCodeMissing) {
                     MessageToast.show(`Employee ID: ${empCode} not found in the database. Please check and try again.`);
@@ -223,7 +225,7 @@ sap.ui.define(
           };
 
           reader.onerror = () => {
-            MessageToast.show(this.i18nModel.getText("quoSchemefailedtofetch"));
+            MessageToast.show(this.i18nModel.getText("commonReadingDataError"));
             BusyIndicator.hide();
           };
 
@@ -252,23 +254,23 @@ sap.ui.define(
           record.PayDays = parseFloat(payDays.toFixed(2));
         });
 
-        var employeeCodes = encodeURIComponent(JSON.stringify(records.map(record => record["EmpCode"])));
-        await this._fetchCommonData("SalaryDetailsFunction", "oEmpSalaryModel", { Month: month, Year: year, EmployeeID: employeeCodes }, []);
-        var empSalaryData = this.oModel.getProperty("/oEmpSalaryModel");
+        var employeeCodes = JSON.stringify(records.map(record => record["EmpCode"]));
+        await this._commonGETCall("SalaryDetailsFunction", "EmployeeSalaryData", { Month: month, Year: year, EmployeeID: employeeCodes }, []);
+        var empSalaryData = this.oModel.getProperty("/EmployeeSalaryData");
         for (let i = 0; i < records.length; i++) {
           let record = records[i];
 
           // Filter salary details for the employee
-          let empSal = empSalaryData.find(sal => parseInt(sal.EmployeeID, 10) === record.EmpCode);
+          let empSal = empSalaryData.find(sal => sal.EmployeeID === record.EmpCode);
 
           // **Check if Employee Salary is found**
           if (!empSal) {
             this.oModel.setProperty("/isExcelMismatch", true);
             this.oModel.setProperty("/Records", null);
-            that.resetColumnHeaders();
+            this.resetColumnHeaders();
             this.oModel.setProperty("/isSELVisible", false);
             BusyIndicator.hide();
-            let isEmpCodeMissing = !empSalaryData.some(sal => parseInt(sal.EmployeeID, 10) === record.EmpCode);
+            let isEmpCodeMissing = !empSalaryData.some(sal => sal.EmployeeID === record.EmpCode);
             if (isEmpCodeMissing) {
               MessageToast.show(`Salary details not found for Employee ID: ${record.EmpCode}. Please check and try again.`);
             } else {
@@ -278,17 +280,17 @@ sap.ui.define(
           }
 
           // **Salary Calculations**
-          record.GrossPay = parseFloat(empSal.MonthTotal) || 0;
+          record.GrossPay = parseFloat(empSal.GrossPayMontly) || 0;
           record.ActualPay = parseFloat(((record.GrossPay / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
 
           // Employee PF calculation with max cap
-          record.EplyePF = parseFloat((parseFloat(empSal.MonthBasic) * (12 / 100)).toFixed(2));
+          record.EplyePF = parseFloat(((parseFloat(empSal.BasicSalary) / 12) * (12 / 100)).toFixed(2));
           if (record.EplyePF > 1800) {
             record.EplyePF = 1800;
           }
 
           // Employer PF calculation with max cap
-          record.EplyrPF = parseFloat((parseFloat(empSal.MonthBasic) * (13 / 100)).toFixed(2));
+          record.EplyrPF = parseFloat(((parseFloat(empSal.BasicSalary) / 12) * (13 / 100)).toFixed(2));
           if (record.EplyrPF > 1950) {
             record.EplyrPF = 1950;
           }
@@ -322,10 +324,9 @@ sap.ui.define(
       },
 
       _sortAndFormatRecords: function (records) {
-        records.sort((a, b) => (parseInt(a["EmpCode"], 10) || 0) - (parseInt(b["EmpCode"], 10) || 0));
+        records.sort((a, b) => a["EmpCode"] - b["EmpCode"]);
         records = records.map(record => {
           return {
-            "Company": record["Company"] ? record["Company"].toString() : "",
             "Branch": record["Branch"] ? record["Branch"].toString() : "",
             "Month": record["Month"] ? record["Month"].toString() : "",
             "Year": record["Year"] ? record["Year"].toString() : "",
@@ -403,31 +404,37 @@ sap.ui.define(
         }
       },
 
-      onPressSave: async function () {
+      GS_onPressSave: async function () {
+        var that = this;
         BusyIndicator.show(0);
-        var response = await this.ajaxCreateWithJQuery("PayRoll", {
-          data: JSON.stringify(this.oModel.getProperty("/TableData")),
+        $.ajax({
+          url: that.oLoginModel.getData().url + "A_PayRoll",
+          method: "POST",
+          data: JSON.stringify({ data: that.oModel.getProperty("/TableData") }),
+          headers: that.oLoginModel.getData().headers,
+          success: function () {
+            that.getView().byId("GS_id_BtnSave").setEnabled(false);
+            that._onExportSalary();
+            BusyIndicator.hide();
+            MessageToast.show(that.i18nModel.getText("msgSalUploadSuccess"));
+          },
+          error: function (error) {
+            console.log(error);
+            BusyIndicator.hide();
+            try {
+              if (error.responseJSON.message.error.substring(0, 15) === "Duplicate entry") {
+                that.getView().byId("GS_id_BtnSave").setEnabled(false);
+                MessageToast.show(that.i18nModel.getText("msgDataExistsInDB"));
+              }
+              else {
+                MessageToast.show(that.i18nModel.getText("msgSchemeDetailErrorSave"));
+              }
+            }
+            catch (e) {
+              MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
+            }
+          }
         });
-        if (response.success) {
-          this.getView().byId("GS_id_BtnSave").setEnabled(false);
-          this._onExportSalary();
-          BusyIndicator.hide();
-          MessageToast.show(this.i18nModel.getText("msgSalUploadSuccess"));
-        } else {
-          BusyIndicator.hide();
-          try {
-            if ((response.error.responseJSON.error).substring(0, 15) === "Duplicate entry") {
-              this.getView().byId("GS_id_BtnSave").setEnabled(false);
-              MessageToast.show(this.i18nModel.getText("msgDataExistsInDB"));
-            }
-            else {
-              MessageToast.show(this.i18nModel.getText("msgSchemeDetailErrorSave"));
-            }
-          }
-          catch (e) {
-            MessageToast.show(this.i18nModel.getText("commanMessage"));
-          }
-        }
       },
 
       _onExportSalary: function () {

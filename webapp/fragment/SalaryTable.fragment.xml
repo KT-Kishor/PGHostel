@@ -32,7 +32,7 @@
                         showSecondaryValues="true"
                     >
                         <core:ListItem
-                            key="{Payroll>city}"
+                            key="{Payroll>branchCode}"
                             text="{Payroll>city}"
                             additionalText="{Payroll>branchCode}"
                         />
@@ -111,7 +111,7 @@
             busyIndicatorDelay="0"
             width="230em"
             id="id_Table"
-            items="{Payroll>/Records}"
+            items="{Payroll>/TableData}"
             growing="true"
             growingThreshold="50"
         >
@@ -134,187 +134,187 @@
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="1" />
+                    <Text id="idDay1" text="1" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="2" />
+                    <Text id="idDay2" text="2" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="3" />
+                    <Text id="idDay3" text="3" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="4" />
+                    <Text id="idDay4" text="4" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="5" />
+                    <Text id="idDay5" text="5" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="6" />
+                    <Text id="idDay6" text="6" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="7" />
+                    <Text id="idDay7" text="7" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="8" />
+                    <Text id="idDay8" text="8" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="9" />
+                    <Text id="idDay9" text="9" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="10" />
+                    <Text id="idDay10" text="10" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="11" />
+                    <Text id="idDay11" text="11" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="12" />
+                    <Text id="idDay12" text="12" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="13" />
+                    <Text id="idDay13" text="13" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="14" />
+                    <Text id="idDay14" text="14" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="15" />
+                    <Text id="idDay15" text="15" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="16" />
+                    <Text id="idDay16" text="16" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="17" />
+                    <Text id="idDay17" text="17" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="18" />
+                    <Text id="idDay18" text="18" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="19" />
+                    <Text id="idDay19" text="19" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="20" />
+                    <Text id="idDay20" text="20" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="21" />
+                    <Text id="idDay21" text="21" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="22" />
+                    <Text id="idDay22" text="22" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="23" />
+                    <Text id="idDay23" text="23" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="24" />
+                    <Text id="idDay24" text="24" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="25" />
+                    <Text id="idDay25" text="25" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="26" />
+                    <Text id="idDay26" text="26" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="27" />
+                    <Text id="idDay27" text="27" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="28" />
+                    <Text id="idDay28" text="28" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="29" />
+                    <Text id="idDay29" text="29" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="30" />
+                    <Text id="idDay30" text="30" />
                 </Column>
                 <Column
                     hAlign="Center"
                     width="5%"
                 >
-                    <Text text="31" />
+                    <Text id="idDay31" text="31" />
                 </Column>
                 <Column
                     width="8%"
@@ -368,7 +368,7 @@
                     width="12%"
                     hAlign="End"
                 >
-                    <Text text="{i18n>grosspay}" />
+                    <Text text="{i18n>grossPay}" />
                 </Column>
                 <Column
                     width="12%"

@@ -570,7 +570,7 @@ sap.ui.define([
         var weekday = date.toLocaleString('en-US', { weekday: 'short' }); // e.g., Sun, Mon
         var text = day + "\n" + weekday;
         var columnId = "idDay" + day;
-        var oColumnText = sap.ui.getCore().byId(columnId);
+        var oColumnText = this.byId(columnId);
         if (oColumnText) {
           oColumnText.setText(text);
         }
@@ -580,7 +580,7 @@ sap.ui.define([
     resetColumnHeaders: function () {
       for (var i = 1; i <= 31; i++) {
         var columnId = "idDay" + i;
-        var oColumnText = sap.ui.getCore().byId(columnId);
+        var oColumnText = this.byId(columnId);
         if (oColumnText) {
           oColumnText.setText(i.toString());
         }
@@ -591,9 +591,10 @@ sap.ui.define([
       try {
         var response = await this.ajaxReadWithJQuery(sEntity, oFilter, aFields);
         if (response.success) {
-          this.oModel.setProperty("/" + sModelName, response.data);
+          this.oModel.setProperty("/" + sModelName, response.data || response.results);
         } else {
-          MessageToast.show(this.i18nModel.getText("msgFailedToFetch"));
+          console.error(response);
+          sap.m.MessageToast.show(this.i18nModel.getText("msgFailedToFetch"));
         }
       }
       catch (e) {
