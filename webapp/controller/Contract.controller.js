@@ -24,8 +24,23 @@ sap.ui.define(
             onLogout: function () {
                 this.CommonLogoutFunction(); // Navigate to login page
             },
-            C_onPressAddContract: function () {
-                this.getRouter().navTo("RouteContractDetails");
+            C_onPressAddContract: function (oEvent) {
+                var oParValue, sAgreementNo = "";
+                var isCreateMode = oEvent.getSource().getId().lastIndexOf("C_id_AddBtn") !== -1;
+                if (isCreateMode) {
+                    // Case: Add new contract
+                    oParValue = "CreateContractFlag";
+                    // Navigate only with sParContract (no AgreementNo during create)
+                    this.getRouter().navTo("RouteContractDetails", {sParContract: oParValue, sID: sAgreementNo || null });
+                } else {
+                    // Case: Edit existing contract
+                    var oContext = oEvent.getSource().getBindingContext("ContractModel");
+                    var oData = oContext.getModel().getData()[oContext.getPath().split("/")[1]];
+                    oParValue = oData.ContractNo;
+                    sAgreementNo = oData.AgreementNo;
+                    // Navigate with both ContractNo and AgreementNo
+                    this.getRouter().navTo("RouteContractDetails", { sParContract: oParValue, sID: sAgreementNo});
+                }
             },
             C_onClearFilters: function () {
                 const oView = this.getView();

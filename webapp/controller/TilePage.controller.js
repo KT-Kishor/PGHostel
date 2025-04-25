@@ -214,7 +214,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteConsultantInvoiceApplication");
         },
         TileV_onpressContract: function () {
-          this.getRouter().navTo("RouteContract");
+          this.getRouter().navTo("RouteContract", {valueEmp: "Contract"});
         },
         TileV_onPressAdminPaySlip: function () {
           this.getRouter().navTo("RouteAdminPaySlip");
@@ -250,7 +250,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteEmployeeDetails");
         },
         TileV_onBackPress: function () {
-          this.CommonLogoutFunction();
+          this.CommonLogoutFunction(); 
         },
         TileV_onpressAddCustomer: function () {
           BusyIndicator.show(0);

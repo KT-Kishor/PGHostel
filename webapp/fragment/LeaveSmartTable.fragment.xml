@@ -15,9 +15,9 @@
 				 <Title id="Al_id_Title" text="{i18n>appliedLeave} ({= ${LeaveModel>/}.length })"/>
 					<ToolbarSpacer/> 
 					<ToolbarSeparator/>
-					<Button icon="sap-icon://vertical-bar-chart" press="AL_onPressBarChart" tooltip="{i18n>openBarCharts}" />
-					<Button icon="sap-icon://create-leave-request" tooltip="{i18n>applyLeave}" press="AL_onPressApplyLeave"/>
-					<Button id="AL_id_Updatebtn" icon="sap-icon://edit" tooltip="{i18n>editDetails}" press="AL_onPressUpdate" visible="{= ${LeaveModel>status} === 'Submitted' }"/>
+					<Button icon="sap-icon://vertical-bar-chart"  press="AL_onPressBarChart" text="{i18n>openBarCharts}" type="Ghost" />
+					<Button icon="sap-icon://create-leave-request" text="{i18n>applyLeave}"  press="AL_onPressApplyLeave" type="Accept"/>
+					<Button id="AL_id_Updatebtn" icon="sap-icon://edit" text="{i18n>editDetails}" press="AL_onPressUpdate" visible="{= ${LeaveModel>status} === 'Submitted' }" type="Neutral"/>
 					<ToolbarSeparator/>
 				</Toolbar>
 			</headerToolbar>

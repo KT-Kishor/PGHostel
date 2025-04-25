@@ -4,7 +4,7 @@
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core" >
-	<Page id="CD_idPage" title="{i18n>headerContractDetails}" showNavButton="true" navButtonPress="CD_onPressback" >
+	<Page id="C_id_PageCreate" title="{i18n>headerContractDetails}" showNavButton="true" navButtonPress="CD_onPressback" >
 		<content>
 			<Wizard 
                         id="CD_id_Wizard"	
@@ -22,7 +22,7 @@
 							<Select id="" selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}">
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
-							<Input value="{ContractModelWizart>/ConsultantName}" 					placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="CD_validateName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
+							<Input value="{ContractModelWizart>/ConsultantName}" placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="CD_validateName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
 							<Label text="{i18n>address}" required="true"/>
 							<TextArea value="{ContractModelWizart>/ConsultantAddress}"  maxLength="120" rows="3" id="CD_id_Address" placeholder="{i18n>placeAddress}" change="onAddress" valueStateText="{i18n>addressValueState}"
 									liveChange="CD_ValidateCommonFields"/>
@@ -179,4 +179,5 @@
 			</Bar>
 		</footer>
 	</Page>
+	<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ContractUpdate" type="XML" />
 </mvc:View>

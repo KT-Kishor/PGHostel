@@ -293,7 +293,7 @@
                 },
                 {
                     "name": "RouteContractDetails",
-                    "pattern": "ContractDetails",
+                    "pattern": "ContractDetails/{sParContract}/:sID:",
                     "target": [
                         "TargetContractDetails"
                     ]
