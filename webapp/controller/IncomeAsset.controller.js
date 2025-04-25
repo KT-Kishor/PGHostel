@@ -27,13 +27,13 @@ sap.ui.define([
            
               
                             var model = new JSONModel({
-                                 "Type": "",
+                                 "Type": "Laptop",
                                  "Model": "",
                                  "Description":"",
                                  "EquipmentNumber": "",
                                  "SerialNumber": "",
                                  "AssetCreationDate": "",
-                                 "AssignBranch": "",
+                                 "AssignBranch": loginModel.BranchCode,
                                  "Status": "Unassigned",
                                  "Currency":"INR",
                                  "TrashDate": "",
@@ -65,7 +65,7 @@ sap.ui.define([
             },
             IA_CommonReadCall: function (filter) {
                 BusyIndicator.show(0)
-				this.ajaxReadWithJQuery("IncomeAsset", filter).then((oData) => {
+				this.ajaxReadWithJQuery("IncomeAsset", "IsCurrent=1").then((oData) => {
 					var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
 					this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "incomeModel");
                     this._populateUniqueFilterValues(oFCIAerData);
@@ -133,7 +133,7 @@ sap.ui.define([
                      sap.ui.getCore().byId("FCIA_id_eqno").setValue("").setValueState("None").setEditable(true)
 					 sap.ui.getCore().byId("FCIA_id_slno").setValue("").setValueState("None").setEditable(true)
                      sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true)
-					 sap.ui.getCore().byId("FCIA_id_Date").setValue("").setValueState("None").setEditable(true)
+					 sap.ui.getCore().byId("FCIA_id_Date").setValue("").setValueState("None").setVisible(true)
 					 sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("").setValueState("None")
 					 sap.ui.getCore().byId("FCIA_id_branch").setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_assetvalue").setValue("").setValueState("None").setEditable(true)
@@ -217,6 +217,7 @@ sap.ui.define([
                              "AssignBranch": oModel.AssignBranch,
 							"AssetValue": oModel.AssetValue,
 							"Currency": oModel.Currency,
+                            "IsCurrent":"1",
                             "Status": "Available",
                             "TrashDate": null,
                             "PickedEmployeeID":sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText()
@@ -249,7 +250,10 @@ sap.ui.define([
 				var oModel=this.getView().getModel("CreateIncomeAssetModel").getData()
                 var table = this.byId("IA_id_OdataTable");
 				var selected = table.getSelectedItem();
-
+                if (
+                    utils._LCvalidateDate(sap.ui.getCore().byId("FCIA_id_Date"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FCIA_id_branch"), "ID") 
+                ){
                 var oPayLoad = {
                     "Type": oModel.Type,
                     "Model": oModel.Model,
@@ -268,14 +272,18 @@ sap.ui.define([
                               var selectedData = selected.getBindingContext("incomeModel").getObject();
 							 this.ajaxUpdateWithJQuery("IncomeAsset", { data: oPayLoad,filters: { ID:selectedData.ID}});
                              this.IA_CommonReadCall("IncomeAsset")
+                            // this.IA_onSearch()
+
                           this.FCIA_Dialog.close();
+            }
 
             },
             FCIA_onTransferbuttonpress:function(){
           
                 var oModel=this.getView().getModel("CreateIncomeAssetModel").getData()
-                   if(utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FCIA_id_transferbranch"), "ID") &&
-                   utils._LCvalidateDate(sap.ui.getCore().byId("FCIA_id_transferdate"), "ID")){
+                   if(   utils._LCvalidateDate(sap.ui.getCore().byId("FCIA_id_transferdate"), "ID")
+                    &&utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FCIA_id_transferbranch"), "ID") 
+      ){
                            var oPayLoad={
                            "Type": oModel.Type,
 							"Model": oModel.Model,
@@ -288,13 +296,14 @@ sap.ui.define([
                             // "AssetCreationDate":null,
                              "Status": "Transferd",
                             "TrashDate": null,
+                            "IsCurrent":"1",
                             // "PickedEmployeeID":sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText(),
                             "TransferBranch":oModel.TransferBranch,
                             "TransferDate":oModel.TransferDate.split("/").reverse().join("-"),
                            }
                            this.ajaxCreateWithJQuery("IncomeAsset",  { data: oPayLoad});
-                           this.IA_CommonReadCall("IncomeAsset")
-                           this.FCIA_Dialog.close();
+                           this.IA_CommonReadCall({IsCurrent:1})                          
+                            this.FCIA_Dialog.close();
                    }
             },
            IA_onUpadateButtonPress: function () {
@@ -313,10 +322,15 @@ sap.ui.define([
 				     MessageToast.show(this.i18nModel.getText("updatemessage"));
                  return;
             }
-            if (data.Status === "Assigned" || data.Status === "Transferd") {
+            if (data.Status === "Assigned" ) {
                 MessageToast.show(this.i18nModel.getText("update is not possible to an assigned status"));
             return;
        }
+        if (data.Status === "Transferd" ) {
+        MessageToast.show(this.i18nModel.getText("update is not possible to an transferd status"));
+    return;
+}
+ 
           if (!this.FCIA_Dialog) {
                 var oView = this.getView();
                 this.FCIA_Dialog = sap.ui.core.Fragment.load({
@@ -378,7 +392,7 @@ sap.ui.define([
             var table = this.byId("IA_id_OdataTable");
             var selected = table.getSelectedItem();
             if (!selected) {
-                MessageToast.show(this.i18nModel.getText("select Row"));
+                MessageToast.show(this.i18nModel.getText("select a transferd row"));
 
            return;
        }
@@ -386,7 +400,7 @@ sap.ui.define([
             var Model = selected.getBindingContext("incomeModel");
             var data = Model.getObject();
 
-                    if(data.Status==="Assigned" || data.Status==="Trashed" ||  data.Status==="Available" ){
+                    if(data.Status==="Assigned" || data.Status==="Trashed" ||  data.Status==="Available" ||  data.Status==="Returned"){
                         MessageToast.show(this.i18nModel.getText("..........."));
                         return;
                     }          
@@ -459,7 +473,7 @@ sap.ui.define([
                 if (data.Status === "Trashed"   ) {
 				     MessageToast.show(this.i18nModel.getText("rowTrashed"));
                  return;
-            }else if(data.Status==="Assigned"){
+            }else if(data.Status==="Assigned" || data.Status==="Transfered"){
                 MessageToast.show(this.i18nModel.getText("assigned"));
                 return;
             }
@@ -500,7 +514,7 @@ sap.ui.define([
        var Model = selected.getBindingContext("incomeModel");
        var data = Model.getObject();
 
-       if (data.Status === "Trashed" || data.Status === "Transferd") {
+       if (data.Status === "Trashed" || data.Status === "Transferd" || data.Status === "Assigned") {
         MessageToast.show(this.i18nModel.getText("This data should not be transferred"));
     return;
 }
@@ -528,7 +542,7 @@ sap.ui.define([
                 sap.ui.getCore().byId("FCIA_id_assetvalue").setValue(data.AssetValue).setEditable(false)
                 sap.ui.getCore().byId("FCIA_id_currency").setValue(data.Currency)
                 sap.ui.getCore().byId("FCIA_id_currency").setEditable(false)  
-                sap.ui.getCore().byId("FCIA_id_transferdate").setValue("").setVisible(true)
+                sap.ui.getCore().byId("FCIA_id_transferdate").setValue("").setValueState("None").setVisible(true)
                 sap.ui.getCore().byId("FCIA_id_transferbranch").setValue("").setVisible(true)
                 this.FCIA_Dialog.open();
             } else {
@@ -546,7 +560,7 @@ sap.ui.define([
                 sap.ui.getCore().byId("FCIA_id_assetvalue").setValue(data.AssetValue).setEditable(false)
                 sap.ui.getCore().byId("FCIA_id_currency").setValue(data.Currency)
                 sap.ui.getCore().byId("FCIA_id_currency").setEditable(false)  
-                sap.ui.getCore().byId("FCIA_id_transferdate").setValue("").setVisible(true)
+                sap.ui.getCore().byId("FCIA_id_transferdate").setValue("").setValueState("None").setVisible(true)
                 sap.ui.getCore().byId("FCIA_id_transferbranch").setValue("").setVisible(true)
 
                 sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(false)     
@@ -620,7 +634,7 @@ sap.ui.define([
                 filters.Status=status;
             }
             BusyIndicator.show(0);
-         this._fetchCommonData("IncomeAsset", "incomeModel", filters).then(() => {  
+         this._fetchCommonData("IncomeAsset", "incomeModel", {...filters, IsCurrent: 1}).then(() => {  
 
             const data = this.getView().getModel("incomeModel").getData();
          }).finally(() => { 

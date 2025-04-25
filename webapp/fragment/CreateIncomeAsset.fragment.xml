@@ -26,43 +26,6 @@
                         key="{oAssetTypeModel>Type}"
                     />
                 </Select>
-
-                <Label text="{i18n>vehicleModel}" required="true" />
-                <Input
-                    id="FCIA_id_model"
-                    value="{CreateIncomeAssetModel>/Model}"
-                    placeholder="Enter model name"
-                    valueStateText="Enter model name"
-                    liveChange="FCIA_onInputLiveChange"
-                    maxLength="30"
-                />
-                 	<Label text="{i18n>description}" required="true" />
-		          <TextArea id="FCIA_ID_DescriptionTextArea" 
-                  valueStateText="Write a model description"
-                  liveChange="FCIA_onDescriptionTextAreaChange"
-                  value="{CreateIncomeAssetModel>/Description}" 
-                  maxLength="60" width="100%" />
-
-                <Label text="{i18n>eqNo}" required="true" />
-                <Input
-                    id="FCIA_id_eqno"
-                    value="{CreateIncomeAssetModel>/EquipmentNumber}"
-                    placeholder="Enter equipment number"
-                    valueStateText="Enter equipment number"
-                    maxLength="25"
-                    liveChange="FCIA_oneqnolivechange"
-                />
-
-                <Label text="{i18n>slNo}" required="true" />
-                <Input
-                    id="FCIA_id_slno"
-                    value="{CreateIncomeAssetModel>/SerialNumber}"
-                    valueStateText="Enter serial number"
-                    placeholder="Enter serial number"
-                    maxLength="25"
-                    liveChange="FCIA_onslnoInputLiveChange"
-           />
-
                 <Label text="{i18n>pickedBy}" required="true" />
                 <Select
                     id="FCIA_id_pickedby"
@@ -76,6 +39,45 @@
                         additionalText="{EmpModel>EmployeeID}"
                     />
                 </Select>
+
+               
+                 	<Label text="{i18n>description}" required="true" />
+		          <TextArea id="FCIA_ID_DescriptionTextArea" 
+                  valueStateText="Write a model description"
+                  liveChange="FCIA_onDescriptionTextAreaChange"
+                  value="{CreateIncomeAssetModel>/Description}" 
+                  maxLength="60" width="100%" />
+                    <Label text="{i18n>slNo}" required="true" />
+                <Input
+                    id="FCIA_id_slno"
+                    value="{CreateIncomeAssetModel>/SerialNumber}"
+                    valueStateText="Enter serial number"
+                    placeholder="Enter serial number"
+                    maxLength="25"
+                    liveChange="FCIA_onslnoInputLiveChange"
+           />
+
+                <Label text="{i18n>eqNo}" required="true" />
+                <Input
+                    id="FCIA_id_eqno"
+                    value="{CreateIncomeAssetModel>/EquipmentNumber}"
+                    placeholder="Enter equipment number"
+                    valueStateText="Enter equipment number"
+                    maxLength="25"
+                    liveChange="FCIA_oneqnolivechange"
+                />
+
+              
+               <Label text="{i18n>vehicleModel}" required="true" />
+                <Input
+                    id="FCIA_id_model"
+                    value="{CreateIncomeAssetModel>/Model}"
+                    placeholder="Enter model name"
+                    valueStateText="Enter model name"
+                    liveChange="FCIA_onInputLiveChange"
+                    maxLength="30"
+                />
+              
 
                 <Label text="{i18n>date}" required="true" />
                 <DatePicker
@@ -135,6 +137,10 @@
                 value="{CreateIncomeAssetModel>/TransferDate}"
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
+                    valueStateText="Select date"
+                    change="FCIA_ondatechange"
+
+
                 />
                  <Label text="TransferBranch"/>
              <ComboBox
@@ -157,24 +163,25 @@
             </f:content>
         </f:SimpleForm>
 
-        <FlexBox justifyContent="End" width="100%" >
-        <!-- <beginButton> -->
+            <footer>
+			<Toolbar>
+				<ToolbarSpacer />
+
             <Button text="Save" 
              press="FCIA_onsavebuttonpress"
              type="Accept"
              id="FCIA_id_saveButton"
+             class="marginRight"
              />
-        <!-- </beginButton> -->
-        <!-- <beginButton> -->
             <Button
                 text="{i18n>Transfer}"
                 press="FCIA_onTransferbuttonpress"
                 type="Accept"
                 id="FCIA_id_transferButton"
-            />
-        <!-- </beginButton> -->
 
-        <!-- <endButton> -->
+
+            />
+
          <Button
                 text="{i18n>Picked}"
                 press="FCIA_onpickButtonPress"
@@ -186,9 +193,11 @@
                 press="FCIA_onCancelButtonPress"
                 type="Reject"
                 id="FCIA_id_CancelButton"
+             class="marginRight"
+
             />
             
-            </FlexBox>
-        <!-- </endButton> -->
+			</Toolbar>
+</footer>
     </Dialog>
 </core:FragmentDefinition>

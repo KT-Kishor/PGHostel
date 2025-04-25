@@ -7,6 +7,14 @@
       {
         "ID": 2,
         "Value": "Returned"
+      },
+      {
+        "ID": 3,
+        "Value": "Transferd"
+      },
+      {
+        "ID": 3,
+        "Value": "Available"
       }
     
      ]
