@@ -169,15 +169,30 @@
   font-size: 1.5rem;
   color: #000103;
 }
-/* .About-us{
-  font-family:Helvetica, sans-serif ;
-  font-weight: bold;
-  font-size: 5px;
-  color: #2964d9;
-} */
-.Aboutus-content{
-  color: #2964d9 !important;
+.formBorder {
+  border: 1px solid #ccc;     
+  border-radius: 8px;          
+  color: #ddf5ff;         
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);  
+  background-color:transparent;      
 }
+.sapUiForm .sapUiFormTitle {
+  border-width: 1px;
+  border-color: #a8b3bd;
+  font-family: "72-Bold", "72-Boldfull", "72", "72full", Arial, Helvetica, sans-serif;
+  height: 2.75rem;
+  line-height: 2.75rem;
+  color: white;
+}
+.Aboutus-content .content {
+  background-image: url("../image/Aboutus.png"); /* adjust the path */
+  background-size: cover;
+  background-position: center;
+  /* padding: 1rem; */
+  color: black;
+  border-radius: 8px;
+}
+
 .career-background {
   background-image: url('../image/career1.jpg');
   background-size: cover;
