@@ -5,7 +5,7 @@
     <Button
         press="onPressback"
         icon="sap-icon://home"
-        tooltip="{i18n>home}"
+        tooltip="{i18n>toolHome}"
     />
     <Text
         text="{LoginModel>/HeaderName}"

@@ -442,7 +442,7 @@ sap.ui.define([
                     "TraineeName": oModel.TraineeName,
                     "toEmailID": oModel.TraineeEmail,
                     "JoiningDate": Formatter.formatDate(oModel.JoiningDate),
-                    "CC": this.getView().getModel("CCMailModel").getData()[0].emails,
+                    "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                 };
                 this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload, ["Mail_id_Form", "TU_id_SimpleForm"]).then((oData) => {
@@ -454,6 +454,7 @@ sap.ui.define([
                 });
                 this.Mail_onPressClose();
             },
+            
             //PDF generation function
             TD_onPressMerge: function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");

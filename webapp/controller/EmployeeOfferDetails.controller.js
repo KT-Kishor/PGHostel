@@ -403,7 +403,7 @@ sap.ui.define([
                 var oPayload = {
                     "EmployeeName": oModel.ConsultantName,
                     "toEmailID": oModel.EmployeeEmail,
-                    "CC": this.getView().getModel("CCMailModel").getData()[0].emails,
+                    "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                     "Designation": oModel.Designation
                 };

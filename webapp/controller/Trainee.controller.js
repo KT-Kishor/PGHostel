@@ -454,7 +454,7 @@ sap.ui.define([
                 var oPayload = {
                     "TraineeName": oModel.TraineeName,
                     "toEmailID": oModel.TraineeEmail,
-                    "CC": this.getView().getModel("CCMailModel").getData()[0].emails,
+                    "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                 };
                 this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload, ["T_id_TraineeTable"]).then((oData) => {
