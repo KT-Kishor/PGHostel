@@ -1,7 +1,7 @@
 <mvc:View xmlns:mvc="sap.ui.core.mvc" 	xmlns:f="sap.f" 	xmlns:card="sap.f.cards" xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
 
-						<l:VerticalLayout  width="98%" class="sapUiTinyMargin" >
-							<l:BlockLayout background="Light">
+						<l:VerticalLayout  width="98%" class="sapUiTinyMargin Aboutus" >
+							<l:BlockLayout background="Light" class="Aboutus-background" >
 								<l:BlockLayoutRow rowColorSet="ColorSet4" >
 									<l:BlockLayoutCell
 					title="{i18n>aboutUscontent1}">

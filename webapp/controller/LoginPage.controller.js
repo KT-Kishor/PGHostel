@@ -29,6 +29,7 @@ sap.ui.define(
           this.getOwnerComponent().setModel(model, "LoginModel");
         },
         _onRouteMatched: function () {
+          BusyIndicator.hide();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           var oLoginModel = new JSONModel({
             "userId": "",

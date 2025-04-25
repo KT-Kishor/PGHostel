@@ -147,7 +147,9 @@
   max-width: 700px;
   line-height: 1.8;
 }
-
+.Aboutus{
+  border-radius: 10px !important;
+}
 .custom-aboutus {
   font-size: 21px;
   font-family: sans-serif;
@@ -183,14 +185,16 @@
 .formBorder {
   border: 1px solid #ccc;     
   border-radius: 8px;          
-  color: #ddf5ff;         
-  box-shadow: 0 2px 4px rgba(0,0,1,1);  
+  color: #ddf5ff !important;         
+  box-shadow: 0 2px 4px rgba(0,0,0,1);  
   background-color:transparent; 
   font-weight: bold;   
   align-items: center;  
 }
-
-.sapUiForm .sapUiFormTitle {
+.Aboutus-background{
+  border-radius: 10px !important;
+}
+/* .sapUiForm .sapUiFormTitle {
   border-width: 1px;
   border-color: #a8b3bd;
   font-family: "72-Bold", "72-Boldfull", "72", "72full", Arial, Helvetica, sans-serif;
@@ -198,7 +202,7 @@
   line-height: 2.75rem;
   color: white;
   font-size: larger;
-}
+} */
 .Aboutus-content .content {
   background-image: url("../image/Aboutus.png"); /* adjust the path */
   background-size: cover;
@@ -243,7 +247,7 @@
 }
 
 .demo-form{
-  background-image: url('../image/grow.jpg');
+  background-image: url('../image/Newdemo.png');
   background-size: cover; 
   border-radius: 0.60rem;
   background-position: center; 
@@ -571,6 +575,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .loginForm {
   width: 20rem !important;
   max-width: 20rem !important;
+  color: #000 !important;
 }
 .Login{
   width: fit-content !important;

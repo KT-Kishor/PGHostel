@@ -207,8 +207,15 @@ sap.ui.define(
         SU_onDeletepress: function () {
           var that = this;
           var oSelectedItem = this.byId("SU_id_Quotationtable").getSelectedItem();
+
+          // First check if any row is selected
+          if (!oSelectedItem) {
+            MessageToast.show(this.i18nModel.getText("msgSelectRow")); // "Please select a row to delete."
+            return;
+          }
+          // Now safely get the context
           var oContext = oSelectedItem.getBindingContext("MainModel").getProperty("ID");
-          // Use common confirmation dialog
+
           this.showConfirmationDialog(
             this.i18nModel.getText("msgBoxConfirm"),
             this.i18nModel.getText("msgBoxConfirmDelete"),
@@ -219,14 +226,16 @@ sap.ui.define(
                 MessageToast.show(that.i18nModel.getText("msgSchemeDeleted"));
                 that.CommomReadCall("");
               }).catch((error) => {
+                BusyIndicator.hide();
                 MessageToast.show(error.responseText);
               });
             },
-            function () {      // On Cancel
+            function () {
               that.byId("SU_id_Quotationtable").removeSelections(true);
             }
           );
         },
+
         FUS_onCreateDialogSubmit: async function () {
           var that = this;
           var oFileUploader = sap.ui.getCore().byId("idFileUploader");
@@ -282,7 +291,7 @@ sap.ui.define(
           });
           if (response.success) {
             BusyIndicator.hide();
-            MessageToast.show("Scheme saved successfully!");
+            MessageToast.show(that.i18nModel.getText("msgschemeupload"));
 
             // Update UI Model after successful save
             that.getView().setModel(that.MainModel, "MainModel");
