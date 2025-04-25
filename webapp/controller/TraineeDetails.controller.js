@@ -76,19 +76,27 @@ sap.ui.define([
                     this.getView().setModel(new JSONModel(traineeData), "oTraineeDetails");
                     if (traineeData.Stipend === "0") { // Stipend condition (NO)
                         this.byId("TU_id_StipendRadio").setSelectedIndex(1);
+                        this.byId("TU_id_Stipend").setVisible(false);
+                        this.byId("TU_id_StipendLabel").setVisible(false);
+                        this.byId("TU_id_Currency").setVisible(false);
                     } else { // Stipend condition (YES)
                         this.byId("TU_id_StipendRadio").setSelectedIndex(0);
+                        this.byId("TU_id_Stipend").setVisible(true)
+                        this.byId("TU_id_StipendLabel").setVisible(true);
+                        this.byId("TU_id_Currency").setVisible(true);
                     }
                     if (traineeData.TrainingPaidAmount === "0") { // Paid Trainee condition (NO)
                         this.byId("TU_id_PaidTraineeRadio").setSelectedIndex(1);
                         this.byId("TU_id_PaidTraineeAmount").setVisible(false); // Hide Paid Amount field if Paid Trainee is NO
                         this.byId("TU_id_FeeCurrency").setVisible(false);
+                        this.byId("TU_id_StipendLabel").setVisible(true);
                         this.byId("TU_id_PaidTraineeAmount").setValue("0"); // Reset Paid Amount value to 0
                     } else { // Paid Trainee condition (YES)
                         this.byId("TU_id_PaidTraineeRadio").setSelectedIndex(0);
                         this.byId("TU_id_PaidTraineeAmount").setVisible(true);
                         this.byId("TU_id_FeeCurrency").setVisible(true);
-                        this.byId("TU_id_PaidTraineeAmount").setValue(traineeData.PaidAmount || ""); // Set Paid Amount value if present
+                        this.byId("TU_id_PaidTraineeLabel").setVisible(true);
+                        this.byId("TU_id_PaidTraineeAmount").setValue(traineeData.TrainingPaidAmount); // Set Paid Amount value if present
                     }
                     // Handle visibility and edit button based on trainee status
                     if (traineeData.Status === "OnBoarded" || traineeData.Status === "Training Completed") {
@@ -287,7 +295,6 @@ sap.ui.define([
             TU_onEditOrSavePress: function () {
                 if (this.viewModel.getProperty("/editable")) {
                     var oView = this.getView();
-
                     // Get stipend radio selection
                     var sStipendSelectedText = oView.byId("TU_id_StipendRadio").getSelectedButton().getText();
                     var bIsStipendValid = true;
@@ -577,7 +584,7 @@ sap.ui.define([
                 oView.byId("TU_id_PaidTraineeLabel").setVisible(bIsYes);
                 oView.byId("TU_id_PaidTraineeAmount").setVisible(bIsYes);
                 oView.byId("TU_id_FeeCurrency").setVisible(bIsYes);
-                oView.byId("TU_id_FeeCurrency").setValueState("");
+                oView.byId("TU_id_FeeCurrency").setValueState("None");
                 if (!bIsYes) {
                     oView.byId("TU_id_PaidTraineeAmount").setValue("0");
                     // Removed ValueState reset
