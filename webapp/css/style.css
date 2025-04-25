@@ -164,6 +164,17 @@
 }
 .carrer-Des{
   font-family: sans-serif;
+  line-height: 1.8;
+}
+.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS) .sapUiBlockLayoutRow:first-of-type .sapUiBlockCellContent {
+  margin-top: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+ 
+}
+.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS) .sapUiBlockLayoutRow:last-of-type .sapUiBlockCellContent {
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+  line-height: 1.8;
 }
 .sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle{
   font-size: 1.5rem;
@@ -173,9 +184,12 @@
   border: 1px solid #ccc;     
   border-radius: 8px;          
   color: #ddf5ff;         
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);  
-  background-color:transparent;      
+  box-shadow: 0 2px 4px rgba(0,0,1,1);  
+  background-color:transparent; 
+  font-weight: bold;   
+  align-items: center;  
 }
+
 .sapUiForm .sapUiFormTitle {
   border-width: 1px;
   border-color: #a8b3bd;
@@ -183,6 +197,7 @@
   height: 2.75rem;
   line-height: 2.75rem;
   color: white;
+  font-size: larger;
 }
 .Aboutus-content .content {
   background-image: url("../image/Aboutus.png"); /* adjust the path */
@@ -246,10 +261,10 @@
   background-position: center;
   background-repeat: no-repeat;
 }
-
 .contact-touch {
   background-color: white;
   border-radius: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .expert-background {
@@ -335,7 +350,7 @@ border-radius: 0.60rem;
   .content-box {
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 1);
     text-align: left;
   }
   .custom-trainee-title{

@@ -69,12 +69,13 @@
 									<l:BlockLayoutCell
 					
 					width="2"
-					title="{i18n>careersapply}">
+					title="{i18n>careersapply}"  >
 										<core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;{i18n>careetsapply2}&lt;/div&gt;&lt;a target=&quot;_blank&quot; href=&quot;mailto:careers@kalpavrikshatechnologies.com&quot;&gt;careers@kalpavrikshatechnologies.com&lt;/a&gt;&lt;/div&gt;'></core:HTML>
 									</l:BlockLayoutCell>
 									<l:BlockLayoutCell
 					title="{i18n>chechopportunity}" 
 					width="2"
+					
 					>
 										<core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;{i18n>checkOpportunity2}&lt;/div&gt;&lt;a target=&quot;_blank&quot; href=&quot;https://sheet.zohopublic.in/sheet/published/0bg2c414cd1ecc6b24ac8a8608180d4d422ba?mode=embed&quot;&gt;Check Opporunity&lt;/a&gt;&lt;/div&gt;'></core:HTML>
 									</l:BlockLayoutCell>
