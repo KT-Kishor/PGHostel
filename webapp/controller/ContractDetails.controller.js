@@ -160,8 +160,35 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
                 if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
             },
+            //back function
             CD_onPressback: function () {
-                this.getRouter().navTo("RouteContract");
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("ConfirmActionTitle"),
+                    this.i18nModel.getText("backConfirmation"),
+                    function () {
+                        this.getRouter().navTo("RouteContract");
+                    }.bind(this)
+                );
+                this.byId("CD_id_Secstep").getParent().setShowNextButton(true);
+            },
+            CU_onBack: function () {
+                var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
+                if (isEditMode) {
+                    // Save button is visible, ask for confirmation
+                    this.showConfirmationDialog(
+                        this.i18nModel.getText("ConfirmActionTitle"),
+                        this.i18nModel.getText("backConfirmation"),
+                        function () {
+                            // On confirm, reset and navigate back
+                            this.getView().getModel("viewModel").setProperty("/isEditMode", false);
+                            this.getView().getModel("simpleForm").setProperty("/editable", false);
+                            this.getRouter().navTo("RouteContract");
+                        }.bind(this)
+                    );
+                } else {
+                    // Edit button is visible, allow direct back
+                    this.getRouter().navTo("RouteContract");
+                }
             },
             //Step validation
             validateStep: function () {
@@ -425,6 +452,6 @@ sap.ui.define([
                         sap.m.MessageToast.show(this.i18nModel.getText("updateContractFailed"));
                     }
                 }
-            }     
+            },
         });
     });

@@ -4,7 +4,7 @@
 	xmlns="sap.uxap"
 	xmlns:m="sap.m"
 	xmlns:core="sap.ui.core">
-	<m:Page id="CUF_id_pageTrainee" title="{i18n>contractDetails}" navButtonPress="onBack" showNavButton="true">
+	<m:Page id="CUF_id_pageTrainee" title="{i18n>contractDetails}" navButtonPress="CU_onBack" showNavButton="true">
 		<ObjectPageLayout id="CU_id_ObjectPage"
             useIconTabBar="true"
             showTitleInHeaderContent="true"
