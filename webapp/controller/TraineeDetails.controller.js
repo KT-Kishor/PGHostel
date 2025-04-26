@@ -105,7 +105,7 @@ sap.ui.define([
                     } else if (traineeData.Status === "Rejected") {
                         this.viewModel.setProperty("/isVisiable", false);
                         this.viewModel.setProperty("/editBut", true);
-                    } else if (traineeData.Status === "Submitted") {
+                    } else if (traineeData.Status === "Saved") {
                         this.viewModel.setProperty("/isVisiable", true);
                         this.viewModel.setProperty("/editBut", true);
                     }
@@ -222,7 +222,7 @@ sap.ui.define([
                     oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.ManagerID = this.getView().byId("TD_id_ReportingManager").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TD_id_Location").getSelectedKey();
-                    oModel.Status = "Submitted";
+                    oModel.Status = "Saved";
                     oModel.ReleaseDate = oModel.ReleaseDate.split("/").reverse().join('-');
                     oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join('-');
                     var oPayload = {
@@ -334,7 +334,7 @@ sap.ui.define([
                 oModel.JoiningDate = this.byId("TU_id_JoinDate").getValue().split("/").reverse().join("-");
                 // Check and update the status if it is 'Rejected'
                 if (oModel.Status === "Rejected") {
-                    oModel.Status = "Submitted";
+                    oModel.Status = "Saved";
                 }
                 oModel.TrainingDuration = this.byId("TU_id_TDuration").getSelectedKey();
                 oModel = {

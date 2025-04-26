@@ -46,12 +46,12 @@
                 <OverflowToolbar >
                     <Title id="T_id_Title" text="{i18n>traineeDetails} ({= ${traineeModel>/}.length })"/>
                     <ToolbarSpacer/>
-                    <Button  tooltip="{i18n>downloadcCertificate}" id="T_id_Download"  type="Default" press="T_onCertDownload"  icon="sap-icon://document-text" visible="false"/>
-                    <Button  tooltip="{i18n>onboardEmp}" id="T_id_EmpOnBoard"  type="Emphasized" press="T_onBoardTrainee"  icon="sap-icon://employee" visible="false"/>
-                    <Button  tooltip="{i18n>sendTrineeCertificate}" id="T_id_Cermail"  type="Neutral" press="T_onCerMail"  icon="sap-icon://email" visible="false"/>
-                    <Button  text="{i18n>onboard}" id="T_id_OnboardBtn"  type="Neutral" press="T_onOnboardPress"  icon="sap-icon://manager" enabled="false"/>
-                    <Button text="{i18n>rejectTainee}" id="T_id_RejectBtn" type="Reject"  press="T_onRejectPress" icon="sap-icon://employee-rejections" enabled="false" />
-                    <Button text="{i18n>addTrainee}" id="T_id_AddBtn" type="Accept"  press="T_onPressAddTrainee"  icon="sap-icon://employee-approvals"/>
+                    <Button  tooltip="{i18n>downloadcCertificate}" text="{i18n>certificate}"  id="T_id_Download"   press="T_onCertDownload"  icon="sap-icon://document-text" visible="false"/>
+                    <Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>traineeOnbord}" id="T_id_EmpOnBoard"   press="T_onBoardTrainee"  icon="sap-icon://employee" visible="false"/>
+                    <Button  tooltip="{i18n>sendTrineeCertificate}" text="{i18n>mailCertificate}" id="T_id_Cermail"  type="Neutral" press="T_onCerMail"  icon="sap-icon://email" visible="false"/>
+                    <Button  text="{i18n>onboard}" id="T_id_OnboardBtn"  type="Neutral" press="T_onOnboardPress"  icon="sap-icon://manager" enabled="false" tooltip="{i18n>onboard}"/>
+                    <Button text="{i18n>rejectTainee}" id="T_id_RejectBtn" type="Reject"  press="T_onRejectPress" icon="sap-icon://employee-rejections" enabled="false" tooltip="{i18n>rejectTainee}" />
+                    <Button text="{i18n>addTrainee}" id="T_id_AddBtn" type="Accept"  press="T_onPressAddTrainee"  icon="sap-icon://employee-approvals" tooltip="{i18n>addTrainee}"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
@@ -64,6 +64,9 @@
 					
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>stipend}" />
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>trainingPaid}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>joiningDate}" />
@@ -84,6 +87,7 @@
 						    <Text text="{traineeModel>NameSalutation} {traineeModel>TraineeName}"/>							
 							<Text text="{traineeModel>ReportingManagerSalutation} {traineeModel>ReportingManager}"/>
 							<Text text="{path:'traineeModel>Stipend', formatter: '.Formatter.formatCurrency'} {traineeModel>Currency}"/>
+							<Text text="{path:'traineeModel>TrainingPaidAmount', formatter: '.Formatter.formatCurrency'} {traineeModel>TrainingAmountCurrency}"/>
 							<Text text="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{traineeModel>TrainingDuration}"/>
 							<Text text="{traineeModel>TraineeEmail}"/>

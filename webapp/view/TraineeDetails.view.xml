@@ -126,14 +126,14 @@
 							<Label text="{i18n>emailId}" />
 							<Text  text="{oTraineeDetails>/TraineeEmail}"/>
 							<Label text="{i18n>stipend}" />
-							<Text text="{oTraineeDetails>/Stipend} "/>
+							<Text text="{path:'oTraineeDetails>/Stipend',formatter: '.Formatter.formatCurrency'} "/>
 							<Label text="{i18n>currency}" />
 							<Text text="{oTraineeDetails>/Currency}"/>
 							<Label text="{i18n>trainingPaid}" />
-							<Text text="{oTraineeDetails>/TrainingPaidAmount} "/>
+							<Text text="{path:'oTraineeDetails>/TrainingPaidAmount',formatter: '.Formatter.formatCurrency'} "/>
 							<Label text="{i18n>trainingFeeCurrency}" />
 							<Text text="{oTraineeDetails>/TrainingAmountCurrency}"/>
-							<Label text="{i18n>releaseDate}" />
+							<Label text="{i18n>releaseDateT}" />
 							<Text text="{oTraineeDetails>/ReleaseDate}"/>
 							<Label text="{i18n>joiningDate}" />
 							<Text text="{oTraineeDetails>/JoiningDate}"/>

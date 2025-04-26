@@ -25,7 +25,9 @@ sap.ui.define([
                 // common company emails read call
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
-                ["T_id_Download", "T_id_EmpOnBoard", "T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
+                this.byId("T_id_Download").setVisible(false);
+                this.byId("T_id_EmpOnBoard").setVisible(false);
+                this.byId("T_id_Cermail").setVisible(false);
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("traineeDetails"));
                 this.oValue = oEvent.getParameter("arguments").value;
                 BusyIndicator.hide()
@@ -184,21 +186,21 @@ sap.ui.define([
                         that.byId("T_id_TraineeTable").removeSelections(true);
                     },
                     function () {
-                        // On Cancel: also clear selection
-                        that.byId("T_id_TraineeTable").removeSelections(true);
-                        that.byId("T_id_OnboardBtn").setEnabled(false);
-                        that.byId("T_id_RejectBtn").setEnabled(false);
+                    that.T_ButtonVisibility();
                     }
                 );
+            },
+            T_ButtonVisibility: function () {
+                this.byId("T_id_OnboardBtn").setEnabled(false);
+                this.byId("T_id_RejectBtn").setEnabled(false);
+                this.byId("T_id_TraineeTable").removeSelections(true);
             },
 
             //Reject trainee function
             _handleReject: function (oContext) {
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
                 this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
-                this.byId("T_id_OnboardBtn").setEnabled(false);
-                this.byId("T_id_RejectBtn").setEnabled(false);
-                this.byId("T_id_TraineeTable").removeSelections(true);
+                this.T_ButtonVisibility();
             },
             //Onboard trainee function
             OTF_onPressOnboard: function (oTraineeData) {
@@ -210,15 +212,21 @@ sap.ui.define([
                         this.getView().getModel("traineeModel").setProperty("/Status", "OnBoarded");
                         this.OTF_onPressClose();
                         // Clear selection and disable buttons
-                        this.byId("T_id_TraineeTable").removeSelections(true);
-                        this.byId("T_id_OnboardBtn").setEnabled(false);
-                        this.byId("T_id_RejectBtn").setEnabled(false);
+                        this.T_ButtonVisibility();
+
                     } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
                 } catch (error) {
                     MessageToast.show(error.message || error.responseText);
                 }
+            },
+            T_Button: function () {
+                this.byId("T_id_OnboardBtn").setVisible(true);
+                this.byId("T_id_RejectBtn").setVisible(true);
+                this.byId("T_id_Download").setVisible(false);
+                this.byId("T_id_EmpOnBoard").setVisible(false);
+                this.byId("T_id_Cermail").setVisible(false);
             },
 
             //Close the  onboarding dialog function
@@ -248,10 +256,11 @@ sap.ui.define([
                 this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValueState("None");
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValue("");
+                this.T_ButtonVisibility();
                 this.TC_oDialog.close();
-                this.byId("T_id_TraineeTable").removeSelections(true);
-                this.byId("T_id_OnboardBtn").setEnabled(false);
-                this.byId("T_id_RejectBtn").setEnabled(false);
+                this.T_Button();
+
+
             },
             //Preview and download certificate function
             TCF_onPressHandlePreview: function () {
@@ -325,9 +334,7 @@ sap.ui.define([
                     this.generateCertificatePDF(htmlContent, oTraineeModel.BranchCode);
                     BusyIndicator.hide();
                     this.TC_oDialog.close();
-                    this.byId("T_id_TraineeTable").removeSelections(true);
-                    this.byId("T_id_OnboardBtn").setEnabled(false);
-                    this.byId("T_id_RejectBtn").setEnabled(false);
+                    this.T_ButtonVisibility();
                     this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview</b> to Preview the Certificate</p>");
                 } catch (error) {
                     BusyIndicator.hide();
@@ -363,15 +370,9 @@ sap.ui.define([
                 if (params && Object.keys(params).length > 0) {
                     this.Filter = false;
                 }
-
                 await this.readCallForTrainee(params);// read call for trainee after filter
-                var oTable = this.byId("T_id_TraineeTable");
-                if (oTable && oTable.removeSelections) {
-                    oTable.removeSelections(true); // Clear all selections
-                }
-                ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setEnabled(false));
-                ["T_id_OnboardBtn", "T_id_RejectBtn"].forEach(id => this.byId(id)?.setVisible(true));
-                ["T_id_Download", "T_id_EmpOnBoard", "T_id_Cermail"].forEach(id => this.byId(id)?.setVisible(false));
+                this.T_ButtonVisibility();
+                this.T_Button();
             },
 
             //clear the filterbar
@@ -418,14 +419,8 @@ sap.ui.define([
             //Close the mail dialog function
             Mail_onPressClose: function () {
                 this.T_MailDialog.destroy();
-                this.byId("T_id_TraineeTable").removeSelections(true);
-                this.byId("T_id_OnboardBtn").setEnabled(false);
-                this.byId("T_id_RejectBtn").setEnabled(false);
-                this.byId("T_id_OnboardBtn").setVisible(true);
-                this.byId("T_id_RejectBtn").setVisible(true);
-                this.byId("T_id_Download").setVisible(false);
-                this.byId("T_id_EmpOnBoard").setVisible(false);
-                this.byId("T_id_Cermail").setVisible(false);
+                this.T_ButtonVisibility();
+                this.T_Button();
                 this.T_MailDialog = null;
                 this.T_MailDialog.close();
             },

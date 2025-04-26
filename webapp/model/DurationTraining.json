@@ -2,19 +2,27 @@
     "duration": [
       {
         "ID": 1,
-        "Code": "6 Month"
+        "Code": "1 Month"
       },
       {
         "ID": 2,
-        "Code": "3 Month"
+        "Code": "2 Month"
       },
       {
         "ID": 3,
-        "Code": "9 Month"
+        "Code": "3 Month"
       },
       {
         "ID": 4,
-        "Code": "1 Month"
+        "Code": "4 Month"
+      },
+      {
+        "ID": 4,
+        "Code": "5 Month"
+      },
+      {
+        "ID": 4,
+        "Code": "6 Month"
       }
     ]
   }

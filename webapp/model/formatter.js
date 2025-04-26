@@ -75,7 +75,9 @@ sap.ui.define([], function () {
                  case "Trashed":
                         return "Error"
                 case "Assigned":
-                            return "Success"            
+                            return "Success" ;
+                case "Saved":
+                    return "Indication03";           
                 default:
                     return "Indication01";
             }
