@@ -166,7 +166,7 @@
 }
 .carrer-Des{
   font-family: sans-serif;
-  line-height: 1.8;
+  line-height: 1.5;
 }
 .sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS) .sapUiBlockLayoutRow:first-of-type .sapUiBlockCellContent {
   margin-top: 1rem;
@@ -176,7 +176,7 @@
 .sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS) .sapUiBlockLayoutRow:last-of-type .sapUiBlockCellContent {
   margin-bottom: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
-  line-height: 1.8;
+  line-height: 1.5;
 }
 .sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle{
   font-size: 1.5rem;
