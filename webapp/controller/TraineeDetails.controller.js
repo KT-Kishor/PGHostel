@@ -173,21 +173,19 @@ sap.ui.define([
                 oModel.TrainingAmountCurrency = this.byId("TD_id_FeeCurrency").getSelectedKey();
                 oModel.BaseLocation = this.getView().byId("TD_id_Location").getSelectedKey();
                 oModel.TrainingDuration = this.getView().byId("TD_id_TDuration").getSelectedKey();
+                const sStipendText = this.getView().byId("TD_id_StipendRadio").getSelectedButton() ? this.getView().byId("TD_id_StipendRadio").getSelectedButton().getText() : "";
+                const sPaidTraineeText = this.getView().byId("TD_id_PaidTraineeRadio").getSelectedButton() ? this.getView().byId("TD_id_PaidTraineeRadio").getSelectedButton().getText() : "";
 
-                var sStipendText = this.getView().byId("TD_id_StipendRadio").getSelectedButton().getText();
-                var sPaidTraineeText = this.getView().byId("TD_id_PaidTraineeRadio").getSelectedButton().getText();
-
-                var allFieldsFilled = oModel.TraineeName && oModel.ReportingManager && oModel.TraineeEmail &&
-                    oModel.TrainingDuration && oModel.ReleaseDate && oModel.JoiningDate &&
-                    (sStipendText === "NO" || (oModel.Stipend && oModel.Currency)) &&
-                    oModel.BaseLocation;
-                if (allFieldsFilled) {
+                const bAllFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getSelectedKey() && this.getView().byId("TD_id_EmailID").getValue().trim() && this.getView().byId("TD_id_ReleaseDate").getValue().trim() &&
+                    this.getView().byId("TD_id_JoiningDate").getValue().trim() && this.getView().byId("TD_id_TDuration").getSelectedKey() && this.getView().byId("TD_id_Location").getSelectedKey() && (sStipendText === "NO" || (this.getView().byId("TD_id_Stipend").getValue().trim() && this.byId("TD_id_Currency").getSelectedKey()));
+                if (bAllFieldsFilled) {
                     let bValid =
                         utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("TD_id_ReportingManager"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") &&
                         utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") &&
                         utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
+
                     if (sStipendText === "YES") {
                         bValid = bValid && utils._LCvalidateAmount(this.getView().byId("TD_id_Stipend"), "ID");
                     }
@@ -329,7 +327,7 @@ sap.ui.define([
             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel, text) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
-                oModel.TrainingPaidAmount= this.byId("TU_id_PaidTraineeAmount").getValue()
+                oModel.TrainingPaidAmount = this.byId("TU_id_PaidTraineeAmount").getValue()
                 oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
                 oModel.ManagerID = this.getView().byId("TU_id_Manager").getSelectedKey();
                 oModel.ReleaseDate = this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");;
@@ -454,7 +452,7 @@ sap.ui.define([
                 });
                 this.Mail_onPressClose();
             },
-            
+
             //PDF generation function
             TD_onPressMerge: function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");
