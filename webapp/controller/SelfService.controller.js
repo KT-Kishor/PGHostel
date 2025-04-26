@@ -134,9 +134,11 @@ sap.ui.define([
             },
             onStartDateChange: function (oEvent) {
                 this.setMinEndDate("AddEd_id_StartEdu", "AddEd_id_EndEdu");
+                sap.ui.getCore().byId("AddEd_id_StartEdu").setValueState("None");
             },
             oEmpStartDateChange: function () {
                 this.setMinEndDate("AddEmp_id_StartDate", "AddEmp_id_EndDate");
+                sap.ui.getCore().byId("AddEmp_id_StartDate").setValueState("None");
             },
             setEduButtonsEnabled: function (bEnabled) {
                 this.byId("EdF_id_EduEdit").setEnabled(bEnabled);
