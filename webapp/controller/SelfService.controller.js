@@ -770,8 +770,9 @@ sap.ui.define([
                                 new sap.m.Title({
                                     text: sTitleText,
                                     level: "H6",
+                                    titleStyle: "H6",
                                     wrapping: true
-                                })
+                                }).addStyleClass("sapUiTinyMarginBeginEnd")
                             ]
                         }),
                         expandable: true,
