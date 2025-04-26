@@ -31,7 +31,7 @@ sap.ui.define([
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
-                this.Filter=true;
+                this.Filter = true;
                 if (this.oValue === "EmployeeOffer") {
                     this.readCallForEmployeeOffer("");
                     this.EO_onPressClear();
@@ -45,11 +45,11 @@ sap.ui.define([
                 await this.ajaxReadWithJQuery("EmployeeOffer", filter, ["EO_id_TableEOffer"]).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModel");
-                    if(this.Filter){
-                    var oFilterData = [...new Map(offerData.filter(item => item.ConsultantName && item.ConsultantName.trim() !== "").map(item => [item.ConsultantName.trim(), item])).values()];
-                    this.getView().setModel(new JSONModel(oFilterData), "EmployeeOfferModelInitial");
-                    this.getView().getModel("EmployeeOfferModelInitial").refresh(true);
-                    this.Filter=true;  
+                    if (this.Filter) {
+                        var oFilterData = [...new Map(offerData.filter(item => item.ConsultantName && item.ConsultantName.trim() !== "").map(item => [item.ConsultantName.trim(), item])).values()];
+                        this.getView().setModel(new JSONModel(oFilterData), "EmployeeOfferModelInitial");
+                        this.getView().getModel("EmployeeOfferModelInitial").refresh(true);
+                        this.Filter = true;
                     }
                     BusyIndicator.hide();
                 }).catch((oError) => {
@@ -168,6 +168,7 @@ sap.ui.define([
                                 BaseLocation: oSelectedData.BaseLocation,
                                 AppraisalDate: oSelectedData.JoiningDate.split('T')[0],
                                 Designation: oSelectedData.Designation,
+                                Department: oSelectedData.Department,
                                 BranchCode: oSelectedData.BranchCode,
                                 MobileNo: "",
                                 ManagerID: "",
@@ -264,15 +265,17 @@ sap.ui.define([
                             this.oDialog.close();
                             this.readCallForEmployeeOffer("");
                         } else {
-                            MessageToast.show(this.i18nModel.getText("mandatoryFields"));
+                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         }
-                    })
-                        .catch((error) => {
-                            BusyIndicator.hide();
-                            MessageToast.show(error.message || error.responseText);
-                        });
+                    }).catch((error) => {
+                        BusyIndicator.hide();
+                        MessageToast.show(error.message || error.responseText);
+                    });
+                } else {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
+
             updateCallForEmployeeOffer: function (oStatus) {
                 this.oSelectedRow.Status = oStatus;
                 var oModelOffer = {
