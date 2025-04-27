@@ -63,7 +63,7 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false, });
                 this.getView().setModel(oViewModel, "viewModel");
-                ["EOD_id_Name","EOD_id_Reldate","EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_PinCode"].forEach(function (ids) {
+                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_PinCode"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 if (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") {
@@ -89,7 +89,7 @@ sap.ui.define([
                 var oViewModel = this.getView().getModel("viewModel");
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
-                    var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") &&
+                    var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
                     if (isValid) this.updateCallForEmployeeOffer(oViewModel, "offerUpdateSucc", ["EOU_id_Form"]);
@@ -107,9 +107,8 @@ sap.ui.define([
             updateCallForEmployeeOffer: async function (oViewModel, text) {
                 var that = this;
                 var oModel = this.getView().getModel("employeeModel").getData();
-                oModel.Status = oModel.Status === "Rejected" ? "Submitted" : oModel.Status;
+                oModel.Status = oModel.Status === "Rejected" ? "Saved" : oModel.Status;
                 oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
-                oModel.Department = this.getView().byId("EOUF_id_Designation").getSelectedItem().getAdditionalText();
                 oModel.JoiningDate = this.byId("EOUF_id_Joindate").getValue().split("/").reverse().join("-");
                 oModel.OfferReleaseDate = this.byId("EOUF_id_Reldate").getValue().split("/").reverse().join("-");
                 oModel = {
@@ -118,6 +117,7 @@ sap.ui.define([
                         "ID": this.sArgPara
                     }
                 }
+                oModel.Department = this.getView().byId("EOUF_id_Designation").getSelectedItem().getAdditionalText();
                 await this.ajaxUpdateWithJQuery("EmployeeOffer", oModel, ["EOU_id_Form"]).then((oData) => {
                     if (oData.success) {
                         oViewModel.setProperty("/editable", false);
@@ -156,7 +156,7 @@ sap.ui.define([
                     } else if (offerData[0].Status === "Rejected") {
                         oViewModel.setProperty("/isVisiable", false);
                         oViewModel.setProperty("/ediBut", true);
-                    } else if (offerData[0].Status === "Submitted") {
+                    } else if (offerData[0].Status === "Saved") {
                         oViewModel.setProperty("/isVisiable", true);
                         oViewModel.setProperty("editBut", true);
                     }
@@ -185,6 +185,11 @@ sap.ui.define([
             EOD_validateJoiningBonus: function (oEvent) {
                 utils._LCvalidateJoiningBonus(oEvent)
             },
+            EOD_validateCombobox: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
+                this.EOD_validateStep();
+            },
+
             EOD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent); // Base validation
                 this.EOD_validateStep(); // Step validation
@@ -213,15 +218,15 @@ sap.ui.define([
             //Step validation
             EOD_validateStep: function () {
                 // Check if all fields have values
-                var allFieldsFilled = this.getView().byId("EOD_id_Name").getValue() && this.getView().byId("EOD_id_Reldate").getValue() && this.getView().byId("EOD_id_mail").getValue() && this.getView().byId("EOD_id_Address").getValue() && this.getView().byId("EOD_id_CTC").getValue() && this.getView().byId("EOD_id_Bonus").getValue() && this.getView().byId("EOUF_id_VariablePerc").getValue();
+                var allFieldsFilled = this.getView().byId("EOD_id_Name").getValue() && this.getView().byId("EOD_id_Reldate").getValue() && this.getView().byId("EOD_id_Designation").getSelectedKey() && this.getView().byId("EOD_id_mail").getValue() && this.getView().byId("EOD_id_Address").getValue() && this.getView().byId("EOD_id_CTC").getValue() && this.getView().byId("EOD_id_Bonus").getValue() && this.getView().byId("EOUF_id_VariablePerc").getValue();
                 if (allFieldsFilled) {
                     // Validate each field directly
-                    var isValid = utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") &&
+                    let isValid = utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_VariablePerc"), "ID");
-                    this.byId("EOD_id_WizardStep").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
+                    this.byId("EOD_id_WizardStep").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
                 }
             },
             // Reset wizard to initial state
@@ -234,7 +239,7 @@ sap.ui.define([
             },
             //Submit the data
             EOD_onSubmitData: async function () {
-                if (utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") &&
+                if (utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") &&
                     utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_VariablePerc"), "ID")) {
                     BusyIndicator.show()
                     var oModel = this.getView().getModel("employeeModel").getData();
@@ -244,13 +249,13 @@ sap.ui.define([
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();
                     oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join("-");
                     oModel.OfferReleaseDate = oModel.OfferReleaseDate.split("/").reverse().join("-");
-                    oModel.Status = "Submitted";
+                    oModel.Status = "Saved";
                     oModel = {
                         "tableName": "Employeeoffer",
                         "data": oModel
                     };
                     await this.ajaxCreateWithJQuery("EmployeeOffer", oModel, ["EOD_id_Wizard"]).then((oData) => {
-                        BusyIndicator.hide()
+                        BusyIndicator.hide();
                         if (oData.success) {
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
@@ -284,7 +289,6 @@ sap.ui.define([
                                                 MessageToast.show(this.i18nModel.getText("pdfSucces"));
                                                 this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
                                                 this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
-                                                // this.getView().getModel("employeeModel").refresh(true);
                                             }
                                         }).catch((error) => {
                                             BusyIndicator.hide();
@@ -302,11 +306,11 @@ sap.ui.define([
                         BusyIndicator.hide();
                         MessageToast.show(error.responseText);
                     });
-
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
+
             EOD_onRadioButtonSelect: function (oEvent) {
                 if (oEvent.getParameter("selectedIndex") === 0) var sValue = true;
                 else var sValue = false;

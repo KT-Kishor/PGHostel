@@ -288,7 +288,7 @@ sap.ui.define([
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
       }
-      var CostToCompany = GrossPay + DeductionTotal + VariablePay + joiningBonus;
+      var CostToCompany = GrossPay + DeductionTotal + VariablePay ;
       // Set model properties
       oModel.setProperty("/BasicSalary", Math.round(BasicSalary));
       oModel.setProperty("/HRA", Math.round(HRA));

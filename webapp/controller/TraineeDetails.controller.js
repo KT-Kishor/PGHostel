@@ -42,7 +42,7 @@ sap.ui.define([
                     "BaseLocation": ""
                 };
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
-                var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, isCTCVisible: false });
+                var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
                 this.getView().setModel(oViewModel, "viewModel");
                 this.viewModel = this.getView().getModel("viewModel");
                 ["TD_id_Name", "TD_id_ReportingManager", "TD_id_EmailID", "TD_id_Stipend", "TD_id_PaidTraineeAmount", "TD_id_JoiningDate", "TD_id_ReleaseDate",
@@ -202,6 +202,8 @@ sap.ui.define([
             //Submit trainee deatails 
             TD_onSubmitData: function (oEvent) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
+                delete oModel.IsStipendSelected;
+                delete oModel.IsPaidTraineeSelected;
                 var sStipendText = this.getView().byId("TD_id_StipendRadio").getSelectedButton().getText();
                 var sPaidTraineeText = this.getView().byId("TD_id_PaidTraineeRadio").getSelectedButton().getText();
                 var bValid =
@@ -288,29 +290,30 @@ sap.ui.define([
             TD_StepTwo: function () {
                 this.getView().byId("TD_id_Submit").setEnabled(true);
                 this.byId("TD_id_StepTwo").getParent().setShowNextButton(false);
+                var oModel = this.getView().getModel("oTraineeDetails");
+                var sStipendSelectedText = this.getView().byId("TD_id_StipendRadio").getSelectedButton().getText();
+                oModel.setProperty("/IsStipendSelected", sStipendSelectedText === "YES");
+                var sPaidTraineeSelectedText = this.getView().byId("TD_id_PaidTraineeRadio").getSelectedButton().getText();
+                oModel.setProperty("/IsPaidTraineeSelected", sPaidTraineeSelectedText === "YES");
             },
+
             //Edit/save button visibility function
             TU_onEditOrSavePress: function () {
                 if (this.viewModel.getProperty("/editable")) {
-                    var oView = this.getView();
                     // Get stipend radio selection
-                    var sStipendSelectedText = oView.byId("TU_id_StipendRadio").getSelectedButton().getText();
+                    var sStipendSelectedText = this.getView().byId("TU_id_StipendRadio").getSelectedButton().getText();
                     var bIsStipendValid = true;
                     if (sStipendSelectedText === "YES") {
-                        bIsStipendValid = utils._LCvalidateAmount(oView.byId("TU_id_Stipend"), "ID");
+                        bIsStipendValid = utils._LCvalidateAmount(this.getView().byId("TU_id_Stipend"), "ID");
                     }
                     // Get paid trainee radio selection
-                    var sPaidTraineeSelectedText = oView.byId("TU_id_PaidTraineeRadio").getSelectedButton().getText();
+                    var sPaidTraineeSelectedText = this.getView().byId("TU_id_PaidTraineeRadio").getSelectedButton().getText();
                     var bIsPaidAmountValid = true;
 
                     if (sPaidTraineeSelectedText === "YES") {
-                        bIsPaidAmountValid = utils._LCvalidateAmount(oView.byId("TU_id_PaidTraineeAmount"), "ID");
+                        bIsPaidAmountValid = utils._LCvalidateAmount(this.getView().byId("TU_id_PaidTraineeAmount"), "ID");
                     }
-                    // Combine all validations
-                    var isValid =
-                        utils._LCvalidateName(oView.byId("TU_id_Name"), "ID") &&
-                        utils._LCstrictValidationComboBox(oView.byId("TU_id_Manager"), "ID") &&
-                        utils._LCvalidateEmail(oView.byId("TU_id_TraineeMail"), "ID") &&
+                    var isValid =utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") &&
                         bIsStipendValid &&
                         bIsPaidAmountValid;
                     if (isValid) {
@@ -327,6 +330,8 @@ sap.ui.define([
             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel, text) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
+                delete oModel.IsStipendSelected;
+                delete oModel.IsPaidTraineeSelected;
                 oModel.TrainingPaidAmount = this.byId("TU_id_PaidTraineeAmount").getValue()
                 oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
                 oModel.ManagerID = this.getView().byId("TU_id_Manager").getSelectedKey();
@@ -513,16 +518,18 @@ sap.ui.define([
                     if (oModel && sCurrencyPath) {
                         oModel.setProperty(sCurrencyPath, "INR");
                     }
+                    oModel.setProperty("/IsStipendSelected", false);
                 } else {
                     this.getView().byId(sStipendId).setVisible(true);
                     this.getView().byId(sCurrencyId).setVisible(true);
                     this.getView().byId(sStipendId).setValue("");
                     this.getView().byId(sStipendId).setValueState("None");
+                    oModel.setProperty("/IsStipendSelected", true);
+                    oModel.setProperty("/IsPaidTraineeSelected", false);
                 }
-                if (this.TD_validateStep) {
-                    this.TD_validateStep();
-                }
+                this.TD_validateStep();
             },
+
 
             onStipendSelectionChange: function (oEvent) {
                 var sSelectedText = oEvent.getSource().getSelectedButton().getText();
@@ -548,27 +555,28 @@ sap.ui.define([
 
             onPaidTraineeChange: function (oEvent) {
                 const sSelectedText = oEvent.getSource().getSelectedButton().getText();
-                const oView = this.getView();
+                const oModel = this.getView().getModel("oTraineeDetails");
                 const bIsYes = sSelectedText === "YES";
                 if (bIsYes) {
-                    oView.byId("TD_id_StipendRadio").setSelectedButton(
-                        oView.byId("TD_id_StipendRadio").getButtons().find(b => b.getText() === "NO")
+                    this.getView().byId("TD_id_StipendRadio").setSelectedButton(
+                        this.getView().byId("TD_id_StipendRadio").getButtons().find(b => b.getText() === "NO")
                     );
                     this.handleStipendSelection("NO", "TD_id_Stipend", "TD_id_Currency", "oTraineeDetails", "/Currency");
                 }
-                oView.byId("TD_id_PaidTraineeLabel").setVisible(bIsYes);
-                oView.byId("TD_id_PaidTraineeAmount").setVisible(bIsYes);
-                oView.byId("TD_id_FeeCurrency").setVisible(bIsYes);
-                oView.byId("TD_id_FeeCurrency").setValueState("None");
+                this.getView().byId("TD_id_PaidTraineeLabel").setVisible(bIsYes);
+                this.getView().byId("TD_id_PaidTraineeAmount").setVisible(bIsYes);
+                this.getView().byId("TD_id_FeeCurrency").setVisible(bIsYes);
+                this.getView().byId("TD_id_FeeCurrency").setValueState("None");
                 if (!bIsYes) {
-                    oView.byId("TD_id_PaidTraineeAmount").setValue("0");
-                    // Removed ValueState reset
+                    this.getView().byId("TD_id_PaidTraineeAmount").setValue("0");
                 } else {
-                    oView.byId("TD_id_PaidTraineeAmount").setValue("");
+                    this.getView().byId("TD_id_PaidTraineeAmount").setValue("");
                 }
-                if (this.TD_validateStep) {
-                    this.TD_validateStep();
+                if (oModel) {
+                    oModel.setProperty("/IsPaidTraineeSelected", bIsYes);
+                    oModel.setProperty("/IsStipendSelected", false);
                 }
+                this.TD_validateStep();
             },
 
             onUpdatePaidTraineeChange: function (oEvent) {

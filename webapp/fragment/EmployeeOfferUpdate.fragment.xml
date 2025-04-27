@@ -6,11 +6,13 @@
 	xmlns="sap.uxap"
 	xmlns:m="sap.m"
 	xmlns:core="sap.ui.core">
-    <m:Page  id="EODF_id_PageUpdate" title="{i18n>pageTitleemployee}" showNavButton="true" navButtonPress="EOD_onPressBack">
+    <m:Page  id="EODF_id_PageUpdate" title="{i18n>pageTitleemployee}" showNavButton="true" navButtonPress="EOD_onPressBack"  >
 		<ObjectPageLayout id="EODF_id_ObjectPageLayoutEmp"
                           selectedSection="{viewModel>/selectedSection}"
                           useIconTabBar="true"
+
                           showTitleInHeaderContent="true"
+						  preserveHeaderStateOnScroll="true"
                           class="sapUiSmallmarginResponsive">
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
@@ -57,11 +59,11 @@
 
 										<!-- Designation ComboBox with data from the DesignationModel -->
 										<m:Label text="{i18n>designation}" required="true" />
-										<m:Select items="{DesignationModel>/}" editable="{viewModel>/editable}" id="EOUF_id_Designation" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}">
+										<m:ComboBox items="{path:'DesignationModel>/', sorter:{ path:'department',descending:false, group:true}}" editable="{viewModel>/editable}" id="EOUF_id_Designation" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}" change="EOD_validateCombobox">
 											    <m:items>
 												<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
 												</m:items>
-										</m:Select>
+										</m:ComboBox>
 										<!-- Base Location ComboBox with data from CityJsonModel -->
 										<m:Label text="{i18n>baseLocation}" required="true" />
 											<m:Select items="{BaseLocationModel>/}" editable="{viewModel>/editable}" id="EOUF_id_Location" showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}">
@@ -158,7 +160,7 @@
 															<m:Label text="{i18n>Total}" class="boldBlackText" />
 															<m:Text text="{path:'employeeModel>/Total',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 
-															<core:Title text="{i18n>totalDeductionAmount}" />
+															<core:Title text="{i18n>deduction}" />
 															<m:Label text="{i18n>providentFund}" />
 															<m:Text text="{path:'employeeModel>/EmployeePF',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<m:Label text="{i18n>performanceTax}" />
@@ -168,13 +170,13 @@
 															<m:Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 															<m:Text text="{path:'employeeModel>/TotalDeduction',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 
-															<core:Title text="{i18n>EmpOfferVariablePay}"/>
+															<!-- <core:Title text="{i18n>EmpOfferVariablePay}"/>
 															<m:Label text="Variable Pay Total" class="boldBlackText" />
 															<m:Text text="{path:'employeeModel>/VariablePay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															
 															<core:Title text="Gross Pay"/>
 															<m:Label text="Gross Total" class="boldBlackText" />
-															<m:Text text="{path:'employeeModel>/GrossPay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+															<m:Text text="{path:'employeeModel>/GrossPay',formatter:'.Formatter.YearlyToMontlyConv'}"/> -->
 														</f:content>
 													</f:SimpleForm>
 												</l:BlockLayoutCell>
@@ -208,13 +210,13 @@
 															<m:Label text="Deduction Total" class="boldBlackText" />
 															<m:Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}"/>															
 
-															<core:Title text="Variable Pay"/>
+															<!-- <core:Title text="Variable Pay"/>
 															<m:Label text="{i18n>variablePayTotal}" class="boldBlackText" />
 															<m:Text text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}"/>
 
 															<core:Title text="{i18n>grossPay}"/>
 															<m:Label text="{i18n>grossPayTotal}" class="boldBlackText"/>
-															<m:Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}"/>
+															<m:Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}"/> -->
 														</f:content>
 													</f:SimpleForm>
 												</l:BlockLayoutCell>
@@ -255,6 +257,9 @@
 		</ObjectPageLayout>
 		<m:footer>
 			<m:Bar id="idbar">
+				<m:contentLeft>
+					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+				</m:contentLeft>
 				<m:contentRight>
 					<!-- Save/Edit and Merge Buttons -->
 					<m:Button text="{= ${viewModel>/editable} ? ${i18n>save} : ${i18n>edit} }"

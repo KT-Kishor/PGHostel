@@ -125,14 +125,19 @@
 							<Text text="{= ${oTraineeDetails>/ReportingManagerSalutation} + ' ' + ${oTraineeDetails>/ReportingManager}}"/>
 							<Label text="{i18n>emailId}" />
 							<Text  text="{oTraineeDetails>/TraineeEmail}"/>
-							<Label text="{i18n>stipend}" />
-							<Text text="{path:'oTraineeDetails>/Stipend',formatter: '.Formatter.formatCurrency'} "/>
-							<Label text="{i18n>currency}" />
-							<Text text="{oTraineeDetails>/Currency}"/>
-							<Label text="{i18n>trainingPaid}" />
-							<Text text="{path:'oTraineeDetails>/TrainingPaidAmount',formatter: '.Formatter.formatCurrency'} "/>
-							<Label text="{i18n>trainingFeeCurrency}" />
-							<Text text="{oTraineeDetails>/TrainingAmountCurrency}"/>
+							<!-- Stipend Amount -->
+							<Label text="{i18n>stipend}" visible="{= ${oTraineeDetails>/IsStipendSelected} === true }" />
+							<Text text="{path:'oTraineeDetails>/Stipend', formatter: '.Formatter.formatCurrency'} {oTraineeDetails>/Currency}" visible="{= ${oTraineeDetails>/IsStipendSelected} === true }"/>
+								
+							<!-- <Label text="{i18n>currency}" visible="{= ${oTraineeDetails>/IsStipendSelected} === true }" />
+							<Text text="" visible="{= ${oTraineeDetails>/IsStipendSelected} === true }"/> -->
+								
+							<Label text="{i18n>trainingPaid}" visible="{= ${oTraineeDetails>/IsPaidTraineeSelected} === true }"/>
+							<Text text="{path:'oTraineeDetails>/TrainingPaidAmount', formatter: '.Formatter.formatCurrency'} {oTraineeDetails>/TrainingAmountCurrency}" visible="{= ${oTraineeDetails>/IsPaidTraineeSelected} === true }"/>
+								
+							<!-- <Label text="{i18n>trainingFeeCurrency}" visible="{= ${oTraineeDetails>/IsPaidTraineeSelected} === true }"/>
+							<Text text="" visible="{= ${oTraineeDetails>/IsPaidTraineeSelected} === true }"/>
+								 -->
 							<Label text="{i18n>releaseDateT}" />
 							<Text text="{oTraineeDetails>/ReleaseDate}"/>
 							<Label text="{i18n>joiningDate}" />

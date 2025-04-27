@@ -6,11 +6,9 @@
 	xmlns:core="sap.ui.core">
 	<Page id="EOD_id_PageCrate" title="{i18n>headerEmployeeOffer}" showNavButton="true" navButtonPress="EOD_onPressBackBtn">
 		<content >
-			<NavContainer id="EOD_id_wizardNav">
-				<pages >
-					<Page>
+					<Page showHeader="false">
 						<content>
-							<Wizard id="EOD_id_Wizard">
+							<Wizard id="EOD_id_Wizard" busyIndicatorDelay="0">
 								<WizardStep id="EOD_id_WizardStep"   complete="EOD_onStep2" title="{i18n>basicDetails}" validated="true">
 									<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4"
 			labelSpanL="4"
@@ -59,11 +57,9 @@
                                             value="{employeeModel>/JoiningDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
                                             change="EOD_validateDate" class="sapUiSmallMarginBottom disableInput" valueStateText="{i18n>dateValueState}"/>
 											<Label text="{i18n>designation}" required="true" />
-											<Select items="{DesignationModel>/}" id="EOD_id_Designation" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}">
-												<items>
-													<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
-												</items>
-											</Select>
+											<ComboBox items="{path:'DesignationModel>/', sorter: {path:'department', descending:false , group:true}}" id="EOD_id_Designation" selectedKey="1" showSecondaryValues="true" value="{employeeModel>/Designation}" change="EOD_validateCombobox">
+													<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />		
+											</ComboBox>
 											<Label text="{i18n>baseLocation}" required="true" />
 											<Select items="{BaseLocationModel>/}" id="EOD_id_Location" showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}">
 												<items>
@@ -139,7 +135,7 @@
 															<Text text="{path:'employeeModel>/SpecailAllowance',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<Label text="{i18n>Total}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/Total',formatter:'.Formatter.YearlyToMontlyConv'}"  />
-															<core:Title text="{i18n>totalDeductionAmount}" />
+															<core:Title text="{i18n>deduction}" />
 															<Label text="{i18n>providentFund}" />
 															<Text text="{path:'employeeModel>/EmployeePF',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<Label text="{i18n>performanceTax}" />
@@ -148,12 +144,12 @@
 															<Text text="{path:'employeeModel>/IncomeTax',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/TotalDeduction',formatter:'.Formatter.YearlyToMontlyConv'}"  />
-															<core:Title text="{i18n>EmpOfferVariablePay}"/>
+															<!-- <core:Title text="{i18n>EmpOfferVariablePay}"/>
 															<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/VariablePay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															<core:Title text="{i18n>grossPay}"/>
 															<Label text="{i18n>grossPayTotal}" class="boldBlackText" />
-															<Text text="{path:'employeeModel>/GrossPay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+															<Text text="{path:'employeeModel>/GrossPay',formatter:'.Formatter.YearlyToMontlyConv'}"/> -->
 														</f:content>
 													</f:SimpleForm>
 												</l:BlockLayoutCell>
@@ -175,7 +171,7 @@
 															<Text text="INR {path:'employeeModel>/SpecailAllowance',formatter: '.Formatter.fromatNumber'}"  />
 															<Label text="{i18n>Total}" class="boldBlackText" />
 															<Text text="INR {path:'employeeModel>/Total',formatter: '.Formatter.fromatNumber'}"  />
-															<core:Title text="{i18n>totalDeductionAmount}"/>
+															<core:Title text="{i18n>deduction}"/>
 															<Label text="{i18n>providentFund}" />
 															<Text text="INR {path:'employeeModel>/EmployeePF',formatter: '.Formatter.fromatNumber'}"/>
 															<Label text="{i18n>performanceTax}" />
@@ -184,12 +180,12 @@
 															<Text text="INR {path:'employeeModel>/IncomeTax',formatter: '.Formatter.fromatNumber'}"/>
 															<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 															<Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}"/>
-															<core:Title text="{i18n>EmpOfferVariablePay}"/>
+															<!-- <core:Title text="{i18n>EmpOfferVariablePay}"/>
 															<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
 															<Text text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}"/>
 															<core:Title text="{i18n>grossPay}"/>
 															<Label text="Gross Total" class="boldBlackText"/>
-															<Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}"/>
+															<Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}"/> -->
 														</f:content>
 													</f:SimpleForm>
 												</l:BlockLayoutCell>
@@ -226,8 +222,6 @@
 							</Wizard>
 						</content>
 					</Page>
-				</pages>
-			</NavContainer>
 		</content>
 		<footer>
 			<Bar>
