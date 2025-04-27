@@ -23,8 +23,15 @@ sap.ui.define([
                 BusyIndicator.show(0);
                 await this._fetchCommonData("Designation", "DesignationModel", {}, ["OEF_id_SimpleForm"]);
                 await this._fetchCommonData("AppVisibility", "RoleModel");
+                var oRoleModel = this.getView().getModel("RoleModel");
+                if (oRoleModel) {
+                    var aRoles = oRoleModel.getData();
+                    aRoles.unshift({
+                        Role: ""
+                    });
+                    oRoleModel.setData(aRoles);
+                }
                 await this._fetchCommonData("EmployeeDetailsData", "EmployeeModel");
-
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
                 this.byId("EO_id_RejectBtn").setEnabled(false);
@@ -252,7 +259,7 @@ sap.ui.define([
             },
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
-                if (utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
+                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
                     var oPayload = {
                         tableName: "EmployeeDetails",
                         data: oModel

@@ -1,6 +1,5 @@
 
 <core:FragmentDefinition
-	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core" >
@@ -23,13 +22,9 @@
 					</items>
 				</Select>
 				<Label text="{i18n>empRole}" required="true"/>
-				<Select
-                 id="selectEmployeeRole"
-                 width="100%"
-                 selectedKey="{oEmpolyeeDetailsModel>/Role}"
-                 items="{RoleModel>/}" >
-					<core:Item key="{RoleModel>Role}" text="{RoleModel>Role}" />
-				</Select>
+				<ComboBox value="{oEmpolyeeDetailsModel>/Role}" showSecondaryValues= "true" id="OEF_id_EmployeeRole" items="{RoleModel>/}"	filterSecondaryValues="true" change="validateCombo">
+				<core:ListItem key="{RoleModel>Role}" text="{RoleModel>Role}" />
+				</ComboBox>
 				<Label text="{i18n>joiningDate}" />
 					<DatePicker  value="{ path: 'oEmpolyeeDetailsModel>/JoiningDate',formatter:'.Formatter.formatDate' }"  editable="false"   displayFormat="dd/MM/yyyy"     valueFormat="dd/MM/yyyy"  />
 				<Label text="{i18n>baseLocation}" required="true"/>
@@ -56,10 +51,10 @@
 				 initialFocusedDateValue="{controller>/focusedDate}"
 				 maxDate="{controller>/maxDate}"
 				 valueStateText="{i18n>dateValueState}" />
-				<Label text="{i18n>bloodGroup}"/>
-				<Select  selectedKey="{oEmpolyeeDetailsModel>/BloodGroup}" items="{BloodGroup>/bloodgroup}" id="OEF_id_blood" >
-					<core:Item key="{BloodGroup>Code}" text="{BloodGroup>Code}" />
-				</Select>
+				<Label text="{i18n>bloodGroup}" required="true"/>
+				<ComboBox value="{oEmpolyeeDetailsModel>/BloodGroup}" showSecondaryValues= "true" id="OEF_id_blood" items="{BloodGroup>/bloodgroup}"	filterSecondaryValues="true" change="validateCombo">
+				<core:ListItem key="{BloodGroup>Code}" text="{BloodGroup>Code}" />
+				</ComboBox>
 				<Label text="{i18n>mobileNo}" required="true" />
 				<Input value="{oEmpolyeeDetailsModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo" maxLength="10" id="OEF_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
 				<Label text="{i18n>manager}" required="true"/>
