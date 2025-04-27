@@ -44,6 +44,7 @@ sap.ui.define(
             "isForgotPasswordVisible": true,
             "sendOtpText": "Send OTP",
             "passwordValueState": "None",
+            "continue": "Continue",
 
             "frgUserId": "",
             "frgUserIdValueState": "None",
@@ -58,6 +59,7 @@ sap.ui.define(
             "frgConfirmPassword": "",
             "frgConfirmPasswordValueState": "None",
             "frgConfirmPasswordVisible": false
+
           });
           this.getView().setModel(oLoginModel, "LoginViewModel");
           //this.LoginModel = oLoginModel;
@@ -361,6 +363,7 @@ sap.ui.define(
               }).then((response) => {
                 if (response.success === true) {
                   BusyIndicator.hide();
+                  oFragModel.setProperty("/continue", this.i18nModel.getText("save"));
                   MessageToast.show(this.i18nModel.getText("verifiedOTP"));
                   sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(false);
                   sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(false);
@@ -425,6 +428,15 @@ sap.ui.define(
           } catch (error) {
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
+        },
+        FSM_OnsendOTP: function () {
+          this.SM_onPressSave()
+        },
+        OnOTPverify: function () {
+          this.SM_onPressSave()
+        },
+        FSM_onConfirm: function () {
+          this.SM_onPressSave()
         }
       }
     );

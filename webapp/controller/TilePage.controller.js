@@ -5,7 +5,7 @@ sap.ui.define(
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/ui/core/BusyIndicator",
-  ],function (BaseController, MessageToast, utils, JSONModel, BusyIndicator) {
+  ], function (BaseController, MessageToast, utils, JSONModel, BusyIndicator) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.TilePage",
@@ -14,21 +14,22 @@ sap.ui.define(
           this.getRouter().getRoute("RouteTilePage").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function () {
+          BusyIndicator.hide()
           this._fetchCommonData("AllLoginDetails", "EmpModel");
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("Quotation").setProperty("/setDefFilter", true);
           this.AppVisibilityReadCall();
         },
 
-        AppVisibilityReadCall: async function(){
+        AppVisibilityReadCall: async function () {
           BusyIndicator.show(0);
           var LoginModel = this.getView().getModel("LoginModel").getData();
-            await this.ajaxReadWithJQuery("AppVisibility", {Role:LoginModel.Role},[]).then((oData) => {
-              var AppVisiblity = Array.isArray(oData.data) ? oData.data[0] : [oData.data[0]];
-              this.getView().setModel(new JSONModel(AppVisiblity), "AppVisibilityModel");              
-              BusyIndicator.hide();
+          await this.ajaxReadWithJQuery("AppVisibility", { Role: LoginModel.Role }, []).then((oData) => {
+            var AppVisiblity = Array.isArray(oData.data) ? oData.data[0] : [oData.data[0]];
+            this.getView().setModel(new JSONModel(AppVisiblity), "AppVisibilityModel");
+            BusyIndicator.hide();
           }).catch((oError) => {
-              BusyIndicator.hide();             
+            BusyIndicator.hide();
           })
         },
 
@@ -214,7 +215,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteConsultantInvoiceApplication");
         },
         TileV_onpressContract: function () {
-          this.getRouter().navTo("RouteContract", {valueEmp: "Contract"});
+          this.getRouter().navTo("RouteContract", { valueEmp: "Contract" });
         },
         TileV_onPressAdminPaySlip: function () {
           this.getRouter().navTo("RouteAdminPaySlip");
@@ -250,7 +251,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteEmployeeDetails");
         },
         TileV_onBackPress: function () {
-          this.CommonLogoutFunction(); 
+          this.CommonLogoutFunction();
         },
         TileV_onpressAddCustomer: function () {
           BusyIndicator.show(0);

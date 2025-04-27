@@ -216,12 +216,11 @@
 		</layout:VerticalLayout>
 		<footer>
 			<Bar>
-			
 					    <contentLeft>
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
 				<contentRight>
-				<Button text="Update Password" icon="sap-icon://refresh" press="TP_onupdatepress" />
+				<Button text="{i18n>updatepassword2}" icon="sap-icon://refresh" press="TP_onupdatepress" visible="{= ${LoginModel>/Role} === 'Admin' }" />
 				</contentRight>
 			</Bar>
 		
