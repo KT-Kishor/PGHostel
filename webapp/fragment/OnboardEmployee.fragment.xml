@@ -22,7 +22,7 @@
 					</items>
 				</Select>
 				<Label text="{i18n>empRole}" required="true"/>
-				<ComboBox value="{oEmpolyeeDetailsModel>/Role}" showSecondaryValues= "true" id="OEF_id_EmployeeRole" items="{RoleModel>/}"	filterSecondaryValues="true" change="validateCombo">
+				<ComboBox value="{oEmpolyeeDetailsModel>/Role}" showSecondaryValues= "true" id="OEF_id_EmployeeRole" items="{RoleModel>/}"	filterSecondaryValues="true" change="validateCombo" valueStateText="{i18n>combovalueState}">
 				<core:ListItem key="{RoleModel>Role}" text="{RoleModel>Role}" />
 				</ComboBox>
 				<Label text="{i18n>joiningDate}" />
@@ -52,7 +52,7 @@
 				 maxDate="{controller>/maxDate}"
 				 valueStateText="{i18n>dateValueState}" />
 				<Label text="{i18n>bloodGroup}" required="true"/>
-				<ComboBox value="{oEmpolyeeDetailsModel>/BloodGroup}" showSecondaryValues= "true" id="OEF_id_blood" items="{BloodGroup>/bloodgroup}"	filterSecondaryValues="true" change="validateCombo">
+				<ComboBox value="{oEmpolyeeDetailsModel>/BloodGroup}" showSecondaryValues= "true" id="OEF_id_blood" items="{BloodGroup>/bloodgroup}"	filterSecondaryValues="true" change="validateCombo" valueStateText="{i18n>combovalueState}">
 				<core:ListItem key="{BloodGroup>Code}" text="{BloodGroup>Code}" />
 				</ComboBox>
 				<Label text="{i18n>mobileNo}" required="true" />
@@ -63,7 +63,8 @@
 				id="OEF_id_Manager"
 				items="{EmployeeModel>/}"
 				filterSecondaryValues="true"
-				change="validateCombo">
+				change="validateCombo"
+				valueStateText="{i18n>combovalueState}">
 					<core:ListItem key="{EmployeeModel>EmployeeID}" text="{EmployeeModel>EmployeeName}" additionalText="{EmployeeModel>EmployeeID}"/>
 				</ComboBox>
 			</f:content>

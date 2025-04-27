@@ -58,7 +58,7 @@
 
 										<!-- Designation ComboBox with data from the DesignationModel -->
 										<m:Label text="{i18n>designation}" required="true" />
-										<m:ComboBox items="{path:'DesignationModel>/', sorter:{ path:'department',descending:false, group:true}}" editable="{viewModel>/editable}" id="EOUF_id_Designation" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}" change="EOD_validateCombobox">
+										<m:ComboBox items="{path:'DesignationModel>/', sorter:{ path:'department',descending:false, group:true}}" editable="{viewModel>/editable}" id="EOUF_id_Designation" showSecondaryValues="true" selectedKey="{employeeModel>/Designation}" change="EOD_validateCombobox" valueStateText="{i18n>combovalueState}">
 											    <m:items>
 												<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
 												</m:items>

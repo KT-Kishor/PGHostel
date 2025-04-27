@@ -410,6 +410,10 @@ sap.ui.define([], function () {
     _LCstrictValidationComboBox: function (oEvent, type) {
       var oComboBox = type === "ID" ? oEvent : oEvent.getSource();
       var sValue = oComboBox.getValue();
+      if(!sValue){
+        oComboBox.setValueState("Error");
+        return false;
+      }
       var aItems = oComboBox.getItems();
       var bValid = aItems.some(function (oItem) {
         return oItem.getText() === sValue || oItem.getKey() === sValue;

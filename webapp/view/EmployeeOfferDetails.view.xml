@@ -57,7 +57,7 @@
                                             value="{employeeModel>/JoiningDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
                                             change="EOD_validateDate" class="sapUiSmallMarginBottom disableInput" valueStateText="{i18n>dateValueState}"/>
 											<Label text="{i18n>designation}" required="true" />
-											<ComboBox items="{path:'DesignationModel>/', sorter: {path:'department', descending:false , group:true}}" id="EOD_id_Designation" selectedKey="1" showSecondaryValues="true" value="{employeeModel>/Designation}" change="EOD_validateCombobox">
+											<ComboBox items="{path:'DesignationModel>/', sorter: {path:'department', descending:false , group:true}}" id="EOD_id_Designation" showSecondaryValues="true" value="{employeeModel>/Designation}" change="EOD_validateCombobox" valueStateText="{i18n>combovalueState}">
 													<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />		
 											</ComboBox>
 											<Label text="{i18n>baseLocation}" required="true" />
