@@ -247,7 +247,7 @@ sap.ui.define(
         },
 
         //formate
-        SUD_onInputchange: function (oEvent) {
+        SUD_onFieldChange: function (oEvent) {
           var oSchemeSource = oEvent.getSource();
           var schemeValue = oSchemeSource.getValue().trim();
           var schemerawValue = schemeValue.replace(/,/g, "");
@@ -269,9 +269,11 @@ sap.ui.define(
           oModel.setProperty(schemeBindingPath, formattedValue);
           oModel.refresh(true);
         },
-        // SUD_onFieldChange: function (oEvent) {
-        //   utils._LCvalidateAmount(oEvent);
-        // }
+        SUD_onliveChange: function (oEvent) {
+          var oSource = oEvent.getSource();
+          var sValue = oSource.getValue();
+          if (/[^0-9.,]/.test(sValue)) oSource.setValue(sValue.replace(/[^0-9.,]/g, ""));
+        }
       }
     );
   }

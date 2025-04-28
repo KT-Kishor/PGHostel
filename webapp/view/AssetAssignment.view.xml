@@ -70,8 +70,7 @@
                     name="AssignedDate"
                     label="{i18n>assignedDate}"
                     groupName="Group1"
-                    visibleInFilterBar="true"
-                >
+                    visibleInFilterBar="true">
                     <fb:control>
                         <DateRangeSelection
                             id="AA_id_Date"
