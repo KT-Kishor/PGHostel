@@ -613,6 +613,35 @@ sap.ui.define([
       if (oFilterBar) {
           oFilterBar.clear(); // Clear all filters in the FilterBar
       }
-  }
+  },
+
+  getBusyDialog:function() {
+    if (!this._pBusyDialog) {
+    this._pBusyDialog = sap.ui.core.Fragment.load({
+    name: "sap.kt.com.minihrsolution.fragment.BusyIndicator",
+    controller: this
+    }).then(function (oBusyDialog) {
+    this.getView().addDependent(oBusyDialog);
+    return oBusyDialog;
+    }.bind(this));
+    }
+    
+    this._pBusyDialog.then(function(oBusyDialog) {
+    oBusyDialog.open();
+    // setTimeout(function() {
+    // this._pBusyDialog.then(function(oBusyDialog) {
+    // oBusyDialog.close();
+    // });
+    // }.bind(this), 5000);
+    }.bind(this));
+    },
+
+    closeBusyDialog: function() {
+      if (this._pBusyDialog) {
+        this._pBusyDialog.then(function(oBusyDialog) {
+          oBusyDialog.close();
+        });
+      }
+    }
   })
 });

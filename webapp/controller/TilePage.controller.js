@@ -261,7 +261,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteMSA");
         },
         TileV_onpressExpenseApp: function () {
-          BusyIndicator.show(0);
+          this.getBusyDialog();
           this.getRouter().navTo("RouteExpensePage");
         },
         TileV_onPressManageSchemeUpload: function () {

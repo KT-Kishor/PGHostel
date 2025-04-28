@@ -34,7 +34,7 @@ sap.ui.define([
             this.CommonModel();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
             this.onChangeEmployeeID();
-            BusyIndicator.hide();
+           this.closeBusyDialog();
             this.Exp_onSearch();            
         },
 
