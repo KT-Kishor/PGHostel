@@ -200,7 +200,7 @@ sap.ui.define(
               data: data,
               filters: sheetFilters[index]
             }));
-            this._updateData(combinedData);
+            this._updateData(sheetData);
           };
           reader.onerror = () => {
             MessageToast.show(this.i18nModel.getText("commonReadingDataError"));
@@ -210,18 +210,23 @@ sap.ui.define(
         }
       },
 
-      _updateData: async function (combinedData) {
-        var response = await this.ajaxUpdateWithJQuery("A_PayRoll", {
-          data: combinedData,
-        });
-        if (response.success) {
+      _updateData: async function (sheetData) {
+        try {
+          var response = await this.ajaxUpdateWithJQuery("A_PayRoll", { data: sheetData, filters: { Branch: this.oModel.getProperty("/FilterBranch"), Month: this.oModel.getProperty("/FilterMonth"), Year: this.oModel.getProperty("/FilterYear") } });
+          if (response.success) {
+            BusyIndicator.hide();
+            this.oModel.setProperty("/TableData", sheetData);
+            this.getView().byId("MP_id_UpdateSalBtn").setEnabled(false);
+            MessageToast.show(this.i18nModel.getText("msgSalUploadSuccess"));
+          } else {
+            BusyIndicator.hide();
+            MessageToast.show(this.i18nModel.getText("msgSchemeUploadFailed"));
+          }
+        }
+        catch (error) {
+          MessageToast.show(this.i18nModel.getText("commonError"));
+          console.error("Error during update:", error);
           BusyIndicator.hide();
-          this.oModel.setProperty("/TableData", sheetData);
-          this.getView().byId("MP_id_UpdateSalBtn").setEnabled(false);
-          MessageToast.show(this.i18nModel.getText("msgSalUploadSuccess"));
-        } else {
-          BusyIndicator.hide();
-          MessageToast.show(this.i18nModel.getText("msgSchemeUploadFailed"));
         }
       },
 

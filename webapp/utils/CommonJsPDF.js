@@ -72,7 +72,7 @@ sap.ui.define([], function () {
                 doc.text(oModel.CreateDate, margin, dateY);
 
                 let currentAfterDateY = dateY;
-                if (oModel.Type === "EmployeeOffer") {
+                if (oModel.Type === "Employee Offer") {
                     doc.setFont("times", "bold");
                     let empNameY = currentAfterDateY + 10;
                     doc.text(oModel.EmpName, margin, empNameY);
@@ -156,7 +156,7 @@ sap.ui.define([], function () {
                 }
 
                 let contentafterTitleContentY = titleContentY;
-                if (oModel.Type === "EmployeeOffer") {
+                if (oModel.Type === "Employee Offer") {
                     doc.setFont("times", "bold");
                     let title3Y = contentafterTitleContentY + 2;
                     let title3 = new Function("oModel", `return ${content[2].Title};`)(oModel);
@@ -230,7 +230,7 @@ sap.ui.define([], function () {
                     contentafterTitleContentY = currentY;
                 }
 
-                if (oModel.Type === "EmployeeOffer") {
+                if (oModel.Type === "Employee Offer") {
                     if (contentafterTitleContentY > bottomLimit - 90) {
                         doc.addPage();
                         doc.addImage(oModel.CompanyLogoHeader, "PNG", 145, 8, 45, 10);
@@ -256,7 +256,7 @@ sap.ui.define([], function () {
                 doc.text(oCompanyModel.designation, margin, headofCoRoleY);
 
                 let acceptTCVisY = headofCoRoleY + 15;
-                if (oModel.Type === "EmployeeOffer") {
+                if (oModel.Type === "Employee Offer") {
                     let acceptTCY = acceptTCVisY;
                     doc.text("I have read and accept the terms and conditions:", margin, acceptTCY);
                     acceptTCVisY = acceptTCY + 15;
@@ -272,7 +272,7 @@ sap.ui.define([], function () {
                 doc.text("Signature: ............................................................", margin, cSignY);
 
 
-                if (oModel.Type === "EmployeeOffer") {
+                if (oModel.Type === "Employee Offer") {
                     doc.addPage();
                     doc.addImage(oModel.CompanyLogoHeader, "PNG", 145, 8, 45, 10);
                     doc.setGState(new doc.GState({ opacity: 0.1 }));
@@ -567,7 +567,7 @@ sap.ui.define([], function () {
                         doc.text(`${salNotes[0].Title} ${salNotes[0].Text}`, margin, salNoteText0Y);
                     }
                 }
-                doc.save(`${oModel.EmpName} Offer Letter.pdf`);
+                doc.save(`${oModel.EmpName} ${oModel.Type} Letter.pdf`);
                 sap.ui.core.BusyIndicator.hide();
             }, 1000);
         }

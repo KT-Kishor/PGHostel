@@ -420,7 +420,6 @@ sap.ui.define([], function () {
       });
       if (!bValid) {
         oComboBox.setValueState("Error");
-        oComboBox.setValueStateText("Please select a valid option from the list");
         return false;
       } else {
         oComboBox.setValueState("None");

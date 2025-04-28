@@ -201,10 +201,10 @@
                                     />
                                     <m:Input
                                         id="QF_id_EmpMobile"
+                                        required="true"
                                         editable="{Quotation>/MasterEdit}"
                                         value="{Quotation>/QuotationFormData/EmployeeMobile}"
                                         liveChange=".QF_onMobileChange"
-                                        type="Number"
                                         valueStateText="{i18n>mobileNoValueState}"
                                     />
                                     <m:Label
@@ -219,6 +219,8 @@
                                         change="QF_onBranchCodeChange"
                                         editable="{= ${Quotation>/AddCase} ? true : false }"
                                         showSecondaryValues="true"
+                                        valueStateText="{i18n>branchCodeValueState}"
+                                        required="true"
                                         visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'CEO' ? true : false }"
                                     >
                                         <core:ListItem
@@ -311,7 +313,6 @@
                                         editable="{Quotation>/MasterEdit}"
                                         value="{Quotation>/QuotationFormData/CustMobile}"
                                         required="true"
-                                        type="Number"
                                         liveChange=".QF_onMobileChange"
                                         valueStateText="{i18n>mobileNoValueState}"
                                     />

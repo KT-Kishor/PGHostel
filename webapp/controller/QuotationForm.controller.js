@@ -332,10 +332,11 @@ sap.ui.define([
 
         _checkValidation: function () {
             var oView = this.getView();
-            if (utils._LCstrictValidationComboBox(oView.byId("QF_id_BranchCodes"), "ID") &&
+            if (
+                utils._LCvalidateMobileNumber(oView.byId("QF_id_EmpMobile"), "ID") &&
+                utils._LCstrictValidationComboBox(oView.byId("QF_id_BranchCodes"), "ID") &&
                 utils._LCvalidateName(oView.byId("QF_id_CustomerName"), "ID") &&
                 utils._LCvalidateMobileNumber(oView.byId("QF_id_CustMobile"), "ID") &&
-                utils._LCvalidateMobileNumber(oView.byId("QF_id_EmpMobile"), "ID") &&
                 utils._LCvalidateEmail(oView.byId("QF_id_CustEmail"), "ID") &&
                 utils._LCvalidateAadharCard(oView.byId("QF_id_CustAadhar"), "ID") &&
                 utils._LCvalidatePanCard(oView.byId("QF_id_CustPanNumber"), "ID") &&

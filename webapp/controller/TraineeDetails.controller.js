@@ -397,9 +397,10 @@ sap.ui.define([
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "TraineeOffer" });
                 var oPDFModel = this.getView().getModel("PDFData");
-                oPDFModel.setProperty("/Type", "TraineeOffer");
+                oPDFModel.setProperty("/Type", "Trainee Offer");
                 oPDFModel.setProperty("/EmpName", oEmpModel.NameSalutation + " " + oEmpModel.TraineeName);
                 oPDFModel.setProperty("/EmpRole", "Trainee");
+                oPDFModel.setProperty("/TrainingDuration", oEmpModel.TrainingDuration);
                 oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.ReleaseDate));
                 oPDFModel.setProperty("/TrainingStartDate", Formatter.formatDate(oEmpModel.JoiningDate));
                 oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
