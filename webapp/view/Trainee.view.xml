@@ -26,6 +26,13 @@
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Type" label="{i18n>trainingType}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox   items="{typeModel>/}" id="T_id_TypeBar" showClearIcon="true">
+								<core:Item key="{typeModel>Type}" text="{typeModel>Type}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="JoiningDate" label="{i18n>joiningDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
                     <DateRangeSelection id="T_id_JoiningDate" valueFormat="MM/dd/yyyy"  displayFormat="MM/dd/yyyy" change="onDateChange" />						

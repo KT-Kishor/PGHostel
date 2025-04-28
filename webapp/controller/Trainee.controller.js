@@ -50,8 +50,11 @@ sap.ui.define([
                         this.getView().setModel(new JSONModel(oFilterData), "traineeNameModel");
                         var oFilterData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "").map(item => [item.ReportingManager.trim(), item])).values()];
                         this.getView().setModel(new JSONModel(oFilterData), "reportingManagerModel");
+                        var oFilterData = [...new Map(offerData.filter(item => item.Type && item.Type.trim() !== "").map(item => [item.Type.trim(), item])).values()];
+                        this.getView().setModel(new JSONModel(oFilterData), "typeModel");
                         this.getView().getModel("traineeNameModel").refresh(true);
                         this.getView().getModel("reportingManagerModel").refresh(true);
+                        this.getView().getModel("typeModel").refresh(true);
                         this.Filter = true;
                     }
                     BusyIndicator.hide();
