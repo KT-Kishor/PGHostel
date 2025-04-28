@@ -158,14 +158,16 @@ sap.ui.define(
           }
           const oData = oModel.getData();
           const aResults = oData.results;
+
+          const aCols = this.createColumnConfig();
+
+          //  If no data, show a toast, but CONTINUE to create empty Excel with only headers
           if (!Array.isArray(aResults) || aResults.length === 0) {
             MessageToast.show(this.i18nModel.getText("noData"));
-            return;
           }
-          const aCols = this.createColumnConfig();
           const oSettings = {
             workbook: { columns: aCols, hierarchyLevel: "Level" },
-            dataSource: aResults,
+            dataSource: aResults || [], //  if aResults is undefined/null, pass empty array
             fileName: "QuotationScheme.xlsx",
             worker: false,
           };
@@ -174,6 +176,8 @@ sap.ui.define(
             oSheet.destroy();
           });
         },
+
+
         createColumnConfig: function () {
           return [
             { label: "Model", property: "Model", type: "string" },
@@ -239,14 +243,12 @@ sap.ui.define(
         FUS_onCreateDialogSubmit: async function () {
           var that = this;
           var oFileUploader = sap.ui.getCore().byId("idFileUploader");
-          if (
-            !that._uploadedExcelData ||
-            that._uploadedExcelData.length === 0
-          ) {
+
+          if (!that._uploadedExcelData || that._uploadedExcelData.length === 0) {
             MessageToast.show("No Data In Excel");
             return;
           }
-          //Filter out rows missing 'Model' or 'Variant'
+
           var validRows = that._uploadedExcelData.filter((row) => {
             return row["Model"] && row["Variant"];
           });
@@ -256,7 +258,6 @@ sap.ui.define(
             return;
           }
 
-          // Format Data
           var formattedData = that._uploadedExcelData.map((row) => ({
             Variant: row["Variant"] || "",
             Model: row["Model"] || "",
@@ -284,30 +285,59 @@ sap.ui.define(
             Emission: row["Emission"] || "",
           }));
 
-          // Send data to backend
-          BusyIndicator.show(0);
-          var response = await that.ajaxCreateWithJQuery("SchemeUploade", {
-            data: formattedData,
-          });
-          if (response.success) {
-            BusyIndicator.hide();
-            MessageToast.show(that.i18nModel.getText("msgschemeupload"));
+          // Show confirmation MessageBox before uploading
+          MessageBox.confirm(
+            "Previous data will be deleted. Do you want to continue?",
+            {
+              title: "Confirm Upload",
+              actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+              emphasizedAction: MessageBox.Action.OK,
+              onClose: async function (oAction) {
+                if (oAction === MessageBox.Action.OK) {
+                  // User confirmed, proceed with delete and upload
+                  BusyIndicator.show(0);
+                  try {
 
-            // Update UI Model after successful save
-            that.getView().setModel(that.MainModel, "MainModel");
-            that.MainModel.refresh(true);
-            that.CommomReadCall("");
-            oFileUploader.setValue(""); // Reset file uploader
-            that.SU_onClear();
-            that.oSchemeUploadDialog.close();
-          } else {
-            BusyIndicator.hide();
-            oFileUploader.setValue(""); // Reset file uploader
-            that._uploadedExcelData = null;
-            if (that.oSchemeUploadDialog) that.oSchemeUploadDialog.close();
-            MessageToast.show("Failed to save data. Please try again.");
-          }
+                    var deleteResponse = await that.ajaxDeleteWithJQuery("/SchemeUploade", {});
+
+                    if (!deleteResponse.success) {
+                      BusyIndicator.hide();
+                      MessageToast.show("Failed to delete previous data.");
+                      return;
+                    }
+
+                    // 2. Now Upload New Data
+                    var uploadResponse = await that.ajaxCreateWithJQuery("SchemeUploade", { data: formattedData });
+
+                    if (uploadResponse.success) {
+                      BusyIndicator.hide();
+                      MessageToast.show(that.i18nModel.getText("msgschemeupload"));
+
+                      // Update UI Model after successful save
+                      that.getView().setModel(that.MainModel, "MainModel");
+                      that.MainModel.refresh(true);
+                      that.CommomReadCall("");
+                      oFileUploader.setValue(""); // Reset file uploader
+                      that.SU_onClear();
+                      that.oSchemeUploadDialog.close();
+                    } else {
+                      BusyIndicator.hide();
+                      MessageToast.show("Failed to upload new data. Please try again.");
+                    }
+                  } catch (error) {
+                    BusyIndicator.hide();
+                    console.error(error);
+                    MessageToast.show("An error occurred. Please try again.");
+                  }
+                } else {
+                  // User cancelled
+                  MessageToast.show("Upload cancelled.");
+                }
+              }
+            }
+          );
         },
+
         CommomReadCall: async function (filter) {
           BusyIndicator.show(0);
           await this.ajaxReadWithJQuery("SchemeUploade", filter)

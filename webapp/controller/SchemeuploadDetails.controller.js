@@ -105,7 +105,15 @@ sap.ui.define(
               }.bind(this)
             );
           } else {
-            this.getRouter().navTo("RouteSchemeUpload", { value: "SchemeUpload" })
+            // this.getRouter().navTo("RouteSchemeUpload", { value: "SchemeUpload" })
+            this.showConfirmationDialog(
+              this.i18nModel.getText("ConfirmActionTitle"),
+              this.i18nModel.getText("backConfirmation"),
+              function () {
+                this.getRouter().navTo("RouteSchemeUpload", { value: "SchemeUpload" });
+                this.onConfirmBack()
+              }.bind(this)
+            );
           }
         },
         onConfirmBack: function () {
@@ -239,7 +247,7 @@ sap.ui.define(
         },
 
         //formate
-        SUD_onFieldChange: function (oEvent) {
+        SUD_onInputchange: function (oEvent) {
           var oSchemeSource = oEvent.getSource();
           var schemeValue = oSchemeSource.getValue().trim();
           var schemerawValue = schemeValue.replace(/,/g, "");
@@ -261,6 +269,9 @@ sap.ui.define(
           oModel.setProperty(schemeBindingPath, formattedValue);
           oModel.refresh(true);
         },
+        // SUD_onFieldChange: function (oEvent) {
+        //   utils._LCvalidateAmount(oEvent);
+        // }
       }
     );
   }

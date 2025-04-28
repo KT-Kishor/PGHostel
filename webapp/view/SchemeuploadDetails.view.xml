@@ -10,7 +10,6 @@
         <headerContent>
             <Button
                 id="SUD_id_Back"
-                text=""
                 press="SUD_onhandleBackPress"
                 type="Transparent"
                 visible="true"
@@ -132,8 +131,9 @@
                     <Input
                         value="{ path: 'detailModel>/EXShowroom', formatter: '.Formatter.fromatNumber' }"
                                             editable="{detailModel>/isEditable}"
-                                            change="SUD_onFieldChange"
+                                            valueStateText="{i18n>mobileNoValueState}"
                                             maxLength="14"
+                                            change="SUD_onInputchange"
                     />
                     <Label text="{i18n>schconsumer}" />
                     <Input
