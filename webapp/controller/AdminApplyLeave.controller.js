@@ -726,7 +726,7 @@ sap.ui.define(
                             }
 
                             if (parseFloat(oData.NoofDays) <= 0) {
-                                return MessageBox.error(this.i18nModel.getText("invalidNoofDays")); 
+                                return MessageBox.error(this.i18nModel.getText("holidaysMess")); 
                             }
                             
                             // Check if leave is on weekend
@@ -743,10 +743,6 @@ sap.ui.define(
                                 return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
                             }
 
-                            if (parseFloat(oData.NoofDays) <= 0) {
-                                return MessageBox.error(this.i18nModel.getText("invalidNoofDays")); 
-                            }
-                
                             // Calculate used leaves
                             var LeaveModel = this.getView().getModel("LeaveModel").getData();
                          
@@ -864,7 +860,7 @@ sap.ui.define(
                             }
 
                             if (parseFloat(oData.NoofDays) <= 0) {
-                                return MessageBox.error(this.i18nModel.getText("invalidNoofDays")); 
+                                return MessageBox.error(this.i18nModel.getText("holidaysMess")); 
                             }
 
                             // Check if leave is on weekend

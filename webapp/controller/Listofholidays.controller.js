@@ -195,6 +195,7 @@ sap.ui.define(
                           return that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData });
                         }).then(() => {
                           MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
+                          that.byId("LOH_id_Holidays").setDateValue(new Date(selectedYear, 0, 1));
                           that.oHolidayDialog.close();
                           return that._fetchCommonData("ListOfHolidays?","HolidayModel",{startDate: `${selectedYear}-01-01`,
                             endDate: `${selectedYear}-12-31`},["LOH_id_HolidayTable"]);
@@ -212,6 +213,7 @@ sap.ui.define(
               } else {
                 that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData }).then(() => {
                   MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
+                  that.byId("LOH_id_Holidays").setDateValue(new Date(selectedYear, 0, 1));
                   that.oHolidayDialog.close();
                   return that._fetchCommonData("ListOfHolidays?","HolidayModel",{startDate: `${selectedYear}-01-01`,
                     endDate: `${selectedYear}-12-31`},["LOH_id_HolidayTable"]);
