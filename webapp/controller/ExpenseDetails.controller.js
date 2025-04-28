@@ -16,6 +16,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
         onInit: async function() {
             // Attach route matched event for "RouteExpensDetails"
             this.getRouter().getRoute("RouteExpensDetails").attachMatched(this._onRouteMatched, this);
+            this.byId("objectPageLayoutExpence").setHeaderContentPinned(true); /// Header content pinned
             await this._fetchCommonData("Currency", "CurrencyModel");
         },
 
@@ -141,7 +142,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                 EmployeeID: this.LoginModel.getProperty("/EmployeeID"),
                 EmployeeName: this.LoginModel.getProperty("/EmployeeName"),
                 IndexNo: this.IndexNo + 1,
-                ItemType: "Bus",
+                ItemType: "",
                 ExpenseAmount: "0",
                 Currency: "INR",
                 ModeOfPayment: "Employee",
@@ -187,6 +188,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
             sap.ui.getCore().byId("ExpDet_id_Amount").setValueState("None");
             sap.ui.getCore().byId("ExpDet_id_ConvertionRate").setValueState("None");
             sap.ui.getCore().byId("ExpDet_id_Comments").setValueState("None");
+            sap.ui.getCore().byId("ExpDet_id_ItemType").setValueState("None");
             this.byId("exp_Id_ExpenseTable").removeSelections();
             this.ExpenseItem.close();
         },
@@ -295,6 +297,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
         },
 
         Exp_Frg_onItemTypeChange: function(oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
             var oText = oEvent.getSource().getSelectedItem().getText();
             if (oText === "Peridiem Declaration") {
                 this.ViewModel.setProperty("/enable", false);
@@ -308,7 +311,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
         async Exp_Det_onPressSubmit() {
             BusyIndicator.show(0);
             var oModel = this.getView().getModel("ExpenseCreateModel").getData();
-            if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && (oModel.ItemType !== "Peridiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
+            if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Peridiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
                 // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(true);
                 var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
                 if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
@@ -355,7 +358,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
             BusyIndicator.show(0);
             var oModel = this.getView().getModel("ExpenseCreateModel").getData();
             var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
-            if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
+            if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
                 if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                 // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(true);
                 var oData = {

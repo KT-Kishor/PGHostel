@@ -8,7 +8,7 @@
 >
 
 <m:Page id="id_Expense_Details" title="{i18n>expDetails}" navButtonPress="Exp_Det_onPressBackBtn" showNavButton="true">
-	<ObjectPageLayout enableLazyLoading="true" beforeNavigate="onBeforeNavigate" useIconTabBar="true" showTitleInHeaderContent="true" upperCaseAnchorBar="false" headerContentPinnable="false" sectionChange="onSectionChange" id="objectPageLayoutExpence" class="sapUiSmallmarginResponsive">
+	<ObjectPageLayout enableLazyLoading="true" beforeNavigate="onBeforeNavigate" useIconTabBar="true" showTitleInHeaderContent="true" upperCaseAnchorBar="false" headerContentPinnable="true" sectionChange="onSectionChange" id="objectPageLayoutExpence" class="sapUiSmallmarginResponsive">
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
 					<expandedHeading>
@@ -117,13 +117,13 @@
 												<m:Label text="{i18n>expDetItemType}" />
 											</m:Column>
 											<m:Column  minScreenWidth="Desktop" demandPopin="true">
-												<m:Label text="{i18n>expDetForeignAmount}" />
-											</m:Column>
-											<m:Column  minScreenWidth="Desktop" demandPopin="true">
 												<m:Label text="{i18n>expDetExpenseDate}" />
 											</m:Column>
 											<m:Column minScreenWidth="Desktop" demandPopin="true">
 												<m:Label text="{i18n>expDetExpenseAmount}" />
+											</m:Column>
+											<m:Column  minScreenWidth="Desktop" demandPopin="true">
+												<m:Label text="{i18n>expDetForeignAmount}" />
 											</m:Column>
 											<m:Column minScreenWidth="Desktop" demandPopin="true">
 												<m:Label text="{i18n>expModeOfPayment}" />
@@ -137,6 +137,8 @@
 												<m:cells>
 													<m:Text text="{ItemExpenseModel>IndexNo}" />
 													<m:Text text="{ItemExpenseModel>ItemType}" />
+													<m:Text text="{path:'ItemExpenseModel>ExpenseDate',formatter: '.Formatter.formatDate'}" />
+													<m:Text text="{path:'ItemExpenseModel>ExpenseAmount', formatter: '.Formatter.fromatNumber'}" />		
 													<m:VBox alignItems="Center">
 														<m:HBox >
 															<m:Text text="{ItemExpenseModel>Currency} {path:'ItemExpenseModel>ForeignAmount',formatter:'.Formatter.fromatNumber'}" />
@@ -144,9 +146,7 @@
 														<m:HBox >
 															<m:Text text="{i18n>expConversionRate} : {path:'ItemExpenseModel>ConversionRate',formatter:'.Formatter.fromatNumber'}" visible="{= ${ItemExpenseModel>Currency} !== 'INR'}" />
 														</m:HBox>
-													</m:VBox>
-													<m:Text text="{path:'ItemExpenseModel>ExpenseDate',formatter: '.Formatter.formatDate'}" />
-													<m:Text text="{path:'ItemExpenseModel>ExpenseAmount', formatter: '.Formatter.fromatNumber'}" />												
+													</m:VBox>								
 													<m:ObjectStatus inverted="true" text="{ItemExpenseModel>ModeOfPayment}" state="{path: 'ItemExpenseModel>ModeOfPayment', formatter: '.Formatter.formatObjectStatus'}" />
 													<!-- <m:Text text="{ItemExpenseModel>Comments}" />													 -->
 													<m:Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" />

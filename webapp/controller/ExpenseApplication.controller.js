@@ -34,7 +34,7 @@ sap.ui.define([
             this.CommonModel();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
             this.onChangeEmployeeID();
-           this.closeBusyDialog();
+            this.closeBusyDialog();
             this.Exp_onSearch();            
         },
 
@@ -209,7 +209,7 @@ sap.ui.define([
         },
 
         Exp_onPressExpenseDownload: function() {
-            let fileUrl = window.location.href.split("index")[0] + "/Perdiem_DeclarationForm.doc";
+            let fileUrl = window.location.origin.split("index")[0] + "/Perdiem_DeclarationForm.doc";
             sap.m.URLHelper.redirect(fileUrl, true)
         },
 

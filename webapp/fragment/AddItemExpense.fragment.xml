@@ -25,9 +25,9 @@
 					<Input value="{ExpenseCreateModel>/IndexNo}" editable="false" />
 					<!-- Item Type -->
 					<Label text="{i18n>expDetItemType}" required="true"/>
-					<Select  items="{ExpenseTypeModel>/}" change="Exp_Frg_onItemTypeChange"  selectedKey="{ExpenseCreateModel>/ItemType}">
+					<ComboBox  items="{ExpenseTypeModel>/}" id="ExpDet_id_ItemType" change="Exp_Frg_onItemTypeChange"  selectedKey="{ExpenseCreateModel>/ItemType}" valueStateText="{i18n>expItemTypeMess}">
 						<core:Item key="{ExpenseTypeModel>itemName}" text="{ExpenseTypeModel>itemName}" />
-					</Select>
+					</ComboBox>
 					<!-- Mode Of Payment -->
 					<Label text="{i18n>expModeOfPayment}" required="true"/>
 					<Select items="{ModeOfPayment>/}" selectedKey="{ExpenseCreateModel>/ModeOfPayment}" enabled="{viewModel>/enable}">

@@ -40,11 +40,6 @@ sap.ui.define(
 
         onSearch: async function () {
           var selectedYear = this.byId("LOH_id_Holidays").getValue(); // Get selected year from input field
-          var currentYear = new Date().getFullYear();
-          if (selectedYear > currentYear) { // Check if selected year is in the future
-            MessageToast.show(this.i18nModel.getText("futureHolidays"));
-            return;
-          }
           await this._fetchCommonData("ListOfHolidays?","HolidayModel",{startDate: `${selectedYear}-01-01`,
             endDate: `${selectedYear}-12-31`},["LOH_id_HolidayTable"]).then(() => {
             BusyIndicator.hide();
