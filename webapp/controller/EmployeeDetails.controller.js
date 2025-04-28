@@ -1,8 +1,9 @@
 sap.ui.define([
-    "./BaseController", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",],
-    function (BaseController, JSONModel, MessageToast) {
+    "./BaseController", "sap/ui/model/json/JSONModel", "sap/m/MessageToast","../model/formatter"],
+    function (BaseController, JSONModel, MessageToast,Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeDetails", {
+            Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteEmployeeDetails").attachMatched(this._onRouteMatched, this);
             },

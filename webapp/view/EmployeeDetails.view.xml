@@ -68,9 +68,9 @@
 							<Text text="{sEmployeeDetails>EmployeeName}"/>
 							<Text text="{sEmployeeDetails>Role}"/>
 							<Text text="{sEmployeeDetails>Designation}"/>
-							<Text text="{sEmployeeDetails>DateOfBirth}"/>
+							<Text text="{path:'sEmployeeDetails>DateOfBirth',formatter: '.Formatter.formatDate'}"/>
 							<Text text="{sEmployeeDetails>CompanyEmailID}"/>
-							<Text text="{sEmployeeDetails>ManagerName} {sEmployeeDetails>ManagerID}"/>
+						    <Text text="{= ${sEmployeeDetails>ManagerName} + '\n(' + ${sEmployeeDetails>ManagerID} + ')' }" />
 							<Text text="{sEmployeeDetails>BaseLocation}"/>
 						</cells>
 					</ColumnListItem>

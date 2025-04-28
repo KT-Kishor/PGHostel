@@ -28,7 +28,7 @@ sap.ui.define([
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("AppVisibility", "RoleModel")
-                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "EmployeeOffer" });
+                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" });
                 var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",
