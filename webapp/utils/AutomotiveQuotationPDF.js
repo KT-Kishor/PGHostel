@@ -4,7 +4,7 @@ sap.ui.define([ "../model/formatter",], function (formatter) {
         formatter: formatter,
         onDownloadPDF: function (oModel) {
             sap.ui.core.BusyIndicator.show(0);
-            const companyName = "Kalpavriksha Automotive LLP";
+            const companyName = oModel.getProperty("/CompanyCodeData/0/companyName");
             const address = oModel.getProperty("/CompanyCodeData/0/longAddress");
             const mobile = oModel.getProperty("/CompanyCodeData/0/mobileNo");
             const email = oModel.getProperty("/CompanyCodeData/0/carrerEmail");

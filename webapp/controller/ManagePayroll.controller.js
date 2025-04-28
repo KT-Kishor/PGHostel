@@ -210,7 +210,7 @@ sap.ui.define(
         }
       },
 
-      _updateData: async function (combinedData) {
+      _updateData: async function (sheetData, combinedData) {
         try {
           var response = await this.ajaxUpdateWithJQuery("A_PayRoll", { data: combinedData });
           if (response.success) {

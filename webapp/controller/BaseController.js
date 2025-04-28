@@ -119,12 +119,10 @@ sap.ui.define([
       }
     },
 
-    _fetchCommonData: async function (entityName, modelName, filter = "", busyIds = []) {
-      busyIds.forEach(id => this.setBusyOnId(id, true));
+    _fetchCommonData: async function (entityName, modelName, filter = "") {
       let url = this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;
-      var that = this;
       try {
-        const data = await new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
           $.ajax({
             url: url,
             method: "GET",
@@ -134,37 +132,22 @@ sap.ui.define([
               if (data) {
                 var oModel = new JSONModel(data.data);
                 this.getOwnerComponent().setModel(oModel, modelName);
-                busyIds.forEach(id => this.setBusyOnId(id, false));
               }
               resolve(data);
             }.bind(this),
             error: function (err) {
-              busyIds.forEach(id => that.setBusyOnId(id, false));
               reject(err);
             }
           });
         });
 
       } catch (error) {
-        busyIds.forEach(id => this.setBusyOnId(id, false));
         sap.m.MessageToast.show(error.responseJSON?.message || "Technical error, please contact the administrator");
       }
     },
 
-    setBusyOnId: function (id, busy) {
-      const ctrl = this.byId(id) || sap.ui.getCore().byId(id);
-      if (ctrl) {
-        ctrl.setBusy(busy);
-      } else {
-        console.error("Invalid ID:", id);
-      }
-    },
-
     //Common read call for all the app
-    async ajaxReadWithJQuery(sUrl, filter, busyIds = []) {
-      var that = this;
-      // Set busy(true) on all controls
-      busyIds.forEach(id => this.setBusyOnId(id, true));
+    async ajaxReadWithJQuery(sUrl, filter) {
       const queryString = new URLSearchParams(filter).toString();
       return new Promise((resolve, reject) => {
         $.ajax({
@@ -172,20 +155,16 @@ sap.ui.define([
           method: "GET",
           headers: this.getView().getModel("LoginModel").getData().headers,
           success: (data) => {
-            busyIds.forEach(id => that.setBusyOnId(id, false));
             resolve(data);
           },
           error: (error) => {
-            busyIds.forEach(id => that.setBusyOnId(id, false));
             reject(error);
           }
         });
       });
     },
     //Common create call for all the app
-    async ajaxCreateWithJQuery(sUrl, oPayLoad, busyIds = []) {
-      var that = this;
-      busyIds.forEach(id => this.setBusyOnId(id, true));
+    async ajaxCreateWithJQuery(sUrl, oPayLoad) {
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
@@ -193,20 +172,16 @@ sap.ui.define([
           data: JSON.stringify(oPayLoad),
           headers: this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
-            busyIds.forEach(id => that.setBusyOnId(id, false));
             resolve(data);
           },
           error: function (error) {
-            busyIds.forEach(id => that.setBusyOnId(id, false));
             reject(error);
           }
         });
       });
     },
     //Common update call for all the app
-    async ajaxUpdateWithJQuery(sUrl, oPayLoad, busyIds = []) {
-      var that = this;
-      busyIds.forEach(id => this.setBusyOnId(id, true));
+    async ajaxUpdateWithJQuery(sUrl, oPayLoad) {
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
@@ -214,11 +189,9 @@ sap.ui.define([
           data: JSON.stringify(oPayLoad),
           headers: this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
-            busyIds.forEach(id => that.setBusyOnId(id, false));
             resolve(data);
           },
           error: function (error) {
-            busyIds.forEach(id => that.setBusyOnId(id, false));
             reject(error);
           }
         });

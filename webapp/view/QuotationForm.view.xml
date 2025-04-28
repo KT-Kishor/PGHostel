@@ -29,7 +29,7 @@
                 <ObjectPageDynamicHeaderTitle>
                     <expandedHeading>
                         <m:Title
-                            text="Kalpavriksha Automotive LLP"
+                            text="{Quotation>/CompanyCodeData/0/companyName}"
                             wrapping="true"
                         />
                     </expandedHeading>
@@ -46,7 +46,7 @@
                                 class="sapUiTinyMarginEnd"
                             />
                             <m:Title
-                                text="Kalpavriksha Automotive LLP"
+                                text="{Quotation>/CompanyCodeData/0/companyName}"
                                 wrapping="true"
                             />
                         </m:FlexBox>

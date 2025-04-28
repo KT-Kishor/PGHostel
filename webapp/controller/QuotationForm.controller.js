@@ -106,7 +106,7 @@ sap.ui.define([
             if (response.success) {
                 this.oModel.setProperty("/VariantList", response.results);
             } else {
-                MessageToast.show(this.i18nModel.getText("msgSchemeDetailErrorSave"));
+                MessageToast.show(this.i18nModel.getText("msgTraineeformerror"));
             }
         },
 
