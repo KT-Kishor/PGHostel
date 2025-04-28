@@ -75,55 +75,45 @@
 										</m:HBox>
 										<m:Label text="{i18n>emailId}" required="true" />
 										<m:Input id="TU_id_TraineeMail" value="{oTraineeDetails>/TraineeEmail}" editable="{viewModel>/editable}" maxLength="100" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
+
+										<m:Label text="{i18n>trainingType}" required="true" />
+											<m:ComboBox  id="TU_id_TrainingType" placeholder="{i18n>selectType}"  value="{oTraineeDetails>/Type}"   selectionChange="onTrainingTypeChange"  editable="{viewModel>/editable}" 	change="TD_validateCombo"  width="100%">
+												<m:items>
+													<core:Item key="Stipend" text="{i18n>stipend}" />
+													<core:Item key="Paid" text="{i18n>paid}" />
+												</m:items>
+											</m:ComboBox>
+											<m:Label ></m:Label>
+											<m:Label id="TU_id_TrainingAmountLabel" text="{i18n>placeAmount}"  />
+											<m:HBox id="TU_id_TrainingDetailsBox" width="100%" justifyContent="Start" alignItems="Center">
+												<m:VBox width="70%">
+													<m:Input 
+															id="TU_id_TrainingAmount" 
+															value="{oTraineeDetails>/Amount}" 
+															editable="{viewModel>/editable}" 
+															placeholder="{i18n>placeAmount}" 
+															maxLength="15" 
+															liveChange="TD_validateAmount" 
+															valueStateText="{i18n>ammountValuState}" 
+															width="100%" />
+												</m:VBox>
+												<m:VBox width="30%" class="sapUiTinyMarginBegin">
+													<m:Select  editable="{viewModel>/editable}" 
+															id="TU_id_Currency" 
+															items="{CurrencyModel>/}" 
+															selectedKey="{oTraineeDetails>/Currency}" 
+															width="100%">
+														<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
+													</m:Select>
+												</m:VBox>
+											</m:HBox>
 										<m:Label text="{i18n>releaseDateT}" required="true" />
 										<m:DatePicker   id="TU_id_RelDate"   value="{ path: 'oTraineeDetails>/ReleaseDate',formatter:'.Formatter.formatDate' }"  editable="{viewModel>/editable}"  displayFormat="dd/MM/yyyy"     valueFormat="dd/MM/yyyy" 
 
-                                    change="TD_validateDate" valueStateText="{i18n>dateValueState}" />
+                                        change="TD_validateDate" valueStateText="{i18n>dateValueState}" />
 										<m:Label text="{i18n>joiningDate}" required="true" />
 										<m:DatePicker   id="TU_id_JoinDate"   value="{ path: 'oTraineeDetails>/JoiningDate',formatter:'.Formatter.formatDate' }"  editable="{viewModel>/editable}"  displayFormat="dd/MM/yyyy"     valueFormat="dd/MM/yyyy" 
-                                    change="TD_validateDate" valueStateText="{i18n>dateValueState}" />
-										<m:Label text="{i18n>stipend}" required="true"  />
-										<m:RadioButtonGroup id="TU_id_StipendRadio" columns="2" select="onUpdateSelectionChange" >
-											<m:buttons>
-												<m:RadioButton text="{i18n>yes}"  editable="{viewModel>/editable}" />
-												<m:RadioButton text="{i18n>no}"  editable="{viewModel>/editable}"  />
-											</m:buttons>
-										</m:RadioButtonGroup>
-										<m:Label id="TU_id_StipendLabel" text="{i18n>stAmount}" required="true" />
-										<m:Input value="{oTraineeDetails>/Stipend}" 
-                                             maxLength="15"
-                                             editable="{viewModel>/editable}" 
-                                               placeholder="{i18n>placeStipend}" 
-                                               id="TU_id_Stipend" 
-                                               liveChange="TD_validateAmount" 
-                                               valueStateText="{i18n>ammountValuState}"/>
-										<m:Select items="{CurrencyModel>/}" 
-                                            editable="{viewModel>/editable}" 
-                                                selectedKey="{oTraineeDetails>/Currency}" 
-                                                id="TU_id_Currency" 
-                                                width="100%" 
-                                                class="marginLeft">
-											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-										</m:Select>
-										<m:Label text="{i18n>paidTrainee}" required="true" />
-										<m:RadioButtonGroup id="TU_id_PaidTraineeRadio" columns="2" select="onUpdatePaidTraineeChange">
-											<m:buttons>
-												<m:RadioButton text="{i18n>yes}" editable="{viewModel>/editable}" />
-												<m:RadioButton text="{i18n>no}" editable="{viewModel>/editable}" />
-											</m:buttons>
-										</m:RadioButtonGroup>
-										<m:Label id="TU_id_PaidTraineeLabel" text="{i18n>trainingPaid}" required="true" visible="false" />
-										<m:Input value="{traineeData>/TrainingPaidAmount}" 
-												   id="TU_id_PaidTraineeAmount" 
-												   placeholder="{i18n>placeAmount}" 
-												   maxLength="10"
-												   visible="false"
-												   editable="{viewModel>/editable}"
-												   liveChange="TD_validateAmount"
-												   valueStateText="{i18n>ammountValuState}" />
-										<m:Select items="{CurrencyModel>/}" selectedKey="{traineeData>/TrainingAmountCurrency}" id="TU_id_FeeCurrency" width="100%" class="marginLeft" editable="{viewModel>/editable}">
-											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-										</m:Select>
+                                         change="TD_validateDate" valueStateText="{i18n>dateValueState}" />
 										<m:Label text="{i18n>traineeDuration}" required="true" />
 										<m:Select  selectedKey="{oTraineeDetails>/TrainingDuration}" items="{DurationTraining>/duration}" id="TU_id_TDuration"  editable="{viewModel>/editable}">
 											<core:Item key="{DurationTraining>Code}" text="{DurationTraining>Code}" />

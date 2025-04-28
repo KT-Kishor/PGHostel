@@ -63,10 +63,10 @@
 					</Column>
 					
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>stipend}" />
+						<Text text="{i18n>type}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>trainingPaid}" />
+						<Text text="{i18n>Amount}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>joiningDate}" />
@@ -86,8 +86,8 @@
 						<cells>
 						    <Text text="{traineeModel>NameSalutation} {traineeModel>TraineeName}"/>							
 							<Text text="{traineeModel>ReportingManagerSalutation} {traineeModel>ReportingManager}"/>
-							<Text text="{path:'traineeModel>Stipend', formatter: '.Formatter.formatCurrency'} {traineeModel>Currency}"/>
-							<Text text="{path:'traineeModel>TrainingPaidAmount', formatter: '.Formatter.formatCurrency'} {traineeModel>TrainingAmountCurrency}"/>
+							<Text text="{traineeModel>Type}"/>							
+							<Text text="{path:'traineeModel>Amount', formatter: '.Formatter.formatCurrency'} {traineeModel>Currency}"/>
 							<Text text="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{traineeModel>TrainingDuration}"/>
 							<Text text="{traineeModel>TraineeEmail}"/>

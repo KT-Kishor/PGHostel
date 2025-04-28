@@ -52,37 +52,43 @@
 									</Select>
 								</VBox>
 								<VBox width="78%">
-									<ComboBox showSecondaryValues="true"  change="TD_validateCombo"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">
+									<ComboBox showSecondaryValues="true"  change="TD_validateCombo"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}" placeholder="{i18n>reportingManagerVs}">
 										<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}" />
 									</ComboBox>
 								</VBox>
 							</HBox>
 							<Label text="{i18n>emailId}" required="true" />
 							<Input value="{oTraineeDetails>/TraineeEmail}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
-							<Label text="{i18n>stipend}" required="true" />
-							<RadioButtonGroup id="TD_id_StipendRadio" columns="2" select="onStipendSelectionChange" selectedIndex="0">
-								<buttons>
-									<RadioButton text="{i18n>yes}" selected="true"/>
-									<RadioButton text="{i18n>no}" />
-								</buttons>
-							</RadioButtonGroup>
-							<Label id="TD_id_StipendLabel" text="{i18n>stAmount}" required="true" />
-							<Input value="{oTraineeDetails>/Stipend}" maxLength="15" placeholder="{i18n>placeStipend}" id="TD_id_Stipend" liveChange="TD_validateAmount" valueStateText="{i18n>ammountValuState}" />
-							<Select items="{CurrencyModel>/}" selectedKey="{oTraineeDetails>/Currency}" id="TD_id_Currency" width="100%" class="marginLeft">
-								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-							</Select>
-							<Label text="{i18n>paidTrainee}" required="true" />
-							<RadioButtonGroup id="TD_id_PaidTraineeRadio" columns="2" select="onPaidTraineeChange" selectedIndex="1">
-								<buttons>
-									<RadioButton text="{i18n>yes}" />
-									<RadioButton text="{i18n>no}" selected="true" />
-								</buttons>
-							</RadioButtonGroup>
-							<Label id="TD_id_PaidTraineeLabel" text="{i18n>trainingPaid}" required="true" visible="false" />
-							<Input value="{oTraineeDetails>/TrainingPaidAmount}" id="TD_id_PaidTraineeAmount" placeholder="{i18n>placeAmount}" maxLength="10" visible="false" liveChange="TD_validateAmount" valueStateText="{i18n>ammountValuState}" />
-							<Select items="{CurrencyModel>/}" selectedKey="{oTraineeDetails>/TrainingAmountCurrency}" id="TD_id_FeeCurrency" width="100%" class="marginLeft">
-								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-							</Select>
+							<Label text="{i18n>trainingType}" required="true" />
+							<ComboBox  id="TD_id_TrainingType" placeholder="{i18n>selectType}"  selectedKey="{oTraineeDetails>/Type}"   selectionChange="onTrainingTypeChange" 	change="TD_validateCombo"  width="100%">
+								<items>
+									<core:Item key="Stipend" text="{i18n>stipend}" />
+									<core:Item key="Paid" text="{i18n>paid}" />
+								</items>
+							</ComboBox>
+							<Label ></Label>
+							<Label id="TD_id_TrainingAmountLabel" text="{i18n>placeAmount}" visible="false" />
+							<HBox id="TD_id_TrainingDetailsBox" width="100%" justifyContent="Start" alignItems="Center" visible="false">
+								<VBox width="70%">
+									<Input 
+											id="TD_id_TrainingAmount" 
+											value="{oTraineeDetails>/Amount}" 
+											placeholder="{i18n>placeAmount}" 
+											maxLength="15" 
+											liveChange="TD_validateAmount" 
+											valueStateText="{i18n>ammountValuState}" 
+											width="100%" />
+								</VBox>
+								<VBox width="30%" class="sapUiTinyMarginBegin">
+									<Select 
+											id="TD_id_Currency" 
+											items="{CurrencyModel>/}" 
+											selectedKey="{oTraineeDetails>/Currency}" 
+											width="100%">
+										<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
+									</Select>
+								</VBox>
+							</HBox>
 							<Label text="{i18n>traineeDuration}" required="true" />
 							<Select  selectedKey="{oTraineeDetails>/TrainingDuration}" items="{DurationTraining>/duration}" id="TD_id_TDuration" >
 								<core:Item key="{DurationTraining>Code}" text="{DurationTraining>Code}" />
@@ -125,19 +131,11 @@
 							<Text text="{= ${oTraineeDetails>/ReportingManagerSalutation} + ' ' + ${oTraineeDetails>/ReportingManager}}"/>
 							<Label text="{i18n>emailId}" />
 							<Text  text="{oTraineeDetails>/TraineeEmail}"/>
+							<Label text="{i18n>trainingType}" />
+							<Text  text="{oTraineeDetails>/Type}"/>
 							<!-- Stipend Amount -->
-							<Label text="{i18n>stipend}" visible="{= ${oTraineeDetails>/IsStipendSelected} === true }" />
-							<Text text="{path:'oTraineeDetails>/Stipend', formatter: '.Formatter.formatCurrency'} {oTraineeDetails>/Currency}" visible="{= ${oTraineeDetails>/IsStipendSelected} === true }"/>
-								
-							<!-- <Label text="{i18n>currency}" visible="{= ${oTraineeDetails>/IsStipendSelected} === true }" />
-							<Text text="" visible="{= ${oTraineeDetails>/IsStipendSelected} === true }"/> -->
-								
-							<Label text="{i18n>trainingPaid}" visible="{= ${oTraineeDetails>/IsPaidTraineeSelected} === true }"/>
-							<Text text="{path:'oTraineeDetails>/TrainingPaidAmount', formatter: '.Formatter.formatCurrency'} {oTraineeDetails>/TrainingAmountCurrency}" visible="{= ${oTraineeDetails>/IsPaidTraineeSelected} === true }"/>
-								
-							<!-- <Label text="{i18n>trainingFeeCurrency}" visible="{= ${oTraineeDetails>/IsPaidTraineeSelected} === true }"/>
-							<Text text="" visible="{= ${oTraineeDetails>/IsPaidTraineeSelected} === true }"/>
-								 -->
+							<Label text="{i18n>amount}" />
+							<Text text="{path:'oTraineeDetails>/Amount', formatter: '.Formatter.formatCurrency'} {oTraineeDetails>/Currency}"/>		 
 							<Label text="{i18n>releaseDateT}" />
 							<Text text="{oTraineeDetails>/ReleaseDate}"/>
 							<Label text="{i18n>joiningDate}" />
