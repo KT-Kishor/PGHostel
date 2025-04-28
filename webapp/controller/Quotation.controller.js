@@ -9,7 +9,7 @@ sap.ui.define([
       this.getOwnerComponent().getRouter().getRoute("RouteQuotation").attachMatched(this._onRouteMatched, this);
     },
 
-    _onRouteMatched: function () {
+    _onRouteMatched: async function () {
       this.checkLoginModel();
       var oView = this.getView();
       this.oCore = sap.ui.getCore();
@@ -34,7 +34,7 @@ sap.ui.define([
       oBinding.attachChange(function () {
         this.oModel.setProperty("/RowCount", oBinding.getLength());
       });
-      this._commonGETCall("BaseLocation", "BaseLocationData", {}, ["Q_id_FilterBranch"]);
+      await this._commonGETCall("BaseLocation", "BaseLocationData", {});
       this.Q_onSearch();
       BusyIndicator.hide();
     },
@@ -75,7 +75,8 @@ sap.ui.define([
       }
     },
 
-    Q_onSearch: function () {
+    Q_onSearch: async function () {
+      this.getView().byId("Q_id_Table").setBusy(true);
       var aFilterItems = this.byId("Q_id_FilterBar").getFilterGroupItems();
       var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
       var params = {};
@@ -91,7 +92,8 @@ sap.ui.define([
           }
         }
       });
-      this._commonGETCall("A_Quotations", "QTableData", params, ["Q_id_Table"]);
+      await this._commonGETCall("A_Quotations", "QTableData", params);
+      this.getView().byId("Q_id_Table").setBusy(false);
     },
 
     Q_onPressClear: async function () {

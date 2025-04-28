@@ -231,6 +231,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteCompanyInvoice", { sPath: "Invoice" });
         },
         TileV_onpressQuotation: function () {
+          BusyIndicator.show(0);
           this.getRouter().navTo("RouteQuotation");
         },
         TileV_onpressAssignment: function () {
@@ -243,9 +244,11 @@ sap.ui.define(
           this.getRouter().navTo("RouteTimesheetApproval");
         },
         TileV_onPressGenerateSalary: function () {
+          BusyIndicator.show(0);
           this.getRouter().navTo("RouteGenerateSalary");
         },
         TileV_onPressManagePayroll: function () {
+          BusyIndicator.show(0);
           this.getRouter().navTo("RouteManagePayroll");
         },
         TileV_onpressEmployeeDetails: function () {

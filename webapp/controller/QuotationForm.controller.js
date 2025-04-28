@@ -31,13 +31,13 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("msgSchemeDetailErrorSave"));
             }
             oView.byId("QF_id_PDFBtn").setEnabled(true);
-            BusyIndicator.hide();
-            this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: this.oModel.getProperty("/QuotationFormData/BranchCode") }, ["QF_id_HeaderContent"]);
+            await this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: this.oModel.getProperty("/QuotationFormData/BranchCode") });
             this.oModel.setProperty("/VariantList", []);
-            var aFieldIds = [ "QF_id_BranchCodes", "QF_id_CustomerName", "QF_id_CustMobile", "QF_id_EmpMobile", "QF_id_CustEmail", "QF_id_CustAadhar", "QF_id_CustPanNumber", "QF_id_CustPinCode", "QF_id_CustGSTNo", "QF_id_CustAddress", "QF_id_VehModel", "QF_id_VehVariant"];
+            var aFieldIds = ["QF_id_BranchCodes", "QF_id_CustomerName", "QF_id_CustMobile", "QF_id_EmpMobile", "QF_id_CustEmail", "QF_id_CustAadhar", "QF_id_CustPanNumber", "QF_id_CustPinCode", "QF_id_CustGSTNo", "QF_id_CustAddress", "QF_id_VehModel", "QF_id_VehVariant"];
             aFieldIds.forEach(function (sId) {
                 oView.byId(sId).setValueState("None");
             });
+            BusyIndicator.hide();
         },
 
         QF_onNavBack: function () {
@@ -49,12 +49,14 @@ sap.ui.define([
         },
 
         QF_onBranchCodeChange: function (oEvent) {
+            this.getView().byId("QF_id_HeaderContent").setBusy(true);
             if (utils._LCstrictValidationComboBox(oEvent)) {
                 var sSelectedValue = (oEvent.getSource().getSelectedItem());
-                this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: sSelectedValue.getKey() }, ["QF_id_HeaderContent"]);
+                this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: sSelectedValue.getKey() });
                 this.oModel.setProperty("/QuotationFormData/BranchCode", sSelectedValue.getKey());
                 this.oModel.setProperty("/QuotationFormData/Branch", sSelectedValue.getAdditionalText());
             }
+            this.getView().byId("QF_id_HeaderContent").setBusy(false);
         },
 
         QF_onNameChange: function (oEvent) {
@@ -78,6 +80,10 @@ sap.ui.define([
         },
 
         QF_onGSTChange: function (oEvent) {
+            if (oEvent.getParameter("newValue").trim() === "") {
+                this.getView().byId("QF_id_CustGSTNo").setValueState("None");
+                return;
+            }
             utils._LCvalidateGstNumber(oEvent);
         },
 
@@ -87,6 +93,12 @@ sap.ui.define([
 
         QF_onPinChange: function (oEvent) {
             utils._LCvalidatePinCode(oEvent);
+        },
+
+        QF_PriceValidation: function (oEvent) {
+            var oSource = oEvent.getSource();
+            var sValue = oSource.getValue();
+            if (/[^0-9.,]/.test(sValue)) oSource.setValue(sValue.replace(/[^0-9.,]/g, ""));
         },
 
         QF_onModelChange: async function (oEvent) {
@@ -102,12 +114,20 @@ sap.ui.define([
         },
 
         QF_onCallVariant: async function (selectedKey) {
-            var response = await this.ajaxCreateWithJQuery("UniqueScheme", { filters: { Model: selectedKey } }, ["QF_id_VehVariant"]);
-            if (response.success) {
-                this.oModel.setProperty("/VariantList", response.results);
-            } else {
-                MessageToast.show(this.i18nModel.getText("msgTraineeformerror"));
+            this.getView().byId("QF_id_VehVariant").setBusy(true);
+            try {
+                var response = await this.ajaxCreateWithJQuery("UniqueScheme", { filters: { Model: selectedKey } });
+                if (response.success) {
+                    this.oModel.setProperty("/VariantList", response.results);
+                } else {
+                    MessageToast.show(this.i18nModel.getText("msgTraineeformerror"));
+                }
             }
+            catch (e) {
+                console.log(e);
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+            }
+            this.getView().byId("QF_id_VehVariant").setBusy(false);
         },
 
         QF_onVariantChange: function (oEvent) {
@@ -340,13 +360,15 @@ sap.ui.define([
                 utils._LCvalidateEmail(oView.byId("QF_id_CustEmail"), "ID") &&
                 utils._LCvalidateAadharCard(oView.byId("QF_id_CustAadhar"), "ID") &&
                 utils._LCvalidatePanCard(oView.byId("QF_id_CustPanNumber"), "ID") &&
-                utils._LCvalidateGstNumber(oView.byId("QF_id_CustGSTNo"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("QF_id_CustAddress"), "ID") &&
                 utils._LCvalidatePinCode(oView.byId("QF_id_CustPinCode"), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("QF_id_VehModel"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("QF_id_VehVariant"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("QF_id_VehTransmission"), "ID")) { return true }
-            else { return false }
+                utils._LCvalidateMandatoryField(oView.byId("QF_id_VehTransmission"), "ID")) {
+                if (oView.byId("QF_id_CustGSTNo").getValue().trim() === "" || utils._LCvalidateGstNumber(oView.byId("QF_id_CustGSTNo"), "ID")) return true
+            } else {
+                return false
+            }
         },
 
         QF_onDownloadPDF: function () {

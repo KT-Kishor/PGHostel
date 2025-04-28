@@ -200,7 +200,7 @@ sap.ui.define(
               data: data,
               filters: sheetFilters[index]
             }));
-            this._updateData(combinedData);
+            this._updateData(sheetData, combinedData);
           };
           reader.onerror = () => {
             MessageToast.show(this.i18nModel.getText("commonReadingDataError"));

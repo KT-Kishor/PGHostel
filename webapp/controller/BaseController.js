@@ -560,9 +560,9 @@ sap.ui.define([
       }
     },
 
-    _commonGETCall: async function (sEntity, sModelName, oFilter, aFields) {
+    _commonGETCall: async function (sEntity, sModelName, oFilter) {
       try {
-        var response = await this.ajaxReadWithJQuery(sEntity, oFilter, aFields);
+        var response = await this.ajaxReadWithJQuery(sEntity, oFilter);
         if (response.success) {
           this.oModel.setProperty("/" + sModelName, response.data || response.results);
         } else {

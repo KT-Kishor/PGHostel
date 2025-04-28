@@ -13,7 +13,7 @@ sap.ui.define(
         this.oMessagePopover.openBy(oEvent.getSource());
       },
 
-      _onRouteMatched: function () {
+      _onRouteMatched: async function () {
         this.oLoginModel = this.getView().getModel("LoginModel");
         this.oModel = this.getView().getModel("Payroll");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -37,9 +37,7 @@ sap.ui.define(
         oBinding.attachChange(function () {
           this.oModel.setProperty("/TableRowCount", oBinding.getLength());
         });
-
-        this._commonGETCall("BaseLocation", "BaseLocationData", {}, ["FST_id_FilterBranch"]);
-        //this.CommonReadcall("GetDepartmentRule", {}, [], "oRuleModel");
+        await this._commonGETCall("BaseLocation", "BaseLocationData", {});
         this.FST_onEnableImport();
         BusyIndicator.hide();
       },
@@ -59,7 +57,7 @@ sap.ui.define(
         if (file) {
           var employeeName = this.oLoginModel.getProperty("/EmployeeName");
           var branch = this.byId("FST_id_FilterBranch").getValue();
-          await this._commonGETCall("getDepartmentRule", "PayRollRules", { BranchCode: this.byId("FST_id_FilterBranch").getSelectedItem().getAdditionalText() }, []);
+          await this._commonGETCall("getDepartmentRule", "PayRollRules", { BranchCode: this.byId("FST_id_FilterBranch").getSelectedItem().getAdditionalText() });
           var oDate = this.byId("FST_id_MonthYearPicker").getDateValue();
           var pickerMonth = String(oDate.getMonth() + 1).padStart(2, '0');
           var pickerYear = String(oDate.getFullYear());
@@ -255,7 +253,7 @@ sap.ui.define(
         });
 
         var employeeCodes = JSON.stringify(records.map(record => record["EmpCode"]));
-        await this._commonGETCall("SalaryDetailsFunction", "EmployeeSalaryData", { Month: month, Year: year, EmployeeID: employeeCodes }, []);
+        await this._commonGETCall("SalaryDetailsFunction", "EmployeeSalaryData", { Month: month, Year: year, EmployeeID: employeeCodes });
         var empSalaryData = this.oModel.getProperty("/EmployeeSalaryData");
         for (let i = 0; i < records.length; i++) {
           let record = records[i];
@@ -282,23 +280,10 @@ sap.ui.define(
           // **Salary Calculations**
           record.GrossPay = parseFloat(empSal.GrossPayMontly) || 0;
           record.ActualPay = parseFloat(((record.GrossPay / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
-
-          // Employee PF calculation with max cap
-          record.EplyePF = parseFloat(((parseFloat(empSal.BasicSalary) / 12) * (12 / 100)).toFixed(2));
-          if (record.EplyePF > 1800) {
-            record.EplyePF = 1800;
-          }
-
-          // Employer PF calculation with max cap
-          record.EplyrPF = parseFloat(((parseFloat(empSal.BasicSalary) / 12) * (13 / 100)).toFixed(2));
-          if (record.EplyrPF > 1950) {
-            record.EplyrPF = 1950;
-          }
-
-          // Professional Tax (PT) based on GrossPay
-          if (record.GrossPay >= 25000) {
-            record.PT = 200;
-          }
+          record.TDS = parseFloat((empSal.IncomeTax / 12).toFixed(2)) || 0;
+          record.EplyePF = parseFloat((empSal.EmployeePF / 12).toFixed(2)) || 0;
+          record.EplyrPF = parseFloat((empSal.EmployerPF / 12).toFixed(2)) || 0;
+          record.PT = parseFloat((empSal.PT / 12).toFixed(2)) || 0;          
 
           // ESI calculation based on GrossPay condition
           if (record.GrossPay <= 21000) {
@@ -307,18 +292,7 @@ sap.ui.define(
           }
 
           // Final NetPay calculation
-          record.NetPay = parseFloat(
-            (
-              record.ActualPay +
-              record.EplyePF -
-              record.PT -
-              record.TDS +
-              record.SecurityDeposit -
-              record.EplyeESI -
-              record.Advance +
-              record.Other
-            ).toFixed(2)
-          ) || 0;
+          record.NetPay = parseFloat((record.ActualPay + record.EplyePF - record.PT - record.TDS + record.SecurityDeposit - record.EplyeESI - record.Advance + record.Other).toFixed(2)) || 0;
         }
         this._sortAndFormatRecords(records);
       },
