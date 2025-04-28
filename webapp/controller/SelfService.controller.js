@@ -277,7 +277,6 @@ sap.ui.define([
                             var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
                             oDataModel.DateOfBirth = oView.byId("SS_id_Dob").getValue()
                             oDataModel.DateOfBirth = oDataModel.DateOfBirth.split("/").reverse().join('-');
-                            oDataModel.AHSalutation = oView.byId("SS_idAHSal").getSelectedKey();
                             oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
                             oDataModel.EmergencyContactPerson2Salutation = oView.byId("SS_idEmeSalS").getSelectedKey();
                             oDataModel.EmergencyContactPerson1Realtion = oView.byId("SS_idRelF").getSelectedKey();

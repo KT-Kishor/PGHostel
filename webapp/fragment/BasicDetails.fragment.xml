@@ -91,13 +91,6 @@
                                          emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
                                          columnsM="1" singleContainerFullSize="false">
 							<f:content>
-								<Label text="{i18n>salutation}" required="true"  />
-								<Select id="SS_idAHSal" editable="{viewModel>/isEditMode}" 
-												   selectedKey="{sEmployeeModel>/0/AHSalutation}"
-												   items="{Salutation>/salutation}"
-												   width="100%">
-										<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
-								</Select>
 								<Label text="{i18n>accountHolder}" required="true" id="SS_id_Ah"/>
 								<Input value="{sEmployeeModel>/0/AccountHolderName}" editable="{viewModel>/isEditMode}" id="SS_id_AcName" liveChange="SS_validateName" maxLength="50" placeholder="{i18n>placeAccountHolder}" valueStateText="{i18n>accountHolderValueState}" />
 								<Label text="{i18n>accountNo}" required="true" id="SS_id_An"/>

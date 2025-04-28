@@ -18,10 +18,9 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
-                this.checkLoginModel()
-                //this.commonLoginFunction("EmployeeOffer");
+                this.commonLoginFunction("EmployeeOffer");
                 BusyIndicator.show(0);
-                await this._fetchCommonData("Designation", "DesignationModel", {}, ["OEF_id_SimpleForm"]);
+                await this._fetchCommonData("Designation", "DesignationModel");
                 await this._fetchCommonData("AppVisibility", "RoleModel");
                 var oRoleModel = this.getView().getModel("RoleModel");
                 if (oRoleModel) {
