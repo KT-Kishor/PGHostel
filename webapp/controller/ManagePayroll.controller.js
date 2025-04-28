@@ -200,7 +200,7 @@ sap.ui.define(
               data: data,
               filters: sheetFilters[index]
             }));
-            this._updateData(sheetData);
+            this._updateData(combinedData);
           };
           reader.onerror = () => {
             MessageToast.show(this.i18nModel.getText("commonReadingDataError"));
@@ -210,9 +210,9 @@ sap.ui.define(
         }
       },
 
-      _updateData: async function (sheetData) {
+      _updateData: async function (combinedData) {
         try {
-          var response = await this.ajaxUpdateWithJQuery("A_PayRoll", { data: sheetData, filters: { Branch: this.oModel.getProperty("/FilterBranch"), Month: this.oModel.getProperty("/FilterMonth"), Year: this.oModel.getProperty("/FilterYear") } });
+          var response = await this.ajaxUpdateWithJQuery("A_PayRoll", { data: combinedData });
           if (response.success) {
             BusyIndicator.hide();
             this.oModel.setProperty("/TableData", sheetData);
