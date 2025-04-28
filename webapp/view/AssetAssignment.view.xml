@@ -122,11 +122,11 @@
             <headerToolbar>
                 <OverflowToolbar>
                     <Title
-                        text="{i18n>assetData} Asset Data:0"  id="AA_id_RowCountText" />
+                        text="{i18n>assetData} ({= ${assetModel>/}.length})" />
                     
                     <ToolbarSpacer />
                     <Button
-                        icon="sap-icon://excel-attachment"
+                        icon="sap-icon://download"
                         press="AA_onExport"
                         type="Ghost"
                         text="{i18n>download}"

@@ -13,6 +13,7 @@ sap.ui.define([
             Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteAssetAssignment").attachMatched(this._onRouteMatched, this);
+                // form.setData({ maxDate: AssignedDate, focusedDate: new Date });
             },
             _onRouteMatched() {
                 this.oLoginModel = this.getView().getModel("LoginModel");
@@ -67,24 +68,29 @@ sap.ui.define([
             AA_CoomonReadCall: function (filter) {
                 this.ajaxReadWithJQuery("IncomeAsset", filter, ["AA_id_AssestTable"]).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getView().setModel(new JSONModel(offerData), "assetModel");
-                    var filter = new sap.ui.model.Filter({
-                        filters: [
-                            new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Assigned"),
-                            new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Returned")
-                        ],
-                        and: false
-                    });
-
-                    this.byId("AA_id_AssestTable").getBinding("items").filter(filter);
-                    var oTableRowCount = this.byId("AA_id_AssestTable").getBinding("items").iLength;
-                    this.byId("AA_id_RowCountText").setText("Asset Data: " + oTableRowCount);
+                    var filteredData = offerData.filter(item => 
+                        item.Status === "Assigned" || item.Status === "Returned" && item.IsCurrent === "1"
+                    );
+                    this.getView().setModel(new JSONModel(filteredData), "assetModel");
                     sap.ui.core.BusyIndicator.hide();
                 }).catch((oError) => {
                     sap.ui.core.BusyIndicator.hide();
                     MessageBox.error(this.i18nModel.getText("commonReadingDataError"))
                 });
             },
+            
+            // setMinEndDate: function (sStartDateId, sEndDateId) {
+            //     let oStartDatePicker = sap.ui.getCore().byId(sStartDateId);
+            //     let oEndDatePicker = sap.ui.getCore().byId(sEndDateId);
+            //     if (oStartDatePicker && oEndDatePicker) {
+            //         let oStartDate = oStartDatePicker.getDateValue();
+            //         let oEndDate = oEndDatePicker.getDateValue();
+            //         oEndDatePicker.setMinDate(oStartDate);
+            //         if (oEndDate && oEndDate < oStartDate) {
+            //             oEndDatePicker.setDateValue(null);
+            //         }
+            //     }
+            // },
 
             onTypeChange: function (oEvent) {
                 var filter = { "Type": oEvent.getSource().getValue() }
@@ -225,6 +231,10 @@ sap.ui.define([
 
             },
 
+            FM_onStrictValidationComboBox:function(oEvent){
+                utils._LCvalidateMandatoryField(oEvent)
+            },
+
             FAU_onStrictValidationComboBox: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
@@ -242,7 +252,7 @@ sap.ui.define([
                 // Validate ComboBoxes
                 var bStrictValid = comboIds.every(function (sId) {
                     var oComboBox = sap.ui.getCore().byId(sId);
-                    return utils._LCstrictValidationComboBox({
+                    return utils._LCstrictValidationComboBox ({
                         getSource: function () { return oComboBox; },
                         getParameter: function () { return oComboBox.getValue(); }
                     });
@@ -270,16 +280,13 @@ sap.ui.define([
                         var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
                         oFormData.AssignedDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oAssignedDate);
                         oFormData.Status = "Assigned";
-                        // oFormData.ReturnDate = "";
+                        oFormData.IsCurrent = 1;
+                        // oFormData.ReturnDate = null;
                         if(originalStatus === "Returned"){
-                            oFormData.IsCurrent = 1;
-                            if(!oFormData.Currency){
-                                oFormData.Currency = this.getView().getModel("myform").getProperty("/formData/data/Currency")
-                            }
                             await this.ajaxCreateWithJQuery("IncomeAsset",{ data: oFormData}, ["FAA_id_FormFrag"])
                         }
                         else{
-                        await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oFormData, filters: {ID: this.getView().getModel("myform").getProperty("/formData/filters/ID") } }, ["FAA_id_FormFrag"]);
+                            await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oFormData, filters: {ID: this.getView().getModel("myform").getProperty("/formData/filters/ID") } }, ["FAA_id_FormFrag"]);
                         }
                         await this.AA_CoomonReadCall();
 
@@ -419,6 +426,11 @@ sap.ui.define([
                             this.getView().addDependent(this._unassignDialog);
                             this._FragmentDatePickersReadOnly(["FAU_id_unassignDate","FAA_id_Model"]);
                         }
+                        var assignedDate = oSelectedData.AssignedDate; // Adjust the field name if necessary
+                        if (assignedDate) {
+                            var oDatePicker = this._unassignDialog.byId("FAU_id_unassignDate");
+                            oDatePicker.setMinDate(new Date(assignedDate)); // Set the minimum date of the DatePicker to Assigned Date
+                        }
                         this._unassignDialog.open();
 
                     } else {
@@ -474,6 +486,7 @@ sap.ui.define([
                 formData.setProperty("/formData/data/SerialNumber", oSelectedData.SerialNumber);
                 formData.setProperty("/formData/data/Status", oSelectedData.Status);
                 formData.setProperty("/formData/data/AssetValue", (oSelectedData.AssetValue).toString());
+                formData.setProperty ("/formData/data/Currency", oSelectedData.Currency);
                 formData.setProperty("/formData/filters/ID", oSelectedData.ID);
 
                 oFrag.byId("FDP_id_ValueHelpDialog").close()
