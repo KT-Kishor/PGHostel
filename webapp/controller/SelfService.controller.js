@@ -887,5 +887,14 @@ sap.ui.define([
             FCR_onCloseDialog: function () {
                 this.SSRTE_oDialog.close();
             },
+
+             //  download Visiting Card
+            onDownloadVisitCard: function () {
+                var oEmployeeData = this.getView().getModel("sEmployeeModel").getData();
+                if (oEmployeeData) {
+                    this.CommonVisitingCard(oEmployeeData[0].EmployeeName, oEmployeeData[0].MobileNo, oEmployeeData[0].CompanyEmailID,
+                    oEmployeeData[0].Designation, oEmployeeData[0].BranchCode);
+                }
+            },  
         });
     });
