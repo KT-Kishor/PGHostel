@@ -198,6 +198,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteTrainee", { value: "Trainee" });
         },
         TileV_onPressOffer: function () {
+          //this.getBusyDialog();
           this.getRouter().navTo("RouteEmployeeOffer", {
             valueEmp: "EmployeeOffer",
           });

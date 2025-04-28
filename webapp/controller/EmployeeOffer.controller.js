@@ -18,8 +18,8 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
+                this.getBusyDialog();
                 this.commonLoginFunction("EmployeeOffer");
-                BusyIndicator.show(0);
                 await this._fetchCommonData("Designation", "DesignationModel");
                 await this._fetchCommonData("AppVisibility", "RoleModel");
                 var oRoleModel = this.getView().getModel("RoleModel");
@@ -45,10 +45,11 @@ sap.ui.define([
                 else {
                     this.EO_onSearch();
                 }
-                BusyIndicator.hide();
+
             },
             readCallForEmployeeOffer: async function (filter) {
-                await this.ajaxReadWithJQuery("EmployeeOffer", filter, ["EO_id_TableEOffer"]).then((oData) => {
+                // this.getBusyDialog();
+                await this.ajaxReadWithJQuery("EmployeeOffer", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModel");
                     if (this.Filter) {
@@ -57,9 +58,9 @@ sap.ui.define([
                         this.getView().getModel("EmployeeOfferModelInitial").refresh(true);
                         this.Filter = true;
                     }
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                 }).catch((oError) => {
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                     MessageBox.error("Error while reading the employee offer details")
                 })
             },

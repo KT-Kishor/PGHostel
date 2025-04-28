@@ -41,12 +41,12 @@ sap.ui.define([
       }
     },
 
-    CommonLogoutFunction: function () {    
+    CommonLogoutFunction: function () {
       var oLoginModel = this.getOwnerComponent().getModel("LoginModel");
       if (oLoginModel) {
         oLoginModel.setProperty("/EmployeeID", "");
         oLoginModel.setProperty("/EmployeeName", "");
-      }    
+      }
       this.getRouter().navTo("RouteLoginPage");
     },
 
@@ -93,15 +93,15 @@ sap.ui.define([
         } else if (value === "Timesheet" && TileModel.getProperty("/Timesheet") === '0') {
           this.getRouter().navTo("RouteLoginPage");
         } else if (value === "TimeSheetApproval" && TileModel.getProperty("/TimeSheetApproval") === '0') {
-          this.getRouter().navTo("RouteLoginPage");        
+          this.getRouter().navTo("RouteLoginPage");
         } else if (value === "SchemeUpload" && TileModel.getProperty("/SchemeUpload") === '0') {
-          this.getRouter().navTo("RouteLoginPage");        
+          this.getRouter().navTo("RouteLoginPage");
         } else if (value === "IncomeAsset" && TileModel.getProperty("/IncomeAsset") === '0') {
-          this.getRouter().navTo("RouteLoginPage");        
+          this.getRouter().navTo("RouteLoginPage");
         } else if (value === "AssetAssignment" && TileModel.getProperty("/AssetAssignment") === '0') {
-          this.getRouter().navTo("RouteLoginPage");        
+          this.getRouter().navTo("RouteLoginPage");
         } else if (value === "A_Quotations" && TileModel.getProperty("/A_Quotations") === '0') {
-          this.getRouter().navTo("RouteLoginPage");        
+          this.getRouter().navTo("RouteLoginPage");
         } else if (value === "A_Payroll" && TileModel.getProperty("/A_Payroll") === '0') {
           this.getRouter().navTo("RouteLoginPage");
         }
@@ -261,7 +261,7 @@ sap.ui.define([
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
       }
-      var CostToCompany = GrossPay + DeductionTotal + VariablePay ;
+      var CostToCompany = GrossPay + DeductionTotal + VariablePay;
       // Set model properties
       oModel.setProperty("/BasicSalary", Math.round(BasicSalary));
       oModel.setProperty("/HRA", Math.round(HRA));
@@ -289,7 +289,7 @@ sap.ui.define([
         var oControl = oView.byId(sId);
         if (oControl) {
           var bIsValueHelp = oControl.getMetadata().getName() === "sap.m.Input" && oControl.getShowValueHelp && oControl.getShowValueHelp();
-    
+
           oControl.addEventDelegate({
             onAfterRendering: function () {
               var oDomRef = oControl.getDomRef("inner");
@@ -299,21 +299,21 @@ sap.ui.define([
               }
             }
           }, oControl);
-    
+
           oControl.attachBrowserEvent("click", function () {
             var oIcon = oControl.getDomRef("icon");
             if (oIcon) {
               oIcon.click(); // open calendar or value help
             }
           });
-    
+
           // Optional: prevent typing via keypress too (extra safe)
           oControl.attachBrowserEvent("keydown", function (oEvent) {
             oEvent.preventDefault();
           });
         }
       });
-    },            
+    },
 
     //fragment date picker function
     _FragmentDatePickersReadOnly: function (aIds) {
@@ -338,7 +338,7 @@ sap.ui.define([
           });
         }
       });
-    }, 
+    },
 
     _convertBLOBtoBASE64: function (buffer) {
       if (!buffer || buffer.byteLength === 0) {
@@ -459,7 +459,7 @@ sap.ui.define([
     //common confirmation dialog box
     showConfirmationDialog: function (sTitle, sMessage, fnOnConfirm, fnOnCancel, sOkText, sCancelText) {
       var oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-    
+
       var dialog = new sap.m.Dialog({
         title: sTitle,
         type: "Message",
@@ -469,9 +469,9 @@ sap.ui.define([
           type: "Accept",
           press: function () {
             sap.ui.core.BusyIndicator.show(0); // Show busy indicator
-    
+
             dialog.close();
-    
+
             setTimeout(function () {
               if (typeof fnOnConfirm === "function") {
                 fnOnConfirm();
@@ -485,7 +485,7 @@ sap.ui.define([
           type: "Reject",
           press: function () {
             dialog.close();
-    
+
             setTimeout(function () {
               if (typeof fnOnCancel === "function") {
                 sap.ui.core.BusyIndicator.show(0);
@@ -499,11 +499,11 @@ sap.ui.define([
           dialog.destroy();
         }
       });
-    
+
       dialog.open();
       sap.ui.core.BusyIndicator.hide();
     },
-    
+
     _initMessagePopover: function () {
       var i18n = this.getOwnerComponent().getModel("i18n").getResourceBundle();
       this.oMessagePopover = new sap.m.MessagePopover({
@@ -584,36 +584,37 @@ sap.ui.define([
     onClearAndSearch: function (sFilterBarId) {
       var oFilterBar = this.byId(sFilterBarId);
       if (oFilterBar) {
-          oFilterBar.clear(); // Clear all filters in the FilterBar
+        oFilterBar.clear(); // Clear all filters in the FilterBar
       }
-  },
-
-  getBusyDialog:function() {
-    if (!this._pBusyDialog) {
-    this._pBusyDialog = sap.ui.core.Fragment.load({
-    name: "sap.kt.com.minihrsolution.fragment.BusyIndicator",
-    controller: this
-    }).then(function (oBusyDialog) {
-    this.getView().addDependent(oBusyDialog);
-    return oBusyDialog;
-    }.bind(this));
-    }
-    
-    this._pBusyDialog.then(function(oBusyDialog) {
-    oBusyDialog.open();
-    // setTimeout(function() {
-    // this._pBusyDialog.then(function(oBusyDialog) {
-    // oBusyDialog.close();
-    // });
-    // }.bind(this), 5000);
-    }.bind(this));
     },
 
-    closeBusyDialog: function() {
-      if (this._pBusyDialog) {
-        this._pBusyDialog.then(function(oBusyDialog) {
-          oBusyDialog.close();
-        });
+    getBusyDialog: function () {
+      if (!this._pBusyDialog) {
+        this._pBusyDialog = sap.ui.core.Fragment.load({
+          name: "sap.kt.com.minihrsolution.fragment.BusyIndicator",
+          controller: this
+        }).then(function (oBusyDialog) {
+          this.getView().addDependent(oBusyDialog);
+          return oBusyDialog;
+        }.bind(this));
+      }
+
+      this._pBusyDialog.then(function (oBusyDialog) {
+        this.oBusyDialog = oBusyDialog;
+        this.oBusyDialog.open();
+        // setTimeout(function() {
+        // this._pBusyDialog.then(function(oBusyDialog) {
+        // oBusyDialog.close();
+        // });
+        // }.bind(this), 5000);
+      }.bind(this));
+    },
+
+    closeBusyDialog: function () {
+      if (this.oBusyDialog) {
+        //this._pBusyDialog.then(function (oBusyDialog) {
+          this.oBusyDialog.close();
+       // });
       }
     }
   })
