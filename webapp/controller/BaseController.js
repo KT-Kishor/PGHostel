@@ -468,17 +468,19 @@ sap.ui.define([
           text: sOkText || oResourceBundle.getText("OkButton"),
           type: "Accept",
           press: function () {
-            sap.ui.core.BusyIndicator.show(0); // Show busy indicator
-
             dialog.close();
 
-            setTimeout(function () {
-              if (typeof fnOnConfirm === "function") {
-                fnOnConfirm();
-              }
-              sap.ui.core.BusyIndicator.hide(); // Hide busy indicator after logic
-            }, 100); // slight delay to ensure UI updates
-          }
+            this.getBusyDialog(); // open BusyDialog immediately
+            Promise.resolve()
+              .then(function () {
+                if (typeof fnOnConfirm === "function") {
+                  return fnOnConfirm();
+                }
+              }.bind(this))
+              .finally(function () {
+                this.closeBusyDialog(); // Always close BusyDialog
+              }.bind(this));
+          }.bind(this)
         }),
         endButton: new sap.m.Button({
           text: sCancelText || oResourceBundle.getText("CancelButton"),
@@ -486,14 +488,17 @@ sap.ui.define([
           press: function () {
             dialog.close();
 
-            setTimeout(function () {
-              if (typeof fnOnCancel === "function") {
-                sap.ui.core.BusyIndicator.show(0);
-                fnOnCancel();
-                sap.ui.core.BusyIndicator.hide();
-              }
-            }, 100);
-          }
+            this.getBusyDialog(); // open BusyDialog immediately
+            Promise.resolve()
+              .then(function () {
+                if (typeof fnOnCancel === "function") {
+                  return fnOnCancel();
+                }
+              }.bind(this))
+              .finally(function () {
+                this.closeBusyDialog(); // Always close BusyDialog
+              }.bind(this));
+          }.bind(this)
         }),
         afterClose: function () {
           dialog.destroy();
@@ -501,7 +506,6 @@ sap.ui.define([
       });
 
       dialog.open();
-      sap.ui.core.BusyIndicator.hide();
     },
 
     _initMessagePopover: function () {
@@ -602,19 +606,14 @@ sap.ui.define([
       this._pBusyDialog.then(function (oBusyDialog) {
         this.oBusyDialog = oBusyDialog;
         this.oBusyDialog.open();
-        // setTimeout(function() {
-        // this._pBusyDialog.then(function(oBusyDialog) {
-        // oBusyDialog.close();
-        // });
-        // }.bind(this), 5000);
+      
       }.bind(this));
     },
 
     closeBusyDialog: function () {
       if (this.oBusyDialog) {
-        //this._pBusyDialog.then(function (oBusyDialog) {
-          this.oBusyDialog.close();
-       // });
+        this.oBusyDialog.close();
+       
       }
     },
 

@@ -4,9 +4,8 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-    "sap/ui/core/BusyIndicator",
     "../model/formatter"],
-    function (BaseController, utils, JSONModel, MessageToast, MessageBox, BusyIndicator, Formatter) {
+    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOffer", {
             Formatter: Formatter,
@@ -48,7 +47,7 @@ sap.ui.define([
 
             },
             readCallForEmployeeOffer: async function (filter) {
-                // this.getBusyDialog();
+                this.getBusyDialog();
                 await this.ajaxReadWithJQuery("EmployeeOffer", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModel");
@@ -92,6 +91,7 @@ sap.ui.define([
                 this.onHandleEmployeeAction("Rejected", "onRejectEmployee");
             },
             EO_onSearch: function () {
+                this.getBusyDialog();
                 var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                 var params = {};
@@ -115,6 +115,7 @@ sap.ui.define([
             },
             // Update the status to 'Rejected' after confirmation
             onRejectEmployee: function () {
+                this.getBusyDialog();
                 this.updateCallForEmployeeOffer("Rejected");
                 this.readCallForEmployeeOffer("");
                 this.EO_ButtonVisibility();
@@ -142,7 +143,6 @@ sap.ui.define([
                 });
             },
             onHandleEmployeeAction: function (status, actionMethod) {
-                BusyIndicator.show(0)
                 var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
                 this.oSelectedRow = oSelectedData;
                 var sName = oSelectedData.Salutation + " " + oSelectedData.ConsultantName;
@@ -218,8 +218,8 @@ sap.ui.define([
                 );
             },
             _commonFragmentOpenOffer: function (name, fragmentName) {
-                BusyIndicator.show(0);
-                if (!this.oDialog) {
+                this.getBusyDialog();          
+                      if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.OnboardEmployee",
                         controller: this
@@ -229,12 +229,12 @@ sap.ui.define([
                         sap.ui.getCore().byId("OEF_id_DateofBirth").setMaxDate(new Date());
                         this._FragmentDatePickersReadOnly(["OEF_id_DateofBirth"]);
                         this.oDialog.open();
-                        BusyIndicator.hide();
-                    })
+                        this.closeBusyDialog();              
+                          })
                 } else {
                     this._FragmentDatePickersReadOnly(["OEF_id_DateofBirth"]);
                     this.oDialog.open();
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                 }
             },
             OEF_onPressClose: function () {
@@ -266,7 +266,8 @@ sap.ui.define([
                     };
                     oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-');
                     oModel.ManagerID = sap.ui.getCore().byId("OEF_id_Manager").getSelectedItem().getAdditionalText();
-                    this.ajaxCreateWithJQuery("EmployeeDetails", oPayload, ["OEF_id_SimpleForm"]).then((oData) => {
+                    this.ajaxCreateWithJQuery("EmployeeDetails", oPayload).then((oData) => {
+                        this.getBusyDialog();
                         if (oData.success) {
                             MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
                             this.oDialog.close();
@@ -275,7 +276,7 @@ sap.ui.define([
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         }
                     }).catch((error) => {
-                        BusyIndicator.hide();
+                        this.closeBusyDialog();
                         MessageToast.show(error.message || error.responseText);
                     });
                 } else {
@@ -283,7 +284,8 @@ sap.ui.define([
                 }
             },
 
-            updateCallForEmployeeOffer: function (oStatus) {
+            updateCallForEmployeeOffer: async function (oStatus) {
+                this.getBusyDialog();
                 this.oSelectedRow.Status = oStatus;
                 var oModelOffer = {
                     "data": this.oSelectedRow,
@@ -292,17 +294,17 @@ sap.ui.define([
                     }
                 };
                 // First call for EmployeeOffer
-                this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer, ["EO_id_TableEOffer"]).then((oData) => {
+                await this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer).then((oData) => {
                     if (oData.success) {
-                        BusyIndicator.hide();
                         var sSuccessMessage = (oStatus === "OnBoarded")
                             ? this.i18nModel.getText("onBoardSuccess")
                             : this.i18nModel.getText("offerEmpReject");
                         MessageToast.show(sSuccessMessage);
+                        this.closeBusyDialog();
                         this.oDialog.close();
                     }
                 }).catch((error) => {
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                     this.oDialog.close();
                     MessageToast.show(error.message || error.responseText);
                 })
