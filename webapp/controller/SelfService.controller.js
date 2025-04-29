@@ -608,14 +608,25 @@ sap.ui.define([
             
             displaySalaryPanels: function (salaryDetailsArray) {
                 var oVBox = this.byId("salaryVBox");
-                oVBox.removeAllItems(); 
+                oVBox.removeAllItems();
                 salaryDetailsArray.forEach(function (offerData) {
                     var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
-                    var oPanel = new sap.m.Panel({
-                        headerText: sTitleText,
-                        expandable: true,
-                        expanded: true
+                    var oTitleText = new sap.m.Text({
+                        text: sTitleText,
+                        wrapping: true
                     });
+                    var oHeaderBox = new sap.m.HBox({
+                        items: [oTitleText],
+                        width: "100%"
+                    });
+                    var oPanel = new sap.m.Panel({
+                        expandable: true,
+                        expanded: true,
+                        headerToolbar: new sap.m.Toolbar({
+                            content: [oHeaderBox]
+                        })
+                    });
+                    oPanel.addStyleClass("sapUiSmallMarginBottom");
                     var oFragModel = new sap.ui.model.json.JSONModel(offerData);
                     oPanel.setModel(oFragModel, "salaryData");
                     var oFragment = sap.ui.xmlfragment(this.getView().getId(), "sap.kt.com.minihrsolution.fragment.SalaryDisplay", this);
@@ -623,6 +634,7 @@ sap.ui.define([
                     oVBox.addItem(oPanel);
                 }, this);
             },
+            
 
             
             
