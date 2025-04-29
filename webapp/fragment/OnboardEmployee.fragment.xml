@@ -37,10 +37,10 @@
 				<Input value="{oEmpolyeeDetailsModel>/BranchCode}" editable="false"/>
 				<Label text="{i18n>companyMailid}" required="true"/>
 				<Input value="{oEmpolyeeDetailsModel>/CompanyEmailID}" id="OEF_id_CompanyMail" maxLength="50" liveChange="validateEmail" placeholder="{i18n>companyMailid}" valueStateText="{i18n>emailValueState}"/>
-				<Label text="{i18n>permanentAddress}" />
-				<TextArea value="{oEmpolyeeDetailsModel>/PermanentAddress}" placeholder="{i18n>permanentAddress}" maxLength="120"/>
-				<Label text="{i18n>correspondenceAddress}" />
-				<TextArea value="{oEmpolyeeDetailsModel>/CorrespondenceAddress}" placeholder="{i18n>correspondenceAddress}" maxLength="120"/>
+				<Label text="{i18n>permanentAddress}"  required="true" />
+				<TextArea value="{oEmpolyeeDetailsModel>/PermanentAddress}" id="OEF_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="validateMandetory" valueStateText="{i18n>addressValueState}"/>
+				<Label text="{i18n>correspondenceAddress}" required="true" />
+				<TextArea value="{oEmpolyeeDetailsModel>/CorrespondenceAddress}" id="OEF_id_CAddress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="validateMandetory" valueStateText="{i18n>addressValueState}"/>
 				<Label text="{i18n>dateOfBirth}" required="true" />
 				<DatePicker 
                  id="OEF_id_DateofBirth"
