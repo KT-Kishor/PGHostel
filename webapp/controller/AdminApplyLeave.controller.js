@@ -8,9 +8,8 @@ sap.ui.define(
         "sap/m/MessageBox", //Import MessageBox for alerts/confirmations
         "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
         "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
-        "sap/ui/core/BusyIndicator" // Import BusyIndicator for loading indicators
     ],
-    function (BaseController, JSONModel, MessageToast, utils, Formatter, MessageBox, Timeline, TimelineItem, BusyIndicator,) {
+    function (BaseController, JSONModel, MessageToast, utils, Formatter, MessageBox, Timeline, TimelineItem) {
         "use strict";
         return BaseController.extend(
             "sap.kt.com.minihrsolution.controller.AdminApplyLeave",
@@ -22,6 +21,7 @@ sap.ui.define(
 
                 _onRouteMatched: function () {
                     var that = this;
+                    that.getBusyDialog(); // Show busy dialog
                     that.commonLoginFunction("ApplyLeave"); // Call common login function
                     that.onClearAndSearch("AL_id_leavefilterbar");// Clear and search function
                     that._makeDatePickersReadOnly(["AL_id_DateRangeSelection"]);
@@ -39,7 +39,7 @@ sap.ui.define(
                     that.byId("AL_id_LeaveYear").setValue(that.currentYear);
 
                     // Start chained async calls
-                    that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId }, ["AL_id_LeaveTableStandard"]).then(() => {
+                    that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId }).then(() => {
                         return that._fetchCommonData("LeaveType", "leaveTypeModel", { type: "Employee" });
                     }).then(() => {
                         // Set i18n and header
@@ -64,9 +64,9 @@ sap.ui.define(
                             return that.EmployeeDetReadCall("Trainee", { "TraineeID": that.userId });
                         }
                     }).then(() => {
-                        BusyIndicator.hide(); // Hide after success
+                        this.closeBusyDialog(); //  Close  BusyDialog
                     }).catch((error) => {
-                        BusyIndicator.hide(); // Hide on error
+                        this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(error.message || error.responseText);
                     });
                 },
@@ -79,7 +79,7 @@ sap.ui.define(
                     try {
                         // Fetch data from backend
                         let oData = await this.ajaxCreateWithJQuery("LeavesFirstBarChart", jsonData);
-                        BusyIndicator.hide();
+                          this.closeBusyDialog(); //  Close BusyDialog
                         // Filter data for first chart
                         let firstChartData = oData.results.filter(item => ["Submitted", "Approved", "Quota"].includes(item.LeaveStatus));
                         // Filter data for second chart
@@ -96,7 +96,7 @@ sap.ui.define(
                         this._configureSecondChart("AL_id_VizFrameAll", oSecondChartModel, this.i18nModel.getText("yearlyLeaveQuota"));
                 
                     } catch (error) {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     }
                 },
@@ -187,9 +187,8 @@ sap.ui.define(
                 MonthBarDisplayFunction: async function (leaveType, selectedYear, userId) {
                     let jsonData = { "data": { "EmployeeID": userId, "selectYear": selectedYear, "LeaveType": leaveType } };
                     try {
-                        BusyIndicator.show(0);
                         let oData = await this.ajaxCreateWithJQuery("MonthyBarChart", jsonData);
-                        BusyIndicator.hide();
+                          this.closeBusyDialog(); //  Close BusyDialog
                         let oLeaveModel = new JSONModel({ chartData: oData.results });
                         this.getView().setModel(oLeaveModel, "MonthleaveData");
                         var oVizFrame = this.getView().byId("AL_id_VizFrame");
@@ -201,7 +200,7 @@ sap.ui.define(
                         var oPopOver = this.getView().byId("AL_id_Popover");
                         oPopOver.connect(oVizFrame.getVizUid());
                     } catch (error) {
-                        BusyIndicator.hide();
+                          this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(error.message || error.responseText);
                     }
                 },
@@ -210,9 +209,8 @@ sap.ui.define(
                 YearlyBarDisplayFunction: async function (userId) {
                     let jsonData = { "data": { "EmployeeID": userId } };
                     try {
-                        BusyIndicator.show(0);
                         let oData = await this.ajaxCreateWithJQuery("YearlyBarChart", jsonData);
-                        BusyIndicator.hide();
+                          this.closeBusyDialog(); //  Close BusyDialog
                         let rawData = oData.results;
                         let result = [];
                         // Process raw data into chart format
@@ -235,7 +233,7 @@ sap.ui.define(
                         var oPopOver = this.getView().byId("AL_id_PopOver");
                         oPopOver.connect(oVizFrame.getVizUid());
                     } catch (error) {
-                        BusyIndicator.hide();
+                          this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(error.message || error.responseText);
                     }
                 },
@@ -277,6 +275,7 @@ sap.ui.define(
 
                 // Leave type change handler
                 AL_onChangeLeaveType: function (oEvent) {
+                    this.getBusyDialog(); // Show busy dialog
                     var year = this.byId("AL_id_LeaveYear").getSelectedKey(); 
                     var type = oEvent.getSource().getSelectedItem().getText() 
                     this.BarDisplayFunction(type, year, this.userId);
@@ -285,6 +284,7 @@ sap.ui.define(
 
                 // Year change handler
                 AL_onChangeYears: function (oEvent) {
+                    this.getBusyDialog(); // Show busy dialog
                     var type = this.byId("AL_id_TypeOfLeave").getSelectedItem().getText(); 
                     var year = oEvent.getSource().getSelectedKey() 
                     this.BarDisplayFunction(type, year, this.userId);
@@ -293,7 +293,7 @@ sap.ui.define(
 
                 // Show bar chart view
                 AL_onPressBarChart: function () {
-                    BusyIndicator.show(0);
+                    this.getBusyDialog(); // Show busy dialog
                     this.byId("AL_id_LeaveBarChart").setVisible(true);
                     this.byId("AL_id_LeaveTableStandard").setVisible(false);
                     this.byId("AL_id_leavefilterbar").setVisible(false);
@@ -304,7 +304,7 @@ sap.ui.define(
                         this.byId("AL_id_YearLabel").setVisible(false);
                         this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId).then(() => sap.ui.core.BusyIndicator.hide())
                             .catch((error) => {
-                                BusyIndicator.hide();
+                                  this.closeBusyDialog(); //  Close BusyDialog
                                 MessageToast.show(error.message || error.responseText);
                             });
                     } else {
@@ -316,7 +316,7 @@ sap.ui.define(
                             this.MonthBarDisplayFunction("All In One Leave", this.currentYear, this.userId),
                             this.YearlyBarDisplayFunction(this.userId).then(() => sap.ui.core.BusyIndicator.hide())
                                 .catch((error) => {
-                                    BusyIndicator.hide();
+                                      this.closeBusyDialog(); //  Close BusyDialog
                                     MessageToast.show(error.message || error.responseText);
                                 });
                     }
@@ -790,14 +790,14 @@ sap.ui.define(
                                 delete oData.minDate;
                                 delete oData.isUpdate;
                 
-                                BusyIndicator.show(0);
+                                this.getBusyDialog(); // Show busy dialog
                 
                                 // Submit to backend
                                 this.ajaxCreateWithJQuery("Leaves", { data: oData }).then(response => {
-                                        BusyIndicator.hide();
+                                          this.closeBusyDialog(); //  Close BusyDialog
                                         this._handleResponse(response, "leaveSubmitted");
                                     }).catch((error) => {
-                                        BusyIndicator.hide();
+                                          this.closeBusyDialog(); //  Close BusyDialog
                                         MessageToast.show(error.message || error.responseText);
                                     });
                             } else {
@@ -808,7 +808,7 @@ sap.ui.define(
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         }
                     } catch (error) {
-                        BusyIndicator.hide();
+                          this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(error.message || error.responseText);
                     }
                 },
@@ -926,15 +926,15 @@ sap.ui.define(
                                 delete oData.minDate;
                                 delete oData.isUpdate;
                     
-                                BusyIndicator.show(0);
+                                this.getBusyDialog(); // Show busy dialog
                     
                                 // Save to backend
                                 var requestData = { filters: { ID: oData.ID }, data: oData };
                                 this.ajaxUpdateWithJQuery("Leaves", requestData).then(response => {
-                                        BusyIndicator.hide();
+                                          this.closeBusyDialog(); //  Close BusyDialog
                                         this._handleResponse(response, "leaveUpdatedSuccess");
                                     }).catch((error) => {
-                                        BusyIndicator.hide();
+                                          this.closeBusyDialog(); //  Close BusyDialog
                                         MessageToast.show(error.message || error.responseText);
                                     });
                             } else {
@@ -942,7 +942,7 @@ sap.ui.define(
                             }
                         }
                     } catch (error) {
-                        BusyIndicator.hide();
+                          this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(error.message || error.responseText);
                     }
                 },
@@ -971,7 +971,8 @@ sap.ui.define(
                     oUpdateButton.setVisible(bVisible);
                 },
 
-                AL_onSearch: function () {
+                AL_onSearch: async function () {
+                    this.getBusyDialog(); // Show busy dialog
                     var aFilterItems = this.byId("AL_id_leavefilterbar").getFilterGroupItems();
                     var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                     var params = {};
@@ -989,8 +990,14 @@ sap.ui.define(
                         }
                       }
                     });
-                    this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId, ...params}, ["AL_id_LeaveTableStandard"]);
-                  },
+                    try {
+                        await this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId, ...params });
+                      } catch (error) {
+                        sap.m.MessageToast.show(error.message || error.responseText);
+                      } finally {
+                        this.closeBusyDialog(); // Close after call finishes
+                      }
+                    },
 
                 // Clear filters in leave filter bar
                 AL_onClear: function () {
