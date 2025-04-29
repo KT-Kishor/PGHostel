@@ -46,7 +46,7 @@
 				<Label text="{i18n>type}" />
 				<ComboBox
                     id="FAA_id_Type"
-                    items="{assetType>/}"
+                    items="{typeModel>/}"
                     selectionChange="onStrictValidationComboBox"
                     change="onTypeChange"
                     required="true"
@@ -54,9 +54,8 @@
                     valueStateText="{i18n>selectType}"
                 >
 					<core:ListItem
-                        key="{assetType>Type}"
-                        text="{assetType>Type}"
-                        additionalText="{assetType>Type}"
+                        key="{typeModel>Type}"
+                        text="{typeModel>Type}"
                     />
 				</ComboBox>
 				<Label text="{i18n>model}" />
