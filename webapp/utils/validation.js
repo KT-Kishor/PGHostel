@@ -45,24 +45,24 @@ sap.ui.define([], function () {
     _LCvalidateName: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
       if (!oField) return false;
-      if (!oField.getValue()) { 
-        oField.setValueState("Error");
-        return false;
+      var oValue = oField.getValue().trim(); 
+      if (oValue === "") { 
+          oField.setValueState("Error");
+          return false;
       }
-      var oValue = oField.getValue().replace(/[^a-zA-Z\s]/g, "");
-      if (oField.getValue() !== oValue) oField.setValue(oValue);
-      var regex = /^[a-zA-Z\s]+$/;
-      if (!regex.test(oValue)) {
-        oField.setValueState("Error");
-        return false;
+      var sanitizedValue = oValue.replace(/[^a-zA-Z\s]/g, "");
+      if (oValue !== sanitizedValue) oField.setValue(sanitizedValue);
+      var regex = /^[a-zA-Z\s]+$/; 
+      if (!regex.test(sanitizedValue)) {
+          oField.setValueState("Error");
+          return false;
       } else {
-        oField.setValueState("None");
-        return true;
+          oField.setValueState("None"); 
+          return true;
       }
-    },
-    
-
-    // Amount validation function
+  },
+   
+        // Amount validation function
     _LCvalidateAmount: function (oEvent, type) {
       var oInput = type === "ID" ? (oInput = oEvent) : (oInput = oEvent.getSource());
       var value = oInput.getValue();
