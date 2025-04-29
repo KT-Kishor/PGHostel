@@ -13,17 +13,14 @@ sap.ui.define(
         this.oMessagePopover.openBy(oEvent.getSource());
       },
 
-      _onRouteMatched: function () {
+      _onRouteMatched: async function () {
+        this.checkLoginModel();
+        this._makeDatePickersReadOnly(["FST_id_MonthYearPicker"]);
         this.oLoginModel = this.getView().getModel("LoginModel");
         this.oModel = this.getView().getModel("Payroll");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-
-        if (!this.oLoginModel) {
-          this.getRouter().navTo("RouteLoginPage");
-          return;
-        }
         this.byId("FST_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/BranchCode"));
-        this.oLoginModel.setProperty("/HeaderName", "Manage Payroll Data");
+        this.oLoginModel.setProperty("/HeaderName", this.i18nModel.getText("headerManagePayroll"));
         this.oModel.setProperty("/ShowOnGenerate", false);
         this.oModel.setProperty("/ShowOnPayroll", true);
         this.oModel.setProperty("/TableData", null);
@@ -37,9 +34,7 @@ sap.ui.define(
         oBinding.attachChange(function () {
           this.oModel.setProperty("/TableRowCount", oBinding.getLength());
         });
-
-        this._commonGETCall("BaseLocation", "BaseLocationData", {}, ["FST_id_FilterBranch"]);
-        //this.CommonReadcall("GetDepartmentRule", {}, [], "oRuleModel");
+        await this._commonGETCall("BaseLocation", "BaseLocationData", {});
         this.FST_onEnableImport();
         BusyIndicator.hide();
       },
@@ -63,7 +58,7 @@ sap.ui.define(
         this.oModel.setProperty("/FilterBranch", branch);
         this.oModel.setProperty("/FilterMonth", pickerMonth);
         this.oModel.setProperty("/FilterYear", pickerYear);
-        await this._commonGETCall("A_PayRoll", "TableData", { Branch: branch, Month: pickerMonth, Year: pickerYear }, []);
+        await this._commonGETCall("A_PayRoll", "TableData", { Branch: branch, Month: pickerMonth, Year: pickerYear });
         var oData = this.oModel.getProperty("/TableData");
         if (!oData || oData.length === 0) {
           BusyIndicator.hide();
@@ -80,71 +75,23 @@ sap.ui.define(
       _sortAndFormatRecords: function (records) {
         records.sort((a, b) => a["EmployeeID"] - b["EmployeeID"]);
         records = records.map(record => {
-          return {
-            "Branch": record["Branch"] ? record["Branch"].toString() : "",
-            "Month": record["Month"] ? record["Month"].toString() : "",
-            "Year": record["Year"] ? record["Year"].toString() : "",
-            "EmployeeID": record["EmployeeID"] ? record["EmployeeID"].toString() : "",
-            "EmployeeName": record["EmployeeName"] ? record["EmployeeName"].toString() : "",
+          const fields = [
+            "Branch", "Month", "Year", "EmployeeID", "EmployeeName",
+            ...Array.from({ length: 31 }, (_, i) => `Day${i + 1}`),
+            "TotalDays", "TotalPresent", "TotalAbsent", "ActualAbsent", "TotalLate",
+            "TotalHalf", "TotalSunP", "TotalSun", "PayDays", "GrossPay", "ActualPay",
+            "TDS", "EplyePF", "PT", "SD", "EplyeESI", "Advance", "Other", "NetPay",
+            "EplyrPF", "EplyrESI", "Status", "UploadedBy", "ChangedBy"
+          ];
 
-            "Day1": record["Day1"] ? record["Day1"].toString() : "",
-            "Day2": record["Day2"] ? record["Day2"].toString() : "",
-            "Day3": record["Day3"] ? record["Day3"].toString() : "",
-            "Day4": record["Day4"] ? record["Day4"].toString() : "",
-            "Day5": record["Day5"] ? record["Day5"].toString() : "",
-            "Day6": record["Day6"] ? record["Day6"].toString() : "",
-            "Day7": record["Day7"] ? record["Day7"].toString() : "",
-            "Day8": record["Day8"] ? record["Day8"].toString() : "",
-            "Day9": record["Day9"] ? record["Day9"].toString() : "",
-            "Day10": record["Day10"] ? record["Day10"].toString() : "",
-            "Day11": record["Day11"] ? record["Day11"].toString() : "",
-            "Day12": record["Day12"] ? record["Day12"].toString() : "",
-            "Day13": record["Day13"] ? record["Day13"].toString() : "",
-            "Day14": record["Day14"] ? record["Day14"].toString() : "",
-            "Day15": record["Day15"] ? record["Day15"].toString() : "",
-            "Day16": record["Day16"] ? record["Day16"].toString() : "",
-            "Day17": record["Day17"] ? record["Day17"].toString() : "",
-            "Day18": record["Day18"] ? record["Day18"].toString() : "",
-            "Day19": record["Day19"] ? record["Day19"].toString() : "",
-            "Day20": record["Day20"] ? record["Day20"].toString() : "",
-            "Day21": record["Day21"] ? record["Day21"].toString() : "",
-            "Day22": record["Day22"] ? record["Day22"].toString() : "",
-            "Day23": record["Day23"] ? record["Day23"].toString() : "",
-            "Day24": record["Day24"] ? record["Day24"].toString() : "",
-            "Day25": record["Day25"] ? record["Day25"].toString() : "",
-            "Day26": record["Day26"] ? record["Day26"].toString() : "",
-            "Day27": record["Day27"] ? record["Day27"].toString() : "",
-            "Day28": record["Day28"] ? record["Day28"].toString() : "",
-            "Day29": record["Day29"] ? record["Day29"].toString() : "",
-            "Day30": record["Day30"] ? record["Day30"].toString() : "",
-            "Day31": record["Day31"] ? record["Day31"].toString() : "",
+          const result = fields.reduce((acc, field) => {
+            acc[field] = record[field] ? record[field].toString() : (field === "TotalAbsent"
+              ? ((parseInt(record["TotalAbsent"] || 0) + parseInt(record["TotalSunA"] || 0)).toString())
+              : "");
+            return acc;
+          }, {});
 
-            "TotalDays": record["TotalDays"] ? record["TotalDays"].toString() : "0",
-            "TotalPresent": record["TotalPresent"] ? record["TotalPresent"].toString() : "0",
-            "TotalAbsent": ((parseInt(record["TotalAbsent"] ? record["TotalAbsent"] : 0)) + (parseInt(record["TotalSunA"] ? record["TotalSunA"] : 0))).toString(),
-            "ActualAbsent": record["ActualAbsent"] ? record["ActualAbsent"].toString() : "0",
-            "TotalLate": record["TotalLate"] ? record["TotalLate"].toString() : "0",
-            "TotalHalf": record["TotalHalf"] ? record["TotalHalf"].toString() : "0",
-            "TotalSunP": record["TotalSunP"] ? record["TotalSunP"].toString() : "0",
-            "TotalSun": record["TotalSun"] ? record["TotalSun"].toString() : "0",
-            "PayDays": record["PayDays"] ? record["PayDays"].toString() : "0",
-
-            "GrossPay": record["GrossPay"] ? record["GrossPay"].toString() : "0",
-            "ActualPay": record["ActualPay"] ? record["ActualPay"].toString() : "0",
-            "TDS": record["TDS"] ? record["TDS"].toString() : "0",
-            "EplyePF": record["EplyePF"] ? record["EplyePF"].toString() : "0",
-            "PT": record["PT"] ? record["PT"].toString() : "0",
-            "SD": record["SecurityDeposit"] ? record["SecurityDeposit"].toString() : "0",
-            "EplyeESI": record["EplyeESI"] ? record["EplyeESI"].toString() : "0",
-            "Advance": record["Advance"] ? record["Advance"].toString() : "0",
-            "Other": record["Other"] ? record["Other"].toString() : "0",
-            "NetPay": record["NetPay"] ? record["NetPay"].toString() : "0",
-            "EplyrPF": record["EplyrPF"] ? record["EplyrPF"].toString() : "0",
-            "EplyrESI": record["EplyrESI"] ? record["EplyrESI"].toString() : "0",
-            "Status": record["Status"] ? record["Status"].toString() : "",
-            "UploadedBy": record["UploadedBy"] ? record["UploadedBy"].toString() : "",
-            "ChangedBy": record["ChangedBy"] ? record["ChangedBy"].toString() : "",
-          };
+          return result;
         });
         this.oModel.setProperty("/TableData", records);
         this.oModel.setProperty("/isSELVisible", true);
@@ -165,19 +112,13 @@ sap.ui.define(
             var sheetName = workbook.SheetNames[0];
             var sheetData = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
             var isMismatch = sheetData.some(row => {
-              var branch = row["Branch"] || "";
-              var month = row["Month"] || "";
-              var year = row["Year"] || "";
-              var empCode = row["EmployeeID"] || "";
-              var actualPay = row["ActualPay"] || "";
-              var uploadedBy = row["UploadedBy"] || "";
               var matchingRecord = payrollData.find(record =>
-                record["Branch"] === branch &&
-                record["Month"] === month &&
-                record["Year"] === year &&
-                record["EmployeeID"] === empCode &&
-                record["ActualPay"] === actualPay &&
-                record["UploadedBy"] === uploadedBy
+                record["Branch"] === row["Branch"] || "" &&
+                record["Month"] === row["Month"] || "" &&
+                record["Year"] === row["Year"] || "" &&
+                record["EmployeeID"] === row["EmployeeID"] || "" &&
+                record["ActualPay"] === row["ActualPay"] || "" &&
+                record["UploadedBy"] === row["UploadedBy"] || ""
               );
               return !matchingRecord; // Return true if mismatch found
             });
@@ -231,6 +172,7 @@ sap.ui.define(
       },
 
       MP_onPressExport: function () {
+        BusyIndicator.show(0);
         var branch = this.oModel.getProperty("/FilterBranch");
         var month = this.oModel.getProperty("/FilterMonth");
         var year = this.oModel.getProperty("/FilterYear");
@@ -239,6 +181,7 @@ sap.ui.define(
         var workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
         XLSX.writeFile(workbook, `${branch} Salary Data ${month}-${year}.xlsx`);
+        BusyIndicator.hide();
       },
 
       MP_onPressDelete: function () {

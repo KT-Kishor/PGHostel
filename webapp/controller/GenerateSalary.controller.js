@@ -14,17 +14,13 @@ sap.ui.define(
       },
 
       _onRouteMatched: async function () {
+        this.checkLoginModel();
+        this._makeDatePickersReadOnly(["FST_id_MonthYearPicker"]);
         this.oLoginModel = this.getView().getModel("LoginModel");
         this.oModel = this.getView().getModel("Payroll");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-        this._FragmentDatePickersReadOnly(["FST_id_MonthYearPicker", "FST_id_FilterBranch"]);
-
-        if (!this.oLoginModel) {
-          this.getRouter().navTo("RouteLoginPage");
-          return;
-        }
         this.byId("FST_id_FilterBranch").setSelectedKey(this.oLoginModel.getProperty("/BranchCode"));
-        this.oLoginModel.setProperty("/HeaderName", "Generate Salary");
+        this.oLoginModel.setProperty("/HeaderName", this.i18nModel.getText("headerGenerateSalary"));
         this.oModel.setProperty("/ShowOnGenerate", true);
         this.oModel.setProperty("/ShowOnPayroll", false);
         this.oModel.setProperty("/TableData", null);
@@ -235,9 +231,7 @@ sap.ui.define(
         var month = this.oModel.getProperty("/FilterMonth");
         var year = this.oModel.getProperty("/FilterYear");
         records.forEach(record => {
-          var payDays = (record.TotalPresent + record.TotalLate + (record.TotalHalf / 2) + record.TotalAbsent + record.TotalSunA)
-            - (parseInt((record.TotalLate / 3)) * 0.5);
-
+          var payDays = (record.TotalPresent + record.TotalLate + (record.TotalHalf / 2) + record.TotalAbsent + record.TotalSunA) - (parseInt((record.TotalLate / 3)) * 0.5);
           if (record.TotalAbsent > 2) {
             payDays -= record.TotalAbsent - 2;
           }
@@ -248,7 +242,6 @@ sap.ui.define(
           if (tAbsent < 3) {
             payDays += 1;
           }
-
           record.PayDays = parseFloat(payDays.toFixed(2));
         });
 
@@ -357,27 +350,6 @@ sap.ui.define(
         return null;
       },
 
-      getDaysWithWeekdays: function (year, month) {
-        var daysArray = [];
-        var daysInMonth = new Date(year, month, 0).getDate(); // Get number of days in the month
-        for (var day = 1; day <= daysInMonth; day++) {
-          var date = new Date(year, month - 1, day); // JS months are 0-indexed
-          var weekday = date.toLocaleString('en-US', { weekday: 'short' }); // Get weekday (e.g., Sun, Mon)
-          daysArray.push(day + "\n" + weekday);
-        }
-        return daysArray;
-      },
-
-      resetColumnHeaders: function () {
-        for (var i = 1; i <= 31; i++) {
-          var columnId = "idDay" + i;
-          var oColumnText = this.getView().byId(columnId);
-          if (oColumnText) {
-            oColumnText.setText(i.toString());
-          }
-        }
-      },
-
       GS_onPressSave: async function () {
         var that = this;
         BusyIndicator.show(0);
@@ -401,7 +373,7 @@ sap.ui.define(
                 MessageToast.show(that.i18nModel.getText("msgDataExistsInDB"));
               }
               else {
-                MessageToast.show(that.i18nModel.getText("msgSchemeDetailErrorSave"));
+                MessageToast.show(that.i18nModel.getText("msgTraineeformerror"));
               }
             }
             catch (e) {

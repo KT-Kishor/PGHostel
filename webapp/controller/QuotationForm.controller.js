@@ -28,7 +28,7 @@ sap.ui.define([
             if (response.success) {
                 this.oModel.setProperty("/ModelList", response.results);
             } else {
-                MessageToast.show(this.i18nModel.getText("msgSchemeDetailErrorSave"));
+                MessageToast.show(this.i18nModel.getText("msgTraineeformerror"));
             }
             oView.byId("QF_id_PDFBtn").setEnabled(true);
             await this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: this.oModel.getProperty("/QuotationFormData/BranchCode") });
@@ -247,7 +247,7 @@ sap.ui.define([
                         this.oModel.setProperty("/QuotationFormData/QuotationNumber", response.QuotationNumber);
                         this._submitSuccess();
                     } else {
-                        MessageToast.show(this.i18nModel.getText("msgSchemeDetailErrorSave"));
+                        MessageToast.show(this.i18nModel.getText("msgTraineeformerror"));
                     }
                 }
                 else {
@@ -268,7 +268,7 @@ sap.ui.define([
                     type: sap.m.DialogType.Message,
                     state: "Success",
                     content: new sap.m.Text({
-                        text: `${that.i18nModel.getText("quotation")} (${that.oModel.getProperty("/QuotationFormData/QuotationNumber")}) ${that.i18nModel.getText("msgCustomer3")}.`,
+                        text: that.i18nModel.getText("qCreateSuccess"),
                     }),
                     buttons: [
                         new sap.m.Button({
