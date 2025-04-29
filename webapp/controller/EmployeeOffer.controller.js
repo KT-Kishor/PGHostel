@@ -18,9 +18,9 @@ sap.ui.define([
             },
             _onRouteMatched: async function (oEvent) {
                 this.getBusyDialog();
-                this.commonLoginFunction("EmployeeOffer");
-                await this._fetchCommonData("Designation", "DesignationModel");
-                await this._fetchCommonData("AppVisibility", "RoleModel");
+                this.commonLoginFunction("EmployeeOffer"); // common login function
+                await this._fetchCommonData("Designation", "DesignationModel"); // common designation read call
+                await this._fetchCommonData("AppVisibility", "RoleModel"); // common role get call
                 var oRoleModel = this.getView().getModel("RoleModel");
                 if (oRoleModel) {
                     var aRoles = oRoleModel.getData();
@@ -29,11 +29,11 @@ sap.ui.define([
                     });
                     oRoleModel.setData(aRoles);
                 }
-                await this._fetchCommonData("EmployeeDetailsData", "EmployeeModel");
+                await this._fetchCommonData("EmployeeDetailsData", "EmployeeModel"); // employee read get call
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
                 this.byId("EO_id_RejectBtn").setEnabled(false);
-                await this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                await this._fetchCommonData("BaseLocation", "BaseLocationModel"); // base location read call
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 this.Filter = true;
@@ -42,10 +42,10 @@ sap.ui.define([
                     this.EO_onPressClear();
                 }
                 else {
-                    this.EO_onSearch();
+                    this.EO_onSearch(); 
                 }
-
             },
+            // Read call for employee offer data
             readCallForEmployeeOffer: async function (filter) {
                 this.getBusyDialog();
                 await this.ajaxReadWithJQuery("EmployeeOffer", filter).then((oData) => {
@@ -63,15 +63,17 @@ sap.ui.define([
                     MessageBox.error("Error while reading the employee offer details")
                 })
             },
+            //Back to tile page
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
+            //Logout function
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
                 this.CommonLogoutFunction();
             },
+            //Navigation function
             EO_onPressEmployee: function (oEvent) {
-                //this.getBusyDialog();
                 var oParValue, value;
                 if (oEvent.getSource().getId().lastIndexOf("EO_id_AddEOffBut") !== -1) {
                     oParValue = "CreateOfferFlag"
@@ -85,12 +87,15 @@ sap.ui.define([
                     sParEmployee: value
                 });
             },
+            //Onboard call
             EO_onOnboardPress: async function () {
                 this.onHandleEmployeeAction("OnBoarded", "onBoardEmployee");
             },
+            //reject call
             EO_onRejectPress: function () {
                 this.onHandleEmployeeAction("Rejected", "onRejectEmployee");
             },
+            //Search call for filtering
             EO_onSearch: function () {
                 this.getBusyDialog();
                 var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
@@ -111,7 +116,7 @@ sap.ui.define([
                 if (params && Object.keys(params).length > 0) {
                     this.Filter = false;
                 }
-                this.readCallForEmployeeOffer(params);
+                this.readCallForEmployeeOffer(params); // after filtering read call
                 this.EO_ButtonVisibility();
             },
             // Update the status to 'Rejected' after confirmation
@@ -121,11 +126,13 @@ sap.ui.define([
                 this.readCallForEmployeeOffer("");
                 this.EO_ButtonVisibility();
             },
+            //Common button visibility
             EO_ButtonVisibility: function () {
                 this.byId("EO_id_TableEOffer").removeSelections(true);
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
                 this.byId("EO_id_RejectBtn").setEnabled(false);
             },
+            //Clear filter function
             EO_onPressClear: function () {
                 var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
                 aFilterItems.forEach(function (oItem) {
@@ -143,6 +150,7 @@ sap.ui.define([
                     }
                 });
             },
+            //Common  reject or onboard action handling
             onHandleEmployeeAction: function (status, actionMethod) {
                 var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
                 this.oSelectedRow = oSelectedData;
@@ -161,7 +169,7 @@ sap.ui.define([
                     sMessage,
                     function () { // onConfirm
                         if (status === "OnBoarded") {
-                            const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({
+                            const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({   //Common json data passing from frontend all record will be created from backend
                                 ID: oSelectedData.ID,
                                 Salutation: oSelectedData.Salutation,
                                 EmployeeName: oSelectedData.ConsultantName,
@@ -218,8 +226,8 @@ sap.ui.define([
                     that.i18nModel.getText("CancelButton")
                 );
             },
+            //Common Dialog opening function
             _commonFragmentOpenOffer: function (name, fragmentName) {
-                this.getBusyDialog();          
                       if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.OnboardEmployee",
@@ -230,12 +238,10 @@ sap.ui.define([
                         sap.ui.getCore().byId("OEF_id_DateofBirth").setMaxDate(new Date());
                         this._FragmentDatePickersReadOnly(["OEF_id_DateofBirth"]);
                         this.oDialog.open();
-                        this.closeBusyDialog();              
                           })
                 } else {
                     this._FragmentDatePickersReadOnly(["OEF_id_DateofBirth"]);
                     this.oDialog.open();
-                    this.closeBusyDialog();
                 }
             },
             OEF_onPressClose: function () {
@@ -246,18 +252,23 @@ sap.ui.define([
                 this.oDialog.close();
                 this.EO_ButtonVisibility();
             },
+            //Validate date 
             validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
             },
+            //Validate email
             validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
             },
+            //Validate mobile 
             validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
             },
+            //Validate comobox
             validateCombo: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
             },
+            //Onboard function
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
                 if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
@@ -284,7 +295,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
-
+            //Common update function
             updateCallForEmployeeOffer: async function (oStatus) {
                 this.getBusyDialog();
                 this.oSelectedRow.Status = oStatus;
@@ -294,7 +305,7 @@ sap.ui.define([
                         "ID": this.oSelectedRow.ID
                     }
                 };
-                // First call for EmployeeOffer
+                // call for EmployeeOffer
                 await this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer).then((oData) => {
                     if (oData.success) {
                         var sSuccessMessage = (oStatus === "OnBoarded")
@@ -320,6 +331,7 @@ sap.ui.define([
                     this.byId("EO_id_RejectBtn").setEnabled(!isDisabled);
                 }
             },
+            //Base location change code change
             EO_onBaseLocationChange: function (oEvent) {
                 var sSelectedKey = oEvent.getSource().getSelectedKey();
                 var oBaseLocationModel = this.getView().getModel("BaseLocationModel");
@@ -332,6 +344,5 @@ sap.ui.define([
                     oEmpModel.setProperty("/BranchCode", oSelectedLocation.branchCode);
                 }
             }
-
         });
     });

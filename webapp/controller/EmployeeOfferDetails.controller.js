@@ -14,7 +14,7 @@ sap.ui.define([
             },
             _onRouteMatched: async function (oEvent) {
                 this.getBusyDialog();
-                this.commonLoginFunction("EmployeeOffer");
+                this.commonLoginFunction("EmployeeOffer"); //common login function
                 this.byId("EOD_id_Joindate").setMinDate(new Date());
                 this.sArgPara = oEvent.getParameter("arguments").sParOffer
                 this.sSalutationArg = oEvent.getParameter("arguments").sParEmployee;
@@ -22,11 +22,11 @@ sap.ui.define([
                 this.getView().byId("EOD_id_BondCombo").setVisible(false);
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                await this._fetchCommonData("Designation", "DesignationModel");
-                await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                await this._fetchCommonData("Currency", "CurrencyModel");
-                await this._fetchCommonData("AppVisibility", "RoleModel")
-                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" });
+                await this._fetchCommonData("Designation", "DesignationModel");//designation get call
+                await this._fetchCommonData("BaseLocation", "BaseLocationModel"); //base location get call
+                await this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
+                await this._fetchCommonData("AppVisibility", "RoleModel") // role get call
+                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
                 var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",
@@ -64,24 +64,27 @@ sap.ui.define([
                 ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_PinCode"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
+                //create case
                 if (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") {
                     var createPage = true, updatePage = false;
                     if (this.sArgPara !== "CreateOfferFlag") {
                         this.getView().getModel("employeeModel").setProperty("/ConsultantName", this.sArgPara);
                         this.getView().getModel("employeeModel").setProperty("/Salutation", this.sSalutationArg);
                     }
-                    this.EOD_onResetWizard();
+                    this.EOD_onResetWizard(); // reset wizard 
+                    //update case
                 } else {
                     var createPage = false, updatePage = true;
                     var oBasicDetailsSection = this.getView().byId("EODF_id_BasicDetailsSection");
                     this.getView().byId("EODF_id_ObjectPageLayoutEmp").setSelectedSection(oBasicDetailsSection);
                     this.readCallForEmployeeOffer(this.sArgPara);
                 }
-                this.getView().byId("EOD_id_PageCrate").setVisible(createPage);
-                this.getView().byId("EODF_id_PageUpdate").setVisible(updatePage);
+                this.getView().byId("EOD_id_PageCrate").setVisible(createPage); // create page visibility
+                this.getView().byId("EODF_id_PageUpdate").setVisible(updatePage); // update page visibilty
                 this.getView().byId("EOD_id_Submit").setEnabled(false);
-                this._makeDatePickersReadOnly(["EOD_id_Reldate", "EOD_id_Joindate", "EOUF_id_Reldate", "EOUF_id_Joindate"]);
+                this._makeDatePickersReadOnly(["EOD_id_Reldate", "EOD_id_Joindate", "EOUF_id_Reldate", "EOUF_id_Joindate"]); // make date only read
             },
+            //Edit or save in update case
             EOUF_onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");
                 // Check if in edit mode
@@ -89,7 +92,7 @@ sap.ui.define([
                     var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
-                    if (isValid) this.updateCallForEmployeeOffer(oViewModel, "offerUpdateSucc", ["EOU_id_Form"]);
+                    if (isValid) this.updateCallForEmployeeOffer(oViewModel, "offerUpdateSucc");
                     else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 } else {
                     // Enable edit mode and make CTC field visible
@@ -98,9 +101,11 @@ sap.ui.define([
                     oViewModel.setProperty("/isCTCVisible", true);
                 }
             },
+            //Navigate back to offer view
             EOD_onPressBack: function () {
                 this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
             },
+            //Update call 
             updateCallForEmployeeOffer: async function (oViewModel, text) {
                 this.getBusyDialog();
                 var oModel = this.getView().getModel("employeeModel").getData();
@@ -133,6 +138,7 @@ sap.ui.define([
                     MessageToast.show(error.responseText);
                 })
             },
+            //Read call
             readCallForEmployeeOffer: async function (sArgPara) {
                 var queryString = $.param({
                     "ID": sArgPara
@@ -162,31 +168,37 @@ sap.ui.define([
                     MessageToast.show(error.responseText);
                 })
             },
+            //Validate name
             EOD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
                 this.EOD_validateStep();
             },
+            //Validate email
             EOD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
                 this.EOD_validateStep();
             },
+            //validate pincode
             EOD_validatePinCode: function (oEvent) {
                 utils._LCvalidatePinCode(oEvent);
                 this.EOD_validateStep();
             },
+            //validate amount
             EOD_validateAmount: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
                 this.EOD_validateStep();
                 this.EOD_onTDSCheckboxChange();
             },
+            //validate joining bonus
             EOD_validateJoiningBonus: function (oEvent) {
                 utils._LCvalidateJoiningBonus(oEvent)
             },
+            //validate combobox
             EOD_validateCombobox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 this.EOD_validateStep();
             },
-
+            //validate date
             EOD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent); // Base validation
                 this.EOD_validateStep(); // Step validation
@@ -208,6 +220,7 @@ sap.ui.define([
                     }
                 }
             },
+            //validate common field
             EOD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 this.EOD_validateStep();
@@ -308,13 +321,14 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
-
+           //visibility of bond dropdown
             EOD_onRadioButtonSelect: function (oEvent) {
                 if (oEvent.getParameter("selectedIndex") === 0) var sValue = true;
                 else var sValue = false;
                 this.getView().byId("EOD_id_BondCombo").setVisible(sValue);
                 this.getView().byId("EOD_id_Lyear").setVisible(sValue);
             },
+            //TDS check box
             EOD_onTDSCheckboxChange: function () {
                 var ID = (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") ? "EOD_id_RadioButTds" : "EOUF_id_RadioButTds";
                 var oTdsVal = this.byId(ID).getAggregation("buttons")[this.byId(ID).getSelectedIndex()].getProperty("text");
@@ -323,6 +337,7 @@ sap.ui.define([
                 if (this.getView().getModel("employeeModel").getProperty("/CTC"))
                     this._calculateSalaryComponents(oTdsVal);
             },
+            //Step two validation
             EOD_onStep2: function () {
                 this.getView().byId("EOD_id_Submit").setEnabled(true);
                 var oTdsVal = this.byId("EOD_id_RadioButTds").getAggregation("buttons")[this.byId("EOD_id_RadioButTds").getSelectedIndex()].getProperty("text");
@@ -332,7 +347,7 @@ sap.ui.define([
                 if (oModel.Designation === "") this.getView().getModel("employeeModel").setProperty("/Designation", this.byId("EOD_id_Designation").getSelectedKey())
                 this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(false);
             },
-
+            //common dialog
             EOD_commonOpenDialog: function (fragmentName) {
                 if (!this.EOU_oDialogMail) {
                     sap.ui.core.Fragment.load({
@@ -347,6 +362,7 @@ sap.ui.define([
                     this.EOU_oDialogMail.open();
                 }
             },
+            //Send mail function
             EOUF_onSendEmail: function () {
                 var oEmployeeEmail = this.getView().getModel("employeeModel").getData().EmployeeEmail;
                 if (!oEmployeeEmail || oEmployeeEmail.length === 0) {
@@ -367,11 +383,13 @@ sap.ui.define([
                 this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
             },
+            //close mail dialog
             Mail_onPressClose: function () {
                 this.EOU_oDialogMail.destroy();
                 this.EOU_oDialogMail = null;
                 this.EOU_oDialogMail.close();
             },
+            //File upload function calling from base controller
             Mail_onUpload: function (oEvent) {
                 this.handleFileUpload(
                     oEvent,
@@ -387,16 +405,18 @@ sap.ui.define([
                     () => this.validateSendButton()
                 );
             },
+            //Mail dialog button visibility
             validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                 const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
                 const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
                 sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
-
+            //If mail changing then check validation
             Mail_onEmailChange: function () {
-                this.validateSendButton(); // Reuse from BaseController
+                this.validateSendButton(); 
             },
+            //Send mail
             Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("employeeModel").getData();
                 var oPayload = {
@@ -408,7 +428,6 @@ sap.ui.define([
                 };
                 this.getBusyDialog();
                 this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload).then((oData) => {
-                    //this.getBusyDialog();
                     this.getView().getModel("employeeModel").setProperty("/Status", "Offer Sent");
                     this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
@@ -419,6 +438,7 @@ sap.ui.define([
                 });
                 this.Mail_onPressClose();
             },
+            //back confirmation
             EOD_onPressBackBtn: function () {
                 this.showConfirmationDialog(
                     this.i18nModel.getText("ConfirmActionTitle"),
@@ -429,7 +449,7 @@ sap.ui.define([
                 );
                 this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
             },
-
+            //PDF download function
             EOUF_onPressMerge: async function () {
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);
@@ -438,9 +458,9 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("pdfSucces"));
 
             },
+            //pdf generate function
             async offerGeneratingPdfFunction(oModel) {
                 var oEmpModel = oModel.getData();
-               // BusyIndicator.show(0);
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
                 var oPDFModel = this.getView().getModel("PDFData");
@@ -478,7 +498,6 @@ sap.ui.define([
                 }
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                    //BusyIndicator.hide();
                     MessageToast.show("Company not found on selected branch. Please check and try again.");
                     return;
                 }
@@ -495,13 +514,12 @@ sap.ui.define([
                 }
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
-                       // BusyIndicator.show(0);
                         jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
                     } else {
-                       // BusyIndicator.hide();
                     }
                 }
             },
+            //Variable pay function
             EOD_onVariablePayInfoPress: function (oEvent) {
                 if (!this._oPopover) {
                     this._oPopover = new sap.m.Popover({
@@ -527,7 +545,5 @@ sap.ui.define([
                 }
                 this._oPopover.openBy(oEvent.getSource());
             }
-
-
         });
     });
