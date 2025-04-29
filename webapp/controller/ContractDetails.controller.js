@@ -8,7 +8,7 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteContractDetails").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog(); // Show busy dialog
                 this.commonLoginFunction("Contract");
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
@@ -77,9 +77,9 @@ sap.ui.define([
                         oView.byId("C_id_PageCreate").setVisible(true);
                         oView.byId("CUF_id_pageTrainee").setVisible(false);
             
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog(); //  Close BusyDialog
                     } catch (error) {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog(); //  Close BusyDialog
                         sap.m.MessageToast.show(error.message || error.responseText);
                     }
             
@@ -123,9 +123,9 @@ sap.ui.define([
                         this.getView().byId("C_id_PageCreate").setVisible(false);
                         this.getView().byId("CUF_id_pageTrainee").setVisible(true);
                 
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog(); // Close BusyDialog
                     } catch (error) {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog(); // Close BusyDialog
                         sap.m.MessageToast.show(error.message || error.responseText);
                     }
                 }
@@ -154,11 +154,6 @@ sap.ui.define([
             CD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 this.validateStep();
-            },
-            CD_ValidateCommonFields: function (oEvent) {
-                var oInput = oEvent.getSource();
-                utils._LCvalidateMandatoryField(oEvent);
-                if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
             },
             //back function
             CD_onPressback: function () {
@@ -242,7 +237,7 @@ sap.ui.define([
                         default:
                             formattedText = "Hr";
                     }
-            
+
                     var oModel = this.getView().getModel("ContractModelWizart");
                     // Prepare data object with the required fields
                     var data = {
@@ -269,12 +264,15 @@ sap.ui.define([
                         "ContractLocation": (oModel.oData.contractLocation),
                         "AgreementNo": String(1).padStart(2, '0')
                     };
+                    this.getBusyDialog(); // Show busy dialog
                     var response = await this.ajaxCreateWithJQuery("Contract", { data: data });
                     if(response.success===true){
+                        this.closeBusyDialog(); // Close busy dialog
                         MessageToast.show(this.i18nModel.getText("contractSuccess"));
                         this.getRouter().navTo("RouteContract")
                     }
                 } catch (error) {
+                    this.closeBusyDialog(); // Close busy dialog
                     MessageToast.show(error.message || error.responseText);
                 }
             }, 
@@ -333,8 +331,7 @@ sap.ui.define([
                     utils._LCvalidateEmail(this.byId("CU_id_ContractEmailID"), "ID") &&
                     utils._LCvalidateMandatoryField(this.byId("CU_id_ContractAddress"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_ClientReportContact"), "ID") &&
-                    utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.byId("CU_id_Comments"), "ID")
+                    utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") 
                   );
                   if (!isMandatoryValid) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -375,7 +372,7 @@ sap.ui.define([
                 };
             
                 var oldContractData = { "ContractStatus": "Inactive" };
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog(); // Show busy dialog
             
                 // Handle Renewed case
                 if (oModel.ContractStatus === "Renewed" && that.OldStatus !== "Active") {
@@ -384,7 +381,7 @@ sap.ui.define([
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.getView().getModel("viewModel").setProperty("/isEditMode", false);
                     this.byId("CU_id_Mail").setEnabled(true);
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog(); //  Close BusyDialog
                     return sap.m.MessageBox.error(this.i18nModel.getText("contractStatusMessage"));
                 }
             
@@ -405,7 +402,7 @@ sap.ui.define([
                             this.getView().getModel("simpleForm").setProperty("/editable", false);
                             this.getView().getModel("simpleForm").setProperty("/Status", false);
             
-                            sap.ui.core.BusyIndicator.hide();
+                             this.closeBusyDialog(); //  Close BusyDialog
                             sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
                                 onClose: function () {
                                     that.getRouter().navTo("RouteContract");
@@ -413,11 +410,11 @@ sap.ui.define([
                             });
             
                         } catch (error) {
-                            sap.ui.core.BusyIndicator.hide();
+                             this.closeBusyDialog(); //  Close BusyDialog
                             sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
                         }
                     } else {
-                        sap.ui.core.BusyIndicator.hide();
+                         this.closeBusyDialog(); //  Close BusyDialog
                         this.getView().getModel("oFilteredContractModel").setProperty("/ContractStatus", this.ContractStatus);
                         sap.m.MessageBox.error(this.i18nModel.getText("renewEndDateMess"));
                     }
@@ -439,7 +436,7 @@ sap.ui.define([
                         this.getView().getModel("viewModel").setProperty("/isEditMode", false);
                         this.byId("CU_id_Merge").setEnabled(true);
                         this.byId("CU_id_Mail").setEnabled(true);
-                        sap.ui.core.BusyIndicator.hide();
+                         this.closeBusyDialog(); //  Close BusyDialog
             
                         sap.m.MessageBox.success(this.i18nModel.getText("agreementUpdatedSuccess"), {
                             onClose: function () {
@@ -448,7 +445,7 @@ sap.ui.define([
                         });
             
                     } catch (error) {
-                        sap.ui.core.BusyIndicator.hide();
+                         this.closeBusyDialog(); //  Close BusyDialog
                         sap.m.MessageToast.show(this.i18nModel.getText("updateContractFailed"));
                     }
                 }

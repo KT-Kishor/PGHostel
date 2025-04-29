@@ -11,13 +11,19 @@ sap.ui.define(
                 this.getRouter().getRoute("RouteContract").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched:async function () {
+                this.getBusyDialog(); // Show busy dialog
                 this.commonLoginFunction("Contract"); // Call common login function
                 this.onClearAndSearch("C_id_FilterBar");// Clear and search function
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("contractDetails"));
-                await this._fetchCommonData("Contract", "ContractModel", { startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31` }, ["C_id_Salary"]) // Fetch common data
-                await this._fetchCommonData("ManageCustomer", "CreateCustomerModel"); // fetch customer data
-            },
+                try {
+                    await this._fetchCommonData("Contract", "ContractModel", { startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31` }) // Fetch common data
+                  } catch (error) {
+                    sap.m.MessageToast.show(error.message || error.responseText);
+                  } finally {
+                    this.closeBusyDialog(); // Close after async call finishes
+                  }
+                },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
@@ -57,7 +63,8 @@ sap.ui.define(
                     }
                 });
             },            
-            C_onSearch: function () {
+            C_onSearch: async function () {
+                this.getBusyDialog(); // Show busy dialog
                 var aFilterItems = this.byId("C_id_FilterBar").getFilterGroupItems();
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                 var params = {};
@@ -75,7 +82,13 @@ sap.ui.define(
                     }
                   }
                 });
-                this._fetchCommonData("Contract", "ContractModel", params, ["C_id_Salary"]);
-              },
+                try {
+                   await this._fetchCommonData("Contract", "ContractModel", params);
+                  } catch (error) {
+                    sap.m.MessageToast.show(error.message || error.responseText);
+                  } finally {
+                    this.closeBusyDialog(); // Close after async call finishes
+                  }
+                }
         });
     });

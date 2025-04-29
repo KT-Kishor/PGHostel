@@ -273,7 +273,7 @@ sap.ui.define([
       oModel.setProperty("/IncomeTax", Math.round(IncomeTax_TDS));
       oModel.setProperty("/TotalDeduction", Math.round(DeductionTotal));
       oModel.setProperty("/GrossPay", Math.round(GrossPay));
-      oModel.setProperty("/GrossPayMontly", Math.round(GrossPay * 12 / 100));
+      oModel.setProperty("/GrossPayMontly", Math.round(GrossPay / 12));
 
       oModel.setProperty("/VariablePay", Math.round(VariablePay));
       oModel.setProperty("/CostofCompany", Math.round(CostToCompany));

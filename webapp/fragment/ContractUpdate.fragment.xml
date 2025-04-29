@@ -136,7 +136,7 @@
 										</m:ComboBox>
 
 										<m:Label text="Comments" />
-										<m:TextArea  value="{oFilteredContractModel>/Comments}" id="CU_id_Comments" editable="{simpleForm>/Status}" liveChange="CD_ValidateCommonFields" valueStateText="{i18n>commentsValueState}"  maxLength="200"/>
+										<m:TextArea  value="{oFilteredContractModel>/Comments}" id="CU_id_Comments" editable="{simpleForm>/Status}" valueStateText="{i18n>commentsValueState}"  maxLength="200"/>
 									</f:content>
 								</f:SimpleForm>
 							</blocks>

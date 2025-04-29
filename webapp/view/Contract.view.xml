@@ -46,7 +46,7 @@
                     displayFormat="dd/MM/yyyy"/>						
 					</fb:control>
 						</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="ContractStatus" label="{i18n>contractStatus}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Status" label="{i18n>contractStatus}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
 						<ComboBox showClearIcon="true" selectionChange=".onSelectionChange" items="{AssignmentStatus>/assignmentStatus}">
 							<core:Item key="{AssignmentStatus>ID}" text="{AssignmentStatus>Value}"/>
