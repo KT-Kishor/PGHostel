@@ -19,7 +19,7 @@ sap.ui.define([
                 this.checkLoginModel();
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
                 await this._fetchCommonData("Currency", "CurrencyModel");
-                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });//CC mailId read call
+                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeOffer" });
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 await this._fetchCommonData("EmployeeDetailsData", "empModel");
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
@@ -316,7 +316,7 @@ sap.ui.define([
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
                     ToEmail: oTraineeEmail,
-                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
+                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].CCEmailId,
                     name: "",
                     mimeType: "",
                     content: "",

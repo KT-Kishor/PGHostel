@@ -60,11 +60,8 @@
 							<Label text="{i18n>emailId}" required="true" />
 							<Input value="{oTraineeDetails>/TraineeEmail}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>trainingType}" required="true" />
-							<ComboBox  id="TD_id_TrainingType" placeholder="{i18n>selectType}"  selectedKey="{oTraineeDetails>/Type}"   selectionChange="onTrainingTypeChange" 	change="TD_validateCombo"  width="100%">
-								<items>
-									<core:Item key="Stipend" text="{i18n>stipend}" />
-									<core:Item key="Paid" text="{i18n>paid}" />
-								</items>
+							<ComboBox  id="TD_id_TrainingType" placeholder="{i18n>selectType}"  selectedKey="{oTraineeDetails>/Type}"   selectionChange="onTrainingTypeChange" 	change="TD_validateCombo"  width="100%" items="{TypeModel>/}">
+								<core:ListItem key="{TypeModel>ID}" text="{TypeModel>Type}" />
 							</ComboBox>
 							<Label ></Label>
 							<Label id="TD_id_TrainingAmountLabel" text="{i18n>placeAmount}" visible="false" />

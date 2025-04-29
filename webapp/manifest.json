@@ -192,6 +192,11 @@
                 "type":"sap.ui.model.json.JSONModel",
                 "uri":"model/SowStatus.json",
                 "preload":true
+            },
+            "TypeModel": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/TrainingType.json",
+                "preload": true
             }
         },
         "resources": {

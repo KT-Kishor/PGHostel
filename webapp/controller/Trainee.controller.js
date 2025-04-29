@@ -20,7 +20,7 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 await this._fetchCommonData("Designation", "DesignationModel");
                 await this._fetchCommonData("Department", "Departmentmodel");
-                await this._fetchCommonData("CompanyEmails", "CCMailModel", { applicationName: "Trainee" });
+                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeCertificate" });
                 // common company emails read call
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
@@ -50,11 +50,8 @@ sap.ui.define([
                         this.getView().setModel(new JSONModel(oFilterData), "traineeNameModel");
                         var oFilterData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "").map(item => [item.ReportingManager.trim(), item])).values()];
                         this.getView().setModel(new JSONModel(oFilterData), "reportingManagerModel");
-                        var oFilterData = [...new Map(offerData.filter(item => item.Type && item.Type.trim() !== "").map(item => [item.Type.trim(), item])).values()];
-                        this.getView().setModel(new JSONModel(oFilterData), "typeModel");
                         this.getView().getModel("traineeNameModel").refresh(true);
                         this.getView().getModel("reportingManagerModel").refresh(true);
-                        this.getView().getModel("typeModel").refresh(true);
                         this.Filter = true;
                     }
                     BusyIndicator.hide();
@@ -406,7 +403,7 @@ sap.ui.define([
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
                     ToEmail: oTraineeEmail,
-                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
+                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].CCEmailId,
                     name: "",
                     mimeType: "",
                     content: "",
