@@ -265,7 +265,7 @@ sap.ui.define([
             },
 
             onPressSave: async function () {
-                var comboIds = ["FAA_id_employeeID", "FAA_id_Type","FAA_branch_Id","FAA_id_AssignedBy"];
+                var comboIds = ["FAA_id_employeeID", "FAA_id_Type", "FAA_branch_Id", "FAA_id_AssignedBy"];
 
                 // Collect Input field IDs (not ComboBoxes)
                 var inputIds = ["FAA_id_Model"];
@@ -282,8 +282,7 @@ sap.ui.define([
                 // Validate Inputs
                 var bInputValid = inputIds.every(function (sId) {
                     var oInput = sap.ui.getCore().byId(sId);
-                    return oInput && oInput.getValue && oInput.getValue().trim() !== "";
-                });
+                    return utils._LCvalidateMandatoryField(oInput, sId)});
 
                 try {
                     if (bStrictValid &&
