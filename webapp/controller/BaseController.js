@@ -199,7 +199,6 @@ sap.ui.define([
     },
     //Common delete call for all the app
     async ajaxDeleteWithJQuery(sUrl, oPayLoad) {
-      sap.ui.core.BusyIndicator.show();
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getView().getModel("LoginModel").getData().url + sUrl,
@@ -209,11 +208,9 @@ sap.ui.define([
           data: JSON.stringify(oPayLoad),
           headers: this.getView().getModel("LoginModel").getData().headers,
           success: function (data) {
-            sap.ui.core.BusyIndicator.hide();
             resolve(data);
           },
           error: function (error) {
-            sap.ui.core.BusyIndicator.hide();
             reject(error);
           }
         });

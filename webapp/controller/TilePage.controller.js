@@ -258,7 +258,6 @@ sap.ui.define(
           this.CommonLogoutFunction();
         },
         TileV_onpressAddCustomer: function () {
-          BusyIndicator.show(0);
           this.getRouter().navTo("RouteManageCustomer", { value: "ManageCustomer" });
         },
         TileV_onpressMSA: function () {

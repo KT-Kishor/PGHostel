@@ -4,9 +4,8 @@ sap.ui.define([
   "sap/m/MessageToast", // Import MessageToast for notifications
   "../utils/validation", //  Import formatter utility
   "sap/m/MessageBox", // Import MessageBox for alerts/confirmations
-  "sap/ui/core/BusyIndicator" // Import BusyIndicator for loading state
 ],
-  function (BaseController, JSONModel, MessageToast, utils, MessageBox, BusyIndicator) {
+  function (BaseController, JSONModel, MessageToast, utils, MessageBox) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.ManageCustomer", {
       onInit: function () {
@@ -15,7 +14,7 @@ sap.ui.define([
 
       _onRouteMatched: async function (oEvent) {
         this.commonLoginFunction("Customer"); // Call common login function
-        sap.ui.core.BusyIndicator.show(0); // Show busy indicator
+        this.getBusyDialog(); // Show busy dialog
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
         this.byId("MC_id_CustTable").removeSelections(true); // Clear table selection
         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerCustomer")); // Set header name
@@ -30,7 +29,7 @@ sap.ui.define([
         } catch (error) {
           sap.m.MessageToast.show(error.message || error.responseText);
         } finally {
-          sap.ui.core.BusyIndicator.hide(); // Hide in all cases
+          this.closeBusyDialog(); // Hide in all cases
         }
       },
 
@@ -232,7 +231,7 @@ sap.ui.define([
             MessageToast.show(this.i18nModel.getText("mandetoryChecks"));
             return;
           }
-          BusyIndicator.show(0); // Show busy indicator
+          this.getBusyDialog(); // Show busy dialog 
           // Submit data 
           await this.ajaxCreateWithJQuery("ManageCustomer", { data: oData }).then(function (response) {
             if (response && response.success === true) {
@@ -244,13 +243,13 @@ sap.ui.define([
             }
           }.bind(this))
             .then(function () {
-              BusyIndicator.hide();
+              that.closeBusyDialog();
             }).catch(function (error) {
-              BusyIndicator.hide();
+              that.closeBusyDialog();
               MessageToast.show(error.message || error.responseText);
             }.bind(this));
         } catch (error) {
-          BusyIndicator.hide();
+          that.closeBusyDialog();
           MessageToast.show(error.message || error.responseText);
         }
       },
@@ -290,9 +289,9 @@ sap.ui.define([
             MessageToast.show(this.i18nModel.getText("mandetoryChecks"));
             return;
           }
+          this.getBusyDialog(); // Show busy dialog
           // Send update request
           var requestData = { filters: { ID: sCustomerId }, data: oUpdatedData };
-          BusyIndicator.show(0);
           await this.ajaxUpdateWithJQuery("/ManageCustomer", requestData).then(function (response) {
             if (response.success === true) {
               oTable.removeSelections(true);
@@ -305,13 +304,13 @@ sap.ui.define([
             }
           }.bind(this))
             .then(function () {
-              BusyIndicator.hide();
+              that.closeBusyDialog();
             }).catch(function (error) {
-              BusyIndicator.hide();
+              that.closeBusyDialog();
               MessageToast.show(error.message || error.responseText);
             }.bind(this));
         } catch (error) {
-          BusyIndicator.hide();
+          that.closeBusyDialog();
           MessageToast.show(error.message || error.responseText);
         }
       },
@@ -330,18 +329,17 @@ sap.ui.define([
           this.i18nModel.getText("confirmDeleteCustomerMessage"),
           // onConfirm
           function () {
-            BusyIndicator.show(0);
             that.ajaxDeleteWithJQuery("/ManageCustomer", { filters: { ID: sCustomerID } }).then(() => {
               // Refresh the customer data after deletion
               return that.readCallForManageCustomer("Initial");
             }).then(() => {
-              BusyIndicator.hide();
+              that.closeBusyDialog();
               MessageToast.show(that.i18nModel.getText("msgCustomerDeleteSuccess"));
               that.byId("MC_id_AddCustomer").setEnabled(true);
               oTable.removeSelections(true);
               that.MC_onTableSelectionChange();
             }).catch((error) => {
-              BusyIndicator.hide();
+              that.closeBusyDialog();
               MessageToast.show(error.message || error.responseText);
               oTable.removeSelections(true);
             });
@@ -372,17 +370,17 @@ sap.ui.define([
           }
         });
         this.byId("MC_id_AddCustomer").setEnabled(true);
-        sap.ui.core.BusyIndicator.show(0);
+        this.getBusyDialog(); // Show busy dialog
         await this.readCallForManageCustomer(params).then(() => {
         }).catch((error) => {
           MessageToast.show(error.message || error.responseText);
         }).finally(() => {
-          sap.ui.core.BusyIndicator.hide();
+          this.closeBusyDialog();
         });
       },
 
       readCallForManageCustomer: async function (filter) {
-        BusyIndicator.show(0);
+        this.getBusyDialog(); // <-- Open custom BusyDialog
         await this.ajaxReadWithJQuery("ManageCustomer", filter).then((oData) => {
           var companyData = Array.isArray(oData.data) ? oData.data : [oData.data];
           this.getOwnerComponent().setModel(new JSONModel(companyData), "CreateCustomerModel");
@@ -390,13 +388,14 @@ sap.ui.define([
             var customererData = [...new Map(companyData.filter(item => item.companyName).map(item => [item.companyName.trim(), item])).values()];
             this.getView().setModel(new JSONModel(customererData), "CreateCustomerModelInitial");
           }
-          BusyIndicator.hide();
+          this.closeBusyDialog(); // <-- Close custom BusyDialog
         }).catch((error) => {
-          BusyIndicator.hide();
           sap.m.MessageToast.show(error.message || error.responseText);
+        }).finally(() => {
+          this.closeBusyDialog(); // <-- Close custom BusyDialog
         });
       },
-
+      
       // Handle Table Row Selection - Enable/Disable Buttons
       MC_onTableSelectionChange: function () {
         var aSelectedItems = this.byId("MC_id_CustTable").getSelectedItems();
