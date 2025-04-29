@@ -71,6 +71,7 @@ sap.ui.define([
                 this.CommonLogoutFunction();
             },
             EO_onPressEmployee: function (oEvent) {
+                //this.getBusyDialog();
                 var oParValue, value;
                 if (oEvent.getSource().getId().lastIndexOf("EO_id_AddEOffBut") !== -1) {
                     oParValue = "CreateOfferFlag"

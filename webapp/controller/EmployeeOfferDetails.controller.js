@@ -69,7 +69,6 @@ sap.ui.define([
                     if (this.sArgPara !== "CreateOfferFlag") {
                         this.getView().getModel("employeeModel").setProperty("/ConsultantName", this.sArgPara);
                         this.getView().getModel("employeeModel").setProperty("/Salutation", this.sSalutationArg);
-                        this.closeBusyDialog();
                     }
                     this.EOD_onResetWizard();
                 } else {
@@ -82,7 +81,6 @@ sap.ui.define([
                 this.getView().byId("EODF_id_PageUpdate").setVisible(updatePage);
                 this.getView().byId("EOD_id_Submit").setEnabled(false);
                 this._makeDatePickersReadOnly(["EOD_id_Reldate", "EOD_id_Joindate", "EOUF_id_Reldate", "EOUF_id_Joindate"]);
-                this.closeBusyDialog();
             },
             EOUF_onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");
@@ -125,7 +123,6 @@ sap.ui.define([
                         oViewModel.setProperty("editBut", true);
                         oViewModel.setProperty("/isVisiable", true);
                         oViewModel.setProperty("/isCTCVisible", false);
-                        this.getBusyDialog();
                         if (text && text !== "silent") {
                             MessageToast.show(this.i18nModel.getText(text));
                         }
@@ -137,7 +134,6 @@ sap.ui.define([
                 })
             },
             readCallForEmployeeOffer: async function (sArgPara) {
-                var that=this;
                 var queryString = $.param({
                     "ID": sArgPara
                 });
@@ -160,9 +156,9 @@ sap.ui.define([
                         oViewModel.setProperty("/isVisiable", true);
                         oViewModel.setProperty("editBut", true);
                     }
-                    that.closeBusyDialog();
+                    this.closeBusyDialog();
                 }).catch((error) => {
-                    that.closeBusyDialog();
+                    this.closeBusyDialog();
                     MessageToast.show(error.responseText);
                 })
             },
@@ -232,6 +228,7 @@ sap.ui.define([
             },
             // Reset wizard to initial state
             EOD_onResetWizard: function () {
+                this.closeBusyDialog();
                 var oWizard = this.getView().byId("EOD_id_Wizard");
                 oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
                 oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
@@ -337,7 +334,6 @@ sap.ui.define([
             },
 
             EOD_commonOpenDialog: function (fragmentName) {
-                this.getBusyDialog();
                 if (!this.EOU_oDialogMail) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -346,11 +342,9 @@ sap.ui.define([
                         this.EOU_oDialogMail = EOU_oDialogMail;
                         this.getView().addDependent(this.EOU_oDialogMail);
                         this.EOU_oDialogMail.open();
-                        this.closeBusyDialog();
                     }.bind(this));
                 } else {
                     this.EOU_oDialogMail.open();
-                    this.closeBusyDialog();
                 }
             },
             EOUF_onSendEmail: function () {
@@ -412,15 +406,16 @@ sap.ui.define([
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                     "Designation": oModel.Designation
                 };
+                this.getBusyDialog();
                 this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload).then((oData) => {
-                    this.getBusyDialog();
+                    //this.getBusyDialog();
                     this.getView().getModel("employeeModel").setProperty("/Status", "Offer Sent");
                     this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
                     this.closeBusyDialog();
                 }).catch((error) => {
-                    MessageToast.show(error.responseText);
                     this.closeBusyDialog();
+                    MessageToast.show(error.responseText);
                 });
                 this.Mail_onPressClose();
             },
