@@ -109,7 +109,7 @@
             class="sapUiTinyMargin"
             alternateRowColors="true"
             busyIndicatorDelay="0"
-            width="230em"
+            width="300em"
             id="id_Table"
             items="{Payroll>/TableData}"
             growing="true"
@@ -368,61 +368,13 @@
                     width="12%"
                     hAlign="End"
                 >
-                    <Text text="{i18n>grossPay}" />
+                    <Text text="{i18n>basic}" />
                 </Column>
                 <Column
                     width="12%"
                     hAlign="End"
                 >
-                    <Text text="{i18n>actualPay}" />
-                </Column>
-                <Column
-                    width="9%"
-                    hAlign="End"
-                >
-                    <Text text="{i18n>tds}" />
-                </Column>
-                <Column
-                    width="12%"
-                    hAlign="End"
-                >
-                    <Text text="{i18n>eplyePF}" />
-                </Column>
-                <Column
-                    width="8%"
-                    hAlign="End"
-                >
-                    <Text text="{i18n>pt}" />
-                </Column>
-                <Column
-                    width="10%"
-                    hAlign="End"
-                >
-                    <Text text="{i18n>sd}" />
-                </Column>
-                <Column
-                    width="10%"
-                    hAlign="End"
-                >
-                    <Text text="{i18n>eplyeESI}" />
-                </Column>
-                <Column
-                    width="9%"
-                    hAlign="End"
-                >
-                    <Text text="{i18n>advance}" />
-                </Column>
-                <Column
-                    width="9%"
-                    hAlign="End"
-                >
-                    <Text text="{i18n>other}" />
-                </Column>
-                <Column
-                    width="12%"
-                    hAlign="End"
-                >
-                    <Text text="{i18n>netPay}" />
+                    <Text text="{i18n>hra}" />
                 </Column>
                 <Column
                     width="12%"
@@ -435,6 +387,84 @@
                     hAlign="End"
                 >
                     <Text text="{i18n>eplyrESI}" />
+                </Column>
+                <Column
+                    width="10%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>medicalInsurance}" />
+                </Column>
+                <Column
+                    width="10%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>specialAllowence}" />
+                </Column>
+                <Column
+                    width="9%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>advance}" />
+                </Column>
+                <Column
+                    width="9%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>tds}" />
+                </Column>
+                <Column
+                    width="9%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>gratuity}" />
+                </Column>
+                <Column
+                    width="12%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>eplyePF}" />
+                </Column>
+                <Column
+                    width="10%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>eplyeESI}" />
+                </Column>
+                <Column
+                    width="8%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>pt}" />
+                </Column>
+                <Column
+                    width="10%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>advanceDeduction}" />
+                </Column>
+                <Column
+                    width="10%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>variablePay}" />
+                </Column>
+                <Column
+                    width="10%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>sd}" />
+                </Column>
+                <Column
+                    width="9%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>other}" />
+                </Column>
+                <Column
+                    width="12%"
+                    hAlign="End"
+                >
+                    <Text text="{i18n>grossPay}" />
                 </Column>
             </columns>
             <items>
@@ -481,18 +511,23 @@
                         <Text text="{Payroll>TotalSun}" />
                         <Text text="{Payroll>TotalSunP}" />
                         <Text text="{Payroll>PayDays}" />
-                        <Text text="{Payroll>GrossPay}" />
-                        <Text text="{Payroll>ActualPay}" />
-                        <Text text="{Payroll>TDS}" />
-                        <Text text="{Payroll>EplyePF}" />
-                        <Text text="{Payroll>PT}" />
-                        <Text text="{Payroll>SD}" />
-                        <Text text="{Payroll>EplyeESI}" />
-                        <Text text="{Payroll>Advance}" />
-                        <Text text="{Payroll>Other}" />
-                        <Text text="{Payroll>NetPay}" />
+                        <Text text="{Payroll>Basic}" />
+                        <Text text="{Payroll>HRA}" />
                         <Text text="{Payroll>EplyrPF}" />
                         <Text text="{Payroll>EplyrESI}" />
+                        <Text text="{Payroll>MedInsurance}" />
+                        <Text text="{Payroll>SpecAllowance}" />
+                        <Text text="{Payroll>Advance}" />
+                        <Text text="{Payroll>TDS}" />
+                        <Text text="{Payroll>Gratuity}" />
+                        <Text text="{Payroll>EplyePF}" />
+                        <Text text="{Payroll>EplyeESI}" />
+                        <Text text="{Payroll>PT}" />
+                        <Text text="{Payroll>AdvanceDeduction}" />
+                        <Text text="{Payroll>VariablePay}" />
+                        <Text text="{Payroll>SD}" />
+                        <Text text="{Payroll>Other}" />
+                        <Text text="{Payroll>GrossPay}" />
                     </cells>
                 </ColumnListItem>
             </items>

@@ -121,18 +121,23 @@ sap.ui.define(
                     TotalSunP: 0,
                     TotalSun: 0,
                     PayDays: 0,
-                    GrossPay: 0,
-                    ActualPay: 0,
-                    TDS: 0,
-                    EplyePF: 0,
+                    Basic: 0,
+                    HRA: 0,
                     EplyrPF: 0,
-                    PT: 0,
-                    SecurityDeposit: 0,
-                    EplyeESI: 0,
                     EplyrESI: 0,
+                    MedInsurance: 0,
+                    SpecAllowance: 0,
                     Advance: 0,
+                    TDS: 0,
+                    Gratuity: 0,
+                    EplyePF: 0,
+                    EplyeESI: 0,
+                    PT: 0,
+                    AdvanceDeduction: 0,
+                    VariablePay: 0,
+                    SecurityDeposit: 0,
                     Other: 0,
-                    NetPay: 0,
+                    GrossPay: 0,
                     Status: "Saved",
                     UploadedBy: employeeName,
                     ChangedBy: ""
@@ -271,21 +276,28 @@ sap.ui.define(
           }
 
           // **Salary Calculations**
-          record.GrossPay = parseFloat(empSal.GrossPayMontly) || 0;
-          record.ActualPay = parseFloat(((record.GrossPay / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
-          record.TDS = parseFloat((empSal.IncomeTax / 12).toFixed(2)) || 0;
-          record.EplyePF = parseFloat((empSal.EmployeePF / 12).toFixed(2)) || 0;
-          record.EplyrPF = parseFloat((empSal.EmployerPF / 12).toFixed(2)) || 0;
-          record.PT = parseFloat((empSal.PT / 12).toFixed(2)) || 0;          
+          record.Basic = +((((+(empSal.BasicSalary)/12) / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
+          record.HRA = +((((+(empSal.HRA)/12) / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
+          record.EplyrPF = +((((+(empSal.EmployerPF)/12) / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
+          record.MedInsurance = +((((+(empSal.MedicalInsurance)/12) / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
+          record.SpecAllowance = +((((+(empSal.SpecailAllowance)/12) / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
+          record.TDS = +((((+(empSal.IncomeTax)/12) / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
+          record.Gratuity = +((((+(empSal.Gratuity)/12) / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
+          record.EplyePF = +((((+(empSal.EmployeePF)/12) / record.TotalDays) * record.PayDays).toFixed(2)) || 0;
+          record.PT = +((+(empSal.PT)/12).toFixed(2)) || 0;        
+          record.VariablePay = +((+(empSal.VariablePay)/12).toFixed(2)) || 0;        
 
           // ESI calculation based on GrossPay condition
-          if (record.GrossPay <= 21000) {
-            record.EplyeESI = parseFloat((parseFloat(record.GrossPay) * (0.75 / 100)).toFixed(2)) || 0;
-            record.EplyrESI = parseFloat((parseFloat(record.GrossPay) * (3.25 / 100)).toFixed(2)) || 0;
+          if (empSal.GrossPayMontly <= 21000) {
+            record.EplyeESI = +((+(empSal.GrossPayMontly) * (0.75 / 100)).toFixed(2)) || 0;
+            record.EplyrESI = +((+(empSal.GrossPayMontly) * (3.25 / 100)).toFixed(2)) || 0;
           }
 
-          // Final NetPay calculation
-          record.NetPay = parseFloat((record.ActualPay + record.EplyePF - record.PT - record.TDS + record.SecurityDeposit - record.EplyeESI - record.Advance + record.Other).toFixed(2)) || 0;
+          // Final GrossPay calculation
+          record.GrossPay = +((record.Basic + record.HRA + record.EplyrPF + record.MedInsurance + record.SpecAllowance + record.SecurityDeposit + record.Advance - record.TDS - record.Gratuity - record.EplyePF - record.EplyeESI - record.PT - record.AdvanceDeduction).toFixed(2)) || 0;
+          if(record.Month === "03"){
+            record.GrossPay = +((record.GrossPay + +(empSal.VariablePay)).toFixed(2));
+          }
         }
         this._sortAndFormatRecords(records);
       },
@@ -312,18 +324,23 @@ sap.ui.define(
             "TotalSunP": record["TotalSunP"] ? record["TotalSunP"].toString() : "0",
             "TotalSun": record["TotalSun"] ? record["TotalSun"].toString() : "0",
             "PayDays": record["PayDays"] ? record["PayDays"].toString() : "0",
-            "GrossPay": record["GrossPay"] ? record["GrossPay"].toString() : "0",
-            "ActualPay": record["ActualPay"] ? record["ActualPay"].toString() : "0",
-            "TDS": record["TDS"] ? record["TDS"].toString() : "0",
-            "EplyePF": record["EplyePF"] ? record["EplyePF"].toString() : "0",
-            "PT": record["PT"] ? record["PT"].toString() : "0",
-            "SD": record["SecurityDeposit"] ? record["SecurityDeposit"].toString() : "0",
-            "EplyeESI": record["EplyeESI"] ? record["EplyeESI"].toString() : "0",
-            "Advance": record["Advance"] ? record["Advance"].toString() : "0",
-            "Other": record["Other"] ? record["Other"].toString() : "0",
-            "NetPay": record["NetPay"] ? record["NetPay"].toString() : "0",
+            "Basic": record["Basic"] ? record["Basic"].toString() : "0",
+            "HRA": record["HRA"] ? record["HRA"].toString() : "0",
             "EplyrPF": record["EplyrPF"] ? record["EplyrPF"].toString() : "0",
             "EplyrESI": record["EplyrESI"] ? record["EplyrESI"].toString() : "0",
+            "MedInsurance": record["MedInsurance"] ? record["MedInsurance"].toString() : "0",
+            "SpecAllowance": record["SpecAllowance"] ? record["SpecAllowance"].toString() : "0",
+            "Advance": record["Advance"] ? record["Advance"].toString() : "0",
+            "TDS": record["TDS"] ? record["TDS"].toString() : "0",
+            "Gratuity": record["Gratuity"] ? record["Gratuity"].toString() : "0",
+            "EplyePF": record["EplyePF"] ? record["EplyePF"].toString() : "0",
+            "EplyeESI": record["EplyeESI"] ? record["EplyeESI"].toString() : "0",
+            "PT": record["PT"] ? record["PT"].toString() : "0",
+            "AdvanceDeduction": record["AdvanceDeduction"] ? record["AdvanceDeduction"].toString() : "0",
+            "VariablePay": record["VariablePay"] ? record["VariablePay"].toString() : "0",
+            "SD": record["SecurityDeposit"] ? record["SecurityDeposit"].toString() : "0",
+            "Other": record["Other"] ? record["Other"].toString() : "0",
+            "GrossPay": record["GrossPay"] ? record["GrossPay"].toString() : "0",
             "Status": record["Status"] ? record["Status"].toString() : "",
             "UploadedBy": record["UploadedBy"] ? record["UploadedBy"].toString() : "",
             "ChangedBy": record["ChangedBy"] ? record["ChangedBy"].toString() : "",

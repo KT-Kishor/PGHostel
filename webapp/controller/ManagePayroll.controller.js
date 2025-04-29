@@ -79,9 +79,10 @@ sap.ui.define(
             "Branch", "Month", "Year", "EmployeeID", "EmployeeName",
             ...Array.from({ length: 31 }, (_, i) => `Day${i + 1}`),
             "TotalDays", "TotalPresent", "TotalAbsent", "ActualAbsent", "TotalLate",
-            "TotalHalf", "TotalSunP", "TotalSun", "PayDays", "GrossPay", "ActualPay",
-            "TDS", "EplyePF", "PT", "SD", "EplyeESI", "Advance", "Other", "NetPay",
-            "EplyrPF", "EplyrESI", "Status", "UploadedBy", "ChangedBy"
+            "TotalHalf", "TotalSunP", "TotalSun", "PayDays", "Basic", "HRA", "EplyrPF", "EplyrESI", 
+            "MedInsurance", "SpecAllowance", "Advance", "TDS", "Gratuity", 
+            "EplyePF", "EplyeESI", "PT", "AdvanceDeduction", "VariablePay", "SD", "Other", 
+            "GrossPay", "Status", "UploadedBy", "ChangedBy"
           ];
 
           const result = fields.reduce((acc, field) => {
@@ -113,12 +114,12 @@ sap.ui.define(
             var sheetData = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
             var isMismatch = sheetData.some(row => {
               var matchingRecord = payrollData.find(record =>
-                record["Branch"] === row["Branch"] || "" &&
-                record["Month"] === row["Month"] || "" &&
-                record["Year"] === row["Year"] || "" &&
-                record["EmployeeID"] === row["EmployeeID"] || "" &&
-                record["ActualPay"] === row["ActualPay"] || "" &&
-                record["UploadedBy"] === row["UploadedBy"] || ""
+                record["Branch"] === row["Branch"] &&
+                record["Month"] === row["Month"] &&
+                record["Year"] === row["Year"] &&
+                record["EmployeeID"] === row["EmployeeID"] &&
+                record["Basic"] === row["Basic"] &&
+                record["UploadedBy"] === row["UploadedBy"]
               );
               return !matchingRecord; // Return true if mismatch found
             });
@@ -199,6 +200,7 @@ sap.ui.define(
                 text: that.i18nModel.getText("OkButton"),
                 type: "Accept",
                 press: async function () {
+                  BusyIndicator.show(0);
                   that._oWarningDialog.close();
                   var response = await that.ajaxDeleteWithJQuery("A_Payroll", { filters: { Branch: that.oModel.getProperty("/FilterBranch"), Month: that.oModel.getProperty("/FilterMonth"), Year: that.oModel.getProperty("/FilterYear") } });
                   if (response.success) {
@@ -209,6 +211,7 @@ sap.ui.define(
                   } else {
                     MessageToast.show(that.i18nModel.getText("msgSchemeUploadFailed"));
                   }
+                  BusyIndicator.hide();
                 },
               }),
               new sap.m.Button({
