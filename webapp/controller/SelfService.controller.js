@@ -535,7 +535,7 @@ sap.ui.define([
                     function () {
                         that.ajaxDeleteWithJQuery("/EmploymentDetails", { filters: { ID: oContext } }).then(() => {
                             sap.m.MessageToast.show(that.i18nModel.getText("empDataDeleteSuccess"));
-                            that._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: that.EmployeeID }, ["EmpF_id_EmpTable"]);
+                            that._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: that.EmployeeID });
                             that.setEmpButtonsEnabled(false);
                         }).catch((error) => {
                             sap.m.MessageToast.show(error.responseText);
@@ -589,7 +589,6 @@ sap.ui.define([
                             oDialog.close();
                             oTable.removeSelections(true);
                             that.setEmpButtonsEnabled(false);
-
                         }
                     })
                 });
@@ -598,159 +597,178 @@ sap.ui.define([
 
             SS_readSalaryDetails: async function (filter) {
                 try {
-                    const oData = await this.ajaxReadWithJQuery("SalaryDetails", { EmployeeID: this.EmployeeID }, []);
-                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    // Set entire array to model if needed globally
+                    const oData = await this.ajaxReadWithJQuery("SalaryDetails", { EmployeeID: this.EmployeeID });
+                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];   
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "salaryData");
-                    // Display all salary records
-                    this.displaySalaryDetails(offerData);
+                    this.displaySalaryPanels(offerData);
                 } catch (error) {
                     MessageToast.show(error.message || error.responseText);
                 }
             },
-
-            displaySalaryDetails: function (salaryDetailsArray) {
-                var oVBox = this.getView().byId("SS_id_FormsContainer");
-                oVBox.removeAllItems();
             
-                salaryDetailsArray.forEach(function (offerData, index) {
-                    var effectiveDate = offerData.EffectiveDate || "";
-                    var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(effectiveDate)}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
-            
-                    // Yearly Earnings Form
-                    var oYearlyEarningsForm = new sap.ui.layout.form.SimpleForm({
-                        editable: false,
-                        layout: "ResponsiveGridLayout",
-                        title: this.i18nModel.getText("yearly"),
-                        content: [
-                            new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.BasicSalary)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("hra") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.HRA)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployerPF)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.MedicalInsurance)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Gratuity)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.SpecailAllowance)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("Total") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Total)}` })
-                        ]
-                    });
-            
-                    // Yearly Deductions Form
-                    var oYearlyDeductionsForm = new sap.ui.layout.form.SimpleForm({
-                        editable: false,
-                        layout: "ResponsiveGridLayout",
-                        title: this.i18nModel.getText("Deductions"),
-                        content: [
-                            new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployeePF)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.PT)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.IncomeTax)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` }),
-            
-                            new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
-                            new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
-                        ]
-                    });
-            
-                    // HBox to align Earnings and Deductions side by side
-                    var oTopHBox = new sap.m.HBox({
-                        justifyContent: "SpaceAround",
-                        alignItems: "Start",
-                        items: [oYearlyEarningsForm, oYearlyDeductionsForm]
-                    });
-            
-                    // Summary Section
-                    var oSummaryFlex = new sap.m.FlexBox({
-                        direction: "Row",
-                        wrap: "Wrap",
-                        justifyContent: "Start",
-                        items: [
-                            new sap.m.VBox({
-                                width: "200px",
-                                items: [
-                                    new sap.m.Label({ text: this.i18nModel.getText("yearlyGrossPay") }).addStyleClass("boldBlackText"),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
-                                ]
-                            }),
-                            new sap.m.VBox({
-                                width: "200px",
-                                items: [
-                                    new sap.m.Label({ text: this.i18nModel.getText("yearlyDeduction") }).addStyleClass("boldBlackText"),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` })
-                                ]
-                            }),
-                            new sap.m.VBox({
-                                width: "200px",
-                                items: [
-                                    new sap.m.Label({ text: this.i18nModel.getText("EmpOfferVariablePay") }).addStyleClass("boldBlackText"),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` })
-                                ]
-                            }),
-                            new sap.m.VBox({
-                                width: "200px",
-                                items: [
-                                    new sap.m.Label({ text: this.i18nModel.getText("joiningBonus") }).addStyleClass("boldBlackText"),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.JoiningBonus)}` })
-                                ]
-                            }),
-                            new sap.m.VBox({
-                                width: "200px",
-                                items: [
-                                    new sap.m.Label({ text: this.i18nModel.getText("costOfCompany") }).addStyleClass("boldBlackText"),
-                                    new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.CostofCompany)}` })
-                                ]
-                            })
-                        ]
-                    });
-            
-                    // Final Panel
+            displaySalaryPanels: function (salaryDetailsArray) {
+                var oVBox = this.byId("salaryVBox");
+                oVBox.removeAllItems(); 
+                salaryDetailsArray.forEach(function (offerData) {
+                    var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
                     var oPanel = new sap.m.Panel({
-                        headerToolbar: new sap.m.Toolbar({
-                            content: [
-                                new sap.m.Title({
-                                    text: sTitleText,
-                                    level: "H6",
-                                    titleStyle: "H6",
-                                    wrapping: true
-                                }).addStyleClass("sapUiTinyMarginBeginEnd")
-                            ]
-                        }),
+                        headerText: sTitleText,
                         expandable: true,
-                        expanded: true,
-                        content: [
-                            new sap.m.VBox({
-                                items: [
-                                    oTopHBox,
-                                    new sap.m.Label({ text: "Summary" }).addStyleClass("boldBlackText"),
-                                    oSummaryFlex
-                                ]
-                            })
-                        ]
-                    }).addStyleClass("sapUiSmallMarginBottom");
-            
+                        expanded: true
+                    });
+                    var oFragModel = new sap.ui.model.json.JSONModel(offerData);
+                    oPanel.setModel(oFragModel, "salaryData");
+                    var oFragment = sap.ui.xmlfragment(this.getView().getId(), "sap.kt.com.minihrsolution.fragment.SalaryDisplay", this);
+                    oPanel.addContent(oFragment);
                     oVBox.addItem(oPanel);
-                }.bind(this));
+                }, this);
             },
+
+            
+            
+           
+            // displaySalaryDetails: function (salaryDetailsArray) {
+            //     var oVBox = this.getView().byId("SS_id_FormsContainer");
+            //     oVBox.removeAllItems();
+            
+            //     salaryDetailsArray.forEach(function (offerData, index) {
+            //         var effectiveDate = offerData.EffectiveDate || "";
+            //         var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(effectiveDate)}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
+            
+            //         // Yearly Earnings Form
+            //         var oYearlyEarningsForm = new sap.ui.layout.form.SimpleForm({
+            //             editable: false,
+            //             layout: "ResponsiveGridLayout",
+            //             title: this.i18nModel.getText("yearly"),
+            //             content: [
+            //                 new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.BasicSalary)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("hra") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.HRA)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployerPF)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.MedicalInsurance)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Gratuity)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.SpecailAllowance)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("Total") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Total)}` })
+            //             ]
+            //         });
+            
+            //         // Yearly Deductions Form
+            //         var oYearlyDeductionsForm = new sap.ui.layout.form.SimpleForm({
+            //             editable: false,
+            //             layout: "ResponsiveGridLayout",
+            //             title: this.i18nModel.getText("Deductions"),
+            //             content: [
+            //                 new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployeePF)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.PT)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.IncomeTax)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` }),
+            
+            //                 new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
+            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
+            //             ]
+            //         });
+            
+            //         // HBox to align Earnings and Deductions side by side
+            //         var oTopHBox = new sap.m.HBox({
+            //             justifyContent: "SpaceAround",
+            //             alignItems: "Start",
+            //             items: [oYearlyEarningsForm, oYearlyDeductionsForm]
+            //         });
+            
+            //         // Summary Section
+            //         var oSummaryFlex = new sap.m.FlexBox({
+            //             direction: "Row",
+            //             wrap: "Wrap",
+            //             justifyContent: "Start",
+            //             items: [
+            //                 new sap.m.VBox({
+            //                     width: "200px",
+            //                     items: [
+            //                         new sap.m.Label({ text: this.i18nModel.getText("yearlyGrossPay") }).addStyleClass("boldBlackText"),
+            //                         new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
+            //                     ]
+            //                 }),
+            //                 new sap.m.VBox({
+            //                     width: "200px",
+            //                     items: [
+            //                         new sap.m.Label({ text: this.i18nModel.getText("yearlyDeduction") }).addStyleClass("boldBlackText"),
+            //                         new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` })
+            //                     ]
+            //                 }),
+            //                 new sap.m.VBox({
+            //                     width: "200px",
+            //                     items: [
+            //                         new sap.m.Label({ text: this.i18nModel.getText("EmpOfferVariablePay") }).addStyleClass("boldBlackText"),
+            //                         new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` })
+            //                     ]
+            //                 }),
+            //                 new sap.m.VBox({
+            //                     width: "200px",
+            //                     items: [
+            //                         new sap.m.Label({ text: this.i18nModel.getText("joiningBonus") }).addStyleClass("boldBlackText"),
+            //                         new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.JoiningBonus)}` })
+            //                     ]
+            //                 }),
+            //                 new sap.m.VBox({
+            //                     width: "200px",
+            //                     items: [
+            //                         new sap.m.Label({ text: this.i18nModel.getText("costOfCompany") }).addStyleClass("boldBlackText"),
+            //                         new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.CostofCompany)}` })
+            //                     ]
+            //                 })
+            //             ]
+            //         });
+            
+            //         // Final Panel
+            //         var oPanel = new sap.m.Panel({
+            //             headerToolbar: new sap.m.Toolbar({
+            //                 content: [
+            //                     new sap.m.Title({
+            //                         text: sTitleText,
+            //                         level: "H6",
+            //                         titleStyle: "H6",
+            //                         wrapping: true
+            //                     }).addStyleClass("sapUiTinyMarginBeginEnd")
+            //                 ]
+            //             }),
+            //             expandable: true,
+            //             expanded: true,
+            //             content: [
+            //                 new sap.m.VBox({
+            //                     items: [
+            //                         oTopHBox,
+            //                         new sap.m.Label({ text: "Summary" }).addStyleClass("boldBlackText"),
+            //                         oSummaryFlex
+            //                     ]
+            //                 })
+            //             ]
+            //         }).addStyleClass("sapUiSmallMarginBottom");
+            
+            //         oVBox.addItem(oPanel);
+            //     }.bind(this));
+            // },
                  
             //On icon tab select function
             SS_onTabSelect: function (oEvent) {
@@ -790,7 +808,7 @@ sap.ui.define([
                     } else if (sKey === "employmentKey") {
                         await this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID }, ["EmpF_id_EmpTable"]);
                     } else if (sKey === "salaryKey") {
-                        await this._fetchCommonData("SalaryDetails", "sSalaryModel", { EmployeeID: this.EmployeeID });
+                        await this._fetchCommonData("SalaryDetails", "salaryData", { EmployeeID: this.EmployeeID });
                     } else if (sKey === "paySlipKey") {
                         // Future logic for payslip tab
                     }

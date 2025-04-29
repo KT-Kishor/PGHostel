@@ -42,7 +42,9 @@
 			        design="Horizontal"
 			        text="{i18n>salaryDetails}"
 				    icon="sap-icon://money-bills">
-						<VBox id="SS_id_FormsContainer" />
+						<!-- <VBox id="SS_id_FormsContainer" /> -->
+						<VBox id="salaryVBox" />
+
 					</IconTabFilter>
 					<IconTabFilter text="{i18n>paySlip}"  icon="sap-icon://simple-payment" design="Horizontal" key="paySlipKey"></IconTabFilter>
 				</items>

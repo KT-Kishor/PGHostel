@@ -1,0 +1,69 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core">
+	<l:VerticalLayout  width="100%">
+		<l:BlockLayout background="Dashboard">
+			<l:BlockLayoutRow >
+				<l:BlockLayoutCell title="{i18n>yearly}" width="2">
+					<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
+						<f:content>
+							<core:Title text="{i18n>monthlyComponents}" />
+							<Label text="{i18n>basicSalary}" />
+							<Text text="INR {path:'salaryData>/BasicSalary',formatter: '.Formatter.fromatNumber'}"/>
+							<Label text="{i18n>hra}" />
+							<Text text="INR {path:'salaryData>/HRA',formatter: '.Formatter.fromatNumber'}"  />
+							<Label text="{i18n>eplyrPF}" />
+							<Text text="INR {path:'salaryData>/EmployerPF',formatter: '.Formatter.fromatNumber'}"/>
+							<Label text="{i18n>medicalInsurance}" />
+							<Text text="INR {path:'salaryData>/MedicalInsurance',formatter: '.Formatter.fromatNumber'}"  />
+							<Label text="{i18n>gratuity}" />
+							<Text text="INR {path:'salaryData>/Gratuity',formatter: '.Formatter.fromatNumber'}"  />
+							<Label text="{i18n>SpecailAllowance}" />
+							<Text text="INR {path:'salaryData>/SpecailAllowance',formatter: '.Formatter.fromatNumber'}"  />
+							<Label text="{i18n>Total}" class="boldBlackText" />
+							<Text text="INR {path:'salaryData>/Total',formatter: '.Formatter.fromatNumber'}"  />
+						</f:content>
+					</f:SimpleForm>
+				</l:BlockLayoutCell>
+				<l:BlockLayoutCell title="{i18n>deduction}" width="2">
+					<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
+						<f:content>
+							<core:Title text="{i18n>deduction}"/>
+							<Label text="{i18n>providentFund}" />
+							<Text text="INR {path:'salaryData>/EmployeePF',formatter: '.Formatter.fromatNumber'}"/>
+							<Label text="{i18n>performanceTax}" />
+							<Text text="INR {path:'salaryData>/PT',formatter: '.Formatter.fromatNumber'}"/>
+							<Label text="{i18n>incomeTax}" />
+							<Text text="INR {path:'salaryData>/IncomeTax',formatter: '.Formatter.fromatNumber'}"/>
+							<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
+							<Text text="INR {path:'salaryData>/TotalDeduction',formatter: '.Formatter.fromatNumber'}"/>
+							<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
+							<Text text="INR {path:'salaryData>/VariablePay',formatter: '.Formatter.fromatNumber'}"/>
+							<Label text="{i18n>grossPayTotal}" class="boldBlackText"/>
+							<Text text="INR {path:'salaryData>/GrossPay',formatter: '.Formatter.fromatNumber'}"/>
+						</f:content>
+					</f:SimpleForm>
+				</l:BlockLayoutCell>
+				<l:BlockLayoutCell  title="{i18n>summary}" width="2">
+					<f:SimpleForm>
+						<f:content>
+							<Label text="{i18n>yearlyGrossPay}" class="boldBlackText"/>
+							<Text text="INR {path:'salaryData>/GrossPay',formatter: '.Formatter.fromatNumber'}" />
+							<Label text="{i18n>yearlyDeduction}" class="boldBlackText"/>
+							<Text text="INR {path:'salaryData>/TotalDeduction',formatter: '.Formatter.fromatNumber'}" />
+							<Label text="{i18n>EmpOfferVariablePay}" class="boldBlackText"/>
+							<Text text="INR {path:'salaryData>/VariablePay',formatter: '.Formatter.fromatNumber'}" />
+							<Label text="{i18n>joiningBonus}" class="boldBlackText"/>
+							<Text text="INR {path:'salaryData>/JoiningBonus',formatter: '.Formatter.fromatNumber'}" />
+							<Label text="{i18n>costOfCompany}" class="boldBlackText"/>
+							<Text text="INR {path:'salaryData>/CostofCompany',formatter: '.Formatter.fromatNumber'}" />
+						</f:content>
+					</f:SimpleForm>
+				</l:BlockLayoutCell>
+			</l:BlockLayoutRow>
+		</l:BlockLayout>
+	</l:VerticalLayout>
+</c:FragmentDefinition>
