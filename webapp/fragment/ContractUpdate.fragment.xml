@@ -150,7 +150,7 @@
 			<m:Bar>
 				<m:contentRight>
 					<m:Button text="{= ${viewModel>/isEditMode} ? ${i18n>save} : ${i18n>edit} }" press=".onEditOrSavePress" visible="{ContractStatus>/status}" />
-					<m:Button text="{i18n>tileFooter}" id="CU_id_Mail" press="onPressSendEmail" visible="{ContractStatus>/status}"/>
+					<m:Button text="{i18n>tileFooter}" id="CU_id_Mail" press="CUD_onSendEmail" visible="{ContractStatus>/status}"/>
 					<m:Button text="{i18n>GeneratePDF}" id="CU_id_Merge" press="onPressMerge" visible="{ContractStatus>/status}" />
 				</m:contentRight>
 			</m:Bar>

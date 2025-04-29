@@ -5,9 +5,8 @@ sap.ui.define(
     "sap/ui/export/Spreadsheet", // Import Spreadsheet for Excel export functionality
     "sap/m/MessageToast", // Import MessageToast for notifications
     "sap/m/MessageBox", // Import MessageBox for alerts/confirmations
-    "sap/ui/core/BusyIndicator" // Import BusyIndicator for loading indicators
   ],
-  function (BaseController, Formatter, Spreadsheet, MessageToast, MessageBox, BusyIndicator) {
+  function (BaseController, Formatter, Spreadsheet, MessageToast, MessageBox) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.Listofholidays",
@@ -19,6 +18,7 @@ sap.ui.define(
 
         _onRouteMatched: async function () {
           var that = this;
+          this.getBusyDialog(); // Show busy dialog
           this.commonLoginFunction("Holiday"); // Call common login function
           // Set current year in the holidays input field
           this.byId("LOH_id_Holidays").setValue(new Date().getFullYear());
@@ -26,25 +26,26 @@ sap.ui.define(
           this._makeDatePickersReadOnly(["LOH_id_Holidays"]);
           // Fetch holiday data for current year 
           await this._fetchCommonData("ListOfHolidays?","HolidayModel",{ startDate: `${new Date().getFullYear()}-01-01`, 
-              endDate: `${new Date().getFullYear()}-12-31` },["LOH_id_HolidayTable"]).then(() => {
+              endDate: `${new Date().getFullYear()}-12-31` }).then(() => {
             // Get i18n resource bundle
             that.i18nModel = that.getView().getModel("i18n").getResourceBundle();
             // Set header name in LoginModel
             that.getView().getModel("LoginModel").setProperty("/HeaderName", that.i18nModel.getText("headerListOfHolidays"));
-            BusyIndicator.hide();
+            this.closeBusyDialog();
           }).catch((error) => {
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             MessageToast.show(error.message || error.responseText);
           });
         },
 
         onSearch: async function () {
+          this.getBusyDialog(); // Show busy dialog
           var selectedYear = this.byId("LOH_id_Holidays").getValue(); // Get selected year from input field
           await this._fetchCommonData("ListOfHolidays?","HolidayModel",{startDate: `${selectedYear}-01-01`,
-            endDate: `${selectedYear}-12-31`},["LOH_id_HolidayTable"]).then(() => {
-            BusyIndicator.hide();
+            endDate: `${selectedYear}-12-31`}).then(() => {
+            this.closeBusyDialog();
           }).catch((error) => {
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             MessageToast.show(error.message || error.responseText);
           });
         },
@@ -180,7 +181,7 @@ sap.ui.define(
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                     onClose: async function (sAction) {
                       if (sAction === MessageBox.Action.YES) {
-                        BusyIndicator.show(0);
+                        that.getBusyDialog(); // Show busy dialog
                         await that.ajaxDeleteWithJQuery("ListOfHolidays", {
                           filters: {
                             startDate: `${selectedYear}-01-01`,
@@ -197,15 +198,16 @@ sap.ui.define(
                         }).catch((error) => {
                           MessageToast.show(error.message || error.responseText);
                         }).finally(() => {
-                          BusyIndicator.hide();
+                          that.closeBusyDialog();
                         });
                       } else {
-                        BusyIndicator.hide();
+                        that.closeBusyDialog();
                       }
                     },
                   }
                 );
               } else {
+                that.getBusyDialog(); // Show busy dialog
                 that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData }).then(() => {
                   MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
                   that.byId("LOH_id_Holidays").setDateValue(new Date(selectedYear, 0, 1));
@@ -215,15 +217,15 @@ sap.ui.define(
                 }).catch((error) => {
                   MessageToast.show(error.message || error.responseText);
                 }).finally(() => {
-                  BusyIndicator.hide();
+                  that.closeBusyDialog();
                 });
               }
             }).catch((err) => {
-              BusyIndicator.hide();
+              that.closeBusyDialog();
               MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
             });
           } catch (error) {
-            BusyIndicator.hide();
+            that.closeBusyDialog();
             MessageToast.show(error.message || error.responseText);
           }
         },
