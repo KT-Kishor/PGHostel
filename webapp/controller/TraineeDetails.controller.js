@@ -4,9 +4,8 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "../model/formatter",
-    "../utils/CommonJsPDF",
-    "sap/ui/core/BusyIndicator"],
-    function (BaseController, utils, JSONModel, MessageToast, Formatter, jsPDF, BusyIndicator) {
+    "../utils/CommonJsPDF"],
+    function (BaseController, utils, JSONModel, MessageToast, Formatter, jsPDF) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.TraineeDetails", {
             Formatter: Formatter,
@@ -14,9 +13,8 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTraineeDetails").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
-                BusyIndicator.show(0)
+                this.getBusyDialog();
                 this.commonLoginFunction("Trainee");
-                this.checkLoginModel();
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeOffer" });
@@ -62,7 +60,6 @@ sap.ui.define([
                 }
                 this._makeDatePickersReadOnly(["TD_id_JoiningDate", "TD_id_ReleaseDate", "TU_id_JoinDate", "TU_id_RelDate"]); //make date pickers read only
                 this.getView().byId("TD_id_Submit").setEnabled(false);
-                BusyIndicator.hide();
             },
             //for edit case reading data from model
             getModelData: function (sArgPara) {
@@ -85,8 +82,10 @@ sap.ui.define([
                         this.viewModel.setProperty("/isVisiable", true);
                         this.viewModel.setProperty("/editBut", true);
                     }
+                    this.closeBusyDialog();
                 } else {
                     MessageBox.error(this.i18nModel.getText("commonErrorMessage"));
+                    this.closeBusyDialog();
                 }
             },
 
@@ -96,6 +95,7 @@ sap.ui.define([
             },
             // Reset wizard to initial state
             T_onResetWizard: function () {
+                this.closeBusyDialog();
                 var oWizard = this.getView().byId("TD_id_Wizard");
                 oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
                 oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
@@ -162,9 +162,8 @@ sap.ui.define([
             //Submit trainee deatails 
             TD_onSubmitData: function (oEvent) {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
-
                 if (utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_TrainingType"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("TD_id_TrainingAmount"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID")) {
-
+                    this.getBusyDialog();
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.ManagerID = this.getView().byId("TD_id_ReportingManager").getSelectedItem().getAdditionalText();
@@ -176,8 +175,9 @@ sap.ui.define([
                         "tableName": "Trainee",
                         "data": oModel
                     };
-                    this.ajaxCreateWithJQuery("Trainee", oPayload, ["TD_id_Wizard"]).then((oData) => {
+                    this.ajaxCreateWithJQuery("Trainee", oPayload).then((oData) => {
                         if (oData.success) {
+                            this.closeBusyDialog();
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
                                 type: sap.m.DialogType.Message,
@@ -202,8 +202,8 @@ sap.ui.define([
                                             data: { Status: "New" },
                                             filters: { ID: oData.ID }
                                         };
-                                        this.ajaxUpdateWithJQuery("Trainee", oUpdatePayload, ["TD_id_Wizard"]).then((oData) => {
-                                            BusyIndicator.hide();
+                                        this.ajaxUpdateWithJQuery("Trainee", oUpdatePayload).then((oData) => {
+                                            this.closeBusyDialog();
                                             if (oData.success) {
                                                 MessageToast.show(this.i18nModel.getText("pdfSucces"));
                                                 oDialog.close();
@@ -213,6 +213,7 @@ sap.ui.define([
                                             }
                                         }).catch((error) => {
                                             MessageToast.show(error.message || error.responseText);
+                                            this.closeBusyDialog();
                                         });
                                     }.bind(this)
                                 }),
@@ -223,7 +224,7 @@ sap.ui.define([
                             oDialog.open();
                         }
                     }).catch((error) => {
-                        BusyIndicator.hide();
+                        this.closeBusyDialog();
                         MessageToast.show(error.message || error.responseText);
                     });
                 } else {
@@ -251,9 +252,9 @@ sap.ui.define([
                     this.viewModel.setProperty("/isEditMode", false);
                 }
             },
-
-            //Update trainee deatails 
+             //Update trainee deatails 
             updateCallForTrainee: function (oViewModel, text) {
+                this.getBusyDialog();
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
                 oModel.ManagerID = this.getView().byId("TU_id_Manager").getSelectedKey();
@@ -271,26 +272,25 @@ sap.ui.define([
                     }
                 };
                 // AJAX call for updating the data
-                this.ajaxUpdateWithJQuery("Trainee", oModel, ["TU_id_SimpleForm"]).then((oData) => {
+                this.ajaxUpdateWithJQuery("Trainee", oModel).then((oData) => {
                     if (oData.success) {
+                        this.closeBusyDialog();
                         oViewModel.setProperty("/editable", false);
                         oViewModel.setProperty("/isEditMode", true);
                         oViewModel.setProperty("/isVisiable", true);
                         oViewModel.setProperty("editBut", true);
-                        BusyIndicator.hide();
                         if (text && text !== "silent") {
                             MessageToast.show(this.i18nModel.getText(text));
                         }
                         this.getView().getModel("oTraineeDetails").refresh(true);
                     }
                 }).catch((error) => {
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                     MessageToast.show(error.message || error.responseText);
                 });
             },
             // common function for opening dialog
             TD_commonOpenDialog: function (fragmentName) {
-                BusyIndicator.show(0)
                 if (!this.TU_oDialogMail) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -299,11 +299,9 @@ sap.ui.define([
                         this.TU_oDialogMail = TU_oDialogMail;
                         this.getView().addDependent(this.TU_oDialogMail);
                         this.TU_oDialogMail.open();
-                        BusyIndicator.hide()
                     }.bind(this));
                 } else {
                     this.TU_oDialogMail.open();
-                    BusyIndicator.hide()
                 }
             },
             //Mail dialog open function
@@ -362,6 +360,7 @@ sap.ui.define([
             },
             //mail send function
             Mail_onSendEmail: function () {
+                this.getBusyDialog();
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 var oPayload = {
                     "TraineeName": oModel.TraineeName,
@@ -370,12 +369,14 @@ sap.ui.define([
                     "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                 };
-                this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload, ["Mail_id_Form", "TU_id_SimpleForm"]).then((oData) => {
+                this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload).then((oData) => {
                     this.getView().getModel("oTraineeDetails").setProperty("/Status", "Offer Sent");
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                    this.closeBusyDialog();
                     this.updateCallForTrainee(this.viewModel, "silent");
                 }).catch((error) => {
                     MessageToast.show(error.message || error.responseText);
+                    this.closeBusyDialog();
                 });
                 this.Mail_onPressClose();
             },
@@ -392,7 +393,6 @@ sap.ui.define([
                 this.getView().getModel("oTraineeDetails").refresh(true);
             },
             async offerGeneratingPdfFunction(oModel) {
-                BusyIndicator.show(0);
                 var oEmpModel = oModel.getData();
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "TraineeOffer" });
@@ -411,7 +411,6 @@ sap.ui.define([
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
                 if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                    BusyIndicator.hide();
                     MessageToast.show("Company not found on selected branch. Please check and try again.");
                     return;
                 }
@@ -425,40 +424,26 @@ sap.ui.define([
                 }
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
-                        BusyIndicator.show(0);
                         jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
                     } else {
-                        BusyIndicator.hide();
                     }
                 }
             },
-
-
             onTrainingTypeChange: function (oEvent) {
-                var oSelectedKey = oEvent.getSource().getSelectedKey();
-                var oTrainingDetailsBox = this.byId("TD_id_TrainingDetailsBox");
-                var oTrainingAmountLabel = this.byId("TD_id_TrainingAmountLabel");
-                var oAmountInput = this.byId("TD_id_TrainingAmount");
-
-                if (oSelectedKey === "Stipend" || oSelectedKey === "Paid") {
-                    oTrainingDetailsBox.setVisible(true);
-                    oTrainingAmountLabel.setVisible(true);
-                    oAmountInput.setValue("");
-                    var oModel = this.getView().getModel("oTraineeDetails");
-                    if (oModel) {
-                        oModel.setProperty("/Amount", "");
-                    }
+                const oComboBox = oEvent.getSource();
+                const sSelectedKey = oComboBox.getSelectedKey();
+                const oView = this.getView();        
+                if (sSelectedKey) {
+                    oView.byId("TD_id_TrainingAmountLabel").setVisible(true);
+                    oView.byId("TD_id_TrainingDetailsBox").setVisible(true);
+                    oView.byId("TD_id_TrainingAmount").setValue("");
+                    oView.byId("TD_id_TrainingAmount").setValueState("None");
                 } else {
-                    oTrainingDetailsBox.setVisible(false);
-                    oTrainingAmountLabel.setVisible(false);
-
-                    oAmountInput.setValue("");
-                    var oModel = this.getView().getModel("oTraineeDetails");
-                    if (oModel) {
-                        oModel.setProperty("/Amount", "");
-                    }
+                    oView.byId("TD_id_TrainingAmountLabel").setVisible(false);
+                    oView.byId("TD_id_TrainingDetailsBox").setVisible(false);
+                    oView.byId("TD_id_TrainingAmount").setValue("");
+                    oView.byId("TD_id_TrainingAmount").setValueState("None");
                 }
-            }
-
+            }    
         });
     });
