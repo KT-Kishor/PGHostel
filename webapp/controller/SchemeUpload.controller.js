@@ -224,13 +224,13 @@ sap.ui.define(
             this.i18nModel.getText("msgBoxConfirm"),
             this.i18nModel.getText("msgBoxConfirmDelete"),
             async function () {
-              BusyIndicator.show(0);
+              this.getBusyDialog();
               await that.ajaxDeleteWithJQuery("/SchemeUploade", { filters: { ID: oContext } }).then(() => {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(that.i18nModel.getText("msgSchemeDeleted"));
                 that.CommomReadCall("");
               }).catch((error) => {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(error.responseText);
               });
             },
@@ -295,13 +295,13 @@ sap.ui.define(
               onClose: async function (oAction) {
                 if (oAction === MessageBox.Action.OK) {
                   // User confirmed, proceed with delete and upload
-                  BusyIndicator.show(0);
+                  this.getBusyDialog();
                   try {
 
                     var deleteResponse = await that.ajaxDeleteWithJQuery("/SchemeUploade", {});
 
                     if (!deleteResponse.success) {
-                      BusyIndicator.hide();
+                      this.closeBusyDialog();
                       MessageToast.show("Failed to delete previous data.");
                       return;
                     }
@@ -310,7 +310,7 @@ sap.ui.define(
                     var uploadResponse = await that.ajaxCreateWithJQuery("SchemeUploade", { data: formattedData });
 
                     if (uploadResponse.success) {
-                      BusyIndicator.hide();
+                      this.closeBusyDialog();
                       MessageToast.show(that.i18nModel.getText("msgschemeupload"));
 
                       // Update UI Model after successful save
@@ -321,11 +321,11 @@ sap.ui.define(
                       that.SU_onClear();
                       that.oSchemeUploadDialog.close();
                     } else {
-                      BusyIndicator.hide();
+                      this.closeBusyDialog();
                       MessageToast.show("Failed to upload new data. Please try again.");
                     }
                   } catch (error) {
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                     console.error(error);
                     MessageToast.show("An error occurred. Please try again.");
                   }
@@ -339,7 +339,7 @@ sap.ui.define(
         },
 
         CommomReadCall: async function (filter) {
-          BusyIndicator.show(0);
+          this.getBusyDialog();
           await this.ajaxReadWithJQuery("SchemeUploade", filter)
             .then((oData) => {
               var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -356,10 +356,9 @@ sap.ui.define(
                 "MainModel"
               );
 
-              BusyIndicator.hide();
-            })
-            .catch((Error) => {
-              BusyIndicator.hide();
+              this.closeBusyDialog();
+            }).catch((Error) => {
+              this.closeBusyDialog();
               MessageBox.error(
                 this.i18nModel.getText("commonReadingDataError")
               );
@@ -399,14 +398,12 @@ sap.ui.define(
             return;
           }
           oData.isEditable = false;
-          BusyIndicator.show(0);
           this.getRouter().navTo("RouteSchemeUploadDetails", {
             data: oData.ID,
           });
         },
         //create a new data
         SU_onCreateform: function () {
-          BusyIndicator.show(0);
           this.getRouter().navTo("RouteSchemeUploadDetails", { data: "new" });
         },
       }

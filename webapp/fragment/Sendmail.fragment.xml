@@ -31,7 +31,7 @@
 					<Input id="FSM_id_newPasswordInput"  placeholder="{i18n>placenewpass}" value="{LoginViewModel>/frgNewPassword}" valueState="{LoginViewModel>/frgNewPasswordValueState}" visible="{LoginViewModel>/frgNewPasswordVisible}" type="Password" liveChange="SM_onChnageSetAndConfirm"  showValueHelp="true" valueStateText="{i18n>passwordValueState}" valueHelpIconSrc="sap-icon://show" valueHelpRequest="SM_onTogglePasswordVisibility" maxLength="50" />
 
 					<Label text="{i18n>inpConpassword}" id="FSM_id_frgconpass" required="true" />
-					<Input id="FSM_id_confirmPasswordInput" value="{LoginViewModel>/frgConfirmPassword}" valueState="{LoginViewModel>/frgConfirmPasswordValueState}" visible="{LoginViewModel>/frgConfirmPasswordVisible}" valueStateText="{i18n>placeconpass}" placeholder="{i18n>placeconpass}" type="Password" liveChange="SM_onChnageSetAndConfirm"   showValueHelp="true" valueHelpIconSrc="sap-icon://show"     valueHelpRequest="SM_onTogglePasswordVisibility" maxLength="50" submit="FSM_onConfirm" />
+					<Input id="FSM_id_confirmPasswordInput" value="{LoginViewModel>/frgConfirmPassword}" valueState="{LoginViewModel>/frgConfirmPasswordValueState}" visible="{LoginViewModel>/frgConfirmPasswordVisible}" valueStateText="{i18n>valuestaetconpass}" placeholder="{i18n>placeconpass}" type="Password" change="SM_onChnageSetCofirm"   showValueHelp="true" valueHelpIconSrc="sap-icon://show"     valueHelpRequest="SM_onTogglePasswordVisibility" maxLength="50" submit="FSM_onConfirm" />
 
 				</f:content>
 			</f:SimpleForm>
@@ -40,7 +40,7 @@
 			<Toolbar>
 				<ToolbarSpacer />
 				<Button text="{LoginViewModel>/continue}" class="marginRigth" type="Accept" id="FSM_id_SaveBTN" press="SM_onPressSave"  />
-				<Button text="{i18n>btnCancel}" class="marginRigth" press="SM_onPressCancle" type="Negative"/>
+				<Button text="{i18n>btnCancel}" class="marginRigth" press="SM_onPressCancle" type="Reject"/>
 			</Toolbar>
 		</footer>
 	</Dialog>

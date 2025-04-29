@@ -14,12 +14,10 @@ sap.ui.define(
       {
         Formatter: Formatter,
         onInit: function () {
-          this.getRouter()
-            .getRoute("RouteSchemeUploadDetails")
-            .attachMatched(this._onObjectMatched, this);
+          this.getRouter().getRoute("RouteSchemeUploadDetails").attachMatched(this._onObjectMatched, this);
         },
         _onObjectMatched: function (oEvent) {
-          BusyIndicator.hide();
+          this.closeBusyDialog();
           this.commonLoginFunction("SchemeUpload");
           var that = this;
           var sData = oEvent.getParameter("arguments").data;
@@ -61,7 +59,7 @@ sap.ui.define(
             this.getView().byId("SUD_id_Edit").setText("Save"); // Change button text to "Save"
           } else {
             // Edit Mode: Fetch data for the selected ID
-            BusyIndicator.show(0);
+            this.getBusyDialog();
             $.ajax({
               url: `https://www.rest.kalpavrikshatechnologies.com/SchemeUploade?ID=${sData}`,
               type: "GET",
@@ -72,7 +70,7 @@ sap.ui.define(
                   "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
               },
               success: function (odata) {
-                BusyIndicator.hide();
+                that.closeBusyDialog();
                 if (odata && odata.data && odata.data.length > 0) {
                   var oModelData =
                     odata.data.find((item) => item.ID == sData) || {};
@@ -85,7 +83,7 @@ sap.ui.define(
                 }
               },
               errr: function () {
-                BusyIndicator.hide();
+                that.closeBusyDialog();
                 MessageToast.show("Error fetching data.");
               },
             });
@@ -210,7 +208,7 @@ sap.ui.define(
             ? { data: oPayload, filters: { ID: oData.ID } }
             : { data: oPayload };
 
-          BusyIndicator.show(0);
+          this.getBusyDialog();
           $.ajax({
             url: sEndpoint,
             type: sType,
@@ -222,7 +220,7 @@ sap.ui.define(
             },
             data: JSON.stringify(oRequestBody),
             success: function (response) {
-              BusyIndicator.hide();
+              this.closeBusyDialog();
               MessageToast.show(
                 bIsUpdate
                   ? "Scheme Updated Successfully"
@@ -238,7 +236,7 @@ sap.ui.define(
               oView.byId("SUD_id_Edit").setText("Edit");
             },
             error: function (jqXHR) {
-              BusyIndicator.hide();
+              this.closeBusyDialog();
               var sError =
                 jqXHR.responseJSON?.error || "Error: " + jqXHR.statusText;
               MessageToast.show(sError);

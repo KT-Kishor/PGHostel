@@ -3,10 +3,9 @@ sap.ui.define(
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "../utils/validation",
-    "sap/ui/core/BusyIndicator"
+    "../utils/validation"
   ],
-  function (BaseController, JSONModel, MessageToast, utils, BusyIndicator) {
+  function (BaseController, JSONModel, MessageToast, utils) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.LoginPage",
@@ -29,7 +28,7 @@ sap.ui.define(
           this.getOwnerComponent().setModel(model, "LoginModel");
         },
         _onRouteMatched: function () {
-          BusyIndicator.hide();
+          this.closeBusyDialog();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           var oLoginModel = new JSONModel({
             "userId": "",
@@ -92,7 +91,7 @@ sap.ui.define(
             return;
           }
           // Send OTP via AJAX
-          BusyIndicator.show(0);
+          this.getBusyDialog();
           try {
             await this.ajaxCreateWithJQuery("SendOTP", {
               EmployeeID: oModel.getProperty("/userId"),
@@ -100,18 +99,18 @@ sap.ui.define(
               Type: "OTP"
             }).then((response) => {
               if (response && response.success === true) {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 oModel.setProperty("/isOtpVisible", true);
                 oModel.setProperty("/isSendOtpVisible", true);
                 oModel.setProperty("/otp", "");
                 oModel.setProperty("/sendOtpText", this.i18nModel.getText("msgresndotp"));
                 MessageToast.show(this.i18nModel.getText("sentOTP"));
               } else {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("errorMsguser"));
               }
             }).catch((error) => {
-              BusyIndicator.hide();
+              this.closeBusyDialog();
               MessageToast.show(this.i18nModel.getText(error.responseJSON.message));
             });
           } catch (err) {
@@ -319,14 +318,14 @@ sap.ui.define(
             }
 
             try {
-              BusyIndicator.show(0);
+              this.getBusyDialog();
               await this.ajaxCreateWithJQuery("SendOTP", {
                 EmployeeID: oFragModel.getProperty("/frgUserId"),
                 EmployeeName: oFragModel.getProperty("/frgUserName"),
                 Type: "OTP"
               }).then((response) => {
                 if (response.success === true) {
-                  BusyIndicator.hide();
+                  this.closeBusyDialog();
                   MessageToast.show(this.i18nModel.getText("sentOTP"));
                   sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(false);
                   sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(false);
@@ -334,11 +333,11 @@ sap.ui.define(
                   oFragModel.setProperty("/frgOtp", "");
                   oFragModel.setProperty("/frgOtpVerified", false); // Reset OTP verification flag
                 } else {
-                  BusyIndicator.hide();
+                  this.closeBusyDialog();
                   MessageToast.show(this.i18nModel.getText("errorMsguser"));
                 }
               }).catch(() => {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("errorMsguser"));
               });
             } catch (error) {
@@ -355,14 +354,14 @@ sap.ui.define(
             }
 
             try {
-              BusyIndicator.show(0);
+              this.getBusyDialog();
               await this.ajaxReadWithJQuery("LoginDetails", {
                 EmployeeID: oFragModel.getProperty("/frgUserId"),
                 EmployeeName: oFragModel.getProperty("/frgUserName"),
                 OTP: oFragModel.getProperty("/frgOtp")
               }).then((response) => {
                 if (response.success === true) {
-                  BusyIndicator.hide();
+                  this.closeBusyDialog();
                   oFragModel.setProperty("/continue", this.i18nModel.getText("save"));
                   MessageToast.show(this.i18nModel.getText("verifiedOTP"));
                   sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(false);
@@ -370,12 +369,12 @@ sap.ui.define(
                   sap.ui.getCore().byId("FSM_id_otpInput").setEditable(false);
                   oFragModel.setProperty("/frgOtpVerified", true); oFragModel.setProperty("/frgNewPasswordVisible", true); oFragModel.setProperty("/frgConfirmPasswordVisible", true);
                 } else {
-                  BusyIndicator.hide();
+                  this.closeBusyDialog();
                   MessageToast.show(this.i18nModel.getText("invalidOTP"));
                   oFragModel.setProperty("/frgOtpVerified", false); // Ensure unsuccessful verification doesn't trigger password step
                 }
               }).catch(() => {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("invalidOTP"));
                 oFragModel.setProperty("/frgOtpVerified", false);
               });
@@ -388,9 +387,7 @@ sap.ui.define(
 
           // Step 3: Validate Passwords & Update
           const oNewPwInput = sap.ui.getCore().byId("FSM_id_newPasswordInput");
-          const oConfirmPwInput = sap.ui.getCore().byId("FSM_id_confirmPasswordInput");
-
-          if (!utils._LCvalidatePassword(oNewPwInput, "ID") || !utils._LCvalidatePassword(oConfirmPwInput, "ID")) {
+          if (!utils._LCvalidatePassword(oNewPwInput, "ID")) {
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
           }
@@ -401,16 +398,17 @@ sap.ui.define(
           }
 
           try {
-            BusyIndicator.show(0);
+            this.getBusyDialog();
             await this.ajaxUpdateWithJQuery("LoginDetails", {
               data: { Password: btoa(sap.ui.getCore().byId("FSM_id_newPasswordInput").getValue()) },
               filters: { EmployeeID: sap.ui.getCore().byId("FSM_id_userIdInput").getValue() }
             }).then((response) => {
               if (response.success === true) {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("updatepassword"));
 
                 // Reset form state after successful password update
+                sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
                 oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserName", "");
                 oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
 
@@ -418,11 +416,11 @@ sap.ui.define(
                   this.oPassforgot.close();
                 }
               } else {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show("An error occurred: " + response.message);
               }
             }).catch(() => {
-              BusyIndicator.hide();
+              this.closeBusyDialog();
               MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             });
           } catch (error) {
@@ -436,7 +434,17 @@ sap.ui.define(
           this.SM_onPressSave()
         },
         FSM_onConfirm: function () {
-          this.SM_onPressSave()
+          const oFragModel = this.getView().getModel("LoginViewModel");
+          if (oFragModel.getProperty("/frgNewPassword") !== oFragModel.getProperty("/frgConfirmPassword")) {
+            sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("Error")
+            MessageToast.show(this.i18nModel.getText("misPasswords"));
+            return;
+          } else {
+            sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
+            this.SM_onPressSave()
+          }
+
+
         }
       }
     );
