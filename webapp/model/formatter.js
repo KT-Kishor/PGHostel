@@ -1,6 +1,6 @@
 sap.ui.define([], function () {
     "use strict";
-    return {  
+    return {
         formatDate: function (sDate) {
 
             if (sDate) {
@@ -9,8 +9,8 @@ sap.ui.define([], function () {
             }
             return sDate;
         },
-        
-        
+
+
         formatCurrency: function (value, code) {
             if (value || value === 0) {
                 var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
@@ -21,7 +21,7 @@ sap.ui.define([], function () {
             }
             return "";
         },
-        
+
         formatCurrencyInINRText: function (sValue) {
             if (sValue || sValue === 0) {
                 return "INR" + " " + parseFloat(sValue).toLocaleString('en-IN');
@@ -53,7 +53,7 @@ sap.ui.define([], function () {
                 case "OnBoarded":
                     return "Success";
                 case "Rejected":
-                    return "Error";                
+                    return "Error";
                 case "Offer Sent":
                     return "Indication06";
                 case "Invoiced":
@@ -61,25 +61,30 @@ sap.ui.define([], function () {
                 case "Payment Received":
                     return "Success";
                 case "Invoice Sent":
-                    return "Indication03";                
+                    return "Indication03";
                 case "Send back by account":
-                    return "Indication06"; 
+                    return "Indication06";
                 case "PDF Generated":
-                    return "Indication18";       
+                    return "Indication18";
                 case "Send back by manager":
-                    return "Information";       
+                    return "Information";
                 case "Paid":
-                    return "Success";   
+                    return "Success";
                 case "Available":
-                    return "Information"  
-                 case "Trashed":
-                        return "Error"
+                    return "Indication14"
+                case "Returned":
+                    return "Indication14"
+                case "Trashed":
+                    return "Error"
                 case "Assigned":
-                            return "Success" ;
+                    return "Warning"
+                case "Transferred":
+                    return "Indication13"
                 case "Saved":
-                    return "Indication03";           
+                    return "Indication03";
                 default:
                     return "Indication01";
+
             }
         },
 
@@ -89,33 +94,33 @@ sap.ui.define([], function () {
             }
             if (value.includes("Percentage")) {
                 var data = value.split(" ")
-                return data[0] + " " +"%";
+                return data[0] + " " + "%";
             }
             return value;
         },
 
-        companyInvoicePayByDate:function(payByDate,status){
+        companyInvoicePayByDate: function (payByDate, status) {
             var tenDay = 10;
             if (!payByDate) return "None";
             var parts = payByDate.split('/');
             var day = parseInt(parts[0], 10);
-            var month = parseInt(parts[1], 10) - 1; 
-            var year = parseInt(parts[2], 10);                  
+            var month = parseInt(parts[1], 10) - 1;
+            var year = parseInt(parts[2], 10);
             var endDateObj = new Date(year, month, day);
             var now = new Date();
 
             var timeDiff = endDateObj - now;
             var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-            if(status === "Submitted"){
+            if (status === "Submitted") {
                 return "Indication17";
-            }else if(status === "Payment Received"){
+            } else if (status === "Payment Received") {
                 return "Success";
-            }else if(status === "Invoice Sent" && daysDiff >= 0){
+            } else if (status === "Invoice Sent" && daysDiff >= 0) {
                 return "Warning";
-            }else if(status === "Invoice Sent" && daysDiff <= 0){
+            } else if (status === "Invoice Sent" && daysDiff <= 0) {
                 return "Error";
-            }else{
+            } else {
                 return "Indication01";
             }
         },
@@ -142,20 +147,20 @@ sap.ui.define([], function () {
             }
             var numericValue = parseFloat(avalue);
             if (isNaN(numericValue)) {
-                return ""; 
+                return "";
             }
-            
+
             var oFormatOptions = {
-                groupingBaseSize:3,
-                groupingSize:2,
-                minIntegerDigits: 1,                
+                groupingBaseSize: 3,
+                groupingSize: 2,
+                minIntegerDigits: 1,
                 minFractionDigits: 2,
-                maxFractionDigits: 4  
+                maxFractionDigits: 4
             };
-            
+
             var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
             return oFloatFormat.format(numericValue);
-        },      
+        },
 
         fullNameFormatter: function (salutation, consultantName) {
             if (salutation && consultantName) {
@@ -167,32 +172,32 @@ sap.ui.define([], function () {
         YearlyToMontlyConv: function (value) {
             var Data = parseFloat(value);
             if (isNaN(Data)) {
-              return "INR 0.00";
+                return "INR 0.00";
             }
             var oFormatOptions = {
-                groupingBaseSize:3,
-                groupingSize:2,
-                minIntegerDigits: 1,                
+                groupingBaseSize: 3,
+                groupingSize: 2,
+                minIntegerDigits: 1,
                 minFractionDigits: 2,
-                maxFractionDigits: 2  
+                maxFractionDigits: 2
             };
-            
+
             var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
             // return oFloatFormat.format(numericValue);
             var monthlyValue = Data / 12;
-            return "INR " +  oFloatFormat.format(monthlyValue);
-          },
-          formatGradeWithType: function(sGrade, sGradeType) {
+            return "INR " + oFloatFormat.format(monthlyValue);
+        },
+        formatGradeWithType: function (sGrade, sGradeType) {
             if (!sGrade || isNaN(sGrade)) return "";
             var formattedGrade = parseFloat(sGrade).toFixed(2);
             if (sGradeType === "Percentage") {
-              return formattedGrade + " %";
+                return formattedGrade + " %";
             } else if (sGradeType === "CGPA") {
-              return formattedGrade + " CGPA";
+                return formattedGrade + " CGPA";
             } else {
-              return formattedGrade;
+                return formattedGrade;
             }
-        }        
+        }
 
     }
 });

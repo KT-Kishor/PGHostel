@@ -7,6 +7,17 @@
       {
         "ID": 2,
         "Value": "Returned"
+      },
+      {
+        "ID": 3,
+        "Value": "Transferred"
+      },
+      {
+        "ID": 4,
+        "Value": "Available"
+      },
+      {
+        "ID": 5,
+        "Value": "Trashed"
       }
-    
      ]

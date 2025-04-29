@@ -146,6 +146,7 @@
                 }]
                 }"
             mode="SingleSelectLeft"
+            updateFinished="onTableColorFormatting"
             id="IA_id_OdataTable"
         >
             <headerToolbar>
@@ -189,12 +190,7 @@
                         icon="sap-icon://flight"
                         press="IA_onTransferButtonPress"
                     />
-                    <Button
-                        text="{i18n>Picked}"
-                        type="Neutral"
-                        icon="sap-icon://edit"
-                        press="IA_onPickedButtonPress"
-                    />
+                    
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
@@ -211,7 +207,7 @@
                     <Text text="{i18n>eqNo}"/>
                 </Column>
                <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>date}"/>
+                    <Text text="{i18n>Assetdate}"/>
                 </Column>
                 <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>branch}"/>
@@ -226,10 +222,19 @@
                  <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>assetvalue}"/>
                 </Column>  
+                      <!-- <Column minScreenWidth="Tablet" demandPopin="true">
+                    <Text text="{i18n>Transferdate}"/>
+                </Column> 
+                      <Column minScreenWidth="Tablet" demandPopin="true">
+                    <Text text="{i18n>Tranferbranch}"/>
+                </Column>  -->
             </columns>
-            <items>
-                <ColumnListItem>
-                    <cells>
+            <items >
+                <ColumnListItem
+               
+         >
+                                  
+                    <cells >
                     <ObjectIdentifier
 						title="{incomeModel>Model}"
 						text="{incomeModel>Description}"/>
@@ -244,14 +249,23 @@
                             formatter: '.Formatter.formatDate'
                         }"/>
                         <Text text="{incomeModel>AssignBranch}"/>
-                      <ObjectStatus
-                            text="{incomeModel>Status}"
-                            inverted="true"
-                            state="{
-                            path:'incomeModel>Status',
-                            formatter:'.Formatter.formatObjectStatus'
-                            }"
-                        />
+                        <HBox alignItems="Center" justifyContent="Center">
+                              <ObjectStatus 
+                                  text="{incomeModel>Status}"
+                                  inverted="true"
+                                  state="{
+                                  path:'incomeModel>Status',
+                                  formatter:'.Formatter.formatObjectStatus'
+                                  }"
+                              />
+                              <Button 
+                                  visible="{= ${incomeModel>Status} === 'Transferred' }"
+                                text="{i18n>Picked}"
+                                   icon="sap-icon://edit"
+                                  type="Neutral"
+                                  press="IA_onPickedButtonPress"
+                              />
+                          </HBox>
                         <Text text="{
                         path:'incomeModel>TrashDate',
                         formatter: '.Formatter.formatDate'
@@ -264,6 +278,9 @@
 								formatOptions: {showMeasure: false}
 							}"
 							unit="{incomeModel>Currency}" />
+                            <!-- <Text text="{incomeModel>TransferDate}"/>
+                            <Text text="{incomeModel>TransferBranch}"/> -->
+
                     </cells>
                 </ColumnListItem>
             </items>

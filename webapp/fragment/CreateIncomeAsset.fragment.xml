@@ -39,7 +39,15 @@
                         additionalText="{EmpModel>EmployeeID}"
                     />
                 </Select>
-
+                <Label text="{i18n>vehicleModel}" required="true" />
+                <Input
+                    id="FCIA_id_model"
+                    value="{CreateIncomeAssetModel>/Model}"
+                    placeholder="Enter model name"
+                    valueStateText="Enter model name"
+                    liveChange="FCIA_onInputLiveChange"
+                    maxLength="30"
+                />
                
                  	<Label text="{i18n>description}" required="true" />
 		          <TextArea id="FCIA_ID_DescriptionTextArea" 
@@ -66,24 +74,10 @@
                     maxLength="25"
                     liveChange="FCIA_oneqnolivechange"
                 />
-
-              
-               <Label text="{i18n>vehicleModel}" required="true" />
-                <Input
-                    id="FCIA_id_model"
-                    value="{CreateIncomeAssetModel>/Model}"
-                    placeholder="Enter model name"
-                    valueStateText="Enter model name"
-                    liveChange="FCIA_onInputLiveChange"
-                    maxLength="30"
-                />
-              
-
-                <Label text="{i18n>date}" required="true" />
+                     <Label text="{i18n>date}" required="true" />
                 <DatePicker
                     id="FCIA_id_Date"
                     value="{CreateIncomeAssetModel>/AssetCreationDate}"
-                    placeholder="Select date"
                     change="FCIA_ondatechange"
                      valueStateText="Select date"
                     valueFormat="dd/MM/yyyy"
@@ -116,7 +110,7 @@
                     value="{CreateIncomeAssetModel>/AssetValue}"
                     valueStateText="Enter asset value"
                     placeholder="Enter asset value"
-                    maxLength="15"
+                    maxLength="7"
                     liveChange="FCIA_assetammountlivechange"
                 />
 
@@ -160,8 +154,10 @@
                         additionalText="{branchModel>branchCode}"
                     />
                 </ComboBox>
+                
             </f:content>
         </f:SimpleForm>
+
 
             <footer>
 			<Toolbar>
@@ -187,6 +183,7 @@
                 press="FCIA_onpickButtonPress"
                 type="Accept"
                 id="FCIA_id_pickButton"
+                visible="false"
             />
             <Button
                 text="{i18n>btnCancel}"
