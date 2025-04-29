@@ -263,8 +263,24 @@ sap.ui.define([], function () {
         return true;
       }
     },
+    _LCvalidateCTC: function (oEvent, type) {
+      var oInput = type === "ID" ? oEvent : oEvent.getSource();
+      var value = oInput.getValue().replace(/[^0-9.]/g, ""); 
+        var parts = value.split(".");
+      if (parts.length === 2) {
+        value = parts[0] + "." + parts[1].slice(0, 2);
+      }
+      oInput.setValue(value);
+      var num = parseFloat(value);
+      if (!/^\d+(\.\d{1,2})?$/.test(value) || isNaN(num) || num < 50000) {
+        oInput.setValueState("Error");
+        return false;
+      }
+      oInput.setValueState("None");
+      return true;
+    },
     
-
+    
     // Pin Code Validation (NEW FUNCTION ADDED)
     _LCvalidatePinCode: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();

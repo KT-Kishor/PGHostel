@@ -116,12 +116,12 @@
 														<m:VBox class="summaryBox">
 															<m:Label text="{i18n>ctc}" required="true" />
 															<m:Input value="{employeeModel>/CTC}" editable="{viewModel>/editable}" id="EOUF_id_CTC" placeholder="{i18n>placeCtc}" 
-                                             liveChange="EOD_validateAmount" maxLength="15" valueStateText="{i18n>ammountValuState}"/>
+                                             liveChange="EOD_validateAmount" maxLength="15" valueStateText="{i18n>ctcValueState}"/>
 														</m:VBox>
 														<m:VBox class="summaryBox">
 															<m:Label text="{i18n>joiningBonus}" required="true"/>
 															<m:Input value="{employeeModel>/JoiningBonus}" editable="{viewModel>/editable}" placeholder="{i18n>joiningBonus}" 
-                                            liveChange="EOD_validateJoiningBonus" maxLength="10" id="EOUF_id_Bonus" valueStateText="{i18n>ammountValuState}" />
+                                            liveChange="EOD_validateJoiningBonus" maxLength="10" id="EOUF_id_Bonus" valueStateText="{i18n>joiningBonusValustate}" />
 														</m:VBox>
 														<m:VBox class="summaryBox">
 															<m:Label text="{i18n>variablePayPer}" required="true"/>

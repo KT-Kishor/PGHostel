@@ -61,7 +61,7 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false, });
                 this.getView().setModel(oViewModel, "viewModel");
-                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_PinCode"].forEach(function (ids) {
+                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay","EOUF_id_VariablePerc", "EOD_id_PinCode"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 //create case
@@ -90,7 +90,7 @@ sap.ui.define([
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
                     var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") &&
-                        utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
+                        utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
                     if (isValid) this.updateCallForEmployeeOffer(oViewModel, "offerUpdateSucc");
                     else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -185,13 +185,15 @@ sap.ui.define([
             },
             //validate amount
             EOD_validateAmount: function (oEvent) {
-                utils._LCvalidateAmount(oEvent);
+                utils._LCvalidateCTC(oEvent);
                 this.EOD_validateStep();
                 this.EOD_onTDSCheckboxChange();
             },
             //validate joining bonus
             EOD_validateJoiningBonus: function (oEvent) {
-                utils._LCvalidateJoiningBonus(oEvent)
+                utils._LCvalidateJoiningBonus(oEvent);
+                this.EOD_validateStep();
+
             },
             //validate combobox
             EOD_validateCombobox: function (oEvent) {
@@ -233,11 +235,11 @@ sap.ui.define([
             //Step validation
             EOD_validateStep: function () {
                 // Check if all fields have values
-                var allFieldsFilled = this.getView().byId("EOD_id_Name").getValue() && this.getView().byId("EOD_id_Reldate").getValue() && this.getView().byId("EOD_id_Designation").getSelectedKey() && this.getView().byId("EOD_id_mail").getValue() && this.getView().byId("EOD_id_Address").getValue() && this.getView().byId("EOD_id_CTC").getValue() && this.getView().byId("EOD_id_Bonus").getValue() && this.getView().byId("EOUF_id_VariablePerc").getValue();
+                var allFieldsFilled = this.getView().byId("EOD_id_Name").getValue() && this.getView().byId("EOD_id_Reldate").getValue() && this.getView().byId("EOD_id_Designation").getSelectedKey() && this.getView().byId("EOD_id_mail").getValue() && this.getView().byId("EOD_id_Address").getValue() && this.getView().byId("EOD_id_CTC").getValue() && this.getView().byId("EOD_id_Bonus").getValue() && this.getView().byId("EOD_id_VariablePay").getValue();
                 if (allFieldsFilled) {
                     // Validate each field directly
                     let isValid = utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") &&
-                        utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
+                        utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOD_id_VariablePay"), "ID");
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
@@ -256,7 +258,7 @@ sap.ui.define([
             //Submit the data
             EOD_onSubmitData: async function () {
                 if (utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") &&
-                    utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateAmount(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID")) {
+                    utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID")) {
                     this.getBusyDialog();
                     var oModel = this.getView().getModel("employeeModel").getData();
                     oModel.Gender = this.getView().byId("EOD_id_Gender").getSelectedKey()
