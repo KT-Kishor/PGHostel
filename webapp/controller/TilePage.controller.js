@@ -15,6 +15,7 @@ sap.ui.define(
         },
         _onRouteMatched: async function () {
           BusyIndicator.hide()
+          this.commonLoginFunction("TilePage")
           this._fetchCommonData("AllLoginDetails", "EmpModel");
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("Quotation").setProperty("/setDefFilter", true);
@@ -264,7 +265,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteMSA");
         },
         TileV_onpressExpenseApp: function () {
-          this.getBusyDialog();
+          // this.getBusyDialog();
           this.getRouter().navTo("RouteExpensePage");
         },
         TileV_onPressManageSchemeUpload: function () {

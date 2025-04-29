@@ -104,9 +104,10 @@ sap.ui.define([
           this.getRouter().navTo("RouteLoginPage");
         } else if (value === "A_Payroll" && TileModel.getProperty("/A_Payroll") === '0') {
           this.getRouter().navTo("RouteLoginPage");
+        } else if (value === "TilePage" && TileModel.getProperty("/TilePage") === '0') {
+          this.getRouter().navTo("RouteLoginPage");
         }
       }
-
       if (!oModel) {
         this.getRouter().navTo("RouteLoginPage");
         return;
@@ -117,6 +118,7 @@ sap.ui.define([
         this.getRouter().navTo("RouteLoginPage");
         return;
       }
+
     },
 
     _fetchCommonData: async function (entityName, modelName, filter = "") {
@@ -603,72 +605,72 @@ sap.ui.define([
       this._pBusyDialog.then(function (oBusyDialog) {
         this.oBusyDialog = oBusyDialog;
         this.oBusyDialog.open();
-      
+
       }.bind(this));
     },
 
     closeBusyDialog: function () {
       if (this.oBusyDialog) {
         this.oBusyDialog.close();
-       
+
       }
     },
 
     CommonVisitingCard: async function (EmployeeName, MobileNo, Email, Designation, branchCode) {
       const { jsPDF } = window.jspdf;
       sap.ui.core.BusyIndicator.show(0); // Show Busy indicator
-  
+
       try {
-         await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: branchCode });
-         var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-  
-          const visitfrontBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.visitingCardFront?.data);
-          const visitbackBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.visitingCardBack?.data);
-          const address = oCompanyDetailsModel.shortAddress;
-          const companyurl = oCompanyDetailsModel.website;
-  
-          const doc = new jsPDF({
-              orientation: "landscape",
-              unit: "mm",
-              format: [50.8, 88.9] // 3.5 x 2 inches
-          });
-  
-          // Add Front Background
-          doc.addImage(visitfrontBase64, "JPEG", 0, 0, 88.9, 50.8);
-  
-          // Add Employee Info
-          doc.setFontSize(12);
-          doc.setTextColor("#FFFFFF");
-          doc.setFont("times", "bold");
-          doc.text(EmployeeName, 5, 8);
-  
-          doc.setFontSize(8);
-          doc.setFont("times", "normal");
-          doc.text(Designation, 5, 12);
-  
-          doc.setFontSize(6.5);
-          doc.text(`+91 ${MobileNo}`, 13, 23);
-  
-          const emailLines = doc.splitTextToSize(Email, 33);
-          doc.text(emailLines, 13, 29);
-  
-          doc.setTextColor("#FFFFFF");
-          doc.textWithLink(companyurl, 13, 38, { url: companyurl });
-  
-          const addressLines = doc.splitTextToSize(address, 44);
-          doc.text(addressLines, 13, 45);
-  
-          // Add Back Page
-          doc.addPage();
-          doc.addImage(visitbackBase64, "JPEG", 0, 0, 88.9, 50.8);
-  
-          // Save PDF
-          doc.save(`${EmployeeName}_VisitingCard.pdf`);
+        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: branchCode });
+        var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+
+        const visitfrontBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.visitingCardFront?.data);
+        const visitbackBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.visitingCardBack?.data);
+        const address = oCompanyDetailsModel.shortAddress;
+        const companyurl = oCompanyDetailsModel.website;
+
+        const doc = new jsPDF({
+          orientation: "landscape",
+          unit: "mm",
+          format: [50.8, 88.9] // 3.5 x 2 inches
+        });
+
+        // Add Front Background
+        doc.addImage(visitfrontBase64, "JPEG", 0, 0, 88.9, 50.8);
+
+        // Add Employee Info
+        doc.setFontSize(12);
+        doc.setTextColor("#FFFFFF");
+        doc.setFont("times", "bold");
+        doc.text(EmployeeName, 5, 8);
+
+        doc.setFontSize(8);
+        doc.setFont("times", "normal");
+        doc.text(Designation, 5, 12);
+
+        doc.setFontSize(6.5);
+        doc.text(`+91 ${MobileNo}`, 13, 23);
+
+        const emailLines = doc.splitTextToSize(Email, 33);
+        doc.text(emailLines, 13, 29);
+
+        doc.setTextColor("#FFFFFF");
+        doc.textWithLink(companyurl, 13, 38, { url: companyurl });
+
+        const addressLines = doc.splitTextToSize(address, 44);
+        doc.text(addressLines, 13, 45);
+
+        // Add Back Page
+        doc.addPage();
+        doc.addImage(visitbackBase64, "JPEG", 0, 0, 88.9, 50.8);
+
+        // Save PDF
+        doc.save(`${EmployeeName}_VisitingCard.pdf`);
       } catch (error) {
-          sap.m.MessageToast.show(error.message || error.responseText);
+        sap.m.MessageToast.show(error.message || error.responseText);
       } finally {
-          sap.ui.core.BusyIndicator.hide();
+        sap.ui.core.BusyIndicator.hide();
       }
-  },
+    },
   })
 });

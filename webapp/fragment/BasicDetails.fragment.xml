@@ -48,7 +48,7 @@
 								</items>
 								</Select>
 								<Label text="{i18n>designation}"/>
-								<Select items="{sDesignationModel>/}" id="SS_id_Desi" showSecondaryValues="true" selectedKey="{sEmployeeModel>/Designation}" editable="false">
+								<Select items="{sDesignationModel>/}" id="SS_id_Desi" showSecondaryValues="true" selectedKey="{sEmployeeModel>/0/Designation}" editable="false">
 									<items>
 									<core:ListItem key="{sDesignationModel>designationName}" text="{sDesignationModel>designationName}" additionalText="{sDesignationModel>department}" />
 									</items>

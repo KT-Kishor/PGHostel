@@ -11,9 +11,7 @@ sap.ui.define(
       "sap.kt.com.minihrsolution.controller.LoginPage",
       {
         onInit: function () {
-          this.getRouter()
-            .getRoute("RouteLoginPage")
-            .attachMatched(this._onRouteMatched, this);
+          this.getRouter().getRoute("RouteLoginPage").attachMatched(this._onRouteMatched, this);
           const model = new JSONModel({
             // for Database connection
             url: "https://www.rest.kalpavrikshatechnologies.com/",
@@ -58,7 +56,6 @@ sap.ui.define(
             "frgConfirmPassword": "",
             "frgConfirmPasswordValueState": "None",
             "frgConfirmPasswordVisible": false
-
           });
           this.getView().setModel(oLoginModel, "LoginViewModel");
           //this.LoginModel = oLoginModel;
@@ -187,6 +184,12 @@ sap.ui.define(
                   oVM.setProperty("/userId", ""); oVM.setProperty("/userName", ""); oVM.setProperty("/otp", ""); oVM.setProperty("/password", ""); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isPasswordVisible", false); oVM.setProperty("/isSendOtpVisible", false); oVM.setProperty("/sendOtpText", this.i18nModel.getText("sendOtp")); oVM.setProperty("/isOtpSelected", false); oVM.setProperty("/isPasswordSelected", false); oVM.setProperty("/isForgotPasswordVisible", false);
                   // Navigate
                   this.getRouter().navTo("RouteTilePage");
+                  // Add this block after navigation
+                  window.history.pushState(null, "", window.location.href);
+                  window.addEventListener("popstate", function (event) {
+                    window.history.pushState(null, "", window.location.href);
+                    MessageToast.show("Browser navigation is disabled on this page.");
+                  })
                 } else {
                   oButton.setBusy(false)
                   MessageToast.show(this.i18nModel.getText("errorMsguser"));
