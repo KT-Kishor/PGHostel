@@ -266,9 +266,9 @@ sap.ui.define([
             },
 
             onPressSave: async function () {
-                var comboIds = ["FAA_id_employeeID", "FAA_id_AssignedBy", "FAA_id_Type", "FAA_branch_Id"];
+                var comboIds = ["FAA_id_employeeID", "FAA_id_Type", "FAA_id_Model","FAA_branch_Id","FAA_id_AssignedBy"];
 
-                // Collect Input field IDs (not ComboBoxes)
+                //  Collect Input field IDs (not ComboBoxes)
                 var inputIds = ["FAA_id_Model"];
 
                 // Validate ComboBoxes
