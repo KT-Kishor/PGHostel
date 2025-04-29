@@ -189,16 +189,6 @@ sap.ui.define([
                 // Set to a new JSON model bound to ComboBox
                 var typeModel = new sap.ui.model.json.JSONModel(uniqueTypes);
                 this.getView().setModel(typeModel, "typeModel");
-
-
-                // var oBindingContext = oTableSelected.getBindingContext("assetModel");
-                // var oSelectedData = oBindingContext.getObject();
-                // this.selectedAssignData = oSelectedData;
-                // oFormModel.setProperty("/formData/data", oSelectedData);
-                // oFormModel.setProperty("/formData/filters", { SerialNumber: oSelectedData.SerialNumber, EquipmentNumber: oSelectedData.EquipmentNumber });
-                // oFormModel.setProperty("/formData/data/AssignedByEmployeeName", this.oLoginModel.getProperty("/EmployeeName"));
-                // oFormModel.setProperty("/formData/data/AssignedByEmployeeID", this.oLoginModel.getProperty("/EmployeeID"));
-                // oFormModel.setProperty("/formData/data/AssignedDate", new Date());
                 if (!this.FAA_Dialog) {
                     var oView = this.getView();
                     this.FAA_Dialog = sap.ui.core.Fragment.load({
@@ -282,7 +272,7 @@ sap.ui.define([
                 // Validate Inputs
                 var bInputValid = inputIds.every(function (sId) {
                     var oInput = sap.ui.getCore().byId(sId);
-                    return utils._LCvalidateMandatoryField(oInput, sId)});
+                    return utils._LCvalidateMandatoryField(oInput, "ID")});
 
                 try {
                     if (bStrictValid &&
@@ -319,9 +309,7 @@ sap.ui.define([
                     }
                 } catch (e) {
                     this.closeBusyDialog();
-
                     MessageToast.show(this.i18nModel.getText("technicalError"));
-
                     console.error(e);
                 }
             },
