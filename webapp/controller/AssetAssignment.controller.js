@@ -151,24 +151,6 @@ sap.ui.define([
 
 
             AA_onPressAssign: function () {
-                var allData = this.getView().getModel("incomeModel").getProperty("/");
-                var filteredData = allData.filter(item =>
-                    item.IsCurrent === "1" &&
-                    (item.Status === "Available" || item.Status === "Returned")
-                );
-                // Extract unique types
-                var uniqueTypes = [];
-                var typeSet = new Set();
-                filteredData.forEach(item => {
-                    if (!typeSet.has(item.Type)) {
-                        typeSet.add(item.Type);
-                        uniqueTypes.push({ Type: item.Type }); // Format as object for ComboBox
-                    }
-                });
-                // Set to a new JSON model bound to ComboBox
-                var typeModel = new sap.ui.model.json.JSONModel(uniqueTypes);
-                this.getView().setModel(typeModel, "typeModel");
-
                 var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === "Admin"));
                 this.getView().setModel(oModel, "AdminModel");
                 var oView = this.getView();
@@ -190,6 +172,23 @@ sap.ui.define([
                     AssignedByEmployeeName: this.oLoginModel.getProperty("/EmployeeName"),
                     AssignedByEmployeeID: this.oLoginModel.getProperty("/EmployeeID")
                 });
+                var allData = this.getView().getModel("incomeModel").getProperty("/");
+                var filteredData = allData.filter(item =>
+                    item.IsCurrent === "1" &&
+                    (item.Status === "Available" || item.Status === "Returned")
+                );
+                // Extract unique types
+                var uniqueTypes = [];
+                var typeSet = new Set();
+                filteredData.forEach(item => {
+                    if (!typeSet.has(item.Type)) {
+                        typeSet.add(item.Type);
+                        uniqueTypes.push({ Type: item.Type }); // Format as object for ComboBox
+                    }
+                });
+                // Set to a new JSON model bound to ComboBox
+                var typeModel = new sap.ui.model.json.JSONModel(uniqueTypes);
+                this.getView().setModel(typeModel, "typeModel");
 
 
                 // var oBindingContext = oTableSelected.getBindingContext("assetModel");
@@ -266,9 +265,9 @@ sap.ui.define([
             },
 
             onPressSave: async function () {
-                var comboIds = ["FAA_id_employeeID", "FAA_id_Type", "FAA_id_Model","FAA_branch_Id","FAA_id_AssignedBy"];
+                var comboIds = ["FAA_id_employeeID", "FAA_id_Type","FAA_branch_Id","FAA_id_AssignedBy"];
 
-                //  Collect Input field IDs (not ComboBoxes)
+                // Collect Input field IDs (not ComboBoxes)
                 var inputIds = ["FAA_id_Model"];
 
                 // Validate ComboBoxes
