@@ -85,12 +85,12 @@
                                              id="EOD_id_VariablePay"
                                              value="{employeeModel>/VariablePercentage}"
                                              placeholder="{i18n>variablePayPer}"
-                                             liveChange="EOD_validateAmount"
-                                             maxLength="2"
+                                             liveChange="EOD_validatevariable"
+                                             maxLength="5"
                                              showValueHelp="true"
                                              valueHelpRequest="EOD_onVariablePayInfoPress"
                                              valueHelpIconSrc="sap-icon://message-information"
-                                             valueStateText="{i18n>ammountValuState}"/>
+                                             valueStateText="{i18n>variabelPayValueStae}"/>
 											<Label text="{i18n>joiningBonus}" required="true" />
 											<Input value="{employeeModel>/JoiningBonus}" placeholder="{i18n>joiningBonus}" 
                                              liveChange="EOD_validateJoiningBonus" maxLength="10" id="EOD_id_Bonus" valueStateText="{i18n>ammountValuState}" />

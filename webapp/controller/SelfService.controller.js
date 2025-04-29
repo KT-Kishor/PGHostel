@@ -72,14 +72,15 @@ sap.ui.define([
                 });
                 this.getView().setModel(empModel, "employmentModel");
             },
-            onPressback: function (oEvent) {
-                this.showConfirmationDialog(
-                    this.i18nModel.getText("ConfirmActionTitle"),
-                    this.i18nModel.getText("backConfirmation"),
-                    function () {
-                        this.getRouter().navTo("RouteTilePage");
-                    }.bind(this)
-                );
+            onPressback: function () {
+                this.getRouter().navTo("RouteTilePage");
+                // this.showConfirmationDialog(
+                //     this.i18nModel.getText("ConfirmActionTitle"),
+                //     this.i18nModel.getText("backConfirmation"),
+                //     function () {
+                //         this.getRouter().navTo("RouteTilePage");
+                //     }.bind(this)
+                // );
             },
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");

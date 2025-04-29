@@ -41,12 +41,14 @@ sap.ui.define([], function () {
         return true;
       }
     },
-
-
-    // Name validation function
+  
     _LCvalidateName: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
       if (!oField) return false;
+      if (!oField.getValue()) { 
+        oField.setValueState("Error");
+        return false;
+      }
       var oValue = oField.getValue().replace(/[^a-zA-Z\s]/g, "");
       if (oField.getValue() !== oValue) oField.setValue(oValue);
       var regex = /^[a-zA-Z\s]+$/;
@@ -58,6 +60,7 @@ sap.ui.define([], function () {
         return true;
       }
     },
+    
 
     // Amount validation function
     _LCvalidateAmount: function (oEvent, type) {
@@ -250,8 +253,9 @@ sap.ui.define([], function () {
     // Mandatory Field Validation
     _LCvalidateMandatoryField: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
-      if (!oField) return false;
-      if (!oField.getValue()) {
+      if (!oField) return false; 
+      var oValue = oField.getValue().trim(); 
+      if (!oValue) { 
         oField.setValueState("Error");
         return false;
       } else {
@@ -259,6 +263,7 @@ sap.ui.define([], function () {
         return true;
       }
     },
+    
 
     // Pin Code Validation (NEW FUNCTION ADDED)
     _LCvalidatePinCode: function (oEvent, type) {
@@ -272,7 +277,6 @@ sap.ui.define([], function () {
       if (oField.getValue() !== oValue) {
         oField.setValue(oValue);
       }
-
       var regex = /^\d{6}$/;
       if (!regex.test(oValue)) {
         oField.setValueState("Error");
@@ -311,6 +315,27 @@ sap.ui.define([], function () {
         return true;
       }
     },
+
+    _LCvalidateVariablePay: function (oEvent, type) {
+      var oInput = type === "ID" ? oEvent : oEvent.getSource();
+      var value = oInput.getValue(); 
+      var cleanedValue = value.replace(/[^0-9.]/g, "");
+      var parts = cleanedValue.split(".");
+      if (parts.length === 2) {
+        cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
+      } 
+      oInput.setValue(cleanedValue); 
+      var isValidFormat = /^\d+(\.\d{1,2})?$/.test(cleanedValue);
+      var numValue = parseFloat(cleanedValue);
+        if (!isValidFormat || isNaN(numValue) || numValue < 0 || numValue > 20) {
+        oInput.setValueState("Error");
+        return false;
+      } else {
+        oInput.setValueState("None");
+        return true;
+      }
+    },
+    
     _LCvalidationComboBox: function (oEvent, type) {
       var aSelectedKeys =
         type === "ID"

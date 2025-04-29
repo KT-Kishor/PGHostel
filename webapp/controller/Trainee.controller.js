@@ -14,8 +14,8 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
+                this.getBusyDialog();
                 this.commonLoginFunction("Trainee");
-                BusyIndicator.show(0)
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 await this._fetchCommonData("Designation", "DesignationModel");
@@ -42,7 +42,8 @@ sap.ui.define([
 
             //read call for trainee
             readCallForTrainee: async function (filter) {
-                await this.ajaxReadWithJQuery("Trainee", filter, ["T_id_TraineeTable"]).then((oData) => {
+                this.getBusyDialog();
+                await this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
                     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
                     if (this.Filter) {
@@ -54,9 +55,9 @@ sap.ui.define([
                         this.getView().getModel("reportingManagerModel").refresh(true);
                         this.Filter = true;
                     }
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                 }).catch((error) => {
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                     sap.m.MessageToast.show(error.message || error.responseText);
                 });
             },
@@ -92,7 +93,6 @@ sap.ui.define([
             },
             // common open the dialog function
             T_commonOpenDialog: function (dialogProperty, fragmentName) {
-                BusyIndicator.show(0);
                 if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -101,13 +101,10 @@ sap.ui.define([
                         this[dialogProperty] = oDialog;
                         this.getView().addDependent(this[dialogProperty]);
                         this[dialogProperty].open();
-                        BusyIndicator.hide();
                     }.bind(this)).catch(function (oError) {
-                        BusyIndicator.hide();
                     });
                 } else {
                     this[dialogProperty].open();
-                    BusyIndicator.hide();
                 }
             },
 
@@ -351,6 +348,7 @@ sap.ui.define([
             },
             //Trainee search function for filtering
             T_onSearch: async function () {
+                this.closeBusyDialog();
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                 var params = {};

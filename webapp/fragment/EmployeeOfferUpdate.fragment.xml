@@ -126,7 +126,7 @@
 														<m:VBox class="summaryBox">
 															<m:Label text="{i18n>variablePayPer}" required="true"/>
 															<m:Input value="{employeeModel>/VariablePercentage}" editable="{viewModel>/editable}" placeholder="{i18n>variablePayPer}" 
-                                            liveChange="EOD_validateAmount" maxLength="2" id="EOUF_id_VariablePerc" valueStateText="{i18n>ammountValuState}" />
+                                            liveChange="EOD_validatevariable" maxLength="5" id="EOUF_id_VariablePerc" valueStateText="{i18n>variabelPayValueStae}" />
 														</m:VBox>
 														<m:VBox class="summaryBox">
 															<m:Label text="{i18n>salaryType}"/>
