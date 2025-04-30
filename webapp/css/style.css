@@ -480,7 +480,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 
 .center-content {
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   display: flex;
 }

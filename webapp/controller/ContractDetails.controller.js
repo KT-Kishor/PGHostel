@@ -14,6 +14,7 @@ sap.ui.define([
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 await this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
                 await this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ContractOffer" }); 
             
                 this.sArgPara = oEvent.getParameter("arguments").sParContract;
                 var AgreementNo = oEvent.getParameter("arguments").sID
@@ -71,7 +72,7 @@ sap.ui.define([
                             contractLocation: "Kalaburagi"
                         };
             
-                        const oModel = new sap.ui.model.json.JSONModel(oData);
+                        const oModel = new JSONModel(oData);
                         oView.setModel(oModel, "ContractModelWizart");
             
                         oView.byId("C_id_PageCreate").setVisible(true);
@@ -87,13 +88,13 @@ sap.ui.define([
                     // UPDATE case
                     this.getView().getModel("LoginModel").setProperty("/sendEmail", false);
                 
-                    var ContractStatusModel = new sap.ui.model.json.JSONModel({ status: false });
+                    var ContractStatusModel = new JSONModel({ status: false });
                     this.getView().setModel(ContractStatusModel, "ContractStatus");
                 
-                    var editable = new sap.ui.model.json.JSONModel({ editable: false, Status: false });
+                    var editable = new JSONModel({ editable: false, Status: false });
                     this.getView().setModel(editable, "simpleForm");
                 
-                    var oViewModel = new sap.ui.model.json.JSONModel({ isEditMode: false, isVisiable: true, isMerge: true });
+                    var oViewModel = new JSONModel({ isEditMode: false, isVisiable: true, isMerge: true });
                     this.getView().setModel(oViewModel, "viewModel");
                 
                     try {
@@ -110,7 +111,7 @@ sap.ui.define([
                             this.getView().getModel("ContractStatus").setProperty("/status", true);
                         }
                 
-                        var contractModel = new sap.ui.model.json.JSONModel(oResult);
+                        var contractModel = new JSONModel(oResult);
                         this.getOwnerComponent().setModel(contractModel, "oFilteredContractModel");
                 
                         this.getView().getModel("oFilteredContractModel").setProperty("/Amount", parseFloat(oResult.ConsultantRate.split(" ")[0]));
@@ -134,10 +135,16 @@ sap.ui.define([
             CD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
                 this.validateStep();
-
-                const selectedKey = oEvent.getSource().getSelectedKey();
-                const oModel = this.getView().getModel("ContractModelWizart");
-                oModel.setProperty("/HiringContact", selectedKey);
+                const selectedKey = oEvent.getSource().getSelectedKey?.();
+                let oModel;
+                if (this.sArgPara === "CreateContractFlag") {
+                    oModel = this.getView().getModel("ContractModelWizart");
+                } else {
+                    oModel = this.getView().getModel("oFilteredContractModel");
+                }
+                if (oModel && selectedKey) {
+                    oModel.setProperty("/ClientReportContact", selectedKey);
+                } 
             },
             CD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
@@ -154,6 +161,9 @@ sap.ui.define([
             CD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 this.validateStep();
+            },
+            CD_ValidateComboBox: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
             },
             //back function
             CD_onPressback: function () {
@@ -195,7 +205,8 @@ sap.ui.define([
                     utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID");
 
                 var step2Validated = this.byId("CD_id_HiringContact").getValue() && this.byId("CD_id_Datestart").getValue() && this.byId("CD_id_DateEnd").getValue() &&
-                    utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID");
+                utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") && utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") && utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
+                 utils._LCvalidateMandatoryField(this.byId("CD_id_ConLocation"), "ID")
 
                 var isStep1Validated = step1Validated ? true : false;
                 var isStep2Validated = step2Validated ? true : false;
@@ -254,7 +265,7 @@ sap.ui.define([
                         "ConsultantRate": oModel.oData.Amount + " " + oModel.oData.Currency + " Per " + formattedText + " Including all tax",
                         "PaymentTerms": (oModel.oData.PaymentTerms),
                         "ClientReportContactSalutation": (oModel.oData.Salutation2),
-                        "ClientReportContact": (oModel.oData.HiringContact),
+                        "ClientReportContact": (oModel.oData.ClientReportContact),
                         "SpecificInsuranceRequirement": (oModel.oData.InsuranceRequirement),
                         "ContractPeriod": (oModel.oData.WarrantyDate),
                         "ExpensesClaim": (oModel.oData.AdditionalRates),
@@ -301,154 +312,242 @@ sap.ui.define([
             onChangeStartEndDate: function (oEvent) {
                 var oModel = this.getView().getModel("oFilteredContractModel")
                 var oModelData = oModel.getData();
-                var endDate = this.AssignmentEndDate.split('/').map(Number);
+                var endDate = this.Formatter.formatDate(this.AssignmentEndDate).split('/').map(Number);
                 var endDateCreate = new Date(endDate[2], endDate[1] - 1, endDate[0]);
                 var today = new Date();
                 if (today >= endDateCreate) {
                   if (oEvent.getSource().getValue() === "Renewed" && this.OldStatus === "Active") {
-                    var assignmentStart = oModelData.AssignmentEndDate;
+                    var assignmentStart = this.Formatter.formatDate(oModelData.AssignmentEndDate);
                     var assignmentStart = new Date(assignmentStart.split('/')[2], assignmentStart.split('/')[1] - 1, assignmentStart.split('/')[0], 10);
                     assignmentStart.setDate(assignmentStart.getDate() + 1);
                     oModel.setProperty("/AssignmentStartDate", this.Formatter.formatDate(assignmentStart));
           
-                    var assignmentEndDate = assignmentStart;
+                    var assignmentEndDate =assignmentStart;
                     var contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]);
                     assignmentEndDate.setMonth(assignmentEndDate.getMonth() + contractPeriod);
                     var incrementedDate = assignmentEndDate.toISOString().split('T')[0];
                     oModel.setProperty("/AssignmentEndDate", this.Formatter.formatDate(incrementedDate))
                   } else {
-                    oModel.setProperty("/AssignmentStartDate", this.AssignmentStartDate);
-                    oModel.setProperty("/AssignmentEndDate", this.AssignmentEndDate)
+                    oModel.setProperty("/AssignmentStartDate", this.Formatter.formatDate(this.AssignmentStartDate));
+                    oModel.setProperty("/AssignmentEndDate", this.Formatter.formatDate(this.AssignmentEndDate))
                   }
                 }
               },
 
               onPressSave: async function () {
-                var that = this;
-                var isMandatoryValid = (
+                const that = this;
+                const oView = this.getView();
+    
+                // Mandatory validation
+                const isMandatoryValid = (
                     utils._LCvalidateName(this.byId("CU_id_ConsultantName"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.byId("CU_id_ConsultingService"), "ID") &&
+                    utils._LCvalidateName(this.byId("CU_id_ConsultingService"), "ID") &&
                     utils._LCvalidateEmail(this.byId("CU_id_ContractEmailID"), "ID") &&
+                    utils._LCvalidateDate(this.byId("CU_id_AgreementDate"), "ID") &&
                     utils._LCvalidateMandatoryField(this.byId("CU_id_ContractAddress"), "ID") &&
+                    utils._LCvalidateName(this.byId("CU_id_EndClient"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_ClientReportContact"), "ID") &&
-                    utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") 
-                  );
-                  if (!isMandatoryValid) {
+                    utils._LCvalidateDate(this.byId("CU_id_AssignmentStartDate"), "ID") &&
+                    utils._LCvalidateDate(this.byId("CU_id_AssignmentEndDate"), "ID") &&
+                    utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.byId("CU_id_ContractCity"), "ID")
+                );
+            
+                if (!isMandatoryValid) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
-                  }
-                var oModel = this.getView().getModel("oFilteredContractModel").getData();
-                var AgreementNo = oModel.AgreementNo;
-                var newAgreementNo = (oModel.ContractStatus === 'Renewed') ? (parseInt(AgreementNo) + 1) : AgreementNo;
-                newAgreementNo = String(newAgreementNo).padStart(2, "0");
+                }
             
-                var type = oModel.HrDaliyMonth;
-                var radioValue = type === 0 ? "Hr" : type === 1 ? "Day" : "Month";
-                var ConsultantRate = `${oModel.Amount} ${oModel.Currency} Per ${radioValue} Including all tax`;
+                const oModel = oView.getModel("oFilteredContractModel").getData();
+                const AgreementNo = oModel.AgreementNo;
+                const isRenewed = oModel.ContractStatus === 'Renewed';
+                const newAgreementNo = isRenewed ? String(parseInt(AgreementNo) + 1).padStart(2, "0") : AgreementNo;
             
-                var jsonData = {
-                    "ContractNo": oModel.ContractNo,
-                    "AgreementNo": newAgreementNo,
-                    "ConsultantNameSalutation": (oModel.ConsultantNameSalutation),
-                    "ConsultantName": (oModel.ConsultantName),
-                    "ConsultingService": (oModel.ConsultingService),
-                    "ConsultantAddress": (oModel.ConsultantAddress),
-                    "EndClient": (oModel.EndClient),
-                    "LocationService": (oModel.LocationService),
-                    "ContractStatus": (oModel.ContractStatus === 'Renewed') ? 'New' : oModel.ContractStatus,
-                    "AssignmentStartDate": oModel.AssignmentStartDate,
-                    "AssignmentEndDate": oModel.AssignmentEndDate,
-                    "ConsultantRate": (ConsultantRate),
-                    "PaymentTerms": (oModel.PaymentTerms),
-                    "ClientReportContactSalutation": (oModel.ClientReportContactSalutation),
-                    "ClientReportContact": (oModel.ClientReportContact),
-                    "SpecificInsuranceRequirement": (oModel.SpecificInsuranceRequirement),
-                    "ContractPeriod": (oModel.ContractPeriod),
-                    "ExpensesClaim": (oModel.ExpensesClaim),
-                    "AgreementDate": (oModel.AgreementDate),
-                    "ContarctEmail": (oModel.ContarctEmail),
-                    "ContractLocation": (oModel.ContractLocation),
-                    "Comments": oModel.Comments
+                const rateType = oModel.HrDaliyMonth;
+                const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
+                const ConsultantRate = `${oModel.Amount} ${oModel.Currency} Per ${rateText} Including all tax`;
+            
+                const jsonData = {
+                    ContractNo: oModel.ContractNo,
+                    AgreementNo: newAgreementNo,
+                    ConsultantNameSalutation: oModel.ConsultantNameSalutation,
+                    ConsultantName: oModel.ConsultantName,
+                    ConsultingService: oModel.ConsultingService,
+                    ConsultantAddress: oModel.ConsultantAddress,
+                    EndClient: oModel.EndClient,
+                    LocationService: oModel.LocationService,
+                    ContractStatus: isRenewed ? 'New' : oModel.ContractStatus,
+                    AssignmentStartDate: oModel.AssignmentStartDate.split("/").reverse().join("-"),
+                    AssignmentEndDate: oModel.AssignmentEndDate.split("/").reverse().join("-"),
+                    ConsultantRate: ConsultantRate,
+                    PaymentTerms: oModel.PaymentTerms,
+                    ClientReportContactSalutation: oModel.ClientReportContactSalutation,
+                    ClientReportContact: oModel.ClientReportContact,
+                    SpecificInsuranceRequirement: oModel.SpecificInsuranceRequirement,
+                    ContractPeriod: oModel.ContractPeriod,
+                    ExpensesClaim: oModel.ExpensesClaim,
+                    AgreementDate: oModel.AgreementDate,
+                    ContarctEmail: oModel.ContarctEmail,
+                    ContractLocation: oModel.ContractLocation,
+                    Comments: oModel.Comments
                 };
             
-                var oldContractData = { "ContractStatus": "Inactive" };
+                const oldContractData = { ContractStatus: "Inactive" };
                 this.getBusyDialog(); // Show busy dialog
             
-                // Handle Renewed case
-                if (oModel.ContractStatus === "Renewed" && that.OldStatus !== "Active") {
-                    this.getView().getModel("simpleForm").setProperty("/editable", false);
-                    this.getView().getModel("simpleForm").setProperty("/Status", false);
+                // 1. Case: Renewed but previous not active
+                if (isRenewed && that.OldStatus !== "Active") {
+                    oView.getModel("simpleForm").setProperty("/editable", false);
+                    oView.getModel("simpleForm").setProperty("/Status", false);
+                    oView.getModel("viewModel").setProperty("/isEditMode", false);
                     this.byId("CU_id_Merge").setEnabled(true);
-                    this.getView().getModel("viewModel").setProperty("/isEditMode", false);
                     this.byId("CU_id_Mail").setEnabled(true);
-                    this.closeBusyDialog(); //  Close BusyDialog
+                    this.closeBusyDialog();
                     return sap.m.MessageBox.error(this.i18nModel.getText("contractStatusMessage"));
                 }
             
-                if (oModel.ContractStatus === "Renewed" && that.OldStatus === "Active") {
-                    var endDate = this.AssignmentEndDate.split('/').map(Number);
-                    var endDateCreate = new Date(endDate[2], endDate[1] - 1, endDate[0]);
-                    var today = new Date();
+                // 2. Case: Renewed and previous was active
+                if (isRenewed && that.OldStatus === "Active") {
+                    const endDateArr = this.Formatter.formatDate(this.AssignmentEndDate).split('/').map(Number);
+                    const endDateCreate = new Date(endDateArr[2], endDateArr[1] - 1, endDateArr[0]);
+                    const today = new Date();
             
                     if (today >= endDateCreate) {
                         delete jsonData.Comments;
+            
                         try {
-                            await this.ajaxCreateWithJQuery("Contract", jsonData);
-            
-                            var requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: AgreementNo }, data: oldContractData };
+                            const createResponse = await this.ajaxCreateWithJQuery("Contract", { data: jsonData });
+                            if (createResponse.success) {
+                                var requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: AgreementNo }, data: oldContractData };
 
-                            await this.ajaxUpdateWithJQuery("Contract", requestData);
+                                await this.ajaxUpdateWithJQuery("Contract", requestData);
             
-                            this.getView().getModel("simpleForm").setProperty("/editable", false);
-                            this.getView().getModel("simpleForm").setProperty("/Status", false);
+                                oView.getModel("simpleForm").setProperty("/editable", false);
+                                oView.getModel("simpleForm").setProperty("/Status", false);
+                                this.closeBusyDialog();
             
-                             this.closeBusyDialog(); //  Close BusyDialog
-                            sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
-                                onClose: function () {
-                                    that.getRouter().navTo("RouteContract");
-                                }
-                            });
-            
+                                sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
+                                    onClose: function () {
+                                        that.getRouter().navTo("RouteContractDetails");
+                                    }
+                                });
+                            }
                         } catch (error) {
-                             this.closeBusyDialog(); //  Close BusyDialog
+                            this.closeBusyDialog();
                             sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
                         }
+            
                     } else {
-                         this.closeBusyDialog(); //  Close BusyDialog
-                        this.getView().getModel("oFilteredContractModel").setProperty("/ContractStatus", this.ContractStatus);
+                        this.closeBusyDialog();
+                        oView.getModel("oFilteredContractModel").setProperty("/ContractStatus", this.ContractStatus);
                         sap.m.MessageBox.error(this.i18nModel.getText("renewEndDateMess"));
                     }
-            
-                } else {
-                    // if (jsonData.ContractStatus === "Active") {
-                    //     this.sendContractEmail();
-                    // }
-                    var requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: AgreementNo }, data: jsonData };
-                    try {
-                        await this.ajaxUpdateWithJQuery("Contract", requestData);
-            
-                        // if (oModel.ContractStatus === "Inactive") {
-                        //     await this.ajaxUpdateWithJQuery(`/Login('${oModel.ContractNo}')`, {}, []);
-                        // }
-            
-                        this.getView().getModel("simpleForm").setProperty("/editable", false);
-                        this.getView().getModel("simpleForm").setProperty("/Status", false);
-                        this.getView().getModel("viewModel").setProperty("/isEditMode", false);
-                        this.byId("CU_id_Merge").setEnabled(true);
-                        this.byId("CU_id_Mail").setEnabled(true);
-                         this.closeBusyDialog(); //  Close BusyDialog
-            
-                        sap.m.MessageBox.success(this.i18nModel.getText("agreementUpdatedSuccess"), {
-                            onClose: function () {
-                                that.getRouter().navTo("RouteContract");
-                            }
-                        });
-            
-                    } catch (error) {
-                         this.closeBusyDialog(); //  Close BusyDialog
-                        sap.m.MessageToast.show(this.i18nModel.getText("updateContractFailed"));
-                    }
+                    return;
                 }
+                try {
+                    const requestData = {filters: {ContractNo: oModel.ContractNo, AgreementNo: AgreementNo}, data: jsonData};
+            
+                    await this.ajaxUpdateWithJQuery("Contract", requestData);
+                    oView.getModel("simpleForm").setProperty("/editable", false);
+                    oView.getModel("simpleForm").setProperty("/Status", false);
+                    oView.getModel("viewModel").setProperty("/isEditMode", false);
+                    this.byId("CU_id_Merge").setEnabled(true);
+                    this.byId("CU_id_Mail").setEnabled(true);
+                    this.closeBusyDialog();
+                    sap.m.MessageBox.success(this.i18nModel.getText("agreementUpdatedSuccess"), {
+                        onClose: function () {
+                            that.getRouter().navTo("RouteContractDetails");
+                        }
+                    });
+                } catch (error) {
+                    this.closeBusyDialog();
+                    sap.m.MessageToast.show(this.i18nModel.getText("updateContractFailed"));
+                }
+            },
+            CUD_commonOpenDialog: function (fragmentName) {
+                sap.ui.core.BusyIndicator.show(0)
+                if (!this.CUD_oDialogMail) {
+                    sap.ui.core.Fragment.load({
+                        name: fragmentName,
+                        controller: this,
+                    }).then(function (CUD_oDialogMail) {
+                        this.CUD_oDialogMail = CUD_oDialogMail;
+                        this.getView().addDependent(this.CUD_oDialogMail);
+                        this.CUD_oDialogMail.open();
+                        sap.ui.core.BusyIndicator.hide()
+                    }.bind(this));
+                } else {
+                    this.CUD_oDialogMail.open();
+                    sap.ui.core.BusyIndicator.hide()
+                }
+            },
+            CUD_onSendEmail: function () {
+                var oContractEmail = this.getView().getModel("oFilteredContractModel").getData().ContarctEmail;
+                if (!oContractEmail || oContractEmail.length === 0) {
+                    MessageBox.error("To Email is missing");
+                    return;
+                }
+                var oUploaderDataModel = new JSONModel({
+                    isEmailValid: true,
+                    ToEmail: oContractEmail,
+                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
+                    name: "",
+                    mimeType: "",
+                    content: "",
+                    isFileUploaded: false,
+                    button: false
+                });
+                this.getView().setModel(oUploaderDataModel, "UploaderData");
+                this.CUD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
+                this.validateSendButton();
+            },
+            Mail_onPressClose: function () {
+                this.CUD_oDialogMail.destroy();
+                this.CUD_oDialogMail = null;
+                this.CUD_oDialogMail.close();
+            },
+            Mail_onUpload: function (oEvent) {
+                this.handleFileUpload(
+                    oEvent,
+                    this,                      // context
+                    "UploaderData",            // model name
+                    "/attachments",            // path to attachment array
+                    "/name",                   // path to comma-separated file names
+                    "/isFileUploaded",         // boolean flag path
+                    "uploadSuccessfull",       // i18n success key
+                    "fileAlreadyUploaded",     // i18n duplicate key
+                    "noFileSelected",          // i18n no file selected
+                    "fileReadError",           // i18n file read error
+                    () => this.validateSendButton()
+                );
+            },
+            validateSendButton: function () {
+                const sendBtn = sap.ui.getCore().byId("SendMail_Button");
+                const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
+                const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
+                sendBtn.setEnabled(isEmailValid && isFileUploaded);
+            },
+
+            Mail_onEmailChange: function () {
+                this.validateSendButton(); // Reuse from BaseController
+            },
+            Mail_onSendEmail: function () {
+                var oModel = this.getView().getModel("oFilteredContractModel").getData();
+                var oPayload = {
+                    "EmployeeName": oModel.ConsultantName,
+                    "toEmailID": oModel.ContarctEmail,
+                    "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
+                    "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
+                    "Designation": oModel.ConsultingService
+                };
+                this.ajaxCreateWithJQuery("ContractOfferMail", oPayload).then((oData) => {
+                    MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                    sap.ui.core.BusyIndicator.hide();
+                }).catch((error) => {
+                    MessageToast.show(error.responseText);
+                    sap.ui.core.BusyIndicator.hide();
+                });
+                this.Mail_onPressClose();
             },
         });
     });

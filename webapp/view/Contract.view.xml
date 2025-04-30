@@ -1,4 +1,3 @@
-
 <mvc:View
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
@@ -9,7 +8,6 @@
 	<Page id="C_id_Page" >
 		<headerContent>
 	    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
-
 		</headerContent>
 		<content>
 			<fb:FilterBar  class="sapUiTinyMargin" id="C_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="C_onClearFilters" showClearOnFB="true" search="C_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false">
@@ -46,7 +44,7 @@
                     displayFormat="dd/MM/yyyy"/>						
 					</fb:control>
 						</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Status" label="{i18n>contractStatus}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="ContractStatus" label="{i18n>contractStatus}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
 						<ComboBox showClearIcon="true" selectionChange=".onSelectionChange" items="{AssignmentStatus>/assignmentStatus}">
 							<core:Item key="{AssignmentStatus>ID}" text="{AssignmentStatus>Value}"/>

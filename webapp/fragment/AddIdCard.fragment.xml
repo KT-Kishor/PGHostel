@@ -23,9 +23,10 @@
             singleContainerFullSize="false">
 			<f:content>
 				<Label text="{i18n>employeeType}" required="true"/>
-				<RadioButtonGroup id="IC_id_GroupC"  selectedIndex="0" select="onRadioButtonSelect"  class="center-content" columns="2" editable="{IdCardModel>/isEditable}">
+				<RadioButtonGroup id="IC_id_GroupC"  selectedIndex="0" select="onRadioButtonSelect"  class="center-content" columns="3" editable="{IdCardModel>/isEditable}">
 					<RadioButton text="{i18n>employeeOffer}" />
 					<RadioButton text="{i18n>contractOffer}" />
+					<RadioButton text="{i18n>traineeOffer}" />
 				</RadioButtonGroup>
 				<!-- Employee ID -->
 				<Label text="{i18n>employeeID}"  required="true" />
@@ -82,11 +83,14 @@
 				</VBox>
 			</f:content>
 		</f:SimpleForm>
-		<!-- Buttons for Submit and Close actions -->
-		<FlexBox justifyContent="End">
-			<Button text="{i18n>submit}" type="Emphasized" press="IC_onPressSubmit" class="sendMail" visible="{IdCardModel>/Submit}"/>
+			<!-- Buttons for Submit and Close actions -->
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+	        <Button text="{i18n>submit}" type="Emphasized" press="IC_onPressSubmit" class="sendMail" visible="{IdCardModel>/Submit}"/>
 			<Button text="{i18n>save}" type="Emphasized" press="IC_onPressSave" class="sendMail" visible="{IdCardModel>/Save}"/>
 			<Button text="{i18n>close}" class="sendMail" press="IC_onPressClose" />
-		</FlexBox>
+			</Toolbar>
+		</footer>
 	</Dialog>
 </core:FragmentDefinition>

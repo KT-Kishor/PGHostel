@@ -58,7 +58,7 @@
 							<Label text="{i18n>contractNo}"/>
 							<Input placeholder="{i18n>ContractNoPlaceholder}" id="CD_id_ConNo" editable="false"/>
 							<Label text="{i18n>endClientHirer}" required="true"/>
-							<ComboBox items="{CreateCustomerModel>/}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName">
+							<ComboBox items="{CreateCustomerModel>/}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
                             <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
                             </ComboBox>
 							<Label text="{i18n>locationswhereServices}" required="true"/>
@@ -70,7 +70,7 @@
                               items="{Salutation>/salutation}" >
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
-							<Input value="{ContractModelWizart>/HiringContact}"
+							<Input value="{ContractModelWizart>/ClientReportContact}"
                              placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" liveChange="CD_validateName" valueStateText="{i18n>commonNameValueState}"/>
 							<Label text="{i18n>assignmentStatus}"/>
 							<ComboBox selectedKey="New" value="{ContractModelWizart>/AssignmentStatus}" 
@@ -99,7 +99,7 @@
 								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</Select>
 							<Label text="{i18n>contractLocation}" required="true"/>
-							<ComboBox id="CD_id_ConLocation" change="CD_ValidateCommonFields"  items="{BaseLocationModel>/}" value="{ContractModelWizart>/contractLocation}" >
+							<ComboBox id="CD_id_ConLocation" change="CD_ValidateCommonFields"  items="{BaseLocationModel>/}" value="{ContractModelWizart>/contractLocation}"  valueStateText="{i18n>combovalueState}">
 								 <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 							</ComboBox>
 						</f:content>
@@ -149,7 +149,7 @@
 							<Label text="{i18n>locationswhereServices}"/>
 							<Text text="{ContractModelWizart>/Location}"/>
 							<Label text="{i18n>clienthiringcontact}"/>
-							<Text text="{= ${ContractModelWizart>/Salutation2} + ' ' + ${ContractModelWizart>/HiringContact} }" />
+							<Text text="{= ${ContractModelWizart>/Salutation2} + ' ' + ${ContractModelWizart>/ClientReportContact} }" />
 							<Label text="{i18n>assignmentStatus}"/>
 							<Text text="{ContractModelWizart>/AssignmentStatus}"/>
 							<Label text="{i18n>StartDate}"/>

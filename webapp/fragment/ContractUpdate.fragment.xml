@@ -50,7 +50,7 @@
 										<m:Input value="{oFilteredContractModel>/ConsultantName}" liveChange="CD_validateName" maxLength="50" id="CU_id_ConsultantName" valueStateText="{i18n>nameConsultantValueState}" editable="{simpleForm>/editable}"  />
 										<!-- Consulting Service -->
 										<m:Label text="{i18n>consultingService}" required="true"/>
-										<m:Input value="{oFilteredContractModel>/ConsultingService}" liveChange="CD_ValidateCommonFields" maxLength="50" valueStateText="{i18n>roleValueState}" id="CU_id_ConsultingService" editable="{simpleForm>/editable}" />
+										<m:Input value="{oFilteredContractModel>/ConsultingService}" liveChange="CD_validateName" maxLength="50" valueStateText="{i18n>roleValueState}" id="CU_id_ConsultingService" editable="{simpleForm>/editable}" />
 										<!-- Consultant Email -->
 										<m:Label text="{i18n>consultantEmailID}" required="true"/>
 										<m:Input value="{oFilteredContractModel>/ContarctEmail}" liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}" id="CU_id_ContractEmailID" editable="{simpleForm>/editable}" maxLength="100" />
@@ -62,7 +62,7 @@
 										<m:TextArea value="{oFilteredContractModel>/ConsultantAddress}" valueStateText="{i18n>addressValueState}" liveChange="CD_ValidateCommonFields" id="CU_id_ContractAddress" maxLength="120" editable="{simpleForm>/editable}"/>
 										<!-- End Client -->
 										<m:Label text="{i18n>endClient}" required="true"/>
-										<m:ComboBox items="{CreateCustomerModel>/}" valueState="None" value="{oFilteredContractModel>/EndClient}" id="CU_id_EndClient" change="CD_validateName"  editable="{simpleForm>/editable}">
+										<m:ComboBox items="{CreateCustomerModel>/}" valueStateText="{i18n>combovalueState}" value="{oFilteredContractModel>/EndClient}" id="CU_id_EndClient" change="CD_validateName"  editable="{simpleForm>/editable}">
 										<core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}" text="{CreateCustomerModel>companyName}" />
 										</m:ComboBox>	
 										<!-- <m:Input value="{oFilteredContractModel>/EndClient}" liveChange="onLiveValidation" id="idEndClient"  editable="{simpleForm>/editable}" maxLength="50" /> -->
@@ -131,8 +131,8 @@
 											<core:Item key="No" text="{i18n>no}" />
 										</m:Select>
 										<m:Label text="{i18n>contractLocation}" required="true"/>
-										<m:ComboBox  change="onLiveValidation"  items="{BaseLocationModel>/}" id="CU_id_ContractCity" value="{oFilteredContractModel>/ContractLocation}" editable="{simpleForm>/editable}">
-											 <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+										<m:ComboBox  change="CD_ValidateComboBox"  items="{BaseLocationModel>/}" id="CU_id_ContractCity" value="{oFilteredContractModel>/ContractLocation}" editable="{simpleForm>/editable}" valueStateText="{i18n>combovalueState}">
+											 <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" /> 
 										</m:ComboBox>
 
 										<m:Label text="Comments" />
