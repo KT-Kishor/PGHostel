@@ -50,6 +50,7 @@
 				 valueFormat="dd/MM/yyyy"
 				 initialFocusedDateValue="{controller>/focusedDate}"
 				 maxDate="{controller>/maxDate}"
+				 minDate="{controller>/minDate}"
 				 valueStateText="{i18n>dateValueState}" />
 				<Label text="{i18n>bloodGroup}" required="true"/>
 				<ComboBox value="{oEmpolyeeDetailsModel>/BloodGroup}" showSecondaryValues= "true" id="OEF_id_blood" items="{BloodGroup>/bloodgroup}"	filterSecondaryValues="true" change="validateCombo" valueStateText="{i18n>combovalueState}">

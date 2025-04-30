@@ -10,12 +10,12 @@ sap.ui.define([
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOffer", {
             Formatter: Formatter,
             onInit: function () {
-                var oDateModel = new sap.ui.model.json.JSONModel();
-                var currentDate = new Date();
-                oDateModel.setData({ maxDate: currentDate, focusedDate: new Date(2000, 0, 1) });
+                var oDateModel = new sap.ui.model.json.JSONModel();  
+                oDateModel.setData({ maxDate: new Date(), focusedDate: new Date(2000, 0, 1), minDate: new Date(1850, 0, 1) });
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
+            
             _onRouteMatched: async function (oEvent) {
                 this.getBusyDialog();
                 this.commonLoginFunction("EmployeeOffer"); // common login function
@@ -123,7 +123,7 @@ sap.ui.define([
             onRejectEmployee: function () {
                 this.getBusyDialog();
                 this.updateCallForEmployeeOffer("Rejected");
-                this.readCallForEmployeeOffer("");
+                this.EO_onSearch();
                 this.EO_ButtonVisibility();
             },
             //Common button visibility
@@ -286,7 +286,7 @@ sap.ui.define([
                         if (oData.success) {
                             MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
                             this.oDialog.close();
-                            this.readCallForEmployeeOffer("");
+                            this.EO_onSearch();
                         } else {
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         }
