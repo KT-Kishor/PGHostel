@@ -220,6 +220,7 @@ sap.ui.define([
             EOD_validatevariable: function (oEvent) {
                 utils._LCvalidateVariablePay(oEvent);
                 this.EOD_validateStep();
+                this.EOD_onTDSCheckboxChange()
             },
             //validate date
             EOD_validateDate: function (oEvent) {

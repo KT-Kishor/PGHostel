@@ -31,7 +31,7 @@
 				<Input value="{LeaveTempModel>/email}" editable="false"/>
 				<!-- Leave Type -->
 				<Label text="{i18n>type}" required="true"/>
-				<Select items="{leaveTypeModel>/}" selectedKey="{LeaveTempModel>/typeOfLeave}">
+				<Select items="{leaveTypeModel>/}" selectedKey="{LeaveTempModel>/typeOfLeave}" editable="{= !${LeaveTempModel>/isUpdate} }">
 				<core:Item key="{leaveTypeModel>name}" text="{leaveTypeModel>name}" />
 				</Select>
 				<VBox>
