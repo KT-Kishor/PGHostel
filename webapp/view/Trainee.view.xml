@@ -28,8 +28,8 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Type" label="{i18n>trainingType}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox   items="{typeModel>/}" id="T_id_TypeBar" showClearIcon="true">
-								<core:Item key="{typeModel>Type}" text="{typeModel>Type}"/>
+							<ComboBox   items="{TypeModel>/}" id="T_id_TypeBar" showClearIcon="true">
+								<core:Item key="{TypeModel>Type}" text="{TypeModel>Type}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>

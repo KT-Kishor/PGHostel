@@ -126,7 +126,7 @@ sap.ui.define([
                 }
             },
             //update call for trainee
-            updateCallForTrainee: function (oTraineeData, text) {
+            updateCallForTrainee: async function (oTraineeData, text) {
                 this.getBusyDialog();
                 var that = this;
                 if (oTraineeData.Status === "OnBoarded") {
@@ -138,7 +138,7 @@ sap.ui.define([
                         "ID": oTraineeData.ID
                     }
                 };
-                this.ajaxUpdateWithJQuery("Trainee", oModelOffer).then((oData) => {
+                await this.ajaxUpdateWithJQuery("Trainee", oModelOffer).then((oData) => {
                     MessageToast.show(that.i18nModel.getText(text))
                     this.closeBusyDialog();
                 }).catch((error) => {
@@ -180,7 +180,7 @@ sap.ui.define([
                         that.byId("T_id_TraineeTable").removeSelections(true);
                     },
                     function () {
-                    that.T_ButtonVisibility();
+                        that.T_ButtonVisibility();
                     }
                 );
             },
@@ -191,23 +191,25 @@ sap.ui.define([
             },
 
             //Reject trainee function
-            _handleReject: function (oContext) {
+            _handleReject: async function (oContext) {
                 this.getBusyDialog();
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
-                this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
+                await this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
                 this.T_ButtonVisibility();
+                this.T_onSearch();
             },
             //Onboard trainee function
-            OTF_onPressOnboard: function (oTraineeData) {
+            OTF_onPressOnboard: async function (oTraineeData) {
                 try {
                     if (utils._LCvalidateEmail(sap.ui.getCore().byId("OTF_id_TraineeMail"), "ID")) {
                         var oTraineeData = this.SelectedData;
                         oTraineeData.Status = "OnBoarded";
-                        this.updateCallForTrainee(oTraineeData, "traineeOnboardSucess");
+                        await this.updateCallForTrainee(oTraineeData, "traineeOnboardSucess");
                         this.getView().getModel("traineeModel").setProperty("/Status", "OnBoarded");
                         this.OTF_onPressClose();
                         // Clear selection and disable buttons
                         this.T_ButtonVisibility();
+                        this.T_onSearch();
                     } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
@@ -459,6 +461,6 @@ sap.ui.define([
                     MessageToast.show(error.responseText);
                 }
             }
-            
+
         });
     });
