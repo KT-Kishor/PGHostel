@@ -88,10 +88,24 @@ sap.ui.define([
                     this.closeBusyDialog();
                 }
             },
-
             //navigation to trainee view
             TUF_onPressback: function () {
-                this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
+                var oViewModel = this.getView().getModel("viewModel");    
+                // Check if in edit mode
+                if (oViewModel.getProperty("/editable")) {
+                    // Show confirmation dialog before navigating
+                    this.showConfirmationDialog(
+                        this.i18nModel.getText("ConfirmActionTitle"),              
+                        this.i18nModel.getText("backConfirmation"),  
+                        function () {
+                            oViewModel.setProperty("/editable", false);
+                            oViewModel.setProperty("/isEditMode", true); 
+                            this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
+                        }.bind(this), 
+                    );
+                } else {
+                    this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
+                }
             },
             // Reset wizard to initial state
             T_onResetWizard: function () {

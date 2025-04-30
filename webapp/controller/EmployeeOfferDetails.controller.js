@@ -61,7 +61,7 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false, });
                 this.getView().setModel(oViewModel, "viewModel");
-                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay","EOUF_id_VariablePerc", "EOD_id_PinCode"].forEach(function (ids) {
+                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay","EOUF_id_VariablePerc", "EOD_id_PinCode","EOUF_id_PinCode"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 //create case
@@ -103,8 +103,24 @@ sap.ui.define([
             },
             //Navigate back to offer view
             EOD_onPressBack: function () {
-                this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
+                var oViewModel = this.getView().getModel("viewModel");    
+                // Check if in edit mode
+                if (oViewModel.getProperty("/editable")) {
+                    // Show confirmation dialog before navigating
+                    this.showConfirmationDialog(
+                        this.i18nModel.getText("ConfirmActionTitle"),              
+                        this.i18nModel.getText("backConfirmation"),  
+                        function () {
+                            oViewModel.setProperty("/editable", false);
+                            oViewModel.setProperty("/isEditMode", true); 
+                            this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
+                        }.bind(this), 
+                    );
+                } else {
+                    this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
+                }
             },
+            
             //Update call 
             updateCallForEmployeeOffer: async function (oViewModel, text) {
                 this.getBusyDialog();
