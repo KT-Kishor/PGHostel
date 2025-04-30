@@ -188,7 +188,6 @@ sap.ui.define(
                   window.history.pushState(null, "", window.location.href);
                   window.addEventListener("popstate", function (event) {
                     window.history.pushState(null, "", window.location.href);
-                    MessageToast.show("Browser navigation is disabled on this page.");
                   })
                 } else {
                   oButton.setBusy(false)
@@ -332,9 +331,9 @@ sap.ui.define(
                   MessageToast.show(this.i18nModel.getText("sentOTP"));
                   sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(false);
                   sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(false);
-                  oFragModel.setProperty("/frgOtpVisible", true);
-                  oFragModel.setProperty("/frgOtp", "");
-                  oFragModel.setProperty("/frgOtpVerified", false); // Reset OTP verification flag
+                  oFragModel.setProperty("/frgOtpVisible", true); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVerified", false);
+
+                  // Reset OTP verification flag
                 } else {
                   this.closeBusyDialog();
                   MessageToast.show(this.i18nModel.getText("errorMsguser"));
