@@ -115,28 +115,24 @@
                         <Button
                             id="SU_id_Upload"
                             text="{i18n>upload}"
-                            icon="sap-icon://upload"
                             press="SU_onUploadpress"
                             type="Ghost"
                         /> 
                         <Button
                             id="SU_id_Export"
                             text="{i18n>download}"
-                            icon="sap-icon://download"
                             press="SU_onDownloadpress"
-                            type="Neutral"
+                            type="Ghost"
                         />
                         <Button
                             id="SU_id_Add"
                             text="{i18n>create}"
-                            icon="sap-icon://add"
                             press="SU_onCreateform"
                             type="Accept"
                         />
                         <Button
                             id="SU_id_Delete"
                             text="{i18n>delete}"
-                            icon="sap-icon://delete"
                             press="SU_onDeletepress"
                             type="Reject"
                         />

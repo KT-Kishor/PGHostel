@@ -4,7 +4,7 @@
     xmlns:l="sap.ui.layout" 
     xmlns:f="sap.ui.layout.form">
 
-    <Dialog  title="Assign Task" id="FAT_id_dialog"   stretch="false" >
+    <Dialog  title="{i18n>assigntasktitle}" id="FAT_id_dialog"   stretch="false" >
         <f:SimpleForm layout="ResponsiveGridLayout" editable="true">
             <f:content>
             

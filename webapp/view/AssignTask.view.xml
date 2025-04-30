@@ -57,8 +57,8 @@
                 <Title text="{i18n>tileAssignmentFooter}({= ${AssignModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
-					    <Button  text="Assign Employee" press="AT_onAssignEmpTask"  icon="sap-icon://employee-lookup" id="AT_id_Assign" type="Accept"/>
-						<Button  icon="sap-icon://edit"  press="AT_onEditTask" text="{i18n>edit}" id="AT_id_EditTask" type="Neutral" />
+					    <Button  text="Assign Employee" press="AT_onAssignEmpTask"   id="AT_id_Assign" type="Accept"/>
+						<Button    press="AT_onEditTask" text="{i18n>edit}" id="AT_id_EditTask"  />
 
                    </OverflowToolbar>
             </headerToolbar>

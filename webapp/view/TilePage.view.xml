@@ -220,7 +220,7 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
 				<contentRight>
-				<Button text="{i18n>updatepassword2}" icon="sap-icon://refresh" press="TP_onupdatepress" visible="{= ${LoginModel>/Role} === 'Admin' }" />
+				<Button text="{i18n>updatepassword2}" press="TP_onupdatepress" visible="{= ${LoginModel>/Role} === 'Admin' }" />
 				</contentRight>
 			</Bar>
 		
