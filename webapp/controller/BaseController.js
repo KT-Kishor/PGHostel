@@ -469,7 +469,7 @@ sap.ui.define([
           press: function () {
             dialog.close();
 
-            this.getBusyDialog(); // open BusyDialog immediately
+           // this.getBusyDialog(); // open BusyDialog immediately
             Promise.resolve()
               .then(function () {
                 if (typeof fnOnConfirm === "function") {
@@ -477,7 +477,7 @@ sap.ui.define([
                 }
               }.bind(this))
               .finally(function () {
-                this.closeBusyDialog(); // Always close BusyDialog
+               // this.closeBusyDialog(); // Always close BusyDialog
               }.bind(this));
           }.bind(this)
         }),
@@ -487,7 +487,7 @@ sap.ui.define([
           press: function () {
             dialog.close();
 
-            this.getBusyDialog(); // open BusyDialog immediately
+           // this.getBusyDialog(); // open BusyDialog immediately
             Promise.resolve()
               .then(function () {
                 if (typeof fnOnCancel === "function") {
@@ -495,7 +495,7 @@ sap.ui.define([
                 }
               }.bind(this))
               .finally(function () {
-                this.closeBusyDialog(); // Always close BusyDialog
+               // this.closeBusyDialog(); // Always close BusyDialog
               }.bind(this));
           }.bind(this)
         }),

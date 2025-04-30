@@ -12,7 +12,7 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteSelfService").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function () {
-                BusyIndicator.show(0)
+                this.getBusyDialog();
                 this.commonLoginFunction("EmployeeDetails");
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
@@ -36,7 +36,7 @@ sap.ui.define([
                 this.setEduButtonsEnabled(false);
                 this.setEmpButtonsEnabled(false);
                 this.SS_CommonID();
-                BusyIndicator.hide()
+                this.closeBusyDialog();
             },
 
             SS_commonEduFunction() {
@@ -94,7 +94,6 @@ sap.ui.define([
             },
             //Common dialog open function
             SS_commonOpenDialog: function (dialogProperty, fragmentName, datePickerIds = []) {
-                BusyIndicator.show(0)
                 if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -104,12 +103,10 @@ sap.ui.define([
                         this.getView().addDependent(oDialog);
                         this._FragmentDatePickersReadOnly(datePickerIds);
                         oDialog.open();
-                        BusyIndicator.hide()
                     });
                 } else {
                     this._FragmentDatePickersReadOnly(datePickerIds);
                     this[dialogProperty].open();
-                    BusyIndicator.hide()
                 }
             },
 
@@ -181,7 +178,7 @@ sap.ui.define([
                 this.setEmpButtonsEnabled(false);
                 const ids = ["AddEmp_id_Company", "AddEmp_id_Desig", "AddEmp_id_OfcAddress", "AddEmp_id_StartDate", "AddEmp_id_EndDate", "AdEmp_id_RCNameI", "AdEmp_id_RCAddressI", "AdEmp_id_RCMailI", "AdEmp_id_RCMobileI", "AdEmp_id_RCSalII", "AdEmp_id_RCNameII", "AdEmp_id_RCAddressII", "AdEmp_id_RCMailII", "AdEmp_id_RCMobileII"];
                 ids.forEach((id) => { sap.ui.getCore().byId(id).setValueState("None"); });
-                this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID }, ["EmpF_id_EmpTable"]);
+                this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID });
             },
             //validation function calling from base controller
             SS_validateMobileNo: function (oEvent) {
@@ -244,63 +241,62 @@ sap.ui.define([
             //Basic detail update call
             SS_onSavePress: function () {
                 try {
-                    const oView = this.getView();
                     // Validate required fields
                     if (
-                        utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
-                        utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
-                        utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
-                        utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
-                        utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
-                        utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID") &&
-                        utils._LCvalidateMandatoryField(oView.byId("SS_id_BankName"), "ID") &&
-                        utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") &&
-                        utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") &&
-                        utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") &&
-                        utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID") &&
-                        utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
-                        utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
-                        utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
-                        utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
-                        utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
-                        utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID")
+                        utils._LCvalidateDate(this.getView().byId("SS_id_Dob"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("SS_id_PAddress"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("SS_id_CAdress"), "ID") &&
+                        utils._LCvalidateMobileNumber(this.getView().byId("SS_id_MobileNo"), "ID") &&
+                        utils._LCvalidateName(this.getView().byId("SS_id_AcName"), "ID") &&
+                        utils._LCvalidateAccountNo(this.getView().byId("SS_id_Acno"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("SS_id_BankName"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("SS_id_Branch"), "ID") &&
+                        utils._LCvalidateIfcCode(this.getView().byId("SS_id_IfcsCode"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("SS_id_Address"), "ID") &&
+                        utils._LCvalidatePanCard(this.getView().byId("SS_id_Pan"), "ID") &&
+                        utils._LCvalidateName(this.getView().byId("SS_id_EmeNameF"), "ID") &&
+                        utils._LCvalidateMobileNumber(this.getView().byId("SS_id_EmpMoF"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("SS_id_AddF"), "ID") &&
+                        utils._LCvalidateName(this.getView().byId("SS_id_NameS"), "ID") &&
+                        utils._LCvalidateMobileNumber(this.getView().byId("SS_id_EmpMoS"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("SS_id_EmpAddS"), "ID")
                     ) {
                         // Optional fields validation (only if value exists)
-                        const aadhar = oView.byId("SS_idAdhar").getValue().trim();
-                        const passport = oView.byId("SS_id_Passport").getValue().trim();
-                        const voterId = oView.byId("SS_id_Voterid").getValue().trim();
+                        const aadhar = this.getView().byId("SS_idAdhar").getValue().trim();
+                        const passport = this.getView().byId("SS_id_Passport").getValue().trim();
+                        const voterId = this.getView().byId("SS_id_Voterid").getValue().trim();
                         if (
-                            (aadhar === "" || utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID")) &&
-                            (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
-                            (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID"))
+                            (aadhar === "" || utils._LCvalidateAadharCard(this.getView().byId("SS_idAdhar"), "ID")) &&
+                            (passport === "" || utils._LCvalidatePassport(this.getView().byId("SS_id_Passport"), "ID")) &&
+                            (voterId === "" || utils._LCvalidateVoterId(this.getView().byId("SS_id_Voterid"), "ID"))
                         ) {
-                            BusyIndicator.show(0);
-                            var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
-                            oDataModel.DateOfBirth = oView.byId("SS_id_Dob").getValue()
+                            this.getBusyDialog();
+                            var oDataModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                            oDataModel.DateOfBirth = this.getView().byId("SS_id_Dob").getValue()
                             oDataModel.DateOfBirth = oDataModel.DateOfBirth.split("/").reverse().join('-');
-                            oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
-                            oDataModel.EmergencyContactPerson2Salutation = oView.byId("SS_idEmeSalS").getSelectedKey();
-                            oDataModel.EmergencyContactPerson1Realtion = oView.byId("SS_idRelF").getSelectedKey();
-                            oDataModel.EmergencyContactPerson2Realtion = oView.byId("SS_idRelS").getSelectedKey();
+                            oDataModel.EmergencyContactPerson1Salutation = this.getView().byId("SS_idEmeSalF").getSelectedKey();
+                            oDataModel.EmergencyContactPerson2Salutation = this.getView().byId("SS_idEmeSalS").getSelectedKey();
+                            oDataModel.EmergencyContactPerson1Realtion = this.getView().byId("SS_idRelF").getSelectedKey();
+                            oDataModel.EmergencyContactPerson2Realtion = this.getView().byId("SS_idRelS").getSelectedKey();
                             var oPayload = {
                                 data: oDataModel,
                                 filters: {
                                     EmployeeID: this.EmployeeID
                                 }
                             };
-                            this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload, ["SS_id_BSimpleForm"]).then((oData) => {
-                                BusyIndicator.hide();
+                            this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload).then((oData) => {
                                 if (oData.success) {
                                     MessageToast.show(this.i18nModel.getText("dataSaved"));
-                                    oView.getModel("viewModel").setProperty("/isEditMode", false);
+                                    this.getView().getModel("viewModel").setProperty("/isEditMode", false);
                                     this.byId("SS_idAdhar").setValueState("None");
                                     this.byId("SS_id_Passport").setValueState("None");
                                     this.byId("SS_id_Voterid").setValueState("None");
+                                    this.closeBusyDialog();
                                 } else {
                                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                                 }
                             }).catch((oError) => {
-                                BusyIndicator.hide();
+                                this.closeBusyDialog();
                                 sap.m.MessageToast.show(error.responseText);
                             });
                         } else {
@@ -310,7 +306,7 @@ sap.ui.define([
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
                 } catch (error) {
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                     sap.m.MessageToast.show(error.responseText);
                 }
             },
@@ -338,65 +334,66 @@ sap.ui.define([
             //Education detail create call
             saveEducationDetails: function (bIsCreate) {
                 try {
+                    this.getBusyDialog();
                     const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") &&
                         utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType");
+
                     if (!isValid) {
+                        this.closeBusyDialog();
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
                     }
-                    // Get and prepare model data
-                    let oModel = this.getView().getModel("educationModel").getData();
-                    oModel.EmployeeID = this.EmployeeID;
-                    oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey() || "";
-                    oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey() || "";
-                    oModel.EducationStartDate = sap.ui.getCore().byId("AddEd_id_StartEdu").getValue()
-                    oModel.EducationStartDate = oModel.EducationStartDate.split("/").reverse().join('-');
-                    oModel.EducationEndDate = sap.ui.getCore().byId("AddEd_id_EndEdu").getValue()
-                    oModel.EducationEndDate = oModel.EducationEndDate.split("/").reverse().join('-');
-                    let oPayload;
-                    let fnCall;
-                    let sSuccessMessage;
+                   // Get and prepare model data
+                   let oModel = this.getView().getModel("educationModel").getData();
+                   oModel.EmployeeID = this.EmployeeID;
+                   oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey() || "";
+                   oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey() || "";
+                   oModel.EducationStartDate = sap.ui.getCore().byId("AddEd_id_StartEdu").getValue()
+                   oModel.EducationStartDate = oModel.EducationStartDate.split("/").reverse().join('-');
+                   oModel.EducationEndDate = sap.ui.getCore().byId("AddEd_id_EndEdu").getValue()
+                   oModel.EducationEndDate = oModel.EducationEndDate.split("/").reverse().join('-');
+
+                    let oPayload, fnCall, sSuccessMessage;
                     if (bIsCreate) {
                         oPayload = {
                             "tableName": "EducationalDetails",
                             "data": oModel
                         };
-                        fnCall = this.ajaxCreateWithJQuery("EducationalDetails", oPayload, ["AddEd_id_Form", "EdF_id_EduTable"]);
+                        fnCall = this.ajaxCreateWithJQuery("EducationalDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("eduDataSaved");
                     } else {
                         oPayload = {
                             "data": oModel,
-                            "filters": {
-                                "ID": oModel.ID
-                            }
+                            "filters": { "ID": oModel.ID }
                         };
-                        fnCall = this.ajaxUpdateWithJQuery("EducationalDetails", oPayload, ["EdF_id_EduTable", "AddEd_id_Form"]);
+                        fnCall = this.ajaxUpdateWithJQuery("EducationalDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("eduDataupdate");
                         this.setEduButtonsEnabled(false);
                     }
                     fnCall.then((oData) => {
+                        this.closeBusyDialog();
                         if (oData.success) {
-                            BusyIndicator.hide();
                             MessageToast.show(sSuccessMessage);
                             this.SEd_oDialog.close();
                             this.setEduButtonsEnabled(false);
                             this.byId("EdF_id_EduTable").removeSelections(true);
-                            this.SS_commonEduFunction()
-                            this._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: this.EmployeeID }, ["EdF_id_EduTable"]);
+                            this.SS_commonEduFunction();
+                            this._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: this.EmployeeID });
                         } else {
                             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         }
                     }).catch((error) => {
-                        BusyIndicator.hide();
-                        sap.m.MessageToast.show(error.responseText);
+                        this.closeBusyDialog();
+                        MessageToast.show(error.responseText);
                     });
                 } catch (error) {
-                    BusyIndicator.hide();
-                    sap.m.MessageToast.show(error.responseText);
+                    this.closeBusyDialog();
+                    MessageToast.show(error.responseText);
                 }
             },
+
             AddEd_onSubmitEdDetails: function () {
                 this.saveEducationDetails(true); // create mode
             },
@@ -412,21 +409,26 @@ sap.ui.define([
                     sap.m.MessageToast.show(this.i18nModel.getText("selctRowtoDelete"));
                     return;
                 }
-                var oContext = oSelectedItem.getBindingContext("sEducationModel").getProperty("ID");
-                // Use common confirmation dialog
+                const sSelectedId = oSelectedItem.getBindingContext("sEducationModel").getProperty("ID");
                 this.showConfirmationDialog(
                     this.i18nModel.getText("msgBoxConfirm"),
                     this.i18nModel.getText("edudeletConfirmation"),
                     function () {
-                        that.ajaxDeleteWithJQuery("/EducationalDetails", { filters: { ID: oContext } }).then(() => {
-                            sap.m.MessageToast.show(that.i18nModel.getText("eduDataDeletSuucess"));
-                            that._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: that.EmployeeID }, ["EdF_id_EduTable"]);
-                            that.setEduButtonsEnabled(false);
-                        }).catch((error) => {
-                            sap.m.MessageToast.show(error.responseText);
-                        });
+                        that.getBusyDialog();
+                        that.ajaxDeleteWithJQuery("/EducationalDetails", { filters: { ID: sSelectedId } })
+                            .then(() => {
+                                sap.m.MessageToast.show(that.i18nModel.getText("eduDataDeletSuucess"));
+                                that._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: that.EmployeeID });
+                                that.setEduButtonsEnabled(false);
+                            })
+                            .catch((error) => {
+                                MessageToast.show(error.responseText);
+                            })
+                            .finally(() => {
+                                that.closeBusyDialog();
+                            });
                     },
-                    function () {      // On Cancel
+                    function () { // onCancel
                         that.byId("EdF_id_EduTable").removeSelections(true);
                         that.setEduButtonsEnabled(false);
                     }
@@ -436,22 +438,35 @@ sap.ui.define([
             //Employment detail create calls
             saveEmploymentDetails: function (bIsCreate) {
                 try {
-                    const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID") && utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressI"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID") &&
-                        utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID") && utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressII"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID");
+                    this.getBusyDialog();
+                    const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") &&
+                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") &&
+                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") &&
+                        utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") &&
+                        utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID") &&
+                        utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID") &&
+                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressI"), "ID") &&
+                        utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID") &&
+                        utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID") &&
+                        utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID") &&
+                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressII"), "ID") &&
+                        utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID") &&
+                        utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID");
+
                     if (!isValid) {
+                        this.closeBusyDialog();
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
                     }
-                    // Get and prepare model data
+                    // Prepare data model for submission
                     let oModel = this.getView().getModel("employmentModel").getData();
                     oModel.EmployeeID = this.EmployeeID;
                     oModel.Designation = sap.ui.getCore().byId("AddEmp_id_Desig").getValue();
                     oModel.RCISal = sap.ui.getCore().byId("AddEmp_id_SalI").getSelectedKey() || "";
                     oModel.RCIISal = sap.ui.getCore().byId("AdEmp_id_RCSalII").getSelectedKey() || "";
-                    oModel.StartDate = sap.ui.getCore().byId("AddEmp_id_StartDate").getValue()
-                    oModel.StartDate = oModel.StartDate.split("/").reverse().join('-');
-                    oModel.EndDate = sap.ui.getCore().byId("AddEmp_id_EndDate").getValue()
-                    oModel.EndDate = oModel.EndDate.split("/").reverse().join('-');
+                    oModel.StartDate = sap.ui.getCore().byId("AddEmp_id_StartDate").getValue().split("/").reverse().join('-');
+                    oModel.EndDate = sap.ui.getCore().byId("AddEmp_id_EndDate").getValue().split("/").reverse().join('-');
+
                     let oPayload;
                     let fnCall;
                     let sSuccessMessage;
@@ -460,39 +475,39 @@ sap.ui.define([
                             "tableName": "EmploymentDetails",
                             "data": oModel
                         };
-                        fnCall = this.ajaxCreateWithJQuery("EmploymentDetails", oPayload, ["AddEmp_id_Form", "EmpF_id_EmpTable"]);
+                        fnCall = this.ajaxCreateWithJQuery("EmploymentDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("empDataSaved");
                     } else {
                         oPayload = {
                             "data": oModel,
-                            "filters": {
-                                "ID": oModel.ID
-                            }
+                            "filters": { "ID": oModel.ID }
                         };
-                        fnCall = this.ajaxUpdateWithJQuery("EmploymentDetails", oPayload, ["AddEmp_id_Form", "EmpF_id_EmpTable"]);
+                        fnCall = this.ajaxUpdateWithJQuery("EmploymentDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("empDataupdate");
                     }
                     fnCall.then((oData) => {
+                        this.closeBusyDialog();
                         if (oData.success) {
-                            BusyIndicator.hide();
                             MessageToast.show(sSuccessMessage);
                             this.SEmp_oDialog.close();
                             this.byId("EmpF_id_EmpTable").removeSelections(true);
                             this.setEmpButtonsEnabled(false);
                             this.SS_commonEmpFunction();
-                            this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID }, ["EmpF_id_EmpTable"]);
+                            this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID });
                         } else {
                             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         }
                     }).catch((error) => {
-                        BusyIndicator.hide();
+                        this.closeBusyDialog();
                         MessageToast.show(error.responseText);
                     });
+
                 } catch (error) {
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                     MessageToast.show(error.responseText);
                 }
             },
+
             AddEmp_onSubmitEmpDetails: function () {
                 this.saveEmploymentDetails(true); // create mode
             },
@@ -533,16 +548,19 @@ sap.ui.define([
                 this.showConfirmationDialog(
                     this.i18nModel.getText("msgBoxConfirm"),
                     this.i18nModel.getText("empdeleteConfirmation"),
-                    function () {
+                    function () { // onConfirm
+                        that.getBusyDialog();
                         that.ajaxDeleteWithJQuery("/EmploymentDetails", { filters: { ID: oContext } }).then(() => {
-                            sap.m.MessageToast.show(that.i18nModel.getText("empDataDeleteSuccess"));
-                            that._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: that.EmployeeID });
-                            that.setEmpButtonsEnabled(false);
-                        }).catch((error) => {
-                            sap.m.MessageToast.show(error.responseText);
-                        });
+                                that.closeBusyDialog();
+                                sap.m.MessageToast.show(that.i18nModel.getText("empDataDeleteSuccess"));
+                                that._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: that.EmployeeID });
+                                that.setEmpButtonsEnabled(false);
+                            }).catch((error) => {
+                                that.closeBusyDialog();
+                                MessageToast.show(error.responseText);
+                            });
                     },
-                    function () {
+                    function () { // onCancel
                         that.byId("EmpF_id_EmpTable").removeSelections(true);
                         that.setEmpButtonsEnabled(false);
                     }
@@ -598,15 +616,19 @@ sap.ui.define([
 
             SS_readSalaryDetails: async function (filter) {
                 try {
+                    this.getBusyDialog();
                     const oData = await this.ajaxReadWithJQuery("SalaryDetails", { EmployeeID: this.EmployeeID });
-                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];   
+                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "salaryData");
                     this.displaySalaryPanels(offerData);
+                    this.closeBusyDialog();
                 } catch (error) {
                     MessageToast.show(error.message || error.responseText);
+                    this.closeBusyDialog();
                 }
             },
-            
+
             displaySalaryPanels: function (salaryDetailsArray) {
                 var oVBox = this.byId("salaryVBox");
                 oVBox.removeAllItems();
@@ -620,6 +642,7 @@ sap.ui.define([
                         items: [oTitleText],
                         width: "100%"
                     });
+
                     var oPanel = new sap.m.Panel({
                         expandable: true,
                         expanded: true,
@@ -627,6 +650,7 @@ sap.ui.define([
                             content: [oHeaderBox]
                         })
                     });
+                    // Style the panel
                     oPanel.addStyleClass("sapUiSmallMarginBottom");
                     var oFragModel = new sap.ui.model.json.JSONModel(offerData);
                     oPanel.setModel(oFragModel, "salaryData");
@@ -635,160 +659,15 @@ sap.ui.define([
                     oVBox.addItem(oPanel);
                 }, this);
             },
-            
 
-            
-            
-           
-            // displaySalaryDetails: function (salaryDetailsArray) {
-            //     var oVBox = this.getView().byId("SS_id_FormsContainer");
-            //     oVBox.removeAllItems();
-            
-            //     salaryDetailsArray.forEach(function (offerData, index) {
-            //         var effectiveDate = offerData.EffectiveDate || "";
-            //         var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(effectiveDate)}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
-            
-            //         // Yearly Earnings Form
-            //         var oYearlyEarningsForm = new sap.ui.layout.form.SimpleForm({
-            //             editable: false,
-            //             layout: "ResponsiveGridLayout",
-            //             title: this.i18nModel.getText("yearly"),
-            //             content: [
-            //                 new sap.m.Label({ text: this.i18nModel.getText("basicSalary") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.BasicSalary)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("hra") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.HRA)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("eplyrPF") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployerPF)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("medicalInsurance") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.MedicalInsurance)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("gratuity") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Gratuity)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("SpecailAllowance") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.SpecailAllowance)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("Total") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.Total)}` })
-            //             ]
-            //         });
-            
-            //         // Yearly Deductions Form
-            //         var oYearlyDeductionsForm = new sap.ui.layout.form.SimpleForm({
-            //             editable: false,
-            //             layout: "ResponsiveGridLayout",
-            //             title: this.i18nModel.getText("Deductions"),
-            //             content: [
-            //                 new sap.m.Label({ text: this.i18nModel.getText("providentFund") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.EmployeePF)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("performanceTax") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.PT)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("incomeTax") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.IncomeTax)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("totalDeductionAmount") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("variablePayTotal") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` }),
-            
-            //                 new sap.m.Label({ text: this.i18nModel.getText("grossPayTotal") }),
-            //                 new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
-            //             ]
-            //         });
-            
-            //         // HBox to align Earnings and Deductions side by side
-            //         var oTopHBox = new sap.m.HBox({
-            //             justifyContent: "SpaceAround",
-            //             alignItems: "Start",
-            //             items: [oYearlyEarningsForm, oYearlyDeductionsForm]
-            //         });
-            
-            //         // Summary Section
-            //         var oSummaryFlex = new sap.m.FlexBox({
-            //             direction: "Row",
-            //             wrap: "Wrap",
-            //             justifyContent: "Start",
-            //             items: [
-            //                 new sap.m.VBox({
-            //                     width: "200px",
-            //                     items: [
-            //                         new sap.m.Label({ text: this.i18nModel.getText("yearlyGrossPay") }).addStyleClass("boldBlackText"),
-            //                         new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.GrossPay)}` })
-            //                     ]
-            //                 }),
-            //                 new sap.m.VBox({
-            //                     width: "200px",
-            //                     items: [
-            //                         new sap.m.Label({ text: this.i18nModel.getText("yearlyDeduction") }).addStyleClass("boldBlackText"),
-            //                         new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.TotalDeduction)}` })
-            //                     ]
-            //                 }),
-            //                 new sap.m.VBox({
-            //                     width: "200px",
-            //                     items: [
-            //                         new sap.m.Label({ text: this.i18nModel.getText("EmpOfferVariablePay") }).addStyleClass("boldBlackText"),
-            //                         new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.VariablePay)}` })
-            //                     ]
-            //                 }),
-            //                 new sap.m.VBox({
-            //                     width: "200px",
-            //                     items: [
-            //                         new sap.m.Label({ text: this.i18nModel.getText("joiningBonus") }).addStyleClass("boldBlackText"),
-            //                         new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.JoiningBonus)}` })
-            //                     ]
-            //                 }),
-            //                 new sap.m.VBox({
-            //                     width: "200px",
-            //                     items: [
-            //                         new sap.m.Label({ text: this.i18nModel.getText("costOfCompany") }).addStyleClass("boldBlackText"),
-            //                         new sap.m.Text({ text: `INR ${this.Formatter.fromatNumber(offerData.CostofCompany)}` })
-            //                     ]
-            //                 })
-            //             ]
-            //         });
-            
-            //         // Final Panel
-            //         var oPanel = new sap.m.Panel({
-            //             headerToolbar: new sap.m.Toolbar({
-            //                 content: [
-            //                     new sap.m.Title({
-            //                         text: sTitleText,
-            //                         level: "H6",
-            //                         titleStyle: "H6",
-            //                         wrapping: true
-            //                     }).addStyleClass("sapUiTinyMarginBeginEnd")
-            //                 ]
-            //             }),
-            //             expandable: true,
-            //             expanded: true,
-            //             content: [
-            //                 new sap.m.VBox({
-            //                     items: [
-            //                         oTopHBox,
-            //                         new sap.m.Label({ text: "Summary" }).addStyleClass("boldBlackText"),
-            //                         oSummaryFlex
-            //                     ]
-            //                 })
-            //             ]
-            //         }).addStyleClass("sapUiSmallMarginBottom");
-            
-            //         oVBox.addItem(oPanel);
-            //     }.bind(this));
-            // },
-                 
-            //On icon tab select function
+
+            // On icon tab select function
             SS_onTabSelect: function (oEvent) {
                 var oView = this.getView();
                 var oViewModel = oView.getModel("viewModel");
                 var isEditMode = oViewModel.getProperty("/isEditMode");
                 var sKey = oEvent.getParameter("key");
+
                 if (isEditMode) {
                     this.showConfirmationDialog(
                         this.i18nModel.getText("confirmTitle"),
@@ -808,8 +687,9 @@ sap.ui.define([
                 }
             },
 
+            // Handle tab switching with custom busy dialog management
             _handleTabSwitch: async function (sKey) {
-                this.getView().setBusy(true);
+                this.getBusyDialog();        
                 try {
                     let oViewModel = this.getView().getModel("viewModel");
                     oViewModel.setProperty("/isEditButtonVisible", false);
@@ -817,21 +697,20 @@ sap.ui.define([
                         oViewModel.setProperty("/isEditButtonVisible", true);
                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                     } else if (sKey === "educationDetailKey") {
-                        await this._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: this.EmployeeID }, ["EdF_id_EduTable"]);
+                        await this._fetchCommonData("EducationalDetails", "sEducationModel", { EmployeeID: this.EmployeeID });
                     } else if (sKey === "employmentKey") {
-                        await this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID }, ["EmpF_id_EmpTable"]);
+                        await this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID });
                     } else if (sKey === "salaryKey") {
                         await this._fetchCommonData("SalaryDetails", "salaryData", { EmployeeID: this.EmployeeID });
-                    } else if (sKey === "paySlipKey") {
-                        // Future logic for payslip tab
-                    }
+                    } 
                 } catch (oError) {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog();
                     sap.m.MessageToast.show(oError.responseText);
                 } finally {
-                    this.getView().setBusy(false);
+                    this.closeBusyDialog();
                 }
             },
+
             SS_onDownloadTerminateLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var date = Formatter.formatDate(new Date());
@@ -884,13 +763,13 @@ sap.ui.define([
                 this.SSRTE_oDialog.close();
             },
 
-             //  download Visiting Card
+            //  download Visiting Card
             onDownloadVisitCard: function () {
                 var oEmployeeData = this.getView().getModel("sEmployeeModel").getData();
                 if (oEmployeeData) {
                     this.CommonVisitingCard(oEmployeeData[0].EmployeeName, oEmployeeData[0].MobileNo, oEmployeeData[0].CompanyEmailID,
-                    oEmployeeData[0].Designation, oEmployeeData[0].BranchCode);
+                        oEmployeeData[0].Designation, oEmployeeData[0].BranchCode);
                 }
-            },  
+            },
         });
     });

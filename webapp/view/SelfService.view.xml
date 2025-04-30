@@ -46,7 +46,7 @@
 						<VBox id="salaryVBox" />
 
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>paySlip}"  icon="sap-icon://simple-payment" design="Horizontal" key="paySlipKey"></IconTabFilter>
+					<!-- <IconTabFilter text="{i18n>paySlip}"  icon="sap-icon://simple-payment" design="Horizontal" key="paySlipKey"></IconTabFilter> -->
 				</items>
 			</IconTabBar>
 		</content>

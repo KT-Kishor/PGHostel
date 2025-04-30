@@ -47,7 +47,7 @@
             minDate="{startDate}" 
 			valueStateText="{i18n>dateValueState}"/>
 				<Label text="{i18n>grade}"  required="true" />
-				<HBox width="70%" justifyContent="Start">
+				<HBox width="100%" justifyContent="Start">
 					<Input  value="{educationModel>/Grade}" id="AddEd_id_Grade" liveChange="SS_validateGrade"  placeholder="{i18n>grade}"  valueStateText="{i18n>gradeValueState}" maxLength="5"/>
 					<Select  selectedKey="{educationModel>/GradeType}" items="{CollegeGrade>/grade}" id="AddEd_id_GradeType" class="sapUiSmallMarginBegin" change="SS_validateGradeType">
 						<core:Item key="{CollegeGrade>Value}" text="{CollegeGrade>Value}" />
