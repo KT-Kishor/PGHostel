@@ -41,27 +41,27 @@ sap.ui.define([], function () {
         return true;
       }
     },
-  
     _LCvalidateName: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
       if (!oField) return false;
-      var oValue = oField.getValue().trim(); 
-      if (oValue === "") { 
+      var oValue = oField.getValue().trim();
+      if (oValue === "") {
           oField.setValueState("Error");
           return false;
       }
-      var sanitizedValue = oValue.replace(/[^a-zA-Z\s]/g, "");
+     // Allow only letters, spaces, and dots
+      var sanitizedValue = oValue.replace(/[^a-zA-Z\s.]/g, "");
       if (oValue !== sanitizedValue) oField.setValue(sanitizedValue);
-      var regex = /^[a-zA-Z\s]+$/; 
+      var regex = /^[a-zA-Z\s.]+$/;
       if (!regex.test(sanitizedValue)) {
           oField.setValueState("Error");
           return false;
       } else {
-          oField.setValueState("None"); 
+          oField.setValueState("None");
           return true;
       }
   },
-   
+  
         // Amount validation function
     _LCvalidateAmount: function (oEvent, type) {
       var oInput = type === "ID" ? (oInput = oEvent) : (oInput = oEvent.getSource());
