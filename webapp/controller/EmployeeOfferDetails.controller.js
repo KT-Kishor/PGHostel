@@ -458,12 +458,9 @@ sap.ui.define([
             },
             //PDF download function
             EOUF_onPressMerge: async function () {
+                this.getBusyDialog();
                 var oModel = this.getView().getModel("employeeModel");
                 this.offerGeneratingPdfFunction(oModel);
-                this.getView().getModel("employeeModel").setProperty("/Status", "New");
-                await this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
-                MessageToast.show(this.i18nModel.getText("pdfSucces"));
-
             },
             //pdf generate function
             async offerGeneratingPdfFunction(oModel) {
@@ -522,6 +519,11 @@ sap.ui.define([
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
                         jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                        this.getView().getModel("employeeModel").setProperty("/Status", "New");
+                        await this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
+                        this.closeBusyDialog();
+                        MessageToast.show(this.i18nModel.getText("pdfSucces"));
+
                     } else {
                     }
                 }

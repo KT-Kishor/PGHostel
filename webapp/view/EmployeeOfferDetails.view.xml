@@ -44,7 +44,7 @@
 													<l:GridData span="XL4 L4 M6 S9" />
 												</layoutData>
 											</Input>
-											<Label text="{i18n>gender}"/>
+											<Label text="{i18n>gender}" required="true"/>
 											<Select items="{GenderModel>/}" id="EOD_id_Gender" selectedKey="{employeeModel>/Gender}" >
 												<core:Item key="{GenderModel>Value}" text="{GenderModel>Value}" />
 											</Select>
