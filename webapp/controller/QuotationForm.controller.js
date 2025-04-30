@@ -280,9 +280,8 @@ sap.ui.define([
                             },
                         }),
                         new sap.m.Button({
-                            text: that.i18nModel.getText("generate"),
+                            text: that.i18nModel.getText("tileUnit"),
                             type: "Reject",
-                            icon: "sap-icon://pdf-attachment",
                             press: function () {
                                 that.QF_oSuccessDialog.close();
                                 that.QF_onDownloadPDF();

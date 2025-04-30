@@ -169,7 +169,6 @@
                             text="{i18n>dashboard}"
                         />
                         <Button
-                            icon="sap-icon://add"
                             text="Create"
                             type="Accept"
                             press="Q_onPressCreate"

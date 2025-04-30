@@ -26,7 +26,6 @@
                     <Button
                         type="Neutral"
                         text="{i18n>legend}"
-                        icon="sap-icon://message-popup"
                         press=".GS_onOpenMessagePopover"
                         visible="{Payroll>/isSELVisible}"
                     />

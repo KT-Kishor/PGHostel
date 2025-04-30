@@ -1,7 +1,189 @@
-sap.ui.define([], function () {
+sap.ui.define(["../model/formatter"], function (Formatter) {
     "use strict";
     return {
+        Formatter: Formatter,
+
+        _checkPageBreak: function (currentYPosition, bottomLimit, doc, topMargin, backImgX, backImgY, oModel) {
+            if (currentYPosition >= bottomLimit) {
+                doc.addPage(); // Add a new page if the current position exceeds the limit
+                doc.addImage(oModel.CompanyLogoHeader, "PNG", 125, 8, 65, 14.5);
+                doc.setGState(new doc.GState({ opacity: 0.2 }));
+                doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                doc.setGState(new doc.GState({ opacity: 1 }));
+                currentYPosition = topMargin; // Reset to top margin on the new page
+            }
+            return currentYPosition; // Return updated Y position
+        },
+
+        _pdfContent: function (that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content) {
+            doc.addImage(oModel.CompanyLogoHeader, "PNG", 125, 8, 65, 14.5);
+            doc.setGState(new doc.GState({ opacity: 0.2 }));
+            doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+            doc.setGState(new doc.GState({ opacity: 1 }));
+            let titleY = currentY;
+            let titleText = content[0].Title;
+            doc.setFont("times", "bold").setFontSize(12);
+            let textWidth = doc.getTextWidth(titleText);
+            let titleX = (pageWidth - textWidth) / 2;
+            doc.text(titleText, titleX, titleY);
+            doc.setFont("times", "normal").setFontSize(11);
+
+            let titleContentY = titleY + 10; // Initial Y position after titleY
+            const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
+            const boldWordList = boldWords.join(" ").split(" ");
+
+            for (let i = 0; i < 10; i++) {
+                if (!content[i]?.TitleContent) break;
+
+                let titleContent = new Function("oCompanyModel", "oModel", `return ${content[i].TitleContent};`)(oCompanyModel, oModel);
+                let titleContentLines = doc.splitTextToSize(titleContent, maxWidth);
+
+                titleContentLines.forEach((line, lineIndex) => {
+                    let words = line.split(/\s+/);
+                    let totalWords = words.length;
+                    let currentX = margin;
+                    let lineWidth = 0;
+                    let wordWidths = []; // To store widths
+
+                    // Calculate line width, account for bold
+                    words.forEach(word => {
+                        let isBold = boldWordList.some(boldWord => word.includes(boldWord));
+                        doc.setFont("times", isBold ? "bold" : "normal");
+                        let wordWidth = doc.getTextWidth(word);
+                        wordWidths.push(wordWidth);
+                        lineWidth += wordWidth;
+                    });
+
+                    let totalSpaces = totalWords - 1;
+                    let extraSpace = totalSpaces > 0 ? (maxWidth - lineWidth) / totalSpaces : 0;
+
+                    if (lineIndex < titleContentLines.length - 1 && totalWords > 1) {
+                        // Justify all lines except the last
+                        words.forEach((word, index) => {
+                            let isBold = boldWordList.some(boldWord => word.includes(boldWord));
+                            doc.setFont("times", isBold ? "bold" : "normal");
+                            doc.text(word, currentX, titleContentY);
+                            currentX += wordWidths[index] + extraSpace;
+                        });
+                    } else {
+                        // Left-align the last line
+                        words.forEach((word, index) => { // Added index
+                            let isBold = boldWordList.some(boldWord => word.includes(boldWord));
+                            doc.setFont("times", isBold ? "bold" : "normal");
+                            doc.text(word, currentX, titleContentY);
+                            currentX += wordWidths[index] + doc.getTextWidth(" ");
+                        });
+                    }
+                    titleContentY += 6;
+                });
+                titleContentY += 3;
+            }
+
+            currentY = titleContentY; // Start initial Y position
+            doc.setFont("times", "normal");
+
+            for (let i = 1; i <= content.length; i++) {
+                if (!content[i - 1]?.PointNo) break; // Break if data is missing to avoid errors
+                currentY += 2; // Add extra spacing between points
+                currentY = that._checkPageBreak(currentY, bottomLimit, doc, topMargin, backImgX, backImgY, oModel);
+                // Add Point Number and Point Title
+                if (content[i - 1].PointTitle) {
+                    doc.setFont("times", "bold");
+                    doc.setTextColor(0, 111, 191);
+                    doc.text(`${content[i - 1].PointNo}.`, margin + (paraMargin - 6), currentY);
+                    doc.text(content[i - 1].PointTitle, margin + paraMargin, currentY);
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFont("times", "normal");
+                    currentY += 10; // Increment Y position for the content section
+                }
+                else {
+                    doc.text(`${content[i - 1].PointNo}.`, margin + (paraMargin - 6), currentY);
+                }
+                let pointContentY = currentY;
+                let pointContentTemplate = new Function("oCompanyModel", "oModel", `return ${content[i - 1].PointDesc};`)(oCompanyModel, oModel);
+
+                let pointContentParas = pointContentTemplate.split(`\n\n`); // Split content by paragraphs
+
+                // Loop through each paragraph in the PointDesc
+                pointContentParas.forEach((paragraph) => {
+                    let pointContentLines = doc.splitTextToSize(paragraph, maxWidth - paraMargin); // Break paragraph into lines
+
+                    pointContentLines.forEach((line, lineIndex) => {
+                        let words = line.split(" ");
+                        let totalWords = words.length;
+
+                        // Calculate line width and space width
+                        let lineWidth = doc.getTextWidth(line);
+                        let spaceWidth = doc.getTextWidth(" ");
+
+                        // Apply the page-break check
+                        pointContentY = that._checkPageBreak(pointContentY, bottomLimit, doc, topMargin, backImgX, backImgY, oModel);
+
+                        if (lineIndex < pointContentLines.length - 1) {
+                            // Justify all lines except the last line of each paragraph
+                            let extraSpace = totalWords > 1 ? ((maxWidth - paraMargin) - lineWidth) / (totalWords - 1) : 0;
+                            let currentX = margin + paraMargin;
+
+                            words.forEach((word, index) => {
+                                doc.text(word, currentX, pointContentY);
+                                currentX += doc.getTextWidth(word) + spaceWidth + (index < totalWords - 1 ? extraSpace : 0);
+                            });
+                        } else {
+                            // Last line of the paragraph left-aligned
+                            doc.text(line, margin + paraMargin, pointContentY);
+                        }
+
+                        pointContentY += 6; // Increment Y position after each line
+                    });
+
+                    pointContentY += 3; // Add extra spacing between paragraphs
+                });
+
+                currentY = pointContentY; // Update Y position for the next PointTitle
+            }
+
+            let pointContentLastY = currentY + 5;
+            if (pointContentLastY > bottomLimit - 60) {
+                doc.addPage();
+                doc.addImage(oModel.CompanyLogoHeader, "PNG", 130, 8, 60, 13);
+                doc.setGState(new doc.GState({ opacity: 0.2 }));
+                doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                doc.setGState(new doc.GState({ opacity: 1 }));
+                pointContentLastY = topMargin;
+            }
+            doc.setFont("times", "bold");
+            var pointContentLast = `Understood and agreed to by the duly authorized representative of ${oCompanyModel.companyName} and ${oModel.ClientCompanyName}`;
+            let pointContentLastLines = doc.splitTextToSize(pointContentLast, maxWidth);
+            pointContentLastLines.forEach((line) => {
+                doc.text(line, margin, pointContentLastY);
+                pointContentLastY += 6;
+            });
+
+            let forCoNameY = pointContentLastY + 10;
+            doc.text(`For ${oCompanyModel.companyName}`, margin, forCoNameY);
+            doc.text("By:", margin, forCoNameY + 5);
+
+            let headofCoNameY = forCoNameY + 30;
+            doc.text(oCompanyModel.headOfCompany, margin, headofCoNameY);
+
+            doc.setFont("times", "normal");
+            let headofCoRoleY = headofCoNameY + 5;
+            doc.text(oCompanyModel.designation, margin, headofCoRoleY);
+            doc.text(oModel.AgreementDate, margin, headofCoRoleY + 5);
+
+            doc.setFont("times", "bold");
+            doc.text(`For ${oModel.ClientCompanyName}`, pageMiddle + 10, forCoNameY);
+            doc.text("By:", pageMiddle + 10, forCoNameY + 5);
+
+            doc.text(oModel.ClientName, pageMiddle + 10, headofCoNameY);
+
+            doc.setFont("times", "normal");
+            doc.text(oModel.ClientRole, pageMiddle + 10, headofCoRoleY);
+            doc.text(oModel.AgreementDate, pageMiddle + 10, headofCoRoleY + 5);
+        },
+        
         _GenerateAgreementPDF: function (oModel, oCompanyModel, contentNDA, contentMSA) {
+            var that = this;
             setTimeout(function () {
                 var { jsPDF } = window.jspdf;
                 var doc = new jsPDF({
@@ -21,194 +203,46 @@ sap.ui.define([], function () {
                 var maxWidth = pageWidth - 2 * margin; // usable width
                 var pageMiddle = pageWidth / 2;
                 var bottomLimit = pageHeight - footerHeight;
-                let currentY;
+                let currentY = topMargin;
 
                 const backImgX = (pageWidth - 100) / 2; // Center horizontally
                 const backImgY = (pageHeight - 100) / 2; // Center vertically
 
-                function checkPageBreak(currentYPosition) {
-
-                    if (currentYPosition >= bottomLimit) {
-                        doc.addPage(); // Add a new page if the current position exceeds the limit
-                        doc.addImage(oModel.CompanyLogoHeader, "PNG", 125, 8, 65, 14.5);
-                        doc.setGState(new doc.GState({ opacity: 0.2 }));
-                        doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
-                        doc.setGState(new doc.GState({ opacity: 1 }));
-                        currentYPosition = topMargin; // Reset to top margin on the new page
-                    }
-                    return currentYPosition; // Return updated Y position
-                }
-
-                function pdfContent(content) {
-                    doc.addImage(oModel.CompanyLogoHeader, "PNG", 125, 8, 65, 14.5);
-                    doc.setGState(new doc.GState({ opacity: 0.2 }));
-                    doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
-                    doc.setGState(new doc.GState({ opacity: 1 }));
-                    let titleY = topMargin;
-                    let titleText = content[0].Title;
-                    doc.setFont("times", "bold").setFontSize(12);
-                    let textWidth = doc.getTextWidth(titleText);
-                    let titleX = (pageWidth - textWidth) / 2;
-                    doc.text(titleText, titleX, titleY);
-                    doc.setFont("times", "normal").setFontSize(11);
-
-                    let titleContentY = titleY + 10; // Initial Y position after titleY
-                    const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
-                    const boldWordList = boldWords.join(" ").split(" ");
-
-                    for (let i = 0; i < 10; i++) {
-                        if (!content[i]?.TitleContent) break;
-
-                        let titleContent = new Function("oCompanyModel", "oModel", `return ${content[i].TitleContent};`)(oCompanyModel, oModel);
-                        let titleContentLines = doc.splitTextToSize(titleContent, maxWidth);
-
-                        titleContentLines.forEach((line, lineIndex) => {
-                            let words = line.split(/\s+/);
-                            let totalWords = words.length;
-                            let currentX = margin;
-                            let lineWidth = 0;
-                            let wordWidths = []; // To store widths
-
-                            // Calculate line width, account for bold
-                            words.forEach(word => {
-                                let isBold = boldWordList.some(boldWord => word.includes(boldWord));
-                                doc.setFont("times", isBold ? "bold" : "normal");
-                                let wordWidth = doc.getTextWidth(word);
-                                wordWidths.push(wordWidth);
-                                lineWidth += wordWidth;
-                            });
-
-                            let totalSpaces = totalWords - 1;
-                            let extraSpace = totalSpaces > 0 ? (maxWidth - lineWidth) / totalSpaces : 0;
-
-                            if (lineIndex < titleContentLines.length - 1 && totalWords > 1) {
-                                // Justify all lines except the last
-                                words.forEach((word, index) => {
-                                    let isBold = boldWordList.some(boldWord => word.includes(boldWord));
-                                    doc.setFont("times", isBold ? "bold" : "normal");
-                                    doc.text(word, currentX, titleContentY);
-                                    currentX += wordWidths[index] + extraSpace;
-                                });
-                            } else {
-                                // Left-align the last line
-                                words.forEach((word, index) => { // Added index
-                                    let isBold = boldWordList.some(boldWord => word.includes(boldWord));
-                                    doc.setFont("times", isBold ? "bold" : "normal");
-                                    doc.text(word, currentX, titleContentY);
-                                    currentX += wordWidths[index] + doc.getTextWidth(" ");
-                                });
-                            }
-                            titleContentY += 6;
-                        });
-                        titleContentY += 3;
-                    }
-
-                    currentY = titleContentY; // Start initial Y position
-                    doc.setFont("times", "normal");
-
-                    for (let i = 1; i <= content.length; i++) {
-                        if (!content[i - 1]?.PointNo) break; // Break if data is missing to avoid errors
-                        currentY += 2; // Add extra spacing between points
-                        currentY = checkPageBreak(currentY);
-                        // Add Point Number and Point Title
-                        if (content[i - 1].PointTitle) {
-                            doc.setFont("times", "bold");
-                            doc.setTextColor(0, 111, 191);
-                            doc.text(`${content[i - 1].PointNo}.`, margin + (paraMargin - 6), currentY);
-                            doc.text(content[i - 1].PointTitle, margin + paraMargin, currentY);
-                            doc.setTextColor(0, 0, 0);
-                            doc.setFont("times", "normal");
-                            currentY += 10; // Increment Y position for the content section
-                        }
-                        else {
-                            doc.text(`${content[i - 1].PointNo}.`, margin + (paraMargin - 6), currentY);
-                        }
-                        let pointContentY = currentY;
-                        let pointContentTemplate = new Function("oCompanyModel", "oModel", `return ${content[i - 1].PointDesc};`)(oCompanyModel, oModel);
-
-                        let pointContentParas = pointContentTemplate.split(`\n\n`); // Split content by paragraphs
-
-                        // Loop through each paragraph in the PointDesc
-                        pointContentParas.forEach((paragraph) => {
-                            let pointContentLines = doc.splitTextToSize(paragraph, maxWidth - paraMargin); // Break paragraph into lines
-
-                            pointContentLines.forEach((line, lineIndex) => {
-                                let words = line.split(" ");
-                                let totalWords = words.length;
-
-                                // Calculate line width and space width
-                                let lineWidth = doc.getTextWidth(line);
-                                let spaceWidth = doc.getTextWidth(" ");
-
-                                // Apply the page-break check
-                                pointContentY = checkPageBreak(pointContentY);
-
-                                if (lineIndex < pointContentLines.length - 1) {
-                                    // Justify all lines except the last line of each paragraph
-                                    let extraSpace = totalWords > 1 ? ((maxWidth - paraMargin) - lineWidth) / (totalWords - 1) : 0;
-                                    let currentX = margin + paraMargin;
-
-                                    words.forEach((word, index) => {
-                                        doc.text(word, currentX, pointContentY);
-                                        currentX += doc.getTextWidth(word) + spaceWidth + (index < totalWords - 1 ? extraSpace : 0);
-                                    });
-                                } else {
-                                    // Last line of the paragraph left-aligned
-                                    doc.text(line, margin + paraMargin, pointContentY);
-                                }
-
-                                pointContentY += 6; // Increment Y position after each line
-                            });
-
-                            pointContentY += 3; // Add extra spacing between paragraphs
-                        });
-
-                        currentY = pointContentY; // Update Y position for the next PointTitle
-                    }
-
-                    let pointContentLastY = currentY + 5;
-                    if (pointContentLastY > bottomLimit - 60) {
-                        doc.addPage();
-                        doc.addImage(oModel.CompanyLogoHeader, "PNG", 130, 8, 60, 13);
-                        doc.setGState(new doc.GState({ opacity: 0.2 }));
-                        doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
-                        doc.setGState(new doc.GState({ opacity: 1 }));
-                        pointContentLastY = topMargin;
-                    }
-                    doc.setFont("times", "bold");
-                    var pointContentLast = `Understood and agreed to by the duly authorized representative of ${oCompanyModel.companyName} and ${oModel.ClientCompanyName}`;
-                    let pointContentLastLines = doc.splitTextToSize(pointContentLast, maxWidth);
-                    pointContentLastLines.forEach((line) => {
-                        doc.text(line, margin, pointContentLastY);
-                        pointContentLastY += 6;
-                    });
-
-                    let forCoNameY = pointContentLastY + 10;
-                    doc.text(`For ${oCompanyModel.companyName}`, margin, forCoNameY);
-                    doc.text("By:", margin, forCoNameY + 5);
-
-                    let headofCoNameY = forCoNameY + 30;
-                    doc.text(oCompanyModel.headOfCompany, margin, headofCoNameY);
-
-                    doc.setFont("times", "normal");
-                    let headofCoRoleY = headofCoNameY + 5;
-                    doc.text(oCompanyModel.designation, margin, headofCoRoleY);
-                    doc.text(oModel.AgreementDate, margin, headofCoRoleY + 5);
-
-                    doc.setFont("times", "bold");
-                    doc.text(`For ${oModel.ClientCompanyName}`, pageMiddle + 10, forCoNameY);
-                    doc.text("By:", pageMiddle + 10, forCoNameY + 5);
-
-                    doc.text(oModel.ClientName, pageMiddle + 10, headofCoNameY);
-
-                    doc.setFont("times", "normal");
-                    doc.text(oModel.ClientRole, pageMiddle + 10, headofCoRoleY);
-                    doc.text(oModel.AgreementDate, pageMiddle + 10, headofCoRoleY + 5);
-                }
-
-                pdfContent(contentNDA);
+                that._pdfContent(that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, contentNDA);
                 doc.addPage();
-                pdfContent(contentMSA);
+                that._pdfContent(that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, contentMSA);
+                doc.save(`${oCompanyModel.companyName} - ${oModel.ClientCompanyName} MSA & NDA.pdf`);
+                sap.ui.core.BusyIndicator.hide();
+            }, 1000);
+        },
+
+        _GenerateContractPDF: function (oModel, oCompanyModel, content) {
+            var that = this;
+            setTimeout(function () {
+                var { jsPDF } = window.jspdf;
+                var doc = new jsPDF({
+                    unit: "mm",
+                    format: "a4",
+                    margins: { left: 30, right: 30 },
+                    lineHeight: 1.5,
+                    orientation: "portrait",
+                });
+
+                var pageWidth = doc.internal.pageSize.getWidth();
+                var pageHeight = doc.internal.pageSize.getHeight();
+                var margin = 25; // left and right margin
+                var paraMargin = 6; // left margin for paragraphs
+                var topMargin = 35;
+                var footerHeight = 25; // reserve 25 units at the bottom for footer
+                var maxWidth = pageWidth - 2 * margin; // usable width
+                var pageMiddle = pageWidth / 2;
+                var bottomLimit = pageHeight - footerHeight;
+                let currentY = topMargin;
+
+                const backImgX = (pageWidth - 100) / 2; // Center horizontally
+                const backImgY = (pageHeight - 100) / 2; // Center vertically
+
+                that._pdfContent(that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content);
                 doc.save(`${oCompanyModel.companyName} - ${oModel.ClientCompanyName} MSA & NDA.pdf`);
                 sap.ui.core.BusyIndicator.hide();
             }, 1000);
@@ -353,55 +387,94 @@ sap.ui.define([], function () {
                     doc.setFont("helvetica", "normal");
                     let pointContentTemplate = new Function("oCompanyModel", "oModel", `return ${content[i - 1].PointDesc};`)(oCompanyModel, oModel);
 
-                    if (pointContentTemplate == "Table") {
-                        doc.setLineWidth(1);
-                        doc.setDrawColor(231, 166, 0);
-                        let firstLineY = currentY + 6;
-                        doc.line(margin + 6, firstLineY, pageWidth - margin, firstLineY);
-                        let secondLineY = firstLineY + 8;
-                        doc.line(margin + 6, secondLineY, pageWidth - margin, secondLineY);
-                        doc.setFillColor(255, 207, 84);
-                        doc.rect(margin + 6, firstLineY, maxWidth - 6, secondLineY - firstLineY, 'F');
-                        let headingY = firstLineY + 3;
-                        doc.setFont("helvetica", "bold").setFontSize(8.5);
-                        let column1TextX = margin + 7;
-                        doc.text("Sl", column1TextX, headingY);
-                        doc.text("No", column1TextX, headingY + 4);
-                        let column2TextX = column1TextX + 10;
-                        doc.text("Details of Assigned", column2TextX, headingY);
-                        doc.text("IT Personnel", column2TextX, headingY + 4);
-                        let column3TextX = column2TextX + 42;
-                        doc.text("Designation", column3TextX, headingY);
-                        let column4TextX = column3TextX + 35;
-                        doc.text("Start Date", column4TextX, headingY);
-                        let column5TextX = column4TextX + 20;
-                        doc.text("End Date", column5TextX, headingY);
-                        let column6TextX = column5TextX + 20;
-                        doc.text("Rate Card", column6TextX, headingY);
+                    if (pointContentTemplate === "Table") {
+                        const pageHeight = doc.internal.pageSize.height;
+                        const lineHeight = 6;
+                        const rowHeight = 6;
+                        const headingFontSize = 8.5;
+                        const bodyFontSize = 8;
 
-                        doc.setFont("helvetica", "normal").setFontSize(8);
-                        var tableData = oModel.TableData;
-                        let tableDataCurrentY = secondLineY + 4.5;
+                        // Column definitions
+                        const columns = [
+                            { title: "Sl\nNo", widthRatio: 0.08 },
+                            { title: "Details of Assigned\nIT Personnel", widthRatio: 0.32 },
+                            { title: "Designation", widthRatio: 0.18 },
+                            { title: "Start Date", widthRatio: 0.12 },
+                            { title: "End Date", widthRatio: 0.12 },
+                            { title: "Rate Card", widthRatio: 0.18 }
+                        ];
+
+                        const tableStartX = margin + 6;
+                        const tableMaxWidth = pageWidth - tableStartX - margin;
+                        const columnWidths = columns.map(col => col.widthRatio * tableMaxWidth);
+                        const columnXPositions = columnWidths.reduce((acc, width, i) => {
+                            acc.push((acc[i - 1] || tableStartX) + (i ? columnWidths[i - 1] : 0));
+                            return acc;
+                        }, []);
+
+                        // Draw Header Background
+                        let firstLineY = currentY + 6;
+                        let secondLineY = firstLineY + 8;
+                        doc.setLineWidth(1).setDrawColor(231, 166, 0);
+                        doc.line(tableStartX, firstLineY, pageWidth - margin, firstLineY);
+                        doc.line(tableStartX, secondLineY, pageWidth - margin, secondLineY);
+                        doc.setFillColor(255, 207, 84);
+                        doc.rect(tableStartX, firstLineY, tableMaxWidth, secondLineY - firstLineY, 'F');
+
+                        // Header Text
+                        doc.setFont("helvetica", "bold").setFontSize(headingFontSize);
+                        const headingY = firstLineY + 3;
+                        columns.forEach((col, i) => {
+                            const lines = col.title.split("\n");
+                            lines.forEach((line, j) => {
+                                doc.text(line, columnXPositions[i] + 1, headingY + (j * 4));
+                            });
+                        });
+
+                        // Table Body
+                        doc.setFont("helvetica", "normal").setFontSize(bodyFontSize);
+                        const tableData = oModel.TableData;
+                        let tableDataY = secondLineY + 4.5;
 
                         for (let i = 0; i < tableData.length; i++) {
-                            doc.setFillColor(255, 237, 194);
-                            doc.rect(margin + 6, tableDataCurrentY - 4, maxWidth - 6, 6, 'F');
-                            doc.text(tableData[i].SlNo, column1TextX, tableDataCurrentY);
-                            doc.text(tableData[i].Name, column2TextX, tableDataCurrentY);
-                            doc.text(tableData[i].Role, column3TextX, tableDataCurrentY);
-                            doc.text(tableData[i].StartDate, column4TextX, tableDataCurrentY);
-                            doc.text(tableData[i].EndDate, column5TextX, tableDataCurrentY);
-                            doc.text(tableData[i].RateCard, column6TextX, tableDataCurrentY);
-                            if (i == tableData.length - 1) {
-                                doc.setLineWidth(0.5);
+                            const { Salutation, ConsultantName, Designation, StartDate, EndDate, Rate } = tableData[i];
+                            const rowValues = [i+1, Salutation + " " + ConsultantName, Designation, Formatter.formatDate(StartDate), Formatter.formatDate(EndDate), Rate];
+                        
+                            // Wrap text for each cell and calculate line count
+                            const wrappedLines = rowValues.map((val, j) => doc.splitTextToSize(val, columnWidths[j] - 2));
+                            const lineCounts = wrappedLines.map(lines => lines.length);
+                            const maxLineCount = Math.max(...lineCounts);
+                            const dynamicRowHeight = maxLineCount * 4.5; // Adjust line height as needed
+                        
+                            // Check for page overflow
+                            if (tableDataY + dynamicRowHeight > pageHeight - margin) {
+                                doc.addPage();
+                                tableDataY = margin;
                             }
-                            doc.line(margin + 6, tableDataCurrentY + 2, pageWidth - margin, tableDataCurrentY + 2); // Draw line below the row
-                            tableDataCurrentY += 6;
-                        }
+                        
+                            // Background fill
+                            doc.setFillColor(255, 237, 194);
+                            doc.rect(tableStartX, tableDataY-4, tableMaxWidth, dynamicRowHeight, 'F');
+                        
+                            // Draw text cell by cell
+                            wrappedLines.forEach((lines, j) => {
+                                for (let k = 0; k < lines.length; k++) {
+                                    doc.text(lines[k], columnXPositions[j] + 1, (tableDataY + (k * 4) - 1));
+                                }
+                            });
+                        
+                            // Bottom line
+                            if(i == tableData.length - 1) doc.setLineWidth(0.5);
+                            doc.line(tableStartX, tableDataY + dynamicRowHeight-4, pageWidth - margin, tableDataY + dynamicRowHeight-4);
+                        
+                            // Move to next row
+                            tableDataY += dynamicRowHeight;
+                        }                        
+
+                        // Reset and update Y position
                         doc.setDrawColor(0, 0, 0);
-                        currentY = tableDataCurrentY + 4; // Update Y position for the next PointTitle
-                        doc.setFont("helvetica", "bold");
-                        doc.setFontSize(11);
+                        currentY = tableDataY + 4;
+                        doc.setFont("helvetica", "bold").setFontSize(11);
                         continue;
                     }
 

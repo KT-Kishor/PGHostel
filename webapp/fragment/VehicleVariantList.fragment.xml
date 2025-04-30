@@ -92,7 +92,7 @@
         <endButton>
             <Button
                 text="Close"
-                type="Negative"
+                type="Reject"
                 press="VVF_onCloseDialog"
             />
         </endButton>

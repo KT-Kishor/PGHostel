@@ -24,29 +24,25 @@
                         buttonOnly="true"
                         fileType="XLSX,xlsx,XLS,xls"
                         style="Attention"
-                        icon="sap-icon://sys-next-page"
                         change=".MP_onPressSalUpdate"
                         visible="{Payroll>/isSELVisible}"
                     />
                     <Button
                         id="MP_id_DeleteBtn"
-                        type="Negative"
+                        type="Reject"
                         text="{i18n>delete}"
-                        icon="sap-icon://delete"
                         press=".MP_onPressDelete"
                         visible="{Payroll>/isSELVisible}"
                     />
                     <Button
                         type="Emphasized"
                         text="{i18n>export}"
-                        icon="sap-icon://sys-prev-page"
                         press=".MP_onPressExport"
                         visible="{Payroll>/isSELVisible}"
                     />
                     <Button
                         type="Neutral"
                         text="{i18n>legend}"
-                        icon="sap-icon://message-popup"
                         press=".MP_onOpenMessagePopover"
                         visible="{Payroll>/isSELVisible}"
                     />

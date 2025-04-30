@@ -742,8 +742,7 @@
                 <m:contentRight>
                     <m:Button
                         iconFirst="true"
-                        icon="sap-icon://pdf-attachment"
-                        text="{i18n>generate}"
+                        text="{i18n>tileUnit}"
                         id="QF_id_PDFBtn"
                         type="Reject"
                         press="QF_onDownloadPDF"
@@ -754,7 +753,6 @@
                         press="QF_onPressEdit"
                         type="{= ${Quotation>/MasterEdit} ? 'Accept' : 'Neutral'}"
                         visible="{Quotation>/ShowCase}"
-                        icon="{= ${Quotation>/MasterEdit} ? '' : 'sap-icon://edit'}"
                     />
 
                     <m:Button
