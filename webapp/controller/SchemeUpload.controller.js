@@ -224,13 +224,14 @@ sap.ui.define(
             this.i18nModel.getText("msgBoxConfirm"),
             this.i18nModel.getText("msgBoxConfirmDelete"),
             async function () {
-              this.getBusyDialog();
+              that.getBusyDialog();
               await that.ajaxDeleteWithJQuery("/SchemeUploade", { filters: { ID: oContext } }).then(() => {
-                this.closeBusyDialog();
+                that.closeBusyDialog();
                 MessageToast.show(that.i18nModel.getText("msgSchemeDeleted"));
-                that.CommomReadCall("");
+                // that.CommomReadCall("");
+                that.SU_onSearch();
               }).catch((error) => {
-                this.closeBusyDialog();
+                that.closeBusyDialog();
                 MessageToast.show(error.responseText);
               });
             },
