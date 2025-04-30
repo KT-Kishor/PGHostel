@@ -413,7 +413,7 @@ sap.ui.define([
                 this.T_ButtonVisibility();
                 this.T_Button();
                 this.T_MailDialog = null;
-                this.T_MailDialog.close();
+                // this.T_MailDialog.close();
             },
             //Handle the file upload function
             Mail_onUpload: function (oEvent) {
@@ -436,23 +436,29 @@ sap.ui.define([
             },
             //send mail function
             Mail_onSendEmail: function () {
-                var oModel = this.getView().getModel("traineeModel").getData()[0];
-                var oPayload = {
-                    "TraineeName": oModel.TraineeName,
-                    "toEmailID": oModel.TraineeEmail,
-                    "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
-                    "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
-                };
-                this.getBusyDialog();
-                this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload).then((oData) => {
-                    MessageToast.show(this.i18nModel.getText("certificateSuccess"));
-                    this.byId("T_id_TraineeTable").removeSelections(true);
+                try {
+                    var oModel = this.getView().getModel("traineeModel").getData()[0];
+                    var oPayload = {
+                        "TraineeName": oModel.TraineeName,
+                        "toEmailID": oModel.TraineeEmail,
+                        "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
+                        "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
+                    };
+                    this.getBusyDialog();
+                    this.ajaxCreateWithJQuery("TraineeCertificateEmail", oPayload).then((oData) => {
+                        MessageToast.show(this.i18nModel.getText("certificateSuccess"));
+                        this.byId("T_id_TraineeTable").removeSelections(true);
+                        this.closeBusyDialog();
+                    }).catch((error) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.responseText);
+                    });
+                    this.Mail_onPressClose();
+                } catch (error) {
                     this.closeBusyDialog();
-                }).catch((error) => {
-                    MessageToast.show(error.message || error.responseText);
-                    this.closeBusyDialog();
-                });
-                this.Mail_onPressClose();
+                    MessageToast.show(error.responseText);
+                }
             }
+            
         });
     });

@@ -394,7 +394,7 @@ sap.ui.define([
             Mail_onPressClose: function () {
                 this.EOU_oDialogMail.destroy();
                 this.EOU_oDialogMail = null;
-                this.EOU_oDialogMail.close();
+               // this.EOU_oDialogMail.close();
             },
             //File upload function calling from base controller
             Mail_onUpload: function (oEvent) {
@@ -425,26 +425,32 @@ sap.ui.define([
             },
             //Send mail
             Mail_onSendEmail: function () {
-                var oModel = this.getView().getModel("employeeModel").getData();
-                var oPayload = {
-                    "EmployeeName": oModel.ConsultantName,
-                    "toEmailID": oModel.EmployeeEmail,
-                    "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
-                    "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
-                    "Designation": oModel.Designation
-                };
-                this.getBusyDialog();
-                this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload).then((oData) => {
-                    this.getView().getModel("employeeModel").setProperty("/Status", "Offer Sent");
-                    this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
-                    MessageToast.show(this.i18nModel.getText("emailSuccess"));
-                    this.closeBusyDialog();
-                }).catch((error) => {
+                try {
+                    var oModel = this.getView().getModel("employeeModel").getData();
+                    var oPayload = {
+                        "EmployeeName": oModel.ConsultantName,
+                        "toEmailID": oModel.EmployeeEmail,
+                        "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
+                        "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
+                        "Designation": oModel.Designation
+                    };
+                    this.getBusyDialog();
+                    this.ajaxCreateWithJQuery("EmployeeOfferEmail", oPayload).then((oData) => {
+                        this.getView().getModel("employeeModel").setProperty("/Status", "Offer Sent");
+                        this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
+                        MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                        this.closeBusyDialog();
+                    }).catch((error) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.responseText);
+                    });
+                    this.Mail_onPressClose();        
+                } catch (error) {
                     this.closeBusyDialog();
                     MessageToast.show(error.responseText);
-                });
-                this.Mail_onPressClose();
+                }
             },
+            
             //back confirmation
             EOD_onPressBackBtn: function () {
                 this.showConfirmationDialog(

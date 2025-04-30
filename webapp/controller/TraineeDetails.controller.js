@@ -340,7 +340,7 @@ sap.ui.define([
             Mail_onPressClose: function () {
                 this.TU_oDialogMail.destroy();
                 this.TU_oDialogMail = null;
-                this.TU_oDialogMail.close();
+                // this.TU_oDialogMail.close();
             },
             //File upload function
             Mail_onUpload: function (oEvent) {
@@ -360,27 +360,32 @@ sap.ui.define([
             },
             //mail send function
             Mail_onSendEmail: function () {
-                this.getBusyDialog();
-                var oModel = this.getView().getModel("oTraineeDetails").getData();
-                var oPayload = {
-                    "TraineeName": oModel.TraineeName,
-                    "toEmailID": oModel.TraineeEmail,
-                    "JoiningDate": Formatter.formatDate(oModel.JoiningDate),
-                    "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
-                    "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
-                };
-                this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload).then((oData) => {
-                    this.getView().getModel("oTraineeDetails").setProperty("/Status", "Offer Sent");
-                    MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                try {
+                    this.getBusyDialog();
+                    var oModel = this.getView().getModel("oTraineeDetails").getData();
+                    var oPayload = {
+                        "TraineeName": oModel.TraineeName,
+                        "toEmailID": oModel.TraineeEmail,
+                        "JoiningDate": Formatter.formatDate(oModel.JoiningDate),
+                        "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
+                        "attachments": this.getView().getModel("UploaderData").getProperty("/attachments")
+                    };
+                    this.ajaxCreateWithJQuery("TraineeOfferEmail", oPayload).then((oData) => {
+                        this.getView().getModel("oTraineeDetails").setProperty("/Status", "Offer Sent");
+                        MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                        this.closeBusyDialog();
+                        this.updateCallForTrainee(this.viewModel, "silent");
+                    }).catch((error) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.responseText);
+                    });
+                    this.Mail_onPressClose();
+                } catch (error) {
                     this.closeBusyDialog();
-                    this.updateCallForTrainee(this.viewModel, "silent");
-                }).catch((error) => {
-                    MessageToast.show(error.message || error.responseText);
-                    this.closeBusyDialog();
-                });
-                this.Mail_onPressClose();
+                    MessageToast.show(error.responseText);
+                }
             },
-
+            
             //PDF generation function
             TD_onPressMerge: function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");
