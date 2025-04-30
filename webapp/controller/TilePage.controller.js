@@ -23,9 +23,13 @@ sap.ui.define(
         },
 
         AppVisibilityReadCall: async function () {
+          var oModel = this.getView().getModel("LoginModel");
+          if(!oModel){
+            return;
+          }
           BusyIndicator.show(0);
-          var LoginModel = this.getView().getModel("LoginModel").getData();
-          await this.ajaxReadWithJQuery("AppVisibility", { Role: LoginModel.Role }, []).then((oData) => {
+          var LoginModel = oModel.getData();
+          await this.ajaxReadWithJQuery("AppVisibility", { Role: LoginModel.Role }).then((oData) => {
             var AppVisiblity = Array.isArray(oData.data) ? oData.data[0] : [oData.data[0]];
             this.getView().setModel(new JSONModel(AppVisiblity), "AppVisibilityModel");
             BusyIndicator.hide();

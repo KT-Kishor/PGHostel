@@ -2,8 +2,9 @@ sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/model/json/JSONModel",
   "../utils/TraineeCertificatePDF",
-  "../model/formatter"
-], function (Controller, JSONModel, jsPDF, Formatter) {
+  "../model/formatter",
+  "sap/ui/core/BusyIndicator"
+], function (Controller, JSONModel, jsPDF, Formatter,BusyIndicator) {
   "use strict";
 
   return Controller.extend("sap.kt.ktofferletter.products.controller.BaseController", {
@@ -122,6 +123,10 @@ sap.ui.define([
     },
 
     _fetchCommonData: async function (entityName, modelName, filter = "") {
+      if(!this.getOwnerComponent().getModel("LoginModel")){
+        BusyIndicator.hide();
+        return;
+      }
       let url = this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;
       try {
         await new Promise((resolve, reject) => {
