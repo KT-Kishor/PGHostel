@@ -12,6 +12,9 @@ sap.ui.define([
         return BaseController.extend("sap.kt.com.minihrsolution.controller.AssetAssignment", {
             Formatter: Formatter,
             onInit: function () {
+                var oDateModel = new sap.ui.model.json.JSONModel();
+                oDateModel.setData({ maxDate: new Date() });
+                this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("RouteAssetAssignment").attachMatched(this._onRouteMatched, this);
                 // form.setData({ maxDate: AssignedDate, focusedDate: new Date });
             },
@@ -52,7 +55,7 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
                 this.AA_CoomonReadCall();
-                this.oLoginModel.setProperty("/HeaderName", "Asset Assignment Details");
+                this.oLoginModel.setProperty("/HeaderName", "Asset Assignment");
                 this.getModelData();
                 this.closeBusyDialog();
             },
@@ -143,6 +146,7 @@ sap.ui.define([
                     fileName: "Asset_Assignment_Details.xlsx",
                     worker: false,
                 };
+                MessageToast.show(this.i18nModel.getText("assetDownload"))
                 const oSheet = new sap.ui.export.Spreadsheet(oSettings);
                 oSheet.build().finally(function () {
                     oSheet.destroy();
@@ -205,6 +209,7 @@ sap.ui.define([
                     this.FAA_Dialog.open();
                     sap.ui.getCore().byId("FAA_id_employeeID").setSelectedKey("");
                     sap.ui.getCore().byId("FAA_id_Type").setSelectedKey("");
+                    sap.ui.getCore().byId("FAA_id_Model").setSelectedKey("");
                     sap.ui.getCore().byId("FAA_branch_Id").setSelectedKey("");
                     sap.ui.getCore().byId("FAA_id_AssignedBy").setSelectedKey("");
 
@@ -237,7 +242,11 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            onStrictValidationComboBox: function (oEvent) {
+            FAB_onStrictValidationComboBox: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+            },
+
+            FAT_onStrictValidationComboBox: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
 
             },
@@ -255,58 +264,55 @@ sap.ui.define([
             },
 
             onPressSave: async function () {
-                var comboIds = ["FAA_id_employeeID", "FAA_id_Type", "FAA_branch_Id", "FAA_id_AssignedBy"];
+                var fieldOrder = [
+                    { id: "FAA_id_employeeID", type: "ComboBox" },
+                    { id: "FAA_id_Type", type: "ComboBox" },
+                    { id: "FAA_id_Model", type: "Input" }, // VHD input
+                    { id: "FAA_branch_Id", type: "ComboBox" },
+                    { id: "FAA_id_AssignedBy", type: "ComboBox" }
+                ];
 
-                // Collect Input field IDs (not ComboBoxes)
-                var inputIds = ["FAA_id_Model"];
+                for (let field of fieldOrder) {
+                    var oControl = sap.ui.getCore().byId(field.id);
+                    var isValid;
 
-                // Validate ComboBoxes
-                var bStrictValid = comboIds.every(function (sId) {
-                    var oComboBox = sap.ui.getCore().byId(sId);
-                    return utils._LCstrictValidationComboBox({
-                        getSource: function () { return oComboBox; },
-                        getParameter: function () { return oComboBox.getValue(); }
-                    });
-                });
-
-                // Validate Inputs
-                var bInputValid = inputIds.every(function (sId) {
-                    var oInput = sap.ui.getCore().byId(sId);
-                    return utils._LCvalidateMandatoryField(oInput, "ID")});
-
-                try {
-                    if (bStrictValid &&
-                        bInputValid &&
-                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FAA_id_employeeID"), "ID") &&
-                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FAA_id_Type"), "ID") &&
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_Model"), "ID") &&
-                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FAA_branch_Id"), "ID") &&
-                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FAA_id_AssignedBy"), "ID") &&
-                        utils._LCvalidateName(sap.ui.getCore().byId("FAA_id_AssignedBy"), "ID") &&
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FAA_id_AssignedDate"), "ID")) {
-
-                        var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
-                        var originalStatus = this.getView().getModel("myform").getProperty("/formData/data/Status");
-                        var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
-                        oFormData.AssignedDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oAssignedDate);
-                        oFormData.Status = "Assigned";
-                        oFormData.IsCurrent = 1;
-                        // oFormData.ReturnDate = null;
-                        this.getBusyDialog();
-                        if (originalStatus === "Returned") {
-                            await this.ajaxCreateWithJQuery("IncomeAsset", { data: oFormData }, ["FAA_id_FormFrag"])
-                        }
-                        else {
-                            await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oFormData, filters: { ID: this.getView().getModel("myform").getProperty("/formData/filters/ID") } }, ["FAA_id_FormFrag"]);
-                        }
-                        await this.AA_CoomonReadCall();
-
-                        this.FAA_Dialog.close();
-                        this.byId("AA_id_AssestTable").removeSelections(true)
-
+                    if (field.type === "ComboBox") {
+                        isValid = utils._LCstrictValidationComboBox(oControl, "ID");
                     } else {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        isValid = utils._LCvalidateMandatoryField(oControl, "ID");
                     }
+
+                    if (!isValid) {
+                        oControl.focus(); // optional: focus the first invalid field
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return; // stop on first invalid field
+                    }
+                }
+
+                // --- If all fields are valid, proceed ---
+                try {
+                    var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
+                    var originalStatus = oFormData.Status;
+                    var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
+                    oFormData.AssignedDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oAssignedDate);
+                    oFormData.Status = "Assigned";
+                    oFormData.IsCurrent = 1;
+
+                    this.getBusyDialog();
+
+                    if (originalStatus === "Returned") {
+                        await this.ajaxCreateWithJQuery("IncomeAsset", { data: oFormData }, ["FAA_id_FormFrag"]);
+                    } else {
+                        await this.ajaxUpdateWithJQuery("IncomeAsset", {
+                            data: oFormData,
+                            filters: { ID: this.getView().getModel("myform").getProperty("/formData/filters/ID") }
+                        }, ["FAA_id_FormFrag"]);
+                    }
+
+                    await this.AA_onSearch();
+                    this.FAA_Dialog.close();
+                    this.byId("AA_id_AssestTable").removeSelections(true);
+
                 } catch (e) {
                     this.closeBusyDialog();
                     MessageToast.show(this.i18nModel.getText("technicalError"));
@@ -373,6 +379,7 @@ sap.ui.define([
                 if (oTableSelected) {
                     var oFormModel = this.getView().getModel("myform");
                     var oBindingContext = oTableSelected.getBindingContext("assetModel");
+
                     if (oBindingContext) {
                         var oSelectedData = oBindingContext.getObject();
 
@@ -385,11 +392,25 @@ sap.ui.define([
                         oFormModel.setProperty("/formData/filters", {
                             ID: oSelectedData.ID
                         });
+                        // Ensure ReturnDate is valid to avoid 1899 display
+                        var oReturnDate = oFormModel.getProperty("/formData/data/ReturnDate");
+                        if (!oReturnDate || new Date(oReturnDate).getFullYear() === 1899) {
+                            oFormModel.setProperty("/formData/data/ReturnDate", new Date());
+                        }
+                        oFormModel.setProperty("/formData/data/ReturnDate", null); // optional if user has to pick
+
 
                         if (!this._unassignDialog) {
                             this._unassignDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetUnassignDialog", this);
                             this.getView().addDependent(this._unassignDialog);
                             this._FragmentDatePickersReadOnly(["FAU_id_unassignDate", "FAA_id_Model"]);
+                        }
+
+                        // ✅ Set AssignedDate as minDate for UnassignDate
+                        var oAssignedDate = oFormModel.getProperty("/formData/data/AssignedDate");
+                        if (oAssignedDate) {
+                            var oMinDate = new Date(oAssignedDate); // convert to Date object if needed
+                            sap.ui.getCore().byId("FAU_id_unassignDate").setMinDate(oMinDate);
                         }
 
                         this._unassignDialog.open();
@@ -398,13 +419,12 @@ sap.ui.define([
                         this.closeBusyDialog();
                         MessageToast.show(this.i18nModel.getText("tableBindingContextNotFound"));
                         return;
-
                     }
-                }
-                else {
+                } else {
                     MessageToast.show(this.i18nModel.getText("pleaseSelectTheRowToUnassign"));
                 }
             },
+
 
             onCancelReturn: function () {
                 this.byId("AA_id_AssestTable").removeSelections(true)
@@ -458,10 +478,8 @@ sap.ui.define([
                 var oView = this.getView();
                 var oCore = sap.ui.getCore();
                 var oTypeSelected = oCore.byId("FAA_id_Type").getSelectedKey();
-
                 var allData = this.getView().getModel("incomeModel").getProperty("/");
                 var filteredData = allData.filter(item => item.IsCurrent === "1" && item.Status === "Available" || item.IsCurrent === "1" && item.Status === "Returned");
-
                 var filteredModel = new sap.ui.model.json.JSONModel(filteredData);
                 oView.setModel(filteredModel, "filteredAssetDetails");
 
@@ -470,6 +488,8 @@ sap.ui.define([
                     this.getView().addDependent(this._oValueHelpDialog);
                 }
                 this._oValueHelpDialog.open();
+                if (utils._LCstrictValidationComboBox(oEvent)) {
+                }
             },
 
             onSaveReturn: async function () {

@@ -47,7 +47,7 @@
 				<ComboBox
                     id="FAA_id_Type"
                     items="{typeModel>/}"
-                    selectionChange="onStrictValidationComboBox"
+                    selectionChange="FAT_onStrictValidationComboBox"
                     change="onTypeChange"
                     required="true"
                     value="{myform>/formData/data/Type}"
@@ -73,7 +73,7 @@
                     required="true"
                     id="FAA_branch_Id"
                     showSecondaryValues="true"
-                    change="FAA_onStrictValidationComboBox"
+                    change="FAB_onStrictValidationComboBox"
                     items="{BaseLocationModel>/}"
                     value="{myform>/formData/data/AssignBranch}"
                     valueStateText="{i18n>selectBranch}"
@@ -129,6 +129,7 @@
 				<DatePicker
                     id="FAA_id_AssignedDate"
                     required="true"
+                    maxDate="{controller>/maxDate}"
                     change="onAssignedDateChange"
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"

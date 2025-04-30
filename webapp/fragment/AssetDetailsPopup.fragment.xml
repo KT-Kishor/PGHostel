@@ -44,7 +44,7 @@
         <beginButton>
             <Button
                 text="{i18n>close}"
-                type="Negative"
+                type="Reject"
                 press=".onVHDClose"
             />
         </beginButton>

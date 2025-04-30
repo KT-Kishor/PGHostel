@@ -66,11 +66,12 @@
                     </fb:control>
                 </fb:FilterGroupItem>
 
-               <fb:FilterGroupItem
+                <fb:FilterGroupItem
                     name="AssignedDate"
                     label="{i18n>assignedDate}"
                     groupName="Group1"
-                    visibleInFilterBar="true">
+                    visibleInFilterBar="true"
+                >
                     <fb:control>
                         <DateRangeSelection
                             id="AA_id_Date"
@@ -89,13 +90,16 @@
                 >
                     <fb:control>
                         <ComboBox
-                            items="{AssetAssignmentStatus>/}"
                             showClearIcon="true"
                             id="AA_id_Status"
                         >
                             <core:ListItem
-                                key="{AssetAssignmentStatus>ID}"
-                                text="{AssetAssignmentStatus>Value}"
+                                key="{AssetAssignmentStatus>/0/ID}"
+                                text="{AssetAssignmentStatus>/0/Value}"
+                            />
+                            <core:ListItem
+                                key="{AssetAssignmentStatus>/1/ID}"
+                                text="{AssetAssignmentStatus>/1/Value}"
                             />
                         </ComboBox>
                     </fb:control>
@@ -121,98 +125,131 @@
             <headerToolbar>
                 <OverflowToolbar>
                     <Title
-                        text="{i18n>assetData} ({= ${assetModel>/}.length})" />
-                    
+                        text="{i18n>assetData} ({= ${assetModel>/}.length})"
+                    />
+
                     <ToolbarSpacer />
                     <Button
-                        icon="sap-icon://download"
                         press="AA_onExport"
                         type="Ghost"
                         text="{i18n>download}"
                     />
 
                     <Button
-                        icon="sap-icon://add"
                         text="{i18n>assign}"
                         type="Accept"
                         press="AA_onPressAssign"
                         id="AA_AssignBtn"
                     />
                     <Button
-                        icon="sap-icon://edit"
                         type="Neutral"
                         press="AA_onPressEdit"
                         text="{i18n>update}"
                         visible="false"
                     />
                     <Button
-                        icon="sap-icon://clear-all"
-                        type="Negative"
+                        type="Reject"
                         press="AA_onOpenUnassign"
                         text="{i18n>return}"
                     />
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-                <Column>
+                <Column
+                    hAlign="Left"
+                    demandPopin="true"
+                >
                     <Text text="{i18n>assignEmployeeID}" />
                 </Column>
-               <!--<Column>
+                <!--<Column>
                     <Text text="{i18n>assignEmployeeName}" />
                 </Column> -->
                 <!-- <Column>
                     <Text text="{i18n>type}" />
                 </Column> -->
-                <Column>
+                <Column
+                    hAlign="Left"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
                     <Text text="{i18n>model}" />
                 </Column>
-                <Column>
+                <Column
+                  hAlign="Left"
+                    minScreenWidth="Tablet"
+                    demandPopin="true">
                     <Text text="{i18n>equipmentNumber}" />
                 </Column>
-                <Column>
+                <Column
+                  hAlign="Left"
+                    minScreenWidth="Tablet"
+                    demandPopin="true">
                     <Text text="{i18n>serialNumber}" />
                 </Column>
-                <Column>
+                <Column
+                 hAlign="Left"
+                        minScreenWidth="Desktop"
+                        demandPopin="true">
                     <Text text="{i18n>assignedByEmployeeName}" />
                 </Column>
-                <Column>
+                <Column
+                 hAlign="Left"
+                        minScreenWidth="Desktop"
+                        demandPopin="true">
                     <Text text="{i18n>assignBranch}" />
                 </Column>
-                <Column>
+                <Column
+                 hAlign="Left"
+                        minScreenWidth="Desktop"
+                        demandPopin="true">
                     <Text text="{i18n>assignedDate}" />
                 </Column>
-                <Column>
+                <Column
+                 hAlign="Left"
+                        minScreenWidth="Desktop"
+                        demandPopin="true">
                     <Text text="{i18n>assetValue}" />
                 </Column>
-                <Column>
+                <Column
+                 hAlign="Left"
+                        minScreenWidth="Desktop"
+                        demandPopin="true">
                     <Text text="{i18n>status}" />
                 </Column>
-                <Column>
+                <Column
+                 hAlign="Left"
+                        minScreenWidth="Desktop"
+                        demandPopin="true">
                     <Text text="{i18n>returnDate}" />
                 </Column>
             </columns>
             <items>
-                <ColumnListItem class="tableRow" id="idTableColumnListItem">
+                <ColumnListItem
+                    class="tableRow"
+                    id="idTableColumnListItem"
+                >
                     <cells>
-                   <ObjectIdentifier 
-                           title="{assetModel>AssignEmployeeID}" 
-                           text="{assetModel>AssignEmployeeName}" /> 
+                        <ObjectIdentifier
+                            title="{assetModel>AssignEmployeeID}"
+                            text="{assetModel>AssignEmployeeName}"
+                        />
                         <!-- <Text text="{assetModel>Type}" /> -->
                         <Text text="{assetModel>Model}" />
                         <Text text="{assetModel>EquipmentNumber}" />
                         <Text text="{assetModel>SerialNumber}" />
-                        <ObjectIdentifier 
-                        title="{assetModel>AssignedByEmployeeID}"
-                        text="{assetModel>AssignedByEmployeeName}" />
+                        <ObjectIdentifier
+                            title="{assetModel>AssignedByEmployeeID}"
+                            text="{assetModel>AssignedByEmployeeName}"
+                        />
                         <Text text="{assetModel>AssignBranch}" />
                         <Text
                             text="{= ${assetModel>AssignedDate} === '1899-11-30T00:00:00.000Z' || !${assetModel>AssignedDate} ? '' : ${assetModel>AssignedDate}.substring(8,10) + '/' + ${assetModel>AssignedDate}.substring(5,7) + '/' + ${assetModel>AssignedDate}.substring(0,4) }"
                         />
                         <Text
                             text="{assetModel>Currency} {path:'assetModel>AssetValue',formatter:'.Formatter.fromatNumber'}"
-                        />  
+                        />
                         <ObjectStatus
-                            inverted="true"
+                            inverted="false"
                             state="{= ${assetModel>Status} === 'Assigned' ? 'Success' : 'Error' }"
                             text="{assetModel>Status}"
                         />

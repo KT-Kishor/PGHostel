@@ -6,33 +6,22 @@
     <Dialog
         id="FAU_id_unassignDialog"
         busyIndicatorDelay="0"
-        contentWidth="25%"
-        title="{i18n>return}"
+        title="{i18n>returnDate}"
         afterClose="onDialogClose"
     >
-        <f:SimpleForm
-            id="FAU_id_FormFrag"
-            busyIndicatorDelay="0"
-            editable="true"
-            layout="ResponsiveGridLayout"
-            labelSpanXL="4"
-            labelSpanL="4"
-            labelSpanM="12"
-            labelSpanS="12"
-            columnsXL="2"
-            columnsL="2"
-            columnsM="2"
-        >
-            <f:content>
+            <VBox class="sapUiResponsiveMargin">
                 <Label text="{i18n>date}" />
                 <DatePicker
                     id="FAU_id_unassignDate"
                     width="100%"
                     required="true"
+                    value="{myform>/formData/data/ReturnDate}"
                     valueFormat="yyyy-MM-dd"
                     displayFormat="dd/MM/yyyy"
                     change="FAU_onDateLiveChange"
+                    valueStateText="{i18n>enterDate}"
                 />
+                </VBox>
                 <!-- <Label text="{i18n>branch}" />
                 <ComboBox
                     required="true"
@@ -48,16 +37,6 @@
                         additionalText="{BaseLocationModel>branchCode}"
                     />
                 </ComboBox>-->
-                <Label text="{i18n>comments}" />
-                <Input
-                    maxLength="50"
-                    id="FAU_id_Comments"
-                    required="true"
-                    liveChange="FAU_validatecomments"
-                    valueStateText="{i18n>invalid}"
-                />
-            </f:content>
-        </f:SimpleForm>
         <beginButton>
             <Button
                 text="{i18n>save}"
