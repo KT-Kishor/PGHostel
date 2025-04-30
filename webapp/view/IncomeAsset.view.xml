@@ -161,34 +161,30 @@
                           <Button
                             id="IA_id_Export"
                             text="{i18n>download}"
-                            icon="sap-icon://download"
                             press="IA_onExport"
-                            type="Neutral"
+                            type="Ghost"
                         />
 
                     <Button
                         text="{i18n>create}"
                         type="Accept"
-                        icon="sap-icon://add"
                         press="IA_onCreateButtonPress"
                     />
-                    <Button
-                        text="{i18n>update}"
-                        type="Neutral"
-                        icon="sap-icon://edit"
-                        press="IA_onUpadateButtonPress"
-                    />
+                   
                     <Button
                         text="{i18n>trash}"
-                        type="Negative"
-                        icon="sap-icon://delete"
+                        type="Reject"
                         press="IA_onTrashButtonPress"
                     />
                       <Button
                         text="{i18n>Transfer}"
-                        type="Accept"
-                        icon="sap-icon://flight"
+                      type="Attention"
                         press="IA_onTransferButtonPress"
+                    />
+                     <Button
+                        text="{i18n>update}"
+                        type="Emphasized"
+                        press="IA_onUpadateButtonPress"
                     />
                     
                 </OverflowToolbar>
@@ -212,7 +208,7 @@
                 <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>branch}"/>
                 </Column>
-                  <Column minScreenWidth="Tablet" demandPopin="true">
+                  <Column minScreenWidth="Tablet"  demandPopin="true">
                     <Text text="{i18n>status}"/>
                 </Column>
                 <Column minScreenWidth="Tablet" demandPopin="true">
@@ -249,7 +245,7 @@
                             formatter: '.Formatter.formatDate'
                         }"/>
                         <Text text="{incomeModel>AssignBranch}"/>
-                        <HBox alignItems="Center" justifyContent="Center">
+                        <HBox alignItems="Center" >
                               <ObjectStatus 
                                   text="{incomeModel>Status}"
                                   inverted="true"
@@ -261,8 +257,7 @@
                               <Button 
                                   visible="{= ${incomeModel>Status} === 'Transferred' }"
                                 text="{i18n>Picked}"
-                                   icon="sap-icon://edit"
-                                  type="Neutral"
+                                type="Ghost"
                                   press="IA_onPickedButtonPress"
                               />
                           </HBox>

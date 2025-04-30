@@ -53,7 +53,8 @@
 		          <TextArea id="FCIA_ID_DescriptionTextArea" 
                   valueStateText="Write a model description"
                   liveChange="FCIA_onDescriptionTextAreaChange"
-                  value="{CreateIncomeAssetModel>/Description}" 
+                  value="{CreateIncomeAssetModel>/Description}"
+                  placeholder="Enter description" 
                   maxLength="60" width="100%" />
                     <Label text="{i18n>slNo}" required="true" />
                 <Input
@@ -98,7 +99,7 @@
                     items="{branchModel>/}"
                 >
                     <core:ListItem
-                        key="{branchModel>city}" 
+                        key="{branchModel>branchCode}" 
                         text="{branchModel>city}"
                         additionalText="{branchModel>branchCode}"
                     />
@@ -125,7 +126,7 @@
                         key="{oCurrencyModel>currency}"
                     />
                 </Select>
-                <Label text="TransferDate"/>
+                <Label text="{i18n>transferDate}"/>
                 <DatePicker
                 id="FCIA_id_transferdate"
                 value="{CreateIncomeAssetModel>/TransferDate}"
@@ -136,7 +137,7 @@
 
 
                 />
-                 <Label text="TransferBranch"/>
+                 <Label text="{i18n>transferBranch}"/>
              <ComboBox
                     id="FCIA_id_transferbranch"
                     placeholder="Select branch"
