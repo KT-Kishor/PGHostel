@@ -46,9 +46,9 @@
                 <OverflowToolbar >
                     <Title text="{i18n>headerEmpDetails} ({= ${EmployeeOfferModel>/}.length})" />
                     <ToolbarSpacer/>
-                    <Button tooltip="{i18n>onboardEmp}" id="EO_id_OnboardBtn" text="Onboard" type="Neutral" press="EO_onOnboardPress"  icon="sap-icon://manager"/>
-                    <Button tooltip="{i18n>rejectEmp}" id="EO_id_RejectBtn" type="Reject" text="Reject" press="EO_onRejectPress" icon="sap-icon://employee-rejections" />
-                    <Button text="{i18n>generateOffer}" id="EO_id_AddEOffBut" press="EO_onPressEmployee" type="Accept"  icon="sap-icon://employee-approvals" tooltip="{i18n>generateOffer}"/>
+                    <Button tooltip="{i18n>onboardEmp}" id="EO_id_OnboardBtn" text="Onboard" type="Neutral" press="EO_onOnboardPress"/>
+                    <Button tooltip="{i18n>rejectEmp}" id="EO_id_RejectBtn" type="Reject" text="Reject" press="EO_onRejectPress"  />
+                    <Button text="{i18n>generateOffer}" id="EO_id_AddEOffBut" press="EO_onPressEmployee" type="Accept"  tooltip="{i18n>generateOffer}"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>

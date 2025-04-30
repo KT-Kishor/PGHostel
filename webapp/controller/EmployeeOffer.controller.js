@@ -11,7 +11,7 @@ sap.ui.define([
             Formatter: Formatter,
             onInit: function () {
                 var oDateModel = new sap.ui.model.json.JSONModel();  
-                oDateModel.setData({ maxDate: new Date(), focusedDate: new Date(2000, 0, 1), minDate: new Date(1850, 0, 1) });
+                oDateModel.setData({ maxDate: new Date(), focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1) });
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
@@ -120,11 +120,11 @@ sap.ui.define([
                 this.EO_ButtonVisibility();
             },
             // Update the status to 'Rejected' after confirmation
-            onRejectEmployee: function () {
+            onRejectEmployee: async function () {
                 this.getBusyDialog();
-                this.updateCallForEmployeeOffer("Rejected");
-                this.EO_onSearch();
+                await this.updateCallForEmployeeOffer("Rejected");
                 this.EO_ButtonVisibility();
+               
             },
             //Common button visibility
             EO_ButtonVisibility: function () {
@@ -317,6 +317,7 @@ sap.ui.define([
                         MessageToast.show(sSuccessMessage);
                         this.closeBusyDialog();
                         this.oDialog.close();
+                        this.EO_onSearch();
                     }
                 }).catch((error) => {
                     this.closeBusyDialog();
