@@ -3,41 +3,49 @@ sap.ui.define([
     "../utils/validation",
     "sap/m/MessageToast",
     "../model/formatter",
-    "sap/ui/core/BusyIndicator",
     "sap/ui/model/json/JSONModel",
-], function(Controller, utils, MessageToast, Formatter, BusyIndicator, JSONModel) {
+], function(Controller, utils, MessageToast, Formatter, JSONModel) {
     "use strict";
     return Controller.extend("sap.kt.com.minihrsolution.controller.ExpenseApplication", {
         Formatter: Formatter,
-        onInit: async function() {
-            await this.getRouter().getRoute("RouteExpensePage").attachMatched(this._onRouteMatched, this);
+        onInit:  function() {
+            this.getRouter().getRoute("RouteExpensePage").attachMatched(this._onRouteMatched, this);
         },
         
         _onRouteMatched: async function(oEvent) {
-            if(!this.getView().getModel("BaseLocationModel")){
-                await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                await this._fetchCommonData("Country", "CountryModel");
-                await this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
+            this.getBusyDialog();
+            try {
+                if (!this.getView().getModel("BaseLocationModel")) {
+                    await this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                    await this._fetchCommonData("Country", "CountryModel");
+                    await this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
+                }
+        
+                this.commonLoginFunction("Expense");
+                this.LoginModel = this.getView().getModel("LoginModel");
+        
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                var View = new JSONModel({
+                    SaveBtn: false,
+                    SubmitBtn: false,
+                    required: true,
+                    minDate: new Date()
+                });
+                this.getOwnerComponent().setModel(View, "viewModel");
+                this.ViewModel = this.getView().getModel("viewModel");
+        
+                this.CommonModel();
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
+                this.onChangeEmployeeID();
+                this.Exp_onSearch();
+            } catch (error) {
+                this.closeBusyDialog();
+                 MessageToast.show(error.message || error.responseText);
+            } finally {
+                this.closeBusyDialog();
             }
-            this.commonLoginFunction("Expense");
-            this.LoginModel = this.getView().getModel("LoginModel");
-
-            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            var View = new JSONModel({
-                SaveBtn: false,
-                SubmitBtn: false,
-                required: true,
-                minDate:new Date()
-            });
-            this.getOwnerComponent().setModel(View, "viewModel");
-            this.ViewModel = this.getView().getModel("viewModel");           
-            this.CommonModel();
-            this.getView().getModel("LoginModel").setProperty("/HeaderName", "Expense Details");
-            this.onChangeEmployeeID();
-            this.closeBusyDialog();
-            this.Exp_onSearch();            
         },
-
+  
         onChangeEmployeeID: async function () {
             var selectedItem = this.byId("Exp_id_EmployeeName").getSelectedItem();
             var EmployeeID = selectedItem 
@@ -57,7 +65,7 @@ sap.ui.define([
                 FilterModel.setData(uniqueData);
             }
         },        
- // Function to initialize the common model for expense creation
+        // Function to initialize the common model for expense creation
         CommonModel: function() {
             var oModel = new JSONModel({
                 EmployeeID: this.LoginModel.getProperty("/EmployeeID"),
@@ -84,7 +92,7 @@ sap.ui.define([
         onLogout: function() {
             this.CommonLogoutFunction();
         },
-   // Open the "Add Expense" fragment
+       // Open the "Add Expense" fragment
         Exp_onPressAddExpense: function() {
             this.CommonModel();
             var oView = this.getView();
@@ -103,7 +111,7 @@ sap.ui.define([
                 this._FragmentDatePickersReadOnly(["exp-Id-StartDate","exp-Id-EndDate"])
             }
         },
- // Close the "Add Expense" fragment and reset validation states
+        // Close the "Add Expense" fragment and reset validation states
         Exp_Frg_onPressClose: function() {
             this.Expense.close();
             var core = sap.ui.getCore();
@@ -115,11 +123,10 @@ sap.ui.define([
             core.byId("exp-Id-Destination").setValueState("None");
             core.byId("exp-Id-EmployeeRemark").setValueState("None");
         },
-// Submit the expense after validation
+        // Submit the expense after validation
         Exp_Frg_onPressSubmit: async function() {
             var that = this;
             try {
-                BusyIndicator.show(0);
                 const isValid =
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-ExpenseName"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") &&
@@ -137,13 +144,13 @@ sap.ui.define([
                 const oModel = this.getView().getModel("CreateExpenseModel").getData();
                 oModel.ExpStartDate = oModel.ExpStartDate.split("/").reverse().join("-");
                 oModel.ExpEndDate = oModel.ExpEndDate.split("/").reverse().join("-");
-
+                this.getBusyDialog();
                 const oResponse = await that.ajaxCreateWithJQuery("Expense", {data: oModel});
                 if (oResponse) {
                     that.Expense.close();
                     await that.Exp_onPressClear();
                     await that._fetchCommonData("ExpenseTotalCalculation", "", {ExpenseID: oResponse.ExpenseID});
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                     that.onChangeEmployeeID();
                     await that.Exp_onSearch();
                     MessageToast.show(that.i18nModel.getText("expenseCreatedMess"));
@@ -153,12 +160,11 @@ sap.ui.define([
             } catch (oError) {
                 MessageToast.show(that.i18nModel.getText("expenseCreatedMessFailed"));
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
 
         Exp_onCheckExpenseDetails: function(oEvent) {
-            BusyIndicator.show(0);
             var ExpenseID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
             this.getRouter().navTo("RouteExpensDetails", {
                 sPath: ExpenseID.replaceAll("/", "")
@@ -239,6 +245,7 @@ sap.ui.define([
 //Filter Function
         Exp_onSearch: async function() {
             try {
+                this.getBusyDialog();
                 var oTable = this.getView().byId("exp_Id_ExpenseTable");
                 oTable.setEnableBusyIndicator(true);
                 const aFilterItems = this.byId("Exp-id-FilterBar").getFilterGroupItems();
@@ -257,8 +264,9 @@ sap.ui.define([
                     }
                 });
                 await this._fetchCommonData("Expense", "ExpenseModel", params,["exp_Id_ExpenseTable"]);
-
+                this.closeBusyDialog();
             } catch (error) {
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             } 
         },

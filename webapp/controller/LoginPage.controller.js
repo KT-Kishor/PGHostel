@@ -410,6 +410,7 @@ sap.ui.define(
                 MessageToast.show(this.i18nModel.getText("updatepassword"));
 
                 // Reset form state after successful password update
+                sap.ui.getCore().byId("FSM_id_SaveBTN").setText(this.i18nModel.getText("continue"));
                 sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
                 oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserName", "");
                 oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false);

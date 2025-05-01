@@ -1,6 +1,5 @@
 sap.ui.define([
     "./BaseController",
-    "sap/ui/core/BusyIndicator",
     "sap/ui/model/json/JSONModel",
     "../utils/validation",
     "sap/m/MessageToast",
@@ -9,58 +8,77 @@ sap.ui.define([
     "sap/suite/ui/commons/Timeline",
     "sap/suite/ui/commons/TimelineItem"
 ],
-function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, MessageBox, Timeline, TimelineItem) {
+function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Timeline, TimelineItem) {
     "use strict";
     return Controller.extend("sap.kt.com.minihrsolution.controller.ExpenseDetails", {
         Formatter: Formatter,
-        onInit: async function() {
+        onInit: function() {
             // Attach route matched event for "RouteExpensDetails"
             this.getRouter().getRoute("RouteExpensDetails").attachMatched(this._onRouteMatched, this);
-            this.byId("objectPageLayoutExpence").setHeaderContentPinned(true); /// Header content pinned
-            await this._fetchCommonData("Currency", "CurrencyModel");
         },
 
         _onRouteMatched: async function(oEvent) {
-            this.commonLoginFunction("Expense");
-            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this.ExpenseID = oEvent.getParameter("arguments").sPath;
-            await this._fetchCommonData("Expense", "FilteredExpenseModel", {
-                ExpenseID: this.ExpenseID,
-            });
+            this.getBusyDialog();
+            try {
+                this.commonLoginFunction("Expense");
+                this.byId("objectPageLayoutExpence").setHeaderContentPinned(true); /// Header content pinned
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                this.ExpenseID = oEvent.getParameter("arguments").sPath;
 
-            var viewModel = new JSONModel({
-                isEditMode: false,
-                status: true,
-                editable: false,
-                enable: true,
-                enableDelete: true,
-                required: true,
-                SubmitBtn: false,
-                SaveBtn: false,
-            });
-
-            this.getView().setModel(viewModel, "viewModel");
-            this.LoginModel = this.getView().getModel("LoginModel");
-
-
-            this.ViewModel = this.getView().getModel("viewModel");
-            this.FilteredExpenseModel = this.getView().getModel("FilteredExpenseModel").getData();
-
-            this.IndexNoIncreent();
-            if (this.FilteredExpenseModel[0].Status === "Submitted" || this.FilteredExpenseModel[0].Status === "Send to account") {
-                this.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
-            } else {
-                this.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.SingleSelectLeft);
+                await this._fetchCommonData("Currency", "CurrencyModel");
+                await this._fetchCommonData("Expense", "FilteredExpenseModel", {
+                    ExpenseID: this.ExpenseID,
+                });
+        
+                var viewModel = new JSONModel({
+                    isEditMode: false,
+                    status: true,
+                    editable: false,
+                    enable: true,
+                    enableDelete: true,
+                    required: true,
+                    SubmitBtn: false,
+                    SaveBtn: false,
+                });
+        
+                this.getView().setModel(viewModel, "viewModel");
+                this.LoginModel = this.getView().getModel("LoginModel");
+                this.ViewModel = this.getView().getModel("viewModel");
+        
+                this.FilteredExpenseModel = this.getView().getModel("FilteredExpenseModel").getData();
+        
+                this.IndexNoIncreent();
+        
+                if (this.FilteredExpenseModel[0].Status === "Submitted" || this.FilteredExpenseModel[0].Status === "Send to account") {
+                    this.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
+                } else {
+                    this.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.SingleSelectLeft);
+                }
+        
+                if (
+                    this.FilteredExpenseModel[0].Status === "Draft" ||
+                    this.FilteredExpenseModel[0].Status === "Send back by manager" ||
+                    this.FilteredExpenseModel[0].Status === "Send back by account"
+                ) {
+                    this.ViewModel.setProperty("/status", true);
+                } else {
+                    this.ViewModel.setProperty("/status", false);
+                }
+        
+                if (this.FilteredExpenseModel[0].TripType !== "Customer Facing") {
+                    this.ViewModel.setProperty("/required", false);
+                }
+        
+                this.CountryAndCity();
+                this.closeBusyDialog();
+            } catch (error) {
+                this.closeBusyDialog();
+                MessageToast.show(error.message || error.responseText);
+            } finally {
+                this.closeBusyDialog();
             }
-            if (this.FilteredExpenseModel[0].Status === "Draft" || this.FilteredExpenseModel[0].Status === "Send back by manager" || this.FilteredExpenseModel[0].Status === "Send back by account") {
-                this.ViewModel.setProperty("/status", true);
-            } else {
-                this.ViewModel.setProperty("/status", false);
-            }
-            if (this.FilteredExpenseModel[0].TripType !== "Customer Facing") this.ViewModel.setProperty("/required", false);
-            this.CountryAndCity();
-            BusyIndicator.hide();
         },
+        
         // Expense Item Index increment and ItemExpense Read call
         IndexNoIncreent: function() {
             var that = this;
@@ -259,7 +277,6 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
         },
 
         onPressSave: async function() {
-            BusyIndicator.show(0);
             if (
                 utils._LCvalidateMandatoryField(this.byId("Exp_id_Source"), "ID") &&
                 (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"), "ID") : true) && utils._LCstrictValidationComboBox(this.byId("Exp_id_Country"), "ID") && utils._LCvalidateMandatoryField(this.byId("Exp_id_EmpRemark"), "ID")) {               
@@ -273,6 +290,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                         ExpenseID: oModel.getData()[0].ExpenseID,
                     },
                 };
+                this.getBusyDialog();
                 await this.ajaxUpdateWithJQuery("Expense", oData)
                     .then((oData) => {
                         if (oData) {
@@ -284,14 +302,14 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                         } else {
                             MessageToast.show(this.i18nModel.getText("expenseUpdateMessFailed"));                           
                         }
-                        BusyIndicator.hide();
+                        this.closeBusyDialog();
                     })
                     .catch((oError) => {   
-                        BusyIndicator.hide();                    
+                        this.closeBusyDialog();                    
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     });
             } else {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             }
         },
@@ -309,7 +327,6 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
         },
 
         async Exp_Det_onPressSubmit() {
-            BusyIndicator.show(0);
             var oModel = this.getView().getModel("ExpenseCreateModel").getData();
             if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Peridiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
                 // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(true);
@@ -329,6 +346,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                         ModeOfPayment: oModel.ModeOfPayment,
                     },
                 };
+                this.getBusyDialog();
                 try {
                     const oCreateResponse = await this.ajaxCreateWithJQuery("ItemExpense", oData);
                     if (oCreateResponse) {
@@ -337,25 +355,24 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                         this.ViewModel.setProperty("/enable", true);
                         this.ExpenseItem.close();
                         this.ExpenseTotalCalculation();
-                        BusyIndicator.hide();
+                        this.closeBusyDialog();
                         // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
                     } else {
                         MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
                         // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
-                        BusyIndicator.hide();
+                        this.closeBusyDialog();
                     }
                 } catch (oError) {
                     // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             } else {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             }
         },
 
         async Exp_Det_onPressSaveExpense() {
-            BusyIndicator.show(0);
             var oModel = this.getView().getModel("ExpenseCreateModel").getData();
             var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
             if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
@@ -378,6 +395,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                         ItemID: this.SelectedData.ItemID,
                     },
                 };
+                this.getBusyDialog();
                 await this.ajaxUpdateWithJQuery("ItemExpense", oData)
                     .then((oData) => {
                         if (oData) {
@@ -386,20 +404,20 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                             this.ExpenseItem.close();
                             MessageToast.show(this.i18nModel.getText("expenseUpdateMess"));
                             // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
-                            BusyIndicator.hide();
+                            this.closeBusyDialog();
                         } else {
                             MessageToast.show(this.i18nModel.getText("expenseUpdateMessFailed"));
                             // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
-                            BusyIndicator.hide();
+                            this.closeBusyDialog();
                         }
                     })
                     .catch((oError) => {
                         // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
-                        BusyIndicator.hide();
+                        this.closeBusyDialog();
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     });
             } else {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             }
         },
@@ -486,7 +504,6 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                     type: "Accept",
                     press: function() {
                         if (checkbox.getSelected()) {
-                            BusyIndicator.show(0);
                             var inboxData = {
                                 data: {
                                     ExpenseID: oModelData.ExpenseID,
@@ -508,21 +525,22 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                                     ExpenseID: oModelData.ExpenseID
                                 },
                             };
+                            that.getBusyDialog();
                             that.ajaxUpdateWithJQuery("Expense", inboxData).then((oData) => {
                                     if (oData) {
                                         that.ViewModel.setProperty("/status", false);
                                         that.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
                                         dialog.close();
                                         MessageToast.show(that.i18nModel.getText("expenseSubmittedStatus"));
-                                        BusyIndicator.hide();
+                                        that.closeBusyDialog();
                                     } else {
                                         MessageToast.show(this.i18nModel.getText("expenseSubmittedStatusFailed"));
-                                        BusyIndicator.hide();
+                                        that.closeBusyDialog();
                                     }
                                 })
                                 .catch((oError) => {
                                     dialog.close();
-                                    BusyIndicator.hide();
+                                    that.closeBusyDialog();
                                     MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
                                 });
                         } else {
@@ -578,7 +596,7 @@ function(Controller, BusyIndicator, JSONModel, utils, MessageToast, Formatter, M
                     });
                 }
             } catch (oError) {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             }
         },

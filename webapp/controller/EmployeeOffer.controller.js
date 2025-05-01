@@ -245,7 +245,7 @@ sap.ui.define([
                 }
             },
             OEF_onPressClose: function () {
-                const fields = ["OEF_id_CompanyMail", "OEF_id_DateofBirth", "OEF_id_Mobile","OEF_id_EmployeeRole","OEF_id_PAddress","OEF_id_CAddress","OEF_id_Manager"];
+                const fields = ["OEF_id_CompanyMail", "OEF_id_DateofBirth", "OEF_id_Mobile","OEF_id_EmployeeRole","OEF_id_PAddress","OEF_id_CAddress", "OEF_id_blood", "OEF_id_Manager"];
                 fields.forEach(field => {
                     sap.ui.getCore().byId(field).setValueState("None");
                 });
