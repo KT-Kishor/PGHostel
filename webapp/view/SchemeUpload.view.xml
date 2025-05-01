@@ -37,7 +37,7 @@
                                 items="{ModelOnly>/results}"
                                 id="SU_id_ModelComboBox"
                                 enabled="true"
-                                change="SU_onModelChange"
+                                selectionChange="SU_onModelChange"
                             >
                                 <core:Item
                                     key="{ModelOnly>Model}"

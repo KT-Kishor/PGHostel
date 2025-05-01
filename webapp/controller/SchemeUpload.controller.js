@@ -31,9 +31,22 @@ sap.ui.define(
           this.oValue = oEvent.getParameter("arguments").value;
           if (this.oValue === "SchemeUpload") {
             this.CommomReadCall("");
+            this.fetchUniqueModels();
             this.SU_onClear();
           } else {
             this.SU_onSearch();
+          }
+        },
+        // Add this function to fetch unique models
+        fetchUniqueModels: async function () {
+          try {
+            const response = await this.ajaxCreateWithJQuery("UniqueScheme", { data: {} });
+            if (response.success) {
+              const oModel = new JSONModel({ results: response.results });
+              this.getView().setModel(oModel, "ModelOnly");
+            }
+          } catch (e) {
+            MessageToast.show("Failed to load models");
           }
         },
         //for Search
@@ -61,17 +74,45 @@ sap.ui.define(
             }
           });
         },
-        SU_onModelChange: function (oEvent) {
-          var oVariantComboBox = this.getView().byId("SU_id_Variant1");
-          var oTransmissionComboBox = this.getView().byId(
-            "SU_id_Transmission1"
-          );
+        // Add this handler for the Model ComboBox's change event
+        SU_onModelChange: async function (oEvent) {
+          const oSelectedItem = oEvent.getParameter("selectedItem");
+          const oVariantComboBox = this.getView().byId("SU_id_Variant1");
+          const oTransmissionComboBox = this.getView().byId("SU_id_Transmission1");
 
+          // Clear dependent fields regardless of selection
           if (oVariantComboBox && oTransmissionComboBox) {
-            oVariantComboBox.setSelectedKey(""); // Clear selection
-            oVariantComboBox.setValue(""); // Clear displayed text
-            oTransmissionComboBox.setSelectedKey(""); // Clear selection
+            oVariantComboBox.setSelectedKey("");
+            oVariantComboBox.setValue("");
+            oTransmissionComboBox.setSelectedKey("");
             oTransmissionComboBox.setValue("");
+          }
+
+          // Exit if no valid selection
+          if (!oSelectedItem) {
+            return;
+          }
+          // Proceed only if there's a valid selected item
+          oVariantComboBox.setBusy(true);
+          try {
+            const sSelectedModel = oSelectedItem.getKey(); // Now safe to call
+            const response = await this.ajaxCreateWithJQuery("UniqueScheme", {
+              filters: { Model: sSelectedModel }
+            });
+            if (response.success) {
+              this.getView().setModel(
+                new JSONModel({ results: response.results }),
+                "VariantOnly",
+                "TransmissionOnly"
+              );
+            } else {
+              MessageToast.show(this.i18nModel.getText("msgTraineeformerror"));
+            }
+          } catch (e) {
+            console.error(e);
+            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+          } finally {
+            oVariantComboBox.setBusy(false);
           }
         },
         // goto Tilepage
@@ -346,10 +387,10 @@ sap.ui.define(
               var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
 
               // Save the full unfiltered data once (e.g., onInit) — if no filters applied
-              if (!filter || Object.keys(filter).length === 0) {
-                this._fullOfferData = offerData; // Save for ComboBox deduplication
-                this._populateComboBoxModels(offerData);
-              }
+              // if (!filter || Object.keys(filter).length === 0) {
+              //   this._fullOfferData = offerData; // Save for ComboBox deduplication
+              //   this._populateComboBoxModels(offerData);
+              // }
 
               // Always update the table view
               this.getView().setModel(
@@ -365,32 +406,30 @@ sap.ui.define(
               );
             });
         },
-        _populateComboBoxModels: function (offerData) {
-          const getUnique = (arr, key) => {
-            const seen = new Set();
-            return arr.filter((item) => {
-              if (item[key] && !seen.has(item[key])) {
-                seen.add(item[key]);
-                return true;
-              }
-              return false;
-            }).map((item) => ({ [key]: item[key] }));
-          };
+        // _populateComboBoxModels: function (offerData) {
+        //   const getUnique = (arr, key) => {
+        //     const seen = new Set();
+        //     return arr.filter((item) => {
+        //       if (item[key] && !seen.has(item[key])) {
+        //         seen.add(item[key]);
+        //         return true;
+        //       }
+        //       return false;
+        //     }).map((item) => ({ [key]: item[key] }));
+        //   };
 
-          const uniqueModels = getUnique(offerData, "Model");
-          const uniqueVariants = getUnique(offerData, "Variant");
-          const uniqueTransmissions = getUnique(offerData, "Transmission");
+        //   const uniqueModels = getUnique(offerData, "Model");
+        //   const uniqueVariants = getUnique(offerData, "Variant");
+        //   const uniqueTransmissions = getUnique(offerData, "Transmission");
 
-          this.getView().setModel(new JSONModel({ results: uniqueModels }), "ModelOnly");
-          this.getView().setModel(new JSONModel({ results: uniqueVariants }), "VariantOnly");
-          this.getView().setModel(new JSONModel({ results: uniqueTransmissions }), "TransmissionOnly");
-        },
+        //   this.getView().setModel(new JSONModel({ results: uniqueModels }), "ModelOnly");
+        //   this.getView().setModel(new JSONModel({ results: uniqueVariants }), "VariantOnly");
+        //   this.getView().setModel(new JSONModel({ results: uniqueTransmissions }), "TransmissionOnly");
+        // },
 
         //Navigate to new page with data
         SU_onItemPress: function (oEvent) {
-          var oSelectedContext = oEvent
-            .getSource()
-            .getBindingContext("MainModel");
+          var oSelectedContext = oEvent.getSource().getBindingContext("MainModel");
           if (!oSelectedContext) {
             return;
           }

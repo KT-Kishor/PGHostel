@@ -3,9 +3,8 @@ sap.ui.define(
     "./BaseController",
     "sap/m/MessageToast",
     "../utils/validation",
-    "sap/ui/model/json/JSONModel",
-    "sap/ui/core/BusyIndicator",
-  ], function (BaseController, MessageToast, utils, JSONModel, BusyIndicator) {
+    "sap/ui/model/json/JSONModel"
+  ], function (BaseController, MessageToast, utils, JSONModel) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.TilePage",
@@ -14,25 +13,24 @@ sap.ui.define(
           this.getRouter().getRoute("RouteTilePage").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function () {
-          BusyIndicator.hide()
           this.commonLoginFunction("TilePage")
           this._fetchCommonData("AllLoginDetails", "EmpModel");
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("Quotation").setProperty("/setDefFilter", true);
           this.AppVisibilityReadCall();
         },
-
         AppVisibilityReadCall: async function () {
-          BusyIndicator.show(0);
-          var LoginModel = this.getView().getModel("LoginModel").getData();
-          await this.ajaxReadWithJQuery("AppVisibility", { Role: LoginModel.Role }, []).then((oData) => {
-            var AppVisiblity = Array.isArray(oData.data) ? oData.data[0] : [oData.data[0]];
-            this.getView().setModel(new JSONModel(AppVisiblity), "AppVisibilityModel");
-            BusyIndicator.hide();
-          }).catch((oError) => {
-            BusyIndicator.hide();
-          })
+          try {
+            if (!this.getView().getModel("LoginModel")) return;
+            var LoginModel = this.getView().getModel("LoginModel").getData();
+            let oData = await this.ajaxReadWithJQuery("AppVisibility", { Role: LoginModel.Role }, []);
+            var AppVisibility = Array.isArray(oData.data) ? oData.data[0] : [oData.data[0]];
+            this.getView().setModel(new JSONModel(AppVisibility), "AppVisibilityModel");
+          } catch (oError) {
+            MessageToast.show("Error in AppVisibilityReadCall:", oError);
+          }
         },
+
 
         RP_onUseridpress: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
@@ -232,7 +230,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteCompanyInvoice", { sPath: "Invoice" });
         },
         TileV_onpressQuotation: function () {
-          BusyIndicator.show(0);
+
           this.getRouter().navTo("RouteQuotation");
         },
         TileV_onpressAssignment: function () {
@@ -245,11 +243,11 @@ sap.ui.define(
           this.getRouter().navTo("RouteTimesheetApproval");
         },
         TileV_onPressGenerateSalary: function () {
-          BusyIndicator.show(0);
+
           this.getRouter().navTo("RouteGenerateSalary");
         },
         TileV_onPressManagePayroll: function () {
-          BusyIndicator.show(0);
+
           this.getRouter().navTo("RouteManagePayroll");
         },
         TileV_onpressEmployeeDetails: function () {
