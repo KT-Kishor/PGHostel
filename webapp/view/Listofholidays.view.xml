@@ -43,13 +43,13 @@
 					<OverflowToolbar>
 						<Title  id="LOH_id_Title" text="{i18n>headerListOfHolidays} ({= ${HolidayModel>/}.length })"/>
 						<ToolbarSpacer />
-						<Button text="{i18n>import}" icon="sap-icon://sys-next-page" press="LOH_onOpenImport" type="Ghost" visible="{= ${LoginModel>/Role} === 'Admin' }" />
-						<Button text="{i18n>export}" icon="sap-icon://excel-attachment" press="LOH_onExport" type="Ghost"/>
+						<Button text="{i18n>import}" press="LOH_onOpenImport" type="Ghost" visible="{= ${LoginModel>/Role} === 'Admin' }" />
+						<Button text="{i18n>export}"  press="LOH_onExport" type="Ghost"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>name}" textAlign="Center"></Text>
+						<Text text="{i18n>holidayName}" textAlign="Center"></Text>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true" >
 						<Text text="{i18n>date}" textAlign="Center"></Text>

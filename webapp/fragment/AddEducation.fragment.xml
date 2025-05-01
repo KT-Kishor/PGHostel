@@ -36,7 +36,7 @@
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy"
            maxDate="{viewModel>/Max}"
-		   valueStateText="{i18>dateValueState}" />
+		   valueStateText="{i18n>dateValueState}"/>
 				<Label text="{i18n>endDate}" required="true" />
 				<DatePicker id="AddEd_id_EndEdu" 
 				value="{ path: 'educationModel>/EducationEndDate',formatter:'.Formatter.formatDate' }" 

@@ -623,7 +623,7 @@ sap.ui.define([
 
     CommonVisitingCard: async function (EmployeeName, MobileNo, Email, Designation, branchCode) {
       const { jsPDF } = window.jspdf;
-      sap.ui.core.BusyIndicator.show(0); // Show Busy indicator
+      this.getBusyDialog(); // open BusyDialog immediately
 
       try {
         await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: branchCode });
@@ -674,7 +674,7 @@ sap.ui.define([
       } catch (error) {
         sap.m.MessageToast.show(error.message || error.responseText);
       } finally {
-        sap.ui.core.BusyIndicator.hide();
+        this.closeBusyDialog();
       }
     },
   })

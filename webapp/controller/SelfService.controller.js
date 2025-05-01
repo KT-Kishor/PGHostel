@@ -334,7 +334,6 @@ sap.ui.define([
             //Education detail create call
             saveEducationDetails: function (bIsCreate) {
                 try {
-                    this.getBusyDialog();
                     const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") &&
@@ -345,6 +344,7 @@ sap.ui.define([
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
                     }
+                    this.getBusyDialog();
                    // Get and prepare model data
                    let oModel = this.getView().getModel("educationModel").getData();
                    oModel.EmployeeID = this.EmployeeID;
@@ -438,7 +438,6 @@ sap.ui.define([
             //Employment detail create calls
             saveEmploymentDetails: function (bIsCreate) {
                 try {
-                    this.getBusyDialog();
                     const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") &&
@@ -458,6 +457,7 @@ sap.ui.define([
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
                     }
+                    this.getBusyDialog();
                     // Prepare data model for submission
                     let oModel = this.getView().getModel("employmentModel").getData();
                     oModel.EmployeeID = this.EmployeeID;
