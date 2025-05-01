@@ -273,7 +273,6 @@ sap.ui.define([
             },
             //Onboard function
             OEF_onPressOnBoard: function (oEvent) {
-                this.getBusyDialog();
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
                 if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
                     var oPayload = {
@@ -282,6 +281,7 @@ sap.ui.define([
                     };
                     oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-');
                     oModel.ManagerID = sap.ui.getCore().byId("OEF_id_Manager").getSelectedItem().getAdditionalText();
+                    this.getBusyDialog();
                     this.ajaxCreateWithJQuery("EmployeeDetails", oPayload).then((oData) => {
                         if (oData.success) {
                             this.EO_onSearch();
@@ -291,6 +291,7 @@ sap.ui.define([
                         } else {
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         }
+                        this.closeBusyDialog();
                     }).catch((error) => {
                         this.closeBusyDialog();
                         MessageToast.show(error.message || error.responseText);

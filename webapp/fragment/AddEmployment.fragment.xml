@@ -16,7 +16,7 @@
 				<Label text="{i18n>companyName}" required="true"/>
 				<Input value="{employmentModel>/CompanyName}" id="AddEmp_id_Company" placeholder="{i18n>companyName}" maxLength="50" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>companyNameValueState}"/>
 				<Label text="{i18n>designation}" required="true" />
-				<ComboBox items="{path:'sDesignationModel>/'}" id="AddEmp_id_Desig" change="SS_ValidateCommonFields" valueStateText="{i18n>designationValueState}" selectedKey="{employmentModel>/Designation}" showSecondaryValues="true" placeholder="{i18n>plaseDesignation}" maxLength="50">
+				<ComboBox items="{path:'sDesignationModel>/'}" id="AddEmp_id_Desig" change="SS_ValidateCommonFields" valueStateText="{i18n>designationValueState}" selectedKey="{employmentModel>/Designation}" showSecondaryValues="true" placeholder="{i18n>plaseDesignation}">
 					<core:Item key="{sDesignationModel>designationName}" text="{sDesignationModel>designationName}" />
 				</ComboBox>
 				<Label text="{i18n>companyAddress}" required="true"/>
