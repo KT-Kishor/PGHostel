@@ -423,10 +423,9 @@ sap.ui.define([
                 oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.ReleaseDate));
                 oPDFModel.setProperty("/TrainingStartDate", Formatter.formatDate(oEmpModel.JoiningDate));
                 oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
-                oPDFModel.setProperty("/Stipend", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Stipend));
-                oPDFModel.setProperty("/TrainingFees", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TrainingPaidAmount));
-                oPDFModel.setProperty("/StipendSkipLine", (oEmpModel.Stipend == 0 || oEmpModel.Stipend == "") ? 5 : null);
-                oPDFModel.setProperty("/TrainingFeesSkipLine", (oEmpModel.TrainingPaidAmount == 0 || oEmpModel.TrainingPaidAmount == "") ? 6 : null);
+                oPDFModel.setProperty("/StipendOrFees", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Amount));
+                oPDFModel.setProperty("/StipendSkipLine", (oEmpModel.Type === "Paid") ? 5 : null);
+                oPDFModel.setProperty("/TrainingFeesSkipLine", (oEmpModel.Type === "Stipend") ? 6 : null);
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
                 if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {

@@ -109,9 +109,8 @@
     "TrainingStartDate": "(Training Start Date)",
     "ReportingManager": "(Name of the Reporting Manager)",
     "TrainingDuration": "(Training Duration)",
-    "Stipend": null,
+    "StipendOrFees": null,
     "StipendSkipLine": null,
-    "TrainingFees": null,
     "TrainingFeesSkipLine": null,
 
     "AgreementDate": "02/04/2025",
