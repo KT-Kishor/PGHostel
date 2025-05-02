@@ -27,7 +27,7 @@
                     id="FAA_id_employeeID"
                     showSecondaryValues="true"
                     items="{EmpModel>/}"
-                    change="FAS_onchange"
+                    change="FAA_onEmpIDChange"
                     value="{myform>/formData/data/AssignEmployeeID}"
                     valueStateText="{i18n>selectEmployeeID}"
                 >
@@ -47,11 +47,11 @@
 				<ComboBox
                     id="FAA_id_Type"
                     items="{typeModel>/}"
-                    selectionChange="FAT_onStrictValidationComboBox"
-                    change="onTypeChange"
+                    change="FAA_onTypeChange"
                     required="true"
                     value="{myform>/formData/data/Type}"
                     valueStateText="{i18n>selectType}"
+                    selectionChange="FAA_onTypeSelectionChange"
                 >
 					<core:ListItem
                         key="{typeModel>Type}"
@@ -60,9 +60,10 @@
 				</ComboBox>
 				<Label text="{i18n>model}" />
 				<Input
+                    busyIndicatorDelay="0"
                     required="true"
                     id="FAA_id_Model"
-                    liveChange="FM_onStrictValidationComboBox"
+                    liveChange="FAA_onModelChange"
                     value="{myform>/formData/data/Model}"
                     showValueHelp="true"
                     valueHelpRequest="onOpenVHD"
@@ -73,7 +74,7 @@
                     required="true"
                     id="FAA_branch_Id"
                     showSecondaryValues="true"
-                    change="FAB_onStrictValidationComboBox"
+                    change="FAA_onBranchChange"
                     items="{BaseLocationModel>/}"
                     value="{myform>/formData/data/AssignBranch}"
                     valueStateText="{i18n>selectBranch}"
@@ -89,7 +90,7 @@
                     required="true"
                     id="FAA_id_AssignedBy"
                     items="{AdminModel>/}"
-                    change="FAA_onStrictValidationComboBox"
+                    change="FAA_onChangeAssignedBy"
                     showSecondaryValues="true"
                     value="{myform>/formData/data/AssignedByEmployeeName}"
                     editable="{= ${LoginModel>/Role} === 'Admin' ?true : false}"
