@@ -419,8 +419,15 @@ sap.ui.define([
 
                 var oFrag = sap.ui.getCore();
 
-                oFrag.byId("FAA_id_Model").setValue(oSelectedData.Model);
-                oFrag.byId("FAA_id_Model").setValueState("None");
+                
+                // oFrag.byId("FAA_id_Model").setValue(oSelectedData.Model);
+                // oFrag.byId("FAA_id_Model").setValueState("None");
+                // oFrag.byId("FAA_id_Model").setValueStateText("");
+
+                var oModelField = oFrag.byId("FAA_id_Model");
+                oModelField.setValue(oSelectedData.Model);
+                oModelField.setValueState("None");
+                oModelField.setValueStateText("");
 
                 var formData = this.getView().getModel("myform");
                 formData.setProperty("/formData/data/EquipmentNumber", oSelectedData.EquipmentNumber);
