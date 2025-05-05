@@ -53,11 +53,6 @@
                     "bundleName": "sap.kt.com.minihrsolution.i18n.i18n"
                 }
             },
-            "AssignmentStatus": {
-                "type": "sap.ui.model.json.JSONModel",
-                "uri": "model/AssignmentStatus.json",
-                "preload": true
-            },
             "BloodGroup": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/BloodGroup.json",
@@ -128,11 +123,6 @@
                 "uri": "model/TripType.json",
                 "preload": true
             },
-            "WorkingMode": {
-                "type": "sap.ui.model.json.JSONModel",
-                "uri": "model/WorkingMode.json",
-                "preload": true
-            },
             "Salutation": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Salutation.json",
@@ -161,11 +151,6 @@
             "PDFData": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/PDFData.json",
-                "preload": true
-            },
-            "TravelAllowance": {
-                "type": "sap.ui.model.json.JSONModel",
-                "uri": "model/TravelAllowance.json",
                 "preload": true
             },
             "TraineeCourse": {
