@@ -10,15 +10,16 @@ sap.ui.define([
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOffer", {
             Formatter: Formatter,
             onInit: function () {
-                var oDateModel = new sap.ui.model.json.JSONModel();  
+                var oDateModel = new sap.ui.model.json.JSONModel();
                 oDateModel.setData({ maxDate: new Date(), focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1) });
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
-            
+
             _onRouteMatched: async function (oEvent) {
+                var LoginFunction = await this.commonLoginFunction("EmployeeOffer");
+                if (!LoginFunction) return;
                 this.getBusyDialog();
-                this.commonLoginFunction("EmployeeOffer"); // common login function
                 await this._fetchCommonData("Designation", "DesignationModel"); // common designation read call
                 await this._fetchCommonData("AppVisibility", "RoleModel"); // common role get call
                 var oRoleModel = this.getView().getModel("RoleModel");
@@ -42,7 +43,7 @@ sap.ui.define([
                     this.EO_onPressClear();
                 }
                 else {
-                    this.EO_onSearch(); 
+                    this.EO_onSearch();
                 }
             },
             // Read call for employee offer data
@@ -124,7 +125,7 @@ sap.ui.define([
                 this.getBusyDialog();
                 await this.updateCallForEmployeeOffer("Rejected");
                 this.EO_ButtonVisibility();
-               
+
             },
             //Common button visibility
             EO_ButtonVisibility: function () {
@@ -228,7 +229,7 @@ sap.ui.define([
             },
             //Common Dialog opening function
             _commonFragmentOpenOffer: function (name, fragmentName) {
-                      if (!this.oDialog) {
+                if (!this.oDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.OnboardEmployee",
                         controller: this
@@ -238,14 +239,14 @@ sap.ui.define([
                         sap.ui.getCore().byId("OEF_id_DateofBirth").setMaxDate(new Date());
                         this._FragmentDatePickersReadOnly(["OEF_id_DateofBirth"]);
                         this.oDialog.open();
-                          })
+                    })
                 } else {
                     this._FragmentDatePickersReadOnly(["OEF_id_DateofBirth"]);
                     this.oDialog.open();
                 }
             },
             OEF_onPressClose: function () {
-                const fields = ["OEF_id_CompanyMail", "OEF_id_DateofBirth", "OEF_id_Mobile","OEF_id_EmployeeRole","OEF_id_PAddress","OEF_id_CAddress", "OEF_id_blood", "OEF_id_Manager"];
+                const fields = ["OEF_id_CompanyMail", "OEF_id_DateofBirth", "OEF_id_Mobile", "OEF_id_EmployeeRole", "OEF_id_PAddress", "OEF_id_CAddress", "OEF_id_blood", "OEF_id_Manager"];
                 fields.forEach(field => {
                     sap.ui.getCore().byId(field).setValueState("None");
                 });
@@ -268,7 +269,7 @@ sap.ui.define([
             validateCombo: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
             },
-            validateMandetory:function(oEvent){
+            validateMandetory: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent)
             },
             //Onboard function
@@ -287,7 +288,7 @@ sap.ui.define([
                             this.EO_onSearch();
                             this.oDialog.close();
                             MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
-                           
+
                         } else {
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         }

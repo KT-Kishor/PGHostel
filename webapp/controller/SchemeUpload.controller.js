@@ -22,8 +22,9 @@ sap.ui.define(
         onInit: function () {
           this.getRouter().getRoute("RouteSchemeUpload").attachMatched(this._RouteAppVisibility, this);
         },
-        _RouteAppVisibility: function (oEvent) {
-          this.commonLoginFunction("SchemeUpload");
+        _RouteAppVisibility: async function (oEvent) {
+          var LoginFunction = await this.commonLoginFunction("SchemeUpload");
+          if (!LoginFunction) return;
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().setModel(new JSONModel({ isFileValid: false })); //for createfragmentsubmit button
           this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("schemeupload"));

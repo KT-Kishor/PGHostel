@@ -16,9 +16,10 @@ sap.ui.define(
         onInit: function () {
           this.getRouter().getRoute("RouteSchemeUploadDetails").attachMatched(this._onObjectMatched, this);
         },
-        _onObjectMatched: function (oEvent) {
+        _onObjectMatched: async function (oEvent) {
           this.closeBusyDialog();
-          this.commonLoginFunction("SchemeUpload");
+          var LoginFunction = await this.commonLoginFunction("SchemeUpload");
+          if (!LoginFunction) return;
           var that = this;
           var sData = oEvent.getParameter("arguments").data;
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();

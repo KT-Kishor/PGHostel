@@ -13,19 +13,24 @@ sap.ui.define(
           this.getRouter().getRoute("RouteTilePage").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function () {
-          this.commonLoginFunction("TilePage")
+          var LoginFunction = await this.commonLoginFunction("TilePage");
+          if (!LoginFunction) return;
+
+          this.getBusyDialog();
           this._fetchCommonData("AllLoginDetails", "EmpModel");
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          this.getView().getModel("Quotation").setProperty("/setDefFilter", true);
           this.AppVisibilityReadCall();
         },
+
         AppVisibilityReadCall: async function () {
           try {
             if (!this.getView().getModel("LoginModel")) return;
             var LoginModel = this.getView().getModel("LoginModel").getData();
-            let oData = await this.ajaxReadWithJQuery("AppVisibility", { Role: LoginModel.Role }, []);
-            var AppVisibility = Array.isArray(oData.data) ? oData.data[0] : [oData.data[0]];
-            this.getView().setModel(new JSONModel(AppVisibility), "AppVisibilityModel");
+            let oData = await this.ajaxReadWithJQuery("AppVisibility", { Role: LoginModel.Role }, []).then((oData) => {
+              this.closeBusyDialog();
+              var AppVisibility = Array.isArray(oData.data) ? oData.data[0] : [oData.data[0]];
+              this.getView().setModel(new JSONModel(AppVisibility), "AppVisibilityModel");
+            });
           } catch (oError) {
             MessageToast.show("Error in AppVisibilityReadCall:", oError);
           }

@@ -13,8 +13,10 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteEmployeeOfferDetails").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
+                var LoginFunction = await this.commonLoginFunction("EmployeeOffer");
+                if (!LoginFunction) return;
+
                 this.getBusyDialog();
-                this.commonLoginFunction("EmployeeOffer"); //common login function
                 this.byId("EOD_id_Joindate").setMinDate(new Date());
                 this.sArgPara = oEvent.getParameter("arguments").sParOffer
                 this.sSalutationArg = oEvent.getParameter("arguments").sParEmployee;
@@ -61,7 +63,7 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false, });
                 this.getView().setModel(oViewModel, "viewModel");
-                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay","EOUF_id_VariablePerc", "EOD_id_PinCode","EOUF_id_PinCode"].forEach(function (ids) {
+                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay", "EOUF_id_VariablePerc", "EOD_id_PinCode", "EOUF_id_PinCode"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 //create case
@@ -103,24 +105,24 @@ sap.ui.define([
             },
             //Navigate back to offer view
             EOD_onPressBack: function () {
-                var oViewModel = this.getView().getModel("viewModel");    
+                var oViewModel = this.getView().getModel("viewModel");
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
                     // Show confirmation dialog before navigating
                     this.showConfirmationDialog(
-                        this.i18nModel.getText("ConfirmActionTitle"),              
-                        this.i18nModel.getText("backConfirmation"),  
+                        this.i18nModel.getText("ConfirmActionTitle"),
+                        this.i18nModel.getText("backConfirmation"),
                         function () {
                             oViewModel.setProperty("/editable", false);
-                            oViewModel.setProperty("/isEditMode", true); 
+                            oViewModel.setProperty("/isEditMode", true);
                             this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
-                        }.bind(this), 
+                        }.bind(this),
                     );
                 } else {
                     this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
                 }
             },
-            
+
             //Update call 
             updateCallForEmployeeOffer: async function (oViewModel, text) {
                 this.getBusyDialog();
@@ -345,7 +347,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
-           //visibility of bond dropdown
+            //visibility of bond dropdown
             EOD_onRadioButtonSelect: function (oEvent) {
                 if (oEvent.getParameter("selectedIndex") === 0) var sValue = true;
                 else var sValue = false;
@@ -411,7 +413,7 @@ sap.ui.define([
             Mail_onPressClose: function () {
                 this.EOU_oDialogMail.destroy();
                 this.EOU_oDialogMail = null;
-               // this.EOU_oDialogMail.close();
+                // this.EOU_oDialogMail.close();
             },
             //File upload function calling from base controller
             Mail_onUpload: function (oEvent) {
@@ -438,7 +440,7 @@ sap.ui.define([
             },
             //If mail changing then check validation
             Mail_onEmailChange: function () {
-                this.validateSendButton(); 
+                this.validateSendButton();
             },
             //Send mail
             Mail_onSendEmail: function () {
@@ -461,13 +463,13 @@ sap.ui.define([
                         this.closeBusyDialog();
                         MessageToast.show(error.responseText);
                     });
-                    this.Mail_onPressClose();        
+                    this.Mail_onPressClose();
                 } catch (error) {
                     this.closeBusyDialog();
                     MessageToast.show(error.responseText);
                 }
             },
-            
+
             //back confirmation
             EOD_onPressBackBtn: function () {
                 this.showConfirmationDialog(

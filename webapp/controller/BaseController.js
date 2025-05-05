@@ -4,7 +4,7 @@ sap.ui.define([
   "../utils/TraineeCertificatePDF",
   "../model/formatter",
   "sap/ui/core/BusyIndicator"
-], function (Controller, JSONModel, jsPDF, Formatter,BusyIndicator) {
+], function (Controller, JSONModel, jsPDF, Formatter, BusyIndicator) {
   "use strict";
 
   return Controller.extend("sap.kt.ktofferletter.products.controller.BaseController", {
@@ -52,78 +52,45 @@ sap.ui.define([
     },
 
     commonLoginFunction: function (value) {
-      var oModel = this.getOwnerComponent().getModel("LoginModel");
-      var TileModel = this.getView().getModel("AppVisibilityModel");
-      if (value && TileModel) {
-        if (value === "EmployeeOffer" && TileModel.getProperty("/GenerateEmployeeOffer") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "Contract" && TileModel.getProperty("/GenerateContract") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "MSA&SOW" && TileModel.getProperty("/GenerateMsaNda") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "Trainee" && TileModel.getProperty("/GenerateTraineeOffer") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "Holiday" && TileModel.getProperty("/ListOfHolidays") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "ApplyLeave" && TileModel.getProperty("/ApplyLeave") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "MyInbox" && TileModel.getProperty("/MyInbox") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "Expense" && TileModel.getProperty("/ExpenseApp") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "CompanyInvoice" && TileModel.getProperty("/InvoiceApp") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "SelfService" && TileModel.getProperty("/SelfService") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "Customer" && TileModel.getProperty("/AddCustomer") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "IDCard" && TileModel.getProperty("/IDCard") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "ConsultantInvoice" && TileModel.getProperty("/ConsultantInvoice") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "EmployeeDetails" && TileModel.getProperty("/EmployeeDetail") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "Quotation" && TileModel.getProperty("/QuotationApp") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "AssigmentTask" && TileModel.getProperty("/AssignmentTask") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "AssigmentTask" && TileModel.getProperty("/AssignmentTask") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "PaySlip" && TileModel.getProperty("/PaySlip") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "Timesheet" && TileModel.getProperty("/Timesheet") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "TimeSheetApproval" && TileModel.getProperty("/TimeSheetApproval") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "SchemeUpload" && TileModel.getProperty("/SchemeUpload") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "IncomeAsset" && TileModel.getProperty("/IncomeAsset") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "AssetAssignment" && TileModel.getProperty("/AssetAssignment") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "A_Quotations" && TileModel.getProperty("/A_Quotations") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "A_Payroll" && TileModel.getProperty("/A_Payroll") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        } else if (value === "TilePage" && TileModel.getProperty("/TilePage") === '0') {
-          this.getRouter().navTo("RouteLoginPage");
-        }
-      }
-      if (!oModel) {
-        this.getRouter().navTo("RouteLoginPage");
-        return;
-      }
-      var userId = oModel.getProperty("/EmployeeID");
-      var userName = oModel.getProperty("/EmployeeName");
-      if (!userId || !userName) {
-        this.getRouter().navTo("RouteLoginPage");
-        return;
-      }
+      return new Promise((resolve) => {
+        const oModel = this.getOwnerComponent().getModel("LoginModel");
+        const TileModel = this.getView().getModel("AppVisibilityModel");
 
+        const fail = () => {
+          this.closeBusyDialog();
+          this.getRouter().navTo("RouteLoginPage");
+          resolve(false);
+        };
+
+        if (!oModel) return fail();
+
+        const userId = oModel.getProperty("/EmployeeID");
+        const userName = oModel.getProperty("/EmployeeName");
+
+        if (!userId || !userName) {
+          return fail();
+        }
+
+        if (value && TileModel) {
+          const tileMap = {
+            "EmployeeOffer": "/GenerateEmployeeOffer",
+            "Holiday": "/ListOfHolidays",
+            "SelfService": "/SelfService",
+            "EmployeeDetails": "/EmployeeDetail",
+            "TilePage": "/TilePage"
+          };
+
+          const modelPath = tileMap[value];
+          if (modelPath && TileModel.getProperty(modelPath) === '0') {
+            return fail();
+          }
+        }
+        resolve(true);
+      });
     },
 
     _fetchCommonData: async function (entityName, modelName, filter = "") {
-      if(!this.getOwnerComponent().getModel("LoginModel")){
+      if (!this.getOwnerComponent().getModel("LoginModel")) {
         BusyIndicator.hide();
         return;
       }
@@ -474,7 +441,7 @@ sap.ui.define([
           press: function () {
             dialog.close();
 
-           // this.getBusyDialog(); // open BusyDialog immediately
+            // this.getBusyDialog(); // open BusyDialog immediately
             Promise.resolve()
               .then(function () {
                 if (typeof fnOnConfirm === "function") {
@@ -482,7 +449,7 @@ sap.ui.define([
                 }
               }.bind(this))
               .finally(function () {
-               // this.closeBusyDialog(); // Always close BusyDialog
+                // this.closeBusyDialog(); // Always close BusyDialog
               }.bind(this));
           }.bind(this)
         }),
@@ -492,7 +459,7 @@ sap.ui.define([
           press: function () {
             dialog.close();
 
-           // this.getBusyDialog(); // open BusyDialog immediately
+            // this.getBusyDialog(); // open BusyDialog immediately
             Promise.resolve()
               .then(function () {
                 if (typeof fnOnCancel === "function") {
@@ -500,7 +467,7 @@ sap.ui.define([
                 }
               }.bind(this))
               .finally(function () {
-               // this.closeBusyDialog(); // Always close BusyDialog
+                // this.closeBusyDialog(); // Always close BusyDialog
               }.bind(this));
           }.bind(this)
         }),

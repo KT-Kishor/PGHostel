@@ -13,7 +13,9 @@ sap.ui.define([
             },
             _onRouteMatched: async function () {
                 this.getBusyDialog();
-                this.commonLoginFunction("EmployeeDetails");
+                var LoginFUnction = this.commonLoginFunction("SelfService");
+                if (!LoginFUnction) return;
+
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
                 this.byId("SS_id_IconTab").setSelectedKey("employeeDetailsKey");
@@ -345,15 +347,15 @@ sap.ui.define([
                         return;
                     }
                     this.getBusyDialog();
-                   // Get and prepare model data
-                   let oModel = this.getView().getModel("educationModel").getData();
-                   oModel.EmployeeID = this.EmployeeID;
-                   oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey() || "";
-                   oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey() || "";
-                   oModel.EducationStartDate = sap.ui.getCore().byId("AddEd_id_StartEdu").getValue()
-                   oModel.EducationStartDate = oModel.EducationStartDate.split("/").reverse().join('-');
-                   oModel.EducationEndDate = sap.ui.getCore().byId("AddEd_id_EndEdu").getValue()
-                   oModel.EducationEndDate = oModel.EducationEndDate.split("/").reverse().join('-');
+                    // Get and prepare model data
+                    let oModel = this.getView().getModel("educationModel").getData();
+                    oModel.EmployeeID = this.EmployeeID;
+                    oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey() || "";
+                    oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey() || "";
+                    oModel.EducationStartDate = sap.ui.getCore().byId("AddEd_id_StartEdu").getValue()
+                    oModel.EducationStartDate = oModel.EducationStartDate.split("/").reverse().join('-');
+                    oModel.EducationEndDate = sap.ui.getCore().byId("AddEd_id_EndEdu").getValue()
+                    oModel.EducationEndDate = oModel.EducationEndDate.split("/").reverse().join('-');
 
                     let oPayload, fnCall, sSuccessMessage;
                     if (bIsCreate) {
@@ -551,14 +553,14 @@ sap.ui.define([
                     function () { // onConfirm
                         that.getBusyDialog();
                         that.ajaxDeleteWithJQuery("/EmploymentDetails", { filters: { ID: oContext } }).then(() => {
-                                that.closeBusyDialog();
-                                sap.m.MessageToast.show(that.i18nModel.getText("empDataDeleteSuccess"));
-                                that._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: that.EmployeeID });
-                                that.setEmpButtonsEnabled(false);
-                            }).catch((error) => {
-                                that.closeBusyDialog();
-                                MessageToast.show(error.responseText);
-                            });
+                            that.closeBusyDialog();
+                            sap.m.MessageToast.show(that.i18nModel.getText("empDataDeleteSuccess"));
+                            that._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: that.EmployeeID });
+                            that.setEmpButtonsEnabled(false);
+                        }).catch((error) => {
+                            that.closeBusyDialog();
+                            MessageToast.show(error.responseText);
+                        });
                     },
                     function () { // onCancel
                         that.byId("EmpF_id_EmpTable").removeSelections(true);
@@ -689,7 +691,7 @@ sap.ui.define([
 
             // Handle tab switching with custom busy dialog management
             _handleTabSwitch: async function (sKey) {
-                this.getBusyDialog();        
+                this.getBusyDialog();
                 try {
                     let oViewModel = this.getView().getModel("viewModel");
                     oViewModel.setProperty("/isEditButtonVisible", false);
@@ -702,7 +704,7 @@ sap.ui.define([
                         await this._fetchCommonData("EmploymentDetails", "sEmploymentModel", { EmployeeID: this.EmployeeID });
                     } else if (sKey === "salaryKey") {
                         await this._fetchCommonData("SalaryDetails", "salaryData", { EmployeeID: this.EmployeeID });
-                    } 
+                    }
                 } catch (oError) {
                     this.closeBusyDialog();
                     sap.m.MessageToast.show(oError.responseText);
