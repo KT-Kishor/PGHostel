@@ -50,7 +50,7 @@
 										<m:Input value="{oFilteredContractModel>/ConsultantName}" liveChange="CD_validateName" maxLength="50" id="CU_id_ConsultantName" valueStateText="{i18n>nameConsultantValueState}" editable="{simpleForm>/editable}"  />
 										<!-- Consulting Service -->
 										<m:Label text="{i18n>consultingService}" required="true"/>
-										<m:Input value="{oFilteredContractModel>/ConsultingService}" liveChange="CD_validateName" maxLength="50" valueStateText="{i18n>roleValueState}" id="CU_id_ConsultingService" editable="{simpleForm>/editable}" />
+										<m:Input value="{oFilteredContractModel>/ConsultingService}" liveChange="CD_validateName" maxLength="50" valueStateText="{i18n>roleValueState}" id="CU_id_ConsultingService" editable="false"/>
 										<!-- Consultant Email -->
 										<m:Label text="{i18n>consultantEmailID}" required="true"/>
 										<m:Input value="{oFilteredContractModel>/ContarctEmail}" liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}" id="CU_id_ContractEmailID" editable="{simpleForm>/editable}" maxLength="100" />
@@ -76,16 +76,16 @@
 												<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 												</m:Select>		
 										<!-- Client Report Contact Name -->
-										<m:Input value="{oFilteredContractModel>/ClientReportContact}" id="CU_id_ClientReportContact" editable="{simpleForm>/editable}" maxLength="50" liveChange="CD_validateName" valueStateText="{i18n>commonNameValueState}"/>
+										<m:Input value="{oFilteredContractModel>/ClientReportContact}" id="CU_id_ClientReportContact" editable="{simpleForm>/editable}" maxLength="50" liveChange="CD_validateName"  valueStateText="{i18n>commonNameValueState}"/>
 										<!-- Location where services are provided -->
 										<m:Label text="{i18n>locationswhereServices}" required="true"></m:Label>
-										<m:Select selectedKey="{oFilteredContractModel>/Location}" items="{WorkingMode>/location}" editable="{simpleForm>/editable}">
+										<m:Select selectedKey="{oFilteredContractModel>/Location}" id="CD_id_contractLocation" items="{WorkingMode>/location}" editable="{simpleForm>/editable}">
 											<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
 										</m:Select>
 										<!-- Contract Status -->
 										<m:Label text="{i18n>contractStatus}" required="true"/>
-										<m:ComboBox value="{oFilteredContractModel>/ContractStatus}" items="{AssignmentStatus>/assignmentStatus}" editable="{simpleForm>/Status}" change="onChangeStartEndDate">
-											<core:Item key="{AssignmentStatus>ID}" text="{AssignmentStatus>Value}"/>
+										<m:ComboBox value="{oFilteredContractModel>/ContractStatus}" id="CD_id_contractStatus" items="{AssignmentStatus>/assignmentStatus}" editable="{simpleForm>/Status}" change="onChangeStartEndDate" valueStateText="{i18n>combovalueState}">
+											<core:Item key="{AssignmentStatus>ID}" text="{AssignmentStatus>Value}" />
 										</m:ComboBox>										
 										<!-- Assignment Start Date -->
 										<m:Label text="{i18n>assignmentStartDate}" required="true"/>
@@ -105,7 +105,7 @@
 										<!-- Input for Amount -->
 										<m:Label text="{i18n>amount}" required="true" />
 										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>amountPlaceholder}" liveChange="CD_validateAmount"  maxLength="15" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/editable}" />
-										<m:Select items="{CurrencyModel>/}" selectedKey="{oFilteredContractModel>/currency}" visible="true" width="100%" class="marginLeft" editable="{simpleForm>/editable}">
+										<m:Select  id="CU_id_CurrencySelect" items="{CurrencyModel>/}" selectedKey="{oFilteredContractModel>/currency}" visible="true" width="100%" class="marginLeft" editable="{simpleForm>/editable}">
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
 										<!-- Payment Terms -->

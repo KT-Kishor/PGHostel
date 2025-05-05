@@ -29,8 +29,8 @@
 							<Label text="{i18n>consultantEmail}" required="true"/>
 							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="50" placeholder="{i18n>placeConsultantEmail}" id="CD_id_Email"  liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>role}" required="true"/>
-							<Input value="{ContractModelWizart>/Role}"  placeholder="{i18n>placeRole}"
-								id="CD_id_Role" liveChange="CD_validateName" maxLength="50" valueStateText="{i18n>roleValueState}"/>
+							<Input value="{ContractModelWizart>/Role}"  placeholder="{i18n>placeRole} "
+								id="CD_id_Role" liveChange="CD_validateName" maxLength="50" valueStateText="{i18n>roleValueState}" editable="false"/>
 							<Label text="{i18n>rate}" required="true" />
 							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="0" select="RadioButtonSelect" >
 								<RadioButton  text="{i18n>rateHour}" />
@@ -99,7 +99,7 @@
 								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</Select>
 							<Label text="{i18n>contractLocation}" required="true"/>
-							<ComboBox id="CD_id_ConLocation" change="CD_ValidateCommonFields"  items="{BaseLocationModel>/}" value="{ContractModelWizart>/contractLocation}"  valueStateText="{i18n>combovalueState}">
+							<ComboBox id="CD_id_ConLocation" change="CD_ValidateComboBox"  items="{BaseLocationModel>/}" value="{ContractModelWizart>/contractLocation}"  valueStateText="{i18n>combovalueState}">
 								 <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 							</ComboBox>
 						</f:content>

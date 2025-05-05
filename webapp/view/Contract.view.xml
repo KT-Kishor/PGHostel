@@ -59,7 +59,7 @@
                     <Title id="" text="{i18n>contractDetails}  ({= ${ContractModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
-                    <Button text="{i18n>headerContractDetails}" id="C_id_AddBtn" press="C_onPressAddContract" type="Accept"/>
+                    <Button text="{i18n>headerContractDetails}" tooltip="{i18n>headerContractDetails}" id="C_id_AddBtn" press="C_onPressAddContract" type="Accept"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>

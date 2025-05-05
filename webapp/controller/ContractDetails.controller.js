@@ -10,11 +10,13 @@ sap.ui.define([
             _onRouteMatched: async function (oEvent) {
                 this.getBusyDialog(); // Show busy dialog
                 this.commonLoginFunction("Contract");
+                this._makeDatePickersReadOnly(["CD_id_AgreeDate", "CD_id_Datestart","CD_id_DateEnd"]);
+                this._makeDatePickersReadOnly(["CU_id_AgreementDate", "CU_id_AssignmentStartDate","CU_id_AssignmentEndDate"]);
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 await this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
                 await this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
-                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ContractOffer" }); 
+                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ContractActive" }); 
             
                 this.sArgPara = oEvent.getParameter("arguments").sParContract;
                 var AgreementNo = oEvent.getParameter("arguments").sID
@@ -52,7 +54,7 @@ sap.ui.define([
                             ConsultantName: "",
                             ConsultantAddress: "",
                             ContarctEmail: "",
-                            Role: "",
+                            Role: "Contractor",
                             Rate: "Hr",
                             Amount: "",
                             Currency: "INR",
@@ -133,16 +135,22 @@ sap.ui.define([
             },
                 
             CD_validateName: function (oEvent) {
-                const selectedKey = oEvent.getSource().getSelectedKey?.();
-                let oModel;
+                const oSource = oEvent.getSource();
+                const selectedKey = oSource.getSelectedKey?.();
+                let oModel, oInput;
                 if (this.sArgPara === "CreateContractFlag") {
                     oModel = this.getView().getModel("ContractModelWizart");
+                    oInput = this.byId("CD_id_HiringContact"); // ID for Hiring Contact input
                 } else {
                     oModel = this.getView().getModel("oFilteredContractModel");
+                    oInput = this.byId("CU_id_ClientReportContact"); // ID for Client Report Contact input
                 }
                 if (oModel && selectedKey) {
                     oModel.setProperty("/ClientReportContact", selectedKey);
-                } 
+                    if (oInput) {
+                        oInput.setValueState("None");
+                    }
+                }
                 utils._LCvalidateName(oEvent);
                 this.validateStep();
             },
@@ -163,7 +171,7 @@ sap.ui.define([
                 this.validateStep();
             },
             CD_ValidateComboBox: function (oEvent) {
-                utils._LCvalidateMandatoryField(oEvent);
+                utils._LCstrictValidationComboBox(oEvent);
             },
             //back function
             CD_onPressback: function () {
@@ -201,12 +209,12 @@ sap.ui.define([
                     this.byId("CD_id_Address").getValue() && this.byId("CD_id_Email").getValue() &&
                     this.byId("CD_id_Role").getValue() && this.byId("CD_id_Amount").getValue() &&
                     utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") && utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
-                    utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") && utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&  utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") && utils._LCvalidateName(this.byId("CD_id_Role"), "ID") &&
                     utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID");
 
                 var step2Validated = this.byId("CD_id_HiringContact").getValue() && this.byId("CD_id_Datestart").getValue() && this.byId("CD_id_DateEnd").getValue() &&
                 utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") && utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") && utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
-                 utils._LCvalidateMandatoryField(this.byId("CD_id_ConLocation"), "ID")
+                utils._LCvalidateMandatoryField(this.byId("CD_id_ConLocation"), "ID")
 
                 var isStep1Validated = step1Validated ? true : false;
                 var isStep2Validated = step2Validated ? true : false;
@@ -233,7 +241,7 @@ sap.ui.define([
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
                     }
-
+            
                     var formattedText;
                     switch (this.RadioButton) {
                         case "Hour":
@@ -248,46 +256,77 @@ sap.ui.define([
                         default:
                             formattedText = "Hr";
                     }
-
+            
                     var oModel = this.getView().getModel("ContractModelWizart");
-                    // Prepare data object with the required fields
+                    var selectedCurrency = this.byId("CD_id_Currency").getSelectedKey();
+            
                     var data = {
                         "ContractNo": oModel.oData.ContractNo,
-                        "ConsultantNameSalutation": (oModel.oData.Salutation),
-                        "ConsultantName": (oModel.oData.ConsultantName),
-                        "ConsultantAddress": (oModel.oData.ConsultantAddress),
-                        "EndClient": (oModel.oData.EndClientHirer),
-                        "ConsultingService": (oModel.oData.Role),
-                        "LocationService": (oModel.oData.Location),
-                        "ContractStatus": (oModel.oData.AssignmentStatus),
+                        "ConsultantNameSalutation": oModel.oData.Salutation,
+                        "ConsultantName": oModel.oData.ConsultantName,
+                        "ConsultantAddress": oModel.oData.ConsultantAddress,
+                        "EndClient": oModel.oData.EndClientHirer,
+                        "ConsultingService": oModel.oData.Role,
+                        "LocationService": oModel.oData.Location,
+                        "ContractStatus": oModel.oData.AssignmentStatus,
                         "AssignmentStartDate": oModel.oData.StartDate.split("/").reverse().join("-"),
                         "AssignmentEndDate": oModel.oData.EndDate.split("/").reverse().join("-"),
-                        "ConsultantRate": oModel.oData.Amount + " " + oModel.oData.Currency + " Per " + formattedText + " Including all tax",
-                        "PaymentTerms": (oModel.oData.PaymentTerms),
-                        "ClientReportContactSalutation": (oModel.oData.Salutation2),
-                        "ClientReportContact": (oModel.oData.ClientReportContact),
-                        "SpecificInsuranceRequirement": (oModel.oData.InsuranceRequirement),
-                        "ContractPeriod": (oModel.oData.WarrantyDate),
-                        "ExpensesClaim": (oModel.oData.AdditionalRates),
+                        "ConsultantRate": oModel.oData.Amount + " " + selectedCurrency + " Per " + formattedText + " Including all tax",
+                        "PaymentTerms": oModel.oData.PaymentTerms,
+                        "ClientReportContactSalutation": oModel.oData.Salutation2,
+                        "ClientReportContact": oModel.oData.ClientReportContact,
+                        "SpecificInsuranceRequirement": oModel.oData.InsuranceRequirement,
+                        "ContractPeriod": oModel.oData.WarrantyDate,
+                        "ExpensesClaim": oModel.oData.AdditionalRates,
                         "Status": "Submitted",
-                        "AgreementDate":oModel.oData.AgreementDate.split("/").reverse().join("-"),
-                        "ContarctEmail": (oModel.oData.ContarctEmail),
-                        "ContractLocation": (oModel.oData.contractLocation),
+                        "AgreementDate": oModel.oData.AgreementDate.split("/").reverse().join("-"),
+                        "ContarctEmail": oModel.oData.ContarctEmail,
+                        "ContractLocation": oModel.oData.contractLocation,
                         "AgreementNo": String(1).padStart(2, '0')
                     };
+            
                     this.getBusyDialog(); // Show busy dialog
+            
                     var response = await this.ajaxCreateWithJQuery("Contract", { data: data });
-                    if(response.success===true){
+            
+                    if (response.success === true) {
                         this.closeBusyDialog(); // Close busy dialog
-                        MessageToast.show(this.i18nModel.getText("contractSuccess"));
-                        this.getRouter().navTo("RouteContract")
+            
+                        var oDialog = new sap.m.Dialog({
+                            title: this.i18nModel.getText("success"),
+                            type: sap.m.DialogType.Message,
+                            state: sap.ui.core.ValueState.Success,
+                            content: new sap.m.Text({ text: this.i18nModel.getText("contractSuccess") }),
+                            beginButton: new sap.m.Button({
+                                text: "OK",
+                                type: "Accept",
+                                press: function () {
+                                    oDialog.close();
+                                    this.getRouter().navTo("RouteContract");
+                                }.bind(this)
+                            }),
+                            endButton: new sap.m.Button({
+                                text: "Generate PDF",
+                                type: "Reject",
+                                press: function () {
+                                    oDialog.close();
+                                    this.onGeneratePDF();
+                                }.bind(this)
+                            }),
+                            afterClose: function () {
+                                oDialog.destroy();
+                            }
+                        });
+            
+                        oDialog.open();
                     }
+            
                 } catch (error) {
                     this.closeBusyDialog(); // Close busy dialog
                     MessageToast.show(error.message || error.responseText);
                 }
-            }, 
-
+            },
+            
             onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");
                 var isEditMode = oViewModel.getProperty("/isEditMode");
@@ -346,11 +385,12 @@ sap.ui.define([
                     utils._LCvalidateDate(this.byId("CU_id_AgreementDate"), "ID") &&
                     utils._LCvalidateMandatoryField(this.byId("CU_id_ContractAddress"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_EndClient"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CD_id_contractStatus"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_ClientReportContact"), "ID") &&
                     utils._LCvalidateDate(this.byId("CU_id_AssignmentStartDate"), "ID") &&
                     utils._LCvalidateDate(this.byId("CU_id_AssignmentEndDate"), "ID") &&
                     utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.byId("CU_id_ContractCity"), "ID")
+                    utils._LCstrictValidationComboBox(this.byId("CU_id_ContractCity"), "ID")
                 );
             
                 if (!isMandatoryValid) {
@@ -365,7 +405,9 @@ sap.ui.define([
             
                 const rateType = oModel.HrDaliyMonth;
                 const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
-                const ConsultantRate = `${oModel.Amount} ${oModel.Currency} Per ${rateText} Including all tax`;
+                const selectedCurrency = this.byId("CU_id_CurrencySelect").getSelectedKey();
+                const ConsultantRate = `${oModel.Amount} ${selectedCurrency} Per ${rateText} Including all tax`;                
+                const LocationService = this.byId("CD_id_contractLocation").getSelectedKey();
             
                 const jsonData = {
                     ContractNo: oModel.ContractNo,
@@ -375,7 +417,7 @@ sap.ui.define([
                     ConsultingService: oModel.ConsultingService,
                     ConsultantAddress: oModel.ConsultantAddress,
                     EndClient: oModel.EndClient,
-                    LocationService: oModel.LocationService,
+                    LocationService: LocationService,
                     ContractStatus: isRenewed ? 'New' : oModel.ContractStatus,
                     AssignmentStartDate: oModel.AssignmentStartDate.split("/").reverse().join("-"),
                     AssignmentEndDate: oModel.AssignmentEndDate.split("/").reverse().join("-"),
@@ -446,7 +488,6 @@ sap.ui.define([
                 }
                 try {
                     const requestData = {filters: {ContractNo: oModel.ContractNo, AgreementNo: AgreementNo}, data: jsonData};
-            
                     await this.ajaxUpdateWithJQuery("Contract", requestData);
                     oView.getModel("simpleForm").setProperty("/editable", false);
                     oView.getModel("simpleForm").setProperty("/Status", false);
@@ -454,18 +495,16 @@ sap.ui.define([
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
                     this.closeBusyDialog();
-                    sap.m.MessageBox.success(this.i18nModel.getText("agreementUpdatedSuccess"), {
-                        onClose: function () {
-                            that.getRouter().navTo("RouteContractDetails");
-                        }
+                    this.getRouter().navTo("RouteContractDetails", {
+                        sParContract: oModel.ContractNo 
                     });
+                    sap.m.MessageToast.show(this.i18nModel.getText("agreementUpdatedSuccess"));
                 } catch (error) {
                     this.closeBusyDialog();
                     sap.m.MessageToast.show(this.i18nModel.getText("updateContractFailed"));
                 }
             },
             CUD_commonOpenDialog: function (fragmentName) {
-                sap.ui.core.BusyIndicator.show(0)
                 if (!this.CUD_oDialogMail) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -474,11 +513,9 @@ sap.ui.define([
                         this.CUD_oDialogMail = CUD_oDialogMail;
                         this.getView().addDependent(this.CUD_oDialogMail);
                         this.CUD_oDialogMail.open();
-                        sap.ui.core.BusyIndicator.hide()
                     }.bind(this));
                 } else {
                     this.CUD_oDialogMail.open();
-                    sap.ui.core.BusyIndicator.hide()
                 }
             },
             CUD_onSendEmail: function () {
@@ -490,7 +527,7 @@ sap.ui.define([
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
                     ToEmail: oContractEmail,
-                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].emails,
+                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].CCEmailId,
                     name: "",
                     mimeType: "",
                     content: "",
@@ -540,12 +577,13 @@ sap.ui.define([
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                     "Designation": oModel.ConsultingService
                 };
+                this.getBusyDialog();
                 this.ajaxCreateWithJQuery("ContractOfferMail", oPayload).then((oData) => {
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog();
                 }).catch((error) => {
                     MessageToast.show(error.responseText);
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog();
                 });
                 this.Mail_onPressClose();
             },
