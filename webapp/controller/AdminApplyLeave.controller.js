@@ -92,8 +92,9 @@ sap.ui.define(
                         this.getView().setModel(oSecondChartModel, "secondLeaveData");
 
                         // Configure charts
-                        this._configureFirstChart("AL_id_VizFrame6", oFirstChartModel, this.i18nModel.getText("currentLeaveQuota"));
-                        this._configureSecondChart("AL_id_VizFrameAll", oSecondChartModel, this.i18nModel.getText("yearlyLeaveQuota"));
+                        this._configureFirstChart("AL_id_VizFrame6", oFirstChartModel, this.i18nModel.getText("currentLeaveQuota"), leaveType);
+                        this._configureSecondChart("AL_id_VizFrameAll", oSecondChartModel, this.i18nModel.getText("yearlyLeaveQuota"), leaveType);
+                        
                 
                     } catch (error) {
                         this.closeBusyDialog(); //  Close BusyDialog
@@ -101,10 +102,35 @@ sap.ui.define(
                     }
                 },
                 
-                _configureFirstChart: function (chartId, oModel, titleText) {
+                _configureFirstChart: function (chartId, oModel, titleText, leaveType) {
                     let oVizFrame = this.getView().byId(chartId);
-                    if (!oVizFrame) return; 
+                    if (!oVizFrame) return;
+                
                     oVizFrame.setModel(oModel);
+                
+                    // Base rules
+                    let rules = [
+                        {
+                            dataContext: { LeaveType: "Submitted" },
+                            properties: { color: "#fc7b03" },
+                            displayName: "Submitted"
+                        },
+                        {
+                            dataContext: { LeaveType: "Approved" },
+                            properties: { color: "#4CAF50" },
+                            displayName: "Approved"
+                        }
+                    ];
+                
+                    // Add "Quota" only if leaveType is not LOP
+                    if (leaveType !== "LOP") {
+                        rules.push({
+                            dataContext: { LeaveType: "Quota" },
+                            properties: { color: "#4c79e0" },
+                            displayName: "Quota"
+                        });
+                    }
+                
                     oVizFrame.setVizProperties({
                         legend: {
                             title: { visible: true, text: "All Measures" }
@@ -115,37 +141,45 @@ sap.ui.define(
                         },
                         plotArea: {
                             dataPointStyle: {
-                                rules: [
-                                    {
-                                        dataContext: { LeaveType: "Submitted" },
-                                        properties: { color: "#fc7b03" },
-                                        "displayName": "Submitted"
-                                    },
-                                    {
-                                        dataContext: { LeaveType: "Approved" },
-                                        properties: { color: "#4CAF50" },
-                                        "displayName": "Approved"
-                                    },
-                                    {
-                                        dataContext: { LeaveType: "Quota" },
-                                        properties: { color: "#4c79e0" },
-                                        "displayName": "Quota"
-                                    },
-                                ]
+                                rules: rules
                             }
                         }
                     });
-                    let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null; 
+                
+                    let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : null;
                     let oPopOver = popoverId ? this.getView().byId(popoverId) : null;
                     if (oPopOver) {
                         oPopOver.connect(oVizFrame.getVizUid());
                     }
                 },
-        
-                _configureSecondChart: function (chartId, oModel, titleText) {
+                
+                _configureSecondChart: function (chartId, oModel, titleText, leaveType) {
                     let oVizFrame = this.getView().byId(chartId);
-                    if (!oVizFrame) return; 
+                    if (!oVizFrame) return;
+                
                     oVizFrame.setModel(oModel);
+                
+                    let rules = [
+                        {
+                            dataContext: { LeaveType: "Submitted" },
+                            properties: { color: "#fc7b03" },
+                            displayName: "Submitted"
+                        },
+                        {
+                            dataContext: { LeaveType: "Approved" },
+                            properties: { color: "#4CAF50" },
+                            displayName: "Approved"
+                        }
+                    ];
+                
+                    if (leaveType !== "LOP") {
+                        rules.push({
+                            dataContext: { LeaveType: "All Quota" },
+                            properties: { color: "#4c79e0" },
+                            displayName: "Quota"
+                        });
+                    }
+                
                     oVizFrame.setVizProperties({
                         legend: {
                             title: { visible: true, text: "All Measures" }
@@ -156,33 +190,18 @@ sap.ui.define(
                         },
                         plotArea: {
                             dataPointStyle: {
-                                rules: [
-                                    {
-                                        dataContext: { LeaveType: "Submitted" },
-                                        properties: { color: "#fc7b03" },
-                                        "displayName": "Submitted"
-                                    },
-                                    {
-                                        dataContext: { LeaveType: "Approved" },
-                                        properties: { color: "#4CAF50" },
-                                        "displayName": "Approved"
-                                    },
-                                    {
-                                        dataContext: { LeaveType: "All Quota" },
-                                        properties: { color: "#4c79e0" },
-                                        "displayName": "Quota"
-                                    }
-                                ]
+                                rules: rules
                             }
                         }
                     });
-                    let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null; 
+                
+                    let popoverId = (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null;
                     let oPopOver = popoverId ? this.getView().byId(popoverId) : null;
                     if (oPopOver) {
                         oPopOver.connect(oVizFrame.getVizUid());
                     }
                 },
-        
+                
                 // Function to display monthly bar chart
                 MonthBarDisplayFunction: async function (leaveType, selectedYear, userId) {
                     let jsonData = { "data": { "EmployeeID": userId, "selectYear": selectedYear, "LeaveType": leaveType } };

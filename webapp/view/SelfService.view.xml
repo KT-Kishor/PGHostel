@@ -56,16 +56,14 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
 				<contentRight>
-					<Button text="{i18n>visit}" type="Critical" 
+					<Button text="{i18n>visit}" type="Attention" 
         press="onDownloadVisitCard" 
-        icon="sap-icon://visits" 
         enabled="{viewModel>/isVisitMode}" 
         tooltip="{i18n>visit}" 
         visible="{viewModel>/isEditButtonVisible}" />
 					<Button text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" 
         press="SS_onEditPress"
-        type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Neutral' }" 
-        icon="{= ${viewModel>/isEditMode} ? '' : 'sap-icon://edit' }"   
+        type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Ghost' }"   
         tooltip="{i18n>editDetails}" 
         visible="{viewModel>/isEditButtonVisible}" />
 				</contentRight>
