@@ -26,12 +26,12 @@ sap.ui.define(
 
         _fetchTaskDetails: async function (sTaskID) {
           try {
-            BusyIndicator.show();
+            this.getBusyDialog();
             const response = await this.ajaxReadWithJQuery("NewTask", {
               TaskID: sTaskID,
             });
             if (response.success) {
-              BusyIndicator.hide();
+              this.closeBusyDialog();
               const oTaskDetails = Array.isArray(response.data)
                 ? response.data[0]
                 : response.data;
@@ -41,12 +41,12 @@ sap.ui.define(
               );
             }
           } catch (error) {
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             MessageToast.show(this.i18nModel.getText("smgerrorloading"));
           }
         },
         readCallForAllLoginDetails: async function (filter) {
-          BusyIndicator.show();
+          this.getBusyDialog();
           // Fetch all login details
           await this.ajaxReadWithJQuery("AllLoginDetails", filter)
             .then((oData) => {
@@ -66,10 +66,10 @@ sap.ui.define(
                   new JSONModel(uniqueLoginData), "AllLoginDetailsModelInitial"
                 );
               }
-              BusyIndicator.hide();
+              this.closeBusyDialog();
             })
             .catch((oError) => {
-              BusyIndicator.hide();
+              this.closeBusyDialog();
               MessageToast.show(this.i18nModel.getText("smgerrorlogindetails"));
             });
         },
@@ -193,13 +193,13 @@ sap.ui.define(
 
         CommonReadcall: async function (params) {
           try {
-            BusyIndicator.show(0);
+            this.getBusyDialog();
             const response = await this.ajaxReadWithJQuery(
               "AssignedTask",
               params
             );
             if (response.success) {
-              BusyIndicator.hide();
+              this.closeBusyDialog();
               let taskData = Array.isArray(response.data) ? response.data : [response.data];
 
               const aEmployees =
@@ -221,7 +221,7 @@ sap.ui.define(
               this.getView().setModel(new JSONModel(taskData), "AssignModel");
             }
           } catch (error) {
-            BusyIndicator.hide();
+            this.getBusyDialog();
             MessageToast.show(this.i18nModel.getText("smgerrorassigntask"));
           }
         },
@@ -229,7 +229,6 @@ sap.ui.define(
         //Submit the task details
         FAT_onSubmitTask: async function () {
           const oView = this.getView();
-          // const oData = oView.getModel("EditTaskModel").getData();
           const aEmployees = oView.getModel("LoginDetailsModel").getData();
 
           // Validate all fields
@@ -242,6 +241,7 @@ sap.ui.define(
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
           }
+
           const aSelectedIDs = sap.ui.getCore().byId("FAT_id_EmployeeID").getSelectedKeys().filter(key => key.trim() !== "");
           const sTaskID = sap.ui.getCore().byId("FAT_id_TaskID").getValue();
 
@@ -251,7 +251,6 @@ sap.ui.define(
 
           // Extract already assigned EmployeeIDs
           const existingEmployeeIDs = aAssignedTasks.map(task => task.EmployeeID.trim());
-          // Filter out duplicate employee IDs
           const aFilteredIDs = aSelectedIDs.filter(id => !existingEmployeeIDs.includes(id.trim()));
 
           if (aFilteredIDs.length === 0) {
@@ -265,12 +264,10 @@ sap.ui.define(
           const sStartDate = sap.ui.getCore().byId("FAT_id_StartDate").getValue();
           const sEndDate = sap.ui.getCore().byId("FAT_id_EndDate").getValue();
 
-          let successCount = 0;
-
-          // Create a separate entry for each employee
-          for (const empID of aFilteredIDs) {
+          // Construct full payload array
+          const aPayloadData = aFilteredIDs.map(empID => {
             const oEmployee = aEmployees.find(emp => emp.EmployeeID === empID);
-            const payload = {
+            return {
               TaskID: sTaskID,
               TaskName: sTaskName,
               EmployeeID: empID,
@@ -279,15 +276,13 @@ sap.ui.define(
               StartDate: sStartDate,
               EndDate: sEndDate
             };
-            BusyIndicator.show();
-            const response = await this.ajaxCreateWithJQuery("AssignedTask", { data: payload });
+          });
 
-            if (response.success) {
-              BusyIndicator.hide();
-              successCount++;
-            }
-          }
-          if (successCount > 0) {
+          BusyIndicator.show();
+          const response = await this.ajaxCreateWithJQuery("AssignedTask", { data: aPayloadData });
+          BusyIndicator.hide();
+
+          if (response.success) {
             MessageToast.show("Employee assigned successfully!");
             await this._fetchCommonData("AssignedTask", "AssignModel", { TaskID: sTaskID });
             await this.CommonReadcall({ TaskID: sTaskID });
@@ -296,6 +291,7 @@ sap.ui.define(
             MessageToast.show(this.i18nModel.getText("smgFailtoassign"));
           }
         },
+
 
         //Update the task details
         MA_onPressSave: async function () {
