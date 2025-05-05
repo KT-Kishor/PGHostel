@@ -644,5 +644,22 @@ sap.ui.define([
         this.closeBusyDialog();
       }
     },
+     // Common salutaon and gender change code
+     onSalutationChangeCommon: function (oEvent, sModelName, sGenderPropertyPath, sGenderControlId) {
+      var selectedSalutation = oEvent.getSource().getSelectedKey();
+      var oView = this.getView();
+      var oModel = oView.getModel(sModelName);
+    
+      if (selectedSalutation === "Ms." || selectedSalutation === "Mrs.") {
+          oModel.setProperty(sGenderPropertyPath, "Female");
+          oView.byId(sGenderControlId).setEnabled(false);
+      } else if (selectedSalutation === "Mr.") {
+          oModel.setProperty(sGenderPropertyPath, "Male");
+          oView.byId(sGenderControlId).setEnabled(false);
+      } else {
+          oView.byId(sGenderControlId).setEnabled(true);
+      }
+    }
+    
   })
 });

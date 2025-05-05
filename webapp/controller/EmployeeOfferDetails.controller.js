@@ -580,6 +580,14 @@ sap.ui.define([
                     this.getView().addDependent(this._oPopover);
                 }
                 this._oPopover.openBy(oEvent.getSource());
+            },
+            onSalutationChange: function (oEvent) {
+                this.onSalutationChangeCommon(
+                    oEvent,
+                    "employeeModel",       // name of the model
+                    "/Gender",             // path to gender property
+                    "EOU_id_Gender"        // ID of the gender control
+                );
             }
         });
     });

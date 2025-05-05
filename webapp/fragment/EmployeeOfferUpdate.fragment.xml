@@ -45,7 +45,7 @@
 										<m:Select editable="{viewModel>/editable}"
 											selectedKey="{employeeModel>/Salutation}"
 											items="{Salutation>/salutation}"
-											width="100%">
+											width="100%" change="onSalutationChange">
 											<!-- Binding the key and text of the Select control to the NameSalutation model -->
 											<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 											</m:Select>
