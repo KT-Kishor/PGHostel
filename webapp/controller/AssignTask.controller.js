@@ -283,7 +283,7 @@ sap.ui.define(
           BusyIndicator.hide();
 
           if (response.success) {
-            MessageToast.show("Employee assigned successfully!");
+            MessageToast.show("Employee(s) assigned successfully!");
             await this._fetchCommonData("AssignedTask", "AssignModel", { TaskID: sTaskID });
             await this.CommonReadcall({ TaskID: sTaskID });
             this.oTaskDialog.close();
@@ -297,22 +297,26 @@ sap.ui.define(
         MA_onPressSave: async function () {
           const oTable = this.byId("AT_id_TaskTable");
           const oSelectedItem = oTable.getSelectedItem();
-          const params = {
-            // Always include the current task ID
-            TaskID: this._currentTaskID
-          };
+
           if (!oSelectedItem) {
             MessageToast.show(this.i18nModel.getText("smgSelecttask"));
             return;
           }
+
           const oEditModel = this.getView().getModel("EditTaskModel");
-          const oData = { ...oEditModel.getData() }; // Clone data to prevent reference issues
-          const oTaskId = oSelectedItem.getBindingContext("AssignModel").getProperty("EmployeeID");
+          const oData = { ...oEditModel.getData() }; // Clone data to avoid reference issues
+          const oEmpId = oSelectedItem.getBindingContext("AssignModel").getProperty("EmployeeID");
+
+          // Construct both EmployeeID and TaskID filters
+          const filters = {
+            EmployeeID: oEmpId,
+            TaskID: this._currentTaskID
+          };
 
           try {
             BusyIndicator.show(0);
             const response = await this.ajaxUpdateWithJQuery("/AssignedTask", {
-              filters: { EmployeeID: oTaskId },
+              filters: filters,
               data: oData,
             });
 
@@ -320,11 +324,10 @@ sap.ui.define(
               BusyIndicator.hide();
               MessageToast.show(this.i18nModel.getText("smgUpdatetask"));
 
-              // 1. Refresh the entire table data
-              this._fetchCommonData("AssignedTask", "AssignModel", params);
-              this.FAT_onSearch()
-              this.CommonReadcall(params);
-              // 3. Clear selection and close dialog
+              // Refresh data and UI
+              this._fetchCommonData("AssignedTask", "AssignModel");
+              this.FAT_onSearch();
+              // this.CommonReadcall();
               oTable.removeSelections();
               this.oTaskDialog.close();
             } else {
@@ -336,6 +339,7 @@ sap.ui.define(
             MessageToast.show("Error updating task: " + error.message);
           }
         },
+
         AT_onstartDatevalidateDate: function (oEvent) {
           const oStartDate = oEvent.getSource().getDateValue(); // get selected start date
           const oEndDatePicker = sap.ui.getCore().byId("FAT_id_EndDate");
