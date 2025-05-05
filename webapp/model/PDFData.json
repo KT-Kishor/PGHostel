@@ -7,6 +7,7 @@
     "JoiningDate": "(Employee Joining Date)",
     "EmpCTC": "(CTC of Employee)",
     "BondCondition": "(Condition of Bond)",
+    "BondCondition2": "",
     "SectorType": "(Type of Sector)",
     "CompanyLogoHeader": "../image/KT_Logo.png",
     "CompanyBackImage": "../image/logo.png",

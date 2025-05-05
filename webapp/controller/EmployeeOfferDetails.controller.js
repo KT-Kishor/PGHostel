@@ -500,11 +500,13 @@ sap.ui.define([
                 oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.OfferReleaseDate));
                 oPDFModel.setProperty("/JoiningDate", Formatter.formatDate(oEmpModel.JoiningDate));
                 oPDFModel.setProperty("/EmpCTC", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.CostofCompany));
-                if (oEmpModel.EmploymentBond == "0" || oEmpModel.EmploymentBond == "") {
+                if (oEmpModel.EmploymentBond == "0" || oEmpModel.EmploymentBond == "" || oEmpModel.EmploymentBond == null) {
                     oPDFModel.setProperty("/BondCondition", "18 employment months");
+                    oPDFModel.setProperty("/BondCondition2", "");
                 }
                 else {
-                    oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond years");
+                    oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond year(s)");
+                    oPDFModel.setProperty("/BondCondition2", "any training costs and ");
                 }
                 oPDFModel.setProperty("/YearlyComponents/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Total));
                 oPDFModel.setProperty("/YearlyComponents/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.BasicSalary));

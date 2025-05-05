@@ -397,11 +397,9 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                         // Column definitions
                         const columns = [
                             { title: "Sl\nNo", widthRatio: 0.08 },
-                            { title: "Details of Assigned\nIT Personnel", widthRatio: 0.32 },
-                            { title: "Designation", widthRatio: 0.18 },
-                            { title: "Start Date", widthRatio: 0.12 },
-                            { title: "End Date", widthRatio: 0.12 },
-                            { title: "Rate Card", widthRatio: 0.18 }
+                            { title: "Details of Assigned\nIT Personnel", widthRatio: 0.4 },
+                            { title: "Designation", widthRatio: 0.3 },
+                            { title: "Rate Card", widthRatio: 0.2 }
                         ];
 
                         const tableStartX = margin + 6;
@@ -437,8 +435,8 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                         let tableDataY = secondLineY + 4.5;
 
                         for (let i = 0; i < tableData.length; i++) {
-                            const { Salutation, ConsultantName, Designation, StartDate, EndDate, Rate } = tableData[i];
-                            const rowValues = [i+1, Salutation + " " + ConsultantName, Designation, Formatter.formatDate(StartDate), Formatter.formatDate(EndDate), Rate];
+                            const { Salutation, ConsultantName, Designation, Rate } = tableData[i];
+                            const rowValues = [i+1, Salutation + " " + ConsultantName, Designation, Rate];
                         
                             // Wrap text for each cell and calculate line count
                             const wrappedLines = rowValues.map((val, j) => doc.splitTextToSize(val, columnWidths[j] - 2));

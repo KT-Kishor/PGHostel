@@ -522,10 +522,11 @@ sap.ui.define([
             },
 
             async MsaE_onPressMergeSow() {
+                var oPDFModel = this.getView().getModel("PDFData");
+                oPDFModel.setProperty("/TableData", this.getView().getModel("SowReadModel").getData().filter((item) => item.SowID === this.Selected.SowID));
                 var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
                 await this._fetchCommonData("PDFCondition", "PDFSOWModel", { Type: "SOW" });
-                var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/SOWCreateDate", Formatter.formatDate(oModel.CreateMSADate));
                 oPDFModel.setProperty("/AgreementEndDate", Formatter.formatDate(oModel.MsaContractPeriodEndDate));
                 oPDFModel.setProperty("/ClientCompanyName", oModel.CompanyName);
@@ -533,7 +534,8 @@ sap.ui.define([
                 oPDFModel.setProperty("/ClientName", oModel.Salutation + " " + oModel.CompanyHeadName);
                 oPDFModel.setProperty("/ClientRole", oModel.CompanyHeadPosition);
                 oPDFModel.setProperty("/AgreementDuration", oModel.ContractPeriod);
-                oPDFModel.setProperty("/TableData", this.getView().getModel("SowReadModel").getData());
+                oPDFModel.setProperty("/SOWStartDate", Formatter.formatDate(oPDFModel.getProperty("/TableData/0/StartDate")));
+                oPDFModel.setProperty("/SOWEndDate", Formatter.formatDate(oPDFModel.getProperty("/TableData/0/EndDate")));
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFSOWModel = this.getView().getModel("PDFSOWModel").getData();
                 if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
