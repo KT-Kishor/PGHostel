@@ -55,29 +55,25 @@ sap.ui.define([
                 this.IA_CommonReadCall("");
                 this._fetchCommonData("AssetType", "oAssetTypeModel");
                 this._fetchCommonData("Currency", "oCurrencyModel");
-                this._fetchCommonData("BaseLocation", "branchModel");
-
-                const oBranchModel = this.getView().getModel("branchModel");
-                if (oBranchModel) {
-                    oBranchModel.attachRequestCompleted(() => {
-                        const branchCode = loginModel.BranchCode;
-                        const branchData = oBranchModel.getData();
-
-                        const matchedBranch = branchData.find(branch => branch.BranchCode === branchCode);
-                        if (matchedBranch) {
-                            const branchName = matchedBranch.city;
-                            this.getView().getModel("CreateIncomeAssetModel").setProperty("/AssignBranch", branchName);
-                        } else {
-                            console.warn("BranchCode not found in branchModel.");
-                        }
-                    });
-                }
+                this._fetchCommonData("BaseLocation", "branchModel").then(() => {
+                    const loginBranchCode = this.getView().getModel("LoginModel").getProperty("/BranchCode");
+                    const baseData = this.getView().getModel("branchModel").getData();
+                
+                    const matchedBranch = baseData.find(branch => branch.branchCode === loginBranchCode);
+                
+                    if (matchedBranch) {
+                        const branchName = matchedBranch.city;
+                        console.log("Branch Name:", branchName);
+                
+                        this.getView().getModel("CreateIncomeAssetModel").setProperty("/AssignBranch", branchName);
+                    } else {
+                        console.warn("Branch not found for BranchCode:", loginBranchCode);
+                    }
+                });
+                
+                 
                 this._FragmentDatePickersReadOnly(["FCIA_id_Date"])
                 this._fetchCommonData("AllLoginDetails", "EmpModel", {})
-
-
-
-
 
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Company Asset");
 
@@ -156,6 +152,8 @@ sap.ui.define([
 
                 } else {
                     this.FCIA_Dialog.open();
+                    
+                    var oModel = this.getView().getModel("CreateIncomeAssetModel")
                     var oSimpleForm = sap.ui.getCore().byId("FCIA_id_SimpleFormChange354wide");
                     if (oSimpleForm) {
                         oSimpleForm.setLayout(sap.ui.layout.form.SimpleFormLayout.ColumnLayout);
@@ -171,7 +169,7 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_slno").setValue("").setValueState("None").setEditable(true).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_Date").setValue("").setValueState("None").setVisible(true)
-                    sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("").setValueState("None")
+                    sap.ui.getCore().byId("FCIA_id_branch") .setSelectedKey(oModel.getProperty("/AssignBranch")).setValueState("None");
                     sap.ui.getCore().byId("FCIA_id_branch").setVisible(true).setEditable(true)
                     sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_assetvalue").setValue("").setValueState("None").setEditable(true).setVisible(true)
@@ -342,6 +340,8 @@ sap.ui.define([
                     
                     this.IA_onSearch();
                     this.FCIA_Dialog.close();
+                }else{     
+                      MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
                 }
             
             },
@@ -485,9 +485,9 @@ sap.ui.define([
 
             IA_onPickedButtonPress: function (oEvent) {
                 this.item = oEvent.getSource().getBindingContext("incomeModel").getObject().ID
+                var oRowData = oEvent.getSource().getBindingContext("incomeModel").getObject();
                 var oModel = this.getView().getModel("CreateIncomeAssetModel");
-                var data = this.getView().getModel("incomeModel").getData()
-                
+
                 if (!this.FCIA_Dialog) {
                     var oView = this.getView();
                     this.FCIA_Dialog = sap.ui.core.Fragment.load({
@@ -502,7 +502,7 @@ sap.ui.define([
                         }
                         this._FragmentDatePickersReadOnly(["FCIA_id_transferdate"])
 
-                        var oAssignedDate = data.TransferDate;
+                        var oAssignedDate = oRowData.TransferDate
                         if (oAssignedDate) {
                             var oMinDate = new Date(oAssignedDate);
                             sap.ui.getCore().byId("FCIA_id_Date").setMinDate(oMinDate);
@@ -518,9 +518,9 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_eqno").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_slno").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true)
-                        sap.ui.getCore().byId("FCIA_id_Date").setVisible(true)
+                        sap.ui.getCore().byId("FCIA_id_Date").setVisible(true).setValueState("None")
                         sap.ui.getCore().byId("FCIA_id_branch").setVisible(false)
-                        sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true)
+                        sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true).setValueState("None").setSelectedKey("")
                         sap.ui.getCore().byId("FCIA_id_assetvalue").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_currency").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
@@ -536,7 +536,7 @@ sap.ui.define([
                         oSimpleForm.setLayout(sap.ui.layout.form.SimpleFormLayout.ResponsiveGridLayout);
                     }
 
-                    var oAssignedDate = data.TransferDate;
+                    var oAssignedDate = oRowData.TransferDate;
                     if (oAssignedDate) {
                         var oMinDate = new Date(oAssignedDate);
                         sap.ui.getCore().byId("FCIA_id_Date").setMinDate(oMinDate);
@@ -547,9 +547,9 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_eqno").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_slno").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true)
-                    sap.ui.getCore().byId("FCIA_id_Date").setVisible(true).setValue("")
+                    sap.ui.getCore().byId("FCIA_id_Date").setVisible(true).setValue("").setValueState("None")
                     sap.ui.getCore().byId("FCIA_id_branch").setVisible(false).setSelectedKey("")
-                    sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true)
+                    sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true).setSelectedKey("").setValueState("None")
                    sap.ui.getCore().byId("FCIA_id_assetvalue").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_currency").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
@@ -670,7 +670,7 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_currency").setValue(data.Currency)
                     sap.ui.getCore().byId("FCIA_id_currency").setEditable(false).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_transferdate").setValue("").setValueState("None").setVisible(true)
-                    sap.ui.getCore().byId("FCIA_id_transferbranch").setValue("").setVisible(true)
+                    sap.ui.getCore().byId("FCIA_id_transferbranch").setValue("").setVisible(true).setValueState("None")
                     this.FCIA_Dialog.open();
                 } else {
                     this.FCIA_Dialog.open();
@@ -701,7 +701,7 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_currency").setValue(data.Currency)
                     sap.ui.getCore().byId("FCIA_id_currency").setEditable(false).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_transferdate").setValue("").setValueState("None").setVisible(true)
-                    sap.ui.getCore().byId("FCIA_id_transferbranch").setValue("").setVisible(true)
+                    sap.ui.getCore().byId("FCIA_id_transferbranch").setValue("").setVisible(true).setValueState("None")
 
                     sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_pickButton").setVisible(false)

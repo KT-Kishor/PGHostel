@@ -105,7 +105,7 @@
                         additionalText="{branchModel>branchCode}"
                     />
                 </ComboBox>
-                  <Label text="{i18n>picked branch}" required="true" />
+                  <Label text="{i18n>pickedbranch}" required="true" />
                 <ComboBox
                     id="FCIA_id_pickbranch"
                     placeholder="Select branch"
@@ -148,6 +148,7 @@
                 <Label text="{i18n>transferDate}"/>
                 <DatePicker
                 id="FCIA_id_transferdate"
+                required="true"
                 value="{CreateIncomeAssetModel>/TransferDate}"
                 minDate="{VisiableModel>/minDate}"
                     valueFormat="dd/MM/yyyy"
@@ -160,6 +161,7 @@
                  <Label text="{i18n>transferBranch}"/>
              <ComboBox
                     id="FCIA_id_transferbranch"
+                    required="true"
                     placeholder="Select branch"
                     change="FCIA_onbranchchange"
                     selectionChange="FCIA_onselectionchange"
