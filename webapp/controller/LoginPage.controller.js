@@ -116,7 +116,6 @@ sap.ui.define(
           }
         },
         LP_onLogin: function () {
-          // this.getRouter().navTo("RouteTilePage")
           var oButton = this.byId("LP_id_loginBTn").setBusy(true);
           const oLoginModel = this.getView().getModel("LoginModel");
           const oVM = this.getView().getModel("LoginViewModel");
@@ -159,7 +158,7 @@ sap.ui.define(
 
                 if (oVM.getProperty("/isOtpSelected")) {
                   var timeDifference = new Date().getTime() - new Date(parseInt(userData.TimeDate)).getTime();
-                  if (timeDifference >= 120000) {
+                  if (timeDifference >= 600000) {
                     MessageToast.show(this.i18nModel.getText("loginTimeOut")); // "OTP expired"
                     return;
                   }
@@ -184,6 +183,7 @@ sap.ui.define(
                   oVM.setProperty("/userId", ""); oVM.setProperty("/userName", ""); oVM.setProperty("/otp", ""); oVM.setProperty("/password", ""); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isPasswordVisible", false); oVM.setProperty("/isSendOtpVisible", false); oVM.setProperty("/sendOtpText", this.i18nModel.getText("sendOtp")); oVM.setProperty("/isOtpSelected", false); oVM.setProperty("/isPasswordSelected", false); oVM.setProperty("/isForgotPasswordVisible", false);
                   // Navigate
                   this.getRouter().navTo("RouteTilePage");
+                  // this.getBusyDialog();
                   // Add this block after navigation
                   window.history.pushState(null, "", window.location.href);
                   window.addEventListener("popstate", function (event) {
@@ -444,7 +444,6 @@ sap.ui.define(
             return;
           } else {
             sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
-            this.SM_onPressSave()
           }
 
 

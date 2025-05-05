@@ -337,7 +337,7 @@ sap.ui.define(
               onClose: async function (oAction) {
                 if (oAction === MessageBox.Action.OK) {
                   // User confirmed, proceed with delete and upload
-                  this.getBusyDialog();
+                  that.getBusyDialog();
                   try {
 
                     var deleteResponse = await that.ajaxDeleteWithJQuery("/SchemeUploade", {});
@@ -352,7 +352,7 @@ sap.ui.define(
                     var uploadResponse = await that.ajaxCreateWithJQuery("SchemeUploade", { data: formattedData });
 
                     if (uploadResponse.success) {
-                      this.closeBusyDialog();
+                      that.closeBusyDialog();
                       MessageToast.show(that.i18nModel.getText("msgschemeupload"));
 
                       // Update UI Model after successful save
@@ -363,11 +363,11 @@ sap.ui.define(
                       that.SU_onClear();
                       that.oSchemeUploadDialog.close();
                     } else {
-                      this.closeBusyDialog();
+                      that.closeBusyDialog();
                       MessageToast.show("Failed to upload new data. Please try again.");
                     }
                   } catch (error) {
-                    this.closeBusyDialog();
+                    that.closeBusyDialog();
                     console.error(error);
                     MessageToast.show("An error occurred. Please try again.");
                   }

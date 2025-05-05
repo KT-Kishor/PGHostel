@@ -177,6 +177,19 @@ sap.ui.define(
             MessageToast.show("An error occurred: " + err.message);
           }
         },
+        RP_onComPass: function () {
+          const oNewPwInput = sap.ui.getCore().byId("RP_id_NewPW");
+          const oConfirmPwInput = sap.ui.getCore().byId("RP_id_ConfirmPW");
+          const newPassword = oNewPwInput.getValue();
+          const confirmPassword = oConfirmPwInput.getValue();
+          if (newPassword !== confirmPassword) {
+            sap.ui.getCore().byId("RP_id_ConfirmPW").setValueState("Error")
+            MessageToast.show(this.i18nModel.getText("misPasswords"));
+            return;
+          } else {
+            sap.ui.getCore().byId("RP_id_ConfirmPW").setValueState("None")
+          }
+        },
         //password visibility change
         RP_onTogglePasswordVisibility: function (oEvent) {
           var oInput = oEvent.getSource();

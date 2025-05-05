@@ -4,7 +4,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core" >
 	<Dialog 
-        title="{i18n>headerEmpDetails}">
+        title="{i18n>headerEmpDetails}">	
 		<f:SimpleForm
             editable="true" layout="ColumnLayout" id="OEF_id_SimpleForm"
             labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
