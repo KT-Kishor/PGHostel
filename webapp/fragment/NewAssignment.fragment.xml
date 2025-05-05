@@ -38,12 +38,15 @@
                     valueStateText="{i18n>dateValueState}"/>
                
             </f:content>
-            <HBox justifyContent="End">
-                <Button text="{i18n>save}" type="Emphasized" press="MA_onPressSave" class="submit" visible="{visiblePlay>/save}"/>
+        </f:SimpleForm>
+
+        <footer>
+        <Toolbar>
+        <ToolbarSpacer />
+ <Button text="{i18n>save}" type="Emphasized" press="MA_onPressSave" class="submit" visible="{visiblePlay>/save}"/>
                 <Button text="{i18n>submit}" type="Accept" press="NAF_onSubmitTask" class="submit" visible="{visiblePlay>/submit}"/>
                 <Button text="{i18n>close}" press="NAF_onTaskClose" class="sendMail" type="Reject"/>
-                
-            </HBox>
-        </f:SimpleForm>
+        </Toolbar>
+        </footer>
     </Dialog>
 </core:FragmentDefinition>

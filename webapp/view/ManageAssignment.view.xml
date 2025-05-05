@@ -11,7 +11,7 @@
 			        <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 		</headerContent>
 		<content>
-				<fb:FilterBar  class="sapUiTinyMargin" id="MA_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="MA_onPressClear" showClearOnFB="true" search="MA_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+				<fb:FilterBar  class="sapUiTinyMargin" id="MA_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="MA_onPressClear" showClearOnFB="true" search="MA_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false" >
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="TaskName" label="{i18n>assignmentid}" groupName="Group1" visibleInFilterBar="true" >
 					<fb:control>
