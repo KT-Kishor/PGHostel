@@ -6,29 +6,42 @@
     <Dialog
         id="FAU_id_unassignDialog"
         busyIndicatorDelay="0"
+        contentWidth="25%"
         title="{i18n>returnDate}"
         afterClose="onDialogClose"
     >
-            <VBox class="sapUiResponsiveMargin">
+           <f:SimpleForm
+            id="FAU_id_FormFrag"
+            busyIndicatorDelay="0"
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="4"
+            labelSpanM="12"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="2"
+        >
+            <f:content>
                 <Label text="{i18n>date}" />
                 <DatePicker
                     id="FAU_id_unassignDate"
                     width="100%"
                     required="true"
-                    value="{myform>/formData/data/ReturnDate}"
                     valueFormat="yyyy-MM-dd"
                     displayFormat="dd/MM/yyyy"
                     change="FAU_onDateLiveChange"
-                    valueStateText="{i18n>enterDate}"
+                    valueStateText="{i18n>invalidDate}"
                 />
-                </VBox>
-                <!-- <Label text="{i18n>branch}" />
+                <Label text="{i18n>branch}" />
                 <ComboBox
                     required="true"
                     id="FAU_id_branch"
                     showSecondaryValues="true"
-                    change="FAU_onStrictValidationComboBox"
+                    change="FAU_onReturnBranchChange"
                     items="{BaseLocationModel>/}"
+                    valueStateText="{i18n>selectBranch}"
                     value="{myform>/formData/data/ReturnBranch}"
                 >
                     <core:ListItem
@@ -36,7 +49,18 @@
                         text="{BaseLocationModel>city}"
                         additionalText="{BaseLocationModel>branchCode}"
                     />
-                </ComboBox>-->
+                </ComboBox>
+                <Label text="{i18n>comments}" />
+                <TextArea rows="2" cols="20" 
+                    maxLength="200"
+                    id="FAU_id_Comments"
+                    required="true"
+                    placeholder="{i18n>enterComments}"
+                    liveChange="FAU_validatecomments"
+                    valueStateText="{i18n>commentsValueState}"
+                />
+            </f:content>
+        </f:SimpleForm>
         <beginButton>
             <Button
                 text="{i18n>save}"
@@ -53,3 +77,4 @@
         </endButton>
     </Dialog>
 </core:FragmentDefinition>
+				

@@ -126,7 +126,17 @@ sap.ui.define([
             },
 
 
-            AA_onPressAssign: function () {
+            AA_onPressAssign: async function () {
+                try {
+                    var response = await this.ajaxReadWithJQuery("IncomeAsset", {});
+                    if (response.success) {
+                        this.getOwnerComponent().setModel(new JSONModel(response.data), "incomeModel");
+                    }
+                }
+                catch (e) {
+                    console.log(e);
+                    MessageToast.show(this.i18nModel.getText("Error"));
+                }
                 var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === "Admin"));
                 this.getView().setModel(oModel, "AdminModel");
                 var oView = this.getView();
@@ -229,6 +239,14 @@ sap.ui.define([
             },
 
             FAA_onChangeAssignedBy: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
+            },
+
+            FAU_onDateLiveChange:function(oEvent){
+                this._LCvalidateDate(oEvent);
+            },
+
+            FAU_onReturnBranchChange:function(oEvent){
                 utils._LCstrictValidationComboBox(oEvent);
             },
 
@@ -397,6 +415,8 @@ sap.ui.define([
 
             onCancelReturn: function () {
                 this.byId("AA_id_AssestTable").removeSelections(true)
+                this.getView().getModel("myform").setProperty("/formData/data", {});
+                sap.ui.getCore().byId("FAU_id_branch").setValueState("None");
                 this._unassignDialog.close();
 
             },
@@ -418,16 +438,9 @@ sap.ui.define([
                 var oSelectedData = oBindingContext.getObject();
 
                 var oFrag = sap.ui.getCore();
-
-                
-                // oFrag.byId("FAA_id_Model").setValue(oSelectedData.Model);
-                // oFrag.byId("FAA_id_Model").setValueState("None");
-                // oFrag.byId("FAA_id_Model").setValueStateText("");
-
-                var oModelField = oFrag.byId("FAA_id_Model");
-                oModelField.setValue(oSelectedData.Model);
-                oModelField.setValueState("None");
-                oModelField.setValueStateText("");
+                oFrag.byId("FAA_id_Model").setValue(oSelectedData.Model);
+                oFrag.byId("FAA_id_Model").setValueState("None");
+                oFrag.byId("FAA_id_Model").setValueStateText("");
 
                 var formData = this.getView().getModel("myform");
                 formData.setProperty("/formData/data/EquipmentNumber", oSelectedData.EquipmentNumber);
@@ -486,6 +499,7 @@ sap.ui.define([
                     utils._LCstrictValidationComboBox(oCore.byId("FAA_id_Type"), "ID") &&
                     utils._LCvalidateMandatoryField(oCore.byId("FAA_id_Model"), "ID") &&
                     utils._LCstrictValidationComboBox(oCore.byId("FAA_branch_Id"), "ID") &&
+                    utils._LCstrictValidationComboBox(oCore.byId("FAU_id_branch"), "ID") &&
                     utils._LCstrictValidationComboBox(oCore.byId("FAA_id_AssignedBy"), "ID")) {
                     return true
                 }

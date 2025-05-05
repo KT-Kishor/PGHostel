@@ -36,12 +36,15 @@
                             showClearIcon="true"
                             id="AA_id_EmployeeName"
                             items="{EmpModel>/}"
+                            showSecondaryValues="true"
                         >
-                            <core:ListItem
-                                key="{EmpModel>EmployeeName}"
-                                text="{EmpModel>EmployeeName}"
-                                additionalText="{EmpModel>EmployeeID}"
-                            />
+                            <items>
+                                <core:ListItem
+                                    key="{EmpModel>EmployeeName}"
+                                    text="{EmpModel>EmployeeName}"
+                                    additionalText="{EmpModel>EmployeeID}"
+                                />
+                            </items>
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
@@ -175,51 +178,59 @@
                     <Text text="{i18n>model}" />
                 </Column>
                 <Column
-                  hAlign="Left"
+                    hAlign="Left"
                     minScreenWidth="Tablet"
-                    demandPopin="true">
+                    demandPopin="true"
+                >
                     <Text text="{i18n>equipmentNumber}" />
                 </Column>
                 <Column
-                  hAlign="Left"
+                    hAlign="Left"
                     minScreenWidth="Tablet"
-                    demandPopin="true">
+                    demandPopin="true"
+                >
                     <Text text="{i18n>serialNumber}" />
                 </Column>
                 <Column
-                 hAlign="Left"
-                        minScreenWidth="Desktop"
-                        demandPopin="true">
+                    hAlign="Left"
+                    minScreenWidth="Desktop"
+                    demandPopin="true"
+                >
                     <Text text="{i18n>assignedByEmployeeName}" />
                 </Column>
                 <Column
-                 hAlign="Left"
-                        minScreenWidth="Desktop"
-                        demandPopin="true">
+                    hAlign="Left"
+                    minScreenWidth="Desktop"
+                    demandPopin="true"
+                >
                     <Text text="{i18n>assignBranch}" />
                 </Column>
                 <Column
-                 hAlign="Left"
-                        minScreenWidth="Desktop"
-                        demandPopin="true">
+                    hAlign="Left"
+                    minScreenWidth="Desktop"
+                    demandPopin="true"
+                >
                     <Text text="{i18n>assignedDate}" />
                 </Column>
                 <Column
-                 hAlign="Left"
-                        minScreenWidth="Desktop"
-                        demandPopin="true">
+                    hAlign="Left"
+                    minScreenWidth="Desktop"
+                    demandPopin="true"
+                >
                     <Text text="{i18n>assetValue}" />
                 </Column>
                 <Column
-                 hAlign="Left"
-                        minScreenWidth="Desktop"
-                        demandPopin="true">
+                    hAlign="Left"
+                    minScreenWidth="Desktop"
+                    demandPopin="true"
+                >
                     <Text text="{i18n>status}" />
                 </Column>
                 <Column
-                 hAlign="Left"
-                        minScreenWidth="Desktop"
-                        demandPopin="true">
+                    hAlign="Left"
+                    minScreenWidth="Desktop"
+                    demandPopin="true"
+                >
                     <Text text="{i18n>returnDate}" />
                 </Column>
             </columns>
@@ -249,7 +260,7 @@
                             text="{assetModel>Currency} {path:'assetModel>AssetValue',formatter:'.Formatter.fromatNumber'}"
                         />
                         <ObjectStatus
-                            inverted="false"
+                            inverted="true"
                             state="{= ${assetModel>Status} === 'Assigned' ? 'Success' : 'Error' }"
                             text="{assetModel>Status}"
                         />
