@@ -182,6 +182,21 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TrainingType.json",
                 "preload": true
+            },
+            "AssignmentStatus": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/AssignmentStatus.json",
+                "preload": true
+            },
+            "WorkingMode": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/WorkingMode.json",
+                "preload": true
+            },
+            "TravelAllowance": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/TravelAllowance.json",
+                "preload": true
             }
         },
         "resources": {

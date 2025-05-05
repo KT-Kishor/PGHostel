@@ -30,7 +30,7 @@
 							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="50" placeholder="{i18n>placeConsultantEmail}" id="CD_id_Email"  liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>role}" required="true"/>
 							<Input value="{ContractModelWizart>/Role}"  placeholder="{i18n>placeRole}"
-								id="CD_id_Role" liveChange="CD_ValidateCommonFields" maxLength="50" valueStateText="{i18n>roleValueState}"/>
+								id="CD_id_Role" liveChange="CD_validateName" maxLength="50" valueStateText="{i18n>roleValueState}"/>
 							<Label text="{i18n>rate}" required="true" />
 							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="0" select="RadioButtonSelect" >
 								<RadioButton  text="{i18n>rateHour}" />

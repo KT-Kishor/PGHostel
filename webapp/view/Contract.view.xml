@@ -14,8 +14,8 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="ContractNo" label="{i18n>contractNo}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox selectionChange=".onBranchChange" showClearIcon="true" items="{ContractModel>/}">
-                            <core:Item key="{ContractModel>ContractNo}" text="{ContractModel>ContractNo}"/>
+						<ComboBox selectionChange=".onBranchChange" showClearIcon="true" items="{ContractModelInitial>/}">
+                            <core:Item key="{ContractModelInitial>ContractNo}" text="{ContractModelInitial>ContractNo}"/>
                         </ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
@@ -59,7 +59,7 @@
                     <Title id="" text="{i18n>contractDetails}  ({= ${ContractModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
-                    <Button text="{i18n>headerContractDetails}" id="C_id_AddBtn" press="C_onPressAddContract" type="Accept"  icon="sap-icon://customer-order-entry"/>
+                    <Button text="{i18n>headerContractDetails}" id="C_id_AddBtn" press="C_onPressAddContract" type="Accept"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
@@ -101,7 +101,7 @@
 							<Text text="{ContractModel>EndClient}"/>
 							<Text text="{path:'ContractModel>AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{path:'ContractModel>AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" />
-							<ObjectStatus inverted="true" text="{ContractModel>ContractStatus}"  state="{path: 'ContractModel>ContractStatus', formatter:'.Formatter.formatObjectStatus'}"  class="centerText"/>
+						    <ObjectStatus inverted="true" text="{ContractModel>ContractStatus}"  state="{path: 'ContractModel>ContractStatus', formatter:'.Formatter.formatObjectStatus'}"  class="centerText"/>
 							<Text text="{ContractModel>Comments}"/>
 						</cells>
 					</ColumnListItem>

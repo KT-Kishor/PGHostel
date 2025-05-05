@@ -133,8 +133,6 @@ sap.ui.define([
             },
                 
             CD_validateName: function (oEvent) {
-                utils._LCvalidateName(oEvent);
-                this.validateStep();
                 const selectedKey = oEvent.getSource().getSelectedKey?.();
                 let oModel;
                 if (this.sArgPara === "CreateContractFlag") {
@@ -145,6 +143,8 @@ sap.ui.define([
                 if (oModel && selectedKey) {
                     oModel.setProperty("/ClientReportContact", selectedKey);
                 } 
+                utils._LCvalidateName(oEvent);
+                this.validateStep();
             },
             CD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);

@@ -2,8 +2,9 @@ sap.ui.define(
   [
     "./BaseController", // Import BaseController
     "../model/formatter", // Custom formatter functions
+    "sap/ui/model/json/JSONModel", //json model
   ],
-  function (BaseController, Formatter) {
+  function (BaseController, Formatter,JSONModel) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.Contract",
@@ -20,12 +21,28 @@ sap.ui.define(
           this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("contractDetails"));
           try {  
               await this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
-              await this._fetchCommonData("Contract", "ContractModel", { startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31` }) // Fetch common data
+              await this.readCallForContract("Initial");
             } catch (error) {
               sap.m.MessageToast.show(error.message || error.responseText);
             } finally {
               this.closeBusyDialog(); // Close after async call finishes
             }
+        },
+        readCallForContract: async function (filter) {
+          this.getBusyDialog(); // <-- Open custom BusyDialog
+          await this.ajaxReadWithJQuery("Contract", filter).then((oData) => {
+            var contractData = Array.isArray(oData.data) ? oData.data : [oData.data];
+            this.getOwnerComponent().setModel(new JSONModel(contractData), "ContractModel");
+            if (filter === "Initial") {
+              var contractDetails = [...new Map(contractData.filter(item => item.ContractNo).map(item => [item.ContractNo.trim(), item])).values()];
+              this.getView().setModel(new JSONModel(contractDetails), "ContractModelInitial");
+            }
+            this.closeBusyDialog(); // <-- Close custom BusyDialog
+          }).catch((error) => {
+            sap.m.MessageToast.show(error.message || error.responseText);
+          }).finally(() => {
+            this.closeBusyDialog(); // <-- Close custom BusyDialog
+          });
         },
         onPressback: function () {
           this.getRouter().navTo("RouteTilePage");
