@@ -14,7 +14,7 @@
             id="FAU_id_FormFrag"
             busyIndicatorDelay="0"
             editable="true"
-            layout="ResponsiveGridLayout"
+            layout="ColumnLayout"
             labelSpanXL="4"
             labelSpanL="4"
             labelSpanM="12"
@@ -27,12 +27,12 @@
                 <Label text="{i18n>date}" />
                 <DatePicker
                     id="FAU_id_unassignDate"
-                    width="100%"
                     required="true"
-                    valueFormat="yyyy-MM-dd"
+                    valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
                     change="FAU_onDateLiveChange"
                     valueStateText="{i18n>invalidDate}"
+                    value="{path:'myform>/formData/data/ReturnDate',formatter:'.Formatter.formatDate'}"
                 />
                 <Label text="{i18n>branch}" />
                 <ComboBox
@@ -58,6 +58,7 @@
                     placeholder="{i18n>enterComments}"
                     liveChange="FAU_validatecomments"
                     valueStateText="{i18n>commentsValueState}"
+                    value="{myform>/formData/data/Comments}"
                 />
             </f:content>
         </f:SimpleForm>

@@ -130,7 +130,6 @@
 				<DatePicker
                     id="FAA_id_AssignedDate"
                     required="true"
-                    maxDate="{controller>/maxDate}"
                     change="onAssignedDateChange"
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
