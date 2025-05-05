@@ -206,7 +206,10 @@
                     <Text text="{i18n>Assetdate}"/>
                 </Column>
                 <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>branch}"/>
+                    <Text text="{i18n>creationbranch}"/>
+                </Column>
+                 <Column minScreenWidth="Tablet" demandPopin="true">
+                    <Text text="{i18n>pickedbranch}"/>
                 </Column>
                   <Column minScreenWidth="Tablet"  demandPopin="true">
                     <Text text="{i18n>status}"/>
@@ -245,10 +248,11 @@
                             formatter: '.Formatter.formatDate'
                         }"/>
                         <Text text="{incomeModel>AssignBranch}"/>
+                        <Text text="{incomeModel>PickedBranch}"></Text>
                         <HBox alignItems="Center" >
                               <ObjectStatus 
+                                 inverted="true"
                                   text="{incomeModel>Status}"
-                                  inverted="true"
                                   state="{
                                   path:'incomeModel>Status',
                                   formatter:'.Formatter.formatObjectStatus'
@@ -258,7 +262,7 @@
                                   visible="{= ${incomeModel>Status} === 'Transferred' }"
                                 text="{i18n>Picked}"
                                 type="Ghost"
-                                  press="IA_onPickedButtonPress"
+                                press="IA_onPickedButtonPress"
                               />
                           </HBox>
                         <Text text="{

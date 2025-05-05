@@ -77,7 +77,8 @@
                 />
                      <Label text="{i18n>date}" required="true" />
                 <DatePicker
-                    id="FCIA_id_Date"
+                    id="FCIA_id_Date" 
+                    minDate="{VisiableModel>/minDate}"
                     value="{CreateIncomeAssetModel>/AssetCreationDate}"
                     change="FCIA_ondatechange"
                      valueStateText="Select date"
@@ -95,6 +96,24 @@
                     valueStateText="Select branch"
                     value="{CreateIncomeAssetModel>/AssignBranch}"
                     selectedKey="{CreateIncomeAssetModel>/AssignBranch}"
+                    showSecondaryValues="true"
+                    items="{branchModel>/}"
+                >
+                    <core:ListItem
+                        key="{branchModel>branchCode}" 
+                        text="{branchModel>city}"
+                        additionalText="{branchModel>branchCode}"
+                    />
+                </ComboBox>
+                  <Label text="{i18n>picked branch}" required="true" />
+                <ComboBox
+                    id="FCIA_id_pickbranch"
+                    placeholder="Select branch"
+                    change="FCIA_onbranchchange"
+                    selectionChange="FCIA_onselectionchange"
+                    valueStateText="Select branch"
+                    value="{CreateIncomeAssetModel>/PickedBranch}"
+                    selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
                     showSecondaryValues="true"
                     items="{branchModel>/}"
                 >
@@ -130,6 +149,7 @@
                 <DatePicker
                 id="FCIA_id_transferdate"
                 value="{CreateIncomeAssetModel>/TransferDate}"
+                minDate="{VisiableModel>/minDate}"
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
                     valueStateText="Select date"

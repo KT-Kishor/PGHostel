@@ -26,11 +26,13 @@
 
 			<f:content>
 			<Label text="{i18n>trashDate}"/>
-				<DatePicker
+				<DatePicker 
 					id="FTIA_id_Date"
+					minDate="{VisiableModel>/minDate}"
 					liveChange="onDateTimePickerLiveChange"
 					valueFormat="yyyy-MM-dd"
-					displayFormat="dd/MM/yyyy "
+					displayFormat="dd/MM/yyyy"
+					required="true"
 				/>
 			</f:content>
 		</f:SimpleForm>
