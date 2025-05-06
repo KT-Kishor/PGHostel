@@ -246,6 +246,16 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oEvent);
             },
 
+            FAU_id_Comments:function(oEvent){
+                    var sValue = oEvent.getParameter("value");
+                    var oTextArea = oEvent.getSource();
+                
+                    if (sValue && sValue.trim().length > 0) {
+                        oTextArea.setValueState("None");
+                        oTextArea.setValueStateText("");
+                    }
+            },
+
             onPressSave: async function () {
                 if(this._checkValidation()){
                     try {
@@ -378,8 +388,9 @@ sap.ui.define([
 
             onCancelReturn: function () {
                 this.byId("AA_id_AssestTable").removeSelections(true)
-                this.getView().getModel("myform").setProperty("/formData/data", {});
-                sap.ui.getCore().byId("FAU_id_branch").setValueState("None");
+                var oModel = this.getView().getModel("myform");
+                oModel.setProperty("/formData/data/ReturnBranch", "");
+                oModel.setProperty("/formData/data/Comments", "");
                 this._unassignDialog.close();
 
             },
@@ -451,7 +462,6 @@ sap.ui.define([
                     utils._LCstrictValidationComboBox(oCore.byId("FAA_id_Type"), "ID") &&
                     utils._LCvalidateMandatoryField(oCore.byId("FAA_id_Model"), "ID") &&
                     utils._LCstrictValidationComboBox(oCore.byId("FAA_branch_Id"), "ID") &&
-                    utils._LCstrictValidationComboBox(oCore.byId("FAU_id_branch"), "ID") &&
                     utils._LCstrictValidationComboBox(oCore.byId("FAA_id_AssignedBy"), "ID")) {
                     return true
                 }

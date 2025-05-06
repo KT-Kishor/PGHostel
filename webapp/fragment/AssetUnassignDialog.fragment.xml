@@ -52,7 +52,7 @@
                 </ComboBox>
                 <Label text="{i18n>comments}" />
                 <TextArea rows="2" cols="20" 
-                    maxLength="200"
+                    maxLength="20"
                     id="FAU_id_Comments"
                     required="true"
                     placeholder="{i18n>enterComments}"
