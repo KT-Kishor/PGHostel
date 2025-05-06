@@ -49,18 +49,23 @@ sap.ui.define([], function () {
           oField.setValueState("Error");
           return false;
       }
-     // Allow only letters, spaces, and dots
+      // Allow only letters, spaces, and dots
       var sanitizedValue = oValue.replace(/[^a-zA-Z\s.]/g, "");
       if (oValue !== sanitizedValue) oField.setValue(sanitizedValue);
       var regex = /^[a-zA-Z\s.]+$/;
       if (!regex.test(sanitizedValue)) {
           oField.setValueState("Error");
           return false;
-      } else {
-          oField.setValueState("None");
-          return true;
       }
+      var letterCount = (sanitizedValue.match(/[a-zA-Z]/g) || []).length;
+      if (letterCount < 3) {
+          oField.setValueState("Error");
+          return false;
+      }
+        oField.setValueState("None");
+      return true;
   },
+  
   
         // Amount validation function
     _LCvalidateAmount: function (oEvent, type) {
