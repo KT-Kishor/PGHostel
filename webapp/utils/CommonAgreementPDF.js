@@ -257,43 +257,45 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.setGState(new doc.GState({ opacity: 0.2 }));
                 doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
+                doc.setFont("times", "bold").setFontSize(12);
                 var titleText2 = "ASSIGNMENT SCHEDULE 1";
                 let textWidth2 = doc.getTextWidth(titleText2);
                 let titleX2 = (pageWidth - textWidth2) / 2;
                 doc.text(titleText2, titleX2, topMargin);
+                doc.setFont("times", "normal").setFontSize(11);
                 const textBlock = "This Assignment Schedule is subject to and forms part of the Agreement (Agreement for the Engagement And Provision of Services). In the event of conflict between the Agreement and this Assignment Schedule, the Agreement will take precedence save where expressly provided for within the Agreement or where variations are expressly stated below within this Assignment Schedule.";
                 const options = { maxWidth: maxWidth, align: "justify" };
                 doc.text(textBlock, margin, topMargin + 10, options);
                 const dimensions = doc.getTextDimensions(textBlock, options);
-                const nextY = topMargin + dimensions.h + 15;
+                const nextY = topMargin + dimensions.h + 20;
 
                 const tableData = [
                     ["Agreement No.", oModel.AgreementNo],
                     ["Client Company Name", oCompanyModel.companyName],
-                    ["End Client/Hirer (if different from Client)", "SAP"],
-                    ["Location(s) where Services are to be delivered", "REMOTE"],
-                    ["Client hiring contact", "Mr. Veerang"],
-                    ["Name of Consultant’s", "Mr. Sai"],
-                    ["Description of the Services", "HR"],
-                    ["Assignment Status", "New"],
-                    ["Start Date", "1/10/2024"],
-                    ["End Date", "1/10/2024"],
+                    ["End Client/Hirer (if different from Client)", oModel.ClientCompanyName],
+                    ["Location(s) where Services are to be delivered", oModel.LocationService],
+                    ["Client hiring contact", oCompanyModel.headOfCompany],
+                    ["Name of Consultant", oModel.ClientName],
+                    ["Description of the Services", oModel.ConsultingService],
+                    ["Assignment Status", oModel.ContractStatus],
+                    ["Start Date", oModel.AgreementDate],
+                    ["End Date", oModel.AgreementEndDate],
                     ["Specific hours/days/time keeping requirement", "Maximum of 60 days to be billed throughout the duration of the contract."],
                     ["Notice period for Consultant to terminate", "5 calendar weeks subject to clauses 23-27"],
                     ["Notice period for us to terminate", "5 calendar weeks subject to clauses 23-27"],
-                    ["Specific Insurance Requirement", "No"],
-                    ["Warranty Date", "6 Months"],
-                    ["Consultant Rate – standard daily rate (8 hrs)", "500000 INR Per Hr Including all tax"],
+                    ["Specific Insurance Requirement", oModel.SpecificInsuranceRequirement],
+                    ["Warranty Date", oModel.AgreementDuration],
+                    ["Consultant Rate – standard daily rate (8 hrs)", oModel.ConsultantRate],
                     ["Consultant Rate – non-standard", "Any non-standard rate will be on a pro-rata basis with strict prior"],
-                    ["Call-out/additional rates/expenses", "No"],
-                    ["Payment terms", "45 Days"],
+                    ["Call-out/additional rates/expenses", oModel.ExpensesClaim],
+                    ["Payment terms", oModel.PaymentTerms],
                     ["Agreed variations to Agreement", "Appendix 1 – Special Terms"]
                 ];
 
                 // Configuration
-                const labelWidth = maxWidth * 0.43; // ~43% for label (left)
+                const labelWidth = maxWidth * 0.48; // ~43% for label (left)
                 const valueWidth = maxWidth - labelWidth; // Remaining width for value
-                const fontSize = 8.5;
+                const fontSize = 10;
                 const lineHeight = 5;
                 let yPos = nextY;
 
@@ -305,20 +307,14 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     const numLines = Math.max(labelLines.length, valueLines.length);
                     const rowHeight = numLines * lineHeight;
 
-                    // Page break check
-                    if (yPos + rowHeight > bottomLimit) {
-                        doc.addPage();
-                        yPos = topMargin;
-                    }
-
                     // Draw label
-                    doc.setFont("helvetica", "bold");
+                    doc.setFont("times", "bold");
                     labelLines.forEach((line, i) => {
                         doc.text(line, margin + 1, yPos + i * lineHeight);
                     });
 
                     // Draw value
-                    doc.setFont("helvetica", "normal");
+                    doc.setFont("times", "normal");
                     valueLines.forEach((line, i) => {
                         doc.text(line, margin + labelWidth + 1, yPos + i * lineHeight);
                     });

@@ -10,6 +10,10 @@ sap.ui.define([
     },
 
     _onRouteMatched: async function () {
+      BusyIndicator.hide();
+      this.getBusyDialog();
+      var LoginFunction = await this.commonLoginFunction("Quotation");
+      if (!LoginFunction) return;
       this.checkLoginModel();
       var oView = this.getView();
       this.oCore = sap.ui.getCore();
@@ -36,7 +40,7 @@ sap.ui.define([
       });
       await this._commonGETCall("BaseLocation", "BaseLocationData", {});
       this.Q_onSearch();
-      BusyIndicator.hide();
+      this.closeBusyDialog();
     },
 
     onPressback: function () {

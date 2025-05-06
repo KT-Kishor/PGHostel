@@ -77,7 +77,7 @@
             <headerContent>
                 <m:FlexBox
                     busyIndicatorDelay="0"
-                    id="QF_id_HeaderContent"
+                    id="QF_id_HeaderContents"
                     wrap="Wrap"
                     fitContainer="true"
                 >

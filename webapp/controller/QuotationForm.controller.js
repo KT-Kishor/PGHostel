@@ -17,6 +17,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            BusyIndicator.hide();
+            this.getBusyDialog();
             var oView = this.getView();
             this.oCore = sap.ui.getCore();
             this.oModel = oView.getModel("Quotation");
@@ -37,26 +39,27 @@ sap.ui.define([
             aFieldIds.forEach(function (sId) {
                 oView.byId(sId).setValueState("None");
             });
-            BusyIndicator.hide();
+            this.closeBusyDialog();
         },
 
         QF_onNavBack: function () {
             if (this.oModel.getProperty("/MasterEdit")) {
-                this.showConfirmationDialog(this.i18nModel.getText("ConfirmActionTitle"), this.i18nModel.getText("backConfirmation"), function () { this.getRouter().navTo("RouteQuotation"); }.bind(this))
+                this.showConfirmationDialog(this.i18nModel.getText("ConfirmActionTitle"), this.i18nModel.getText("backConfirmation"), function () { BusyIndicator.show(0); this.getRouter().navTo("RouteQuotation"); }.bind(this))
             } else {
+                BusyIndicator.show(0); 
                 this.getRouter().navTo("RouteQuotation");
             }
         },
 
-        QF_onBranchCodeChange: function (oEvent) {
-            this.getView().byId("QF_id_HeaderContent").setBusy(true);
+        QF_onBranchCodeChange: async function (oEvent) {
+            this.getView().byId("QF_id_HeaderContents").setBusy(true);
             if (utils._LCstrictValidationComboBox(oEvent)) {
                 var sSelectedValue = (oEvent.getSource().getSelectedItem());
-                this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: sSelectedValue.getKey() });
+                await this._commonGETCall("CompanyCodeDetails", "CompanyCodeData", { branchCode: sSelectedValue.getKey() });
                 this.oModel.setProperty("/QuotationFormData/BranchCode", sSelectedValue.getKey());
                 this.oModel.setProperty("/QuotationFormData/Branch", sSelectedValue.getAdditionalText());
             }
-            this.getView().byId("QF_id_HeaderContent").setBusy(false);
+            this.getView().byId("QF_id_HeaderContents").setBusy(false);
         },
 
         QF_onNameChange: function (oEvent) {
@@ -275,6 +278,7 @@ sap.ui.define([
                             text: that.i18nModel.getText("OkButton"),
                             type: "Accept",
                             press: function () {
+                                BusyIndicator.show(0);
                                 that.QF_oSuccessDialog.close();
                                 that.getRouter().navTo("RouteQuotation");
                             },
@@ -283,6 +287,7 @@ sap.ui.define([
                             text: that.i18nModel.getText("tileUnit"),
                             type: "Reject",
                             press: function () {
+                                BusyIndicator.show(0);
                                 that.QF_oSuccessDialog.close();
                                 that.QF_onDownloadPDF();
                                 that.getRouter().navTo("RouteQuotation");

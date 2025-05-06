@@ -528,10 +528,6 @@ sap.ui.define([
                     oPDFModel.setProperty("/Notes/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.JoiningBonus));
                 }
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-                if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                    MessageToast.show("Company not found on selected branch. Please check and try again.");
-                    return;
-                }
                 oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
                 oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
@@ -549,13 +545,10 @@ sap.ui.define([
                 }
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
-                        jsPDF._GeneratePDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                        jsPDF._GeneratePDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
                         this.getView().getModel("employeeModel").setProperty("/Status", "New");
                         await this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
-                        this.closeBusyDialog();
                         MessageToast.show(this.i18nModel.getText("pdfSucces"));
-
-                    } else {
                     }
                 }
             },

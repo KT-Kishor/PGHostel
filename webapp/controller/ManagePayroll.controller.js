@@ -14,6 +14,10 @@ sap.ui.define(
       },
 
       _onRouteMatched: async function () {
+        BusyIndicator.hide();
+        this.getBusyDialog();
+        var LoginFunction = await this.commonLoginFunction("Payroll");
+        if (!LoginFunction) return;
         this.checkLoginModel();
         this._makeDatePickersReadOnly(["FST_id_MonthYearPicker"]);
         this.oLoginModel = this.getView().getModel("LoginModel");
@@ -36,7 +40,7 @@ sap.ui.define(
         });
         await this._commonGETCall("BaseLocation", "BaseLocationData", {});
         this.FST_onEnableImport();
-        BusyIndicator.hide();
+        this.closeBusyDialog();
       },
 
       onPressback: function () {
@@ -48,7 +52,7 @@ sap.ui.define(
       },
 
       MP_onPressGo: async function () {
-        BusyIndicator.show(0);
+        this.getBusyDialog();
         this.oModel.setProperty("/isExcelMismatch", false);
         var branch = this.byId("FST_id_FilterBranch").getValue();
         var oDate = this.byId("FST_id_MonthYearPicker").getDateValue();
@@ -61,7 +65,7 @@ sap.ui.define(
         await this._commonGETCall("A_PayRoll", "TableData", { Branch: branch, Month: pickerMonth, Year: pickerYear });
         var oData = this.oModel.getProperty("/TableData");
         if (!oData || oData.length === 0) {
-          BusyIndicator.hide();
+          this.closeBusyDialog();
           MessageToast.show(this.i18nModel.getText("msgDataNotExistsInDB"));
           this.oModel.setProperty("/TableData", null);
           this.resetColumnHeaders();
@@ -98,11 +102,11 @@ sap.ui.define(
         this.oModel.setProperty("/isSELVisible", true);
         this.getView().byId("MP_id_UpdateSalBtn").setEnabled(true);
         this.getView().byId("MP_id_DeleteBtn").setEnabled(true);
-        BusyIndicator.hide();
+        this.closeBusyDialog();
       },
 
       MP_onPressSalUpdate: function (e) {
-        BusyIndicator.show(0);
+        this.getBusyDialog();
         var file = e.getParameter("files") && e.getParameter("files")[0];
         if (file) {
           var reader = new FileReader();
@@ -125,7 +129,7 @@ sap.ui.define(
             });
             if (isMismatch) {
               MessageToast.show(this.i18nModel.getText("msgUploadCorrectExcel"));
-              BusyIndicator.hide();
+              this.closeBusyDialog();
               return;
             }
             sheetData = sheetData.map(row => {
@@ -146,7 +150,7 @@ sap.ui.define(
           };
           reader.onerror = () => {
             MessageToast.show(this.i18nModel.getText("commonReadingDataError"));
-            BusyIndicator.hide();
+            this.closeBusyDialog();
           };
           reader.readAsBinaryString(file);
         }
@@ -156,24 +160,23 @@ sap.ui.define(
         try {
           var response = await this.ajaxUpdateWithJQuery("A_PayRoll", { data: combinedData });
           if (response.success) {
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             this.oModel.setProperty("/TableData", sheetData);
             this.getView().byId("MP_id_UpdateSalBtn").setEnabled(false);
             MessageToast.show(this.i18nModel.getText("msgSalUploadSuccess"));
           } else {
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             MessageToast.show(this.i18nModel.getText("msgSchemeUploadFailed"));
           }
         }
         catch (error) {
           MessageToast.show(this.i18nModel.getText("commonError"));
           console.error("Error during update:", error);
-          BusyIndicator.hide();
+          this.closeBusyDialog();
         }
       },
 
       MP_onPressExport: function () {
-        BusyIndicator.show(0);
         var branch = this.oModel.getProperty("/FilterBranch");
         var month = this.oModel.getProperty("/FilterMonth");
         var year = this.oModel.getProperty("/FilterYear");
@@ -182,7 +185,6 @@ sap.ui.define(
         var workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
         XLSX.writeFile(workbook, `${branch} Salary Data ${month}-${year}.xlsx`);
-        BusyIndicator.hide();
       },
 
       MP_onPressDelete: function () {
@@ -200,7 +202,7 @@ sap.ui.define(
                 text: that.i18nModel.getText("OkButton"),
                 type: "Accept",
                 press: async function () {
-                  BusyIndicator.show(0);
+                  that.getBusyDialog();
                   that._oWarningDialog.close();
                   var response = await that.ajaxDeleteWithJQuery("A_Payroll", { filters: { Branch: that.oModel.getProperty("/FilterBranch"), Month: that.oModel.getProperty("/FilterMonth"), Year: that.oModel.getProperty("/FilterYear") } });
                   if (response.success) {
@@ -211,7 +213,7 @@ sap.ui.define(
                   } else {
                     MessageToast.show(that.i18nModel.getText("msgSchemeUploadFailed"));
                   }
-                  BusyIndicator.hide();
+                  that.closeBusyDialog();
                 },
               }),
               new sap.m.Button({

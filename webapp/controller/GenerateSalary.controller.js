@@ -14,6 +14,10 @@ sap.ui.define(
       },
 
       _onRouteMatched: async function () {
+        BusyIndicator.hide();
+        this.getBusyDialog();
+        var LoginFunction = await this.commonLoginFunction("Payroll");
+        if (!LoginFunction) return;
         this.checkLoginModel();
         this._makeDatePickersReadOnly(["FST_id_MonthYearPicker"]);
         this.oLoginModel = this.getView().getModel("LoginModel");
@@ -35,7 +39,7 @@ sap.ui.define(
         });
         await this._commonGETCall("BaseLocation", "BaseLocationData", {});
         this.FST_onEnableImport();
-        BusyIndicator.hide();
+        this.closeBusyDialog();
       },
 
       onPressback: function () {
@@ -47,7 +51,7 @@ sap.ui.define(
       },
 
       FST_onUpload: async function (e) {
-        BusyIndicator.show(0);
+        this.getBusyDialog();
         this.oModel.setProperty("/isExcelMismatch", false);
         var file = e.getParameter("files") && e.getParameter("files")[0];
         if (file) {
@@ -97,7 +101,7 @@ sap.ui.define(
                   this.oModel.setProperty("/TableData", null);
                   this.resetColumnHeaders();
                   this.oModel.setProperty("/isSELVisible", false);
-                  BusyIndicator.hide();
+                  this.closeBusyDialog();
                   return;
                 }
 
@@ -163,7 +167,7 @@ sap.ui.define(
                   this.oModel.setProperty("/TableData", null);
                   this.resetColumnHeaders();
                   this.oModel.setProperty("/isSELVisible", false);
-                  BusyIndicator.hide();
+                  this.closeBusyDialog();
                   return; // Exit the entire function
                 }
 
@@ -225,7 +229,7 @@ sap.ui.define(
 
           reader.onerror = () => {
             MessageToast.show(this.i18nModel.getText("commonReadingDataError"));
-            BusyIndicator.hide();
+            this.closeBusyDialog();
           };
 
           reader.readAsBinaryString(file);
@@ -265,7 +269,7 @@ sap.ui.define(
             this.oModel.setProperty("/Records", null);
             this.resetColumnHeaders();
             this.oModel.setProperty("/isSELVisible", false);
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             let isEmpCodeMissing = !empSalaryData.some(sal => sal.EmployeeID === record.EmpCode);
             if (isEmpCodeMissing) {
               MessageToast.show(`Salary details not found for Employee ID: ${record.EmpCode}. Please check and try again.`);
@@ -349,7 +353,7 @@ sap.ui.define(
         this.oModel.setProperty("/TableData", records);
         this.oModel.setProperty("/isSELVisible", true);
         this.getView().byId("GS_id_BtnSave").setEnabled(true);
-        BusyIndicator.hide();
+        this.closeBusyDialog();
       },
 
       _convertTimeToMinutes: function (timeStr) {
@@ -369,7 +373,7 @@ sap.ui.define(
 
       GS_onPressSave: async function () {
         var that = this;
-        BusyIndicator.show(0);
+        this.getBusyDialog();
         $.ajax({
           url: that.oLoginModel.getData().url + "A_PayRoll",
           method: "POST",
@@ -378,12 +382,12 @@ sap.ui.define(
           success: function () {
             that.getView().byId("GS_id_BtnSave").setEnabled(false);
             that._onExportSalary();
-            BusyIndicator.hide();
+            that.closeBusyDialog();
             MessageToast.show(that.i18nModel.getText("msgSalUploadSuccess"));
           },
           error: function (error) {
             console.log(error);
-            BusyIndicator.hide();
+            that.closeBusyDialog();
             try {
               if (error.responseJSON.message.error.substring(0, 15) === "Duplicate entry") {
                 that.getView().byId("GS_id_BtnSave").setEnabled(false);

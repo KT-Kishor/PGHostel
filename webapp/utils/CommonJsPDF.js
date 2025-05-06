@@ -1,7 +1,7 @@
 sap.ui.define([], function () {
     "use strict";
     return {
-        _GeneratePDF: function (oModel, oCompanyModel, content) {
+        _GeneratePDF: function (that, oModel, oCompanyModel, content) {
             setTimeout(function () {
                 var { jsPDF } = window.jspdf;
                 var doc = new jsPDF({
@@ -568,7 +568,7 @@ sap.ui.define([], function () {
                     }
                 }
                 doc.save(`${oModel.EmpName} ${oModel.Type} Letter.pdf`);
-                sap.ui.core.BusyIndicator.hide();
+                that.closeBusyDialog();
             }, 1000);
         }
     };

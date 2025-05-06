@@ -162,5 +162,13 @@
     "PreviewFlag": false,
     "RTEText": "<p>Please click on <b>Preview</b> to Preview the Certificate</p>",
     "CertificateTitle" : "(Certificate Title)",
-    "CertificateSubTitle": "TO WHOMESOEVER IT MAY CONCERN"
+    "CertificateSubTitle": "TO WHOMESOEVER IT MAY CONCERN",
+
+    "LocationService": "(LocationService)",
+    "ConsultingService": "(ConsultingService)",
+    "ContractStatus": "(ContractStatus)",
+    "SpecificInsuranceRequirement": "(SpecificInsuranceRequirement)",
+    "ConsultantRate": "(ConsultantRate)",
+    "ExpensesClaim": "(ExpensesClaim)"
+
 }

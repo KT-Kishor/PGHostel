@@ -77,7 +77,9 @@ sap.ui.define([
             "Holiday": "/ListOfHolidays",
             "SelfService": "/SelfService",
             "EmployeeDetails": "/EmployeeDetail",
-            "TilePage": "/TilePage"
+            "TilePage": "/TilePage",
+            "Quotation": "/A_Quotations",
+            "Payroll": "/A_Payroll"
           };
 
           const modelPath = tileMap[value];
