@@ -89,10 +89,10 @@
 										</m:ComboBox>										
 										<!-- Assignment Start Date -->
 										<m:Label text="{i18n>assignmentStartDate}" required="true"/>
-										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentStartDate' ,formatter:'.Formatter.formatDate'}"  id="CU_id_AssignmentStartDate" displayFormat="dd/M/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}" valueFormat="dd/MM/yyyy" />
+										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentStartDate' ,formatter:'.Formatter.formatDate'}"  id="CU_id_AssignmentStartDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}"/>
 										<!-- Assignment End Date -->
 										<m:Label text="{i18n>assignmentEndDate}" required="true"/>
-										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" id="CU_id_AssignmentEndDate" displayFormat="dd/M/yyyy" editable="{simpleForm>/editable}" valueFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}"/>
+										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" id="CU_id_AssignmentEndDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}" minDate="{oFilteredContractModel>/MinToDate}"/>
 										<!-- Consultant Rate -->
 										<!-- <m:Label text="{i18n>consultantRate}" required="true"/>
 										<m:Input value="{oFilteredContractModel>/ConsultantRate}" liveChange="onLiveValidation" id="idConsultantRate" editable="{simpleForm>/editable}" maxLength="50"/> -->
@@ -105,7 +105,7 @@
 										<!-- Input for Amount -->
 										<m:Label text="{i18n>amount}" required="true" />
 										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>amountPlaceholder}" liveChange="CD_validateAmount"  maxLength="15" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/editable}" />
-										<m:Select  id="CU_id_CurrencySelect" items="{CurrencyModel>/}" selectedKey="{oFilteredContractModel>/currency}" visible="true" width="100%" class="marginLeft" editable="{simpleForm>/editable}">
+										<m:Select  id="CU_id_CurrencySelect" items="{CurrencyModel>/}" selectedKey="{oFilteredContractModel>/Currency}" visible="true" width="100%" class="marginLeft" editable="{simpleForm>/editable}">
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
 										<!-- Payment Terms -->
@@ -151,7 +151,7 @@
 				<m:contentRight>
 					<m:Button text="{= ${viewModel>/isEditMode} ? ${i18n>save} : ${i18n>edit} }" press=".onEditOrSavePress" visible="{ContractStatus>/status}" />
 					<m:Button text="{i18n>tileFooter}" id="CU_id_Mail" press="CUD_onSendEmail" visible="{ContractStatus>/status}"/>
-					<m:Button text="{i18n>GeneratePDF}" id="CU_id_Merge" press="onPressMerge" visible="{ContractStatus>/status}" />
+					<m:Button text="{i18n>GeneratePDF}" id="CU_id_Merge" press="onPressMerge" visible="{ContractStatus>/status}" type="Reject"/>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

@@ -20,6 +20,7 @@ sap.ui.define([
             
                 this.sArgPara = oEvent.getParameter("arguments").sParContract;
                 var AgreementNo = oEvent.getParameter("arguments").sID
+                this.CD_CommonID();
                 var oView = this.getView();
                 this.i18nModel = oView.getModel("i18n").getResourceBundle();
             
@@ -133,7 +134,12 @@ sap.ui.define([
                     }
                 }
             },
-                
+
+            CD_CommonID: function () {
+                const ids = ["CD_id_CName", "CD_id_Address", "CD_id_Email", "CD_id_Amount", "CD_id_EndClientHirer", "CD_id_Locationcomb", "CD_id_HiringContact", "CD_id_ConLocation"]
+                ids.forEach((id) => { this.byId(id).setValueState("None"); });
+            },
+
             CD_validateName: function (oEvent) {
                 const oSource = oEvent.getSource();
                 const selectedKey = oSource.getSelectedKey?.();
@@ -154,6 +160,7 @@ sap.ui.define([
                 utils._LCvalidateName(oEvent);
                 this.validateStep();
             },
+                
             CD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
                 this.validateStep();
@@ -165,6 +172,29 @@ sap.ui.define([
             CD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
                 this.validateStep();
+            
+                let oDatePicker, oDate, oModel;
+                if (this.sArgPara === "CreateContractFlag") {
+                    oModel = this.getView().getModel("ContractModelWizart");
+                    oDatePicker = this.byId("CD_id_Datestart");
+                } else {
+                    oModel = this.getView().getModel("oFilteredContractModel");
+                    oDatePicker = this.byId("CU_id_AssignmentStartDate");
+                }
+            
+                if (oDatePicker && oModel) {
+                    const sValue = oDatePicker.getValue(); // Value from DatePicker as string "dd/MM/yyyy"
+                    oDate = this.onFormatDate(sValue);     // Convert to Date object
+            
+                    if (!isNaN(oDate.getTime())) {
+                        oModel.setProperty("/MinToDate", oDate); // Set minDate for EndDate
+                    }
+                }
+            },
+             // Format date string to Date object
+             onFormatDate: function (dateString) {
+                var parts = dateString.split('/');
+                return new Date(parts[2], parts[1] - 1, parts[0]);
             },
             CD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
@@ -496,7 +526,8 @@ sap.ui.define([
                     this.byId("CU_id_Mail").setEnabled(true);
                     this.closeBusyDialog();
                     this.getRouter().navTo("RouteContractDetails", {
-                        sParContract: oModel.ContractNo 
+                        sParContract: oModel.ContractNo ,
+                        sID: oModel.AgreementNo
                     });
                     sap.m.MessageToast.show(this.i18nModel.getText("agreementUpdatedSuccess"));
                 } catch (error) {

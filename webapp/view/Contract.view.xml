@@ -84,7 +84,7 @@
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>endDate}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
+					<Column  hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>contractStatus}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
@@ -101,7 +101,7 @@
 							<Text text="{ContractModel>EndClient}"/>
 							<Text text="{path:'ContractModel>AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{path:'ContractModel>AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" />
-						    <ObjectStatus inverted="true" text="{ContractModel>ContractStatus}"  state="{path: 'ContractModel>ContractStatus', formatter:'.Formatter.formatObjectStatus'}"  class="centerText"/>
+						    <ObjectStatus inverted="true" text="{ContractModel>ContractStatus}"  state="{path: 'ContractModel>ContractStatus', formatter:'.Formatter.formatObjectStatus'}" />
 							<Text text="{ContractModel>Comments}"/>
 						</cells>
 					</ColumnListItem>

@@ -40,7 +40,7 @@
 							<Label text="{i18n>amount}" required="true" />
 							<Input value="{ContractModelWizart>/Amount}"  id="CD_id_Amount"  placeholder="{i18n>placeAmount}"  liveChange="CD_validateAmount"  maxLength="15" valueStateText="{i18n>ammountValuState}" />
 							<Select items="{CurrencyModel>/}" 
-									selectedKey="{ContractModelWizart>/currency}" id="CD_id_Currency" visible="true" class="marginLeft">
+									selectedKey="{ContractModelWizart>/Currency}" id="CD_id_Currency" visible="true" class="marginLeft">
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
 						</f:content>
@@ -80,8 +80,8 @@
 							<Label text="{i18n>startDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>endDate}" required="true"/>
-							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}"/>
-							<Label text="{i18n>specificInsuranceRequirement}" required="true"/>
+							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}" minDate="{ContractModelWizart>/MinToDate}"/>
+							<Label text="{i18n>specificInsuranceRequirement}" required="true" />
 
 							<Select id="CD_id_InsuranceReq" selectedKey="{ContractModelWizart>/InsuranceRequirement}" items="{TravelAllowance>/type}">
 							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
@@ -141,7 +141,7 @@
 							<Label text="{i18n>amount}"/>
 							<Text text="{ContractModelWizart>/Amount}"/>
 							<Label text="{i18n>currency}"/>
-							<Text text="{ContractModelWizart>/Currency}"/>
+					    	<Text text="{ContractModelWizart>/Currency}" />
 							<Label text="{i18n>rate}"/>
 							<Text text="{ContractModelWizart>/Rate}"/>
 							<Label text="{i18n>endClientHirer}"/>
