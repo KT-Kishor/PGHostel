@@ -38,7 +38,7 @@ sap.ui.define([
                     "JoiningDate": "",
                     "TraineeEmail": "",
                     "TrainingDuration": "",
-                    "BaseLocation": ""
+                    "BaseLocation": "Kalaburagi"
                 };
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
