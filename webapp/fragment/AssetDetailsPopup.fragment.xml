@@ -29,11 +29,13 @@
                 <items>
                     <ColumnListItem
                         type="Active"
-                        press=".onVHDPick"
+                        press="FDP_onVHDPick"
                     >
                         <cells>
                             <Text text="{filteredAssetDetails>Model}" />
-                            <Text text="{filteredAssetDetails>EquipmentNumber}" />
+                            <Text
+                                text="{filteredAssetDetails>EquipmentNumber}"
+                            />
                             <Text text="{filteredAssetDetails>SerialNumber}" />
                             <Text text="{filteredAssetDetails>AssetValue}" />
                         </cells>
@@ -45,7 +47,7 @@
             <Button
                 text="{i18n>close}"
                 type="Reject"
-                press=".onVHDClose"
+                press="FDP_onVHDClose"
             />
         </beginButton>
     </Dialog>

@@ -385,7 +385,7 @@ sap.ui.define([
             },
 
 
-            onCancelReturn: function () {
+            FAU_onCancelReturn: function () {
                 this.byId("AA_id_AssestTable").removeSelections(true)
                 var oModel = this.getView().getModel("myform");
                 oModel.setProperty("/formData/data/ReturnBranch", "");
@@ -394,13 +394,13 @@ sap.ui.define([
 
             },
 
-            onVHDClose: function () {
+            FDP_onVHDClose: function () {
                 if (this._oValueHelpDialog) {
                     this._oValueHelpDialog.close();
                 }
             },
 
-            onVHDPick: function (oEvent) {
+            FDP_onVHDPick: function (oEvent) {
                 var oSelectedItem = oEvent.getSource();
                 var oBindingContext = oSelectedItem.getBindingContext("filteredAssetDetails");
                 if (!oBindingContext) {
@@ -421,7 +421,7 @@ sap.ui.define([
                 sap.ui.getCore().byId("FAA_id_Model").setValueState("None");
             },
 
-            onOpenVHD: function () {
+            FAA_onOpenVHD: function () {
                 var oView = this.getView();
                 var oCore = sap.ui.getCore();
                 var oTypeSelected = oCore.byId("FAA_id_Type").getSelectedKey();
@@ -450,7 +450,7 @@ sap.ui.define([
                 this._oValueHelpDialog.open();
             },
 
-            onSaveReturn: async function () {
+            FAU_onSaveReturn: async function () {
                 var oCore = sap.ui.getCore();
                 var oFormDataModel = this.getView().getModel("myform");
                 if(utils._LCstrictValidationComboBox(oCore.byId("FAU_id_branch"), "ID") && utils._LCvalidateMandatoryField(oCore.byId("FAU_id_Comments"), "ID")){

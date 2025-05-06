@@ -66,7 +66,7 @@
                     liveChange="FAA_onModelChange"
                     value="{myform>/formData/data/Model}"
                     showValueHelp="true"
-                    valueHelpRequest="onOpenVHD"
+                    valueHelpRequest="FAA_onOpenVHD"
                     valueStateText="{i18n>modelValueState}"
                 />
 				<Label text="{i18n>branch}" />
@@ -107,7 +107,7 @@
                     editable="false"
                     id="FAA_id_EquipmentNumber"
                     value="{myform>/formData/data/EquipmentNumber}"
-                    liveChange="onEquipmentNumberChange"
+                    liveChange="FAA_onEquipmentNumberChange"
                 />
 				<Label text="{i18n>serialNumber}" />
 				<Input
@@ -115,7 +115,7 @@
                     editable="false"
                     id="FAA_id_SerialNumber"
                     value="{myform>/formData/data/SerialNumber}"
-                    liveChange=".onSerialNumberChange"
+                    liveChange="FAA_onSerialNumberChange"
                 />
 				<Label text="{i18n>assetValue}"/>
 				<Input
@@ -123,12 +123,12 @@
                     editable="false"
                     id="FAA_id_AssetValue"
                     value="{path:'myform>/formData/data/AssetValue',formatter:'.Formatter.fromatNumber'}"
-                    liveChange=".onAssetValueChange"
+                    liveChange="FAA_onAssetValueChange"
                 />
 				<Label text="{i18n>assignedDate}" />
 				<DatePicker
                     id="FAA_id_AssignedDate"
-                    change="onAssignedDateChange"
+                    change="FAA_onAssignedDateChange"
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
                     value="{path:'myform>/formData/data/AssignedDate',formatter:'.Formatter.formatDate'}"
@@ -138,14 +138,14 @@
 		<beginButton>
 			<Button
                 text="{i18n>save}"
-                press="onPressSave"
+                press="FAA_onPressSave"
                 type="Accept"
             />
 		</beginButton>
 		<endButton>
 			<Button
                 text="{i18n>close}"
-                press="onPressClose"
+                press="FAA_onPressClose"
                 type="Reject"
             />
 		</endButton>

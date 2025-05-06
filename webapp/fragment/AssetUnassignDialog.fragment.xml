@@ -52,7 +52,7 @@
                 </ComboBox>
                 <Label text="{i18n>comments}" />
                 <TextArea rows="2" cols="20" 
-                    maxLength="20"
+                    maxLength="200"
                     id="FAU_id_Comments"
                     required="true"
                     placeholder="{i18n>enterComments}"
@@ -66,16 +66,15 @@
             <Button
                 text="{i18n>save}"
                 type="Accept"
-                press="onSaveReturn"
+                press="FAU_onSaveReturn"
             />
         </beginButton>
         <endButton>
             <Button
                 text="{i18n>cancel}"
                 type="Reject"
-                press="onCancelReturn"
+                press="FAU_onCancelReturn"
             />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>
-				
