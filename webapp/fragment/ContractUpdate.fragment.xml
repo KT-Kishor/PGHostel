@@ -131,8 +131,8 @@
 											<core:Item key="No" text="{i18n>no}" />
 										</m:Select>
 										<m:Label text="{i18n>contractLocation}" required="true"/>
-										<m:ComboBox  change="CD_ValidateComboBox"  items="{BaseLocationModel>/}" id="CU_id_ContractCity" value="{oFilteredContractModel>/ContractLocation}" editable="{simpleForm>/editable}" valueStateText="{i18n>combovalueState}">
-											 <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" /> 
+										<m:ComboBox  change="CD_ValidateComboBox" showSecondaryValues="true"  items="{BaseLocationModel>/}" id="CU_id_ContractCity" value="{oFilteredContractModel>/ContractLocation}" editable="{simpleForm>/editable}" valueStateText="{i18n>combovalueState}">
+											 <core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" /> 
 										</m:ComboBox>
 
 										<m:Label text="Comments" />

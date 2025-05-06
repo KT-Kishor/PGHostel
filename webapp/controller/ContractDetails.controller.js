@@ -72,7 +72,7 @@ sap.ui.define([
                             Status: "Submitted",
                             Salutation: "Mr.",
                             Salutation2: "Mr.",
-                            contractLocation: "Kalaburagi"
+                            contractLocation: ""
                         };
             
                         const oModel = new JSONModel(oData);
@@ -243,8 +243,7 @@ sap.ui.define([
                     utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID");
 
                 var step2Validated = this.byId("CD_id_HiringContact").getValue() && this.byId("CD_id_Datestart").getValue() && this.byId("CD_id_DateEnd").getValue() &&
-                utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") && utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") && utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("CD_id_ConLocation"), "ID")
+                utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") && utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") && utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") 
 
                 var isStep1Validated = step1Validated ? true : false;
                 var isStep2Validated = step2Validated ? true : false;
@@ -289,6 +288,7 @@ sap.ui.define([
             
                     var oModel = this.getView().getModel("ContractModelWizart");
                     var selectedCurrency = this.byId("CD_id_Currency").getSelectedKey();
+                    var branchCode = this.getView().byId("CD_id_ConLocation").getSelectedItem().getAdditionalText();
             
                     var data = {
                         "ContractNo": oModel.oData.ContractNo,
@@ -312,7 +312,8 @@ sap.ui.define([
                         "AgreementDate": oModel.oData.AgreementDate.split("/").reverse().join("-"),
                         "ContarctEmail": oModel.oData.ContarctEmail,
                         "ContractLocation": oModel.oData.contractLocation,
-                        "AgreementNo": String(1).padStart(2, '0')
+                        "AgreementNo": String(1).padStart(2, '0'),
+                         "BranchCode":branchCode
                     };
             
                     this.getBusyDialog(); // Show busy dialog
@@ -340,7 +341,8 @@ sap.ui.define([
                                 type: "Reject",
                                 press: function () {
                                     oDialog.close();
-                                    this.onGeneratePDF();
+                                    this.offerGeneratingPdfFunction(data);
+                                    this.getRouter().navTo("RouteContract");
                                 }.bind(this)
                             }),
                             afterClose: function () {
@@ -438,6 +440,7 @@ sap.ui.define([
                 const selectedCurrency = this.byId("CU_id_CurrencySelect").getSelectedKey();
                 const ConsultantRate = `${oModel.Amount} ${selectedCurrency} Per ${rateText} Including all tax`;                
                 const LocationService = this.byId("CD_id_contractLocation").getSelectedKey();
+                const branchCode = this.getView().byId("CU_id_ContractCity").getSelectedItem().getAdditionalText();
             
                 const jsonData = {
                     ContractNo: oModel.ContractNo,
@@ -461,7 +464,8 @@ sap.ui.define([
                     AgreementDate: oModel.AgreementDate,
                     ContarctEmail: oModel.ContarctEmail,
                     ContractLocation: oModel.ContractLocation,
-                    Comments: oModel.Comments
+                    Comments: oModel.Comments,
+                    BranchCode:branchCode
                 };
             
                 const oldContractData = { ContractStatus: "Inactive" };
@@ -619,8 +623,14 @@ sap.ui.define([
                 this.Mail_onPressClose();
             },
 
-            onPressMerge: async function () {
-                var oEmpModel = this.getView().getModel("oFilteredContractModel").getData();
+             //PDF download function
+             onPressMerge: async function () {
+                var oModel = this.getView().getModel("oFilteredContractModel");
+                this.offerGeneratingPdfFunction(oModel);
+            },
+
+            offerGeneratingPdfFunction: async function (input) {
+                var oEmpModel = typeof input.getData === "function" ? input.getData() : input;
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "Contract" });
                 var oPDFModel = this.getView().getModel("PDFData");

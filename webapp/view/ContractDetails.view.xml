@@ -99,8 +99,8 @@
 								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</Select>
 							<Label text="{i18n>contractLocation}" required="true"/>
-							<ComboBox id="CD_id_ConLocation" change="CD_ValidateComboBox"  items="{BaseLocationModel>/}" value="{ContractModelWizart>/contractLocation}"  valueStateText="{i18n>combovalueState}">
-								 <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+							<ComboBox id="CD_id_ConLocation" showSecondaryValues="true"  change="CD_ValidateComboBox"  items="{BaseLocationModel>/}" value="{ContractModelWizart>/contractLocation}"  valueStateText="{i18n>combovalueState}">
+								 <core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 							</ComboBox>
 						</f:content>
 					</f:SimpleForm>
