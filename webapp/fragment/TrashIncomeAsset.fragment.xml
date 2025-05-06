@@ -29,11 +29,19 @@
 				<DatePicker 
 					id="FTIA_id_Date"
 					minDate="{VisiableModel>/minDate}"
-					liveChange="onDateTimePickerLiveChange"
+				    change="FCIA_onInputLiveChange"
 					valueFormat="yyyy-MM-dd"
 					displayFormat="dd/MM/yyyy"
+
 					required="true"
 				/>
+				<Label text="{i18n>Comments}"/>
+				    <TextArea id="FTIA_id_Comments" 
+                  valueStateText="Write a comment on trashed asset"
+                  liveChange="FCIA_onDescriptionTextAreaChange"
+                  value="{CreateIncomeAssetModel>/Comments}"
+                  placeholder="Enter Comments" 
+                  maxLength="60" width="100%" />
 			</f:content>
 		</f:SimpleForm>
 		<beginButton>
