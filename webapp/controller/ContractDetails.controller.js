@@ -1,7 +1,7 @@
 sap.ui.define([
-    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/MessageToast",
+    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "../utils/CommonAgreementPDF", "sap/m/MessageToast",
 ],
-    function (BaseController, utils, JSONModel, MessageToast) {
+    function (BaseController, utils, JSONModel, jsPDF, MessageToast) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.ContractDetails", {
             onInit: function () {
@@ -618,5 +618,36 @@ sap.ui.define([
                 });
                 this.Mail_onPressClose();
             },
+
+            onPressMerge: async function () {
+                var oEmpModel = this.getView().getModel("oFilteredContractModel").getData();
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
+                await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "Contract" });
+                var oPDFModel = this.getView().getModel("PDFData");
+                var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
+                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
+                    MessageToast.show("Company not found on selected branch. Please check and try again.");
+                    return;
+                }
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
+                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
+                    var backgroundLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.backgroundLogo?.data);
+                    var emailLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companyEmailLogo?.data);
+                    if (logoBase64 && signBase64 && backgroundLogoBase64 && emailLogoBase64) {
+                        oCompanyDetailsModel.backgroundLogoBase64 = "data:image/png;base64," + backgroundLogoBase64;
+                        oCompanyDetailsModel.emailLogoBase64 = "data:image/png;base64," + emailLogoBase64;
+                        oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
+                        oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+                    }
+                }
+                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                    if (typeof jsPDF !== "undefined" && typeof jsPDF._GenerateContractPDF === "function") {
+                        jsPDF._GenerateContractPDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                        MessageToast.show(this.i18nModel.getText("pdfSucces"));
+                    }
+                }
+            }
         });
     });

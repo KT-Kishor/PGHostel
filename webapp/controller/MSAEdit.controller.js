@@ -527,8 +527,7 @@ sap.ui.define([
                 var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
                 await this._fetchCommonData("PDFCondition", "PDFSOWModel", { Type: "SOW" });
-                oPDFModel.setProperty("/SOWCreateDate", Formatter.formatDate(oModel.CreateMSADate));
-                oPDFModel.setProperty("/AgreementEndDate", Formatter.formatDate(oModel.MsaContractPeriodEndDate));
+                oPDFModel.setProperty("/AgreementDate", Formatter.formatDate(oModel.CreateMSADate));
                 oPDFModel.setProperty("/ClientCompanyName", oModel.CompanyName);
                 oPDFModel.setProperty("/ClientCompanyAddress", oModel.Address);
                 oPDFModel.setProperty("/ClientName", oModel.Salutation + " " + oModel.CompanyHeadName);

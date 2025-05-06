@@ -32,9 +32,9 @@ sap.ui.define([], function () {
 
                     if (currentYPosition >= bottomLimit) {
                         doc.addPage(); // Add a new page if the current position exceeds the limit
-                        doc.addImage(oModel.CompanyLogoHeader, "PNG", 145, 8, 45, 10);
+                        doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 145, 8, 45, 10);
                         doc.setGState(new doc.GState({ opacity: 0.1 }));
-                        doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                        doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                         doc.setGState(new doc.GState({ opacity: 1 }));
                         currentYPosition = topMargin; // Reset to top margin on the new page
                     }
@@ -43,7 +43,7 @@ sap.ui.define([], function () {
 
                 doc.addImage(oCompanyModel.companylogo64, "PNG", margin, currentYPosition, 45, 45);
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
-                doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
                 doc.setFontSize(12);
 
@@ -233,9 +233,9 @@ sap.ui.define([], function () {
                 if (oModel.Type === "Employee Offer") {
                     if (contentafterTitleContentY > bottomLimit - 90) {
                         doc.addPage();
-                        doc.addImage(oModel.CompanyLogoHeader, "PNG", 145, 8, 45, 10);
+                        doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 145, 8, 45, 10);
                         doc.setGState(new doc.GState({ opacity: 0.1 }));
-                        doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                        doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                         doc.setGState(new doc.GState({ opacity: 1 }));
                         contentafterTitleContentY = topMargin;
                     }
@@ -274,9 +274,9 @@ sap.ui.define([], function () {
 
                 if (oModel.Type === "Employee Offer") {
                     doc.addPage();
-                    doc.addImage(oModel.CompanyLogoHeader, "PNG", 145, 8, 45, 10);
+                    doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 145, 8, 45, 10);
                     doc.setGState(new doc.GState({ opacity: 0.1 }));
-                    doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                    doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                     doc.setGState(new doc.GState({ opacity: 1 }));
 
                     let salPageHeader = oModel.PageHeader;

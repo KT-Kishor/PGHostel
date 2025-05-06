@@ -181,7 +181,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.text(oModel.ClientRole, pageMiddle + 10, headofCoRoleY);
             doc.text(oModel.AgreementDate, pageMiddle + 10, headofCoRoleY + 5);
         },
-        
+
         _GenerateAgreementPDF: function (oModel, oCompanyModel, contentNDA, contentMSA) {
             var that = this;
             setTimeout(function () {
@@ -242,8 +242,101 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 const backImgX = (pageWidth - 100) / 2; // Center horizontally
                 const backImgY = (pageHeight - 100) / 2; // Center vertically
 
+                doc.setFont("times", "bold").setFontSize(12);
+                doc.text(`Agreement Date : ${oModel.AgreementDate}`, margin, topMargin);
+                doc.text(`Agreement No. : ${oModel.AgreementNo}`, margin, topMargin + 10);
+                var titleText = "SOLE TRADER AGREEMENT";
+                let textWidth = doc.getTextWidth(titleText);
+                let titleX = (pageWidth - textWidth) / 2;
+                doc.text(titleText, titleX, topMargin + 30);
+                currentY = topMargin + 40; // Update currentY after title
+
                 that._pdfContent(that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content);
-                doc.save(`${oCompanyModel.companyName} - ${oModel.ClientCompanyName} MSA & NDA.pdf`);
+                doc.addPage();
+                doc.addImage(oModel.CompanyLogoHeader, "PNG", 125, 8, 65, 14.5);
+                doc.setGState(new doc.GState({ opacity: 0.2 }));
+                doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                doc.setGState(new doc.GState({ opacity: 1 }));
+                var titleText2 = "ASSIGNMENT SCHEDULE 1";
+                let textWidth2 = doc.getTextWidth(titleText2);
+                let titleX2 = (pageWidth - textWidth2) / 2;
+                doc.text(titleText2, titleX2, topMargin);
+                const textBlock = "This Assignment Schedule is subject to and forms part of the Agreement (Agreement for the Engagement And Provision of Services). In the event of conflict between the Agreement and this Assignment Schedule, the Agreement will take precedence save where expressly provided for within the Agreement or where variations are expressly stated below within this Assignment Schedule.";
+                const options = { maxWidth: maxWidth, align: "justify" };
+                doc.text(textBlock, margin, topMargin + 10, options);
+                const dimensions = doc.getTextDimensions(textBlock, options);
+                const nextY = topMargin + dimensions.h + 15;
+
+                const tableData = [
+                    ["Agreement No.", oModel.AgreementNo],
+                    ["Client Company Name", oCompanyModel.companyName],
+                    ["End Client/Hirer (if different from Client)", "SAP"],
+                    ["Location(s) where Services are to be delivered", "REMOTE"],
+                    ["Client hiring contact", "Mr. Veerang"],
+                    ["Name of Consultant’s", "Mr. Sai"],
+                    ["Description of the Services", "HR"],
+                    ["Assignment Status", "New"],
+                    ["Start Date", "1/10/2024"],
+                    ["End Date", "1/10/2024"],
+                    ["Specific hours/days/time keeping requirement", "Maximum of 60 days to be billed throughout the duration of the contract."],
+                    ["Notice period for Consultant to terminate", "5 calendar weeks subject to clauses 23-27"],
+                    ["Notice period for us to terminate", "5 calendar weeks subject to clauses 23-27"],
+                    ["Specific Insurance Requirement", "No"],
+                    ["Warranty Date", "6 Months"],
+                    ["Consultant Rate – standard daily rate (8 hrs)", "500000 INR Per Hr Including all tax"],
+                    ["Consultant Rate – non-standard", "Any non-standard rate will be on a pro-rata basis with strict prior"],
+                    ["Call-out/additional rates/expenses", "No"],
+                    ["Payment terms", "45 Days"],
+                    ["Agreed variations to Agreement", "Appendix 1 – Special Terms"]
+                ];
+
+                // Configuration
+                const labelWidth = maxWidth * 0.43; // ~43% for label (left)
+                const valueWidth = maxWidth - labelWidth; // Remaining width for value
+                const fontSize = 8.5;
+                const lineHeight = 5;
+                let yPos = nextY;
+
+                doc.setFontSize(fontSize);
+
+                tableData.forEach(([label, value]) => {
+                    const labelLines = doc.splitTextToSize(label, labelWidth - 2);
+                    const valueLines = doc.splitTextToSize(value, valueWidth - 2);
+                    const numLines = Math.max(labelLines.length, valueLines.length);
+                    const rowHeight = numLines * lineHeight;
+
+                    // Page break check
+                    if (yPos + rowHeight > bottomLimit) {
+                        doc.addPage();
+                        yPos = topMargin;
+                    }
+
+                    // Draw label
+                    doc.setFont("helvetica", "bold");
+                    labelLines.forEach((line, i) => {
+                        doc.text(line, margin + 1, yPos + i * lineHeight);
+                    });
+
+                    // Draw value
+                    doc.setFont("helvetica", "normal");
+                    valueLines.forEach((line, i) => {
+                        doc.text(line, margin + labelWidth + 1, yPos + i * lineHeight);
+                    });
+
+                    // Optional: Add horizontal line below row (uncomment if needed)
+                    doc.line(margin, yPos + rowHeight - 2, margin + maxWidth, yPos + rowHeight - 2);
+
+                    yPos += rowHeight + 2; // small spacing between rows
+                });
+                const startY = nextY; // Save this BEFORE the loop starts
+                let endY = yPos; // yPos after the loop ends
+
+                // Draw a rectangle around the entire table
+                doc.setDrawColor(0); // Black border
+                doc.setLineWidth(0.2); // Optional: adjust for thinner/thicker border
+                doc.rect(margin, startY - 4, maxWidth, endY - startY); // Slight padding adjustment
+                doc.line(margin + labelWidth, startY - 4, margin + labelWidth, endY - 4); // Vertical line between label and value
+                doc.save(`${oCompanyModel.companyName} - ${oModel.ClientCompanyName} contract.pdf`);
                 sap.ui.core.BusyIndicator.hide();
             }, 1000);
         },
@@ -396,10 +489,10 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                         // Column definitions
                         const columns = [
-                            { title: "Sl\nNo", widthRatio: 0.08 },
-                            { title: "Details of Assigned\nIT Personnel", widthRatio: 0.4 },
-                            { title: "Designation", widthRatio: 0.3 },
-                            { title: "Rate Card", widthRatio: 0.2 }
+                            { title: "SNo", widthRatio: 0.06 },
+                            { title: "Consultant Name", widthRatio: 0.32 },
+                            { title: "Designation", widthRatio: 0.32 },
+                            { title: "Rate Card", widthRatio: 0.3 }
                         ];
 
                         const tableStartX = margin + 6;
@@ -412,7 +505,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                         // Draw Header Background
                         let firstLineY = currentY + 6;
-                        let secondLineY = firstLineY + 8;
+                        let secondLineY = firstLineY + 4;
                         doc.setLineWidth(1).setDrawColor(231, 166, 0);
                         doc.line(tableStartX, firstLineY, pageWidth - margin, firstLineY);
                         doc.line(tableStartX, secondLineY, pageWidth - margin, secondLineY);
@@ -436,38 +529,38 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                         for (let i = 0; i < tableData.length; i++) {
                             const { Salutation, ConsultantName, Designation, Rate } = tableData[i];
-                            const rowValues = [i+1, Salutation + " " + ConsultantName, Designation, Rate];
-                        
+                            const rowValues = [i + 1, Salutation + " " + ConsultantName, Designation, Rate];
+
                             // Wrap text for each cell and calculate line count
                             const wrappedLines = rowValues.map((val, j) => doc.splitTextToSize(val, columnWidths[j] - 2));
                             const lineCounts = wrappedLines.map(lines => lines.length);
                             const maxLineCount = Math.max(...lineCounts);
                             const dynamicRowHeight = maxLineCount * 4.5; // Adjust line height as needed
-                        
+
                             // Check for page overflow
                             if (tableDataY + dynamicRowHeight > pageHeight - margin) {
                                 doc.addPage();
                                 tableDataY = margin;
                             }
-                        
+
                             // Background fill
                             doc.setFillColor(255, 237, 194);
-                            doc.rect(tableStartX, tableDataY-4, tableMaxWidth, dynamicRowHeight, 'F');
-                        
+                            doc.rect(tableStartX, tableDataY - 4, tableMaxWidth, dynamicRowHeight, 'F');
+
                             // Draw text cell by cell
                             wrappedLines.forEach((lines, j) => {
                                 for (let k = 0; k < lines.length; k++) {
                                     doc.text(lines[k], columnXPositions[j] + 1, (tableDataY + (k * 4) - 1));
                                 }
                             });
-                        
+
                             // Bottom line
-                            if(i == tableData.length - 1) doc.setLineWidth(0.5);
-                            doc.line(tableStartX, tableDataY + dynamicRowHeight-4, pageWidth - margin, tableDataY + dynamicRowHeight-4);
-                        
+                            if (i == tableData.length - 1) doc.setLineWidth(0.5);
+                            doc.line(tableStartX, tableDataY + dynamicRowHeight - 4, pageWidth - margin, tableDataY + dynamicRowHeight - 4);
+
                             // Move to next row
                             tableDataY += dynamicRowHeight;
-                        }                        
+                        }
 
                         // Reset and update Y position
                         doc.setDrawColor(0, 0, 0);

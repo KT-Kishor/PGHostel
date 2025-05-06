@@ -535,10 +535,14 @@ sap.ui.define([
                 oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
                 oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
-                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                     var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
                     var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
-                    if (logoBase64 && signBase64) {
+                    var backgroundLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.backgroundLogo?.data);
+                    var emailLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companyEmailLogo?.data);
+                    if (logoBase64 && signBase64 && backgroundLogoBase64 && emailLogoBase64) {
+                        oCompanyDetailsModel.backgroundLogoBase64 = "data:image/png;base64," + backgroundLogoBase64;
+                        oCompanyDetailsModel.emailLogoBase64 = "data:image/png;base64," + emailLogoBase64;
                         oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
                         oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
                     }
