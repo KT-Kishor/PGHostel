@@ -60,7 +60,7 @@
 							<Label text="{i18n>emailId}" required="true" />
 							<Input value="{oTraineeDetails>/TraineeEmail}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>trainingType}" required="true" />
-							<ComboBox  id="TD_id_TrainingType" placeholder="{i18n>selectType}"  value="{oTraineeDetails>/Type}"   selectionChange="onTrainingTypeChange" 	change="TD_validateCombo"  width="100%" items="{TypeModel>/}">
+							<ComboBox  id="TD_id_TrainingType" placeholder="{i18n>selectType}"  value="{oTraineeDetails>/Type}"   selectionChange="onTrainingTypeChange" 	change="TD_validateCombo"  width="100%" items="{TypeModel>/}" valueStateText="{i18n>selectType}">
 								<core:ListItem key="{TypeModel>ID}" text="{TypeModel>Type}" />
 							</ComboBox>
 							<Label ></Label>

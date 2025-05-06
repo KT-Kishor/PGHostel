@@ -77,7 +77,7 @@
 										<m:Input id="TU_id_TraineeMail" value="{oTraineeDetails>/TraineeEmail}" editable="{viewModel>/editable}" maxLength="100" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 
 										<m:Label text="{i18n>trainingType}" required="true" />
-											<m:ComboBox  id="TU_id_TrainingType" placeholder="{i18n>selectType}"  value="{oTraineeDetails>/Type}"   selectionChange="onTrainingTypeChange"  editable="{viewModel>/editable}" 	change="TD_validateCombo"  width="100%">
+											<m:ComboBox  id="TU_id_TrainingType" placeholder="{i18n>selectType}"  value="{oTraineeDetails>/Type}"   selectionChange="onTrainingTypeChange"  editable="{viewModel>/editable}" 	change="TD_validateCombo"  width="100%" valueStateText="{i18n>selectType}">
 												<m:items>
 													<core:Item key="Stipend" text="{i18n>stipend}" />
 													<core:Item key="Paid" text="{i18n>paid}" />

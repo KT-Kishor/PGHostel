@@ -14,14 +14,14 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="TraineeName" label="{i18n>traineeName}" groupName="Group1" visibleInFilterBar="true" >
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="{traineeNameModel>/}" id="T_id_TraineeName" showClearIcon="true">
+							<ComboBox  showSecondaryValues= "true"  id="T_id_TraineeName" showClearIcon="true" items="{path:'traineeNameModel>/', sorter: {path:'TraineeName', descending:false }}" >
 								<core:ListItem key="{traineeNameModel>TraineeName}" text="{traineeNameModel>TraineeName}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="ReportingManager" label="{i18n>reportingManager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox   items="{reportingManagerModel>/}" id="T_id_RmFilterBar" showClearIcon="true">
+							<ComboBox   id="T_id_RmFilterBar" showClearIcon="true" items="{path:'reportingManagerModel>/', sorter: {path:'ReportingManager', descending:false }}">
 								<core:Item key="{reportingManagerModel>ReportingManager}" text="{reportingManagerModel>ReportingManager}"/>
 							</ComboBox>
 						</fb:control>
@@ -56,7 +56,7 @@
                     <Button  tooltip="{i18n>downloadcCertificate}" text="{i18n>certificate}"  id="T_id_Download"   press="T_onCertDownload"   visible="false"/>
                     <Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>traineeOnbord}" id="T_id_EmpOnBoard"   press="T_onBoardTrainee"  visible="false"/>
                     <Button  tooltip="{i18n>sendTrineeCertificate}" text="{i18n>mailCertificate}" id="T_id_Cermail"  type="Neutral" press="T_onCerMail"  visible="false"/>
-                    <Button  text="{i18n>onboard}" id="T_id_OnboardBtn"  type="Neutral" press="T_onOnboardPress"  enabled="false" tooltip="{i18n>onboard}"/>
+                    <Button  text="{i18n>onboard}" id="T_id_OnboardBtn"  type="Ghost" press="T_onOnboardPress"  enabled="false" tooltip="{i18n>onboard}"/>
                     <Button text="{i18n>rejectTainee}" id="T_id_RejectBtn" type="Reject"  press="T_onRejectPress"  enabled="false" tooltip="{i18n>rejectTainee}" />
                     <Button text="{i18n>addTrainee}" id="T_id_AddBtn" type="Accept"  press="T_onPressAddTrainee"   tooltip="{i18n>addTrainee}"/>
                 </OverflowToolbar>
