@@ -255,7 +255,7 @@ sap.ui.define([
                 if (oInput.getValue() === "") oInput.setValueState("None");
             },
 
-            onPressSave: async function () {
+            FAA_onPressSave: async function () {
                 if(this._checkValidation()){
                     try {
                         var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
@@ -292,7 +292,7 @@ sap.ui.define([
                 
             },
 
-            onPressClose: function () {
+            FAA_onPressClose: function () {
                 this.byId("AA_id_AssestTable").removeSelections(true);
                 this.getView().getModel("myform").setProperty("/formData/data", {});
                 sap.ui.getCore().byId("FAA_id_employeeID").revertSelection();

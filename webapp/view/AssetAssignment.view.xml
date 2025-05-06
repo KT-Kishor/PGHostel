@@ -139,12 +139,6 @@
                         id="AA_AssignBtn"
                     />
                     <Button
-                        type="Neutral"
-                        press="AA_onPressEdit"
-                        text="{i18n>update}"
-                        visible="false"
-                    />
-                    <Button
                         type="Reject"
                         press="AA_onOpenUnassign"
                         text="{i18n>return}"
