@@ -44,8 +44,8 @@ sap.ui.define([
                     "TransferDate": "",
                     "TransferBranch": "",
                     "PickedBranch":"",
-                    "Comments":""
-                 
+                    "Comments":"",
+                    "minDate":new Date()
 
                 })
                 this.getView().setModel(model, "CreateIncomeAssetModel");
@@ -137,6 +137,7 @@ sap.ui.define([
                     }
 
                     this._FragmentDatePickersReadOnly(["FCIA_id_Date"]);
+
                     sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_transferbranch").setVisible(false)
 
@@ -146,8 +147,11 @@ sap.ui.define([
  
                    table.removeSelections();
                     this.FCIA_Dialog.open();
+                    sap.ui.getCore().byId("FCIA_id_Date").setMinDate(new Date());
 
                 } else {
+                    sap.ui.getCore().byId("FCIA_id_Date").setMinDate(new Date());
+
                     this.FCIA_Dialog.open();
                     
                     var oModel = this.getView().getModel("CreateIncomeAssetModel")
