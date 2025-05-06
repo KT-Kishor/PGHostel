@@ -246,7 +246,7 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oEvent);
             },
 
-            FAU_id_Comments:function(oEvent){
+            FAU_validatecomments:function(oEvent){
                     var sValue = oEvent.getParameter("value");
                     var oTextArea = oEvent.getSource();
                 
