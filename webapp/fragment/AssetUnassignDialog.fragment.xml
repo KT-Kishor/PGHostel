@@ -7,7 +7,7 @@
         id="FAU_id_unassignDialog"
         busyIndicatorDelay="0"
         contentWidth="25%"
-        title="{i18n>returnDate}"
+        title="{i18n>returnData}"
         afterClose="onDialogClose"
     >
            <f:SimpleForm
@@ -24,7 +24,7 @@
             columnsM="2"
         >
             <f:content>
-                <Label text="{i18n>date}" />
+                <Label text="{i18n>returnDate}" />
                 <DatePicker
                     id="FAU_id_unassignDate"
                     required="true"
@@ -34,7 +34,7 @@
                     valueStateText="{i18n>invalidDate}"
                     value="{path:'myform>/formData/data/ReturnDate',formatter:'.Formatter.formatDate'}"
                 />
-                <Label text="{i18n>branch}" />
+                <Label text="{i18n>returnBranch}" />
                 <ComboBox
                     required="true"
                     id="FAU_id_branch"

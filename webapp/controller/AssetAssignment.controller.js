@@ -14,7 +14,7 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteAssetAssignment").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched() {
+            _onRouteMatched:async function() {
                 this.oLoginModel = this.getView().getModel("LoginModel");
                 this.getBusyDialog();
                 if (!this.oLoginModel) {
@@ -41,6 +41,9 @@ sap.ui.define([
                     },
 
                 });
+                
+                var LoginFunction = await this.commonLoginFunction("AssetAssignment");
+                if (!LoginFunction) return;
                 this.commonLoginFunction("AssetAssignment");
                 this._makeDatePickersReadOnly(["AA_id_Date"]);
                 this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAU_id_unassignDate", "FAA_id_Model"]);
@@ -82,17 +85,17 @@ sap.ui.define([
 
             createTableSheet: function () {
                 return [
-                    { label: "employeeId", property: "AssignEmployeeID", type: "string" },
+                    { label: "Employee ID", property: "AssignEmployeeID", type: "string" },
                     { label: "Type", property: "Type", type: "string" },
                     { label: "Model", property: "Model", type: "Number" },
-                    { label: "EquipmentNumber", property: "EquipmentNumber", type: "Number" },
-                    { label: "SerialNumber", property: "SerialNumber", type: "Number" },
-                    { label: "AssignedBy", property: "AssignedByEmployeeName", type: "string" },
+                    { label: "Equipment Number", property: "EquipmentNumber", type: "Number" },
+                    { label: "Serial Number", property: "SerialNumber", type: "Number" },
+                    { label: "Assigned By", property: "AssignedByEmployeeName", type: "string" },
                     { label: "Branch", property: "AssignBranch", type: "string" },
-                    { label: "AssignedDate", property: "AssignedDate", type: "Date" },
-                    { label: "AssetValue", property: "AssetValue", type: "Number" },
+                    { label: "Assigned Date", property: "AssignedDate", type: "Date" },
+                    { label: "Asset Value", property: "AssetValue", type: "Number" },
                     { label: "Status", property: "Status", type: "string" },
-                    { label: "ReturnDate", property: "ReturnDate", type: "Date" },
+                    { label: "Return Date", property: "ReturnDate", type: "Date" },
                 ];
             },
 
@@ -247,13 +250,9 @@ sap.ui.define([
             },
 
             FAU_validatecomments:function(oEvent){
-                    var sValue = oEvent.getParameter("value");
-                    var oTextArea = oEvent.getSource();
-                
-                    if (sValue && sValue.trim().length > 0) {
-                        oTextArea.setValueState("None");
-                        oTextArea.setValueStateText("");
-                    }
+                var oInput = oEvent.getSource();
+                utils._LCvalidateMandatoryField(oEvent);
+                if (oInput.getValue() === "") oInput.setValueState("None");
             },
 
             onPressSave: async function () {
@@ -426,6 +425,19 @@ sap.ui.define([
                 var oView = this.getView();
                 var oCore = sap.ui.getCore();
                 var oTypeSelected = oCore.byId("FAA_id_Type").getSelectedKey();
+                if (!oTypeSelected) {
+                    // Set empty model to show no data
+                    var emptyModel = new sap.ui.model.json.JSONModel([]);
+                    oView.setModel(emptyModel, "filteredAssetDetails");
+            
+                    if (!this._oValueHelpDialog) {
+                        this._oValueHelpDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetDetailsPopup", this);
+                        this.getView().addDependent(this._oValueHelpDialog);
+                    }
+            
+                    this._oValueHelpDialog.open();
+                    return;
+                }
                 var allData = this.getView().getModel("incomeModel").getProperty("/");
                 var filteredData = allData.filter(item => item.IsCurrent === "1" && item.Status === "Available" || item.IsCurrent === "1" && item.Status === "Returned");
                 var filteredModel = new sap.ui.model.json.JSONModel(filteredData);

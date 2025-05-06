@@ -133,12 +133,6 @@
 
                     <ToolbarSpacer />
                     <Button
-                        press="AA_onExport"
-                        type="Ghost"
-                        text="{i18n>download}"
-                    />
-
-                    <Button
                         text="{i18n>assign}"
                         type="Accept"
                         press="AA_onPressAssign"
@@ -154,6 +148,12 @@
                         type="Reject"
                         press="AA_onOpenUnassign"
                         text="{i18n>return}"
+                    />
+                    
+                    <Button
+                        press="AA_onExport"
+                        type="Ghost"
+                        text="{i18n>download}"
                     />
                 </OverflowToolbar>
             </headerToolbar>

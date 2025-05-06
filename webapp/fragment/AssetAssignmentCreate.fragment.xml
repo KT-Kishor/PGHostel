@@ -87,7 +87,6 @@
 				</ComboBox>
 				<Label text="{i18n>assignedBy}" required="true"/>
 				<ComboBox
-                    required="true"
                     id="FAA_id_AssignedBy"
                     items="{AdminModel>/}"
                     change="FAA_onChangeAssignedBy"
@@ -129,7 +128,6 @@
 				<Label text="{i18n>assignedDate}" />
 				<DatePicker
                     id="FAA_id_AssignedDate"
-                    required="true"
                     change="onAssignedDateChange"
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
