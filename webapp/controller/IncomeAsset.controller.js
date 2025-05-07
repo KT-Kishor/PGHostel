@@ -75,6 +75,7 @@ sap.ui.define([
                  
                 this._FragmentDatePickersReadOnly(["FCIA_id_Date"])
                 this._fetchCommonData("AllLoginDetails", "EmpModel", {})
+                
 
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Company Asset");
 
@@ -89,8 +90,8 @@ sap.ui.define([
                 this.ajaxReadWithJQuery("IncomeAsset", "IsCurrent=1").then((oData) => {
                     var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "incomeModel");
-                    this._populateUniqueFilterValues(oFCIAerData);
-                    this.closeBusyDialog()
+                    this._populateUniqueFilterValues(oFCIAerData);                 
+                   this.closeBusyDialog()
                 }).catch((error) => {
                     this.closeBusyDialog()
 
@@ -99,28 +100,27 @@ sap.ui.define([
             },
             _populateUniqueFilterValues: function (data) {
                 let uniqueValues = {
-                    IA_id_EqNo: new Set(),
                     IA_id_SlNo: new Set(),
-                };
+                    IA_id_EqNo: new Set(),
+                   };
 
                 data.forEach(item => {
-                    uniqueValues.IA_id_EqNo.add(item.EquipmentNumber);
                     uniqueValues.IA_id_SlNo.add(item.SerialNumber);
-                });
+                    uniqueValues.IA_id_EqNo.add(item.EquipmentNumber);
+                   });
 
                 let oView = this.getView();
                 ["IA_id_EqNo", "IA_id_SlNo"].forEach(field => {
                     let oComboBox = oView.byId(field);
                     oComboBox.destroyItems();
                     Array.from(uniqueValues[field]).sort().forEach(value => {
-                        oComboBox.addItem(new sap.ui.core.Item({
+                        oComboBox.addItem(new sap.ui.core.Item({    
                             key: value,
                             text: value
                         }));
                     });
                 });
             },
-
             IA_onCreateButtonPress: function () {
                 var oModel = this.getView().getModel("CreateIncomeAssetModel")
                 // this._onRouteMatched();  
@@ -225,7 +225,7 @@ sap.ui.define([
             FCIA_onsavebuttonpress: async function () {
                 var table = this.byId("IA_id_OdataTable");
                 var selected = table.getSelectedItem();
-
+                             var model=this.getView().getModel("incomeModel").getData()
                 var oModel = this.getView().getModel("CreateIncomeAssetModel").getData()
                 try {
                     if (
@@ -281,7 +281,7 @@ sap.ui.define([
                         }
 
                         this.IA_onSearch();
-
+                        this._populateUniqueFilterValues(model); 
                         this.FCIA_Dialog.close();
 
                     }
@@ -380,7 +380,6 @@ sap.ui.define([
                     }
                 await this.ajaxCreateWithJQuery("IncomeAsset", { data: oPayLoad }).then( ()=>{
                       MessageToast.show(this.i18nModel.getText("transfer"));
-                    // this.IA_CommonReadCall()
                     this.IA_onSearch();
                     this.FCIA_Dialog.close();
                 }).catch((error)=>{
@@ -762,6 +761,8 @@ sap.ui.define([
 
 
             IA_onSearch: function () {
+                var model=this.getView().getModel("incomeModel").getData()
+
                 var sEqNo = this.getView().byId("IA_id_EqNo").getSelectedKey();
                 var sPickedBy = this.getView().byId("IA_id_PickedBy").getSelectedKey();
                 var oDateRange = this.getView().byId("idOdataDateComboBox");
@@ -770,7 +771,6 @@ sap.ui.define([
                 var oEndDate = oDateRange.getSecondDateValue();
                 var slNo = this.getView().byId("IA_id_SlNo").getSelectedKey();
                 var status = this.getView().byId("IA_id_Status").getSelectedKey();
-
 
                 var filters = {
                     IsCurrent: "1"
@@ -794,8 +794,11 @@ sap.ui.define([
                 if (status) {
                     filters.Status = status;
                 }
-                this.getBusyDialog()
+                this.getBusyDialog();
+
+               
                 this._fetchCommonData("IncomeAsset", "incomeModel", filters).then(() => {
+                    this._populateUniqueFilterValues(model); 
                     const data = this.getView().getModel("incomeModel").getData();
                 }).finally(() => {
                     this.closeBusyDialog()

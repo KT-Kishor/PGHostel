@@ -211,7 +211,7 @@
                  <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>pickedbranch}"/>
                 </Column>
-                  <Column minScreenWidth="Tablet"  demandPopin="true">
+                  <Column minScreenWidth="Tablet"  demandPopin="true" width="12%" hAlign="Center">
                     <Text text="{i18n>status}"/>
                 </Column>
                 <Column minScreenWidth="Tablet" demandPopin="true">
@@ -229,7 +229,7 @@
                 </Column>  -->
             </columns>
             <items >
-                <ColumnListItem
+                <ColumnListItem 
                
          >
                                   
@@ -249,7 +249,7 @@
                         }"/>
                         <Text text="{incomeModel>AssignBranch}"/>
                         <Text text="{incomeModel>PickedBranch}"></Text>
-                        <HBox alignItems="Center" >
+                        <HBox alignItems="Center" justifyContent="Center">
                               <ObjectStatus 
                                  inverted="true"
                                   text="{incomeModel>Status}"
@@ -262,6 +262,7 @@
                                   visible="{= ${incomeModel>Status} === 'Transferred' }"
                                 text="{i18n>Picked}"
                                 type="Ghost"
+                                class="sapUiTinyMarginBegin"
                                 press="IA_onPickedButtonPress"
                               />
                           </HBox>

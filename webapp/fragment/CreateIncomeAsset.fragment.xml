@@ -100,7 +100,7 @@
                     items="{branchModel>/}"
                 >
                     <core:ListItem
-                        key="{branchModel>branchCode}" 
+                        key="{branchModel>city}" 
                         text="{branchModel>city}"
                         additionalText="{branchModel>branchCode}"
                     />
@@ -118,7 +118,7 @@
                     items="{branchModel>/}"
                 >
                     <core:ListItem
-                        key="{branchModel>branchCode}" 
+                        key="{branchModel>city}" 
                         text="{branchModel>city}"
                         additionalText="{branchModel>branchCode}"
                     />
