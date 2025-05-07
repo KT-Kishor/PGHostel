@@ -14,8 +14,9 @@ sap.ui.define(
           this.getRouter().getRoute("RouteContract").attachMatched(this._onRouteMatched, this);
         },
       _onRouteMatched:async function () {
+          var LoginFunction = await this.commonLoginFunction("Contract");
+          if (!LoginFunction) return;
           this.getBusyDialog(); // Show busy dialog
-          this.commonLoginFunction("Contract"); // Call common login function
           this.onClearAndSearch("C_id_FilterBar");// Clear and search function
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("contractDetails"));

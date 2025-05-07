@@ -18,7 +18,7 @@
 							<Input  id="CD_id_ContractNo" value="{ContractModelWizart>/ContractNo}" editable="false"/>
 							<Label text="{i18n>agreementDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="CD_validateDate"  valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
-							<Label text="{i18n>consultantName}" required="true" />
+							<Label text="{i18n>consultantName}"  />
 							<Select id="" selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}">
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
@@ -61,11 +61,11 @@
 							<ComboBox items="{CreateCustomerModel>/}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
                             <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
                             </ComboBox>
-							<Label text="{i18n>locationswhereServices}" required="true"/>
+							<Label text="{i18n>locationswhereServices}" />
 							<Select id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}">
 								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
 							</Select>
-							<Label text="{i18n>clienthiringcontact}" required="true"/>
+							<Label text="{i18n>clienthiringcontact}" />
 							<Select id="CD_id_selectSal" selectedKey="{ContractModelWizart>/Salutation2}" 
                               items="{Salutation>/salutation}" >
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
@@ -81,27 +81,29 @@
 							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>endDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}" minDate="{ContractModelWizart>/MinToDate}"/>
-							<Label text="{i18n>specificInsuranceRequirement}" required="true" />
+							<Label text="{i18n>specificInsuranceRequirement}"  />
 
 							<Select id="CD_id_InsuranceReq" selectedKey="{ContractModelWizart>/InsuranceRequirement}" items="{TravelAllowance>/type}">
 							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
 							</Select>
-							<Label text="{i18n>warrantyDate}" required="true"/>
+							<Label text="{i18n>warrantyDate}" />
 							<Select id="CD_id_Warranty" selectedKey="{ContractModelWizart>/WarrantyDate}" items="{ContractPeriod>/ContractPeriod}">
 								<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 							</Select>
-							<Label text="{i18n>calloutadditionalratesexpenses}" required="true"/>
+							<Label text="{i18n>calloutadditionalratesexpenses}" />
 							<Select  id="CD_id_AddRate" selectedKey="{ContractModelWizart>/AdditionalRates}" items="{TravelAllowance>/type}">
 							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
 							</Select>
-							<Label text="{i18n>paymentterms}" required="true"/>
+							<Label text="{i18n>paymentterms}"/>
 							<Select id="CD_id_PaymentTerms" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/}">
 								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</Select>
 							<Label text="{i18n>contractLocation}" required="true"/>
-							<ComboBox id="CD_id_ConLocation" showSecondaryValues="true"  change="CD_ValidateComboBox"  items="{BaseLocationModel>/}" value="{ContractModelWizart>/contractLocation}"  valueStateText="{i18n>combovalueState}">
-								 <core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
-							</ComboBox>
+								 <Select items="{BaseLocationModel>/}" id="CD_id_ConLocation"  showSecondaryValues="true" selectedKey="{oFilteredContractModel>/BaseLocation}" >
+												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+											  
+										   </Select>
+							
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>

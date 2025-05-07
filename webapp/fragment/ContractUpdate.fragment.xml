@@ -38,7 +38,7 @@
 										<m:Label text="{i18n>contractNo}"/>
 										<m:Text text="{oFilteredContractModel>/ContractNo}" />
 										<!-- Consultant Name -->
-										<m:Label text="{i18n>consultantName}" required="true"/>
+										<m:Label text="{i18n>consultantName}"/>
                                          <m:Select
                                                editable="{simpleForm>/editable}"
                                                selectedKey="{oFilteredContractModel>/Salutation}"
@@ -67,7 +67,7 @@
 										</m:ComboBox>	
 										<!-- <m:Input value="{oFilteredContractModel>/EndClient}" liveChange="onLiveValidation" id="idEndClient"  editable="{simpleForm>/editable}" maxLength="50" /> -->
 
-										<m:Label text="{i18n>clientReportContact}" required="true"/>
+										<m:Label text="{i18n>clientReportContact}" />
                                             <m:Select
                                                editable="{simpleForm>/editable}"
                                                selectedKey="{oFilteredContractModel>/Salutation2}" 
@@ -78,7 +78,7 @@
 										<!-- Client Report Contact Name -->
 										<m:Input value="{oFilteredContractModel>/ClientReportContact}" id="CU_id_ClientReportContact" editable="{simpleForm>/editable}" maxLength="50" liveChange="CD_validateName"  valueStateText="{i18n>commonNameValueState}"/>
 										<!-- Location where services are provided -->
-										<m:Label text="{i18n>locationswhereServices}" required="true"></m:Label>
+										<m:Label text="{i18n>locationswhereServices}" ></m:Label>
 										<m:Select selectedKey="{oFilteredContractModel>/Location}" id="CD_id_contractLocation" items="{WorkingMode>/location}" editable="{simpleForm>/editable}">
 											<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
 										</m:Select>
@@ -109,31 +109,32 @@
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
 										<!-- Payment Terms -->
-										<m:Label text="{i18n>paymentterms}" required="true"></m:Label>
+										<m:Label text="{i18n>paymentterms}" ></m:Label>
 										<m:Select selectedKey="{oFilteredContractModel>/PaymentTerms}" items="{ContractpaymentModel>/}" editable="{simpleForm>/editable}">
 											<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 										</m:Select>									
 										<!-- Specific Insurance Requirement -->
-										<m:Label text="{i18n>specificInsuranceRequirement}" required="true"></m:Label>
+										<m:Label text="{i18n>specificInsuranceRequirement}" ></m:Label>
 										<m:Select id="CU_id_InsuranceRequirement" selectedKey="{oFilteredContractModel>/SpecificInsuranceRequirement}" editable="{simpleForm>/editable}">
 											<core:Item key="Yes" text="{i18n>yes}" />
 											<core:Item key="No" text="{i18n>no}" />
 										</m:Select>
 										<!-- Contract Period -->
-										<m:Label text="{i18n>contractPeriod}" required="true" />
+										<m:Label text="{i18n>contractPeriod}"  />
 										<m:Select id="CU_id_WarrantyDate" selectedKey="{oFilteredContractModel>/WarrantyDate}" items="{ContractPeriod>/ContractPeriod}" editable="{simpleForm>/editable}">
 											<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 										</m:Select>
 										<!-- Expenses Claim -->
-										<m:Label text="{i18n>expensesClaim}" required="true"/>
+										<m:Label text="{i18n>expensesClaim}" />
 										<m:Select selectedKey="{oFilteredContractModel>/ExpensesClaim}" editable="{simpleForm>/editable}">
 											<core:Item key="Yes" text="{i18n>yes}" />
 											<core:Item key="No" text="{i18n>no}" />
 										</m:Select>
-										<m:Label text="{i18n>contractLocation}" required="true"/>
-										<m:ComboBox  change="CD_ValidateComboBox" showSecondaryValues="true"  items="{BaseLocationModel>/}" id="CU_id_ContractCity" value="{oFilteredContractModel>/ContractLocation}" editable="{simpleForm>/editable}" valueStateText="{i18n>combovalueState}">
-											 <core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" /> 
-										</m:ComboBox>
+
+								        <m:Label text="{i18n>contractLocation}" />
+										<m:Select items="{BaseLocationModel>/}"  editable="{simpleForm>/editable}" id="CU_id_ContractCity"  showSecondaryValues="true" selectedKey="{oFilteredContractModel>/BaseLocation}">  
+												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+										   </m:Select>
 
 										<m:Label text="Comments" />
 										<m:TextArea  value="{oFilteredContractModel>/Comments}" id="CU_id_Comments" editable="{simpleForm>/Status}" valueStateText="{i18n>commentsValueState}"  maxLength="200"/>
@@ -149,7 +150,7 @@
 			<!-- button with expression binding for visibility -->
 			<m:Bar>
 				<m:contentRight>
-					<m:Button text="{= ${viewModel>/isEditMode} ? ${i18n>save} : ${i18n>edit} }" press=".onEditOrSavePress" visible="{ContractStatus>/status}" />
+					<m:Button text="{= ${viewModel>/isEditMode} ? ${i18n>save} : ${i18n>edit} }" press=".onEditOrSavePress" visible="{ContractStatus>/status}" type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Transparent' }"/>
 					<m:Button text="{i18n>tileFooter}" id="CU_id_Mail" press="CUD_onSendEmail" visible="{ContractStatus>/status}"/>
 					<m:Button text="{i18n>GeneratePDF}" id="CU_id_Merge" press="onPressMerge" visible="{ContractStatus>/status}" type="Reject"/>
 				</m:contentRight>

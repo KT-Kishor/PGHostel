@@ -312,7 +312,7 @@ sap.ui.define([
                         "Status": "Submitted",
                         "AgreementDate": oModel.oData.AgreementDate.split("/").reverse().join("-"),
                         "ContarctEmail": oModel.oData.ContarctEmail,
-                        "ContractLocation": oModel.oData.contractLocation,
+                        "ContractLocation": oModel.oData.BaseLocation !== "" ? oModel.oData.BaseLocation : this.getView().byId("CD_id_ConLocation"),
                         "AgreementNo": String(1).padStart(2, '0'),
                         "BranchCode": branchCode
                     };
@@ -422,8 +422,7 @@ sap.ui.define([
                     utils._LCvalidateName(this.byId("CU_id_ClientReportContact"), "ID") &&
                     utils._LCvalidateDate(this.byId("CU_id_AssignmentStartDate"), "ID") &&
                     utils._LCvalidateDate(this.byId("CU_id_AssignmentEndDate"), "ID") &&
-                    utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") &&
-                    utils._LCstrictValidationComboBox(this.byId("CU_id_ContractCity"), "ID")
+                    utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") 
                 );
 
                 if (!isMandatoryValid) {
@@ -464,7 +463,7 @@ sap.ui.define([
                     ExpensesClaim: oModel.ExpensesClaim,
                     AgreementDate: oModel.AgreementDate,
                     ContarctEmail: oModel.ContarctEmail,
-                    ContractLocation: oModel.ContractLocation,
+                    ContractLocation: oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("CD_id_ConLocation").getSelectedKey(),
                     Comments: oModel.Comments,
                     BranchCode: branchCode
                 };
@@ -480,7 +479,7 @@ sap.ui.define([
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
                     this.closeBusyDialog();
-                    return sap.m.MessageBox.error(this.i18nModel.getText("contractStatusMessage"));
+                    return sap.m.MessageToast.show(this.i18nModel.getText("contractStatusMessage"));
                 }
 
                 // 2. Case: Renewed and previous was active
@@ -511,15 +510,14 @@ sap.ui.define([
                             }
                         } catch (error) {
                             this.closeBusyDialog();
-                            sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
+                            sap.m.MessageToast.show(this.i18nModel.getText("createNewContractFailed"));
                         }
 
                     } else {
-                        this.closeBusyDialog();
                         oView.getModel("oFilteredContractModel").setProperty("/ContractStatus", this.ContractStatus);
-                        sap.m.MessageBox.error(this.i18nModel.getText("renewEndDateMess"));
+                        sap.m.MessageToast.show(this.i18nModel.getText("renewEndDateMess"));
+                        this.closeBusyDialog();
                     }
-                    return;
                 }
                 try {
                     const requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: AgreementNo }, data: jsonData };
@@ -621,6 +619,7 @@ sap.ui.define([
                     MessageToast.show(error.responseText);
                     this.closeBusyDialog();
                 });
+                this.closeBusyDialog();
                 this.Mail_onPressClose();
             },
 

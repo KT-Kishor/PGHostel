@@ -80,7 +80,8 @@ sap.ui.define([
             "TilePage": "/TilePage",
             "Quotation": "/A_Quotations",
             "Payroll": "/A_Payroll",
-            "Trainee":"/Trainee"
+            "Trainee":"/Trainee",
+             "Contract":"/GenerateContract"
           };
 
           const modelPath = tileMap[value];
