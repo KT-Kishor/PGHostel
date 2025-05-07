@@ -138,6 +138,8 @@
                 <Select
                     id="FCIA_id_currency"
                     selectedKey="{CreateIncomeAssetModel>/Currency}"
+                    value="{CreateIncomeAssetModel>/Currency}"
+
                     items="{oCurrencyModel>/}"
                 >
                     <core:Item
