@@ -1076,7 +1076,7 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
             var oTable = this.byId("EmpF_id_EmpTable");
             var aSelectedContexts = oTable.getSelectedContexts();   
             if (aSelectedContexts.length === 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("selectRowToEdit"));
+                sap.m.MessageToast.show(that.i18nModel.getText("selectRowToEdit")); // Using i18n for message text
                 return;
             }
             var dataModel = aSelectedContexts[0].getObject();
@@ -1084,35 +1084,35 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
             var referenceDetailsExist = 
                 (dataModel.RCISal && dataModel.RCIName && dataModel.RCIAddress && dataModel.RCIEmailID && dataModel.RCIMobileNo) ||
                 (dataModel.RCIISal && dataModel.RCIIName && dataModel.RCIIAddress && dataModel.RCIIEmailID && dataModel.RCIIMobileNo);
-        
             if (!referenceDetailsExist) {
-                sap.m.MessageToast.show("There are no reference details to display.");
+                sap.m.MessageToast.show(that.i18nModel.getText("noReferenceDetails")); // Using i18n for warning message
                 return;
             }
             var formattedReferenceData = `<div style="padding-left: 15px; padding-right: 15px;">`;
             // Add first reference if available
             if (dataModel.RCISal && dataModel.RCIName && dataModel.RCIAddress && dataModel.RCIEmailID && dataModel.RCIMobileNo) {
                 formattedReferenceData += `
-                    <h4>Reference Details 1</h4>
-                    <p><b>Name:</b> ${dataModel.RCISal} ${dataModel.RCIName}</p>
-                    <p><b>Contact Address:</b> ${dataModel.RCIAddress}</p>
-                    <p><b>Email:</b> ${dataModel.RCIEmailID}</p>
-                    <p><b>Mobile No:</b> ${dataModel.RCIMobileNo}</p>
+                    <h4>${that.i18nModel.getText("referenceDetailsI")}</h4>
+                    <p><b>${that.i18nModel.getText("name")}:</b> ${dataModel.RCISal} ${dataModel.RCIName}</p>
+                    <p><b>${that.i18nModel.getText("address")}:</b> ${dataModel.RCIAddress}</p>
+                    <p><b>${that.i18nModel.getText("emailId")}:</b> ${dataModel.RCIEmailID}</p>
+                    <p><b>${that.i18nModel.getText("mobileNo")}:</b> ${dataModel.RCIMobileNo}</p>
                     <br/>`;
             }
             // Add second reference if available
             if (dataModel.RCIISal && dataModel.RCIIName && dataModel.RCIIAddress && dataModel.RCIIEmailID && dataModel.RCIIMobileNo) {
                 formattedReferenceData += `
-                    <h4>Reference Details 2</h4>
-                    <p><b>Name:</b> ${dataModel.RCIISal} ${dataModel.RCIIName}</p>
-                    <p><b>Contact Address:</b> ${dataModel.RCIIAddress}</p>
-                    <p><b>Email:</b> ${dataModel.RCIIEmailID}</p>
-                    <p><b>Mobile No:</b> ${dataModel.RCIIMobileNo}</p>`;
+                    <h4>${that.i18nModel.getText("referenceDetailsII")}</h4>
+                    <p><b>${that.i18nModel.getText("name")}:</b> ${dataModel.RCIISal} ${dataModel.RCIIName}</p>
+                    <p><b>${that.i18nModel.getText("address")}:</b> ${dataModel.RCIIAddress}</p>
+                    <p><b>${that.i18nModel.getText("emailId")}:</b> ${dataModel.RCIIEmailID}</p>
+                    <p><b>${that.i18nModel.getText("mobileNo")}:</b> ${dataModel.RCIIMobileNo}</p>`;
             }
             formattedReferenceData += `</div>`;
+        
             // Create a dialog to display the reference details
             var oDialog = new sap.m.Dialog({
-                title: "Reference Details",
+                title: that.i18nModel.getText("referenceDetails"),
                 draggable: false,
                 resizable: false,
                 contentWidth: "500px",
@@ -1122,7 +1122,7 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                     content: formattedReferenceData
                 }),
                 beginButton: new sap.m.Button({
-                    text: "Close",
+                    text: that.i18nModel.getText("close"),
                     type: "Reject",
                     press: function () {
                         oDialog.close();
