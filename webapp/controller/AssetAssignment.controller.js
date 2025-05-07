@@ -83,6 +83,11 @@ sap.ui.define([
                 });
             },
 
+            AA_onPressRow:function(oEvent){
+                var AD = oEvent.getSource().getBindingContext("assetModel").getProperty("SerialNumber");
+                this.getRouter().navTo("AssetDetails",{})
+            },
+
             createTableSheet: function () {
                 return [
                     { label: "Employee ID", property: "AssignEmployeeID", type: "string" },

@@ -512,6 +512,13 @@
                         "TargetAssetAssignment"
                     ]
                    
+                },
+                {
+                    "name":"RouteAssetDetails",
+                    "pattern": "AssetDetails/{SerialNumber}",
+                    "target":[
+                        "TargetAssetDetails"
+                    ]
                 }
 
             ],
@@ -796,6 +803,13 @@
                     "clearControlAggregation": false,
                     "viewId": "AssetAssignment",
                     "viewName": "AssetAssignment"
+                },
+                "TargetAssetDetails":{
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "AssetDetails",
+                    "viewName": "AssetDetails"
                 }
 
             }

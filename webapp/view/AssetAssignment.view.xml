@@ -229,7 +229,7 @@
                 </Column>
             </columns>
             <items>
-                <ColumnListItem
+                <ColumnListItem type="Navigation" press="AA_onPressRow"
                     class="tableRow"
                     id="AA_id_TableColumnListItem"
                 >
