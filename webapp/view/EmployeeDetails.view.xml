@@ -27,7 +27,7 @@
 						</fb:control>
 					</fb:FilterGroupItem>
 
-				<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="EmployeeStatus" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox showSecondaryValues= "true"  items="{StatusEmp>/}" id="ED_id_Status" showClearIcon="true">
 								<core:ListItem key="{StatusEmp>Value}" text="{StatusEmp>Value}"/>
@@ -68,6 +68,9 @@
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>baseLocation}" />
 					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>status}" />
+					</Column>
 				</columns>
 				<items>
 					<ColumnListItem type="Navigation" press="ED_onPressEmployeeRow">
@@ -80,6 +83,7 @@
 							<Text text="{sEmployeeDetails>CompanyEmailID}"/>
 						    <Text text="{= ${sEmployeeDetails>ManagerName} + '\n(' + ${sEmployeeDetails>ManagerID} + ')' }" />
 							<Text text="{sEmployeeDetails>BaseLocation}"/>
+							<Text text="{sEmployeeDetails>EmployeeStatus}"/>
 						</cells>
 					</ColumnListItem>
 				</items>
