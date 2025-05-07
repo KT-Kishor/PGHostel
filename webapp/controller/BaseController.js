@@ -326,7 +326,40 @@ sap.ui.define([
         binary += String.fromCharCode(bytes[i]);
       }
 
-      return btoa(binary); // Convert binary string to Base64
+      var base64String = btoa(binary); // Convert binary string to Base64
+
+      // Calculate size in bytes (1 character in base64 = 1 byte)
+      var base64Length = base64String.length;
+      var approxSizeInKB = base64Length * 0.75 / 1024; // base64 is ~33% larger than original binary
+      var approxSizeInMB = approxSizeInKB / 1024;
+
+      console.log("Base64 string size: " + base64Length + " characters");
+      console.log("Approx. size: " + approxSizeInKB.toFixed(2) + " KB (" + approxSizeInMB.toFixed(2) + " MB)");
+
+      return base64String;
+    },
+
+    _convertBLOBToImage: function (oBlob) {
+      return new Promise((resolve, reject) => {
+        const oImage = new Image();
+        oImage.onload = function () {
+          const MAX_WIDTH = 800;
+          const scale = MAX_WIDTH / oImage.width;
+          const canvas = document.createElement("canvas");
+          canvas.width = MAX_WIDTH;
+          canvas.height = oImage.height * scale;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(oImage, 0, 0, canvas.width, canvas.height);
+
+          const compressedDataUrl = canvas.toDataURL("image/png"); // Preserves transparency
+          resolve(compressedDataUrl);
+        };
+        oImage.onerror = function () {
+          reject("Image load failed");
+        };
+        oImage.src = URL.createObjectURL(oBlob);
+      });
     },
 
     handleFileUpload: function (
@@ -646,22 +679,22 @@ sap.ui.define([
         this.closeBusyDialog();
       }
     },
-     // Common salutaon and gender change code
-     onSalutationChangeCommon: function (oEvent, sModelName, sGenderPropertyPath, sGenderControlId) {
+    // Common salutaon and gender change code
+    onSalutationChangeCommon: function (oEvent, sModelName, sGenderPropertyPath, sGenderControlId) {
       var selectedSalutation = oEvent.getSource().getSelectedKey();
       var oView = this.getView();
       var oModel = oView.getModel(sModelName);
-    
+
       if (selectedSalutation === "Ms." || selectedSalutation === "Mrs.") {
-          oModel.setProperty(sGenderPropertyPath, "Female");
-          oView.byId(sGenderControlId).setEnabled(false);
+        oModel.setProperty(sGenderPropertyPath, "Female");
+        oView.byId(sGenderControlId).setEnabled(false);
       } else if (selectedSalutation === "Mr.") {
-          oModel.setProperty(sGenderPropertyPath, "Male");
-          oView.byId(sGenderControlId).setEnabled(false);
+        oModel.setProperty(sGenderPropertyPath, "Male");
+        oView.byId(sGenderControlId).setEnabled(false);
       } else {
-          oView.byId(sGenderControlId).setEnabled(true);
+        oView.byId(sGenderControlId).setEnabled(true);
       }
     }
-    
+
   })
 });
