@@ -29,7 +29,7 @@
                         </VBox>
                     </HBox>
             
-                <Label text="{i18n>toMailText}" required="true"/>
+                <Label text="{i18n>toMailText}"/>
                 <Input id="Mail_id_Text" value ="{UploaderData>/ToEmail}" editable="false"/>
 
                 <Label text="{i18n>ccMailText}" required="true"/>
@@ -39,7 +39,7 @@
 
         <FlexBox justifyContent="End">
            <Button id="SendMail_Button" text="{i18n>tileFooter}" type="Emphasized" class="sendMail" press="Mail_onSendEmail" enabled="false"/>
-           <Button text="{i18n>close}" width="80px" class="sendMail" press="Mail_onPressClose"/>
+           <Button text="{i18n>close}" width="80px" class="sendMail" press="Mail_onPressClose" type="Reject"/>
         </FlexBox>
     </Dialog>
 </core:FragmentDefinition>
