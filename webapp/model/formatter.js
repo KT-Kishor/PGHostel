@@ -197,7 +197,13 @@ sap.ui.define([], function () {
             } else {
                 return formattedGrade;
             }
-        }
+        },
+        getImageSrc: function (base64Str) {
+            if (base64Str) {
+                return "data:image/png;base64," + base64Str;
+            }
+            return ""; // fallback
+        },
 
     }
 });

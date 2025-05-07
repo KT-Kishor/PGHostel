@@ -36,7 +36,7 @@
             displayFormat="dd/MM/yyyy" 
             valueFormat="dd/MM/yyyy"
            maxDate="{viewModel>/Max}"
-		   valueStateText="{i18n>dateValueState}"/>
+		   valueStateText="{i18n>dateValueState}" />
 				<Label text="{i18n>endDate}" required="true" />
 				<DatePicker id="AddEd_id_EndEdu" 
 				value="{ path: 'educationModel>/EducationEndDate',formatter:'.Formatter.formatDate' }" 
@@ -47,7 +47,7 @@
             minDate="{startDate}" 
 			valueStateText="{i18n>dateValueState}"/>
 				<Label text="{i18n>grade}"  required="true" />
-				<HBox width="100%" justifyContent="Start">
+				<HBox width="70%" justifyContent="Start">
 					<Input  value="{educationModel>/Grade}" id="AddEd_id_Grade" liveChange="SS_validateGrade"  placeholder="{i18n>grade}"  valueStateText="{i18n>gradeValueState}" maxLength="5"/>
 					<Select  selectedKey="{educationModel>/GradeType}" items="{CollegeGrade>/grade}" id="AddEd_id_GradeType" class="sapUiSmallMarginBegin" change="SS_validateGradeType">
 						<core:Item key="{CollegeGrade>Value}" text="{CollegeGrade>Value}" />
@@ -58,7 +58,7 @@
 		<HBox justifyContent="End" >
 			<Button text="{i18n>Submit}" type="Accept" id="AddEd_id_Submit" press="AddEd_onSubmitEdDetails" class="submit"  visible="{viewModel>/fragmentSubmit}" />
 			<Button text="{i18n>save}" type="Accept" press="AddEd_onUpdateEdDetails" class="submit" id="AddEd_id_Save" visible="{viewModel>/fragmentSave}"/>
-			<Button text="{i18n>close}" press="AddEd_onCloseDial" class="sendMail" type="Reject"/>
+			<Button text="{i18n>close}" press="AddEd_onCloseDial" class="submit" type="Reject"/>
 		</HBox>
 	</Dialog>
 </core:FragmentDefinition>

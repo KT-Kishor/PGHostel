@@ -239,7 +239,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteAdminPaySlip");
         },
         TileV_onpressSelfservice: function () {
-          this.getRouter().navTo("RouteSelfService");
+          this.getRouter().navTo("SelfService",{sPath:"SelfService"});
         },
         TileV_onpressInbox: function () {
           this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInboxView" });
@@ -269,7 +269,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteManagePayroll");
         },
         TileV_onpressEmployeeDetails: function () {
-          this.getRouter().navTo("RouteEmployeeDetails");
+          this.getRouter().navTo("RouteEmployeeDetails",{sPath:"EmployeeDetails"});
         },
         TileV_onBackPress: function () {
           this.CommonLogoutFunction();

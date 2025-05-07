@@ -392,6 +392,11 @@ sap.ui.define([
         : [];
 
       Array.from(oFiles).forEach((oFile) => {
+        const MAX_FILE_SIZE = 20 * 1024 * 1024; 
+        if (oFile.size > MAX_FILE_SIZE) {
+          sap.m.MessageToast.show("File size should not exceed 20 MB: " + oFile.name);
+          return;
+        }
         if (uploadedFileNames.includes(oFile.name)) {
           sap.m.MessageToast.show(oContext.getI18nText(sDuplicateTextKey, [oFile.name]));
           return;

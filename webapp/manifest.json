@@ -339,10 +339,10 @@
                     ]
                 },
                 {
-                    "name": "RouteSelfService",
-                    "pattern": "SelfService",
+                    "name": "SelfService",
+                    "pattern": "SelfService/{sPath}",
                     "target": [
-                        "TargetSelfService"
+                        "SelfServiceTarget"
                     ]
                 },
                 {
@@ -354,7 +354,7 @@
                 },
                 {
                     "name": "RouteEmployeeDetails",
-                    "pattern": "EmployeeDetails",
+                    "pattern": "EmployeeDetails/{sPath}",
                     "target": [
                         "TargetEmployeeDetails"
                     ]
@@ -632,7 +632,7 @@
                     "viewId": "AdminPaySlipDetails",
                     "viewName": "AdminPaySlipDetails"
                 },
-                "TargetSelfService": {
+                "SelfServiceTarget": {
                     "viewType": "XML",
                     "transition": "slide",
                     "clearControlAggregation": false,
