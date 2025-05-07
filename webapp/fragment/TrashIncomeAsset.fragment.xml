@@ -37,6 +37,7 @@
 				/>
 				<Label text="{i18n>Comments}"/>
 				    <TextArea id="FTIA_id_Comments" 
+					required="true"
                   valueStateText="Write a comment on trashed asset"
                   liveChange="FCIA_onDescriptionTextAreaChange"
                   value="{CreateIncomeAssetModel>/Comments}"
