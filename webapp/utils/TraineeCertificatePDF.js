@@ -65,8 +65,8 @@ sap.ui.define([], function () {
                 callback: function (doc) {
                     const backImgX = (pageWidth - 100) / 2;
                     const backImgY = (pageHeight - 100) / 2;
-                    doc.setGState(new doc.GState({ opacity: 0.2 }));
-                    doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                    doc.setGState(new doc.GState({ opacity: 0.1 }));
+                    doc.addImage(oCompanyDetailsModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                     doc.setGState(new doc.GState({ opacity: 1 }));
 
                     doc.setFont("times", "bold").setFontSize(11);

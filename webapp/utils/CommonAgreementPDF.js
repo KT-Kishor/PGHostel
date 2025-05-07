@@ -3,12 +3,12 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
     return {
         Formatter: Formatter,
 
-        _checkPageBreak: function (currentYPosition, bottomLimit, doc, topMargin, backImgX, backImgY, oModel) {
+        _checkPageBreak: function (currentYPosition, bottomLimit, doc, topMargin, backImgX, backImgY, oCompanyModel) {
             if (currentYPosition >= bottomLimit) {
                 doc.addPage(); // Add a new page if the current position exceeds the limit
-                doc.addImage(oModel.CompanyLogoHeader, "PNG", 125, 8, 65, 14.5);
-                doc.setGState(new doc.GState({ opacity: 0.2 }));
-                doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+                doc.setGState(new doc.GState({ opacity: 0.1 }));
+                doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
                 currentYPosition = topMargin; // Reset to top margin on the new page
             }
@@ -16,9 +16,9 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
         },
 
         _pdfContent: function (that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content) {
-            doc.addImage(oModel.CompanyLogoHeader, "PNG", 125, 8, 65, 14.5);
-            doc.setGState(new doc.GState({ opacity: 0.2 }));
-            doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+            doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+            doc.setGState(new doc.GState({ opacity: 0.1 }));
+            doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
             doc.setGState(new doc.GState({ opacity: 1 }));
             let titleY = currentY;
             let titleText = content[0].Title;
@@ -85,7 +85,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             for (let i = 1; i <= content.length; i++) {
                 if (!content[i - 1]?.PointNo) break; // Break if data is missing to avoid errors
                 currentY += 2; // Add extra spacing between points
-                currentY = that._checkPageBreak(currentY, bottomLimit, doc, topMargin, backImgX, backImgY, oModel);
+                currentY = that._checkPageBreak(currentY, bottomLimit, doc, topMargin, backImgX, backImgY, oCompanyModel);
                 // Add Point Number and Point Title
                 if (content[i - 1].PointTitle) {
                     doc.setFont("times", "bold");
@@ -117,7 +117,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                         let spaceWidth = doc.getTextWidth(" ");
 
                         // Apply the page-break check
-                        pointContentY = that._checkPageBreak(pointContentY, bottomLimit, doc, topMargin, backImgX, backImgY, oModel);
+                        pointContentY = that._checkPageBreak(pointContentY, bottomLimit, doc, topMargin, backImgX, backImgY, oCompanyModel);
 
                         if (lineIndex < pointContentLines.length - 1) {
                             // Justify all lines except the last line of each paragraph
@@ -145,9 +145,9 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             let pointContentLastY = currentY + 5;
             if (pointContentLastY > bottomLimit - 60) {
                 doc.addPage();
-                doc.addImage(oModel.CompanyLogoHeader, "PNG", 130, 8, 60, 13);
-                doc.setGState(new doc.GState({ opacity: 0.2 }));
-                doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 130, 8, 60, 13);
+                doc.setGState(new doc.GState({ opacity: 0.1 }));
+                doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
                 pointContentLastY = topMargin;
             }
@@ -182,7 +182,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.text(oModel.AgreementDate, pageMiddle + 10, headofCoRoleY + 5);
         },
 
-        _GenerateAgreementPDF: function (oModel, oCompanyModel, contentNDA, contentMSA) {
+        _GenerateAgreementPDF: function (that2, oModel, oCompanyModel, contentNDA, contentMSA) {
             var that = this;
             setTimeout(function () {
                 var { jsPDF } = window.jspdf;
@@ -212,11 +212,11 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.addPage();
                 that._pdfContent(that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, contentMSA);
                 doc.save(`${oCompanyModel.companyName} - ${oModel.ClientCompanyName} MSA & NDA.pdf`);
-                sap.ui.core.BusyIndicator.hide();
+                that2.closeBusyDialog();
             }, 1000);
         },
 
-        _GenerateContractPDF: function (oModel, oCompanyModel, content) {
+        _GenerateContractPDF: function (that2, oModel, oCompanyModel, content) {
             var that = this;
             setTimeout(function () {
                 var { jsPDF } = window.jspdf;
@@ -253,9 +253,9 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                 that._pdfContent(that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content);
                 doc.addPage();
-                doc.addImage(oModel.CompanyLogoHeader, "PNG", 125, 8, 65, 14.5);
-                doc.setGState(new doc.GState({ opacity: 0.2 }));
-                doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+                doc.setGState(new doc.GState({ opacity: 0.1 }));
+                doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
                 doc.setFont("times", "bold").setFontSize(12);
                 var titleText2 = "ASSIGNMENT SCHEDULE 1";
@@ -274,11 +274,11 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     ["Client Company Name", oCompanyModel.companyName],
                     ["End Client/Hirer (if different from Client)", oModel.ClientCompanyName],
                     ["Location(s) where Services are to be delivered", oModel.LocationService],
-                    ["Client hiring contact", oCompanyModel.headOfCompany],
+                    ["Client hiring contact", oModel.ClientReportingName],
                     ["Name of Consultant", oModel.ClientName],
                     ["Description of the Services", oModel.ConsultingService],
                     ["Assignment Status", oModel.ContractStatus],
-                    ["Start Date", oModel.AgreementDate],
+                    ["Start Date", oModel.AgreementStartDate],
                     ["End Date", oModel.AgreementEndDate],
                     ["Specific hours/days/time keeping requirement", "Maximum of 60 days to be billed throughout the duration of the contract."],
                     ["Notice period for Consultant to terminate", "5 calendar weeks subject to clauses 23-27"],
@@ -333,11 +333,11 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.rect(margin, startY - 4, maxWidth, endY - startY); // Slight padding adjustment
                 doc.line(margin + labelWidth, startY - 4, margin + labelWidth, endY - 4); // Vertical line between label and value
                 doc.save(`${oCompanyModel.companyName} - ${oModel.ClientCompanyName} contract.pdf`);
-                sap.ui.core.BusyIndicator.hide();
+                that2.closeBusyDialog();
             }, 1000);
         },
 
-        _GenerateSOWPDF: function (oModel, oCompanyModel, content) {
+        _GenerateSOWPDF: function (that, oModel, oCompanyModel, content) {
             setTimeout(function () {
 
                 var { jsPDF } = window.jspdf;
@@ -367,18 +367,18 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                     if (currentYPosition >= bottomLimit) {
                         doc.addPage(); // Add a new page if the current position exceeds the limit
-                        doc.addImage(oModel.CompanyLogoHeader, "PNG", 125, 8, 65, 14.5);
-                        doc.setGState(new doc.GState({ opacity: 0.2 }));
-                        doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                        doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+                        doc.setGState(new doc.GState({ opacity: 0.1 }));
+                        doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                         doc.setGState(new doc.GState({ opacity: 1 }));
                         currentYPosition = topMargin; // Reset to top margin on the new page
                     }
                     return currentYPosition; // Return updated Y position
                 }
 
-                doc.addImage(oModel.CompanyLogoHeader, "PNG", 125, 8, 65, 14.5);
-                doc.setGState(new doc.GState({ opacity: 0.2 }));
-                doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+                doc.setGState(new doc.GState({ opacity: 0.1 }));
+                doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
                 doc.setFont("helvetica", "bold").setFontSize(9);
                 let subtitletextWidth = doc.getTextWidth("Master Service Agreement");
@@ -477,6 +477,16 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     let pointContentTemplate = new Function("oCompanyModel", "oModel", `return ${content[i - 1].PointDesc};`)(oCompanyModel, oModel);
 
                     if (pointContentTemplate === "Table") {
+                        doc.setFont("helvetica", "bold").setFontSize(10);
+                        let descriptionY = currentY + 8;
+                        let label = "Description:";
+                        let labelX = margin + paraMargin;
+                        doc.text(label, labelX, descriptionY);
+                        let labelWidth = doc.getTextWidth(label);
+                        doc.setFont("helvetica", "normal");
+                        let valueX = labelX + labelWidth + 2;
+                        doc.text(oModel.SOWDescription, valueX, descriptionY);
+                        currentY = descriptionY - 3;
                         const pageHeight = doc.internal.pageSize.height;
                         const lineHeight = 6;
                         const rowHeight = 6;
@@ -641,9 +651,9 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 let pointContentLastY = currentY + 5;
                 if (pointContentLastY > bottomLimit - 60) {
                     doc.addPage();
-                    doc.addImage(oModel.CompanyLogoHeader, "PNG", 130, 8, 60, 13);
-                    doc.setGState(new doc.GState({ opacity: 0.2 }));
-                    doc.addImage(oModel.CompanyBackImage, "PNG", backImgX, backImgY, 100, 100);
+                    doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 130, 8, 60, 13);
+                    doc.setGState(new doc.GState({ opacity: 0.1 }));
+                    doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                     doc.setGState(new doc.GState({ opacity: 1 }));
                     pointContentLastY = topMargin;
                 }
@@ -677,7 +687,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.text(oModel.AgreementDate, pageMiddle + 10, headofCoRoleY + 5);
 
                 doc.save("SOW.pdf");
-                sap.ui.core.BusyIndicator.hide();
+                that.closeBusyDialog();
             }, 1000);
         }
     };

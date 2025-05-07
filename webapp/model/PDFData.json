@@ -116,6 +116,7 @@
 
     "AgreementNo": "KT-C001",
     "AgreementDate": "02/04/2025",
+    "AgreementStartDate": "02/04/2025",
     "AgreementEndDate": "30/09/2025",
     "ClientCompanyName": "Google Inc.",
     "ClientCompanyAddress": "No. 3, Old Madras Rd, Sadanandanagar, Bennigana Halli, Bengaluru, Karnataka 560016",
@@ -132,6 +133,7 @@
     "SOWCreateDate": "01/04/2025",
     "SOWStartDate": "02/04/2025",
     "SOWEndDate": "30/09/2025",
+    "SOWDescription": "(SOWDescription)",
     "TableData": [
         {
             "SlNo": "1",
@@ -169,6 +171,7 @@
     "ContractStatus": "(ContractStatus)",
     "SpecificInsuranceRequirement": "(SpecificInsuranceRequirement)",
     "ConsultantRate": "(ConsultantRate)",
-    "ExpensesClaim": "(ExpensesClaim)"
+    "ExpensesClaim": "(ExpensesClaim)",
+    "ClientReportingName": "(ClientReportingName)"
 
 }

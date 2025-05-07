@@ -430,15 +430,25 @@ sap.ui.define([
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
-                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
-                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
-                    var backgroundLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.backgroundLogo?.data);
-                    var emailLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companyEmailLogo?.data);
-                    if (logoBase64 && signBase64 && backgroundLogoBase64 && emailLogoBase64) {
-                        oCompanyDetailsModel.backgroundLogoBase64 = "data:image/png;base64," + backgroundLogoBase64;
-                        oCompanyDetailsModel.emailLogoBase64 = "data:image/png;base64," + emailLogoBase64;
-                        oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
-                        oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+                    try {
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
+                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+            
+                        const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
+                            this._convertBLOBToImage(logoBlob),
+                            this._convertBLOBToImage(signBlob),
+                            this._convertBLOBToImage(backgroundBlob),
+                            this._convertBLOBToImage(emailBlob)
+                        ]);
+            
+                        oCompanyDetailsModel.companylogo64 = logoBase64;
+                        oCompanyDetailsModel.signature64 = signBase64;
+                        oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+                        oCompanyDetailsModel.emailLogoBase64 = emailBase64;
+                    } catch (err) {
+                        console.error("Image compression failed:", err);
                     }
                 }
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {

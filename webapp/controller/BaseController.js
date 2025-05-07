@@ -449,12 +449,23 @@ sap.ui.define([
         MessageToast.show("Company not found on selected branch. Please check and try again.");
         return;
       }
-      if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
-        var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
-        var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
-        if (logoBase64 && signBase64) {
-          oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
-          oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+      if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64) {
+        try {
+          const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+          const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+          const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
+
+          const [logoBase64, signBase64, backgroundBase64] = await Promise.all([
+            this._convertBLOBToImage(logoBlob),
+            this._convertBLOBToImage(signBlob),
+            this._convertBLOBToImage(backgroundBlob)
+          ]);
+
+          oCompanyDetailsModel.companylogo64 = logoBase64;
+          oCompanyDetailsModel.signature64 = signBase64;
+          oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+        } catch (err) {
+          console.error("Image compression failed:", err);
         }
       }
       if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {

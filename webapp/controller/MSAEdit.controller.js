@@ -473,7 +473,7 @@ sap.ui.define([
             },
 
             async MsaE_onPressMerge() {
-                BusyIndicator.show(0);
+                this.getBusyDialog();
                 var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oModel.BranchCode });
                 var msa = "MSA", nda = "NDA";
@@ -497,31 +497,41 @@ sap.ui.define([
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFNDAModel = this.getView().getModel("PDFNDAModel").getData();
                 var oPDFMSAModel = this.getView().getModel("PDFMSAModel").getData();
-                if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                    BusyIndicator.hide();
-                    MessageToast.show("Company not found on selected branch. Please check and try again.");
-                    return;
-                }
-                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
-                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
-                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
-                    if (logoBase64 && signBase64) {
-                        oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
-                        oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
+                    try {
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
+                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+            
+                        const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
+                            this._convertBLOBToImage(logoBlob),
+                            this._convertBLOBToImage(signBlob),
+                            this._convertBLOBToImage(backgroundBlob),
+                            this._convertBLOBToImage(emailBlob)
+                        ]);
+            
+                        oCompanyDetailsModel.companylogo64 = logoBase64;
+                        oCompanyDetailsModel.signature64 = signBase64;
+                        oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+                        oCompanyDetailsModel.emailLogoBase64 = emailBase64;
+                    } catch (err) {
+                        this.closeBusyDialog();
+                        console.error("Image compression failed:", err);
                     }
                 }
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GenerateAgreementPDF === "function") {
-                        BusyIndicator.show(0);
-                        jsPDF._GenerateAgreementPDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFNDAModel, oPDFMSAModel);
+                        jsPDF._GenerateAgreementPDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFNDAModel, oPDFMSAModel);
                     } else {
-                        BusyIndicator.hide();
+                        this.closeBusyDialog();
                         console.error("Error: jsPDF._GenerateAgreementPDF function not found.");
                     }
                 }
             },
 
             async MsaE_onPressMergeSow() {
+                this.getBusyDialog();
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/TableData", this.getView().getModel("SowReadModel").getData().filter((item) => item.SowID === this.Selected.SowID));
                 var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
@@ -535,26 +545,38 @@ sap.ui.define([
                 oPDFModel.setProperty("/AgreementDuration", oModel.ContractPeriod);
                 oPDFModel.setProperty("/SOWStartDate", Formatter.formatDate(oPDFModel.getProperty("/TableData/0/StartDate")));
                 oPDFModel.setProperty("/SOWEndDate", Formatter.formatDate(oPDFModel.getProperty("/TableData/0/EndDate")));
+                oPDFModel.setProperty("/SOWDescription", oPDFModel.getProperty("/TableData/0/Description"));
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFSOWModel = this.getView().getModel("PDFSOWModel").getData();
-                if (!oCompanyDetailsModel || !oCompanyDetailsModel.companylogo) {
-                    MessageToast.show("Company not found on selected branch. Please check and try again.");
-                    return;
-                }
-                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64) {
-                    var logoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
-                    var signBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.signature?.data);
-                    if (logoBase64 && signBase64) {
-                        oCompanyDetailsModel.companylogo64 = "data:image/png;base64," + logoBase64;
-                        oCompanyDetailsModel.signature64 = "data:image/png;base64," + signBase64;
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
+                    try {
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
+                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+            
+                        const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
+                            this._convertBLOBToImage(logoBlob),
+                            this._convertBLOBToImage(signBlob),
+                            this._convertBLOBToImage(backgroundBlob),
+                            this._convertBLOBToImage(emailBlob)
+                        ]);
+            
+                        oCompanyDetailsModel.companylogo64 = logoBase64;
+                        oCompanyDetailsModel.signature64 = signBase64;
+                        oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+                        oCompanyDetailsModel.emailLogoBase64 = emailBase64;
+                    } catch (err) {
+                        console.error("Image compression failed:", err);
+                        this.closeBusyDialog();
                     }
                 }
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GenerateSOWPDF === "function") {
-                        sap.ui.core.BusyIndicator.show(0);
-                        jsPDF._GenerateSOWPDF(oPDFModel.getData(), oCompanyDetailsModel, oPDFSOWModel);
+                        jsPDF._GenerateSOWPDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFSOWModel);
                     } else {
                         console.error("Error: jsPDF._GenerateSOWPDF function not found.");
+                        this.closeBusyDialog();
                     }
                 }
             }
