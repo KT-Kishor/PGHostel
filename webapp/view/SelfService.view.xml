@@ -144,9 +144,8 @@
 										<m:Label text="{i18n>role}"/>
 										<m:Input value="{sEmployeeModel>/0/Role}" editable="false" maxLength="10" id="SS_id_RoleEmpSele" placeholder="{i18n>mobileNo}"/>
 										<m:Label text="{i18n>employeeStatus}" />
-										<m:Select change="SS_onStatusChange" id="SS_id_StatusSelf" editable="false" selectedKey="{sEmployeeModel>/0/EmployeeStatus}" items="">
-											<core:Item key="Active" text="{i18n>active}" />
-											<core:Item key="Inactive" text="{i18n>inactive}" />
+										<m:Select change="SS_onStatusChange" id="SS_id_StatusSelf" editable="false" selectedKey="{sEmployeeModel>/0/EmployeeStatus}" items="{StatusEmp>/}">
+										<core:Item key="{StatusEmp>Value}" text="{StatusEmp>Value}"/>
 										</m:Select>
 									</f:content>
 								</f:SimpleForm>

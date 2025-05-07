@@ -26,6 +26,14 @@
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
+
+				<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox showSecondaryValues= "true"  items="{StatusEmp>/}" id="ED_id_Status" showClearIcon="true">
+								<core:ListItem key="{StatusEmp>Value}" text="{StatusEmp>Value}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="ED_id_EmpDetailsTable" class="sapUiTinyMargin" items="{path:'sEmployeeDetails>/'}"  busyIndicatorDelay="0"  width="auto"
