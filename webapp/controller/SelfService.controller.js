@@ -1074,25 +1074,42 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
         EmpF_onReferenceDetails: function () {
             var that = this;
             var oTable = this.byId("EmpF_id_EmpTable");
-            var aSelectedContexts = oTable.getSelectedContexts();
+            var aSelectedContexts = oTable.getSelectedContexts();   
             if (aSelectedContexts.length === 0) {
                 sap.m.MessageToast.show(this.i18nModel.getText("selectRowToEdit"));
                 return;
             }
             var dataModel = aSelectedContexts[0].getObject();
-            // Prepare formatted reference details HTML
-            var formattedReferenceData = `
-				<div style="padding-left: 15px; padding-right: 15px;">
-					<p><b>Name:</b> ${dataModel.RCISal} ${dataModel.RCIName}</p>
-					<p><b>Contact Address:</b> ${dataModel.RCIAddress}</p>
-					<p><b>Email:</b> ${dataModel.RCIEmailID}</p>
-					<p><b>Mobile No:</b> ${dataModel.RCIMobileNo}</p>
-					<br/>
-					<p><b>Name:</b> ${dataModel.RCIISal} ${dataModel.RCIIName}</p>
-					<p><b>Contact Address:</b> ${dataModel.RCIIAddress}</p>
-					<p><b>Email:</b> ${dataModel.RCIIEmailID}</p>
-					<p><b>Mobile No:</b> ${dataModel.RCIIMobileNo}</p>
-				</div>`;
+            // Check if at least one reference set is available
+            var referenceDetailsExist = 
+                (dataModel.RCISal && dataModel.RCIName && dataModel.RCIAddress && dataModel.RCIEmailID && dataModel.RCIMobileNo) ||
+                (dataModel.RCIISal && dataModel.RCIIName && dataModel.RCIIAddress && dataModel.RCIIEmailID && dataModel.RCIIMobileNo);
+        
+            if (!referenceDetailsExist) {
+                sap.m.MessageToast.show("There are no reference details to display.");
+                return;
+            }
+            var formattedReferenceData = `<div style="padding-left: 15px; padding-right: 15px;">`;
+            // Add first reference if available
+            if (dataModel.RCISal && dataModel.RCIName && dataModel.RCIAddress && dataModel.RCIEmailID && dataModel.RCIMobileNo) {
+                formattedReferenceData += `
+                    <h4>Reference Details 1</h4>
+                    <p><b>Name:</b> ${dataModel.RCISal} ${dataModel.RCIName}</p>
+                    <p><b>Contact Address:</b> ${dataModel.RCIAddress}</p>
+                    <p><b>Email:</b> ${dataModel.RCIEmailID}</p>
+                    <p><b>Mobile No:</b> ${dataModel.RCIMobileNo}</p>
+                    <br/>`;
+            }
+            // Add second reference if available
+            if (dataModel.RCIISal && dataModel.RCIIName && dataModel.RCIIAddress && dataModel.RCIIEmailID && dataModel.RCIIMobileNo) {
+                formattedReferenceData += `
+                    <h4>Reference Details 2</h4>
+                    <p><b>Name:</b> ${dataModel.RCIISal} ${dataModel.RCIIName}</p>
+                    <p><b>Contact Address:</b> ${dataModel.RCIIAddress}</p>
+                    <p><b>Email:</b> ${dataModel.RCIIEmailID}</p>
+                    <p><b>Mobile No:</b> ${dataModel.RCIIMobileNo}</p>`;
+            }
+            formattedReferenceData += `</div>`;
             // Create a dialog to display the reference details
             var oDialog = new sap.m.Dialog({
                 title: "Reference Details",

@@ -351,7 +351,7 @@
 										<m:OverflowToolbar >
 											<m:Title text="{i18n>employmentDetails} ({= ${sEmploymentModel>/}.length})"/>
 											<m:ToolbarSpacer/>
-											<m:Button id="EmpF_id_RefButton" visible="true" tooltip="{i18n>referenceDetails}" press="EmpF_onReferenceDetails" type="Transparent" />										
+											<m:Button id="EmpF_id_RefButton" visible="true" tooltip="{i18n>referenceDetails}" press="EmpF_onReferenceDetails" type="Ghost" text="{i18n>referenceDetails}"/>										
 											<m:Button text="{i18n>add}" press="EmpF_onAddEmployment" type="Accept" tooltip="{i18n>toolAddEmp}" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
 											<m:Button  text="{i18n>edit}" press="EmpF_onEditEmployment" type="Ghost" tooltip="{i18n>toolEditEmp}" id="EmpF_id_EmpEdit" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
 											<m:Button text="{i18n>delete}" press="EmpF_onDeletEmployment" type="Negative" tooltip="{i18n>toolDelEmp}" id="EmpF_id_EmpDelete" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
