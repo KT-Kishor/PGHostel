@@ -61,7 +61,8 @@
 													<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />		
 											</ComboBox>
 											<Label text="{i18n>baseLocation}" required="true" />
-											<Select items="{BaseLocationModel>/}" id="EOD_id_Location" showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}">
+											<Select items="{BaseLocationModel>/}" id="EOD_id_Location" 
+											 showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}" valueStateText="{i18n>valuestatebaseLocation}" >
 												<items>
 													<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 												</items>
@@ -117,8 +118,8 @@
 									<l:VerticalLayout  width="100%">
 										<l:BlockLayout background="Dashboard">
 											<l:BlockLayoutRow >
-												<l:BlockLayoutCell title="{i18n>monthly}" width="2">
-													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
+												<l:BlockLayoutCell  width="2">
+													<f:SimpleForm title="{i18n>monthly}" editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
 														<f:content>
 															<core:Title text="{i18n>monthlyComponents}" />
 															<Label text="{i18n>basicSalary}" />
@@ -151,8 +152,8 @@
 														</f:content>
 													</f:SimpleForm>
 												</l:BlockLayoutCell>
-												<l:BlockLayoutCell title="{i18n>yearly}" width="2">
-													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
+												<l:BlockLayoutCell  width="2">
+													<f:SimpleForm title="{i18n>yearly}" editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
 														<f:content>
 															<core:Title text="{i18n>monthlyComponents}" />
 															<Label text="{i18n>basicSalary}" />
@@ -187,7 +188,8 @@
 												</l:BlockLayoutCell>
 											</l:BlockLayoutRow>
 											<l:BlockLayoutRow >
-												<l:BlockLayoutCell title="{i18n>summary}" width="2">
+												<l:BlockLayoutCell width="2">
+												<Title text="{i18n>summary}" class="boldBlackText" level="H2" />
 													<FlexBox direction="Row" justifyContent="Start" wrap="Wrap">
 														<VBox class="summaryBox">
 															<Label text="{i18n>yearlyGrossPay}" class="boldBlackText"/>

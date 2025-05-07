@@ -13,8 +13,9 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
+                 var LoginFunction = await this.commonLoginFunction("Trainee");
+                if (!LoginFunction) return;
                 this.getBusyDialog();
-                this.commonLoginFunction("Trainee");
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 await this._fetchCommonData("Designation", "DesignationModel");

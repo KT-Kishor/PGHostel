@@ -3,8 +3,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core"
 	xmlns:u="sap.ui.unified">
-	<Dialog title="{i18n>addCardDetails}">
-		<MessageStrip text="{i18n>imageMsg}" type="Warning" class="sapUiTinyMarginBottom" />
+	<Dialog title="Set Profile Photo">
 		<f:SimpleForm
 		    editable="true"
             layout="ResponsiveGridLayout"
@@ -21,76 +20,55 @@
             columnsL="1"
             columnsM="1"
             singleContainerFullSize="false">
-			<f:content>
-				<Label text="{i18n>employeeType}" required="true"/>
-				<RadioButtonGroup id="IC_id_GroupC"  selectedIndex="0" select="onRadioButtonSelect"  class="center-content" columns="3" editable="{IdCardModel>/isEditable}">
-					<RadioButton text="{i18n>employeeOffer}" />
-					<RadioButton text="{i18n>contractOffer}" />
-					<RadioButton text="{i18n>traineeOffer}" />
-				</RadioButtonGroup>
-				<!-- Employee ID -->
-				<Label text="{i18n>employeeID}"  required="true" />
-				<ComboBox id="IC_id_EmployeeID" showSecondaryValues="true" value="{IdCardModel>/EmployeeID}" editable="{IdCardModel>/isEditable}" change=".onEmployeeIDChange">
-					<items>
-						<core:ListItem key="{IdCardModel>key}" text="{IdCardModel>key}"
-						additionalText="{IdCardModel>text}" />
-					</items>
-				</ComboBox>
-				<!-- Employee Name -->
-				<Label text="{i18n>employeeName}" required="true" />
-				<Input value="{IdCardModel>/EmployeeName}" liveChange="IC_ValidateEmployeeName" maxLength="50" valueStateText="{i18n>validEmpNameMsg}" id="IC_id_EmployeeName" editable="{IdCardModel>/isEditable}" />
-				<!-- Designation -->
-				<Label text="{i18n>designation}" required="true"/>
-				<Input value="{IdCardModel>/Designation}" liveChange="IC_ValidateCommonFields" maxLength="20" id="IC_id_Designation" valueStateText="{i18n>destinationValueState}"/>
-				<!-- Email -->
-				<Label text="{i18n>emailId}" required="true"/>
-				<Input value="{IdCardModel>/Email}" id="IC_id_Email" liveChange="IC_ValidateEmail" maxLength="50" valueStateText="{i18n>emailValueState}"/>
-				<!-- DOB -->
-				<Label text="{i18n>dateOfBirth}" required="true" />
-				<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{IdCardModel>/DOB}" id="IC_id_DateBirth" maxDate="{IdCardModel>/today}" initialFocusedDateValue="{IdCardModel>/minDOB}" change="IC_ValidateDate" valueStateText="{i18n>dateValueState}" />
-				<!-- MobileNo -->
-				<Label text="{i18n>mobileNo}" required="true"/>
-				<Input value="{IdCardModel>/MobileNo}" id="IC_id_Mobile" liveChange="IC_ValidateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}" />
-				<!-- BloodGroup -->
-				<Label text="{i18n>bloodGroup}" required="true" />
-				<ComboBox id="IC_id_bloodGroup"  items="{BloodGroup>/bloodgroup}" change="IC_ValidateCommonFields" valueStateText="{i18n>validBloodGroupMsg}" value="{IdCardModel>/BloodGroup}" >
-					<core:Item key="{BloodGroup>ID}" text="{BloodGroup>Code}" />
-				</ComboBox>
+			<f:content>				
 				<!-- File Uploader -->
-				<Label text="{i18n>fileUploader}" required="true"/>
-				<HBox width="100%" justifyContent="Start" alignItems="Center">
-					<VBox width="30%">
-						<u:FileUploader                       
-                        name="myFileUpload"
-                        uploadUrl="upload/"
-                        tooltip="{i18n>fileUploadId}"
-                        change="IC_onHandleUploadPress"
-                        buttonOnly="true"  
-						id="IC_id_file"  
-						fileType="jpg,png,jpeg"  
-						valueStateText="{i18n>fileUploaderValueState}"               
-                        uploadComplete="handleUploadComplete"/>
-					</VBox>
-					<VBox width="70%" >
-						<Text text="{TextDisplay>/name}"></Text>
-					</VBox>
-				</HBox>
-				<Label text="{i18n>picture}"/>
-				<Button text="{i18n>openCamera}" icon="sap-icon://camera" press="IC_onPressOpenCamera" />
+				<VBox width="100%" alignItems="Start" class="sapUiSmallMarginTop">
+    
+    <!-- File Uploader Section -->
+    <HBox width="50%" alignItems="Start" justifyContent="SpaceBetween">
+        <Label text="{i18n>fileUploader}" required="true" showColon="true" class="sapUiTinyMarginEnd" />
+        <u:FileUploader                       
+            name="myFileUpload"
+            uploadUrl="upload/"
+            tooltip="{i18n>fileUploadId}"
+            change="IC_onHandleUploadPress"
+            maximumFileSize="5MB"
+            fileType="jpg,jpeg,png"
+            buttonOnly="true"  
+            id="IC_id_file"  
+            fileSizeExceed="onFileSizeExceeds"						 
+            valueStateText="{i18n>fileUploaderValueState}"               
+            uploadComplete="handleUploadComplete"/>
+    </HBox>
+
+    <!-- Camera Button Section -->
+    <HBox width="50%" alignItems="Center" justifyContent="SpaceBetween" class="sapUiSmallMarginTop">
+        <Label text="{i18n>picture}" showColon="true" class="sapUiTinyMarginEnd"/>
+        <Button 
+            text="{i18n>openCamera}" 
+            icon="sap-icon://camera" 
+            press="IC_onPressOpenCamera" />
+    </HBox>
+
+</VBox>
+
+
+
 				<Label/>
-				<VBox id="canvasContainer" visible="true" class="sapUiSmallMargin canvas">
+				<HBox id="canvasContainer" visible="true" class="canvas">
 					<core:HTML content="&lt;canvas id='canvas' class='passport-size-canvas'&gt;&lt;/canvas&gt;" />
-				</VBox>
+				</HBox>
 			</f:content>
 		</f:SimpleForm>
-			<!-- Buttons for Submit and Close actions -->
-		<footer>
-			<Toolbar>
-				<ToolbarSpacer/>
-	        <Button text="{i18n>submit}" type="Emphasized" press="IC_onPressSubmit" class="sendMail" visible="{IdCardModel>/Submit}"/>
-			<Button text="{i18n>save}" type="Emphasized" press="IC_onPressSave" class="sendMail" visible="{IdCardModel>/Save}"/>
-			<Button text="{i18n>close}" class="sendMail" press="IC_onPressClose" />
-			</Toolbar>
-		</footer>
+		
+        <footer> 
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button text="{i18n>save}" type="Accept" press="IC_onPressSave" class="submit" visible="{viewModel>/PhotoSave}"/>
+                <Button text="{i18n>close}" type="Reject" class="submit" press="IC_onPressClose" />
+            </Toolbar>
+        </footer>
+		<!-- <FlexBox justifyContent="End">			
+		</FlexBox> -->
 	</Dialog>
 </core:FragmentDefinition>

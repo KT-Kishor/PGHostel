@@ -64,7 +64,7 @@
 								<core:ListItem key="{TypeModel>ID}" text="{TypeModel>Type}" />
 							</ComboBox>
 							<Label ></Label>
-							<Label id="TD_id_TrainingAmountLabel" text="{i18n>placeAmount}" visible="false" />
+							<Label id="TD_id_TrainingAmountLabel" text="{i18n>placeAmount}" visible="false"  required="true"/>
 							<HBox id="TD_id_TrainingDetailsBox" width="100%" justifyContent="Start" alignItems="Center" visible="false">
 								<VBox width="70%">
 									<Input 

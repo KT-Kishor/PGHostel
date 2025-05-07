@@ -22,8 +22,8 @@
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="BaseLocation" label="{i18n>baseLocation}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox items="{BaseLocationModel>/}" showClearIcon="true" id="EO_id_DesiFilter">
-								<core:Item key="{BaseLocationModel>id}" text="{BaseLocationModel>city}"/>
+							<ComboBox items="{BaseLocationModel>/}" showClearIcon="true" showSecondaryValues="true" id="EO_id_DesiFilter">
+								<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>

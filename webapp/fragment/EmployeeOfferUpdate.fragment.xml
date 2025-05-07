@@ -45,7 +45,7 @@
 										<m:Select editable="{viewModel>/editable}"
 											selectedKey="{employeeModel>/Salutation}"
 											items="{Salutation>/salutation}"
-											width="100%" change="onSalutationChange">
+											width="100%"  change="onSalutationChange">
 											<!-- Binding the key and text of the Select control to the NameSalutation model -->
 											<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 											</m:Select>
@@ -65,11 +65,13 @@
 										</m:ComboBox>
 										<!-- Base Location ComboBox with data from CityJsonModel -->
 										<m:Label text="{i18n>baseLocation}" required="true" />
-											<m:Select items="{BaseLocationModel>/}" editable="{viewModel>/editable}" id="EOUF_id_Location" showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}">
-											   <m:items>
-												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
-											   </m:items>
-										   </m:Select>
+											<m:Select items="{BaseLocationModel>/}" id="EOUF_id_Location" 
+											editable="{viewModel>/editable}" 
+											showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}" valueStateText="{i18n>valuestatebaseLocation}" >
+												<m:items>
+													<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+												</m:items>
+											</m:Select>
 										<!-- Joining Date Field with DatePicker control -->
 										<m:Label text="{i18n>offerReleaseDate}" required="true" />
 											<m:DatePicker id="EOUF_id_Reldate" editable="{viewModel>/editable}" placeholder="{i18n>offerReleaseDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
@@ -140,8 +142,8 @@
 												</l:BlockLayoutCell>											
 											</l:BlockLayoutRow>	
 											<l:BlockLayoutRow >
-												<l:BlockLayoutCell title="{i18n>monthly}" width="2">
-													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
+												<l:BlockLayoutCell  width="2">
+													<f:SimpleForm title="{i18n>monthly}" editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
 														<f:content>
 															<core:Title text="{i18n>monthlyComponents}" />
 															<m:Label text="{i18n>basicSalary}" />
@@ -178,8 +180,8 @@
 													</f:SimpleForm>
 												</l:BlockLayoutCell>
 
-												<l:BlockLayoutCell title="{i18n>yearly}" width="2">
-													<f:SimpleForm  editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
+												<l:BlockLayoutCell  width="2">
+													<f:SimpleForm title="{i18n>yearly}" editable="false" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
 														<f:content>											
 															<core:Title text="{i18n>monthlyComponents}" />
 															<m:Label text="{i18n>basicSalary}" />
@@ -216,7 +218,8 @@
 												</l:BlockLayoutCell>
 											</l:BlockLayoutRow>
 											<l:BlockLayoutRow >
-												<l:BlockLayoutCell title="{i18n>summary}" width="2">
+												<l:BlockLayoutCell width="2">
+												<m:Title text="{i18n>summary}" class="boldBlackText" level="H2" />
 													<m:FlexBox direction="Row" justifyContent="Start" wrap="Wrap">
 														<m:VBox class="summaryBox">
 															<m:Label text="{i18n>yearlyGrossPay}" class="boldBlackText"/>

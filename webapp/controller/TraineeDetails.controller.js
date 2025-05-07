@@ -13,8 +13,9 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTraineeDetails").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
+                var LoginFunction = await this.commonLoginFunction("Trainee");
+                if (!LoginFunction) return;
                 this.getBusyDialog();
-                this.commonLoginFunction("Trainee");
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeOffer" });

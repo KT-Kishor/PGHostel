@@ -84,7 +84,7 @@
 												</m:items>
 											</m:ComboBox>
 											<m:Label ></m:Label>
-											<m:Label id="TU_id_TrainingAmountLabel" text="{i18n>placeAmount}"  />
+											<m:Label id="TU_id_TrainingAmountLabel" text="{i18n>placeAmount}" required="true" />
 											<m:HBox id="TU_id_TrainingDetailsBox" width="100%" justifyContent="Start" alignItems="Center">
 												<m:VBox width="70%">
 													<m:Input 

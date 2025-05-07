@@ -26,6 +26,16 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 await this._fetchCommonData("Designation", "DesignationModel");//designation get call
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel"); //base location get call
+                let oModel = this.getView().getModel("BaseLocationModel");
+                let aData = oModel.getData();
+
+                // Sort by city name
+                aData.sort((a, b) => a.city.localeCompare(b.city));
+
+                // Update the model with sorted data
+                oModel.setData(aData);
+
+
                 await this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
                 await this._fetchCommonData("AppVisibility", "RoleModel") // role get call
                 await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
@@ -40,7 +50,7 @@ sap.ui.define([
                     "CTC": "",
                     "EmploymentBond": "0",
                     "JoiningBonus": "0",
-                    "BaseLocation": "",
+                    "BaseLocation": "Kalaburagi",
                     "BasicSalary": "",
                     "HRA": "",
                     "IncomeTax": "",
@@ -409,8 +419,8 @@ sap.ui.define([
                 this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
             },
-            //close mail dialog
-            Mail_onPressClose: function () {
+             //close mail dialog
+             Mail_onPressClose: function () {
                 this.EOU_oDialogMail.destroy();
                 this.EOU_oDialogMail = null;
                 // this.EOU_oDialogMail.close();
@@ -434,10 +444,17 @@ sap.ui.define([
             //Mail dialog button visibility
             validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
-                const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
-                const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
+                const emailField = sap.ui.getCore().byId("CCMail_TextArea");
+                const uploaderModel = this.getView().getModel("UploaderData");
+                if (!sendBtn || !emailField || !uploaderModel) {
+                    return;
+                }
+                const isEmailValid = utils._LCvalidateEmail(emailField, "ID") === true;
+                const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
+
                 sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
+
             //If mail changing then check validation
             Mail_onEmailChange: function () {
                 this.validateSendButton();
@@ -535,20 +552,20 @@ sap.ui.define([
                     !oCompanyDetailsModel.signature64 &&
                     !oCompanyDetailsModel.backgroundLogoBase64 &&
                     !oCompanyDetailsModel.emailLogoBase64) {
-            
+
                     try {
                         const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
                         const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
                         const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
                         const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
-            
+
                         const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
                             this._convertBLOBToImage(logoBlob),
                             this._convertBLOBToImage(signBlob),
                             this._convertBLOBToImage(backgroundBlob),
                             this._convertBLOBToImage(emailBlob)
                         ]);
-            
+
                         oCompanyDetailsModel.companylogo64 = logoBase64;
                         oCompanyDetailsModel.signature64 = signBase64;
                         oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
