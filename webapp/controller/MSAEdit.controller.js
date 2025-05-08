@@ -358,9 +358,21 @@ sap.ui.define([
                 var SowReadModel = this.getView().getModel("SowReadModel").getData();
                 var FilterData = SowReadModel.filter((item) => item.SowID === this.Selected.SowID);
                 var sowCreateModel = this.getView().getModel("sowCreateModel");
-                sowCreateModel.setProperty("/SowID", FilterData[0].SowID);
-                sowCreateModel.setProperty("/EndDate", FilterData[0].EndDate);
-                sowCreateModel.setProperty("/StartDate", FilterData[0].StartDate);
+                if(value === 'Expend'){                    
+                    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                    var result = ""
+                    for (var i = 0; i < 10; i++) {
+                        result += characters.charAt(Math.floor(Math.random() * characters.length));
+                    }
+                    var StartDate = new Date(FilterData[0].EndDate);
+                    StartDate.setDate(StartDate.getDate() + 1);
+
+                    var EndDate = new Date(StartDate);
+                    EndDate.setMonth(EndDate.getMonth() + 3);
+                }
+                sowCreateModel.setProperty("/SowID", value !== "Expend" ? FilterData[0].SowID : result);
+                sowCreateModel.setProperty("/EndDate", this.Formatter.formatDate(value !== "Expend" ? FilterData[0].EndDate : EndDate));
+                sowCreateModel.setProperty("/StartDate",  this.Formatter.formatDate(value !== "Expend" ? FilterData[0].StartDate : StartDate));
                 sowCreateModel.setProperty("/Description", FilterData[0].Description);
                 sowCreateModel.setProperty("/Currency", FilterData[0].Rate.split(" ")[1]);
 
@@ -399,6 +411,13 @@ sap.ui.define([
             },
 
             MasE_onPressExpendSow: function () {
+                var endDateObj = new Date(this.Selected.EndDate);
+                var currentDate = new Date();
+                var timeDiff = endDateObj.getTime() - currentDate.getTime();
+                var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        
+                if (daysDiff > 30) return sap.m.MessageBox.error(this.i18nModel.getText("sowExtend30Days"));                
+                
                 this.TableGetData("Expend");
                 this.SimpleFormModel.setProperty("/save", false);
                 this.SimpleFormModel.setProperty("/Mode", "MultiSelect");
@@ -418,25 +437,58 @@ sap.ui.define([
                 this.FragmentOpen();
             },
 
-            SOW_onExpendFrag:async function(){               
-                if(!sap.ui.getCore().byId("SOW_id_oTableCreateSow").getSelectedItem()){
-                    return MessageToast.show(this.i18nModel.getText("msaSelectMess"))
+            SOW_onExpendFrag: async function () {    
+                var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");          
+                if (!oTable.getSelectedItem()) {
+                    return MessageToast.show(this.i18nModel.getText("msaSelectMess"));
                 }
-
-                var oData = {
-                    "data": FilterData.map((item) => {
-                        return {
-                            "data": {
-                                "Status": Status
-                            },
-                            "filters": {
-                                "SowID": item.SowID 
-                            }
-                        };
-                    })
+            
+                var aSelectedItems = oTable.getSelectedItems();
+                var aSelectedData = aSelectedItems.map(function (oItem) {
+                    return oItem.getBindingContext("oModelDataPro").getObject();
+                });
+            
+                var SowId = sap.ui.getCore().byId("SOW_id_SowID").getValue();
+                var StartDate = sap.ui.getCore().byId("SOW_id_StartDate").getValue();
+                var EndDate = sap.ui.getCore().byId("SOW_id_EndDate").getValue();
+                var Desc = sap.ui.getCore().byId("SOW_id_MsaDesc").getValue();
+                var sowCreateModel = this.getView().getModel("sowCreateModel").getData();
+            
+                var oJson = {
+                    data: aSelectedData.map((item) => ({
+                        data: {
+                            MsaID: item.MsaID,
+                            SowID: SowId,
+                            Description: Desc,
+                            SNo: item.SNo,
+                            Salutation: item.Salutation,
+                            ConsultantName: item.ConsultantName,
+                            Designation: item.Designation,
+                            StartDate: StartDate.split('/').reverse().join('-'),
+                            EndDate: EndDate.split('/').reverse().join('-'),
+                            Rate: (sowCreateModel.Currency === 'INR') 
+                                ? `${item.Rate} ${sowCreateModel.Currency} GST ${item.PerDay}` 
+                                : `${item.Rate} ${sowCreateModel.Currency} ${item.PerDay}`,
+                            Status: item.Status
+                        }
+                    }))
+                };
+                                                 
+                try {
+                    const oData = await this.ajaxCreateWithJQuery("SowDetails", oJson);            
+                    if (oData.success) {
+                        await this.CommonReadCallForSow();
+                        this.SOW_oDialog.close();
+                        MessageToast.show(this.i18nModel.getText("sowExpendCreate"));
+                    } else {
+                        MessageToast.show(this.i18nModel.getText("sowFailed"));
+                    }
+                } catch (error) {
+                    MessageToast.show(error.responseText || this.i18nModel.getText("sowExpendCreateFailed"));
+                } finally {
+                    oTable.setBusy(false);
                 }
-                await this.CommonUpdateCall(oData); 
-            },
+            },            
 
             SOW_onReleaseFrag: async function(){               
                 if(!sap.ui.getCore().byId("SOW_id_oTableCreateSow").getSelectedItem()){
@@ -457,78 +509,47 @@ sap.ui.define([
                 await this.CommonUpdateCall(oData); 
             },
 
-            SOW_onSubmitFrag:async function () {
-                var oData = {
-                    "data": FilterData.map((item) => {
-                        return {
-                            "data": {
-                                "Status": Status
-                            },
-                            "filters": {
-                                "SowID": item.SowID 
-                            }
-                        };
-                    })}
-                await this.CommonUpdateCall(oData); 
-            },
+            SOW_onSubmitFrag: async function () {
+                const oModelDataPro = this.getView().getModel("oModelDataPro").getData();
+                const sowCreateModel = this.getView().getModel("sowCreateModel").getData();
+            
+                const transformedData = oModelDataPro.map((item) => ({
+                    MsaID: item.MsaID,
+                    SowID: sowCreateModel.SowID,
+                    Description: sowCreateModel.Description,
+                    SNo: item.SNo,
+                    Salutation: item.Salutation,
+                    ConsultantName: item.ConsultantName,
+                    Designation: item.Designation,
+                    StartDate: sowCreateModel.StartDate.split('/').reverse().join('-'),
+                    EndDate: sowCreateModel.EndDate.split('/').reverse().join('-'),
+                    Rate: (sowCreateModel.Currency === 'INR') ? `${item.Rate} ${sowCreateModel.Currency} GST ${item.PerDay}` : `${item.Rate} ${sowCreateModel.Currency} ${item.PerDay}`,
+                    Status: item.Status
+                }));
+            
+                const oData = {
+                    data: transformedData.map((item) => ({
+                        data: item,
+                        filters: {
+                            SNo : item.SNo 
+                        }
+                    }))
+                };
+            
+              await this.CommonUpdateCall(oData);
+              this.SOW_oDialog.close();
+            },            
 
-            async MsaE_onPressMerge() {
-                this.getBusyDialog();
-                var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oModel.BranchCode });
-                var msa = "MSA", nda = "NDA";
-                if (oModel.Type === "Recruitment") { msa = "R-MSA"; nda = "R-NDA"; }
-                await this._fetchCommonData("PDFCondition", "PDFNDAModel", { Type: nda });
-                await this._fetchCommonData("PDFCondition", "PDFMSAModel", { Type: msa });
-                var oPDFModel = this.getView().getModel("PDFData");
-                oPDFModel.setProperty("/AgreementDate", Formatter.formatDate(oModel.CreateMSADate));
-                oPDFModel.setProperty("/AgreementEndDate", Formatter.formatDate(oModel.MsaContractPeriodEndDate));
-                oPDFModel.setProperty("/ClientCompanyName", oModel.CompanyName);
-                oPDFModel.setProperty("/ClientCompanyAddress", oModel.Address);
-                oPDFModel.setProperty("/ClientName", oModel.Salutation + " " + oModel.CompanyHeadName);
-                oPDFModel.setProperty("/ClientRole", oModel.CompanyHeadPosition);
-                oPDFModel.setProperty("/AgreementDuration", oModel.ContractPeriod);
-                oPDFModel.setProperty("/PaymentTerms", oModel.PaymentTerms);
-                oPDFModel.setProperty("/PaymentPerc", oModel.RateCharge);
-                oPDFModel.setProperty("/FirstHalfPerc", oModel.PaymentAdvance);
-                oPDFModel.setProperty("/SecondHalfPerc", oModel.PaymentBalance);
-                oPDFModel.setProperty("/CandidateWorkingMonths", oModel.ReplacementMonth);
-                oPDFModel.setProperty("/LatePaymentThreshold", oModel.ReplacementRefund);
-                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-                var oPDFNDAModel = this.getView().getModel("PDFNDAModel").getData();
-                var oPDFMSAModel = this.getView().getModel("PDFMSAModel").getData();
-                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
-                    try {
-                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
-                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
-                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
-                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+            onOpenActionSheet: function (oEvent) {
+                var oButton = oEvent.getSource();
             
-                        const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
-                            this._convertBLOBToImage(logoBlob),
-                            this._convertBLOBToImage(signBlob),
-                            this._convertBLOBToImage(backgroundBlob),
-                            this._convertBLOBToImage(emailBlob)
-                        ]);
+                if (!this._oActionSheet) {
+                    this._oActionSheet = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.ActionsDialog", this);
+                    this.getView().addDependent(this._oActionSheet);
+                }
             
-                        oCompanyDetailsModel.companylogo64 = logoBase64;
-                        oCompanyDetailsModel.signature64 = signBase64;
-                        oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
-                        oCompanyDetailsModel.emailLogoBase64 = emailBase64;
-                    } catch (err) {
-                        this.closeBusyDialog();
-                        console.error("Image compression failed:", err);
-                    }
-                }
-                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
-                    if (typeof jsPDF !== "undefined" && typeof jsPDF._GenerateAgreementPDF === "function") {
-                        jsPDF._GenerateAgreementPDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFNDAModel, oPDFMSAModel);
-                    } else {
-                        this.closeBusyDialog();
-                        console.error("Error: jsPDF._GenerateAgreementPDF function not found.");
-                    }
-                }
-            },
+                this._oActionSheet.openBy(oButton);
+            }, 
 
             async MsaE_onPressMergeSow() {
                 this.getBusyDialog();

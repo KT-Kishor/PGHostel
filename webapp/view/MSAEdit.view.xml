@@ -157,27 +157,13 @@
 										<m:OverflowToolbar>
 											<m:Title text="{i18n>sowTitle}"/>
 											<m:ToolbarSpacer />
-											<m:Button text="{i18n>headerCompanyInvoice}" press="MsaE_GoToInvoice"/>
-											<m:ToolbarSeparator />
+											<!-- <m:ToolbarSeparator /> -->
 											<m:ComboBox id="MsaE_id_SowStatus" items="{SowStatusModel>/SowStatus}" width="10%" change="MsaE_onChangeSowStatus">
 												<core:Item key="{SowStatusModel>ID}" text="{SowStatusModel>Status}" />
 											</m:ComboBox>
 											<m:ToolbarSeparator />
-											<m:Button text="{i18n>addSOW}" press="MsaE_onPressCreateSow"/>
-											<m:ToolbarSeparator />
-											<m:Button text="{i18n>active}" id="MsaE_id_ActiveBtn" press="MsaE_onPressSOWActive"/>
-											<m:ToolbarSeparator />
-											<m:Button text="{i18n>inactive}" id="Msa_id_InactiveBtn" press="MsaE_onPressSOWActive"/>
-											<m:ToolbarSeparator />
-											<m:Button id="MsaE_id_RelesedBtn" press="MsaE_onPressRelesedSow" text="{i18n>ReleaseBtn}" />
-											<m:ToolbarSeparator />
-											<m:Button text="{i18n>ExpendBtn}" id="MsaE_id_ExpendBtn" press="MasE_onPressExpendSow"/>
-											<m:ToolbarSeparator />
-											<m:Button id="MsaE_id_SowEmailBut" text="{i18n>tileFooter}" press="MsaE_onPressSendEmailSOW"/>
-											<m:ToolbarSeparator />
-											<m:Button id="MsaE_id_SowMergeBut" text="{i18n>GeneratePDF}" press="MsaE_onPressMergeSow"/>
-											<m:ToolbarSeparator />
-											<m:Button icon="sap-icon://edit" id="MsaE_id_UpdateSow" press="MsaE_onPressUpdateSOW"/>
+											<m:Button icon="sap-icon://action" text="Actions" press="onOpenActionSheet"/>
+											
 										</m:OverflowToolbar>
 									</m:headerToolbar>
 									<m:columns>

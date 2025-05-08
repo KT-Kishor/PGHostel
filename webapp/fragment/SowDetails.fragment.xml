@@ -30,7 +30,7 @@
             <Input value="{sowCreateModel>/Description}"  maxLength="50" id="SOW_id_MsaDesc" placeholder="{i18n>companyInvoiceDescPlaceH}" liveChange="MsaE_ValidateCommonFields" valueStateText="{i18n>companyInvoiceDescPlaceH}"/>
             
             <Label text="{i18n>startDate}" class="oSowFragLabel" required="true"/>
-            <DatePicker  id="SOW_id_StartDate" value="{path:'sowCreateModel>/StartDate',formatter: '.Formatter.formatDate'}" visible="{VisibleUpdateModel>/VisibleUpdate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="MsaE_validateDate" valueStateText="{i18n>dateValueState}"/>
+            <DatePicker  id="SOW_id_StartDate" value="{sowCreateModel>/StartDate}" visible="{VisibleUpdateModel>/VisibleUpdate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="MsaE_validateDate" valueStateText="{i18n>dateValueState}"/>
            
              <Label text="{i18n>currency}" class="oSowFragLabel" required="true"/>
              <ComboBox items="{CurrencyModel>/}" selectedKey="1" value="{sowCreateModel>/Currency}">
@@ -39,7 +39,7 @@
             
             <Label text="{i18n>endDate}" class="oSowFragLabel" required="true"/>
             <DatePicker  id="SOW_id_EndDate" visible="{VisibleUpdateModel>/visibleCreate}" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="MsaE_validateDate" valueStateText="{i18n>dateValueState}"
-                value="{path:'sowCreateModel>/EndDate',formatter: '.Formatter.formatDate'}" />
+                value="{sowCreateModel>/EndDate}" />
         </f:content>
     </f:SimpleForm>
         <VBox class="sapUiSmallMargin sapUiSmallPadding">
