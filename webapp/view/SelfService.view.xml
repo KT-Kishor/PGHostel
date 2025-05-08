@@ -41,7 +41,7 @@
 					<actions>
 						<m:Button id="Submit" text="{i18n>submit}" press="onPressSubmit" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Accept" visible="{viewModel>/SelfService}" ></m:Button>
 						<m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Emphasized"></m:Button>
-						<m:Button text="{i18n>headerIdCard}" type="Emphasized" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>headerIdCard}" id="IC_id_Idcard" press="CC_onPressIdCardDetails" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" />
+												<m:Button text="{i18n>headerIdCard}" type="Emphasized" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>headerIdCard}" id="IC_id_Idcard" press="CC_onPressIdCardDetails" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" />
 						<m:Button text="{i18n>visit}"  press="onDownloadVisitCard" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Emphasized" tooltip="{i18n>visit}"/>
 						<m:Button text="{i18n>RelievingLetter}" type="Emphasized" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" />
 					</actions>
@@ -118,33 +118,35 @@
 										<m:DatePicker value="{path:'sEmployeeModel>/0/DateOfBirth', formatter:'.Formatter.formatDate'}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="SS_validateDate"
 									id="SS_id_Dob" editable="{viewModel>/isEditMode}" initialFocusedDateValue="{controller>/focusedDate}" valueStateText="{i18n>dateValueState}"
 									maxDate="{controller>/maxDate}" />
-										<m:Label text="{i18n>bloodGroup}"  id="SS_id_lb"/>
+										<m:Label text="{i18n>bloodGroup}" required="true"  id="SS_id_lb"/>
 										<m:Select  selectedKey="{sEmployeeModel>/0/BloodGroup}" items="{BloodGroup>/bloodgroup}" id="SS_id_BloodGroup"  editable="{viewModel>/isEditMode}">
 											<core:Item key="{BloodGroup>Code}" text="{BloodGroup>Code}" />
 										</m:Select>
-										<m:Label text="{i18n>companyMailid}" required="true"/>
+										<m:Label text="{i18n>companyMailid}" required="true" id="SS_id_lc"/>
 										<m:Input valueStateText="{i18n>emailValueState}" value="{sEmployeeModel>/0/CompanyEmailID}" liveChange="SS_validateEmail" editable="{viewModel>/AdminRole}" id="SS_id_Compmail"  placeholder="{i18n>companyMailid}" maxLength="100"/>
 										<m:Label text="{i18n>permanentAddress}" required="true" id="SS_id_lpa"/>
 										<m:TextArea value="{sEmployeeModel>/0/PermanentAddress}" editable="{viewModel>/isEditMode}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}"/>
 										<m:Label text="{i18n>correspondenceAddress}" required="true" id="SS_id_lca"/>
 										<m:TextArea value="{sEmployeeModel>/0/CorrespondenceAddress}" editable="{viewModel>/isEditMode}" id="SS_id_CAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}"/>
-										<m:Label text="{i18n>baseLocation}" />
-										<m:Select items="{sBaseLocationModel>/}" id="SS_id_BaseL" showSecondaryValues="true" selectedKey="{sEmployeeModel>/0/BaseLocation}" editable="{viewModel>/AdminRole}">
+										<m:Label text="{i18n>baseLocation}" required="true" id="SS_id_lbase" />
+										<m:Select items="{sBaseLocationModel>/}" id="SS_id_BaseL" showSecondaryValues="true" selectedKey="{sEmployeeModel>/0/BaseLocation}" editable="{viewModel>/AdminRole}" change="SS_onBaseLocationChange">
 											<core:ListItem key="{sBaseLocationModel>city}" text="{sBaseLocationModel>city}" additionalText="{sBaseLocationModel>branchCode}" />
 										</m:Select>
-										<m:Label text="{i18n>designation}"/>
+										<m:Label text="{i18n>branchCode}"  />
+										<m:Input value="{sEmployeeModel>/0/BranchCode}" editable="false"/>
+										<m:Label text="{i18n>designation}" required="true" id="SS_id_lds"/>
 										<m:Select items="{sDesignationModel>/}" id="SS_id_Desi" showSecondaryValues="true" selectedKey="{sEmployeeModel>/0/Designation}" editable="{viewModel>/AdminRole}">
 											<core:ListItem key="{sDesignationModel>designationName}" text="{sDesignationModel>designationName}" additionalText="{sDesignationModel>department}" />
 										</m:Select>
-										<m:Label text="{i18n>manager}"/>
+										<m:Label text="{i18n>manager}" id="SS_id_Lmg"/>
 										<m:ComboBox value="{sEmployeeModel>/0/ManagerName}"  showSecondaryValues= "true" id="SS_id_Manager" editable="{viewModel>/AdminRole}" items="{EmployeeModel>/}" filterSecondaryValues="true" change="onManagerChange">
 											<core:ListItem key="{EmployeeModel>EmployeeID}" text="{EmployeeModel>EmployeeName}" additionalText="{EmployeeModel>EmployeeID}"/>
 										</m:ComboBox>
 										<m:Label text="{i18n>mobileNo}" required="true" id="SS_id_Lmo"/>
 										<m:Input value="{sEmployeeModel>/0/MobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="SS_validateMobileNo" valueStateText="{i18n>mobileNoValueState}"/>
-										<m:Label text="{i18n>role}"/>
+										<m:Label text="{i18n>role}" id="SS_id_lr"/>
 										<m:Input value="{sEmployeeModel>/0/Role}" editable="{viewModel>/AdminRole}" maxLength="10" id="SS_id_RoleEmpSele" placeholder="{i18n>mobileNo}"/>
-										<m:Label text="{i18n>employeeStatus}" />
+										<m:Label text="{i18n>employeeStatus}" id="SS_id_les"/>
 										<m:Select change="SS_onStatusChange" id="SS_id_StatusSelf" editable="{viewModel>/AdminRole}" selectedKey="{sEmployeeModel>/0/EmployeeStatus}" items="{StatusEmp>/}">
 										<core:Item key="{StatusEmp>Value}" text="{StatusEmp>Value}"/>
 										</m:Select>
@@ -172,7 +174,7 @@
 												width="100%">
 															<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 														</m:Select>
-														<m:Label text="{i18n>name}" required="true"  />
+														<m:Label text="{i18n>name}" required="true" id="SS_id_lName" />
 														<m:Input  value="{sEmployeeModel>/0/EmergencyContactPerson1Name}"  editable="{viewModel>/isEditMode}" liveChange="SS_validateName" id="SS_id_EmeNameF" placeholder="{i18n>placeName}" maxLength="50" valueStateText="{i18n>commonNameValueState}"/>
 														<m:Label text="{i18n>realtion}"  id="SS_id_Rf"/>
 														<m:Select  selectedKey="{sEmployeeModel>/0/EmergencyContactPerson1Realtion}" items="{RelationModel>/relation}" id="SS_idRelF"  editable="{viewModel>/isEditMode}">
@@ -200,9 +202,9 @@
 												width="100%">
 															<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 														</m:Select>
-														<m:Label text="{i18n>name}" required="true" />
+														<m:Label text="{i18n>name}" required="true" id="SS_id_lN" />
 														<m:Input value="{sEmployeeModel>/0/EmergencyContactPerson2Name}"  editable="{viewModel>/isEditMode}" liveChange="SS_validateName" id="SS_id_NameS" placeholder="{i18n>placeName}" maxLength="50" valueStateText="{i18n>commonNameValueState}"/>
-														<m:Label text="{i18n>realtion}"  id="SS_id_Rs"/>
+														<m:Label text="{i18n>realtion}" />
 														<m:Select  selectedKey="{sEmployeeModel>/0/EmergencyContactPerson2Realtion}" items="{RelationModel>/relation}" id="SS_idRelS"  editable="{viewModel>/isEditMode}">
 															<core:Item key="{RelationModel>Relationship}" text="{RelationModel>Relationship}" />
 														</m:Select>

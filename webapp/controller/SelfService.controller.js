@@ -25,15 +25,23 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                 oView.setModel(viewModel, "viewModel");
                 this.ViewModel = this.getView().getModel("viewModel");
                 const loginModel = this.getOwnerComponent().getModel("LoginModel");
+                var aIds= ["SS_id_ldob", "SS_id_lb", "SS_id_lc", "SS_id_lpa", "SS_id_lca","SS_id_lds", "SS_id_Lmg", "SS_id_Lmo", "SS_id_lr", "SS_id_les","SS_id_lbase","SS_id_Pf","SS_id_lName","SS_id_Rf","SS_id_Mf","SS_id_Af","SS_id_Ps","SS_idEmeSalS","SS_id_lN","SS_id_Ms","SS_id_As",
+                    "SS_id_An","SS_id_Ah","SS_id_Bn","SS_id_Bb","SS_id_Ifc","SS_id_Ba","SS_id_LPan"];
                 this.sPath = oEvent.getParameter('arguments').sPath;
                 if (this.sPath === "SelfService") {
                     this.ViewModel.setProperty("/SetProfile", true);
                     if (loginModel) this.EmployeeID = loginModel.getProperty("/EmployeeID");
+                    aIds.forEach(function (sId) {
+                        this.getView().byId(sId).setRequired(true);
+                      }.bind(this));
                 } else {
                     this.EmployeeID = this.sPath;                   
                     if(loginModel.getProperty("/Role") === "Admin"){
                         this.ViewModel.setProperty("/RelievingLetter",true);
                     }
+                    aIds.forEach(function (sId) {
+                        this.getView().byId(sId).setRequired(false);
+                      }.bind(this));
                 }   
                 this.i18nModel = oView.getModel("i18n").getResourceBundle();
                 loginModel.setProperty("/HeaderName", "My Details");
@@ -74,7 +82,7 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                 this.closeBusyDialog();
             }
         },
-
+    
         onSectionChange: async function (oEvent) {
             const sectionTitle = oEvent.getParameter("section").getTitle();
             switch (sectionTitle) {
@@ -228,7 +236,7 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                 }
             } else {
                 this.getView().getModel("viewModel").setProperty("/isEditMode", true);
-                if (Role === "Admin") {
+                if (Role === "Admin" && this.sPath !== "SelfService" ) {
                     this.getView().getModel("viewModel").setProperty("/AdminRole", true);
                 } else {
                     this.getView().getModel("viewModel").setProperty("/AdminRole", false);
@@ -256,34 +264,37 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
             let isValid = true;
             try {
                 if (ID !== "Submit") {
-                    // Validate based on section
-                    if (ID === "BasicDetailsBtn") {
-                        isValid =
-                            utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
-                            utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
-                            utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
-                            utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
-                            utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
-                            utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
-                            utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
-                            utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
-                            utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
-                            utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
-                            utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID");
-                    } else if (ID === "DocumentBtn") {
-                        isValid =
-                            utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
-                            utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID") &&
-                            utils._LCvalidateMandatoryField(oView.byId("SS_id_BankName"), "ID") &&
-                            utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") &&
-                            utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") &&
-                            utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") &&
-                            utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID");
+                        if(this.sPath === 'SelfService'){
+                        // Validate based on section
+                        if (ID === "BasicDetailsBtn") {
+                            isValid =
+                                utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
+                                utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
+                                utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
+                                utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
+                                utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
+                                utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
+                                utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
+                                utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
+                                utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
+                                utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
+                                utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID");
+                        } else if (ID === "DocumentBtn") {
+                            isValid =
+                                utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
+                                utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID") &&
+                                utils._LCvalidateMandatoryField(oView.byId("SS_id_BankName"), "ID") &&
+                                utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") &&
+                                utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") &&
+                                utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") &&
+                                utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID");
+                        }
+                        if (!isValid) {
+                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                            return;
+                        }
                     }
-                    if (!isValid) {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        return;
-                    }
+
                     // Optional Fields Validation
                     const aadhar = oView.byId("SS_idAdhar").getValue().trim();
                     const passport = oView.byId("SS_id_Passport").getValue().trim();
@@ -291,7 +302,11 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                     const optionalValid =
                         (aadhar === "" || utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID")) &&
                         (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
-                        (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID"));
+                        (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) && 
+                        (oDataModel.MobileNo == null || oDataModel.MobileNo.trim() === "" || utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID")) &&
+                        (oDataModel.AccountNo == null || oDataModel.AccountNo.trim() === "" || utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID")) &&
+                        (oDataModel.IFSCCode == null || oDataModel.IFSCCode.trim() === "" || utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID")) &&
+                        (oDataModel.PANCard == null || oDataModel.PANCard.trim() === "" || utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID"))
                     if (!optionalValid) {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
@@ -1369,7 +1384,18 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
             } else {
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             }
-        },    
+        }, 
+        SS_onBaseLocationChange: function (oEvent) {
+            var sSelectedKey = oEvent.getParameter("selectedItem").getKey(); // Get selected base location
+            var oModel = this.getView().getModel("sBaseLocationModel"); 
+            var aLocations = oModel.getData();     
+            var oSelectedLocation = aLocations.find(function (location) {
+                return location.city === sSelectedKey;
+            });
+            if (oSelectedLocation) {
+                this.getView().getModel("sEmployeeModel").setProperty("/0/BranchCode", oSelectedLocation.branchCode);
+            }
+        } , 
 
         //  download Visiting Card
         onDownloadVisitCard: function () {
@@ -1411,7 +1437,6 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
         FCR_onCloseDialog: function () {
             this.SSRTE_oDialog.close();
         },
-
         CC_onPressIdCardDetails: function () {
             var oView = this.getView();
             var employeeDetails = oView.getModel("sEmployeeModel").getData()[0];
@@ -1485,7 +1510,7 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        CC_ValidateCommonFields_ValidateEmail: function (oEvent) {
+        CC_ValidateEmail: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
 
