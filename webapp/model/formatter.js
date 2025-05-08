@@ -204,8 +204,8 @@ sap.ui.define([], function () {
             }
             return ""; // fallback
         },
-        statusState: function (sStatus) {
-            if (sStatus === "Active") {
+        statusState: function (Status) {
+            if (Status === "Active") {
                 return "Success";
             } else {
                 return "Error";

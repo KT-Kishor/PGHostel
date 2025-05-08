@@ -3,9 +3,10 @@ sap.ui.define(
     "./BaseController",
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast"
+    "sap/m/MessageToast",
+    "sap/m/MessageBox"
   ],
-  function (BaseController, utils, JSONModel, MessageToast) {
+  function (BaseController, utils, JSONModel, MessageToast, MessageBox) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.AssignTask",
@@ -256,7 +257,7 @@ sap.ui.define(
           const aFilteredIDs = aSelectedIDs.filter(id => !existingEmployeeIDs.includes(id.trim()));
 
           if (aFilteredIDs.length === 0) {
-            MessageToast.show(this.i18nModel.getText("smgEmptask"));
+            MessageBox.error(this.i18nModel.getText("smgEmptask"));
             this.oTaskDialog.close();
             return;
           }

@@ -57,15 +57,12 @@
                 <Title text="{i18n>tileAssignmentFooter}({= ${AssignModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
-					    <Button  text="Assign Employee" press="AT_onAssignEmpTask"   id="AT_id_Assign" type="Accept"/>
-						<Button    press="AT_onEditTask" text="{i18n>edit}" id="AT_id_EditTask"  />
+					    <Button  text="Assign Employee" press="AT_onAssignEmpTask"   id="AT_id_Assign" type="Accept" tooltip="{i18n>assigntask}"/>
+						<Button    press="AT_onEditTask" text="{i18n>edit}" id="AT_id_EditTask" tooltip="{i18n>editassigntask}" />
 
                    </OverflowToolbar>
             </headerToolbar>
 				<columns>
-					<Column demandPopin="true">
-						<Text text="{i18n>assignmentName}"/>
-					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>employeeID}" />
 					</Column>
@@ -86,7 +83,6 @@
 				<items>
 					<ColumnListItem>
 						<cells>
-							<Text text="{AssignModel>TaskName}"/>
 							<Text text="{AssignModel>EmployeeID}"/>
 							<Text text="{AssignModel>EmployeeName}"/>
 							<Text text="{AssignModel>StartDate}"/>

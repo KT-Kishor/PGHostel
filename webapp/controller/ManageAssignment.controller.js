@@ -18,7 +18,7 @@ sap.ui.define(
           if (!LoginFunction) return;
           this.getBusyDialog();
           this._fetchCommonData("NewTask", "TaskModel", {});
-          this.CommonReadcall()
+          this.CommonReadcall();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("LoginModel").setProperty("/HeaderName", "Create New Assignment");
           this._FragmentDatePickersReadOnly(["NAF_id_StartDate", "NAF_id_EndDate", "MA_id_StartDate", "MA_id_EndDate"])
