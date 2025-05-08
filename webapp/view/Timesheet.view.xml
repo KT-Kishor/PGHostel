@@ -1,106 +1,118 @@
 <mvc:View
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"
-	xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
     controllerName="sap.kt.com.minihrsolution.controller.Timesheet"
-	xmlns:fb="sap.ui.comp.filterbar"	
+    xmlns:fb="sap.ui.comp.filterbar"    
     displayBlock="true"
     xmlns:u="sap.ui.unified">
-	<Page id="TS_id_Page" >
-		<headerContent>
-			        <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
-
-		</headerContent>
-		<content>
-		  <u:CalendarDateInterval
+    <Page id="TS_id_Page" >
+        <headerContent>
+            <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+        </headerContent>
+        <content>
+            <u:CalendarDateInterval
  id="TS_id_calendarTimesheet"
  width="100%"
- startDateChange="onCalendarSelect"/>
-			<fb:FilterBar  class="sapUiTinyMargin" id="TS_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
-				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Month" label="{i18n>month}" groupName="Group1" visibleInFilterBar="true">
-					<fb:control>
-						<ComboBox   showClearIcon="true" items="" >
-							<core:Item key="" text=""/>
-						</ComboBox>
-					</fb:control>
-				</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Year" label="{i18n>year}" groupName="Group1" visibleInFilterBar="true">
-						<fb:control>
-                    <DatePicker
-                    id="TS_id_Year"
-                    valueFormat="yyyy" 
-                    displayFormat="yyyy"
-                    change="onDateChange" />						
-					</fb:control>
-						</fb:FilterGroupItem>
-				</fb:filterGroupItems>
-			</fb:FilterBar>
-			<MessageStrip
+ legend="calendarLegend"
+ startDate="{viewModel>/calendarStartDate}" 
+ select="onCalendarDateSelect" 
+ startDateChange="onInitializeCalendarLegend"
+ days="7" 
+ showDayNamesLine="true" 
+ intervalSelection="false" />
+            <fb:FilterBar  class="sapUiTinyMargin" id="TS_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" showFilterConfiguration="false" afterVariantLoad=".onAfterVariantLoad" >
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem name="Month" label="{i18n>month}" groupName="Group1" visibleInFilterBar="true">
+    <fb:control>
+        <ComboBox id="monthComboBox"
+          showClearIcon="true"
+          selectionChange=".onMonthChange">
+            <core:Item key="01" text="January" />
+            <core:Item key="02" text="February" />
+            <core:Item key="03" text="March" />
+            <core:Item key="04" text="April" />
+            <core:Item key="05" text="May" />
+            <core:Item key="06" text="June" />
+            <core:Item key="07" text="July" />
+            <core:Item key="08" text="August" />
+            <core:Item key="09" text="September" />
+            <core:Item key="10" text="October" />
+            <core:Item key="11" text="November" />
+            <core:Item key="12" text="December" />
+        </ComboBox>
+    </fb:control>
+</fb:FilterGroupItem>
+
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+            <MessageStrip
                 text="{i18n>notification}"
                 type="Information"
                 showIcon="true"
                 class="sapUiResponsiveLayout"/>
-			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"   items="" growing="true"  growingThreshold="50"  alternateRowColors="true">
-			 <headerToolbar>
-                <OverflowToolbar >
-                    <Title text="{i18n>tileTimesheetFooter}"/>
-                    <ToolbarSpacer/>
-                    <Button text="{i18n>fillTimesheet}" press="TS_onFillDetails" type="Accept" icon="sap-icon://create-entry-time"/>
-                </OverflowToolbar>
-            </headerToolbar>
-				<columns>
-					<Column demandPopin="true">
-						<Text text="{i18n>taskName}"/>
-					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>date}" />
-					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>day}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>hoursWorked}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>manager}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>status}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>employeeComment}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>managerComment}" />
-					</Column>
-				</columns>
-				<items>
-					<ColumnListItem >
-						<cells>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-						</cells>
-					</ColumnListItem>
-				</items>
-			</Table>
-		</content>
-		<footer>
-			<Bar>
-				 <contentLeft>
+                <Table
+                class="sapUiTinyMargin"
+                growing="true"
+                growingScrollToLoad="true"
+                width="auto"
+                mode="SingleSelectLeft"
+                alternateRowColors="true"
+                items="{FilteredTimesheetModel>/}"
+                growingThreshold="50">
+            
+   
+
+                
+                <headerToolbar>
+                  <OverflowToolbar>
+                    <Title text="{i18n>tileTimesheetFooter}" />
+                    <ToolbarSpacer />
+                    <Button text="{i18n>fillTimesheet}" press="TS_onFillDetails" type="Accept" icon="sap-icon://create-entry-time" />
+                  </OverflowToolbar>
+                </headerToolbar>
+              
+                <columns>
+                  <Column demandPopin="true"><Text text="{i18n>taskName}" /></Column>
+                  <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>date}" /></Column>
+                  <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>day}" /></Column>
+                  <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>hoursWorked}" /></Column>
+                  <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>manager}" /></Column>
+                  <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>status}" /></Column>
+                  <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>employeeComment}" /></Column>
+                  <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>managerComment}" /></Column>
+                </columns>
+              
+                <items>
+                    <ColumnListItem type="Navigation" press="TS_onPressData" >
+                      <cells>
+                        <Text text="{FilteredTimesheetModel>TaskName}" />
+                        <Text text="{FilteredTimesheetModel>Date}" />
+                        <Text text="{FilteredTimesheetModel>Day}" />
+                        <Text text="{FilteredTimesheetModel>HoursWorked}" />
+                        <Text text="{EmployeeModel>/0/ManagerName}" />
+                        <!-- <Text text="{FilteredTimesheetModel>Status}" /> -->
+                            <ObjectStatus text="{FilteredTimesheetModel>Status}" inverted="true"
+                                state="{path:'FilteredTimesheetModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
+                        <Text text="{FilteredTimesheetModel>EmployeeComments}" />
+                        <Text text="{FilteredTimesheetModel>ManagerComments}" />
+                      </cells>
+                    </ColumnListItem>
+                  </items>
+                
+            </Table>
+              
+        </content>
+        <footer>
+            <Bar>
+                <contentLeft>
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
-				<contentRight>
-					<Button text="{i18n>submit}" press="TS_onSubmitTimesheet" type="Success"  id="TS_id_Submited"/>
-                <Button text="{i18n>delete}" press="TS_onDeleteTimesheet" type="Negative"  id="TS_id_Delete"/>
-				</contentRight>
-			</Bar>
-		</footer>
-	</Page>
+                <contentRight>
+                    <Button text="{i18n>submit}" press="TS_onSubmitTimesheet" type="Success"  id="TS_id_Submited"/>
+                    <Button text="{i18n>delete}" press="TS_onDeleteTimesheet" type="Negative"  id="TS_id_Delete"/>
+                </contentRight>
+            </Bar>
+        </footer>
+    </Page>
 </mvc:View>

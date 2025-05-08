@@ -2,13 +2,13 @@
     <SelectDialog
         id="TSF_id_Dialog"
         title="{i18n>selectAss}"
-        items="{oAssignmentModel>/}"
+        items="{AssignModel>/}"
         confirm=".onValueHelpDialogClose"
         cancel=".onValueHelpCancel">
         <StandardListItem
             iconDensityAware="false"
             iconInset="false"
-            title="{oAssignmentModel>TaskName}"
-            description="{oAssignmentModel>TaskID}" />
+            title="{AssignModel>TaskName}"
+            description="{AssignModel>TaskID}" />
     </SelectDialog>
 </core:FragmentDefinition>

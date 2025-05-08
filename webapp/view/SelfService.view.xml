@@ -142,9 +142,9 @@
 										<m:Label text="{i18n>mobileNo}" required="true" id="SS_id_Lmo"/>
 										<m:Input value="{sEmployeeModel>/0/MobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="SS_validateMobileNo" valueStateText="{i18n>mobileNoValueState}"/>
 										<m:Label text="{i18n>role}"/>
-										<m:Input value="{sEmployeeModel>/0/Role}" editable="false" maxLength="10" id="SS_id_RoleEmpSele" placeholder="{i18n>mobileNo}"/>
+										<m:Input value="{sEmployeeModel>/0/Role}" editable="{viewModel>/AdminRole}" maxLength="10" id="SS_id_RoleEmpSele" placeholder="{i18n>mobileNo}"/>
 										<m:Label text="{i18n>employeeStatus}" />
-										<m:Select change="SS_onStatusChange" id="SS_id_StatusSelf" editable="false" selectedKey="{sEmployeeModel>/0/EmployeeStatus}" items="{StatusEmp>/}">
+										<m:Select change="SS_onStatusChange" id="SS_id_StatusSelf" editable="{viewModel>/AdminRole}" selectedKey="{sEmployeeModel>/0/EmployeeStatus}" items="{StatusEmp>/}">
 										<core:Item key="{StatusEmp>Value}" text="{StatusEmp>Value}"/>
 										</m:Select>
 									</f:content>
