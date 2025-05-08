@@ -41,6 +41,7 @@
 					<actions>
 						<m:Button id="Submit" text="{i18n>submit}" press="onPressSubmit" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Accept" visible="{viewModel>/SelfService}" ></m:Button>
 						<m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Emphasized"></m:Button>
+						<m:Button text="{i18n>headerIdCard}" type="Emphasized" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>headerIdCard}" id="IC_id_Idcard" press="CC_onPressIdCardDetails" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" />
 						<m:Button text="{i18n>visit}"  press="onDownloadVisitCard" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Emphasized" tooltip="{i18n>visit}"/>
 						<m:Button text="{i18n>RelievingLetter}" type="Emphasized" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" />
 					</actions>

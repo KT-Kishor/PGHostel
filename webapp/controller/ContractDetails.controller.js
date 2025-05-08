@@ -48,7 +48,7 @@ sap.ui.define([
                             newContractNo = "KT-C001";
                         }
 
-                        oView.byId('CD_id_ConNo').setValue(newContractNo);
+                        oView.byId('CD_id_ContractNo').setValue(newContractNo);
 
                         const oData = {
                             ContractNo: newContractNo,
@@ -73,7 +73,7 @@ sap.ui.define([
                             Status: "Submitted",
                             Salutation: "Mr.",
                             Salutation2: "Mr.",
-                            contractLocation: ""
+                            contractLocation: "Agra"
                         };
 
                         const oModel = new JSONModel(oData);
@@ -81,6 +81,8 @@ sap.ui.define([
 
                         oView.byId("C_id_PageCreate").setVisible(true);
                         oView.byId("CUF_id_pageTrainee").setVisible(false);
+
+                        this.getView().byId("CD_id_Submit").setEnabled(false);
 
                         this.closeBusyDialog(); //  Close BusyDialog
                     } catch (error) {
@@ -213,7 +215,7 @@ sap.ui.define([
                         this.getRouter().navTo("RouteContract");
                     }.bind(this)
                 );
-                this.byId("CD_id_Secstep").getParent().setShowNextButton(true);
+                this.byId("idWizardStep").getParent().setShowNextButton(true);
             },
             CU_onBack: function () {
                 var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
@@ -236,24 +238,44 @@ sap.ui.define([
             },
             //Step validation
             validateStep: function () {
-                var step1Validated = this.byId("CD_id_AgreeDate").getValue() && this.byId("CD_id_CName").getValue() &&
-                    this.byId("CD_id_Address").getValue() && this.byId("CD_id_Email").getValue() &&
-                    this.byId("CD_id_Role").getValue() && this.byId("CD_id_Amount").getValue() &&
-                    utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") && utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") && utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") && utils._LCvalidateName(this.byId("CD_id_Role"), "ID") &&
-                    utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID");
-
-                var step2Validated = this.byId("CD_id_HiringContact").getValue() && this.byId("CD_id_Datestart").getValue() && this.byId("CD_id_DateEnd").getValue() &&
-                    utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") && utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") && utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") && utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") && utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID")
-
-                var isStep1Validated = step1Validated ? true : false;
-                var isStep2Validated = step2Validated ? true : false;
-
-                // Update validation status for each step
-                this.byId("CD_id_Wizard").getSteps()[0].setValidated(isStep1Validated);
-                this.byId("CD_id_Wizard").getSteps()[1].setValidated(isStep2Validated);
+                var oModel = this.getView().getModel("ContractModelWizart").getData();
+                oModel.AgreeDate = this.byId("CD_id_AgreeDate").getValue();
+                oModel.CName = this.byId("CD_id_CName").getValue();
+                oModel.Address = this.byId("CD_id_Address").getValue();
+                oModel.Email = this.byId("CD_id_Email").getValue();
+                oModel.Role = this.byId("CD_id_Role").getValue();
+                oModel.Amount = this.byId("CD_id_Amount").getValue();
+                oModel.HiringContact = this.byId("CD_id_HiringContact").getValue();
+                oModel.Datestart = this.byId("CD_id_Datestart").getValue();
+                oModel.DateEnd = this.byId("CD_id_DateEnd").getValue();
+                oModel.EndClientHirer = this.byId("CD_id_EndClientHirer").getValue();
+            
+                const bAllFieldsFilled = oModel.AgreeDate && oModel.CName && oModel.Address && oModel.Email &&
+                    oModel.Role && oModel.Amount && oModel.HiringContact &&
+                    oModel.Datestart && oModel.DateEnd && oModel.EndClientHirer;
+            
+                if (bAllFieldsFilled) {
+                    // Run all validations
+                    let bValid =
+                        utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
+                        utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_Role"), "ID") &&
+                        utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID");
+            
+                    // Set wizard step validation
+                    this.byId("CD_id_Wizard").getSteps()[0].setValidated(bValid);
+                } else {
+                    this.byId("CD_id_Wizard").getSteps()[0].setValidated(false);
+                    this.byId("CD_id_Firststep").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
+                }
             },
-
+            
             //radio button select function
             RadioButtonSelect: function (oEvent) {
                 var oModel = this.getView().getModel("ContractModelWizart");
@@ -261,105 +283,116 @@ sap.ui.define([
                 oModel.setProperty("/Rate", this.RadioButton);
             },
 
+            //third step validation function
+            CD_StepThree: function () {
+                this.getView().byId("CD_id_Submit").setEnabled(true);
+                this.byId("idWizardStep").getParent().setShowNextButton(false);
+            },
+
             CD_onSubmit: async function () {
                 try {
-                    var allStepsValidated = this.byId("CD_id_Wizard").getSteps().every(function (step) {
-                        return step.getValidated();
-                    });
-
-                    if (!allStepsValidated) {
+                    if (
+                        utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
+                        utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_Role"), "ID") &&
+                        utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID")
+                    ) {
+                        var formattedText;
+                        switch (this.RadioButton) {
+                            case "Hour":
+                                formattedText = "Hr";
+                                break;
+                            case "Daily":
+                                formattedText = "Day";
+                                break;
+                            case "Monthly":
+                                formattedText = "Month";
+                                break;
+                            default:
+                                formattedText = "Hr";
+                        }
+            
+                        var oModel = this.getView().getModel("ContractModelWizart");
+                        var selectedCurrency = this.byId("CD_id_Currency").getSelectedKey();
+                        var branchCode = this.getView().byId("CD_id_ConLocation").getSelectedItem().getAdditionalText();
+            
+                        var data = {
+                            "ContractNo": oModel.oData.ContractNo,
+                            "ConsultantNameSalutation": oModel.oData.Salutation,
+                            "ConsultantName": oModel.oData.ConsultantName,
+                            "ConsultantAddress": oModel.oData.ConsultantAddress,
+                            "EndClient": oModel.oData.EndClientHirer,
+                            "ConsultingService": oModel.oData.Role,
+                            "LocationService": oModel.oData.Location,
+                            "ContractStatus": oModel.oData.AssignmentStatus,
+                            "AssignmentStartDate": oModel.oData.StartDate.split("/").reverse().join("-"),
+                            "AssignmentEndDate": oModel.oData.EndDate.split("/").reverse().join("-"),
+                            "ConsultantRate": oModel.oData.Amount + " " + selectedCurrency + " Per " + formattedText + " Including all tax",
+                            "PaymentTerms": oModel.oData.PaymentTerms,
+                            "ClientReportContactSalutation": oModel.oData.Salutation2,
+                            "ClientReportContact": oModel.oData.ClientReportContact,
+                            "SpecificInsuranceRequirement": oModel.oData.InsuranceRequirement,
+                            "ContractPeriod": oModel.oData.WarrantyDate,
+                            "ExpensesClaim": oModel.oData.AdditionalRates,
+                            "Status": "Submitted",
+                            "AgreementDate": oModel.oData.AgreementDate.split("/").reverse().join("-"),
+                            "ContarctEmail": oModel.oData.ContarctEmail,
+                            "ContractLocation": oModel.oData.BaseLocation !== "" ? oModel.oData.BaseLocation : this.getView().byId("CD_id_ConLocation"),
+                            "AgreementNo": String(1).padStart(2, '0'),
+                            "BranchCode": branchCode
+                        };
+            
+                        this.getBusyDialog(); // Show busy dialog
+            
+                        var response = await this.ajaxCreateWithJQuery("Contract", { data: data });
+            
+                        if (response.success === true) {
+                            this.closeBusyDialog(); // Close busy dialog
+            
+                            var oDialog = new sap.m.Dialog({
+                                title: this.i18nModel.getText("success"),
+                                type: sap.m.DialogType.Message,
+                                state: sap.ui.core.ValueState.Success,
+                                content: new sap.m.Text({ text: this.i18nModel.getText("contractSuccess") }),
+                                beginButton: new sap.m.Button({
+                                    text: "OK",
+                                    type: "Accept",
+                                    press: function () {
+                                        oDialog.close();
+                                        this.getRouter().navTo("RouteContract");
+                                    }.bind(this)
+                                }),
+                                endButton: new sap.m.Button({
+                                    text: "Generate PDF",
+                                    type: "Reject",
+                                    press: function () {
+                                        oDialog.close();
+                                        this.contractPDFgenerate(data);
+                                        this.getRouter().navTo("RouteContract");
+                                    }.bind(this)
+                                }),
+                                afterClose: function () {
+                                    oDialog.destroy();
+                                }
+                            });
+            
+                            oDialog.open();
+                        }
+                    } else {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        return;
                     }
-
-                    var formattedText;
-                    switch (this.RadioButton) {
-                        case "Hour":
-                            formattedText = "Hr";
-                            break;
-                        case "Daily":
-                            formattedText = "Day";
-                            break;
-                        case "Monthly":
-                            formattedText = "Month";
-                            break;
-                        default:
-                            formattedText = "Hr";
-                    }
-
-                    var oModel = this.getView().getModel("ContractModelWizart");
-                    var selectedCurrency = this.byId("CD_id_Currency").getSelectedKey();
-                    var branchCode = this.getView().byId("CD_id_ConLocation").getSelectedItem().getAdditionalText();
-
-                    var data = {
-                        "ContractNo": oModel.oData.ContractNo,
-                        "ConsultantNameSalutation": oModel.oData.Salutation,
-                        "ConsultantName": oModel.oData.ConsultantName,
-                        "ConsultantAddress": oModel.oData.ConsultantAddress,
-                        "EndClient": oModel.oData.EndClientHirer,
-                        "ConsultingService": oModel.oData.Role,
-                        "LocationService": oModel.oData.Location,
-                        "ContractStatus": oModel.oData.AssignmentStatus,
-                        "AssignmentStartDate": oModel.oData.StartDate.split("/").reverse().join("-"),
-                        "AssignmentEndDate": oModel.oData.EndDate.split("/").reverse().join("-"),
-                        "ConsultantRate": oModel.oData.Amount + " " + selectedCurrency + " Per " + formattedText + " Including all tax",
-                        "PaymentTerms": oModel.oData.PaymentTerms,
-                        "ClientReportContactSalutation": oModel.oData.Salutation2,
-                        "ClientReportContact": oModel.oData.ClientReportContact,
-                        "SpecificInsuranceRequirement": oModel.oData.InsuranceRequirement,
-                        "ContractPeriod": oModel.oData.WarrantyDate,
-                        "ExpensesClaim": oModel.oData.AdditionalRates,
-                        "Status": "Submitted",
-                        "AgreementDate": oModel.oData.AgreementDate.split("/").reverse().join("-"),
-                        "ContarctEmail": oModel.oData.ContarctEmail,
-                        "ContractLocation": oModel.oData.BaseLocation !== "" ? oModel.oData.BaseLocation : this.getView().byId("CD_id_ConLocation"),
-                        "AgreementNo": String(1).padStart(2, '0'),
-                        "BranchCode": branchCode
-                    };
-
-                    this.getBusyDialog(); // Show busy dialog
-
-                    var response = await this.ajaxCreateWithJQuery("Contract", { data: data });
-
-                    if (response.success === true) {
-                        this.closeBusyDialog(); // Close busy dialog
-
-                        var oDialog = new sap.m.Dialog({
-                            title: this.i18nModel.getText("success"),
-                            type: sap.m.DialogType.Message,
-                            state: sap.ui.core.ValueState.Success,
-                            content: new sap.m.Text({ text: this.i18nModel.getText("contractSuccess") }),
-                            beginButton: new sap.m.Button({
-                                text: "OK",
-                                type: "Accept",
-                                press: function () {
-                                    oDialog.close();
-                                    this.getRouter().navTo("RouteContract");
-                                }.bind(this)
-                            }),
-                            endButton: new sap.m.Button({
-                                text: "Generate PDF",
-                                type: "Reject",
-                                press: function () {
-                                    oDialog.close();
-                                    this.contractPDFgenerate(data);
-                                    this.getRouter().navTo("RouteContract");
-                                }.bind(this)
-                            }),
-                            afterClose: function () {
-                                oDialog.destroy();
-                            }
-                        });
-
-                        oDialog.open();
-                    }
-
                 } catch (error) {
                     this.closeBusyDialog(); // Close busy dialog
                     MessageToast.show(error.message || error.responseText);
                 }
             },
-
+            
             onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");
                 var isEditMode = oViewModel.getProperty("/isEditMode");
@@ -469,8 +502,7 @@ sap.ui.define([
                 };
 
                 const oldContractData = { ContractStatus: "Inactive" };
-                this.getBusyDialog(); // Show busy dialog
-
+               
                 // 1. Case: Renewed but previous not active
                 if (isRenewed && that.OldStatus !== "Active") {
                     oView.getModel("simpleForm").setProperty("/editable", false);
@@ -479,7 +511,7 @@ sap.ui.define([
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
                     this.closeBusyDialog();
-                    return sap.m.MessageToast.show(this.i18nModel.getText("contractStatusMessage"));
+                    return sap.m.MessageBox.error(this.i18nModel.getText("contractStatusMessage"));
                 }
 
                 // 2. Case: Renewed and previous was active
@@ -490,7 +522,7 @@ sap.ui.define([
 
                     if (today >= endDateCreate) {
                         delete jsonData.Comments;
-
+                        this.getBusyDialog(); // Show busy dialog
                         try {
                             const createResponse = await this.ajaxCreateWithJQuery("Contract", { data: jsonData });
                             if (createResponse.success) {
@@ -510,16 +542,18 @@ sap.ui.define([
                             }
                         } catch (error) {
                             this.closeBusyDialog();
-                            sap.m.MessageToast.show(this.i18nModel.getText("createNewContractFailed"));
+                            sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
                         }
 
                     } else {
                         oView.getModel("oFilteredContractModel").setProperty("/ContractStatus", this.ContractStatus);
-                        sap.m.MessageToast.show(this.i18nModel.getText("renewEndDateMess"));
+                        sap.m.MessageBox.error(this.i18nModel.getText("renewEndDateMess"));
                         this.closeBusyDialog();
+                        return;
                     }
                 }
                 try {
+                    this.getBusyDialog(); // Show busy dialog
                     const requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: AgreementNo }, data: jsonData };
                     await this.ajaxUpdateWithJQuery("Contract", requestData);
                     oView.getModel("simpleForm").setProperty("/editable", false);

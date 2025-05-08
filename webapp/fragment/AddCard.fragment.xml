@@ -1,0 +1,95 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified">
+	<Dialog title="{i18n>addCardDetails}">
+		<MessageStrip text="{i18n>imageMsg}" type="Warning" class="sapUiTinyMarginBottom" />
+		<f:SimpleForm
+		    editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="3"
+            labelSpanL="3"
+            labelSpanM="3"
+            labelSpanS="12"
+            adjustLabelSpan="false"
+            emptySpanXL="4"
+            emptySpanL="4"
+            emptySpanM="4"
+            emptySpanS="0"
+            columnsXL="1"
+            columnsL="1"
+            columnsM="1"
+            singleContainerFullSize="false">
+			<f:content>
+				<!-- Employee ID -->
+				<Label text="{i18n>employeeID}"  required="true" />
+				<ComboBox id="CC_id_EmployeeID" showSecondaryValues="true" value="{IdCardModel>/EmployeeID}" editable="{IdCardModel>/isEditable}" change=".onEmployeeIDChange">
+					<items>
+						<core:ListItem key="{IdCardModel>key}" text="{IdCardModel>key}"
+						additionalText="{IdCardModel>text}" />
+					</items>
+				</ComboBox>
+				<!-- Employee Name -->
+				<Label text="{i18n>employeeName}" required="true" />
+				<Input value="{IdCardModel>/EmployeeName}" liveChange="CC_ValidateEmployeeName" maxLength="50" valueStateText="{i18n>validEmpNameMsg}" id="CC_id_EmployeeName" editable="{IdCardModel>/isEditable}" />
+				<!-- Designation -->
+				<Label text="{i18n>designation}" required="true"/>
+				<Input value="{IdCardModel>/Designation}" liveChange="CC_ValidateCommonFields" maxLength="20" id="CC_id_Designation" valueStateText="{i18n>destinationValueState}"/>
+				<!-- Email -->
+				<Label text="{i18n>emailId}" required="true"/>
+				<Input value="{IdCardModel>/Email}" id="CC_id_Email" liveChange="CC_ValidateEmail" maxLength="50" valueStateText="{i18n>emailValueState}"/>
+				<!-- DOB -->
+				<Label text="{i18n>dateOfBirth}" required="true" />
+				<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"  value="{IdCardModel>/DOB}" id="CC_id_DateBirth" maxDate="{IdCardModel>/today}" initialFocusedDateValue="{IdCardModel>/minDOB}" change="CC_ValidateDate" valueStateText="{i18n>dateValueState}" />
+				<!-- MobileNo -->
+				<Label text="{i18n>mobileNo}" required="true"/>
+				<Input value="{IdCardModel>/MobileNo}" id="CC_id_Mobile" liveChange="CC_ValidateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}" />
+				<!-- BloodGroup -->
+				<Label text="{i18n>bloodGroup}" required="true" />
+				<ComboBox id="CC_id_bloodGroup"  items="{BloodGroup>/bloodgroup}" change="CC_ValidateCommonFields" valueStateText="{i18n>validBloodGroupMsg}" value="{IdCardModel>/BloodGroup}" >
+					<core:Item key="{BloodGroup>ID}" text="{BloodGroup>Code}" />
+				</ComboBox>
+				<!-- base Location -->
+				<Label text="{i18n>baseLocation}" required="true" />
+				 <Select items="{sBaseLocationModel>/}" id="CC_id_Location"  showSecondaryValues="true" selectedKey="{oFilteredContractModel>/BaseLocation}" >
+				<core:ListItem key="{sBaseLocationModel>city}" text="{sBaseLocationModel>city}" additionalText="{sBaseLocationModel>branchCode}" />
+				</Select>
+				<!-- File Uploader -->
+				<Label text="{i18n>fileUploader}" required="true"/>
+				<HBox width="100%" justifyContent="Start" alignItems="Center">
+					<VBox width="30%">
+						  <u:FileUploader                       
+					name="myFileUpload"
+					uploadUrl="upload/"
+					tooltip="{i18n>fileUploadId}"
+					change="IC_onHandleUploadPress"
+					maximumFileSize="5MB"
+					fileType="jpg,jpeg,png"
+					buttonOnly="true"  
+					fileSizeExceed="onFileSizeExceeds"						 
+					valueStateText="{i18n>fileUploaderValueState}"               
+					uploadComplete="handleUploadComplete"/>
+					</VBox>
+					<VBox width="70%" >
+						<Text text="{TextDisplay>/name}"></Text>
+					</VBox>
+				</HBox>
+				<Label text="{i18n>picture}"/>
+				<Button text="{i18n>openCamera}" icon="sap-icon://camera" press="IC_onPressOpenCamera" />
+				<Label/>
+				<VBox id="CC_id_canvasContainer" visible="true" class="sapUiSmallMargin canvas">
+					<core:HTML content="&lt;canvas id='canvas' class='passport-size-canvas'&gt;&lt;/canvas&gt;" />
+				</VBox>
+			</f:content>
+		</f:SimpleForm>
+			<!-- Buttons for Submit and Close actions -->
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+	        <Button text="{i18n>submit}" type="Emphasized" press="CC_onPressSubmit" class="sendMail" visible="{IdCardModel>/Submit}"/>
+			<Button text="{i18n>close}" class="sendMail" press="CC_onPressClose" />
+			</Toolbar>
+		</footer>
+	</Dialog>
+</core:FragmentDefinition>

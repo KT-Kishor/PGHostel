@@ -53,6 +53,12 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                         oObjectPage.setSelectedSection(oSection);
                     }
                 }
+                var oTextModel = new JSONModel({ name: "" });
+                this.getView().setModel(oTextModel, "TextDisplay");
+                var oIdCardModel = this.getView().getModel("IdCardModel");
+                if (oIdCardModel) {
+                    oIdCardModel.attachPropertyChange(this.IC_onPressDisplayImageOnCanvas.bind(this));
+                }
                 this.byId("SS_id_EmeNameF").setValueState("None");
                 this.byId("SS_idRelF").setValueState("None");
                 this.byId("SS_id_EmpMoF").setValueState("None");
@@ -1404,6 +1410,213 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
 
         FCR_onCloseDialog: function () {
             this.SSRTE_oDialog.close();
+        },
+
+        CC_onPressIdCardDetails: function () {
+            var oView = this.getView();
+            var employeeDetails = oView.getModel("sEmployeeModel").getData()[0];
+        
+            this.getView().getModel("TextDisplay").setProperty("/name", "");
+            this._FragmentDatePickersReadOnly(["CC_id_DateBirth", "CC_id_bloodGroup"]);
+        
+            var idCardJson = {
+                EmployeeID: employeeDetails.EmployeeID || "",
+                EmployeeName: employeeDetails.EmployeeName || "",
+                Designation: employeeDetails.Designation || "",
+                Email: employeeDetails.CompanyEmailID || "",
+                BloodGroup: employeeDetails.BloodGroup || "",
+                DOB: this.Formatter.formatDate(employeeDetails.DateOfBirth) || "",
+                MobileNo: employeeDetails.MobileNo || "",
+                BaseLocation: employeeDetails.BaseLocation || "",
+                ProfilePhoto: employeeDetails.ProfilePhoto || "",
+                isEditable: false,
+                minDOB: new Date(2000, 0, 1),
+                today: new Date()
+            };
+        
+            var oIdCardModel = new sap.ui.model.json.JSONModel(idCardJson);
+            oView.setModel(oIdCardModel, "IdCardModel");
+        
+            var aInputIds = [
+                "CC_id_EmployeeID", "CC_id_EmployeeName", "CC_id_Designation",
+                "CC_id_Email", "CC_id_Mobile", "CC_id_bloodGroup", "CC_id_Location"
+            ];
+            aInputIds.forEach(function (id) {
+                var oControl = sap.ui.getCore().byId(id);
+                if (oControl) {
+                    oControl.setValueState("None").setValueStateText("");
+                }
+            });
+        
+            if (!this.oIdCardDialog) {
+                sap.ui.core.Fragment.load({
+                    name: "sap.kt.com.minihrsolution.fragment.AddCard",
+                    controller: this
+                }).then(function (oDialog) {
+                    this.oIdCardDialog = oDialog;
+                    oView.addDependent(this.oIdCardDialog);
+                    this.oIdCardDialog.open();
+        
+                    this.oIdCardDialog.attachAfterOpen(function () {
+                        if (employeeDetails.ProfilePhoto) {
+                            var sFileBinary = employeeDetails.ProfilePhoto; 
+                            var sFileType = employeeDetails.ProfilePhotoType;
+                            this.onPressDisplayImageOnCanvas(sFileBinary, sFileType);
+                        }
+                    }.bind(this));
+                }.bind(this));
+            } else {
+                this.oIdCardDialog.open();
+                this.oIdCardDialog.attachAfterOpen(function () {
+                    if (employeeDetails.ProfilePhoto) {
+                        var sFileBinary = employeeDetails.ProfilePhoto;
+                        var sFileType = employeeDetails.ProfilePhotoType;
+                        this.onPressDisplayImageOnCanvas(sFileBinary, sFileType);
+                    }
+                }.bind(this));
+             }
+         },
+
+        CC_ValidateEmployeeName: function (oEvent) {
+            utils._LCvalidateName(oEvent);
+        },
+        
+        CC_ValidateCommonFields: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        CC_ValidateCommonFields_ValidateEmail: function (oEvent) {
+            utils._LCvalidateEmail(oEvent);
+        },
+
+        CC_ValidateDate: function (oEvent) {
+            utils._LCvalidateDate(oEvent);
+        },
+
+        CC_ValidateMobileNo: function (oEvent) {
+            utils._LCvalidateMobileNumber(oEvent);
+        },
+        CC_onPressClose:function(){
+            this.oIdCardDialog.close();
+        },
+
+        CC_onPressSubmit: async function () {
+            try {
+                if (
+                    utils._LCvalidateName(sap.ui.getCore().byId("CC_id_EmployeeName"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("CC_id_Designation"), "ID") &&
+                    utils._LCvalidateEmail(sap.ui.getCore().byId("CC_id_Email"), "ID") &&
+                    utils._LCvalidateDate(sap.ui.getCore().byId("CC_id_DateBirth"), "ID") &&
+                    utils._LCvalidateMobileNumber(sap.ui.getCore().byId("CC_id_Mobile"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("CC_id_bloodGroup"), "ID")
+                ) {
+                    const that = this;
+                    const oEmployeeData = this.getView().getModel("IdCardModel").getData();
+                   
+                    const cleanedData = { ...oEmployeeData };
+                    delete cleanedData.minDOB;
+                    delete cleanedData.today;
+                    delete cleanedData.isFileUploaded;
+                    delete cleanedData.isEditable;
+                    delete cleanedData.capturedImage;
+                    delete cleanedData.capturedImageName;
+        
+                    const jsonData = [{
+                        EmployeeID: cleanedData.EmployeeID,
+                        EmployeeName: cleanedData.EmployeeName,
+                        Designation: cleanedData.Designation,
+                        DOB:  sap.ui.getCore().byId("CC_id_DateBirth").getValue().split("/").reverse().join("-"),
+                        BloodGroup: cleanedData.BloodGroup,
+                        MobileNo: cleanedData.MobileNo,
+                        Email: cleanedData.Email,
+                        Attachment: cleanedData.ProfilePhoto,
+                        BranchCode: sap.ui.getCore().byId("CC_id_Location").getSelectedItem().getAdditionalText()
+                    }];                        
+        
+                    const response = await this.ajaxCreateWithJQuery("IDCard", { data: jsonData });
+                    if (response && response.success === true) {
+                        sap.m.MessageToast.show("ID Card generated successfully.");
+                        that.CC_onPressClose();
+                        that.onPressMerge(cleanedData);
+                    } else {
+                        sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    }
+                } else {
+                    sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered value");
+                }
+            } catch (error) {
+                sap.m.MessageToast.show(error.message || error.responseText);
+            }
+        },     
+
+        onPressMerge: async function (employeeDetails) {
+            const { jsPDF } = window.jspdf;
+            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: employeeDetails.BranchCode });
+            var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+
+            const compLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+            const templateBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.idCardTemplate?.data);
+            const address =  oCompanyDetailsModel.shortAddress;
+            
+            // Create the PDF document
+            const doc = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: [54, 86]  // Standard ID card size
+            });
+            // Set the background template 
+            if (templateBase64) {
+                doc.addImage(templateBase64, 'JPEG', 0, 0, 54, 86);
+            }
+            // company logo at top-right corner
+            if (compLogoBase64) {
+                doc.addImage(compLogoBase64, 'JPEG', 40, 2.5, 12, 12);   // logo at top-right
+            }
+            // Define the photo placeholder
+            const imageWidth = 20;
+            const imageHeight = 20;
+            const imageX = (54 - imageWidth) / 2; // Center horizontally
+            const imageY = 20;
+            // Set the border around the employee photo placeholder
+            doc.setDrawColor(72, 61, 139);
+            doc.setLineWidth(1);
+            // Draw the border exactly around the photo
+            doc.rect(imageX, imageY, imageWidth, imageHeight);
+            // Add a white rectangle as a placeholder for the employee photo
+            doc.setFillColor(255, 255, 255); // Fill color as white
+            doc.rect(imageX, imageY, imageWidth, imageHeight, 'F');
+            // Add employee image 
+            if (employeeDetails.ProfilePhoto) {
+                doc.addImage(employeeDetails.ProfilePhoto, 'JPEG', imageX, imageY, imageWidth, imageHeight);
+            }
+            // Employee details below the image
+            const textStartY = imageY + imageHeight + 5;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8.5);
+            // Center employee name and designation
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const employeeNameX = (pageWidth - doc.getTextWidth(employeeDetails.EmployeeName)) / 2;
+            const designationX = (pageWidth - doc.getTextWidth(employeeDetails.Designation)) / 2;
+            doc.text(employeeDetails.EmployeeName, employeeNameX, textStartY);
+            doc.text(employeeDetails.Designation, designationX, textStartY + 5);
+            // Other details
+            const lineHeight = 5;
+            const textYOffset = textStartY + 10;
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "normal");
+            const centerText = (text) => (pageWidth - doc.getTextWidth(text)) / 2;
+            doc.text(`Employee ID: ${employeeDetails.EmployeeID}`, centerText(`Employee ID: ${employeeDetails.EmployeeID}`), textYOffset);
+            doc.text(`DOB: ${employeeDetails.DOB}`, centerText(`DOB: ${employeeDetails.DOB}`), textYOffset + lineHeight);
+            doc.text(`Blood: ${employeeDetails.BloodGroup}`, centerText(`Blood: ${employeeDetails.BloodGroup}`), textYOffset + lineHeight * 2);
+            doc.text(`Phone: ${employeeDetails.MobileNo}`, centerText(`Phone: ${employeeDetails.MobileNo}`), textYOffset + lineHeight * 3);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(7);
+            const maxWidth = 44;
+            const addressLines = doc.splitTextToSize(address, maxWidth);
+            const addressY = textYOffset + lineHeight * 3 + 5;
+            doc.text(addressLines, centerText(addressLines[0]), addressY);
+            // Save the document
+            doc.save(`${employeeDetails.EmployeeName}_IDCard.pdf`);
         },
     });
 });

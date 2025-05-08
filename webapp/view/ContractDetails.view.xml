@@ -6,12 +6,10 @@
 	xmlns:core="sap.ui.core" >
 	<Page id="C_id_PageCreate" title="{i18n>headerContractDetails}" showNavButton="true" navButtonPress="CD_onPressback" >
 		<content>
-			<Wizard 
-                        id="CD_id_Wizard"	
-						showNextButton="true" finishButtonText="{i18n>submit}" >
+			<Wizard id="CD_id_Wizard" showNextButton="true"  busyIndicatorDelay="0" >
 				<WizardStep id="CD_id_Firststep"
                             title="{i18n>basicDetails}"							
-                            validated="true" complete="onComplete">
+                            validated="true" complete="CD_StepThree" >
 					<f:SimpleForm  editable="true" layout="ColumnLayout" columnsM="1" columnsL="2" columnsXL="2">
 						<f:content>
 							<Label text="{i18n>contractNo}"/>
@@ -43,20 +41,6 @@
 									selectedKey="{ContractModelWizart>/Currency}" id="CD_id_Currency" visible="true" class="marginLeft">
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
-						</f:content>
-					</f:SimpleForm>
-				</WizardStep>
-				<WizardStep id="CD_id_Secstep"
-                            title="{i18n>basicDetails}"
-                            validated="true" >
-					<f:SimpleForm id="SimpleFormToolbar2" editable="true" layout="ColumnLayout"
-                       labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
-                       adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"  
-                       emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"    
-                       columnsM="1" >
-						<f:content>
-							<Label text="{i18n>contractNo}"/>
-							<Input placeholder="{i18n>ContractNoPlaceholder}" id="CD_id_ConNo" editable="false"/>
 							<Label text="{i18n>endClientHirer}" required="true"/>
 							<ComboBox items="{CreateCustomerModel>/}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
                             <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
@@ -99,18 +83,15 @@
 								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</Select>
 							<Label text="{i18n>contractLocation}" required="true"/>
-								 <Select items="{BaseLocationModel>/}" id="CD_id_ConLocation"  showSecondaryValues="true" selectedKey="{oFilteredContractModel>/BaseLocation}" >
+								 <Select items="{BaseLocationModel>/}" id="CD_id_ConLocation"  showSecondaryValues="true" selectedKey="{ContractModelWizart>/contractLocation}" >
 												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
-											  
 										   </Select>
-							
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
 				<WizardStep id="idWizardStep"
-							complete="CD_onSubmit"
                             title="{i18n>review}"
-                            validated="true">
+							validated="true">
 					<f:SimpleForm 
                                 id="SimpleForm"
                                 editable="true"
@@ -132,7 +113,7 @@
 							<Text text="{ContractModelWizart>/ContractNo}"/>
 							<Label text="{i18n>agreementDate}"/>
 							<Text text="{path:'ContractModelWizart>/AgreementDate'}"/>
-							<Label text="{i18n>clientCompanyName}"/>
+							<Label text="{i18n>name}"/>
 							<Text text="{= ${ContractModelWizart>/Salutation} + ' ' + ${ContractModelWizart>/ConsultantName}}"/>
 							<Label text="{i18n>address}"/>
 							<Text text="{ContractModelWizart>/ConsultantAddress}"/>
@@ -178,6 +159,9 @@
 					    <contentLeft>
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
+				<contentRight>
+					<Button text="{i18n>submit}" press="CD_onSubmit" id="CD_id_Submit" type="Success"  enabled="false"/>
+				</contentRight>
 			</Bar>
 		</footer>
 	</Page>
