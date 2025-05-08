@@ -145,11 +145,14 @@
 										<m:Label text="{i18n>mobileNo}" required="true" id="SS_id_Lmo"/>
 										<m:Input value="{sEmployeeModel>/0/MobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="SS_validateMobileNo" valueStateText="{i18n>mobileNoValueState}"/>
 										<m:Label text="{i18n>role}" id="SS_id_lr"/>
-										<m:Input value="{sEmployeeModel>/0/Role}" editable="{viewModel>/AdminRole}" maxLength="10" id="SS_id_RoleEmpSele" placeholder="{i18n>mobileNo}"/>
-										<m:Label text="{i18n>employeeStatus}" id="SS_id_les"/>
+                                        <m:ComboBox editable="{viewModel>/AdminRole}" value="{sEmployeeModel>/0/Role}" showSecondaryValues= "true" id="SS_id_RoleEmpSele" items="{RoleModel>/}"	filterSecondaryValues="true" change="validateCombo" valueStateText="{i18n>combovalueState}">
+											<core:ListItem key="{RoleModel>Role}" text="{RoleModel>Role}" />
+										</m:ComboBox>										<m:Label text="{i18n>employeeStatus}" id="SS_id_les"/>
 										<m:Select change="SS_onStatusChange" id="SS_id_StatusSelf" editable="{viewModel>/AdminRole}" selectedKey="{sEmployeeModel>/0/EmployeeStatus}" items="{StatusEmp>/}">
 										<core:Item key="{StatusEmp>Value}" text="{StatusEmp>Value}"/>
 										</m:Select>
+										<m:Label text="{i18n>ResigEndDate}" required="{= ${sEmployeeModel>/0/EmployeeStatus} === 'Inactive' ? true : false}" visible="{viewModel>/RelievingLetter}" />
+										<m:DatePicker id="SS_id_ResgEndDate" value="{sEmployeeModel>/0/ResignationEndDate}" change="onChangeResigEndDate" displayFormat="dd/MM/yyyy" editable="{viewModel>/AdminRole}"  valueFormat="dd/MM/yyyy" visible="{viewModel>/RelievingLetter}"/>
 									</f:content>
 								</f:SimpleForm>
 							</blocks>

@@ -19,7 +19,9 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                     await this._fetchCommonData("Designation", "sDesignationModel");
                     await this._fetchCommonData("BaseLocation", "sBaseLocationModel");
                     await this._fetchCommonData("EmployeeDetailsData", "EmployeeModel"); 
+                    await this._fetchCommonData("AppVisibility", "RoleModel"); 
                 }
+                this._makeDatePickersReadOnly(["SS_id_ResgEndDate"]);
                 const viewModel = new sap.ui.model.json.JSONModel({ fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(),
                     isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter:false, SelfService:false,  SetProfile:false});
                 oView.setModel(viewModel, "viewModel");
@@ -257,6 +259,10 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                     that.closeBusyDialog();
                 });
         },
+        
+        onChangeResigEndDate:function(oEvent){
+            utils._LCvalidateDate(oEvent);
+        },
 
         SS_onSavePress: function (ID) {
             var oView = this.getView();
@@ -279,6 +285,7 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                                 utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
                                 utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
                                 utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID");
+                                (oDataModel.EmployeeStatus === 'Inactive' ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
                         } else if (ID === "DocumentBtn") {
                             isValid =
                                 utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
@@ -1288,6 +1295,9 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                 utils._LCvalidateCTC(oEvent);
             }  
         },
+        EOD_validateAmountAppraisal:function(oEvent){
+            utils._LCvalidateAmount(oEvent);
+        },
 
         CommonCalculation:function(){
             var AppraisalModel = this.getView().getModel("AppraisalModel");
@@ -1362,7 +1372,7 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
         
             var isCTCValid = CTCType === "Percentage"
                 ? utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("EOUF_id_CTC"), "ID")
-                : utils._LCvalidateCTC(sap.ui.getCore().byId("EOUF_id_CTC"), "ID");
+                : utils._LCvalidateAmount(sap.ui.getCore().byId("EOUF_id_CTC"), "ID");
         
             var isVariablePayValid = utils._LCvalidateVariablePay(sap.ui.getCore().byId("EOD_id_VariablePay"), "ID");
             if (isCTCValid && isVariablePayValid) {

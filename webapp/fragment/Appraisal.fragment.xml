@@ -24,7 +24,7 @@
                 <Label text="CTC in Percentage/CTC" required="true" />
                 <HBox width="100%" justifyContent="SpaceBetween" id="EOUF_id_CTCPercentage">
                     <VBox width="68%">
-                        <Input value="{AppraisalModel>/CtcPercentage}" id="EOUF_id_CTC" placeholder="{i18n>placeCtc}" liveChange="EOD_validateAmount" maxLength="15" valueStateText="{i18n>ctcAndVariblePay}"/>                
+                        <Input value="{AppraisalModel>/CtcPercentage}" id="EOUF_id_CTC" placeholder="{i18n>placeCtc}" liveChange="EOD_validateAmountAppraisal" maxLength="15" valueStateText="{i18n>ctcAndVariblePay}"/>                
                     </VBox>
                     <VBox width="30%">
                         <Select forceSelection="false" selectedKey="1" id="ED_Frg_idAppraisalType" change="onSelectChange">
