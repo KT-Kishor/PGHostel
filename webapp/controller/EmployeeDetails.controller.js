@@ -13,10 +13,10 @@ sap.ui.define([
                     if (!LoginFunction) return;
 
                     this.getBusyDialog();
-                    if(oEvent.getParameter("arguments").sPath === 'EmployeeDetails') this.onClearEmployeeDetails();
+                    if (oEvent.getParameter("arguments").sPath === 'EmployeeDetails') this.onClearEmployeeDetails();
                     this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                     this.getView().getModel("LoginModel").setProperty("/HeaderName", "Employee Details");
-                    await this._fetchCommonData("EmployeeDetailsData", "EmployeeModel"); 
+                    await this._fetchCommonData("EmployeeDetailsData", "EmployeeModel");
 
                     this.CommonReadCall();
                     this.Emp_det_onSearch();
@@ -56,6 +56,7 @@ sap.ui.define([
             onClearEmployeeDetails: function () {
                 this.byId("ED_id_EmpIDFilter").setValue("");
                 this.byId("ED_id_ManagerFilter").setValue("");
+                this.byId("ED_id_Status").setValue("");
             },
 
             CommonReadCall: async function () {

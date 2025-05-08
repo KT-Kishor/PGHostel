@@ -80,8 +80,9 @@ sap.ui.define([
             "TilePage": "/TilePage",
             "Quotation": "/A_Quotations",
             "Payroll": "/A_Payroll",
-            "Trainee":"/Trainee",
-             "Contract":"/GenerateContract"
+            "Trainee": "/Trainee",
+            "Contract": "/GenerateContract",
+            "ManageAssignment": "/AssignmentTask"
           };
 
           const modelPath = tileMap[value];
@@ -394,7 +395,7 @@ sap.ui.define([
         : [];
 
       Array.from(oFiles).forEach((oFile) => {
-        const MAX_FILE_SIZE = 20 * 1024 * 1024; 
+        const MAX_FILE_SIZE = 20 * 1024 * 1024;
         if (oFile.size > MAX_FILE_SIZE) {
           sap.m.MessageToast.show("File size should not exceed 20 MB: " + oFile.name);
           return;
@@ -487,7 +488,7 @@ sap.ui.define([
       var dialog = new sap.m.Dialog({
         title: sTitle,
         type: "Message",
-        icon:"sap-icon://message-information",
+        icon: "sap-icon://message-information",
         content: new sap.m.Text({ text: sMessage }),
         beginButton: new sap.m.Button({
           text: sOkText || oResourceBundle.getText("OkButton"),

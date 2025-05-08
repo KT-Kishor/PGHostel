@@ -83,7 +83,10 @@
 							<Text text="{sEmployeeDetails>CompanyEmailID}"/>
 						    <Text text="{= ${sEmployeeDetails>ManagerName} + '\n(' + ${sEmployeeDetails>ManagerID} + ')' }" />
 							<Text text="{sEmployeeDetails>BaseLocation}"/>
-							<Text text="{sEmployeeDetails>EmployeeStatus}"/>
+							<ObjectStatus
+    text="{sEmployeeDetails>EmployeeStatus}"
+    state="{path: 'sEmployeeDetails>EmployeeStatus', formatter: '.Formatter.statusState'}" />
+
 						</cells>
 					</ColumnListItem>
 				</items>

@@ -3,10 +3,9 @@ sap.ui.define(
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "../utils/validation",
-    "sap/ui/core/BusyIndicator",
+    "../utils/validation"
   ],
-  function (BaseController, JSONModel, MessageToast, utils, BusyIndicator) {
+  function (BaseController, JSONModel, MessageToast, utils) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.ManageAssignment",
@@ -14,11 +13,15 @@ sap.ui.define(
         onInit: function () {
           this.getRouter().getRoute("RouteManageAssignment").attachMatched(this._onRouteMatched, this);
         },
-        _onRouteMatched: function () {
+        _onRouteMatched: async function () {
+          var LoginFunction = await this.commonLoginFunction("ManageAssignment");
+          if (!LoginFunction) return;
+          this.getBusyDialog();
           this._fetchCommonData("NewTask", "TaskModel", {});
           this.CommonReadcall()
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("LoginModel").setProperty("/HeaderName", "Create New Assignment");
+          this._FragmentDatePickersReadOnly(["NAF_id_StartDate", "NAF_id_EndDate", "MA_id_StartDate", "MA_id_EndDate"])
         },
         onPressback: function () {
           this.getRouter().navTo("RouteTilePage");
@@ -95,14 +98,7 @@ sap.ui.define(
             }
           });
         },
-        NAF_onTaskClose: function () {
-          const oTable = this.byId("MA_id_TaskTable");
-          oTable.removeSelections(true); // Clear selection
 
-          if (this.oTaskDialog) {
-            this.oTaskDialog.close();
-          }
-        },
         AT_ValidateCommonFields: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
@@ -127,18 +123,18 @@ sap.ui.define(
           oData.TaskType = TaskType;
           oData.StartDate = oData.StartDate.split("/").reverse().join('-');
           oData.EndDate = oData.EndDate.split("/").reverse().join('-');
-          BusyIndicator.show(0);
+          this.getBusyDialog();
           const response = await this.ajaxCreateWithJQuery("NewTask", {
             data: oData,
           });
           if (response.success === true) {
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             MessageToast.show("Task created successfully!");
             this.oTaskDialog.close();
             this._fetchCommonData("NewTask", "TaskModel", {});
             this.CommonReadcall()
           } else {
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             MessageToast.show("Failed to create task.");
           }
         },
@@ -149,22 +145,47 @@ sap.ui.define(
             MessageToast.show("Please select a task to update.");
             return;
           }
+          if (
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FNA_id_TaskName"), "ID") &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("NAF_id_Description"), "ID") &&
+            utils._LCvalidateDate(sap.ui.getCore().byId("NAF_id_StartDate"), "ID") &&
+            utils._LCvalidateDate(sap.ui.getCore().byId("NAF_id_EndDate"), "ID")
+          ) {
+          } else {
+            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+            return;
+          }
           const oData = this.getView().getModel("EditTaskModel").getData();
           const oTaskId = oSelectedItem.getBindingContext("TaskModel").getProperty("TaskID");
           const requestData = { filters: { TaskID: oTaskId }, data: oData };
-          BusyIndicator.show(0);
+          this.getBusyDialog();
           const response = await this.ajaxUpdateWithJQuery("/NewTask",
             requestData
           );
           if (response.success === true) {
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             MessageToast.show("Task updated successfully!");
             this.oTaskDialog.close();
             this._fetchCommonData("NewTask", "TaskModel", {});
             this.CommonReadcall()
           } else {
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             MessageToast.show("Failed to update task.");
+          }
+        },
+        NAF_onTaskClose: function () {
+          var oModel = this.getView().getModel("EditTaskModel");
+          this.byId("MA_id_TaskTable").removeSelections(true);
+          // Reset value states
+          sap.ui.getCore().byId("FNA_id_TaskName").setValueState("None");
+          sap.ui.getCore().byId("NAF_id_Description").setValueState("None");
+          sap.ui.getCore().byId("NAF_id_StartDate").setValueState("None");
+          sap.ui.getCore().byId("NAF_id_EndDate").setValueState("None");
+          // Refresh the model
+          oModel.refresh(true);
+          // Close the dialog if it exists
+          if (this.oTaskDialog) {
+            this.oTaskDialog.close();
           }
         },
 
@@ -189,10 +210,10 @@ sap.ui.define(
 
         CommonReadcall: async function (params) {
           try {
-            BusyIndicator.show(0);
+            this.getBusyDialog();
             const response = await this.ajaxReadWithJQuery("NewTask", params);
             if (response.success === true) {
-              BusyIndicator.hide();
+              this.closeBusyDialog();
               // Ensure data is an array
               const taskData = Array.isArray(response.data)
                 ? response.data
@@ -201,7 +222,7 @@ sap.ui.define(
               this.getView().setModel(oModel, "TaskModel");
             }
           } catch (error) {
-            BusyIndicator.hide();
+            this.closeBusyDialog();
             MessageToast.show("Request failed");
           }
         },
