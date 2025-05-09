@@ -29,27 +29,46 @@ sap.ui.define(
 
         _fetchTaskDetails: async function (sTaskID) {
           try {
-            this.getBusyDialog();
             const response = await this.ajaxReadWithJQuery("NewTask", {
               TaskID: sTaskID,
             });
+
             if (response.success) {
               this.closeBusyDialog();
               const oTaskDetails = Array.isArray(response.data)
                 ? response.data[0]
                 : response.data;
-              this.getView().setModel(
-                new JSONModel(oTaskDetails),
-                "TaskDetailsModel"
-              );
+
+              // Set view-level model for ObjectHeader
+              this.getView().setModel(new JSONModel(oTaskDetails), "TaskDetailsModel");
+
+              // Set this as the current task ID for reuse
+              this._currentTaskID = oTaskDetails.TaskID;
+
+              // OPTIONAL: Parse date from dd/MM/yyyy (if needed)
+              const fnParseDate = (sDate) => {
+                const [dd, mm, yyyy] = sDate.split("/");
+                return new Date(`${yyyy}-${mm}-${dd}`);
+              };
+
+              const oStartDate = fnParseDate(oTaskDetails.StartDate);
+              const oEndDate = fnParseDate(oTaskDetails.EndDate);
+
+              // Create a new model to store min/max dates
+              const oNewTaskModel = new JSONModel({
+                minDate: oStartDate,
+                maxDate: oEndDate
+              });
+
+              this.getView().setModel(oNewTaskModel, "newTaskModel");
             }
           } catch (error) {
             this.closeBusyDialog();
             MessageToast.show(this.i18nModel.getText("smgerrorloading"));
           }
         },
+
         readCallForAllLoginDetails: async function (filter) {
-          this.getBusyDialog();
           // Fetch all login details
           await this.ajaxReadWithJQuery("AllLoginDetails", filter)
             .then((oData) => {
@@ -130,15 +149,21 @@ sap.ui.define(
             oModel = new JSONModel(oData);
           } else {
             this._originalTaskData = null;
+
+            //  Get StartDate from the view model
+            const oTaskDetails = this.getView().getModel("TaskDetailsModel")?.getData();
+            const sStartDateFromView = oTaskDetails?.StartDate || "";
+
             const newTaskData = {
               EmployeeID: "",
               EmployeeName: "",
               HoursWorked: "",
               TaskName: "",
               TaskID: "",
-              StartDate: "",
+              StartDate: sStartDateFromView, // Set from view
               EndDate: "",
             };
+
             oModel = new JSONModel(newTaskData);
           }
 
@@ -237,7 +262,6 @@ sap.ui.define(
           // Validate all fields
           if (
             !utils._LCvalidationComboBox(sap.ui.getCore().byId("FAT_id_EmployeeID"), "ID") ||
-            !utils._LCvalidateDate(sap.ui.getCore().byId("FAT_id_StartDate"), "ID") ||
             !utils._LCvalidateDate(sap.ui.getCore().byId("FAT_id_EndDate"), "ID") ||
             !utils._LCvalidateTimeLimit(sap.ui.getCore().byId("FAT_id_HoursWorked"), "ID")
           ) {
@@ -249,7 +273,6 @@ sap.ui.define(
           const sTaskID = sap.ui.getCore().byId("FAT_id_TaskID").getValue();
 
           // Fetch existing assignments for current TaskID
-          await this.CommonReadcall({ TaskID: sTaskID });
           const aAssignedTasks = oView.getModel("AssignModel").getData() || [];
 
           // Extract already assigned EmployeeIDs
@@ -287,9 +310,13 @@ sap.ui.define(
             this.closeBusyDialog();
             await this._fetchCommonData("AssignedTask", "AssignModel", { TaskID: sTaskID });
             await this.CommonReadcall({ TaskID: sTaskID });
+            //  Reset EditTaskModel to clear previous values
+            this.getView().setModel(null, "EditTaskModel");
+
             this.oTaskDialog.close();
             MessageToast.show("Employee(s) assigned successfully!");
-          } else {
+          }
+          else {
             MessageToast.show(this.i18nModel.getText("smgFailtoassign"));
           }
         },
@@ -341,7 +368,16 @@ sap.ui.define(
         },
 
         AT_onstartDatevalidateDate: function (oEvent) {
-          const oStartDate = oEvent.getSource().getDateValue(); // get selected start date
+          const oStartDatePicker = oEvent.getSource();
+          const oStartDate = oStartDatePicker.getDateValue();
+
+          if (!oStartDate) {
+            oStartDatePicker.setValueState("Error");
+            oStartDatePicker.setValueStateText("Invalid start date");
+            return;
+          } else {
+            oStartDatePicker.setValueState("None"); //  Reset if valid
+          }
           const oEndDatePicker = sap.ui.getCore().byId("FAT_id_EndDate");
 
           if (oEndDatePicker) {
@@ -349,6 +385,10 @@ sap.ui.define(
             oEndDatePicker.setMinDate(oStartDate);
             if (oEndDate && oEndDate < oStartDate) {
               oEndDatePicker.setDateValue(null);
+              oEndDatePicker.setValueState("Error");
+              oEndDatePicker.setValueStateText("End date must be after start date.");
+            } else if (oEndDate) {
+              oEndDatePicker.setValueState("None"); //  Reset EndDate state if valid
             }
           }
         },

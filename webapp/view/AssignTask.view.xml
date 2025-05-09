@@ -33,6 +33,7 @@
     textDirection="LTR" />
 </ObjectHeader>
 	
+				
 				<fb:FilterBar  class="sapUiTinyMargin" id="AT_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="FAT_onPressClear" showClearOnFB="true" search="FAT_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showFilterConfiguration="false">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
@@ -51,6 +52,7 @@
 
 				</fb:filterGroupItems>
 			</fb:FilterBar>
+			
 			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"  items="{AssignModel>/}" growing="true"  growingThreshold="50" mode="SingleSelectLeft" alternateRowColors="true" id="AT_id_TaskTable">
 			 <headerToolbar>
                 <OverflowToolbar>

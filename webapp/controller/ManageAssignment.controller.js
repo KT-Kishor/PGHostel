@@ -158,6 +158,8 @@ sap.ui.define(
           const oData = this.getView().getModel("EditTaskModel").getData();
           const oTaskId = oSelectedItem.getBindingContext("TaskModel").getProperty("TaskID");
           const requestData = { filters: { TaskID: oTaskId }, data: oData };
+          oData.StartDate = oData.StartDate.split("/").reverse().join("-");
+          oData.EndDate = oData.EndDate.split("/").reverse().join("-");
           this.getBusyDialog();
           const response = await this.ajaxUpdateWithJQuery("/NewTask",
             requestData
@@ -174,7 +176,7 @@ sap.ui.define(
           }
         },
         NAF_onTaskClose: function () {
-          var oModel = this.getView().getModel("EditTaskModel");
+          // var oModel = this.getView().getModel("EditTaskModel");
           this.byId("MA_id_TaskTable").removeSelections(true);
           // Reset value states
           sap.ui.getCore().byId("FNA_id_TaskName").setValueState("None");
@@ -182,11 +184,14 @@ sap.ui.define(
           sap.ui.getCore().byId("NAF_id_StartDate").setValueState("None");
           sap.ui.getCore().byId("NAF_id_EndDate").setValueState("None");
           // Refresh the model
-          oModel.refresh(true);
+
           // Close the dialog if it exists
           if (this.oTaskDialog) {
+            // Reset form binding 
+            this.CommonReadcall();
             this.oTaskDialog.close();
           }
+
         },
 
         MA_onSearch: async function () {
@@ -234,7 +239,17 @@ sap.ui.define(
           });
         },
         MA_onstartDatevalidateDate: function (oEvent) {
-          const oStartDate = oEvent.getSource().getDateValue(); // get selected start date
+          const oStartDatePicker = oEvent.getSource();
+          const oStartDate = oStartDatePicker.getDateValue();
+
+          if (!oStartDate) {
+            oStartDatePicker.setValueState("Error");
+            oStartDatePicker.setValueStateText("Invalid start date");
+            return;
+          } else {
+            oStartDatePicker.setValueState("None"); //  Reset if valid
+          }
+
           const oEndDatePicker = sap.ui.getCore().byId("NAF_id_EndDate");
 
           if (oEndDatePicker) {
@@ -242,9 +257,14 @@ sap.ui.define(
             oEndDatePicker.setMinDate(oStartDate);
             if (oEndDate && oEndDate < oStartDate) {
               oEndDatePicker.setDateValue(null);
+              oEndDatePicker.setValueState("Error");
+              oEndDatePicker.setValueStateText("End date must be after start date.");
+            } else if (oEndDate) {
+              oEndDatePicker.setValueState("None"); //  Reset EndDate state if valid
             }
           }
-        },
+        }
+
 
       }
     );

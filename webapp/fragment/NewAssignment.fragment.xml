@@ -22,7 +22,7 @@
                     maxDate="{newTaskModel>/maxDate}"
                     change="MA_onstartDatevalidateDate"
                     value="{EditTaskModel>/StartDate}"
-                    displayFormat="dd/MM/yyyy"
+                    displayFormat="dd-MM-yyyy"
                     valueFormat="dd/MM/yyyy"
                     id="NAF_id_StartDate"
                     valueStateText="{i18n>dateValueState}"/>
@@ -32,7 +32,7 @@
                     maxDate="{newTaskModel>/maxDate}"
                     change="AT_validateDate"
                     value="{EditTaskModel>/EndDate}"
-                    displayFormat="dd/MM/yyyy"
+                    displayFormat="dd-MM-yyyy"
                     valueFormat="dd/MM/yyyy"
                     id="NAF_id_EndDate"
                     valueStateText="{i18n>dateValueState}"/>

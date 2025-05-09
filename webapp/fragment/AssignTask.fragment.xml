@@ -29,7 +29,8 @@
 
                 <Label text="{i18n>startDate}" required="true"/>
                 <DatePicker
-                  maxDate="{newTaskModel>/maxDate}"
+                minDate="{newTaskModel>/minDate}"
+                maxDate="{newTaskModel>/maxDate}"
                     change="AT_onstartDatevalidateDate"
                     value="{EditTaskModel>/StartDate}"
                     displayFormat="dd/MM/yyyy"
@@ -39,7 +40,8 @@
                     
                 <Label text="{i18n>endDate}" required="true"/>
                 <DatePicker
-                    minDate="{newTaskModel>/minDate}"
+                minDate="{newTaskModel>/minDate}"
+                     maxDate="{newTaskModel>/maxDate}"
                     change="AT_validateDate"
                     value="{EditTaskModel>/EndDate}"
                     displayFormat="dd/MM/yyyy" 
