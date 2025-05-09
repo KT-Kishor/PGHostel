@@ -488,7 +488,7 @@ sap.ui.define([
       var dialog = new sap.m.Dialog({
         title: sTitle,
         type: "Message",
-        icon: "sap-icon://message-information",
+        icon: "sap-icon://question-mark",
         content: new sap.m.Text({ text: sMessage }),
         beginButton: new sap.m.Button({
           text: sOkText || oResourceBundle.getText("OkButton"),
