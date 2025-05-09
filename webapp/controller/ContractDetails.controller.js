@@ -431,7 +431,7 @@ sap.ui.define([
             onPressSave: async function () {
                 const that = this;
                 const oView = this.getView();
-
+            
                 // Mandatory validation
                 const isMandatoryValid = (
                     utils._LCvalidateName(this.byId("CU_id_ConsultantName"), "ID") &&
@@ -443,24 +443,23 @@ sap.ui.define([
                     utils._LCvalidateName(this.byId("CU_id_ClientReportContact"), "ID") &&
                     utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") 
                 );
-
+            
                 if (!isMandatoryValid) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
-
-                var oModel = this.getView().getModel("oFilteredContractModel").getData();
-                var AgreementNo = oModel.AgreementNo;
-                var newAgreementNo = (oModel.ContractStatus === 'Renewed') ? (parseInt(AgreementNo) + 1) : AgreementNo;
-                newAgreementNo = String(newAgreementNo).padStart(2, "0");
+            
+                const oModel = oView.getModel("oFilteredContractModel").getData();
+                const AgreementNo = oModel.AgreementNo;
+                const newAgreementNo = (oModel.ContractStatus === 'Renewed') ? (parseInt(AgreementNo) + 1).toString().padStart(2, "0") : AgreementNo;
             
                 const rateType = oModel.HrDaliyMonth;
                 const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
                 const selectedCurrency = this.byId("CU_id_CurrencySelect").getSelectedKey();
                 const ConsultantRate = `${oModel.Amount} ${selectedCurrency} Per ${rateText} Including all tax`;
                 const LocationService = this.byId("CD_id_contractLocation").getSelectedKey();
-                const branchCode = this.getView().byId("CU_id_ContractCity").getSelectedItem().getAdditionalText();
-
+                const branchCode = this.byId("CU_id_ContractCity").getSelectedItem().getAdditionalText();
+            
                 const jsonData = {
                     ContractNo: oModel.ContractNo,
                     AgreementNo: newAgreementNo,
@@ -470,7 +469,7 @@ sap.ui.define([
                     ConsultantAddress: oModel.ConsultantAddress,
                     EndClient: oModel.EndClient,
                     LocationService: LocationService,
-                    ContractStatus: (oModel.ContractStatus === 'Renewed') ? 'New' : oModel.ContractStatus,
+                    ContractStatus: oModel.ContractStatus,
                     AssignmentStartDate: oModel.AssignmentStartDate.split("/").reverse().join("-"),
                     AssignmentEndDate: oModel.AssignmentEndDate.split("/").reverse().join("-"),
                     ConsultantRate: ConsultantRate,
@@ -482,52 +481,46 @@ sap.ui.define([
                     ExpensesClaim: oModel.ExpensesClaim,
                     AgreementDate: oModel.AgreementDate,
                     ContarctEmail: oModel.ContarctEmail,
-                    ContractLocation: oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("CD_id_ConLocation").getSelectedKey(),
+                    ContractLocation: oModel.BaseLocation !== "" ? oModel.BaseLocation : this.byId("CD_id_ConLocation").getSelectedKey(),
                     Comments: oModel.Comments,
                     BranchCode: branchCode
                 };
 
+                const oldContractData = { ContractStatus: "Inactive" };
             
-                // 1. Case: Renewed but previous not active
+                // Case 1: Renewed but previous not active
                 if (oModel.ContractStatus === "Renewed" && that.OldStatus !== "Active") {
                     oView.getModel("simpleForm").setProperty("/editable", false);
                     oView.getModel("simpleForm").setProperty("/Status", false);
                     oView.getModel("viewModel").setProperty("/isEditMode", false);
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
-                    this.getView().getModel("oFilteredContractModel").setProperty("/ContractStatus", that.OldStatus);
+                    oView.getModel("oFilteredContractModel").setProperty("/ContractStatus", that.OldStatus);
                     this.closeBusyDialog();
                     return sap.m.MessageBox.error(this.i18nModel.getText("contractStatusMessage"));
                 }
-
-                // 2. Case: Renewed and previous was active
+            
+                //  Case 2: Renewed and previous was Active — create new contract
                 if (oModel.ContractStatus === "Renewed" && that.OldStatus === "Active") {
                     const endDateArr = this.Formatter.formatDate(this.AssignmentEndDate).split('/').map(Number);
                     const endDateCreate = new Date(endDateArr[2], endDateArr[1] - 1, endDateArr[0]);
                     const today = new Date();
-                    oModel.ContractStatus="Renewed"
-                   
-
+            
                     if (today >= endDateCreate) {
-                        delete oModel.Comments;
-                        delete oModel.Amount;
-                        this.getBusyDialog(); // Show busy dialog
+                        delete jsonData.Comments;
+                        this.getBusyDialog();
                         try {
-                        //    const createResponse = await this.ajaxCreateWithJQuery("Contract", { data: jsonData });
-                        var requestData = {
-                            filters: {
-                                ContractNo: oModel.ContractNo,
-                                AgreementNo: oModel.AgreementNo,
-                            },
-                            data: oModel
-                        };
-                        
-                     var updateResponse =   await this.ajaxUpdateWithJQuery("Contract", requestData);
-                            if (updateResponse.success) {   
+                            jsonData.ContractStatus = "Renewed";
+                            const createResponse = await this.ajaxCreateWithJQuery("Contract", { data: jsonData });
+            
+                            if (createResponse.success) {
+                                var requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: AgreementNo }, data: oldContractData };
+
+                                await this.ajaxUpdateWithJQuery("Contract", requestData);
                                 oView.getModel("simpleForm").setProperty("/editable", false);
                                 oView.getModel("simpleForm").setProperty("/Status", false);
                                 this.closeBusyDialog();
-
+            
                                 sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
                                     onClose: function () {
                                         that.getRouter().navTo("RouteContract");
@@ -538,17 +531,17 @@ sap.ui.define([
                             this.closeBusyDialog();
                             sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
                         }
-
+                        return; //  Prevent fallback update
                     } else {
                         oView.getModel("oFilteredContractModel").setProperty("/ContractStatus", this.ContractStatus);
-                        sap.m.MessageBox.error(this.i18nModel.getText("renewEndDateMess"));
                         this.closeBusyDialog();
-                        return;
+                        return sap.m.MessageBox.error(this.i18nModel.getText("renewEndDateMess"));
                     }
                 }
+        
                 try {
-                    this.getBusyDialog(); // Show busy dialog
-                    const requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: AgreementNo }, data: jsonData };
+                    this.getBusyDialog();
+                    const requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: oModel.AgreementNo }, data: jsonData };
                     await this.ajaxUpdateWithJQuery("Contract", requestData);
                     oView.getModel("simpleForm").setProperty("/editable", false);
                     oView.getModel("simpleForm").setProperty("/Status", false);
@@ -563,6 +556,7 @@ sap.ui.define([
                     sap.m.MessageToast.show(this.i18nModel.getText("updateContractFailed"));
                 }
             },
+            
             CUD_commonOpenDialog: function (fragmentName) {
                 if (!this.CUD_oDialogMail) {
                     sap.ui.core.Fragment.load({
