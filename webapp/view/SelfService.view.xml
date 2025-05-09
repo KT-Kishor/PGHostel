@@ -415,7 +415,7 @@
 											<m:OverflowToolbar>
 												<m:Title text="{i18n>Documents} ({= ${DocumentModel>/items}.length})" level="H2"/>
 												<m:ToolbarSpacer />
-												<m:Label text="{i18n>DocumentTypeText}" showColon="true" required="true" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
+												<m:Label text="{i18n>documentType}" showColon="true" required="true" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
 												<m:ComboBox visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" items="{DocumentJson>/documents}" id="SS_id_DocType" change="onDocumentTypeChange" valueStateText="{i18n>decumentType}">
 													<core:Item key="{DocumentJson>id}" text="{DocumentJson>name}" />
 												</m:ComboBox>
@@ -436,7 +436,7 @@
 												<m:Label text="{i18n>createdBy}" />
 											</m:Column>
 											<m:Column demandPopin="true" minScreenWidth="Tablet">
-												<m:Label text="{i18n>createdOn}" />
+												<m:Label text="{i18n>qCreateDate}" />
 											</m:Column>
 										</m:columns>
 										<m:items>

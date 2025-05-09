@@ -1,0 +1,10 @@
+{
+    "documents": [
+      { "id": "2", "name": "Aadhar Card" },
+      { "id": "1", "name": "Pan Card" },
+      { "id": "4", "name": "Passport" },
+      { "id": "6", "name": "PUC/12th" },
+      { "id": "5", "name": "School/10th"},
+      { "id": "3", "name": "Voter ID" }
+    ]
+  }

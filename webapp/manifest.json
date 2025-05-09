@@ -153,6 +153,11 @@
                 "uri": "model/PDFData.json",
                 "preload": true
             },
+              "DocumentJson": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Document.json",
+                "preload": true
+            },
             "TraineeCourse": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Course.json",

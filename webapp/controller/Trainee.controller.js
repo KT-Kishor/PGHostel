@@ -314,6 +314,7 @@ sap.ui.define([
                     // Create the updated trainee data
                     const oUpdatedData = {
                         ID: oTraineeModel.ID,
+                        TraineeID:oTraineeModel.TraineeID,
                         Department: sap.ui.getCore().byId("TCF_id_Department").getSelectedKey(),
                         ProjectName: oTraineeModel.ProjectName,
                         EndDate: oTraineeModel.EndDate,
