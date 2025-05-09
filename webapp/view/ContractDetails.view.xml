@@ -26,11 +26,8 @@
 									liveChange="CD_ValidateCommonFields"/>
 							<Label text="{i18n>consultantEmail}" required="true"/>
 							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="50" placeholder="{i18n>placeConsultantEmail}" id="CD_id_Email"  liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}"/>
-							<Label text="{i18n>role}" required="true"/>
-							<Input value="{ContractModelWizart>/Role}"  placeholder="{i18n>placeRole} "
-								id="CD_id_Role" liveChange="CD_validateName" maxLength="50" valueStateText="{i18n>roleValueState}" editable="false"/>
 							<Label text="{i18n>rate}" required="true" />
-							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="0" select="RadioButtonSelect" >
+							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="1" select="RadioButtonSelect" >
 								<RadioButton  text="{i18n>rateHour}" />
 								<RadioButton text="{i18n>rateDaily}" />
 								<RadioButton text="{i18n>rateMonthly}" />
@@ -45,17 +42,17 @@
 							<ComboBox items="{CreateCustomerModel>/}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
                             <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
                             </ComboBox>
-							<Label text="{i18n>locationswhereServices}" />
-							<Select id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}">
-								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
-							</Select>
-							<Label text="{i18n>clienthiringcontact}" />
+							<Label text="{i18n>clienthiringcontact}"  required="true"/>
 							<Select id="CD_id_selectSal" selectedKey="{ContractModelWizart>/Salutation2}" 
                               items="{Salutation>/salutation}" >
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
 							<Input value="{ContractModelWizart>/ClientReportContact}"
                              placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" liveChange="CD_validateName" valueStateText="{i18n>commonNameValueState}"/>
+							<Label text="{i18n>locationswhereServices}" />
+							<Select id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}">
+								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
+							</Select>
 							<Label text="{i18n>assignmentStatus}"/>
 							<ComboBox selectedKey="New" value="{ContractModelWizart>/AssignmentStatus}" 
                              items="{AssignmentStatus>/assignmentStatus}" editable="false">

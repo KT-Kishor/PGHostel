@@ -48,9 +48,7 @@
 												<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 												</m:Select>
 										<m:Input value="{oFilteredContractModel>/ConsultantName}" liveChange="CD_validateName" maxLength="50" id="CU_id_ConsultantName" valueStateText="{i18n>nameConsultantValueState}" editable="{simpleForm>/editable}"  />
-										<!-- Consulting Service -->
-										<m:Label text="{i18n>consultingService}" required="true"/>
-										<m:Input value="{oFilteredContractModel>/ConsultingService}" liveChange="CD_validateName" maxLength="50" valueStateText="{i18n>roleValueState}" id="CU_id_ConsultingService" editable="false"/>
+										
 										<!-- Consultant Email -->
 										<m:Label text="{i18n>consultantEmailID}" required="true"/>
 										<m:Input value="{oFilteredContractModel>/ContarctEmail}" liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}" id="CU_id_ContractEmailID" editable="{simpleForm>/editable}" maxLength="100" />

@@ -57,7 +57,7 @@ sap.ui.define([
                             ConsultantAddress: "",
                             ContarctEmail: "",
                             Role: "Contractor",
-                            Rate: "Hr",
+                            Rate: "Daily",
                             Amount: "",
                             Currency: "INR",
                             EndClientHirer: "",
@@ -296,7 +296,6 @@ sap.ui.define([
                         utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
                         utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
-                        utils._LCvalidateName(this.byId("CD_id_Role"), "ID") &&
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
@@ -446,7 +445,6 @@ sap.ui.define([
                 // Mandatory validation
                 const isMandatoryValid = (
                     utils._LCvalidateName(this.byId("CU_id_ConsultantName"), "ID") &&
-                    utils._LCvalidateName(this.byId("CU_id_ConsultingService"), "ID") &&
                     utils._LCvalidateEmail(this.byId("CU_id_ContractEmailID"), "ID") &&
                     utils._LCvalidateDate(this.byId("CU_id_AgreementDate"), "ID") &&
                     utils._LCvalidateMandatoryField(this.byId("CU_id_ContractAddress"), "ID") &&
@@ -536,7 +534,7 @@ sap.ui.define([
 
                                 sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
                                     onClose: function () {
-                                        that.getRouter().navTo("RouteContractDetails");
+                                        that.getRouter().navTo("RouteContract");
                                     }
                                 });
                             }
@@ -562,10 +560,7 @@ sap.ui.define([
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
                     this.closeBusyDialog();
-                    this.getRouter().navTo("RouteContractDetails", {
-                        sParContract: oModel.ContractNo,
-                        sID: oModel.AgreementNo
-                    });
+                    this.getRouter().navTo("RouteContract");
                     sap.m.MessageToast.show(this.i18nModel.getText("agreementUpdatedSuccess"));
                 } catch (error) {
                     this.closeBusyDialog();
