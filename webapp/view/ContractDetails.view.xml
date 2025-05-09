@@ -12,14 +12,13 @@
                             validated="true" complete="CD_StepThree" >
 					<f:SimpleForm  editable="true" layout="ColumnLayout" columnsM="1" columnsL="2" columnsXL="2">
 						<f:content>
-							<Label text="{i18n>contractNo}"/>
-							<Input  id="CD_id_ContractNo" value="{ContractModelWizart>/ContractNo}" editable="false"/>
 							<Label text="{i18n>agreementDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="CD_validateDate"  valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
-							<Label text="{i18n>consultantName}"  />
-							<Select id="" selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}">
+							<Label text="{i18n>salutation}"  />
+							<Select id=""  selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}">
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
+							<Label text="{i18n>consultantName}"  required="true"/>
 							<Input value="{ContractModelWizart>/ConsultantName}" placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="CD_validateName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
 							<Label text="{i18n>address}" required="true"/>
 							<TextArea value="{ContractModelWizart>/ConsultantAddress}"  maxLength="120" rows="3" id="CD_id_Address" placeholder="{i18n>placeAddress}" change="onAddress" valueStateText="{i18n>addressValueState}"
@@ -42,11 +41,12 @@
 							<ComboBox items="{CreateCustomerModel>/}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
                             <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
                             </ComboBox>
-							<Label text="{i18n>clienthiringcontact}"  required="true"/>
+							<Label text="{i18n>salutation}"/>
 							<Select id="CD_id_selectSal" selectedKey="{ContractModelWizart>/Salutation2}" 
                               items="{Salutation>/salutation}" >
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
+							<Label text="{i18n>clienthiringcontact}"  required="true"/>
 							<Input value="{ContractModelWizart>/ClientReportContact}"
                              placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" liveChange="CD_validateName" valueStateText="{i18n>commonNameValueState}"/>
 							<Label text="{i18n>locationswhereServices}" />
@@ -61,7 +61,8 @@
 							<Label text="{i18n>startDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>endDate}" required="true"/>
-							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}" minDate="{ContractModelWizart>/MinToDate}"/>
+							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy"  
+							displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}" minDate="{ContractModelWizart>/MinToDate}"/>
 							<Label text="{i18n>specificInsuranceRequirement}"  />
 
 							<Select id="CD_id_InsuranceReq" selectedKey="{ContractModelWizart>/InsuranceRequirement}" items="{TravelAllowance>/type}">

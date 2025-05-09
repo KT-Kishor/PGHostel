@@ -71,7 +71,7 @@
 				<Button text="{i18n>openCamera}" icon="sap-icon://camera" press="IC_onPressOpenCamera" />
 				<Label/>
 				<VBox id="CC_id_canvasContainer" visible="true" class="sapUiSmallMargin canvas">
-					<core:HTML content="&lt;canvas id='canvas' class='passport-size-canvas'&gt;&lt;/canvas&gt;" />
+					<core:HTML content="&lt;canvas id='camera_id_canvas' class='passport-size-canvas'&gt;&lt;/canvas&gt;" />
 				</VBox>
 			</f:content>
 		</f:SimpleForm>

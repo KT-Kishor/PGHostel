@@ -67,9 +67,6 @@
 						<Text text="{i18n>contractNo}"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>aggrementNo}" />
-					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>consultantName}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
@@ -87,6 +84,12 @@
 					<Column  hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>contractStatus}" />
 					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>amount}" />
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>paymentterms}" />
+					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>comments}" />
 					</Column>
@@ -94,14 +97,15 @@
 				<items>
 					<ColumnListItem type="Navigation" press="C_onPressAddContract">
 						<cells>
-							<Text text="{ContractModel>ContractNo}"/>
-							<Text text="{ContractModel>AgreementNo}"/>
+							<Text text="{ContractModel>ContractNo} - {ContractModel>AgreementNo}"/>
 							<Text text="{ContractModel>ConsultantName}"/>
 							<Text text="{ContractModel>LocationService}"/>
 							<Text text="{ContractModel>EndClient}"/>
 							<Text text="{path:'ContractModel>AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{path:'ContractModel>AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" />
 						    <ObjectStatus inverted="true" text="{ContractModel>ContractStatus}"  state="{path: 'ContractModel>ContractStatus', formatter:'.Formatter.formatObjectStatus'}" />
+							<Text text="{ContractModel>ConsultantRate}"/>
+								<Text text="{ContractModel>PaymentTerms}"/>
 							<Text text="{ContractModel>Comments}"/>
 						</cells>
 					</ColumnListItem>
