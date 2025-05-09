@@ -419,8 +419,8 @@ sap.ui.define([
                 this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
             },
-             //close mail dialog
-             Mail_onPressClose: function () {
+            //close mail dialog
+            Mail_onPressClose: function () {
                 this.EOU_oDialogMail.destroy();
                 this.EOU_oDialogMail = null;
                 // this.EOU_oDialogMail.close();
@@ -500,12 +500,14 @@ sap.ui.define([
             },
             //PDF download function
             EOUF_onPressMerge: async function () {
-                this.getBusyDialog();
                 var oModel = this.getView().getModel("employeeModel");
+                this.getView().getModel("employeeModel").setProperty("/Status", "New");
+                await this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
                 this.offerGeneratingPdfFunction(oModel);
             },
             //pdf generate function
             async offerGeneratingPdfFunction(oModel) {
+                this.getBusyDialog();
                 var oEmpModel = oModel.getData();
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
@@ -577,9 +579,6 @@ sap.ui.define([
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
                         jsPDF._GeneratePDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
-                        this.getView().getModel("employeeModel").setProperty("/Status", "New");
-                        await this.updateCallForEmployeeOffer(this.getView().getModel("viewModel"), "silent");
-                        MessageToast.show(this.i18nModel.getText("pdfSucces"));
                     }
                 }
             },
