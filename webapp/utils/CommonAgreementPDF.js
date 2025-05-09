@@ -30,7 +30,8 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
             let titleContentY = titleY + 10; // Initial Y position after titleY
             const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
-            const boldWordList = boldWords.join(" ").split(" ");
+            const trimmedBoldWords = boldWords.map(word => word.trim());
+            const boldWordList = trimmedBoldWords.join(" ").split(" ");
 
             for (let i = 0; i < 10; i++) {
                 if (!content[i]?.TitleContent) break;
