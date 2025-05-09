@@ -210,7 +210,13 @@ sap.ui.define([], function () {
             } else {
                 return "Error";
             }
-        }
+        },
+        formatContractEntry: function (contractNo, consultantName) {
+            return contractNo + " - " + consultantName;
+        },
+       
+        
+        
 
 
     }

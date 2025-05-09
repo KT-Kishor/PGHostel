@@ -86,32 +86,40 @@ sap.ui.define(
         C_onSearch: async function () {
           this.getBusyDialog(); // Show busy dialog
           var aFilterItems = this.byId("C_id_FilterBar").getFilterGroupItems();
-          var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({pattern: "yyyy-MM-dd",});
+          var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
           var params = {};
           aFilterItems.forEach(function (oItem) {
-            var oControl = oItem.getControl();
-            var sValue = oItem.getName();
-            if (oControl && oControl.getValue()) {
-              if (sValue === "Year") {
-                var oAssignmentStartDate = oControl.getDateValue();
-                var oAssignmentEndDate = oControl.getSecondDateValue();
-                params["AssignmentStartDate"] =
-                  oDateFormat.format(oAssignmentStartDate);
-                params["AssignmentEndDate"] =
-                  oDateFormat.format(oAssignmentEndDate);
-              } else {
-                params[sValue] = oControl.getValue();
+              var oControl = oItem.getControl();
+              var sValue = oItem.getName();
+              if (oControl) {
+                  if (sValue === "Year") {
+                      var oAssignmentStartDate = oControl.getDateValue();
+                      var oAssignmentEndDate = oControl.getSecondDateValue();
+                      if (oAssignmentStartDate && oAssignmentEndDate) {
+                          params["AssignmentStartDate"] = oDateFormat.format(oAssignmentStartDate);
+                          params["AssignmentEndDate"] = oDateFormat.format(oAssignmentEndDate);
+                      }
+                  }
+                  else if (oControl.isA("sap.m.ComboBox")) {
+                      var selectedKey = oControl.getSelectedKey();
+                      if (selectedKey) {
+                          params[sValue] = selectedKey; 
+                      }
+                  }
+                  else if (oControl.getValue && oControl.getValue()) {
+                      params[sValue] = oControl.getValue();
+                  }
               }
-            }
           });
           try {
-            await this._fetchCommonData("Contract", "ContractModel", params);
+              await this._fetchCommonData("Contract", "ContractModel", params);
           } catch (error) {
-            sap.m.MessageToast.show(error.message || error.responseText);
+              sap.m.MessageToast.show(error.message || error.responseText);
           } finally {
-            this.closeBusyDialog(); // Close after async call finishes
+              this.closeBusyDialog(); //  close busy dialog
           }
-        },
+      }
+      
       }
     );
   }

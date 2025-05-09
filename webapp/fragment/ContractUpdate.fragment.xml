@@ -89,10 +89,10 @@
 										</m:ComboBox>										
 										<!-- Assignment Start Date -->
 										<m:Label text="{i18n>assignmentStartDate}" required="true"/>
-										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentStartDate' ,formatter:'.Formatter.formatDate'}"  id="CU_id_AssignmentStartDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}"/>
+										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentStartDate'}"  id="CU_id_AssignmentStartDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}"/>
 										<!-- Assignment End Date -->
 										<m:Label text="{i18n>assignmentEndDate}" required="true"/>
-										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" id="CU_id_AssignmentEndDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}" minDate="{oFilteredContractModel>/MinToDate}"/>
+										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentEndDate'}" id="CU_id_AssignmentEndDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}" minDate="{oFilteredContractModel>/MinToDate}"/>
 										<!-- Consultant Rate -->
 										<!-- <m:Label text="{i18n>consultantRate}" required="true"/>
 										<m:Input value="{oFilteredContractModel>/ConsultantRate}" liveChange="onLiveValidation" id="idConsultantRate" editable="{simpleForm>/editable}" maxLength="50"/> -->

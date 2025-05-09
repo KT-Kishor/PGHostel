@@ -93,8 +93,8 @@ sap.ui.define([
                         var oResult = response.data[0];
                         this.ContractNo = oResult.ContractNo;
                         this.OldStatus = oResult.ContractStatus;
-                        this.AssignmentStartDate = oResult.AssignmentStartDate;
-                        this.AssignmentEndDate = oResult.AssignmentEndDate;
+                        this.AssignmentStartDate = this.Formatter.formatDate(oResult.AssignmentStartDate);
+                        this.AssignmentEndDate = this.Formatter.formatDate(oResult.AssignmentEndDate);
                         this.ContractStatus = oResult.ContractStatus;
 
                         if (this.ContractStatus !== "Inactive") {
@@ -419,7 +419,7 @@ sap.ui.define([
                         var assignmentEndDate = assignmentStart;
                         var contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]);
                         assignmentEndDate.setMonth(assignmentEndDate.getMonth() + contractPeriod);
-                        var incrementedDate = assignmentEndDate;
+                        var incrementedDate = assignmentEndDate
                         oModel.setProperty("/AssignmentEndDate", this.Formatter.formatDate(incrementedDate))
                     } else {
                         oModel.setProperty("/AssignmentStartDate", (this.AssignmentStartDate));
@@ -427,6 +427,12 @@ sap.ui.define([
                     }
                 }
             },
+
+            formatDateToISO: function (dateObj) {
+                if (!dateObj || !(dateObj instanceof Date)) return "";
+                return dateObj.toISOString().split("T")[0]; // YYYY-MM-DD
+            },
+            
 
             onPressSave: async function () {
                 const that = this;
@@ -451,7 +457,7 @@ sap.ui.define([
             
                 const oModel = oView.getModel("oFilteredContractModel").getData();
                 const AgreementNo = oModel.AgreementNo;
-                const newAgreementNo = (oModel.ContractStatus === 'Renewed') ? (parseInt(AgreementNo) + 1).toString().padStart(2, "0") : AgreementNo;
+                // const newAgreementNo = (oModel.ContractStatus === 'Renewed') ? (parseInt(AgreementNo) + 1).toString().padStart(2, "0") : AgreementNo;
             
                 const rateType = oModel.HrDaliyMonth;
                 const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
@@ -459,10 +465,13 @@ sap.ui.define([
                 const ConsultantRate = `${oModel.Amount} ${selectedCurrency} Per ${rateText} Including all tax`;
                 const LocationService = this.byId("CD_id_contractLocation").getSelectedKey();
                 const branchCode = this.byId("CU_id_ContractCity").getSelectedItem().getAdditionalText();
+                const startDate = this.byId("CU_id_AssignmentStartDate").getDateValue();
+                const endDate = this.byId("CU_id_AssignmentEndDate").getDateValue();
+                
             
                 const jsonData = {
                     ContractNo: oModel.ContractNo,
-                    AgreementNo: newAgreementNo,
+                    AgreementNo: oModel.AgreementNo,
                     ConsultantNameSalutation: oModel.ConsultantNameSalutation,
                     ConsultantName: oModel.ConsultantName,
                     ConsultingService: oModel.ConsultingService,
@@ -470,8 +479,8 @@ sap.ui.define([
                     EndClient: oModel.EndClient,
                     LocationService: LocationService,
                     ContractStatus: oModel.ContractStatus,
-                    AssignmentStartDate: oModel.AssignmentStartDate.split("/").reverse().join("-"),
-                    AssignmentEndDate: oModel.AssignmentEndDate.split("/").reverse().join("-"),
+                    AssignmentStartDate: this.formatDateToISO(startDate),
+                    AssignmentEndDate: this.formatDateToISO(endDate),
                     ConsultantRate: ConsultantRate,
                     PaymentTerms: oModel.PaymentTerms,
                     ClientReportContactSalutation: oModel.ClientReportContactSalutation,
@@ -481,13 +490,11 @@ sap.ui.define([
                     ExpensesClaim: oModel.ExpensesClaim,
                     AgreementDate: oModel.AgreementDate,
                     ContarctEmail: oModel.ContarctEmail,
-                    ContractLocation: oModel.BaseLocation !== "" ? oModel.BaseLocation : this.byId("CD_id_ConLocation").getSelectedKey(),
+                    ContractLocation: oModel.BaseLocation ? oModel.BaseLocation : this.byId("CD_id_ConLocation").getSelectedKey(),
                     Comments: oModel.Comments,
                     BranchCode: branchCode
                 };
 
-                const oldContractData = { ContractStatus: "Inactive" };
-            
                 // Case 1: Renewed but previous not active
                 if (oModel.ContractStatus === "Renewed" && that.OldStatus !== "Active") {
                     oView.getModel("simpleForm").setProperty("/editable", false);
@@ -500,27 +507,31 @@ sap.ui.define([
                     return sap.m.MessageBox.error(this.i18nModel.getText("contractStatusMessage"));
                 }
             
-                //  Case 2: Renewed and previous was Active — create new contract
+                // ✅ Case 2: Renewed and previous was Active — update old & create new contract
                 if (oModel.ContractStatus === "Renewed" && that.OldStatus === "Active") {
                     const endDateArr = this.Formatter.formatDate(this.AssignmentEndDate).split('/').map(Number);
                     const endDateCreate = new Date(endDateArr[2], endDateArr[1] - 1, endDateArr[0]);
                     const today = new Date();
-            
+                    oModel.ContractStatus="Renewed"
+
                     if (today >= endDateCreate) {
                         delete jsonData.Comments;
-                        this.getBusyDialog();
-                        try {
-                            jsonData.ContractStatus = "Renewed";
-                            const createResponse = await this.ajaxCreateWithJQuery("Contract", { data: jsonData });
-            
-                            if (createResponse.success) {
-                                var requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: AgreementNo }, data: oldContractData };
 
-                                await this.ajaxUpdateWithJQuery("Contract", requestData);
+                        this.getBusyDialog();
+
+                        try {
+                            const oldRequest = {
+                                filters: { ContractNo: oModel.ContractNo, AgreementNo: oModel.AgreementNo },
+                                data: jsonData
+                            };
+                           const  createResponse= await this.ajaxUpdateWithJQuery("Contract", oldRequest);
+
+                            if (createResponse.success) {
+                              
                                 oView.getModel("simpleForm").setProperty("/editable", false);
                                 oView.getModel("simpleForm").setProperty("/Status", false);
                                 this.closeBusyDialog();
-            
+
                                 sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
                                     onClose: function () {
                                         that.getRouter().navTo("RouteContract");
@@ -531,13 +542,15 @@ sap.ui.define([
                             this.closeBusyDialog();
                             sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
                         }
-                        return; //  Prevent fallback update
+
+                        return; // ✅ Skip update fallback
                     } else {
                         oView.getModel("oFilteredContractModel").setProperty("/ContractStatus", this.ContractStatus);
                         this.closeBusyDialog();
                         return sap.m.MessageBox.error(this.i18nModel.getText("renewEndDateMess"));
                     }
                 }
+
         
                 try {
                     this.getBusyDialog();
