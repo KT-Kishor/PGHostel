@@ -102,14 +102,12 @@
                 text="{= ${PDFData>/PreviewFlag} ? ${i18n>downloadcCertificate} : ${i18n>preview} }"
                 type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Neutral'}"
                 press="TCF_onPressHandlePreview"
-                class="submit"
             />
         </beginButton>
         <endButton>
             <Button
                 text="{i18n>close}"
                 press="TCF_onPressCloseDialog"
-                class="sendMail"
                 type="Reject"
             />
         </endButton>

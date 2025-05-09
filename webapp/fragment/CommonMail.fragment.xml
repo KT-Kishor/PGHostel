@@ -25,7 +25,7 @@
                     </HBox>
             
                 <Label text="{i18n>toMailText}"/>
-                <Input id="Mail_id_Text" value ="{UploaderData>/ToEmail}" editable="false"/>
+                <Text id="Mail_id_Text" text ="{UploaderData>/ToEmail}" class="sapUiSmallMarhinBegin"/>
 
                 <Label text="{i18n>ccMailText}" required="true"/>
                 <TextArea id="CCMail_TextArea" value ="{UploaderData>/CCEmail}" maxLength="600" liveChange="Mail_onEmailChange" valueStateText="{i18n>emailValueState}"/>

@@ -268,7 +268,7 @@ sap.ui.define([
                 }
             },
              //Update trainee deatails 
-            updateCallForTrainee: function (oViewModel, text) {
+            updateCallForTrainee: async function (oViewModel, text) {
                 this.getBusyDialog();
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
@@ -287,7 +287,7 @@ sap.ui.define([
                     }
                 };
                 // AJAX call for updating the data
-                this.ajaxUpdateWithJQuery("Trainee", oModel).then((oData) => {
+                await this.ajaxUpdateWithJQuery("Trainee", oModel).then((oData) => {
                     if (oData.success) {
                         this.closeBusyDialog();
                         oViewModel.setProperty("/editable", false);
@@ -402,14 +402,13 @@ sap.ui.define([
             },
             
             //PDF generation function
-            TD_onPressMerge: function (value) {
+            TD_onPressMerge: async function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");
-                this.offerGeneratingPdfFunction(oModel);
                 this.getView().getModel("oTraineeDetails").setProperty("/Status", "New");
                 if (value !== "create") {
-                    this.updateCallForTrainee(this.viewModel, "silent");
+                    await this.updateCallForTrainee(this.viewModel, "silent");
                 }
-                MessageToast.show(this.i18nModel.getText("pdfSucces"));
+                this.offerGeneratingPdfFunction(oModel);
                 this.getView().getModel("oTraineeDetails").refresh(true);
             },
             async offerGeneratingPdfFunction(oModel) {
@@ -426,8 +425,8 @@ sap.ui.define([
                 oPDFModel.setProperty("/TrainingStartDate", Formatter.formatDate(oEmpModel.JoiningDate));
                 oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
                 oPDFModel.setProperty("/StipendOrFees", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Amount));
-                oPDFModel.setProperty("/StipendSkipLine", (oEmpModel.Type === "Paid") ? 5 : null);
-                oPDFModel.setProperty("/TrainingFeesSkipLine", (oEmpModel.Type === "Stipend") ? 6 : null);
+                oPDFModel.setProperty("/StipendSkipLine", (oEmpModel.Type === "Paid" || oEmpModel.Amount == "0") ? 5 : null);
+                oPDFModel.setProperty("/TrainingFeesSkipLine", (oEmpModel.Type === "Stipend" || oEmpModel.Amount == "0") ? 6 : null);
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {

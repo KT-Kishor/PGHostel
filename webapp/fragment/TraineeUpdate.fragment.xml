@@ -12,9 +12,13 @@
         class="sapUiSmallmarginResponsive">
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
+					<!-- Expanded heading to display Consultant Name and Designation -->
 					<expandedHeading>
 						<m:Title text="{oTraineeDetails>/NameSalutation} {oTraineeDetails>/TraineeName}" wrapping="true" width="100%" />
 					</expandedHeading>
+					<expandedContent>
+						<m:Label text="{oTraineeDetails>/Status}"  wrapping="true" width="100%" />
+					</expandedContent>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
 			<sections>
@@ -124,8 +128,6 @@
 												<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 											</m:items>
 										</m:Select>
-										<m:Label text="{i18n>status}" required="true" />
-										<m:Input value="{oTraineeDetails>/Status}" editable="false" enabled="true" class="onClassTarineStatus" maxLength="50" />
 									</f:content>
 								</f:SimpleForm>
 							</blocks>
@@ -140,10 +142,10 @@
 					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</m:contentLeft>
 				<m:contentRight>
+					<m:Button text="{i18n>tileFooter}" press="TU_onSendEmail"  id="TU_id_Traineemail" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}" type="Ghost"/>
 					<m:Button text="{= ${viewModel>/editable} ? ${i18n>save} : ${i18n>edit} }"
-                press="TU_onEditOrSavePress"  id="TD_id_Savebtn" visible="{= ${viewModel>/editBut} }" type="{= ${viewModel>/isEditMode} ? 'Default' : 'Accept' }" />
-					<m:Button text="{i18n>tileFooter}" press="TU_onSendEmail"  id="TU_id_Traineemail" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}"/>
-					<m:Button id="TU_id_Jspdf" text="{i18n>tileUnit}" press="TD_onPressMerge" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}" type="Reject"/>
+                     press="TU_onEditOrSavePress"  id="TD_id_Savebtn" visible="{= ${viewModel>/editBut} }" type="{= ${viewModel>/isEditMode} ? 'Emphasized' : 'Accept' }" />
+					<m:Button id="TU_id_Jspdf" text="{i18n>tileUnit}" press="TD_onPressMerge" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}" type="Attention"/>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>
