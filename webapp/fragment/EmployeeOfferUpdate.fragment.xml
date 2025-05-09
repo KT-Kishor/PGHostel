@@ -96,9 +96,6 @@
 										<m:Label text="{i18n>emailId}" required="true" />
 										<m:Input editable="{viewModel>/editable}" value="{employeeModel>/EmployeeEmail}" placeholder="{i18n>placeEmplyeeEmail}" 
                                              id="EOUF_id_mail" maxLength="50" liveChange="EOD_validateEmail" valueStateText="{i18n>emailValueState}"/>
-											<!-- Employee Status Input (read-only) -->
-										<m:Label text="{i18n>employeeStatus}" />
-										<m:Input value="{employeeModel>/Status}" editable="false" />
 									</f:content>
 								</f:SimpleForm>
 							</blocks>

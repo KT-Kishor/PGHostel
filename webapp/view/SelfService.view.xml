@@ -138,16 +138,17 @@
 										<m:Select items="{sDesignationModel>/}" id="SS_id_Desi" showSecondaryValues="true" selectedKey="{sEmployeeModel>/0/Designation}" editable="{viewModel>/AdminRole}">
 											<core:ListItem key="{sDesignationModel>designationName}" text="{sDesignationModel>designationName}" additionalText="{sDesignationModel>department}" />
 										</m:Select>
-										<m:Label text="{i18n>manager}" id="SS_id_Lmg"/>
-										<m:ComboBox value="{sEmployeeModel>/0/ManagerName}"  showSecondaryValues= "true" id="SS_id_Manager" editable="{viewModel>/AdminRole}" items="{EmployeeModel>/}" filterSecondaryValues="true" change="onManagerChange">
+										<m:Label text="{i18n>manager}" id="SS_id_Lmg" required="true"/>
+										<m:ComboBox value="{sEmployeeModel>/0/ManagerName}"  showSecondaryValues= "true" id="SS_id_Manager" editable="{viewModel>/AdminRole}" items="{EmployeeModel>/}" filterSecondaryValues="true" change="onManagerChange" valueStateText="{i18n>selectManager}">
 											<core:ListItem key="{EmployeeModel>EmployeeID}" text="{EmployeeModel>EmployeeName}" additionalText="{EmployeeModel>EmployeeID}"/>
 										</m:ComboBox>
 										<m:Label text="{i18n>mobileNo}" required="true" id="SS_id_Lmo"/>
 										<m:Input value="{sEmployeeModel>/0/MobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="SS_validateMobileNo" valueStateText="{i18n>mobileNoValueState}"/>
 										<m:Label text="{i18n>role}" id="SS_id_lr"/>
-                                        <m:ComboBox editable="{viewModel>/AdminRole}" value="{sEmployeeModel>/0/Role}" showSecondaryValues= "true" id="SS_id_RoleEmpSele" items="{RoleModel>/}"	filterSecondaryValues="true" change="validateCombo" valueStateText="{i18n>combovalueState}">
+                                        <m:Select editable="{viewModel>/AdminRole}" selectedKey="{sEmployeeModel>/0/Role}" showSecondaryValues= "true" id="SS_id_RoleEmpSele" items="{RoleModel>/}"	 valueStateText="{i18n>combovalueState}">
 											<core:ListItem key="{RoleModel>Role}" text="{RoleModel>Role}" />
-										</m:ComboBox>										<m:Label text="{i18n>employeeStatus}" id="SS_id_les"/>
+										</m:Select>										
+										<m:Label text="{i18n>employeeStatus}" id="SS_id_les"/>
 										<m:Select change="SS_onStatusChange" id="SS_id_StatusSelf" editable="{viewModel>/AdminRole}" selectedKey="{sEmployeeModel>/0/EmployeeStatus}" items="{StatusEmp>/}">
 										<core:Item key="{StatusEmp>Value}" text="{StatusEmp>Value}"/>
 										</m:Select>
@@ -221,15 +222,6 @@
 										</layout:BlockLayoutRow>
 									</layout:BlockLayout>
 								</layout:VerticalLayout>
-							</blocks>
-						</ObjectPageSubSection>
-					</subSections>
-				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" id="idSalaryDetails" title="Salary Details">
-					<subSections>
-						<ObjectPageSubSection title="" titleUppercase="false">
-							<blocks>
-								<m:VBox id="salaryVBox" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -315,7 +307,7 @@
 											<m:ToolbarSpacer/>
 											<m:Button text="{i18n>add}"  id="EdF_id_EduAdd" tooltip="{i18n>toolEAddEdu}" press="EdF_AddEdu"  type="Accept" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"/>
 											<m:Button text="{i18n>edit}"  id="EdF_id_EduEdit"  tooltip="{i18n>toolEEditEdu}" press="EDF_EditEducation" type="Ghost" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
-											<m:Button text="{i18n>delete}" id="EdF_id_EduDelete" tooltip="{i18n>toolDeleteEdu}" press="EdF_DeletEdu" type="Negative" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"/>
+											<m:Button text="{i18n>delete}" id="EdF_id_EduDelete" tooltip="{i18n>toolDeleteEdu}" press="EdF_DeletEdu" type="Reject" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"/>
 										</m:OverflowToolbar>
 									</m:headerToolbar>
 									<m:columns>
@@ -359,7 +351,7 @@
 											<m:Button id="EmpF_id_RefButton" visible="true" tooltip="{i18n>referenceDetails}" press="EmpF_onReferenceDetails" type="Ghost" text="{i18n>referenceDetails}"/>										
 											<m:Button text="{i18n>add}" press="EmpF_onAddEmployment" type="Accept" tooltip="{i18n>toolAddEmp}" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
 											<m:Button  text="{i18n>edit}" press="EmpF_onEditEmployment" type="Ghost" tooltip="{i18n>toolEditEmp}" id="EmpF_id_EmpEdit" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
-											<m:Button text="{i18n>delete}" press="EmpF_onDeletEmployment" type="Negative" tooltip="{i18n>toolDelEmp}" id="EmpF_id_EmpDelete" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
+											<m:Button text="{i18n>delete}" press="EmpF_onDeletEmployment" type="Reject" tooltip="{i18n>toolDelEmp}" id="EmpF_id_EmpDelete" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
 										</m:OverflowToolbar>
 									</m:headerToolbar>
 									<m:columns>
@@ -421,7 +413,7 @@
 												</m:ComboBox>
 												<m:ToolbarSeparator />
 												<u:FileUploader visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png" buttonText="Upload" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true" icon="sap-icon://upload" iconFirst="true" class="sapUiSmallMarginBeginEnd" />
-												<m:Button visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" id="downloadSelectedButton" text="{i18n>delete}" type="Negative" press="onDeleteFiles" enabled="false"/>
+												<m:Button visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" id="downloadSelectedButton" text="{i18n>delete}" type="Reject" press="onDeleteFiles" enabled="false"/>
 												<m:Button id="DeleteSelectedButton" text="{i18n>Download}" type="Ghost" press="onDownloadFiles" enabled="false"/>
 											</m:OverflowToolbar>
 										</m:headerToolbar>
@@ -451,6 +443,15 @@
 										</m:items>
 									</m:Table>
 								</m:VBox>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>			
+               <ObjectPageSection titleUppercase="false" id="idSalaryDetails" title="Salary Details">
+					<subSections>
+						<ObjectPageSubSection title="" titleUppercase="false">
+							<blocks>
+								<m:VBox id="salaryVBox" />
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>

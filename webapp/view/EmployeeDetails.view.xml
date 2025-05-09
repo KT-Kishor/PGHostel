@@ -56,10 +56,7 @@
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>designation}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>dateOfBirth}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
+					<Column minScreenWidth="Desktop" demandPopin="true" width="15%">
 						<Text text="{i18n>email}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true" >
@@ -79,13 +76,10 @@
 							<Text text="{sEmployeeDetails>EmployeeName}"/>
 							<Text text="{sEmployeeDetails>Role}"/>
 							<Text text="{sEmployeeDetails>Designation}"/>
-							<Text text="{path:'sEmployeeDetails>DateOfBirth',formatter: '.Formatter.formatDate'}"/>
 							<Text text="{sEmployeeDetails>CompanyEmailID}"/>
 						    <Text text="{= ${sEmployeeDetails>ManagerName} + '\n(' + ${sEmployeeDetails>ManagerID} + ')' }" />
 							<Text text="{sEmployeeDetails>BaseLocation}"/>
-							<ObjectStatus
-    text="{sEmployeeDetails>EmployeeStatus}"
-    state="{path: 'sEmployeeDetails>EmployeeStatus', formatter: '.Formatter.statusState'}" />
+							<ObjectStatus text="{sEmployeeDetails>EmployeeStatus}" state="{path: 'sEmployeeDetails>EmployeeStatus', formatter: '.Formatter.statusState'}" />
 
 						</cells>
 					</ColumnListItem>
