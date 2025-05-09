@@ -21,9 +21,9 @@
                 <DatePicker minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"
                     change="MA_onstartDatevalidateDate"
-                    value="{EditTaskModel>/StartDate}"
-                    displayFormat="dd-MM-yyyy"
-                    valueFormat="dd/MM/yyyy"
+                    value="{path:'EditTaskModel>/StartDate', formatter:'.Formatter.formatDate'}"
+                       valueFormat="dd/MM/yyyy"
+                    displayFormat="dd/MM/yyyy"
                     id="NAF_id_StartDate"
                     valueStateText="{i18n>dateValueState}"/>
                 <Label text="{i18n>endDate}" required="true"/>
@@ -31,8 +31,8 @@
                     minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"
                     change="AT_validateDate"
-                    value="{EditTaskModel>/EndDate}"
-                    displayFormat="dd-MM-yyyy"
+                    value="{path:'EditTaskModel>/EndDate', formatter:'.Formatter.formatDate'}"
+                    displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     id="NAF_id_EndDate"
                     valueStateText="{i18n>dateValueState}"/>

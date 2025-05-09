@@ -3,13 +3,15 @@ sap.ui.define(
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "../utils/validation"
+    "../utils/validation",
+    "../model/formatter",
   ],
-  function (BaseController, JSONModel, MessageToast, utils) {
+  function (BaseController, JSONModel, MessageToast, utils, Formatter) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.ManageAssignment",
       {
+        Formatter: Formatter,
         onInit: function () {
           this.getRouter().getRoute("RouteManageAssignment").attachMatched(this._onRouteMatched, this);
         },
@@ -21,7 +23,7 @@ sap.ui.define(
           this.CommonReadcall();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("LoginModel").setProperty("/HeaderName", "Create New Assignment");
-          this._FragmentDatePickersReadOnly(["NAF_id_StartDate", "NAF_id_EndDate", "MA_id_StartDate", "MA_id_EndDate"])
+
         },
         onPressback: function () {
           this.getRouter().navTo("RouteTilePage");
@@ -57,6 +59,7 @@ sap.ui.define(
 
             const oData = oSelectedItem.getBindingContext("TaskModel").getObject();
             this._originalTaskData = JSON.parse(JSON.stringify(oData)); // deep copy
+
             oModel = new JSONModel(oData);
           } else {
             this._originalTaskData = null;
@@ -121,8 +124,8 @@ sap.ui.define(
           }
           var TaskType = sap.ui.getCore().byId("FNA_id_Tasktype").getSelectedKey();
           oData.TaskType = TaskType;
-          oData.StartDate = oData.StartDate.split("/").reverse().join('-');
-          oData.EndDate = oData.EndDate.split("/").reverse().join('-');
+          oData.StartDate = sap.ui.getCore().byId("NAF_id_StartDate").getValue().split("/").reverse().join('-');
+          oData.EndDate = sap.ui.getCore().byId("NAF_id_EndDate").getValue().split("/").reverse().join('-');
           this.getBusyDialog();
           const response = await this.ajaxCreateWithJQuery("NewTask", {
             data: oData,
@@ -158,8 +161,9 @@ sap.ui.define(
           const oData = this.getView().getModel("EditTaskModel").getData();
           const oTaskId = oSelectedItem.getBindingContext("TaskModel").getProperty("TaskID");
           const requestData = { filters: { TaskID: oTaskId }, data: oData };
-          oData.StartDate = oData.StartDate.split("/").reverse().join("-");
-          oData.EndDate = oData.EndDate.split("/").reverse().join("-");
+          oData.StartDate = sap.ui.getCore().byId("NAF_id_StartDate").getValue().split("/").reverse().join('-');
+          oData.EndDate = sap.ui.getCore().byId("NAF_id_EndDate").getValue().split("/").reverse().join('-');
+
           this.getBusyDialog();
           const response = await this.ajaxUpdateWithJQuery("/NewTask",
             requestData
