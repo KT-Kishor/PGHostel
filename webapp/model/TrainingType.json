@@ -1,10 +1,10 @@
 [
     {
         "ID": 1,
-        "Type": "Stipend"
+        "Type": "Paid"
     },
     {
         "ID": 2,
-        "Type": "Paid"
+        "Type": "Stipend"
     }
 ]

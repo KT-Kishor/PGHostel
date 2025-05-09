@@ -21,9 +21,9 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="ReportingManager" label="{i18n>reportingManager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox   id="T_id_RmFilterBar" showClearIcon="true" items="{path:'reportingManagerModel>/', sorter: {path:'ReportingManager', descending:false }}">
-								<core:Item key="{reportingManagerModel>ReportingManager}" text="{reportingManagerModel>ReportingManager}"/>
-							</ComboBox>
+						<ComboBox showSecondaryValues="true" showClearIcon="true" items="{empModel>/}" id="T_id_RmFilterBar">
+						<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}" />
+						</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Type" label="{i18n>trainingType}" groupName="Group1" visibleInFilterBar="true">
@@ -47,7 +47,7 @@
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="T_id_TraineeTable" class="sapUiTinyMargin"  items="{path: 'traineeModel>/'}"  busyIndicatorDelay="0"  width="auto" mode="SingleSelectLeft" selectionChange="T_onTableSelectionChange"
+			<Table id="T_id_TraineeTable" class="sapUiResponsiveMargin"  items="{path: 'traineeModel>/'}"  busyIndicatorDelay="0"  width="auto" mode="SingleSelectLeft" selectionChange="T_onTableSelectionChange"
                     growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				 <headerToolbar>
                 <OverflowToolbar >

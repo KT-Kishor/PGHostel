@@ -1,23 +1,23 @@
 [
     {
       "ID": 1,
-      "StatusValue": "OnBoarded"
+      "StatusValue": "New"
     },
     {
       "ID": 2,
-      "StatusValue": "Saved"
-    },
-    {
-      "ID": 3,
-      "StatusValue": "Rejected"
-    },
-    {
-      "ID": 4,
       "StatusValue": "Offer Sent"
     },
     {
+      "ID": 3,
+      "StatusValue": "OnBoarded"
+    },
+    {
+      "ID": 4,
+      "StatusValue": "Rejected"
+    },
+    {
       "ID": 5,
-      "StatusValue": "New"
+      "StatusValue": "Saved"
     },
     {
       "ID":6,

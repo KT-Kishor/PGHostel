@@ -21,6 +21,8 @@ sap.ui.define([
                 await this._fetchCommonData("Designation", "DesignationModel");
                 await this._fetchCommonData("Department", "Departmentmodel");
                 await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeCertificate" });
+                await this._fetchCommonData("EmployeeDetailsData", "empModel");
+
                 // common company emails read call
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
@@ -48,10 +50,7 @@ sap.ui.define([
                     if (this.Filter) {
                         var oFilterData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "").map(item => [item.TraineeName.trim(), item])).values()];
                         this.getView().setModel(new JSONModel(oFilterData), "traineeNameModel");
-                        var oFilterData = [...new Map(offerData.filter(item => item.ReportingManager && item.ReportingManager.trim() !== "").map(item => [item.ReportingManager.trim(), item])).values()];
-                        this.getView().setModel(new JSONModel(oFilterData), "reportingManagerModel");
                         this.getView().getModel("traineeNameModel").refresh(true);
-                        this.getView().getModel("reportingManagerModel").refresh(true);
                         this.Filter = true;
                     }
                     this.closeBusyDialog();
