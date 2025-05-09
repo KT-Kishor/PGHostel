@@ -211,7 +211,7 @@
 					<subSections>
 						<ObjectPageSubSection title=" " titleUppercase="false">
 							<blocks>
-								<m:Text text="PO"/>
+								<m:Button text="Generate PDF" press="onPressOpenRTE"/>
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>

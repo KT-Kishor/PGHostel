@@ -363,19 +363,6 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 const backImgX = (pageWidth - 100) / 2; // Center horizontally
                 const backImgY = (pageHeight - 100) / 2; // Center vertically
 
-                function checkPageBreak(currentYPosition) {
-
-                    if (currentYPosition >= bottomLimit) {
-                        doc.addPage(); // Add a new page if the current position exceeds the limit
-                        doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
-                        doc.setGState(new doc.GState({ opacity: 0.1 }));
-                        doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
-                        doc.setGState(new doc.GState({ opacity: 1 }));
-                        currentYPosition = topMargin; // Reset to top margin on the new page
-                    }
-                    return currentYPosition; // Return updated Y position
-                }
-
                 doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
                 doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
@@ -454,7 +441,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                 for (let i = 1; i < content.length; i++) {
                     currentY += 5;
-                    currentY = checkPageBreak(currentY);
+                    currentY = that._checkPageBreak(currentY, bottomLimit, doc, topMargin, backImgX, backImgY, oCompanyModel);
 
                     // Point number and title
                     doc.text(`${content[i - 1].PointNo}.`, margin + (paraMargin - 6), currentY);
@@ -598,7 +585,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     // Print lines
                     lines.forEach((lineText, index) => {
                         let lineX = index === 0 ? pointContentX : margin + paraMargin;
-                        currentY = checkPageBreak(currentY);
+                        currentY = that._checkPageBreak(currentY, bottomLimit, doc, topMargin, backImgX, backImgY, oCompanyModel);
                         doc.text(lineText, lineX, currentY);
                         currentY += 6;
                     });
@@ -626,7 +613,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                         let lineWidth = doc.getTextWidth(line);
                         let spaceWidth = doc.getTextWidth(" ");
 
-                        lastPointContentY = checkPageBreak(lastPointContentY);
+                        lastPointContentY = that._checkPageBreak(lastPointContentY, bottomLimit, doc, topMargin, backImgX, backImgY, oCompanyModel);
 
                         if (lineIndex < pointContentLines.length - 1 && totalWords > 1) {
                             let extraSpace = ((maxWidth - paraMargin) - lineWidth) / (totalWords - 1);
@@ -688,6 +675,186 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                 doc.save("SOW.pdf");
                 that.closeBusyDialog();
+            }, 1000);
+        },
+
+        _GeneratePOPDF: function (that, oModel, oCompanyModel, htmlContent) {
+            setTimeout(function () {
+                var { jsPDF } = window.jspdf;
+                var doc = new jsPDF({
+                    unit: "mm",
+                    format: "a4",
+                    margins: { left: 30, right: 30 },
+                    lineHeight: 1.5,
+                    orientation: "portrait",
+                });
+
+                var pageWidth = doc.internal.pageSize.getWidth();
+                var pageHeight = doc.internal.pageSize.getHeight();
+                var margin = 25; // left and right margin
+                var paraMargin = 6; // left margin for paragraphs
+                var topMargin = 25;
+                var footerHeight = 25; // reserve 25 units at the bottom for footer
+                var maxWidth = pageWidth - 2 * margin; // usable width
+                var pageMiddle = pageWidth / 2;
+                var bottomLimit = pageHeight - footerHeight;
+                let currentY;
+
+                doc.setFont("times", "bold").setFontSize(14);
+
+                const backImgX = (pageWidth - 100) / 2; // Center horizontally
+                const backImgY = (pageHeight - 100) / 2; // Center vertically
+
+                doc.addImage(oCompanyModel.companylogo64, "PNG", margin, topMargin - 10, 45, 45);
+                doc.setGState(new doc.GState({ opacity: 0.1 }));
+                doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
+                doc.setGState(new doc.GState({ opacity: 1 }));
+
+                let coAlignment = { maxWidth: 70, align: "right" };
+                let coNameY = topMargin;
+
+                doc.text(oCompanyModel.companyName, pageWidth - margin, coNameY, coAlignment)
+                let coAddressY = doc.getTextDimensions(oCompanyModel.companyName, coAlignment).h + coNameY + 3;
+
+                doc.setFont("times", "normal").setFontSize(12);
+                doc.text(oCompanyModel.longAddress, pageWidth - margin, coAddressY, coAlignment)
+                let coGSTINY = doc.getTextDimensions(oCompanyModel.longAddress, coAlignment).h + coAddressY + 3;
+
+                doc.text("GSTIN: " + oCompanyModel.GSTIN, pageWidth - margin, coGSTINY, coAlignment);
+                // currentY = doc.getTextDimensions("GSTIN: " + oCompanyModel.gstin, coAlignment).h; (NOT REQURIED AS OF NOW)
+
+                let titleY = topMargin + 50;
+                doc.setTextColor(255, 0, 0);
+                doc.setFont("times", "bold").setFontSize(14);
+                let titleText = "PURCHASE ORDER";
+                let titletextWidth = doc.getTextWidth(titleText);
+                let titleX = (pageWidth - titletextWidth) / 2;
+                doc.text(titleText, titleX, titleY);
+
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(11);
+
+                let clientAlignment = { maxWidth: 70, align: "left" };
+                let clientNameY = titleY + 15;
+                doc.text("To,", margin, clientNameY - 5, clientAlignment);
+                doc.text(oModel.ClientCompanyName, margin, clientNameY);
+                doc.setFont("times", "normal");
+                doc.text(oModel.ClientCompanyAddress, margin, clientNameY + 6, clientAlignment);
+                let clientPANY = doc.getTextDimensions(oModel.ClientCompanyAddress, clientAlignment).h + clientNameY + 8;
+                doc.text("PAN: " + oModel.ClientCompanyPAN, margin, clientPANY);
+
+                doc.setFont("times", "bold");
+                let poDetaisX = pageWidth - margin - 50;
+                let poDetailsY = clientNameY - 4;
+                doc.text("PO Number", poDetaisX, poDetailsY);
+                doc.text("Type", poDetaisX, poDetailsY + 6);
+                doc.text("From", poDetaisX, poDetailsY + 12);
+                doc.text("To", poDetaisX, poDetailsY + 18);
+                doc.text("Date", poDetaisX, poDetailsY + 24);
+                doc.setFont("times", "normal");
+                doc.text(`: ${oModel.PONumber}`, poDetaisX + 22, poDetailsY);
+                doc.text(`: ${oModel.POType}`, poDetaisX + 22, poDetailsY + 6);
+                doc.text(`: ${oModel.POFrom}`, poDetaisX + 22, poDetailsY + 12);
+                doc.text(`: ${oModel.POTo}`, poDetaisX + 22, poDetailsY + 18);
+                doc.text(`: ${oModel.PODate}`, poDetaisX + 22, poDetailsY + 24);
+
+                let tableY = poDetailsY + 35;
+
+                doc.autoTable({
+                    startY: tableY,
+                    head: [["Description", "Unit/Quantity", "Amount", "Currency"]],
+                    body: oModel.POItems.map(item => [item.Description, item.Qty, item.Amount, item.Currency]),
+
+                    styles: {
+                        font: "times",
+                        fontSize: 10,
+                        cellPadding: 1,
+                        overflow: 'linebreak',
+                        halign: 'left',
+                        valign: 'middle',
+                        minCellHeight: 5,
+                        fillColor: [200, 200, 200],
+                        textColor: [0, 0, 0]
+                    },
+
+                    headStyles: {
+                        fillColor: [150, 150, 150],
+                        textColor: [0, 0, 0],
+                        fontStyle: "bold",
+                        valign: 'middle',
+                        cellPadding: 1
+                    },
+
+                    columnStyles: {
+                        0: { cellWidth: maxWidth * 0.4 },
+                        1: { cellWidth: maxWidth * 0.2 },
+                        2: { cellWidth: maxWidth * 0.2 },
+                        3: { cellWidth: maxWidth * 0.2 }
+                    },
+
+                    tableWidth: maxWidth,
+                    margin: { left: margin, right: margin }
+                });
+
+                var totalAmountY = doc.lastAutoTable.finalY + 10;
+                doc.setFont("times", "bold").setFontSize(10);
+                doc.text("TOTAL AMOUNT:", margin, totalAmountY);
+                doc.setFont("times", "normal");
+                doc.text(`${oModel.TotalPOAmount} (${oModel.POAmountInWords})`, margin + 32, totalAmountY);
+
+                function prepareHtmlForPdf(htmlContent) {
+                    // Styles to inject
+                    const style = `
+                        <style>
+                            body {
+                            margin: 0;
+                            padding: 0;
+                            }
+                            ul, li {
+                            list-style-position: inside;
+                            padding-left: 0;
+                            margin: 0;
+                            line-height: 1.4;
+                            font-size: inherit;
+                            font-family: inherit;
+                            }
+                            li::marker {
+                            vertical-align: middle;
+                            }
+                            p, span {
+                            margin: 0;
+                            padding: 0;
+                            }
+                        </style>
+                        `;
+
+                    return style + htmlContent;
+                }
+
+
+                let mmToPx = (mm) => mm * (96 / 48);
+                let containerWidthPx = mmToPx(maxWidth);
+
+                let container = document.createElement("div");
+                container.innerHTML = prepareHtmlForPdf(htmlContent);
+                container.style.width = `${containerWidthPx}px`;
+                container.style.fontFamily = "Times New Roman";
+                container.style.fontSize = "5.5pt";
+                container.style.lineHeight = "1.4";
+                container.style.padding = "0";
+                document.body.appendChild(container);
+
+                let rteY = totalAmountY + 10;
+                doc.html(container, {
+                    x: margin,
+                    y: rteY,
+                    html2canvas: { scale: 0.5 },
+                    callback: function (doc) {
+                        doc.save("PO.pdf");
+                        that.closeBusyDialog();
+                    }
+                });
+
             }, 1000);
         }
     };

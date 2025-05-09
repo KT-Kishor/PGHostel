@@ -172,6 +172,30 @@
     "SpecificInsuranceRequirement": "(SpecificInsuranceRequirement)",
     "ConsultantRate": "(ConsultantRate)",
     "ExpensesClaim": "(ExpensesClaim)",
-    "ClientReportingName": "(ClientReportingName)"
+    "ClientReportingName": "(ClientReportingName)",
+
+    "POItems": [
+        {
+            "Description": "Laptop",
+            "Qty": "5",
+            "Amount": "3,00,000",
+            "Currency": "INR"
+        },
+        {
+            "Description": "Keyboard",
+            "Qty": "10",
+            "Amount": "5,000",
+            "Currency": "INR"
+        },
+        {
+            "Description": "Router",
+            "Qty": "2",
+            "Amount": "4,000",
+            "Currency": "INR"
+        }
+    ],
+
+    "TotalPOAmount": "3,09,000 INR",
+    "POAmountInWords": "Three Lakh Nine Thousand Only"
 
 }
