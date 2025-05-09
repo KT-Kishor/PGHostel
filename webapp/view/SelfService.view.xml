@@ -393,7 +393,7 @@
 							<blocks>
 								<m:VBox>
 									<!-- MessageStrip appears first -->
-									<m:MessageStrip text="{i18n>uploadMsg}" type="Warning" class="sapUiTinyMarginBottom" />
+									<m:MessageStrip text="{i18n>uploadMsg}" type="Information" showIcon="true" class="sapUiTinyMarginBottom" />
 									<m:Table
 								id="table-uploadSet"								
 								mode="SingleSelectLeft"																
@@ -412,7 +412,7 @@
 													<core:Item key="{DocumentJson>id}" text="{DocumentJson>name}" />
 												</m:ComboBox>
 												<m:ToolbarSeparator />
-												<u:FileUploader visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png" buttonText="Upload" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true" icon="sap-icon://upload" iconFirst="true" class="sapUiSmallMarginBeginEnd" />
+												<u:FileUploader visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png" buttonText="Upload" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true"  iconFirst="true" class="sapUiSmallMarginBeginEnd" />
 												<m:Button visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" id="downloadSelectedButton" text="{i18n>delete}" type="Reject" press="onDeleteFiles" enabled="false"/>
 												<m:Button id="DeleteSelectedButton" text="{i18n>Download}" type="Ghost" press="onDownloadFiles" enabled="false"/>
 											</m:OverflowToolbar>

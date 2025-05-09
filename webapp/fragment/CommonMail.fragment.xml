@@ -6,12 +6,7 @@
     <Dialog title="Send Mail" contentWidth="60%" >
         <f:SimpleForm id="Mail_id_Form" busyIndicatorDelay="0" editable="true" layout="ResponsiveGridLayout">
             <f:content>
-                <MessageStrip
-                    text="{i18n>sendMailFragMsg}"
-                    type="Warning"
-                    showIcon="true"
-                    class="sapUiTinyMarginBottom">
-                </MessageStrip>
+            <MessageStrip text="{i18n>sendMailFragMsg}" type="Information" showIcon="true" />    
                 <Label text="{i18n>fileUploader}" required="true"/>
                     <HBox width="100%" justifyContent="Start" alignItems="Center">
                         <VBox width="20%">
