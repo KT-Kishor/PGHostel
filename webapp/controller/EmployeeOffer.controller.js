@@ -45,6 +45,7 @@ sap.ui.define([
                 else {
                     this.EO_onSearch();
                 }
+              this._makeDatePickersReadOnly(["EO_id_JoiningDate"]);
             },
             // Read call for employee offer data
             readCallForEmployeeOffer: async function (filter) {

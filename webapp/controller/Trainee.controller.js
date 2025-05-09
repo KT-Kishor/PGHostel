@@ -39,6 +39,8 @@ sap.ui.define([
                 else {
                     this.T_onSearch();// filter function for trainee 
                 }
+                 this._makeDatePickersReadOnly(["T_id_JoiningDate"]);
+
             },
 
             //read call for trainee
