@@ -62,7 +62,10 @@
 .submit {
   margin-right: 10px;
 }
-
+.sapMMsgStrip {
+    display: flex;
+    align-items: center;
+}
 .sapUiSmallMargin {
   margin-left: 5px;
   margin-right: 5px;
