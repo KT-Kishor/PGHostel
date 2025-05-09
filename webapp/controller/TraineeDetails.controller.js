@@ -38,7 +38,7 @@ sap.ui.define([
                     "ReleaseDate": this.Formatter.formatDate(new Date()),
                     "JoiningDate": "",
                     "TraineeEmail": "",
-                    "TrainingDuration": "",
+                    "TrainingDuration": "6 Month",
                     "BaseLocation": "Kalaburagi"
                 };
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
