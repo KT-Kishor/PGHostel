@@ -9,15 +9,17 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteMSA").attachMatched(this._onRouteMatched, this);
                 this._fetchCommonData("ManageCustomer", "CompanyNameModel");
             },
-            _onRouteMatched: async function () {
-                this.commonLoginFunction("MSA&SOW");
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");
-                this.MSA_onSearch();
-                BusyIndicator.hide();
+            _onRouteMatched: async function () {               
+                await this.commonLoginFunction("MSA&SOW");
+                await this.MSA_onSearch();
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");            
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
+            onPressClear:function(){
+                this.byId("MSA_id_CompanyName").setValue('');
+            }, 
             onLogout: function () {
                 this.CommonLogoutFunction();
             },
@@ -25,16 +27,14 @@ sap.ui.define([
                 this.getRouter().navTo("RouteMSADetails");                
             },
                        
-            OnPressNavigationMsaDet:function(oEvent){
-                BusyIndicator.show(0);
+            OnPressNavigationMsaDet:function(oEvent){               
                 var MsaID = oEvent.getSource().getBindingContext("MSADisplayModel").getProperty("MsaID");
                 this.getRouter().navTo("RouteMSAEdit",{sPath:MsaID})
             },
 
             MSA_onSearch: async function () {
                 try {
-                    var oTable = this.byId("MSA_id_Table");
-                    oTable.setBusy(true);
+                    this.getBusyDialog();
                     const aFilterItems = this.byId("MSA_id_AdminFilter").getFilterGroupItems();
                     const params = {};
             
@@ -55,7 +55,7 @@ sap.ui.define([
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
-                    oTable.setBusy(false); 
+                    this.closeBusyDialog();
                 }
             },
 

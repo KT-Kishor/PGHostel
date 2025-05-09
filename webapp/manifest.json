@@ -207,7 +207,12 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TravelAllowance.json",
                 "preload": true
-            }
+            },
+            "SowStatusModel": {
+        "uri": "model/SowFilter.json",
+        "type": "sap.ui.model.json.JSONModel",
+        "preload": true
+      }
         },
         "resources": {
             "js": [

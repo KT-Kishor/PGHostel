@@ -5,9 +5,8 @@ sap.ui.define([
     "sap/m/MessageToast",   
     "../model/formatter",
     "sap/m/MessageBox",
-    "sap/ui/core/BusyIndicator"
 ],
-    function (BaseController, utils, JSONModel, MessageToast,Formatter,MessageBox,BusyIndicator) {
+    function (BaseController, utils, JSONModel, MessageToast,Formatter,MessageBox) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSADetails", {
             Formatter:Formatter,
@@ -190,7 +189,7 @@ sap.ui.define([
                 }
             
                 try {
-                    BusyIndicator.show(0);            
+                    this.getBusyDialog();            
                     const oModelData = this.getView().getModel("msaModelWizart").getData();
                     const [day, month, year] = oModelData.CreateMSADate.split('/');
                     const assignmentEndDate = new Date(year, month - 1, day);
@@ -202,17 +201,21 @@ sap.ui.define([
                     oModelData.CreateMSADate = oModelData.CreateMSADate.split("/").reverse().join("-");
                     oModelData.Type = this.byId("MsaD_id_Type").getSelectedButton().getText();
 
-                    if(!this.getView().getModel("VisibleModel").getProperty("/Recruitment")) oModelData.ReplacementMonth = ""
+                    if(!this.getView().getModel("VisibleModel").getProperty("/Recruitment")) oModelData.ReplacementMonth = "0"
+                    if(!this.getView().getModel("VisibleModel").getProperty("/Recruitment")) oModelData.ReplacementRefund = "0"
+                    if(!this.getView().getModel("VisibleModel").getProperty("/Recruitment")) oModelData.PaymentBalance = "0"
+                    if(!this.getView().getModel("VisibleModel").getProperty("/Recruitment")) oModelData.PaymentAdvance = "0"
+                    if(!this.getView().getModel("VisibleModel").getProperty("/Recruitment")) oModelData.RateCharge = "0"
             
                     const oCreateResponse = await this.ajaxCreateWithJQuery("MSADetails", { data: oModelData });
             
-                    if (oCreateResponse) {                        
+                    if (oCreateResponse) {     
+                        this.closeBusyDialog();                   
                         MessageBox.success(this.getView().getModel("i18n").getResourceBundle().getText("msaCreatedMsg"), {
                             icon: MessageBox.Icon.SUCCESS,
                             title: "Success",
                             actions: [sap.m.MessageBox.Action.OK, "Generate PDF"],
                             onClose: (sAction) => {
-                                BusyIndicator.hide();
                                 if (sAction === "OK") {
                                     this.getRouter().navTo("RouteMSA");
                                     this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
@@ -222,11 +225,11 @@ sap.ui.define([
                             }
                         });
                     } else {
-                        BusyIndicator.hide();
+                        this.closeBusyDialog();
                         MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
                     }
                 } catch (oError) {
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             }            

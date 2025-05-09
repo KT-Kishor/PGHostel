@@ -51,7 +51,7 @@ sap.ui.define([
             if (sAction === sap.m.MessageBox.Action.OK) {
               this.getView().getModel("LoginModel").setData({});
               window.location.reload(true);
-              this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+              this.getOwnerComponent().getRouter().navTo("LoginPage");
             }
           }.bind(this) // Bind 'this' to ensure the correct context
         }
@@ -78,7 +78,7 @@ sap.ui.define([
             if (sAction === sap.m.MessageBox.Action.OK) {
               this.getView().getModel("LoginModel").setData({});
               // Navigate to the login page
-              this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+              this.getOwnerComponent().getRouter().navTo("LoginPage");
             }
           }.bind(this) // Bind 'this' to ensure the correct context
         });

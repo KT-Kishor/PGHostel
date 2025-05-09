@@ -33,7 +33,7 @@
             <DatePicker  id="SOW_id_StartDate" value="{sowCreateModel>/StartDate}" visible="{VisibleUpdateModel>/VisibleUpdate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="MsaE_validateDate" valueStateText="{i18n>dateValueState}"/>
            
              <Label text="{i18n>currency}" class="oSowFragLabel" required="true"/>
-             <ComboBox items="{CurrencyModel>/}" selectedKey="1" value="{sowCreateModel>/Currency}">
+             <ComboBox items="{CurrencyModel>/}" value="{sowCreateModel>/Currency}">
                 <core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
             </ComboBox>
             
@@ -48,9 +48,9 @@
         <Toolbar>
             <Title text="{i18n>ConsultantHeaderDetails}" id="SOW_id_SowDetails" />
             <ToolbarSpacer />
-        <Button text="{i18n>addConsultant}" visible="{VisibleUpdateModel>/addSowBtn}" press="SOW_onAddConsultant" />
+        <Button text="{i18n>addConsultant}" visible="{simpleForm>/addSowBtn}" press="SOW_onAddConsultant" />
            <ToolbarSeparator />
-            <Button icon="sap-icon://delete" press="SOW_onDeleteExtendItem" visible="{VisibleUpdateModel>/ExpendBtn}" />
+            <Button icon="sap-icon://delete" press="SOW_onDeleteExtendItem" visible="{simpleForm>/ExpendBtn}" />
         </Toolbar>
     </headerToolbar>
     <columns>
