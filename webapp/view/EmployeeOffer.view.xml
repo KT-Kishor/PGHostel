@@ -71,9 +71,6 @@
 					<Column minScreenWidth="Desktop" demandPopin="true" >
 						<Text text="{i18n>emailId}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>status}" />
-					</Column>
 				</columns>
 				<items>
 					<ColumnListItem type="Navigation" press="EO_onPressEmployee">
@@ -84,8 +81,6 @@
 							<Text text="{path: 'EmployeeOfferModel>CTC' ,formatter: '.Formatter.formatCurrencyInINRText'}"/>
 							<Text text="{path:'EmployeeOfferModel>JoiningDate',formatter: '.Formatter.formatDate'}"/>
 							<Text text="{EmployeeOfferModel>EmployeeEmail}"/>
-							<ObjectStatus text="{EmployeeOfferModel>Status}"
-                        state="{path:'EmployeeOfferModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
 						</cells>
 					</ColumnListItem>
 				</items>

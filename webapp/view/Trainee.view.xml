@@ -52,7 +52,7 @@
                     growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				 <headerToolbar>
                 <OverflowToolbar >
-                    <Title id="T_id_Title" text="{i18n>traineeEdit} ({= ${traineeModel>/}.length })"/>
+                    <Title id="T_id_Title" text="{i18n>traineeDetail} ({= ${traineeModel>/}.length })"/>
                     <ToolbarSpacer/>
                     <Button  tooltip="{i18n>downloadcCertificate}" text="{i18n>certificate}"  id="T_id_Download"   press="T_onCertDownload"   visible="false" type="Attention"/>
                     <Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>traineeOnbord}" id="T_id_EmpOnBoard"   press="T_onBoardTrainee"  visible="false"/>
@@ -87,9 +87,7 @@
 					<Column minScreenWidth="Tablet" demandPopin="true" width="20%">
 						<Text text="{i18n>emailId}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>status}" />
-					</Column>
+				
 				</columns>
 				<items>
 					<ColumnListItem  type="Navigation" press="T_onPressAddTrainee">
@@ -99,10 +97,9 @@
 							<Text text="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{traineeModel>TrainingDuration}"/>
 							<Text text="{traineeModel>Type}"/>							
-							<Text text="{path:'traineeModel>Amount', formatter: '.Formatter.formatCurrency'} {traineeModel>Currency}" textAlign="Right"/>
+							<Text text="{path:'traineeModel>Amount', formatter: '.Formatter.formatCurrency'} {traineeModel>Currency}" textDirection="RTL"/>
 							<Text text="{traineeModel>BaseLocation}"/>
 							<Text text="{traineeModel>TraineeEmail}"/>
-							<ObjectStatus text="{traineeModel>Status}"  state="{path:'traineeModel>Status',formatter:'.Formatter.formatObjectStatus'}"/>
 						</cells>
 					</ColumnListItem>
 				</items>

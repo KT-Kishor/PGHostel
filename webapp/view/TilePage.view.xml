@@ -24,8 +24,8 @@
 
 				<GenericTile visible="{= ${AppVisibilityModel>/GenerateTraineeOffer} === '1' ? true : false}"
                    class="sapUiMediumMargin"
-                    header="{i18n>headerTrainee}" press="TileV_onpressTrainee"  subheader="{i18n>subhead}">
-					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>SendMail}">
+                    header="{i18n>addTrainee}" press="TileV_onpressTrainee"  subheader="{i18n>subhead}">
+					<TileContent  unit="{i18n>tileUnit}">
 						<ImageContent src="sap-icon://account" />
 					</TileContent>
 				</GenericTile>
@@ -33,9 +33,9 @@
 				<GenericTile visible="{= ${AppVisibilityModel>/GenerateEmployeeOffer} === '1' ? true : false}"
                     class="sapUiMediumMargin"
                     
-                    header="{i18n>headerEmployeeOffer}" press="TileV_onPressOffer"
+                    header="{i18n>generateOffer}" press="TileV_onPressOffer"
                     subheader="{i18n>subhead}">
-					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>tileFooter}">
+					<TileContent  unit="{i18n>tileUnit}">
 						<ImageContent src="sap-icon://employee-approvals" />
 					</TileContent>
 				</GenericTile>
@@ -44,7 +44,7 @@
                     class="sapUiMediumMargin"
                     header="{i18n>headerContractDetails}" press="TileV_onpressContract"
                     subheader="{i18n>subhead}">
-					<TileContent  unit="{i18n>tileUnit}" footer="{i18n>tileFooter}">
+					<TileContent  unit="{i18n>tileUnit}">
 						<ImageContent src="sap-icon://decision" />
 					</TileContent>
 				</GenericTile>
