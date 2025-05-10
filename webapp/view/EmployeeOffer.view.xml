@@ -62,14 +62,14 @@
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>baseLocation}" />
 					</Column>
-					<Column demandPopin="true">
-						<Text text="{i18n>ctc}" />
-					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>joiningDate}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true" >
 						<Text text="{i18n>emailId}" />
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>ctc}" />
 					</Column>
 				</columns>
 				<items>
@@ -78,9 +78,10 @@
 							<Text text="{EmployeeOfferModel>Salutation} {EmployeeOfferModel>ConsultantName}"/>
 							<Text text="{EmployeeOfferModel>Designation}"/>
 							<Text text="{EmployeeOfferModel>BaseLocation}"/>
-							<Text text="{path: 'EmployeeOfferModel>CTC' ,formatter: '.Formatter.formatCurrencyInINRText'}"/>
 							<Text text="{path:'EmployeeOfferModel>JoiningDate',formatter: '.Formatter.formatDate'}"/>
 							<Text text="{EmployeeOfferModel>EmployeeEmail}"/>
+							<Text text="{path: 'EmployeeOfferModel>CTC' ,formatter: '.Formatter.formatCurrencyInINRText'}"/>
+
 						</cells>
 					</ColumnListItem>
 				</items>

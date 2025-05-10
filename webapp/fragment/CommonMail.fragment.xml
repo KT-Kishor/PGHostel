@@ -1,16 +1,16 @@
 <core:FragmentDefinition
-    xmlns="sap.m"
-    xmlns:f="sap.ui.layout.form"
-    xmlns:u="sap.ui.unified"
-    xmlns:core="sap.ui.core">
-    <Dialog title="Send Mail" contentWidth="60%" >
-        <f:SimpleForm id="Mail_id_Form" busyIndicatorDelay="0" editable="true" layout="ResponsiveGridLayout">
-            <f:content>
-            <MessageStrip text="{i18n>sendMailFragMsg}" type="Information" showIcon="true" />    
-                <Label text="{i18n>fileUploader}" required="true"/>
-                    <HBox width="100%" justifyContent="Start" alignItems="Center">
-                        <VBox width="20%">
-                            <u:FileUploader  
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified"
+	xmlns:core="sap.ui.core">
+	<Dialog title="Send Mail" contentWidth="60%" >
+		<f:SimpleForm id="Mail_id_Form" busyIndicatorDelay="0" editable="true" layout="ResponsiveGridLayout">
+			<f:content>
+				<MessageStrip text="{i18n>sendMailFragMsg}" type="Information" showIcon="true" />
+				<Label text="{i18n>fileUploader}" required="true"/>
+				<HBox width="100%" justifyContent="Start" alignItems="Center">
+					<VBox width="20%">
+						<u:FileUploader  
                                 id="Mail_id_FileUploader"                                     
                                 name="myFileUpload"
                                 multiple="true"
@@ -18,23 +18,22 @@
                                 tooltip="{i18n>toolTipMsgSM}"
                                 change="Mail_onUpload"
                                 buttonOnly="true"                  />
-                        </VBox>
-                        <VBox width="80%" >
-                            <Text text="{UploaderData>/name}"></Text>
-                        </VBox>
-                    </HBox>
-            
-                <Label text="{i18n>toMailText}"/>
-                <Text id="Mail_id_Text" text ="{UploaderData>/ToEmail}" class="sapUiSmallMarhinBegin"/>
-
-                <Label text="{i18n>ccMailText}" required="true"/>
-                <TextArea id="CCMail_TextArea" value ="{UploaderData>/CCEmail}" maxLength="600" liveChange="Mail_onEmailChange" valueStateText="{i18n>emailValueState}"/>
-            </f:content>
-        </f:SimpleForm>
-
-        <FlexBox justifyContent="End">
-           <Button id="SendMail_Button" text="{i18n>tileFooter}" type="Ghost" class="sendMail" press="Mail_onSendEmail" enabled="false"/>
-           <Button text="{i18n>close}" width="80px" class="sendMail" press="Mail_onPressClose" type="Reject"/>
-        </FlexBox>
-    </Dialog>
+					</VBox>
+					<VBox width="80%" >
+						<Text text="{UploaderData>/name}"></Text>
+					</VBox>
+				</HBox>
+				<Label text="{i18n>toMailText}"/>
+				<Text id="Mail_id_Text" text ="{UploaderData>/ToEmail}" class="sapUiSmallMarhinBegin"/>
+				<Label text="{i18n>ccMailText}" required="true"/>
+				<TextArea id="CCMail_TextArea" value ="{UploaderData>/CCEmail}" maxLength="600" liveChange="Mail_onEmailChange" valueStateText="{i18n>emailValueState}"/>
+			</f:content>
+		</f:SimpleForm>
+		<beginButton>
+			<Button id="SendMail_Button" text="{i18n>tileFooter}" type="Ghost"  press="Mail_onSendEmail" enabled="false"/>
+		</beginButton>
+		<endButton>
+			<Button text="{i18n>close}" width="80px" press="Mail_onPressClose" type="Reject"/>
+		</endButton>
+	</Dialog>
 </core:FragmentDefinition>
