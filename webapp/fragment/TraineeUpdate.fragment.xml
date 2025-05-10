@@ -5,8 +5,7 @@
 	xmlns:m="sap.m"
 	xmlns:core="sap.ui.core">
 	<m:Page id="TUF_id_pageTrainee" title="{i18n>traineeEdit}" showNavButton="true" navButtonPress="TUF_onPressback">
-		<ObjectPageLayout 
-        useIconTabBar="true"
+		<ObjectPageLayout
         showTitleInHeaderContent="true"
 		preserveHeaderStateOnScroll="true"
         class="sapUiSmallmarginResponsive">
@@ -28,7 +27,7 @@
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
 			<sections>
-				<ObjectPageSection >
+				<ObjectPageSection showTitle="false" >
 					<subSections>
 						<ObjectPageSubSection   >
 							<blocks>
