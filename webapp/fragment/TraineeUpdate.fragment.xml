@@ -17,7 +17,13 @@
 						<m:Title text="{oTraineeDetails>/NameSalutation} {oTraineeDetails>/TraineeName}" wrapping="true" width="100%" />
 					</expandedHeading>
 					<expandedContent>
-						<m:Label text="{oTraineeDetails>/Status}"  wrapping="true" width="100%" />
+                  <m:ObjectStatus text="{= ${oTraineeDetails>/Status} }"
+                   state="{= ${oTraineeDetails>/Status} === 'Rejected' ? 'Error' :
+                             ${oTraineeDetails>/Status} === 'Saved' ? 'Warning' :
+                             ${oTraineeDetails>/Status} === 'New' ? 'Information' :
+                             ${oTraineeDetails>/Status} === 'OnBoarded' ? 'Success' :
+                             ${oTraineeDetails>/Status} === 'Training Completed' ? 'Indication01' :
+                             ${oTraineeDetails>/Status} === 'Offer Sent' ? 'Indication06' : 'None' }" />
 					</expandedContent>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
