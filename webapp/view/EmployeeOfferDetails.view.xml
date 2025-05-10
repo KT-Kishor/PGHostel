@@ -60,6 +60,10 @@
 											<ComboBox items="{path:'DesignationModel>/', sorter: {path:'department', descending:false , group:true}}" id="EOD_id_Designation" showSecondaryValues="true" value="{employeeModel>/Designation}" change="EOD_validateCombobox" valueStateText="{i18n>combovalueState}">
 													<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />		
 											</ComboBox>
+											<Label text="{i18n>expCountry}" required="true"/>
+				                            <ComboBox change="EOD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EOD-Id-Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true" editable="false">
+					                        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+				                            </ComboBox>
 											<Label text="{i18n>baseLocation}" required="true" />
 											<Select items="{BaseLocationModel>/}" id="EOD_id_Location" 
 											 showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}" valueStateText="{i18n>valuestatebaseLocation}" >

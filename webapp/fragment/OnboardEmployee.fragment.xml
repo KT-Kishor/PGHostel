@@ -26,7 +26,11 @@
 				<core:ListItem key="{RoleModel>Role}" text="{RoleModel>Role}" />
 				</ComboBox>
 				<Label text="{i18n>joiningDate}" />
-					<DatePicker  value="{ path: 'oEmpolyeeDetailsModel>/JoiningDate',formatter:'.Formatter.formatDate' }"  editable="false"   displayFormat="dd/MM/yyyy"     valueFormat="dd/MM/yyyy"  />
+					<DatePicker  value="{ path: 'oEmpolyeeDetailsModel>/JoiningDate',formatter:'.Formatter.formatDate' }"  editable="false"   displayFormat="dd/MM/yyyy"  valueFormat="dd/MM/yyyy"  />
+				<Label text="{i18n>expCountry}" required="true"/>
+				<ComboBox change="EOD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EOU-Id-Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{oEmpolyeeDetailsModel>/Country}" showSecondaryValues="true"  editable="false">
+				<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+				</ComboBox>
 				<Label text="{i18n>baseLocation}" required="true"/>
 			   <Select items="{BaseLocationModel>/}"  showSecondaryValues="true" selectedKey="{oEmpolyeeDetailsModel>/BaseLocation}" change="EO_onBaseLocationChange">
 					<items>
@@ -57,6 +61,9 @@
 				<core:ListItem key="{BloodGroup>Code}" text="{BloodGroup>Code}" />
 				</ComboBox>
 				<Label text="{i18n>mobileNo}" required="true" />
+				<ComboBox value="{oEmpolyeeDetailsModel>/STDCode}" showSecondaryValues= "true" id="OEF_id_STDCode" items="{codeModel>/}" filterSecondaryValues="true" change="validateCombo" valueStateText="{i18n>combovalueState}" editable="false">
+					<core:ListItem key="{codeModel>country}" text="{codeModel>calling_code}" additionalText="{codeModel>country}"/>
+				</ComboBox>
 				<Input value="{oEmpolyeeDetailsModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo" maxLength="10" id="OEF_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
 				<Label text="{i18n>manager}" required="true"/>
 				<ComboBox value="{oEmpolyeeDetailsModel>/ManagerName}"

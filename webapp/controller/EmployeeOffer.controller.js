@@ -35,6 +35,7 @@ sap.ui.define([
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
                 this.byId("EO_id_RejectBtn").setEnabled(false);
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel"); // base location read call
+                await this._fetchCommonData("Country", "CountryModel"); 
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 this.Filter = true;
@@ -183,11 +184,13 @@ sap.ui.define([
                                 EmployeeEmail: oSelectedData.EmployeeEmail,
                                 PermanentAddress: oSelectedData.ConsultantAddress,
                                 CorrespondenceAddress: oSelectedData.ConsultantAddress,
+                                Country: "India",
                                 BaseLocation: oSelectedData.BaseLocation,
                                 AppraisalDate: oSelectedData.JoiningDate.split('T')[0],
                                 Designation: oSelectedData.Designation,
                                 Department: oSelectedData.Department,
                                 BranchCode: oSelectedData.BranchCode,
+                                STDCode: "+91",
                                 MobileNo: "",
                                 ManagerID: "",
                                 ManagerName: "",

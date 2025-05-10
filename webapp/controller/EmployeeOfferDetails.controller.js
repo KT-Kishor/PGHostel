@@ -50,6 +50,7 @@ sap.ui.define([
                     "CTC": "",
                     "EmploymentBond": "0",
                     "JoiningBonus": "0",
+                    "Country":"India",
                     "BaseLocation": "Kalaburagi",
                     "BasicSalary": "",
                     "HRA": "",
@@ -398,6 +399,15 @@ sap.ui.define([
                     this.EOU_oDialogMail.open();
                 }
             },
+            EOD_onChangeCountry: function(oEvent) {
+            utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            if(oEvent.getSource().getValue()===''){
+                oEvent.getSource().setValueState("None")
+            }
+            var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+            var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+            this.getView().byId("EOD_id_Location").getBinding("items").filter(oFilter);
+          },
             //Send mail function
             EOUF_onSendEmail: function () {
                 var oEmployeeEmail = this.getView().getModel("employeeModel").getData().EmployeeEmail;
