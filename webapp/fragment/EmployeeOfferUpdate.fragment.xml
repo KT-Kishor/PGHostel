@@ -60,7 +60,7 @@
 										<m:Label text="{i18n>consultantName}" required="true" />
 										<m:Input id="EOUF_id_Name" value="{employeeModel>/ConsultantName}" editable="{viewModel>/editable}" maxLength="50" liveChange="EOD_validateName" valueStateText="{i18n>placeConsultantName}"/>
 										<m:Label text="{i18n>gender}" required="true" />
-											<m:Select items="{GenderModel>/}" id="EOU_id_Gender" selectedKey="{employeeModel>/Gender}" editable="{viewModel>/editable}" >
+											<m:Select items="{GenderModel>/}" id="EOU_id_Gender" selectedKey="{employeeModel>/Gender}" editable="false" >
 												<core:Item key="{GenderModel>Value}" text="{GenderModel>Value}" />
 											</m:Select>	
 
@@ -80,17 +80,16 @@
 													<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 												</m:items>
 											</m:Select>
-										<!-- Joining Date Field with DatePicker control -->
 										<m:Label text="{i18n>offerReleaseDate}" required="true" />
 											<m:DatePicker id="EOUF_id_Reldate" editable="{viewModel>/editable}" placeholder="{i18n>offerReleaseDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
                                              value= "{path:'employeeModel>/OfferReleaseDate',formatter:'.Formatter.formatDate'}"
-                                             change="EOD_validateDate" class="sapUiSmallMarginBottom" valueStateText="{i18n>dateValueState}"/>
+                                             change="EOD_validateDate" valueStateText="{i18n>dateValueState}"/>
 											<m:Label text="{i18n>joiningDate}" required="true" />
 											<m:DatePicker id="EOUF_id_Joindate" editable="{viewModel>/editable}" placeholder="{i18n>joiningDate}" minDate="{viewModel>/maxDate}"
-                                            value="{path:'employeeModel>/JoiningDate',formatter:'.Formatter.formatDate'}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" class="sapUiSmallMarginBottom disableInput" valueStateText="{i18n>dateValueState}"/>
+                                            value="{path:'employeeModel>/JoiningDate',formatter:'.Formatter.formatDate'}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"  valueStateText="{i18n>dateValueState}"/>
 									    
 										<!-- Consultant Address TextArea -->
-										<m:Label text="{i18n>consultantAddress}" required="true" />
+										   <m:Label text="{i18n>consultantAddress}" required="true" />
 											<m:TextArea  editable="{viewModel>/editable}" value="{employeeModel>/ConsultantAddress}" placeholder="{i18n>consultantAddress}" liveChange="EOD_ValidateCommonFields"
                                             id="EOUF_id_Address" maxLength="120" valueStateText="{i18n>addressValueState}"/>
 											<!-- Employment Bond Year ComboBox -->
