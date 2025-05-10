@@ -403,37 +403,50 @@ sap.ui.define([
                 }
             },
 
-            onChangeStartEndDate: function (oEvent) {
-                var oModel = this.getView().getModel("oFilteredContractModel")
-                var oModelData = oModel.getData();
-                var endDate = this.Formatter.formatDate(this.AssignmentEndDate).split('/').map(Number);
-                var endDateCreate = new Date(endDate[2], endDate[1] - 1, endDate[0]);
-                var today = new Date();
-                if (today >= endDateCreate) {
-                    if (oEvent.getSource().getValue() === "Renewed" && this.OldStatus === "Active") {
-                        var assignmentStart = this.Formatter.formatDate(oModelData.AssignmentEndDate);
-                        var assignmentStart = new Date(assignmentStart.split('/')[2], assignmentStart.split('/')[1] - 1, assignmentStart.split('/')[0], 10);
-                        assignmentStart.setDate(assignmentStart.getDate() + 1);
-                        oModel.setProperty("/AssignmentStartDate", this.Formatter.formatDate(assignmentStart));
+          onChangeStartEndDate: function (oEvent) {
+            var oModel = this.getView().getModel("oFilteredContractModel");
+            var oModelData = oModel.getData();
 
-                        var assignmentEndDate = assignmentStart;
-                        var contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]);
-                        assignmentEndDate.setMonth(assignmentEndDate.getMonth() + contractPeriod);
-                        var incrementedDate = assignmentEndDate
-                        oModel.setProperty("/AssignmentEndDate", this.Formatter.formatDate(incrementedDate))
-                    } else {
-                        oModel.setProperty("/AssignmentStartDate", (this.AssignmentStartDate));
-                        oModel.setProperty("/AssignmentEndDate", (this.AssignmentEndDate));
-                    }
+            var endDate = this.AssignmentEndDate.split('/').map(Number);
+            var endDateCreate = new Date(endDate[2], endDate[1] - 1, endDate[0]);
+
+            var today = new Date();
+
+            if (today >= endDateCreate) {
+                if (oEvent.getSource().getValue() === "Renewed" && this.OldStatus === "Active") {
+                    // Assignment Start = previous end date + 1
+                    var oldEndDate = new Date(oModelData.AssignmentEndDate); // This should be a Date
+                    var assignmentStart = new Date(oldEndDate);
+                    assignmentStart.setDate(assignmentStart.getDate() + 1);
+
+                    // Contract Period in months
+                    var contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]); // e.g. "6 Months"
+                    var assignmentEnd = new Date(assignmentStart);
+                    assignmentEnd.setMonth(assignmentEnd.getMonth() + contractPeriod);
+
+                    // Set Date objects directly to model
+                    oModel.setProperty("/AssignmentStartDate", assignmentStart);
+                    oModel.setProperty("/AssignmentEndDate", assignmentEnd);
+                } else {
+                    oModel.setProperty("/AssignmentStartDate", this._parseDateString(this.AssignmentStartDate));
+                    oModel.setProperty("/AssignmentEndDate", this._parseDateString(this.AssignmentEndDate));
                 }
-            },
+
+                oModel.refresh(true);
+            }
+        },
+
+        // Helper to convert "dd/MM/yyyy" to Date object
+        _parseDateString: function (sDate) {
+            var parts = sDate.split('/').map(Number);
+            return new Date(parts[2], parts[1] - 1, parts[0]);
+        },
 
             formatDateToISO: function (dateObj) {
                 if (!dateObj || !(dateObj instanceof Date)) return "";
                 return dateObj.toISOString().split("T")[0]; // YYYY-MM-DD
             },
             
-
             onPressSave: async function () {
                 const that = this;
                 const oView = this.getView();
@@ -509,7 +522,7 @@ sap.ui.define([
             
                 // ✅ Case 2: Renewed and previous was Active — update old & create new contract
                 if (oModel.ContractStatus === "Renewed" && that.OldStatus === "Active") {
-                    const endDateArr = this.Formatter.formatDate(this.AssignmentEndDate).split('/').map(Number);
+                    const endDateArr =(this.AssignmentEndDate).split('/').map(Number);
                     const endDateCreate = new Date(endDateArr[2], endDateArr[1] - 1, endDateArr[0]);
                     const today = new Date();
                     oModel.ContractStatus="Renewed"

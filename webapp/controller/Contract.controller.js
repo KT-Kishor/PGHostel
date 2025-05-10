@@ -83,7 +83,7 @@ sap.ui.define(
             }
           });
         },
-        C_onSearch: async function () {
+       C_onSearch: async function () {
           this.getBusyDialog(); // Show busy dialog
           var aFilterItems = this.byId("C_id_FilterBar").getFilterGroupItems();
           var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
@@ -99,14 +99,20 @@ sap.ui.define(
                           params["AssignmentStartDate"] = oDateFormat.format(oAssignmentStartDate);
                           params["AssignmentEndDate"] = oDateFormat.format(oAssignmentEndDate);
                       }
-                  }
-                  else if (oControl.isA("sap.m.ComboBox")) {
-                      var selectedKey = oControl.getSelectedKey();
-                      if (selectedKey) {
-                          params[sValue] = selectedKey; 
+                  } else if (oControl.isA("sap.m.ComboBox")) {
+                      var sControlId = oControl.getId();
+                      if (sControlId.includes("idContractNoCombo")) {
+                          var selectedKey = oControl.getSelectedKey();
+                          if (selectedKey) {
+                              params[sValue] = selectedKey;
+                          }
+                      } else {
+                          var sValueText = oControl.getValue();
+                          if (sValueText) {
+                              params[sValue] = sValueText;
+                          }
                       }
-                  }
-                  else if (oControl.getValue && oControl.getValue()) {
+                  } else if (oControl.getValue && oControl.getValue()) {
                       params[sValue] = oControl.getValue();
                   }
               }
@@ -116,10 +122,9 @@ sap.ui.define(
           } catch (error) {
               sap.m.MessageToast.show(error.message || error.responseText);
           } finally {
-              this.closeBusyDialog(); //  close busy dialog
+              this.closeBusyDialog(); // Close busy dialog
           }
       }
-      
       }
     );
   }
