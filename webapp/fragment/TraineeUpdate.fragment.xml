@@ -28,9 +28,9 @@
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
 			<sections>
-				<ObjectPageSection titleUppercase="false">
+				<ObjectPageSection >
 					<subSections>
-						<ObjectPageSubSection  title="{i18n>traineeDetails}" >
+						<ObjectPageSubSection   >
 							<blocks>
 								<f:SimpleForm 
 								id="TU_id_SimpleForm"

@@ -29,7 +29,7 @@ sap.ui.define([
                 this.byId("T_id_Download").setVisible(false);
                 this.byId("T_id_EmpOnBoard").setVisible(false);
                 this.byId("T_id_Cermail").setVisible(false);
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("traineeDetails"));
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("traineeEdit"));
                 this.oValue = oEvent.getParameter("arguments").value;
                 this.Filter = true;
                 if (this.oValue === "Trainee") {
