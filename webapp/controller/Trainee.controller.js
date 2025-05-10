@@ -309,7 +309,7 @@ sap.ui.define([
                     // Get selected trainee's data from the table
                     let oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                     let oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
-                    this.getView().getModel("PDFData").setProperty("/CreateDate", Formatter.formatDate(oTraineeModel.ReleaseDate));
+                    this.getView().getModel("PDFData").setProperty("/CreateDate", Formatter.formatDate(new Date()));
                     this.getView().getModel("PDFData").setProperty("/CertificateTitle", "TRAINEE CERTIFICATE");
                     // Create the updated trainee data
                     const oUpdatedData = {

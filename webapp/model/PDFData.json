@@ -114,7 +114,8 @@
     "StipendSkipLine": null,
     "TrainingFeesSkipLine": null,
 
-    "AgreementNo": "KT-C001",
+    "AgreementNo": "(Agreement No)",
+    "ContractNo": "(Contract No)",
     "AgreementDate": "02/04/2025",
     "AgreementStartDate": "02/04/2025",
     "AgreementEndDate": "30/09/2025",

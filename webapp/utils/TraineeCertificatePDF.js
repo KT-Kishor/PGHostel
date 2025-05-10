@@ -1,7 +1,7 @@
 sap.ui.define([], function () {
     "use strict";
     return {
-        _GeneratePDF: function (htmlContent, oCompanyModel, oModel) {
+        _GeneratePDF: function (that, htmlContent, oCompanyModel, oModel) {
             var { jsPDF } = window.jspdf;
             var doc = new jsPDF({
                 unit: "mm",
@@ -106,7 +106,7 @@ sap.ui.define([], function () {
 
                     document.body.removeChild(container);
                     doc.save(`${oModel.CertificateTitle}.pdf`);
-                    sap.ui.core.BusyIndicator.hide();
+                    that.closeBusyDialog();
                 }
             });
 

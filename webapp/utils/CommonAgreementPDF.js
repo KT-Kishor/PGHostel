@@ -245,7 +245,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                 doc.setFont("times", "bold").setFontSize(12);
                 doc.text(`Agreement Date : ${oModel.AgreementDate}`, margin, topMargin);
-                doc.text(`Agreement No. : ${oModel.AgreementNo}`, margin, topMargin + 10);
+                doc.text(`Agreement No. : ${oModel.ContractNo} (${oModel.AgreementNo})`, margin, topMargin + 10);
                 var titleText = "SOLE TRADER AGREEMENT";
                 let textWidth = doc.getTextWidth(titleText);
                 let titleX = (pageWidth - textWidth) / 2;
@@ -271,7 +271,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 const nextY = topMargin + dimensions.h + 20;
 
                 const tableData = [
-                    ["Agreement No.", oModel.AgreementNo],
+                    ["Agreement No.", `${oModel.ContractNo} (${oModel.AgreementNo})`],
                     ["Client Company Name", oCompanyModel.companyName],
                     ["End Client/Hirer (if different from Client)", oModel.ClientCompanyName],
                     ["Location(s) where Services are to be delivered", oModel.LocationService],
