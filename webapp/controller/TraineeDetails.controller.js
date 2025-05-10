@@ -30,7 +30,6 @@ sap.ui.define([
                 var jsonData = {
                     "NameSalutation": "Mr.",
                     "TraineeName": "",
-                    "ReportingManagerSalutation": "Mr.",
                     "ReportingManager": "",
                     "Type": "",
                     "Amount": "",
@@ -423,7 +422,7 @@ sap.ui.define([
                 oPDFModel.setProperty("/TrainingDuration", oEmpModel.TrainingDuration);
                 oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.ReleaseDate));
                 oPDFModel.setProperty("/TrainingStartDate", Formatter.formatDate(oEmpModel.JoiningDate));
-                oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManagerSalutation + " " + oEmpModel.ReportingManager);
+                oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManager);
                 oPDFModel.setProperty("/StipendOrFees", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Amount));
                 oPDFModel.setProperty("/StipendSkipLine", (oEmpModel.Type === "Paid" || oEmpModel.Amount == "0") ? 5 : null);
                 oPDFModel.setProperty("/TrainingFeesSkipLine", (oEmpModel.Type === "Stipend" || oEmpModel.Amount == "0") ? 6 : null);

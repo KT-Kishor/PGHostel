@@ -282,7 +282,7 @@ sap.ui.define([
                 var role = "Trainee";
                 var department = sap.ui.getCore().byId("TCF_id_Department").getSelectedKey();
                 var projectName = oTraineeModel.ProjectName;
-                var supervisor = oTraineeModel.ReportingManagerSalutation + " " + oTraineeModel.ReportingManager;
+                var supervisor = oTraineeModel.ReportingManager;
                 var data = `
                 <div style="text-align: justify;">
                     <p>This is to certify that <b>${empName}</b> has successfully completed an internship at <b>${this.companyName}</b> from <b>${joinDate}</b> to <b>${endDate}</b>.</p> 

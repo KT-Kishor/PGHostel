@@ -93,7 +93,7 @@
 					<ColumnListItem  type="Navigation" press="T_onPressAddTrainee">
 						<cells>
 						    <Text text="{traineeModel>NameSalutation} {traineeModel>TraineeName}"/>							
-							<Text text="{traineeModel>ReportingManagerSalutation} {traineeModel>ReportingManager}"/>
+							<Text text="{traineeModel>ReportingManager}"/>
 							<Text text="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{traineeModel>TrainingDuration}"/>
 							<Text text="{traineeModel>Type}"/>							

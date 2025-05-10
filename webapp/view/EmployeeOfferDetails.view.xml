@@ -39,7 +39,7 @@
                                              id="EOD_id_Name"
                                              liveChange="EOD_validateName"
                                              maxLength="50"
-                                             valueStateText="{i18n>nameEmployeeValueState}">
+                                             valueStateText="{i18n>placeConsultantName}">
 												<layoutData>
 													<l:GridData span="XL4 L4 M6 S9" />
 												</layoutData>

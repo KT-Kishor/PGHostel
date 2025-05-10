@@ -67,22 +67,9 @@
 											</m:VBox>
 										</m:HBox>
 										<m:Label text="{i18n>reportingManager}" required="true" />
-										<m:HBox width="100%" justifyContent="Start" alignItems="Center">
-											<m:VBox width="20%">
-												<m:ComboBox
-                                                editable="{viewModel>/editable}"
-                                                value="{oTraineeDetails>/ReportingManagerSalutation}"
-                                                items="{Salutation>/salutation}"
-                                                width="100%" change="TD_validateCombo">
-													<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
-												</m:ComboBox>
-											</m:VBox>
-											<m:VBox width="78%">
-												<m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"   value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" selectedKey="1" editable="{viewModel>/editable}" width="100%" class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}">
-													<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}"  />
-												</m:ComboBox>
-											</m:VBox>
-										</m:HBox>
+										<m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"   value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" selectedKey="1" editable="{viewModel>/editable}" valueStateText="{i18n>reportingManagerVs}">
+										<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}"  />
+										</m:ComboBox>
 										<m:Label text="{i18n>emailId}" required="true" />
 										<m:Input id="TU_id_TraineeMail" value="{oTraineeDetails>/TraineeEmail}" editable="{viewModel>/editable}" maxLength="100" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 

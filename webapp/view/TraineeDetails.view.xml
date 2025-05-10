@@ -40,23 +40,9 @@
 								</VBox>
 							</HBox>
 							<Label text="{i18n>reportingManager}" required="true" />
-							<HBox width="100%" justifyContent="Start" alignItems="Center">
-								<VBox width="20%">
-									<Select
-                                               id="TD_id_ManagerSalutation"
-                                               selectedKey="{oTraineeDetails>/ReportingManagerSalutation}"
-                                               items="{Salutation>/salutation}"
-                                               width="100%"
-											   valueStateText="{i18n>nameEmployeeValueState}">
-										<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
-									</Select>
-								</VBox>
-								<VBox width="78%">
-									<ComboBox showSecondaryValues="true"  change="TD_validateCombo"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" id="TD_id_ReportingManager" width="100%"  class="sapUiTinyMarginBegin" valueStateText="{i18n>reportingManagerVs}" placeholder="{i18n>reportingManagerVs}">
-										<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}" />
-									</ComboBox>
-								</VBox>
-							</HBox>
+							<ComboBox showSecondaryValues="true"  change="TD_validateCombo"  selectionChange="onManagerSelectionChange"  selectedKey="1" value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" id="TD_id_ReportingManager"  valueStateText="{i18n>reportingManagerVs}" placeholder="{i18n>reportingManagerVs}">
+							<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}" />
+							</ComboBox>
 							<Label text="{i18n>emailId}" required="true" />
 							<Input value="{oTraineeDetails>/TraineeEmail}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>trainingType}" required="true" />
@@ -125,7 +111,7 @@
 							<Label text="{i18n>traineeName}"/>
 							<Text text="{= ${oTraineeDetails>/NameSalutation} + ' ' + ${oTraineeDetails>/TraineeName}}"/>
 							<Label text="{i18n>reportingManager}" />
-							<Text text="{= ${oTraineeDetails>/ReportingManagerSalutation} + ' ' + ${oTraineeDetails>/ReportingManager}}"/>
+							<Text text="{oTraineeDetails>/ReportingManager}"/>
 							<Label text="{i18n>emailId}" />
 							<Text  text="{oTraineeDetails>/TraineeEmail}"/>
 							<Label text="{i18n>trainingType}" />
