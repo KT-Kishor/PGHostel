@@ -21,7 +21,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="ReportingManager" label="{i18n>reportingManager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-						<ComboBox showSecondaryValues="true" showClearIcon="true" items="{empModel>/}" id="T_id_RmFilterBar">
+						<ComboBox showSecondaryValues="true" showClearIcon="true" id="T_id_RmFilterBar" items="{path:'empModel>/', sorter: {path:'EmployeeName', descending:false }}">
 						<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}" />
 						</ComboBox>
 						</fb:control>

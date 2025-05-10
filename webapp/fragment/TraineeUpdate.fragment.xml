@@ -17,7 +17,7 @@
 						<m:Title text="{oTraineeDetails>/NameSalutation} {oTraineeDetails>/TraineeName}" wrapping="true" width="100%" />
 					</expandedHeading>
 					<expandedContent>
-                  <m:ObjectStatus text="{= ${oTraineeDetails>/Status} }"
+                  <m:ObjectStatus textDirection="LTR" inverted="true" text="{= ${oTraineeDetails>/Status} }"
                    state="{= ${oTraineeDetails>/Status} === 'Rejected' ? 'Error' :
                              ${oTraineeDetails>/Status} === 'Saved' ? 'Warning' :
                              ${oTraineeDetails>/Status} === 'New' ? 'Information' :

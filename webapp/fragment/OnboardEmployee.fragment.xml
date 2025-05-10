@@ -71,10 +71,10 @@
 			</f:content>
 		</f:SimpleForm>
 		<beginButton>
-			<Button text="{i18n>onboard}" type="Accept" press="OEF_onPressOnBoard"  />
+			<Button text="{i18n>onboard}" type="Ghost" press="OEF_onPressOnBoard"  />
 		</beginButton>
 		<endButton>
-			<Button text="{i18n>close}" press="OEF_onPressClose" type="Reject" class="sendMail"/>
+			<Button text="{i18n>close}" press="OEF_onPressClose" type="Reject"/>
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>
