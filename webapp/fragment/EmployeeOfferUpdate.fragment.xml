@@ -267,7 +267,7 @@
 					<m:Button text="{i18n>tileFooter}" press="EOUF_onSendEmail"  id="EOUF_id_EmpmailBut" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}" type="Ghost"/>
 					<m:Button text="{= ${viewModel>/editable} ? ${i18n>save} : ${i18n>edit} }"
                               press="EOUF_onEditOrSavePress"  id="EOUF_id_SaveBut" visible="{= ${viewModel>/ediBut} }" type="{= ${viewModel>/isEditMode} ? 'Emphasized' : 'Accept' }" />
-					<m:Button text="{i18n>tileUnit}" press="EOUF_onPressMerge" visible="{= ${viewModel>/isVisiable} }" id="EOUF_id_EmpmergeButton" enabled="{viewModel>/isEditMode}" type="Attention"/>
+					<m:Button text="{i18n>GeneratePDF}" press="EOUF_onPressMerge" visible="{= ${viewModel>/isVisiable} }" id="EOUF_id_EmpmergeButton" enabled="{viewModel>/isEditMode}" type="Attention"/>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

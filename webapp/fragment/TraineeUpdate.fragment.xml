@@ -138,7 +138,7 @@
 					<m:Button text="{i18n>tileFooter}" press="TU_onSendEmail"  id="TU_id_Traineemail" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}" type="Ghost"/>
 					<m:Button text="{= ${viewModel>/editable} ? ${i18n>save} : ${i18n>edit} }"
                      press="TU_onEditOrSavePress"  id="TD_id_Savebtn" visible="{= ${viewModel>/editBut} }" type="{= ${viewModel>/isEditMode} ? 'Emphasized' : 'Accept' }" />
-					<m:Button id="TU_id_Jspdf" text="{i18n>tileUnit}" press="TD_onPressMerge" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}" type="Attention"/>
+					<m:Button id="TU_id_Jspdf" text="{i18n>GeneratePDF}" press="TD_onPressMerge" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}" type="Attention"/>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

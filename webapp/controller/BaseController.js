@@ -364,82 +364,89 @@ sap.ui.define([
       });
     },
 
-    handleFileUpload: function (
-      oEvent,
-      oContext,
-      sModelName,
-      sAttachmentPath,
-      sNamePath,
-      sUploadFlagPath,
-      sSuccessTextKey,
-      sDuplicateTextKey,
-      sNoFileKey,
-      sErrorKey,
-      fnValidateCallback
-    ) {
-      var that = this;
-      const oFileUploader = oEvent.getSource();
-      const oFiles = oFileUploader.oFileUpload.files;
-      const oModel = oContext.getView().getModel(sModelName);
+   handleFileUpload: function (
+  oEvent,
+  oContext,
+  sModelName,
+  sAttachmentPath,
+  sNamePath,
+  sUploadFlagPath,
+  sSuccessTextKey,
+  sDuplicateTextKey,
+  sNoFileKey,
+  sErrorKey,
+  fnValidateCallback
+) {
+  var that = this;
+  const oFileUploader = oEvent.getSource();
+  const oFiles = oFileUploader.oFileUpload.files;
+  const oModel = oContext.getView().getModel(sModelName);
+  const MAX_TOTAL_SIZE = 20 * 1024 * 1024; // 20 MB
 
-      // No file selected
-      if (!oFiles.length) {
-        sap.m.MessageToast.show(oContext.getI18nText(sNoFileKey));
-        return;
-      }
+  // No file selected
+  if (!oFiles.length) {
+    sap.m.MessageToast.show(oContext.getI18nText(sNoFileKey));
+    return;
+  }
 
-      let attachments = oModel.getProperty(sAttachmentPath) || [];
-      let uploadedFileNames = oModel.getProperty(sNamePath)
-        ? oModel.getProperty(sNamePath).split(", ")
-        : [];
+  let attachments = oModel.getProperty(sAttachmentPath) || [];
+  let uploadedFileNames = oModel.getProperty(sNamePath)
+    ? oModel.getProperty(sNamePath).split(", ")
+    : [];
+  let currentTotalSize = attachments.reduce((sum, file) => sum + file.size, 0);
 
-      Array.from(oFiles).forEach((oFile) => {
-        const MAX_FILE_SIZE = 20 * 1024 * 1024;
-        if (oFile.size > MAX_FILE_SIZE) {
-          sap.m.MessageToast.show("File size should not exceed 20 MB: " + oFile.name);
-          return;
-        }
-        if (uploadedFileNames.includes(oFile.name)) {
-          sap.m.MessageToast.show(oContext.getI18nText(sDuplicateTextKey, [oFile.name]));
-          return;
-        }
+  // Calculate total size including new files
+  let newFilesTotalSize = Array.from(oFiles).reduce((sum, file) => sum + file.size, 0);
+  let finalTotalSize = currentTotalSize + newFilesTotalSize;
 
-        const oReader = new FileReader();
+  // Check total size constraint
+  if (finalTotalSize > MAX_TOTAL_SIZE) {
+    sap.m.MessageToast.show("Total file size should not exceed 20 MB.");
+    return;
+  }
 
-        oReader.onload = (e) => {
-          const sFileBinary = e.target.result.split(",")[1];
+  Array.from(oFiles).forEach((oFile) => {
+    if (uploadedFileNames.includes(oFile.name)) {
+      sap.m.MessageToast.show(oContext.getI18nText(sDuplicateTextKey, [oFile.name]));
+      return;
+    }
 
-          attachments.push({
-            filename: oFile.name,
-            contentType: oFile.type,
-            content: sFileBinary,
-            encoding: "base64"
-          });
+    const oReader = new FileReader();
+    oReader.onload = (e) => {
+      const sFileBinary = e.target.result.split(",")[1];
 
-          oModel.setProperty(sAttachmentPath, attachments);
-          oModel.setProperty(sUploadFlagPath, true);
-
-          uploadedFileNames.push(oFile.name);
-          oModel.setProperty(sNamePath, uploadedFileNames.join(", "));
-
-          sap.m.MessageToast.show(oContext.getI18nText(sSuccessTextKey, [oFile.name]));
-
-          // Re-validate button
-          if (typeof fnValidateCallback === "function") {
-            fnValidateCallback.call(oContext);
-          }
-        };
-
-        oReader.onerror = () => {
-          sap.m.MessageToast.show(oContext.getI18nText(sErrorKey, [oFile.name]));
-        };
-
-        oReader.readAsDataURL(oFile);
+      attachments.push({
+        filename: oFile.name,
+        contentType: oFile.type,
+        content: sFileBinary,
+        encoding: "base64",
+        size: oFile.size // Store file size for future calculations
       });
 
-      // Clear uploader for next selection
-      oFileUploader.setValue("");
-    },
+      oModel.setProperty(sAttachmentPath, attachments);
+      oModel.setProperty(sUploadFlagPath, true);
+
+      uploadedFileNames.push(oFile.name);
+      oModel.setProperty(sNamePath, uploadedFileNames.join(", "));
+
+      sap.m.MessageToast.show(oContext.getI18nText(sSuccessTextKey, [oFile.name]));
+
+      // Re-validate button
+      if (typeof fnValidateCallback === "function") {
+        fnValidateCallback.call(oContext);
+      }
+    };
+
+    oReader.onerror = () => {
+      sap.m.MessageToast.show(oContext.getI18nText(sErrorKey, [oFile.name]));
+    };
+
+    oReader.readAsDataURL(oFile);
+  });
+
+  // Clear uploader for next selection
+  oFileUploader.setValue("");
+},
 
     async generateCertificatePDF(content, branchCode) {
       var oModel = this.getView().getModel("PDFData").getData();
