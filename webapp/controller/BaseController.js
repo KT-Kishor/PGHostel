@@ -196,7 +196,7 @@ sap.ui.define([
       });
     },
 
-    _calculateSalaryComponents: function (isTDSIncluded) {
+     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
 
       // Convert and fetch values
@@ -207,14 +207,14 @@ sap.ui.define([
 
       var BasicSalary, HRA, EmployeerPF, MedicalInsurance, Gratuity, SpecailAllowance, Total;
       var DeductionPF, IncomeTax_TDS, DeductionTotal, GrossPay;
-
+      var newCTC = CTC - VariablePay;
       if (isTDSIncluded === "TDS") {
-        BasicSalary = CTC * 40 / 100;
+        BasicSalary = newCTC * 40 / 100;
         HRA = BasicSalary * 40 / 100;
         EmployeerPF = 0;
         MedicalInsurance = BasicSalary * 40 / 100;
         Gratuity = BasicSalary * 4.81 / 100;
-        SpecailAllowance = CTC - (BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity);
+        SpecailAllowance = newCTC - (BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity);
         Total = BasicSalary + HRA + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
 
         DeductionPF = 0;
@@ -223,7 +223,6 @@ sap.ui.define([
         GrossPay = (Total - DeductionTotal);
 
       } else {
-        var newCTC = CTC - VariablePay;
         BasicSalary = newCTC * 40 / 100;
         HRA = BasicSalary * 40 / 100;
         EmployeerPF = BasicSalary * 13 / 100;
