@@ -258,15 +258,14 @@ sap.ui.define([
                 oModel.CName = this.byId("CD_id_CName").getValue();
                 oModel.Address = this.byId("CD_id_Address").getValue();
                 oModel.Email = this.byId("CD_id_Email").getValue();
+                oModel.EndClientHirer = this.byId("CD_id_EndClientHirer").getValue();
                 oModel.Amount = this.byId("CD_id_Amount").getValue();
                 oModel.HiringContact = this.byId("CD_id_HiringContact").getValue();
                 oModel.Datestart = this.byId("CD_id_Datestart").getValue();
                 oModel.DateEnd = this.byId("CD_id_DateEnd").getValue();
-                oModel.EndClientHirer = this.byId("CD_id_EndClientHirer").getValue();
-            
-                const bAllFieldsFilled = oModel.AgreeDate && oModel.CName && oModel.Address && oModel.Email &&
-                    oModel.Role && oModel.Amount && oModel.HiringContact &&
-                    oModel.Datestart && oModel.DateEnd && oModel.EndClientHirer;
+               
+                const bAllFieldsFilled = oModel.AgreeDate && oModel.CName && oModel.Address && oModel.Email && oModel.EndClientHirer 
+                   &&  oModel.Amount && oModel.HiringContact && oModel.Datestart && oModel.DateEnd;
             
                 if (bAllFieldsFilled) {
                     // Run all validations
@@ -275,12 +274,12 @@ sap.ui.define([
                         utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
                         utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID");
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
-                        utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID");
-            
+                       
                     // Set wizard step validation
                     this.byId("CD_id_Wizard").getSteps()[0].setValidated(bValid);
                 } else {
