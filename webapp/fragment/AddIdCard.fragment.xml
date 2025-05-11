@@ -25,7 +25,7 @@
 				<VBox width="100%" alignItems="Start" class="sapUiSmallMarginTop">
     
     <!-- File Uploader Section -->
-    <HBox width="50%" alignItems="Start" justifyContent="SpaceBetween">
+    <HBox width="50%" alignItems="Center" justifyContent="SpaceBetween">
         <Label text="{i18n>fileUploader}" required="true" showColon="true" class="sapUiTinyMarginEnd" />
         <u:FileUploader                       
             name="myFileUpload"
@@ -51,9 +51,6 @@
     </HBox>
 
 </VBox>
-
-
-
 				<Label/>
 				<HBox id="canvasContainer" visible="true" class="canvas">
 					<core:HTML content="&lt;canvas id='canvas' class='passport-size-canvas'&gt;&lt;/canvas&gt;" />
