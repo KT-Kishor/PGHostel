@@ -97,9 +97,9 @@ sap.ui.define([
                         this.AssignmentEndDate = this.Formatter.formatDate(oResult.AssignmentEndDate);
                         this.ContractStatus = oResult.ContractStatus;
 
-                        if (this.ContractStatus !== "Inactive") {
+                     if (this.ContractStatus !== "Inactive" && this.ContractStatus !== "Renewed") {
                             this.getView().getModel("ContractStatus").setProperty("/status", true);
-                        }
+                    }
 
                         var contractModel = new JSONModel(oResult);
                         this.getOwnerComponent().setModel(contractModel, "oFilteredContractModel");
@@ -160,45 +160,65 @@ sap.ui.define([
                 utils._LCvalidateEmail(oEvent);
                 this.validateStep();
             },
+
             CD_validateAmount: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
                 this.validateStep();
             },
+
             CD_validateDate: function (oEvent) {
-                let oDatePicker, oDate, oModel;
+                let oModel, oStartDatePicker, oEndDatePicker;
+
                 if (this.sArgPara === "CreateContractFlag") {
                     oModel = this.getView().getModel("ContractModelWizart");
-                    oDatePicker = this.byId("CD_id_Datestart");
+                    oStartDatePicker = this.byId("CD_id_Datestart");
+                    oEndDatePicker = this.byId("CD_id_DateEnd");
                 } else {
                     oModel = this.getView().getModel("oFilteredContractModel");
-                    oDatePicker = this.byId("CU_id_AssignmentStartDate");
+                    oStartDatePicker = this.byId("CU_id_AssignmentStartDate");
+                    oEndDatePicker = this.byId("CU_id_AssignmentEndDate");
                 }
 
-                if (oDatePicker && oModel) {
-                    const sValue = oDatePicker.getValue(); // Value from DatePicker as string "dd/MM/yyyy"
-                    oDate = this.onFormatDate(sValue);     // Convert to Date object
+                const oSource = oEvent.getSource();
+                const sId = oSource.getId();
+                const sValue = oSource.getValue();
+                const oDate = this.onFormatDate(sValue); // Convert "dd/MM/yyyy" to Date object
 
-                    if (!isNaN(oDate.getTime())) {
-                        oModel.setProperty("/MinToDate", oDate); // Set minDate for EndDate
+                if (!isNaN(oDate?.getTime?.())) {
+                    if (sId === oStartDatePicker.getId()) {
+                        oEndDatePicker.setMinDate(oDate);   // Start Date changed — set minDate on End Date
+                    } else if (sId === oEndDatePicker.getId()) {
+                        oStartDatePicker.setMaxDate(oDate);// End Date changed — set maxDate on Start Date
                     }
                 }
+
                 utils._LCvalidateDate(oEvent);
-                if (this.sArgPara === "CreateContractFlag") {
-                    this.validateStep();
+
+                if (this.sArgPara === "CreateContractFlag") { 
+                    this.validateStep();    //  validation if in create flow
                 }
             },
+
             // Format date string to Date object
             onFormatDate: function (dateString) {
                 var parts = dateString.split('/');
                 return new Date(parts[2], parts[1] - 1, parts[0]);
             },
+
             CD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 this.validateStep();
             },
+
             CD_ValidateComboBox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
             },
+
+            CD_ValidateConsultantName:function(oEvent){
+                utils._LCvalidateName(oEvent);
+                this.validateStep();
+            },
+
             //back function
             CD_onPressback: function () {
                 this.showConfirmationDialog(
@@ -210,6 +230,7 @@ sap.ui.define([
                 );
                 this.byId("idWizardStep").getParent().setShowNextButton(true);
             },
+
             CU_onBack: function () {
                 var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
                 if (isEditMode) {
@@ -229,6 +250,7 @@ sap.ui.define([
                     this.getRouter().navTo("RouteContract");
                 }
             },
+
             //Step validation
             validateStep: function () {
                 var oModel = this.getView().getModel("ContractModelWizart").getData();
@@ -420,7 +442,9 @@ sap.ui.define([
                     assignmentStart.setDate(assignmentStart.getDate() + 1);
 
                     // Contract Period in months
-                    var contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]); // e.g. "6 Months"
+                    var oSelect = this.byId("CU_id_WarrantyDate");
+                    var sSelectedKey = oSelect.getSelectedKey(); // e.g., "6 Months"
+                    var contractPeriod = parseInt(sSelectedKey.split(" ")[0], 10);
                     var assignmentEnd = new Date(assignmentStart);
                     assignmentEnd.setMonth(assignmentEnd.getMonth() + contractPeriod);
 

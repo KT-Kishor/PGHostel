@@ -19,7 +19,7 @@
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
 							<Label text="{i18n>consultantName}"  required="true"/>
-							<Input value="{ContractModelWizart>/ConsultantName}" placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="CD_validateName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
+							<Input value="{ContractModelWizart>/ConsultantName}" placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="CD_ValidateConsultantName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
 							<Label text="{i18n>address}" required="true"/>
 							<TextArea value="{ContractModelWizart>/ConsultantAddress}"  maxLength="120" rows="3" id="CD_id_Address" placeholder="{i18n>placeAddress}" change="onAddress" valueStateText="{i18n>addressValueState}"
 									liveChange="CD_ValidateCommonFields"/>
@@ -41,6 +41,11 @@
 							<ComboBox items="{CreateCustomerModel>/}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
                             <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
                             </ComboBox>
+							<Label text="{i18n>assignmentStatus}"/>
+							<ComboBox selectedKey="New" value="{ContractModelWizart>/AssignmentStatus}" 
+                             items="{AssignmentStatus>/assignmentStatus}" editable="false">
+								<core:Item key="{AssignmentStatus>Value}" text="{AssignmentStatus>Value}"/>
+							</ComboBox>
 							<Label text="{i18n>salutation}"/>
 							<Select id="CD_id_selectSal" selectedKey="{ContractModelWizart>/Salutation2}" 
                               items="{Salutation>/salutation}" >
@@ -53,13 +58,8 @@
 							<Select id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}">
 								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
 							</Select>
-							<Label text="{i18n>assignmentStatus}"/>
-							<ComboBox selectedKey="New" value="{ContractModelWizart>/AssignmentStatus}" 
-                             items="{AssignmentStatus>/assignmentStatus}" editable="false">
-								<core:Item key="{AssignmentStatus>Value}" text="{AssignmentStatus>Value}"/>
-							</ComboBox>
 							<Label text="{i18n>startDate}" required="true"/>
-							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}"/>
+							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}" maxDate="{ContractModelWizart>/MaxFromDate}"/>
 							<Label text="{i18n>endDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy"  
 							displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}" minDate="{ContractModelWizart>/MinToDate}"/>
@@ -107,8 +107,6 @@
                                 columnsL="2"    
                                 columnsM="1">
 						<f:content>
-							<Label text="{i18n>ContractNo}"/>
-							<Text text="{ContractModelWizart>/ContractNo}"/>
 							<Label text="{i18n>agreementDate}"/>
 							<Text text="{path:'ContractModelWizart>/AgreementDate'}"/>
 							<Label text="{i18n>name}"/>
@@ -158,7 +156,7 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
 				<contentRight>
-					<Button text="{i18n>submit}" press="CD_onSubmit" id="CD_id_Submit" type="Success"  enabled="false"/>
+					<Button text="{i18n>submit}" press="CD_onSubmit" id="CD_id_Submit" type="Accept"  enabled="false"/>
 				</contentRight>
 			</Bar>
 		</footer>

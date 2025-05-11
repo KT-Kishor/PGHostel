@@ -64,7 +64,8 @@
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="C_id_Salary"  items="{ContractModel>/}" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0">
+			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="C_id_Salary"  items="{
+                path: 'ContractModel>/', sorter: {path: 'ContractStatus',descending: false,group: true}}" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0">
 			 <headerToolbar>
                 <OverflowToolbar >
                     <Title id="" text="{i18n>contractDetails}  ({= ${ContractModel>/}.length })"/>

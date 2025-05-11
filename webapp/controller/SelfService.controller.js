@@ -1484,29 +1484,29 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
                     this.oIdCardDialog = oDialog;
                     oView.addDependent(this.oIdCardDialog);
                     this.oIdCardDialog.open();
-                    this.oIdCardDialog.attachAfterOpen(function () {
-                        const photo = employeeDetails.ProfilePhoto;
-                        const type = employeeDetails.ProfilePhotoType;
-                    
-                        if (photo && type && photo !== "") {
-                            this.onDisplayImageOnCanvas(photo, type);
-                        } else {
-                            this.cameracanvas(); // only if no image
-                        }
-                    }.bind(this));
-                }.bind(this));
-            } else {
-                this.oIdCardDialog.open();
-                this.oIdCardDialog.attachAfterOpen(function () {
+                   this.oIdCardDialog.attachAfterOpen(function () {
                     const photo = employeeDetails.ProfilePhoto;
                     const type = employeeDetails.ProfilePhotoType;
-                
+                    this.cameracanvas();
                     if (photo && type && photo !== "") {
                         this.onDisplayImageOnCanvas(photo, type);
                     } else {
                         this.cameracanvas(); // only if no image
                     }
                 }.bind(this));
+                }.bind(this));
+            } else {
+                this.oIdCardDialog.open();
+               this.oIdCardDialog.attachAfterOpen(function () {
+                const photo = employeeDetails.ProfilePhoto;
+                const type = employeeDetails.ProfilePhotoType;
+                this.cameracanvas();
+                if (photo && type && photo !== "") {
+                    this.onDisplayImageOnCanvas(photo, type);
+                } else {
+                    this.cameracanvas(); // only if no image
+                }
+            }.bind(this));
              }
          },
 
@@ -1520,7 +1520,6 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
             }
         },
         
-
         onDisplayImageOnCanvas: function (sFileBinary, sFileType) {
             var canvas = document.getElementById("camera_id_canvas");
             if (canvas) {
@@ -1549,7 +1548,6 @@ sap.ui.define([ "./BaseController", "../model/formatter","../utils/validation","
             this.cameracanvas(); // clears visible canvas
             this.oIdCardDialog.close();
         },
-        
         
         CC_onPressSubmit: async function () {
             try {
