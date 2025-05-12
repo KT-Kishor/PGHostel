@@ -35,7 +35,7 @@ sap.ui.define([
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
                 this.byId("EO_id_RejectBtn").setEnabled(false);
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel"); // base location read call
-                await this._fetchCommonData("Country", "CountryModel"); 
+                await this._fetchCommonData("Country", "CountryModel");
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 this.Filter = true;
@@ -46,7 +46,7 @@ sap.ui.define([
                 else {
                     this.EO_onSearch();
                 }
-              this._makeDatePickersReadOnly(["EO_id_JoiningDate"]);
+                this._makeDatePickersReadOnly(["EO_id_JoiningDate"]);
             },
             // Read call for employee offer data
             readCallForEmployeeOffer: async function (filter) {
@@ -185,7 +185,7 @@ sap.ui.define([
                                 PermanentAddress: oSelectedData.ConsultantAddress,
                                 CorrespondenceAddress: oSelectedData.ConsultantAddress,
                                 Country: "India",
-                                CountryCode:  oSelectedData.CountryCode,
+                                CountryCode: oSelectedData.CountryCode,
                                 BaseLocation: oSelectedData.BaseLocation,
                                 AppraisalDate: oSelectedData.JoiningDate.split('T')[0],
                                 Designation: oSelectedData.Designation,
@@ -251,7 +251,7 @@ sap.ui.define([
                 }
             },
             OEF_onPressClose: function () {
-                const fields = ["OEF_id_CompanyMail", "OEF_id_DateofBirth", "OEF_id_Mobile", "OEF_id_EmployeeRole","OEF_id_Country", "OEF_id_PAddress", "OEF_id_CAddress", "OEF_id_blood", "OEF_id_Manager"];
+                const fields = ["OEF_id_CompanyMail", "OEF_id_DateofBirth", "OEF_id_Mobile", "OEF_id_EmployeeRole", "OEF_id_Country", "OEF_id_PAddress", "OEF_id_CAddress", "OEF_id_blood", "OEF_id_Manager"];
                 fields.forEach(field => {
                     sap.ui.getCore().byId(field).setValueState("None");
                 });
@@ -280,7 +280,7 @@ sap.ui.define([
             //Onboard function
             OEF_onPressOnBoard: function (oEvent) {
                 var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
-                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Country"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idSelect"), "ID")&& utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_STDCode"), "ID")  && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
+                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Country"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idSelect"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_STDCode"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
                     var oPayload = {
                         tableName: "EmployeeDetails",
                         data: oModel
@@ -355,22 +355,38 @@ sap.ui.define([
                     var oEmpModel = this.getView().getModel("oEmpolyeeDetailsModel");
                     oEmpModel.setProperty("/BranchCode", oSelectedLocation.branchCode);
                 }
-            
-          },
-           OE_onChangeCountry: function(oEvent) {
-            utils._LCstrictValidationComboBox(oEvent, "oEvent");
-            if(oEvent.getSource().getValue()===''){
-                oEvent.getSource().setValueState("None")
+
+            },
+            OE_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+
+                if (oEvent.getSource().getValue() === '') {
+                    oEvent.getSource().setValueState("None");
+                    return;
+                }
+                var oSelectedItem = oEvent.getSource().getSelectedItem();
+                if (!oSelectedItem) return;
+                var sCountryCode = oSelectedItem.getAdditionalText(); 
+                var oSTDCombo = sap.ui.getCore().byId("OEF_id_STDCode");
+                oSTDCombo.getBinding("items").filter([]); 
+                oSTDCombo.setValue(""); 
+                setTimeout(function () {
+                    var aFilteredItems = oSTDCombo.getItems();
+                    var oDefaultItem = aFilteredItems.find(item => item.getAdditionalText() === sCountryCode);
+                    if (oDefaultItem) {
+                        oSTDCombo.setSelectedItem(oDefaultItem);
+                        oSTDCombo.setValue(oDefaultItem.getText()); // Auto-select the matching STD Code (e.g., "+91" for India)
+                    }
+                }, 100);
+                var oFilterBase = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, sCountryCode);
+                var oBaseCombo = sap.ui.getCore().byId("idSelect");
+
+                oBaseCombo.getBinding("items").filter([oFilterBase]); // Apply filter based on the selected country
+                oBaseCombo.setSelectedKey(""); 
+                oBaseCombo.setValue(""); 
+                // Clears Branch Code Field
+                sap.ui.getCore().byId("OE_id_BranchInput").setValue("");
             }
-            var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
-            var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-            var oValue2= oEvent.getSource().getSelectedItem().getAdditionalText();
-            var oFilter2 = new sap.ui.model.Filter("country_code", sap.ui.model.FilterOperator.EQ, oValue2);
-            sap.ui.getCore().byId("idSelect").getBinding("items").filter(oFilter);
-            sap.ui.getCore().byId("OEF_id_STDCode").getBinding("items").filter(oFilter2);
-            sap.ui.getCore().byId("idSelect").setValue("");
-            sap.ui.getCore().byId("OEF_id_STDCode").setValue("");
-            sap.ui.getCore().byId("OE_id_BranchInput").setValue("");
-          },
+
         });
     });
