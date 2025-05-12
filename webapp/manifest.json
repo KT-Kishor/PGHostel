@@ -153,11 +153,6 @@
                 "uri": "model/PDFData.json",
                 "preload": true
             },
-              "DocumentJson": {
-                "type": "sap.ui.model.json.JSONModel",
-                "uri": "model/Document.json",
-                "preload": true
-            },
             "TraineeCourse": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Course.json",
@@ -176,16 +171,6 @@
             "GenderModel": {
                 "type":"sap.ui.model.json.JSONModel",
                 "uri":"model/Gender.json",
-                "preload":true
-            },
-             "codeModel": {
-                "type":"sap.ui.model.json.JSONModel",
-                "uri":"model/STDCode.json",
-                "preload":true
-            },
-            "StatusEmp": {
-                "type":"sap.ui.model.json.JSONModel",
-                "uri":"model/StatusEmp.json",
                 "preload":true
             },
             "SowModel": {
@@ -212,12 +197,7 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TravelAllowance.json",
                 "preload": true
-            },
-            "SowStatusModel": {
-        "uri": "model/SowFilter.json",
-        "type": "sap.ui.model.json.JSONModel",
-        "preload": true
-      }
+            }
         },
         "resources": {
             "js": [
@@ -539,6 +519,20 @@
                     "target":[
                         "TargetAssetDetails"
                     ]
+                },
+                {
+                    "name":"RouteHrQuotation",
+                    "pattern":"HrQuotation",
+                    "target": [
+                        "TargetHrQuotation"
+                    ]
+                },
+                {
+                    "name":"RouteHrQuotationDetails",
+                    "pattern":"HrQuotationDetails",
+                    "target": [
+                        "TargetHrQuotationDetails"
+                    ]
                 }
 
             ],
@@ -830,6 +824,20 @@
                     "clearControlAggregation": false,
                     "viewId": "AssetDetails",
                     "viewName": "AssetDetails"
+                },
+                "TargetHrQuotation":{
+                    "viewType": "XML",
+                    "transition":"slide",
+                    "clearControlAggregation": false,
+                    "viewId": "HrQuotation",
+                    "viewName": "HrQuotation"
+                },
+                "TargetHrQuotationDetails":{
+                    "viewType": "XML",
+                    "transition":"slide",
+                    "clearControlAggregation": false,
+                    "viewId": "HrQuotationDetails",
+                    "viewName": "HrQuotationDetails"
                 }
 
             }
