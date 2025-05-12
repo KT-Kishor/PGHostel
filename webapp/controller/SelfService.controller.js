@@ -1026,26 +1026,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID")
+                    // utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID") &&
+                    // utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressI"), "ID") &&
+                    // utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID") &&
+                    // utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID") &&
+                    // utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID") &&
+                    // utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressII"), "ID") &&
+                    // utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID") &&
+                    // utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID");
+
                     if (!isValid) {
                         //.closeBusyDialog();
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        return;
-                    }
-                    // Optional Fields Validation
-                    const name = sap.ui.getCore().byId("AdEmp_id_RCNameI").getValue().trim();
-                    const mail = sap.ui.getCore().byId("AdEmp_id_RCMailI").getValue().trim();
-                    const mobileNo = sap.ui.getCore().byId("AdEmp_id_RCMobileI").getValue().trim();
-                    const nameTwo = sap.ui.getCore().byId("AdEmp_id_RCNameII").getValue().trim();
-                    const mailTwo = sap.ui.getCore().byId("AdEmp_id_RCMailII").getValue().trim();
-                    const mobileNoTwo = sap.ui.getCore().byId("AdEmp_id_RCMobileII").getValue().trim();
-                    const optionalValid =
-                        (name === "" || utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID")) &&
-                        (mail === "" || utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID")) &&
-                        (mobileNo === "" || utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID")) &&
-                        (nameTwo === "" || utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID")) &&
-                        (mailTwo === "" || utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID")) &&
-                        (mobileNoTwo === "" || utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID")) 
-                    if (!optionalValid) {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
                     }
@@ -1069,12 +1060,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         };
                         fnCall = this.ajaxCreateWithJQuery("EmploymentDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("empDataSaved");
-                        sap.ui.getCore().byId("AdEmp_id_RCNameI").setValueState("None");
-                        sap.ui.getCore().byId("AdEmp_id_RCMailI").setValueState("None");
-                        sap.ui.getCore().byId("AdEmp_id_RCMobileI").setValueState("None");
-                        sap.ui.getCore().byId("AdEmp_id_RCNameII").setValueState("None");
-                        sap.ui.getCore().byId("AdEmp_id_RCMailII").setValueState("None");
-                        sap.ui.getCore().byId("AdEmp_id_RCMobileII").setValueState("None");
                     } else {
                         oPayload = {
                             "data": oModel,
@@ -1084,12 +1069,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         };
                         fnCall = this.ajaxUpdateWithJQuery("EmploymentDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("empDataupdate");
-                         sap.ui.getCore().byId("AdEmp_id_RCNameI").setValueState("None");
-                        sap.ui.getCore().byId("AdEmp_id_RCMailI").setValueState("None");
-                        sap.ui.getCore().byId("AdEmp_id_RCMobileI").setValueState("None");
-                        sap.ui.getCore().byId("AdEmp_id_RCNameII").setValueState("None");
-                        sap.ui.getCore().byId("AdEmp_id_RCMailII").setValueState("None");
-                        sap.ui.getCore().byId("AdEmp_id_RCMobileII").setValueState("None");
                     }
                     fnCall.then((oData) => {
                         this.closeBusyDialog();

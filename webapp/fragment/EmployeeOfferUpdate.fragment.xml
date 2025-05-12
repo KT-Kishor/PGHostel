@@ -72,17 +72,13 @@
 												</m:items>
 										</m:ComboBox>
 										<m:Label text="{i18n>expCountry}" required="true"/>
-				                            <m:ComboBox change="EOD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EUD-Id-Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true" editable="false">
+				                            <m:ComboBox change="EUD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EUD_Id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true" editable="{viewModel>/editable}">
 					                        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				                            </m:ComboBox>
 										<m:Label text="{i18n>baseLocation}" required="true" />
-											<m:Select items="{BaseLocationModel>/}" id="EOUF_id_Location" 
-											editable="{viewModel>/editable}" 
-											showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}" valueStateText="{i18n>valuestatebaseLocation}" >
-												<m:items>
-													<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
-												</m:items>
-											</m:Select>
+										 <m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>selectBase}" change="EOD_validateCombobox">
+						               <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+				                       </m:ComboBox>
 										<m:Label text="{i18n>offerReleaseDate}" required="true" />
 											<m:DatePicker id="EOUF_id_Reldate" editable="{viewModel>/editable}" placeholder="{i18n>offerReleaseDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
                                              value= "{path:'employeeModel>/OfferReleaseDate',formatter:'.Formatter.formatDate'}"

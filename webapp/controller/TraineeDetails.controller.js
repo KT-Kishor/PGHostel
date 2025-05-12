@@ -209,7 +209,7 @@ sap.ui.define([
                                 }),
                                 endButton: new sap.m.Button({
                                     text: "Generate PDF",
-                                    type: "Reject",
+                                    type: "Attention",
                                     press: function () {
                                         this.TD_onPressMerge("create");
                                         var oUpdatePayload = {

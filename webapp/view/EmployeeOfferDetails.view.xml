@@ -61,7 +61,7 @@
 													<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />		
 											</ComboBox>
 											<Label text="{i18n>expCountry}" required="true"/>
-				                            <ComboBox change="EOD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EOD-Id-Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true" editable="false">
+				                            <ComboBox change="EOD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EOD_Id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true"  >
 					                        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				                            </ComboBox>
 											<Label text="{i18n>baseLocation}" required="true" />
