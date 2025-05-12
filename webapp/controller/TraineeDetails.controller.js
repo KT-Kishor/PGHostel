@@ -72,7 +72,7 @@ sap.ui.define([
                     this.byId("TU_id_JoinDate").setMinDate(new Date(traineeData.ReleaseDate));
                     this.getView().setModel(new JSONModel(traineeData), "oTraineeDetails");
                     // Handle visibility and edit button based on trainee status
-                    if (traineeData.Status === "OnBoarded" || traineeData.Status === "Training Completed") {
+                    if (traineeData.Status === "Onboarded" || traineeData.Status === "Training Completed") {
                         this.viewModel.setProperty("/isVisiable", false);
                         this.viewModel.setProperty("/editBut", false);
                     } else if (traineeData.Status === "Rejected") {

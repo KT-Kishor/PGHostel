@@ -20,7 +20,7 @@
                    state="{= ${oTraineeDetails>/Status} === 'Rejected' ? 'Error' :
                              ${oTraineeDetails>/Status} === 'Saved' ? 'Warning' :
                              ${oTraineeDetails>/Status} === 'New' ? 'Information' :
-                             ${oTraineeDetails>/Status} === 'OnBoarded' ? 'Success' :
+                             ${oTraineeDetails>/Status} === 'Onboarded' ? 'Success' :
                              ${oTraineeDetails>/Status} === 'Training Completed' ? 'Indication01' :
                              ${oTraineeDetails>/Status} === 'Offer Sent' ? 'Indication06' : 'None' }" />
 					</expandedContent>

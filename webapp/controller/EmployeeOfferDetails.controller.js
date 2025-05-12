@@ -181,7 +181,7 @@ sap.ui.define([
                     this.getView().setModel(new JSONModel(offerData[0]), "employeeModel");
                     var oViewModel = this.getView().getModel("viewModel");
                     this.byId("EOUF_id_Joindate").setMinDate(new Date(offerData[0].OfferReleaseDate));
-                    if (offerData[0].Status === "OnBoarded") {
+                    if (offerData[0].Status === "Onboarded") {
                         oViewModel.setProperty("/isVisiable", false);
                         oViewModel.setProperty("/ediBut", false);
                     } else if (offerData[0].Status === "Rejected") {

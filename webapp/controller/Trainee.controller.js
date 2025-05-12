@@ -114,10 +114,10 @@ sap.ui.define([
                 this.SelectedData = oSelectedItem.getBindingContext("traineeModel").getObject();
                 if (oSelectedItem) {
                     var sStatus = oSelectedItem.getBindingContext("traineeModel").getProperty("Status");
-                    var isDisabled = sStatus === "OnBoarded" || sStatus === "Rejected";
+                    var isDisabled = sStatus === "Onboarded" || sStatus === "Rejected";
                     this.byId("T_id_OnboardBtn").setEnabled(!isDisabled);
                     this.byId("T_id_RejectBtn").setEnabled(!isDisabled);
-                    var isCertificateVisible = sStatus === "Training Completed" || sStatus === "OnBoarded";
+                    var isCertificateVisible = sStatus === "Training Completed" || sStatus === "Onboarded";
                     this.byId("T_id_Download").setVisible(isCertificateVisible);
                     var isEmpOnBoardVisible = sStatus === "Training Completed";
                     this.byId("T_id_EmpOnBoard").setVisible(isEmpOnBoardVisible);
@@ -131,7 +131,7 @@ sap.ui.define([
             updateCallForTrainee: async function (oTraineeData, text) {
                 this.getBusyDialog();
                 var that = this;
-                if (oTraineeData.Status === "OnBoarded") {
+                if (oTraineeData.Status === "Onboarded") {
                     oTraineeData.CompanyEmailID = sap.ui.getCore().byId("OTF_id_TraineeMail").getValue();
                 }
                 var oModelOffer = {
@@ -205,9 +205,9 @@ sap.ui.define([
                 try {
                     if (utils._LCvalidateEmail(sap.ui.getCore().byId("OTF_id_TraineeMail"), "ID")) {
                         var oTraineeData = this.SelectedData;
-                        oTraineeData.Status = "OnBoarded";
+                        oTraineeData.Status = "Onboarded";
                         await this.updateCallForTrainee(oTraineeData, "traineeOnboardSucess");
-                        this.getView().getModel("traineeModel").setProperty("/Status", "OnBoarded");
+                        this.getView().getModel("traineeModel").setProperty("/Status", "Onboarded");
                         this.OTF_onPressClose();
                         // Clear selection and disable buttons
                         this.T_ButtonVisibility();

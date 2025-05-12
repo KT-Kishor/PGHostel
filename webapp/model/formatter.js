@@ -50,7 +50,7 @@ sap.ui.define([], function () {
                     return "Success";
                 case 'Draft':
                     return "Indication17";
-                case "OnBoarded":
+                case "Onboarded":
                     return "Success";
                 case "Rejected":
                     return "Error";

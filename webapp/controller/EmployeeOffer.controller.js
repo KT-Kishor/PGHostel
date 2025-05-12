@@ -92,7 +92,7 @@ sap.ui.define([
             },
             //Onboard call
             EO_onOnboardPress: async function () {
-                this.onHandleEmployeeAction("OnBoarded", "onBoardEmployee");
+                this.onHandleEmployeeAction("Onboarded", "onBoardEmployee");
             },
             //reject call
             EO_onRejectPress: function () {
@@ -160,10 +160,10 @@ sap.ui.define([
                 var sName = oSelectedData.Salutation + " " + oSelectedData.ConsultantName;
                 var that = this;
                 // Build message and title
-                var sMessage = (status === "OnBoarded")
+                var sMessage = (status === "Onboarded")
                     ? that.i18nModel.getText("confirmOnboard", [sName])
                     : that.i18nModel.getText("confirmReject", [sName]);
-                var sTitle = (status === "OnBoarded")
+                var sTitle = (status === "Onboarded")
                     ? that.i18nModel.getText("confirmTitleOnboard")
                     : that.i18nModel.getText("confirmTitleReject");
                 // Call reusable confirmation dialog
@@ -171,7 +171,7 @@ sap.ui.define([
                     sTitle,
                     sMessage,
                     function () { // onConfirm
-                        if (status === "OnBoarded") {
+                        if (status === "Onboarded") {
                             const oEmployeeDetailsModel = new sap.ui.model.json.JSONModel({   //Common json data passing from frontend all record will be created from backend
                                 ID: oSelectedData.ID,
                                 Salutation: oSelectedData.Salutation,
@@ -318,7 +318,7 @@ sap.ui.define([
                 // call for EmployeeOffer
                 await this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer).then((oData) => {
                     if (oData.success) {
-                        var sSuccessMessage = (oStatus === "OnBoarded")
+                        var sSuccessMessage = (oStatus === "Onboarded")
                             ? this.i18nModel.getText("onBoardSuccess")
                             : this.i18nModel.getText("offerEmpReject");
                         MessageToast.show(sSuccessMessage);
@@ -337,7 +337,7 @@ sap.ui.define([
                 // If an item is selected, check the status and update button visibility accordingly
                 if (oSelectedItem) {
                     var sStatus = oSelectedItem.getBindingContext("EmployeeOfferModel").getProperty("Status");
-                    var isDisabled = sStatus === "OnBoarded" || sStatus === "Rejected";
+                    var isDisabled = sStatus === "Onboarded" || sStatus === "Rejected";
                     this.byId("EO_id_OnboardBtn").setEnabled(!isDisabled);
                     this.byId("EO_id_RejectBtn").setEnabled(!isDisabled);
                 }

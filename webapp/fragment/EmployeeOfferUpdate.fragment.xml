@@ -10,7 +10,7 @@
 		<ObjectPageLayout id="EODF_id_ObjectPageLayoutEmp"
                           selectedSection="{viewModel>/selectedSection}"
                           useIconTabBar="true"
-                          showTitleInHeaderContent="true"
+                          showTitleInHeaderContent="true"		  
 						  preserveHeaderStateOnScroll="true"
                           class="sapUiSmallmarginResponsive">
 			<headerTitle>
@@ -27,7 +27,7 @@
                    state="{= ${employeeModel>/Status} === 'Rejected' ? 'Error' :
                              ${employeeModel>/Status} === 'Saved' ? 'Warning' :
                              ${employeeModel>/Status} === 'New' ? 'Information' :
-                             ${employeeModel>/Status} === 'OnBoarded' ? 'Success' :
+                             ${employeeModel>/Status} === 'Onboarded' ? 'Success' :
                              ${employeeModel>/Status} === 'Offer Sent' ? 'Indication06' : 'None' }" />
 					</expandedContent>
 				</ObjectPageDynamicHeaderTitle>

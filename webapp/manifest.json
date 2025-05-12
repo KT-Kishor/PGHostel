@@ -178,6 +178,11 @@
                 "uri":"model/SowStatus.json",
                 "preload":true
             },
+               "DocumentJson": {
+                "type":"sap.ui.model.json.JSONModel",
+                "uri":"model/Document.json",
+                "preload":true
+            },
             "TypeModel": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TrainingType.json",
