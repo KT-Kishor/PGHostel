@@ -13,8 +13,9 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteMSADetails").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: function () {
-                // this.commonLoginFunction("MSA&SOW");
+            _onRouteMatched:async function () {
+                var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
+                if (!LoginFUnction) return;
                 this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();

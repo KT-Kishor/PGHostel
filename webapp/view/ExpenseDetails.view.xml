@@ -104,8 +104,8 @@
 											<m:Button type="Accept"  text="{i18n>add}" tooltip="{i18n>expenseAddTooltip}" press="Exp_Det_onPressAddExpenseItem" visible="{viewModel>/status}" id="idAddExpBtn" enabled="{viewModel>/enable}" />											
 											<m:Button type="Neutral"  text="{i18n>edit}" tooltip="{i18n>expenseEditTooltip}" press="Exp_Det_onPressExpenseItemEdit" id="idExpenseItemEdit"  visible="{viewModel>/status}" enabled="{viewModel>/enableDelete}" />											
 											<m:Button type="Negative"  text="{i18n>delete}" tooltip="{i18n>expenseDeleteTooltip}" press="Exp_Det_onPressExpenseItemDelete" visible="{viewModel>/status}"  id="idExpDeleteBtn" enabled="{viewModel>/enable}" />											
-											<m:Button type="Ghost"  text="{i18n>expUploadBTN}" press="Exp_Det_onPressOpenFolder" visible="{= ${FilteredExpenseModel>/0/FolderID} === '' ? false : true}" enabled="{viewModel>/enable}" />										
-											<m:Button type="Ghost"  text="{i18n>creatFolder}" press="Exp_Det_onPressNewFolder" visible="{= ${FilteredExpenseModel>/0/FolderID} === '' ? true : false}" enabled="{viewModel>/enable}" />											
+											<!-- <m:Button type="Ghost"  text="{i18n>expUploadBTN}" press="Exp_Det_onPressOpenFolder" visible="{= ${FilteredExpenseModel>/0/FolderID} === '' ? false : true}" enabled="{viewModel>/enable}" />										
+											<m:Button type="Ghost"  text="{i18n>creatFolder}" press="Exp_Det_onPressNewFolder" visible="{= ${FilteredExpenseModel>/0/FolderID} === '' ? true : false}" enabled="{viewModel>/enable}" />											 -->
 											<m:Button type="Neutral" text="{i18n>download}"  press="Exp_Det_onPressExpenseDownload" visible="{viewModel>/status}" enabled="{viewModel>/enable}"/>
 										</m:OverflowToolbar>
 									</m:headerToolbar>
@@ -136,7 +136,7 @@
 											<m:ColumnListItem type="Navigation" press="onCheckExpenseDetails">
 												<m:cells>
 													<m:Text text="{ItemExpenseModel>IndexNo}" />
-													<m:Text text="{ItemExpenseModel>ItemType}" />
+													<m:Link text="{ItemExpenseModel>ItemType}" press="OnPressAttachment" />
 													<m:Text text="{path:'ItemExpenseModel>ExpenseDate',formatter: '.Formatter.formatDate'}" />
 													<m:Text text="{path:'ItemExpenseModel>ExpenseAmount', formatter: '.Formatter.fromatNumber'}" />		
 													<m:VBox alignItems="Center">

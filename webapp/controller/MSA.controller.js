@@ -10,7 +10,8 @@ sap.ui.define([
                 this._fetchCommonData("ManageCustomer", "CompanyNameModel");
             },
             _onRouteMatched: async function () {               
-                await this.commonLoginFunction("MSA&SOW");
+                var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
+                if (!LoginFUnction) return;
                 await this.MSA_onSearch();
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");            
             },

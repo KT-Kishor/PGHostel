@@ -1,6 +1,7 @@
 <core:FragmentDefinition
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified"
 	xmlns:core="sap.ui.core">
 	<Dialog
         title="{i18n>addItemExpense}">		
@@ -50,7 +51,12 @@
 					</HBox>
 					<!-- Conversion Rate -->
 					<Label text="{i18n>expConversionRate}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" required="true" />
-					<Input id="ExpDet_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="Exp_Frg_onChangeConverstionRate"/>									
+					<Input id="ExpDet_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="Exp_Frg_onChangeConverstionRate"/>	
+					<VBox>
+						<Label text="Attachment" required="true" />
+						<u:FileUploader fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png" buttonText="Upload" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true"  iconFirst="true" class="sapUiSmallMarginBeginEnd" />
+					</VBox>								
+
 					<Label text="{i18n>comments}" required="true" ></Label>
 					<TextArea id="ExpDet_id_Comments" valueStateText="{i18n>enterComments}" liveChange="LC_ExpComments" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
 				</f:content>

@@ -18,9 +18,10 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
         },
 
         _onRouteMatched: async function(oEvent) {
+            var LoginFUnction = await this.commonLoginFunction("Expense");
+            if (!LoginFUnction) return;
             this.getBusyDialog();
             try {
-                this.commonLoginFunction("Expense");
                 this.byId("objectPageLayoutExpence").setHeaderContentPinned(true); /// Header content pinned
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.ExpenseID = oEvent.getParameter("arguments").sPath;
@@ -44,6 +45,9 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
                 this.getView().setModel(viewModel, "viewModel");
                 this.LoginModel = this.getView().getModel("LoginModel");
                 this.ViewModel = this.getView().getModel("viewModel");
+
+                var oUploadModel = new sap.ui.model.json.JSONModel({File: "",FileName: "",FileType: ""});
+                this.getView().setModel(oUploadModel, "UploadModel");
         
                 this.FilteredExpenseModel = this.getView().getModel("FilteredExpenseModel").getData();
         
@@ -169,7 +173,7 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
                 Submit: true,
                 Save: false,
                 ConversionRate: "0",
-                ForeignAmount: "0",
+                ForeignAmount: "0",                
             };
             var oExpenseCreateModel = new JSONModel(jsonExpense);
             this.getView().setModel(oExpenseCreateModel, "ExpenseCreateModel");
@@ -195,6 +199,9 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
                 Comments: this.SelectedData.Comments,
                 ConversionRate: this.SelectedData.ConversionRate,
                 ForeignAmount: this.SelectedData.ForeignAmount,
+                Attachment: this.SelectedData.Attachment,
+                AttachmentType: this.SelectedData.AttachmentType,
+                AttachmentName: this.SelectedData.AttachmentName,
                 Submit: false,
                 Save: true,
             };
@@ -312,6 +319,69 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
                 this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             }
+        },                    
+
+        OnPressAttachment: function (oEvent) {
+            const oContext = oEvent.getSource().getBindingContext("ItemExpenseModel");
+            const oData = oContext.getObject();
+            const sMimeType = oData.AttachmentType || "image/png";
+            const sBase64 = oData.Attachment;
+            const sFileName = "Document Preview";
+            if (!this._oPreviewDialog) {
+                this._oPreviewDialog = new sap.m.Dialog({
+                    title: sFileName,
+                    contentWidth: "50%",
+                    contentHeight: "50%",
+                    resizable: true,
+                    draggable: true,
+                    content: [],
+                    endButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            if (this._pdfBlobUrl) {
+                                URL.revokeObjectURL(this._pdfBlobUrl);
+                                this._pdfBlobUrl = null;
+                            }
+                            this._oPreviewDialog.close();
+                        }.bind(this)
+                    })
+                });
+                this.getView().addDependent(this._oPreviewDialog);
+            }
+            this._oPreviewDialog.removeAllContent();
+            if (sMimeType.startsWith("image/")) {
+                const sFileUri = `data:${sMimeType};base64,${sBase64}`;
+                const oImage = new sap.m.Image({
+                    src: sFileUri,
+                    densityAware: false
+                });
+                oImage.addStyleClass("imagePreviewFit");
+                this._oPreviewDialog.addContent(oImage);
+            } else if (sMimeType === "application/pdf") {
+                // Convert base64 to Blob
+                const byteCharacters = atob(sBase64);
+                const byteArrays = [];
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    byteArrays.push(byteArray);
+                }
+                const blob = new Blob(byteArrays, { type: sMimeType });
+                const sBlobUrl = URL.createObjectURL(blob);
+                this._pdfBlobUrl = sBlobUrl;
+                this._oPreviewDialog.addContent(new sap.ui.core.HTML({
+                    content: `<iframe src="${sBlobUrl}" width="100%" height="600px" style="border:none;"></iframe>`
+                }));
+            } else {
+                this._oPreviewDialog.addContent(new sap.m.Text({
+                    text: "Preview not supported."
+                }));
+            }
+            this._oPreviewDialog.open();
         },
 
         Exp_Frg_onItemTypeChange: function(oEvent) {
@@ -326,10 +396,37 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
             }
         },
 
+        onFileSizeExceeds: function () {
+            MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
+        },
+
+        onBeforeUploadStarts: function (oEvent) {
+            var oFile = oEvent.getParameter("files")[0];
+            if (oFile) {
+                var reader = new FileReader();
+                var that = this;
+                reader.onload = function (e) {
+                    var base64 = e.target.result.split(',')[1];
+                    var oUploadModel = that.getView().getModel("UploadModel");
+                    oUploadModel.setData({
+                        File: base64,
+                        FileName: oFile.name,
+                        FileType: oFile.type
+                    });
+                    MessageToast.show("File uploaded successfully: " + oFile.name);
+                };
+                reader.readAsDataURL(oFile);
+            }
+        },               
+
         async Exp_Det_onPressSubmit() {
             var oModel = this.getView().getModel("ExpenseCreateModel").getData();
+            var oUploadModel = this.getView().getModel("UploadModel").getData();
             if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Peridiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
-                // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(true);
+                // ❗ Attachment validation
+                if (!oUploadModel.File) {
+                    return sap.m.MessageBox.warning("Please upload an attachment before submitting.");
+                }
                 var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
                 if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                 var oData = {
@@ -344,6 +441,9 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
                         ForeignAmount: oModel.ExpenseAmount,
                         ItemType: oModel.ItemType,
                         ModeOfPayment: oModel.ModeOfPayment,
+                        Attachment: oUploadModel.File,
+                        AttachmentType: oUploadModel.FileType,
+                        AttachmentName: oUploadModel.FileName
                     },
                 };
                 this.getBusyDialog();
@@ -356,14 +456,11 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
                         this.ExpenseItem.close();
                         this.ExpenseTotalCalculation();
                         this.closeBusyDialog();
-                        // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
                     } else {
                         MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
-                        // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
                         this.closeBusyDialog();
                     }
                 } catch (oError) {
-                    // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             } else {
@@ -375,9 +472,13 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
         async Exp_Det_onPressSaveExpense() {
             var oModel = this.getView().getModel("ExpenseCreateModel").getData();
             var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
+            var oUploadModel = this.getView().getModel("UploadModel").getData();
             if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
                 if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
-                // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(true);
+                 // ❗ Attachment validation
+                 if (!oUploadModel.File) {
+                    return sap.m.MessageBox.warning("Please upload an attachment before submitting.");
+                }
                 var oData = {
                     data: {
                         Comments: oModel.Comments,
@@ -390,6 +491,9 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
                         ForeignAmount: oModel.ExpenseAmount,
                         ItemType: oModel.ItemType,
                         ModeOfPayment: oModel.ModeOfPayment,
+                        Attachment: oUploadModel.File,
+                        AttachmentType: oUploadModel.FileType,
+                        AttachmentName: oUploadModel.FileName
                     },
                     filters: {
                         ItemID: this.SelectedData.ItemID,
@@ -480,7 +584,7 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
             var itemExpenses = that.getView().getModel("ItemExpenseModel").getData();
 
             // Validate Travel Allowance and Per Diem Declaration
-            if (oModelData.TravelAllowance === "Yes") {
+            if (oModelData.TravelAllowance === "YES") {
                 var hasPerDiemDeclaration = itemExpenses.some(function(item) {
                     return item.ItemType === "Peridiem Declaration";
                 });

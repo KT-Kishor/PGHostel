@@ -82,7 +82,9 @@ sap.ui.define([
             "Payroll": "/A_Payroll",
             "Trainee": "/Trainee",
             "Contract": "/GenerateContract",
-            "ManageAssignment": "/AssignmentTask"
+            "ManageAssignment": "/AssignmentTask",
+            "Expense":"/ExpenseApp",
+            "MSA&SOW":"/GenerateMsaNda"
           };
 
           const modelPath = tileMap[value];

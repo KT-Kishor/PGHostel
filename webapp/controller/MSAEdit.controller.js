@@ -16,8 +16,9 @@ sap.ui.define([
             },
 
             _onRouteMatched: async function (oEvent) {
+                var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
+                if (!LoginFUnction) return;                
                 this.getBusyDialog();
-                await this.commonLoginFunction("MSA&SOW");
                 if (!this.getView().getModel("ContractpaymentModel") && !this.getView().getModel("BaseLocationModel")) {
                     await this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
                     await this._fetchCommonData("BaseLocation", "BaseLocationModel");

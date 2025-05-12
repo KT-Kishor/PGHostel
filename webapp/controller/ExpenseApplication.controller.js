@@ -13,6 +13,8 @@ sap.ui.define([
         },
         
         _onRouteMatched: async function(oEvent) {
+            var LoginFUnction = await this.commonLoginFunction("Expense");
+            if (!LoginFUnction) return;
             this.getBusyDialog();
             try {
                 if (!this.getView().getModel("BaseLocationModel")) {
@@ -21,7 +23,6 @@ sap.ui.define([
                     await this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
                 }
         
-                this.commonLoginFunction("Expense");
                 this.LoginModel = this.getView().getModel("LoginModel");
         
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
