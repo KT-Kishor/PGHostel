@@ -203,7 +203,7 @@ sap.ui.define([
       if (code !== this.codeflag) {
         this.getBusyDialog(); // open BusyDialog immediately
         try {
-          await this._fetchCommonData("TaxCalculation", "TDSModel" /*, { Country: code } (Still filter not applied) */);
+          await this._fetchCommonData("TaxCalculation", "TDSModel", { Country: code });
           this.codeflag = code;
           this.closeBusyDialog();
         }
