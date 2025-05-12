@@ -13,7 +13,7 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
-                 var LoginFunction = await this.commonLoginFunction("Trainee");
+                var LoginFunction = await this.commonLoginFunction("Trainee");
                 if (!LoginFunction) return;
                 this.getBusyDialog();
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
@@ -39,7 +39,7 @@ sap.ui.define([
                 else {
                     this.T_onSearch();// filter function for trainee 
                 }
-                 this._makeDatePickersReadOnly(["T_id_JoiningDate"]);
+                this._makeDatePickersReadOnly(["T_id_JoiningDate"]);
 
             },
 
@@ -231,6 +231,7 @@ sap.ui.define([
             OTF_onPressClose: function () {
                 sap.ui.getCore().byId("OTF_id_TraineeMail").setValueState("None");
                 sap.ui.getCore().byId("OTF_id_TraineeMail").setValue("");
+                this.T_ButtonVisibility()
                 this.TOb_oDialog.close();
             },
             //Trainee  certificate  dialog function
@@ -238,16 +239,24 @@ sap.ui.define([
                 var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                 var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
                 var oJoiningDate = new Date(oTraineeModel.JoiningDate);
-                // Calculate End Date (6 months from Joining Date)
+                var trainingDuration = oTraineeModel.TrainingDuration; 
+                var monthsMatch = trainingDuration.match(/(\d+)/);  
+                var months = monthsMatch ? parseInt(monthsMatch[0]) : 0;
+                if (months === 0) {
+                    console.error("Invalid training duration");
+                    return;
+                }
                 var oCalculatedEndDate = new Date(oJoiningDate);
-                oCalculatedEndDate.setMonth(oCalculatedEndDate.getMonth() + 6);
+                oCalculatedEndDate.setMonth(oCalculatedEndDate.getMonth() + months);  // Add the number of months
                 var sFormattedEndDate = oCalculatedEndDate.toISOString().split("T")[0];
-                oTraineeModel.EndDate = new Date(sFormattedEndDate)
+                oTraineeModel.EndDate = new Date(sFormattedEndDate);
+
                 var oTraineeContext = oSelectedItem.getBindingContext("traineeModel");
                 this.getView().setBindingContext(oTraineeContext, "traineeModel");
-                // Open the dialog
+
                 this.T_commonOpenDialog("TC_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate", "TCF_id_EndDate");
             },
+
             //Close the certificate dialog function
             TCF_onPressCloseDialog: function () {
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
@@ -309,18 +318,18 @@ sap.ui.define([
                 if (oEditor) {
                     var plainText = oEditor.getContent({ format: 'text' });
                     var charCount = plainText.length;
- 
+
                     var lines = plainText.split(/\r\n|\r|\n/);
                     var lineCount = lines.length;
- 
+
                     console.log("Characters:", charCount, "Lines:", lineCount);
                 } else {
                     console.warn("Editor not ready yet.");
                     this.closeBusyDialog();
                     return;
                 }
- 
-                if(charCount > 1000 || lineCount > 21) {
+
+                if (charCount > 1000 || lineCount > 21) {
                     this.closeBusyDialog();
                     MessageBox.error("Certificate content exceeds the limit of 1000 characters or 21 lines.");
                     return;
@@ -335,7 +344,7 @@ sap.ui.define([
                     // Create the updated trainee data
                     const oUpdatedData = {
                         ID: oTraineeModel.ID,
-                        TraineeID:oTraineeModel.TraineeID,
+                        TraineeID: oTraineeModel.TraineeID,
                         Department: sap.ui.getCore().byId("TCF_id_Department").getSelectedKey(),
                         ProjectName: oTraineeModel.ProjectName,
                         EndDate: oTraineeModel.EndDate,
@@ -343,7 +352,7 @@ sap.ui.define([
                         Status: "Training Completed",
                     };
                     this.updateCallForTrainee(oUpdatedData, "downloadSucess");
-                    await this.readCallForTrainee("");
+                    this.T_onSearch()
                     this.byId("T_id_TraineeTable").removeSelections(true);
                     this.byId("T_id_Download").setVisible(false);
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
