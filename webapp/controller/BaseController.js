@@ -196,6 +196,18 @@ sap.ui.define([
       });
     },
 
+    _calculateTDS: function (ctc) {
+      var tdsSlab = this.getView().getModel("TDSModel").getData();
+      var filtered = tdsSlab.filter(function (item) {
+        return ctc >= item.IncomeStart && ctc <= item.IncomeEnd;
+      });
+
+      var ctcforTDS = ctc - filtered[0].IncomeStart + 1;
+      var tdsofctc = ctcforTDS * filtered[0].TaxRate / 100;
+      var actualtds = tdsofctc + filtered[0].AutoCalculation;
+      return +(actualtds.toFixed(2));
+    },
+
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
 
@@ -218,7 +230,7 @@ sap.ui.define([
         Total = BasicSalary + HRA + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
 
         DeductionPF = 0;
-        IncomeTax_TDS = CTC * 10 / 100;
+        IncomeTax_TDS = this._calculateTDS(CTC);
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
 
@@ -232,7 +244,7 @@ sap.ui.define([
         Total = BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity + SpecailAllowance;
 
         DeductionPF = BasicSalary * 12 / 100;
-        IncomeTax_TDS = CTC * 10 / 100;
+        IncomeTax_TDS = this._calculateTDS(CTC);
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
       }
