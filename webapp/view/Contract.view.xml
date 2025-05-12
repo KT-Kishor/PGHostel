@@ -14,20 +14,11 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="ContractNo" label="{i18n>contractNo}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						 <ComboBox
-            id="idContractNoCombo"
-            selectedKey="{path: 'filters>/ContractNo'}"
-            showSecondaryValues="true"
-            showClearIcon="true"
-            items="{ContractModelInitial>/}">
-            <core:Item
-                key="{ContractModelInitial>ContractNo}"
-                text="{parts: [
-                    {path: 'ContractModelInitial>ContractNo'},
-                    {path: 'ContractModelInitial>ConsultantName'}
-                ], formatter: '.formatter.formatContractEntry'}" />
-        </ComboBox>
-		
+						 <ComboBox id="idContractNoCombo" selectedKey="{path: 'filters>/ContractNo'}" showSecondaryValues="true"
+                         showClearIcon="true" items="{ContractModelInitial>/}">
+                         <core:Item key="{ContractModelInitial>ContractNo}" text="{parts: [{path: 'ContractModelInitial>ContractNo'},
+                           {path: 'ContractModelInitial>ConsultantName'}], formatter: '.formatter.formatContractEntry'}" />
+                         </ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="LocationService" label="{i18n>locationService}" groupName="Group1" visibleInFilterBar="true">

@@ -15,10 +15,16 @@ sap.ui.define([
                 this._makeDatePickersReadOnly(["CU_id_AgreementDate", "CU_id_AssignmentStartDate", "CU_id_AssignmentEndDate"]);
                 await this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                await this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
                 await this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
                 await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ContractActive" });
+                await this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
 
+                const oModel = this.getView().getModel("CreateCustomerModel");
+                const aData = oModel.getData();
+                if (Array.isArray(aData)) {
+                    aData.sort((a, b) => a.companyName.localeCompare(b.companyName));
+                    oModel.setData(aData); // Update sorted data
+                }
                 this.sArgPara = oEvent.getParameter("arguments").sParContract;
                 var AgreementNo = oEvent.getParameter("arguments").sID
                 this.CD_CommonID();
