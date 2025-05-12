@@ -185,6 +185,7 @@ sap.ui.define([
                                 PermanentAddress: oSelectedData.ConsultantAddress,
                                 CorrespondenceAddress: oSelectedData.ConsultantAddress,
                                 Country: "India",
+                                CountryCode:  oSelectedData.CountryCode,
                                 BaseLocation: oSelectedData.BaseLocation,
                                 AppraisalDate: oSelectedData.JoiningDate.split('T')[0],
                                 Designation: oSelectedData.Designation,

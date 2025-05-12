@@ -139,6 +139,7 @@ sap.ui.define([
                 this.getBusyDialog();
                 var oModel = this.getView().getModel("employeeModel").getData();
                 oModel.Status = oModel.Status === "Rejected" ? "Saved" : oModel.Status;
+                oModel.CountryCode = this.getView().byId("EOD_Id_Country").getSelectedItem().getAdditionalText();
                 oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
                 oModel.JoiningDate = this.byId("EOUF_id_Joindate").getValue().split("/").reverse().join("-");
                 oModel.OfferReleaseDate = this.byId("EOUF_id_Reldate").getValue().split("/").reverse().join("-");
@@ -292,6 +293,7 @@ sap.ui.define([
                     this.getBusyDialog();
                     var oModel = this.getView().getModel("employeeModel").getData();
                     oModel.Gender = this.getView().byId("EOD_id_Gender").getSelectedKey()
+                    oModel.CountryCode = this.getView().byId("EOD_Id_Country").getSelectedItem().getAdditionalText();
                     oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.Department = this.getView().byId("EOD_id_Designation").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();
