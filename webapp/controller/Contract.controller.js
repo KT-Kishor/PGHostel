@@ -22,12 +22,6 @@ sap.ui.define(
           this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("contractDetails"));
           try {  
                await this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
-                  const oModel = this.getView().getModel("CreateCustomerModel");
-                  const aData = oModel.getData();
-              if (Array.isArray(aData)) {
-                  aData.sort((a, b) => a.companyName.localeCompare(b.companyName));
-                  oModel.setData(aData); // Update sorted data
-              }
               await this.readCallForContract("Initial");
             } catch (error) {
               sap.m.MessageToast.show(error.message || error.responseText);

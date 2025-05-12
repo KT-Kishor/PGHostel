@@ -36,7 +36,7 @@
 									<f:content>
 										<!-- Agreement Number -->
 										<m:Label text="{i18n>contractNo}"/>
-										<m:Text text="{oFilteredContractModel>/ContractNo} - {oFilteredContractModel>/AgreementNo}" />
+										<m:Text text="{oFilteredContractModel>/ContractNo} / {oFilteredContractModel>/AgreementNo}" />
 										<!-- Consultant Name -->
 										<m:Label text="{i18n>salutation}"/>
                                          <m:Select
@@ -61,7 +61,7 @@
 										<m:TextArea value="{oFilteredContractModel>/ConsultantAddress}" valueStateText="{i18n>addressValueState}" liveChange="CD_ValidateCommonFields" id="CU_id_ContractAddress" maxLength="120" editable="{simpleForm>/editable}"/>
 										<!-- End Client -->
 										<m:Label text="{i18n>endClient}" required="true"/>
-										<m:ComboBox items="{CreateCustomerModel>/}" valueStateText="{i18n>combovalueState}" value="{oFilteredContractModel>/EndClient}" id="CU_id_EndClient" change="CD_validateName"  editable="{simpleForm>/editable}">
+										<m:ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" valueStateText="{i18n>combovalueState}" value="{oFilteredContractModel>/EndClient}" id="CU_id_EndClient" change="CD_validateName"  editable="{simpleForm>/editable}">
 										<core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}" text="{CreateCustomerModel>companyName}" />
 										</m:ComboBox>	
 										<!-- <m:Input value="{oFilteredContractModel>/EndClient}" liveChange="onLiveValidation" id="idEndClient"  editable="{simpleForm>/editable}" maxLength="50" /> -->
@@ -150,8 +150,8 @@
 			<!-- button with expression binding for visibility -->
 			<m:Bar>
 				<m:contentRight>
-					<m:Button text="{= ${viewModel>/isEditMode} ? ${i18n>save} : ${i18n>edit} }" press=".onEditOrSavePress" visible="{ContractStatus>/status}" type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"/>
 					<m:Button text="{i18n>tileFooter}" id="CU_id_Mail" press="CUD_onSendEmail" visible="{ContractStatus>/status}" type="Ghost"/>
+					<m:Button text="{= ${viewModel>/isEditMode} ? ${i18n>save} : ${i18n>edit} }" press=".onEditOrSavePress" visible="{ContractStatus>/status}" type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"/>
 					<m:Button text="{i18n>GeneratePDF}" id="CU_id_Merge" press="onPressMerge" visible="{ContractStatus>/status}" type="Attention"/>
 				</m:contentRight>
 			</m:Bar>

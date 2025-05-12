@@ -304,6 +304,27 @@ sap.ui.define([
             },
             //generate PDF function
             TCF_onPressDownload: async function () {
+                var oRTE = sap.ui.getCore().byId("myRTE");
+                var oEditor = oRTE._oEditor?.editorManager?.activeEditor;
+                if (oEditor) {
+                    var plainText = oEditor.getContent({ format: 'text' });
+                    var charCount = plainText.length;
+ 
+                    var lines = plainText.split(/\r\n|\r|\n/);
+                    var lineCount = lines.length;
+ 
+                    console.log("Characters:", charCount, "Lines:", lineCount);
+                } else {
+                    console.warn("Editor not ready yet.");
+                    this.closeBusyDialog();
+                    return;
+                }
+ 
+                if(charCount > 1000 || lineCount > 21) {
+                    this.closeBusyDialog();
+                    MessageBox.error("Certificate content exceeds the limit of 1000 characters or 21 lines.");
+                    return;
+                }
                 try {
                     this.getBusyDialog();
                     // Get selected trainee's data from the table

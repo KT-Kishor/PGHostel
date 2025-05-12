@@ -33,12 +33,12 @@
 						<ComboBox
 							id="C_id_EndClient"
 							showClearIcon="true"
-							items="{CreateCustomerModel>/}">
+							items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" >
 							<core:Item key="{CreateCustomerModel>companyName}" text="{CreateCustomerModel>companyName}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Year" label="{i18n>year}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="Year" label="{i18n>startDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
                     <DateRangeSelection
                     id="C_id_Year"
@@ -55,7 +55,7 @@
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto" id="C_id_Salary"  items="{
+			<Table  class="sapUiResponsiveMargin" growingScrollToLoad="true" width="auto" id="C_id_Salary"  items="{
                 path: 'ContractModel>/', sorter: {path: 'ContractStatus',descending: false,group: true}}" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0">
 			 <headerToolbar>
                 <OverflowToolbar >

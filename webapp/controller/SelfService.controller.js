@@ -1454,6 +1454,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             FCR_onCloseDialog: function () {
                 this.SSRTE_oDialog.close();
             },
+
             CC_onPressIdCardDetails: function () {
                 this.cameracanvas();
                 var oView = this.getView();
@@ -1471,10 +1472,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     BaseLocation: employeeDetails.BaseLocation || "",
                     BranchCode: employeeDetails.BranchCode || "",
                     ProfilePhoto: employeeDetails.ProfilePhoto || ""
-
                 };
                 var oIdCardModel = new sap.ui.model.json.JSONModel(idCardJson);
                 oView.setModel(oIdCardModel, "IdCardModel");
+                this.getBusyDialog();
                 if (!this.oIdCardDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.AddCard",
@@ -1492,6 +1493,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             } else {
                                 this.cameracanvas(); // only if no image
                             }
+                            this.closeBusyDialog();
                         }.bind(this));
                     }.bind(this));
                 } else {
@@ -1505,6 +1507,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         } else {
                             this.cameracanvas(); // only if no image
                         }
+                        this.closeBusyDialog();
                     }.bind(this));
                 }
             },
@@ -1543,7 +1546,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     oModel.setProperty("/ProfilePhoto", "");
                     oModel.setProperty("/ProfilePhotoType", "");
                 }
-
                 this.cameracanvas(); // clears visible canvas
                 this.oIdCardDialog.close();
             },
@@ -1553,17 +1555,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     const oView = this.getView();
                     const oModelData = oView.getModel("IdCardModel").getData();
 
-                    const isAllDataPresent =
-                        oModelData.EmployeeID &&
-                        oModelData.EmployeeName &&
-                        oModelData.Designation &&
-                        oModelData.Email &&
-                        oModelData.DOB &&
-                        oModelData.MobileNo &&
-                        oModelData.BloodGroup &&
-                        oModelData.BaseLocation &&
-                        oModelData.BranchCode &&
-                        (oModelData.ProfilePhoto || oModelData.Attachment)
+                    const isAllDataPresent = oModelData.EmployeeID && oModelData.EmployeeName && oModelData.Designation &&
+                        oModelData.Email && oModelData.DOB && oModelData.MobileNo && oModelData.BloodGroup &&
+                        oModelData.BaseLocation && oModelData.BranchCode && (oModelData.ProfilePhoto || oModelData.Attachment)
 
                     if (isAllDataPresent) {
                         oView.getModel("sEmployeeModel").setProperty("/ProfilePhoto", "");
@@ -1586,7 +1580,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: employeeDetails.BranchCode });
                     var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
 
-                    const compLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.companylogo?.data);
+                    const compLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.transparentComplogo?.data);
                     const templateBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.idCardTemplate?.data);
                     const address =  oCompanyDetailsModel.shortAddress;
 

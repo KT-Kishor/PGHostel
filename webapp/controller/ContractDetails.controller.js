@@ -18,13 +18,6 @@ sap.ui.define([
                 await this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
                 await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ContractActive" });
                 await this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
-
-                const oModel = this.getView().getModel("CreateCustomerModel");
-                const aData = oModel.getData();
-                if (Array.isArray(aData)) {
-                    aData.sort((a, b) => a.companyName.localeCompare(b.companyName));
-                    oModel.setData(aData); // Update sorted data
-                }
                 this.sArgPara = oEvent.getParameter("arguments").sParContract;
                 var AgreementNo = oEvent.getParameter("arguments").sID
                 this.CD_CommonID();
@@ -386,7 +379,7 @@ sap.ui.define([
                                 }),
                                 endButton: new sap.m.Button({
                                     text: "Generate PDF",
-                                    type: "Reject",
+                                    type: "Attention",
                                     press: function () {
                                         oDialog.close();
                                         this.contractPDFgenerate(data);

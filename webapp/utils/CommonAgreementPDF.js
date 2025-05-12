@@ -245,7 +245,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                 doc.setFont("times", "bold").setFontSize(12);
                 doc.text(`Agreement Date : ${oModel.AgreementDate}`, margin, topMargin);
-                doc.text(`Agreement No. : ${oModel.ContractNo} (${oModel.AgreementNo})`, margin, topMargin + 10);
+                doc.text(`Agreement No. : ${oModel.ContractNo} / ${oModel.AgreementNo}`, margin, topMargin + 10);
                 var titleText = "SOLE TRADER AGREEMENT";
                 let textWidth = doc.getTextWidth(titleText);
                 let titleX = (pageWidth - textWidth) / 2;
@@ -271,7 +271,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 const nextY = topMargin + dimensions.h + 20;
 
                 const tableData = [
-                    ["Agreement No.", `${oModel.ContractNo} (${oModel.AgreementNo})`],
+                    ["Agreement No.", `${oModel.ContractNo} / ${oModel.AgreementNo}`],
                     ["Client Company Name", oCompanyModel.companyName],
                     ["End Client/Hirer (if different from Client)", oModel.ClientCompanyName],
                     ["Location(s) where Services are to be delivered", oModel.LocationService],
@@ -333,7 +333,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.setLineWidth(0.2); // Optional: adjust for thinner/thicker border
                 doc.rect(margin, startY - 4, maxWidth, endY - startY); // Slight padding adjustment
                 doc.line(margin + labelWidth, startY - 4, margin + labelWidth, endY - 4); // Vertical line between label and value
-                doc.save(`${oCompanyModel.companyName} - ${oModel.ClientCompanyName} contract.pdf`);
+                doc.save(`${oModel.ClientName} Contract Letter.pdf`);
                 that2.closeBusyDialog();
             }, 1000);
         },

@@ -425,7 +425,7 @@ sap.ui.define([], function () {
                     doc.line(margin, deductions0BotLineY, pageWidth - margin, deductions0BotLineY);
 
                     let varCompTitleY = deductions0BotLineY + 5;
-                    let varCompTitle = "Variable Components";
+                    let varCompTitle = "Variable Component";
                     let varCompTitleWidth = doc.getTextWidth(varCompTitle);
                     let varCompTitleX = (pageWidth - varCompTitleWidth) / 2;
                     let varCompTitleBotLineY = varCompTitleY + 2;

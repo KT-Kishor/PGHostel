@@ -26,8 +26,8 @@
 							<Label text="{i18n>consultantEmail}" required="true"/>
 							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="50" placeholder="{i18n>placeConsultantEmail}" id="CD_id_Email"  liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>rate}" required="true" />
-							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="1" select="RadioButtonSelect" >
-								<RadioButton  text="{i18n>rateHour}" />
+							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="{= ${ContractModelWizart>/Rate} === 'Hourly' ? 0 : (${ContractModelWizart>/Rate} === 'Daily' ? 1 : 2)}" select="RadioButtonSelect">
+								<RadioButton text="{i18n>rateHour}" />
 								<RadioButton text="{i18n>rateDaily}" />
 								<RadioButton text="{i18n>rateMonthly}" />
 							</RadioButtonGroup>
@@ -38,7 +38,7 @@
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
 							<Label text="{i18n>endClientHirer}" required="true"/>
-							<ComboBox items="{CreateCustomerModel>/}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
+							<ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
                             <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
                             </ComboBox>
 							<Label text="{i18n>assignmentStatus}"/>
@@ -80,7 +80,7 @@
 							<Select id="CD_id_PaymentTerms" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/}">
 								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</Select>
-							<Label text="{i18n>contractLocation}" required="true"/>
+							<Label text="{i18n>contractLocation}"/>
 								 <Select items="{BaseLocationModel>/}" id="CD_id_ConLocation"  showSecondaryValues="true" selectedKey="{ContractModelWizart>/contractLocation}" >
 												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 										   </Select>
