@@ -73,7 +73,7 @@
 						<Text text="{i18n>consultantName}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>locationService}" />
+						<Text text="{i18n>locationswhereServices}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>endClient}" />
@@ -83,9 +83,6 @@
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>endDate}" />
-					</Column>
-					<Column  hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>contractStatus}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>amount}" />
@@ -106,9 +103,8 @@
 							<Text text="{ContractModel>EndClient}"/>
 							<Text text="{path:'ContractModel>AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{path:'ContractModel>AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" />
-						    <ObjectStatus inverted="true" text="{ContractModel>ContractStatus}"  state="{path: 'ContractModel>ContractStatus', formatter:'.Formatter.formatObjectStatus'}" />
 							<Text text="{ContractModel>ConsultantRate}"/>
-								<Text text="{ContractModel>PaymentTerms}"/>
+							<Text text="{ContractModel>PaymentTerms}"/>
 							<Text text="{ContractModel>Comments}"/>
 						</cells>
 					</ColumnListItem>

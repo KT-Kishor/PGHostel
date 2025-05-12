@@ -18,6 +18,7 @@ sap.ui.define([
                 await this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
                 await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ContractActive" });
                 await this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
+                 await this._fetchCommonData("Country", "CountryModel"); 
                 this.sArgPara = oEvent.getParameter("arguments").sParContract;
                 var AgreementNo = oEvent.getParameter("arguments").sID
                 this.CD_CommonID();
@@ -56,7 +57,9 @@ sap.ui.define([
                             Status: "Submitted",
                             Salutation: "Mr.",
                             Salutation2: "Mr.",
-                            contractLocation: "Agra"
+                            Country:"India",
+                            contractLocation: "Kalaburagi",
+                            STDCode: "+91",
                         };
 
                         const oModel = new JSONModel(oData);
@@ -164,6 +167,46 @@ sap.ui.define([
                 utils._LCvalidateAmount(oEvent);
                 this.validateStep();
             },
+ 
+            CD_validateMobileNo: function (oEvent) {
+                utils._LCvalidateMobileNumber(oEvent);
+                 this.validateStep();
+            },
+
+          CD_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oSource = oEvent.getSource();
+                const selectedItem = oSource.getSelectedItem();
+                const selectedKey = oSource.getSelectedKey?.();
+
+                if (!oSource.getValue()) {
+                    oSource.setValueState("None");
+                }
+
+               const oValue = selectedItem?.getAdditionalText?.();
+                let oModel;
+                if (this.sArgPara === "CreateContractFlag") {
+                    oModel = this.getView().getModel("ContractModelWizart");
+                    if (oValue) {
+                        const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+                        this.getView().byId("CD_id_ConLocation").getBinding("items").filter(oFilter);
+                    }
+                } else {
+                    oModel = this.getView().getModel("oFilteredContractModel");
+                    if (oValue) {
+                        const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+                        this.getView().byId("CU_id_ContractCity").getBinding("items").filter(oFilter);
+                    }
+                }
+                if (oModel) {
+                    if (selectedKey) {
+                        oModel.setProperty("/Country", selectedKey);
+                        oSource.setValueState("None");
+                    } else {
+                        oModel.setProperty("/Country", "");
+                    }
+                }
+            },
 
             CD_validateDate: function (oEvent) {
                 let oModel, oStartDatePicker, oEndDatePicker;
@@ -262,9 +305,12 @@ sap.ui.define([
                 oModel.HiringContact = this.byId("CD_id_HiringContact").getValue();
                 oModel.Datestart = this.byId("CD_id_Datestart").getValue();
                 oModel.DateEnd = this.byId("CD_id_DateEnd").getValue();
+                oModel.Country = this.byId("CD_id_Country").getSelectedKey();
+                oModel.Location = this.byId("CD_id_ConLocation").getSelectedKey();
+                oModel.MobileNo = this.byId("CD_id_Mobile").getValue();
                
                 const bAllFieldsFilled = oModel.AgreeDate && oModel.CName && oModel.Address && oModel.Email && oModel.EndClientHirer 
-                   &&  oModel.Amount && oModel.HiringContact && oModel.Datestart && oModel.DateEnd;
+                   &&  oModel.Amount && oModel.HiringContact && oModel.Datestart && oModel.DateEnd && oModel.Country && oModel.Location && oModel.MobileNo;
             
                 if (bAllFieldsFilled) {
                     // Run all validations
@@ -277,7 +323,8 @@ sap.ui.define([
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
-                        utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") && 
+                        utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID") && 
                        
                     // Set wizard step validation
                     this.byId("CD_id_Wizard").getSteps()[0].setValidated(bValid);
@@ -311,7 +358,9 @@ sap.ui.define([
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
-                        utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID")
+                        utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") &&
+                         utils._LCstrictValidationComboBox(this.getView().byId("CD_id_Country"), "ID") &&
+                        utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID") 
                     ) {
                         var formattedText;
                         switch (this.RadioButton) {
@@ -352,9 +401,12 @@ sap.ui.define([
                             "Status": "Submitted",
                             "AgreementDate": oModel.oData.AgreementDate.split("/").reverse().join("-"),
                             "ContarctEmail": oModel.oData.ContarctEmail,
-                            "ContractLocation": oModel.oData.BaseLocation !== "" ? oModel.oData.BaseLocation : this.getView().byId("CD_id_ConLocation"),
+                            "ContractLocation": oModel.oData.contractLocation !== "" ? oModel.oData.contractLocation : this.getView().byId("CD_id_ConLocation"),
                             "AgreementNo": String(1).padStart(2, '0'),
-                            "BranchCode": branchCode
+                            "BranchCode": branchCode,
+                            "Country": oModel.oData.Country,
+                            "MobileNo": oModel.oData.MobileNo,
+                            "STDCode": oModel.oData.STDCode,
                         };
             
                         this.getBusyDialog(); // Show busy dialog
@@ -363,7 +415,8 @@ sap.ui.define([
             
                         if (response.success === true) {
                             this.closeBusyDialog(); // Close busy dialog
-            
+                            data.ContractNo = response.ContractNo;
+                             
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
                                 type: sap.m.DialogType.Message,
@@ -482,7 +535,8 @@ sap.ui.define([
                     utils._LCvalidateName(this.byId("CU_id_EndClient"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CD_id_contractStatus"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_ClientReportContact"), "ID") &&
-                    utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") 
+                    utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") &&
+                    utils._LCvalidateMobileNumber(this.byId("CU_id_Mobile"), "ID") 
                 );
             
                 if (!isMandatoryValid) {
@@ -491,9 +545,6 @@ sap.ui.define([
                 }
             
                 const oModel = oView.getModel("oFilteredContractModel").getData();
-                const AgreementNo = oModel.AgreementNo;
-                // const newAgreementNo = (oModel.ContractStatus === 'Renewed') ? (parseInt(AgreementNo) + 1).toString().padStart(2, "0") : AgreementNo;
-            
                 const rateType = oModel.HrDaliyMonth;
                 const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
                 const selectedCurrency = this.byId("CU_id_CurrencySelect").getSelectedKey();
@@ -502,8 +553,7 @@ sap.ui.define([
                 const branchCode = this.byId("CU_id_ContractCity").getSelectedItem().getAdditionalText();
                 const startDate = this.byId("CU_id_AssignmentStartDate").getDateValue();
                 const endDate = this.byId("CU_id_AssignmentEndDate").getDateValue();
-                
-            
+                 
                 const jsonData = {
                     ContractNo: oModel.ContractNo,
                     AgreementNo: oModel.AgreementNo,
@@ -525,9 +575,12 @@ sap.ui.define([
                     ExpensesClaim: oModel.ExpensesClaim,
                     AgreementDate: oModel.AgreementDate,
                     ContarctEmail: oModel.ContarctEmail,
-                    ContractLocation: oModel.BaseLocation ? oModel.BaseLocation : this.byId("CD_id_ConLocation").getSelectedKey(),
+                    ContractLocation: oModel.ContractLocation ? oModel.ContractLocation : this.byId("CD_id_ConLocation").getSelectedKey(),
                     Comments: oModel.Comments,
-                    BranchCode: branchCode
+                    BranchCode: branchCode,
+                    Country: oModel.Country,
+                    MobileNo: oModel.MobileNo,
+                    STDCode: oModel.STDCode,
                 };
 
                 // Case 1: Renewed but previous not active
@@ -542,7 +595,7 @@ sap.ui.define([
                     return sap.m.MessageBox.error(this.i18nModel.getText("contractStatusMessage"));
                 }
             
-                // ✅ Case 2: Renewed and previous was Active — update old & create new contract
+                //  Case 2: Renewed and previous was Active — update old & create new contract
                 if (oModel.ContractStatus === "Renewed" && that.OldStatus === "Active") {
                     const endDateArr =(this.AssignmentEndDate).split('/').map(Number);
                     const endDateCreate = new Date(endDateArr[2], endDateArr[1] - 1, endDateArr[0]);
@@ -578,7 +631,7 @@ sap.ui.define([
                             sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
                         }
 
-                        return; // ✅ Skip update fallback
+                        return; //  Skip update fallback
                     } else {
                         oView.getModel("oFilteredContractModel").setProperty("/ContractStatus", this.ContractStatus);
                         this.closeBusyDialog();
@@ -586,7 +639,6 @@ sap.ui.define([
                     }
                 }
 
-        
                 try {
                     this.getBusyDialog();
                     const requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: oModel.AgreementNo }, data: jsonData };

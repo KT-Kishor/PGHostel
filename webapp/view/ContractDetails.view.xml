@@ -15,10 +15,9 @@
 							<Label text="{i18n>agreementDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="CD_validateDate"  valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>salutation}"  />
-							<Select id=""  selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}">
+							<Select id=""  selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}" width="100%">
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
-							<Label text="{i18n>consultantName}"  required="true"/>
 							<Input value="{ContractModelWizart>/ConsultantName}" placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="CD_ValidateConsultantName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
 							<Label text="{i18n>address}" required="true"/>
 							<TextArea value="{ContractModelWizart>/ConsultantAddress}"  maxLength="120" rows="3" id="CD_id_Address" placeholder="{i18n>placeAddress}" change="onAddress" valueStateText="{i18n>addressValueState}"
@@ -41,17 +40,11 @@
 							<ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
                             <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
                             </ComboBox>
-							<Label text="{i18n>assignmentStatus}"/>
-							<ComboBox selectedKey="New" value="{ContractModelWizart>/AssignmentStatus}" 
-                             items="{AssignmentStatus>/assignmentStatus}" editable="false">
-								<core:Item key="{AssignmentStatus>Value}" text="{AssignmentStatus>Value}"/>
-							</ComboBox>
 							<Label text="{i18n>salutation}"/>
 							<Select id="CD_id_selectSal" selectedKey="{ContractModelWizart>/Salutation2}" 
-                              items="{Salutation>/salutation}" >
+                              items="{Salutation>/salutation}" width="100%" >
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
-							<Label text="{i18n>clienthiringcontact}"  required="true"/>
 							<Input value="{ContractModelWizart>/ClientReportContact}"
                              placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" liveChange="CD_validateName" valueStateText="{i18n>commonNameValueState}"/>
 							<Label text="{i18n>locationswhereServices}" />
@@ -80,10 +73,21 @@
 							<Select id="CD_id_PaymentTerms" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/}">
 								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</Select>
+							<Label text="{i18n>expCountry}" required="true"/>
+				             <ComboBox change="CD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="CD_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{ContractModelWizart>/Country}" showSecondaryValues="true"  >
+					        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+				            </ComboBox>
 							<Label text="{i18n>contractLocation}"/>
 								 <Select items="{BaseLocationModel>/}" id="CD_id_ConLocation"  showSecondaryValues="true" selectedKey="{ContractModelWizart>/contractLocation}" >
 												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 										   </Select>
+										   
+				<Label text="{i18n>mobileNo}" required="true" />
+				<ComboBox value="{ContractModelWizart>/STDCode}" showSecondaryValues= "true" id="CD_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" change="validateCombo" valueStateText="{i18n>combovalueState}">
+					<core:ListItem key="{codeModel>country}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}"/>
+				</ComboBox>
+				<Input value="{ContractModelWizart>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="10" id="CD_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
+
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
@@ -125,8 +129,6 @@
 							<Text text="{ContractModelWizart>/Location}"/>
 							<Label text="{i18n>clienthiringcontact}"/>
 							<Text text="{= ${ContractModelWizart>/Salutation2} + ' ' + ${ContractModelWizart>/ClientReportContact} }" />
-							<Label text="{i18n>assignmentStatus}"/>
-							<Text text="{ContractModelWizart>/AssignmentStatus}"/>
 							<Label text="{i18n>startDate}"/>
 							<Text text="{path : 'ContractModelWizart>/StartDate'}"/>
 							<Label text="{i18n>endDate}"/>
@@ -141,6 +143,10 @@
 							<Text text="{ContractModelWizart>/PaymentTerms}"/>
 							<Label text="{i18n>contractLocation}"/>
 							<Text  text="{ContractModelWizart>/contractLocation}" />
+							<Label text="{i18n>expCountry}"/>
+							<Text text="{ContractModelWizart>/Country}"/>
+							<Label text="{i18n>mobileNo}"/>
+							<Text text="{= ${ContractModelWizart>/STDCode} + ' ' + ${ContractModelWizart>/MobileNo} }"/>
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>
