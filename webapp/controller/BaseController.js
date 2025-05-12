@@ -221,16 +221,16 @@ sap.ui.define([
         return 0;
       }
       var filtered = tdsSlab.filter(function (item) {
-        return ctc >= item.IncomeStart && ctc <= item.IncomeEnd;
+        return ctc >= item.StartAmount && ctc <= item.EndAmount;
       });
 
-      var ctcforTDS = ctc - filtered[0].IncomeStart + 1;
-      var tdsofctc = ctcforTDS * filtered[0].TaxRate / 100;
+      var ctcforTDS = ctc - filtered[0].StartAmount + 1;
+      var tdsofctc = ctcforTDS * filtered[0].TaxPercentage / 100;
       var actualtds = tdsofctc + filtered[0].AutoCalculation;
       return +(actualtds.toFixed(2));
     },
 
-    _calculateSalaryComponents: function (isTDSIncluded) {
+    _calculateSalaryComponents: async function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
       var code = oModel.getProperty("/CountryCode");
       // Convert and fetch values
@@ -252,7 +252,7 @@ sap.ui.define([
         Total = BasicSalary + HRA + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
 
         DeductionPF = 0;
-        IncomeTax_TDS = this._calculateTDS(CTC, code);
+        IncomeTax_TDS = await this._calculateTDS(CTC, code);
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
 
@@ -266,7 +266,7 @@ sap.ui.define([
         Total = BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity + SpecailAllowance;
 
         DeductionPF = BasicSalary * 12 / 100;
-        IncomeTax_TDS = this._calculateTDS(CTC, code);
+        IncomeTax_TDS = await this._calculateTDS(CTC, code);
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
       }
