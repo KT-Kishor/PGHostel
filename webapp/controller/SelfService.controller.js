@@ -1455,12 +1455,24 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.SSRTE_oDialog.close();
             },
 
-            CC_onPressIdCardDetails: function () {
-                this.cameracanvas();
+          CC_onPressIdCardDetails: function () {
                 var oView = this.getView();
-                var employeeDetails = oView.getModel("sEmployeeModel").getData()[0];
-                this.getView().getModel("TextDisplay").setProperty("/name", "");
-                this._FragmentDatePickersReadOnly(["CC_id_DateBirth", "CC_id_bloodGroup"])
+                var oEmployeeModel = oView.getModel("sEmployeeModel");
+                var employeeData = oEmployeeModel && oEmployeeModel.getData();
+                var employeeDetails = employeeData && employeeData[0];
+
+                if (!employeeDetails) {
+                    sap.m.MessageToast.show("Employee details not found.");
+                    return;
+                }
+
+                // Reset the name field in TextDisplay model
+                var oTextDisplayModel = oView.getModel("TextDisplay");
+                if (oTextDisplayModel) {
+                    oTextDisplayModel.setProperty("/name", "");
+                }
+
+                // Prepare ID card data
                 var idCardJson = {
                     EmployeeID: employeeDetails.EmployeeID || "",
                     EmployeeName: employeeDetails.EmployeeName || "",
@@ -1473,9 +1485,24 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     BranchCode: employeeDetails.BranchCode || "",
                     ProfilePhoto: employeeDetails.ProfilePhoto || ""
                 };
+
                 var oIdCardModel = new sap.ui.model.json.JSONModel(idCardJson);
                 oView.setModel(oIdCardModel, "IdCardModel");
+
+                // Show busy dialog
                 this.getBusyDialog();
+                var fnAfterOpen = function () {
+                    var sFileBinary = employeeDetails.ProfilePhoto;
+                    var sFileType = employeeDetails.ProfilePhotoType;
+
+                    if (sFileBinary && sFileType) {
+                        try {
+                            this.onPressDisplayImageOnCanvas(sFileBinary, sFileType);
+                        } catch (e) {
+                            console.error("Error displaying image on canvas:", e);
+                        }
+                    }
+                }.bind(this);
                 if (!this.oIdCardDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.AddCard",
@@ -1483,60 +1510,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     }).then(function (oDialog) {
                         this.oIdCardDialog = oDialog;
                         oView.addDependent(this.oIdCardDialog);
+                        this.oIdCardDialog.attachAfterOpen(fnAfterOpen);
                         this.oIdCardDialog.open();
-                        this.oIdCardDialog.attachAfterOpen(function () {
-                            const photo = employeeDetails.ProfilePhoto;
-                            const type = employeeDetails.ProfilePhotoType;
-                            this.cameracanvas();
-                            if (photo && type && photo !== "") {
-                                this.onDisplayImageOnCanvas(photo, type);
-                            } else {
-                                this.cameracanvas(); // only if no image
-                            }
-                            this.closeBusyDialog();
-                        }.bind(this));
-                    }.bind(this));
-                } else {
-                    this.oIdCardDialog.open();
-                    this.oIdCardDialog.attachAfterOpen(function () {
-                        const photo = employeeDetails.ProfilePhoto;
-                        const type = employeeDetails.ProfilePhotoType;
-                        this.cameracanvas();
-                        if (photo && type && photo !== "") {
-                            this.onDisplayImageOnCanvas(photo, type);
-                        } else {
-                            this.cameracanvas(); // only if no image
-                        }
                         this.closeBusyDialog();
                     }.bind(this));
-                }
-            },
-
-            cameracanvas: function () {
-                var canvas = document.getElementById("camera_id_canvas");
-                if (canvas) {
-                    var context = canvas.getContext("2d");
-                    context.clearRect(0, 0, canvas.width, canvas.height);
-                    context.fillStyle = "rgba(255,255,255,0)";
-                    context.fillRect(0, 0, canvas.width, canvas.height);
-                }
-            },
-
-            onDisplayImageOnCanvas: function (sFileBinary, sFileType) {
-                var canvas = document.getElementById("camera_id_canvas");
-                if (canvas) {
-                    var context = canvas.getContext("2d");
-
-                    var img = new Image();
-                    img.onload = function () {
-                        context.clearRect(0, 0, canvas.width, canvas.height);
-                        context.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    };
-
-                    img.src = "";
-                    setTimeout(() => {
-                        img.src = "data:" + sFileType + ";base64," + sFileBinary;
-                    }, 0);
+                } else {
+                    this.oIdCardDialog.attachAfterOpen(fnAfterOpen);
+                    this.oIdCardDialog.open();
+                    this.closeBusyDialog();
                 }
             },
 
@@ -1546,7 +1527,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     oModel.setProperty("/ProfilePhoto", "");
                     oModel.setProperty("/ProfilePhotoType", "");
                 }
-                this.cameracanvas(); // clears visible canvas
                 this.oIdCardDialog.close();
             },
 

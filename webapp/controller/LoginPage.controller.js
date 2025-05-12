@@ -444,6 +444,7 @@ sap.ui.define(
             return;
           } else {
             sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
+            this.SM_onPressSave()
           }
 
 

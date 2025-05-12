@@ -23,7 +23,7 @@
 							<Label text="{i18n>address}" required="true"/>
 							<TextArea value="{ContractModelWizart>/ConsultantAddress}"  maxLength="120" rows="3" id="CD_id_Address" placeholder="{i18n>placeAddress}" change="onAddress" valueStateText="{i18n>addressValueState}"
 									liveChange="CD_ValidateCommonFields"/>
-							<Label text="{i18n>consultantEmail}" required="true"/>
+							<Label text="{i18n>consultantEmailID}" required="true"/>
 							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="50" placeholder="{i18n>placeConsultantEmail}" id="CD_id_Email"  liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>rate}" required="true" />
 							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="{= ${ContractModelWizart>/Rate} === 'Hourly' ? 0 : (${ContractModelWizart>/Rate} === 'Daily' ? 1 : 2)}" select="RadioButtonSelect">
@@ -109,18 +109,14 @@
 						<f:content>
 							<Label text="{i18n>agreementDate}"/>
 							<Text text="{path:'ContractModelWizart>/AgreementDate'}"/>
-							<Label text="{i18n>name}"/>
+							<Label text="{i18n>consultantName}"/>
 							<Text text="{= ${ContractModelWizart>/Salutation} + ' ' + ${ContractModelWizart>/ConsultantName}}"/>
 							<Label text="{i18n>address}"/>
 							<Text text="{ContractModelWizart>/ConsultantAddress}"/>
 							<Label text="{i18n>consultantEmailID}"/>
 							<Text text="{ContractModelWizart>/ContarctEmail}"/>
-							<Label text="{i18n>role}"/>
-							<Text text="{ContractModelWizart>/Role}"/>
 							<Label text="{i18n>amount}"/>
-							<Text text="{ContractModelWizart>/Amount}"/>
-							<Label text="{i18n>currency}"/>
-					    	<Text text="{ContractModelWizart>/Currency}" />
+							<Text text="{path:'ContractModelWizart>/Amount', formatter: '.Formatter.formatCurrency'} {ContractModelWizart>/Currency}"/>	
 							<Label text="{i18n>rate}"/>
 							<Text text="{ContractModelWizart>/Rate}"/>
 							<Label text="{i18n>endClientHirer}"/>
@@ -131,9 +127,9 @@
 							<Text text="{= ${ContractModelWizart>/Salutation2} + ' ' + ${ContractModelWizart>/ClientReportContact} }" />
 							<Label text="{i18n>assignmentStatus}"/>
 							<Text text="{ContractModelWizart>/AssignmentStatus}"/>
-							<Label text="{i18n>StartDate}"/>
+							<Label text="{i18n>startDate}"/>
 							<Text text="{path : 'ContractModelWizart>/StartDate'}"/>
-							<Label text="{i18n>EndDate}"/>
+							<Label text="{i18n>endDate}"/>
 							<Text text="{path:'ContractModelWizart>/EndDate'}"/>
 							<Label text="{i18n>specificInsuranceRequirement}"/>
 							<Text text="{ContractModelWizart>/InsuranceRequirement}"/>

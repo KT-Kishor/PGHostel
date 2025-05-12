@@ -128,7 +128,7 @@ sap.ui.define([
 
             CD_validateName: function (oEvent) {
                 const oSource = oEvent.getSource();
-                const selectedKey = oSource.getSelectedKey?.();
+                const selectedKey = oSource.getSelectedKey?.().trim();
                 let oModel, oInput;
             
                 if (this.sArgPara === "CreateContractFlag") {
