@@ -201,16 +201,16 @@ sap.ui.define([
 
     _calculateTDS: async function (ctc, code) {
       if (code !== this.codeflag) {
-        this.getBusyDialog(); // open BusyDialog immediately
+      //  this.getBusyDialog(); // open BusyDialog immediately
         try {
           await this._fetchCommonData("TaxCalculation", "TDSModel", { Country: code });
           this.codeflag = code;
-          this.closeBusyDialog();
+          //this.closeBusyDialog();
         }
         catch (e) {
           console.error(e);
           sap.m.MessageToast.show("Error fetching TDS data");
-          this.closeBusyDialog();
+          //this.closeBusyDialog();
           return 0;
         }
       }
