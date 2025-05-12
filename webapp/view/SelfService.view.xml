@@ -113,7 +113,7 @@
 										<m:Label text="{i18n>employeeName}"  />
 										<m:Input value="{sEmployeeModel>/0/Salutation} {sEmployeeModel>/0/EmployeeName}" editable="false"/>
 										<m:Label  text="{i18n>joiningDate}"/>
-										<m:DatePicker value="{path:'sEmployeeModel>/0/AppraisalDate', formatter:'.Formatter.formatDate'}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" id="SS_id_Joinn" editable="false"/>
+										<m:DatePicker value="{path:'sEmployeeModel>/0/JoiningDate', formatter:'.Formatter.formatDate'}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" id="SS_id_Joinn" editable="false"/>
 										<m:Label text="{i18n>dateOfBirth}" required="true" id="SS_id_ldob" />
 										<m:DatePicker value="{path:'sEmployeeModel>/0/DateOfBirth', formatter:'.Formatter.formatDate'}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="SS_validateDate"
 									id="SS_id_Dob" editable="{viewModel>/isEditMode}" initialFocusedDateValue="{controller>/focusedDate}" valueStateText="{i18n>dateValueState}"

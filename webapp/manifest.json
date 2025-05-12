@@ -178,6 +178,16 @@
                 "uri":"model/SowStatus.json",
                 "preload":true
             },
+              "codeModel": {
+                "type":"sap.ui.model.json.JSONModel",
+                "uri":"model/STDCode.json",
+                "preload":true
+            },
+            "StatusEmp": {
+                "type":"sap.ui.model.json.JSONModel",
+                "uri":"model/StatusEmp.json",
+                "preload":true
+            },
                "DocumentJson": {
                 "type":"sap.ui.model.json.JSONModel",
                 "uri":"model/Document.json",
