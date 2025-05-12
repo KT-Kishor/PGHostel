@@ -202,11 +202,6 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TravelAllowance.json",
                 "preload": true
-            },
-            "TDSModel": {
-                "type": "sap.ui.model.json.JSONModel",
-                "uri": "model/SalaryTDSPerc.json",
-                "preload": true
             }
         },
         "resources": {

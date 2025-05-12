@@ -11,6 +11,7 @@ sap.ui.define([
     Formatter: Formatter,
     // Router Code 
     getRouter: function () {
+      this.codeflag = "";
       return sap.ui.core.UIComponent.getRouterFor(this);
     },
 
@@ -83,8 +84,8 @@ sap.ui.define([
             "Trainee": "/Trainee",
             "Contract": "/GenerateContract",
             "ManageAssignment": "/AssignmentTask",
-            "Expense":"/ExpenseApp",
-            "MSA&SOW":"/GenerateMsaNda"
+            "Expense": "/ExpenseApp",
+            "MSA&SOW": "/GenerateMsaNda"
           };
 
           const modelPath = tileMap[value];
@@ -198,8 +199,19 @@ sap.ui.define([
       });
     },
 
-    _calculateTDS: function (ctc) {
+    _calculateTDS: async function (ctc, code) {
+      if (code !== this.codeflag) {
+        this.getBusyDialog(); // open BusyDialog immediately
+        await this._fetchCommonData("TaxCalculation", "TDSModel", { Country: code });
+        this.codeflag = code;
+        this.closeBusyDialog();
+      }
+
       var tdsSlab = this.getView().getModel("TDSModel").getData();
+      if (!tdsSlab || tdsSlab.length === 0) {
+        sap.m.MessageToast.show("Tax calculation not available for the selected country: " + code);
+        return 0;
+      }
       var filtered = tdsSlab.filter(function (item) {
         return ctc >= item.IncomeStart && ctc <= item.IncomeEnd;
       });
@@ -212,7 +224,7 @@ sap.ui.define([
 
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
-
+      var code = oModel.getProperty("/CountryCode");
       // Convert and fetch values
       var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",", ""));
       var VariableData = parseFloat(oModel.getProperty("/VariablePercentage"));
@@ -232,7 +244,7 @@ sap.ui.define([
         Total = BasicSalary + HRA + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
 
         DeductionPF = 0;
-        IncomeTax_TDS = this._calculateTDS(CTC);
+        IncomeTax_TDS = this._calculateTDS(CTC, code);
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
 
@@ -246,7 +258,7 @@ sap.ui.define([
         Total = BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity + SpecailAllowance;
 
         DeductionPF = BasicSalary * 12 / 100;
-        IncomeTax_TDS = this._calculateTDS(CTC);
+        IncomeTax_TDS = this._calculateTDS(CTC, code);
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
       }
