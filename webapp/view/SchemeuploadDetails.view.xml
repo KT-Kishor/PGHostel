@@ -270,7 +270,7 @@
     id="SUD_id_Edit"
     text="{= ${detailModel>/isCreateMode} ? ${i18n>save} : (${detailModel>/isEditable} ? ${i18n>save} : ${i18n>edit}) }"
     press="SUD_onhandleEdit_SavePress"
-    type="{= ${detailModel>/isCreateMode} ? 'Accept' : (${detailModel>/isEditable} ? 'Accept' : 'Ghost') }"
+    type="{= ${detailModel>/isCreateMode} ? 'Accept' : (${detailModel>/isEditable} ? 'Accept' : 'Emphasized') }"
     visible="{= ${detailModel>/isCreateMode} || ${detailModel>/showEditButton} }"
 />
 

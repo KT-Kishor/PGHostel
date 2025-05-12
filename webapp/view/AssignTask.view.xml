@@ -60,7 +60,7 @@
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
 					    <Button  text="Assign Employee" press="AT_onAssignEmpTask"   id="AT_id_Assign" type="Accept" tooltip="{i18n>assigntask}"/>
-						<Button    press="AT_onEditTask" text="{i18n>edit}" id="AT_id_EditTask" tooltip="{i18n>editassigntask}" />
+						<Button    press="AT_onEditTask" text="{i18n>edit}" id="AT_id_EditTask" tooltip="{i18n>editassigntask}" type="Emphasized" />
 
                    </OverflowToolbar>
             </headerToolbar>

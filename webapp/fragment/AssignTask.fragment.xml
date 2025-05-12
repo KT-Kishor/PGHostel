@@ -61,7 +61,7 @@
             </f:content>
              </f:SimpleForm>
             <HBox justifyContent="End" >
-            <Button text="{i18n>save}" type="Emphasized" press="MA_onPressSave" class="submit" visible="{visiblePlay>/save}"/>
+            <Button text="{i18n>save}" type="Accept" press="MA_onPressSave" class="submit" visible="{visiblePlay>/save}"/>
                 <Button text="{i18n>submit}" type="Accept" press="FAT_onSubmitTask" class="submit" visible="{visiblePlay>/submit}"/>
                 <Button text="{i18n>close}" press="FAT_onTaskClose" class="sendMail" type="Reject"/>
           </HBox>
