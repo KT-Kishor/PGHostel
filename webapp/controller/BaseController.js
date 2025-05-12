@@ -202,9 +202,17 @@ sap.ui.define([
     _calculateTDS: async function (ctc, code) {
       if (code !== this.codeflag) {
         this.getBusyDialog(); // open BusyDialog immediately
-        await this._fetchCommonData("TaxCalculation", "TDSModel", { Country: code });
-        this.codeflag = code;
-        this.closeBusyDialog();
+        try {
+          await this._fetchCommonData("TaxCalculation", "TDSModel" /*, { Country: code } (Still filter not applied) */);
+          this.codeflag = code;
+          this.closeBusyDialog();
+        }
+        catch (e) {
+          console.error(e);
+          sap.m.MessageToast.show("Error fetching TDS data");
+          this.closeBusyDialog();
+          return 0;
+        }
       }
 
       var tdsSlab = this.getView().getModel("TDSModel").getData();
