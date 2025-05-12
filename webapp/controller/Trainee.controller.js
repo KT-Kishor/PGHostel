@@ -442,7 +442,7 @@ sap.ui.define([
             //send mail function
             Mail_onSendEmail: function () {
                 try {
-                    var oModel = this.getView().getModel("traineeModel").getData()[0];
+                    var oModel = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject();
                     var oPayload = {
                         "TraineeName": oModel.TraineeName,
                         "toEmailID": oModel.TraineeEmail,

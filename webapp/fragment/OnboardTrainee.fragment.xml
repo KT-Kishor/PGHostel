@@ -3,7 +3,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core" >
 	<Dialog 
-        title="{i18n>onBoardTrainee}">
+        title="{i18n>traineeOnbord}">
 		<f:SimpleForm 
 			editable="true"
 			layout="ResponsiveGridLayout"
