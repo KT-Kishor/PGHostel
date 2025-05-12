@@ -295,6 +295,9 @@ sap.ui.define(
         TileV_onPressAssetAssignment: function () {
           this.getRouter().navTo("RouteAssetAssignment");
         },
+        TileV_onPressHrQuotation: function () {
+          this.getRouter().navTo("RouteHrQuotation");
+        },
       }
     );
   }
