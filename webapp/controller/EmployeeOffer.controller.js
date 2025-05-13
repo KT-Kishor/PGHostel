@@ -358,35 +358,9 @@ sap.ui.define([
 
             },
             OE_onChangeCountry: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                this.onCountryChange(oEvent, { stdCodeCombo: "OEF_id_STDCode", baseLocationCombo: "idSelect", branchInput: "OE_id_BranchInput"});
+             }
 
-                if (oEvent.getSource().getValue() === '') {
-                    oEvent.getSource().setValueState("None");
-                    return;
-                }
-                var oSelectedItem = oEvent.getSource().getSelectedItem();
-                if (!oSelectedItem) return;
-                var sCountryCode = oSelectedItem.getAdditionalText(); 
-                var oSTDCombo = sap.ui.getCore().byId("OEF_id_STDCode");
-                oSTDCombo.getBinding("items").filter([]); 
-                oSTDCombo.setValue(""); 
-                setTimeout(function () {
-                    var aFilteredItems = oSTDCombo.getItems();
-                    var oDefaultItem = aFilteredItems.find(item => item.getAdditionalText() === sCountryCode);
-                    if (oDefaultItem) {
-                        oSTDCombo.setSelectedItem(oDefaultItem);
-                        oSTDCombo.setValue(oDefaultItem.getText()); // Auto-select the matching STD Code (e.g., "+91" for India)
-                    }
-                }, 100);
-                var oFilterBase = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, sCountryCode);
-                var oBaseCombo = sap.ui.getCore().byId("idSelect");
-
-                oBaseCombo.getBinding("items").filter([oFilterBase]); // Apply filter based on the selected country
-                oBaseCombo.setSelectedKey(""); 
-                oBaseCombo.setValue(""); 
-                // Clears Branch Code Field
-                sap.ui.getCore().byId("OE_id_BranchInput").setValue("");
-            }
 
         });
     });

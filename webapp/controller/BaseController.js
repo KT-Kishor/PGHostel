@@ -201,7 +201,7 @@ sap.ui.define([
 
     _calculateTDS: async function (ctc, code) {
       if (code !== this.codeflag) {
-      //  this.getBusyDialog(); // open BusyDialog immediately
+        //  this.getBusyDialog(); // open BusyDialog immediately
         try {
           await this._fetchCommonData("TaxCalculation", "TDSModel", { Country: code });
           this.codeflag = code;
@@ -745,6 +745,51 @@ sap.ui.define([
         oView.byId(sGenderControlId).setEnabled(false);
       } else {
         oView.byId(sGenderControlId).setEnabled(true);
+      }
+    },
+    onCountryChange: function (oEvent, oIds) {
+      const oSource = oEvent.getSource();
+      const oSelectedItem = oSource.getSelectedItem();
+
+      if (!oSelectedItem) {
+        oSource.setValueState("None");
+        return;
+      }
+
+      const sCountryCode = oSelectedItem.getAdditionalText();
+      const oView = this.getView() || oSource.getParent();
+
+      const getById = (sId) => oView.byId(sId) || sap.ui.getCore().byId(sId);
+
+      // STD Code Logic
+      const oSTDCombo = getById(oIds.stdCodeCombo);
+      if (oSTDCombo?.getBinding("items")) {
+        oSTDCombo.getBinding("items").filter([]);
+        oSTDCombo.setValue("");
+
+        setTimeout(() => {
+          const aFilteredItems = oSTDCombo.getItems();
+          const oMatch = aFilteredItems.find(item => item.getAdditionalText() === sCountryCode);
+          if (oMatch) {
+            oSTDCombo.setSelectedItem(oMatch);
+            oSTDCombo.setValue(oMatch.getText());
+          }
+        }, 100);
+      }
+
+      // Base Location Filtering
+      const oBaseCombo = getById(oIds.baseLocationCombo);
+      if (oBaseCombo?.getBinding("items")) {
+        const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, sCountryCode);
+        oBaseCombo.getBinding("items").filter([oFilter]);
+        oBaseCombo.setSelectedKey("");
+        oBaseCombo.setValue("");
+      }
+
+      // Branch Code Clear
+      const oBranchInput = getById(oIds.branchInput);
+      if (oBranchInput) {
+        oBranchInput.setValue("");
       }
     }
 
