@@ -632,8 +632,16 @@ sap.ui.define([
                 this.onSalutationChangeCommon(
                     oEvent,
                     "employeeModel",       // name of the model
-                    "/Gender",             // path to gender property
+                    "/Gender" ,           // path to gender property
                     "EOU_id_Gender"        // ID of the gender control
+                );
+            },
+            onCreateSalutationChange: function (oEvent) {
+                this.onSalutationChangeCommon(
+                    oEvent,
+                    "employeeModel",       // name of the model
+                    "/Gender" ,           // path to gender property
+                    "EOD_id_Gender"        // ID of the gender control
                 );
             }
         });

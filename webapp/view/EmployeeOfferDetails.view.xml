@@ -9,7 +9,7 @@
 					<Page showHeader="false">
 						<content>
 							<Wizard id="EOD_id_Wizard" busyIndicatorDelay="0">
-								<WizardStep id="EOD_id_WizardStep"   complete="EOD_onStep2" title="{i18n>basicDetails}" validated="true">
+								<WizardStep id="EOD_id_WizardStep"   complete="EOD_onStep2" title="{i18n>basicDetails}" >
 									<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4"
 			labelSpanL="4"
 			labelSpanM="12"
@@ -25,7 +25,7 @@
 			singleContainerFullSize="false">
 										<f:content>
 											<Label text="{i18n>salutation}" required="true" />
-											<Select
+											<Select change="onCreateSalutationChange"
                                              selectedKey="{employeeModel>/Salutation}"
                                              items="{Salutation>/salutation}">
 												<core:Item key="{Salutation>text}" text="{Salutation>text}" />
@@ -45,7 +45,7 @@
 												</layoutData>
 											</Input>
 											<Label text="{i18n>gender}" required="true"/>
-											<Select items="{GenderModel>/}" id="EOD_id_Gender" enabled="{= ${employeeModel>/Salutation} === 'Dr.' }" selectedKey="{= ${employeeModel>/Salutation} === 'Mr.' ? 'Male' : 'Female' }" >
+											<Select items="{GenderModel>/}" id="EOD_id_Gender" enabled="false" selectedKey="{employeeModel>/Gender}" >
 												<core:Item key="{GenderModel>Value}" text="{GenderModel>Value}" />
 											</Select>
 											<Label text="{i18n>offerReleaseDate}" required="true" />
