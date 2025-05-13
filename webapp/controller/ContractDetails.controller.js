@@ -25,6 +25,11 @@ sap.ui.define([
                 var oView = this.getView();
                 this.i18nModel = oView.getModel("i18n").getResourceBundle();
 
+                const today = new Date();
+                const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
+                this.byId("CD_id_Datestart")?.setMinDate(lastYearStart);
+                this.byId("CU_id_AssignmentStartDate")?.setMinDate(lastYearStart);
+               
                 var oWizard = oView.byId("CD_id_Wizard");
                 oWizard.discardProgress(oView.byId("CD_id_Firststep"));
                 oWizard.goToStep(oView.byId("CD_id_Firststep"));
@@ -173,38 +178,48 @@ sap.ui.define([
                  this.validateStep();
             },
 
-          CD_onChangeCountry: function (oEvent) {
+         CD_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSource = oEvent.getSource();
                 const selectedItem = oSource.getSelectedItem();
                 const selectedKey = oSource.getSelectedKey?.();
+                const oCountryValue = oSource.getValue();
 
-                if (!oSource.getValue()) {
-                    oSource.setValueState("None");
-                }
-
-               const oValue = selectedItem?.getAdditionalText?.();
+                const oValue = selectedItem?.getAdditionalText?.(); // Country Code
                 let oModel;
                 if (this.sArgPara === "CreateContractFlag") {
                     oModel = this.getView().getModel("ContractModelWizart");
+
                     if (oValue) {
                         const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
                         this.getView().byId("CD_id_ConLocation").getBinding("items").filter(oFilter);
                     }
                 } else {
                     oModel = this.getView().getModel("oFilteredContractModel");
+
                     if (oValue) {
                         const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
                         this.getView().byId("CU_id_ContractCity").getBinding("items").filter(oFilter);
                     }
                 }
+
                 if (oModel) {
                     if (selectedKey) {
-                        oModel.setProperty("/Country", selectedKey);
-                        oSource.setValueState("None");
+                        oModel.setProperty("/Country", selectedKey);   // Set or clear country and STDCode
+                        const oCodeModel = this.getView().getModel("codeModel");  // Get codeModel and match selected country
+                        const aCodes = oCodeModel.getProperty("/");
+                        const matched = aCodes.find(item => item.country === selectedKey);
+                        oModel.setProperty("/STDCode", matched ? matched.calling_code : "");
                     } else {
                         oModel.setProperty("/Country", "");
+                        oModel.setProperty("/STDCode", "");
                     }
+
+                    oSource.setValueState("None");
+                }
+
+                   if (this.sArgPara === "CreateContractFlag") { 
+                    this.validateStep();    //  validation if in create flow
                 }
             },
 
@@ -235,10 +250,6 @@ sap.ui.define([
                 }
 
                 utils._LCvalidateDate(oEvent);
-
-                if (this.sArgPara === "CreateContractFlag") { 
-                    this.validateStep();    //  validation if in create flow
-                }
             },
 
             // Format date string to Date object
@@ -254,6 +265,7 @@ sap.ui.define([
 
             CD_ValidateComboBox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
+                this.validateStep();
             },
 
             CD_ValidateConsultantName:function(oEvent){
@@ -305,12 +317,10 @@ sap.ui.define([
                 oModel.HiringContact = this.byId("CD_id_HiringContact").getValue();
                 oModel.Datestart = this.byId("CD_id_Datestart").getValue();
                 oModel.DateEnd = this.byId("CD_id_DateEnd").getValue();
-                oModel.Country = this.byId("CD_id_Country").getSelectedKey();
-                oModel.Location = this.byId("CD_id_ConLocation").getSelectedKey();
                 oModel.MobileNo = this.byId("CD_id_Mobile").getValue();
                
                 const bAllFieldsFilled = oModel.AgreeDate && oModel.CName && oModel.Address && oModel.Email && oModel.EndClientHirer 
-                   &&  oModel.Amount && oModel.HiringContact && oModel.Datestart && oModel.DateEnd && oModel.Country && oModel.Location && oModel.MobileNo;
+                   &&  oModel.Amount && oModel.HiringContact && oModel.Datestart && oModel.DateEnd && oModel.MobileNo;
             
                 if (bAllFieldsFilled) {
                     // Run all validations
@@ -324,7 +334,7 @@ sap.ui.define([
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") && 
-                        utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID") && 
+                        utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID") 
                        
                     // Set wizard step validation
                     this.byId("CD_id_Wizard").getSteps()[0].setValidated(bValid);
@@ -359,7 +369,8 @@ sap.ui.define([
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") &&
-                         utils._LCstrictValidationComboBox(this.getView().byId("CD_id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
                         utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID") 
                     ) {
                         var formattedText;
