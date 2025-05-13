@@ -9,8 +9,8 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteContractDetails").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
-                this.getBusyDialog(); // Show busy dialog
                 this.commonLoginFunction("Contract");
+                this.getBusyDialog(); // Show busy dialog
                 this._makeDatePickersReadOnly(["CD_id_AgreeDate", "CD_id_Datestart", "CD_id_DateEnd"]);
                 this._makeDatePickersReadOnly(["CU_id_AgreementDate", "CU_id_AssignmentStartDate", "CU_id_AssignmentEndDate"]);
                 await this._fetchCommonData("Currency", "CurrencyModel");
@@ -175,46 +175,31 @@ sap.ui.define([
  
             CD_validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
-                 this.validateStep();
+                this.validateStep();
             },
 
          CD_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSource = oEvent.getSource();
-                const selectedItem = oSource.getSelectedItem();
                 const selectedKey = oSource.getSelectedKey?.();
-                const oCountryValue = oSource.getValue();
 
-                const oValue = selectedItem?.getAdditionalText?.(); // Country Code
                 let oModel;
                 if (this.sArgPara === "CreateContractFlag") {
+                    this.onCountryChange(oEvent, { stdCodeCombo: "CD_id_codeModel", baseLocationCombo: "CD_id_ConLocation" });
                     oModel = this.getView().getModel("ContractModelWizart");
-
-                    if (oValue) {
-                        const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-                        this.getView().byId("CD_id_ConLocation").getBinding("items").filter(oFilter);
-                    }
                 } else {
+                    this.onCountryChange(oEvent, { stdCodeCombo: "CU_id_codeModel", baseLocationCombo: "CU_id_ContractCity" });
                     oModel = this.getView().getModel("oFilteredContractModel");
-
-                    if (oValue) {
-                        const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-                        this.getView().byId("CU_id_ContractCity").getBinding("items").filter(oFilter);
-                    }
                 }
 
                 if (oModel) {
                     if (selectedKey) {
-                        oModel.setProperty("/Country", selectedKey);   // Set or clear country and STDCode
-                        const oCodeModel = this.getView().getModel("codeModel");  // Get codeModel and match selected country
-                        const aCodes = oCodeModel.getProperty("/");
-                        const matched = aCodes.find(item => item.country === selectedKey);
-                        oModel.setProperty("/STDCode", matched ? matched.calling_code : "");
+                        oModel.setProperty("/Country", selectedKey);   // Set or clear country and STDCode 
+                        oModel.setProperty("/STDCode", this.byId("CU_id_codeModel").getValue() || this.getView().byId("CD_id_codeModel").getValue());
                     } else {
                         oModel.setProperty("/Country", "");
                         oModel.setProperty("/STDCode", "");
                     }
-
                     oSource.setValueState("None");
                 }
 
@@ -259,6 +244,12 @@ sap.ui.define([
             },
 
             CD_ValidateCommonFields: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+                this.validateStep();
+            },
+
+            CD_onBaseLocationChange: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
                 utils._LCvalidateMandatoryField(oEvent);
                 this.validateStep();
             },
@@ -334,6 +325,10 @@ sap.ui.define([
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") && 
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CD_id_ConLocation"), "ID") &&
                         utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID") 
                        
                     // Set wizard step validation
@@ -370,7 +365,9 @@ sap.ui.define([
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CD_id_ConLocation"), "ID") &&
                         utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID") 
                     ) {
                         var formattedText;
@@ -547,6 +544,10 @@ sap.ui.define([
                     utils._LCstrictValidationComboBox(this.byId("CD_id_contractStatus"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_ClientReportContact"), "ID") &&
                     utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CU_id_Country"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CU_id_ContractCity"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CU_id_codeModel"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.byId("CU_id_ContractCity"), "ID") &&
                     utils._LCvalidateMobileNumber(this.byId("CU_id_Mobile"), "ID") 
                 );
             
@@ -755,12 +756,12 @@ sap.ui.define([
 
             //PDF download function
             onPressMerge: async function () {
-                this.getBusyDialog();
                 var oModel = this.getView().getModel("oFilteredContractModel");
                 this.contractPDFgenerate(oModel);
             },
 
             contractPDFgenerate: async function (input) {
+                this.getBusyDialog();
                 var oEmpModel = typeof input.getData === "function" ? input.getData() : input;
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "Contract" });

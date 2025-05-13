@@ -79,9 +79,9 @@
 					        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				            </ComboBox>
 							<Label text="{i18n>contractLocation}"/>
-								 <Select items="{BaseLocationModel>/}" id="CD_id_ConLocation"  showSecondaryValues="true" selectedKey="{ContractModelWizart>/contractLocation}" >
+								 <ComboBox change="CD_onBaseLocationChange" items="{BaseLocationModel>/}" id="CD_id_ConLocation"  showSecondaryValues="true" selectedKey="{ContractModelWizart>/contractLocation}" valueStateText="{i18n>combovalueState}" >
 												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
-										   </Select>
+										   </ComboBox>
 										   
 							<Label text="{i18n>mobileNo}" required="true" />
 							<ComboBox value="{path: 'ContractModelWizart>/STDCode'}" showSecondaryValues= "true" id="CD_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" change="CD_ValidateComboBox" valueStateText="{i18n>combovalueState}">

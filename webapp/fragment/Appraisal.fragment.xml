@@ -22,9 +22,9 @@
             singleContainerFullSize="false">
 			<f:content>
                 <Label text="CTC in Percentage/CTC" required="true" />
-                <HBox width="100%" justifyContent="SpaceBetween" id="EOUF_id_CTCPercentage">
+                <HBox width="100%" justifyContent="SpaceBetween" id="AF_id_CTCPercentage">
                     <VBox width="68%">
-                        <Input value="{AppraisalModel>/CtcPercentage}" id="EOUF_id_CTC" placeholder="{i18n>placeCtc}" liveChange="EOD_validateAmountAppraisal" maxLength="15" valueStateText="{i18n>ctcAndVariblePay}"/>                
+                        <Input value="{AppraisalModel>/CtcPercentage}" id="AF_id_CTC" placeholder="{i18n>placeCtc}" liveChange="EOD_validateAmountAppraisal" maxLength="15" valueStateText="{i18n>ctcAndVariblePay}"/>                
                     </VBox>
                     <VBox width="30%">
                         <Select forceSelection="false" selectedKey="1" id="ED_Frg_idAppraisalType" change="onSelectChange">
@@ -34,13 +34,13 @@
                     </VBox>
                 </HBox>
                 <Label text="{i18n>EmpOfferVariablePay}" required="true" />
-				<Input id="EOD_id_VariablePay" value="{AppraisalModel>/VariablePay}" placeholder="{i18n>variablePayPer}" liveChange="EOD_validatevariable" maxLength="5" showValueHelp="false" valueStateText="{i18n>variabelPayValueStae}"/>              
+				<Input id="AF_id_VariablePay" value="{AppraisalModel>/VariablePay}" placeholder="{i18n>variablePayPer}" liveChange="EOD_validatevariable" maxLength="5" showValueHelp="false" valueStateText="{i18n>variabelPayValueStae}"/>              
                
                 <Label text="{i18n>EffectiveDate}" required="true" />
 				<DatePicker minDate="{viewModel>/Max}"  value="{path: 'AppraisalModel>/EffectiveDate', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'MM-yyyy' }, constraints: { displayFormat: 'MM-yyyy' }}" change="onChangeEffectiveDate" displayFormat="MM-yyyy" valueFormat="dd/MM/yyyy" id="SS_id_Joinn"/>
 
                 <Label text="{i18n>salaryType}"/>
-                <RadioButtonGroup id="EOUF_id_RadioButTds" columns="3"  select="EOD_onTDSCheckboxChange">
+                <RadioButtonGroup id="AF_id_RadioButTds" columns="3"  select="EOD_onTDSCheckboxChange">
                     <RadioButton  text="{i18n>tds}" />					
                     <RadioButton  text="{i18n>pf}" />
                 </RadioButtonGroup>

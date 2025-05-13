@@ -1318,7 +1318,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
                 this.getView().getModel("employeeModel").setProperty("/CTC", this.Formatter.fromatNumber(NewCTC));
                 this.getView().getModel("employeeModel").setProperty("/JoiningBonus", this.Formatter.fromatNumber(0));
-                var type = sap.ui.getCore().byId("EOUF_id_RadioButTds").getSelectedButton().getText();
+                var type = sap.ui.getCore().byId("AF_id_RadioButTds").getSelectedButton().getText();
                 var variablePay = AppraisalModel.getProperty("/VariablePay");
                 this.getView().getModel("employeeModel").setProperty("/VariablePercentage", variablePay);
                 this._calculateSalaryComponents(type);
@@ -1365,8 +1365,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             onSelectChange: function (oEvent) {
-                oEvent.getSource().getSelectedItem().getText() === "Percentage" ? utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("EOUF_id_CTC"), "ID")
-                    : utils._LCvalidateAmount(sap.ui.getCore().byId("EOUF_id_CTC"), "ID");
+                oEvent.getSource().getSelectedItem().getText() === "Percentage" ? utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("AF_id_CTC"), "ID")
+                    : utils._LCvalidateAmount(sap.ui.getCore().byId("AF_id_CTC"), "ID");
             },
 
             EOD_validateAmountAppraisal: function (oEvent) {
@@ -1378,10 +1378,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var CTCType = oSelect.getSelectedItem().getText();
 
                 var isCTCValid = CTCType === "Percentage"
-                    ? utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("EOUF_id_CTC"), "ID")
-                    : utils._LCvalidateAmount(sap.ui.getCore().byId("EOUF_id_CTC"), "ID");
+                    ? utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("AF_id_CTC"), "ID")
+                    : utils._LCvalidateAmount(sap.ui.getCore().byId("AF_id_CTC"), "ID");
 
-                var isVariablePayValid = utils._LCvalidateVariablePay(sap.ui.getCore().byId("EOD_id_VariablePay"), "ID");
+                var isVariablePayValid = utils._LCvalidateVariablePay(sap.ui.getCore().byId("AF_id_VariablePay"), "ID");
                 if (isCTCValid && isVariablePayValid) {
                     this.getBusyDialog();
                     try {
