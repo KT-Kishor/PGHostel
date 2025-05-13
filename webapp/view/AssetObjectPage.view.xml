@@ -1,0 +1,151 @@
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.AssetObjectPage"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:m="sap.m"
+    xmlns="sap.uxap"
+    xmlns:layout="sap.ui.layout"
+    xmlns:c="sap.ui.core" displayBlock="true" height="100%" busyIndicatorDelay="0">
+
+    <m:Page title="{i18n>Asset Details}" navButtonPress="AOP_onButtonPress" showNavButton="true">
+        <ObjectPageLayout id="ObjectPageLayout" enableLazyLoading="true" useIconTabBar="true" showTitleInHeaderContent="true" upperCaseAnchorBar="false">
+            <headerTitle>
+                <ObjectPageDynamicHeaderTitle>
+                    <expandedHeading>
+                        <m:Title text="{objectModel>/0/Type}" wrapping="true"/>
+                    </expandedHeading>
+                    <snappedHeading>
+                    </snappedHeading>
+                    <expandedContent>
+                        <m:ObjectIdentifier title="{objectModel>/0/Model}" text="{objectModel>/0/Description}"/>
+                    </expandedContent>
+                </ObjectPageDynamicHeaderTitle>
+
+            </headerTitle>
+            <headerContent>
+                <m:FlexBox wrap="Wrap" fitContainer="true">
+                    <m:Avatar class="sapUiSmallMarginEnd" src="../image/logo.jpg" displaySize="L" />
+
+
+                    <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                        <m:ObjectIdentifier title="Serial Number" text="{objectModel>/0/SerialNumber}"/>
+                    </layout:VerticalLayout>
+
+                    <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                        <m:ObjectIdentifier title="Equipment Number" text="{objectModel>/0/EquipmentNumber}"/>
+                    </layout:VerticalLayout>
+
+                    <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                       <m:ObjectIdentifier title="Asset Value" class="sapUiTinyMarginBottom"/>
+                        <m:ObjectNumber number="{
+								parts:[{path:'objectModel>/0/AssetValue'},{path:'objectModel>/0/Currency'}],
+								type: 'sap.ui.model.type.Currency',
+								formatOptions: {showMeasure: false}
+							}" unit="{objectModel>/0/Currency}" />                   
+                             </layout:VerticalLayout>
+                </m:FlexBox>
+            </headerContent>
+            <sections>
+                <ObjectPageSection titleUppercase="false" id="goals" title="{= 'History of '+ ${objectModel>/0/Model} + ' Asset' }">
+                    <subSections>
+                        <ObjectPageSubSection id="goalsSS1" titleUppercase="false">
+                            <blocks>
+                                <m:Table items="{
+                                path:'objectModel>/',
+                                 sorter: { path: 'AssetCreationDate', descending: false }
+                                }">
+                                    <m:columns>
+                                        <m:Column>
+                                            <m:Text text="PickedBy"/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Asset Creation Date"/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Asset Creation Branch "/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Status"/>
+                                        </m:Column>
+
+                                        <m:Column>
+                                            <m:Text text="Trash Date"/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Transfer Date"/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Transfer Branch"/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Picked Branch"/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Return Date"/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Assigned By "/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Assigned "/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Assigned Date"/>
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Return Branch"/>
+                                        </m:Column>
+                                    </m:columns>
+                                    <m:items>
+                                        <m:ColumnListItem >
+                                            <m:cells>
+                                                <m:ObjectIdentifier title="{objectModel>PickedEmployeeName}" text="{objectModel>PickedEmployeeID}"/>
+                                                <m:Text text=  "{
+                                        path: 'objectModel>AssetCreationDate',
+                                        formatter: '.Formatter.formatDate' }"/>
+                                                <m:Text text="{objectModel>AssignBranch}"/>
+                                                <m:ObjectStatus inverted="true" text="{objectModel>Status}" state="{
+                                           path:'objectModel>Status',
+                                           formatter:'.Formatter.formatObjectStatus'
+                                  }" />
+                                                <m:Text text=  "{
+                                        path: 'objectModel>TrashDate',
+                                        formatter: '.Formatter.formatDate' }"/>
+                                                <m:Text text="{= ${objectModel>TransferDate} === '1899-11-30T00:00:00.000Z' ? ''
+                   : ${path: 'objectModel>TransferDate', formatter: '.Formatter.formatDate'}}"/>
+                                                <m:Text text="{objectModel>TransferBranch}"/>
+                                                <m:Text text="{objectModel>PickedBranch}"/>
+                                                <m:Text text="{= ${objectModel>ReturnDate} === '1899-11-30T00:00:00.000Z' ? ''
+                   : ${path: 'objectModel>ReturnDate', formatter: '.Formatter.formatDate'}}"/>
+                                                <m:ObjectIdentifier title="{objectModel>AssignedByEmployeeName}" text="{objectModel>AssignedByEmployeeID}"/>
+                                                <m:ObjectIdentifier title="{objectModel>AssignEmployeeName}" text="{objectModel>AssignEmployeeID}"/>
+
+                                                <m:Text text=  "{
+                                        path: 'objectModel>AssignedDate',
+                                        formatter: '.Formatter.formatDate' }"/>
+                                                <m:Text text="{objectModel>ReturnBranch}"/>
+
+
+
+
+                                            </m:cells>
+                                        </m:ColumnListItem>
+                                    </m:items>
+                                </m:Table>
+                            </blocks>
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+                <ObjectPageSection titleUppercase="false" title="Timeline of Assets">
+                    <subSections>
+                        <ObjectPageSubSection titleUppercase="false">
+                            <blocks>
+                                <m:Text text="comming soon..." />
+                            </blocks>
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+
+            </sections>
+
+        </ObjectPageLayout>
+    </m:Page>
+</mvc:View>

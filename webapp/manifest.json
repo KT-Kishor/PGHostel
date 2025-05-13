@@ -548,6 +548,13 @@
                     "target": [
                         "TargetHrQuotationDetails"
                     ]
+                },
+                 {
+                    "name":"AssetObjectPage",
+                    "pattern": "Page/{sPath}",
+                    "target":[
+                        "TargetAssetObjectPage"
+                    ]
                 }
 
             ],
@@ -555,6 +562,10 @@
                 "TargetView1": {
                     "id": "View1",
                     "name": "View1"
+                },
+                  "TargetAssetObjectPage": {
+                    "id": "AssetObjectPage",
+                    "name": "AssetObjectPage"
                 },
                 "TargetHomePage": {
                     "viewType": "XML",

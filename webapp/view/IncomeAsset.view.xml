@@ -182,7 +182,7 @@
                         press="IA_onTransferButtonPress"
                     />
                      <Button
-                        text="{i18n>update}"
+                        text="{i18n>edit}"
                         type="Emphasized"
                         press="IA_onUpadateButtonPress"
                     />
@@ -197,27 +197,31 @@
                     <Text text="{i18n>pickedBy}"/>
                 </Column>
                      <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>slNo}"/>
+                    <Text text="SlNo/EqNo"/>
                 </Column>
-                <Column minScreenWidth="Tablet" demandPopin="true">
+                <!-- <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>eqNo}"/>
-                </Column>
+                </Column> -->
                <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>Assetdate}"/>
                 </Column>
-                <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>creationbranch}"/>
+                 <Column minScreenWidth="Tablet" demandPopin="true">
+                    <Text text="{i18n>trashDate}"/>
+
                 </Column>
+                <!-- <Column minScreenWidth="Tablet" demandPopin="true">
+                    <Text text="{i18n>creationbranch}"/>
+                </Column> -->
                  <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>pickedbranch}"/>
                 </Column>
                   <Column minScreenWidth="Tablet"  demandPopin="true" width="12%" hAlign="Center">
                     <Text text="{i18n>status}"/>
                 </Column>
-                <Column minScreenWidth="Tablet" demandPopin="true">
+                <!-- <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>trashDate}"/>
 
-                </Column>
+                </Column> -->
                  <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>assetvalue}"/>
                 </Column>  
@@ -229,10 +233,7 @@
                 </Column>  -->
             </columns>
             <items >
-                <ColumnListItem 
-               
-         >
-                                  
+                <ColumnListItem type="Navigation" press="onColumnListItemPress">
                     <cells >
                     <ObjectIdentifier
 						title="{incomeModel>Model}"
@@ -241,13 +242,26 @@
 						title="{incomeModel>PickedEmployeeName}"
 						text="{incomeModel>PickedEmployeeID}"/>
 
-                      <Text text="{incomeModel>SerialNumber}"/>
-                        <Text text="{incomeModel>EquipmentNumber}"/>
+                      <!-- <Text text="{incomeModel>SerialNumber}"/>
+                        <Text text="{incomeModel>EquipmentNumber}"/> -->
+                         <ObjectIdentifier
+						title="{incomeModel>SerialNumber}"
+						text="{incomeModel>EquipmentNumber}"/>
+                            <ObjectIdentifier
+						title="{
+                            path: 'incomeModel>AssetCreationDate',
+                            formatter: '.Formatter.formatDate'
+                        }"
+						text="{incomeModel>AssignBranch}"/>
                           <Text text="{
+                        path:'incomeModel>TrashDate',
+                        formatter: '.Formatter.formatDate'
+                        }"/>
+                          <!-- <Text text="{
                             path: 'incomeModel>AssetCreationDate',
                             formatter: '.Formatter.formatDate'
                         }"/>
-                        <Text text="{incomeModel>AssignBranch}"/>
+                        <Text text="{incomeModel>AssignBranch}"/> -->
                         <Text text="{incomeModel>PickedBranch}"></Text>
                         <HBox alignItems="Center" justifyContent="Center">
                               <ObjectStatus 
@@ -259,25 +273,35 @@
                                   }"
                               />
                               <Button 
-                                  visible="{= ${incomeModel>Status} === 'Transferred' }"
-                                text="{i18n>Picked}"
-                                type="Ghost"
+                              id="IA_pickButton"
+                     visible="{= ${incomeModel>Status} === 'Transferred' &amp;&amp; ${LoginModel>/Role} === 'Admin' }"             
+                                        text="{i18n>Picked}"                      
+                                    type="Ghost"
                                 class="sapUiTinyMarginBegin"
                                 press="IA_onPickedButtonPress"
                               />
                           </HBox>
-                        <Text text="{
+                        <!-- <Text text="{
                         path:'incomeModel>TrashDate',
                         formatter: '.Formatter.formatDate'
-                        }"/>
+                        }"/> -->
                        
-                         <ObjectNumber
+                         <!-- <ObjectNumber
 							number="{
 								parts:[{path:'incomeModel>AssetValue'},{path:'incomeModel>Currency'}],
 								type: 'sap.ui.model.type.Currency',
 								formatOptions: {showMeasure: false}
 							}"
-							unit="{incomeModel>Currency}" />
+							unit="{incomeModel>Currency}" /> -->
+                             <!-- <Text text="{
+                        path:'incomeModel>Currency',
+                        formatter: '.Formatter.formatCurrency'
+                        }"/> -->
+                              <Text text="{
+                                parts:[{path:'incomeModel>AssetValue'},{path:'incomeModel>Currency'}],
+                                formatter: '.Formatter.formatCurrency'
+                                          }"/>                      
+
                             <!-- <Text text="{incomeModel>TransferDate}"/>
                             <Text text="{incomeModel>TransferBranch}"/> -->
 
