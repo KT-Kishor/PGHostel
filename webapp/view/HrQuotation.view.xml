@@ -14,7 +14,7 @@
         </headerContent>
         <content>
         <fb:FilterBar
-            id="HQ_id_QuotationSmartFilterBar"
+            id="HQ_id_QuotationFilterBar"
             persistencyKey="myPersKey"
             filterChange="HQ_onFilterChange"
             afterVariantLoad=".onAfterVariantLoad"
@@ -27,7 +27,7 @@
             <fb:filterGroupItems>
                 <fb:FilterGroupItem
                     name="QuotationNo"
-                    label="Quotation No"
+                    label="{i18n>quotationNo}"
                     groupName="Group1"
                     visibleInFilterBar="true"
                 >
@@ -41,7 +41,7 @@
                         </fb:FilterGroupItem>
             </fb:filterGroupItems>
         </fb:FilterBar>
-        <Table
+        <Table  items="{path: 'QuotationModel>/'}" 
             alternateRowColors="true"
             busyIndicatorDelay="0"
             id="HQ_id_QuotationItemTable"

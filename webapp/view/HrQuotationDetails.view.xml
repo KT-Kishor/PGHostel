@@ -40,10 +40,7 @@
                                     columnsM="1"
                                 >
                                     <f:content>
-                                        <m:Label
-                                            text="{i18n>quotationNo}"
-                                            required="true"
-                                        />
+                                        <m:Label text="{i18n>quotationNo}" />
                                         <m:Input
                                             id="HQD_id_QuotationNoFilter"
                                             value="{QuotationModel>/QuotationNo}"
@@ -56,6 +53,8 @@
                                         <m:DatePicker
                                             displayFormat="dd/MM/yyyy"
                                             valueFormat="dd/MM/yyyy"
+                                            change="HQD_DateValidate"
+                                            valueStateText="{i18n>invalidDate}"
                                             value="{QuotationModel>/Date}"
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_Quotation"
@@ -67,6 +66,8 @@
                                         <m:DatePicker
                                             displayFormat="dd/MM/yyyy"
                                             valueFormat="dd/MM/yyyy"
+                                            change="HQD_LastDate"
+                                            valueStateText="{i18n>invalidDate}"
                                             value="{QuotationModel>/ValidUntil}"
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_QuotationValid"
@@ -78,7 +79,8 @@
                                         <m:Input
                                             value="{QuotationModel>/CompanyName}"
                                             id="HQD_id_InputCompanyName"
-                                            liveChange="HQD_onPressLiveChange"
+                                            liveChange="HQD_onNameLiveChange"
+                                            valueStateText="{i18n>placeName}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="50"
                                         />
@@ -89,9 +91,10 @@
                                         <m:Input
                                             value="{QuotationModel>/CompanyMobileNo}"
                                             id="HQD_id_InputCompanyMobileNo"
-                                            liveChange="HQD_onPressLiveChange"
+                                            liveChange="HQD_onMNumberLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
+                                            valueStateText="{i18n>mobileNoValueState}"
                                         />
                                         <m:Label
                                             text="{i18n>emailID}"
@@ -100,8 +103,9 @@
                                         <m:Input
                                             value="{QuotationModel>/CompanyEmailID}"
                                             id="HQD_id_CompanyEmailID"
-                                            liveChange="HQD_onPressLiveChange"
+                                            liveChange="HQD_EmailIDLiveChange"
                                             editable="{visiablityPlay>/editable}"
+                                            valueStateText="{i18n>emailValueState}"
                                             maxLength="100"
                                         />
                                         <m:Label
@@ -111,8 +115,9 @@
                                         <m:TextArea
                                             value="{QuotationModel>/CompanyAddress}"
                                             id="HQD_id_InputCompanyAddress"
-                                            liveChange="HQD_onPressLiveChange"
+                                            liveChange="HQD_onAddressLiveChange"
                                             rows="2"
+                                            valueStateText="{i18n>addressValueState}"
                                             maxLength="120"
                                             editable="{visiablityPlay>/editable}"
                                         />
@@ -120,7 +125,8 @@
                                         <m:Input
                                             value="{QuotationModel>/CompanyGSTNO}"
                                             id="HQD_id_CompGSTNO"
-                                            liveChange="HQD_onPressLiveChange"
+                                            liveChange="HQD_onComGSTLiveChange"
+                                            valueStateText="{i18n>gstNoValueState}"
                                             change="HQD_onChangeGstNo"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="20"
@@ -198,7 +204,7 @@
                                         <m:Input
                                             value="{QuotationModel>/CustomerName}"
                                             id="HQD_id_CustomerName"
-                                            liveChange="HQD_onPressLiveChange"
+                                            liveChange="HQD_onCustomerNameLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="100"
                                         />
@@ -209,7 +215,7 @@
                                         <m:Input
                                             value="{QuotationModel>/CustomerEmailID}"
                                             id="HQD_id_CustomerEmailID"
-                                            liveChange="HQD_onPressLiveChange"
+                                            liveChange="HQD_EmailIDLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="100"
                                         />
@@ -220,7 +226,7 @@
                                         <m:Input
                                             value="{QuotationModel>/CustomerMobileNo}"
                                             id="HQD_id_InputCustomerMobileNo"
-                                            liveChange="HQD_onPressLiveChange"
+                                            liveChange="HQD_onMNumberLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
                                         />
@@ -232,7 +238,7 @@
                                             value="{QuotationModel>/CustomerAddress}"
                                             maxLength="120"
                                             id="HQD_id_InputCustomerAddress"
-                                            liveChange="HQD_onPressLiveChange"
+                                            liveChange="HQD_onAddressLiveChange"
                                             rows="2"
                                             editable="{visiablityPlay>/editable}"
                                         />
@@ -254,62 +260,63 @@
                         >
                             <blocks>
                                 <m:VBox>
-                                    <Table
+                                    <m:Table
+                                        id="HQD_id_SmartTableQuotationItem"
                                         alternateRowColors="true"
                                         busyIndicatorDelay="0"
-                                         id="HQD_id_SmartTableQuotationItem"
                                         class="sapUiResponsiveMargin"
                                         width="auto"
+                                        delete="HQD_onPressDelete"
+                                        mode="Delete"
+                                        items="{QuotationModel>/QuotationItemModel}"
                                     >
-                                        <headerToolbar>
-                                            <OverflowToolbar>
-                                                <ToolbarSpacer />
-                                                <Button
+                                        <m:headerToolbar>
+                                            <m:OverflowToolbar>
+                                                <m:Title
+                                                    text="{i18n>itemDetails}"
+                                                />
+                                                <m:ToolbarSpacer />
+                                                <m:Button
                                                     visible="{visiablityPlay>/invBtn}"
                                                     icon="sap-icon://add"
                                                     tooltip="{i18n>addItem}"
                                                     press="HQD_onPressAddQuotationItem"
                                                     type="Emphasized"
                                                 />
-                                                <ToolbarSeparator />
-                                            </OverflowToolbar>
-                                        </headerToolbar>
-                                        <m:Table
-                                            id="HQD_id_QuotationTable"
-                                            mode="Delete"
-                                            delete="HQD_onPressDelete"
-                                        >
+                                                <m:ToolbarSeparator />
+                                            </m:OverflowToolbar>
+                                        </m:headerToolbar>
                                             <m:columns>
-                                                <Column width="100px">
+                                                <m:Column width="100px">
                                                     <m:customData>
                                                         <core:CustomData
                                                             key="p13nData"
                                                             value='{"columnKey": "SNo", "leadingProperty": "SNo", "sortProperty": "SNo", "filterProperty": "SNo", "columnIndex": 1}'
                                                         />
                                                     </m:customData>
-                                                    <Text
+                                                    <m:Text
                                                         text="{i18n>siNo}"
                                                     />
                                                 </m:Column>
-                                                <Column width="300px">
-                                                    <customData>
+                                                <m:Column width="300px">
+                                                    <m:customData>
                                                         <core:CustomData
                                                             key="p13nData"
                                                             value='{"columnKey": "Item", "leadingProperty": "Item", "sortProperty": "Item", "filterProperty": "Item", "columnIndex": 2}'
                                                         />
                                                     </m:customData>
-                                                    <Text
+                                                    <m:Text
                                                         text="{i18n>item}"
                                                     />
                                                 </m:Column>
-                                                <Column id="HQD_id_SAC">
+                                                <m:Column id="HQD_id_SAC">
                                                     <m:customData>
                                                         <core:CustomData
                                                             key="p13nData"
                                                             value='{"columnKey": "SAC", "leadingProperty": "SAC", "sortProperty": "SAC", "filterProperty": "SAC", "columnIndex": 3 }'
                                                         />
                                                     </m:customData>
-                                                    <Text text="{i18n>SAC}" />
+                                                    <m:Text text="{i18n>SAC}" />
                                                 </m:Column>
                                                 <m:Column
                                                     id="HQD_id_GSTCalculaton"
@@ -320,7 +327,7 @@
                                                             value='\{"columnKey": "GSTCalculation", "leadingProperty": "GSTCalculation", "sortProperty": "GSTCalculation", "filterProperty": "GSTCalculation", "columnIndex": 4}'
                                                         />
                                                     </m:customData>
-                                                    <Text
+                                                    <m:Text
                                                         text="{i18n>GSTCalculation}"
                                                     />
                                                 </m:Column>
@@ -331,7 +338,7 @@
                                                             value='{"columnKey": "Days", "leadingProperty": "Days", "sortProperty": "Days", "filterProperty": "Days", "columnIndex": 5}'
                                                         />
                                                     </m:customData>
-                                                    <Text
+                                                    <m:Text
                                                         text="{i18n>days}"
                                                     />
                                                 </m:Column>
@@ -341,11 +348,11 @@
                                                             key="p13nData"
                                                             value='{"columnKey": "UnitPrice", "leadingProperty": "UnitPrice", "sortProperty": "UnitPrice", "filterProperty": "UnitPrice", "columnIndex": 6}'
                                                         />
-                                                    </customData>
-                                                    <Text
+                                                    </m:customData>
+                                                    <m:Text
                                                         text="{i18n>unitPrice}"
                                                     />
-                                                </Column>
+                                                </m:Column>
                                                 <m:Column>
                                                     <m:customData>
                                                         <core:CustomData
@@ -464,7 +471,6 @@
                                                 </m:ColumnListItem>
                                             </m:items>
                                         </m:Table>
-                                    </Table>
                                     <m:FlexBox
                                         class="custom-flexbox"
                                         direction="Column"

@@ -123,7 +123,7 @@ sap.ui.define([
                     worker: false,
                 };
                 MessageToast.show(this.i18nModel.getText("assetDownload"))
-                const oSheet = new sap.ui.export.Spreadsheet(oSettings);
+                const oSheet = Spreadsheet(oSettings);
                 oSheet.build().finally(function () {
                     oSheet.destroy();
                 });
