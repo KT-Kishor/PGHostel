@@ -66,9 +66,9 @@
 				                            </ComboBox>
 											<Label text="{i18n>baseLocation}" required="true" />
 											<Select items="{BaseLocationModel>/}" id="EOD_id_Location" 
-											 showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}" valueStateText="{i18n>valuestatebaseLocation}" >
+											 showSecondaryValues="true" selectedKey="{employeeModel>/BaseLocation}" valueStateText="{i18n>valuestatebaseLocation}" change="EOD_chnageBaseLocation">
 												<items>
-													<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+													<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}"  />
 												</items>
 											</Select>
 											<Label text="{i18n>emailId}" required="true" />

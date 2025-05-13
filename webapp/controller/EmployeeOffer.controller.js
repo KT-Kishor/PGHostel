@@ -345,21 +345,16 @@ sap.ui.define([
             },
             //Base location change code change
             EO_onBaseLocationChange: function (oEvent) {
-                var sSelectedKey = oEvent.getSource().getSelectedKey();
-                var oBaseLocationModel = this.getView().getModel("BaseLocationModel");
-                var aLocations = oBaseLocationModel.getData();
-                var oSelectedLocation = aLocations.find(function (loc) {
-                    return loc.city === sSelectedKey;
-                });
-                if (oSelectedLocation) {
-                    var oEmpModel = this.getView().getModel("oEmpolyeeDetailsModel");
-                    oEmpModel.setProperty("/BranchCode", oSelectedLocation.branchCode);
-                }
-
+                this.handleBaseLocationChange(
+                    oEvent,
+                    "BaseLocationModel",         // Source model
+                    "oEmpolyeeDetailsModel",     // Target model
+                    "/BranchCode"                // Path in target model
+                );
             },
             OE_onChangeCountry: function (oEvent) {
-                this.onCountryChange(oEvent, { stdCodeCombo: "OEF_id_STDCode", baseLocationCombo: "idSelect", branchInput: "OE_id_BranchInput"});
-             }
+                this.onCountryChange(oEvent, { stdCodeCombo: "OEF_id_STDCode", baseLocationCombo: "idSelect", branchInput: "OE_id_BranchInput" });
+            }
 
 
         });

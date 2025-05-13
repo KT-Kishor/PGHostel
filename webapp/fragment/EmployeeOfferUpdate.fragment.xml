@@ -76,7 +76,7 @@
 					                        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				                            </m:ComboBox>
 										<m:Label text="{i18n>baseLocation}" required="true" />
-										 <m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>selectBase}" change="EOD_validateCombobox">
+										 <m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>selectBase}" change="EOD_chnageBaseLocation" selectedKey="{employeeModel>/BaseLocation}">
 						               <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 				                       </m:ComboBox>
 										<m:Label text="{i18n>offerReleaseDate}" required="true" />

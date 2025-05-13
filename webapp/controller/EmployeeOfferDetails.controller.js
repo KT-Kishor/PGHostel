@@ -15,7 +15,6 @@ sap.ui.define([
             _onRouteMatched: async function (oEvent) {
                 var LoginFunction = await this.commonLoginFunction("EmployeeOffer");
                 if (!LoginFunction) return;
-
                 this.getBusyDialog();
                 this.byId("EOD_id_Joindate").setMinDate(new Date());
                 this.sArgPara = oEvent.getParameter("arguments").sParOffer
@@ -28,14 +27,11 @@ sap.ui.define([
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel"); //base location get call
                 let oModel = this.getView().getModel("BaseLocationModel");
                 let aData = oModel.getData();
-
                 // Sort by city name
                 aData.sort((a, b) => a.city.localeCompare(b.city));
 
                 // Update the model with sorted data
                 oModel.setData(aData);
-
-
                 await this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
                 await this._fetchCommonData("AppVisibility", "RoleModel") // role get call
                 await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
@@ -141,7 +137,7 @@ sap.ui.define([
                 var oModel = this.getView().getModel("employeeModel").getData();
                 oModel.Status = oModel.Status === "Rejected" ? "Saved" : oModel.Status;
                 oModel.CountryCode = this.getView().byId("EOD_Id_Country").getSelectedItem().getAdditionalText();
-                // oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
+                oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
                 oModel.JoiningDate = this.byId("EOUF_id_Joindate").getValue().split("/").reverse().join("-");
                 oModel.OfferReleaseDate = this.byId("EOUF_id_Reldate").getValue().split("/").reverse().join("-");
                 oModel = {
@@ -271,7 +267,7 @@ sap.ui.define([
                 if (allFieldsFilled) {
                     // Validate each field directly
                     let isValid = utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Location"), "ID")
-                         && utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOD_id_VariablePay"), "ID");
+                        && utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOD_id_VariablePay"), "ID");
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
@@ -402,15 +398,15 @@ sap.ui.define([
                     this.EOU_oDialogMail.open();
                 }
             },
-            EOD_onChangeCountry: function(oEvent) {
-            utils._LCstrictValidationComboBox(oEvent, "oEvent");
-            if(oEvent.getSource().getValue()===''){
-                oEvent.getSource().setValueState("None")
-            }
-            var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
-            var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-            this.getView().byId("EOD_id_Location").getBinding("items").filter(oFilter);
-          },
+            EOD_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                if (oEvent.getSource().getValue() === '') {
+                    oEvent.getSource().setValueState("None")
+                }
+                var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+                var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+                this.getView().byId("EOD_id_Location").getBinding("items").filter(oFilter);
+            },
             //Send mail function
             EOUF_onSendEmail: function () {
                 var oEmployeeEmail = this.getView().getModel("employeeModel").getData().EmployeeEmail;
@@ -510,16 +506,16 @@ sap.ui.define([
                     }.bind(this)
                 );
                 this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
-          },
-            EUD_onChangeCountry: function(oEvent) {
-            utils._LCstrictValidationComboBox(oEvent, "oEvent");
-            if(oEvent.getSource().getValue()===''){
-                oEvent.getSource().setValueState("None")
-            }
-            var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
-            var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-            this.getView().byId("EOUF_id_Location").getBinding("items").filter(oFilter);
-          },
+            },
+            EUD_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                if (oEvent.getSource().getValue() === '') {
+                    oEvent.getSource().setValueState("None")
+                }
+                var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+                var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+                this.getView().byId("EOUF_id_Location").getBinding("items").filter(oFilter);
+            },
             //PDF download function
             EOUF_onPressMerge: async function () {
                 var oModel = this.getView().getModel("employeeModel");

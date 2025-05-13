@@ -791,7 +791,20 @@ sap.ui.define([
       if (oBranchInput) {
         oBranchInput.setValue("");
       }
-    }
+    },
+      handleBaseLocationChange: function (oEvent, sBaseLocationModelName, sTargetModelName, sTargetPath) {
+            const sSelectedKey = oEvent.getSource().getSelectedKey();
+            const oView = this.getView();
+            const oBaseLocationModel = oView.getModel(sBaseLocationModelName);
+            const aLocations = oBaseLocationModel.getData();
+
+            const oSelectedLocation = aLocations.find(loc => loc.city === sSelectedKey);
+
+            if (oSelectedLocation) {
+                const oTargetModel = oView.getModel(sTargetModelName);
+                oTargetModel.setProperty(sTargetPath, oSelectedLocation.branchCode);
+            }
+        }
 
   })
 });
