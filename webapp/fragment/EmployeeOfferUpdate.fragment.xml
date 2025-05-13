@@ -76,8 +76,10 @@
 					                        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				                            </m:ComboBox>
 										<m:Label text="{i18n>baseLocation}" required="true" />
-										 <m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>selectBase}" change="EOD_chnageBaseLocation" selectedKey="{employeeModel>/BaseLocation}">
-						               <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+										 <m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>valuestatebaseLocation}" change="EOD_validateCombobox" selectedKey="{employeeModel>/BaseLocation}">
+										 <m:items>
+						               <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />	
+										 </m:items>
 				                       </m:ComboBox>
 										<m:Label text="{i18n>offerReleaseDate}" required="true" />
 											<m:DatePicker id="EOUF_id_Reldate" editable="{viewModel>/editable}" placeholder="{i18n>offerReleaseDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"
