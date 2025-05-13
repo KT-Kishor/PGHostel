@@ -76,7 +76,7 @@
 					                        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				                            </m:ComboBox>
 										<m:Label text="{i18n>baseLocation}" required="true" />
-										 <m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>valuestatebaseLocation}" change="EOD_validateCombobox" selectedKey="{employeeModel>/BaseLocation}">
+										 <m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>selectBase}" change="EOD_validateCombobox" selectedKey="{employeeModel>/BaseLocation}">
 										 <m:items>
 						               <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />	
 										 </m:items>
@@ -122,7 +122,7 @@
 													<m:FlexBox direction="Row" justifyContent="Start" wrap="Wrap">														
 														<m:VBox class="summaryBox">
 															<m:Label text="{i18n>ctc}" required="true" />
-															<m:Input value="{employeeModel>/CTC}" editable="{viewModel>/editable}" id="EOUF_id_CTC" placeholder="{i18n>placeCtc}" 
+															<m:Input value="{employeeModel>/CTC}" editable="{viewModel>/editable}" id="EOUF_id_CTC" placeholder="{i18n>placeCtc}" change="_calculateSalaryComponents" 
                                              liveChange="EOD_validateAmount" maxLength="10" valueStateText="{i18n>ctcValueState}"/>
 														</m:VBox>
 														<m:VBox class="summaryBox">
