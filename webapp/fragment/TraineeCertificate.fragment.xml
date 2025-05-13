@@ -100,7 +100,7 @@
         <beginButton>
             <Button
                 text="{= ${PDFData>/PreviewFlag} ? ${i18n>downloadcCertificate} : ${i18n>preview} }"
-                type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Neutral'}"
+                type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Emphasized' }"
                 press="TCF_onPressHandlePreview"
             />
         </beginButton>

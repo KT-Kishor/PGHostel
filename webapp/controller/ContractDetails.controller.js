@@ -111,7 +111,7 @@ sap.ui.define([
                         var contractModel = new JSONModel(oResult);
                         this.getOwnerComponent().setModel(contractModel, "oFilteredContractModel");
 
-                        this.getView().getModel("oFilteredContractModel").setProperty("/Amount", parseFloat(oResult.ConsultantRate.split(" ")[0]));
+                        this.getView().getModel("oFilteredContractModel").setProperty("/Amount", Number((oResult.ConsultantRate.split(" ")[0]).replace(/,/g, '')));
                         this.getView().getModel("oFilteredContractModel").setProperty("/Currency", oResult.ConsultantRate.split(" ")[1]);
 
                         var rateType = oResult.ConsultantRate.split(" ")[3];
@@ -402,7 +402,7 @@ sap.ui.define([
                             "ContractStatus": oModel.oData.AssignmentStatus,
                             "AssignmentStartDate": oModel.oData.StartDate.split("/").reverse().join("-"),
                             "AssignmentEndDate": oModel.oData.EndDate.split("/").reverse().join("-"),
-                            "ConsultantRate": oModel.oData.Amount + " " + selectedCurrency + " Per " + formattedText + " Including all tax",
+                            "ConsultantRate": Formatter.fromatNumber(oModel.oData.Amount) + " " + selectedCurrency + " Per " + formattedText + " Including all tax",
                             "PaymentTerms": oModel.oData.PaymentTerms,
                             "ClientReportContactSalutation": oModel.oData.Salutation2,
                             "ClientReportContact": oModel.oData.ClientReportContact,
@@ -559,7 +559,7 @@ sap.ui.define([
                 const rateType = oModel.HrDaliyMonth;
                 const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
                 const selectedCurrency = this.byId("CU_id_CurrencySelect").getSelectedKey();
-                const ConsultantRate = `${oModel.Amount} ${selectedCurrency} Per ${rateText} Including all tax`;
+                const ConsultantRate = `${Formatter.fromatNumber(oModel.Amount)} ${selectedCurrency} Per ${rateText} Including all tax`;
                 const LocationService = this.byId("CD_id_contractLocation").getSelectedKey();
                 const branchCode = this.byId("CU_id_ContractCity").getSelectedItem().getAdditionalText();
                 const startDate = this.byId("CU_id_AssignmentStartDate").getDateValue();

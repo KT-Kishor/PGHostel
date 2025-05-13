@@ -38,7 +38,7 @@
 										<m:Label text="{i18n>contractNo}"/>
 										<m:Text text="{oFilteredContractModel>/ContractNo} / {oFilteredContractModel>/AgreementNo}" />
 										<!-- Consultant Name -->
-										<m:Label text="{i18n>salutation}"/>
+										<m:Label text="{i18n>consultantName}" required="true"/>
                                          <m:Select
                                                editable="{simpleForm>/editable}" 
                                                selectedKey="{oFilteredContractModel>/Salutation}"
@@ -65,7 +65,7 @@
 										</m:ComboBox>	
 										<!-- <m:Input value="{oFilteredContractModel>/EndClient}" liveChange="onLiveValidation" id="idEndClient"  editable="{simpleForm>/editable}" maxLength="50" /> -->
 
-										<m:Label text="{i18n>salutation}" />
+										<m:Label text="{i18n>hiringContactLabel}" required="true"/>
                                             <m:Select
                                                editable="{simpleForm>/editable}"
                                                selectedKey="{oFilteredContractModel>/Salutation2}" 
@@ -148,7 +148,7 @@
 										<m:Input value="{oFilteredContractModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="10" id="CU_id_Mobile" valueStateText="{i18n>mobileNoValueState}" editable="{simpleForm>/editable}" />
 
 										<m:Label text="Comments" />
-										<m:TextArea  value="{oFilteredContractModel>/Comments}" id="CU_id_Comments" editable="{simpleForm>/Status}" valueStateText="{i18n>commentsValueState}"  maxLength="200"/>
+										<m:TextArea  value="{oFilteredContractModel>/Comments}" id="CU_id_Comments" editable="{simpleForm>/Status}" valueStateText="{i18n>commentsValueState}"  maxLength="100"/>
 									</f:content>
 								</f:SimpleForm>
 							</blocks>

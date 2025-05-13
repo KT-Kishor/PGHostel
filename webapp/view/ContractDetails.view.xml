@@ -14,7 +14,7 @@
 						<f:content>
 							<Label text="{i18n>agreementDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="CD_validateDate"  valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
-							<Label text="{i18n>salutation}"  />
+							<Label text="{i18n>consultantName}" required="true"/>
 							<Select id=""  selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}" width="100%">
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
@@ -40,7 +40,7 @@
 							<ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
                             <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
                             </ComboBox>
-							<Label text="{i18n>salutation}"/>
+							<Label text="{i18n>hiringContactLabel}" required="true"/>
 							<Select id="CD_id_selectSal" selectedKey="{ContractModelWizart>/Salutation2}" 
                               items="{Salutation>/salutation}" width="100%" >
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />

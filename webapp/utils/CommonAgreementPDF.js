@@ -811,20 +811,18 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                             margin: 0;
                             padding: 0;
                             }
-                            ul, li {
-                            list-style-position: inside;
-                            padding-left: 0;
-                            margin: 0;
-                            line-height: 1.4;
-                            font-size: inherit;
-                            font-family: inherit;
+                            ul,
+                            li {
+                                padding-left: 3px;
+                                margin-left: 5px;
+                            }
+                            ol,
+                            li {
+                                padding-left: 3px;
+                                margin-left: 5px;
                             }
                             li::marker {
-                            vertical-align: middle;
-                            }
-                            p, span {
-                            margin: 0;
-                            padding: 0;
+                            vertical-align: middle; !important;
                             }
                         </style>
                         `;
@@ -832,27 +830,25 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     return style + htmlContent;
                 }
 
-
-                let mmToPx = (mm) => mm * (96 / 48);
-                let containerWidthPx = mmToPx(maxWidth);
-
                 let container = document.createElement("div");
                 container.innerHTML = prepareHtmlForPdf(htmlContent);
-                container.style.width = `${containerWidthPx}px`;
+                container.style.width = `${2 * maxWidth}px`;
                 container.style.fontFamily = "Times New Roman";
                 container.style.fontSize = "5.5pt";
                 container.style.lineHeight = "1.4";
+                container.style.position = "absolute";  // Prevent it from affecting layout
                 container.style.padding = "0";
                 document.body.appendChild(container);
 
-                let rteY = totalAmountY + 10;
                 doc.html(container, {
                     x: margin,
-                    y: rteY,
+                    y: pageHeight + margin,
                     html2canvas: { scale: 0.5 },
                     callback: function (doc) {
+                        doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
                         doc.save("PO.pdf");
                         that.closeBusyDialog();
+                        document.body.removeChild(container);
                     }
                 });
 
