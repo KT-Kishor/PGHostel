@@ -71,11 +71,12 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false, });
                 this.getView().setModel(oViewModel, "viewModel");
-                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail","EOD_id_Location","EOD_Id_Country", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay", "EOUF_id_VariablePerc", "EOD_id_PinCode", "EOUF_id_PinCode","EOUF_id_Location","EUD_Id_Country"].forEach(function (ids) {
+                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOD_id_Location", "EOD_Id_Country", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay", "EOUF_id_VariablePerc", "EOD_id_PinCode", "EOUF_id_PinCode", "EOUF_id_Location", "EUD_Id_Country"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 //create case
                 if (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") {
+                    this._TDSslabCall("IN");
                     var createPage = true, updatePage = false;
                     if (this.sArgPara !== "CreateOfferFlag") {
                         this.getView().getModel("employeeModel").setProperty("/ConsultantName", this.sArgPara);
@@ -100,7 +101,7 @@ sap.ui.define([
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
                     var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EUD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Location"), "ID")
-                        utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
+                    utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
                     if (isValid) this.updateCallForEmployeeOffer(oViewModel, "offerUpdateSucc");
                     else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -129,6 +130,13 @@ sap.ui.define([
                 } else {
                     this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOfferDetails" });
                 }
+            },
+
+            _TDSslabCall: async function (code, id) {
+                if (id) id.setBusy(true), id.setValue("");
+                await this._fetchCommonData("TaxCalculation", "TDSModel", { Country: code });
+                if (!this.getView().getModel("TDSModel") || this.getView().getModel("TDSModel").getData().length === 0) sap.m.MessageBox.error("Tax calculation not available for the selected country, and it will be zero by default");
+                if (id) id.setBusy(false);
             },
 
             //Update call 
@@ -179,6 +187,7 @@ sap.ui.define([
                     this.getView().setModel(new JSONModel(offerData[0]), "employeeModel");
                     var oViewModel = this.getView().getModel("viewModel");
                     this.byId("EOUF_id_Joindate").setMinDate(new Date(offerData[0].OfferReleaseDate));
+                    this._TDSslabCall(offerData[0].CountryCode);
                     if (offerData[0].Status === "Onboarded") {
                         oViewModel.setProperty("/isVisiable", false);
                         oViewModel.setProperty("/ediBut", false);
@@ -266,7 +275,7 @@ sap.ui.define([
                 var allFieldsFilled = this.getView().byId("EOD_id_Name").getValue() && this.getView().byId("EOD_id_Reldate").getValue() && this.getView().byId("EOD_id_Designation").getSelectedKey() && this.getView().byId("EOD_id_mail").getValue() && this.getView().byId("EOD_id_Address").getValue() && this.getView().byId("EOD_id_CTC").getValue() && this.getView().byId("EOD_id_Bonus").getValue() && this.getView().byId("EOD_id_VariablePay").getValue();
                 if (allFieldsFilled) {
                     // Validate each field directly
-                    let isValid = utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_Id_Country"), "ID") 
+                    let isValid = utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_Id_Country"), "ID")
                         && utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOD_id_VariablePay"), "ID");
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
@@ -285,7 +294,7 @@ sap.ui.define([
             },
             //Submit the data
             EOD_onSubmitData: async function () {
-                if (utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") &&  utils._LCstrictValidationComboBox(this.getView().byId("EOD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
+                if (utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
                     utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID")) {
                     this.getBusyDialog();
                     var oModel = this.getView().getModel("employeeModel").getData();
@@ -404,9 +413,10 @@ sap.ui.define([
                     oEvent.getSource().setValueState("None")
                 }
                 var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+                this._TDSslabCall(oValue, this.getView().byId("EOD_id_CTC"));
                 var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
                 this.getView().byId("EOD_id_Location").getBinding("items").filter(oFilter);
-                this.byId("EOD_id_Location").setValue("")
+                this.byId("EOD_id_Location").setValue("");
             },
             //Send mail function
             EOUF_onSendEmail: function () {
@@ -514,6 +524,7 @@ sap.ui.define([
                     oEvent.getSource().setValueState("None")
                 }
                 var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+                this._TDSslabCall(oValue, this.byId("EOUF_id_CTC"));
                 var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
                 this.getView().byId("EOUF_id_Location").getBinding("items").filter(oFilter);
                 this.byId("EOUF_id_Location").setValue("");
@@ -632,7 +643,7 @@ sap.ui.define([
                 this.onSalutationChangeCommon(
                     oEvent,
                     "employeeModel",       // name of the model
-                    "/Gender" ,           // path to gender property
+                    "/Gender",           // path to gender property
                     "EOU_id_Gender"        // ID of the gender control
                 );
             },
@@ -640,7 +651,7 @@ sap.ui.define([
                 this.onSalutationChangeCommon(
                     oEvent,
                     "employeeModel",       // name of the model
-                    "/Gender" ,           // path to gender property
+                    "/Gender",           // path to gender property
                     "EOD_id_Gender"        // ID of the gender control
                 );
             }

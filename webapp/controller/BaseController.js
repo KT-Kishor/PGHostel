@@ -11,7 +11,6 @@ sap.ui.define([
     Formatter: Formatter,
     // Router Code 
     getRouter: function () {
-      this.codeflag = "";
       return sap.ui.core.UIComponent.getRouterFor(this);
     },
 
@@ -199,40 +198,21 @@ sap.ui.define([
       });
     },
 
-    _calculateTDS: async function (ctc, code) {
-      if (code !== this.codeflag) {
-        //  this.getBusyDialog(); // open BusyDialog immediately
-        try {
-          await this._fetchCommonData("TaxCalculation", "TDSModel", { Country: code });
-          this.codeflag = code;
-          //this.closeBusyDialog();
-        }
-        catch (e) {
-          console.error(e);
-          sap.m.MessageToast.show("Error fetching TDS data");
-          //this.closeBusyDialog();
-          return 0;
-        }
-      }
-
-      var tdsSlab = this.getView().getModel("TDSModel").getData();
-      if (!tdsSlab || tdsSlab.length === 0) {
-        sap.m.MessageToast.show("Tax calculation not available for the selected country: " + code);
+    _calculateTDS: function (ctc) {
+      if (!this.getView().getModel("TDSModel") || this.getView().getModel("TDSModel").getData().length === 0) {
         return 0;
       }
-      var filtered = tdsSlab.filter(function (item) {
+      var filtered = this.getView().getModel("TDSModel").getData().filter(function (item) {
         return ctc >= item.StartAmount && ctc <= item.EndAmount;
       });
-
       var ctcforTDS = ctc - filtered[0].StartAmount + 1;
       var tdsofctc = ctcforTDS * filtered[0].TaxPercentage / 100;
       var actualtds = tdsofctc + filtered[0].AutoCalculation;
       return +(actualtds.toFixed(2));
     },
 
-    _calculateSalaryComponents: async function (isTDSIncluded) {
+    _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
-      var code = oModel.getProperty("/CountryCode");
       // Convert and fetch values
       var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",", ""));
       var VariableData = parseFloat(oModel.getProperty("/VariablePercentage"));
@@ -252,7 +232,7 @@ sap.ui.define([
         Total = BasicSalary + HRA + MedicalInsurance + EmployeerPF + Gratuity + SpecailAllowance;
 
         DeductionPF = 0;
-        IncomeTax_TDS = await this._calculateTDS(CTC, code);
+        IncomeTax_TDS = this._calculateTDS(CTC);
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
 
@@ -266,7 +246,7 @@ sap.ui.define([
         Total = BasicSalary + HRA + EmployeerPF + MedicalInsurance + Gratuity + SpecailAllowance;
 
         DeductionPF = BasicSalary * 12 / 100;
-        IncomeTax_TDS = await this._calculateTDS(CTC, code);
+        IncomeTax_TDS = this._calculateTDS(CTC);
         DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
       }
@@ -792,19 +772,19 @@ sap.ui.define([
         oBranchInput.setValue("");
       }
     },
-      handleBaseLocationChange: function (oEvent, sBaseLocationModelName, sTargetModelName, sTargetPath) {
-            const sSelectedKey = oEvent.getSource().getSelectedKey();
-            const oView = this.getView();
-            const oBaseLocationModel = oView.getModel(sBaseLocationModelName);
-            const aLocations = oBaseLocationModel.getData();
+    handleBaseLocationChange: function (oEvent, sBaseLocationModelName, sTargetModelName, sTargetPath) {
+      const sSelectedKey = oEvent.getSource().getSelectedKey();
+      const oView = this.getView();
+      const oBaseLocationModel = oView.getModel(sBaseLocationModelName);
+      const aLocations = oBaseLocationModel.getData();
 
-            const oSelectedLocation = aLocations.find(loc => loc.city === sSelectedKey);
+      const oSelectedLocation = aLocations.find(loc => loc.city === sSelectedKey);
 
-            if (oSelectedLocation) {
-                const oTargetModel = oView.getModel(sTargetModelName);
-                oTargetModel.setProperty(sTargetPath, oSelectedLocation.branchCode);
-            }
-        }
+      if (oSelectedLocation) {
+        const oTargetModel = oView.getModel(sTargetModelName);
+        oTargetModel.setProperty(sTargetPath, oSelectedLocation.branchCode);
+      }
+    }
 
   })
 });
