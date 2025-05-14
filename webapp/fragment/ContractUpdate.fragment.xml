@@ -18,14 +18,20 @@
 					<expandedContent>
 						<m:Label text="{oFilteredContractModel>/ConsultingService}" wrapping="true" width="100%" />
 					</expandedContent>
+					<snappedHeading>
+						<m:Title text="{oFilteredContractModel>/ConsultantNameSalutation} {oFilteredContractModel>/ConsultantName}" wrapping="true" width="100%" />
+					</snappedHeading>
+					<snappedContent>
+						<m:Label text="{oFilteredContractModel>/ConsultingService}" wrapping="true" width="100%" />
+					</snappedContent>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
 			<!-- Object Page Sections -->
 			<sections>
-				<ObjectPageSection >
+				<ObjectPageSection showTitle="false">
 					<subSections>
 						<!-- Sub-section for displaying contract basic information -->
-						<ObjectPageSubSection  title="{i18n>contractsBasic}">
+						<ObjectPageSubSection showTitle="false">
 							<blocks>
 								<!-- SimpleForm for displaying and editing contract details -->
 								<f:SimpleForm 
@@ -48,7 +54,8 @@
 												<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 												</m:Select>
 										<m:Input value="{oFilteredContractModel>/ConsultantName}" liveChange="CD_ValidateConsultantName" maxLength="50" id="CU_id_ConsultantName" valueStateText="{i18n>nameConsultantValueState}" editable="{simpleForm>/editable}"  />
-										
+										<m:Label text="{i18n>consultingService}" required="true"/>
+                                        <m:Input value="{oFilteredContractModel>/ConsultingService}" valueStateText="{i18n>plaseDesignation}" placeholder="{i18n>plaseDesignation}" id="CU_id_Role" change="onRole" liveChange="CD_ValidateConsultantName"  maxLength="50"  editable="{simpleForm>/editable}" />
 										<!-- Consultant Email -->
 										<m:Label text="{i18n>consultantEmailID}" required="true"/>
 										<m:Input value="{oFilteredContractModel>/ContarctEmail}" liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}" id="CU_id_ContractEmailID" editable="{simpleForm>/editable}" maxLength="100" />
@@ -79,12 +86,7 @@
 										<m:Label text="{i18n>locationswhereServices}" ></m:Label>
 										<m:Select selectedKey="{oFilteredContractModel>/LocationService}" id="CD_id_contractLocation" items="{WorkingMode>/location}" editable="{simpleForm>/editable}">
 											<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
-										</m:Select>
-										<!-- Contract Status -->
-										<m:Label text="{i18n>contractStatus}" required="true"/>
-										<m:ComboBox value="{oFilteredContractModel>/ContractStatus}" id="CD_id_contractStatus" items="{AssignmentStatus>/assignmentStatus}" editable="{simpleForm>/Status}" change="onChangeStartEndDate" valueStateText="{i18n>combovalueState}">
-											<core:Item key="{AssignmentStatus>ID}" text="{AssignmentStatus>Value}" />
-										</m:ComboBox>										
+										</m:Select>									
 										<!-- Assignment Start Date -->
 										<m:Label text="{i18n>assignmentStartDate}" required="true"/>
 										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" id="CU_id_AssignmentStartDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}" maxDate="{oFilteredContractModel>/MaxFromDate}"/>
@@ -98,6 +100,11 @@
 											<m:RadioButton id="CU_id_RB3-2" text="{i18n>rateDaily}" />
 											<m:RadioButton id="CU_id_RB3-3" text="{i18n>rateMonthly}" />
 										</m:RadioButtonGroup>
+										<!-- Contract Status -->
+										<m:Label text="{i18n>contractStatus}" required="true"/>
+										<m:ComboBox value="{oFilteredContractModel>/ContractStatus}" id="CD_id_contractStatus" items="{AssignmentStatus>/assignmentStatus}" editable="{simpleForm>/Status}" change="onChangeStartEndDate" valueStateText="{i18n>combovalueState}">
+											<core:Item key="{AssignmentStatus>ID}" text="{AssignmentStatus>Value}" />
+										</m:ComboBox>	
 										<!-- Input for Amount -->
 										<m:Label text="{i18n>amount}" required="true" />
 										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>placeAmount}" liveChange="CD_validateAmount"  maxLength="10" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/Status}" />
