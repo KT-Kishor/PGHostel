@@ -50,21 +50,26 @@ sap.ui.define([
             },
             // Read call for employee offer data
             readCallForEmployeeOffer: async function (filter) {
-                this.getBusyDialog();
-                await this.ajaxReadWithJQuery("EmployeeOffer", filter).then((oData) => {
-                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModel");
-                    if (this.Filter) {
-                        var oFilterData = [...new Map(offerData.filter(item => item.ConsultantName && item.ConsultantName.trim() !== "").map(item => [item.ConsultantName.trim(), item])).values()];
-                        this.getView().setModel(new JSONModel(oFilterData), "EmployeeOfferModelInitial");
-                        this.getView().getModel("EmployeeOfferModelInitial").refresh(true);
-                        this.Filter = true;
-                    }
+                try {
+                    this.getBusyDialog();
+                    await this.ajaxReadWithJQuery("EmployeeOffer", filter).then((oData) => {
+                        var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                        this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModel");
+                        if (this.Filter) {
+                         var oFilterData = [...new Map(offerData.filter(item => item.ConsultantName && item.ConsultantName.trim() !== "").map(item => [item.ConsultantName.trim(), item])).values()];
+                            this.getView().setModel(new JSONModel(oFilterData), "EmployeeOfferModelInitial");
+                            this.getView().getModel("EmployeeOfferModelInitial").refresh(true);
+                            this.Filter = true;
+                        }
+                        this.closeBusyDialog();
+                    }).catch((oError) => {
+                        this.closeBusyDialog();
+                        MessageBox.error("Error while reading the employee offer details");
+                    });
+                } catch (error) {
                     this.closeBusyDialog();
-                }).catch((oError) => {
-                    this.closeBusyDialog();
-                    MessageBox.error("Error while reading the employee offer details")
-                })
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                }
             },
             //Back to tile page
             onPressback: function () {
@@ -154,7 +159,7 @@ sap.ui.define([
                 });
             },
             //Common  reject or onboard action handling
-            onHandleEmployeeAction: function (status, actionMethod) {
+           onHandleEmployeeAction: function (status, actionMethod) {
                 var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
                 this.oSelectedRow = oSelectedData;
                 var sName = oSelectedData.Salutation + " " + oSelectedData.ConsultantName;
@@ -279,59 +284,72 @@ sap.ui.define([
             },
             //Onboard function
             OEF_onPressOnBoard: function (oEvent) {
-                var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
-                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Country"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idSelect"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_STDCode"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
-                    var oPayload = {
-                        tableName: "EmployeeDetails",
-                        data: oModel
-                    };
-                    oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-');
-                    oModel.ManagerID = sap.ui.getCore().byId("OEF_id_Manager").getSelectedItem().getAdditionalText();
-                    this.getBusyDialog();
-                    this.ajaxCreateWithJQuery("EmployeeDetails", oPayload).then((oData) => {
-                        if (oData.success) {
-                            this.EO_onSearch();
-                            this.oDialog.close();
-                            MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
+                try {
+                    var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
+                     if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Country"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idSelect"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID")
+                         && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_STDCode"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
+                        var oPayload = {
+                            tableName: "EmployeeDetails",
+                            data: oModel
+                        };
+                        oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-');
+                        oModel.ManagerID = sap.ui.getCore().byId("OEF_id_Manager").getSelectedItem().getAdditionalText();
+                        this.getBusyDialog();
+                        this.ajaxCreateWithJQuery("EmployeeDetails", oPayload).then((oData) => {
+                            if (oData.success) {
+                                this.EO_onSearch();
+                                this.oDialog.close();
+                                MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
+                                
+                            } else {
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                            }
+                            this.closeBusyDialog();
+                        }).catch((error) => {
+                            this.closeBusyDialog();
+                            MessageToast.show(error.message || error.responseText);
+                        });
+                    } else {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    }
+                } catch (error) {
+                    this.closeBusyDialog();
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
 
-                        } else {
-                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        }
-                        this.closeBusyDialog();
-                    }).catch((error) => {
-                        this.closeBusyDialog();
-                        MessageToast.show(error.message || error.responseText);
-                    });
-                } else {
-                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
             //Common update function
             updateCallForEmployeeOffer: async function (oStatus) {
-                this.getBusyDialog();
-                this.oSelectedRow.Status = oStatus;
-                var oModelOffer = {
-                    "data": this.oSelectedRow,
-                    "filters": {
-                        "ID": this.oSelectedRow.ID
-                    }
-                };
-                // call for EmployeeOffer
-                await this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer).then((oData) => {
-                    if (oData.success) {
-                        var sSuccessMessage = (oStatus === "Onboarded")
-                            ? this.i18nModel.getText("onBoardSuccess")
-                            : this.i18nModel.getText("offerEmpReject");
-                        MessageToast.show(sSuccessMessage);
-                        this.EO_onSearch();
+                try {
+                    this.getBusyDialog();
+                    this.oSelectedRow.Status = oStatus;
+                    var oModelOffer = {
+                        "data": this.oSelectedRow,
+                        "filters": {
+                            "ID": this.oSelectedRow.ID
+                        }
+                    };
+                     // call for EmployeeOffer
+                    await this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer).then((oData) => {
+                        if (oData.success) {
+                            var sSuccessMessage = (oStatus === "Onboarded")
+                                ? this.i18nModel.getText("onBoardSuccess")
+                                : this.i18nModel.getText("offerEmpReject");
+                            MessageToast.show(sSuccessMessage);
+                            this.EO_onSearch();
+                            this.oDialog.close();
+                            this.closeBusyDialog();
+                        }
+                    }).catch((error) => {
                         this.oDialog.close();
                         this.closeBusyDialog();
-                    }
-                }).catch((error) => {
-                    this.oDialog.close();
+                        MessageToast.show(error.message || error.responseText);
+                    });
+                } catch (error) {
                     this.closeBusyDialog();
-                    MessageToast.show(error.message || error.responseText);
-                })
+                    this.oDialog.close();
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                }
             },
             EO_onSelectionRadRowE: function (oEvent) {
                 var oSelectedItem = oEvent.getParameter("listItem");
@@ -353,7 +371,7 @@ sap.ui.define([
                 );
             },
             OE_onChangeCountry: function (oEvent) {
-                this.onCountryChange(oEvent, { stdCodeCombo: "OEF_id_STDCode", baseLocationCombo: "idSelect", branchInput: "OE_id_BranchInput" });
+                this.onCountryChange(oEvent, { stdCodeCombo: "OEF_id_STDCode", baseLocationCombo: "idSelect", branchInput: "OE_id_BranchInput", mobileInput:"OEF_id_Mobile" });
             }
 
 

@@ -771,6 +771,12 @@ sap.ui.define([
       if (oBranchInput) {
         oBranchInput.setValue("");
       }
+
+      // Mobile Number Clear
+      const oMobileInput = getById(oIds.mobileInput);
+      if (oMobileInput) {
+        oMobileInput.setValue("");
+      }
     },
     handleBaseLocationChange: function (oEvent, sBaseLocationModelName, sTargetModelName, sTargetPath) {
       const sSelectedKey = oEvent.getSource().getSelectedKey();

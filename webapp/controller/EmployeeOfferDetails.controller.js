@@ -101,7 +101,7 @@ sap.ui.define([
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
                     var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EUD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Location"), "ID") &&
-                    utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
+                        utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
                     if (isValid) {
                         this.updateCallForEmployeeOffer(oViewModel, "offerUpdateSucc");
@@ -137,45 +137,57 @@ sap.ui.define([
             },
 
             _TDSslabCall: async function (code, id) {
-                if (id) id.setBusy(true), id.setValue("");
-                await this._fetchCommonData("TaxCalculation", "TDSModel", { Country: code });
-                if (!this.getView().getModel("TDSModel") || this.getView().getModel("TDSModel").getData().length === 0) sap.m.MessageBox.error("Tax calculation not available for the selected country, and it will be zero by default");
-                if (id) id.setBusy(false);
+                try {
+                    if (id) id.setBusy(true), id.setValue("");
+                    await this._fetchCommonData("TaxCalculation", "TDSModel", { Country: code });
+                    if (!this.getView().getModel("TDSModel") || this.getView().getModel("TDSModel").getData().length === 0) MessageBox.warning("TDS will be zero as Tax Calculation is not available for the selected country.");
+                    if (id) id.setBusy(false);
+                }
+                catch (e) {
+                    if (id) id.setBusy(false);
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                }
+
             },
 
             //Update call 
             updateCallForEmployeeOffer: async function (oViewModel, text) {
-                this.getBusyDialog();
-                var oModel = this.getView().getModel("employeeModel").getData();
-                oModel.Status = oModel.Status === "Rejected" ? "Saved" : oModel.Status;
-                oModel.CountryCode = this.getView().byId("EOD_Id_Country").getSelectedItem().getAdditionalText();
-                oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
-                oModel.JoiningDate = this.byId("EOUF_id_Joindate").getValue().split("/").reverse().join("-");
-                oModel.OfferReleaseDate = this.byId("EOUF_id_Reldate").getValue().split("/").reverse().join("-");
-                oModel = {
-                    "data": oModel,
-                    "filters": {
-                        "ID": this.sArgPara
-                    }
-                }
-                oModel.Department = this.getView().byId("EOUF_id_Designation").getSelectedItem().getAdditionalText();
-                await this.ajaxUpdateWithJQuery("EmployeeOffer", oModel).then((oData) => {
-                    if (oData.success) {
-                        this.closeBusyDialog();
-                        oViewModel.setProperty("/editable", false);
-                        oViewModel.setProperty("/isEditMode", true);
-                        oViewModel.setProperty("editBut", true);
-                        oViewModel.setProperty("/isVisiable", true);
-                        oViewModel.setProperty("/isCTCVisible", false);
-                        if (text && text !== "silent") {
-                            MessageToast.show(this.i18nModel.getText(text));
+                try {
+                    this.getBusyDialog();
+                    var oModel = this.getView().getModel("employeeModel").getData();
+                    oModel.Status = oModel.Status === "Rejected" ? "Saved" : oModel.Status;
+                    oModel.CountryCode = this.getView().byId("EOD_Id_Country").getSelectedItem().getAdditionalText();
+                    oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
+                    oModel.JoiningDate = this.byId("EOUF_id_Joindate").getValue().split("/").reverse().join("-");
+                    oModel.OfferReleaseDate = this.byId("EOUF_id_Reldate").getValue().split("/").reverse().join("-");
+                    oModel = {
+                        "data": oModel,
+                        "filters": {
+                            "ID": this.sArgPara
                         }
-                        this.getView().getModel("employeeModel").refresh(true);
-                    }
-                }).catch((error) => {
+                    };
+                    oModel.Department = this.getView().byId("EOUF_id_Designation").getSelectedItem().getAdditionalText();
+                    await this.ajaxUpdateWithJQuery("EmployeeOffer", oModel).then((oData) => {
+                        if (oData.success) {
+                            this.closeBusyDialog();
+                            oViewModel.setProperty("/editable", false);
+                            oViewModel.setProperty("/isEditMode", true);
+                            oViewModel.setProperty("editBut", true);
+                            oViewModel.setProperty("/isVisiable", true);
+                            oViewModel.setProperty("/isCTCVisible", false);
+                            if (text && text !== "silent") {
+                                MessageToast.show(this.i18nModel.getText(text));
+                            }
+                            this.getView().getModel("employeeModel").refresh(true);
+                        }
+                    }).catch((error) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.responseText);
+                    });
+                } catch (error) {
                     this.closeBusyDialog();
-                    MessageToast.show(error.responseText);
-                })
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                }
             },
             //Read call
             readCallForEmployeeOffer: async function (sArgPara) {
@@ -298,76 +310,80 @@ sap.ui.define([
             },
             //Submit the data
             EOD_onSubmitData: async function () {
-                if (utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
-                    utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID")) {
-                    this.getBusyDialog();
-                    var oModel = this.getView().getModel("employeeModel").getData();
-                    oModel.Gender = this.getView().byId("EOD_id_Gender").getSelectedKey()
-                    oModel.CountryCode = this.getView().byId("EOD_Id_Country").getSelectedItem().getAdditionalText();
-                    oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
-                    oModel.Department = this.getView().byId("EOD_id_Designation").getSelectedItem().getAdditionalText();
-                    oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();
-                    oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join("-");
-                    oModel.OfferReleaseDate = oModel.OfferReleaseDate.split("/").reverse().join("-");
-                    oModel.Status = "Saved";
-                    oModel = {
-                        "tableName": "Employeeoffer",
-                        "data": oModel
-                    };
-                    await this.ajaxCreateWithJQuery("EmployeeOffer", oModel).then((oData) => {
-                        if (oData.success) {
+                try {
+                    if (utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
+                        utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID")) {
+                        this.getBusyDialog();
+                        var oModel = this.getView().getModel("employeeModel").getData();
+                        oModel.Gender = this.getView().byId("EOD_id_Gender").getSelectedKey();
+                        oModel.CountryCode = this.getView().byId("EOD_Id_Country").getSelectedItem().getAdditionalText();
+                        oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
+                        oModel.Department = this.getView().byId("EOD_id_Designation").getSelectedItem().getAdditionalText();
+                        oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();
+                        oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join("-");
+                        oModel.OfferReleaseDate = oModel.OfferReleaseDate.split("/").reverse().join("-");
+                        oModel.Status = "Saved";
+                        oModel = {
+                            "tableName": "Employeeoffer",
+                            "data": oModel
+                        };
+                        await this.ajaxCreateWithJQuery("EmployeeOffer", oModel).then((oData) => {
+                            if (oData.success) {
+                                this.closeBusyDialog();
+                                var oDialog = new sap.m.Dialog({
+                                    title: this.i18nModel.getText("success"),
+                                    type: sap.m.DialogType.Message,
+                                    state: sap.ui.core.ValueState.Success,
+                                    content: new sap.m.Text({ text: this.i18nModel.getText("offerSuccess") }),
+                                    beginButton: new sap.m.Button({
+                                        text: "OK",
+                                        type: "Accept",
+                                        press: function () {
+                                            oDialog.close();
+                                            this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
+                                            this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
+                                        }.bind(this)
+                                    }),
+                                    endButton: new sap.m.Button({
+                                        text: "Generate PDF",
+                                        type: "Attention",
+                                        press: function () {
+                                            this.EOUF_onPressMerge();
+                                            var oUpdatePayload = {
+                                                "data": { Status: "New" },
+                                                "filters": { "ID": oData.ID }
+                                            };
+                                            this.ajaxUpdateWithJQuery("EmployeeOffer", oUpdatePayload).then((oData) => {
+                                                this.closeBusyDialog();
+                                                if (oData.success) {
+                                                    oDialog.close();
+                                                    MessageToast.show(this.i18nModel.getText("pdfSucces"));
+                                                    this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
+                                                    this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
+                                                }
+                                            }).catch((error) => {
+                                                this.closeBusyDialog();
+                                                MessageToast.show(error.responseText);
+                                            });
+                                        }.bind(this)
+                                    }),
+                                    afterClose: function () {
+                                        oDialog.destroy();
+                                    }
+                                });
+                                oDialog.open();
+                            }
+                        }).catch((error) => {
                             this.closeBusyDialog();
-                            var oDialog = new sap.m.Dialog({
-                                title: this.i18nModel.getText("success"),
-                                type: sap.m.DialogType.Message,
-                                state: sap.ui.core.ValueState.Success,
-                                content: new sap.m.Text({ text: this.i18nModel.getText("offerSuccess") }),
-                                beginButton: new sap.m.Button({
-                                    text: "OK",
-                                    type: "Accept",
-                                    press: function () {
-                                        oDialog.close();
-                                        this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
-                                        this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
-                                    }.bind(this)
-                                }),
-                                endButton: new sap.m.Button({
-                                    text: "Generate PDF",
-                                    type: "Attention",
-                                    press: function () {
-                                        this.EOUF_onPressMerge();
-                                        var oUpdatePayload = {
-                                            "data": { Status: "New" },
-                                            "filters": {
-                                                "ID": oData.ID
-                                            }
-                                        };
-                                        this.ajaxUpdateWithJQuery("EmployeeOffer", oUpdatePayload).then((oData) => {
-                                            this.closeBusyDialog();
-                                            if (oData.success) {
-                                                oDialog.close();
-                                                MessageToast.show(this.i18nModel.getText("pdfSucces"));
-                                                this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
-                                                this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
-                                            }
-                                        }).catch((error) => {
-                                            this.closeBusyDialog();
-                                            MessageToast.show(error.responseText);
-                                        });
-                                    }.bind(this)
-                                }),
-                                afterClose: function () {
-                                    oDialog.destroy();
-                                }
-                            });
-                            oDialog.open();
-                        }
-                    }).catch((error) => {
-                        this.closeBusyDialog();
-                        MessageToast.show(error.responseText);
-                    });
-                } else {
-                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                            MessageToast.show(error.responseText);
+                        });
+                    } else {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    }
+
+                } catch (error) {
+                    this.closeBusyDialog();
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
                 }
             },
             //visibility of bond dropdown
@@ -447,7 +463,6 @@ sap.ui.define([
             Mail_onPressClose: function () {
                 this.EOU_oDialogMail.destroy();
                 this.EOU_oDialogMail = null;
-                // this.EOU_oDialogMail.close();
             },
             //File upload function calling from base controller
             Mail_onUpload: function (oEvent) {
@@ -466,17 +481,20 @@ sap.ui.define([
                 );
             },
             //Mail dialog button visibility
-            validateSendButton: function () {
-                const sendBtn = sap.ui.getCore().byId("SendMail_Button");
-                const emailField = sap.ui.getCore().byId("CCMail_TextArea");
-                const uploaderModel = this.getView().getModel("UploaderData");
-                if (!sendBtn || !emailField || !uploaderModel) {
-                    return;
+             validateSendButton: function () {
+                try {
+                    const sendBtn = sap.ui.getCore().byId("SendMail_Button");
+                    const emailField = sap.ui.getCore().byId("CCMail_TextArea");
+                    const uploaderModel = this.getView().getModel("UploaderData");
+                    if (!sendBtn || !emailField || !uploaderModel) {
+                        return;
+                    }
+                    const isEmailValid = utils._LCvalidateEmail(emailField, "ID") === true;
+                    const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
+                    sendBtn.setEnabled(isEmailValid && isFileUploaded);
+                } catch (error) {
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
                 }
-                const isEmailValid = utils._LCvalidateEmail(emailField, "ID") === true;
-                const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
-
-                sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
 
             //If mail changing then check validation
