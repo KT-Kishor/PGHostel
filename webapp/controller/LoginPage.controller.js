@@ -240,7 +240,7 @@ sap.ui.define(
           };
           if (!this.oPassforgot) {
             sap.ui.core.Fragment.load({
-              name: "sap.kt.com.minihrsolution.fragment.Sendmail",
+              name: "sap.kt.com.minihrsolution.fragment.SetPassword",
               controller: this,
             }).then((oPassforgot) => {
               this.oPassforgot = oPassforgot;
@@ -288,16 +288,7 @@ sap.ui.define(
           oInput.setValue(sCurrentValue);
         },
         LP_onTogglePasswordVisibility: function (oEvent) {
-          var oInput = oEvent.getSource();
-          var sType = oInput.getType() === "Password" ? "Text" : "Password";
-          oInput.setType(sType);
-          // Toggle the value help icon properly without losing the value
-          var sIcon =
-            sType === "Password" ? "sap-icon://show" : "sap-icon://hide";
-          oInput.setValueHelpIconSrc(sIcon);
-          // Ensure the current value of the password is retained
-          var sCurrentValue = oInput.getValue();
-          oInput.setValue(sCurrentValue);
+          this.SM_onTogglePasswordVisibility(oEvent)
         },
         FSM_username: function (oEvent) {
           utils._LCvalidateName(oEvent);
@@ -444,7 +435,6 @@ sap.ui.define(
             return;
           } else {
             sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
-            this.SM_onPressSave()
           }
 
 
