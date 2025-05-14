@@ -100,7 +100,7 @@
 										</m:RadioButtonGroup>
 										<!-- Input for Amount -->
 										<m:Label text="{i18n>amount}" required="true" />
-										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>placeAmount}" liveChange="CD_validateAmount"  maxLength="15" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/Status}" />
+										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>placeAmount}" liveChange="CD_validateAmount"  maxLength="10" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/Status}" />
 										<m:Select  id="CU_id_CurrencySelect" items="{CurrencyModel>/}" selectedKey="{oFilteredContractModel>/Currency}" visible="true" width="100%" class="marginLeft" editable="{simpleForm>/editable}">
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>

@@ -31,6 +31,8 @@ sap.ui.define([
                 const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
                 this.byId("CD_id_Datestart")?.setMinDate(lastYearStart);
                 this.byId("CU_id_AssignmentStartDate")?.setMinDate(lastYearStart);
+                this.byId("CD_id_AgreeDate")?.setMinDate(lastYearStart);
+                 this.byId("CU_id_AgreementDate")?.setMinDate(lastYearStart);
                
                 var oWizard = oView.byId("CD_id_Wizard");
                 oWizard.discardProgress(oView.byId("CD_id_Firststep"));
@@ -80,7 +82,7 @@ sap.ui.define([
                         this.closeBusyDialog(); //  Close BusyDialog
                     } catch (error) {
                         this.closeBusyDialog(); //  Close BusyDialog
-                        sap.m.MessageToast.show(error.message || error.responseText);
+                          MessageToast.show(error.message || error.responseText || this.i18nModel.getText("commonErrorMessage"));
                     }
 
                 } else {
@@ -106,9 +108,11 @@ sap.ui.define([
                         this.AssignmentEndDate = this.Formatter.formatDate(oResult.AssignmentEndDate);
                         this.ContractStatus = oResult.ContractStatus;
 
-                     if (this.ContractStatus !== "Inactive" || this.ContractStatus !== "Renewed") {
+                        if (this.ContractStatus !== "Inactive" && this.ContractStatus !== "Renewed") {
                             this.getView().getModel("ContractStatus").setProperty("/status", true);
-                      }
+                        } else {
+                            this.getView().getModel("ContractStatus").setProperty("/status", false);
+                        }
 
                         var contractModel = new JSONModel(oResult);
                         this.getOwnerComponent().setModel(contractModel, "oFilteredContractModel");
@@ -126,7 +130,7 @@ sap.ui.define([
                         this.closeBusyDialog(); // Close BusyDialog
                     } catch (error) {
                         this.closeBusyDialog(); // Close BusyDialog
-                        sap.m.MessageToast.show(error.message || error.responseText);
+                          MessageToast.show(error.message || error.responseText || this.i18nModel.getText("commonErrorMessage"));
                     }
                 }
             },
@@ -479,7 +483,7 @@ sap.ui.define([
                     }
                 } catch (error) {
                     this.closeBusyDialog(); // Close busy dialog
-                    MessageToast.show(error.message || error.responseText);
+                    MessageToast.show(error.message || error.responseText || this.i18nModel.getText("commonErrorMessage"));
                 }
             },
             
@@ -661,13 +665,14 @@ sap.ui.define([
                             if (updateResponse.success) {
                                 oView.getModel("simpleForm").setProperty("/editable", false);
                                 oView.getModel("simpleForm").setProperty("/Status", false);
-                                 await this.ajaxReadWithJQuery("Contract", { filters: { ContractNo: oModel.ContractNo, AgreementNo: oModel.AgreementNo } });
-                                  this.closeBusyDialog();
-
+                                await this.updateContractdata(oModel.ContractNo, oModel.AgreementNo);
+                                this.closeBusyDialog();
                                 sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
-                                    onClose: function () {
-                                        that.getRouter().navTo("RouteContractDetails", {sParContract: oModel.ContractNo, 
-                                            sID: oModel.AgreementNo});
+                                onClose: function () {
+                               that.getRouter().navTo("RouteContractDetails", {
+                                sParContract: oModel.ContractNo,
+                                sID: oModel.AgreementNo
+                                        });
                                     }
                                 });
                             }
@@ -694,16 +699,49 @@ sap.ui.define([
                     oView.getModel("viewModel").setProperty("/isEditMode", false);
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
+                    await this.updateContractdata(oModel.ContractNo, oModel.AgreementNo);
                     this.closeBusyDialog();
                     this.getRouter().navTo("RouteContractDetails", {sParContract: oModel.ContractNo, sID: oModel.AgreementNo});
-                     await this.ajaxReadWithJQuery("Contract", { filters: { ContractNo: oModel.ContractNo, AgreementNo: oModel.AgreementNo } });
-                    sap.m.MessageToast.show(this.i18nModel.getText("agreementUpdatedSuccess"));
+                    MessageToast.show(this.i18nModel.getText("agreementUpdatedSuccess"));
                 } catch (error) {
                     this.closeBusyDialog();
-                    sap.m.MessageToast.show(this.i18nModel.getText("updateContractFailed"));
+                    MessageToast.show(this.i18nModel.getText("updateContractFailed"));
                 }
             },
-            
+
+            updateContractdata: async function (ContractNo, AgreementNo) {
+                var response = await this.ajaxReadWithJQuery("Contract", { ContractNo: ContractNo, AgreementNo: AgreementNo });
+
+                 var oResult = response.data[0];
+                        this.ContractNo = oResult.ContractNo;
+                        this.OldStatus = oResult.ContractStatus;
+                        this.AssignmentStartDate = this.Formatter.formatDate(oResult.AssignmentStartDate);
+                        this.AssignmentEndDate = this.Formatter.formatDate(oResult.AssignmentEndDate);
+                        this.ContractStatus = oResult.ContractStatus;
+
+                        if (this.ContractStatus !== "Inactive" && this.ContractStatus !== "Renewed") {
+                            this.getView().getModel("ContractStatus").setProperty("/status", true);
+                        } else {
+                            this.getView().getModel("ContractStatus").setProperty("/status", false);
+                        }
+
+
+                this.getView().getModel("ContractStatus").setProperty("/status", !(this.ContractStatus === "Inactive" || this.ContractStatus === "Renewed"));
+
+                const contractModel = new JSONModel(oResult);
+                this.getOwnerComponent().setModel(contractModel, "oFilteredContractModel");
+
+                this.getView().getModel("oFilteredContractModel").setProperty("/Amount", Number((oResult.ConsultantRate.split(" ")[0]).replace(/,/g, '')));
+                 this.getView().getModel("oFilteredContractModel").setProperty("/Currency", oResult.ConsultantRate.split(" ")[1]);
+
+                var rateType = oResult.ConsultantRate.split(" ")[3];
+                var varible = rateType === "Hr" ? 0 : rateType === "Day" ? 1 : 2;
+                this.getView().getModel("oFilteredContractModel").setProperty("/HrDaliyMonth", varible);
+
+                this.getView().byId("C_id_PageCreate").setVisible(false);
+                this.getView().byId("CUF_id_pageTrainee").setVisible(true);
+            },
+
             CUD_commonOpenDialog: function (fragmentName) {
                 if (!this.CUD_oDialogMail) {
                     sap.ui.core.Fragment.load({
@@ -741,7 +779,7 @@ sap.ui.define([
             Mail_onPressClose: function () {
                 this.CUD_oDialogMail.destroy();
                 this.CUD_oDialogMail = null;
-                this.CUD_oDialogMail.close();
+                // this.CUD_oDialogMail.close();
             },
             Mail_onUpload: function (oEvent) {
                 this.handleFileUpload(
@@ -758,10 +796,17 @@ sap.ui.define([
                     () => this.validateSendButton()
                 );
             },
+
             validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
-                const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
-                const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
+                const emailField = sap.ui.getCore().byId("CCMail_TextArea");
+                const uploaderModel = this.getView().getModel("UploaderData");
+                if (!sendBtn || !emailField || !uploaderModel) {
+                    return;
+                }
+                const isEmailValid = utils._LCvalidateEmail(emailField, "ID") === true;
+                const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
+
                 sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
 

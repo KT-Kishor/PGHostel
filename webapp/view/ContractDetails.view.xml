@@ -31,7 +31,7 @@
 								<RadioButton text="{i18n>rateMonthly}" />
 							</RadioButtonGroup>
 							<Label text="{i18n>amount}" required="true" />
-							<Input value="{ContractModelWizart>/Amount}"  id="CD_id_Amount"  placeholder="{i18n>placeAmount}"  liveChange="CD_validateAmount"  maxLength="15" valueStateText="{i18n>ammountValuState}" />
+							<Input value="{ContractModelWizart>/Amount}"  id="CD_id_Amount"  placeholder="{i18n>placeAmount}"  liveChange="CD_validateAmount"  maxLength="10" valueStateText="{i18n>ammountValuState}" />
 							<Select items="{CurrencyModel>/}" 
 									selectedKey="{ContractModelWizart>/Currency}" id="CD_id_Currency" visible="true" class="marginLeft">
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
@@ -88,7 +88,7 @@
 								<core:ListItem key="{codeModel>country}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}"/>
 							</ComboBox>
 
-							<Input value="{ContractModelWizart>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="10" id="CD_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
+							<Input value="{ContractModelWizart>/MobileNo}" placeholder="{i18n>mobileNo}"  change="CD_validateMobileNo" maxLength="10" id="CD_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
 
 						</f:content>
 					</f:SimpleForm>
