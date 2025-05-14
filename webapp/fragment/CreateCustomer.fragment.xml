@@ -3,9 +3,10 @@
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core" >
-	<Dialog 
+	<Dialog  contentWidth="50%" 
         title="{i18n>custDetails}">
-		<f:SimpleForm id="MC_id_SimpleFormAddToolbar" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4"	labelSpanL="3" labelSpanM="4" labelSpanS="12" emptySpanXL="0" emptySpanL="4" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1">
+		<f:SimpleForm id="MC_id_SimpleFormAddToolbar" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4"	labelSpanL="3" labelSpanM="4" labelSpanS="12" emptySpanXL="0" emptySpanL="4" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1"
+		width="100%" maxContainerCols="2">
 			<f:content>
 				<Label text="{i18n>companyName}"  /> 
 				<Input id="MC_id_CustCompanyName" liveChange="MC_ValidateCommonFields"  value="{CustomerModel>/companyName}" required="true" maxLength="50" placeholder="{i18n>companyNamePlace}" valueStateText="{i18n>placeCompany}"/>
@@ -43,8 +44,28 @@
 				<Label text="{i18n>customerEmail}" required="true"/>
 				<Input value="{CustomerModel>/customerEmail}" id="MC_id_FinanceEmail" placeholder="{i18n>placeholderFinanceEmail}" maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
 
-				<Label text="{i18n>mobileNo}"/>
-				<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="10" liveChange="MC_ValidateMobileNo" valueStateText="{i18n>mobileNoValueState}" />
+				<Label text="{i18n>expCountry}" required="true"/>
+				<ComboBox change="MC_onChangeCountry"  valueStateText="{i18n>expValStaCountry}" id="MC_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{CustomerModel>/country}" showSecondaryValues="true"  >
+				<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+				</ComboBox>
+
+				<Label text="{i18n>contractLocation}" required="true"/>
+				<ComboBox items="{BaseLocationModel>/}" change="MC_onBaseLocationChange" id="MC_id_BaseCity"  showSecondaryValues="true" selectedKey="{CustomerModel>/baseLocation}" valueStateText="{i18n>combovalueState}">  
+				<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+				</ComboBox>
+						   
+				<Label text="{i18n>mobileNo}" required="true" />
+				<HBox width="100%" justifyContent="Start" alignItems="Center">
+					<VBox width="22%">
+						<ComboBox selectedKey="{CustomerModel>/stdCode}" showSecondaryValues="true" change="MC_ValidateComboBox"
+                id="MC_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}">
+				<core:ListItem key="{codeModel>calling_code}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
+				</ComboBox>
+					</VBox>
+					<VBox width="78%">
+						<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="10" liveChange="MC_ValidateMobileNo" valueStateText="{i18n>mobileNoValueState}" />
+					</VBox>
+				</HBox>
 
 				<Label text="{i18n>custLut}"/>
 				<Input value="{CustomerModel>/LUT}" maxLength="16" placeholder="{i18n>placeholderLUT}" liveChange="MC_ValidateLUTNo" valueStateText="{i18n>placeholderLUT}" id="MC_id_LUTNo"/>

@@ -15,6 +15,8 @@ sap.ui.define([
       _onRouteMatched: async function (oEvent) {
         this.commonLoginFunction("Customer"); // Call common login function
         this.getBusyDialog(); // Show busy dialog
+        await this._fetchCommonData("Country", "CountryModel"); 
+         await this._fetchCommonData("BaseLocation", "BaseLocationModel");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
         this.byId("MC_id_CustTable").removeSelections(true); // Clear table selection
         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerCustomer")); // Set header name
@@ -72,6 +74,9 @@ sap.ui.define([
             value: "0",
             salutation: "Mr.",
             customerEmail: "",
+            stdCode: "",
+            country: "",
+            baseLocation: "",
           };
           oModel = new JSONModel(oData);
         }
@@ -101,6 +106,8 @@ sap.ui.define([
         sap.ui.getCore().byId("MC_id_CustMail").setValueState("None");
         sap.ui.getCore().byId("MC_id_FinanceEmail").setValueState("None");
         sap.ui.getCore().byId("MC_id_CustMob").setValueState("None");
+        sap.ui.getCore().byId("MC_id_Country").setValueState("None");
+        sap.ui.getCore().byId("MC_id_codeModel").setValueState("None");
         sap.ui.getCore().byId("MC_id_CustAddress").setValueState("None");
         if (bIsEdit && this._originalCustomerData) {
           this.getView().getModel("CustomerModel").setData(JSON.parse(JSON.stringify(this._originalCustomerData)));
@@ -150,6 +157,13 @@ sap.ui.define([
         var oInput = oEvent.getSource();
         utils._LCvalidateLutNumber(oEvent);
         if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+      },
+
+      // Validate STDCode on Input
+       MC_ValidateComboBox: function (oEvent) {
+         var oInput = oEvent.getSource();
+          utils._LCstrictValidationComboBox(oEvent);
+          if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
       },
 
       // Validate GST Number on Input
@@ -205,8 +219,43 @@ sap.ui.define([
         if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
       },
 
+       MC_onBaseLocationChange: function (oEvent) {
+        utils._LCstrictValidationComboBox(oEvent);
+      },
+
+      MC_onChangeCountry: function (oEvent) {
+          utils._LCstrictValidationComboBox(oEvent, "oEvent");
+
+          const oSource = oEvent.getSource();
+          const selectedKey = oSource.getSelectedKey?.();
+          const oModel = this.getView().getModel("CustomerModel");
+
+          // Also handle related dropdowns (calling code & base city)
+          this.onCountryChange(oEvent, { 
+              stdCodeCombo: "MC_id_codeModel", 
+              baseLocationCombo: "MC_id_BaseCity" ,
+              mobileInput: "MC_id_CustMob" 
+          });
+
+          if (oModel) {
+              if (selectedKey) {
+                  oModel.setProperty("/country", selectedKey);
+
+                  const oCodeCombo = this.byId("MC_id_codeModel");
+                  const stdCodeValue = oCodeCombo ? oCodeCombo.getSelectedKey() : "";
+                  oModel.setProperty("/stdCode", stdCodeValue);
+              } else {
+                  oModel.setProperty("/country", "");
+                  oModel.setProperty("/stdCode", "");
+              }
+
+              oSource.setValueState("None");
+          }
+      },
+
       // Submit Customer Data
       MC_onPressSubmit: async function () {
+        var that = this;
         try {
           // Validate Mandatory Fields
           var isMandatoryValid = (
@@ -214,6 +263,8 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCustomerName"), "ID") &&
             utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
             utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
+            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_Country"), "ID") &&
+            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_BaseCity"), "ID") &&
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
           );
           if (!isMandatoryValid) {
@@ -256,6 +307,7 @@ sap.ui.define([
 
       // Save Edited Customer
       MC_onPressSave: async function () {
+        var that = this;
         try {
           // Validate Mandatory Fields
           var isMandatoryValid = (
@@ -263,6 +315,8 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCustomerName"), "ID") &&
             utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
             utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
+            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_Country"), "ID") &&
+            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_BaseCity"), "ID") &&
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
           );
           if (!isMandatoryValid) {
@@ -310,7 +364,7 @@ sap.ui.define([
               MessageToast.show(error.message || error.responseText);
             }.bind(this));
         } catch (error) {
-          that.closeBusyDialog();
+          this.closeBusyDialog();
           MessageToast.show(error.message || error.responseText);
         }
       },
