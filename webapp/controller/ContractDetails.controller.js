@@ -104,9 +104,9 @@ sap.ui.define([
                         this.AssignmentEndDate = this.Formatter.formatDate(oResult.AssignmentEndDate);
                         this.ContractStatus = oResult.ContractStatus;
 
-                     if (this.ContractStatus !== "Inactive" && this.ContractStatus !== "Renewed") {
+                     if (this.ContractStatus !== "Inactive" || this.ContractStatus !== "Renewed") {
                             this.getView().getModel("ContractStatus").setProperty("/status", true);
-                    }
+                      }
 
                         var contractModel = new JSONModel(oResult);
                         this.getOwnerComponent().setModel(contractModel, "oFilteredContractModel");
@@ -160,7 +160,9 @@ sap.ui.define([
                 }
             
                 utils._LCvalidateName(oEvent);
-                this.validateStep();
+                if (this.sArgPara === "CreateContractFlag") { 
+                    this.validateStep();    //  validation if in create flow
+                }
             },
             
             CD_validateEmail: function (oEvent) {
@@ -178,7 +180,7 @@ sap.ui.define([
                 this.validateStep();
             },
 
-         CD_onChangeCountry: function (oEvent) {
+            CD_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSource = oEvent.getSource();
                 const selectedKey = oSource.getSelectedKey?.();
@@ -484,7 +486,7 @@ sap.ui.define([
                 }
             },
 
-          onChangeStartEndDate: function (oEvent) {
+            onChangeStartEndDate: function (oEvent) {
             var oModel = this.getView().getModel("oFilteredContractModel");
             var oModelData = oModel.getData();
 
@@ -511,23 +513,20 @@ sap.ui.define([
                     oModel.setProperty("/AssignmentStartDate", assignmentStart);
                     oModel.setProperty("/AssignmentEndDate", assignmentEnd);
                 } else {
-                    oModel.setProperty("/AssignmentStartDate", this._parseDateString(this.AssignmentStartDate));
-                    oModel.setProperty("/AssignmentEndDate", this._parseDateString(this.AssignmentEndDate));
+                    oModel.setProperty("/AssignmentStartDate", this.onFormatDate(this.AssignmentStartDate));
+                    oModel.setProperty("/AssignmentEndDate", this.onFormatDate(this.AssignmentEndDate));
                 }
 
                 oModel.refresh(true);
             }
-        },
-
-        // Helper to convert "dd/MM/yyyy" to Date object
-        _parseDateString: function (sDate) {
-            var parts = sDate.split('/').map(Number);
-            return new Date(parts[2], parts[1] - 1, parts[0]);
-        },
+            },
 
             formatDateToISO: function (dateObj) {
                 if (!dateObj || !(dateObj instanceof Date)) return "";
-                return dateObj.toISOString().split("T")[0]; // YYYY-MM-DD
+                const year = dateObj.getFullYear();
+                const month = (dateObj.getMonth() + 1).toString().padStart(2, "0");
+                const day = dateObj.getDate().toString().padStart(2, "0");
+                return `${year}-${month}-${day}`; // YYYY-MM-DD
             },
             
             onPressSave: async function () {
@@ -565,6 +564,7 @@ sap.ui.define([
                 const branchCode = this.byId("CU_id_ContractCity").getSelectedItem().getAdditionalText();
                 const startDate = this.byId("CU_id_AssignmentStartDate").getDateValue();
                 const endDate = this.byId("CU_id_AssignmentEndDate").getDateValue();
+                const aggrementDate = this.byId("CU_id_AgreementDate").getDateValue();
                  
                 const jsonData = {
                     ContractNo: oModel.ContractNo,
@@ -585,7 +585,7 @@ sap.ui.define([
                     SpecificInsuranceRequirement: oModel.SpecificInsuranceRequirement,
                     ContractPeriod: oModel.ContractPeriod,
                     ExpensesClaim: oModel.ExpensesClaim,
-                    AgreementDate: oModel.AgreementDate,
+                    AgreementDate: this.formatDateToISO(aggrementDate),
                     ContarctEmail: oModel.ContarctEmail,
                     ContractLocation: oModel.ContractLocation ? oModel.ContractLocation : this.byId("CD_id_ConLocation").getSelectedKey(),
                     Comments: oModel.Comments,
@@ -620,21 +620,20 @@ sap.ui.define([
                         this.getBusyDialog();
 
                         try {
-                            const oldRequest = {
-                                filters: { ContractNo: oModel.ContractNo, AgreementNo: oModel.AgreementNo },
-                                data: jsonData
-                            };
-                           const  createResponse= await this.ajaxUpdateWithJQuery("Contract", oldRequest);
+                            const oldRequest = {filters: { ContractNo: oModel.ContractNo, AgreementNo: oModel.AgreementNo },
+                            data: jsonData};
+                           const  updateResponse= await this.ajaxUpdateWithJQuery("Contract", oldRequest);
 
-                            if (createResponse.success) {
-                              
+                            if (updateResponse.success) {
                                 oView.getModel("simpleForm").setProperty("/editable", false);
                                 oView.getModel("simpleForm").setProperty("/Status", false);
-                                this.closeBusyDialog();
+                                 await this.ajaxReadWithJQuery("Contract", { filters: { ContractNo: oModel.ContractNo, AgreementNo: oModel.AgreementNo } });
+                                  this.closeBusyDialog();
 
                                 sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
                                     onClose: function () {
-                                        that.getRouter().navTo("RouteContract");
+                                        that.getRouter().navTo("RouteContractDetails", {sParContract: oModel.ContractNo, 
+                                            sID: oModel.AgreementNo});
                                     }
                                 });
                             }
@@ -661,7 +660,8 @@ sap.ui.define([
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
                     this.closeBusyDialog();
-                    this.getRouter().navTo("RouteContract");
+                    this.getRouter().navTo("RouteContractDetails", {sParContract: oModel.ContractNo, sID: oModel.AgreementNo});
+                     await this.ajaxReadWithJQuery("Contract", { filters: { ContractNo: oModel.ContractNo, AgreementNo: oModel.AgreementNo } });
                     sap.m.MessageToast.show(this.i18nModel.getText("agreementUpdatedSuccess"));
                 } catch (error) {
                     this.closeBusyDialog();

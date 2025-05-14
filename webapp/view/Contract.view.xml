@@ -16,8 +16,8 @@
 					<fb:control>
 						 <ComboBox id="idContractNoCombo" selectedKey="{path: 'filters>/ContractNo'}" showSecondaryValues="true"
                          showClearIcon="true" items="{ContractModelInitial>/}">
-                         <core:Item key="{ContractModelInitial>ContractNo}" text="{parts: [{path: 'ContractModelInitial>ContractNo'},
-                           {path: 'ContractModelInitial>ConsultantName'}], formatter: '.formatter.formatContractEntry'}" />
+						   <core:ListItem key="{ContractModelInitial>ContractNo}" text="{ContractModelInitial>ContractNo}"
+                            additionalText="{ContractModelInitial>ConsultantName}"/>
                          </ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>

@@ -91,9 +91,7 @@
 										<!-- Assignment End Date -->
 										<m:Label text="{i18n>assignmentEndDate}" required="true"/>
 										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentEndDate' ,formatter:'.Formatter.formatDate'}"  id="CU_id_AssignmentEndDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}" minDate="{oFilteredContractModel>/MinToDate}"/>
-										<!-- Consultant Rate -->
-										<!-- <m:Label text="{i18n>consultantRate}" required="true"/>
-										<m:Input value="{oFilteredContractModel>/ConsultantRate}" liveChange="onLiveValidation" id="idConsultantRate" editable="{simpleForm>/editable}" maxLength="50"/> -->
+										<!-- Rate Type -->
 										<m:Label text="{i18n>rate}" required="true" />
 										<m:RadioButtonGroup id="CU_id_rbg3" columns="3" selectedIndex="{oFilteredContractModel>/HrDaliyMonth}" select="RadioButtonSelect" editable="{simpleForm>/editable}" >
 											<m:RadioButton id="CU_id_RB3-1" text="{i18n>rateHour}" />
@@ -102,13 +100,13 @@
 										</m:RadioButtonGroup>
 										<!-- Input for Amount -->
 										<m:Label text="{i18n>amount}" required="true" />
-										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>amountPlaceholder}" liveChange="CD_validateAmount"  maxLength="15" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/Status}" />
+										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>placeAmount}" liveChange="CD_validateAmount"  maxLength="15" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/Status}" />
 										<m:Select  id="CU_id_CurrencySelect" items="{CurrencyModel>/}" selectedKey="{oFilteredContractModel>/Currency}" visible="true" width="100%" class="marginLeft" editable="{simpleForm>/editable}">
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
 											<!-- Contract Period -->
 										<m:Label text="{i18n>contractPeriod}"  />
-										<m:Select id="CU_id_WarrantyDate" selectedKey="{oFilteredContractModel>/ContractPeriod}" items="{ContractPeriod>/ContractPeriod}" editable="{simpleForm>/Status}">
+										<m:Select id="CU_id_WarrantyDate" selectedKey="{oFilteredContractModel>/ContractPeriod}" items="{ContractPeriod>/ContractPeriod}" editable="{simpleForm>/Status}" change="onChangeContractPeriod">
 											<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 										</m:Select>
 										<!-- Payment Terms -->
@@ -134,7 +132,7 @@
 										<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 										</m:ComboBox>
 
-						                <m:Label text="{i18n>contractLocation}" />
+						                <m:Label text="{i18n>contractLocation}" required="true"/>
 										<m:ComboBox items="{BaseLocationModel>/}" change="CD_onBaseLocationChange"  editable="{simpleForm>/editable}" id="CU_id_ContractCity"  showSecondaryValues="true" selectedKey="{oFilteredContractModel>/ContractLocation}" valueStateText="{i18n>combovalueState}">  
 												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 										   </m:ComboBox>
