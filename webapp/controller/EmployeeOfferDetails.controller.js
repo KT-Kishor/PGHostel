@@ -100,11 +100,15 @@ sap.ui.define([
                 var oViewModel = this.getView().getModel("viewModel");
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
-                    var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EUD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Location"), "ID")
+                    var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EUD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Location"), "ID") &&
                     utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
-                    if (isValid) this.updateCallForEmployeeOffer(oViewModel, "offerUpdateSucc");
-                    else MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    if (isValid) {
+                        this.updateCallForEmployeeOffer(oViewModel, "offerUpdateSucc");
+                    }
+                    else {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    }
                 } else {
                     // Enable edit mode and make CTC field visible
                     oViewModel.setProperty("/editable", true);

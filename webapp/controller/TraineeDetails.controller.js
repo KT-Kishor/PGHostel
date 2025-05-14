@@ -45,7 +45,7 @@ sap.ui.define([
                 this.getView().setModel(oViewModel, "viewModel");
                 this.viewModel = this.getView().getModel("viewModel");
                 ["TD_id_Name", "TD_id_ReportingManager", "TD_id_EmailID", "TD_id_TrainingType", "TD_id_JoiningDate", "TD_id_ReleaseDate", "TD_id_TrainingAmount",
-                    "TU_id_Name", "TU_id_Manager", "TU_id_TraineeMail", "TU_id_JoinDate","TU_id_TrainingType","TU_id_TrainingAmount"].forEach(function (ids) {
+                    "TU_id_Name", "TU_id_Manager", "TU_id_TraineeMail", "TU_id_JoinDate", "TU_id_TrainingType", "TU_id_TrainingAmount"].forEach(function (ids) {
                         this.getView().byId(ids).setValueState("None");
                     }.bind(this));
                 if (this.sArgPara === "CreateTraineeFlag") {
@@ -90,18 +90,18 @@ sap.ui.define([
             },
             //navigation to trainee view
             TUF_onPressback: function () {
-                var oViewModel = this.getView().getModel("viewModel");    
+                var oViewModel = this.getView().getModel("viewModel");
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
                     // Show confirmation dialog before navigating
                     this.showConfirmationDialog(
-                        this.i18nModel.getText("ConfirmActionTitle"),              
-                        this.i18nModel.getText("backConfirmation"),  
+                        this.i18nModel.getText("ConfirmActionTitle"),
+                        this.i18nModel.getText("backConfirmation"),
                         function () {
                             oViewModel.setProperty("/editable", false);
-                            oViewModel.setProperty("/isEditMode", true); 
+                            oViewModel.setProperty("/isEditMode", true);
                             this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
-                        }.bind(this), 
+                        }.bind(this),
                     );
                 } else {
                     this.getRouter().navTo("RouteTrainee", { value: "TraineeDetails" });
@@ -175,9 +175,23 @@ sap.ui.define([
 
             //Submit trainee deatails 
             TD_onSubmitData: function (oEvent) {
-                var oModel = this.getView().getModel("oTraineeDetails").getData();
-                if (utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_TrainingType"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("TD_id_TrainingAmount"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID")) {
+                try {
+                    var oModel = this.getView().getModel("oTraineeDetails").getData();
+                    // Perform validations
+                    var isValid =
+                        utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.getView().byId("TD_id_ReportingManager"), "ID") &&
+                        utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.getView().byId("TD_id_TrainingType"), "ID") &&
+                        utils._LCvalidateJoiningBonus(this.getView().byId("TD_id_TrainingAmount"), "ID") &&
+                        utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") &&
+                        utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
+                    if (!isValid) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
                     this.getBusyDialog();
+                    // Prepare payload
                     oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
                     oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.ManagerID = this.getView().byId("TD_id_ReportingManager").getSelectedItem().getAdditionalText();
@@ -226,8 +240,8 @@ sap.ui.define([
                                                 this.getView().getModel("oTraineeDetails").refresh(true);
                                             }
                                         }).catch((error) => {
-                                            MessageToast.show(error.message || error.responseText);
                                             this.closeBusyDialog();
+                                            MessageToast.show(error.message || error.responseText);
                                         });
                                     }.bind(this)
                                 }),
@@ -241,11 +255,11 @@ sap.ui.define([
                         this.closeBusyDialog();
                         MessageToast.show(error.message || error.responseText);
                     });
-                } else {
-                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                } catch (error) {
+                    this.closeBusyDialog();
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
                 }
             },
-
             //second step validation function
             TD_StepTwo: function () {
                 this.getView().byId("TD_id_Submit").setEnabled(true);
@@ -254,55 +268,72 @@ sap.ui.define([
 
             //Edit/save button visibility function
             TU_onEditOrSavePress: function () {
-                if (this.viewModel.getProperty("/editable")) {
-
-                    if (utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Manager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TU_id_TrainingType"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("TU_id_TrainingAmount"), "ID")) {
-                        this.updateCallForTrainee(this.viewModel, "traineeDataUpdated");
-                    } else {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                    }
-                } else {
-                    this.viewModel.setProperty("/editable", true);
-                    this.viewModel.setProperty("/isEditMode", false);
-                }
-            },
-             //Update trainee deatails 
-            updateCallForTrainee: async function (oViewModel, text) {
-                this.getBusyDialog();
-                var oModel = this.getView().getModel("oTraineeDetails").getData();
-                oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
-                oModel.ManagerID = this.getView().byId("TU_id_Manager").getSelectedKey();
-                oModel.ReleaseDate = this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");;
-                oModel.JoiningDate = this.byId("TU_id_JoinDate").getValue().split("/").reverse().join("-");
-                // Check and update the status if it is 'Rejected'
-                if (oModel.Status === "Rejected") {
-                    oModel.Status = "Saved";
-                }
-                oModel.TrainingDuration = this.byId("TU_id_TDuration").getSelectedKey();
-                oModel = {
-                    "data": oModel,
-                    "filters": {
-                        "ID": this.sArgPara
-                    }
-                };
-                // AJAX call for updating the data
-                await this.ajaxUpdateWithJQuery("Trainee", oModel).then((oData) => {
-                    if (oData.success) {
-                        this.closeBusyDialog();
-                        oViewModel.setProperty("/editable", false);
-                        oViewModel.setProperty("/isEditMode", true);
-                        oViewModel.setProperty("/isVisiable", true);
-                        oViewModel.setProperty("editBut", true);
-                        if (text && text !== "silent") {
-                            MessageToast.show(this.i18nModel.getText(text));
+                try {
+                    if (this.viewModel.getProperty("/editable")) {
+                        // Perform validations
+                        var isValid =
+                            utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Manager"), "ID") &&
+                            utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.getView().byId("TU_id_TrainingType"), "ID") &&
+                            utils._LCvalidateJoiningBonus(this.getView().byId("TU_id_TrainingAmount"), "ID");
+                        if (isValid) {
+                            this.updateCallForTrainee(this.viewModel, "traineeDataUpdated");
+                        } else {
+                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         }
-                        this.getView().getModel("oTraineeDetails").refresh(true);
+                    } else {
+                        this.viewModel.setProperty("/editable", true);
+                        this.viewModel.setProperty("/isEditMode", false);
                     }
-                }).catch((error) => {
-                    this.closeBusyDialog();
-                    MessageToast.show(error.message || error.responseText);
-                });
+                } catch (error) {
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                }
             },
+
+            //Update trainee deatails 
+            updateCallForTrainee: async function (oViewModel, text) {
+                try {
+                    this.getBusyDialog();
+                    var oModel = this.getView().getModel("oTraineeDetails").getData();
+                    oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
+                    oModel.ManagerID = this.getView().byId("TU_id_Manager").getSelectedKey();
+                    oModel.ReleaseDate = this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");
+                    oModel.JoiningDate = this.byId("TU_id_JoinDate").getValue().split("/").reverse().join("-");
+                    // Check and update the status if it is 'Rejected'
+                    if (oModel.Status === "Rejected") {
+                        oModel.Status = "Saved";
+                    }
+                    oModel.TrainingDuration = this.byId("TU_id_TDuration").getSelectedKey();
+                    oModel = {
+                        "data": oModel,
+                        "filters": {
+                            "ID": this.sArgPara
+                        }
+                    };
+                    // AJAX call for updating the data
+                    await this.ajaxUpdateWithJQuery("Trainee", oModel).then((oData) => {
+                        if (oData.success) {
+                            this.closeBusyDialog();
+                            oViewModel.setProperty("/editable", false);
+                            oViewModel.setProperty("/isEditMode", true);
+                            oViewModel.setProperty("/isVisiable", true);
+                            oViewModel.setProperty("editBut", true);
+                            if (text && text !== "silent") {
+                                MessageToast.show(this.i18nModel.getText(text));
+                            }
+                            this.getView().getModel("oTraineeDetails").refresh(true);
+                        }
+                    }).catch((error) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.message || error.responseText);
+                    });
+                } catch (error) {
+                    this.closeBusyDialog();
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                }
+            },
+
             // common function for opening dialog
             TD_commonOpenDialog: function (fragmentName) {
                 if (!this.TU_oDialogMail) {
@@ -354,7 +385,6 @@ sap.ui.define([
             Mail_onPressClose: function () {
                 this.TU_oDialogMail.destroy();
                 this.TU_oDialogMail = null;
-                // this.TU_oDialogMail.close();
             },
             //File upload function
             Mail_onUpload: function (oEvent) {
@@ -363,11 +393,21 @@ sap.ui.define([
             },
             //validate button function
             validateSendButton: function () {
-                const sendBtn = sap.ui.getCore().byId("SendMail_Button");
-                const isEmailValid = utils._LCvalidateEmail(sap.ui.getCore().byId("CCMail_TextArea"), "ID");
-                const isFileUploaded = this.getView().getModel("UploaderData").getProperty("/isFileUploaded");
-                sendBtn.setEnabled(isEmailValid && isFileUploaded);
+                try {
+                    const sendBtn = sap.ui.getCore().byId("SendMail_Button");
+                    const emailField = sap.ui.getCore().byId("CCMail_TextArea");
+                    const uploaderModel = this.getView().getModel("UploaderData");
+                    if (!sendBtn || !emailField || !uploaderModel) {
+                        return;
+                    }
+                    const isEmailValid = utils._LCvalidateEmail(emailField, "ID") === true;
+                    const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
+                    sendBtn.setEnabled(isEmailValid && isFileUploaded);
+                } catch (error) {
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                }
             },
+
             //mail id change function
             Mail_onEmailChange: function () {
                 this.validateSendButton();
@@ -399,7 +439,7 @@ sap.ui.define([
                     MessageToast.show(error.responseText);
                 }
             },
-            
+
             //PDF generation function
             TD_onPressMerge: async function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");
@@ -434,14 +474,14 @@ sap.ui.define([
                         const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
                         const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
                         const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
-            
+
                         const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
                             this._convertBLOBToImage(logoBlob),
                             this._convertBLOBToImage(signBlob),
                             this._convertBLOBToImage(backgroundBlob),
                             this._convertBLOBToImage(emailBlob)
                         ]);
-            
+
                         oCompanyDetailsModel.companylogo64 = logoBase64;
                         oCompanyDetailsModel.signature64 = signBase64;
                         oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
@@ -459,7 +499,7 @@ sap.ui.define([
             onTrainingTypeChange: function (oEvent) {
                 const oComboBox = oEvent.getSource();
                 const sSelectedKey = oComboBox.getSelectedKey();
-                const oView = this.getView();        
+                const oView = this.getView();
                 if (sSelectedKey) {
                     oView.byId("TD_id_TrainingAmountLabel").setVisible(true);
                     oView.byId("TD_id_TrainingDetailsBox").setVisible(true);
@@ -471,6 +511,6 @@ sap.ui.define([
                     oView.byId("TD_id_TrainingAmount").setValue("");
                     oView.byId("TD_id_TrainingAmount").setValueState("None");
                 }
-            }    
+            }
         });
     });

@@ -58,7 +58,7 @@ sap.ui.define([], function () {
           return false;
       }
       var letterCount = (sanitizedValue.match(/[a-zA-Z]/g) || []).length;
-      if (letterCount < 3) {
+      if (letterCount < 2) {
           oField.setValueState("Error");
           return false;
       }
