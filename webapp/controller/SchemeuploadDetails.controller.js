@@ -146,6 +146,7 @@ sap.ui.define(
         },
         SUD_onhandleEdit_SavePress: function () {
           var oView = this.getView();
+          var that = this;
           var oModel = oView.getModel("detailModel");
           var oData = oModel.getData();
 
@@ -209,7 +210,7 @@ sap.ui.define(
             ? { data: oPayload, filters: { ID: oData.ID } }
             : { data: oPayload };
 
-          this.getBusyDialog();
+          that.getBusyDialog();
           $.ajax({
             url: sEndpoint,
             type: sType,
@@ -221,7 +222,7 @@ sap.ui.define(
             },
             data: JSON.stringify(oRequestBody),
             success: function (response) {
-              this.closeBusyDialog();
+              that.closeBusyDialog();
               MessageToast.show(
                 bIsUpdate
                   ? "Scheme Updated Successfully"
@@ -237,7 +238,7 @@ sap.ui.define(
               oView.byId("SUD_id_Edit").setText("Edit");
             },
             error: function (jqXHR) {
-              this.closeBusyDialog();
+              that.closeBusyDialog();
               var sError =
                 jqXHR.responseJSON?.error || "Error: " + jqXHR.statusText;
               MessageToast.show(sError);
