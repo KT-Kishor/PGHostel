@@ -126,7 +126,7 @@ sap.ui.define([
 
                         this.getView().byId("C_id_PageCreate").setVisible(false);
                         this.getView().byId("CUF_id_pageTrainee").setVisible(true);
-
+                        this.pdfData = this.getView().getModel("oFilteredContractModel").getData();
                         this.closeBusyDialog(); // Close BusyDialog
                     } catch (error) {
                         this.closeBusyDialog(); // Close BusyDialog
@@ -199,10 +199,10 @@ sap.ui.define([
 
                 let oModel;
                 if (this.sArgPara === "CreateContractFlag") {
-                    this.onCountryChange(oEvent, { stdCodeCombo: "CD_id_codeModel", baseLocationCombo: "CD_id_ConLocation" });
+                    this.onCountryChange(oEvent, { stdCodeCombo: "CD_id_codeModel", baseLocationCombo: "CD_id_ConLocation", mobileInput: "CD_id_Mobile" });
                     oModel = this.getView().getModel("ContractModelWizart");
                 } else {
-                    this.onCountryChange(oEvent, { stdCodeCombo: "CU_id_codeModel", baseLocationCombo: "CU_id_ContractCity" });
+                    this.onCountryChange(oEvent, { stdCodeCombo: "CU_id_codeModel", baseLocationCombo: "CU_id_ContractCity", mobileInput: "CU_id_Mobile" });
                     oModel = this.getView().getModel("oFilteredContractModel");
                 }
 
@@ -467,8 +467,8 @@ sap.ui.define([
                                     type: "Attention",
                                     press: function () {
                                         oDialog.close();
-                                        this.contractPDFgenerate(data);
                                         this.getRouter().navTo("RouteContract");
+                                        this.contractPDFgenerate(data);
                                     }.bind(this)
                                 }),
                                 afterClose: function () {
@@ -836,11 +836,11 @@ sap.ui.define([
 
             //PDF download function
             onPressMerge: async function () {
+                this.getBusyDialog();
                 this.contractPDFgenerate(this.pdfData);
             },
 
             contractPDFgenerate: async function (oEmpModel) {
-                this.getBusyDialog();
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "Contract" });
                 var oPDFModel = this.getView().getModel("PDFData");
@@ -888,8 +888,9 @@ sap.ui.define([
                 }
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GenerateContractPDF === "function") {
+                        this.closeBusyDialog();
+                        this.getBusyDialog();
                         jsPDF._GenerateContractPDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
-                        MessageToast.show(this.i18nModel.getText("pdfSucces"));
                     }
                 }
             }
