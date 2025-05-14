@@ -24,11 +24,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this._makeDatePickersReadOnly(["SS_id_Dob","SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
                         fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(),
-                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, SetProfile: false
+                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, SetProfile: false ,TraineeRole: false,
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
+                    this.ViewModel.setProperty("/TraineeRole", loginModel.getProperty("/Role") === "Trainee");
                     var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lc", "SS_id_lpa", "SS_id_lca", "SS_id_lds", "SS_id_Lmg", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_lbase", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
                         "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan"];
                     this.sPath = oEvent.getParameter('arguments').sPath;
@@ -82,6 +83,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.byId("SS_id_CAdress").setValueState("None");
                     this.byId("SS_id_EmpAddS").setValueState("None");
                     this.byId("SS_id_MobileNo").setValueState("None");
+                    this.byId("SS_id_STDCode").setValueState("None");
+                    this.byId("SS_id_STDCodeRI").setValueState("None");
+                    this.byId("SS_id_STDCodeRII").setValueState("None");
                 } catch (error) { } finally {
                     this.closeBusyDialog();
                 }
@@ -279,11 +283,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                     utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
                                     utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
                                     utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
+                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCode"), "ID") &&
                                     utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
                                     utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
+                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
                                     utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
                                     utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
                                     utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
+                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
                                     utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
                                     utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
                                     utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID");
@@ -295,7 +302,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                     utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") &&
                                     utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") &&
                                     utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") &&
-                                    utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID");
+                                    utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID") &&
+                                    utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID");
                             }
                             if (!isValid) {
                                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -307,19 +315,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                             return;
                         }
-
                         // Optional Fields Validation
-                        const aadhar = oView.byId("SS_idAdhar").getValue().trim();
                         const passport = oView.byId("SS_id_Passport").getValue().trim();
                         const voterId = oView.byId("SS_id_Voterid").getValue().trim();
                         const optionalValid =
-                            (aadhar === "" || utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID")) &&
                             (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
                             (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) &&
                             (oDataModel.MobileNo == null || oDataModel.MobileNo.trim() === "" || utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID")) &&
                             (oDataModel.AccountNo == null || oDataModel.AccountNo.trim() === "" || utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID")) &&
                             (oDataModel.IFSCCode == null || oDataModel.IFSCCode.trim() === "" || utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID")) &&
                             (oDataModel.PANCard == null || oDataModel.PANCard.trim() === "" || utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID")) &&
+                            (oDataModel.AdharCard == null || oDataModel.AdharCard.trim() === "" || utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID")) &&
                             (oDataModel.EmployeeStatus === 'Inactive' ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
                         if (!optionalValid) {
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -352,9 +358,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 oView.getModel("viewModel").setProperty("/isEditMode", false);
                                 oView.getModel("viewModel").setProperty("/AdminRole", false);
                                 this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
-                                ["SS_idAdhar", "SS_id_Passport", "SS_id_Voterid"].forEach(id => {
-                                    this.byId(id).setValueState("None");
-                                });
+                                this.byId("SS_id_Passport").setValueState("None");
+                                this.byId("SS_id_Voterid").setValueState("None");
                             } else {
                                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                             }
