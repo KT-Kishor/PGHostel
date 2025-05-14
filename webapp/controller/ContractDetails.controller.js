@@ -9,8 +9,10 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteContractDetails").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function (oEvent) {
-                this.commonLoginFunction("Contract");
-                this.getBusyDialog(); // Show busy dialog
+                var LoginFunction = await this.commonLoginFunction("Contract");
+                if (!LoginFunction) return;
+                this.getBusyDialog();
+                this.pdfData = {};
                 this._makeDatePickersReadOnly(["CD_id_AgreeDate", "CD_id_Datestart", "CD_id_DateEnd"]);
                 this._makeDatePickersReadOnly(["CU_id_AgreementDate", "CU_id_AssignmentStartDate", "CU_id_AssignmentEndDate"]);
                 await this._fetchCommonData("Currency", "CurrencyModel");
@@ -167,17 +169,23 @@ sap.ui.define([
             
             CD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
-                this.validateStep();
+                 if (this.sArgPara === "CreateContractFlag") { 
+                    this.validateStep();    //  validation if in create flow
+                }
             },
 
             CD_validateAmount: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
-                this.validateStep();
+                if (this.sArgPara === "CreateContractFlag") { 
+                    this.validateStep();    //  validation if in create flow
+                }
             },
  
             CD_validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
-                this.validateStep();
+                 if (this.sArgPara === "CreateContractFlag") { 
+                    this.validateStep();    //  validation if in create flow
+                }
             },
 
             CD_onChangeCountry: function (oEvent) {
@@ -210,9 +218,8 @@ sap.ui.define([
                 }
             },
 
-            CD_validateDate: function (oEvent) {
+           CD_validateDate: function (oEvent) {
                 let oModel, oStartDatePicker, oEndDatePicker;
-
                 if (this.sArgPara === "CreateContractFlag") {
                     oModel = this.getView().getModel("ContractModelWizart");
                     oStartDatePicker = this.byId("CD_id_Datestart");
@@ -232,11 +239,14 @@ sap.ui.define([
                     if (sId === oStartDatePicker.getId()) {
                         oEndDatePicker.setMinDate(oDate);   // Start Date changed — set minDate on End Date
                     } else if (sId === oEndDatePicker.getId()) {
-                        oStartDatePicker.setMaxDate(oDate);// End Date changed — set maxDate on Start Date
+                        oStartDatePicker.setMaxDate(oDate); // End Date changed — set maxDate on Start Date
                     }
                 }
 
                 utils._LCvalidateDate(oEvent);
+                if (this.sArgPara === "CreateContractFlag") {
+                    this.validateStep(); // Only run in create flow
+                }
             },
 
             // Format date string to Date object
@@ -247,23 +257,31 @@ sap.ui.define([
 
             CD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
-                this.validateStep();
+                if (this.sArgPara === "CreateContractFlag") { 
+                    this.validateStep();    //  validation if in create flow
+                }
             },
 
             CD_onBaseLocationChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 utils._LCvalidateMandatoryField(oEvent);
-                this.validateStep();
+                 if (this.sArgPara === "CreateContractFlag") { 
+                    this.validateStep();    //  validation if in create flow
+                }
             },
 
             CD_ValidateComboBox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
-                this.validateStep();
+                 if (this.sArgPara === "CreateContractFlag") { 
+                    this.validateStep();    //  validation if in create flow
+                }
             },
 
             CD_ValidateConsultantName:function(oEvent){
                 utils._LCvalidateName(oEvent);
-                this.validateStep();
+                 if (this.sArgPara === "CreateContractFlag") { 
+                    this.validateStep();    //  validation if in create flow
+                }
             },
 
             //back function
@@ -532,6 +550,22 @@ sap.ui.define([
             onPressSave: async function () {
                 const that = this;
                 const oView = this.getView();
+
+                const oStartDatePicker = this.byId("CU_id_AssignmentStartDate");
+                const oEndDatePicker = this.byId("CU_id_AssignmentEndDate");
+                const oStartDate = oStartDatePicker.getDateValue();
+                const oEndDate = oEndDatePicker.getDateValue();
+
+                let isDateRangeValid = true;
+                if (oStartDate && oEndDate) {
+                    if (oStartDate > oEndDate) {
+                        oStartDatePicker.setValueState("Error");
+                        oStartDatePicker.setValueStateText(this.i18nModel.getText("startDateValidation"));
+                        isDateRangeValid = false;
+                    } else {
+                        oStartDatePicker.setValueState("None");
+                    }
+                }
             
                 // Mandatory validation
                 const isMandatoryValid = (
@@ -550,11 +584,11 @@ sap.ui.define([
                     utils._LCvalidateMobileNumber(this.byId("CU_id_Mobile"), "ID") 
                 );
             
-                if (!isMandatoryValid) {
+                if (!isMandatoryValid || !isDateRangeValid) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
-            
+
                 const oModel = oView.getModel("oFilteredContractModel").getData();
                 const rateType = oModel.HrDaliyMonth;
                 const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
@@ -654,6 +688,7 @@ sap.ui.define([
                     this.getBusyDialog();
                     const requestData = { filters: { ContractNo: oModel.ContractNo, AgreementNo: oModel.AgreementNo }, data: jsonData };
                     await this.ajaxUpdateWithJQuery("Contract", requestData);
+                    this.pdfData = jsonData;
                     oView.getModel("simpleForm").setProperty("/editable", false);
                     oView.getModel("simpleForm").setProperty("/Status", false);
                     oView.getModel("viewModel").setProperty("/isEditMode", false);
@@ -756,13 +791,11 @@ sap.ui.define([
 
             //PDF download function
             onPressMerge: async function () {
-                var oModel = this.getView().getModel("oFilteredContractModel");
-                this.contractPDFgenerate(oModel);
+                this.contractPDFgenerate(this.pdfData);
             },
 
-            contractPDFgenerate: async function (input) {
+            contractPDFgenerate: async function (oEmpModel) {
                 this.getBusyDialog();
-                var oEmpModel = typeof input.getData === "function" ? input.getData() : input;
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "Contract" });
                 var oPDFModel = this.getView().getModel("PDFData");
