@@ -281,7 +281,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     ["Assignment Status", oModel.ContractStatus],
                     ["Start Date", oModel.AgreementStartDate],
                     ["End Date", oModel.AgreementEndDate],
-                    ["Specific Hours/Days and Timekeeping Requirement", "Maximum of 60 days to be billed throughout the duration of the contract."],
+                    ["Specific Hours/Days and Time keeping Requirement", "Maximum of 60 days to be billed throughout the duration of the contract."],
                     ["Notice period for Consultant to terminate", "5 calendar weeks subject to clauses 23-27"],
                     ["Notice period for us to terminate", "5 calendar weeks subject to clauses 23-27"],
                     ["Specific Insurance Requirement", oModel.SpecificInsuranceRequirement],
@@ -294,7 +294,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 ];
 
                 // Configuration
-                const labelWidth = maxWidth * 0.48; // ~43% for label (left)
+                const labelWidth = maxWidth * 0.52; // ~43% for label (left)
                 const valueWidth = maxWidth - labelWidth; // Remaining width for value
                 const fontSize = 10;
                 const lineHeight = 5;

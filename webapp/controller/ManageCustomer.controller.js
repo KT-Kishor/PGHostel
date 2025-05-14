@@ -74,8 +74,8 @@ sap.ui.define([
             value: "0",
             salutation: "Mr.",
             customerEmail: "",
-            stdCode: "",
-            country: "",
+            stdCode: "+91",
+            country: "India",
             baseLocation: "",
           };
           oModel = new JSONModel(oData);
