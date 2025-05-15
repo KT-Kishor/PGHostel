@@ -31,26 +31,70 @@ sap.ui.define(
         }
         var oModel = new JSONModel(QuotaionModel);
         this.getView().setModel(oModel, "quotation");
-
+        var oQuotationModel = new JSONModel();
+        oQuotationModel.setData({ Date: this.Formatter.formatDate(new Date()),
+         Country: "India",
+        STDCode: "+91"
+        })
+        this.getView().setModel(oQuotationModel, "QuotationModel");
         this.getRouter().getRoute("RouteHrQuotationDetails").attachMatched(this._onRouteMatched, this);
       },
-      _onRouteMatched: function (oEvent) {
+      _onRouteMatched: async function (oEvent) {
+        await this._fetchCommonData("Currency", "CurrencyModel");
+        await this._fetchCommonData("Country", "CountryModel");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         this._fetchCommonData("Quotation", "QuotationPDFModel", {})
 
       },
 
+      HQD_onCountryChange: function (oEvent) {
+        this.onCountryChange(oEvent, { stdCodeCombo: "HQD_id_STDCode" });
+      },
+
+      HQD_onChangeGstNo: function (oEvent) {
+        var sGST = oEvent.getSource().getValue().trim();
+        var oView = this.getView();
+        var oModel = oView.getModel("QuotationModel");
+
+        if (sGST !== "") {
+          oModel.setProperty("/GSTValid", true); // make checkboxes & percentage required/editable
+        } else {
+          oModel.setProperty("/GSTValid", false);
+          oModel.setProperty("/CGSTSelected", false);
+          oModel.setProperty("/IGSTSelected", false);
+          oModel.setProperty("/Percentage", "");
+        }
+      },
+
+      onSelectCGST: function (oEvent) {
+        var oView = this.getView();
+        var oModel = oView.getModel("QuotationModel");
+
+        if (oEvent.getParameter("selected")) {
+          oModel.setProperty("/CGSTSelected", true);
+          oModel.setProperty("/IGSTSelected", false); // uncheck IGST if CGST selected
+          oModel.setProperty("/Percentage", "9");
+        } else {
+          oModel.setProperty("/Percentage", "");
+        }
+      },
+
+      onSelectIGST: function (oEvent) {
+        var oView = this.getView();
+        var oModel = oView.getModel("QuotationModel");
+
+        if (oEvent.getParameter("selected")) {
+          oModel.setProperty("/IGSTSelected", true);
+          oModel.setProperty("/CGSTSelected", false); // uncheck CGST if IGST selected
+          oModel.setProperty("/Percentage", "18");
+        } else {
+          oModel.setProperty("/Percentage", "");
+        }
+      },
+
       HQD_onBack: function () {
         this.getRouter().navTo("RouteHrQuotation");
       },
-
-      // _checkValidation:function(){
-      //   if(
-      //     utils._LCvalidateDate(this.byId("HQD_id_Quotation"),"ID") &&
-      //     utils._LCvalidateDate(this.byId("HQD_id_QuotationValid"),"ID") &&
-
-      //   )
-      // },
 
       HQD_DateValidate: function (oEvent) {
         utils._LCvalidateDate(oEvent)
@@ -72,12 +116,29 @@ sap.ui.define(
         utils._LCvalidateEmail(oEvent)
       },
 
+      HQD_onCountryChange: function (oEvent) {
+        utils._LCstrictValidationComboBox(oEvent)
+      },
+
       HQD_onAddressLiveChange: function (oEvent) {
         utils._LCvalidateMandatoryField(oEvent)
       },
-
       HQD_onComGSTLiveChange: function (oEvent) {
         utils._LCvalidateGstNumber(oEvent)
+        // Validate GST logic
+        var oModel = this.getView().getModel("QuotationModel");
+        var sGST = oModel.getProperty("/CompanyGSTNO");
+
+        if (sGST) {
+          var bCGST = oModel.getProperty("/CGSTSelected");
+          var bIGST = oModel.getProperty("/IGSTSelected");
+
+          if (!bCGST && !bIGST) {
+            MessageToast.show("Please select either CGST/SGST or IGST.");
+            return;
+          }
+        }
+
       },
 
       HQD_onCurrencyChange: function (oEvent) {
@@ -100,7 +161,7 @@ sap.ui.define(
         utils._LCvalidateMandatoryField(oEvent)
       },
 
-      HQD_onComGSTLiveChange: function (oEvent) {
+      HQD_onCustomerGSTLiveChange:function(oEvent){
         utils._LCvalidateGstNumber(oEvent)
       },
 
@@ -109,9 +170,11 @@ sap.ui.define(
           if (
             utils._LCvalidateDate(this.byId("HQD_id_Quotation"), "ID") &&
             utils._LCvalidateDate(this.byId("HQD_id_QuotationValid"), "ID") &&
+            utils._LCvalidateName(this.byId("HQD_id_InputCompanyName"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyName"), "ID") &&
             utils._LCvalidateMobileNumber(this.byId("HQD_id_InputCompanyMobileNo"), "ID") &&
             utils._LCvalidateEmail(this.byId("HQD_id_CompanyEmailID"), "ID") &&
+            utils._LCstrictValidationComboBox(this.byId("HQD_id_Country"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyAddress"), "ID") &&
             utils._LCvalidateGstNumber(this.byId("HQD_id_CompGSTNO"), "ID") &&
             utils._LCstrictValidationComboBox(this.byId("HQD_id_Curency"), "ID") &&

@@ -32,7 +32,7 @@
                     displayFormat="dd/MM/yyyy"
                     change="FAU_onDateLiveChange"
                     valueStateText="{i18n>invalidDate}"
-                    value="{path:'myform>/formData/data/ReturnDate',formatter:'.Formatter.formatDate'}"
+                    value="{path:'myform>/formData/data/ReturnDate', formatter:'.Formatter.formatDate'}"
                 />
                 <Label text="{i18n>returnBranch}" />
                 <ComboBox

@@ -13,85 +13,85 @@
             />
         </headerContent>
         <content>
-        <fb:FilterBar
-            id="HQ_id_QuotationFilterBar"
-            persistencyKey="myPersKey"
-            filterChange="HQ_onFilterChange"
-            afterVariantLoad=".onAfterVariantLoad"
-            clear="HQ_onClearFilters"
-            showClearOnFB="true"
-            showFilterConfiguration="false"
-            useToolbar="false"
-            search="HQ_onSearch"
-        >
-            <fb:filterGroupItems>
-                <fb:FilterGroupItem
-                    name="QuotationNo"
-                    label="{i18n>quotationNo}"
-                    groupName="Group1"
-                    visibleInFilterBar="true"
-                >
-                <fb:control>
-                  <ComboBox
-                            showClearIcon="true"
-                            id="HQ_id_quotationNo"
-                        >
-                        </ComboBox>
+            <fb:FilterBar
+                id="HQ_id_QuotationFilterBar"
+                persistencyKey="myPersKey"
+                filterChange="HQ_onFilterChange"
+                afterVariantLoad=".onAfterVariantLoad"
+                clear="HQ_onClearFilters"
+                showClearOnFB="true"
+                showFilterConfiguration="false"
+                useToolbar="false"
+                search="HQ_onSearch"
+            >
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="QuotationNo"
+                        label="{i18n>quotationNo}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                showClearIcon="true"
+                                id="HQ_id_quotationNo"
+                            />
                         </fb:control>
-                        </fb:FilterGroupItem>
-            </fb:filterGroupItems>
-        </fb:FilterBar>
-        <Table  items="{path: 'QuotationModel>/'}" 
-            alternateRowColors="true"
-            busyIndicatorDelay="0"
-            id="HQ_id_QuotationItemTable"
-            class="sapUiResponsiveMargin"
-            width="auto"
-        >
-            <headerToolbar>
-                <OverflowToolbar>
-                    <Title text="{i18n>quotation}" />
-                    <ToolbarSpacer />
-                    <Button
-                        text="{i18n>create}"
-                        tooltip="{i18n>addQuotation}"
-                        press="HQ_onPressAddQuotation"
-                    />
-                </OverflowToolbar>
-            </headerToolbar>
-            <columns>
-                <Column>
-                    <Text text="{i18n>quotationNo}" />
-                </Column>
-                <Column>
-                    <Text text="{i18n>companyName}" />
-                </Column>
-                <Column>
-                    <Text text="{i18n>date}" />
-                </Column>
-                <Column>
-                    <Text text="{i18n>companyGSTNO}" />
-                </Column>
-                <Column>
-                    <Text text="{i18n>customerName}" />
-                </Column>
-                <Column>
-                    <Text text="{i18n>customerGSTNO}" />
-                </Column>
-            </columns>
-            <items>
-                <ColumnListItem>
-                    <cells>
-                        <Text text="{quotationNo}" />
-                        <Text text="{companyName}" />
-                        <Text text="{date}" />
-                        <Text text="{companyGSTNO}" />
-                        <Text text="{customerName}" />
-                        <Text text="{customerGSTNO}" />
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+            <Table
+                items="{path: 'QuotationModel>/'}"
+                alternateRowColors="true"
+                busyIndicatorDelay="0"
+                id="HQ_id_QuotationItemTable"
+                class="sapUiResponsiveMargin"
+                width="auto"
+            >
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="{i18n>quotation}" />
+                        <ToolbarSpacer />
+                        <Button
+                            text="{i18n>create}"
+                            tooltip="{i18n>addQuotation}"
+                            press="HQ_onPressAddQuotation"
+                        />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>quotationNo}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>companyName}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>date}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>companyGSTNO}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>customerName}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>customerGSTNO}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{quotationNo}" />
+                            <Text text="{companyName}" />
+                            <Text text="{date}" />
+                            <Text text="{companyGSTNO}" />
+                            <Text text="{customerName}" />
+                            <Text text="{customerGSTNO}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
         </content>
         <footer>
             <Bar>

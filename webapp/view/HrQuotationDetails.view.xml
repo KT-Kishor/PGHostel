@@ -88,9 +88,25 @@
                                             text="{i18n>companyMobileNo}"
                                             required="true"
                                         />
+                                        <m:ComboBox
+                                            value="{QuotationModel>/STDCode}"
+                                            showSecondaryValues="true"
+                                            id="HQD_id_STDCode"
+                                            items="{codeModel>/}"
+                                            filterSecondaryValues="true"
+                                            change="HQD_STDCode"
+                                            valueStateText="{i18n>combovalueState}"
+                                        >
+                                            <core:ListItem
+                                                key="{codeModel>country}"
+                                                text="{codeModel>calling_code}"
+                                                additionalText="{codeModel>country_code}"
+                                            />
+                                        </m:ComboBox>
                                         <m:Input
-                                            value="{QuotationModel>/CompanyMobileNo}"
+                                            value="{QuotationModel>/Mobile}"
                                             id="HQD_id_InputCompanyMobileNo"
+                                            placeholder="{i18n>mobileNo}"
                                             liveChange="HQD_onMNumberLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
@@ -108,6 +124,26 @@
                                             valueStateText="{i18n>emailValueState}"
                                             maxLength="100"
                                         />
+                                        <m:Label
+                                            text="{i18n>expCountry}"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            items="{CountryModel>/}"
+                                            selectedKey="{QuotationModel>/Country}"
+                                            width="100%"
+                                            showSecondaryValues="true"
+                                            valueStateText="{i18n>countryValueState}"
+                                            editable="{visiablityPlay>/editable}"
+                                            id="HQD_id_Country"
+                                            change="HQD_onCountryChange"
+                                        >
+                                            <core:ListItem
+                                                key="{CountryModel>countryName}"
+                                                text="{CountryModel>countryName}"
+                                                additionalText="{CountryModel>code}"
+                                            />
+                                        </m:ComboBox>
                                         <m:Label
                                             text="{i18n>companyAddress}"
                                             required="true"
@@ -163,19 +199,19 @@
                                             text="{i18n>currency}"
                                             required="true"
                                         />
-                                        <m:Select
-                                            items="{currencyModel>/results}"
-                                            selectedKey="{QuotationModel>/Currency}"
+                                        <m:ComboBox
+                                            items="{CurrencyModel>/}"
                                             width="100%"
-                                            editable="{visiablityPlay>/editable}"
                                             id="HQD_id_Curency"
+                                            selectedKey="{QuotationModel>/Currency}"
+                                            valueStateText="{i18n>selectCurrency}"
                                             change="HQD_onCurrencyChange"
                                         >
                                             <core:Item
-                                                key="{currencyModel>Currency}"
-                                                text="{currencyModel>Currency}"
+                                                key="{CurrencyModel>currency}"
+                                                text="{CurrencyModel>currency}"
                                             />
-                                        </m:Select>
+                                        </m:ComboBox>
                                     </f:content>
                                 </f:SimpleForm>
                             </blocks>
@@ -205,6 +241,7 @@
                                             value="{QuotationModel>/CustomerName}"
                                             id="HQD_id_CustomerName"
                                             liveChange="HQD_onCustomerNameLiveChange"
+                                            valueStateText="{i18n>placeName}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="100"
                                         />
@@ -216,6 +253,7 @@
                                             value="{QuotationModel>/CustomerEmailID}"
                                             id="HQD_id_CustomerEmailID"
                                             liveChange="HQD_EmailIDLiveChange"
+                                            valueStateText="{i18n>emailValueState}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="100"
                                         />
@@ -227,6 +265,7 @@
                                             value="{QuotationModel>/CustomerMobileNo}"
                                             id="HQD_id_InputCustomerMobileNo"
                                             liveChange="HQD_onMNumberLiveChange"
+                                            valueStateText="{i18n>mobileNoValueState}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
                                         />
@@ -239,6 +278,7 @@
                                             maxLength="120"
                                             id="HQD_id_InputCustomerAddress"
                                             liveChange="HQD_onAddressLiveChange"
+                                            valueStateText="{i18n>addressValueState}"
                                             rows="2"
                                             editable="{visiablityPlay>/editable}"
                                         />
@@ -246,7 +286,8 @@
                                         <m:Input
                                             value="{QuotationModel>/CustomerGSTNO}"
                                             id="HQD_id_InputCustomerGSTNO"
-                                            liveChange="HQD_onPressLiveChange"
+                                            valueStateText="{i18n>gstNoValueState}"
+                                            liveChange="HQD_onCustomerGSTLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="20"
                                         />
@@ -286,191 +327,181 @@
                                                 <m:ToolbarSeparator />
                                             </m:OverflowToolbar>
                                         </m:headerToolbar>
-                                            <m:columns>
-                                                <m:Column width="100px">
-                                                    <m:customData>
-                                                        <core:CustomData
-                                                            key="p13nData"
-                                                            value='{"columnKey": "SNo", "leadingProperty": "SNo", "sortProperty": "SNo", "filterProperty": "SNo", "columnIndex": 1}'
-                                                        />
-                                                    </m:customData>
-                                                    <m:Text
-                                                        text="{i18n>siNo}"
+                                        <m:columns>
+                                            <m:Column width="100px">
+                                                <m:customData>
+                                                    <core:CustomData
+                                                        key="p13nData"
+                                                        value='{"columnKey": "SNo", "leadingProperty": "SNo", "sortProperty": "SNo", "filterProperty": "SNo", "columnIndex": 1}'
                                                     />
-                                                </m:Column>
-                                                <m:Column width="300px">
-                                                    <m:customData>
-                                                        <core:CustomData
-                                                            key="p13nData"
-                                                            value='{"columnKey": "Item", "leadingProperty": "Item", "sortProperty": "Item", "filterProperty": "Item", "columnIndex": 2}'
-                                                        />
-                                                    </m:customData>
-                                                    <m:Text
-                                                        text="{i18n>item}"
+                                                </m:customData>
+                                                <m:Text text="{i18n>siNo}" />
+                                            </m:Column>
+                                            <m:Column width="300px">
+                                                <m:customData>
+                                                    <core:CustomData
+                                                        key="p13nData"
+                                                        value='{"columnKey": "Item", "leadingProperty": "Item", "sortProperty": "Item", "filterProperty": "Item", "columnIndex": 2}'
                                                     />
-                                                </m:Column>
-                                                <m:Column id="HQD_id_SAC">
-                                                    <m:customData>
-                                                        <core:CustomData
-                                                            key="p13nData"
-                                                            value='{"columnKey": "SAC", "leadingProperty": "SAC", "sortProperty": "SAC", "filterProperty": "SAC", "columnIndex": 3 }'
-                                                        />
-                                                    </m:customData>
-                                                    <m:Text text="{i18n>SAC}" />
-                                                </m:Column>
-                                                <m:Column
-                                                    id="HQD_id_GSTCalculaton"
-                                                >
-                                                    <m:customData>
-                                                        <core:CustomData
-                                                            key="p13nData"
-                                                            value='\{"columnKey": "GSTCalculation", "leadingProperty": "GSTCalculation", "sortProperty": "GSTCalculation", "filterProperty": "GSTCalculation", "columnIndex": 4}'
-                                                        />
-                                                    </m:customData>
-                                                    <m:Text
-                                                        text="{i18n>GSTCalculation}"
+                                                </m:customData>
+                                                <m:Text text="{i18n>item}" />
+                                            </m:Column>
+                                            <m:Column id="HQD_id_SAC">
+                                                <m:customData>
+                                                    <core:CustomData
+                                                        key="p13nData"
+                                                        value='{"columnKey": "SAC", "leadingProperty": "SAC", "sortProperty": "SAC", "filterProperty": "SAC", "columnIndex": 3 }'
                                                     />
-                                                </m:Column>
-                                                <m:Column>
-                                                    <m:customData>
-                                                        <core:CustomData
-                                                            key="p13nData"
-                                                            value='{"columnKey": "Days", "leadingProperty": "Days", "sortProperty": "Days", "filterProperty": "Days", "columnIndex": 5}'
-                                                        />
-                                                    </m:customData>
-                                                    <m:Text
-                                                        text="{i18n>days}"
+                                                </m:customData>
+                                                <m:Text text="{i18n>SAC}" />
+                                            </m:Column>
+                                            <m:Column id="HQD_id_GSTCalculaton">
+                                                <m:customData>
+                                                    <core:CustomData
+                                                        key="p13nData"
+                                                        value='\{"columnKey": "GSTCalculation", "leadingProperty": "GSTCalculation", "sortProperty": "GSTCalculation", "filterProperty": "GSTCalculation", "columnIndex": 4}'
                                                     />
-                                                </m:Column>
-                                                <m:Column>
-                                                    <m:customData>
-                                                        <core:CustomData
-                                                            key="p13nData"
-                                                            value='{"columnKey": "UnitPrice", "leadingProperty": "UnitPrice", "sortProperty": "UnitPrice", "filterProperty": "UnitPrice", "columnIndex": 6}'
-                                                        />
-                                                    </m:customData>
-                                                    <m:Text
-                                                        text="{i18n>unitPrice}"
+                                                </m:customData>
+                                                <m:Text
+                                                    text="{i18n>GSTCalculation}"
+                                                />
+                                            </m:Column>
+                                            <m:Column>
+                                                <m:customData>
+                                                    <core:CustomData
+                                                        key="p13nData"
+                                                        value='{"columnKey": "Days", "leadingProperty": "Days", "sortProperty": "Days", "filterProperty": "Days", "columnIndex": 5}'
                                                     />
-                                                </m:Column>
-                                                <m:Column>
-                                                    <m:customData>
-                                                        <core:CustomData
-                                                            key="p13nData"
-                                                            value='\{"columnKey": "Discount", "leadingProperty": "Discount", "sortProperty": "Discount", "filterProperty": "Discount", "columnIndex": 7}'
-                                                        />
-                                                    </m:customData>
-                                                    <m:Text
-                                                        text="{i18n>discount}"
+                                                </m:customData>
+                                                <m:Text text="{i18n>days}" />
+                                            </m:Column>
+                                            <m:Column>
+                                                <m:customData>
+                                                    <core:CustomData
+                                                        key="p13nData"
+                                                        value='{"columnKey": "UnitPrice", "leadingProperty": "UnitPrice", "sortProperty": "UnitPrice", "filterProperty": "UnitPrice", "columnIndex": 6}'
                                                     />
-                                                </m:Column>
-                                                <m:Column>
-                                                    <m:customData>
-                                                        <core:CustomData
-                                                            key="p13nData"
-                                                            value='{"columnKey": "Total", "leadingProperty": "Total", "sortProperty": "Total", "filterProperty": "Total", "columnIndex": 8}'
-                                                        />
-                                                    </m:customData>
-                                                    <m:Text
-                                                        text="{i18n>total}"
+                                                </m:customData>
+                                                <m:Text
+                                                    text="{i18n>unitPrice}"
+                                                />
+                                            </m:Column>
+                                            <m:Column>
+                                                <m:customData>
+                                                    <core:CustomData
+                                                        key="p13nData"
+                                                        value='\{"columnKey": "Discount", "leadingProperty": "Discount", "sortProperty": "Discount", "filterProperty": "Discount", "columnIndex": 7}'
                                                     />
-                                                </m:Column>
-                                            </m:columns>
-                                            <m:items>
-                                                <m:ColumnListItem>
-                                                    <m:cells>
+                                                </m:customData>
+                                                <m:Text
+                                                    text="{i18n>discount}"
+                                                />
+                                            </m:Column>
+                                            <m:Column>
+                                                <m:customData>
+                                                    <core:CustomData
+                                                        key="p13nData"
+                                                        value='{"columnKey": "Total", "leadingProperty": "Total", "sortProperty": "Total", "filterProperty": "Total", "columnIndex": 8}'
+                                                    />
+                                                </m:customData>
+                                                <m:Text text="{i18n>total}" />
+                                            </m:Column>
+                                        </m:columns>
+                                        <m:items>
+                                            <m:ColumnListItem>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{IndexNo}"
+                                                        editable="false"
+                                                    />
+                                                </m:cells>
+                                                <m:VBox>
+                                                    <m:items>
                                                         <m:Input
-                                                            value="{IndexNo}"
-                                                            editable="false"
-                                                        />
-                                                    </m:cells>
-                                                    <m:VBox>
-                                                        <m:items>
-                                                            <m:Input
-                                                                value="{Item}"
-                                                                placeholder="Item Description"
-                                                                editable="{visiablityPlay>/editable}"
-                                                                maxLength="40"
-                                                            />
-                                                            <m:Input
-                                                                value="{Description}"
-                                                                placeholder="Additional details"
-                                                                editable="{visiablityPlay>/editable}"
-                                                                maxLength="40"
-                                                            />
-                                                        </m:items>
-                                                    </m:VBox>
-                                                    <m:cells>
-                                                        <m:ComboBox
-                                                            showSecondaryValues="true"
-                                                            items="{InvoiceSACModel>/results}"
-                                                            value="{SAC}"
-                                                            editable="{QuotationModel>/GSTValid}"
-                                                            selectedKey="1"
-                                                        >
-                                                            <core:ListItem
-                                                                key="{InvoiceSACModel>ID}"
-                                                                additionalText="{InvoiceSACModel>Description}"
-                                                                text="{InvoiceSACModel>SAC}"
-                                                            />
-                                                        </m:ComboBox>
-                                                    </m:cells>
-                                                    <m:cells>
-                                                        <m:ComboBox
-                                                            value="{GSTCalculation}"
-                                                            selectedKey="1"
-                                                            editable="{QuotationModel>/GSTValid}"
-                                                            change="HQD_onChangeGSTCalculation"
-                                                        >
-                                                            <core:Item
-                                                                key="{i18n>yes}"
-                                                                text="{i18n>yes}"
-                                                            />
-                                                            <core:Item
-                                                                key="{i18n>no}"
-                                                                text="{i18n>no}"
-                                                            />
-                                                        </m:ComboBox>
-                                                    </m:cells>
-                                                    <m:cells>
-                                                        <m:Input
-                                                            value="{Days}"
+                                                            value="{Item}"
+                                                            placeholder="Item Description"
                                                             editable="{visiablityPlay>/editable}"
-                                                            change="HQD_onInputChange"
-                                                            type="Number"
-                                                            maxLength="20"
-                                                            textAlign="End"
+                                                            maxLength="40"
                                                         />
-                                                    </m:cells>
-                                                    <m:cells>
                                                         <m:Input
-                                                            value="{UnitPrice}"
+                                                            value="{Description}"
+                                                            placeholder="Additional details"
                                                             editable="{visiablityPlay>/editable}"
-                                                            change="HQD_onInputChange"
-                                                            type="Number"
-                                                            maxLength="20"
-                                                            textAlign="End"
+                                                            maxLength="40"
                                                         />
-                                                    </m:cells>
-                                                    <m:cells>
-                                                        <m:Input
-                                                            value="{Discount}"
-                                                            editable="{visiablityPlay>/editable}"
-                                                            liveChange="HQD_onchangeDiscount"
-                                                            maxLength="20"
-                                                            textAlign="End"
+                                                    </m:items>
+                                                </m:VBox>
+                                                <m:cells>
+                                                    <m:ComboBox
+                                                        showSecondaryValues="true"
+                                                        items="{InvoiceSACModel>/results}"
+                                                        value="{SAC}"
+                                                        editable="{QuotationModel>/GSTValid}"
+                                                        selectedKey="1"
+                                                    >
+                                                        <core:ListItem
+                                                            key="{InvoiceSACModel>ID}"
+                                                            additionalText="{InvoiceSACModel>Description}"
+                                                            text="{InvoiceSACModel>SAC}"
                                                         />
-                                                    </m:cells>
-                                                    <m:cells>
-                                                        <m:Input
-                                                            value="{path:'Total',formatter: '.Formatter.numberFormater'}"
-                                                            editable="false"
-                                                            textAlign="End"
+                                                    </m:ComboBox>
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:ComboBox
+                                                        value="{GSTCalculation}"
+                                                        selectedKey="1"
+                                                        editable="{QuotationModel>/GSTValid}"
+                                                        change="HQD_onChangeGSTCalculation"
+                                                    >
+                                                        <core:Item
+                                                            key="{i18n>yes}"
+                                                            text="{i18n>yes}"
                                                         />
-                                                    </m:cells>
-                                                </m:ColumnListItem>
-                                            </m:items>
-                                        </m:Table>
+                                                        <core:Item
+                                                            key="{i18n>no}"
+                                                            text="{i18n>no}"
+                                                        />
+                                                    </m:ComboBox>
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{Days}"
+                                                        editable="{visiablityPlay>/editable}"
+                                                        change="HQD_onInputChange"
+                                                        type="Number"
+                                                        maxLength="20"
+                                                        textAlign="End"
+                                                    />
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{UnitPrice}"
+                                                        editable="{visiablityPlay>/editable}"
+                                                        change="HQD_onInputChange"
+                                                        type="Number"
+                                                        maxLength="20"
+                                                        textAlign="End"
+                                                    />
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{Discount}"
+                                                        editable="{visiablityPlay>/editable}"
+                                                        liveChange="HQD_onchangeDiscount"
+                                                        maxLength="20"
+                                                        textAlign="End"
+                                                    />
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{path:'Total',formatter: '.Formatter.numberFormater'}"
+                                                        editable="false"
+                                                        textAlign="End"
+                                                    />
+                                                </m:cells>
+                                            </m:ColumnListItem>
+                                        </m:items>
+                                    </m:Table>
                                     <m:FlexBox
                                         class="custom-flexbox"
                                         direction="Column"
