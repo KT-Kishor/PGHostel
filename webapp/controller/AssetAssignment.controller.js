@@ -247,9 +247,13 @@ sap.ui.define([
             },
 
             FAU_onDateLiveChange: function (oEvent) {
-                this.getView().getModel("myform").setProperty("/formData/data/ReturnDate", oEvent.getSource().getDateValue());
-                console.log(this.getView().getModel("myform").getProperty("/formData/data/ReturnDate"));
-            },
+                const oDate = oEvent.getSource().getDateValue();
+                if (oDate) {
+                    const sFormatted = oDate.toISOString().split("T")[0];
+                    this.getView().getModel("myform").setProperty("/formData/data/ReturnDate", sFormatted);
+                    console.log("ReturnDate:", sFormatted);
+                }
+            },            
 
             FAU_onReturnBranchChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);

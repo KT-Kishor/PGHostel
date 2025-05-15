@@ -229,8 +229,7 @@
                 </Column>
             </columns>
             <items>
-                <ColumnListItem type="Navigation" press="AA_onPressRow"
-                    class="tableRow"
+                <ColumnListItem
                     id="AA_id_TableColumnListItem"
                 >
                     <cells>
