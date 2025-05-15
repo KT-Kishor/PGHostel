@@ -29,10 +29,8 @@ sap.ui.define([
 
                 const today = new Date();
                 const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
-                this.byId("CD_id_Datestart")?.setMinDate(lastYearStart);
-                this.byId("CU_id_AssignmentStartDate")?.setMinDate(lastYearStart);
                 this.byId("CD_id_AgreeDate")?.setMinDate(lastYearStart);
-                 this.byId("CU_id_AgreementDate")?.setMinDate(lastYearStart);
+                this.byId("CU_id_AgreementDate")?.setMinDate(lastYearStart);
                
                 var oWizard = oView.byId("CD_id_Wizard");
                 oWizard.discardProgress(oView.byId("CD_id_Firststep"));
@@ -45,11 +43,11 @@ sap.ui.define([
                 if (this.sArgPara === "CreateContractFlag") {
                     try {
                         const oData = {
-                            AgreementDate: this.Formatter.formatDate(new Date()),
+                            AgreementDate: "",
                             ConsultantName: "",
                             ConsultantAddress: "",
                             ContarctEmail: "",
-                            Role: "Contractor",
+                            ConsultingService: "",
                             Rate: "Daily",
                             Amount: "",
                             Currency: "INR",
@@ -138,6 +136,18 @@ sap.ui.define([
             CD_CommonID: function () {
                 const ids = ["CD_id_CName", "CD_id_Address", "CD_id_Email", "CD_id_Amount", "CD_id_EndClientHirer", "CD_id_Locationcomb", "CD_id_HiringContact", "CD_id_ConLocation"]
                 ids.forEach((id) => { this.byId(id).setValueState("None"); });
+            },
+
+            onChangeAggrementDate: function () {
+                const sCreateAgreementDate =  this.byId("CD_id_AgreeDate").getDateValue();
+                if (sCreateAgreementDate) {
+                    this.byId("CD_id_Datestart")?.setMinDate(sCreateAgreementDate);
+                }
+
+                const supdateAgreementDate =  this.byId("CU_id_AssignmentStartDate").getDateValue();
+                if (supdateAgreementDate) {
+                    this.byId("CU_id_AssignmentStartDate")?.setMinDate(supdateAgreementDate);
+                }
             },
 
             CD_validateName: function (oEvent) {
@@ -320,41 +330,47 @@ sap.ui.define([
                 }
             },
 
-            //Step validation
-            validateStep: function () {
+           validateStep: function () {
                 var oModel = this.getView().getModel("ContractModelWizart").getData();
+
+                // Get values from fields
                 oModel.AgreeDate = this.byId("CD_id_AgreeDate").getValue();
                 oModel.CName = this.byId("CD_id_CName").getValue();
                 oModel.Address = this.byId("CD_id_Address").getValue();
+                oModel.ConsultingService = this.byId("CD_id_ConsultingService").getValue();
                 oModel.Email = this.byId("CD_id_Email").getValue();
                 oModel.EndClientHirer = this.byId("CD_id_EndClientHirer").getValue();
                 oModel.Amount = this.byId("CD_id_Amount").getValue();
                 oModel.HiringContact = this.byId("CD_id_HiringContact").getValue();
                 oModel.Datestart = this.byId("CD_id_Datestart").getValue();
                 oModel.DateEnd = this.byId("CD_id_DateEnd").getValue();
+                oModel.Country = this.byId("CD_id_Country").getSelectedKey();
+                oModel.ConLocation = this.byId("CD_id_ConLocation").getSelectedKey();
+                oModel.STDCode = this.byId("CD_id_codeModel").getSelectedKey();
                 oModel.MobileNo = this.byId("CD_id_Mobile").getValue();
-               
-                const bAllFieldsFilled = oModel.AgreeDate && oModel.CName && oModel.Address && oModel.Email && oModel.EndClientHirer 
-                   &&  oModel.Amount && oModel.HiringContact && oModel.Datestart && oModel.DateEnd && oModel.MobileNo;
-            
+
+                // Include Country and ConLocation in field check
+                const bAllFieldsFilled = oModel.AgreeDate && oModel.CName && oModel.Address && oModel.ConsultingService && oModel.Email &&
+                    oModel.EndClientHirer && oModel.Amount && oModel.HiringContact && oModel.Datestart && oModel.DateEnd &&  oModel.Country && oModel.ConLocation && oModel.STDCode && oModel.MobileNo;
+
                 if (bAllFieldsFilled) {
-                    // Run all validations
+                    // Run validations with correct chaining using &&
                     let bValid =
                         utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_ConsultingService"), "ID") &&
                         utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
-                        utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID");
+                        utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") &&
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
-                        utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") && 
+                        utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CD_id_ConLocation"), "ID") &&
-                        utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID") 
-                       
+                        utils._LCvalidateMandatoryField(this.byId("CD_id_codeModel"), "ID") &&
+                        utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID");
+
                     // Set wizard step validation
                     this.byId("CD_id_Wizard").getSteps()[0].setValidated(bValid);
                 } else {
@@ -362,7 +378,7 @@ sap.ui.define([
                     this.byId("CD_id_Firststep").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
                 }
             },
-            
+  
             //radio button select function
             RadioButtonSelect: function (oEvent) {
                 var oModel = this.getView().getModel("ContractModelWizart");
@@ -418,7 +434,7 @@ sap.ui.define([
                             "ConsultantName": oModel.oData.ConsultantName,
                             "ConsultantAddress": oModel.oData.ConsultantAddress,
                             "EndClient": oModel.oData.EndClientHirer,
-                            "ConsultingService": "Contractor",
+                            "ConsultingService": oModel.oData.ConsultingService,
                             "LocationService": oModel.oData.Location,
                             "ContractStatus": oModel.oData.AssignmentStatus,
                             "AssignmentStartDate": oModel.oData.StartDate.split("/").reverse().join("-"),
@@ -577,6 +593,7 @@ sap.ui.define([
                     utils._LCvalidateEmail(this.byId("CU_id_ContractEmailID"), "ID") &&
                     utils._LCvalidateDate(this.byId("CU_id_AgreementDate"), "ID") &&
                     utils._LCvalidateMandatoryField(this.byId("CU_id_ContractAddress"), "ID") &&
+                    utils._LCvalidateName(this.byId("CU_id_Role"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_EndClient"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CD_id_contractStatus"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_ClientReportContact"), "ID") &&
@@ -851,6 +868,7 @@ sap.ui.define([
                 oPDFModel.setProperty("/ClientCompanyAddress", oEmpModel.ConsultantAddress);
                 oPDFModel.setProperty("/ClientCompanyName", oEmpModel.EndClient);
                 oPDFModel.setProperty("/ConsultingService", oEmpModel.ConsultingService);
+                oPDFModel.setProperty("/ClientRole", oEmpModel.ConsultingService);
                 oPDFModel.setProperty("/LocationService", oEmpModel.LocationService);
                 oPDFModel.setProperty("/ContractStatus", oEmpModel.ContractStatus);
                 oPDFModel.setProperty("/AgreementStartDate", Formatter.formatDate(oEmpModel.AssignmentStartDate));
