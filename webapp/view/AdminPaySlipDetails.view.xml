@@ -1,175 +1,248 @@
-<mvc:View controllerName="sap.kt.com.minihrsolution.controller.AdminPaySlipDetails"
-	xmlns:mvc="sap.ui.core.mvc" 
+<mvc:View
+    controllerName="sap.kt.com.minihrsolution.controller.AdminPaySlipDetails"
+    xmlns:mvc="sap.ui.core.mvc"
     displayBlock="true"
-	xmlns:f="sap.ui.layout.form"
-	xmlns="sap.uxap"
-	xmlns:g="sap.f"
-	xmlns:core="sap.ui.core"
-	xmlns:layout="sap.ui.layout"
-	xmlns:m="sap.m">
-	<m:Page title="{i18n>paySlipTitle}" navButtonPress="APD_onPressBack" showNavButton="true">
-		<ObjectPageLayout id="APD_id_NavAdmin"  enableLazyLoading="true"
+    xmlns:f="sap.ui.layout.form"
+    xmlns="sap.uxap"
+    xmlns:g="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:m="sap.m"
+>
+    <m:Page
+        title="{i18n>paySlipTitle}"
+        navButtonPress="APD_onPressBack"
+        showNavButton="true"
+    >
+        <ObjectPageLayout
+            id="APD_id_NavAdmin"
+            enableLazyLoading="true"
             useIconTabBar="false"
-            class="sapUiSmallmarginResponsive">
-			<sections>
-				<ObjectPageSection id="APD_id_First">
-					<subSections>
-						<ObjectPageSubSection>
-							<blocks>
-								<m:VBox>
-									<m:HBox justifyContent="Start" alignItems="Center" width="100%">
-										<m:Label text="{i18n>selectID}" class="sapUiSmallMarginEnd" />
-										<m:ComboBox showSecondaryValues="true" id="APD_id_Employee" change="onEmployeeIDChange" 
-											items="{Employeemodel>/employees}" 
-											class="sapUiSmallMarginEnd">
-											<core:ListItem key="{Employeemodel>key}" text="{Employeemodel>key}" additionalText="{Employeemodel>text}"/>
-										</m:ComboBox>
-										<m:Label text="{i18n>selectMonth}" class="sapUiSmallMarginEnd" />
-										<m:ComboBox showSecondaryValues="true" id="APD_id_Month" items="{MonthsModel>/results}" value="{payrollModel>/Month}" change="onMonthChange" class="sapUiSmallMarginEnd"  editable="false">
-											<core:Item key="{MonthsModel>ID}" text="{MonthsModel>Month}" />
-										</m:ComboBox>
-										<m:Label text="{i18n>year}" class="sapUiSmallMarginEnd" />
-										<m:DatePicker width="50%" id="APD_id_Payroll" value="{path: 'payrollModel>/Year', type: 'sap.ui.model.type.String'}"
-                                         displayFormat="yyyy"  class="sapUiSmallMarginEnd" editable="false"/>
-									</m:HBox>
-								</m:VBox>
-							</blocks>
-						</ObjectPageSubSection>
-						<ObjectPageSubSection title="{i18n>employeedetails}">
-							<blocks>
-								<m:VBox>
-									<m:HBox>
-										<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" columnsXL="3" columnsL="3" columnsM="3">
-											<f:content>
-												<m:Label text="{i18n>employeeIDAndEmployeeName}" />
-												<m:Text text="{payrollModel>/ID} - {payrollModel>/EmployeeName}" />
-												<m:Label text="{i18n>baseLocation}" />
-												<m:Text text="{payrollModel>/BaseLocation}" />
-												<m:Label text="{i18n>bankName}" />
-												<m:Text text="{payrollModel>/BankName}" />
-												<m:Label text="{i18n>accountNo}" />
-												<m:Text text="{payrollModel>/AccountNo}" />
-												<m:Label text="{i18n>payableDays}" />
-												<m:Text text="{payrollModel>/PayableDays}"/>
-												<m:Label text="{i18n>PAN}"/>
-												<m:Text text="{payrollModel>/PAN}" />
-												<m:Label text="{i18n>department}" />
-												<m:Text text="{payrollModel>/Designation}" />
-												<m:Label text="{i18n>role}" />
-												<m:Text text="{payrollModel>/Role}" />
-												<m:Label text="{i18n>joiningDate}" />
-												<m:Text text="{payrollModel>/AppraisalDate}"/>
-											</f:content>
-										</f:SimpleForm>
-									</m:HBox>
-								</m:VBox>
-							</blocks>
-						</ObjectPageSubSection>
-						<!-- Salary Details SubSection -->
-						<ObjectPageSubSection title="{i18n>salaryDetailsEmployee}">
-							<m:VBox class="sapUiSmallMargin">
-								<!-- GridContainer for Tables -->
-								<g:GridContainer columnsChange=".onGridColumnsChange">
-									<g:layout>
-										<g:GridContainerSettings columnSize="49.5%" gap="10px" />
-									</g:layout>
-									<g:layoutXS>
-										<g:GridContainerSettings columnSize="100%" gap="10px" />
-									</g:layoutXS>
-									<g:layoutS>
-										<g:GridContainerSettings columnSize="100%" gap="10px" />
-									</g:layoutS>
-									<g:layoutM>
-										<g:GridContainerSettings columnSize="100%" gap="10px" />
-									</g:layoutM>
-									<!-- Earnings Table -->
-									<m:VBox class="sapUiSmallMargin">
-										<m:Toolbar>
-											<m:ToolbarSpacer />
-											<m:Button type="Transparent" icon="sap-icon://add" tooltip="{i18n>addSalaryField}" press="APD_onAddSalaryField" />
-											<m:ToolbarSeparator />
-										</m:Toolbar>
-										<m:Table id="APD_id_SalaryTable" items="{EarningModel>/SalaryFields}" mode="Delete" delete="onPressDeleteSalaryFields">
-											<m:columns>
-												<m:Column minScreenWidth="Tablet" demandPopin="true">
-													<m:Text text="{i18n>desc}" />
-												</m:Column>
-												<m:Column minScreenWidth="Tablet" demandPopin="true">
-													<m:Text text="{i18n>amount}" />
-												</m:Column>
-												<m:Column minScreenWidth="Tablet" demandPopin="true">
-													<m:Text text="{i18n>yearlyAmount}" />
-												</m:Column>
-											</m:columns>
-											<m:items>
-												<m:ColumnListItem>
-													<m:cells>
-														<m:Input value="{EarningModel>Description}" maxLength="25" editable="{= ${EarningModel>Flag} === true }" />
-														<m:Input value="{EarningModel>Amount}" change="onEarningAmountChange" textAlign="End" type="Number" />
-														<m:Input value="{EarningModel>Year}" editable="false" textAlign="End" />
-													</m:cells>
-												</m:ColumnListItem>
-											</m:items>
-										</m:Table>
-										<m:HBox class="customEarningBox" width="100%">
-											<m:Text class="boldBlackText" text="{i18n>totalEarningAmount} :" textAlign="End" />
-											<m:Text class="boldBlackText" text="{path:'EarningModel>/TotalEarningMonth', formatter: '.Formatter.numberFormater'}" textAlign="End" />
-											<m:Text class="boldBlackText" text="{path:'EarningModel>/TotalEarningYearly', formatter: '.Formatter.numberFormater'}" textAlign="End" />
-										</m:HBox>
-									</m:VBox>
-									<!-- Deductions Table -->
-									<m:VBox class="sapUiSmallMargin">
-										<m:Toolbar>
-											<m:ToolbarSpacer />
-											<m:Button type="Transparent" icon="sap-icon://add" tooltip="{i18n>addDeductionField}" press="APD_onAddDeductionField" />
-											<m:ToolbarSeparator />
-										</m:Toolbar>
-										<m:Table items="{DeductionModel>/DeductionFields}" mode="Delete" delete="onPressDeleteDeductionFields">
-											<m:columns>
-												<m:Column minScreenWidth="Tablet" demandPopin="true">
-													<m:Text text="{i18n>desc}" />
-												</m:Column>
-												<m:Column minScreenWidth="Tablet" demandPopin="true">
-													<m:Text text="{i18n>amount}" />
-												</m:Column>
-												<m:Column minScreenWidth="Tablet" demandPopin="true">
-													<m:Text text="{i18n>yearlyAmount}" />
-												</m:Column>
-											</m:columns>
-											<m:items>
-												<m:ColumnListItem>
-													<m:cells>
-														<m:Input value="{DeductionModel>Description}" maxLength="25" editable="{= ${DeductionModel>Flag} === true }"/>
-														<m:Input value="{DeductionModel>Amount}" change="onDeductionAmountChange" textAlign="End" type="Number"/>
-														<m:Input value="{DeductionModel>Year}" editable="false" textAlign="End" />
-													</m:cells>
-												</m:ColumnListItem>
-											</m:items>
-										</m:Table>
-										<m:HBox class="customDeductionBox" width="100%">
-											<m:Text class="boldBlackText" text="{i18n>totalDeductionAmount} :" textAlign="End" />
-											<m:Text class="boldBlackText" text="{path:'DeductionModel>/TotalDeductionMonth', formatter: '.Formatter.numberFormater'}" textAlign="Right" />
-											<m:Text class="boldBlackText" text="{path:'DeductionModel>/TotalDeductionYearly', formatter: '.Formatter.numberFormater'}" textAlign="Right" />
-										</m:HBox>
-									</m:VBox>
-								</g:GridContainer>
-								<m:HBox class="customNetPayBox" width="100%">
-									<m:Text text="Net Pay ( INR ) :  {path: 'DeductionModel>/totalNetPay', formatter: '.Formatter.numberFormater'} ({DeductionModel>/totalNetPayText})"
-                                    class="boldBlackText" width="100%" />
-								</m:HBox>
-							</m:VBox>
-						</ObjectPageSubSection>
-					</subSections>
-				</ObjectPageSection>
-			</sections>
-		</ObjectPageLayout>
-		<m:footer>
-		<m:Toolbar>
-			 <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
-				<m:ToolbarSpacer/>
-				<m:Button text="{i18n>submit}" type="Emphasized" press="APD_onPressSubmit" class="sendMail"/>
-				<m:Button text="{i18n>jsPdf}" press="APD_onPressGeneratePdf" class="sapUiSmallMarginBeginEnd" visible="false"/>
-			</m:Toolbar>
-		</m:footer>
-	</m:Page>
+            class="sapUiSmallmarginResponsive"
+            upperCaseAnchorBar="false"
+            showHeaderContent="true"
+        >
+            <headerTitle>
+                <ObjectPageDynamicHeaderTitle visible="true">
+                    <expandedHeading>
+                        <m:Title
+                            text="{payrollModel>/EmployeeName}"
+                            wrapping="true"
+                        />
+                    </expandedHeading>
+
+                    <snappedHeading>
+                        <m:Title
+                            text="{payrollModel>/EmployeeName}"
+                            wrapping="true"
+                        />
+                    </snappedHeading>
+
+                    <expandedContent>
+                        <m:Text text="{payrollModel>/ID}" />
+                    </expandedContent>
+
+                    <snappedContent>
+                        <m:Text text="{payrollModel>/ID}" />
+                    </snappedContent>
+                </ObjectPageDynamicHeaderTitle>
+            </headerTitle>
+
+            <headerContent>
+                <m:FlexBox
+                    busyIndicatorDelay="0"
+                    id="QF_id_Header"
+                    wrap="Wrap"
+                    fitContainer="true"
+                >
+                    <m:Avatar
+                        class="sapUiLargeMarginEnd"
+                        displayShape="Circle"
+                        displaySize="L"
+                        src="../image/logo.jpg"
+                    />
+
+                    <layout:VerticalLayout class="sapUiSmallMarginEnd">
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>baseLocation}" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{payrollModel>/BaseLocation}"
+                            />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>role}" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{payrollModel>/Role}"
+                            />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>department}" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{payrollModel>/Designation}"
+                            />
+                        </layout:HorizontalLayout>
+                    </layout:VerticalLayout>
+
+                    <layout:VerticalLayout
+                        class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom sapUiMediumMarginEnd sapUiSmallMarginBottom"
+                    >
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>bankName}" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{payrollModel>/BankName}"
+                            />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>accountNo}" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{payrollModel>/AccountNo}"
+                            />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>PAN}" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{payrollModel>/PAN}"
+                            />
+                        </layout:HorizontalLayout>
+                    </layout:VerticalLayout>
+
+                    <layout:VerticalLayout
+                        class="sapUiTinyMarginBottom sapUiSmallMarginBegin"
+                    >
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>payableDays}" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{payrollModel>/payableDays}"
+                            />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>joiningDate}" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{payrollModel>/joiningDate}"
+                            />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>monthAndYear}" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{payrollModel>/monthAndYear}"
+                            />
+                        </layout:HorizontalLayout>
+                    </layout:VerticalLayout>
+                </m:FlexBox>
+            </headerContent>
+            <sections>
+                <ObjectPageSection id="APD_id_First" showTitle="false">
+                    <subSections>
+                        <ObjectPageSubSection title="{i18n>selectID}">
+                            <f:SimpleForm
+                                editable="true"
+                                layout="ColumnLayout"
+                                labelSpanXL="4"
+                                labelSpanL="3"
+                                labelSpanM="4"
+                                labelSpanS="12"
+                                columnsXL="4"
+                                columnsL="4"
+                                columnsM="2"
+                            >
+                                <f:content>
+                                    <m:Label text="{i18n>employeeID}" />
+                                    <m:ComboBox
+                                        showSecondaryValues="true"
+                                        id="APD_id_Employee"
+                                        change="onEmployeeIDChange"
+                                        items="{Employeemodel>/employees}"
+                                    >
+                                        <core:ListItem
+                                            key="{Employeemodel>key}"
+                                            text="{Employeemodel>key}"
+                                            additionalText="{Employeemodel>text}"
+                                        />
+                                    </m:ComboBox>
+                                    <!-- <m:Label text="{i18n>selectMonth}" />
+                                    <m:ComboBox
+                                        showSecondaryValues="true"
+                                        id="APD_id_Month"
+                                        items="{MonthsModel>/results}"
+                                        value="{payrollModel>/Month}"
+                                        change="onMonthChange"
+                                        editable="false"
+                                    >
+                                        <core:Item
+                                            key="{MonthsModel>ID}"
+                                            text="{MonthsModel>Month}"
+                                        />
+                                    </m:ComboBox> -->
+                                    <m:Label text="{i18n>monthAndYear}" />
+                                    <m:DatePicker
+                                        id="APD_id_Payroll"
+                                        value="{path: 'payrollModel>/Year', type: 'sap.ui.model.type.String'}"
+                                        displayFormat="MM-yyyy"
+                                        editable="true"
+                                    />
+                                </f:content>
+                            </f:SimpleForm>
+                        </ObjectPageSubSection>
+                        <!-- Salary Details SubSection -->
+                        <ObjectPageSubSection
+                            title="{i18n>salaryDetailsEmployee}"
+                        >
+                            <core:Fragment
+                                fragmentName="sap.kt.com.minihrsolution.fragment.PaySlipTable"
+                                type="XML"
+                            />
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+            </sections>
+        </ObjectPageLayout>
+        <m:footer>
+            <m:Toolbar>
+                <core:Fragment
+                    fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
+                    type="XML"
+                />
+                <m:ToolbarSpacer />
+                <m:Button
+                    text="{i18n>submit}"
+                    type="Emphasized"
+                    press="APD_onPressSubmit"
+                    class="sendMail"
+                />
+                <m:Button
+                    text="{i18n>jsPdf}"
+                    press="APD_onPressGeneratePdf"
+                    class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                    visible="false"
+                />
+            </m:Toolbar>
+        </m:footer>
+    </m:Page>
 </mvc:View>

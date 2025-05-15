@@ -707,9 +707,6 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 const backImgY = (pageHeight - 100) / 2; // Center vertically
 
                 doc.addImage(oCompanyModel.companylogo64, "PNG", margin, topMargin - 10, 45, 45);
-                doc.setGState(new doc.GState({ opacity: 0.1 }));
-                doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
-                doc.setGState(new doc.GState({ opacity: 1 }));
 
                 let coAlignment = { maxWidth: 70, align: "right" };
                 let coNameY = topMargin;
@@ -811,6 +808,9 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                             margin: 0;
                             padding: 0;
                             }
+                            li::marker {
+                                vertical-align: middle;
+                            }
                             ul,
                             li {
                                 padding-left: 3px;
@@ -820,9 +820,6 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                             li {
                                 padding-left: 3px;
                                 margin-left: 5px;
-                            }
-                            li::marker {
-                            vertical-align: middle; !important;
                             }
                         </style>
                         `;
@@ -840,17 +837,32 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 container.style.padding = "0";
                 document.body.appendChild(container);
 
+                let rteY;
+                let estRteY = 68;
+                let isNextPage = false;
+                if (bottomLimit - totalAmountY < estRteY) {
+                    rteY = pageHeight + margin;
+                    isNextPage = true;
+                    doc.setGState(new doc.GState({ opacity: 0.1 }));
+                    doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
+                    doc.setGState(new doc.GState({ opacity: 1 }));
+                }
+                else rteY = totalAmountY + 3;
                 doc.html(container, {
                     x: margin,
-                    y: pageHeight + margin,
+                    y: rteY,
                     html2canvas: { scale: 0.5 },
                     callback: function (doc) {
-                        doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+                        if (isNextPage) doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+                        doc.setGState(new doc.GState({ opacity: 0.1 }));
+                        doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
+                        doc.setGState(new doc.GState({ opacity: 1 }));
                         doc.save("PO.pdf");
                         that.closeBusyDialog();
                         document.body.removeChild(container);
                     }
                 });
+
 
             }, 1000);
         }

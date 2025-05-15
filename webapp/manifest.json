@@ -212,6 +212,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TravelAllowance.json",
                 "preload": true
+            },
+            "PaySlip": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/PaySlip.json",
+                "preload": true
             }
         },
         "resources": {
