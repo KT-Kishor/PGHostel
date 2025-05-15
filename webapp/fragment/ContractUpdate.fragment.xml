@@ -146,11 +146,11 @@
 										   
 										<m:Label text="{i18n>mobileNo}" required="true" />
 										<m:ComboBox selectedKey="{oFilteredContractModel>/STDCode}" showSecondaryValues="true" change="CD_ValidateComboBox"
-                                        id="CU_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}" editable="{simpleForm>/editable}">
+                                        id="CU_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}" editable="{simpleForm>/Status}">
 										<core:ListItem key="{codeModel>calling_code}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
 										</m:ComboBox>
 
-										<m:Input value="{oFilteredContractModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="10" id="CU_id_Mobile" valueStateText="{i18n>mobileNoValueState}" editable="{simpleForm>/editable}" />
+										<m:Input value="{oFilteredContractModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="10" id="CU_id_Mobile" valueStateText="{i18n>mobileNoValueState}" editable="{simpleForm>/Status}" />
 
 										<m:Label text="Comments" />
 										<m:TextArea  value="{oFilteredContractModel>/Comments}" id="CU_id_Comments" editable="{simpleForm>/Status}" valueStateText="{i18n>commentsValueState}"  maxLength="100"/>
@@ -169,6 +169,7 @@
 					<m:Button text="{i18n>tileFooter}" id="CU_id_Mail" press="CUD_onSendEmail" visible="{ContractStatus>/status}" type="Ghost"/>
 					<m:Button text="{= ${viewModel>/isEditMode} ? ${i18n>save} : ${i18n>edit} }" press=".onEditOrSavePress" visible="{ContractStatus>/status}" type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"/>
 					<m:Button text="{i18n>GeneratePDF}" id="CU_id_Merge" press="onPressMerge" visible="{ContractStatus>/status}" type="Attention"/>
+					<m:Button text="{i18n>activate}" id="CU_id_ActivateBtn" press="CU_id_ActivatePress" visible="{= !${ContractStatus>/status} }" type="Emphasized"/>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

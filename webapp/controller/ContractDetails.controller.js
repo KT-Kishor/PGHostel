@@ -330,6 +330,11 @@ sap.ui.define([
                 }
             },
 
+            CU_id_ActivatePress: function () {
+                this.getView().getModel("ContractStatus").setProperty("/status", true);
+                this.onEditOrSavePress();
+            },
+
            validateStep: function () {
                 var oModel = this.getView().getModel("ContractModelWizart").getData();
 
