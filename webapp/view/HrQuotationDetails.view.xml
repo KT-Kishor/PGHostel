@@ -40,12 +40,7 @@
                                     columnsM="1"
                                 >
                                     <f:content>
-                                        <m:Label text="{i18n>quotationNo}" />
-                                        <m:Input
-                                            id="HQD_id_QuotationNoFilter"
-                                            value="{QuotationModel>/QuotationNo}"
-                                            editable="false"
-                                        />
+                                       
                                         <m:Label
                                             text="{i18n>date}"
                                             required="true"
@@ -77,7 +72,7 @@
                                             required="true"
                                         />
                                         <m:Input
-                                            value="{QuotationModel>/CompanyName}"
+                                            value="{SingleCompanyModel>/companyName}"
                                             id="HQD_id_InputCompanyName"
                                             liveChange="HQD_onNameLiveChange"
                                             valueStateText="{i18n>placeName}"
@@ -117,7 +112,7 @@
                                             required="true"
                                         />
                                         <m:Input
-                                            value="{QuotationModel>/CompanyEmailID}"
+                                            value="{SingleCompanyModel>/carrerEmail}"
                                             id="HQD_id_CompanyEmailID"
                                             liveChange="HQD_EmailIDLiveChange"
                                             editable="{visiablityPlay>/editable}"
@@ -149,7 +144,7 @@
                                             required="true"
                                         />
                                         <m:TextArea
-                                            value="{QuotationModel>/CompanyAddress}"
+                                            value="{SingleCompanyModel>/longAddress}"
                                             id="HQD_id_InputCompanyAddress"
                                             liveChange="HQD_onAddressLiveChange"
                                             rows="2"
@@ -159,7 +154,7 @@
                                         />
                                         <m:Label text="{i18n>companyGSTNO}" />
                                         <m:Input
-                                            value="{QuotationModel>/CompanyGSTNO}"
+                                            value="{SingleCompanyModel>/gstin}"
                                             id="HQD_id_CompGSTNO"
                                             liveChange="HQD_onComGSTLiveChange"
                                             valueStateText="{i18n>gstNoValueState}"
@@ -169,32 +164,40 @@
                                         />
                                         <m:Label
                                             text="{i18n>type}"
-                                            required="{QuotationModel>/GSTValid}"
+                                            required="true"
                                         />
-                                        <m:CheckBox
-                                            text="{i18n>cgst}"
-                                            id="HQD_id_CheckboxCGS"
-                                            selected="{QuotationModel>/CGSTSelected}"
-                                            select="onSelectCGST"
-                                            editable="{QuotationModel>/GSTValid}"
-                                        />
-                                        <m:CheckBox
-                                            text="{i18n>igst}"
-                                            id="HQD_id_CheckboxIGS"
-                                            selected="{QuotationModel>/IGSTSelected}"
-                                            select="onSelectIGST"
-                                            editable="{QuotationModel>/GSTValid}"
-                                        />
-                                        <m:Label
-                                            text="{i18n>percentage}"
-                                            required="{QuotationModel>/GSTValid}"
-                                        />
-                                        <m:Input
-                                            value="{QuotationModel>/Percentage}"
-                                            liveChange="HQD_onPercentageChange"
-                                            editable="{QuotationModel>/GSTValid}"
-                                            maxLength="10"
-                                        />
+                                       <m:RadioButton
+    text="{i18n>cgst}"
+    id="HQD_id_CheckboxCGS"
+    selected="{QuotationModel>/CGSTSelected}"
+    select="onSelectCGST"
+    editable="{QuotationModel>/GSTValid}"
+    visible="{QuotationModel>/ShowGSTFields}"
+/>
+
+<m:RadioButton  
+    text="{i18n>igst}"
+    id="HQD_id_CheckboxIGS"
+    selected="{QuotationModel>/IGSTSelected}"
+    select="onSelectIGST"
+    editable="{QuotationModel>/GSTValid}"
+    visible="{QuotationModel>/ShowGSTFields}"
+/>
+
+<m:Label
+    text="{i18n>percentage}"
+    required="{QuotationModel>/GSTValid}"
+    visible="{QuotationModel>/ShowGSTFields}"
+/>
+
+<m:Input
+    value="{QuotationModel>/Percentage}"
+    liveChange="HQD_onPercentageChange"
+    editable="{QuotationModel>/GSTValid}"
+    maxLength="10"
+    visible="{QuotationModel>/ShowGSTFields}"
+/>
+
                                         <m:Label
                                             text="{i18n>currency}"
                                             required="true"
@@ -295,6 +298,7 @@
                                 </f:SimpleForm>
                             </blocks>
                         </ObjectPageSubSection>
+
                         <ObjectPageSubSection
                             titleUppercase="false"
                             title="{i18n>quotationItemDetails}"
@@ -318,8 +322,8 @@
                                                 />
                                                 <m:ToolbarSpacer />
                                                 <m:Button
+                                                text="{i18n>add}"
                                                     visible="{visiablityPlay>/invBtn}"
-                                                    icon="sap-icon://add"
                                                     tooltip="{i18n>addItem}"
                                                     press="HQD_onPressAddQuotationItem"
                                                     type="Emphasized"
@@ -332,13 +336,13 @@
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
-                                                        value='{"columnKey": "SNo", "leadingProperty": "SNo", "sortProperty": "SNo", "filterProperty": "SNo", "columnIndex": 1}'
+                                                        value='{"columnKey": "SNo", "leadingProperty": "SNo", "sortProperty": "SNo", "filterProperty": "SNo", "columnIndex": 1}'    
                                                     />
                                                 </m:customData>
-                                                <m:Text text="{i18n>siNo}" />
+                                                <m:Text text="{i18n>sNo}" />
                                             </m:Column>
-                                            <m:Column width="300px">
-                                                <m:customData>
+                                            <m:Column width="300px" visible="false">
+                                                <m:customData >
                                                     <core:CustomData
                                                         key="p13nData"
                                                         value='{"columnKey": "Item", "leadingProperty": "Item", "sortProperty": "Item", "filterProperty": "Item", "columnIndex": 2}'
@@ -632,26 +636,29 @@
                 <m:Button
                     visible="{visiablityPlay>/createVisi}"
                     text="{i18n>submit}"
-                    type="Emphasized"
+                    type="Accept"
                     press="HQD_onPressSubmit"
                     class="sendMail"
                 />
-                <m:Button
+                <!-- <m:Button
                     visible="{visiablityPlay>/editVisi}"
                     text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"
                     press="HQD_onPressEdit"
                     class="sendMail"
-                />
+                    
+                /> -->
                 <m:Button
-                    text="{i18n>buttonSendEmail}"
+                    text="{i18n>tileFooter}"
                     id="HQD_id_QuotationMail"
                     press="HQD_onPressSendEmail"
                     visible="{visiablityPlay>/merge}"
+                    type="Ghost"
                 />
                 <m:Button
                     text="{i18n>jsPdf}"
                     press="HQD_onPressMerge"
                     visible="{visiablityPlay>/merge}"
+                    type="Attention"
                 />
             </m:Toolbar>
         </m:footer>

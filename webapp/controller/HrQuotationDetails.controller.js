@@ -4,8 +4,9 @@ sap.ui.define(
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "../model/formatter",
+    "sap/m/MessageToast",
   ],
-  function (BaseController, utils, JSONModel, Formatter) {
+  function (BaseController, utils, JSONModel, Formatter, MessageToast) {
     "use strict";
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.RouteHrQuotationDetails", {
@@ -32,23 +33,47 @@ sap.ui.define(
         var oModel = new JSONModel(QuotaionModel);
         this.getView().setModel(oModel, "quotation");
         var oQuotationModel = new JSONModel();
-        oQuotationModel.setData({ Date: this.Formatter.formatDate(new Date()),
-         Country: "India",
-        STDCode: "+91"
+        oQuotationModel.setData({
+          Date: this.Formatter.formatDate(new Date()),
+          Country: "India",
+          STDCode: "+91"
         })
         this.getView().setModel(oQuotationModel, "QuotationModel");
         this.getRouter().getRoute("RouteHrQuotationDetails").attachMatched(this._onRouteMatched, this);
       },
       _onRouteMatched: async function (oEvent) {
+        var LoginFunction = await this.commonLoginFunction("HrQuotation");
+        if (!LoginFunction) return;
+        this.getBusyDialog();
         await this._fetchCommonData("Currency", "CurrencyModel");
         await this._fetchCommonData("Country", "CountryModel");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-        this._fetchCommonData("Quotation", "QuotationPDFModel", {})
 
+        await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
+        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
+
+        var oCompanyDetails = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+
+        if (oCompanyDetails) {
+          var oSingleCompanyModel = new sap.ui.model.json.JSONModel(oCompanyDetails);
+          this.getView().setModel(oSingleCompanyModel, "SingleCompanyModel");
+        }
+        var oQuotationModel = this.getView().getModel("QuotationModel");
+        oQuotationModel.setProperty("/ShowGSTFields", false);
+        this.closeBusyDialog()
       },
 
+
       HQD_onCountryChange: function (oEvent) {
-        this.onCountryChange(oEvent, { stdCodeCombo: "HQD_id_STDCode" });
+        utils._LCstrictValidationComboBox(oEvent, "oEvent");
+        if (oEvent.getSource().getValue() === '') {
+          oEvent.getSource().setValueState("None")
+        }
+        var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+
+        var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+        this.byId("HQD_id_STDCode").setValue("");
+        this.byId("HQD_id_InputCompanyMobileNo").setValue("");
       },
 
       HQD_onChangeGstNo: function (oEvent) {
@@ -105,7 +130,7 @@ sap.ui.define(
       },
 
       HQD_onNameLiveChange: function (oEvent) {
-        utils._LCvalidateMandatoryField(oEvent)
+        utils._LCvalidateName(oEvent);
       },
 
       HQD_onMNumberLiveChange: function (oEvent) {
@@ -113,12 +138,13 @@ sap.ui.define(
       },
 
       HQD_EmailIDLiveChange: function (oEvent) {
-        utils._LCvalidateEmail(oEvent)
+        utils._LCvalidateEmail(oEvent);
+
       },
 
-      HQD_onCountryChange: function (oEvent) {
-        utils._LCstrictValidationComboBox(oEvent)
-      },
+      // HQD_onCountryChange: function (oEvent) {
+      //   utils._LCstrictValidationComboBox(oEvent)
+      // },
 
       HQD_onAddressLiveChange: function (oEvent) {
         utils._LCvalidateMandatoryField(oEvent)
@@ -142,11 +168,26 @@ sap.ui.define(
       },
 
       HQD_onCurrencyChange: function (oEvent) {
-        utils._LCstrictValidationComboBox(oEvent)
+        utils._LCstrictValidationComboBox(oEvent); // Your existing validation
+
+        var sSelectedCurrency = oEvent.getSource().getSelectedKey();
+        var oQuotationModel = this.getView().getModel("QuotationModel");
+
+        if (sSelectedCurrency === "INR") {
+          oQuotationModel.setProperty("/ShowGSTFields", true);
+          oQuotationModel.setProperty("/CGSTSelected", true);
+        } else {
+          oQuotationModel.setProperty("/ShowGSTFields", false);
+
+          // Optionally clear values when hiding
+          // oQuotationModel.setProperty("/CGSTSelected", false);
+          // oQuotationModel.setProperty("/IGSTSelected", false);
+          // oQuotationModel.setProperty("/Percentage", "");
+        }
       },
 
       HQD_onCustomerNameLiveChange: function (oEvent) {
-        utils._LCvalidateMandatoryField(oEvent)
+        utils._LCvalidateName(oEvent);
       },
 
       HQD_EmailIDLiveChange: function (oEvent) {
@@ -161,7 +202,7 @@ sap.ui.define(
         utils._LCvalidateMandatoryField(oEvent)
       },
 
-      HQD_onCustomerGSTLiveChange:function(oEvent){
+      HQD_onCustomerGSTLiveChange: function (oEvent) {
         utils._LCvalidateGstNumber(oEvent)
       },
 
@@ -194,7 +235,7 @@ sap.ui.define(
         // var oView = this.getView();
         // var oData = oView.getModel("quotation").getData();
 
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
+        ;
         var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0")
         var sData = this.getView().getModel("quotation").getData();
         var oData = this.getView().getModel("QuotationPDFModel").getProperty("/1")
@@ -309,8 +350,59 @@ sap.ui.define(
         doc.text(oData.Notes, 13, termsY + 5, { maxWidth: 180 });
 
         doc.save("Quotation.pdf");
+      },
+
+      HQD_onPressAddQuotationItem: function () {
+        // Get the model and existing items array
+        var oModel = this.getView().getModel("QuotationModel");
+        var aItems = oModel.getProperty("/QuotationItemModel") || [];
+
+        // Create new item object with default values
+        var oNewItem = {
+          IndexNo: aItems.length + 1,
+          Item: "",
+          Description: "",
+          SAC: "",
+          GSTCalculation: "No",
+          Days: "",
+          UnitPrice: "",
+          Discount: "",
+          Total: "0.00"
+        };
+
+        // Add to the array
+        aItems.push(oNewItem);
+
+        // Set the updated array back to the model
+        oModel.setProperty("/QuotationItemModel", aItems);
+      },
+
+
+      HQD_onPressDelete: function (oEvent) {
+        this.byId("HQD_id_SmartTableQuotationItem").setBusy(true);
+        var that = this;
+        this.showConfirmationDialog(
+          this.i18nModel.getText("msgBoxConfirm"),
+          this.i18nModel.getText("commonMesBoxConfirmDelete"),
+          async function () {
+            that.byId("HQD_id_SmartTableQuotationItem").setBusy(true);
+            const QuotationItem = oEvent.getSource().getBindingContext("ExpenseModel").getObject().SlNo;
+            try {
+              await that.ajaxDeleteWithJQuery("/Expense", { filters: { SlNo: QuotationItem } });
+              MessageToast.show(that.i18nModel.getText("expenseDeleteMess")); // <== use 'that' instead of 'this'
+              that.onChangeEmployeeID();
+              that.Exp_onSearch();
+            } catch (error) {
+              MessageToast.show(error.responseText || "Error deleting Quotation item");
+            } finally {
+              that.byId("HQD_id_SmartTableQuotationItem").setBusy(false);
+            }
+          },
+          function () { that.byId("HQD_id_SmartTableQuotationItem").setBusy(false); })
       }
     }
+
+
 
     )
   });

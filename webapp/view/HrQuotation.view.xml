@@ -41,7 +41,7 @@
                 </fb:filterGroupItems>
             </fb:FilterBar>
             <Table
-                items="{path: 'QuotationModel>/'}"
+                items="{path: 'CompanyQuotationModel>/'}"
                 alternateRowColors="true"
                 busyIndicatorDelay="0"
                 id="HQ_id_QuotationItemTable"
@@ -56,6 +56,7 @@
                             text="{i18n>create}"
                             tooltip="{i18n>addQuotation}"
                             press="HQ_onPressAddQuotation"
+                            type="Accept"
                         />
                     </OverflowToolbar>
                 </headerToolbar>
@@ -80,14 +81,14 @@
                     </Column>
                 </columns>
                 <items>
-                    <ColumnListItem>
+                    <ColumnListItem type="Navigation" press="HQ_onPressQuotation">
                         <cells>
-                            <Text text="{quotationNo}" />
-                            <Text text="{companyName}" />
-                            <Text text="{date}" />
-                            <Text text="{companyGSTNO}" />
-                            <Text text="{customerName}" />
-                            <Text text="{customerGSTNO}" />
+                            <Text text="{CompanyQuotationModel>QuotationNo}" />
+                            <Text text="{CompanyQuotationModel>CompanyName}" />
+                            <Text text="{CompanyQuotationModel>Date}" />
+                            <Text text="{CompanyQuotationModel>CompanyGSTNO}" />
+                            <Text text="{CompanyQuotationModel>CustomerName}" />
+                            <Text text="{CompanyQuotationModel>CustomerGSTNO}" />
                         </cells>
                     </ColumnListItem>
                 </items>
