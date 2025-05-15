@@ -90,7 +90,7 @@ sap.ui.define([
                     var ContractStatusModel = new JSONModel({ status: false });
                     this.getView().setModel(ContractStatusModel, "ContractStatus");
 
-                    var editable = new JSONModel({ editable: false, Status: false });
+                    var editable = new JSONModel({ editable: false, Status: false, renewStatus: false });
                     this.getView().setModel(editable, "simpleForm");
 
                     var oViewModel = new JSONModel({ isEditMode: false, isVisiable: true, isMerge: true });
@@ -111,6 +111,10 @@ sap.ui.define([
                         } else {
                             this.getView().getModel("ContractStatus").setProperty("/status", false);
                         }
+
+                        if ( this.ContractStatus !== "Renewed") {
+                            this.byId("CU_id_ActivateBtn").setVisible(false);
+                        } 
 
                         var contractModel = new JSONModel(oResult);
                         this.getOwnerComponent().setModel(contractModel, "oFilteredContractModel");
@@ -278,7 +282,6 @@ sap.ui.define([
 
             CD_onBaseLocationChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
-                utils._LCvalidateMandatoryField(oEvent);
                  if (this.sArgPara === "CreateContractFlag") { 
                     this.validateStep();    //  validation if in create flow
                 }
@@ -373,7 +376,7 @@ sap.ui.define([
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CD_id_codeModel"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
                         utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID");
 
                     // Set wizard step validation
@@ -412,7 +415,6 @@ sap.ui.define([
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CD_id_ConLocation"), "ID") &&
                         utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID") 
                     ) {
                         var formattedText;
@@ -507,7 +509,17 @@ sap.ui.define([
                     MessageToast.show(error.message || error.responseText || this.i18nModel.getText("commonErrorMessage"));
                 }
             },
-            
+
+            onChangeContractStatus: function(oEvent) {
+                    var oSelectedItem = oEvent.getSource().getSelectedItem();
+                    var oSelectedValue = oSelectedItem ? oSelectedItem.getText() : "";        
+                    if (oSelectedValue === "Renewed" && this.OldStatus === "Active") {
+                        this.getView().getModel("simpleForm").setProperty("/renewStatus", true);
+                        this.getView().getModel("simpleForm").setProperty("/editable", false);
+                        this.getView().getModel("simpleForm").setProperty("/Status", true);
+                    } 
+                },
+ 
             onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");
                 var isEditMode = oViewModel.getProperty("/isEditMode");
@@ -517,6 +529,7 @@ sap.ui.define([
                     if (this.ContractStatus !== 'Active') {
                         this.getView().getModel("simpleForm").setProperty("/editable", true);
                         this.getView().getModel("simpleForm").setProperty("/Status", true);
+                        this.getView().getModel("simpleForm").setProperty("/renewStatus", true);
                         oViewModel.setProperty("/isEditMode", true);
                         this.byId("CU_id_Merge").setEnabled(false)
                         this.byId("CU_id_Mail").setEnabled(false)
@@ -527,41 +540,6 @@ sap.ui.define([
                         this.byId("CU_id_Mail").setEnabled(false)
                     }
                 }
-            },
-
-            onChangeStartEndDate: function (oEvent) {
-            var oModel = this.getView().getModel("oFilteredContractModel");
-            var oModelData = oModel.getData();
-
-            var endDate = this.AssignmentEndDate.split('/').map(Number);
-            var endDateCreate = new Date(endDate[2], endDate[1] - 1, endDate[0]);
-
-            var today = new Date();
-
-            if (today >= endDateCreate) {
-                if (oEvent.getSource().getValue() === "Renewed" && this.OldStatus === "Active") {
-                    // Assignment Start = previous end date + 1
-                    var oldEndDate = new Date(oModelData.AssignmentEndDate); // This should be a Date
-                    var assignmentStart = new Date(oldEndDate);
-                    assignmentStart.setDate(assignmentStart.getDate() + 1);
-
-                    // Contract Period in months
-                    var oSelect = this.byId("CU_id_WarrantyDate");
-                    var sSelectedKey = oSelect.getSelectedKey(); // e.g., "6 Months"
-                    var contractPeriod = parseInt(sSelectedKey.split(" ")[0], 10);
-                    var assignmentEnd = new Date(assignmentStart);
-                    assignmentEnd.setMonth(assignmentEnd.getMonth() + contractPeriod);
-
-                    // Set Date objects directly to model
-                    oModel.setProperty("/AssignmentStartDate", assignmentStart);
-                    oModel.setProperty("/AssignmentEndDate", assignmentEnd);
-                } else {
-                    oModel.setProperty("/AssignmentStartDate", this.onFormatDate(this.AssignmentStartDate));
-                    oModel.setProperty("/AssignmentEndDate", this.onFormatDate(this.AssignmentEndDate));
-                }
-
-                oModel.refresh(true);
-            }
             },
 
             formatDateToISO: function (dateObj) {
@@ -606,7 +584,6 @@ sap.ui.define([
                     utils._LCstrictValidationComboBox(this.byId("CU_id_Country"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_ContractCity"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_codeModel"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.byId("CU_id_ContractCity"), "ID") &&
                     utils._LCvalidateMobileNumber(this.byId("CU_id_Mobile"), "ID") 
                 );
             
@@ -731,7 +708,7 @@ sap.ui.define([
                 }
             },
 
-            updateContractdata: async function (ContractNo, AgreementNo) {
+           updateContractdata: async function (ContractNo, AgreementNo) {
                 var response = await this.ajaxReadWithJQuery("Contract", { ContractNo: ContractNo, AgreementNo: AgreementNo });
 
                  var oResult = response.data[0];
@@ -747,6 +724,9 @@ sap.ui.define([
                             this.getView().getModel("ContractStatus").setProperty("/status", false);
                         }
 
+                          if ( this.ContractStatus !== "Renewed") {
+                            this.byId("CU_id_ActivateBtn").setVisible(false);
+                        } 
 
                 this.getView().getModel("ContractStatus").setProperty("/status", !(this.ContractStatus === "Inactive" || this.ContractStatus === "Renewed"));
 

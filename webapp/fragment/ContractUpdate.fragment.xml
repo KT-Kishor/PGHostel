@@ -102,23 +102,24 @@
 										</m:RadioButtonGroup>
 										<!-- Contract Status -->
 										<m:Label text="{i18n>contractStatus}" required="true"/>
-										<m:ComboBox value="{oFilteredContractModel>/ContractStatus}" id="CD_id_contractStatus" items="{AssignmentStatus>/assignmentStatus}" editable="{simpleForm>/Status}" change="onChangeStartEndDate" valueStateText="{i18n>combovalueState}">
+										<m:ComboBox value="{oFilteredContractModel>/ContractStatus}" id="CD_id_contractStatus" items="{AssignmentStatus>/assignmentStatus}" editable="{simpleForm>/Status}"
+                                        change="onChangeContractStatus" valueStateText="{i18n>combovalueState}">
 											<core:Item key="{AssignmentStatus>ID}" text="{AssignmentStatus>Value}" />
 										</m:ComboBox>	
 										<!-- Input for Amount -->
 										<m:Label text="{i18n>amount}" required="true" />
-										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>placeAmount}" liveChange="CD_validateAmount"  maxLength="10" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/Status}" />
-										<m:Select  id="CU_id_CurrencySelect" items="{CurrencyModel>/}" selectedKey="{oFilteredContractModel>/Currency}" visible="true" width="100%" class="marginLeft" editable="{simpleForm>/editable}">
+										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>placeAmount}" liveChange="CD_validateAmount"  maxLength="10" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/renewStatus}" />
+										<m:Select  id="CU_id_CurrencySelect" items="{CurrencyModel>/}" selectedKey="{oFilteredContractModel>/Currency}" visible="true" width="100%" class="marginLeft" editable="{simpleForm>/renewStatus}">
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
 											<!-- Contract Period -->
 										<m:Label text="{i18n>contractPeriod}"  />
-										<m:Select id="CU_id_WarrantyDate" selectedKey="{oFilteredContractModel>/ContractPeriod}" items="{ContractPeriod>/ContractPeriod}" editable="{simpleForm>/Status}" >
+										<m:Select id="CU_id_WarrantyDate" selectedKey="{oFilteredContractModel>/ContractPeriod}" items="{ContractPeriod>/ContractPeriod}" editable="{simpleForm>/renewStatus}" >
 											<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 										</m:Select>
 										<!-- Payment Terms -->
 										<m:Label text="{i18n>paymentterms}" ></m:Label>
-										<m:Select selectedKey="{oFilteredContractModel>/PaymentTerms}" items="{ContractpaymentModel>/}" editable="{simpleForm>/editable}">
+										<m:Select selectedKey="{oFilteredContractModel>/PaymentTerms}" items="{ContractpaymentModel>/}" editable="{simpleForm>/editable}" id="CU_id_PaymentTerms">
 											<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 										</m:Select>									
 										<!-- Specific Insurance Requirement -->
@@ -146,7 +147,7 @@
 										   
 										<m:Label text="{i18n>mobileNo}" required="true" />
 										<m:ComboBox selectedKey="{oFilteredContractModel>/STDCode}" showSecondaryValues="true" change="CD_ValidateComboBox"
-                                        id="CU_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}" editable="{simpleForm>/Status}">
+                                        id="CU_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}" editable="{simpleForm>/editable}">
 										<core:ListItem key="{codeModel>calling_code}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
 										</m:ComboBox>
 
