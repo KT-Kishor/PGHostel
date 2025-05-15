@@ -67,6 +67,7 @@ sap.ui.define([
                             Country:"India",
                             contractLocation: "Kalaburagi",
                             STDCode: "+91",
+                            MobileNo:""
                         };
 
                         const oModel = new JSONModel(oData);
@@ -340,26 +341,25 @@ sap.ui.define([
 
            validateStep: function () {
                 var oModel = this.getView().getModel("ContractModelWizart").getData();
-
-                // Get values from fields
-                oModel.AgreeDate = this.byId("CD_id_AgreeDate").getValue();
-                oModel.CName = this.byId("CD_id_CName").getValue();
+                
+                oModel.AgreementDate = this.byId("CD_id_AgreeDate").getValue();
+                oModel.ConsultantName = this.byId("CD_id_CName").getValue();
                 oModel.Address = this.byId("CD_id_Address").getValue();
                 oModel.ConsultingService = this.byId("CD_id_ConsultingService").getValue();
-                oModel.Email = this.byId("CD_id_Email").getValue();
+                oModel.ContarctEmail = this.byId("CD_id_Email").getValue();
                 oModel.EndClientHirer = this.byId("CD_id_EndClientHirer").getValue();
                 oModel.Amount = this.byId("CD_id_Amount").getValue();
-                oModel.HiringContact = this.byId("CD_id_HiringContact").getValue();
-                oModel.Datestart = this.byId("CD_id_Datestart").getValue();
-                oModel.DateEnd = this.byId("CD_id_DateEnd").getValue();
+                oModel.ClientReportContact = this.byId("CD_id_HiringContact").getValue();
+                oModel.StartDate = this.byId("CD_id_Datestart").getValue();
+                oModel.EndDate = this.byId("CD_id_DateEnd").getValue();
                 oModel.Country = this.byId("CD_id_Country").getSelectedKey();
-                oModel.ConLocation = this.byId("CD_id_ConLocation").getSelectedKey();
-                oModel.STDCode = this.byId("CD_id_codeModel").getSelectedKey();
-                oModel.MobileNo = this.byId("CD_id_Mobile").getValue();
+                oModel.contractLocation = this.byId("CD_id_ConLocation").getSelectedKey();
+                oModel.STDCode = this.byId("CD_id_codeModel").getValue();
+                oModel.MobileNo = this.byId("CD_id_Mobile").getValue();                
 
                 // Include Country and ConLocation in field check
-                const bAllFieldsFilled = oModel.AgreeDate && oModel.CName && oModel.Address && oModel.ConsultingService && oModel.Email &&
-                    oModel.EndClientHirer && oModel.Amount && oModel.HiringContact && oModel.Datestart && oModel.DateEnd &&  oModel.Country && oModel.ConLocation && oModel.STDCode && oModel.MobileNo;
+                 const bAllFieldsFilled = oModel.AgreementDate && oModel.ConsultantName && oModel.ConsultantAddress && oModel.ConsultingService && oModel.ContarctEmail &&
+                    oModel.EndClientHirer && oModel.Amount && oModel.ClientReportContact && oModel.StartDate && oModel.EndDate &&  oModel.Country && oModel.contractLocation && oModel.STDCode && oModel.MobileNo;
 
                 if (bAllFieldsFilled) {
                     // Run validations with correct chaining using &&
@@ -664,6 +664,7 @@ sap.ui.define([
                             if (updateResponse.success) {
                                 oView.getModel("simpleForm").setProperty("/editable", false);
                                 oView.getModel("simpleForm").setProperty("/Status", false);
+                                oView.getModel("simpleForm").setProperty("/renewStatus", false);
                                 await this.updateContractdata(oModel.ContractNo, oModel.AgreementNo);
                                 this.closeBusyDialog();
                                 sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {

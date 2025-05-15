@@ -4,7 +4,7 @@
 	xmlns:layout="sap.ui.layout"
 	xmlns:core="sap.ui.core"
 	xmlns:f="sap.ui.layout.form"
-	xmlns:u="sap.ui.unified"
+		xmlns:u="sap.ui.unified"
 	xmlns:m="sap.m">
 	<m:Page id="SelfService_id_page">
 		<m:headerContent>
@@ -43,7 +43,7 @@
 						<m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Emphasized"></m:Button>
 						<m:Button text="{i18n>headerIdCard}" type="Emphasized" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>headerIdCard}" id="IC_id_Idcard" press="CC_onPressIdCardDetails" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" />
 						<m:Button text="{i18n>visit}"  press="onDownloadVisitCard" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Emphasized" tooltip="{i18n>visit}" visible="{= !${viewModel>/TraineeRole} }" />
-						<m:Button text="{i18n>RelievingLetter}" type="Emphasized" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" />
+						<m:Button text="{i18n>relievingletter}" type="Emphasized" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" />
 					</actions>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
@@ -104,7 +104,7 @@
 										<m:Toolbar>
 											<m:Title text="{i18n>basicDetails}" />
 											<m:ToolbarSpacer />
-											<m:Button id="BasicDetailsBtn" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="SS_onEditPress" type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Ghost' }" tooltip="{i18n>editDetails}" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
+											<m:Button id="BasicDetailsBtn" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="SS_onEditPress" type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Neutral' }" tooltip="{i18n>editDetails}" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
@@ -128,8 +128,8 @@
 										<m:TextArea value="{sEmployeeModel>/0/PermanentAddress}" editable="{viewModel>/isEditMode}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}"/>
 										<m:Label text="{i18n>correspondenceAddress}" required="true" id="SS_id_lca"/>
 										<m:TextArea value="{sEmployeeModel>/0/CorrespondenceAddress}" editable="{viewModel>/isEditMode}" id="SS_id_CAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}"/>
-										<m:Label text="{i18n>expCountry}" required="true" visible="{viewModel>/RelievingLetter}"/>
-				                       <m:ComboBox change="OE_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="SS_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{oEmpolyeeDetailsModel>/Country}" showSecondaryValues="true" editable="{viewModel>/AdminRole}" visible="{viewModel>/RelievingLetter}" >
+										<m:Label text="{i18n>expCountry}" required="false" visible="{viewModel>/RelievingLetter}"/>
+				                       <m:ComboBox value="{sEmployeeModel>/0/Country}" change="OE_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="SS_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{oEmpolyeeDetailsModel>/Country}" showSecondaryValues="true" editable="{viewModel>/AdminRole}" visible="{viewModel>/RelievingLetter}" >
 				                       <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				                       </m:ComboBox>
 										<m:Label text="{i18n>baseLocation}" required="true" id="SS_id_lbase" />
@@ -147,7 +147,7 @@
 											<core:ListItem key="{EmployeeModel>EmployeeID}" text="{EmployeeModel>EmployeeName}" additionalText="{EmployeeModel>EmployeeID}"/>
 										</m:ComboBox>
 										<m:Label text="{i18n>mobileNo}" required="true" id="SS_id_Lmo"/>
-										<m:ComboBox value="{oEmpolyeeDetailsModel>/STDCode}" showSecondaryValues= "true" id="SS_id_STDCode" items="{codeModel>/}" filterSecondaryValues="true" change="Emp_onDesignationChange" valueStateText="{i18n>combovalueState}" editable="{viewModel>/isEditMode}" >
+										<m:ComboBox value="{sEmployeeModel>/0/STDCode}" showSecondaryValues= "true" id="SS_id_STDCode" items="{codeModel>/}" filterSecondaryValues="true" change="Emp_onDesignationChange" valueStateText="{i18n>combovalueState}" editable="{viewModel>/isEditMode}" >
 					                        <core:ListItem key="{codeModel>country}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}"/>
 				                        </m:ComboBox>
 										<m:Input value="{sEmployeeModel>/0/MobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="SS_validateMobileNo" valueStateText="{i18n>mobileNoValueState}"/>
@@ -239,9 +239,9 @@
 						</ObjectPageSubSection>
 					</subSections>
 				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" id="Document" title="Document">
+				<ObjectPageSection titleUppercase="false" id="Document" title="{i18n>Document}">
 					<subSections>
-						<ObjectPageSubSection titleUppercase="false" title="Bank Details">
+						<ObjectPageSubSection titleUppercase="false" title="{i18n>invoiceBankDetails}">
 							<blocks>
 								<f:SimpleForm
 										 layout="ColumnLayout"
@@ -261,7 +261,7 @@
 									<f:toolbar>
 										<m:Toolbar>											
 											<m:ToolbarSpacer />
-											<m:Button id="DocumentBtn" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="SS_onEditPress" type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Ghost' }" tooltip="{i18n>editDetails}" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
+											<m:Button id="DocumentBtn" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="SS_onEditPress" type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Neutral' }" tooltip="{i18n>editDetails}" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
@@ -281,7 +281,7 @@
 								</f:SimpleForm>
 							</blocks>
 						</ObjectPageSubSection>
-						<ObjectPageSubSection titleUppercase="false" title="Personal Details">
+						<ObjectPageSubSection titleUppercase="false" title="{i18n>PersonalDetails}">
 							<blocks>
 								<f:SimpleForm
 										 layout="ColumnLayout"
@@ -319,7 +319,7 @@
 											<m:Title text="{i18n>educationalDetails} ({= ${sEducationModel>/}.length})"/>
 											<m:ToolbarSpacer/>
 											<m:Button text="{i18n>add}"  id="EdF_id_EduAdd" tooltip="{i18n>toolEAddEdu}" press="EdF_AddEdu"  type="Accept" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"/>
-											<m:Button text="{i18n>edit}"  id="EdF_id_EduEdit"  tooltip="{i18n>toolEEditEdu}" press="EDF_EditEducation" type="Ghost" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
+											<m:Button text="{i18n>edit}"  id="EdF_id_EduEdit"  tooltip="{i18n>toolEEditEdu}" press="EDF_EditEducation" type="Neutral" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
 											<m:Button text="{i18n>delete}" id="EdF_id_EduDelete" tooltip="{i18n>toolDeleteEdu}" press="EdF_DeletEdu" type="Reject" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"/>
 										</m:OverflowToolbar>
 									</m:headerToolbar>
@@ -363,7 +363,7 @@
 											<m:ToolbarSpacer/>
 											<m:Button id="EmpF_id_RefButton" visible="true" tooltip="{i18n>referenceDetails}" press="EmpF_onReferenceDetails" type="Ghost" text="{i18n>referenceDetails}"/>										
 											<m:Button text="{i18n>add}" press="EmpF_onAddEmployment" type="Accept" tooltip="{i18n>toolAddEmp}" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
-											<m:Button  text="{i18n>edit}" press="EmpF_onEditEmployment" type="Ghost" tooltip="{i18n>toolEditEmp}" id="EmpF_id_EmpEdit" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
+											<m:Button  text="{i18n>edit}" press="EmpF_onEditEmployment" type="Neutral" tooltip="{i18n>toolEditEmp}" id="EmpF_id_EmpEdit" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
 											<m:Button text="{i18n>delete}" press="EmpF_onDeletEmployment" type="Reject" tooltip="{i18n>toolDelEmp}" id="EmpF_id_EmpDelete" visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }" />
 										</m:OverflowToolbar>
 									</m:headerToolbar>
@@ -400,7 +400,7 @@
 						</ObjectPageSubSection>
 					</subSections>
 				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" id="connections1" title="Attachment" >
+				<ObjectPageSection titleUppercase="false" id="connections1" title="{i18n>Attachment}" >
 					<subSections>
 						<ObjectPageSubSection id="connectionsSS4" titleUppercase="false">
 							<blocks>
@@ -460,7 +460,7 @@
 						</ObjectPageSubSection>
 					</subSections>
 				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" id="idSalaryDetails" title="Salary Details">
+				<ObjectPageSection titleUppercase="false" id="idSalaryDetails" title="{i18n>salaryDetails}">
 					<subSections>
 						<ObjectPageSubSection title="" titleUppercase="false">
 							<blocks>
@@ -469,7 +469,7 @@
 						</ObjectPageSubSection>
 					</subSections>
 				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" id="connections" title="Pay Slip">
+				<ObjectPageSection titleUppercase="false" id="connections" title="{i18n>paySlip}">
 					<subSections>
 						<ObjectPageSubSection id="connectionsSS" titleUppercase="false">
 							<blocks>

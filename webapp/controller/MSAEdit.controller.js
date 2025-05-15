@@ -5,9 +5,8 @@ sap.ui.define([
     "../utils/CommonAgreementPDF",
     "sap/m/MessageToast",
     "../model/formatter",
-    "sap/ui/core/BusyIndicator",
 ],
-    function (BaseController, utils, JSONModel, jsPDF, MessageToast, Formatter, BusyIndicator) {
+    function (BaseController, utils, JSONModel, jsPDF, MessageToast, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSAEdit", {
             Formatter: Formatter,

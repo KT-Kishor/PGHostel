@@ -88,7 +88,7 @@
 										   </ComboBox>
 										   
 							<Label text="{i18n>mobileNo}" required="true" />
-							<ComboBox value="{path: 'ContractModelWizart>/STDCode'}" showSecondaryValues= "true" id="CD_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" change="CD_ValidateComboBox" valueStateText="{i18n>combovalueState}">
+							<ComboBox items="{codeModel>/}" value="{ContractModelWizart>/STDCode}" showSecondaryValues= "true" id="CD_id_codeModel" change="CD_ValidateComboBox" valueStateText="{i18n>combovalueState}">
 								<core:ListItem key="{codeModel>country}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}"/>
 							</ComboBox>
 

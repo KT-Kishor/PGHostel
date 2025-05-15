@@ -36,7 +36,8 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="ED_id_EmpDetailsTable" class="sapUiTinyMargin" items="{path:'sEmployeeDetails>/'}"  busyIndicatorDelay="0"  width="auto"
+			<Table id="ED_id_EmpDetailsTable" class="sapUiTinyMargin" items="{
+                path: 'sEmployeeDetails>/', sorter: {path: 'EmployeeStatus',descending: false,group: true}}"  busyIndicatorDelay="0"  width="auto"
                    growingScrollToLoad="false" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar >
@@ -65,9 +66,9 @@
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>baseLocation}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
+					<!-- <Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>status}" />
-					</Column>
+					</Column> -->
 				</columns>
 				<items>
 					<ColumnListItem type="Navigation" press="ED_onPressEmployeeRow">
@@ -79,8 +80,7 @@
 							<Text text="{sEmployeeDetails>CompanyEmailID}"/>
 						    <Text text="{= ${sEmployeeDetails>ManagerName} + '\n(' + ${sEmployeeDetails>ManagerID} + ')' }" />
 							<Text text="{sEmployeeDetails>BaseLocation}"/>
-							<ObjectStatus text="{sEmployeeDetails>EmployeeStatus}" state="{path: 'sEmployeeDetails>EmployeeStatus', formatter: '.Formatter.statusState'}" />
-
+							<!-- <ObjectStatus text="{sEmployeeDetails>EmployeeStatus}" state="{path: 'sEmployeeDetails>EmployeeStatus', formatter: '.Formatter.statusState'}" /> -->
 						</cells>
 					</ColumnListItem>
 				</items>
