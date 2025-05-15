@@ -170,7 +170,7 @@
 					<m:Button text="{i18n>tileFooter}" id="CU_id_Mail" press="CUD_onSendEmail" visible="{ContractStatus>/status}" type="Ghost"/>
 					<m:Button text="{= ${viewModel>/isEditMode} ? ${i18n>save} : ${i18n>edit} }" press=".onEditOrSavePress" visible="{ContractStatus>/status}" type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"/>
 					<m:Button text="{i18n>GeneratePDF}" id="CU_id_Merge" press="onPressMerge" visible="{ContractStatus>/status}" type="Attention"/>
-					<m:Button text="{i18n>activate}" id="CU_id_ActivateBtn" press="CU_id_ActivatePress" visible="{= !${ContractStatus>/status} }" type="Emphasized"/>
+					<m:Button text="{i18n>active}" id="CU_id_ActivateBtn" press="CU_id_ActivatePress" visible="{= !${ContractStatus>/status} }" type="Emphasized"/>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

@@ -113,7 +113,7 @@ sap.ui.define([
                             this.getView().getModel("ContractStatus").setProperty("/status", false);
                         }
 
-                        if ( this.ContractStatus !== "Renewed") {
+                        if ( this.ContractStatus === "Renewed") {
                             this.byId("CU_id_ActivateBtn").setVisible(false);
                         } 
 
@@ -697,6 +697,7 @@ sap.ui.define([
                     oView.getModel("simpleForm").setProperty("/editable", false);
                     oView.getModel("simpleForm").setProperty("/Status", false);
                     oView.getModel("viewModel").setProperty("/isEditMode", false);
+                    oView.getModel("simpleForm").setProperty("/renewStatus", false);
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
                     await this.updateContractdata(oModel.ContractNo, oModel.AgreementNo);
@@ -728,6 +729,10 @@ sap.ui.define([
                           if ( this.ContractStatus !== "Renewed") {
                             this.byId("CU_id_ActivateBtn").setVisible(false);
                         } 
+
+                        if( this.ContractStatus === "Inactive" ) {
+                            this.byId("CU_id_ActivateBtn").setVisible(true);
+                        }
 
                 this.getView().getModel("ContractStatus").setProperty("/status", !(this.ContractStatus === "Inactive" || this.ContractStatus === "Renewed"));
 
