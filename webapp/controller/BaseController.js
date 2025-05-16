@@ -211,7 +211,8 @@ sap.ui.define([
       var ctcforTDS = ctc - filtered[0].StartAmount + 1;
       var tdsofctc = ctcforTDS * filtered[0].TaxPercentage / 100;
       var actualtds = tdsofctc + filtered[0].AutoCalculation;
-      return +(actualtds.toFixed(2));
+      var finaltds = actualtds + (actualtds * 0.04);
+      return +(finaltds.toFixed(2));
     },
 
     _calculateSalaryComponents: function (isTDSIncluded) {
