@@ -123,7 +123,7 @@ sap.ui.define([
                     worker: false,
                 };
                 MessageToast.show(this.i18nModel.getText("assetDownload"))
-                const oSheet = Spreadsheet(oSettings);
+                const oSheet = new Spreadsheet(oSettings);
                 oSheet.build().finally(function () {
                     oSheet.destroy();
                 });
@@ -243,17 +243,18 @@ sap.ui.define([
             },
 
             FAA_onChangeAssignedBy: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
+                if (utils._LCstrictValidationComboBox(oEvent)){
+                    this.getView().getModel("myform").setProperty("/formData/data/AssignedByEmployeeID", oEvent.getSource().getSelectedItem().getAdditionalText());
+                }
             },
 
             FAU_onDateLiveChange: function (oEvent) {
-                const oDate = oEvent.getSource().getDateValue();
+                var oDate = oEvent.getSource().getDateValue();
                 if (oDate) {
-                    const sFormatted = oDate.toISOString().split("T")[0];
+                    var sFormatted = oDate.toLocaleDateString("en-CA");
                     this.getView().getModel("myform").setProperty("/formData/data/ReturnDate", sFormatted);
-                    console.log("ReturnDate:", sFormatted);
                 }
-            },            
+            },               
 
             FAU_onReturnBranchChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
