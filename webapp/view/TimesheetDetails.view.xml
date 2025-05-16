@@ -9,25 +9,27 @@
     
     <Page showNavButton="true" navButtonPress="TSD_onPressBack" title="{i18n>createTimeEntry}">
         <content>
+            <!-- Calendar with legend -->
             <u:CalendarDateInterval
-            id="calendar"
-            width="100%"
-            legend="calendarLegend"
-            startDate="{path: 'viewModel>/calendarStartDate'}"
-            select="onDateSelect" 
-            startDateChange="onInitializeCalendarLegend"
-            days="7" 
-            showDayNamesLine="true" 
-            intervalSelection="false" />
-
-        
-
-            <f:SimpleForm
+                id="calendar"
+                width="100%"
+                legend="calendarLegend"
+                startDate="{path: 'viewModel>/calendarStartDate'}"
+                select="onDateSelect" 
+                startDateChange="onInitializeLegend"
+                days="7"
+                showDayNamesLine="true" 
+                intervalSelection="false" />
+            
+            <!-- Form for timesheet entry -->
+            <f:SimpleForm 
+                id="SimpleFormToolbar"
                 editable="true"
                 layout="ResponsiveGridLayout"
                 labelSpanXL="4"
                 labelSpanL="3"
                 labelSpanM="4"
+                title="Create entry for {viewModel>/selectedEntryDate}"
                 labelSpanS="12"
                 adjustLabelSpan="false"
                 emptySpanXL="0"
@@ -42,37 +44,30 @@
                 ariaLabelledBy="Title1">
                 
                 <f:content>
+                    <!-- Assignment Selection -->
                     <Label text="{i18n>selectAssignment}" />
-                    <Input id="TSD_id_Assignment" 
-                        textFormatMode="KeyValue" 
-                        showSuggestion="true" 
-                       
+                    <Input id="TSD_id_Assignment"  
+                        showSuggestion="true"
                         liveChange="TD_ValidateCommonFields"
                         value="{AssignModel>/selectedAssignment}" 
                         showValueHelp="true" 
                         valueHelpRequest="onValueHelpRequest"
                         valueStateText="{i18n>selectAssignment}" />
-                        
+                    
+                    <!-- Hours Worked -->
+                    <Label text="{i18n>hoursWorked}" />
+                    <TimePicker
+                        value="{AssignModel>/HoursWorked}" 
+                        id="TSD_id_TimeHours"
+                        displayFormat="HH" 
+                        valueFormat="HH" 
+                        visible="{visiblePlay>/isAssignmentMode}"
+                        change="TD_ValidateTime"
+                        valueStateText="{i18n>hoursValueState}" />
+                        <Text id="idTextActHour" text="Actual Hours: 0" />
 
-                       <Label text="{i18n>hoursWorked}" />
-<TimePicker
-    value="{AssignModel>/EnteredHours}" 
-    id="TSD_id_TimeHours"
-    displayFormat="HH" 
-    valueFormat="HH" 
-    visible="{visiblePlay>/isAssignmentMode}"
-    liveChange="onHoursLiveChange"
-    change="onHoursChange"
-    valueStateText="{i18n>hoursValueState}" />
-<Text
-    id="TSD_id_Text"
-    text=""
-    visible="false"
-    design="Bold"
-    wrapping="true"
-    class="sapUiSmallMarginTop sapUiTinyMarginBottom sapThemeText" />
 
-        
+                    <!-- Employee Comment -->
                     <Label text="{i18n>employeeComment}" />
                     <TextArea id="TSD_id_EmpComment"
                         value="{newModel>/EmployeeComments}" 
@@ -83,23 +78,20 @@
                 </f:content>
             </f:SimpleForm>
         </content>
-  
-            
-        
+
+        <!-- Footer with action buttons -->
         <footer>
             <Bar>
                 <contentLeft>
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
                 <contentRight>
-                    <Button
-                        text="{= ${viewModel>/isEditing} ? 'Save' : 'Edit' }"
+                    <Button text="{= ${viewModel>/isEditing} ? 'Save' : 'Edit' }"
                         press="TSD_onUpdate"
                         type="Default"
                         id="TSD_id_EditDetail"
                         visible="{= ${viewModel>/isUpdate} ? (!${viewModel>/isSubmitted} ? true : false) : false }" />
-                    <Button
-                        text="{i18n>save}"
+                    <Button text="{i18n>save}"
                         press="TSD_onSubmit"
                         type="Emphasized"
                         visible="{= ${viewModel>/isCreate} }"/>
