@@ -37,8 +37,8 @@
 							</Select>
 
 							<Label text="{i18n>endClientHirer}" required="true"/>
-							<ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" value="{ContractModelWizart>/EndClientHirer}" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
-                            <core:Item key="{CreateCustomerModel>Salutation} {CreateCustomerModel>name}"                                    text="{CreateCustomerModel>companyName}" />
+							<ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" value="{ContractModelWizart>/EndClientHirer}" showSecondaryValues="true" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
+                            <core:ListItem  key="{CreateCustomerModel>salutation}" text="{CreateCustomerModel>companyName}" additionalText="{CreateCustomerModel>name}" />
                             </ComboBox>
 							<Label text="{i18n>hiringContactLabel}" required="true"/>
 							<Select id="CD_id_selectSal" selectedKey="{ContractModelWizart>/Salutation2}" 

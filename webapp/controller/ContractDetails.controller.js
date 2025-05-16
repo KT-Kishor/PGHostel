@@ -68,9 +68,8 @@ sap.ui.define([
 
                         const oModel = new JSONModel(oData);
                         oView.setModel(oModel, "ContractModelWizart");
-
-                        oView.byId("C_id_PageCreate").setVisible(true);
-                        oView.byId("CUF_id_pageTrainee").setVisible(false);
+                          oView.byId("C_id_PageCreate").setVisible(true);
+                        oView.byId("CUF_id_Contractpage").setVisible(false);
 
                         this.getView().byId("CD_id_Submit").setEnabled(false);
                         this.CD_onResetWizard();
@@ -128,9 +127,10 @@ sap.ui.define([
                         var rateType = oResult.ConsultantRate.split(" ")[3];
                         var varible = rateType === "Hr" ? 0 : rateType === "Day" ? 1 : 2;
                         this.getView().getModel("oFilteredContractModel").setProperty("/HrDaliyMonth", varible);
+                         this.getView().byId("C_id_PageCreate").setVisible(false);
 
-                        this.getView().byId("C_id_PageCreate").setVisible(false);
-                        this.getView().byId("CUF_id_pageTrainee").setVisible(true);
+
+                        this.getView().byId("CUF_id_Contractpage").setVisible(true);
                         this.pdfData = this.getView().getModel("oFilteredContractModel").getData();
                         this.closeBusyDialog(); // Close BusyDialog
                     } catch (error) {
@@ -172,34 +172,39 @@ sap.ui.define([
             CD_validateName: function (oEvent) {
                 const oSource = oEvent.getSource();
                 const selectedKey = oSource.getSelectedKey?.().trim();
+                const value = oSource.getSelectedItem().getAdditionalText()
+
                 let oModel, oInput;
-            
+
                 if (this.sArgPara === "CreateContractFlag") {
                     oModel = this.getView().getModel("ContractModelWizart");
-                    oInput = this.byId("CD_id_HiringContact"); // ID for Hiring Contact input
+                    oInput = this.byId("CD_id_HiringContact");
                 } else {
                     oModel = this.getView().getModel("oFilteredContractModel");
-                    oInput = this.byId("CU_id_ClientReportContact"); // ID for Client Report Contact input
+                    oInput = this.byId("CU_id_ClientReportContact");
                 }
-            
+
                 if (oModel) {
                     if (selectedKey) {
-                        oModel.setProperty("/ClientReportContact", selectedKey);
+                        oModel.setProperty("/Salutation2", selectedKey);
+                        oModel.setProperty("/ClientReportContact", value); 
                         if (oInput) {
                             oInput.setValueState("None");
                         }
                     } else {
-                        // Clear the value in model if selectedKey is empty
+                        oModel.setProperty("/Salutation2", "");
                         oModel.setProperty("/ClientReportContact", "");
+
                     }
                 }
-            
+
                 utils._LCvalidateName(oEvent);
-                if (this.sArgPara === "CreateContractFlag") { 
-                    this.validateStep();    //  validation if in create flow
+                
+                if (this.sArgPara === "CreateContractFlag") {
+                    this.validateStep(); // Validation step for wizard flow
                 }
             },
-            
+
             CD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
                  if (this.sArgPara === "CreateContractFlag") { 
@@ -252,7 +257,7 @@ sap.ui.define([
                 }
             },
 
-           CD_validateDate: function (oEvent) {
+            CD_validateDate: function (oEvent) {
                 let oModel, oStartDatePicker, oEndDatePicker;
                 if (this.sArgPara === "CreateContractFlag") {
                     oModel = this.getView().getModel("ContractModelWizart");
@@ -534,7 +539,14 @@ sap.ui.define([
                         this.getView().getModel("simpleForm").setProperty("/renewStatus", true);
                         this.getView().getModel("simpleForm").setProperty("/editable", false);
                         this.getView().getModel("simpleForm").setProperty("/Status", true);
-                    }  
+                        
+                    } else if (oSelectedValue === "Inactive") {
+                        
+                          this.getView().getModel("simpleForm").setProperty("/renewStatus", false);
+                    }else if (oSelectedValue === "Active") {
+                      
+                        this.getView().getModel("simpleForm").setProperty("/renewStatus", false);
+                    }
                 },
  
             onEditOrSavePress: function () {
@@ -682,6 +694,7 @@ sap.ui.define([
                                 oView.getModel("simpleForm").setProperty("/editable", false);
                                 oView.getModel("simpleForm").setProperty("/Status", false);
                                 oView.getModel("simpleForm").setProperty("/renewStatus", false);
+                               
                                 this.closeBusyDialog();
                                 sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
                                 onClose: function () {
@@ -757,9 +770,8 @@ sap.ui.define([
                 var rateType = oResult.ConsultantRate.split(" ")[3];
                 var varible = rateType === "Hr" ? 0 : rateType === "Day" ? 1 : 2;
                 this.getView().getModel("oFilteredContractModel").setProperty("/HrDaliyMonth", varible);
-
                 this.getView().byId("C_id_PageCreate").setVisible(false);
-                this.getView().byId("CUF_id_pageTrainee").setVisible(true);
+                this.getView().byId("CUF_id_Contractpage").setVisible(true);
             },
 
             CUD_commonOpenDialog: function (fragmentName) {
