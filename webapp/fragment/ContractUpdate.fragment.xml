@@ -55,16 +55,16 @@
 												</m:Select>
 										<m:Input value="{oFilteredContractModel>/ConsultantName}" liveChange="CD_ValidateConsultantName" maxLength="50" id="CU_id_ConsultantName" valueStateText="{i18n>nameConsultantValueState}" editable="{simpleForm>/editable}"  />
 										<m:Label text="{i18n>consultingService}" required="true"/>
-                                        <m:Input value="{oFilteredContractModel>/ConsultingService}" valueStateText="{i18n>plaseDesignation}" placeholder="{i18n>plaseDesignation}" id="CU_id_Role" change="onRole" liveChange="CD_ValidateConsultantName"  maxLength="50"  editable="{simpleForm>/editable}" />
+                                        <m:Input value="{oFilteredContractModel>/ConsultingService}" valueStateText="{i18n>placeConsultingService}" placeholder="{i18n>placeConsultingService}" id="CU_id_Role" change="onRole" liveChange="CD_ValidateConsultantName"  maxLength="50"  editable="{simpleForm>/editable}" />
 										<!-- Consultant Email -->
 										<m:Label text="{i18n>consultantEmailID}" required="true"/>
 										<m:Input value="{oFilteredContractModel>/ContarctEmail}" liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}" id="CU_id_ContractEmailID" editable="{simpleForm>/editable}" maxLength="100" />
 										<!-- Agreement Date -->
 										<m:Label text="{i18n>agreementDate}" required="true"/>
-										<m:DatePicker value="{path:'oFilteredContractModel>/AgreementDate' ,formatter:'.Formatter.formatDate'}" editable="{simpleForm>/editable}" id="CU_id_AgreementDate" valueFormat="dd/MM/yyyy" displayFormat="dd/M/yyyy" change="onChangeAggrementDate" valueStateText="{i18n>dateValueState}"/>
+										<m:DatePicker value="{path:'oFilteredContractModel>/AgreementDate' ,formatter:'.Formatter.formatDate'}" editable="{simpleForm>/editable}" id="CU_id_AgreementDate" valueFormat="dd/MM/yyyy" displayFormat="dd/M/yyyy" change="CU_onChangeAggrementDate" valueStateText="{i18n>dateValueState}"/>
 										<!-- Consultant Address -->
 										<m:Label text="{i18n>consultantAddress}" required="true"/>
-										<m:TextArea value="{oFilteredContractModel>/ConsultantAddress}" valueStateText="{i18n>addressValueState}" liveChange="CD_ValidateCommonFields" id="CU_id_ContractAddress" maxLength="120" editable="{simpleForm>/editable}"/>
+										<m:TextArea value="{oFilteredContractModel>/ConsultantAddress}" valueStateText="{i18n>addressValueState}" liveChange="CD_ValidateCommonFields" id="CU_id_ContractAddress" maxLength="120" editable="{simpleForm>/editable}" rows="2"/>
 										<!-- End Client -->
 										<m:Label text="{i18n>endClient}" required="true"/>
 										<m:ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" valueStateText="{i18n>combovalueState}" value="{oFilteredContractModel>/EndClient}" id="CU_id_EndClient" change="CD_validateName"  editable="{simpleForm>/editable}">

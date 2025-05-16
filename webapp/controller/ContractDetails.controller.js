@@ -13,6 +13,7 @@ sap.ui.define([
                 if (!LoginFunction) return;
                 this.getBusyDialog();
                 this.pdfData = {};
+                this.byId("CD_id_Datestart")?.setMinDate(null);
                 this._makeDatePickersReadOnly(["CD_id_AgreeDate", "CD_id_Datestart", "CD_id_DateEnd"]);
                 this._makeDatePickersReadOnly(["CU_id_AgreementDate", "CU_id_AssignmentStartDate", "CU_id_AssignmentEndDate"]);
                 await this._fetchCommonData("Currency", "CurrencyModel");
@@ -23,22 +24,17 @@ sap.ui.define([
                  await this._fetchCommonData("Country", "CountryModel"); 
                 this.sArgPara = oEvent.getParameter("arguments").sParContract;
                 var AgreementNo = oEvent.getParameter("arguments").sID
+                this.CD_onResetWizard();
                 this.CD_CommonID();
                 var oView = this.getView();
                 this.i18nModel = oView.getModel("i18n").getResourceBundle();
 
-                const today = new Date();
-                const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
-                this.byId("CD_id_AgreeDate")?.setMinDate(lastYearStart);
-                this.byId("CU_id_AgreementDate")?.setMinDate(lastYearStart);
-               
                 var oWizard = oView.byId("CD_id_Wizard");
                 oWizard.discardProgress(oView.byId("CD_id_Firststep"));
                 oWizard.goToStep(oView.byId("CD_id_Firststep"));
 
                 this._wizard = oView.byId("wizardContentPage");
                 oWizard.getSteps()[0].setValidated(false);
-                oWizard.getSteps()[1].setValidated(false);
 
                 if (this.sArgPara === "CreateContractFlag") {
                     try {
@@ -77,6 +73,7 @@ sap.ui.define([
                         oView.byId("CUF_id_pageTrainee").setVisible(false);
 
                         this.getView().byId("CD_id_Submit").setEnabled(false);
+                        this.CD_onResetWizard();
 
                         this.closeBusyDialog(); //  Close BusyDialog
                     } catch (error) {
@@ -106,8 +103,11 @@ sap.ui.define([
                         this.AssignmentStartDate = this.Formatter.formatDate(oResult.AssignmentStartDate);
                         this.AssignmentEndDate = this.Formatter.formatDate(oResult.AssignmentEndDate);
                         this.ContractStatus = oResult.ContractStatus;
+                        this.AgreementDate = this.Formatter.formatDate(oResult.AgreementDate);
 
-                        if (this.ContractStatus !== "Inactive" && this.ContractStatus !== "Renewed") {
+                        this.CU_onChangeAggrementDate();
+
+                         if (this.ContractStatus !== "Inactive" && this.ContractStatus !== "Renewed") {
                             this.getView().getModel("ContractStatus").setProperty("/status", true);
                         } else {
                             this.getView().getModel("ContractStatus").setProperty("/status", false);
@@ -115,7 +115,9 @@ sap.ui.define([
 
                         if ( this.ContractStatus === "Renewed") {
                             this.byId("CU_id_ActivateBtn").setVisible(false);
-                        } 
+                        } else if (this.ContractStatus === "Inactive") {
+                             this.byId("CU_id_ActivateBtn").setVisible(true);
+                        }
 
                         var contractModel = new JSONModel(oResult);
                         this.getOwnerComponent().setModel(contractModel, "oFilteredContractModel");
@@ -139,19 +141,31 @@ sap.ui.define([
             },
 
             CD_CommonID: function () {
-                const ids = ["CD_id_CName", "CD_id_Address", "CD_id_Email", "CD_id_Amount", "CD_id_EndClientHirer", "CD_id_Locationcomb", "CD_id_HiringContact", "CD_id_ConLocation"]
+                const ids = ["CD_id_CName", "CD_id_Address", "CD_id_Email", "CD_id_Amount", "CD_id_EndClientHirer", "CD_id_Locationcomb", "CD_id_HiringContact", "CD_id_ConLocation", "CD_id_ConsultingService", "CD_id_codeModel", "CD_id_Mobile"]
                 ids.forEach((id) => { this.byId(id).setValueState("None"); });
+            },
+
+             // Reset wizard to initial state
+            CD_onResetWizard: function () {
+                this.closeBusyDialog();
+                var oWizard = this.getView().byId("CD_id_Wizard");
+                oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
+                oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
+                this.byId("CD_id_StepTwo").getParent().setShowNextButton(true);
             },
 
             onChangeAggrementDate: function () {
                 const sCreateAgreementDate =  this.byId("CD_id_AgreeDate").getDateValue();
                 if (sCreateAgreementDate) {
-                    this.byId("CD_id_Datestart")?.setMinDate(sCreateAgreementDate);
+                    this.byId("CD_id_Datestart")?.setMinDate(sCreateAgreementDate)
                 }
+            },
 
-                const supdateAgreementDate =  this.byId("CU_id_AssignmentStartDate").getDateValue();
+            CU_onChangeAggrementDate: function () {
+                const supdateAgreementDate = this.onFormatDate(this.AgreementDate);  
                 if (supdateAgreementDate) {
-                    this.byId("CU_id_AssignmentStartDate")?.setMinDate(supdateAgreementDate);
+                    this.byId("CU_id_AgreementDate")?.setMinDate(supdateAgreementDate);
+                     this.byId("CU_id_AssignmentStartDate")?.setMinDate(supdateAgreementDate);
                 }
             },
 
@@ -225,6 +239,7 @@ sap.ui.define([
                     if (selectedKey) {
                         oModel.setProperty("/Country", selectedKey);   // Set or clear country and STDCode 
                         oModel.setProperty("/STDCode", this.byId("CU_id_codeModel").getValue() || this.getView().byId("CD_id_codeModel").getValue());
+                        
                     } else {
                         oModel.setProperty("/Country", "");
                         oModel.setProperty("/STDCode", "");
@@ -311,7 +326,7 @@ sap.ui.define([
                         this.getRouter().navTo("RouteContract");
                     }.bind(this)
                 );
-                this.byId("idWizardStep").getParent().setShowNextButton(true);
+                this.byId("CD_id_StepTwo").getParent().setShowNextButton(true);
             },
 
             CU_onBack: function () {
@@ -395,9 +410,9 @@ sap.ui.define([
             },
 
             //third step validation function
-            CD_StepThree: function () {
+            CD_StepTwo: function () {
                 this.getView().byId("CD_id_Submit").setEnabled(true);
-                this.byId("idWizardStep").getParent().setShowNextButton(false);
+                this.byId("CD_id_StepTwo").getParent().setShowNextButton(false);
             },
 
             CD_onSubmit: async function () {
@@ -482,6 +497,7 @@ sap.ui.define([
                                     type: "Accept",
                                     press: function () {
                                         oDialog.close();
+                                        this.getView().byId("CD_id_StepTwo").getParent().setShowNextButton(true);
                                         this.getRouter().navTo("RouteContract");
                                     }.bind(this)
                                 }),
@@ -490,6 +506,7 @@ sap.ui.define([
                                     type: "Attention",
                                     press: function () {
                                         oDialog.close();
+                                        this.getView().byId("CD_id_StepTwo").getParent().setShowNextButton(true);
                                         this.getRouter().navTo("RouteContract");
                                         this.contractPDFgenerate(data);
                                     }.bind(this)
@@ -517,7 +534,7 @@ sap.ui.define([
                         this.getView().getModel("simpleForm").setProperty("/renewStatus", true);
                         this.getView().getModel("simpleForm").setProperty("/editable", false);
                         this.getView().getModel("simpleForm").setProperty("/Status", true);
-                    } 
+                    }  
                 },
  
             onEditOrSavePress: function () {
@@ -665,14 +682,10 @@ sap.ui.define([
                                 oView.getModel("simpleForm").setProperty("/editable", false);
                                 oView.getModel("simpleForm").setProperty("/Status", false);
                                 oView.getModel("simpleForm").setProperty("/renewStatus", false);
-                                await this.updateContractdata(oModel.ContractNo, oModel.AgreementNo);
                                 this.closeBusyDialog();
                                 sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
                                 onClose: function () {
-                               that.getRouter().navTo("RouteContractDetails", {
-                                sParContract: oModel.ContractNo,
-                                sID: oModel.AgreementNo
-                                        });
+                                   that.getRouter().navTo("RouteContract");
                                     }
                                 });
                             }
@@ -726,13 +739,12 @@ sap.ui.define([
                             this.getView().getModel("ContractStatus").setProperty("/status", false);
                         }
 
-                          if ( this.ContractStatus !== "Renewed") {
+                        if ( this.ContractStatus === "Renewed") {
                             this.byId("CU_id_ActivateBtn").setVisible(false);
-                        } 
-
-                        if( this.ContractStatus === "Inactive" ) {
-                            this.byId("CU_id_ActivateBtn").setVisible(true);
+                        } else if (this.ContractStatus === "Inactive") {
+                             this.byId("CU_id_ActivateBtn").setVisible(true);
                         }
+
 
                 this.getView().getModel("ContractStatus").setProperty("/status", !(this.ContractStatus === "Inactive" || this.ContractStatus === "Renewed"));
 

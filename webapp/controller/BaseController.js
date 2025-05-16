@@ -86,6 +86,7 @@ sap.ui.define([
             "Expense": "/ExpenseApp",
             "MSA&SOW": "/GenerateMsaNda",
             "HrQuotation": "/QuotationApp",
+            "PaySlip": "/PaySlip"
 
           };
 
@@ -755,6 +756,7 @@ sap.ui.define([
           if (oMatch) {
             oSTDCombo.setSelectedItem(oMatch);
             oSTDCombo.setValue(oMatch.getText());
+             oSTDCombo.setValueState("None");
           }
         }, 100);
       }
