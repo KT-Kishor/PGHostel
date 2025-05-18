@@ -87,7 +87,7 @@ sap.ui.define([
                     var ContractStatusModel = new JSONModel({ status: false });
                     this.getView().setModel(ContractStatusModel, "ContractStatus");
 
-                    var editable = new JSONModel({ editable: false, Status: false, renewStatus: false });
+                    var editable = new JSONModel({ editable: false, Status: false, renewStatus: false , mobile:false});
                     this.getView().setModel(editable, "simpleForm");
 
                     var oViewModel = new JSONModel({ isEditMode: false, isVisiable: true, isMerge: true });
@@ -538,14 +538,23 @@ sap.ui.define([
                     if (oSelectedValue === "Renewed" && this.OldStatus === "Active") {
                         this.getView().getModel("simpleForm").setProperty("/renewStatus", true);
                         this.getView().getModel("simpleForm").setProperty("/editable", false);
-                        this.getView().getModel("simpleForm").setProperty("/Status", true);
-                        
-                    } else if (oSelectedValue === "Inactive") {
-                        
-                          this.getView().getModel("simpleForm").setProperty("/renewStatus", false);
-                    }else if (oSelectedValue === "Active") {
-                      
+                        this.getView().getModel("simpleForm").setProperty("/Status", true);  
+                        this.getView().getModel("simpleForm").setProperty("/mobile", false);                       
+                    }else if (oSelectedValue === "Inactive") {                        
                         this.getView().getModel("simpleForm").setProperty("/renewStatus", false);
+                        this.getView().getModel("simpleForm").setProperty("/mobile", false);  
+                        this.getView().getModel("simpleForm").setProperty("/editable", false);
+                        this.getView().getModel("simpleForm").setProperty("/Status", true);
+                    }else if (oSelectedValue === "Active") {                      
+                        this.getView().getModel("simpleForm").setProperty("/renewStatus", false);
+                        this.getView().getModel("simpleForm").setProperty("/editable", false);
+                        this.getView().getModel("simpleForm").setProperty("/Status", true); 
+                        this.getView().getModel("simpleForm").setProperty("/mobile", true); 
+                    }else if(oSelectedValue === "New"){
+                     this.getView().getModel("simpleForm").setProperty("/renewStatus", true);
+                        this.getView().getModel("simpleForm").setProperty("/editable", true);
+                        this.getView().getModel("simpleForm").setProperty("/Status", true);  
+                        this.getView().getModel("simpleForm").setProperty("/mobile", true); 
                     }
                 },
  
