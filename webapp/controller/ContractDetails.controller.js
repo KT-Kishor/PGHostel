@@ -103,10 +103,9 @@ sap.ui.define([
                         this.AssignmentEndDate = this.Formatter.formatDate(oResult.AssignmentEndDate);
                         this.ContractStatus = oResult.ContractStatus;
                         this.AgreementDate = this.Formatter.formatDate(oResult.AgreementDate);
+                    
 
-                        this.CU_onChangeAggrementDate();
-
-                         if (this.ContractStatus !== "Inactive" && this.ContractStatus !== "Renewed") {
+                        if (this.ContractStatus !== "Inactive" && this.ContractStatus !== "Renewed") {
                             this.getView().getModel("ContractStatus").setProperty("/status", true);
                         } else {
                             this.getView().getModel("ContractStatus").setProperty("/status", false);
@@ -127,11 +126,10 @@ sap.ui.define([
                         var rateType = oResult.ConsultantRate.split(" ")[3];
                         var varible = rateType === "Hr" ? 0 : rateType === "Day" ? 1 : 2;
                         this.getView().getModel("oFilteredContractModel").setProperty("/HrDaliyMonth", varible);
-                         this.getView().byId("C_id_PageCreate").setVisible(false);
-
-
+                        this.getView().byId("C_id_PageCreate").setVisible(false);
                         this.getView().byId("CUF_id_Contractpage").setVisible(true);
                         this.pdfData = this.getView().getModel("oFilteredContractModel").getData();
+                        this.CU_onChangeAggrementDate();
                         this.closeBusyDialog(); // Close BusyDialog
                     } catch (error) {
                         this.closeBusyDialog(); // Close BusyDialog
@@ -166,6 +164,12 @@ sap.ui.define([
                 if (supdateAgreementDate) {
                     this.byId("CU_id_AgreementDate")?.setMinDate(supdateAgreementDate);
                      this.byId("CU_id_AssignmentStartDate")?.setMinDate(supdateAgreementDate);
+                }
+
+                const supdateStartDate = this.onFormatDate(this.AssignmentEndDate);  
+                if (supdateStartDate) {
+                    this.byId("CU_id_AssignmentEndDate")?.setMaxDate(supdateStartDate);
+                     this.byId("CU_id_AssignmentStartDate")?.setMaxDate(supdateStartDate);
                 }
             },
 
@@ -335,21 +339,21 @@ sap.ui.define([
             },
 
             CU_onBack: function () {
-                var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
-                if (isEditMode) {
-                    // Save button is visible, ask for confirmation
+            var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
+            if (isEditMode) {
                     this.showConfirmationDialog(
                         this.i18nModel.getText("ConfirmActionTitle"),
                         this.i18nModel.getText("backConfirmation"),
                         function () {
-                            // On confirm, reset and navigate back
                             this.getView().getModel("viewModel").setProperty("/isEditMode", false);
-                            this.getView().getModel("simpleForm").setProperty("/editable", false);
+                            this.getView().getModel("simpleForm").setProperty("/editable", false);  
+                            this.getView().getModel("simpleForm").setProperty("/Status", false);
+                            this.getView().getModel("simpleForm").setProperty("/renewStatus", false);
+                            this.getView().getModel("simpleForm").setProperty("/mobile", false); 
                             this.getRouter().navTo("RouteContract");
                         }.bind(this)
                     );
                 } else {
-                    // Edit button is visible, allow direct back
                     this.getRouter().navTo("RouteContract");
                 }
             },
@@ -535,7 +539,7 @@ sap.ui.define([
             onChangeContractStatus: function(oEvent) {
                     var oSelectedItem = oEvent.getSource().getSelectedItem();
                     var oSelectedValue = oSelectedItem ? oSelectedItem.getText() : "";        
-                    if (oSelectedValue === "Renewed" && this.OldStatus === "Active") {
+                    if (oSelectedValue === "Renewed") {
                         this.getView().getModel("simpleForm").setProperty("/renewStatus", true);
                         this.getView().getModel("simpleForm").setProperty("/editable", false);
                         this.getView().getModel("simpleForm").setProperty("/Status", true);  
@@ -557,26 +561,41 @@ sap.ui.define([
                         this.getView().getModel("simpleForm").setProperty("/mobile", true); 
                     }
                 },
- 
+
             onEditOrSavePress: function () {
-                var oViewModel = this.getView().getModel("viewModel");
+                var oView = this.getView();
+                var oViewModel = oView.getModel("viewModel");
+                var oSimpleFormModel = oView.getModel("simpleForm");
                 var isEditMode = oViewModel.getProperty("/isEditMode");
                 if (isEditMode) {
                     this.onPressSave();
                 } else {
-                    if (this.ContractStatus !== 'Active') {
-                        this.getView().getModel("simpleForm").setProperty("/editable", true);
-                        this.getView().getModel("simpleForm").setProperty("/Status", true);
-                        this.getView().getModel("simpleForm").setProperty("/renewStatus", true);
-                        oViewModel.setProperty("/isEditMode", true);
-                        this.byId("CU_id_Merge").setEnabled(false)
-                        this.byId("CU_id_Mail").setEnabled(false)
-                    } else {
-                        this.getView().getModel("simpleForm").setProperty("/Status", true);
-                        oViewModel.setProperty("/isEditMode", true);
-                        this.byId("CU_id_Merge").setEnabled(false)
-                        this.byId("CU_id_Mail").setEnabled(false)
+                    var sStatus = this.ContractStatus; 
+                    if (sStatus === "Renewed") {
+                        oSimpleFormModel.setProperty("/renewStatus", true);
+                        oSimpleFormModel.setProperty("/editable", false);
+                        oSimpleFormModel.setProperty("/Status", true);
+                        oSimpleFormModel.setProperty("/mobile", false);
+                    } else if (sStatus === "Inactive") {
+                        oSimpleFormModel.setProperty("/renewStatus", false);
+                        oSimpleFormModel.setProperty("/editable", false);
+                        oSimpleFormModel.setProperty("/Status", true);
+                        oSimpleFormModel.setProperty("/mobile", false);
+                    } else if (sStatus === "Active") {
+                        oSimpleFormModel.setProperty("/renewStatus", false);
+                        oSimpleFormModel.setProperty("/editable", false);
+                        oSimpleFormModel.setProperty("/Status", true);
+                        oSimpleFormModel.setProperty("/mobile", true);
+                    } else if (sStatus === "New") {
+                        oSimpleFormModel.setProperty("/renewStatus", true);
+                        oSimpleFormModel.setProperty("/editable", true);
+                        oSimpleFormModel.setProperty("/Status", true);
+                        oSimpleFormModel.setProperty("/mobile", true);
                     }
+
+                    oViewModel.setProperty("/isEditMode", true);
+                    this.byId("CU_id_Merge").setEnabled(false);
+                    this.byId("CU_id_Mail").setEnabled(false);
                 }
             },
 
@@ -675,6 +694,7 @@ sap.ui.define([
                     oView.getModel("simpleForm").setProperty("/editable", false);
                     oView.getModel("simpleForm").setProperty("/Status", false);
                     oView.getModel("viewModel").setProperty("/isEditMode", false);
+                    oView.getModel("simpleForm").setProperty("/mobile", false);
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
                     oView.getModel("oFilteredContractModel").setProperty("/ContractStatus", that.OldStatus);
@@ -703,7 +723,7 @@ sap.ui.define([
                                 oView.getModel("simpleForm").setProperty("/editable", false);
                                 oView.getModel("simpleForm").setProperty("/Status", false);
                                 oView.getModel("simpleForm").setProperty("/renewStatus", false);
-                               
+                                oView.getModel("simpleForm").setProperty("/mobile", false);
                                 this.closeBusyDialog();
                                 sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
                                 onClose: function () {
@@ -733,6 +753,8 @@ sap.ui.define([
                     oView.getModel("simpleForm").setProperty("/Status", false);
                     oView.getModel("viewModel").setProperty("/isEditMode", false);
                     oView.getModel("simpleForm").setProperty("/renewStatus", false);
+                    oView.getModel("simpleForm").setProperty("/mobile", false); 
+
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
                     await this.updateContractdata(oModel.ContractNo, oModel.AgreementNo);

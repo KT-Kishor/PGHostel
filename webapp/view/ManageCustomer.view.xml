@@ -68,7 +68,7 @@
 							<Text text="{CreateCustomerModel>type}" />
 							<Text text="{CreateCustomerModel>value}" />
 							<Text text="{CreateCustomerModel>mailID}" />
-							<Text text="{CreateCustomerModel>mobileNo}" />
+							<Text text="{CustomerModel>/stdCode} {CreateCustomerModel>mobileNo}" />
 						</cells>
 					</ColumnListItem>
 				</items>
