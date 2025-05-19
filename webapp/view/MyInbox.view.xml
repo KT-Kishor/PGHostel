@@ -6,22 +6,14 @@
 	<Page id="MI_id_MyInboxPage">
 		<headerContent>
 	    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
-
 		</headerContent>
 		<content>
-			<fb:FilterBar  class="sapUiTinyMargin" id="MI_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
+			<fb:FilterBar  class="sapUiTinyMargin" clear="MI_onClearEmployeeDetails" id="MI_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" showClearOnFB="true" search="MI_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmpID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="" change="" id="MI_id_EmpIDFilter" showClearIcon="true">
-								<core:ListItem key="" text="" additionalText="" />
-							</ComboBox>
-						</fb:control>
-					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
-						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="" change="" id="MI_id_StatusFilter" showClearIcon="true">
-								<core:ListItem key="" text="" additionalText="" />
+							<ComboBox  showSecondaryValues= "true"  items="{MyInboxModelData>/}" change="" id="MI_id_EmpIDFilter" showClearIcon="true">
+								<core:ListItem key="{MyInboxModelData>EmpID}" text="{MyInboxModelData>EmpID}" additionalText="{MyInboxModelData>EmpName}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -40,11 +32,17 @@
 							<DateRangeSelection id="MI_id_SubmittedDateFilter" valueFormat="dd/MM/yyyy"  displayFormat="dd/MM/yyyy" change="MI_onDateChangeFilter" />
 						</fb:control>
 					</fb:FilterGroupItem>
+						<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox  showSecondaryValues= "true"  items="{MyInbox>/}" id="MI_id_StatusFilter" showClearIcon="true">
+								<core:ListItem key="{MyInbox>ID}" text="{MyInbox>StatusName}" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="MI_id_MyInboxTable" class="sapUiTinyMargin" items="{ path:'',sorter: {
-			path: '', descending: false, group:true}}"  busyIndicatorDelay="0"  width="auto"
-                inset="false"    growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
+			<Table id="MI_id_MyInboxTable" class="sapUiTinyMargin" items="{ path:'MyInboxModelData>/'}"  busyIndicatorDelay="0"  width="auto"
+                inset="false"  mode="SingleSelectLeft" selectionChange="onSelectionChangeStatus"   growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar >
 						<Title id="MI_id_TitleTable" text="{i18n>headerEmpDetails}"/>
@@ -52,7 +50,7 @@
 						<Button icon="sap-icon://detail-view" visible="{modelButtonVisible>/LOPDataButt}" press="MI_onPressLOPData" tooltip="LOP Leave Details" />
 					</OverflowToolbar>
 				</headerToolbar>
-				<columns>
+				<columns >
 					<Column demandPopin="true">
 						<Text text="{i18n>employeeID}"/>
 					</Column>
@@ -78,13 +76,13 @@
 				<items>
 					<ColumnListItem type="Navigation" press="MI_onPressColNavigation">
 						<cells>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<ObjectStatus text="{Status}" inverted="true" state="{path: 'Status', formatter: '.Formatter.statusStateFormatter'}" />
+							<Text text="{MyInboxModelData>EmpID}"/>
+							<Text text="{MyInboxModelData>EmpName}"/>
+							<Text text="{path:'MyInboxModelData>StartDate',formatter:'.Formatter.formatDate'}"/>
+							<Text text="{path:'MyInboxModelData>EndDate',formatter:'.Formatter.formatDate'}"/>
+							<Text text="{MyInboxModelData>Type}"/>
+							<Text text="{MyInboxModelData>SubType}"/>
+							<ObjectStatus text="{MyInboxModelData>Status}" inverted="true" state="{path: 'MyInboxModelData>Status', formatter: '.Formatter.formatObjectStatus'}" />
 						</cells>
 					</ColumnListItem>
 				</items>
@@ -97,10 +95,10 @@
                 </contentLeft>
 				<contentRight>
 					<!-- Footer Buttons -->
-					<Button id="MI_id_ButApprove" text="{i18n>approve}" press="MI_onPressApprove" type="Accept" visible="true"/>
-					<Button id="MI_id_ButReject" text="{i18n>reject}" press="MI_onPressReject" type="Reject" visible="true"/>
-					<Button id="MI_id_ButReSend" text="{i18n>resend}" press="MI_onPressReSend" type="Emphasized" visible="true"/>
-					<Button id="MI_id_ButPaid" text="{i18n>paid}" press="MI_onPressPaidBut" type="Success" visible="true"/>
+					<Button id="MI_id_ButApprove" text="{i18n>approve}" press="MI_onPressButtons" type="Accept" visible="false"/>
+					<Button id="MI_id_ButReject" text="{i18n>reject}" press="MI_onPressButtons" type="Reject" visible="false"/>
+					<Button id="MI_id_ButReSend" text="{i18n>resend}" press="MI_onPressButtons" type="Emphasized" visible="false"/>
+					<Button id="MI_id_ButPaid" text="{i18n>paid}" press="MI_onPressButtons" type="Success" visible="false"/>
 				</contentRight>
 			</Bar>
 		</footer>
