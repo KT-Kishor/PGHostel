@@ -113,7 +113,7 @@
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:Select>
 											<!-- Contract Period -->
-										<m:Label text="{i18n>contractPeriod}"  />
+										<m:Label text="{i18n>warrantyDate}"  />
 										<m:Select id="CU_id_WarrantyDate" selectedKey="{oFilteredContractModel>/ContractPeriod}" items="{ContractPeriod>/ContractPeriod}" editable="{simpleForm>/renewStatus}" >
 											<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 										</m:Select>

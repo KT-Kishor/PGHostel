@@ -153,7 +153,6 @@ sap.ui.define([
 
              // Reset wizard to initial state
             CD_onResetWizard: function () {
-                this.closeBusyDialog();
                 var oWizard = this.getView().byId("CD_id_Wizard");
                 oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
                 oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
@@ -359,6 +358,9 @@ sap.ui.define([
                             this.getView().getModel("simpleForm").setProperty("/renewStatus", false);
                             this.getView().getModel("simpleForm").setProperty("/mobile", false); 
                             this.getRouter().navTo("RouteContract");
+                             this.byId("CU_id_Merge").setEnabled(true);
+                             this.byId("CU_id_Mail").setEnabled(true);
+
                         }.bind(this)
                     );
                 } else {
@@ -703,6 +705,7 @@ sap.ui.define([
                     oView.getModel("simpleForm").setProperty("/Status", false);
                     oView.getModel("viewModel").setProperty("/isEditMode", false);
                     oView.getModel("simpleForm").setProperty("/mobile", false);
+                    oView.getModel("simpleForm").setProperty("/renewStatus", false);
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
                     oView.getModel("oFilteredContractModel").setProperty("/ContractStatus", that.OldStatus);
