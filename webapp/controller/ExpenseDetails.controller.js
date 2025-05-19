@@ -26,7 +26,7 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.ExpenseID = oEvent.getParameter("arguments").sPath;
 
-                await this._fetchCommonData("Currency", "CurrencyModel");
+                 this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("Expense", "FilteredExpenseModel", {
                     ExpenseID: this.ExpenseID,
                 });
@@ -219,7 +219,17 @@ function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Time
         },
 
         Exp_Det_onPressBackBtn: function() {
-            this.getRouter().navTo("RouteExpensePage");
+            if (this.ViewModel.getProperty("/isEditMode")) {
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("ConfirmActionTitle"),
+                    this.i18nModel.getText("backConfirmation"),
+                    function() {
+                        this.getRouter().navTo("RouteExpensePage");
+                    }.bind(this),
+                );
+            } else {
+                this.getRouter().navTo("RouteExpensePage");
+            }
             this.byId("Exp_id_Country").setValueState("None");
             this.byId("Exp_id_Source").setValueState("None");
             this.byId("Exp_id_Destination").setValueState("None");

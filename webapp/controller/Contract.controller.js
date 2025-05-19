@@ -21,8 +21,8 @@ sap.ui.define(
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("contractDetails"));
           try {  
-               await this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
-              await this.readCallForContract("Initial");
+                this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
+                this.readCallForContract("Initial");
             } catch (error) {
               sap.m.MessageToast.show(error.message || error.responseText);
             } finally {

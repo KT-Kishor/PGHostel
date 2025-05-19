@@ -16,11 +16,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                     // Load dropdown data once
                     if (!oView.getModel("sDesignationModel")) {
-                        await this._fetchCommonData("Designation", "sDesignationModel");
-                        await this._fetchCommonData("BaseLocation", "sBaseLocationModel");
-                        await this._fetchCommonData("EmployeeDetailsData", "EmployeeModel");
-                        await this._fetchCommonData("AppVisibility", "RoleModel");
-                        await this._fetchCommonData("Country", "CountryModel");
+                        this._fetchCommonData("Designation", "sDesignationModel");
+                        this._fetchCommonData("BaseLocation", "sBaseLocationModel");
+                        this._fetchCommonData("EmployeeDetailsData", "EmployeeModel");
+                        this._fetchCommonData("AppVisibility", "RoleModel");
+                        this._fetchCommonData("Country", "CountryModel");
                     }
                     this._makeDatePickersReadOnly(["SS_id_Dob","SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({

@@ -19,11 +19,11 @@ sap.ui.define([
                 if (!LoginFUnction) return;                
                 this.getBusyDialog();
                 if (!this.getView().getModel("ContractpaymentModel") && !this.getView().getModel("BaseLocationModel")) {
-                    await this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
-                    await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                    await this._fetchCommonData("Currency", "CurrencyModel");
+                     this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+                     this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                     this._fetchCommonData("Currency", "CurrencyModel");
+                      this._fetchCommonData("EmailContent", "CCMailModel", { Type: "MSA" }); 
                 }
-                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "MSA" }); 
 
                 this.MSAID = oEvent.getParameter("arguments").sPath;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();

@@ -18,9 +18,9 @@ sap.ui.define([
             this.getBusyDialog();
             try {
                 if (!this.getView().getModel("BaseLocationModel")) {
-                    await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                    await this._fetchCommonData("Country", "CountryModel");
-                    await this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
+                     this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                     this._fetchCommonData("Country", "CountryModel");
+                     this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
                 }
         
                 this.LoginModel = this.getView().getModel("LoginModel");

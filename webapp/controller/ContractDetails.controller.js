@@ -16,12 +16,17 @@ sap.ui.define([
                 this.byId("CD_id_Datestart")?.setMinDate(null);
                 this._makeDatePickersReadOnly(["CD_id_AgreeDate", "CD_id_Datestart", "CD_id_DateEnd"]);
                 this._makeDatePickersReadOnly(["CU_id_AgreementDate", "CU_id_AssignmentStartDate", "CU_id_AssignmentEndDate"]);
-                await this._fetchCommonData("Currency", "CurrencyModel");
-                await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                await this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
-                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ContractActive" });
-                await this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
-                 await this._fetchCommonData("Country", "CountryModel"); 
+                await  this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                 this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+
+                if (!this.getView().getModel("CurrencyModel")) {
+                 this._fetchCommonData("Currency", "CurrencyModel");
+                
+                 this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ContractActive" });
+                 this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
+                 this._fetchCommonData("Country", "CountryModel"); 
+                }
+
                 this.sArgPara = oEvent.getParameter("arguments").sParContract;
                 var AgreementNo = oEvent.getParameter("arguments").sID
                 this.CD_onResetWizard();
@@ -68,18 +73,16 @@ sap.ui.define([
 
                         const oModel = new JSONModel(oData);
                         oView.setModel(oModel, "ContractModelWizart");
-                          oView.byId("C_id_PageCreate").setVisible(true);
+                        oView.byId("C_id_PageCreate").setVisible(true);
                         oView.byId("CUF_id_Contractpage").setVisible(false);
 
                         this.getView().byId("CD_id_Submit").setEnabled(false);
                         this.CD_onResetWizard();
-
                         this.closeBusyDialog(); //  Close BusyDialog
                     } catch (error) {
                         this.closeBusyDialog(); //  Close BusyDialog
                           MessageToast.show(error.message || error.responseText || this.i18nModel.getText("commonErrorMessage"));
                     }
-
                 } else {
                     // UPDATE case
                     this.getView().getModel("LoginModel").setProperty("/sendEmail", false);
