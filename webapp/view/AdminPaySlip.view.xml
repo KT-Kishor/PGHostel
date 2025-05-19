@@ -15,9 +15,9 @@
         <content>
             <fb:FilterBar
                 id="AP_id_AdminPaySlip"
-                clear="onClear"
+                clear="AP_onClear"
                 showClearOnFB="true"
-                search=".onSearch"
+                search=".AP_onSearch"
                 showFilterConfiguration="false"
                 showRestoreButton="true"
                 useToolbar="false"
@@ -33,39 +33,53 @@
                             <ComboBox
                                 id="AP_id_Employee"
                                 showClearIcon="true"
-                                items="{/EmployeeList}"
-                                selectedKey="{filters>/EmployeeID}"
+                                items="{EmpModel>/}"
+                                showSecondaryValues="true"
                             >
-                                <core:Item
-                                    key="{EmployeeID}"
-                                    text="{EmployeeName}"
+                                <core:ListItem
+                                    key="{EmpModel>EmployeeID}"
+                                    text="{EmpModel>EmployeeID}"
+                                    additionalText="{EmpModel>EmployeeName}"
                                 />
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
                     <fb:FilterGroupItem
                         groupName="Basic"
-                        name="Month"
-                        label="{i18n>month}"
+                        name="PaySlipDate"
+                        label="{i18n>monthAndYear}"
                         visibleInFilterBar="true"
                     >
                         <fb:control>
-                            <ComboBox
-                                id="AP_id_Month"
-                                showClearIcon="true"
-                                items="{/MonthList}"
-                                selectedKey="{filters>/Month}"
-                            >
-                                <core:Item
-                                    key="{Month}"
-                                    text="{Month}"
-                                />
-                            </ComboBox>
+                            <DateRangeSelection
+                                id="AP_id_Date"
+                                name="PaySlipDate"
+                                delimiter="to"
+                                displayFormat="MM-yyyy"
+                                valueFormat="MM-yyyy"
+                                change="Q_onFilterChange"
+                            />
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
             </fb:FilterBar>
-            <Table id="AP_id_AdminPaySlipTable" class="sapUiResponsiveMargin" width="auto">
+            <Table
+                id="AP_id_AdminPaySlipTable"
+                busyIndicatorDelay="0"
+                class="sapUiResponsiveMargin"
+                width="auto"
+                growing="true"
+                growingThreshold="50"
+                growingScrollToLoad="true"
+                items="{
+                    path: 'PaySlip>/EmpTable',
+                    sorter: {
+                        path: 'FinancialYear',
+                        descending: false,
+                        group: true
+                    }
+                }"
+            >
                 <headerToolbar>
                     <Toolbar>
                         <Title
@@ -75,7 +89,7 @@
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>create}"
-							type="Accept"
+                            type="Accept"
                             press="AP_onPressAddPayslip"
                         />
                     </Toolbar>
@@ -96,6 +110,9 @@
                     <Column>
                         <Text text="{i18n>payableDays}" />
                     </Column>
+                    <Column>
+                        <Text text="{i18n>netPay}" />
+                    </Column>
                 </columns>
                 <items>
                     <ColumnListItem
@@ -103,19 +120,22 @@
                         press="AP_onPressPayslip"
                     >
                         <cells>
-                            <Text text="{EmployeeID}" />
+                            <Text text="{PaySlip>EmployeeID}" />
                         </cells>
                         <cells>
-                            <Text text="{EmployeeName}" />
+                            <Text text="{PaySlip>EmployeeName}" />
                         </cells>
                         <cells>
-                            <Text text="{Month}" />
+                            <Text text="{PaySlip>Month}" />
                         </cells>
                         <cells>
-                            <Text text="{Year}" />
+                            <Text text="{PaySlip>Year}" />
                         </cells>
                         <cells>
-                            <Text text="{PayableDays}" />
+                            <Text text="{PaySlip>PayableDays}" />
+                        </cells>
+                        <cells>
+                            <Text text="{PaySlip>NetPay}" />
                         </cells>
                     </ColumnListItem>
                 </items>

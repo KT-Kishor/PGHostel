@@ -5,6 +5,7 @@
     xmlns:f="sap.ui.layout.form"
     xmlns="sap.uxap"
     xmlns:g="sap.f"
+    xmlns:card="sap.f.cards"
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout"
     xmlns:m="sap.m"
@@ -20,10 +21,10 @@
             useIconTabBar="false"
             class="sapUiSmallmarginResponsive"
             upperCaseAnchorBar="false"
-            showHeaderContent="true"
+            showHeaderContent="{PaySlip>/isIdSelected}"
         >
             <headerTitle>
-                <ObjectPageDynamicHeaderTitle visible="true">
+                <ObjectPageDynamicHeaderTitle visible="{PaySlip>/isIdSelected}">
                     <expandedHeading>
                         <m:Title
                             text="{payrollModel>/EmployeeName}"
@@ -147,6 +148,7 @@
                         </layout:HorizontalLayout>
                         <layout:HorizontalLayout
                             class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                            visible="{= !${PaySlip>/isCreate} }"
                         >
                             <m:Label text="{i18n>monthAndYear}" />
                             <m:Text
@@ -158,9 +160,15 @@
                 </m:FlexBox>
             </headerContent>
             <sections>
-                <ObjectPageSection id="APD_id_First" showTitle="false">
+                <ObjectPageSection
+                    id="APD_id_First"
+                    showTitle="false"
+                >
                     <subSections>
-                        <ObjectPageSubSection title="{i18n>selectID}">
+                        <ObjectPageSubSection
+                            title="{i18n>selectID}"
+                            visible="{PaySlip>/isCreate}"
+                        >
                             <f:SimpleForm
                                 editable="true"
                                 layout="ColumnLayout"
@@ -213,11 +221,254 @@
                         <!-- Salary Details SubSection -->
                         <ObjectPageSubSection
                             title="{i18n>salaryDetailsEmployee}"
+                            class="earnDedTable"
                         >
-                            <core:Fragment
-                                fragmentName="sap.kt.com.minihrsolution.fragment.PaySlipTable"
-                                type="XML"
-                            />
+                            <m:VBox class="sapUiSmallMargin">
+                                <!-- GridContainer for Tables -->
+                                <g:GridContainer
+                                    columnsChange=".onGridColumnsChange"
+                                >
+                                    <g:layout>
+                                        <g:GridContainerSettings
+                                            columnSize="49.5%"
+                                            gap="10px"
+                                        />
+                                    </g:layout>
+                                    <g:layoutXS>
+                                        <g:GridContainerSettings
+                                            columnSize="100%"
+                                            gap="10px"
+                                        />
+                                    </g:layoutXS>
+                                    <g:layoutS>
+                                        <g:GridContainerSettings
+                                            columnSize="100%"
+                                            gap="10px"
+                                        />
+                                    </g:layoutS>
+                                    <g:layoutM>
+                                        <g:GridContainerSettings
+                                            columnSize="100%"
+                                            gap="10px"
+                                        />
+                                    </g:layoutM>
+                                    <!-- Earnings m:Table -->
+                                    <g:Card>
+                                        <g:content>
+                                            <m:VBox
+                                                class="sapUiTinyMarginBeginEnd"
+                                            >
+                                                <m:Table
+                                                    id="APD_id_SalaryTable"
+                                                    items="{EarningModel>/SalaryFields}"
+                                                    mode="Delete"
+                                                    delete="onPressDeleteSalaryFields"
+                                                >
+                                                    <m:headerToolbar>
+                                                        <m:OverflowToolbar>
+                                                            <m:Title
+                                                                text="{i18n>salaryDetails}"
+                                                                level="H2"
+                                                            />
+                                                            <m:ToolbarSpacer />
+                                                            <m:Button
+                                                                text="{i18n>add}"
+                                                                type="Accept"
+                                                                press="Q_onPressCreate"
+                                                                enabled="{PaySlip>/isIdSelected}"
+                                                                visible="{PaySlip>/isCreate}"
+                                                            />
+                                                        </m:OverflowToolbar>
+                                                    </m:headerToolbar>
+                                                    <m:columns>
+                                                        <m:Column
+                                                            minScreenWidth="Tablet"
+                                                            demandPopin="true"
+                                                        >
+                                                            <m:Text
+                                                                text="{i18n>desc}"
+                                                            />
+                                                        </m:Column>
+                                                        <m:Column
+                                                            minScreenWidth="Tablet"
+                                                            demandPopin="true"
+                                                        >
+                                                            <m:Text
+                                                                text="{i18n>amount}"
+                                                            />
+                                                        </m:Column>
+                                                        <m:Column
+                                                            minScreenWidth="Tablet"
+                                                            demandPopin="true"
+                                                        >
+                                                            <m:Text
+                                                                text="{i18n>yearlyAmount}"
+                                                            />
+                                                        </m:Column>
+                                                    </m:columns>
+                                                    <m:items>
+                                                        <m:ColumnListItem>
+                                                            <m:cells>
+                                                                <m:Input
+                                                                    value="{EarningModel>Description}"
+                                                                    maxLength="25"
+                                                                    editable="{= ${EarningModel>Flag} === true }"
+                                                                />
+                                                                <m:Input
+                                                                    value="{EarningModel>Amount}"
+                                                                    change="onEarningAmountChange"
+                                                                    textAlign="End"
+                                                                    type="Number"
+                                                                />
+                                                                <m:Input
+                                                                    value="{EarningModel>Year}"
+                                                                    editable="false"
+                                                                    textAlign="End"
+                                                                />
+                                                            </m:cells>
+                                                        </m:ColumnListItem>
+                                                    </m:items>
+                                                </m:Table>
+
+                                                <m:HBox
+                                                    class="customEarningBox sapUiTinyMarginBottom"
+                                                    width="100%"
+                                                >
+                                                    <m:Text
+                                                        class="boldBlackText"
+                                                        text="{i18n>totalEarningAmount} :"
+                                                        textAlign="End"
+                                                    />
+                                                    <m:Text
+                                                        class="boldBlackText"
+                                                        text="{path:'EarningModel>/TotalEarningMonth', formatter: '.Formatter.numberFormater'}"
+                                                        textAlign="End"
+                                                    />
+                                                    <m:Text
+                                                        class="boldBlackText"
+                                                        text="{path:'EarningModel>/TotalEarningYearly', formatter: '.Formatter.numberFormater'}"
+                                                        textAlign="End"
+                                                    />
+                                                </m:HBox>
+                                            </m:VBox>
+                                        </g:content>
+                                    </g:Card>
+                                    <!-- Deductions m:Table -->
+                                    <g:Card>
+                                        <g:content>
+                                            <m:VBox
+                                                class="sapUiTinyMarginBeginEnd"
+                                            >
+                                                <m:Table
+                                                    items="{DeductionModel>/DeductionFields}"
+                                                    mode="Delete"
+                                                    delete="onPressDeleteDeductionFields"
+                                                >
+                                                    <m:headerToolbar>
+                                                        <m:OverflowToolbar>
+                                                            <m:Title
+                                                                text="{i18n>deductionDetails}"
+                                                                level="H2"
+                                                            />
+                                                            <m:ToolbarSpacer />
+                                                            <m:Button
+                                                                text="{i18n>add}"
+                                                                type="Accept"
+                                                                press="Q_onPressCreate"
+                                                                enabled="{PaySlip>/isIdSelected}"
+                                                                visible="{PaySlip>/isCreate}"
+                                                            />
+                                                        </m:OverflowToolbar>
+                                                    </m:headerToolbar>
+                                                    <m:columns>
+                                                        <m:Column
+                                                            minScreenWidth="Tablet"
+                                                            demandPopin="true"
+                                                        >
+                                                            <m:Text
+                                                                text="{i18n>desc}"
+                                                            />
+                                                        </m:Column>
+                                                        <m:Column
+                                                            minScreenWidth="Tablet"
+                                                            demandPopin="true"
+                                                        >
+                                                            <m:Text
+                                                                text="{i18n>amount}"
+                                                            />
+                                                        </m:Column>
+                                                        <m:Column
+                                                            minScreenWidth="Tablet"
+                                                            demandPopin="true"
+                                                        >
+                                                            <m:Text
+                                                                text="{i18n>yearlyAmount}"
+                                                            />
+                                                        </m:Column>
+                                                    </m:columns>
+                                                    <m:items>
+                                                        <m:ColumnListItem>
+                                                            <m:cells>
+                                                                <m:Input
+                                                                    value="{DeductionModel>Description}"
+                                                                    maxLength="25"
+                                                                    editable="{= ${DeductionModel>Flag} === true }"
+                                                                />
+                                                                <m:Input
+                                                                    value="{DeductionModel>Amount}"
+                                                                    change="onDeductionAmountChange"
+                                                                    textAlign="End"
+                                                                    type="Number"
+                                                                />
+                                                                <m:Input
+                                                                    value="{DeductionModel>Year}"
+                                                                    editable="false"
+                                                                    textAlign="End"
+                                                                />
+                                                            </m:cells>
+                                                        </m:ColumnListItem>
+                                                    </m:items>
+                                                </m:Table>
+                                                <m:HBox
+                                                    class="customDeductionBox sapUiTinyMarginBottom"
+                                                    width="100%"
+                                                >
+                                                    <m:Text
+                                                        class="boldBlackText"
+                                                        text="{i18n>totalDeductionAmount} :"
+                                                        textAlign="End"
+                                                    />
+                                                    <m:Text
+                                                        class="boldBlackText"
+                                                        text="{path:'DeductionModel>/TotalDeductionMonth', formatter: '.Formatter.numberFormater'}"
+                                                        textAlign="Right"
+                                                    />
+                                                    <m:Text
+                                                        class="boldBlackText"
+                                                        text="{path:'DeductionModel>/TotalDeductionYearly', formatter: '.Formatter.numberFormater'}"
+                                                        textAlign="Right"
+                                                    />
+                                                </m:HBox>
+                                            </m:VBox>
+                                        </g:content>
+                                    </g:Card>
+                                </g:GridContainer>
+                                <m:HBox
+                                    class="customNetPayBox"
+                                    width="100%"
+                                >
+                                    <m:Text
+                                        text="Net Pay ( INR ) : INR 12,34.876.90 (Twelve Lakh Thirty Four Thousand Eight Hundred Seventy Six Rupees and Ninety Paise)"
+                                        class="boldBlackText"
+                                        width="100%"
+                                    />
+                                    <!-- <m:Text
+                                        text=" :  {path: 'DeductionModel>/totalNetPay', formatter: '.Formatter.numberFormater'} ({DeductionModel>/totalNetPayText})"
+                                        class="boldBlackText"
+                                        width="100%"
+                                    /> -->
+                                </m:HBox>
+                            </m:VBox>
                         </ObjectPageSubSection>
                     </subSections>
                 </ObjectPageSection>
@@ -235,12 +486,14 @@
                     type="Emphasized"
                     press="APD_onPressSubmit"
                     class="sendMail"
+                    visible="{PaySlip>/isCreate}"
+                    enabled="{PaySlip>/isIdSelected}"
                 />
                 <m:Button
                     text="{i18n>jsPdf}"
+                    type="Reject"
                     press="APD_onPressGeneratePdf"
-                    class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
-                    visible="false"
+                    visible="{= !${PaySlip>/isCreate} }"
                 />
             </m:Toolbar>
         </m:footer>

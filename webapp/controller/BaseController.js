@@ -215,6 +215,17 @@ sap.ui.define([
       return +(finaltds.toFixed(2));
     },
 
+    _calculatePT: function (ctc) {
+      if (!this.getView().getModel("TDSModel") || this.getView().getModel("TDSModel").getData().length === 0) {
+        return 0;
+      }
+      var filtered = this.getView().getModel("TDSModel").getData().filter(function (item) {
+        return ctc >= item.StartAmount && ctc <= item.EndAmount;
+      });
+      var pt = filtered[0].PT;
+      return pt;
+    },
+
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
       // Convert and fetch values
@@ -224,7 +235,7 @@ sap.ui.define([
       var VariablePay = CTC * VariableData / 100;
 
       var BasicSalary, HRA, EmployeerPF, MedicalInsurance, Gratuity, SpecailAllowance, Total;
-      var DeductionPF, IncomeTax_TDS, DeductionTotal, GrossPay;
+      var DeductionPF, IncomeTax_TDS, PT, DeductionTotal, GrossPay;
       var newCTC = CTC - VariablePay;
       if (isTDSIncluded === "TDS") {
         BasicSalary = newCTC * 40 / 100;
@@ -237,7 +248,8 @@ sap.ui.define([
 
         DeductionPF = 0;
         IncomeTax_TDS = this._calculateTDS(CTC);
-        DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
+        PT = this._calculatePT(CTC);
+        DeductionTotal = DeductionPF + PT + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
 
       } else {
@@ -251,7 +263,8 @@ sap.ui.define([
 
         DeductionPF = BasicSalary * 12 / 100;
         IncomeTax_TDS = this._calculateTDS(CTC);
-        DeductionTotal = DeductionPF + 2400 + IncomeTax_TDS;
+        PT = this._calculatePT(CTC);
+        DeductionTotal = DeductionPF + PT + IncomeTax_TDS;
         GrossPay = (Total - DeductionTotal);
       }
       var CostToCompany = GrossPay + DeductionTotal + VariablePay;
@@ -265,7 +278,7 @@ sap.ui.define([
       oModel.setProperty("/Total", Math.round(Total));
 
       oModel.setProperty("/EmployeePF", Math.round(DeductionPF));
-      oModel.setProperty("/PT", Math.round(2400));
+      oModel.setProperty("/PT", Math.round(PT));
       oModel.setProperty("/IncomeTax", Math.round(IncomeTax_TDS));
       oModel.setProperty("/TotalDeduction", Math.round(DeductionTotal));
       oModel.setProperty("/GrossPay", Math.round(GrossPay));

@@ -601,6 +601,9 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   padding: 5px 0;
   background: transparent;
   border: none;
+  margin-left: 10px;
+  margin-top: 10px;
+  margin-bottom: -10px;
 }
 
 .customEarning {

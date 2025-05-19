@@ -1296,10 +1296,47 @@
                             id="connectionsSS"
                             titleUppercase="false"
                         >
-                            <core:Fragment
-                                fragmentName="sap.kt.com.minihrsolution.fragment.PaySlipTable"
-                                type="XML"
-                            />
+                            <m:Table id="AP_id_PaySlipTable">
+                                <m:columns>
+                                    <m:Column>
+                                        <m:Text text="{i18n>employeeID}" />
+                                    </m:Column>
+                                    <m:Column>
+                                        <m:Text text="{i18n>employeeName}" />
+                                    </m:Column>
+                                    <m:Column>
+                                        <m:Text text="{i18n>month}" />
+                                    </m:Column>
+                                    <m:Column>
+                                        <m:Text text="{i18n>year}" />
+                                    </m:Column>
+                                    <m:Column>
+                                        <m:Text text="{i18n>payableDays}" />
+                                    </m:Column>
+                                </m:columns>
+                                <m:items>
+                                    <m:ColumnListItem
+                                        type="Navigation"
+                                        press="AP_onPressPayslip"
+                                    >
+                                        <m:cells>
+                                            <m:Text text="{EmployeeID}" />
+                                        </m:cells>
+                                        <m:cells>
+                                            <m:Text text="{EmployeeName}" />
+                                        </m:cells>
+                                        <m:cells>
+                                            <m:Text text="{Month}" />
+                                        </m:cells>
+                                        <m:cells>
+                                            <m:Text text="{Year}" />
+                                        </m:cells>
+                                        <m:cells>
+                                            <m:Text text="{PayableDays}" />
+                                        </m:cells>
+                                    </m:ColumnListItem>
+                                </m:items>
+                            </m:Table>
                         </ObjectPageSubSection>
                     </subSections>
                 </ObjectPageSection>
