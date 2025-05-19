@@ -729,6 +729,8 @@ sap.ui.define([
                                 oView.getModel("simpleForm").setProperty("/Status", false);
                                 oView.getModel("simpleForm").setProperty("/renewStatus", false);
                                 oView.getModel("simpleForm").setProperty("/mobile", false);
+                                this.byId("CU_id_Merge").setEnabled(true);
+                                this.byId("CU_id_Mail").setEnabled(true);
                                 this.closeBusyDialog();
                                 sap.m.MessageBox.success(this.i18nModel.getText("createNewContractSuccess"), {
                                 onClose: function () {
