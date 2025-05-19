@@ -211,5 +211,49 @@ sap.ui.define([], function () {
                 return "Error";
             }
         },
+        formatTimelineDate: function(status, creationDate, assignedDate,returnDate,trashDate,transferDate) {
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" });
+
+                if (status === "Assigned" && assignedDate) {
+                   return oDateFormat.format(new Date(assignedDate));    
+              } 
+              else if(status === "Returned" && returnDate){
+               return oDateFormat.format(new Date(returnDate))
+
+          }else if(status === "Trashed" && trashDate){
+               return oDateFormat.format(new Date(trashDate))
+
+          }
+          else if(status === "Transferred" && transferDate){
+               return oDateFormat.format(new Date(transferDate))
+
+          }
+          else if (creationDate) {
+               return oDateFormat.format(new Date(creationDate))
+          } 
+          
+          else {
+        return "Date not available";
+    }
+},
+formatId:function(status,pickId,assigneId){
+    if(status==="Assigned" && assigneId){
+      return assigneId;
+    }else if(status==="Available" && pickId){
+         return pickId;
+    }else{
+        return " ";
+    }
+},
+formatName:function(status,pickName,assigneByName,assigneName){
+    if(status=== "Assigned" &&assigneByName){
+        return assigneByName;
+    }else if(status=== "Available" &&pickName){
+        return pickName;
+}else if(status=== "Returned" && assigneName){
+        return assigneName;
+
+}
+}
     }
 });

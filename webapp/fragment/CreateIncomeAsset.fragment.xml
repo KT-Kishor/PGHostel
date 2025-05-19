@@ -22,7 +22,6 @@
                 <Label text="{i18n>type}" required="true" />
                 <Select id="FCIA_id_type"
                 selectedKey="{CreateIncomeAssetModel>/Type}"
-                    value="{CreateIncomeAssetModel>/Type}"
                  items="{oAssetTypeModel>/}">
                    <core:Item
                         text="{oAssetTypeModel>Type}"
@@ -82,6 +81,7 @@
                 <DatePicker
                     id="FCIA_id_Date" 
                     maxDate="{VisiableModel>/maxDate}"
+                    minDate="{VisiableModel>/minDate}"
                     value="{CreateIncomeAssetModel>/AssetCreationDate}"
                     change="FCIA_ondatechange"
                      valueStateText="Select date"
@@ -141,8 +141,6 @@
                 <Select
                     id="FCIA_id_currency"
                     selectedKey="{CreateIncomeAssetModel>/Currency}"
-                    value="{CreateIncomeAssetModel>/Currency}"
-
                     items="{oCurrencyModel>/}"
                 >
                     <core:Item
@@ -150,18 +148,29 @@
                         key="{oCurrencyModel>currency}"
                     />
                 </Select>
+                <Label text="TransferBy"/>
+                <Select
+                    id="FCIA_id_transferBy"
+                    selectedKey="{CreateIncomeAssetModel>/TransferByName}"
+                    showSecondaryValues="true"
+                    items="{AdminModel>/}"
+                >
+                    <core:ListItem
+                        text="{AdminModel>EmployeeName}"
+                        key="{EmpMoAdminModeldel>EmployeeName}"
+                        additionalText="{AdminModel>EmployeeID}"
+                    />
+               </Select>
                 <Label text="{i18n>transferDate}"/>
                 <DatePicker
                 id="FCIA_id_transferdate"
                 required="true"
-                value="{CreateIncomeAssetModel>/TransferDate}"
                 minDate="{VisiableModel>/minDate}"
+                value="{CreateIncomeAssetModel>/TransferDate}"
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
                     valueStateText="Select date"
                     change="FCIA_ondatechange"
-
-
                 />
                  <Label text="{i18n>transferBranch}"/>
              <ComboBox

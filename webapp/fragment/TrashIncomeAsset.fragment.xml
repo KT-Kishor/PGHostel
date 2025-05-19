@@ -42,7 +42,7 @@
                   liveChange="FCIA_onDescriptionTextAreaChange"
                   value="{CreateIncomeAssetModel>/Comments}"
                   placeholder="Enter Comments" 
-                  maxLength="60" width="100%" />
+                  maxLength="250" width="100%" />
 			</f:content>
 		</f:SimpleForm>
 		<beginButton>
