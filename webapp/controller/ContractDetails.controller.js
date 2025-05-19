@@ -86,12 +86,15 @@ sap.ui.define([
 
                     var ContractStatusModel = new JSONModel({ status: false });
                     this.getView().setModel(ContractStatusModel, "ContractStatus");
-
+                    this.getView().getModel("ContractStatus").refresh(true);
+                    
                     var editable = new JSONModel({ editable: false, Status: false, renewStatus: false , mobile:false});
                     this.getView().setModel(editable, "simpleForm");
+                     this.getView().getModel("simpleForm").refresh(true);
 
                     var oViewModel = new JSONModel({ isEditMode: false, isVisiable: true, isMerge: true });
                     this.getView().setModel(oViewModel, "viewModel");
+                    this.getView().getModel("viewModel").refresh(true);
 
                     try {
                         var response = await this.ajaxReadWithJQuery("Contract", { ContractNo: this.sArgPara, AgreementNo: AgreementNo });
@@ -115,6 +118,8 @@ sap.ui.define([
                             this.byId("CU_id_ActivateBtn").setVisible(false);
                         } else if (this.ContractStatus === "Inactive") {
                              this.byId("CU_id_ActivateBtn").setVisible(true);
+                        }else {
+                            this.getView().getModel("ContractStatus").setProperty("/status", true);
                         }
 
                         var contractModel = new JSONModel(oResult);
@@ -788,9 +793,6 @@ sap.ui.define([
                         } else if (this.ContractStatus === "Inactive") {
                              this.byId("CU_id_ActivateBtn").setVisible(true);
                         }
-
-
-                this.getView().getModel("ContractStatus").setProperty("/status", !(this.ContractStatus === "Inactive" || this.ContractStatus === "Renewed"));
 
                 const contractModel = new JSONModel(oResult);
                 this.getOwnerComponent().setModel(contractModel, "oFilteredContractModel");
