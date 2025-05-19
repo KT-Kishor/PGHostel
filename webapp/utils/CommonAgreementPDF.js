@@ -15,7 +15,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             return currentYPosition; // Return updated Y position
         },
 
-        _pdfContent: function (that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content) {
+        _pdfContent: function (that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content, type) {
             doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
             doc.setGState(new doc.GState({ opacity: 0.1 }));
             doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
@@ -153,7 +153,12 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 pointContentLastY = topMargin;
             }
             doc.setFont("times", "bold");
-            var pointContentLast = `Understood and agreed to by the duly authorized representative of ${oCompanyModel.companyName} and ${oModel.ClientCompanyName}`;
+            if (type === "Contract") {
+                var pointContentLast = `Understood and agreed to by the duly authorized representative of ${oCompanyModel.companyName} and ${oModel.ClientName}`;
+            }
+            else {
+                var pointContentLast = `Understood and agreed to by the duly authorized representative of ${oCompanyModel.companyName} and ${oModel.ClientCompanyName}`;
+            }
             let pointContentLastLines = doc.splitTextToSize(pointContentLast, maxWidth);
             pointContentLastLines.forEach((line) => {
                 doc.text(line, margin, pointContentLastY);
@@ -173,7 +178,9 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.text(oModel.AgreementDate, margin, headofCoRoleY + 5);
 
             doc.setFont("times", "bold");
-            doc.text(`For ${oModel.ClientCompanyName}`, pageMiddle + 10, forCoNameY);
+            if (type !== "Contract") {
+                doc.text(`For ${oModel.ClientCompanyName}`, pageMiddle + 10, forCoNameY);
+            }
             doc.text("By:", pageMiddle + 10, forCoNameY + 5);
 
             doc.text(oModel.ClientName, pageMiddle + 10, headofCoNameY);
@@ -252,7 +259,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.text(titleText, titleX, topMargin + 30);
                 currentY = topMargin + 40; // Update currentY after title
 
-                that._pdfContent(that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content);
+                that._pdfContent(that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content, "Contract");
                 doc.addPage();
                 doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
