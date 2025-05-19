@@ -33,9 +33,17 @@
                     >
                         <fb:control>
                             <ComboBox
+                                showSecondaryValues="true"
+                                items="{path: 'CompanyQuotationModel>/'}"
                                 showClearIcon="true"
                                 id="HQ_id_quotationNo"
-                            />
+                            >
+                                <core:ListItem
+                                    key="{CompanyQuotationModel>QuotationNo}"
+                                    text="{CompanyQuotationModel>QuotationNo}"
+                                    additionalText="{CompanyQuotationModel>CompanyName}"
+                                />
+                            </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
@@ -85,7 +93,7 @@
                         <cells>
                             <Text text="{CompanyQuotationModel>QuotationNo}" />
                             <Text text="{CompanyQuotationModel>CompanyName}" />
-                            <Text text="{CompanyQuotationModel>Date}" />
+                            <Text text="{path:'CompanyQuotationModel>Date',formatter:'.Formatter.formatDate'}" />
                             <Text text="{CompanyQuotationModel>CompanyGSTNO}" />
                             <Text text="{CompanyQuotationModel>CustomerName}" />
                             <Text text="{CompanyQuotationModel>CustomerGSTNO}" />

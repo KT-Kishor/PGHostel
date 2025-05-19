@@ -17,9 +17,9 @@ sap.ui.define([
                 if (!LoginFunction) return;
                 this.getBusyDialog();
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
-                await this._fetchCommonData("Currency", "CurrencyModel");
-                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeOffer" });
-                await this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                this._fetchCommonData("Currency", "CurrencyModel");
+                this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeOffer" });
+                this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 await this._fetchCommonData("EmployeeDetailsData", "empModel");
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);

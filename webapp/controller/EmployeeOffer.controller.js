@@ -20,8 +20,8 @@ sap.ui.define([
                 var LoginFunction = await this.commonLoginFunction("EmployeeOffer");
                 if (!LoginFunction) return;
                 this.getBusyDialog();
-                await this._fetchCommonData("Designation", "DesignationModel"); // common designation read call
-                await this._fetchCommonData("AppVisibility", "RoleModel"); // common role get call
+                this._fetchCommonData("Designation", "DesignationModel"); // common designation read call
+                this._fetchCommonData("AppVisibility", "RoleModel"); // common role get call
                 var oRoleModel = this.getView().getModel("RoleModel");
                 if (oRoleModel) {
                     var aRoles = oRoleModel.getData();
@@ -30,12 +30,12 @@ sap.ui.define([
                     });
                     oRoleModel.setData(aRoles);
                 }
-                await this._fetchCommonData("EmployeeDetailsData", "EmployeeModel"); // employee read get call
+                this._fetchCommonData("EmployeeDetailsData", "EmployeeModel"); // employee read get call
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
                 this.byId("EO_id_RejectBtn").setEnabled(false);
-                await this._fetchCommonData("BaseLocation", "BaseLocationModel"); // base location read call
-                await this._fetchCommonData("Country", "CountryModel");
+                this._fetchCommonData("BaseLocation", "BaseLocationModel"); // base location read call
+                this._fetchCommonData("Country", "CountryModel");
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 this.Filter = true;
@@ -56,7 +56,7 @@ sap.ui.define([
                         var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                         this.getView().setModel(new JSONModel(offerData), "EmployeeOfferModel");
                         if (this.Filter) {
-                         var oFilterData = [...new Map(offerData.filter(item => item.ConsultantName && item.ConsultantName.trim() !== "").map(item => [item.ConsultantName.trim(), item])).values()];
+                            var oFilterData = [...new Map(offerData.filter(item => item.ConsultantName && item.ConsultantName.trim() !== "").map(item => [item.ConsultantName.trim(), item])).values()];
                             this.getView().setModel(new JSONModel(oFilterData), "EmployeeOfferModelInitial");
                             this.getView().getModel("EmployeeOfferModelInitial").refresh(true);
                             this.Filter = true;
@@ -159,7 +159,7 @@ sap.ui.define([
                 });
             },
             //Common  reject or onboard action handling
-           onHandleEmployeeAction: function (status, actionMethod) {
+            onHandleEmployeeAction: function (status, actionMethod) {
                 var oSelectedData = this.byId("EO_id_TableEOffer").getSelectedItem().getBindingContext("EmployeeOfferModel").getObject();
                 this.oSelectedRow = oSelectedData;
                 var sName = oSelectedData.Salutation + " " + oSelectedData.ConsultantName;
@@ -286,8 +286,8 @@ sap.ui.define([
             OEF_onPressOnBoard: function (oEvent) {
                 try {
                     var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
-                     if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Country"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idSelect"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID")
-                         && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_STDCode"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
+                    if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Country"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idSelect"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID")
+                        && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_STDCode"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
                         var oPayload = {
                             tableName: "EmployeeDetails",
                             data: oModel
@@ -300,7 +300,7 @@ sap.ui.define([
                                 this.EO_onSearch();
                                 this.oDialog.close();
                                 MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
-                                
+
                             } else {
                                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                             }
@@ -329,7 +329,7 @@ sap.ui.define([
                             "ID": this.oSelectedRow.ID
                         }
                     };
-                     // call for EmployeeOffer
+                    // call for EmployeeOffer
                     await this.ajaxUpdateWithJQuery("EmployeeOffer", oModelOffer).then((oData) => {
                         if (oData.success) {
                             var sSuccessMessage = (oStatus === "Onboarded")
@@ -371,7 +371,7 @@ sap.ui.define([
                 );
             },
             OE_onChangeCountry: function (oEvent) {
-                this.onCountryChange(oEvent, { stdCodeCombo: "OEF_id_STDCode", baseLocationCombo: "idSelect", branchInput: "OE_id_BranchInput", mobileInput:"OEF_id_Mobile" });
+                this.onCountryChange(oEvent, { stdCodeCombo: "OEF_id_STDCode", baseLocationCombo: "idSelect", branchInput: "OE_id_BranchInput", mobileInput: "OEF_id_Mobile" });
             }
 
 

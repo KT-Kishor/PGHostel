@@ -23,7 +23,7 @@ sap.ui.define([
                 this.getView().byId("EOD_id_BondCombo").setVisible(false);
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                await this._fetchCommonData("Designation", "DesignationModel");//designation get call
+
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel"); //base location get call
                 let oModel = this.getView().getModel("BaseLocationModel");
                 let aData = oModel.getData();
@@ -32,9 +32,12 @@ sap.ui.define([
 
                 // Update the model with sorted data
                 oModel.setData(aData);
-                await this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
-                await this._fetchCommonData("AppVisibility", "RoleModel") // role get call
-                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
+                if (!this.getView().getModel("CurrencyModel")) {
+                    this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
+                    this._fetchCommonData("AppVisibility", "RoleModel") // role get call
+                    this._fetchCommonData("Designation", "DesignationModel");//designation get call
+                    this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
+                }
                 var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",
@@ -481,7 +484,7 @@ sap.ui.define([
                 );
             },
             //Mail dialog button visibility
-             validateSendButton: function () {
+            validateSendButton: function () {
                 try {
                     const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                     const emailField = sap.ui.getCore().byId("CCMail_TextArea");

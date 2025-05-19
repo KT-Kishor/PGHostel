@@ -18,9 +18,9 @@ sap.ui.define([
                 this.getBusyDialog();
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                await this._fetchCommonData("Designation", "DesignationModel");
-                await this._fetchCommonData("Department", "Departmentmodel");
-                await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeCertificate" });
+                this._fetchCommonData("Designation", "DesignationModel");
+                this._fetchCommonData("Department", "Departmentmodel");
+                this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeCertificate" });
                 await this._fetchCommonData("EmployeeDetailsData", "empModel");
 
                 // common company emails read call
@@ -207,11 +207,11 @@ sap.ui.define([
 
             //Reject trainee function
             _handleReject: async function (oContext) {
-                    this.getBusyDialog();
-                    oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
-                    await this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
-                    this.T_ButtonVisibility();
-                    this.T_onSearch();
+                this.getBusyDialog();
+                oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
+                await this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
+                this.T_ButtonVisibility();
+                this.T_onSearch();
             },
             //Onboard trainee function
             OTF_onPressOnboard: async function (oTraineeData) {

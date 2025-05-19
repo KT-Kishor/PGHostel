@@ -86,7 +86,7 @@
                                         <m:ComboBox
                                             value="{QuotationModel>/STDCode}"
                                             showSecondaryValues="true"
-                                            id="HQD_id_STDCode"
+                                            id="HQD_id_mobileNumber"
                                             items="{codeModel>/}"
                                             filterSecondaryValues="true"
                                             change="HQD_STDCode"
@@ -159,7 +159,7 @@
                                             liveChange="HQD_onComGSTLiveChange"
                                             valueStateText="{i18n>gstNoValueState}"
                                             change="HQD_onChangeGstNo"
-                                            editable="{visiablityPlay>/editable}"
+                                           editable="{SingleCompanyModel>/gstEditable}"
                                             maxLength="20"
                                         />
                                         <m:Label
@@ -171,8 +171,8 @@
     id="HQD_id_CheckboxCGS"
     selected="{QuotationModel>/CGSTSelected}"
     select="onSelectCGST"
-    editable="{QuotationModel>/GSTValid}"
-    visible="{QuotationModel>/ShowGSTFields}"
+    editable="{QuotationModel>/ShowGSTFields}"
+    
 />
 
 <m:RadioButton  
@@ -180,22 +180,23 @@
     id="HQD_id_CheckboxIGS"
     selected="{QuotationModel>/IGSTSelected}"
     select="onSelectIGST"
-    editable="{QuotationModel>/GSTValid}"
-    visible="{QuotationModel>/ShowGSTFields}"
+    editable="{QuotationModel>/ShowGSTFields}"
+  
 />
 
 <m:Label
     text="{i18n>percentage}"
-    required="{QuotationModel>/GSTValid}"
-    visible="{QuotationModel>/ShowGSTFields}"
+    required="{QuotationModel>/ShowGSTFields}"
+    
 />
 
 <m:Input
     value="{QuotationModel>/Percentage}"
     liveChange="HQD_onPercentageChange"
-    editable="{QuotationModel>/GSTValid}"
+    editable="{QuotationModel>/ShowGSTFields}"
     maxLength="10"
-    visible="{QuotationModel>/ShowGSTFields}"
+    id="HQD_id_Percentage"
+   
 />
 
                                         <m:Label
@@ -285,7 +286,7 @@
                                             rows="2"
                                             editable="{visiablityPlay>/editable}"
                                         />
-                                        <m:Label text="{i18n>customerGSTNO}" />
+                                        <m:Label text="{i18n>customerGSTNO}" required="true"/>
                                         <m:Input
                                             value="{QuotationModel>/CustomerGSTNO}"
                                             id="HQD_id_InputCustomerGSTNO"
@@ -332,16 +333,16 @@
                                             </m:OverflowToolbar>
                                         </m:headerToolbar>
                                         <m:columns>
-                                            <m:Column width="100px">
+                                            <m:Column width="100px" visible="false">
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
                                                         value='{"columnKey": "SNo", "leadingProperty": "SNo", "sortProperty": "SNo", "filterProperty": "SNo", "columnIndex": 1}'    
                                                     />
                                                 </m:customData>
-                                                <m:Text text="{i18n>sNo}" />
+                                                <m:Text text="{i18n>sNo}"  />
                                             </m:Column>
-                                            <m:Column width="300px" visible="false">
+                                            <m:Column width="300px" >
                                                 <m:customData >
                                                     <core:CustomData
                                                         key="p13nData"
@@ -350,26 +351,28 @@
                                                 </m:customData>
                                                 <m:Text text="{i18n>item}" />
                                             </m:Column>
-                                            <m:Column id="HQD_id_SAC">
-                                                <m:customData>
-                                                    <core:CustomData
-                                                        key="p13nData"
-                                                        value='{"columnKey": "SAC", "leadingProperty": "SAC", "sortProperty": "SAC", "filterProperty": "SAC", "columnIndex": 3 }'
-                                                    />
-                                                </m:customData>
-                                                <m:Text text="{i18n>SAC}" />
-                                            </m:Column>
-                                            <m:Column id="HQD_id_GSTCalculaton">
-                                                <m:customData>
-                                                    <core:CustomData
-                                                        key="p13nData"
-                                                        value='\{"columnKey": "GSTCalculation", "leadingProperty": "GSTCalculation", "sortProperty": "GSTCalculation", "filterProperty": "GSTCalculation", "columnIndex": 4}'
-                                                    />
-                                                </m:customData>
-                                                <m:Text
-                                                    text="{i18n>GSTCalculation}"
-                                                />
-                                            </m:Column>
+                                            <!-- SAC Column -->
+<m:Column id="HQD_id_SAC" visible="{QuotationModel>/ShowSACAndGSTCalculation}">
+    <m:customData>
+        <core:CustomData
+            key="p13nData"
+            value='{"columnKey": "SAC", "leadingProperty": "SAC", "sortProperty": "SAC", "filterProperty": "SAC", "columnIndex": 3 }'
+        />
+    </m:customData>
+    <m:Text text="{i18n>SAC}" />
+</m:Column>
+
+<!-- GSTCalculation Column -->
+<m:Column id="HQD_id_GSTCalculaton" visible="{QuotationModel>/ShowSACAndGSTCalculation}">
+    <m:customData>
+        <core:CustomData
+            key="p13nData"
+            value='{"columnKey": "GSTCalculation", "leadingProperty": "GSTCalculation", "sortProperty": "GSTCalculation", "filterProperty": "GSTCalculation", "columnIndex": 4 }'
+        />
+    </m:customData>
+    <m:Text text="{i18n>GSTCalculation}" />
+</m:Column>
+
                                             <m:Column>
                                                 <m:customData>
                                                     <core:CustomData
@@ -412,98 +415,93 @@
                                             </m:Column>
                                         </m:columns>
                                         <m:items>
-                                            <m:ColumnListItem>
-                                                <m:cells>
-                                                    <m:Input
-                                                        value="{IndexNo}"
-                                                        editable="false"
-                                                    />
-                                                </m:cells>
-                                                <m:VBox>
-                                                    <m:items>
-                                                        <m:Input
-                                                            value="{Item}"
-                                                            placeholder="Item Description"
-                                                            editable="{visiablityPlay>/editable}"
-                                                            maxLength="40"
-                                                        />
-                                                        <m:Input
-                                                            value="{Description}"
-                                                            placeholder="Additional details"
-                                                            editable="{visiablityPlay>/editable}"
-                                                            maxLength="40"
-                                                        />
-                                                    </m:items>
-                                                </m:VBox>
-                                                <m:cells>
-                                                    <m:ComboBox
-                                                        showSecondaryValues="true"
-                                                        items="{InvoiceSACModel>/results}"
-                                                        value="{SAC}"
-                                                        editable="{QuotationModel>/GSTValid}"
-                                                        selectedKey="1"
-                                                    >
-                                                        <core:ListItem
-                                                            key="{InvoiceSACModel>ID}"
-                                                            additionalText="{InvoiceSACModel>Description}"
-                                                            text="{InvoiceSACModel>SAC}"
-                                                        />
-                                                    </m:ComboBox>
-                                                </m:cells>
-                                                <m:cells>
-                                                    <m:ComboBox
-                                                        value="{GSTCalculation}"
-                                                        selectedKey="1"
-                                                        editable="{QuotationModel>/GSTValid}"
-                                                        change="HQD_onChangeGSTCalculation"
-                                                    >
-                                                        <core:Item
-                                                            key="{i18n>yes}"
-                                                            text="{i18n>yes}"
-                                                        />
-                                                        <core:Item
-                                                            key="{i18n>no}"
-                                                            text="{i18n>no}"
-                                                        />
-                                                    </m:ComboBox>
-                                                </m:cells>
-                                                <m:cells>
-                                                    <m:Input
-                                                        value="{Days}"
-                                                        editable="{visiablityPlay>/editable}"
-                                                        change="HQD_onInputChange"
-                                                        type="Number"
-                                                        maxLength="20"
-                                                        textAlign="End"
-                                                    />
-                                                </m:cells>
-                                                <m:cells>
-                                                    <m:Input
-                                                        value="{UnitPrice}"
-                                                        editable="{visiablityPlay>/editable}"
-                                                        change="HQD_onInputChange"
-                                                        type="Number"
-                                                        maxLength="20"
-                                                        textAlign="End"
-                                                    />
-                                                </m:cells>
-                                                <m:cells>
-                                                    <m:Input
-                                                        value="{Discount}"
-                                                        editable="{visiablityPlay>/editable}"
-                                                        liveChange="HQD_onchangeDiscount"
-                                                        maxLength="20"
-                                                        textAlign="End"
-                                                    />
-                                                </m:cells>
-                                                <m:cells>
-                                                    <m:Input
-                                                        value="{path:'Total',formatter: '.Formatter.numberFormater'}"
-                                                        editable="false"
-                                                        textAlign="End"
-                                                    />
-                                                </m:cells>
-                                            </m:ColumnListItem>
+                                           <m:ColumnListItem>
+  <m:cells>
+    <!-- SNo (Column 1) -->
+    <m:Input
+      value="{= ${$index} + 1 }"
+      editable="false"
+    />
+
+    <!-- Item (Column 2) -->
+    <m:VBox>
+      <m:items>
+        <m:TextArea
+          rows="2"
+          value="{QuotationModel>Description}"
+          placeholder="Additional details"
+          editable="{visiablityPlay>/editable}"
+          maxLength="40"
+        />
+      </m:items>
+    </m:VBox>
+
+    <!-- SAC (Column 3) -->
+    <m:ComboBox
+      showSecondaryValues="true"
+      items="{path:'SACModel>/'}"
+      value="{QuotationModel>SAC}"
+      editable="{QuotationModel>/GSTValid}"
+      selectedKey="1"
+      visible="{QuotationModel>/ShowSACAndGSTCalculation}"
+    >
+      <core:ListItem
+        key="{SACModel>id}"
+        additionalText="{SACModel>description}"
+        text="{SACModel>sac}"
+      />
+    </m:ComboBox>
+
+    <!-- GSTCalculation (Column 4) -->
+    <m:ComboBox
+      value="{QuotationModel>GSTCalculation}"
+      selectedKey="1"
+      editable="{QuotationModel>/GSTValid}"
+      change="HQD_onChangeGSTCalculation"
+      visible="{QuotationModel>/ShowSACAndGSTCalculation}"
+    >
+      <core:Item key="Yes" text="{i18n>yes}" />
+      <core:Item key="No" text="{i18n>no}" />
+    </m:ComboBox>
+
+    <!-- Days (Column 5) -->
+     <m:Input
+      value="{QuotationModel>Days}"
+      editable="{visiablityPlay>/editable}"
+      change="HQD_onInputChange"
+      type="Number"
+      maxLength="20"
+      textAlign="End"
+    />
+
+    <!-- UnitPrice (Column 6) -->
+    <m:Input
+      value="{QuotationModel>UnitPrice}"
+      editable="{visiablityPlay>/editable}"
+      change="HQD_onInputChange"
+      type="Number"
+      maxLength="20"
+      textAlign="End"
+    />
+
+    <!-- Discount (Column 7) -->
+    <m:Input
+      value="{QuotationModel>Discount}"
+      editable="{visiablityPlay>/editable}"
+      change="HQD_onInputChange"
+      maxLength="20"
+      textAlign="End"
+      type="Number"
+    />
+
+    <!-- Total (Column 8) -->
+    <m:Input
+      value="{QuotationModel>Total}"
+      editable="false"
+      textAlign="End"
+    />
+  </m:cells>
+</m:ColumnListItem>
                                         </m:items>
                                     </m:Table>
                                     <m:FlexBox
@@ -548,11 +546,11 @@
                                             <m:HBox
                                                 justifyContent="SpaceBetween"
                                             >
-                                                <m:Label
-                                                    text="{= 'CGST ( ' + (${QuotationItemModel>/CGSTPercentage} || ${QuotationModel>/Percentage}) + ' % ) : '}"
-                                                    visible="{= ${QuotationItemModel>/CGSTVisible} === true || ${QuotationModel>/CGSTVisible} === true}"
-                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-                                                />
+                                               <m:Label
+    text="{= 'CGST ( ' + ${QuotationModel>/Percentage} + ' % ) : '}"
+    visible="{= ${QuotationItemModel>/CGSTVisible} === true || ${QuotationModel>/CGSTVisible} === true}"
+    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+/>
                                                 <m:Text
                                                     text="{path:'QuotationItemModel>/CGST',formatter: '.Formatter.numberFormater'}"
                                                     class="amountText"
@@ -565,10 +563,10 @@
                                                 justifyContent="SpaceBetween"
                                             >
                                                 <m:Label
-                                                    text="{= 'SGST ( ' + (${QuotationItemModel>/SGSTPercentage} || ${QuotationModel>/Percentage}) + ' % ) : '}"
-                                                    visible="{= ${QuotationItemModel>/SGSTVisible} === true || ${QuotationModel>/SGSTVisible} === true}"
-                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-                                                />
+    text="{= 'SGST ( ' + ${QuotationModel>/Percentage} + ' % ) : '}"
+    visible="{= ${QuotationItemModel>/SGSTVisible} === true || ${QuotationModel>/SGSTVisible} === true}"
+    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+/>
                                                 <m:Text
                                                     text="{path:'QuotationItemModel>/SGST',formatter: '.Formatter.numberFormater'}"
                                                     class="amountText"
@@ -582,14 +580,14 @@
                                             >
                                                 <m:Label
                                                     text="{= 'IGST ( ' + (${QuotationItemModel>/IGSTPercentage} || ${QuotationModel>/Percentage}) + ' % ) : '}"
-                                                    visible="{= ${QuotationItemModel>/IGSTVisible} === true || ${QuotationModel>/IGSTVisible} === true}"
+                                                     visible="{= ${QuotationModel>/IGSTVisible} === true }"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
                                                 <m:Text
                                                     text="{path:'QuotationItemModel>/IGST',formatter: '.Formatter.numberFormater'}"
                                                     class="amountText"
                                                     textAlign="End"
-                                                    visible="{= ${QuotationItemModel>/IGSTVisible} === true || ${QuotationModel>/IGSTVisible} === true}"
+                                                    visible="{= ${QuotationModel>/IGSTVisible} === true }"
                                                 />
                                             </m:HBox>
                                             <!-- Total -->
