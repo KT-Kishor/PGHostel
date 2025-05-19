@@ -906,11 +906,11 @@ sap.ui.define([
 
             //PDF download function
             onPressMerge: async function () {
-                this.getBusyDialog();
                 this.contractPDFgenerate(this.pdfData);
             },
 
             contractPDFgenerate: async function (oEmpModel) {
+                this.getBusyDialog();
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "Contract" });
                 var oPDFModel = this.getView().getModel("PDFData");
@@ -959,8 +959,6 @@ sap.ui.define([
                 }
                 if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                     if (typeof jsPDF !== "undefined" && typeof jsPDF._GenerateContractPDF === "function") {
-                        this.closeBusyDialog();
-                        this.getBusyDialog();
                         jsPDF._GenerateContractPDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
                     }
                 }
