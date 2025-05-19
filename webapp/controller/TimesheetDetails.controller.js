@@ -21,14 +21,13 @@ sap.ui.define([
             await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
             await this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: this.branch })
             const oViewModel = new JSONModel();
-            oViewModel.setData({
-                calendarStartDate: this._getStartOfWeek(new Date())
-            });
-            this.onMarkCalendarDates()
+            oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
             this.getView().setModel(oViewModel, "viewModel");
             this.byId("TSD_id_Assignment").setValueState("None");
             this.byId("TSD_id_TimeHours").setValueState("None");
             this.byId("TSD_id_EmpComment").setValueState("None");
+            this._makeDatePickersReadOnly(["TSD_id_Assignment", "TSD_id_TimeHours"]);
+            this.onMarkCalendarDates()
         },
         _getStartOfWeek: function (date) {
             const day = date.getDay(); // Sunday = 0, Monday = 1, ...
@@ -63,51 +62,61 @@ sap.ui.define([
         },
         TSD_onSubmit: async function () {
             try {
-                // Step 1: Field Validations
-                const isValidAssignment = utils._LCvalidateMandatoryField(this.byId("TSD_id_Assignment"), "ID");
-                const isValidHours = utils._LCvalidateTimeLimit(this.byId("TSD_id_TimeHours"), "ID");
-                const isValidComment = utils._LCvalidateMandatoryField(this.byId("TSD_id_EmpComment"), "ID");
-                if (!(isValidAssignment && isValidHours && isValidComment)) {
+                // Step 1: Validate mandatory fields
+                const isValid = (
+                    utils._LCvalidateMandatoryField(this.byId("TSD_id_Assignment"), "ID") &&
+                    utils._LCvalidateTimeLimit(this.byId("TSD_id_TimeHours"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.byId("TSD_id_EmpComment"), "ID")
+                );
+                if (!isValid) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
-                // Step 2: Date Selection
+
+                // Step 2: Validate date selected
                 const oCalendar = this.getView().byId("calendar").getSelectedDates();
                 const selectedDateObj = oCalendar[0]?.getStartDate();
                 if (!selectedDateObj) {
-                    MessageToast.show(this.i18nModel.getText("dateSelectionMissing"));
+                    MessageToast.show(this.i18nModel.getText("selectDateT"));
                     return;
                 }
-                // Step 3: Date Formatting
-                const sFormattedDate = selectedDateObj.toISOString().split("T")[0]; // "2025-05-16"
-                const sMonth = selectedDateObj.toLocaleString('default', { month: 'long' }); // "May"
-                const sYear = selectedDateObj.getFullYear();
-                const sDayOfWeek = selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }); // "Friday"
-                // Step 4: Get form data
-                const oModel = this.getView().getModel("EmployeeModel").getData();
-                const oNewModel = this.getView().getModel("newModel");
-                const oData = oNewModel ? oNewModel.getData() : {};
-                const sHoursWorked = this.getView().byId("TSD_id_TimeHours").getValue();
-                const sEmpComment = this.getView().byId("TSD_id_EmpComment").getValue();
 
-                // Step 5: Prepare Payload
+                // Step 3: Get entered and actual hours
+                const sEnteredHours = Number(this.byId("TSD_id_TimeHours").getValue());
+                const oData = this.getView().getModel("newModel")?.getData() || {};
+                const sActualHours = Number(oData?.ActualHours);
+
+                console.log("Entered Hours:", sEnteredHours, "Actual Assignment Hours:", sActualHours);
+
+                if (isNaN(sEnteredHours) || isNaN(sActualHours)) {
+                    MessageToast.show("Invalid hour value.");
+                    return;
+                }
+
+                if (sEnteredHours > sActualHours) {
+                    MessageToast.show(this.i18nModel.getText("hoursExceedError") || "Entered hours cannot exceed actual assignment hours.");
+                    return;
+                }
+
+                // Step 4: Prepare payload
                 const oPayload = {
                     TaskID: oData.TaskID,
                     TaskName: oData.TaskName,
                     EmployeeID: oData.EmployeeID,
                     EmployeeName: oData.EmployeeName,
-                    ManagerName: oModel[0].ManagerName,
-                    ManagerID: oModel[0].ManagerID,
-                    HoursWorked: sHoursWorked.toString(),
-                    EmployeeComments: sEmpComment,
-                    Date: sFormattedDate,     // e.g. "2025-05-16"
-                    Month: sMonth,            // e.g. "May"
-                    Year: sYear,              // e.g. 2025
-                    Day: sDayOfWeek,          // e.g. "Friday"
-                    Status: "SAVED",
-                    ManagerComments: oData.ManagerComments
+                    ManagerName: oData.ManagerName || "Unknown",
+                    ManagerID: oData.ManagerID || "Unknown",
+                    HoursWorked: sEnteredHours.toString(), // ✅ Use entered hours
+                    EmployeeComments: this.byId("TSD_id_EmpComment").getValue(),
+                    Date: selectedDateObj.toISOString().split("T")[0],
+                    Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
+                    Year: selectedDateObj.getFullYear(),
+                    Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
+                    Status: "Saved",
+                    ManagerComments: oData.ManagerComments || ""
                 };
-                // Step 6: Backend Call
+
+                // Step 5: Submit to backend
                 BusyIndicator.show(0);
                 try {
                     await this.ajaxCreateWithJQuery("Timesheet", { data: oPayload });
@@ -118,7 +127,6 @@ sap.ui.define([
                 } finally {
                     BusyIndicator.hide();
                 }
-
             } catch (err) {
                 BusyIndicator.hide();
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -181,6 +189,10 @@ sap.ui.define([
         onDateSelect: function (oEvent) {
             var that = this;
             var selectedDates = oEvent.getSource().getSelectedDates();
+            this.byId("TSD_id_Assignment").setValue("");
+            this.byId("TSD_id_TimeHours").setValue("");
+            this.byId("TSD_id_EmpComment").setValue("");
+            this.byId("idTextActHour").setText("");
             if (selectedDates.length > 0) {
                 var selectedDate = selectedDates[0].getStartDate();
                 var formattedDate = that.Formatter.formatDate(selectedDate);
@@ -208,12 +220,10 @@ sap.ui.define([
                 var oViewModel = that.getView().getModel("viewModel");
                 oViewModel.setProperty("/selectedEntryDate", formattedDate);
             }
-            this.clearTimesheetForm();
         },
 
         clearTimesheetForm: function () {
-            const oView = this.getView();
-            const oAssignModel = oView.getModel("AssignModel");
+            const oAssignModel = this.getView().getModel("AssignModel");
             // Clear input values
             oAssignModel.setProperty("/selectedAssignment", "");
             oAssignModel.setProperty("/HoursWorked", "");
@@ -235,20 +245,21 @@ sap.ui.define([
             const oSelectedItem = oEvent.getParameter("selectedItem");
             if (oSelectedItem) {
                 const AllData = oSelectedItem.getBindingContext("AssignModel").getObject();
-                // Log the data to ensure it's populated correctly
-                console.log("AllData:", AllData);
                 if (AllData) {
-                    this.getView().getModel("AssignModel").setProperty("/selectedAssignment", AllData.TaskName);
+                    // Optional: Show actual hours somewhere in the UI
+                     this.getView().getModel("AssignModel").setProperty("/selectedAssignment", AllData.TaskName);
                     this.getView().getModel("AssignModel").setProperty("/HoursWorked", AllData.HoursWorked);
                     this.getView().byId("idTextActHour").setText("Actual Hours: " + (AllData.HoursWorked || "0"));
-                    const oNewModel = new JSONModel({
+                    // Save assignment details into newModel
+                    const oNewModel = new sap.ui.model.json.JSONModel({
                         TaskID: AllData.TaskID,
                         TaskName: AllData.TaskName,
                         EmployeeID: this.EmployeeID,
                         EmployeeName: AllData.EmployeeName,
                         ManagerName: AllData.ManagerName,
                         ManagerID: AllData.ManagerID,
-                        ManagerComments: AllData.ManagerComments || ""
+                        ManagerComments: AllData.ManagerComments || "",
+                        ActualHours: AllData.HoursWorked
                     });
                     this.getView().setModel(oNewModel, "newModel");
                 } else {
@@ -257,7 +268,7 @@ sap.ui.define([
             } else {
                 console.warn("No selected item.");
             }
-        },
+        }
 
     });
 });

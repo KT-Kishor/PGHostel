@@ -87,7 +87,7 @@
                     <ColumnListItem type="Navigation" press="TS_onPressData" >
                       <cells>
                         <Text text="{FilteredTimesheetModel>TaskName}" />
-                        <Text text="{FilteredTimesheetModel>Date}" />
+                        <Text text="{path:'FilteredTimesheetModel>Date',formatter:'.Formatter.formatDate'}" />
                         <Text text="{FilteredTimesheetModel>Day}" />
                         <Text text="{FilteredTimesheetModel>HoursWorked}" />
                         <Text text="{EmployeeModel>/0/ManagerName}" />

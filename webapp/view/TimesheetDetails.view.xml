@@ -64,9 +64,7 @@
                         visible="{visiblePlay>/isAssignmentMode}"
                         change="TD_ValidateTime"
                         valueStateText="{i18n>hoursValueState}" />
-                        <Text id="idTextActHour" text="Actual Hours: 0" />
-
-
+                    <Text id="idTextActHour" text="Actual Hours: {/newModel/ActualHours}" />
                     <!-- Employee Comment -->
                     <Label text="{i18n>employeeComment}" />
                     <TextArea id="TSD_id_EmpComment"
