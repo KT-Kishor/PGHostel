@@ -29,7 +29,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="SubmittedDate" label="{i18n>submittedDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<DateRangeSelection id="MI_id_SubmittedDateFilter" valueFormat="dd/MM/yyyy"  displayFormat="dd/MM/yyyy" change="MI_onDateChangeFilter" />
+							<DateRangeSelection id="MI_id_SubmittedDateFilter" valueFormat="MM/dd/yyyy"  displayFormat="MM/dd/yyyy" change="MI_onDateChangeFilter" />
 						</fb:control>
 					</fb:FilterGroupItem>
 						<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">

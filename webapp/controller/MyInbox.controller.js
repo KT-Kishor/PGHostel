@@ -45,15 +45,27 @@ sap.ui.define([
         aFilterItems.forEach(function (oItem) {
           const oControl = oItem.getControl();
           const sKey = oItem.getName();
+          var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
 
           if (oControl && typeof oControl.getValue === "function") {
             const sValue = oControl.getValue().trim();
 
-            if (sValue) {
-              params[sKey] = sValue;
-            }
+            if (sKey === "SubmittedDate" && sValue) {
+              params["SubStartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
+              params["SubEndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
+             } else if(sKey === "Type") {
+              if(oControl.getSelectedKeys().length > 0){
+                oControl.getSelectedKeys().forEach(function (oKey) {
+                  params[sKey] = oKey;
+                });
+              }
+             }else if(sValue){
+              params[sKey] = oControl.getValue();
+             }
           }
         });
+        //params["ManagerID"] = this.oLoginModel.EmployeeID;
+        params["ManagerID"] = "KT001";
         await this._fetchCommonData("InboxDetails", "MyInboxModelData", params);
         this.onBeforeShow();
         this.closeBusyDialog();
@@ -95,7 +107,7 @@ sap.ui.define([
     },
     onSelectionChangeStatus: function () {
       this.oModelData = this.byId("MI_id_MyInboxTable").getSelectedItem().getBindingContext("MyInboxModelData").getObject()
-      if (this.oModelData.Status === "Submitted" && this.oLoginModel.Type !== "Accountant") {
+      if (this.oModelData.Status === "Submitted" && this.oLoginModel.Role !== "Accountant") {
         this.getView().byId("MI_id_ButApprove").setVisible(true);
         this.getView().byId("MI_id_ButReject").setVisible(true);
       } else {
@@ -104,14 +116,20 @@ sap.ui.define([
       }
       this.getView().byId("MI_id_ButReSend").setVisible(false);
       this.getView().byId("MI_id_ButPaid").setVisible(false);
-      if ((this.oModelData.Type === "Expense" && this.oModelData.Status === "Submitted" && this.oLoginModel.Type !== "Accountant") || (this.oLoginModel.Type === "Accountant" && this.oModelData.Status === "Send to account")) {
+      if ((this.oModelData.Type === "Expense" && this.oModelData.Status === "Submitted" && this.oLoginModel.Role !== "Accountant") || (this.oLoginModel.Role === "Accountant" && this.oModelData.Status === "Send to account")) {
         this.getView().byId("MI_id_ButReSend").setVisible(true);
-        if (this.oLoginModel.Type === "Accountant" && this.oModelData.Status === "Send to account") this.getView().byId("MI_id_ButPaid").setVisible(true);
+        if (this.oLoginModel.Role === "Accountant" && this.oModelData.Status === "Send to account") this.getView().byId("MI_id_ButPaid").setVisible(true);
       }
     },
     MTF_onPressOk: function () {
       var getText = sap.ui.getCore().byId("MIF_id_OkBtn").getText();
-      if (this.liveChangeForMangerComments() && sap.ui.getCore().byId("remark").getValue()) {
+      var successMsg = getText === "Approve" ? "approveMessageSuccess" : getText === "Reject" ? "rejectMessageSuccess" :
+        getText === "Send Back" ? "resendMessageSuccess" : "PaidMessageSuccess";
+      var errorMsg = getText === "Approve" ? "erroApproveMessage" : getText === "Reject" ? "errorRejectMessage" :
+        getText === "Send Back" ? "errorResendMessage" : "errorPaidMessage";
+      getText = getText === "Approve" ? "Approved" : getText === "Reject" ? "Rejected" :
+        getText === "Send Back" ? "Send Back" : "Paid";
+      if (this.MIF_liveChangeForMangerComments() && sap.ui.getCore().byId("MIF_id_remark").getValue()) {
         this.updateCallForMyInboxFunction(this.oModelData, getText, successMsg, errorMsg);
       } else {
         sap.m.MessageToast.show(this.getView().getModel('i18n').getResourceBundle().getText("enterComments"))
@@ -135,20 +153,21 @@ sap.ui.define([
       // Confirmation dialog
       sap.ui.core.BusyIndicator.show(0)
       // User confirmed, proceed with approval
-      var remark = sap.ui.getCore().byId("remark").getValue();
+      var remark = sap.ui.getCore().byId("MIF_id_remark").getValue();
       that.oDialog.close();
       oModelData.Status = statusValue;
-      if (this.oLoginModel.Type === "Admin" || this.oLoginModel.Type === "Manager") oModelData.ManagerComment = remark;
+      if (this.oLoginModel.Role === "Admin" || this.oLoginModel.Role === "Manager") oModelData.ManagerComment = remark;
       else oModelData.AccountRemark = remark;
       oModelData.NoofDays = String(oModelData.NoofDays);
       var type = oModelData.Type
       var requestData = { filters: { ID: oModelData.ID }, data: oModelData };
       this.ajaxUpdateWithJQuery("InboxDetails", requestData).then(response => {
         this.closeBusyDialog(); //  Close BusyDialog
-        this.sendMailChecking(type);
+       // this.sendMailChecking(type);
         sap.ui.core.BusyIndicator.hide();
+        this._fetchCommonData("InboxDetails", "MyInboxModelData", { ManagerID: 'KT001' });
         sap.m.MessageToast.show(that.getView().getModel('i18n').getResourceBundle().getText(successMsg));
-        this.onBeforeShow();
+        //this.onBeforeShow();
       }).catch((error) => {
         this.closeBusyDialog(); //  Close BusyDialog
         sap.m.MessageBox.error(that.getView().getModel('i18n').getResourceBundle().getText(errorMsg));
@@ -212,7 +231,7 @@ sap.ui.define([
               "EmpID": this.oModelData.ManagerName,
               "ToDate": oData.results[0].ReimbursementAmount.toString(),
               "EmailID": this.oModelData.ManagerEmailID,
-              "Comments": this.oLoginModel.Type === "Accountant" ? oData.results[0].AccountingRemark : oData.results[0].ManagerRemark
+              "Comments": this.oLoginModel.Role === "Accountant" ? oData.results[0].AccountingRemark : oData.results[0].ManagerRemark
             }
             this.sendMailForExpendLeave(data, "ExpenseMail");
           }
