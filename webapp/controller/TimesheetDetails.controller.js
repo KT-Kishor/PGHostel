@@ -13,21 +13,35 @@ sap.ui.define([
         onInit: function () {
             this.getRouter().getRoute("RouteTimesheetDetails").attachMatched(this._onRouteMatched, this);
         },
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function (oEvent) {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.branch = this.getOwnerComponent().getModel("LoginModel").getProperty("/BranchCode");
             this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
             await this._fetchCommonData("AssignedTask", "AssignModel", { EmployeeID: this.EmployeeID });
             await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
-            await this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: this.branch })
-            const oViewModel = new JSONModel();
-            oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
+            await this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: this.branch });
+            const oViewModel = new JSONModel({ isUpdate: false, isCreate: true, isSubmitted: false, isEditing: false, calendarStartDate: this._getStartOfWeek(new Date()) });
             this.getView().setModel(oViewModel, "viewModel");
             this.byId("TSD_id_Assignment").setValueState("None");
             this.byId("TSD_id_TimeHours").setValueState("None");
             this.byId("TSD_id_EmpComment").setValueState("None");
             this._makeDatePickersReadOnly(["TSD_id_Assignment", "TSD_id_TimeHours"]);
-            this.onMarkCalendarDates()
+
+            // Handle Edit and Create cases
+            this.sArg = oEvent.getParameter("arguments").sPath;
+
+            if (this.sArg !== "Timesheet") {
+            var filter = [new sap.ui.model.Filter("SrNo", sap.ui.model.FilterOperator.EQ, this.sArg)];
+            this.readCallTimesheet("EditCase", filter);
+                // Edit Case
+                oViewModel.setProperty("/isUpdate", true);
+                oViewModel.setProperty("/isCreate", false);
+            } else {
+                // Create Case
+                oViewModel.setProperty("/isUpdate", false);
+                oViewModel.setProperty("/isCreate", true);
+                this.getView().getModel("editModel").setProperty("/editableBut", true);
+            }
         },
         _getStartOfWeek: function (date) {
             const day = date.getDay(); // Sunday = 0, Monday = 1, ...
@@ -60,6 +74,25 @@ sap.ui.define([
                 this.TSD_oDialog.open();
             }
         },
+
+         readCallTimesheet: async function (sPath,filter,oPayload) {
+                try {
+
+                    //this.getBusyDialog();
+                    await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID }).then((oData) => {
+                        var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                        this.getOwnerComponent().setModel(new JSONModel(offerData), "newModel");
+
+                        //this.closeBusyDialog();
+                    }).catch((error) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.message || error.responseText);
+                    });
+                } catch (error) {
+                   // this.closeBusyDialog();
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                }
+            },
         TSD_onSubmit: async function () {
             try {
                 // Step 1: Validate mandatory fields
@@ -247,7 +280,7 @@ sap.ui.define([
                 const AllData = oSelectedItem.getBindingContext("AssignModel").getObject();
                 if (AllData) {
                     // Optional: Show actual hours somewhere in the UI
-                     this.getView().getModel("AssignModel").setProperty("/selectedAssignment", AllData.TaskName);
+                    this.getView().getModel("AssignModel").setProperty("/selectedAssignment", AllData.TaskName);
                     this.getView().getModel("AssignModel").setProperty("/HoursWorked", AllData.HoursWorked);
                     this.getView().byId("idTextActHour").setText("Actual Hours: " + (AllData.HoursWorked || "0"));
                     // Save assignment details into newModel
