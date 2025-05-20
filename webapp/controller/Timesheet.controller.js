@@ -10,7 +10,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
             _onRouteMatched: function () {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oViewModel = new JSONModel();
-                oViewModel.setData({calendarStartDate: this._getStartOfWeek(new Date()) });
+                oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
                 this.getView().setModel(oViewModel, "viewModel");
                 var loginModel = this.getOwnerComponent().getModel("LoginModel");
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
@@ -18,21 +18,20 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
 
                 this.branch = loginModel.getProperty("/BranchCode");
                 this.onInitializeCalendarLegend();
-                this.TSD_ReadTimesheetEntries();
+                this.TSD_ReadTimesheetEntries(this.EmployeeID);
             },
 
             TS_onFillDetails: function () {
-                this.getRouter().navTo("RouteTimesheetDetails", {sPath: "Timesheet"});
+                this.getRouter().navTo("RouteTimesheetDetails", { sPath: "Timesheet" });
             },
-            
+
             TS_onPressData: function (oEvent) {
                 var sPath = oEvent.getSource().getBindingContext("FilteredTimesheetModel").getProperty("SrNo");
                 this.getRouter().navTo("RouteTimesheetDetails", {
                     sPath: sPath
                 });
             },
-
-            TSD_ReadTimesheetEntries: async function (filter) {
+             TSD_ReadTimesheetEntries: async function (filter) {
                 try {
                     //this.getBusyDialog();
                     await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID }).then((oData) => {

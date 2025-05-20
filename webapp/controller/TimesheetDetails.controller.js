@@ -31,15 +31,41 @@ sap.ui.define([
             this.sArg = oEvent.getParameter("arguments").sPath;
 
             if (this.sArg !== "Timesheet") {
-            this.readCallTimesheet();
+                this.readCallTimesheet();
                 // Edit Case
                 oViewModel.setProperty("/isUpdate", true);
                 oViewModel.setProperty("/isCreate", false);
+                oViewModel.setProperty("/isEditing", false);
             } else {
                 // Create Case
                 oViewModel.setProperty("/isUpdate", false);
                 oViewModel.setProperty("/isCreate", true);
+                oViewModel.setProperty("/isEditing", true);
                 this.getView().getModel("editModel").setProperty("/editableBut", true);
+            }
+        },
+
+        readCallTimesheet: async function () {
+            try {
+                this.getBusyDialog();
+                await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID }).then((oData) => {
+                    var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+
+                    // Find the selected row using sPath (SrNo)
+                    var selectedEntry = offerData.find(entry => entry.SrNo === this.sArg);
+                    if (selectedEntry) {
+                        this.getOwnerComponent().setModel(new JSONModel(selectedEntry), "newModel");
+                    }
+                    this.closeBusyDialog();
+
+                }).catch((error) => {
+                    MessageToast.show(error.message || error.responseText);
+                    this.closeBusyDialog();
+
+                });
+            } catch (error) {
+                MessageToast.show(this.i18nModel.getText("technicalError"));
+                this.closeBusyDialog();
             }
         },
         _getStartOfWeek: function (date) {
@@ -73,25 +99,6 @@ sap.ui.define([
                 this.TSD_oDialog.open();
             }
         },
-
-         readCallTimesheet: async function () {
-                try {
-
-                    //this.getBusyDialog();
-                    await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID ,}).then((oData) => {
-                        var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                        this.getOwnerComponent().setModel(new JSONModel(offerData), "newModel");
-
-                        //this.closeBusyDialog();
-                    }).catch((error) => {
-                        this.closeBusyDialog();
-                        MessageToast.show(error.message || error.responseText);
-                    });
-                } catch (error) {
-                   // this.closeBusyDialog();
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
-                }
-            },
         TSD_onSubmit: async function () {
             try {
                 // Step 1: Validate mandatory fields
@@ -295,7 +302,50 @@ sap.ui.define([
             } else {
                 console.warn("No selected item.");
             }
-        }
+        },
+        TSD_onToggleEdit: function () {
+            var oViewModel = this.getView().getModel("viewModel");
+            var isEditing = oViewModel.getProperty("/isEditing");
+
+            if (isEditing) {
+                // Save action (handle update logic)
+                this.TSD_onUpdate();
+            }
+
+            // Toggle editing mode
+            oViewModel.setProperty("/isEditing", !isEditing);
+        },
+        TSD_onUpdate: async function () {
+            try {
+                //this.getBusyDialog();
+                var oViewModel = this.getView().getModel("viewModel");
+                var oModel = this.getView().getModel("newModel").getData();
+                oModel = {
+                    "data": oModel,
+                    "filters": {
+                        "SrNo": this.sArg
+                    }
+                };
+                // AJAX call for updating the data
+                await this.ajaxUpdateWithJQuery("Timesheet", oModel).then((oData) => {
+                    if (oData.success) {
+                        this.closeBusyDialog();
+                        oViewModel.setProperty("/editable", false);
+                        oViewModel.setProperty("/isEditMode", true);
+                        oViewModel.setProperty("/isVisiable", true);
+                        oViewModel.setProperty("editBut", true);
+                        this.getView().getModel("newModel").refresh(true);
+                    }
+                }).catch((error) => {
+                    // this.closeBusyDialog();
+                    MessageToast.show(error.message || error.responseText);
+                });
+            } catch (error) {
+                //this.closeBusyDialog();
+                MessageToast.show(this.i18nModel.getText("technicalError"));
+            }
+        },
+
 
     });
 });
