@@ -556,7 +556,7 @@
                 },
                  {
                     "name":"AssetObjectPage",
-                    "pattern": "Page/{sPath}",
+                    "pattern": "Page/{sPath}/{Name}",
                     "target":[
                         "TargetAssetObjectPage"
                     ]

@@ -4,7 +4,7 @@
 >
     <Dialog
         id="FDP_id_ValueHelpDialog"
-        title="{i18n>selectEquipmentDetails}"
+        title="{i18n>assestAssignselectEquipmentDetails}"
         contentWidth="50%"
     >
         <content>

@@ -4,7 +4,7 @@
 	xmlns:core="sap.ui.core"
 >
 	<Dialog
-        title="{i18n>form}"
+        title="{i18n>assestAssignform}"
         contentWidth="50%"
     >
 		<f:SimpleForm
@@ -58,7 +58,7 @@
                         text="{typeModel>Type}"
                     />
 				</ComboBox>
-				<Label text="{i18n>model}" />
+				<Label text="{i18n>assestAssignModel}" />
 				<Input
                     busyIndicatorDelay="0"
                     required="true"
@@ -71,10 +71,10 @@
                 />
 				<Label text="{i18n>branch}" />
 				<ComboBox
-                    required="true"
                     id="FAA_branch_Id"
                     showSecondaryValues="true"
                     change="FAA_onBranchChange"
+                    editable="false"
                     items="{BaseLocationModel>/}"
                     value="{myform>/formData/data/AssignBranch}"
                     valueStateText="{i18n>selectBranch}"
@@ -85,7 +85,31 @@
                         additionalText="{BaseLocationModel>branchCode}"
                     />
 				</ComboBox>
-				<Label text="{i18n>assignedBy}" required="true"/>
+				<Label text="{i18n>assestAssignequipmentNumber}" />
+				<Input
+                    required="true"
+                    editable="false"
+                    id="FAA_id_EquipmentNumber"
+                    value="{myform>/formData/data/EquipmentNumber}"
+                    liveChange="FAA_onEquipmentNumberChange"
+                />
+				<Label text="{i18n>assestAssignserialNumber}" />
+				<Input
+                    required="true"
+                    editable="false"
+                    id="FAA_id_SerialNumber"
+                    value="{myform>/formData/data/SerialNumber}"
+                    liveChange="FAA_onSerialNumberChange"
+                />
+				<Label text="{i18n>assetAssignValue}"/>
+				<Input
+                    required="true"
+                    editable="false"
+                    id="FAA_id_AssetValue"
+                    value="{path:'myform>/formData/data/AssetValue',formatter:'.Formatter.fromatNumber'}"
+                    liveChange="FAA_onAssetValueChange"
+                />
+                <Label text="{i18n>assestAssignassignedBy}" required="true"/>
 				<ComboBox
                     id="FAA_id_AssignedBy"
                     items="{AdminModel>/}"
@@ -101,30 +125,6 @@
                         additionalText="{AdminModel>EmployeeID}"
                     />
 				</ComboBox>
-				<Label text="{i18n>equipmentNumber}" />
-				<Input
-                    required="true"
-                    editable="false"
-                    id="FAA_id_EquipmentNumber"
-                    value="{myform>/formData/data/EquipmentNumber}"
-                    liveChange="FAA_onEquipmentNumberChange"
-                />
-				<Label text="{i18n>serialNumber}" />
-				<Input
-                    required="true"
-                    editable="false"
-                    id="FAA_id_SerialNumber"
-                    value="{myform>/formData/data/SerialNumber}"
-                    liveChange="FAA_onSerialNumberChange"
-                />
-				<Label text="{i18n>assetValue}"/>
-				<Input
-                    required="true"
-                    editable="false"
-                    id="FAA_id_AssetValue"
-                    value="{path:'myform>/formData/data/AssetValue',formatter:'.Formatter.fromatNumber'}"
-                    liveChange="FAA_onAssetValueChange"
-                />
 				<Label text="{i18n>assignedDate}" />
 				<DatePicker
                     id="FAA_id_AssignedDate"

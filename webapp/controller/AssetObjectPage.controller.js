@@ -17,6 +17,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("AssetObjectPage").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function (oEvent) {
+            this.Name =  oEvent.getParameter("arguments").Name;
             this.Slno = oEvent.getParameter("arguments").sPath;
             await this._fetchCommonData("IncomeAsset", "objectModel", {
                 SerialNumber: this.Slno,
@@ -85,8 +86,11 @@ sap.ui.define([
             }
         },
         AOP_onButtonPress: function () {
-            var onav = this.getOwnerComponent().getRouter()
-            onav.navTo("RouteIncomeAsset")
+            if(this.Name === "Asset"){
+                this.getRouter().navTo("RouteAssetAssignment");
+            }else{
+                this.getRouter().navTo("RouteIncomeAsset");
+            }
         }
     });
 });

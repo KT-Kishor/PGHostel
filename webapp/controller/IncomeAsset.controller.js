@@ -885,7 +885,7 @@ sap.ui.define([
                 var Slno = oEvent.getSource().getBindingContext("incomeModel").getObject().SerialNumber;
                 var onav=this.getOwnerComponent().getRouter()
                 onav.navTo("AssetObjectPage",{
-                    sPath: Slno
+                    sPath: Slno,Name:"IncomeAsset"
                 })
             },
             IA_onExport: function () {

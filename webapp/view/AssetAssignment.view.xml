@@ -112,6 +112,10 @@
         <Table
             alternateRowColors="true"
             id="AA_id_AssestTable"
+            autoPopinMode="true"
+             growing="true"
+  growingScrollToLoad="true"
+  fixedLayout="false"
             busyIndicatorDelay="0"
             items="{
                 path: 'assetModel>/',
@@ -128,76 +132,54 @@
             <headerToolbar>
                 <OverflowToolbar>
                     <Title
-                        text="{i18n>assetData} ({= ${assetModel>/}.length})"
+                        text="{i18n>assestAssignassetData} ({= ${assetModel>/}.length})"
                     />
 
                     <ToolbarSpacer />
-                    <Button
-                        text="{i18n>assign}"
+                    <Button 
+                        text="{i18n>assestAssignassign}"
+                        tooltip="{i18n>assestAssignAssignAsset}"
                         type="Accept"
                         press="AA_onPressAssign"
+                        
                         id="AA_AssignBtn"
                     />
                     <Button
                         type="Reject"
                         press="AA_onOpenUnassign"
-                        text="{i18n>return}"
+                        tooltip="{i18n>assestAssignReturnAsset}"
+                        text="{i18n>assestAssignReturn}"
                     />
-                    
+
                     <Button
                         press="AA_onExport"
                         type="Ghost"
+                        tooltip="{i18n>assestAssignDownload}"
                         text="{i18n>download}"
                     />
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
+
                 <Column
                     hAlign="Left"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assignEmployeeID}" />
-                </Column>
-                <!--<Column>
-                    <Text text="{i18n>assignEmployeeName}" />
-                </Column> -->
-                <!-- <Column>
-                    <Text text="{i18n>type}" />
-                </Column> -->
-                <Column
-                    hAlign="Left"
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                >
-                    <Text text="{i18n>model}" />
+                    <Text text="{i18n>assestAssignEmployeeID}" />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>equipmentNumber}" />
+                    <Text text="{i18n>assestAssignModel}" />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>serialNumber}" />
-                </Column>
-                <Column
-                    hAlign="Left"
-                    minScreenWidth="Desktop"
-                    demandPopin="true"
-                >
-                    <Text text="{i18n>assignedByEmployeeName}" />
-                </Column>
-                <Column
-                    hAlign="Left"
-                    minScreenWidth="Desktop"
-                    demandPopin="true"
-                >
-                    <Text text="{i18n>assignBranch}" />
+                    <Text text="{i18n>assestAssignedByEmployeeName}" />
                 </Column>
                 <Column
                     hAlign="Left"
@@ -211,7 +193,7 @@
                     minScreenWidth="Desktop"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assetValue}" />
+                    <Text text="{i18n>assetAssignValue}" />
                 </Column>
                 <Column
                     hAlign="Left"
@@ -225,11 +207,33 @@
                     minScreenWidth="Desktop"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>returnDate}" />
+                    <Text text="{i18n>assestAssignReturnDate}" />
                 </Column>
-            </columns>
+                <Column
+                    hAlign="Left"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>assestAssignReturnID}" />
+                </Column>
+                <Column
+                    hAlign="Left"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                <Text text="{i18n>comments}" />
+                </Column>
+                <Column 
+                 hAlign="Left"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                </Column>
+                </columns>
             <items>
                 <ColumnListItem
+                    type="Navigation"
+                    press="AA_onNavClick"
                     id="AA_id_TableColumnListItem"
                 >
                     <cells>
@@ -237,29 +241,44 @@
                             title="{assetModel>AssignEmployeeID}"
                             text="{assetModel>AssignEmployeeName}"
                         />
-                        <!-- <Text text="{assetModel>Type}" /> -->
-                        <Text text="{assetModel>Model}" />
-                        <Text text="{assetModel>EquipmentNumber}" />
-                        <Text text="{assetModel>SerialNumber}" />
+                        <VBox class="sapUiSmallMarginBottom">
+                            <Text
+                                text="{= 'Model: ' + ${assetModel>Model}}"
+                                class="sapUiTinyMarginBottom"
+                            />
+                            <Text
+                                text="{= 'Eq No: ' + ${assetModel>EquipmentNumber}}"
+                                class="sapUiTinyMarginBottom"
+                            />
+                            <Text
+                                text="{= 'Sl No: ' + ${assetModel>SerialNumber}}"
+                            />
+                        </VBox>
                         <ObjectIdentifier
                             title="{assetModel>AssignedByEmployeeID}"
                             text="{assetModel>AssignedByEmployeeName}"
                         />
-                        <Text text="{assetModel>AssignBranch}" />
-                        <Text
-                            text="{= ${assetModel>AssignedDate} === '1899-11-30T00:00:00.000Z' || !${assetModel>AssignedDate} ? '' : ${assetModel>AssignedDate}.substring(8,10) + '/' + ${assetModel>AssignedDate}.substring(5,7) + '/' + ${assetModel>AssignedDate}.substring(0,4) }"
+                        <ObjectIdentifier
+                            title="{path:'assetModel>AssignedDate',formatter:'.Formatter.formatDate'}"
+                            text="{assetModel>AssignBranch}"
                         />
                         <Text
                             text="{assetModel>Currency} {path:'assetModel>AssetValue',formatter:'.Formatter.fromatNumber'}"
                         />
                         <ObjectStatus
-                            inverted="true"
+                            inverted="false"
                             state="{= ${assetModel>Status} === 'Assigned' ? 'Success' : 'Error' }"
                             text="{assetModel>Status}"
                         />
-                        <Text
-                            text="{= ${assetModel>ReturnDate} === '1899-11-30T00:00:00.000Z' || !${assetModel>ReturnDate} ? '' : ${assetModel>ReturnDate}.substring(8,10) + '/' + ${assetModel>ReturnDate}.substring(5,7) + '/' + ${assetModel>ReturnDate}.substring(0,4) }"
+                        <ObjectIdentifier
+                            title="{= ${assetModel>ReturnDate} === '1899-11-30T00:00:00.000Z' || !${assetModel>ReturnDate} ? '' : ${assetModel>ReturnDate}.substring(8,10) + '/' + ${assetModel>ReturnDate}.substring(5,7) + '/' + ${assetModel>ReturnDate}.substring(0,4) }"
+                            text="{assetModel>ReturnBranch}"
                         />
+                        <ObjectIdentifier
+                            title="{assetModel>ReturnEmpID}"
+                            text="{assetModel>ReturnEmpName}"
+                        />
+                        <Text text="{assetModel>Comments}" />
                     </cells>
                 </ColumnListItem>
             </items>

@@ -15,11 +15,10 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteAssetAssignment").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function () {
+                var LoginFunction = await this.commonLoginFunction("AssetAssignment");
+                if (!LoginFunction) return;
                 this.oLoginModel = this.getView().getModel("LoginModel");
                 this.getBusyDialog();
-                if (!this.oLoginModel) {
-                    this.getRouter().navTo("RouteLoginPage");
-                }
                 var form = new JSONModel({
                     formData: {
                         data: {
@@ -35,15 +34,15 @@ sap.ui.define([
                             AssetValue: "",
                             AssignedDate: new Date(),
                             Status: "",
-                            ReturnDate: ""
+                            ReturnDate: "",
+                            ReturnEmpName:"",
+                            ReturnEmpID:""
                         },
                         filters: {}
                     },
 
                 });
 
-                var LoginFunction = await this.commonLoginFunction("AssetAssignment");
-                if (!LoginFunction) return;
                 this.commonLoginFunction("AssetAssignment");
                 this._makeDatePickersReadOnly(["AA_id_Date"]);
                 this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAU_id_unassignDate", "FAA_id_Model"]);
@@ -53,6 +52,8 @@ sap.ui.define([
                 this._fetchCommonData("AssetType", "assetType");
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
+                var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === "Admin"));
+                this.getView().setModel(oModel, "AdminModel");
                 this.AA_CoomonReadCall();
                 this.oLoginModel.setProperty("/HeaderName", "Asset Assignment");
                 this.getModelData();
@@ -83,9 +84,12 @@ sap.ui.define([
                 });
             },
 
-            AA_onPressRow: function (oEvent) {
-                var AD = oEvent.getSource().getBindingContext("assetModel").getProperty("SerialNumber");
-                this.getRouter().navTo("AssetDetails", {})
+            AA_onNavClick: function (oEvent) {
+                var Slno = oEvent.getSource().getBindingContext("assetModel").getObject().SerialNumber;
+                var onav = this.getOwnerComponent().getRouter()
+                onav.navTo("AssetObjectPage", {
+                    sPath: Slno, Name: "Asset"
+                })
             },
 
             createTableSheet: function () {
@@ -122,7 +126,7 @@ sap.ui.define([
                     fileName: "Asset_Assignment_Details.xlsx",
                     worker: false,
                 };
-                MessageToast.show(this.i18nModel.getText("assetDownload"))
+                MessageToast.show(this.i18nModel.getText("assetAssignDownload"))
                 const oSheet = new Spreadsheet(oSettings);
                 oSheet.build().finally(function () {
                     oSheet.destroy();
@@ -141,8 +145,6 @@ sap.ui.define([
                     console.log(e);
                     MessageToast.show(this.i18nModel.getText("Error"));
                 }
-                var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === "Admin"));
-                this.getView().setModel(oModel, "AdminModel");
                 var oView = this.getView();
                 var oFormModel = oView.getModel("myform");
 
@@ -243,7 +245,7 @@ sap.ui.define([
             },
 
             FAA_onChangeAssignedBy: function (oEvent) {
-                if (utils._LCstrictValidationComboBox(oEvent)){
+                if (utils._LCstrictValidationComboBox(oEvent)) {
                     this.getView().getModel("myform").setProperty("/formData/data/AssignedByEmployeeID", oEvent.getSource().getSelectedItem().getAdditionalText());
                 }
             },
@@ -254,7 +256,7 @@ sap.ui.define([
                     var sFormatted = oDate.toLocaleDateString("en-CA");
                     this.getView().getModel("myform").setProperty("/formData/data/ReturnDate", sFormatted);
                 }
-            },               
+            },
 
             FAU_onReturnBranchChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
@@ -357,6 +359,16 @@ sap.ui.define([
 
             },
 
+            FAU_onChangeReturnTo: function (oEvent) {
+                var oComboBox = oEvent.getSource();
+                var oReturnEmpID = oComboBox.getSelectedKey();
+                var oReturnEmpName = oComboBox.getSelectedItem()?.getText();
+            
+                var oFormModel = this.getView().getModel("myform");
+                oFormModel.setProperty("/formData/data/ReturnEmpID", oReturnEmpID);
+                oFormModel.setProperty("/formData/data/ReturnEmpName", oReturnEmpName); 
+            },            
+
             AA_onOpenUnassign: function () {
                 var oTableSelected = this.byId("AA_id_AssestTable").getSelectedItem();
                 if (oTableSelected) {
@@ -367,10 +379,9 @@ sap.ui.define([
                         var oSelectedData = oBindingContext.getObject();
 
                         if (oSelectedData.Status && oSelectedData.Status === "Returned") {
-                            MessageToast.show(this.i18nModel.getText("thisAssetIsAlreadyUnassignedAndcannotBeUnassignedAgain"));
+                            MessageToast.show(this.i18nModel.getText("thisAssetIsReturned"));
                             return;
                         }
-
                         oFormModel.setProperty("/formData/data", oSelectedData);
                         oFormModel.setProperty("/formData/filters", {
                             ID: oSelectedData.ID
@@ -394,7 +405,6 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("pleaseSelectTheRowToUnassign"));
                 }
             },
-
 
             FAU_onCancelReturn: function () {
                 this.byId("AA_id_AssestTable").removeSelections(true)
@@ -425,8 +435,18 @@ sap.ui.define([
                 formData.setProperty("/formData/data/Status", oSelectedData.Status);
                 formData.setProperty("/formData/data/AssetValue", (oSelectedData.AssetValue).toString());
                 formData.setProperty("/formData/data/Currency", oSelectedData.Currency);
-                formData.setProperty("/formData/data/AssignedDate", new Date(oSelectedData.AssetCreationDate));
-                sap.ui.getCore().byId("FAA_id_AssignedDate").setMinDate(new Date(oSelectedData.AssetCreationDate));
+                var oAssignedDate;
+                var oMinDate;
+                if (oSelectedData.Status === "Returned" && oSelectedData.ReturnDate) {
+                    oAssignedDate = new Date(oSelectedData.ReturnDate);
+                    oMinDate = new Date(oSelectedData.ReturnDate);
+                } else {
+                    oAssignedDate = new Date(oSelectedData.AssetCreationDate);
+                    oMinDate = new Date(oSelectedData.AssetCreationDate);
+                }
+                formData.setProperty("/formData/data/AssignedDate", oAssignedDate);
+                sap.ui.getCore().byId("FAA_id_AssignedDate").setMinDate(oMinDate);
+                formData.setProperty("/formData/data/AssignBranch", oSelectedData.ReturnBranch);
                 formData.setProperty("/formData/filters/ID", oSelectedData.ID);
                 sap.ui.getCore().byId("FDP_id_ValueHelpDialog").close();
                 sap.ui.getCore().byId("FAA_id_Model").setValueState("None");
@@ -464,7 +484,7 @@ sap.ui.define([
             FAU_onSaveReturn: async function () {
                 var oCore = sap.ui.getCore();
                 var oFormDataModel = this.getView().getModel("myform");
-                if (utils._LCstrictValidationComboBox(oCore.byId("FAU_id_branch"), "ID") && utils._LCvalidateMandatoryField(oCore.byId("FAU_id_Comments"), "ID")) {
+                if (utils._LCstrictValidationComboBox(oCore.byId("FAU_id_branch"), "ID") && utils._LCvalidateMandatoryField(oCore.byId("FAU_id_Comments"), "ID") && utils._LCstrictValidationComboBox(oCore.byId("FAU_id_returnTo"), "ID")) {
                     this.getBusyDialog();
                     oFormDataModel.setProperty("/formData/data/Status", "Returned");
                     await this.ajaxUpdateWithJQuery("IncomeAsset", oFormDataModel.getProperty("/formData"));

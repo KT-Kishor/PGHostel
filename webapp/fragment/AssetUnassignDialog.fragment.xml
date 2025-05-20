@@ -7,7 +7,7 @@
         id="FAU_id_unassignDialog"
         busyIndicatorDelay="0"
         contentWidth="25%"
-        title="{i18n>returnData}"
+        title="{i18n>assestAssignReturnData}"
         afterClose="onDialogClose"
     >
            <f:SimpleForm
@@ -24,7 +24,23 @@
             columnsM="2"
         >
             <f:content>
-                <Label text="{i18n>returnDate}" />
+            <Label text="{i18n>assestAssignReturnID}" required="true"/>
+				<ComboBox
+                    id="FAU_id_returnTo"
+                    items="{AdminModel>/}"
+                    change="FAU_onChangeReturnTo"
+                    showSecondaryValues="true"
+                    selectedKey="{myform>/formData/data/ReturnEmpID}"
+                    editable="{= ${LoginModel>/Role} === 'Admin' ?true : false}"
+                    valueStateText="{i18n>commonNameValueState}"
+                >   
+					<core:ListItem
+                        key="{AdminModel>EmployeeID}"
+                        text="{AdminModel>EmployeeName}"
+                        additionalText="{AdminModel>EmployeeID}"
+                    />
+				</ComboBox>
+                <Label text="{i18n>assestAssignReturnDate}" />
                 <DatePicker
                     id="FAU_id_unassignDate"
                     required="true"
@@ -34,7 +50,7 @@
                     valueStateText="{i18n>invalidDate}"
                     value="{path:'myform>/formData/data/ReturnDate', formatter:'.Formatter.formatDate'}"
                 />
-                <Label text="{i18n>returnBranch}" />
+                <Label text="{i18n>assestAssignReturnBranch}" />
                 <ComboBox
                     required="true"
                     id="FAU_id_branch"
@@ -71,7 +87,7 @@
         </beginButton>
         <endButton>
             <Button
-                text="{i18n>cancel}"
+                text="{i18n>assestAssignCancel}"
                 type="Reject"
                 press="FAU_onCancelReturn"
             />
