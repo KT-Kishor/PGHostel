@@ -31,8 +31,7 @@ sap.ui.define([
             this.sArg = oEvent.getParameter("arguments").sPath;
 
             if (this.sArg !== "Timesheet") {
-            var filter = [new sap.ui.model.Filter("SrNo", sap.ui.model.FilterOperator.EQ, this.sArg)];
-            this.readCallTimesheet("EditCase", filter);
+            this.readCallTimesheet();
                 // Edit Case
                 oViewModel.setProperty("/isUpdate", true);
                 oViewModel.setProperty("/isCreate", false);
@@ -75,11 +74,11 @@ sap.ui.define([
             }
         },
 
-         readCallTimesheet: async function (sPath,filter,oPayload) {
+         readCallTimesheet: async function () {
                 try {
 
                     //this.getBusyDialog();
-                    await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID }).then((oData) => {
+                    await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID ,}).then((oData) => {
                         var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                         this.getOwnerComponent().setModel(new JSONModel(offerData), "newModel");
 
@@ -113,14 +112,10 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("selectDateT"));
                     return;
                 }
-
                 // Step 3: Get entered and actual hours
                 const sEnteredHours = Number(this.byId("TSD_id_TimeHours").getValue());
                 const oData = this.getView().getModel("newModel")?.getData() || {};
                 const sActualHours = Number(oData?.ActualHours);
-
-                console.log("Entered Hours:", sEnteredHours, "Actual Assignment Hours:", sActualHours);
-
                 if (isNaN(sEnteredHours) || isNaN(sActualHours)) {
                     MessageToast.show("Invalid hour value.");
                     return;
@@ -130,7 +125,6 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("hoursExceedError") || "Entered hours cannot exceed actual assignment hours.");
                     return;
                 }
-
                 // Step 4: Prepare payload
                 const oPayload = {
                     TaskID: oData.TaskID,
@@ -139,7 +133,7 @@ sap.ui.define([
                     EmployeeName: oData.EmployeeName,
                     ManagerName: oData.ManagerName || "Unknown",
                     ManagerID: oData.ManagerID || "Unknown",
-                    HoursWorked: sEnteredHours.toString(), // ✅ Use entered hours
+                    HoursWorked: sEnteredHours.toString(),
                     EmployeeComments: this.byId("TSD_id_EmpComment").getValue(),
                     Date: selectedDateObj.toISOString().split("T")[0],
                     Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
