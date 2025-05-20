@@ -10,6 +10,14 @@ sap.ui.define([], function () {
             return sDate;
         },
 
+        formatMonthYear: function (sDateStr) {
+            if (!sDateStr) return "";
+
+            var oDate = new Date(sDateStr); // Convert ISO string to Date object
+            var oDateFormat = sap.ui.core.format.DateFormat.getInstance({ pattern: "MM-yyyy" });
+
+            return oDateFormat.format(oDate);
+        },
 
         formatCurrency: function (value, code) {
             if (value || value === 0) {
@@ -28,6 +36,7 @@ sap.ui.define([], function () {
             }
             return "";
         },
+
         formatObjectStatus: function (sStatus) {
             switch (sStatus) {
                 case "New":
@@ -187,6 +196,7 @@ sap.ui.define([], function () {
             var monthlyValue = Data / 12;
             return "INR " + oFloatFormat.format(monthlyValue);
         },
+
         formatGradeWithType: function (sGrade, sGradeType) {
             if (!sGrade || isNaN(sGrade)) return "";
             var formattedGrade = parseFloat(sGrade).toFixed(2);
@@ -198,12 +208,14 @@ sap.ui.define([], function () {
                 return formattedGrade;
             }
         },
+
         getImageSrc: function (base64Str) {
             if (base64Str) {
                 return "data:image/png;base64," + base64Str;
             }
             return ""; // fallback
         },
+
         statusState: function (Status) {
             if (Status === "Active") {
                 return "Success";
@@ -211,49 +223,52 @@ sap.ui.define([], function () {
                 return "Error";
             }
         },
-        formatTimelineDate: function(status, creationDate, assignedDate,returnDate,trashDate,transferDate) {
-                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" });
 
-                if (status === "Assigned" && assignedDate) {
-                   return oDateFormat.format(new Date(assignedDate));    
-              } 
-              else if(status === "Returned" && returnDate){
-               return oDateFormat.format(new Date(returnDate))
+        formatTimelineDate: function (status, creationDate, assignedDate, returnDate, trashDate, transferDate) {
+            var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" });
 
-          }else if(status === "Trashed" && trashDate){
-               return oDateFormat.format(new Date(trashDate))
+            if (status === "Assigned" && assignedDate) {
+                return oDateFormat.format(new Date(assignedDate));
+            }
+            else if (status === "Returned" && returnDate) {
+                return oDateFormat.format(new Date(returnDate))
 
-          }
-          else if(status === "Transferred" && transferDate){
-               return oDateFormat.format(new Date(transferDate))
+            } else if (status === "Trashed" && trashDate) {
+                return oDateFormat.format(new Date(trashDate))
 
-          }
-          else if (creationDate) {
-               return oDateFormat.format(new Date(creationDate))
-          } 
-          
-          else {
-        return "Date not available";
-    }
-},
-formatId:function(status,pickId,assigneId){
-    if(status==="Assigned" && assigneId){
-      return assigneId;
-    }else if(status==="Available" && pickId){
-         return pickId;
-    }else{
-        return " ";
-    }
-},
-formatName:function(status,pickName,assigneByName,assigneName){
-    if(status=== "Assigned" &&assigneByName){
-        return assigneByName;
-    }else if(status=== "Available" &&pickName){
-        return pickName;
-}else if(status=== "Returned" && assigneName){
-        return assigneName;
+            }
+            else if (status === "Transferred" && transferDate) {
+                return oDateFormat.format(new Date(transferDate))
 
-}
-}
+            }
+            else if (creationDate) {
+                return oDateFormat.format(new Date(creationDate))
+            }
+
+            else {
+                return "Date not available";
+            }
+        },
+
+        formatId: function (status, pickId, assigneId) {
+            if (status === "Assigned" && assigneId) {
+                return assigneId;
+            } else if (status === "Available" && pickId) {
+                return pickId;
+            } else {
+                return " ";
+            }
+        },
+        
+        formatName: function (status, pickName, assigneByName, assigneName) {
+            if (status === "Assigned" && assigneByName) {
+                return assigneByName;
+            } else if (status === "Available" && pickName) {
+                return pickName;
+            } else if (status === "Returned" && assigneName) {
+                return assigneName;
+
+            }
+        }
     }
 });
