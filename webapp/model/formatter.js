@@ -80,15 +80,15 @@ sap.ui.define([], function () {
                 case "Paid":
                     return "Success";
                 case "Available":
-                    return "Indication14"
+                    return "Success"
                 case "Returned":
-                    return "Indication14"
+                    return "Success"
                 case "Trashed":
                     return "Error"
                 case "Assigned":
-                    return "Warning"
+                    return "Information"
                 case "Transferred":
-                    return "Indication13"
+                    return "Warning"
                 case "Saved":
                     return "Indication03";
                 default:
