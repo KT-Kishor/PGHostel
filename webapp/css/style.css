@@ -213,8 +213,11 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 92%;
-  border-radius: 0.60rem;
+}
+
+.sapUxAPObjectPageWrapper {
+    background-color: transparent !important;
+    opacity: 95%;
 }
 
 .home-background {
