@@ -124,9 +124,7 @@
 							<Label text="{i18n>consultantEmailID}"/>
 							<Text text="{ContractModelWizart>/ContarctEmail}"/>
 							<Label text="{i18n>amount}"/>
-							<Text text="{path:'ContractModelWizart>/Amount', formatter: '.Formatter.formatCurrency'} {ContractModelWizart>/Currency}"/>	
-							<Label text="{i18n>rate}"/>
-							<Text text="{ContractModelWizart>/Rate}"/>
+							<Text text="{path:'ContractModelWizart>/Amount', formatter: '.Formatter.formatCurrency'} {ContractModelWizart>/Currency} Per {ContractModelWizart>/Rate} Including all tax" />	
 							<Label text="{i18n>endClientHirer}"/>
 							<Text text="{ContractModelWizart>/EndClientHirer}"/>
 							<Label text="{i18n>locationswhereServices}"/>

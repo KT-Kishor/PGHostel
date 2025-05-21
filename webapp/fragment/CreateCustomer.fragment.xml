@@ -9,7 +9,7 @@
 		width="100%" maxContainerCols="2">
 			<f:content>
 				<Label text="{i18n>companyName}"  /> 
-				<Input id="MC_id_CustCompanyName" liveChange="MC_ValidateCommonFields"  value="{CustomerModel>/companyName}" required="true" maxLength="100" placeholder="{i18n>companyNamePlace}" valueStateText="{i18n>placeCompany}"/>
+				<Input id="MC_id_CustCompanyName" liveChange="MC_ValidateCommonFields"  value="{CustomerModel>/companyName}" required="true" maxLength="200" placeholder="{i18n>companyNamePlace}" valueStateText="{i18n>placeCompany}"/>
 
 				<Label text="{i18n>customerName}" required="true"/>
 				<HBox width="100%" justifyContent="Start" alignItems="Center">

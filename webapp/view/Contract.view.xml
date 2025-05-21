@@ -56,13 +56,16 @@
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table  class="sapUiResponsiveMargin" growingScrollToLoad="true" width="auto" id="C_id_Salary"  items="{
-                path: 'ContractModel>/', sorter: {path: 'ContractStatus',descending: false,group: true}}" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0">
+                path: 'ContractModel>/', sorter: {path: 'ContractStatus',descending: false,group: true}}" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0" mode="SingleSelectLeft"
+			    selectionChange="onSelectionChange">
 			 <headerToolbar>
                 <OverflowToolbar >
                     <Title id="" text="{i18n>contractDetails}  ({= ${ContractModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
-                    <Button text="{i18n>headerContractDetails}" tooltip="{i18n>headerContractDetails}" id="C_id_AddBtn" press="C_onPressAddContract" type="Accept"/>
+					<Button text="{i18n>active}"  tooltip="{i18n>active}" id="C_id_ActivateBtn" press="C_id_ActivatePress" type="Emphasized"/>
+					<Button text="{i18n>renew}" tooltip="{i18n>renew}" id="C_id_Renewbtn" press="C_id_RenewPress" type="Emphasized"/>
+					<Button text="{i18n>headerContractDetails}" tooltip="{i18n>headerContractDetails}" id="C_id_AddBtn" press="C_onPressAddContract" type="Accept"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
@@ -99,13 +102,13 @@
 						<cells>
 							<Text text="{ContractModel>ContractNo} / {ContractModel>AgreementNo}"/>
 							<Text text="{ContractModel>ConsultantName}"/>
-							<Text text="{ContractModel>LocationService}"/>
+							<ObjectIdentifier title="{ContractModel>LocationService}" text="{ContractModel>ContractLocation}"/>
 							<Text text="{ContractModel>EndClient}"/>
 							<Text text="{path:'ContractModel>AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{path:'ContractModel>AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{ContractModel>ConsultantRate}"/>
 							<Text text="{ContractModel>PaymentTerms}"/>
-							<Text text="{ContractModel>Comments}"/>
+							<Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" />
 						</cells>
 					</ColumnListItem>
 				</items>
