@@ -214,7 +214,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 utils._LCvalidateMandatoryField(oEvent);
             },
             Emp_onDesignationChange: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
+                utils._LCvalidateMandatoryField(oEvent);
             },
             oEmpStartDateChange: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
@@ -1048,7 +1048,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 try {
                     // this.getBusyDialog();
                     const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") &&
-                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") &&
+                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID")
@@ -1152,7 +1152,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 // Add first reference if available
                 if (dataModel.RCISal && dataModel.RCIName && dataModel.RCIAddress && dataModel.RCIEmailID && dataModel.RCIMobileNo) {
                     formattedReferenceData += `
-                    <h4>${that.i18nModel.getText("referenceDetailsI")}</h4>
+                    // <h4>${that.i18nModel.getText("referenceDetailsI")}</h4>
                     <p><b>${that.i18nModel.getText("name")}:</b> ${dataModel.RCISal} ${dataModel.RCIName}</p>
                     <p><b>${that.i18nModel.getText("address")}:</b> ${dataModel.RCIAddress}</p>
                     <p><b>${that.i18nModel.getText("emailId")}:</b> ${dataModel.RCIEmailID}</p>
@@ -1162,7 +1162,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 // Add second reference if available
                 if (dataModel.RCIISal && dataModel.RCIIName && dataModel.RCIIAddress && dataModel.RCIIEmailID && dataModel.RCIIMobileNo) {
                     formattedReferenceData += `
-                    <h4>${that.i18nModel.getText("referenceDetailsII")}</h4>
+                    // <h4>${that.i18nModel.getText("referenceDetailsII")}</h4>
                     <p><b>${that.i18nModel.getText("name")}:</b> ${dataModel.RCIISal} ${dataModel.RCIIName}</p>
                     <p><b>${that.i18nModel.getText("address")}:</b> ${dataModel.RCIIAddress}</p>
                     <p><b>${that.i18nModel.getText("emailId")}:</b> ${dataModel.RCIIEmailID}</p>
