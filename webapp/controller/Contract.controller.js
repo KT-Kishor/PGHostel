@@ -355,32 +355,27 @@ sap.ui.define(
                     var oContractFormVisible = oView.getModel("ContractFormVisibleModel").getData();
                     var oModel = oView.getModel("ContractActiveModel").getData();
                     if (oModel.ContractStatus === "Renewed") {
-                        // Validate required fields for Renewed status
-                        const isMandatoryValid = (
-                            utils._LCvalidateDate(sap.ui.getCore().byId("CR_id_AssignmentStartDate"), "ID") &&
-                            utils._LCvalidateAmount(sap.ui.getCore().byId("CR_id_EditAmountInput"), "ID") &&
-                            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("CR_id_Comments"), "ID")
-                        );
+                            // Validate required fields for Renewed status
+                            const isMandatoryValid = (
+                                utils._LCvalidateDate(sap.ui.getCore().byId("CR_id_AssignmentStartDate"), "ID") &&
+                                utils._LCvalidateAmount(sap.ui.getCore().byId("CR_id_EditAmountInput"), "ID") &&
+                                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("CR_id_Comments"), "ID")
+                            );
 
-                        if (!isMandatoryValid) {
-                            this.closeBusyDialog();
-                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                            return;
-                        }
+                            if (!isMandatoryValid) {
+                                this.closeBusyDialog();
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                                return;
+                            }
 
-                        const rateType = oModel.HrDaliyMonth;
-                        const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
-                        const selectedCurrency = sap.ui.getCore().byId("CR_id_CurrencySelect").getSelectedKey();
-                        const ConsultantRate = `${Formatter.fromatNumber(oModel.Amount)} ${selectedCurrency} Per ${rateText} Including all tax`;
-                        const startDate = sap.ui.getCore().byId("CR_id_AssignmentStartDate").getDateValue();
-                        const endDate = sap.ui.getCore().byId("CR_id_AssignmentEndDate").getDateValue();
+                            const rateType = oModel.HrDaliyMonth;
+                            const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
+                            const selectedCurrency = sap.ui.getCore().byId("CR_id_CurrencySelect").getSelectedKey();
+                            const ConsultantRate = `${Formatter.fromatNumber(oModel.Amount)} ${selectedCurrency} Per ${rateText} Including all tax`;
+                            const startDate = sap.ui.getCore().byId("CR_id_AssignmentStartDate").getDateValue();
+                            const endDate = sap.ui.getCore().byId("CR_id_AssignmentEndDate").getDateValue();
 
-                        try {
-                            const endDateArr = this.Formatter.formatDate(oModel.AssignmentEndDate).split('/').map(Number);
-                            const endDateCreate = new Date(endDateArr[2], endDateArr[1] - 1, endDateArr[0]);
-                            const today = new Date();
-
-                            if (today >= endDateCreate) {
+                            try {
                                 let jsonData = {
                                     ContractNo: oModel.ContractNo,
                                     AgreementNo: oModel.AgreementNo,
@@ -401,18 +396,13 @@ sap.ui.define(
                                     this.byId("C_id_Salary").removeSelections(true);
                                     return this.readCallForContract("Initial");
                                 }
-                            } else {
+                            } catch (error) {
                                 this.oContractDialog.close();
+                                sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
                                 this.closeBusyDialog();
-                                return sap.m.MessageBox.error(this.i18nModel.getText("renewEndDateMess"));
+                                return;
                             }
-                        } catch (error) {
-                            this.oContractDialog.close();
-                            sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
-                            this.closeBusyDialog();
-                            return;
                         }
-                    }
 
                     // Activation flow
                     if (oModel.ContractStatus === "New") {
