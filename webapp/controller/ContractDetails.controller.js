@@ -585,12 +585,17 @@ sap.ui.define([
                     this.getView().getModel("simpleForm").setProperty("/editable", false);
                     this.getView().getModel("simpleForm").setProperty("/Status", true);
                     this.getView().getModel("simpleForm").setProperty("/mobile", true);
-                } else if (oSelectedValue === "New") {
+                } else if (oSelectedValue === "New" && this._previousContractStatus === "Active") {
                     this.getView().getModel("simpleForm").setProperty("/renewStatus", false);
                     this.getView().getModel("simpleForm").setProperty("/editable", false);
                     this.getView().getModel("simpleForm").setProperty("/Status", true);
                     this.getView().getModel("simpleForm").setProperty("/mobile", false);
                     MessageToast.show(this.i18nModel.getText("renewOperation"));
+                }else if(oSelectedValue === "New"){
+                    this.getView().getModel("simpleForm").setProperty("/renewStatus", true);
+                        this.getView().getModel("simpleForm").setProperty("/editable", true);
+                        this.getView().getModel("simpleForm").setProperty("/Status", true);  
+                        this.getView().getModel("simpleForm").setProperty("/mobile", true); 
                 }
             },
 
@@ -619,10 +624,10 @@ sap.ui.define([
                         oSimpleFormModel.setProperty("/Status", true);
                         oSimpleFormModel.setProperty("/mobile", true);
                     } else if (sStatus === "New") {
-                        oSimpleFormModel.setProperty("/renewStatus", false);
-                        oSimpleFormModel.setProperty("/editable", false);
+                         oSimpleFormModel.setProperty("/renewStatus", true);
+                        oSimpleFormModel.setProperty("/editable", true);
                         oSimpleFormModel.setProperty("/Status", true);
-                        oSimpleFormModel.setProperty("/mobile", false);
+                        oSimpleFormModel.setProperty("/mobile", true);
                     }
 
                     oViewModel.setProperty("/isEditMode", true);
@@ -683,19 +688,23 @@ sap.ui.define([
 
                 const oModel = oView.getModel("oFilteredContractModel").getData();
 
-                if (oModel.ContractStatus === "Renewed" || oModel.ContractStatus === "New") {
+                if (oModel.ContractStatus === "Renewed" || 
+                (this._previousContractStatus === "Active" && oModel.ContractStatus !== "Inactive")) {
                     const previousStatus = this._previousContractStatus;
                     this.getView().getModel("oFilteredContractModel").setProperty("/ContractStatus", previousStatus);
                     const oComboBox = this.byId("CD_id_contractStatus");
                     oComboBox.setSelectedKey(previousStatus);
                     this.getView().getModel("oFilteredContractModel").refresh(true);
+
                     oView.getModel("simpleForm").setProperty("/editable", false);
                     oView.getModel("simpleForm").setProperty("/Status", false);
                     oView.getModel("viewModel").setProperty("/isEditMode", false);
                     oView.getModel("simpleForm").setProperty("/renewStatus", false);
                     oView.getModel("simpleForm").setProperty("/mobile", false);
+
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
+
                     return sap.m.MessageBox.error(this.i18nModel.getText("renewOperation"));
                 }
 
@@ -782,6 +791,7 @@ sap.ui.define([
                 this.AssignmentStartDate = this.Formatter.formatDate(oResult.AssignmentStartDate);
                 this.AssignmentEndDate = this.Formatter.formatDate(oResult.AssignmentEndDate);
                 this.ContractStatus = oResult.ContractStatus;
+                this._previousContractStatus = oResult.ContractStatus;
 
                 if (this.ContractStatus === "Active") {
                     this.getView().getModel("ContractStatus").setProperty("/status", true);

@@ -61,8 +61,6 @@
 											columnsL="2"
 											columnsM="1">
 											<f:content>
-												<m:Label text="{i18n>invoiceNo}"/>
-												<m:Input id="CI_id_InvoiceNoFilter" value="{ConsultantInvoiceModel>/InvoiceNo}" editable="false" />
 												<m:Label text="{i18n>invoiceDate}" required="true" />
 												<m:DatePicker
 													displayFormat="dd/MM/yyyy"
