@@ -61,7 +61,7 @@
                         class="sapUiMediumMarginEnd sapUiTinyMarginBottom sapUiTinyMarginBegin"
                         displayShape="Circle"
                         displaySize="L"
-                        src="../image/logo.jpg"
+                        src="{PaySlip>/EmpData/ProfilePhoto}"
                     />
 
                     <layout:VerticalLayout class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiTinyMarginBottom">
@@ -71,7 +71,7 @@
                             <m:Label text="{i18n>baseLocation}:" />
                             <m:Text
                                 class="sapUiTinyMarginBegin"
-                                text="{PaySlip>/EmpData/Location}"
+                                text="{PaySlip>/EmpData/BaseLocation}"
                             />
                         </layout:HorizontalLayout>
                         <layout:HorizontalLayout
@@ -213,7 +213,7 @@
                                     <m:Label text="{i18n>monthAndYear}" />
                                     <m:DatePicker
                                         id="APD_id_Payroll"
-                                        value="{path: 'PaySlip>/Year', type: 'sap.ui.model.type.String'}"
+                                        value="{path: 'PaySlip>/EmpData/YearMonth', formatter: '.Formatter.formatMonthYear'}"
                                         displayFormat="MM-yyyy"
                                         editable="false"
                                     />
@@ -222,7 +222,7 @@
                         </ObjectPageSubSection>
                         <!-- Salary Details SubSection -->
                         <ObjectPageSubSection
-                            title="{i18n>Payroll Structure}"
+                            title="{i18n>Pay Slip Structure}"
                             class="earnDedTable"
                             titleVisible="true"
                         >
@@ -263,9 +263,7 @@
                                             >
                                                 <m:Table
                                                     id="APD_id_SalaryTable"
-                                                    items="{EarningModel>/SalaryFields}"
-                                                    mode="Delete"
-                                                    delete="onPressDeleteSalaryFields"
+                                                    items="{PaySlip>/EmpData/EarningData}"
                                                 >
                                                     <m:headerToolbar>
                                                         <m:OverflowToolbar>
@@ -277,7 +275,7 @@
                                                             <m:Button
                                                                 text="{i18n>add}"
                                                                 type="Accept"
-                                                                press="Q_onPressCreate"
+                                                                press="APD_onPressSalAdd"
                                                                 enabled="{PaySlip>/isIdSelected}"
                                                                 visible="{PaySlip>/isCreate}"
                                                             />
@@ -308,25 +306,32 @@
                                                                 text="{i18n>yearlyAmount}"
                                                             />
                                                         </m:Column>
+                                                        <m:Column width="10%"/>
                                                     </m:columns>
                                                     <m:items>
                                                         <m:ColumnListItem>
                                                             <m:cells>
                                                                 <m:Input
-                                                                    value="{EarningModel>Description}"
+                                                                    value="{PaySlip>Description}"
                                                                     maxLength="25"
-                                                                    editable="{= ${EarningModel>Flag} === true }"
+                                                                    editable="{= ${PaySlip>Flag} === true }"
                                                                 />
                                                                 <m:Input
-                                                                    value="{EarningModel>Amount}"
-                                                                    change="onEarningAmountChange"
+                                                                    value="{PaySlip>Amount}"
+                                                                    change="APD_onAmountChange"
                                                                     textAlign="End"
                                                                     type="Number"
                                                                 />
                                                                 <m:Input
-                                                                    value="{EarningModel>Year}"
+                                                                    value="{PaySlip>YearlyAmount}"
                                                                     editable="false"
                                                                     textAlign="End"
+                                                                />
+                                                                <m:Button
+                                                                    icon="sap-icon://delete"
+                                                                    press="APD_onPressDeleteEarningFields"
+                                                                    type="Reject"
+                                                                    visible="{= ${PaySlip>Flag} === true }"
                                                                 />
                                                             </m:cells>
                                                         </m:ColumnListItem>
@@ -344,12 +349,12 @@
                                                     />
                                                     <m:Text
                                                         class="boldBlackText"
-                                                        text="{path:'EarningModel>/TotalEarningMonth', formatter: '.Formatter.numberFormater'}"
+                                                        text="{path:'PaySlip>/EmpData/EarningsTotalMonthly', formatter: '.Formatter.fromatNumber'}"
                                                         textAlign="End"
                                                     />
                                                     <m:Text
                                                         class="boldBlackText"
-                                                        text="{path:'EarningModel>/TotalEarningYearly', formatter: '.Formatter.numberFormater'}"
+                                                        text="{path:'PaySlip>/EmpData/EarningsTotalYearly', formatter: '.Formatter.fromatNumber'}"
                                                         textAlign="End"
                                                     />
                                                 </m:HBox>
@@ -363,21 +368,19 @@
                                                 class="sapUiTinyMarginBeginEnd"
                                             >
                                                 <m:Table
-                                                    items="{DeductionModel>/DeductionFields}"
-                                                    mode="Delete"
-                                                    delete="onPressDeleteDeductionFields"
+                                                    items="{PaySlip>/EmpData/DeductionData}"
                                                 >
                                                     <m:headerToolbar>
                                                         <m:OverflowToolbar>
                                                             <m:Title
-                                                                text="{i18n>deductionDetails}"
+                                                                text="{i18n>Deduction Details}"
                                                                 level="H2"
                                                             />
                                                             <m:ToolbarSpacer />
                                                             <m:Button
                                                                 text="{i18n>add}"
                                                                 type="Accept"
-                                                                press="Q_onPressCreate"
+                                                                press="APD_onPressDedAdd"
                                                                 enabled="{PaySlip>/isIdSelected}"
                                                                 visible="{PaySlip>/isCreate}"
                                                             />
@@ -408,25 +411,32 @@
                                                                 text="{i18n>yearlyAmount}"
                                                             />
                                                         </m:Column>
+                                                        <m:Column width="10%"/>
                                                     </m:columns>
                                                     <m:items>
                                                         <m:ColumnListItem>
                                                             <m:cells>
                                                                 <m:Input
-                                                                    value="{DeductionModel>Description}"
+                                                                    value="{PaySlip>Description}"
                                                                     maxLength="25"
-                                                                    editable="{= ${DeductionModel>Flag} === true }"
+                                                                    editable="{= ${PaySlip>Flag} === true }"
                                                                 />
                                                                 <m:Input
-                                                                    value="{DeductionModel>Amount}"
-                                                                    change="onDeductionAmountChange"
+                                                                    value="{PaySlip>Amount}"
+                                                                    change="APD_onAmountChange"
                                                                     textAlign="End"
                                                                     type="Number"
                                                                 />
                                                                 <m:Input
-                                                                    value="{DeductionModel>Year}"
+                                                                    value="{PaySlip>YearlyAmount}"
                                                                     editable="false"
                                                                     textAlign="End"
+                                                                />
+                                                                <m:Button
+                                                                    icon="sap-icon://delete"
+                                                                    press="APD_onPressDeleteDeductionFields"
+                                                                    type="Reject"
+                                                                    visible="{= ${PaySlip>Flag} === true }"
                                                                 />
                                                             </m:cells>
                                                         </m:ColumnListItem>
@@ -443,12 +453,12 @@
                                                     />
                                                     <m:Text
                                                         class="boldBlackText"
-                                                        text="{path:'DeductionModel>/TotalDeductionMonth', formatter: '.Formatter.numberFormater'}"
+                                                        text="{path:'PaySlip>/EmpData/DeductionsTotalMonthly', formatter: '.Formatter.fromatNumber'}"
                                                         textAlign="Right"
                                                     />
                                                     <m:Text
                                                         class="boldBlackText"
-                                                        text="{path:'DeductionModel>/TotalDeductionYearly', formatter: '.Formatter.numberFormater'}"
+                                                        text="{path:'PaySlip>/EmpData/DeductionsTotalYearly', formatter: '.Formatter.fromatNumber'}"
                                                         textAlign="Right"
                                                     />
                                                 </m:HBox>
@@ -461,12 +471,12 @@
                                     width="100%"
                                 >
                                     <m:Text
-                                        text="Net Pay ( INR ) : INR 12,34.876.90 (Twelve Lakh Thirty Four Thousand Eight Hundred Seventy Six Rupees and Ninety Paise)"
+                                        text="Net Pay ( INR ) : {path: 'PaySlip>/EmpData/NetPay', formatter: '.Formatter.formatCurrencyInINRText'} ({PaySlip>/EmpData/NetPayText})"
                                         class="boldBlackText"
                                         width="100%"
                                     />
                                     <!-- <m:Text
-                                        text=" :  {path: 'DeductionModel>/totalNetPay', formatter: '.Formatter.numberFormater'} ({DeductionModel>/totalNetPayText})"
+                                        text=" :  {path: 'PaySlip>/totalNetPay', formatter: '.Formatter.numberFormater'} ({PaySlip>/totalNetPayText})"
                                         class="boldBlackText"
                                         width="100%"
                                     /> -->

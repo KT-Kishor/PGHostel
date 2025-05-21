@@ -86,9 +86,8 @@ sap.ui.define([
             "Expense": "/ExpenseApp",
             "MSA&SOW": "/GenerateMsaNda",
             "HrQuotation": "/QuotationApp",
-            "PaySlip": "/PaySlip",
-            "AssetAssignment":"/AssetAssignment",
-            "ManageAssignment":"/IncomeAsset"
+            "PaySlip": "/PaySlip"
+
           };
 
           const modelPath = tileMap[value];
@@ -708,8 +707,13 @@ sap.ui.define([
         doc.setFontSize(6.5);
         doc.text(`+91 ${MobileNo}`, 13, 23);
 
-        const emailLines = doc.splitTextToSize(Email, 33);
-        doc.text(emailLines, 13, 29);
+        if (Email.length > 26) {
+          const emailLines = doc.splitTextToSize(Email, 33);
+          doc.text(emailLines, 13, 29.5);
+        }
+        else {
+          doc.text(Email, 13, 30.5);
+        }
 
         doc.setTextColor("#FFFFFF");
         doc.textWithLink(companyurl, 13, 38, { url: companyurl });
@@ -771,7 +775,7 @@ sap.ui.define([
           if (oMatch) {
             oSTDCombo.setSelectedItem(oMatch);
             oSTDCombo.setValue(oMatch.getText());
-             oSTDCombo.setValueState("None");
+            oSTDCombo.setValueState("None");
           }
         }, 100);
       }
@@ -809,7 +813,73 @@ sap.ui.define([
         const oTargetModel = oView.getModel(sTargetModelName);
         oTargetModel.setProperty(sTargetPath, oSelectedLocation.branchCode);
       }
-    }
+    },
+
+    getFirstDayOfMonth: function (monthName, year) {
+      // Define a lookup for month names
+      var monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      // Get the index of the month (0-based)
+      var monthIndex = monthNames.indexOf(monthName);
+
+      // Validate input
+      if (monthIndex === -1 || typeof year !== 'number') {
+        console.error("Invalid month name or year");
+        return null;
+      }
+
+      // Return new Date for first day of that month
+      return new Date(year, monthIndex, 1);
+    },
+
+    convertNumberToWords: function (num, currency) {
+      if (num === 0) return "Zero " + currency + " Only";
+
+      const belowTwenty = [
+        '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+        'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen',
+        'Eighteen', 'Nineteen'
+      ];
+      const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+      const thousands = ['', 'Thousand', 'Lakh', 'Crore'];
+
+      function helper(n) {
+        if (n === 0) return '';
+        else if (n < 20) return belowTwenty[n] + ' ';
+        else if (n < 100) return tens[Math.floor(n / 10)] + ' ' + helper(n % 10);
+        else return belowTwenty[Math.floor(n / 100)] + ' Hundred ' + helper(n % 100);
+      }
+
+      let result = '';
+      let i = 0;
+
+      let integerPart = Math.floor(num);
+      let fractionalPart = Math.round((num - integerPart) * 100);
+
+      while (integerPart > 0) {
+        let divisor = i === 0 ? 1000 : 100;
+        const remainder = integerPart % divisor;
+
+        if (remainder !== 0) {
+          result = helper(remainder) + thousands[i] + ' ' + result;
+        }
+
+        integerPart = Math.floor(integerPart / divisor);
+        i++;
+      }
+
+      result = result.trim() + ` ${currency}`;
+
+      // Add fractional part (Paise/Cents)
+      if (fractionalPart > 0) {
+        result += " and " + helper(fractionalPart) + (currency === "Rupees" ? "Paise" : "Cents");
+      }
+
+      return result + " Only";
+    },
 
   })
 });

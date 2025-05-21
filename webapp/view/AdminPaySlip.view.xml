@@ -101,7 +101,7 @@
                     <Column mergeDuplicates="true">
                         <Text text="{i18n>employeeName}" />
                     </Column>
-                    <Column mergeDuplicates="true">
+                    <Column>
                         <Text text="{i18n>baseLocation}" />
                     </Column>
                     <Column>
@@ -126,7 +126,7 @@
                             <Text text="{PaySlip>EmployeeName}" />
                         </cells>
                         <cells>
-                            <Text text="{PaySlip>Location}" />
+                            <Text text="{PaySlip>BaseLocation}" />
                         </cells>
                         <cells>
                             <Text

@@ -83,18 +83,17 @@ sap.ui.define([
                 BusyIndicator.show(0);
                 this.oModel.setProperty("/isCreate", true);
                 this.oModel.setProperty("/isIdSelected", false);
+                this.oModel.setProperty("/EmpData", {});
                 this.oModel.setProperty("/BackRoute", "RouteAdminPaySlip");
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             },
 
             AP_onPressPayslip: function (oEvent) {
-                var oContext = oEvent.getSource().getBindingContext("PaySlip");
-                var sPath = oContext.getPath();
-                var oData = this.oModel.getProperty(sPath);
+                var sPath = oEvent.getSource().getBindingContext("PaySlip").getPath();
                 this.oModel.setProperty("/isCreate", false);
                 this.oModel.setProperty("/isIdSelected", true);
                 this.oModel.setProperty("/BackRoute", "RouteAdminPaySlip");
-                this.oModel.setProperty("/EmpData", oData);
+                this.oModel.setProperty("/SelectedID", this.oModel.getProperty(`${sPath}/EmployeeID`));
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             }
         });
