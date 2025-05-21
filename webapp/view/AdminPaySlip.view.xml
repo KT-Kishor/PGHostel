@@ -84,7 +84,7 @@
                     <Toolbar>
                         <Title
                             id="AP_id_Title"
-                            text="{i18n>paySlipDetails}"
+                            text="{i18n>paySlipDetails} ({PaySlip>/RowCount})"
                         />
                         <ToolbarSpacer />
                         <Button
@@ -95,17 +95,17 @@
                     </Toolbar>
                 </headerToolbar>
                 <columns>
-                    <Column>
+                    <Column mergeDuplicates="true">
                         <Text text="{i18n>employeeID}" />
                     </Column>
-                    <Column>
+                    <Column mergeDuplicates="true">
                         <Text text="{i18n>employeeName}" />
                     </Column>
-                    <Column>
-                        <Text text="{i18n>month}" />
+                    <Column mergeDuplicates="true">
+                        <Text text="{i18n>baseLocation}" />
                     </Column>
                     <Column>
-                        <Text text="{i18n>year}" />
+                        <Text text="{i18n>monthAndYear}" />
                     </Column>
                     <Column>
                         <Text text="{i18n>payableDays}" />
@@ -126,10 +126,12 @@
                             <Text text="{PaySlip>EmployeeName}" />
                         </cells>
                         <cells>
-                            <Text text="{PaySlip>Month}" />
+                            <Text text="{PaySlip>Location}" />
                         </cells>
                         <cells>
-                            <Text text="{PaySlip>Year}" />
+                            <Text
+                                text="{path: 'PaySlip>YearMonth', formatter: '.Formatter.formatMonthYear'}"
+                            />
                         </cells>
                         <cells>
                             <Text text="{PaySlip>PayableDays}" />

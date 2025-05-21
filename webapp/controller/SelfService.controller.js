@@ -90,6 +90,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 } catch (error) { } finally {
                     this.closeBusyDialog();
                 }
+                this.oModel = this.getView().getModel("PaySlip");
             },
 
             onSectionChange: async function (oEvent) {
@@ -105,6 +106,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.SS_readSalaryDetails(this.EmployeeID);
                         break;
                     case "Pay Slip":
+                        this.getView().byId("SS_id_PaySlipTable").setBusy(true);
+                        await this._commonGETCall("AdminPaySlip", "EmpTable", { EmployeeID: this.EmployeeID });
+                        this.getView().byId("SS_id_PaySlipTable").setBusy(false);
                         break;
                     case "Document":
                         this.byId("SS_id_AcName").setValueState("None");
@@ -1657,5 +1661,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.closeBusyDialog();
                 }
             },
+
+            SS_onPressPayslipRow: function (oEvent) {
+                var oContext = oEvent.getSource().getBindingContext("PaySlip");
+                var sPath = oContext.getPath();
+                var oData = this.oModel.getProperty(sPath);
+                this.oModel.setProperty("/isCreate", false);
+                this.oModel.setProperty("/isIdSelected", true);
+                this.oModel.setProperty("/BackRoute", "SelfService");
+                this.oModel.setProperty("/BackPath", this.sPath);
+                this.oModel.setProperty("/EmpData", oData);
+                this.getRouter().navTo("RouteNavAdminPaySlipApp");
+            }
         });
     });

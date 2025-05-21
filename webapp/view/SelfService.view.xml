@@ -74,7 +74,7 @@
                         <m:Button
                             text="{i18n>headerIdCard}"
                             type="Emphasized"
-                            visible="{viewModel>/relievingletter}"
+                            visible="{viewModel>/RelievingLetter}"
                             tooltip="{i18n>headerIdCard}"
                             id="IC_id_Idcard"
                             press="CC_onPressIdCardDetails"
@@ -400,7 +400,7 @@
                                             id="SS_id_Lmo"
                                         />
                                         <m:ComboBox
-                                            value="{sEmployeeModel>/0/STDCode}"
+                                            value="{oEmpolyeeDetailsModel>/STDCode}"
                                             showSecondaryValues="true"
                                             id="SS_id_STDCode"
                                             items="{codeModel>/}"
@@ -560,7 +560,6 @@
                                                         <m:ComboBox
                                                             value="{sEmployeeModel>/0/EContactIStdCode}"
                                                             showSecondaryValues="true"
-                                                            selectedKey="1"
                                                             id="SS_id_STDCodeRI"
                                                             items="{codeModel>/}"
                                                             filterSecondaryValues="true"
@@ -569,7 +568,7 @@
                                                             editable="{viewModel>/isEditMode}"
                                                         >
                                                             <core:ListItem
-                                                                key="{codeModel>id}"
+                                                                key="{codeModel>country}"
                                                                 text="{codeModel>calling_code}"
                                                                 additionalText="{codeModel>country_code}"
                                                             />
@@ -1297,43 +1296,45 @@
                             id="connectionsSS"
                             titleUppercase="false"
                         >
-                            <m:Table id="AP_id_PaySlipTable">
+                            <m:Table
+                                id="SS_id_PaySlipTable"
+                                busyIndicatorDelay="0"
+                                growing="true"
+                                growingThreshold="50"
+                                growingScrollToLoad="true"
+                                items="{
+                                    path: 'PaySlip>/EmpTable',
+                                    sorter: {
+                                        path: 'FinancialYear',
+                                        descending: false,
+                                        group: true
+                                    }
+                                }"
+                            >
                                 <m:columns>
                                     <m:Column>
-                                        <m:Text text="{i18n>employeeID}" />
-                                    </m:Column>
-                                    <m:Column>
-                                        <m:Text text="{i18n>employeeName}" />
-                                    </m:Column>
-                                    <m:Column>
-                                        <m:Text text="{i18n>month}" />
-                                    </m:Column>
-                                    <m:Column>
-                                        <m:Text text="{i18n>year}" />
+                                        <m:Text text="{i18n>monthAndYear}" />
                                     </m:Column>
                                     <m:Column>
                                         <m:Text text="{i18n>payableDays}" />
+                                    </m:Column>
+                                    <m:Column>
+                                        <m:Text text="{i18n>netPay}" />
                                     </m:Column>
                                 </m:columns>
                                 <m:items>
                                     <m:ColumnListItem
                                         type="Navigation"
-                                        press="AP_onPressPayslip"
+                                        press="SS_onPressPayslipRow"
                                     >
                                         <m:cells>
-                                            <m:Text text="{EmployeeID}" />
+                                            <m:Text text="{path: 'PaySlip>YearMonth', formatter: '.Formatter.formatMonthYear'}"/>
                                         </m:cells>
                                         <m:cells>
-                                            <m:Text text="{EmployeeName}" />
+                                            <m:Text text="{PaySlip>PayableDays}" />
                                         </m:cells>
                                         <m:cells>
-                                            <m:Text text="{Month}" />
-                                        </m:cells>
-                                        <m:cells>
-                                            <m:Text text="{Year}" />
-                                        </m:cells>
-                                        <m:cells>
-                                            <m:Text text="{PayableDays}" />
+                                            <m:Text text="{PaySlip>NetPay}" />
                                         </m:cells>
                                     </m:ColumnListItem>
                                 </m:items>

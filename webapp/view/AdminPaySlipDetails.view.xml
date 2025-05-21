@@ -21,30 +21,31 @@
             useIconTabBar="false"
             class="sapUiSmallmarginResponsive"
             upperCaseAnchorBar="false"
+            headerContentPinnable="false"
             showHeaderContent="{PaySlip>/isIdSelected}"
         >
             <headerTitle>
                 <ObjectPageDynamicHeaderTitle visible="{PaySlip>/isIdSelected}">
                     <expandedHeading>
                         <m:Title
-                            text="{payrollModel>/EmployeeName}"
+                            text="{PaySlip>/EmpData/EmployeeName}"
                             wrapping="true"
                         />
                     </expandedHeading>
 
                     <snappedHeading>
                         <m:Title
-                            text="{payrollModel>/EmployeeName}"
+                            text="{PaySlip>/EmpData/EmployeeName}"
                             wrapping="true"
                         />
                     </snappedHeading>
 
                     <expandedContent>
-                        <m:Text text="{payrollModel>/ID}" />
+                        <m:Text text="{PaySlip>/EmpData/EmployeeID}" />
                     </expandedContent>
 
                     <snappedContent>
-                        <m:Text text="{payrollModel>/ID}" />
+                        <m:Text text="{PaySlip>/EmpData/EmployeeID}" />
                     </snappedContent>
                 </ObjectPageDynamicHeaderTitle>
             </headerTitle>
@@ -57,103 +58,103 @@
                     fitContainer="true"
                 >
                     <m:Avatar
-                        class="sapUiLargeMarginEnd"
+                        class="sapUiMediumMarginEnd sapUiTinyMarginBottom sapUiTinyMarginBegin"
                         displayShape="Circle"
                         displaySize="L"
                         src="../image/logo.jpg"
                     />
 
-                    <layout:VerticalLayout class="sapUiSmallMarginEnd">
+                    <layout:VerticalLayout class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiTinyMarginBottom">
                         <layout:HorizontalLayout
                             class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
                         >
-                            <m:Label text="{i18n>baseLocation}" />
+                            <m:Label text="{i18n>baseLocation}:" />
                             <m:Text
                                 class="sapUiTinyMarginBegin"
-                                text="{payrollModel>/BaseLocation}"
+                                text="{PaySlip>/EmpData/Location}"
                             />
                         </layout:HorizontalLayout>
                         <layout:HorizontalLayout
                             class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
                         >
-                            <m:Label text="{i18n>role}" />
+                            <m:Label text="{i18n>role}:" />
                             <m:Text
                                 class="sapUiTinyMarginBegin"
-                                text="{payrollModel>/Role}"
+                                text="{PaySlip>/EmpData/Role}"
                             />
                         </layout:HorizontalLayout>
                         <layout:HorizontalLayout
                             class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
                         >
-                            <m:Label text="{i18n>department}" />
+                            <m:Label text="{i18n>department}:" />
                             <m:Text
                                 class="sapUiTinyMarginBegin"
-                                text="{payrollModel>/Designation}"
-                            />
-                        </layout:HorizontalLayout>
-                    </layout:VerticalLayout>
-
-                    <layout:VerticalLayout
-                        class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom sapUiMediumMarginEnd sapUiSmallMarginBottom"
-                    >
-                        <layout:HorizontalLayout
-                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
-                        >
-                            <m:Label text="{i18n>bankName}" />
-                            <m:Text
-                                class="sapUiTinyMarginBegin"
-                                text="{payrollModel>/BankName}"
-                            />
-                        </layout:HorizontalLayout>
-                        <layout:HorizontalLayout
-                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
-                        >
-                            <m:Label text="{i18n>accountNo}" />
-                            <m:Text
-                                class="sapUiTinyMarginBegin"
-                                text="{payrollModel>/AccountNo}"
-                            />
-                        </layout:HorizontalLayout>
-                        <layout:HorizontalLayout
-                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
-                        >
-                            <m:Label text="{i18n>PAN}" />
-                            <m:Text
-                                class="sapUiTinyMarginBegin"
-                                text="{payrollModel>/PAN}"
+                                text="{PaySlip>/EmpData/Department}"
                             />
                         </layout:HorizontalLayout>
                     </layout:VerticalLayout>
 
                     <layout:VerticalLayout
-                        class="sapUiTinyMarginBottom sapUiSmallMarginBegin"
+                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiTinyMarginBottom"
                     >
                         <layout:HorizontalLayout
                             class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
                         >
-                            <m:Label text="{i18n>payableDays}" />
+                            <m:Label text="{i18n>bankName}:" />
                             <m:Text
                                 class="sapUiTinyMarginBegin"
-                                text="{payrollModel>/payableDays}"
+                                text="{PaySlip>/EmpData/BankName}"
                             />
                         </layout:HorizontalLayout>
                         <layout:HorizontalLayout
                             class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
                         >
-                            <m:Label text="{i18n>joiningDate}" />
+                            <m:Label text="{i18n>accountNo}:" />
                             <m:Text
                                 class="sapUiTinyMarginBegin"
-                                text="{payrollModel>/joiningDate}"
+                                text="{PaySlip>/EmpData/BankAccountNo}"
+                            />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>PAN}:" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{PaySlip>/EmpData/PAN}"
+                            />
+                        </layout:HorizontalLayout>
+                    </layout:VerticalLayout>
+
+                    <layout:VerticalLayout
+                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiTinyMarginBottom"
+                    >
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>payableDays}:" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{PaySlip>/EmpData/PayableDays}"
+                            />
+                        </layout:HorizontalLayout>
+                        <layout:HorizontalLayout
+                            class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+                        >
+                            <m:Label text="{i18n>joiningDate}:" />
+                            <m:Text
+                                class="sapUiTinyMarginBegin"
+                                text="{path: 'PaySlip>/EmpData/JoiningDate', formatter: '.Formatter.formatDate'}"
                             />
                         </layout:HorizontalLayout>
                         <layout:HorizontalLayout
                             class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
                             visible="{= !${PaySlip>/isCreate} }"
                         >
-                            <m:Label text="{i18n>monthAndYear}" />
+                            <m:Label text="{i18n>monthAndYear}:" />
                             <m:Text
                                 class="sapUiTinyMarginBegin"
-                                text="{payrollModel>/monthAndYear}"
+                                text="{path: 'PaySlip>/EmpData/YearMonth', formatter: '.Formatter.formatMonthYear'}"
                             />
                         </layout:HorizontalLayout>
                     </layout:VerticalLayout>
@@ -185,13 +186,14 @@
                                     <m:ComboBox
                                         showSecondaryValues="true"
                                         id="APD_id_Employee"
-                                        change="onEmployeeIDChange"
-                                        items="{Employeemodel>/employees}"
+                                        change="APD_onEmployeeIDChange"
+                                        showClearIcon="true"
+                                        items="{EmpModel>/}"
                                     >
                                         <core:ListItem
-                                            key="{Employeemodel>key}"
-                                            text="{Employeemodel>key}"
-                                            additionalText="{Employeemodel>text}"
+                                            key="{EmpModel>EmployeeID}"
+                                            text="{EmpModel>EmployeeID}"
+                                            additionalText="{EmpModel>EmployeeName}"
                                         />
                                     </m:ComboBox>
                                     <!-- <m:Label text="{i18n>selectMonth}" />
@@ -199,7 +201,7 @@
                                         showSecondaryValues="true"
                                         id="APD_id_Month"
                                         items="{MonthsModel>/results}"
-                                        value="{payrollModel>/Month}"
+                                        value="{PaySlip>/Month}"
                                         change="onMonthChange"
                                         editable="false"
                                     >
@@ -211,17 +213,18 @@
                                     <m:Label text="{i18n>monthAndYear}" />
                                     <m:DatePicker
                                         id="APD_id_Payroll"
-                                        value="{path: 'payrollModel>/Year', type: 'sap.ui.model.type.String'}"
+                                        value="{path: 'PaySlip>/Year', type: 'sap.ui.model.type.String'}"
                                         displayFormat="MM-yyyy"
-                                        editable="true"
+                                        editable="false"
                                     />
                                 </f:content>
                             </f:SimpleForm>
                         </ObjectPageSubSection>
                         <!-- Salary Details SubSection -->
                         <ObjectPageSubSection
-                            title="{i18n>salaryDetailsEmployee}"
+                            title="{i18n>Payroll Structure}"
                             class="earnDedTable"
+                            titleVisible="true"
                         >
                             <m:VBox class="sapUiSmallMargin">
                                 <!-- GridContainer for Tables -->
