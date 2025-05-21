@@ -479,7 +479,7 @@ sap.ui.define([
                                 formattedText = "Month";
                                 break;
                             default:
-                                formattedText = "Hr";
+                                formattedText = "Daily";
                         }
 
                         var oModel = this.getView().getModel("ContractModelWizart");
