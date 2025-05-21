@@ -14,16 +14,16 @@
             >
                 <columns>
                     <Column>
-                        <Text text="{i18n>model}" />
+                        <Text text="{i18n>assestAssignModel}" />
                     </Column>
                     <Column>
-                        <Text text="{i18n>equipmentNumber}" />
+                        <Text text="{i18n>assestAssignequipmentNumber}" />
                     </Column>
                     <Column>
-                        <Text text="{i18n>serialNumber}" />
+                        <Text text="{i18n>assestAssignserialNumber}" />
                     </Column>
                     <Column>
-                        <Text text="{i18n>assetValue}" />
+                        <Text text="{i18n>assetAssignValue}" />
                     </Column>
                 </columns>
                 <items>

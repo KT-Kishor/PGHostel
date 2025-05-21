@@ -467,6 +467,7 @@ sap.ui.define([
             },
 
             FAU_onChangeReturnTo: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent)
                 var oComboBox = oEvent.getSource();
                 var oReturnEmpID = oComboBox.getSelectedKey();
                 var oReturnEmpName = oComboBox.getSelectedItem()?.getText();
@@ -494,7 +495,7 @@ sap.ui.define([
                             ID: oSelectedData.ID
                         });
                         oFormModel.setProperty("/formData/data/ReturnDate", new Date(oSelectedData.AssignedDate));
-
+                        oFormModel.setProperty("/formData/data/ReturnEmpID", this.oLoginModel.getProperty("/EmployeeName"))
                         if (!this._unassignDialog) {
                             this._unassignDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetUnassignDialog", this);
                             this.getView().addDependent(this._unassignDialog);
@@ -557,11 +558,11 @@ sap.ui.define([
                     var oMinDate = new Date(oSelectedData.AssetCreationDate);
                 }
                 sap.ui.getCore().byId("FAA_id_AssignedDate").setMinDate(oMinDate);
-                var sBranch
+                var sBranch;
                 if (oSelectedData.Status === "Returned" && oSelectedData.ReturnBranch) {
                     sBranch = oSelectedData.ReturnBranch;
                 } else {
-                    sBranch = oSelectedData.AssignBranch;
+                    sBranch = oSelectedData.PickedBranch;
                 }
                 formData.setProperty("/formData/data/AssignBranch", sBranch);
                 formData.setProperty("/formData/filters/ID", oSelectedData.ID);
@@ -601,7 +602,7 @@ sap.ui.define([
             FAU_onSaveReturn: async function () {
                 var oCore = sap.ui.getCore();
                 var oFormDataModel = this.getView().getModel("myform");
-                if (utils._LCstrictValidationComboBox(oCore.byId("FAU_id_branch"), "ID") && utils._LCvalidateMandatoryField(oCore.byId("FAU_id_Comments"), "ID") && utils._LCstrictValidationComboBox(oCore.byId("FAU_id_returnTo"), "ID")) {
+                if (utils._LCstrictValidationComboBox(oCore.byId("FAU_id_returnTo"), "ID") && utils._LCstrictValidationComboBox(oCore.byId("FAU_id_branch"), "ID") && utils._LCvalidateMandatoryField(oCore.byId("FAU_id_Comments"), "ID")) {
                     this.getBusyDialog();
                     oFormDataModel.setProperty("/formData/data/Status", "Returned");
                     await this.ajaxUpdateWithJQuery("IncomeAsset", oFormDataModel.getProperty("/formData"));

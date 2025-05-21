@@ -112,7 +112,7 @@
                 <Label text="{i18n>assestAssignassignedBy}" required="true"/>
 				<ComboBox
                     id="FAA_id_AssignedBy"
-                    items="{AdminModel>/}"
+                    items="{EmpModel>/}"
                     change="FAA_onChangeAssignedBy"
                     showSecondaryValues="true"
                     value="{myform>/formData/data/AssignedByEmployeeName}"
@@ -120,9 +120,9 @@
                     valueStateText="{i18n>commonNameValueState}"
                 >
 					<core:ListItem
-                        key="{AdminModel>EmployeeName}"
-                        text="{AdminModel>EmployeeName}"
-                        additionalText="{AdminModel>EmployeeID}"
+                        key="{EmpModel>EmployeeName}"
+                        text="{EmpModel>EmployeeName}"
+                        additionalText="{EmpModel>EmployeeID}"
                     />
 				</ComboBox>
 				<Label text="{i18n>assignedDate}" />
