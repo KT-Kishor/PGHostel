@@ -35,8 +35,8 @@ sap.ui.define([
                             AssignedDate: new Date(),
                             Status: "",
                             ReturnDate: "",
-                            ReturnEmpName:"",
-                            ReturnEmpID:""
+                            ReturnEmpName: "",
+                            ReturnEmpID: ""
                         },
                         filters: {}
                     },
@@ -145,6 +145,7 @@ sap.ui.define([
                     console.log(e);
                     MessageToast.show(this.i18nModel.getText("Error"));
                 }
+                this._dialogMode = "Assign";
                 var oView = this.getView();
                 var oFormModel = oView.getModel("myform");
 
@@ -190,6 +191,29 @@ sap.ui.define([
                         this.FAA_Dialog = FAA_Dialog;
                         oView.addDependent(this.FAA_Dialog);
                         this.FAA_Dialog.open();
+                        var aAssignEditable = [
+                            "FAA_id_employeeID",
+                            "FAA_id_Type",
+                            "FAA_id_Model",
+                            "FAA_id_AssignedDate"
+                        ];
+                        var aAllFields = [
+                            "FAA_id_employeeID",
+                            "FAA_id_Type",
+                            "FAA_id_Model",
+                            "FAA_branch_Id",
+                            "FAA_id_AssetValue",
+                            "FAA_id_SerialNumber",
+                            "FAA_id_EquipmentNumber",
+                            "FAA_id_AssignedBy",
+                            "FAA_id_AssignedDate"
+                        ];
+                        aAllFields.forEach(id => {
+                            var oControl = sap.ui.getCore().byId(id);
+                            if (oControl) {
+                                oControl.setEditable(aAssignEditable.includes(id));
+                            }
+                        });
                         this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAA_id_Model"]);
                     }.bind(this));
 
@@ -199,7 +223,90 @@ sap.ui.define([
                     sap.ui.getCore().byId("FAA_id_Type").setSelectedKey("");
                     sap.ui.getCore().byId("FAA_id_Model").setSelectedKey("");
                     sap.ui.getCore().byId("FAA_branch_Id").setSelectedKey("");
+                    var aAssignEditable = [
+                        "FAA_id_employeeID",
+                        "FAA_id_Type",
+                        "FAA_id_Model",
+                        "FAA_id_AssignedDate"
+                    ];
+                    var aAllFields = [
+                        "FAA_id_employeeID",
+                        "FAA_id_Type",
+                        "FAA_id_Model",
+                        "FAA_branch_Id",
+                        "FAA_id_AssetValue",
+                        "FAA_id_SerialNumber",
+                        "FAA_id_EquipmentNumber",
+                        "FAA_id_AssignedBy",
+                        "FAA_id_AssignedDate"
+                    ];
+                    aAllFields.forEach(id => {
+                        var oControl = sap.ui.getCore().byId(id);
+                        if (oControl) {
+                            oControl.setEditable(aAssignEditable.includes(id));
+                        }
+                    });
 
+                }
+            },
+
+            AA_onPressEdit: async function () {
+                var oTable = this.byId("AA_id_AssestTable");
+                var oSelectedItem = oTable.getSelectedItem();
+
+                if (!oSelectedItem) {
+                    MessageToast.show(this.i18nModel.getText("assestAssignPleaseSelectTheRowToEdit"));
+                    return;
+                }
+                var oBindingContext = oSelectedItem.getBindingContext("assetModel");
+                var oSelectedData = oBindingContext.getObject();
+
+                if (oSelectedData.Status === "Returned") {
+                    MessageToast.show(this.i18nModel.getText("assestAssignEditNotAllowedReturned"));
+                    return;
+                }
+                this._dialogMode = "Edit";
+                var oAssignedDate = new Date(oSelectedData.AssignedDate);
+                // var oToday = new Date();
+                // var oDiffDays = Math.floor((oToday - oAssignedDate) / (1000 * 60 * 60 * 24));
+
+                // if (oDiffDays > 2) {
+                //     MessageToast.show(this.i18nModel.getText("assestAssignEditNotAllowed"));
+                //     return;
+                // }
+                var oFormModel = this.getView().getModel("myform");
+                oFormModel.setProperty("/formData/data", Object.assign({}, oSelectedData));
+                if (!this.FAA_Dialog) {
+                    this.FAA_Dialog = await sap.ui.core.Fragment.load({
+                        name: "sap.kt.com.minihrsolution.fragment.AssetAssignmentCreate",
+                        controller: this
+                    });
+                    this.getView().addDependent(this.FAA_Dialog);
+                }
+                this.FAA_Dialog.open();
+                var aEditableFields = [
+                    "FAA_id_AssignedDate"
+                ];
+                var aAllFields = [
+                    "FAA_id_employeeID",
+                    "FAA_id_Type",
+                    "FAA_id_Model",
+                    "FAA_branch_Id",
+                    "FAA_id_AssetValue",
+                    "FAA_id_SerialNumber",
+                    "FAA_id_EquipmentNumber",
+                    "FAA_id_AssignedBy",
+                    "FAA_id_AssignedDate"
+                ];
+                aAllFields.forEach(id => {
+                    var oControl = sap.ui.getCore().byId(id);
+                    if (oControl) {
+                        oControl.setEditable(aEditableFields.includes(id));
+                    }
+                });
+                var oAssignedDateControl = sap.ui.getCore().byId("FAA_id_AssignedDate");
+                if (oAssignedDateControl) {
+                    oAssignedDateControl.setMinDate(oAssignedDate);
                 }
             },
 
@@ -363,11 +470,11 @@ sap.ui.define([
                 var oComboBox = oEvent.getSource();
                 var oReturnEmpID = oComboBox.getSelectedKey();
                 var oReturnEmpName = oComboBox.getSelectedItem()?.getText();
-            
+
                 var oFormModel = this.getView().getModel("myform");
                 oFormModel.setProperty("/formData/data/ReturnEmpID", oReturnEmpID);
-                oFormModel.setProperty("/formData/data/ReturnEmpName", oReturnEmpName); 
-            },            
+                oFormModel.setProperty("/formData/data/ReturnEmpName", oReturnEmpName);
+            },
 
             AA_onOpenUnassign: function () {
                 var oTableSelected = this.byId("AA_id_AssestTable").getSelectedItem();
@@ -444,9 +551,19 @@ sap.ui.define([
                     oAssignedDate = new Date(oSelectedData.AssetCreationDate);
                     oMinDate = new Date(oSelectedData.AssetCreationDate);
                 }
-                formData.setProperty("/formData/data/AssignedDate", oAssignedDate);
+                if (oSelectedData.Status === "Returned" && oSelectedData.ReturnDate) {
+                    var oMinDate = new Date(oSelectedData.ReturnDate);
+                } else {
+                    var oMinDate = new Date(oSelectedData.AssetCreationDate);
+                }
                 sap.ui.getCore().byId("FAA_id_AssignedDate").setMinDate(oMinDate);
-                formData.setProperty("/formData/data/AssignBranch", oSelectedData.ReturnBranch);
+                var sBranch
+                if (oSelectedData.Status === "Returned" && oSelectedData.ReturnBranch) {
+                    sBranch = oSelectedData.ReturnBranch;
+                } else {
+                    sBranch = oSelectedData.AssignBranch;
+                }
+                formData.setProperty("/formData/data/AssignBranch", sBranch);
                 formData.setProperty("/formData/filters/ID", oSelectedData.ID);
                 sap.ui.getCore().byId("FDP_id_ValueHelpDialog").close();
                 sap.ui.getCore().byId("FAA_id_Model").setValueState("None");

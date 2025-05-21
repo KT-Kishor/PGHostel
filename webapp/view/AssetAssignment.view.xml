@@ -112,10 +112,7 @@
         <Table
             alternateRowColors="true"
             id="AA_id_AssestTable"
-            autoPopinMode="true"
-             growing="true"
-  growingScrollToLoad="true"
-  fixedLayout="false"
+            fixedLayout="false"
             busyIndicatorDelay="0"
             items="{
                 path: 'assetModel>/',
@@ -136,14 +133,23 @@
                     />
 
                     <ToolbarSpacer />
-                    <Button 
+                    <Button
                         text="{i18n>assestAssignassign}"
                         tooltip="{i18n>assestAssignAssignAsset}"
                         type="Accept"
                         press="AA_onPressAssign"
-                        
                         id="AA_AssignBtn"
                     />
+
+                    <Button
+                        text="{i18n>assestAssignEdit}"
+                        tooltip="{i18n>assestAssignEdit}"
+                        type="Ghost"
+                        press="AA_onPressEdit"
+                        id="AA_EditBtn"
+                        visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Manager'}"
+                    />
+
                     <Button
                         type="Reject"
                         press="AA_onOpenUnassign"
@@ -160,7 +166,6 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-
                 <Column
                     hAlign="Left"
                     demandPopin="true"
@@ -221,15 +226,14 @@
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                <Text text="{i18n>comments}" />
+                    <Text text="{i18n>comments}" />
                 </Column>
-                <Column 
-                 hAlign="Left"
+                <Column
+                    hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
-                >
-                </Column>
-                </columns>
+                />
+            </columns>
             <items>
                 <ColumnListItem
                     type="Navigation"
@@ -241,7 +245,7 @@
                             title="{assetModel>AssignEmployeeID}"
                             text="{assetModel>AssignEmployeeName}"
                         />
-                        <VBox class="sapUiSmallMarginBottom">
+                        <VBox class="sapUiTinyMarginTopBottom">
                             <Text
                                 text="{= 'Model: ' + ${assetModel>Model}}"
                                 class="sapUiTinyMarginBottom"
