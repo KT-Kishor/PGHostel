@@ -400,7 +400,7 @@
                                             id="SS_id_Lmo"
                                         />
                                         <m:ComboBox
-                                            value="{oEmpolyeeDetailsModel>/STDCode}"
+                                            value="{sEmployeeModel>/0/STDCode}"
                                             showSecondaryValues="true"
                                             id="SS_id_STDCode"
                                             items="{codeModel>/}"

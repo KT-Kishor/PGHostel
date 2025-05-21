@@ -86,8 +86,9 @@ sap.ui.define([
             "Expense": "/ExpenseApp",
             "MSA&SOW": "/GenerateMsaNda",
             "HrQuotation": "/QuotationApp",
-            "PaySlip": "/PaySlip"
-
+            "PaySlip": "/PaySlip",
+            "AssetAssignment":"/AssetAssignment",
+            "ManageAssignment":"/IncomeAsset"
           };
 
           const modelPath = tileMap[value];

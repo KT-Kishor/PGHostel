@@ -58,9 +58,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             EmployeeID: this.EmployeeID
                         });
                         oView.getModel("sEmployeeModel").refresh(true);
-                        if (this.sPath === "SelfService" && this.getView().getModel("sEmployeeModel").getData()[0].Type !== "Submit") {
-                            this.ViewModel.setProperty("/SelfService", true)
-                        }
+                        var oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
+                        if (this.sPath === "SelfService" && oModelAllData.Type !== "Submit") this.ViewModel.setProperty("/SelfService", true);
+    
+                        if(!oModelAllData.EContactIStdCode)  oModelAllData.EContactIStdCode = "+91";
+                        if(!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
+
                         const oObjectPage = this.byId("ObjectPageLayout");
                         const oSection = this.byId("basicDetailsSection"); // Ensure the section has this ID in XML
                         if (oObjectPage && oSection) {
@@ -257,8 +260,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
 
-            onPressSubmit: function (oEvent) {
+            onPressSubmit: async function (oEvent) {
                 const that = this;
+                await this.ReadEmployeeDocument();
+                var oModel = this.getView().getModel("DocumentModel").getData();
+                 if (!oModel || oModel.items.length === 0) {
+                    sap.m.MessageBox.warning(this.i18nModel.getText("uploadAtLeastOneDocumentMessage")); // You can add this key to your i18n model
+                    return;
+                }
                 this.showConfirmationDialog(
                     this.i18nModel.getText("confirmTitle"),
                     this.i18nModel.getText("confirmSubmitMessage"),
@@ -1156,7 +1165,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 // Add first reference if available
                 if (dataModel.RCISal && dataModel.RCIName && dataModel.RCIAddress && dataModel.RCIEmailID && dataModel.RCIMobileNo) {
                     formattedReferenceData += `
-                    // <h4>${that.i18nModel.getText("referenceDetailsI")}</h4>
                     <p><b>${that.i18nModel.getText("name")}:</b> ${dataModel.RCISal} ${dataModel.RCIName}</p>
                     <p><b>${that.i18nModel.getText("address")}:</b> ${dataModel.RCIAddress}</p>
                     <p><b>${that.i18nModel.getText("emailId")}:</b> ${dataModel.RCIEmailID}</p>
@@ -1166,7 +1174,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 // Add second reference if available
                 if (dataModel.RCIISal && dataModel.RCIIName && dataModel.RCIIAddress && dataModel.RCIIEmailID && dataModel.RCIIMobileNo) {
                     formattedReferenceData += `
-                    // <h4>${that.i18nModel.getText("referenceDetailsII")}</h4>
                     <p><b>${that.i18nModel.getText("name")}:</b> ${dataModel.RCIISal} ${dataModel.RCIIName}</p>
                     <p><b>${that.i18nModel.getText("address")}:</b> ${dataModel.RCIIAddress}</p>
                     <p><b>${that.i18nModel.getText("emailId")}:</b> ${dataModel.RCIIEmailID}</p>
@@ -1485,23 +1492,22 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.SSRTE_oDialog.close();
             },
 
-          CC_onPressIdCardDetails: function () {
+            CC_onPressIdCardDetails: function () {
                 var oView = this.getView();
                 var oEmployeeModel = oView.getModel("sEmployeeModel");
                 var employeeData = oEmployeeModel && oEmployeeModel.getData();
                 var employeeDetails = employeeData && employeeData[0];
-
+ 
                 if (!employeeDetails) {
                     sap.m.MessageToast.show("Employee details not found.");
                     return;
                 }
-
-                // Reset the name field in TextDisplay model
+ 
                 var oTextDisplayModel = oView.getModel("TextDisplay");
                 if (oTextDisplayModel) {
                     oTextDisplayModel.setProperty("/name", "");
                 }
-
+ 
                 // Prepare ID card data
                 var idCardJson = {
                     EmployeeID: employeeDetails.EmployeeID || "",
@@ -1515,16 +1521,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     BranchCode: employeeDetails.BranchCode || "",
                     ProfilePhoto: employeeDetails.ProfilePhoto || ""
                 };
-
+ 
                 var oIdCardModel = new sap.ui.model.json.JSONModel(idCardJson);
                 oView.setModel(oIdCardModel, "IdCardModel");
-
+ 
                 // Show busy dialog
                 this.getBusyDialog();
+ 
                 var fnAfterOpen = function () {
                     var sFileBinary = employeeDetails.ProfilePhoto;
                     var sFileType = employeeDetails.ProfilePhotoType;
-
+ 
                     if (sFileBinary && sFileType) {
                         try {
                             this.onPressDisplayImageOnCanvas(sFileBinary, sFileType);
@@ -1532,7 +1539,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             console.error("Error displaying image on canvas:", e);
                         }
                     }
+                    this.closeBusyDialog();
                 }.bind(this);
+ 
                 if (!this.oIdCardDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.AddCard",
@@ -1540,24 +1549,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     }).then(function (oDialog) {
                         this.oIdCardDialog = oDialog;
                         oView.addDependent(this.oIdCardDialog);
-                        this.oIdCardDialog.attachAfterOpen(fnAfterOpen);
+                        this.oIdCardDialog.attachAfterOpen(fnAfterOpen); // Attach only once
                         this.oIdCardDialog.open();
-                        this.closeBusyDialog();
                     }.bind(this));
                 } else {
-                    this.oIdCardDialog.attachAfterOpen(fnAfterOpen);
+                    this.oIdCardDialog.detachAfterOpen(fnAfterOpen); // Detach if already added
+                    this.oIdCardDialog.attachAfterOpen(fnAfterOpen); // Attach freshly
                     this.oIdCardDialog.open();
-                    this.closeBusyDialog();
                 }
-            },
-
-            CC_onPressClose: function () {
-                var oModel = this.getView().getModel("sEmployeeModel");
-                if (oModel) {
-                    oModel.setProperty("/ProfilePhoto", "");
-                    oModel.setProperty("/ProfilePhotoType", "");
-                }
-                this.oIdCardDialog.close();
             },
 
             CC_onPressSubmit: async function () {

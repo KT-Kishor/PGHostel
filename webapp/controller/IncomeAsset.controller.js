@@ -19,7 +19,9 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("RouteIncomeAsset").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: function () {
+            _onRouteMatched:async function () {
+                 var LoginFunction = await this.commonLoginFunction("IncomeAsset");
+                if (!LoginFunction) return;
                 this.closeBusyDialog()
             
                 this.commonLoginFunction("IncomeAsset");
@@ -194,9 +196,7 @@ sap.ui.define([
                         oSimpleForm.setLayout(sap.ui.layout.form.SimpleFormLayout.ColumnLayout);
                     }
 
-                     if (loginRole === "IT Consultant") {
-                        sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
-                                  }
+                     
 
                                   var oDatePicker = sap.ui.getCore().byId("FCIA_id_Date");
                                         if (oDatePicker) {
@@ -235,7 +235,9 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_transferButton").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(true)
 
-
+if (loginRole === "IT Consultant") {
+                        sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
+                                  }
                     table.removeSelections();
 
                 }

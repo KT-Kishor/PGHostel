@@ -17,6 +17,8 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("AssetObjectPage").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function (oEvent) {
+             var LoginFunction = await this.commonLoginFunction("AssetAssignment");
+                if (!LoginFunction) return;
             this.Name =  oEvent.getParameter("arguments").Name;
             this.Slno = oEvent.getParameter("arguments").sPath;
             await this._fetchCommonData("IncomeAsset", "objectModel", {
