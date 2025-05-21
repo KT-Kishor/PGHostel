@@ -2,6 +2,7 @@
 	xmlns="sap.m"
 	xmlns:c="sap.ui.core"
 	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
 >
 	<Dialog title="{i18n>trash}">
 	
@@ -25,6 +26,20 @@
 		>
 
 			<f:content>
+			 <Label text="{i18n>Trash By}"/>
+                <Select
+                    id="FCIA_id_trashBy"
+					required="true"
+                    selectedKey="{CreateIncomeAssetModel>/TrashByEmployeeName}
+}"                  showSecondaryValues="true"
+                    items="{AdminModel>/}"
+                >
+                    <core:ListItem
+                        text="{AdminModel>EmployeeName}"
+                        key="{AdminModel>EmployeeName}"
+                        additionalText="{AdminModel>EmployeeID}"
+                    />
+               </Select>
 			<Label text="{i18n>trashDate}"/>
 				<DatePicker 
 					id="FTIA_id_Date"
@@ -38,11 +53,11 @@
 				<Label text="{i18n>Comments}"/>
 				    <TextArea id="FTIA_id_Comments" 
 					required="true"
-                  valueStateText="Write a comment on trashed asset"
+                  valueStateText="Write A Comment On Trashed Asset"
                   liveChange="FCIA_onDescriptionTextAreaChange"
-                  value="{CreateIncomeAssetModel>/Comments}"
+                  value="{CreateIncomeAssetModel>/TrashComments}"
                   placeholder="Enter Comments" 
-                  maxLength="250" width="100%" />
+                  maxLength="200" width="100%" />
 			</f:content>
 		</f:SimpleForm>
 		<beginButton>

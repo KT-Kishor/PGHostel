@@ -1,17 +1,18 @@
 <mvc:View
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"
-	xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
     controllerName="sap.kt.com.minihrsolution.controller.IncomeAsset"
-	xmlns:fb="sap.ui.comp.filterbar"
-    displayBlock="true">
- <Page
-        id="IA_id_page"
-     >
-    <headerContent>
-	   <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
-		</headerContent>
-
+    xmlns:fb="sap.ui.comp.filterbar"
+    displayBlock="true"
+>
+    <Page id="IA_id_page">
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.kt.com.minihrsolution.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
         <fb:FilterBar
             id="IA_id_FilterbarEmployee"
             persistencyKey="myPersKey"
@@ -24,7 +25,7 @@
             showFilterConfiguration="false"
         >
             <fb:filterGroupItems>
-              <fb:FilterGroupItem
+                <fb:FilterGroupItem
                     name="SerialNumber"
                     label="{i18n>slNo}"
                     groupName="Group1"
@@ -85,11 +86,11 @@
                         >
                             <items>
                                 <core:ListItem
-                                  text="{EmpModel>EmployeeName}"
+                                    text="{EmpModel>EmployeeName}"
                                     key="{EmpModel>EmployeeName}"
                                     additionalText="{EmpModel>EmployeeID}"
-                               />
-                                    </items>
+                                />
+                            </items>
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
@@ -108,8 +109,7 @@
                         />
                     </fb:control>
                 </fb:FilterGroupItem>
-              
-                 <fb:FilterGroupItem
+                <fb:FilterGroupItem
                     name="Status"
                     label="{i18n>Status}"
                     groupName="Group"
@@ -131,7 +131,6 @@
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
-                
             </fb:filterGroupItems>
         </fb:FilterBar>
         <Table
@@ -139,12 +138,12 @@
             width="auto"
             alternateRowColors="true"
             items="{
-            path:'incomeModel>/',
-             sorter: [{
-                        path: 'Type',
-                        group: true
+                path: 'incomeModel>/',
+                sorter: [{
+                    path: 'Type',
+                    group: true
                 }]
-                }"
+            }"
             mode="SingleSelectLeft"
             updateFinished="onTableColorFormatting"
             id="IA_id_OdataTable"
@@ -155,166 +154,295 @@
                         id="IA_TitleID"
                         text="{i18n>assetDetails} ({=${incomeModel>/}.length})"
                         level="H1"
-
                     />
                     <ToolbarSpacer />
-                          <Button
-                            id="IA_id_Export"
-                            text="{i18n>download}"
-                            press="IA_onExport"
-                            type="Ghost"
-                        />
-
                     <Button
                         text="{i18n>create}"
                         type="Accept"
                         press="IA_onCreateButtonPress"
+                        tooltip="Create"
                     />
-                   
                     <Button
-                        text="{i18n>trash}"
-                        type="Reject"
-                        press="IA_onTrashButtonPress"
-                    />
-                      <Button
-                        text="{i18n>Transfer}"
-                      type="Attention"
-                        press="IA_onTransferButtonPress"
-                    />
-                     <Button
                         text="{i18n>edit}"
                         type="Emphasized"
                         press="IA_onUpadateButtonPress"
+                        tooltip="{i18n>edit}"
                     />
-                    
+                    <Button
+                        text="{i18n>Transferbtn}"
+                        type="Ghost"
+                        press="IA_onTransferButtonPress"
+                        tooltip="Transfer"
+                    />
+                    <Button
+                        text="{i18n>trash}"
+                        type="Ghost"
+                        press="IA_onTrashButtonPress"
+                        tooltip="Trash"
+                    />
+                    <Button
+                        id="IA_id_Export"
+                        text="{i18n>download}"
+                        press="IA_onExport"
+                        type="Ghost"
+                        tooltip="Download"
+                    />
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-               <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>vehicleModel}"/>
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>vehicleModel}" />
                 </Column>
-                 <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>pickedBy}"/>
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>assetdetails}" />
                 </Column>
-                     <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="SlNo/EqNo"/>
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>Assetdate}" />
                 </Column>
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>Pickeddetails}" />
+                </Column>
+                <!-- <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="Sl No/Eq No" />
+                </Column> -->
                 <!-- <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>eqNo}"/>
                 </Column> -->
-               <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>Assetdate}"/>
+                <!-- <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>Assetdate}" />
+                </Column> -->
+                <Column>
+                    <Text text="{i18n>transferdetails}" />
                 </Column>
-                 <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>trashDate}"/>
-
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>trashby}" />
                 </Column>
+                <!-- <Column>
+                    <Text text="{i18n>transferdetails}" />
+                </Column> -->
                 <!-- <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>creationbranch}"/>
                 </Column> -->
-                 <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>pickedbranch}"/>
-                </Column>
-                  <Column minScreenWidth="Tablet"  demandPopin="true" width="12%" hAlign="Center">
-                    <Text text="{i18n>status}"/>
+                <!-- <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>pickedbranch}" />
+                </Column> -->
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                    width="12%"
+                    hAlign="Center"
+                >
+                    <Text text="{i18n>status}" />
                 </Column>
                 <!-- <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>trashDate}"/>
 
                 </Column> -->
-                 <Column minScreenWidth="Tablet" demandPopin="true">
-                    <Text text="{i18n>assetvalue}"/>
-                </Column>  
-                      <!-- <Column minScreenWidth="Tablet" demandPopin="true">
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>assetvalue}" />
+                </Column>
+                <!-- <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>Transferdate}"/>
                 </Column> 
                       <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>Tranferbranch}"/>
                 </Column>  -->
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>return}" />
+                </Column>
             </columns>
-            <items >
-                <ColumnListItem type="Navigation" press="onColumnListItemPress">
-                    <cells >
-                    <ObjectIdentifier
-						title="{incomeModel>Model}"
-						text="{incomeModel>Description}"/>
-                         <ObjectIdentifier
-						title="{incomeModel>PickedEmployeeName}"
-						text="{incomeModel>PickedEmployeeID}"/>
-
-                      <!-- <Text text="{incomeModel>SerialNumber}"/>
+            <items>
+                <ColumnListItem
+                    type="Navigation"
+                    press="onColumnListItemPress"
+                >
+                    <cells>
+                        <ObjectIdentifier
+                            title="{incomeModel>Model}"
+                            text="{incomeModel>Description}"
+                        />
+                        <ObjectIdentifier
+                            title="{= 'Sl No: ' + ${incomeModel>SerialNumber}}"
+                            text="{='Eq No: '+ ${incomeModel>EquipmentNumber}}"
+                        />
+                        <ObjectIdentifier
+                            title="{= 'Date: ' + ${
+                                path: 'incomeModel>AssetCreationDate',
+                                formatter: '.Formatter.formatDate'
+                            }}"
+                            text="{='Branch: '+${incomeModel>AssignBranch}}"
+                        />
+                        <!-- <ObjectIdentifier
+                            title="{incomeModel>PickedEmployeeName}"
+                            text="{incomeModel>PickedEmployeeID}"
+                        /> -->
+                        <ObjectIdentifier
+                            title="{=${incomeModel>PickedEmployeeName}?'By: '+${incomeModel>PickedEmployeeName}+''+${incomeModel>PickedEmployeeID}:''}"
+                            text="{=${incomeModel>PickedBranch}?'Branch: '+${incomeModel>PickedBranch}:''}"
+                        />
+                        <!-- <Text text="{incomeModel>SerialNumber}"/>
                         <Text text="{incomeModel>EquipmentNumber}"/> -->
-                         <ObjectIdentifier
-						title="{incomeModel>SerialNumber}"
-						text="{incomeModel>EquipmentNumber}"/>
+                        <!-- <ObjectIdentifier
+                            title="{incomeModel>SerialNumber}"
+                            text="{incomeModel>EquipmentNumber}"
+                        /> -->
+                        <!-- <ObjectIdentifier
+                            title="{
+                                path: 'incomeModel>AssetCreationDate',
+                                formatter: '.Formatter.formatDate'
+                            }"
+                            text="{incomeModel>AssignBranch}"
+                        /> -->
+                        <VBox>
+                            <Text text="{= ${incomeModel>TransferByName} ? 'By: ' + ${incomeModel>TransferByName} + ' ' + ${incomeModel>TransferByID} : ''}" 
+                                    class="sapUiTinyMarginBottom"
+                            />
+
+                            <Text text="{= ${incomeModel>TransferBranch} ? 'Branch: ' + ${incomeModel>TransferBranch} : ''}"
+                                    class="sapUiTinyMarginBottom"
+                             />
+
+                            <Text text="{= ${incomeModel>TransferDate} === '1899-11-30T00:00:00.000Z' ? '' : 'Date: ' + ${
+                                path: 'incomeModel>TransferDate',
+                                formatter: '.Formatter.formatDate'
+                            }}" />
+                        </VBox>                    
                             <ObjectIdentifier
-						title="{
-                            path: 'incomeModel>AssetCreationDate',
+                            title="{= ${incomeModel>TrashByEmployeeName} ? 'By: ' + ${incomeModel>TrashByEmployeeName} + ' ' 
+                                + ${incomeModel>TrashByEmployeeID} : ''}"
+                            text="{= ${incomeModel>TrashDate} ? 'Date: ' + ${
+                                    path: 'incomeModel>TrashDate',
+                                    formatter: '.Formatter.formatDate'
+                                } : ''}"
+                        />
+                        <!-- <Text text="{
+                            path: 'incomeModel>TrashDate',
                             formatter: '.Formatter.formatDate'
-                        }"
-						text="{incomeModel>AssignBranch}"/>
-                          <Text text="{
-                        path:'incomeModel>TrashDate',
-                        formatter: '.Formatter.formatDate'
-                        }"/>
-                          <!-- <Text text="{
+                        }" /> -->
+                        <!-- <ObjectIdentifier
+                            title="{= ${incomeModel>TransferDate} === '1899-11-30T00:00:00.000Z' ? ''
+                                : ${
+                                    path: 'incomeModel>TransferDate',
+                                    formatter: '.Formatter.formatDate'
+                                }}"
+                            text="{incomeModel>TransferBranch}"
+                        /> -->
+                        <!-- <Text text="{
                             path: 'incomeModel>AssetCreationDate',
                             formatter: '.Formatter.formatDate'
                         }"/>
                         <Text text="{incomeModel>AssignBranch}"/> -->
-                        <Text text="{incomeModel>PickedBranch}"></Text>
-                        <HBox alignItems="Center" justifyContent="Center">
-                              <ObjectStatus 
-                                 inverted="true"
-                                  text="{incomeModel>Status}"
-                                  state="{
-                                  path:'incomeModel>Status',
-                                  formatter:'.Formatter.formatObjectStatus'
-                                  }"
-                              />
-                              <Button 
-                              id="IA_pickButton"
-                     visible="{= ${incomeModel>Status} === 'Transferred' &amp;&amp; ${LoginModel>/Role} === 'Admin' }"             
-                                        text="{i18n>Picked}"                      
-                                    type="Ghost"
-                                class="sapUiTinyMarginBegin"
+                        <!-- <Text text="{incomeModel>PickedBranch}"/> -->
+                        <VBox
+                            alignItems="Center"
+                            justifyContent="Center"
+                        >
+                            <ObjectStatus
+                                inverted="false"
+                                text="{incomeModel>Status}"
+                                state="{
+                                    path: 'incomeModel>Status',
+                                    formatter: '.Formatter.formatObjectStatus'
+                                }"
+                            />
+                            <Button
+                                id="IA_pickButton"
+                                visible="{= ${incomeModel>Status} === 'Transferred' &amp;&amp; (${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Consultant'
+                                 || ${LoginModel>/Role} === 'IT Manager')}"
+                                text="{i18n>pickedBtn}"
+                                type="Ghost"
+                                class="sapUiTinyMarginBegi"
                                 press="IA_onPickedButtonPress"
-                              />
-                          </HBox>
+                            />
+                        </VBox>
                         <!-- <Text text="{
                         path:'incomeModel>TrashDate',
                         formatter: '.Formatter.formatDate'
                         }"/> -->
-                       
-                         <!-- <ObjectNumber
+                        <!-- <ObjectNumber
 							number="{
 								parts:[{path:'incomeModel>AssetValue'},{path:'incomeModel>Currency'}],
 								type: 'sap.ui.model.type.Currency',
 								formatOptions: {showMeasure: false}
 							}"
 							unit="{incomeModel>Currency}" /> -->
-                             <!-- <Text text="{
+                        <!-- <Text text="{
                         path:'incomeModel>Currency',
                         formatter: '.Formatter.formatCurrency'
                         }"/> -->
-                              <Text text="{
-                                parts:[{path:'incomeModel>AssetValue'},{path:'incomeModel>Currency'}],
-                                formatter: '.Formatter.formatCurrency'
-                                          }"/>                      
+                        <Text
+                            text="{incomeModel>Currency} {
+                            path: 'incomeModel>AssetValue',
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                        />
+                        <VBox  >
+                            <Text
+                                text="{= ${incomeModel>ReturnEmpName} ? 'To: ' + ${incomeModel>ReturnEmpName} + ' ' + ${incomeModel>ReturnEmpID} : ''}"
+                                    class="sapUiTinyMarginBottom"
+                            />
+                            <Text
+                                text="{= ${incomeModel>ReturnBranch} ? 'Branch: ' + ${incomeModel>ReturnBranch} : ''}"
+                                    class="sapUiTinyMarginBottom"
+                            />
+                            <Text text="{= ${incomeModel>ReturnDate} === '1899-11-30T00:00:00.000Z' || ${incomeModel>ReturnDate} === null ? '' : 'Date: ' + ${
+                                path: 'incomeModel>ReturnDate',
+                                formatter: '.Formatter.formatDate'
+                            }}" 
+                            />
+                           <!-- <Text
+                               text="{= ${incomeModel>ReturnDate} ? 'Date: ' + ${
+                                   path: 'incomeModel>ReturnDate',
+                                   formatter: '.Formatter.formatDate'
+                               } : ''}"        
+                           /> -->
+                        </VBox>
 
-                            <!-- <Text text="{incomeModel>TransferDate}"/>
+                        <!-- <Text text="{incomeModel>TransferDate}"/>
                             <Text text="{incomeModel>TransferBranch}"/> -->
-
                     </cells>
                 </ColumnListItem>
             </items>
         </Table>
         <footer>
-			<Bar id="IA_id_FooterBar">
-			    <contentLeft>
-                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+            <Bar id="IA_id_FooterBar">
+                <contentLeft>
+                    <core:Fragment
+                        fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
+                        type="XML"
+                    />
                 </contentLeft>
             </Bar>
-            </footer>
+        </footer>
     </Page>
 </mvc:View>

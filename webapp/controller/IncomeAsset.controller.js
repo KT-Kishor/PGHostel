@@ -42,9 +42,14 @@ sap.ui.define([
                     "TransferBranch": "",
                     "PickedBranch":"",
                     "Comments":"",
+                    "TrashComments":"",
                     "minDate":new Date(),
                     "TransferByName":"",
-                    "TransferByID":""
+                    "TransferByID":"",
+                    "TrashByEmployeeName":"",
+                    "TrashByEmployeeID":""
+
+
 
 
                 })
@@ -133,6 +138,8 @@ sap.ui.define([
                 var oModel = this.getView().getModel("CreateIncomeAssetModel")
                 var table = this.getView().byId("IA_id_OdataTable")
                 var data = this.getView().getModel("incomeModel").getData()
+                var loginRole = this.getView().getModel("LoginModel").getProperty("/Role");
+                  
                 if (!this.FCIA_Dialog) {
                     var oView = this.getView();
                     this.FCIA_Dialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.CreateIncomeAsset", this);
@@ -144,6 +151,22 @@ sap.ui.define([
                     }
 
                     this._FragmentDatePickersReadOnly(["FCIA_id_Date"]);
+                    var oDatePicker = sap.ui.getCore().byId("FCIA_id_Date");
+                                        if (oDatePicker) {
+                                            var oToday = new Date();
+                                            var maxdate = new Date(oToday)
+                                            maxdate.setDate(maxdate.getDate() - 30)                                           
+                                             oDatePicker.setMinDate(oToday);
+                                            oDatePicker.setMaxDate(maxdate)
+                                        }
+                    
+                    //  var oAssignedDate = oRowData.TransferDate
+                    //     if (oAssignedDate) {
+                    //         var oMinDate = new Date(oAssignedDate);
+                    //         var oMaxDate = new Date(oAssignedDate);
+                    //         oMaxDate.setDate(oMaxDate.getDate() +365);
+                    //         sap.ui.getCore().byId("FCIA_id_Date").setMinDate(oMinDate).setMaxDate(oMaxDate);
+                    //     }
 
                     sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_transferbranch").setVisible(false)
@@ -153,13 +176,17 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_Date").setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
+                    
+                    if (loginRole === "IT Consultant") {
+                        sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
+                    }
 
  
                    table.removeSelections();
                     this.FCIA_Dialog.open();
 
-                } else {
-                    this.FCIA_Dialog.open();
+                } else {               
+                         this.FCIA_Dialog.open();
 
                     var oModel = this.getView().getModel("CreateIncomeAssetModel")
                     var oSimpleForm = sap.ui.getCore().byId("FCIA_id_SimpleFormChange354wide");
@@ -167,6 +194,18 @@ sap.ui.define([
                         oSimpleForm.setLayout(sap.ui.layout.form.SimpleFormLayout.ColumnLayout);
                     }
 
+                     if (loginRole === "IT Consultant") {
+                        sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
+                                  }
+
+                                  var oDatePicker = sap.ui.getCore().byId("FCIA_id_Date");
+                                        if (oDatePicker) {
+                                            var oToday = new Date();
+                                            var maxdate = new Date(oToday)
+                                            maxdate.setDate(maxdate.getDate() - 30)                                           
+                                             oDatePicker.setMinDate(oToday);
+                                            oDatePicker.setMaxDate(maxdate)
+                                        }
 
                     sap.ui.getCore().byId("FCIA_id_type").setEditable(true).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_type").setSelectedKey("")
@@ -361,6 +400,8 @@ sap.ui.define([
         //    this.getView().getModel("CreateIncomeAssetModel").setProperty("/Type", typeKey);
                
                 var oModel = this.getView().getModel("CreateIncomeAssetModel").getData()
+                var Model = this.getView().getModel("incomeModel").getData()
+
                 if (utils._LCvalidateDate(sap.ui.getCore().byId("FCIA_id_transferdate"), "ID")
                     && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FCIA_id_transferbranch"), "ID")
                 ) 
@@ -389,7 +430,7 @@ sap.ui.define([
                         // "PickedEmployeeID":sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText(),
                         "TransferBranch": oModel.TransferBranch,
                         "TransferDate": oModel.TransferDate.split("/").reverse().join("-"),
-                        "TransferByName":oModel.TransferByName,
+                        "TransferByName":sap.ui.getCore().byId("FCIA_id_transferBy").getSelectedKey(),
                         "TransferByID":sap.ui.getCore().byId("FCIA_id_transferBy").getSelectedItem().getAdditionalText()
 
                     }
@@ -446,6 +487,14 @@ sap.ui.define([
                         if (oSimpleForm) {
                             oSimpleForm.setLayout(sap.ui.layout.form.SimpleFormLayout.ColumnLayout);
                         }
+                         var oDatePicker = sap.ui.getCore().byId("FCIA_id_Date");
+                                        if (oDatePicker) {
+                                            var oToday = new Date();
+                                            var maxdate = new Date(oToday)
+                                            maxdate.setDate(maxdate.getDate() - 30)                                           
+                                             oDatePicker.setMinDate(oToday);
+                                            oDatePicker.setMaxDate(maxdate)
+                                        }
                         this._FragmentDatePickersReadOnly(["FCIA_id_Date"])
                         sap.ui.getCore().byId("FCIA_id_pickButton").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_transferButton").setVisible(false)
@@ -473,6 +522,14 @@ sap.ui.define([
                     if (oSimpleForm) {
                         oSimpleForm.setLayout(sap.ui.layout.form.SimpleFormLayout.ColumnLayout);
                     }
+                      var oDatePicker = sap.ui.getCore().byId("FCIA_id_Date");
+                                        if (oDatePicker) {
+                                            var oToday = new Date();
+                                            var maxdate = new Date(oToday)
+                                            maxdate.setDate(maxdate.getDate() - 30)                                           
+                                             oDatePicker.setMinDate(oToday);
+                                            oDatePicker.setMaxDate(maxdate)
+                                        }
                     this.FCIA_Dialog.open();
                     var oCore = sap.ui.getCore()
                     oCore.byId("FCIA_id_type").setSelectedKey(data.Type).setEditable(true).setVisible(true);
@@ -542,7 +599,7 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true)
                         sap.ui.getCore().byId("FCIA_id_Date").setVisible(true).setValueState("None").setEditable(true)
                         sap.ui.getCore().byId("FCIA_id_branch").setVisible(false)
-                        sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true).setValueState("None").setSelectedKey("")
+                        sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true).setValueState("None").setSelectedKey(oRowData.TransferBranch).setEditable(false)
                         sap.ui.getCore().byId("FCIA_id_assetvalue").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_currency").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
@@ -574,7 +631,7 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_Date").setVisible(true).setValue("").setValueState("None").setEditable(true)
                     sap.ui.getCore().byId("FCIA_id_branch").setVisible(false).setSelectedKey("")
-                    sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true).setSelectedKey("").setValueState("None")
+                    sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true).setSelectedKey(oRowData.TransferBranch).setValueState("None").setEditable(false)
                     sap.ui.getCore().byId("FCIA_id_assetvalue").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_currency").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
@@ -590,6 +647,8 @@ sap.ui.define([
             },
 
             IA_onTrashButtonPress: function () {
+                  var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === "Admin"));
+                this.getView().setModel(oModel, "AdminModel");
                 var table = this.byId("IA_id_OdataTable");
                 var selected = table.getSelectedItem();
                 if (!selected) {
@@ -701,7 +760,9 @@ sap.ui.define([
                         }else if(data.ReturnDate){
                           var oMinDate = new Date(data.ReturnDate);
                           sap.ui.getCore().byId("FCIA_id_transferdate").setMinDate(oMinDate);
-                        }     
+                        }  
+                        
+                        
                     sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_pickButton").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_transferButton").setVisible(true)
@@ -795,8 +856,10 @@ sap.ui.define([
                         var oPayLoad = {
                             "Status": "Trashed",
                             "TrashDate": Date,
-                            "Comments":oModel.Comments
-                        };
+                            "TrashByEmployeeName":sap.ui.getCore().byId("FCIA_id_trashBy").getSelectedKey(),
+                            "TrashByEmployeeID":sap.ui.getCore().byId("FCIA_id_trashBy").getSelectedItem().getAdditionalText(),
+                            "TrashComments":sap.ui.getCore().byId("FTIA_id_Comments").getValue()             
+                                   };
                         await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oPayLoad, filters: { ID: selectedData.ID }, });
                         MessageToast.show(this.i18nModel.getText("Trashed"));
                         this.IA_CommonReadCall("IncomeAsset")
