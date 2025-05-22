@@ -24,8 +24,8 @@
               emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 									<f:content>
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>customerName}" required="true" />
-										<m:ComboBox id="CID_id_AddCustComboBox" visible="{visiablityPlay>/createVisi}" items="{AddCustomerModel>/results}" value="{SelectedCustomerModel>/Customer}" change="CID_ValidateCommonFields" valueStateText="{i18n>selectCustomer}">
-											<core:Item key="{AddCustomerModel>ID}" text="{AddCustomerModel>CompanyName}" />
+										<m:ComboBox id="CID_id_AddCustComboBox" visible="{visiablityPlay>/createVisi}" items="{ManageCustomerModel>/}" value="{SelectedCustomerModel>/Customer}" change="CID_ValidateCommonFields" valueStateText="{i18n>selectCustomer}">
+											<core:Item key="{ManageCustomerModel>ID}" text="{ManageCustomerModel>CompanyName}" />
 										</m:ComboBox>
 
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>customerName}"/>
