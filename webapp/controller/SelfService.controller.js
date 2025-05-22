@@ -1671,6 +1671,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.oModel.setProperty("/BackPath", this.sPath);
                 this.oModel.setProperty("/EmpData", oData);
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
+            },
+            onApplyResignation:function(){
+                this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate");
+            
             }
         });
     });
