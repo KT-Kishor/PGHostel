@@ -27,7 +27,7 @@
             <Label text="{i18n>assestAssignReturnID}" required="true"/>
 				<ComboBox
                     id="FAU_id_returnTo"
-                    items="{EmpModel>/}"
+                    items="{AdminModel>/}"
                     change="FAU_onChangeReturnTo"
                     showSecondaryValues="true"
                     value="{myform>/formData/data/ReturnEmpName}"
@@ -35,9 +35,9 @@
                     valueStateText="{i18n>commonNameValueState}"
                 >   
 					<core:ListItem
-                        key="{EmpModel>EmployeeID}"
-                        text="{EmpModel>EmployeeName}"
-                        additionalText="{EmpModel>EmployeeID}"
+                        key="{AdminModel>EmployeeID}"
+                        text="{AdminModel>EmployeeName}"
+                        additionalText="{AdminModel>EmployeeID}"
                     />
 				</ComboBox>
                 <Label text="{i18n>assestAssignReturnDate}" />
