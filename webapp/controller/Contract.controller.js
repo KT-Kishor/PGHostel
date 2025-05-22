@@ -154,10 +154,6 @@ sap.ui.define(
                     utils._LCvalidateAmount(oEvent);
                 },
 
-                CD_validateComments: function(oEvent) {
-                    utils._LCvalidateMandatoryField(oEvent);
-                },
-
                 CD_validateDate: function(oEvent) {
                     var oStartDatePicker = sap.ui.getCore().byId("CR_id_AssignmentStartDate");
                     var oEndDatePicker = sap.ui.getCore().byId("CR_id_AssignmentEndDate");
@@ -354,8 +350,7 @@ sap.ui.define(
                             // Validate required fields for Renewed status
                             const isMandatoryValid = (
                                 utils._LCvalidateDate(sap.ui.getCore().byId("CR_id_AssignmentStartDate"), "ID") &&
-                                utils._LCvalidateAmount(sap.ui.getCore().byId("CR_id_EditAmountInput"), "ID") &&
-                                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("CR_id_Comments"), "ID")
+                                utils._LCvalidateAmount(sap.ui.getCore().byId("CR_id_EditAmountInput"), "ID") 
                             );
 
                             if (!isMandatoryValid) {
@@ -405,8 +400,7 @@ sap.ui.define(
                         if (oContractFormVisible.showMobileFields) {
                             const isValid = (
                                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId("CR_id_codeModel"), "ID") &&
-                                utils._LCvalidateMobileNumber(sap.ui.getCore().byId("CR_id_Mobile"), "ID") &&
-                                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("CR_id_Comments"), "ID")
+                                utils._LCvalidateMobileNumber(sap.ui.getCore().byId("CR_id_Mobile"), "ID") 
                             );
 
                             if (!isValid) {

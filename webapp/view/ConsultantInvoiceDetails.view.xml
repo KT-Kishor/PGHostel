@@ -123,6 +123,11 @@
 										<m:Input value="{ConsultantInvoiceModel>/ConsultantName}" editable="{visiablityPlay>/editable}" id="CI_id_ConsultantName" liveChange="CID_ValidateCommonFields" maxLength="50" valueStateText="{i18n>validConsultantNameMsg}" />
 
 										<m:Label text="{i18n>mobileNo}" required="true" />
+                                       	<m:ComboBox selectedKey="{ConsultantInvoiceModel>/STDCode}" showSecondaryValues="true" change="CID_ValidateComboBox"
+                                        id="CI_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}" editable="{visiablityPlay>/editable}">
+										<core:ListItem key="{codeModel>calling_code}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
+										</m:ComboBox>
+
 										<m:Input value="{ConsultantInvoiceModel>/MobileNo}" id="CI_id_InputMobile" liveChange="CID_ValidateMobileNo" maxLength="10" valueStateText="{i18n>mobileNoValueState}" editable="{visiablityPlay>/editable}"/>
 
 										<m:Label text="{i18n>consultantAddress}" required="true" />
@@ -182,7 +187,6 @@
 									<m:OverflowToolbar>
 										<m:ToolbarSpacer />
 										<m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://add" tooltip="{i18n>addItem}" press="CI_onPressAddInvoiceDetails" type="Emphasized" />
-										<m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://signature" tooltip="{i18n>addSignature}" press="CI_onPressAddSignature" type="Emphasized" id="CI_id_Sign" />
 										<m:ToolbarSeparator />
 									</m:OverflowToolbar>
 									<m:Table id="CI_id_ConsultantInvoiceDeatailTable" 
@@ -202,7 +206,7 @@
 										</m:columns>
 
 										<m:items>
-											<m:ColumnListItem>
+											<m:ColumnListItem >
 												<m:cells>
 													<m:Input value="{ConsultantInvoiceModel>IndexNo}" editable="false" />
 													<m:Input value="{ConsultantInvoiceModel>Item}" editable="{visiablityPlay>/editable}" maxLength="60" />
@@ -221,12 +225,12 @@
 														selectedKey="1" 
 														editable="{ConsultantInvoiceModel>/GSTValid}" 
 														change="CI_onChangeGSTCalculation">
-														<core:Item key="{i18n>yes}" text="{i18n>yes}" />
-														<core:Item key="{i18n>no}" text="{i18n>no}" />
+														<core:Item key="Yes" text="{i18n>yes}" />
+											            <core:Item key="No" text="{i18n>no}" />
 													</m:ComboBox>
 													<m:Input value="{ConsultantInvoiceModel>Days}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End" />
 													<m:Input value="{ConsultantInvoiceModel>UnitPrice}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End" />
-													<m:Input id="CI_id_DiscountInput" value="{ConsultantInvoiceModel>Discount}" editable="{visiablityPlay>/editable}" liveChange="CI_onchangeDiscount" maxLength="10" textAlign="End" />
+													<m:Input  value="{ConsultantInvoiceModel>Discount}" editable="{visiablityPlay>/editable}" liveChange="CI_onchangeDiscount" maxLength="10" textAlign="End" />
 													<m:Input value="{path:'ConsultantInvoiceModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />
 												</m:cells>
 											</m:ColumnListItem>

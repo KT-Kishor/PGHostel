@@ -293,7 +293,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     ["Notice period for us to terminate", "5 calendar weeks subject to clauses 23-27"],
                     ["Specific Insurance Requirement", oModel.SpecificInsuranceRequirement],
                     ["Warranty Date", oModel.AgreementDuration],
-                    ["Consultant Rate – standard daily rate (8 hrs)", oModel.ConsultantRate],
+                    ["Consultant Rate – standard daily rate (8 hrs)", oModel.ConsultantRate + " Including all tax"],
                     ["Consultant Rate – non-standard", "Any non-standard rate will be on a pro-rata basis with strict prior"],
                     ["Call-out/additional rates/expenses", oModel.ExpensesClaim],
                     ["Payment terms", oModel.PaymentTerms],

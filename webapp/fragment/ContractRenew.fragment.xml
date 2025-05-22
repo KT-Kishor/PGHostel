@@ -54,20 +54,17 @@
 				</Select>
 
 				<!-- STD Code -->
-				<Label text="{i18n>stdCode}" required="true" visible="{ContractFormVisibleModel>/showMobileFields}" />
+                <Label text="{i18n>mobileNo}" required="true" visible="{ContractFormVisibleModel>/showMobileFields}" />
 				<ComboBox selectedKey="{ContractActiveModel>/STDCode}" showSecondaryValues="true" change="CD_ValidateComboBox" id="CR_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}" visible="{ContractFormVisibleModel>/showMobileFields}">
 				<core:ListItem key="{codeModel>calling_code}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
 				</ComboBox>
 
-				<!-- Mobile No -->
-					<Label text="{i18n>mobileNo}" required="true" visible="{ContractFormVisibleModel>/showMobileFields}" />
+				<!-- Mobile No -->				
 				<Input value="{ContractActiveModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="10" id="CR_id_Mobile" valueStateText="{i18n>mobileNoValueState}" visible="{ContractFormVisibleModel>/showMobileFields}" />
 
 				<!-- Comments -->
-				<Label text="Comments" visible="{ContractFormVisibleModel>/showComments}" required="true"/>
-				<TextArea value="{ContractActiveModel>/Comments}" id="CR_id_Comments" valueStateText="{i18n>commentsValueState}" maxLength="100" 
-                    liveChange="CD_validateComments"
-				visible="{ContractFormVisibleModel>/showComments}" />
+				<Label text="Comments" visible="{ContractFormVisibleModel>/showComments}"/>
+				<TextArea value="{ContractActiveModel>/Comments}" id="CR_id_Comments" valueStateText="{i18n>commentsValueState}" maxLength="100" visible="{ContractFormVisibleModel>/showComments}" />
 
 			</f:content>
 		</f:SimpleForm>
