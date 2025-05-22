@@ -36,13 +36,14 @@ sap.ui.define([
                             Status: "",
                             ReturnDate: "",
                             ReturnEmpName: "",
-                            ReturnEmpID: ""
+                            ReturnEmpID: "",
+                            Description: ""
                         },
                         filters: {}
                     },
 
                 });
-
+                // await this._fetchCommonData("EmployeeDetailsData", "empModel");
                 this.commonLoginFunction("AssetAssignment");
                 this._makeDatePickersReadOnly(["AA_id_Date"]);
                 this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAU_id_unassignDate", "FAA_id_Model"]);
@@ -52,7 +53,7 @@ sap.ui.define([
                 this._fetchCommonData("AssetType", "assetType");
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
-                var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === "Admin"));
+                var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === "Admin" || item.Role === "IT Manager" || item.Role === "IT Consultant"));
                 this.getView().setModel(oModel, "AdminModel");
                 this.AA_CoomonReadCall();
                 this.oLoginModel.setProperty("/HeaderName", "Asset Assignment");
@@ -108,7 +109,7 @@ sap.ui.define([
                 ];
             },
 
-            AA_onExport: function () {
+            AA_onDownload: function () {
                 const oModel = this.byId("AA_id_AssestTable")
                     .getModel("assetModel")
                     .getData();
@@ -148,7 +149,25 @@ sap.ui.define([
                 this._dialogMode = "Assign";
                 var oView = this.getView();
                 var oFormModel = oView.getModel("myform");
-
+                let oNewData = {
+                    AssignEmployeeID: "",
+                    AssignEmployeeName: "",
+                    Type: "",
+                    Model: "",
+                    AssignBranch: "",
+                    ReturnBranch: "",
+                    EquipmentNumber: "",
+                    SerialNumber: "",
+                    AssetValue: "",
+                    AssignedDate: new Date(),
+                    Status: "",
+                    ReturnDate: "",
+                    AssignedByEmployeeName: this.oLoginModel.getProperty("/EmployeeName"),
+                    AssignedByEmployeeID: this.oLoginModel.getProperty("/EmployeeID"),
+                    isEdit: false
+                };
+                oFormModel.setProperty("/formData/data", oNewData);
+                // oFormModel.setProperty("/formData/data/isEdit", false);
                 oFormModel.setProperty("/formData/data", {
                     AssignEmployeeID: "",
                     AssignEmployeeName: "",
@@ -205,7 +224,6 @@ sap.ui.define([
                             "FAA_id_AssetValue",
                             "FAA_id_SerialNumber",
                             "FAA_id_EquipmentNumber",
-                            "FAA_id_AssignedBy",
                             "FAA_id_AssignedDate"
                         ];
                         aAllFields.forEach(id => {
@@ -237,7 +255,6 @@ sap.ui.define([
                         "FAA_id_AssetValue",
                         "FAA_id_SerialNumber",
                         "FAA_id_EquipmentNumber",
-                        "FAA_id_AssignedBy",
                         "FAA_id_AssignedDate"
                     ];
                     aAllFields.forEach(id => {
@@ -265,7 +282,6 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("assestAssignEditNotAllowedReturned"));
                     return;
                 }
-                this._dialogMode = "Edit";
                 var oAssignedDate = new Date(oSelectedData.AssignedDate);
                 // var oToday = new Date();
                 // var oDiffDays = Math.floor((oToday - oAssignedDate) / (1000 * 60 * 60 * 24));
@@ -275,7 +291,13 @@ sap.ui.define([
                 //     return;
                 // }
                 var oFormModel = this.getView().getModel("myform");
-                oFormModel.setProperty("/formData/data", Object.assign({}, oSelectedData));
+                let oClonedData = Object.assign({}, oSelectedData);
+                oClonedData.isEdit = true;
+                oFormModel.setProperty("/formData/data", oClonedData);
+                oFormModel.setProperty("/formData/filters", { ID: oSelectedData.ID });
+
+                // oFormModel.setProperty("/formData/data/isEdit", true);
+                // oFormModel.setProperty("/formData/data", Object.assign({}, oSelectedData));
                 if (!this.FAA_Dialog) {
                     this.FAA_Dialog = await sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.AssetAssignmentCreate",
@@ -379,12 +401,13 @@ sap.ui.define([
                 if (this._checkValidation()) {
                     try {
                         var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
+                        delete oFormData.isEdit
                         var originalStatus = oFormData.Status;
                         var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
                         oFormData.AssignedDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(oAssignedDate);
                         oFormData.Status = "Assigned";
-                        oFormData.IsCurrent = 1;
-
+                        oFormData.IsCurrent = 1
+                        oFormData.Description = this.getView().getModel("myform").getProperty("/formData/data/Description");
                         this.getBusyDialog();
 
                         if (originalStatus === "Returned") {
@@ -495,7 +518,9 @@ sap.ui.define([
                             ID: oSelectedData.ID
                         });
                         oFormModel.setProperty("/formData/data/ReturnDate", new Date(oSelectedData.AssignedDate));
-                        oFormModel.setProperty("/formData/data/ReturnEmpID", this.oLoginModel.getProperty("/EmployeeName"))
+                        oFormModel.setProperty("/formData/data/ReturnEmpID", this.oLoginModel.getProperty("/EmployeeID"));
+                        oFormModel.setProperty("/formData/data/ReturnEmpName", this.oLoginModel.getProperty("/EmployeeName"));
+
                         if (!this._unassignDialog) {
                             this._unassignDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetUnassignDialog", this);
                             this.getView().addDependent(this._unassignDialog);
@@ -543,6 +568,7 @@ sap.ui.define([
                 formData.setProperty("/formData/data/Status", oSelectedData.Status);
                 formData.setProperty("/formData/data/AssetValue", (oSelectedData.AssetValue).toString());
                 formData.setProperty("/formData/data/Currency", oSelectedData.Currency);
+                formData.setProperty("/formData/data/Description", oSelectedData.Description);
                 var oAssignedDate;
                 var oMinDate;
                 if (oSelectedData.Status === "Returned" && oSelectedData.ReturnDate) {
@@ -558,7 +584,7 @@ sap.ui.define([
                     var oMinDate = new Date(oSelectedData.AssetCreationDate);
                 }
                 sap.ui.getCore().byId("FAA_id_AssignedDate").setMinDate(oMinDate);
-                var sBranch;
+                var sBranch = "";
                 if (oSelectedData.Status === "Returned" && oSelectedData.ReturnBranch) {
                     sBranch = oSelectedData.ReturnBranch;
                 } else {
@@ -601,11 +627,12 @@ sap.ui.define([
 
             FAU_onSaveReturn: async function () {
                 var oCore = sap.ui.getCore();
-                var oFormDataModel = this.getView().getModel("myform");
+                var oFormDataModel = this.getView().getModel("myform").getProperty("/formData");
                 if (utils._LCstrictValidationComboBox(oCore.byId("FAU_id_returnTo"), "ID") && utils._LCstrictValidationComboBox(oCore.byId("FAU_id_branch"), "ID") && utils._LCvalidateMandatoryField(oCore.byId("FAU_id_Comments"), "ID")) {
                     this.getBusyDialog();
-                    oFormDataModel.setProperty("/formData/data/Status", "Returned");
-                    await this.ajaxUpdateWithJQuery("IncomeAsset", oFormDataModel.getProperty("/formData"));
+                    oFormDataModel.data.Status = "Returned";
+                    delete oFormDataModel.data.isEdit
+                    await this.ajaxUpdateWithJQuery("IncomeAsset", oFormDataModel);
                     this.closeBusyDialog();
                     this.AA_onSearch();
                     this._unassignDialog.close();
@@ -618,6 +645,15 @@ sap.ui.define([
 
             _checkValidation: function () {
                 var oCore = sap.ui.getCore();
+                var bIsEdit = this.getView().getModel("myform").getProperty("/formData/data/isEdit");
+                console.log(" isEdit flag inside validation:", bIsEdit);
+                
+                if (bIsEdit) {
+                    return true;
+                }
+                // if (this.getView().getModel("myform").getProperty("/formData/data/isEdit")) {
+                //     return true
+                // }
                 if (
                     utils._LCstrictValidationComboBox(oCore.byId("FAA_id_employeeID"), "ID") &&
                     utils._LCstrictValidationComboBox(oCore.byId("FAA_id_Type"), "ID") &&

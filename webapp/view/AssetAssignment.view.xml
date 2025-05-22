@@ -158,7 +158,7 @@
                     />
 
                     <Button
-                        press="AA_onExport"
+                        press="AA_onDownload"
                         type="Ghost"
                         tooltip="{i18n>assestAssignDownload}"
                         text="{i18n>download}"
@@ -170,63 +170,63 @@
                     hAlign="Left"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assestAssignEmployeeID}" />
+                    <Text text="{i18n>assestAssignEmployeeID}" tooltip="{i18n>assestAssignEmployeeID}"/>
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assestAssignModel}" />
+                    <Text text="{i18n>assestAssignModel}" tooltip="{i18n>assestAssignModel}" />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assestAssignedByEmployeeName}" />
+                    <Text text="{i18n>assestAssignedByEmployeeName}" tooltip="{i18n>assestAssignedByEmployeeName}" />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Desktop"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assignedDate}" />
+                    <Text text="{i18n>assignedDate}" tooltip="{i18n>assignedDate}" />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Desktop"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assetAssignValue}" />
+                    <Text text="{i18n>assetAssignValue}" tooltip="{i18n>assetAssignValue}" />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Desktop"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>status}" />
+                    <Text text="{i18n>status}" tooltip="{i18n>status}" />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Desktop"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assestAssignReturnDate}" />
+                    <Text text="{i18n>assestAssignReturnDate}" tooltip="{i18n>assestAssignReturnDate}"/>
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assestAssignReturnID}" />
+                    <Text text="{i18n>assestAssignReturnID}" tooltip="{i18n>assestAssignReturnID}" />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>comments}" />
+                    <Text text="{i18n>comments}" tooltip="{i18n>comments}"/>
                 </Column>
                 <Column
                     hAlign="Left"

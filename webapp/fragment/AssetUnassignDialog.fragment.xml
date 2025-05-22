@@ -30,7 +30,7 @@
                     items="{EmpModel>/}"
                     change="FAU_onChangeReturnTo"
                     showSecondaryValues="true"
-                    value="{myform>/formData/data/ReturnEmpID}"
+                    value="{myform>/formData/data/ReturnEmpName}"
                     editable="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Manager'}"
                     valueStateText="{i18n>commonNameValueState}"
                 >   

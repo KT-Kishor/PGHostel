@@ -112,17 +112,17 @@
                 <Label text="{i18n>assestAssignassignedBy}" required="true"/>
 				<ComboBox
                     id="FAA_id_AssignedBy"
-                    items="{EmpModel>/}"
+                    items="{AdminModel>/}"
                     change="FAA_onChangeAssignedBy"
                     showSecondaryValues="true"
                     value="{myform>/formData/data/AssignedByEmployeeName}"
-                    editable="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Manager'}"
+                    editable="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Manager' }"
                     valueStateText="{i18n>commonNameValueState}"
                 >
 					<core:ListItem
-                        key="{EmpModel>EmployeeName}"
-                        text="{EmpModel>EmployeeName}"
-                        additionalText="{EmpModel>EmployeeID}"
+                        key="{AdminModel>EmployeeName}"
+                        text="{AdminModel>EmployeeName}"
+                        additionalText="{AdminModel>EmployeeID}"
                     />
 				</ComboBox>
 				<Label text="{i18n>assignedDate}" />
