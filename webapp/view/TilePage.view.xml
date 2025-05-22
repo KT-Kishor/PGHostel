@@ -393,7 +393,7 @@
                                     class="sapUiTinyMargin"
                                 >
                                     <GenericTile
-                                        visible="{= ${AppVisibilityModel>/QuotationApp} === '1' ? true : false}"
+                                        visible="{= ${AppVisibilityModel>/A_Quotations} === '1' ? true : false}"
                                         class="sapUiMediumMargin"
                                         header="{i18n>headerQuotation}"
                                         press="TileV_onpressQuotation"
