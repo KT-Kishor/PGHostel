@@ -181,17 +181,11 @@ sap.ui.define(
 
                 CU_onChangeAggrementDate: function() {
                     var oModelData = this.byId("C_id_Salary").getSelectedItem().getBindingContext("ContractModel").getObject();
-                    this.AgreementDate = this.Formatter.formatDate(oModelData.AgreementDate);
-                    this.AssignmentEndDate = this.Formatter.formatDate(oModelData.AssignmentEndDate);
-
-                    const supdateAgreementDate = this.onFormatDate(this.AgreementDate);
+                    this.AssignmentStartDate = this.Formatter.formatDate(oModelData.AssignmentStartDate);
+                    const supdateAgreementDate = this.onFormatDate(this.AssignmentStartDate);
                     if (supdateAgreementDate) {
                         sap.ui.getCore().byId("CR_id_AssignmentStartDate")?.setMinDate(supdateAgreementDate);
-                    }
-
-                    const supdateStartDate = this.onFormatDate(this.AssignmentEndDate);
-                    if (supdateStartDate) {
-                        sap.ui.getCore().byId("CR_id_AssignmentStartDate")?.setMaxDate(supdateStartDate);
+                        sap.ui.getCore().byId("CR_id_AssignmentEndDate")?.setMinDate(supdateAgreementDate);
                     }
                 },
 
@@ -285,7 +279,7 @@ sap.ui.define(
                         AgreementNo: oModelData.AgreementNo,
                         STDCode: oModelData.STDCode,
                         MobileNo: oModelData.MobileNo,
-                        Comments: oModelData.Comments,
+                        Comments: "",
                         ContractStatus: "New"
                     };
                     oView.setModel(new JSONModel(ContractActivejson), "ContractActiveModel");
@@ -312,11 +306,11 @@ sap.ui.define(
                         ContractNo: oModelData.ContractNo,
                         AgreementNo: oModelData.AgreementNo,
                         HrDaliyMonth: varible,
-                        AssignmentStartDate: oModelData.AssignmentStartDate,
-                        AssignmentEndDate: oModelData.AssignmentEndDate,
+                        AssignmentStartDate: "",
+                        AssignmentEndDate: "",
                         Amount: Number((oModelData.ConsultantRate.split(" ")[0]).replace(/,/g, '')),
                         Currency: oModelData.ConsultantRate.split(" ")[1],
-                        Comments: oModelData.Comments,
+                        Comments: "",
                         ContractPeriod: oModelData.ContractPeriod,
                         ContractStatus: "Renewed"
                     };

@@ -10,7 +10,7 @@
 					<f:SimpleForm  editable="true" layout="ColumnLayout" columnsM="1" columnsL="2" columnsXL="2">
 						<f:content>
 							<Label text="{i18n>agreementDate}" required="true"/>
-							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="onChangeAggrementDate"  valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
+							<DatePicker value="{ContractModelWizart>/AgreementDate}" id="CD_id_AgreeDate" change="ChangeAggrementDate"  valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>consultantName}" required="true"/>
 							<Select id=""  selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}" width="100%">
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />

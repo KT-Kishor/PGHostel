@@ -185,70 +185,53 @@
 										<m:Button visible="{visiablityPlay>/invBtn}" icon="sap-icon://signature" tooltip="{i18n>addSignature}" press="CI_onPressAddSignature" type="Emphasized" id="CI_id_Sign" />
 										<m:ToolbarSeparator />
 									</m:OverflowToolbar>
+									<m:Table id="CI_id_ConsultantInvoiceDeatailTable" 
+											mode="Delete" 
+											delete="CI_onPressDelete" 
+											items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}">
 
-    <!-- Table -->
-    <m:Table id="CI_id_ConsultantInvoiceDeatailTable" mode="Delete" delete="CI_onPressDelete" items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}">
-        <m:columns>
-            <m:Column width="100px">
-                <m:Text text="{i18n>siNo}" />
-            </m:Column>
-            <m:Column width="300px">
-                <m:Text text="{i18n>item}" />
-            </m:Column>
-            <m:Column id="CI_id_ColumnGST">
-                <m:Text text="{i18n>SAC}" />
-            </m:Column>
-            <m:Column id="CI_id_GSTCalc">
-                <m:Text text="{i18n>GSTCalculation}" />
-            </m:Column>
-            <m:Column>
-                <m:Text text="{i18n>days}" />
-            </m:Column>
-            <m:Column>
-                <m:Text text="{i18n>unitPrice}" />
-            </m:Column>
-            <m:Column>
-                <m:Text text="{i18n>discount}" />
-            </m:Column>
-            <m:Column>
-                <m:Text text="{i18n>total}" />
-            </m:Column>
-        </m:columns>
+										<m:columns>
+											<m:Column width="100px"><m:Text text="{i18n>siNo}" /></m:Column>
+											<m:Column width="300px"><m:Text text="{i18n>item}" /></m:Column>
+											<m:Column id="CI_id_ColumnGST"><m:Text text="{i18n>SAC}" /></m:Column>
+											<m:Column id="CI_id_GSTCalc"><m:Text text="{i18n>GSTCalculation}" /></m:Column>
+											<m:Column><m:Text text="{i18n>days}" /></m:Column>
+											<m:Column><m:Text text="{i18n>unitPrice}" /></m:Column>
+											<m:Column><m:Text text="{i18n>discount}" /></m:Column>
+											<m:Column><m:Text text="{i18n>total}" /></m:Column>
+										</m:columns>
 
-        <m:items>
-            <m:ColumnListItem>
-                <m:cells>
-                    <m:Input value="{ConsultantInvoiceModel>IndexNo}" editable="false" />
-                </m:cells>
-                <m:cells>
-                    <m:Input value="{ConsultantInvoiceModel>Item}" editable="{visiablityPlay>/editable}" maxLength="60"/>
-                </m:cells>
-                <m:cells>
-                    <m:ComboBox showSecondaryValues="true" items="{InvoiceSACModel>/}" value="{SAC}" editable="{ConsultantInvoiceModel>/GSTValid}" selectedKey="1">
-                        <core:ListItem key="{InvoiceSACModel>id}" additionalText="{InvoiceSACModel>description}" text="{InvoiceSACModel>sac}" />
-                    </m:ComboBox>
-                </m:cells>
-                <m:cells>
-                    <m:ComboBox value="{ConsultantInvoiceModel>GSTCalculation}" selectedKey="1" editable="{ConsultantInvoiceModel>/GSTValid}" change="CI_onChangeGSTCalculation">
-                        <core:Item key="{i18n>yes}" text="{i18n>yes}"/>
-                        <core:Item key="{i18n>no}" text="{i18n>no}"/>
-                    </m:ComboBox>
-                </m:cells>
-                <m:cells>
-                    <m:Input value="{ConsultantInvoiceModel>Days}"  editable="{visiablityPlay>/editable}" change="CI_onInputChange"  maxLength="10" textAlign="End"/>
-                </m:cells>
-                <m:cells>
-                    <m:Input value="{ConsultantInvoiceModel>UnitPrice}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End"/>
-                </m:cells>
-                <m:cells>
-                    <m:Input id="CI_id_DiscountInput" value="{ConsultantInvoiceModel>Discount}" editable="{visiablityPlay>/editable}" liveChange="CI_onchangeDiscount" maxLength="10" textAlign="End"/>
-                </m:cells>
-                <m:cells>
-                    <m:Input value="{path:'ConsultantInvoiceModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End"/>
-                </m:cells>
-            </m:ColumnListItem>
-        </m:items>
-    </m:Table>
+										<m:items>
+											<m:ColumnListItem>
+												<m:cells>
+													<m:Input value="{ConsultantInvoiceModel>IndexNo}" editable="false" />
+													<m:Input value="{ConsultantInvoiceModel>Item}" editable="{visiablityPlay>/editable}" maxLength="60" />
+													<m:ComboBox 
+														showSecondaryValues="true"
+														items="{InvoiceSACModel>/}"
+														value="{ConsultantInvoiceModel>SAC}"
+														editable="{ConsultantInvoiceModel>/GSTValid}" 
+														selectedKey="1">
+														<core:ListItem key="{InvoiceSACModel>id}" 
+																	additionalText="{InvoiceSACModel>description}" 
+																	text="{InvoiceSACModel>sac}" />
+													</m:ComboBox>
+													<m:ComboBox 
+														value="{ConsultantInvoiceModel>GSTCalculation}" 
+														selectedKey="1" 
+														editable="{ConsultantInvoiceModel>/GSTValid}" 
+														change="CI_onChangeGSTCalculation">
+														<core:Item key="{i18n>yes}" text="{i18n>yes}" />
+														<core:Item key="{i18n>no}" text="{i18n>no}" />
+													</m:ComboBox>
+													<m:Input value="{ConsultantInvoiceModel>Days}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End" />
+													<m:Input value="{ConsultantInvoiceModel>UnitPrice}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End" />
+													<m:Input id="CI_id_DiscountInput" value="{ConsultantInvoiceModel>Discount}" editable="{visiablityPlay>/editable}" liveChange="CI_onchangeDiscount" maxLength="10" textAlign="End" />
+													<m:Input value="{path:'ConsultantInvoiceModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />
+												</m:cells>
+											</m:ColumnListItem>
+										</m:items>
+									</m:Table>
 									<m:FlexBox class="custom-flexbox" direction="Column">
 										<m:VBox class="custom-vbox">
 											<!-- Sub Total(Non-Taxable) -->

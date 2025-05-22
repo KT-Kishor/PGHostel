@@ -42,7 +42,7 @@ sap.ui.define([
                 if (this.sArgPara === "CreateContractFlag") {
                     try {
                         const oData = {
-                            AgreementDate: "",
+                            AgreementDate: this.Formatter.formatDate(new Date()),
                             ConsultantName: "",
                             ConsultantAddress: "",
                             ContarctEmail: "",
@@ -73,6 +73,9 @@ sap.ui.define([
                         oView.setModel(oModel, "ContractModelWizart");
                         oView.byId("C_id_PageCreate").setVisible(true);
                         oView.byId("CUF_id_Contractpage").setVisible(false);
+                        const supdateAgreementDate = new Date();
+                        oView.byId("CD_id_Datestart")?.setMinDate(supdateAgreementDate);
+                        oView.byId("CD_id_DateEnd")?.setMinDate(supdateAgreementDate);
 
                         this.getView().byId("CD_id_Submit").setEnabled(false);
                         this.CD_onResetWizard();
@@ -173,22 +176,31 @@ sap.ui.define([
             },
 
             onChangeAggrementDate: function() {
-                const sCreateAgreementDate = this.byId("CD_id_AgreeDate").getDateValue();
+                const sCreateAgreementDate = this.byId("CU_id_AgreementDate").getDateValue();
+                  const sStartDate = this.byId("CU_id_AssignmentStartDate").getDateValue();
                 if (sCreateAgreementDate) {
-                    this.byId("CD_id_Datestart")?.setMinDate(sCreateAgreementDate)
+                    this.byId("CU_id_AssignmentStartDate")?.setMinDate(sCreateAgreementDate)
+                     this.byId("CU_id_AssignmentEndDate")?.setMinDate(sStartDate)
                 }
             },
 
-            CU_onChangeAggrementDate: function() {
+            ChangeAggrementDate: function() {
+                const sCreateAgreementDate = this.byId("CD_id_AgreeDate").getDateValue();
+                if (sCreateAgreementDate) {
+                    this.byId("CD_id_Datestart")?.setMinDate(sCreateAgreementDate)
+                     this.byId("CD_id_DateEnd")?.setMinDate(sCreateAgreementDate)
+                }
+            },
+
+             CU_onChangeAggrementDate: function() {
                 const supdateAgreementDate = this.onFormatDate(this.AgreementDate);
                 if (supdateAgreementDate) {
-                    this.byId("CU_id_AgreementDate")?.setMinDate(supdateAgreementDate);
                     this.byId("CU_id_AssignmentStartDate")?.setMinDate(supdateAgreementDate);
+                    this.byId("CU_id_AssignmentEndDate")?.setMinDate(supdateAgreementDate);
                 }
 
                 const supdateStartDate = this.onFormatDate(this.AssignmentEndDate);
                 if (supdateStartDate) {
-                    this.byId("CU_id_AssignmentEndDate")?.setMaxDate(supdateStartDate);
                     this.byId("CU_id_AssignmentStartDate")?.setMaxDate(supdateStartDate);
                 }
             },
