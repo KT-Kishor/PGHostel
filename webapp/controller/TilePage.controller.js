@@ -3,14 +3,17 @@ sap.ui.define(
     "./BaseController",
     "sap/m/MessageToast",
     "../utils/validation",
-    "sap/ui/model/json/JSONModel"
-  ], function (BaseController, MessageToast, utils, JSONModel) {
+    "sap/ui/model/json/JSONModel",
+  ],
+  function (BaseController, MessageToast, utils, JSONModel) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.TilePage",
       {
         onInit: function () {
-          this.getRouter().getRoute("RouteTilePage").attachMatched(this._onRouteMatched, this);
+          this.getRouter()
+            .getRoute("RouteTilePage")
+            .attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function () {
           var LoginFunction = await this.commonLoginFunction("TilePage");
@@ -24,18 +27,38 @@ sap.ui.define(
 
         AppVisibilityReadCall: async function () {
           try {
-            if (!this.getView().getModel("LoginModel")) return;
-            var LoginModel = this.getView().getModel("LoginModel").getData();
-            let oData = await this.ajaxReadWithJQuery("AppVisibility", { Role: LoginModel.Role }, []).then((oData) => {
-              this.closeBusyDialog();
-              var AppVisibility = Array.isArray(oData.data) ? oData.data[0] : [oData.data[0]];
-              this.getView().setModel(new JSONModel(AppVisibility), "AppVisibilityModel");
-            });
+            const oLoginModel = this.getView().getModel("LoginModel");
+            if (!oLoginModel) return;
+
+            const { Role } = oLoginModel.getData();
+            const oData = await this.ajaxReadWithJQuery(
+              "AppVisibility",
+              { Role },
+              []
+            );
+            this.closeBusyDialog();
+
+            const firstEntry = Array.isArray(oData.data)
+              ? oData.data[0]
+              : oData.data;
+            this.getView().setModel(
+              new JSONModel(firstEntry),
+              "AppVisibilityModel"
+            );
+
+            const tileNames = ["Home","Timesheet","Payslip","OfferGeneration","Invoice","Quotation","Expense","ManageAsset",];
+
+            const tileKeys = firstEntry.TileKey?.split(",") || [];
+            const tileMapping = tileNames.reduce((map, name, i) => {
+              map[name] = tileKeys[i] || "0"; 
+              return map;
+            }, {});
+
+            this.getView().setModel(new JSONModel(tileMapping),"TileAccessModel");
           } catch (oError) {
-            MessageToast.show("Error in AppVisibilityReadCall:", oError);
+            MessageToast.show("Error in AppVisibilityReadCall");         
           }
         },
-
 
         RP_onUseridpress: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
@@ -92,8 +115,16 @@ sap.ui.define(
             oUserNameInput.setValue(selectedEmployee.EmployeeName);
             oUserNameInput.setValueState("None");
             // Clear password fields
-            sap.ui.getCore().byId("RP_id_NewPW").setValue("").setValueState("None");
-            sap.ui.getCore().byId("RP_id_ConfirmPW").setValue("").setValueState("None");
+            sap.ui
+              .getCore()
+              .byId("RP_id_NewPW")
+              .setValue("")
+              .setValueState("None");
+            sap.ui
+              .getCore()
+              .byId("RP_id_ConfirmPW")
+              .setValue("")
+              .setValueState("None");
           } else {
             MessageToast.show(that.i18nModel.getText("empnotfound"));
           }
@@ -121,13 +152,26 @@ sap.ui.define(
           }
         },
         RP_onPressCanclePW: function () {
-          sap.ui.getCore().byId("RP_id_userid").setValue("").setSelectedKey("").setValueState("None");
+          sap.ui
+            .getCore()
+            .byId("RP_id_userid")
+            .setValue("")
+            .setSelectedKey("")
+            .setValueState("None");
           var oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
           // Reset all input fields
           oUserNameInput.setValue("");
           oUserNameInput.setValueState("None");
-          sap.ui.getCore().byId("RP_id_NewPW").setValue("").setValueState("None");
-          sap.ui.getCore().byId("RP_id_ConfirmPW").setValue("").setValueState("None");
+          sap.ui
+            .getCore()
+            .byId("RP_id_NewPW")
+            .setValue("")
+            .setValueState("None");
+          sap.ui
+            .getCore()
+            .byId("RP_id_ConfirmPW")
+            .setValue("")
+            .setValueState("None");
           // Close dialog
           if (this.oUpdatePass) {
             this.oUpdatePass.close();
@@ -165,7 +209,10 @@ sap.ui.define(
               },
             });
             if (response.success === true) {
-              oUserIdInput.setValue(""); oUserNameInput.setValue(""); oNewPwInput.setValue(""); oConfirmPwInput.setValue("");
+              oUserIdInput.setValue("");
+              oUserNameInput.setValue("");
+              oNewPwInput.setValue("");
+              oConfirmPwInput.setValue("");
               const oModel = this.getView().getModel("EmpModel");
               if (oModel) {
                 oModel.refresh(true);
@@ -188,11 +235,11 @@ sap.ui.define(
           const newPassword = oNewPwInput.getValue();
           const confirmPassword = oConfirmPwInput.getValue();
           if (newPassword !== confirmPassword) {
-            sap.ui.getCore().byId("RP_id_ConfirmPW").setValueState("Error")
+            sap.ui.getCore().byId("RP_id_ConfirmPW").setValueState("Error");
             MessageToast.show(this.i18nModel.getText("misPasswords"));
             return;
           } else {
-            sap.ui.getCore().byId("RP_id_ConfirmPW").setValueState("None")
+            sap.ui.getCore().byId("RP_id_ConfirmPW").setValueState("None");
           }
         },
         //password visibility change
@@ -239,7 +286,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteAdminPaySlip");
         },
         TileV_onpressSelfservice: function () {
-          this.getRouter().navTo("SelfService",{sPath:"SelfService"});
+          this.getRouter().navTo("SelfService", { sPath: "SelfService" });
         },
         TileV_onpressInbox: function () {
           this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInboxView" });
@@ -269,13 +316,17 @@ sap.ui.define(
           this.getRouter().navTo("RouteManagePayroll");
         },
         TileV_onpressEmployeeDetails: function () {
-          this.getRouter().navTo("RouteEmployeeDetails",{sPath:"EmployeeDetails"});
+          this.getRouter().navTo("RouteEmployeeDetails", {
+            sPath: "EmployeeDetails",
+          });
         },
         TileV_onBackPress: function () {
           this.CommonLogoutFunction();
         },
         TileV_onpressAddCustomer: function () {
-          this.getRouter().navTo("RouteManageCustomer", { value: "ManageCustomer" });
+          this.getRouter().navTo("RouteManageCustomer", {
+            value: "ManageCustomer",
+          });
         },
         TileV_onpressMSA: function () {
           this.getRouter().navTo("RouteMSA");

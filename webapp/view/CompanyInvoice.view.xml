@@ -8,14 +8,14 @@
         <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
         </headerContent>
 		<content>
-			<fb:FilterBar id="CI_id_InvoiceFilterBar" showFilterConfiguration="false" useToolbar="false" showClearOnFB="true" search="onSearch" >
+			<fb:FilterBar id="CI_id_InvoiceFilterBar" showFilterConfiguration="false" useToolbar="false" clear="onPressClear" showClearOnFB="true" search="CompanyInvoice_onSearch" >
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="InvNo" label="{i18n>invoiceNo}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox id="CI_id_InvNo"
-                    items="{path:'oInvoiceModel>/InvoiceNoList', length:1000}"
+                    items="{path:'CompanyInvoiceFilterModel>/', length:1000}"
                     showSecondaryValues="true" showClearIcon="true">
-								<core:ListItem key="{oInvoiceModel>InvoiceNoID}" text="{oInvoiceModel>InvoiceNo}" additionalText="{oInvoiceModel>InvoiceDate}"/>
+								<core:ListItem key="{CompanyInvoiceFilterModel>InvNo}" text="{CompanyInvoiceFilterModel>InvNo}" additionalText="{path:'CompanyInvoiceFilterModel>InvoiceDate',formatter:'.Formatter.formatDate'}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -26,23 +26,27 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="CustomerName" label="{i18n>customerName}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_CustomerNameComboBox" showClearIcon="true"/>
+							<ComboBox id="CI_id_CustomerNameComboBox" items="{ManageCustomerModel>/}" showSecondaryValues="true" showClearIcon="true">
+								<core:ListItem key="{ManageCustomerModel>ID}" text="{ManageCustomerModel>companyName}" additionalText="{ManageCustomerModel>salutation} {ManageCustomerModel>name}"/>
+							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_StatusComboBox" showClearIcon="true" />
+							<ComboBox id="CI_id_StatusComboBox" items="{CompanyInvoiceStatus>/}" showClearIcon="true">
+								<core:ListItem key="{CompanyInvoiceStatus>ID}" text="{CompanyInvoiceStatus>InvoiceStatus}"/>
+							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="CI_id_InvoiceTable" items="{pavan>/}" mode="SingleSelect" selectionChange="onSelectionChange">
+			<Table id="CI_id_InvoiceTable" items="{CompanyInvoiceModel>/}">
 				<headerToolbar>
 					<Toolbar>
-						<Title id="CI_id_Title" text="{i18n>invoiceapp}"/>
+						<Title id="CI_id_Title" text="{i18n>invoiceapp} ({= ${CompanyInvoiceModel>/}.length})"/>
 						<ToolbarSpacer />
 						<ToolbarSeparator />
-						<Button icon="sap-icon://add-employee" tooltip="{i18n>addInvoice}" press="CI_onPressAddInvoice" />
+						<Button text="{i18n>InvoiceAddBtn}" tooltip="{i18n>addInvoice}" press="CI_onPressAddInvoice" />
 						<ToolbarSeparator />
 						<Button text="{i18n>msasow}" tooltip="{i18n>addInvoice}" press="CI_onPressMSASOW"/>
 					</Toolbar>
@@ -61,13 +65,13 @@
 						<Text text="{i18n>invoiceDescription}" />
 					</Column>
 					<Column>
-						<Text text="{i18n>customerName}" />
-					</Column>
-					<Column>
 						<Text text="{i18n>totalAmount}" />
 					</Column>
 					<Column>
 						<Text text="{i18n>currency}" />
+					</Column>
+					<Column>
+						<Text text="{i18n>customerName}" />
 					</Column>
 					<Column>
 						<Text text="{i18n>status}" />
@@ -76,14 +80,14 @@
 				<items>
 					<ColumnListItem type="Navigation" press="CI_onPressInvoiceRow">
 						<cells>
-							<Text text="{InvNo}" />
-							<Text text="{InvoiceDate}" />
-							<Text text="{PayByDate}" />
-							<Text text="{InvoiceDescription}" />
-							<Text text="{CustomerName}" />
-							<Text text="{path: 'TotalAmount', formatter: '.Formatter.numberFormatter'}" textAlign="End" />
-							<Text text="{Currency}" textAlign="End" />
-							<ObjectStatus text="{Status}" inverted="true" state="{path: 'Status', formatter: '.Formatter.statusStateFormatter'}" />
+							<Text text="{CompanyInvoiceModel>InvNo}" />
+							<Text text="{path:'CompanyInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}" />
+							<ObjectStatus text="{path:'CompanyInvoiceModel>PayByDate',formatter:'.Formatter.formatDate'}" inverted="true" state="{ parts: [{path: 'CompanyInvoiceModel>PayByDate'},{path: 'CompanyInvoiceModel>Status'}], formatter: '.Formatter.companyInvoicePayByDate'}" />
+							<Text text="{CompanyInvoiceModel>InvoiceDescription}" />
+							<Text text="{path: 'CompanyInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" textAlign="End" />
+							<Text text="{CompanyInvoiceModel>Currency}" textAlign="End" />
+							<Text text="{CompanyInvoiceModel>CustomerName}" />
+							<ObjectStatus text="{CompanyInvoiceModel>Status}" inverted="false" state="{path: 'CompanyInvoiceModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
 						</cells>
 					</ColumnListItem>
 				</items>

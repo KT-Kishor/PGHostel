@@ -109,16 +109,16 @@ sap.ui.define([], function () {
         },
 
         companyInvoicePayByDate: function (payByDate, status) {
-            var tenDay = 10;
             if (!payByDate) return "None";
-            var parts = payByDate.split('/');
-            var day = parseInt(parts[0], 10);
-            var month = parseInt(parts[1], 10) - 1;
-            var year = parseInt(parts[2], 10);
-            var endDateObj = new Date(year, month, day);
-            var now = new Date();
 
-            var timeDiff = endDateObj - now;
+            var dueDate = new Date(payByDate);
+            var today = new Date();
+
+            // Reset time part for accurate comparison
+            dueDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+
+            var timeDiff = dueDate - today;
             var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
             if (status === "Submitted") {
@@ -127,7 +127,7 @@ sap.ui.define([], function () {
                 return "Success";
             } else if (status === "Invoice Sent" && daysDiff >= 0) {
                 return "Warning";
-            } else if (status === "Invoice Sent" && daysDiff <= 0) {
+            } else if (status === "Invoice Sent" && daysDiff < 0) {
                 return "Error";
             } else {
                 return "Indication01";

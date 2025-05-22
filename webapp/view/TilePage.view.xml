@@ -26,13 +26,14 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Home"
+                    visible="{= ${TileAccessModel>/Home} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
                             <ux:blocks>
                                 <layout:HorizontalLayout
                                     allowWrapping="true"
-                                    class="sapUiTinyMargin"
+                                    class="sapUiTinyMargin"  
                                 >
                                     <GenericTile
                                         visible="{= ${AppVisibilityModel>/SelfService} === '1' ? true : false}"
@@ -118,6 +119,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Timesheet"
+                     visible="{= ${TileAccessModel>/Timesheet} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -180,6 +182,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Payslip"
+                     visible="{= ${TileAccessModel>/Payslip} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -241,6 +244,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Offer Generation"
+                     visible="{= ${TileAccessModel>/OfferGeneration} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -299,6 +303,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Invoice"
+                     visible="{= ${TileAccessModel>/Invoice} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -378,6 +383,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Quotation"
+                     visible="{= ${TileAccessModel>/Quotation} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -400,6 +406,7 @@
                                     </GenericTile>
 
                                     <GenericTile
+                                    visible="{= ${AppVisibilityModel>/QuotationApp} === '1' ? true : false}"
                                         class="sapUiMediumMargin"
                                         header="{i18n>hrQuotation}"
                                         press="TileV_onPressHrQuotation"
@@ -436,6 +443,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Expense"
+                     visible="{= ${TileAccessModel>/Expense} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -465,6 +473,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Manage Asset's"
+                     visible="{= ${TileAccessModel>/ManageAsset} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">

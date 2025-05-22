@@ -1,30 +1,78 @@
-sap.ui.define([
+sap.ui.define(
+  [
     "./BaseController", //call base controller
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast"
-],
-    function (BaseController, JSONModel, MessageToast) {
-        "use strict";
-        return BaseController.extend("sap.kt.com.minihrsolution.controller.CompanyInvoice", {
-            onInit: function () {
-                this.getRouter().getRoute("RouteCompanyInvoice").attachMatched(this._onRouteMatched, this);
-            },
+    "sap/m/MessageToast",
+  ],
+  function (BaseController, JSONModel, MessageToast) {
+    "use strict";
+    return BaseController.extend(
+      "sap.kt.com.minihrsolution.controller.CompanyInvoice",
+      {
+        onInit: function () {
+          this.getRouter()
+            .getRoute("RouteCompanyInvoice")
+            .attachMatched(this._onRouteMatched, this);
+        },
 
-            _onRouteMatched: function () {
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Company Invoice Application"); 
-            },
+        _onRouteMatched: async function () {
+          var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
+          if (!LoginFUnction) return;
+          this.getView().getModel("LoginModel").setProperty("/HeaderName", "Company Invoice Application");
+          await this.CompanyInvoice_onSearch();
+          if (!this.getView().getModel("ManageCustomerModel")) await this._fetchCommonData("ManageCustomer","ManageCustomerModel");
+          await this._fetchCommonData("CompanyInvoice","CompanyInvoiceFilterModel");
+        },
 
-            CI_onPressAddInvoice: function () {
-                this.getRouter().navTo("RouteCompanyInvoiceDetails",
-                    { sPath: "X" });
-            },
+        CompanyInvoice_onSearch: async function () {
+          try {
+            this.getBusyDialog();
+            const aFilterItems = this.byId(
+              "CI_id_InvoiceFilterBar"
+            ).getFilterGroupItems();
+            const params = {};
 
-            onPressback: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteTilePage");
-            },
-      
-            onLogout: function () {
-                this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
-            },
-        });
-    });
+            aFilterItems.forEach(function (oItem) {
+              const oControl = oItem.getControl();
+              const sKey = oItem.getName();
+
+              if (oControl && typeof oControl.getValue === "function") {
+                const sValue = oControl.getValue().trim();
+                if (sValue === "InvoiceDate") {
+                  params["InvoiceStartDate"] = oDateFormat.format(new Date(oControl.getValue().split("-")[0]));
+                  params["InvoiceEndDate"] = oDateFormat.format(new Date(oControl.getValue().split("-")[1]));
+                } else {
+                  params[sKey] = sValue;
+                }
+              }
+            });
+            await this._fetchCommonData("CompanyInvoice","CompanyInvoiceModel",params);
+          } catch (error) {
+            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+          } finally {
+            this.closeBusyDialog();
+          }
+        },
+
+        onPressClear: function () {
+          this.byId("CI_id_InvNo").setValue("");
+          this.byId("CI_id_InvoiceDatePicker").setValue("");
+          this.byId("CI_id_CustomerNameComboBox").setValue("");
+          this.byId("CI_id_StatusComboBox").setValue("");
+        },
+
+        CI_onPressAddInvoice: function () {
+          this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: "X" });
+        },
+
+        onPressback: function () {
+          this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+        },
+
+        onLogout: function () {
+          this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
+        },
+      }
+    );
+  }
+);
