@@ -17,7 +17,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                 this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
 
                 this.branch = loginModel.getProperty("/BranchCode");
-                this.onInitializeCalendarLegend();
                 this.TSD_ReadTimesheetEntries(this.EmployeeID);
             },
 
@@ -31,7 +30,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                     sPath: sPath
                 });
             },
-             TSD_ReadTimesheetEntries: async function (filter) {
+            TSD_ReadTimesheetEntries: async function (filter) {
                 try {
                     //this.getBusyDialog();
                     await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID }).then((oData) => {
@@ -43,14 +42,9 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                         MessageToast.show(error.message || error.responseText);
                     });
                 } catch (error) {
-                   // this.closeBusyDialog();
+                    // this.closeBusyDialog();
                     MessageToast.show(this.i18nModel.getText("technicalError"));
                 }
-            },
-
-            onAfterRendering: function () {
-                // Ensure holidays are marked after rendering
-                this._markHolidaysOnCalendar();
             },
 
             _getStartOfWeek: function (date) {
@@ -65,60 +59,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
-            onInitializeCalendarLegend: function () {
-                this._ensureCalendarLegend();
-            },
-
-            // Ensure the calendar legend exists
-            _ensureCalendarLegend: function () {
-                let oLegend = this.byId("calendarLegend");
-                if (!oLegend) {
-                    oLegend = new CalendarLegend({
-                        id: this.getView().createId("calendarLegend"),
-                        items: [
-                            new CalendarLegendItem({
-                                type: CalendarDayType.Type10,
-                                text: "Holiday"
-                            })
-                        ]
-                    });
-                    this.getView().addDependent(oLegend);
-                }
-
-                const oCalendar = this.byId("TS_id_calendarTimesheet");
-                if (oCalendar) {
-                    oCalendar.setLegend(oLegend);
-                }
-            },
-
-
-            // Mark holidays on the calendar by fetching data from the backend
-            _markHolidaysOnCalendar: async function () {
-                try {
-                    const oCalendar = this.byId("TS_id_calendarTimesheet");
-                    if (!oCalendar) return;
-                    oCalendar.removeAllSpecialDates();
-                    const currentYear = new Date().getFullYear();
-                    const result = await this.ajaxReadWithJQuery("ListOfHolidays", {
-                        startDate: `${currentYear}-01-01`,
-                        endDate: `${currentYear}-12-31`
-                    });
-                    const holidays = result?.data || [];
-                    holidays.forEach(holiday => {
-                        const date = new Date(holiday.Date);
-                        date.setHours(0, 0, 0, 0); // Normalize
-                        const specialDate = new DateTypeRange({
-                            startDate: date,
-                            type: CalendarDayType.Type10,
-                            tooltip: `${holiday.Name} (${holiday.Day})`
-                        });
-                        oCalendar.addSpecialDate(specialDate);
-                    });
-                } catch (error) {
-                    console.error("Error marking holidays:", error);
-                }
-            },
-
 
             onCalendarDateSelect: function (oEvent) {
                 const oCalendar = oEvent.getSource();
@@ -163,29 +103,34 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
             },
 
             TS_onDeleteTimesheet: async function () {
-                const oTable = this.byId("TS_id_calendarTimesheet").getParent().getContent()[3]; // or just this.byId("yourTableId") if ID is given
-                const oSelectedItem = oTable.getSelectedItem();
-                if (!oSelectedItem) {
-                    MessageBox.warning("Please select a row to delete.");
+                var that = this;
+                var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
+                if (!oSelectedItems.length) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("selctRowtoDelete"));
                     return;
                 }
-                const oSelectedData = oSelectedItem.getBindingContext("FilteredTimesheetModel").getObject();
-                const that = this;
-                MessageBox.confirm("Are you sure you want to delete this timesheet entry?", {
-                    onClose: async function (oAction) {
-                        if (oAction === MessageBox.Action.OK) {
-                            try {
-                                await that.ajaxDeleteWithJQuery(`Timesheet/${oSelectedData.ID}`, {}); // Ensure your backend uses this format
-                                MessageToast.show("Entry deleted successfully.");
-                                // Refresh the model or table
-                                that._loadTimesheetData(); // or whatever method you use to reload data
-                            } catch (error) {
-                                MessageBox.error("Failed to delete entry. Please check the console.");
-                                console.error("Delete error:", error);
-                            }
-                        }
+                var aIdsToDelete = oSelectedItems.map(item => item.getBindingContext("FilteredTimesheetModel").getProperty("SrNo"));
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("msgBoxConfirm"),
+                    this.i18nModel.getText("Confirmation"),
+                    function () {
+                        that.getBusyDialog();
+                        that.ajaxDeleteWithJQuery("/Timesheet", {
+                            filters: { SrNo: aIdsToDelete } // Send array of IDs
+                        }).then(() => {
+                            sap.m.MessageToast.show(that.i18nModel.getText("DeletSuucess"));
+                            that._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: that.EmployeeID });
+                            that.closeBusyDialog();
+                        }).catch((error) => {
+                            that.closeBusyDialog();
+                            sap.m.MessageToast.show(error.responseText);
+                        });
+                    },
+                    function () { // On Cancel
+                        that.closeBusyDialog();
+                        that.byId("TD_id_Table").removeSelections(true);
                     }
-                });
+                );
             }
         });
     });

@@ -27,19 +27,9 @@
     <fb:control>
         <ComboBox id="monthComboBox"
           showClearIcon="true"
+          items="{Months>/month}"
           selectionChange=".onMonthChange">
-            <core:Item key="01" text="January" />
-            <core:Item key="02" text="February" />
-            <core:Item key="03" text="March" />
-            <core:Item key="04" text="April" />
-            <core:Item key="05" text="May" />
-            <core:Item key="06" text="June" />
-            <core:Item key="07" text="July" />
-            <core:Item key="08" text="August" />
-            <core:Item key="09" text="September" />
-            <core:Item key="10" text="October" />
-            <core:Item key="11" text="November" />
-            <core:Item key="12" text="December" />
+            <core:Item key="{Months>ID}" text="{Months>Month}" />
         </ComboBox>
     </fb:control>
 </fb:FilterGroupItem>
@@ -56,6 +46,7 @@
                 growing="true"
                 growingScrollToLoad="true"
                 width="auto"
+                id="TD_id_Table"
                 mode="SingleSelectLeft"
                 alternateRowColors="true"
                 items="{FilteredTimesheetModel>/}"
