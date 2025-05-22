@@ -58,6 +58,7 @@
                 </Select>
                 <Label text="{i18n>resignationStartDate}" />
                 <DatePicker
+                value="{sEmployeeModel>ResignationStartDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
 					editable="{= !${PDFData>/PreviewFlag} }"

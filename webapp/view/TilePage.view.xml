@@ -511,6 +511,18 @@
                                             />
                                         </TileContent>
                                     </GenericTile>
+                                    <GenericTile
+                                        visible="{= ${AppVisibilityModel>/MyAsset} === '1' ? true : false}"
+                                        class="sapUiMediumMargin"
+                                        header="{i18n>MyAssetTitle}"
+                                        press="TileV_MyAsset"
+                                        >
+                                        <TileContent unit="{i18n>subheader}">
+                                        <ImageContent
+                                        src="sap-icon://my-view"
+                                        />
+                                        </TileContent>
+                                        </GenericTile>
 
                                 </layout:HorizontalLayout>
                             </ux:blocks>
