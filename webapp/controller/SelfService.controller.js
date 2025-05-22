@@ -1672,9 +1672,24 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.oModel.setProperty("/EmpData", oData);
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             },
-            onApplyResignation:function(){
-                this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate");
-            
-            }
+            onApplyResignation: async function(){
+                var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var oModel = this.getView().getModel("PDFData");
+                oModel.setProperty("/isTypeTrainee", false);
+                await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate");
+                sap.ui.getCore().byId("TCF_id_TraineeName").setValue(oEmpModel.EmployeeName);
+                sap.ui.getCore().byId("TCF_id_Department").setValue(oEmpModel.Department);
+                sap.ui.getCore().byId("TCF_id_JoiningDate").setValue(oEmpModel.JoiningDate);
+                sap.ui.getCore().byId("TCF_id_ReportingManager").setValue(oEmpModel.ManagerName);
+                sap.ui.getCore().byId("TCF_id_StartDate").setValue(new Date());
+                sap.ui.getCore().byId("TCF_id_EndDate").setValue(new Date());
+            },
+
+            TCF_onPressCloseDialog: function () {
+                this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
+                this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+                this.SSReg_oDialog.close();
+                this.SSReg_oDialog.destroy();
+            },
         });
     });

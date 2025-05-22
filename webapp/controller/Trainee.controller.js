@@ -265,6 +265,8 @@ sap.ui.define([
                 oTraineeModel.EndDate = new Date(sFormattedEndDate);
                 var oTraineeContext = oSelectedItem.getBindingContext("traineeModel");
                 this.getView().setBindingContext(oTraineeContext, "traineeModel");
+                var oModel = this.getView().getModel("PDFData");
+                oModel.setProperty("/isTypeTrainee", true);
                 this.T_commonOpenDialog("TC_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate", "TCF_id_EndDate");
             },
 
@@ -276,6 +278,7 @@ sap.ui.define([
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValue("");
                 this.T_ButtonVisibility();
                 this.TC_oDialog.close();
+                this.TC_oDialog.destroy();
                 this.T_Button();
             },
             //Preview and download certificate function

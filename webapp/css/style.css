@@ -606,7 +606,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   border: none;
   margin-left: 10px;
   margin-top: 10px;
-  margin-bottom: -10px;
+  margin-bottom: -5px;
 }
 
 .customEarning {
@@ -648,3 +648,16 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .salaryPanelMargin {
   margin-bottom: 20px; 
 }
+
+@media (min-width: 1175px) {
+    .salaryBox, .deductionBox {
+        width: 48% !important;
+    }
+}
+
+@media (max-width: 1174px) {
+    .salaryBox, .deductionBox {
+        width: 100% !important;
+    }
+}
+
