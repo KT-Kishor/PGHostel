@@ -22,10 +22,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this._fetchCommonData("AppVisibility", "RoleModel");
                         this._fetchCommonData("Country", "CountryModel");
                     }
-                    this._makeDatePickersReadOnly(["SS_id_Dob","SS_id_ResgEndDate"]);
+                    this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
                         fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(),
-                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, SetProfile: false ,TraineeRole: false,
+                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, SetProfile: false, TraineeRole: false,
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
@@ -60,9 +60,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         oView.getModel("sEmployeeModel").refresh(true);
                         var oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
                         if (this.sPath === "SelfService" && oModelAllData.Type !== "Submit") this.ViewModel.setProperty("/SelfService", true);
-    
-                        if(!oModelAllData.EContactIStdCode)  oModelAllData.EContactIStdCode = "+91";
-                        if(!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
+
+                        if (!oModelAllData.EContactIStdCode) oModelAllData.EContactIStdCode = "+91";
+                        if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
 
                         const oObjectPage = this.byId("ObjectPageLayout");
                         const oSection = this.byId("basicDetailsSection"); // Ensure the section has this ID in XML
@@ -252,7 +252,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     }
                 } else {
                     this.getView().getModel("viewModel").setProperty("/isEditMode", true);
-                    if (Role === "Admin" && this.sPath !== "SelfService" ) {
+                    if (Role === "Admin" && this.sPath !== "SelfService") {
                         this.getView().getModel("viewModel").setProperty("/AdminRole", true);
                     } else {
                         this.getView().getModel("viewModel").setProperty("/AdminRole", false);
@@ -264,7 +264,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 const that = this;
                 await this.ReadEmployeeDocument();
                 var oModel = this.getView().getModel("DocumentModel").getData();
-                 if (!oModel || oModel.items.length === 0) {
+                if (!oModel || oModel.items.length === 0) {
                     sap.m.MessageBox.warning(this.i18nModel.getText("uploadAtLeastOneDocumentMessage")); // You can add this key to your i18n model
                     return;
                 }
@@ -280,133 +280,133 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     });
             },
 
-            onChangeResigEndDate:function(oEvent){
+            onChangeResigEndDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
             },
 
-           SS_onSavePress: function (ID) {
-            var oView = this.getView();
-            var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
-            let isValid = true;
-            let optionalValid =true;
-            var Message = this.i18nModel.getText("selfServiceUpdateAdmin")
-            try {
-                if (ID !== "Submit") {
-                    if (this.sPath === 'SelfService') {
-                        var Message = this.i18nModel.getText("selfServiceUpdateEmployee");
-                        if (ID === "BasicDetailsBtn") {
-                            isValid =
-                                utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
-                                utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
-                                utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
-                                utils._LCvalidateMandatoryField(oView.byId("SS_id_STDCode"), "ID") &&
-                                utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
-                                utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
-                                utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
-                                utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
-                                utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
-                                utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
-                                utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
-                                utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
-                                utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
-                                utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID");
-                        } else if (ID === "DocumentBtn") {
-                            isValid =
-                                utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
-                                utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID") &&
-                                utils._LCvalidateMandatoryField(oView.byId("SS_id_BankName"), "ID") &&
-                                utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") &&
-                                utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") &&
-                                utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") &&
-                                utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID") &&
-                                utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID");
+            SS_onSavePress: function (ID) {
+                var oView = this.getView();
+                var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
+                let isValid = true;
+                let optionalValid = true;
+                var Message = this.i18nModel.getText("selfServiceUpdateAdmin")
+                try {
+                    if (ID !== "Submit") {
+                        if (this.sPath === 'SelfService') {
+                            var Message = this.i18nModel.getText("selfServiceUpdateEmployee");
+                            if (ID === "BasicDetailsBtn") {
+                                isValid =
+                                    utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
+                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
+                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
+                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_STDCode"), "ID") &&
+                                    utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
+                                    utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
+                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
+                                    utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
+                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
+                                    utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
+                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
+                                    utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
+                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
+                                    utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID");
+                            } else if (ID === "DocumentBtn") {
+                                isValid =
+                                    utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
+                                    utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID") &&
+                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_BankName"), "ID") &&
+                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") &&
+                                    utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") &&
+                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") &&
+                                    utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID") &&
+                                    utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID");
+                            }
+                            if (!isValid) {
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                                return;
+                            }
                         }
-                        if (!isValid) {
+
+                        // Validate Manager field
+                        if (!utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID")) {
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                             return;
                         }
+
+                        // Optional field validation
+                        const passport = oView.byId("SS_id_Passport").getValue().trim();
+                        const voterId = oView.byId("SS_id_Voterid").getValue().trim();
+                        const optionalValid =
+                            (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
+                            (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) &&
+                            (oDataModel.MobileNo == null || oDataModel.MobileNo.trim() === "" || utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID")) &&
+                            (oDataModel.AccountNo == null || oDataModel.AccountNo.trim() === "" || utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID")) &&
+                            (oDataModel.IFSCCode == null || oDataModel.IFSCCode.trim() === "" || utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID")) &&
+                            (oDataModel.PANCard == null || oDataModel.PANCard.trim() === "" || utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID")) &&
+                            (oDataModel.AdharCard == null || oDataModel.AdharCard.trim() === "" || utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID")) &&
+                            (oDataModel.EmployeeStatus === 'Inactive' ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
+
+                        if (!optionalValid) {
+                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                            return;
+                        }
+
+                        // Update some fields before sending
+                        oDataModel.DateOfBirth = oView.byId("SS_id_Dob").getValue().split("/").reverse().join("-");
+                        oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
+                        oDataModel.EmergencyContactPerson2Salutation = oView.byId("SS_idEmeSalS").getSelectedKey();
+                        oDataModel.EmergencyContactPerson1Realtion = oView.byId("SS_idRelF").getSelectedKey();
+                        oDataModel.EmergencyContactPerson2Realtion = oView.byId("SS_idRelS").getSelectedKey();
+                    } else {
+                        oDataModel.Type = "Submit";
                     }
 
-                    // Validate Manager field
-                    if (!utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID")) {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        return;
-                    }
+                    const oPayload = {
+                        data: oDataModel,
+                        filters: {
+                            EmployeeID: this.EmployeeID
+                        }
+                    };
 
-                    // Optional field validation
-                    const passport = oView.byId("SS_id_Passport").getValue().trim();
-                    const voterId = oView.byId("SS_id_Voterid").getValue().trim();
-                    const optionalValid =
-                        (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
-                        (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) &&
-                        (oDataModel.MobileNo == null || oDataModel.MobileNo.trim() === "" || utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID")) &&
-                        (oDataModel.AccountNo == null || oDataModel.AccountNo.trim() === "" || utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID")) &&
-                        (oDataModel.IFSCCode == null || oDataModel.IFSCCode.trim() === "" || utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID")) &&
-                        (oDataModel.PANCard == null || oDataModel.PANCard.trim() === "" || utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID")) &&
-                        (oDataModel.AdharCard == null || oDataModel.AdharCard.trim() === "" || utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID")) &&
-                        (oDataModel.EmployeeStatus === 'Inactive' ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
-
-                    if (!optionalValid) {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        return;
-                    }
-
-                    // Update some fields before sending
-                    oDataModel.DateOfBirth = oView.byId("SS_id_Dob").getValue().split("/").reverse().join("-");
-                    oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
-                    oDataModel.EmergencyContactPerson2Salutation = oView.byId("SS_idEmeSalS").getSelectedKey();
-                    oDataModel.EmergencyContactPerson1Realtion = oView.byId("SS_idRelF").getSelectedKey();
-                    oDataModel.EmergencyContactPerson2Realtion = oView.byId("SS_idRelS").getSelectedKey();
-                } else {
-                    oDataModel.Type = "Submit";
-                }
-
-                const oPayload = {
-                    data: oDataModel,
-                    filters: {
-                        EmployeeID: this.EmployeeID
-                    }
-                };
-               
-                if (optionalValid) {
-                    this.showConfirmationDialog( this.i18nModel.getText("confirmTitle"),Message,
-                        function () {                        
-                            this.getBusyDialog();
-                            this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload)
-                                .then((oData) => {
-                                    if (oData.success) {
-                                        if (ID === 'Submit') {
-                                            this.ViewModel.setProperty("/SelfService", false);
+                    if (optionalValid) {
+                        this.showConfirmationDialog(this.i18nModel.getText("confirmTitle"), Message,
+                            function () {
+                                this.getBusyDialog();
+                                this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload)
+                                    .then((oData) => {
+                                        if (oData.success) {
+                                            if (ID === 'Submit') {
+                                                this.ViewModel.setProperty("/SelfService", false);
+                                            }
+                                            MessageToast.show(this.i18nModel.getText("dataSaved"));
+                                            oView.getModel("viewModel").setProperty("/isEditMode", false);
+                                            oView.getModel("viewModel").setProperty("/AdminRole", false);
+                                            this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
+                                                EmployeeID: this.EmployeeID
+                                            });
+                                            this.byId("SS_id_Passport").setValueState("None");
+                                            this.byId("SS_id_Voterid").setValueState("None");
+                                        } else {
+                                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                                         }
-                                        MessageToast.show(this.i18nModel.getText("dataSaved"));
-                                        oView.getModel("viewModel").setProperty("/isEditMode", false);
-                                        oView.getModel("viewModel").setProperty("/AdminRole", false);
-                                        this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
-                                            EmployeeID: this.EmployeeID
-                                        });
-                                        this.byId("SS_id_Passport").setValueState("None");
-                                        this.byId("SS_id_Voterid").setValueState("None");
-                                    } else {
-                                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                                    }
-                                    this.closeBusyDialog();
-                                })
-                                .catch((oError) => {
-                                    this.closeBusyDialog();
-                                    MessageToast.show(oError.responseText || oError.message);
-                                });
-                        }.bind(this),                         
-                        function () {
-                            this.closeBusyDialog();
-                        }.bind(this)
-                    );
-                }
+                                        this.closeBusyDialog();
+                                    })
+                                    .catch((oError) => {
+                                        this.closeBusyDialog();
+                                        MessageToast.show(oError.responseText || oError.message);
+                                    });
+                            }.bind(this),
+                            function () {
+                                this.closeBusyDialog();
+                            }.bind(this)
+                        );
+                    }
 
-            } catch (error) {
-                this.closeBusyDialog();
-                MessageToast.show(error.message || "Unexpected error");
-            }
-        },
+                } catch (error) {
+                    this.closeBusyDialog();
+                    MessageToast.show(error.message || "Unexpected error");
+                }
+            },
 
             onManagerChange: function (oEvent) {
                 const oData = this.getView().getModel("sEmployeeModel").getProperty("/0");
@@ -1347,7 +1347,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var CTCType = oSelect.getSelectedItem().getText(); // 'CTC' or 'Percentage'
 
                 this.latest = salaryData.reduce(function (latestEntry, currentEntry) {
-                    return new Date(currentEntry.EffectiveDate) > new Date(latestEntry.EffectiveDate) ? currentEntry : latestEntry;});
+                    return new Date(currentEntry.EffectiveDate) > new Date(latestEntry.EffectiveDate) ? currentEntry : latestEntry;
+                });
 
                 var ctcPercentage = parseFloat(AppraisalModel.getProperty("/CtcPercentage"));
                 var CtcCalculate = (parseFloat(this.latest.CTC.replaceAll(",", "")) || 0) * ctcPercentage / 100;
@@ -1497,17 +1498,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var oEmployeeModel = oView.getModel("sEmployeeModel");
                 var employeeData = oEmployeeModel && oEmployeeModel.getData();
                 var employeeDetails = employeeData && employeeData[0];
- 
+
                 if (!employeeDetails) {
                     sap.m.MessageToast.show("Employee details not found.");
                     return;
                 }
- 
+
                 var oTextDisplayModel = oView.getModel("TextDisplay");
                 if (oTextDisplayModel) {
                     oTextDisplayModel.setProperty("/name", "");
                 }
- 
+
                 // Prepare ID card data
                 var idCardJson = {
                     EmployeeID: employeeDetails.EmployeeID || "",
@@ -1521,17 +1522,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     BranchCode: employeeDetails.BranchCode || "",
                     ProfilePhoto: employeeDetails.ProfilePhoto || ""
                 };
- 
+
                 var oIdCardModel = new sap.ui.model.json.JSONModel(idCardJson);
                 oView.setModel(oIdCardModel, "IdCardModel");
- 
+
                 // Show busy dialog
                 this.getBusyDialog();
- 
+
                 var fnAfterOpen = function () {
                     var sFileBinary = employeeDetails.ProfilePhoto;
                     var sFileType = employeeDetails.ProfilePhotoType;
- 
+
                     if (sFileBinary && sFileType) {
                         try {
                             this.onPressDisplayImageOnCanvas(sFileBinary, sFileType);
@@ -1541,7 +1542,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     }
                     this.closeBusyDialog();
                 }.bind(this);
- 
+
                 if (!this.oIdCardDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.AddCard",
@@ -1591,7 +1592,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
                     const compLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.transparentComplogo?.data);
                     const templateBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.idCardTemplate?.data);
-                    const address =  oCompanyDetailsModel.shortAddress;
+                    const address = oCompanyDetailsModel.shortAddress;
 
                     // Create the PDF document
                     const doc = new jsPDF({
@@ -1654,7 +1655,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     doc.text(addressLines, centerText(addressLines[0]), addressY);
                     // Save the document
                     doc.save(`${employeeDetails.EmployeeName}_IDCard.pdf`);
-                }catch (error) {
+                } catch (error) {
                     sap.m.MessageToast.show(error.message || error.responseText);
                 } finally {
                     this.closeBusyDialog();
@@ -1672,17 +1673,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.oModel.setProperty("/EmpData", oData);
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             },
-            onApplyResignation: async function(){
-                var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
-                var oModel = this.getView().getModel("PDFData");
-                oModel.setProperty("/isTypeTrainee", false);
-                await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.TraineeCertificate");
-                sap.ui.getCore().byId("TCF_id_TraineeName").setValue(oEmpModel.EmployeeName);
-                sap.ui.getCore().byId("TCF_id_Department").setValue(oEmpModel.Department);
-                sap.ui.getCore().byId("TCF_id_JoiningDate").setValue(oEmpModel.JoiningDate);
-                sap.ui.getCore().byId("TCF_id_ReportingManager").setValue(oEmpModel.ManagerName);
-                sap.ui.getCore().byId("TCF_id_StartDate").setValue(new Date());
-                sap.ui.getCore().byId("TCF_id_EndDate").setValue(new Date());
+            onApplyResignation: async function () {
+             await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation");
             },
 
             TCF_onPressCloseDialog: function () {
