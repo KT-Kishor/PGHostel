@@ -549,7 +549,7 @@
                 },
                 {
                     "name":"RouteHrQuotationDetails",
-                    "pattern":"HrQuotationDetails",
+                    "pattern":"HrQuotationDetails/{sQuotationNo}",
                     "target": [
                         "TargetHrQuotationDetails"
                     ]

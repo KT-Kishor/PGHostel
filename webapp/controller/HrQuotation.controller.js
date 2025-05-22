@@ -74,7 +74,7 @@ sap.ui.define(
       // },
 
       HQ_onPressAddQuotation: function () {
-        this.getRouter().navTo("RouteHrQuotationDetails")
+        this.getRouter().navTo("RouteHrQuotationDetails", { sQuotationNo: "new" })
       },
 
       // Function to navigate back to the TileAdminView route
@@ -94,7 +94,16 @@ sap.ui.define(
 
       },
       HQ_onPressQuotation: function (oEvent) {
+        var oContext = oEvent.getSource().getBindingContext("CompanyQuotationModel");
+        var oData = oContext.getObject(); // get full object
+        var sQuotationNo = oData.QuotationNo; // extract actual QuotationNo
 
+        this.getRouter().navTo("RouteHrQuotationDetails", {
+          sQuotationNo: encodeURIComponent(sQuotationNo)
+        });
       }
+
+
+
     });
   });

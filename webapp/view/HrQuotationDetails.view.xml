@@ -50,7 +50,7 @@
                                             valueFormat="dd/MM/yyyy"
                                             change="HQD_DateValidate"
                                             valueStateText="{i18n>invalidDate}"
-                                            value="{QuotationModel>/Date}"
+                                            value="{path:'SingleCompanyModel>/Date' ,formatter:'.Formatter.formatDate'}"
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_Quotation"
                                         />
@@ -63,7 +63,7 @@
                                             valueFormat="dd/MM/yyyy"
                                             change="HQD_LastDate"
                                             valueStateText="{i18n>invalidDate}"
-                                            value="{QuotationModel>/ValidUntil}"
+                                            value="{path:'SingleCompanyModel>/ValidUntil' ,formatter:'.Formatter.formatDate'}"
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_QuotationValid"
                                         />
@@ -72,7 +72,7 @@
                                             required="true"
                                         />
                                         <m:Input
-                                            value="{SingleCompanyModel>/companyName}"
+                                            value="{SingleCompanyModel>/CompanyName}"
                                             id="HQD_id_InputCompanyName"
                                             liveChange="HQD_onNameLiveChange"
                                             valueStateText="{i18n>placeName}"
@@ -84,7 +84,7 @@
                                             required="true"
                                         />
                                         <m:ComboBox
-                                            value="{QuotationModel>/STDCode}"
+                                            value="{SingleCompanyModel>/STDCode}"
                                             showSecondaryValues="true"
                                             id="HQD_id_mobileNumber"
                                             items="{codeModel>/}"
@@ -99,7 +99,7 @@
                                             />
                                         </m:ComboBox>
                                         <m:Input
-                                            value="{QuotationModel>/Mobile}"
+                                            value="{SingleCompanyModel>/CompanyMobileNo}"
                                             id="HQD_id_InputCompanyMobileNo"
                                             placeholder="{i18n>mobileNo}"
                                             liveChange="HQD_onMNumberLiveChange"
@@ -112,7 +112,7 @@
                                             required="true"
                                         />
                                         <m:Input
-                                            value="{SingleCompanyModel>/carrerEmail}"
+                                            value="{SingleCompanyModel>/CompanyEmailID}"
                                             id="HQD_id_CompanyEmailID"
                                             liveChange="HQD_EmailIDLiveChange"
                                             editable="{visiablityPlay>/editable}"
@@ -125,7 +125,7 @@
                                         />
                                         <m:ComboBox
                                             items="{CountryModel>/}"
-                                            selectedKey="{QuotationModel>/Country}"
+                                            selectedKey="{SingleCompanyModel>/Country}"
                                             width="100%"
                                             showSecondaryValues="true"
                                             valueStateText="{i18n>countryValueState}"
@@ -144,7 +144,7 @@
                                             required="true"
                                         />
                                         <m:TextArea
-                                            value="{SingleCompanyModel>/longAddress}"
+                                            value="{SingleCompanyModel>/CompanyAddress}"
                                             id="HQD_id_InputCompanyAddress"
                                             liveChange="HQD_onAddressLiveChange"
                                             rows="2"
@@ -154,7 +154,7 @@
                                         />
                                         <m:Label text="{i18n>companyGSTNO}" />
                                         <m:Input
-                                            value="{SingleCompanyModel>/gstin}"
+                                            value="{SingleCompanyModel>/CompanyGSTNO}"
                                             id="HQD_id_CompGSTNO"
                                             liveChange="HQD_onComGSTLiveChange"
                                             valueStateText="{i18n>gstNoValueState}"
@@ -169,19 +169,18 @@
                                        <m:RadioButton
     text="{i18n>cgst}"
     id="HQD_id_CheckboxCGS"
-    selected="{QuotationModel>/CGSTSelected}"
+    selected="{SingleCompanyModel>/CGSTSelected}"
     select="onSelectCGST"
-    editable="{QuotationModel>/ShowGSTFields}"
-    
+    editable="{SingleCompanyModel>/gstEditable}"
+        
 />
 
 <m:RadioButton  
     text="{i18n>igst}"
     id="HQD_id_CheckboxIGS"
-    selected="{QuotationModel>/IGSTSelected}"
+    selected="{SingleCompanyModel>/IGSTSelected}"
     select="onSelectIGST"
-    editable="{QuotationModel>/ShowGSTFields}"
-  
+    editable="{SingleCompanyModel>/gstEditable}"
 />
 
 <m:Label
@@ -191,9 +190,9 @@
 />
 
 <m:Input
-    value="{QuotationModel>/Percentage}"
+    value="{SingleCompanyModel>/Percentage}"
     liveChange="HQD_onPercentageChange"
-    editable="{QuotationModel>/ShowGSTFields}"
+    editable="{SingleCompanyModel>/gstEditable}"
     maxLength="10"
     id="HQD_id_Percentage"
    
@@ -207,7 +206,7 @@
                                             items="{CurrencyModel>/}"
                                             width="100%"
                                             id="HQD_id_Curency"
-                                            selectedKey="{QuotationModel>/Currency}"
+                                            selectedKey="{SingleCompanyModel>/Currency}"
                                             valueStateText="{i18n>selectCurrency}"
                                             change="HQD_onCurrencyChange"
                                         >
@@ -242,7 +241,7 @@
                                             required="true"
                                         />
                                         <m:Input
-                                            value="{QuotationModel>/CustomerName}"
+                                            value="{SingleCompanyModel>/CustomerName}"
                                             id="HQD_id_CustomerName"
                                             liveChange="HQD_onCustomerNameLiveChange"
                                             valueStateText="{i18n>placeName}"
@@ -254,7 +253,7 @@
                                             required="true"
                                         />
                                         <m:Input
-                                            value="{QuotationModel>/CustomerEmailID}"
+                                            value="{SingleCompanyModel>/CustomerEmailID}"
                                             id="HQD_id_CustomerEmailID"
                                             liveChange="HQD_EmailIDLiveChange"
                                             valueStateText="{i18n>emailValueState}"
@@ -266,7 +265,7 @@
                                             required="true"
                                         />
                                         <m:Input
-                                            value="{QuotationModel>/CustomerMobileNo}"
+                                            value="{SingleCompanyModel>/CustomerMobileNo}"
                                             id="HQD_id_InputCustomerMobileNo"
                                             liveChange="HQD_onMNumberLiveChange"
                                             valueStateText="{i18n>mobileNoValueState}"
@@ -278,7 +277,7 @@
                                             required="true"
                                         />
                                         <m:TextArea
-                                            value="{QuotationModel>/CustomerAddress}"
+                                            value="{SingleCompanyModel>/CustomerAddress}"
                                             maxLength="120"
                                             id="HQD_id_InputCustomerAddress"
                                             liveChange="HQD_onAddressLiveChange"
@@ -288,7 +287,7 @@
                                         />
                                         <m:Label text="{i18n>customerGSTNO}" required="true"/>
                                         <m:Input
-                                            value="{QuotationModel>/CustomerGSTNO}"
+                                            value="{SingleCompanyModel>/CustomerGSTNO}"
                                             id="HQD_id_InputCustomerGSTNO"
                                             valueStateText="{i18n>gstNoValueState}"
                                             liveChange="HQD_onCustomerGSTLiveChange"
@@ -488,10 +487,10 @@
     <m:Input
       value="{QuotationModel>Discount}"
       editable="{visiablityPlay>/editable}"
-      change="HQD_onInputChange"
+      liveChange="HQD_onchangeDiscount"
       maxLength="20"
       textAlign="End"
-      type="Number"
+      type="Text"
     />
 
     <!-- Total (Column 8) -->
@@ -514,12 +513,12 @@
                                                 justifyContent="SpaceBetween"
                                             >
                                                 <m:Label
-                                                    text="{i18n>subTotal} ({i18n>NonTaxable}) ({QuotationModel>/Currency}) :"
+                                                    text="{i18n>subTotal} ({i18n>NonTaxable}) ({SingleCompanyModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                     visible="{= ${QuotationItemModel>/TotalSum} > 0}"
                                                 />
                                                 <m:Text
-                                                    text="{path:'QuotationItemModel>/SubTotalNotGST',formatter: '.Formatter.numberFormater'}"
+                                                    text="{path:'QuotationModel>/SubTotalNotGST',formatter: '.Formatter.numberFormater'}"
                                                     id="id_Subtot"
                                                     class="amountText"
                                                     textAlign="End"
@@ -532,75 +531,73 @@
                                                 visible="{= ${QuotationItemModel>/SubTotal} > 0  }"
                                             >
                                                 <m:Label
-                                                    text="{i18n>subTotal} ({i18n>Taxable}) ({QuotationModel>/Currency}) :"
+                                                    text="{i18n>subTotal} ({i18n>Taxable}) ({SingleCompanyModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
                                                 <m:Text
-                                                    text="{path:'QuotationItemModel>/SubTotal',formatter: '.Formatter.numberFormater'}"
+                                                    text="{path:'QuotationModel>/SubTotal',formatter: '.Formatter.numberFormater'}"
                                                     id="HQD_id_Sub"
                                                     class="amountText"
                                                     textAlign="End"
                                                 />
                                             </m:HBox>
-                                            <!-- CGST -->
-                                            <m:HBox
-                                                justifyContent="SpaceBetween"
-                                            >
-                                               <m:Label
-    text="{= 'CGST ( ' + ${QuotationModel>/Percentage} + ' % ) : '}"
-    visible="{= ${QuotationItemModel>/CGSTVisible} === true || ${QuotationModel>/CGSTVisible} === true}"
+                                          
+                                           <!-- CGST -->
+<m:HBox justifyContent="SpaceBetween">
+  <m:Label
+    text="{= 'CGST ( ' + ${SingleCompanyModel>/Percentage} + ' % ) : '}"
+    visible="{= ${QuotationModel>/CGSTVisible} === true }"
     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-/>
-                                                <m:Text
-                                                    text="{path:'QuotationItemModel>/CGST',formatter: '.Formatter.numberFormater'}"
-                                                    class="amountText"
-                                                    textAlign="End"
-                                                    visible="{= ${QuotationItemModel>/CGSTVisible} === true || ${QuotationModel>/CGSTVisible} === true}"
-                                                />
-                                            </m:HBox>
-                                            <!-- SGST -->
-                                            <m:HBox
-                                                justifyContent="SpaceBetween"
-                                            >
-                                                <m:Label
-    text="{= 'SGST ( ' + ${QuotationModel>/Percentage} + ' % ) : '}"
-    visible="{= ${QuotationItemModel>/SGSTVisible} === true || ${QuotationModel>/SGSTVisible} === true}"
+  />
+  <m:Text
+    text="{path:'QuotationModel>/CGST',formatter: '.Formatter.numberFormater'}"
+    class="amountText"
+    textAlign="End"
+    visible="{= ${QuotationModel>/CGSTVisible} === true }"
+  />
+</m:HBox>
+
+<!-- SGST -->
+<m:HBox justifyContent="SpaceBetween">
+  <m:Label
+    text="{= 'SGST ( ' + ${SingleCompanyModel>/Percentage} + ' % ) : '}"
+    visible="{= ${QuotationModel>/SGSTVisible} === true }"
     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-/>
-                                                <m:Text
-                                                    text="{path:'QuotationItemModel>/SGST',formatter: '.Formatter.numberFormater'}"
-                                                    class="amountText"
-                                                    textAlign="End"
-                                                    visible="{= ${QuotationItemModel>/SGSTVisible} === true || ${QuotationModel>/SGSTVisible} === true}"
-                                                />
-                                            </m:HBox>
-                                            <!-- IGST -->
-                                            <m:HBox
-                                                justifyContent="SpaceBetween"
-                                            >
-                                                <m:Label
-                                                    text="{= 'IGST ( ' + (${QuotationItemModel>/IGSTPercentage} || ${QuotationModel>/Percentage}) + ' % ) : '}"
-                                                     visible="{= ${QuotationModel>/IGSTVisible} === true }"
-                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-                                                />
-                                                <m:Text
-                                                    text="{path:'QuotationItemModel>/IGST',formatter: '.Formatter.numberFormater'}"
-                                                    class="amountText"
-                                                    textAlign="End"
-                                                    visible="{= ${QuotationModel>/IGSTVisible} === true }"
-                                                />
-                                            </m:HBox>
+  />
+  <m:Text
+    text="{path:'QuotationModel>/SGST',formatter: '.Formatter.numberFormater'}"
+    class="amountText"
+    textAlign="End"
+    visible="{= ${QuotationModel>/SGSTVisible} === true }"
+  />
+</m:HBox>
+
+<!-- IGST -->
+<m:HBox justifyContent="SpaceBetween">
+  <m:Label
+    text="{= 'IGST ( ' + ${SingleCompanyModel>/Percentage} + ' % ) : '}"
+    visible="{= ${QuotationModel>/IGSTVisible} === true }"
+    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+  />
+  <m:Text
+    text="{path:'QuotationModel>/IGST',formatter: '.Formatter.numberFormater'}"
+    class="amountText"
+    textAlign="End"
+    visible="{= ${QuotationModel>/IGSTVisible} === true }"
+  />
+</m:HBox>
+
                                             <!-- Total -->
                                             <m:HBox
                                                 justifyContent="SpaceBetween"
                                             >
                                                 <m:Label
-                                                    text="{= ${i18n>total} + ' ( ' + ${QuotationModel>/Currency} + ' ) : '}"
+                                                    text="{= ${i18n>total} + ' ( ' + ${SingleCompanyModel>/Currency} + ' ) : '}"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                     visible="{= ${QuotationItemModel>/TotalSum} > 0}"
                                                 />
                                                 <m:Text
-                                                    text="{path:'QuotationItemModel>/TotalSum',formatter: '.Formatter.numberFormater'}"
+                                                    text="{path:'QuotationModel>/TotalSum',formatter: '.Formatter.numberFormater'}"
                                                     id="HQD_TotalAmountI"
                                                     class="amountText"
                                                     textAlign="End"
@@ -614,7 +611,7 @@
                                         required="true"
                                     />
                                     <rich:RichTextEditor
-                                        value="{QuotationModel>/Notes}"
+                                        value="{SingleCompanyModel>/Notes}"
                                         editable="{visiablityPlay>/editable}"
                                         class="sapUiContentPadding"
                                         width="100%"
@@ -630,35 +627,43 @@
         </ObjectPageLayout>
         <m:footer>
             <m:Toolbar>
-                <m:ToolbarSpacer />
-                <m:Button
-                    visible="{visiablityPlay>/createVisi}"
-                    text="{i18n>submit}"
-                    type="Accept"
-                    press="HQD_onPressSubmit"
-                    class="sendMail"
-                />
-                <!-- <m:Button
-                    visible="{visiablityPlay>/editVisi}"
-                    text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"
-                    press="HQD_onPressEdit"
-                    class="sendMail"
-                    
-                /> -->
-                <m:Button
-                    text="{i18n>tileFooter}"
-                    id="HQD_id_QuotationMail"
-                    press="HQD_onPressSendEmail"
-                    visible="{visiablityPlay>/merge}"
-                    type="Ghost"
-                />
-                <m:Button
-                    text="{i18n>jsPdf}"
-                    press="HQD_onPressMerge"
-                    visible="{visiablityPlay>/merge}"
-                    type="Attention"
-                />
-            </m:Toolbar>
+    <m:ToolbarSpacer />
+
+    <!-- Submit Button - Only for Create mode -->
+    <m:Button
+        visible="{visiablityPlay>/createVisi}"
+        text="{i18n>submit}"
+        type="Accept"
+        press="HQD_onPressSubmit"
+        class="sendMail"
+    />
+
+    <!-- Edit / Save Button - Only for Edit mode -->
+    <m:Button
+        visible="{visiablityPlay>/editVisi}"
+        text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
+        press="HQD_onPressEdit"
+        class="sendMail"
+    />
+
+    <!-- Send Email Button - Only in Edit mode -->
+    <m:Button
+        text="{i18n>tileFooter}"
+        id="HQD_id_QuotationMail"
+        press="HQD_onPressSendEmail"
+        visible="{visiablityPlay>/merge}"
+        type="Ghost"
+    />
+
+    <!-- Generate PDF Button - Only in Edit mode -->
+    <m:Button
+        text="{i18n>jsPdf}"
+        press="HQD_onPressMerge"
+        visible="{visiablityPlay>/merge}"
+        type="Attention"
+    />
+</m:Toolbar>
+
         </m:footer>
     </m:Page>
 </mvc:View>
