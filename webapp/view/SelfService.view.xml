@@ -1,189 +1,123 @@
 <mvc:View
     controllerName="sap.kt.com.minihrsolution.controller.SelfService"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.uxap"
-    xmlns:layout="sap.ui.layout"
-    xmlns:core="sap.ui.core"
-    xmlns:f="sap.ui.layout.form"
-    xmlns:u="sap.ui.unified"
-    xmlns:m="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.uxap"
+	xmlns:layout="sap.ui.layout"
+	xmlns:core="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified"
+	xmlns:m="sap.m"
 >
-    <m:Page id="SelfService_id_page">
-        <m:headerContent>
-            <core:Fragment
-                fragmentName="sap.kt.com.minihrsolution.fragment.Header"
-                type="XML"
-            />
-        </m:headerContent>
-        <ObjectPageLayout
-            id="ObjectPageLayout"
-            navigate="onSectionChange"
-            enableLazyLoading="true"
-            useIconTabBar="true"
-            showTitleInHeaderContent="true"
-            upperCaseAnchorBar="false"
-        >
-            <headerTitle>
-                <ObjectPageDynamicHeaderTitle>
-                    <expandedHeading>
-                        <m:Title
-                            text="{sEmployeeModel>/0/Salutation} {sEmployeeModel>/0/EmployeeName}"
-                            wrapping="true"
-                        />
-                    </expandedHeading>
-                    <snappedHeading>
-                        <m:FlexBox
-                            fitContainer="true"
-                            alignItems="Center"
-                        >
-                            <m:Avatar
-                                src="{path: 'sEmployeeModel>/0/ProfilePhoto', formatter: '.Formatter.getImageSrc'}"
-                                class="sapUiTinyMarginEnd"
-                            />
-                            <m:Title
-                                text="{sEmployeeModel>/0/Salutation} {sEmployeeModel>/0/EmployeeName}"
-                                wrapping="true"
-                            />
-                        </m:FlexBox>
-                    </snappedHeading>
-                    <expandedContent>
-                        <m:Text text="{sEmployeeModel>/0/Designation}" />
-                    </expandedContent>
-                    <snappedContent>
-                        <m:Text text="{sEmployeeModel>/0/Designation}" />
-                    </snappedContent>
-                    <snappedTitleOnMobile>
-                        <m:Title text="{sEmployeeModel>/0/Designation}" />
-                    </snappedTitleOnMobile>
-                    <actions>
-                        <m:Button
-                            id="Submit"
-                            text="{i18n>submit}"
-                            press="onPressSubmit"
-                            enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
-                            type="Accept"
-                            visible="{viewModel>/SelfService}"
-                        />
-                        <m:Button
-                            text="{i18n>setProfileBtn}"
-                            press="onPressSetPhoto"
-                            enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
-                            visible="{viewModel>/SetProfile}"
-                            type="Emphasized"
-                        />
-                        <m:Button
-                            text="{i18n>headerIdCard}"
-                            type="Emphasized"
-                            visible="{viewModel>/RelievingLetter}"
-                            tooltip="{i18n>headerIdCard}"
-                            id="IC_id_Idcard"
-                            press="CC_onPressIdCardDetails"
-                            enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
-                        />
-                        <m:Button
-                            text="{i18n>visit}"
-                            press="onDownloadVisitCard"
-                            enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
-                            type="Emphasized"
-                            tooltip="{i18n>visit}"
-                            visible="{= !${viewModel>/TraineeRole} }"
-                        />
-                        <m:Button
-                            text="{i18n>RelievingLetter}"
-                            type="Emphasized"
-                            visible="{viewModel>/RelievingLetter}"
-                            tooltip="{i18n>relievingletter}"
-                            id="SS_idExperience"
-                            press="SS_onDownloadExperienceLetter"
-                            enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
-                        />
-                    </actions>
-                </ObjectPageDynamicHeaderTitle>
-            </headerTitle>
-            <headerContent>
-                <m:FlexBox
-                    wrap="Wrap"
-                    direction="Row"
-                    fitContainer="true"
-                    alignItems="Start"
-                >
-                    <!-- Avatar Section -->
-                    <m:VBox
+	<m:Page id="SelfService_id_page">
+		<m:headerContent>
+			<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header"  type="XML" />
+		</m:headerContent>
+		<ObjectPageLayout id="ObjectPageLayout" navigate="onSectionChange" enableLazyLoading="true" useIconTabBar="true" showTitleInHeaderContent="true" upperCaseAnchorBar="false" >
+			<headerTitle>
+				<ObjectPageDynamicHeaderTitle>
+					<expandedHeading>
+						<m:Title text="{sEmployeeModel>/0/Salutation} {sEmployeeModel>/0/EmployeeName}" wrapping="true"/>
+					</expandedHeading>
+					<snappedHeading>
+						<m:FlexBox fitContainer="true" alignItems="Center" >
+							<m:Avatar
+                                src="{path: 'sEmployeeModel>/0/ProfilePhoto', formatter: '.Formatter.getImageSrc'}" class="sapUiTinyMarginEnd" />
+							<m:Title text="{sEmployeeModel>/0/Salutation} {sEmployeeModel>/0/EmployeeName}" wrapping="true" />
+						</m:FlexBox>
+					</snappedHeading>
+					<expandedContent>
+						<m:Text text="{sEmployeeModel>/0/Designation}" />
+					</expandedContent>
+					<snappedContent>
+						<m:Text text="{sEmployeeModel>/0/Designation}" />
+					</snappedContent>
+					<snappedTitleOnMobile>
+						<m:Title text="{sEmployeeModel>/0/Designation}" />
+					</snappedTitleOnMobile>
+					<actions>
+						<m:Button id="Submit" text="{i18n>submit}" press="onPressSubmit" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Accept" visible="{viewModel>/SelfService}" />
+						<m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Ghost" />
+						<m:Button text="{i18n>headerIdCard}"  type="Attention" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>headerIdCard}" id="IC_id_Idcard" press="CC_onPressIdCardDetails" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
+						<m:Button text="{i18n>visit}" press="onDownloadVisitCard" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Attention" tooltip="{i18n>visit}" visible="{= !${viewModel>/TraineeRole} }"/>
+						<m:Button text="{i18n>RelievingLetter}" type="Attention" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
+					</actions>
+				</ObjectPageDynamicHeaderTitle>
+			</headerTitle>
+			<headerContent>
+				<m:FlexBox wrap="Wrap" direction="Row" fitContainer="true" alignItems="Start" >
+					<!-- Avatar Section -->
+					<m:VBox
                         class="sapUiSmallMarginEnd"
                         layoutData="{ path: 'sEmployeeModel>', formatter: '.Formatter.getFlexLayoutData' }"
                     >
-                        <m:Avatar
+						<m:Avatar
                             src="{path: 'sEmployeeModel>/0/ProfilePhoto', formatter: '.Formatter.getImageSrc'}"
                             displaySize="L"
                         />
-                    </m:VBox>
-
-                    <!-- Contact Info -->
-                    <m:VBox
+					</m:VBox>
+					<!-- Contact Info -->
+					<m:VBox
                         class="sapUiSmallMarginBeginEnd"
                         layoutData="sap.ui.layout.FlexItemData"
                         growFactor="1"
                     >
-                        <m:Text
-                            text="{sEmployeeModel>/0/MobileNo}"
+						<m:Text
+                            text="{sEmployeeModel>/0/STDCode} {sEmployeeModel>/0/MobileNo}"
                             wrapping="true"
                         />
-                        <m:Text
+						<m:Text
                             text="{sEmployeeModel>/0/CompanyEmailID}"
                             wrapping="true"
                         />
-                    </m:VBox>
-
-                    <!-- Permanent Address -->
-                    <m:VBox
+					</m:VBox>
+					<!-- Permanent Address -->
+					<m:VBox
                         class="sapUiSmallMarginBeginEnd"
                         layoutData="sap.ui.layout.FlexItemData"
                         growFactor="1"
                     >
-                        <m:Label
+						<m:Label
                             text="{i18n>permanentAddress}"
                             class="TextColor"
                             wrapping="true"
                         />
-                        <m:Text
+						<m:Text
                             text="{sEmployeeModel>/0/PermanentAddress}"
                             wrapping="true"
                         />
-                    </m:VBox>
-
-                    <!-- Correspondence Address -->
-                    <m:VBox
+					</m:VBox>
+					<!-- Correspondence Address -->
+					<m:VBox
                         class="sapUiSmallMarginBeginEnd"
                         layoutData="sap.ui.layout.FlexItemData"
                         growFactor="1"
                     >
-                        <m:Label
+						<m:Label
                             text="{i18n>correspondenceAddress}"
                             class="TextColor"
                             wrapping="true"
                         />
-                        <m:Text
+						<m:Text
                             text="{sEmployeeModel>/0/CorrespondenceAddress}"
                             wrapping="true"
                         />
-                    </m:VBox>
-                </m:FlexBox>
-            </headerContent>
-
-            <sections>
-                <ObjectPageSection
+					</m:VBox>
+				</m:FlexBox>
+			</headerContent>
+			<sections>
+				<ObjectPageSection
                     titleUppercase="false"
                     id="basicDetailsSection"
                     title="{i18n>basicDetails}"
                 >
-                    <subSections>
-                        <ObjectPageSubSection
+					<subSections>
+						<ObjectPageSubSection
                             id="goalsSS1"
                             titleUppercase="false"
                             title="{i18n>PersonalInformation}"
                         >
-                            <blocks>
-                                <f:SimpleForm
+							<blocks>
+								<f:SimpleForm
                                     id="SS_id_BSimpleForm"
                                     editable="true"
                                     layout="ColumnLayout"
@@ -201,47 +135,47 @@
                                     columnsM="1"
                                     singleContainerFullSize="false"
                                 >
-                                    <f:toolbar>
-                                        <m:Toolbar>
-                                            <m:Title
+									<f:toolbar>
+										<m:Toolbar>
+											<m:Title
                                                 text="{i18n>basicDetails}"
                                             />
-                                            <m:ToolbarSpacer />
-                                            <m:Button
+											<m:ToolbarSpacer />
+											<m:Button
                                                 id="BasicDetailsBtn"
                                                 text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }"
                                                 press="SS_onEditPress"
-                                                type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Ghost' }"
+                                                type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
                                                 tooltip="{i18n>editDetails}"
                                                 visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
-                                        </m:Toolbar>
-                                    </f:toolbar>
-                                    <f:content>
-                                        <m:Label text="{i18n>employeeID}" />
-                                        <m:Input
+										</m:Toolbar>
+									</f:toolbar>
+									<f:content>
+										<m:Label text="{i18n>employeeID}" />
+										<m:Input
                                             value="{sEmployeeModel>/0/EmployeeID}"
                                             editable="false"
                                         />
-                                        <m:Label text="{i18n>employeeName}" />
-                                        <m:Input
+										<m:Label text="{i18n>employeeName}" />
+										<m:Input
                                             value="{sEmployeeModel>/0/Salutation} {sEmployeeModel>/0/EmployeeName}"
                                             editable="false"
                                         />
-                                        <m:Label text="{i18n>joiningDate}" />
-                                        <m:DatePicker
+										<m:Label text="{i18n>joiningDate}" />
+										<m:DatePicker
                                             value="{path:'sEmployeeModel>/0/JoiningDate', formatter:'.Formatter.formatDate'}"
                                             displayFormat="dd/MM/yyyy"
                                             valueFormat="dd/MM/yyyy"
                                             id="SS_id_Joinn"
                                             editable="false"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>dateOfBirth}"
                                             required="true"
                                             id="SS_id_ldob"
                                         />
-                                        <m:DatePicker
+										<m:DatePicker
                                             value="{path:'sEmployeeModel>/0/DateOfBirth', formatter:'.Formatter.formatDate'}"
                                             displayFormat="dd/MM/yyyy"
                                             valueFormat="dd/MM/yyyy"
@@ -252,28 +186,28 @@
                                             valueStateText="{i18n>dateValueState}"
                                             maxDate="{controller>/maxDate}"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>bloodGroup}"
                                             required="true"
                                             id="SS_id_lb"
                                         />
-                                        <m:Select
+										<m:Select
                                             selectedKey="{sEmployeeModel>/0/BloodGroup}"
                                             items="{BloodGroup>/bloodgroup}"
                                             id="SS_id_BloodGroup"
                                             editable="{viewModel>/isEditMode}"
                                         >
-                                            <core:Item
+											<core:Item
                                                 key="{BloodGroup>Code}"
                                                 text="{BloodGroup>Code}"
                                             />
-                                        </m:Select>
-                                        <m:Label
+										</m:Select>
+										<m:Label
                                             text="{i18n>companyMailid}"
                                             required="true"
                                             id="SS_id_lc"
                                         />
-                                        <m:Input
+										<m:Input
                                             valueStateText="{i18n>emailValueState}"
                                             value="{sEmployeeModel>/0/CompanyEmailID}"
                                             liveChange="SS_validateEmail"
@@ -282,12 +216,12 @@
                                             placeholder="{i18n>companyMailid}"
                                             maxLength="100"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>permanentAddress}"
                                             required="true"
                                             id="SS_id_lpa"
                                         />
-                                        <m:TextArea
+										<m:TextArea
                                             value="{sEmployeeModel>/0/PermanentAddress}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_PAddress"
@@ -296,12 +230,12 @@
                                             liveChange="SS_ValidateCommonFields"
                                             valueStateText="{i18n>addressValueState}"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>correspondenceAddress}"
                                             required="true"
                                             id="SS_id_lca"
                                         />
-                                        <m:TextArea
+										<m:TextArea
                                             value="{sEmployeeModel>/0/CorrespondenceAddress}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_CAdress"
@@ -310,12 +244,12 @@
                                             liveChange="SS_ValidateCommonFields"
                                             valueStateText="{i18n>addressValueState}"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>expCountry}"
                                             required="true"
                                             visible="{viewModel>/RelievingLetter}"
                                         />
-                                        <m:ComboBox
+										<m:ComboBox
                                             change="OE_onChangeCountry"
                                             valueStateText="{i18n>expValStaCountry}"
                                             id="SS_id_Country"
@@ -325,18 +259,18 @@
                                             editable="{viewModel>/AdminRole}"
                                             visible="{viewModel>/RelievingLetter}"
                                         >
-                                            <core:ListItem
+											<core:ListItem
                                                 key="{CountryModel>countryName}"
                                                 text="{CountryModel>countryName}"
                                                 additionalText="{CountryModel>code}"
                                             />
-                                        </m:ComboBox>
-                                        <m:Label
+										</m:ComboBox>
+										<m:Label
                                             text="{i18n>baseLocation}"
                                             required="true"
                                             id="SS_id_lbase"
                                         />
-                                        <m:Select
+										<m:Select
                                             items="{sBaseLocationModel>/}"
                                             id="SS_id_BaseL"
                                             showSecondaryValues="true"
@@ -344,41 +278,41 @@
                                             editable="{viewModel>/AdminRole}"
                                             change="SS_onBaseLocationChange"
                                         >
-                                            <core:ListItem
+											<core:ListItem
                                                 key="{sBaseLocationModel>city}"
                                                 text="{sBaseLocationModel>city}"
                                                 additionalText="{sBaseLocationModel>branchCode}"
                                             />
-                                        </m:Select>
-                                        <m:Label text="{i18n>branchCode}" />
-                                        <m:Input
+										</m:Select>
+										<m:Label text="{i18n>branchCode}" />
+										<m:Input
                                             value="{sEmployeeModel>/0/BranchCode}"
                                             editable="false"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>designation}"
                                             required="true"
                                             id="SS_id_lds"
                                         />
-                                        <m:Select
+										<m:Select
                                             items="{sDesignationModel>/}"
                                             id="SS_id_Desi"
                                             showSecondaryValues="true"
                                             selectedKey="{sEmployeeModel>/0/Designation}"
                                             editable="{viewModel>/AdminRole}"
                                         >
-                                            <core:ListItem
+											<core:ListItem
                                                 key="{sDesignationModel>designationName}"
                                                 text="{sDesignationModel>designationName}"
                                                 additionalText="{sDesignationModel>department}"
                                             />
-                                        </m:Select>
-                                        <m:Label
+										</m:Select>
+										<m:Label
                                             text="{i18n>manager}"
                                             id="SS_id_Lmg"
                                             required="true"
                                         />
-                                        <m:ComboBox
+										<m:ComboBox
                                             value="{sEmployeeModel>/0/ManagerName}"
                                             showSecondaryValues="true"
                                             id="SS_id_Manager"
@@ -388,18 +322,18 @@
                                             change="onManagerChange"
                                             valueStateText="{i18n>selectManager}"
                                         >
-                                            <core:ListItem
+											<core:ListItem
                                                 key="{EmployeeModel>EmployeeID}"
                                                 text="{EmployeeModel>EmployeeName}"
                                                 additionalText="{EmployeeModel>EmployeeID}"
                                             />
-                                        </m:ComboBox>
-                                        <m:Label
+										</m:ComboBox>
+										<m:Label
                                             text="{i18n>mobileNo}"
                                             required="true"
                                             id="SS_id_Lmo"
                                         />
-                                        <m:ComboBox
+										<m:ComboBox
                                             value="{sEmployeeModel>/0/STDCode}"
                                             showSecondaryValues="true"
                                             id="SS_id_STDCode"
@@ -409,13 +343,13 @@
                                             valueStateText="{i18n>combovalueState}"
                                             editable="{viewModel>/isEditMode}"
                                         >
-                                            <core:ListItem
+											<core:ListItem
                                                 key="{codeModel>country}"
                                                 text="{codeModel>calling_code}"
                                                 additionalText="{codeModel>country_code}"
                                             />
-                                        </m:ComboBox>
-                                        <m:Input
+										</m:ComboBox>
+										<m:Input
                                             value="{sEmployeeModel>/0/MobileNo}"
                                             editable="{viewModel>/isEditMode}"
                                             maxLength="10"
@@ -424,30 +358,31 @@
                                             liveChange="SS_validateMobileNo"
                                             valueStateText="{i18n>mobileNoValueState}"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>role}"
                                             id="SS_id_lr"
                                         />
-                                        <m:Select
+										<m:Select
                                             editable="{viewModel>/AdminRole}"
                                             selectedKey="{sEmployeeModel>/0/Role}"
                                             showSecondaryValues="true"
                                             id="SS_id_RoleEmpSele"
                                             items="{RoleModel>/}"
+                                            visible="{viewModel>/RelievingLetter}"
                                             valueStateText="{i18n>combovalueState}"
                                         >
-                                            <core:ListItem
+											<core:ListItem
                                                 key="{RoleModel>Role}"
                                                 text="{RoleModel>Role}"
                                             />
-                                        </m:Select>
-                                        <m:Label
+										</m:Select>
+										<m:Label
                                             text="{i18n>employeeStatus}"
                                             id="SS_id_les"
                                             required="true"
                                             visible="{viewModel>/RelievingLetter}"
                                         />
-                                        <m:Select
+										<m:Select
                                             change="SS_onStatusChange"
                                             id="SS_id_StatusSelf"
                                             editable="{viewModel>/AdminRole}"
@@ -455,17 +390,17 @@
                                             items="{StatusEmp>/}"
                                             visible="{viewModel>/RelievingLetter}"
                                         >
-                                            <core:Item
+											<core:Item
                                                 key="{StatusEmp>Value}"
                                                 text="{StatusEmp>Value}"
                                             />
-                                        </m:Select>
-                                        <m:Label
+										</m:Select>
+										<m:Label
                                             text="{i18n>ResigEndDate}"
                                             required="{= ${sEmployeeModel>/0/EmployeeStatus} === 'Inactive' ? true : false}"
                                             visible="{viewModel>/RelievingLetter}"
                                         />
-                                        <m:DatePicker
+										<m:DatePicker
                                             id="SS_id_ResgEndDate"
                                             value="{sEmployeeModel>/0/ResignationEndDate}"
                                             change="onChangeResigEndDate"
@@ -474,21 +409,21 @@
                                             valueFormat="dd/MM/yyyy"
                                             visible="{viewModel>/RelievingLetter}"
                                         />
-                                    </f:content>
-                                </f:SimpleForm>
-                            </blocks>
-                        </ObjectPageSubSection>
-                        <ObjectPageSubSection
+									</f:content>
+								</f:SimpleForm>
+							</blocks>
+						</ObjectPageSubSection>
+						<ObjectPageSubSection
                             id="goalsSS2"
                             titleUppercase="false"
                             title="{i18n>emergencyDetails}"
                         >
-                            <blocks>
-                                <layout:VerticalLayout width="100%">
-                                    <layout:BlockLayout background="Dashboard">
-                                        <layout:BlockLayoutRow>
-                                            <layout:BlockLayoutCell width="2">
-                                                <f:SimpleForm
+							<blocks>
+								<layout:VerticalLayout width="100%">
+									<layout:BlockLayout background="Dashboard">
+										<layout:BlockLayoutRow>
+											<layout:BlockLayoutCell width="2">
+												<f:SimpleForm
                                                     editable="true"
                                                     layout="ColumnLayout"
                                                     title="{i18n>personOne}"
@@ -506,29 +441,29 @@
                                                     columnsM="1"
                                                     singleContainerFullSize="false"
                                                 >
-                                                    <f:content>
-                                                        <m:Label
+													<f:content>
+														<m:Label
                                                             text="{i18n>salutation}"
                                                             id="SS_id_Pf"
                                                         />
-                                                        <m:Select
+														<m:Select
                                                             id="SS_idEmeSalF"
                                                             editable="{viewModel>/isEditMode}"
                                                             selectedKey="{sEmployeeModel>/0/EmergencyContactPerson1Salutation}"
                                                             items="{Salutation>/salutation}"
                                                             width="100%"
                                                         >
-                                                            <core:Item
+															<core:Item
                                                                 key="{Salutation>text}"
                                                                 text="{Salutation>text}"
                                                             />
-                                                        </m:Select>
-                                                        <m:Label
+														</m:Select>
+														<m:Label
                                                             text="{i18n>name}"
                                                             required="true"
                                                             id="SS_id_lName"
                                                         />
-                                                        <m:Input
+														<m:Input
                                                             value="{sEmployeeModel>/0/EmergencyContactPerson1Name}"
                                                             editable="{viewModel>/isEditMode}"
                                                             liveChange="SS_validateName"
@@ -537,27 +472,27 @@
                                                             maxLength="50"
                                                             valueStateText="{i18n>commonNameValueState}"
                                                         />
-                                                        <m:Label
+														<m:Label
                                                             text="{i18n>realtion}"
                                                             id="SS_id_Rf"
                                                         />
-                                                        <m:Select
+														<m:Select
                                                             selectedKey="{sEmployeeModel>/0/EmergencyContactPerson1Realtion}"
                                                             items="{RelationModel>/relation}"
                                                             id="SS_idRelF"
                                                             editable="{viewModel>/isEditMode}"
                                                         >
-                                                            <core:Item
+															<core:Item
                                                                 key="{RelationModel>Relationship}"
                                                                 text="{RelationModel>Relationship}"
                                                             />
-                                                        </m:Select>
-                                                        <m:Label
+														</m:Select>
+														<m:Label
                                                             text="{i18n>contact}"
                                                             required="true"
                                                             id="SS_id_Mf"
                                                         />
-                                                        <m:ComboBox
+														<m:ComboBox
                                                             value="{sEmployeeModel>/0/EContactIStdCode}"
                                                             showSecondaryValues="true"
                                                             id="SS_id_STDCodeRI"
@@ -567,13 +502,13 @@
                                                             valueStateText="{i18n>combovalueState}"
                                                             editable="{viewModel>/isEditMode}"
                                                         >
-                                                            <core:ListItem
+															<core:ListItem
                                                                 key="{codeModel>country}"
                                                                 text="{codeModel>calling_code}"
                                                                 additionalText="{codeModel>country_code}"
                                                             />
-                                                        </m:ComboBox>
-                                                        <m:Input
+														</m:ComboBox>
+														<m:Input
                                                             value="{sEmployeeModel>/0/EmergencyContactPerson1ContactNo}"
                                                             placeholder="{i18n>mobileNo}"
                                                             editable="{viewModel>/isEditMode}"
@@ -582,12 +517,12 @@
                                                             id="SS_id_EmpMoF"
                                                             valueStateText="{i18n>mobileNoValueState}"
                                                         />
-                                                        <m:Label
+														<m:Label
                                                             text="{i18n>address}"
                                                             required="true"
                                                             id="SS_id_Af"
                                                         />
-                                                        <m:TextArea
+														<m:TextArea
                                                             value="{sEmployeeModel>/0/EmergencyContactPerson1Address}"
                                                             placeholder="{i18n>address}"
                                                             id="SS_id_AddF"
@@ -596,11 +531,11 @@
                                                             maxLength="120"
                                                             valueStateText="{i18n>addressValueState}"
                                                         />
-                                                    </f:content>
-                                                </f:SimpleForm>
-                                            </layout:BlockLayoutCell>
-                                            <layout:BlockLayoutCell width="2">
-                                                <f:SimpleForm
+													</f:content>
+												</f:SimpleForm>
+											</layout:BlockLayoutCell>
+											<layout:BlockLayoutCell width="2">
+												<f:SimpleForm
                                                     editable="true"
                                                     layout="ColumnLayout"
                                                     title="{i18n>personTwo}"
@@ -618,29 +553,29 @@
                                                     columnsM="1"
                                                     singleContainerFullSize="false"
                                                 >
-                                                    <f:content>
-                                                        <m:Label
+													<f:content>
+														<m:Label
                                                             text="{i18n>salutation}"
                                                             id="SS_id_Ps"
                                                         />
-                                                        <m:Select
+														<m:Select
                                                             id="SS_idEmeSalS"
                                                             editable="{viewModel>/isEditMode}"
                                                             selectedKey="{sEmployeeModel>/0/EmergencyContactPerson2Salutation}"
                                                             items="{Salutation>/salutation}"
                                                             width="100%"
                                                         >
-                                                            <core:Item
+															<core:Item
                                                                 key="{Salutation>text}"
                                                                 text="{Salutation>text}"
                                                             />
-                                                        </m:Select>
-                                                        <m:Label
+														</m:Select>
+														<m:Label
                                                             text="{i18n>name}"
                                                             required="true"
                                                             id="SS_id_lN"
                                                         />
-                                                        <m:Input
+														<m:Input
                                                             value="{sEmployeeModel>/0/EmergencyContactPerson2Name}"
                                                             editable="{viewModel>/isEditMode}"
                                                             liveChange="SS_validateName"
@@ -649,26 +584,26 @@
                                                             maxLength="50"
                                                             valueStateText="{i18n>commonNameValueState}"
                                                         />
-                                                        <m:Label
+														<m:Label
                                                             text="{i18n>realtion}"
                                                         />
-                                                        <m:Select
+														<m:Select
                                                             selectedKey="{sEmployeeModel>/0/EmergencyContactPerson2Realtion}"
                                                             items="{RelationModel>/relation}"
                                                             id="SS_idRelS"
                                                             editable="{viewModel>/isEditMode}"
                                                         >
-                                                            <core:Item
+															<core:Item
                                                                 key="{RelationModel>Relationship}"
                                                                 text="{RelationModel>Relationship}"
                                                             />
-                                                        </m:Select>
-                                                        <m:Label
+														</m:Select>
+														<m:Label
                                                             text="{i18n>contact}"
                                                             required="true"
                                                             id="SS_id_Ms"
                                                         />
-                                                        <m:ComboBox
+														<m:ComboBox
                                                             value="{sEmployeeModel>/0/EContactIIStdCode}"
                                                             showSecondaryValues="true"
                                                             id="SS_id_STDCodeRII"
@@ -678,13 +613,13 @@
                                                             valueStateText="{i18n>combovalueState}"
                                                             editable="{viewModel>/isEditMode}"
                                                         >
-                                                            <core:ListItem
+															<core:ListItem
                                                                 key="{codeModel>country}"
                                                                 text="{codeModel>calling_code}"
                                                                 additionalText="{codeModel>country_code}"
                                                             />
-                                                        </m:ComboBox>
-                                                        <m:Input
+														</m:ComboBox>
+														<m:Input
                                                             value="{sEmployeeModel>/0/EmergencyContactPerson2ContactNo}"
                                                             placeholder="{i18n>mobileNo}"
                                                             editable="{viewModel>/isEditMode}"
@@ -693,12 +628,12 @@
                                                             id="SS_id_EmpMoS"
                                                             valueStateText="{i18n>mobileNoValueState}"
                                                         />
-                                                        <m:Label
+														<m:Label
                                                             text="{i18n>address}"
                                                             required="true"
                                                             id="SS_id_As"
                                                         />
-                                                        <m:TextArea
+														<m:TextArea
                                                             value="{sEmployeeModel>/0/EmergencyContactPerson2Address}"
                                                             placeholder="{i18n>address}"
                                                             editable="{viewModel>/isEditMode}"
@@ -707,28 +642,28 @@
                                                             liveChange="SS_ValidateCommonFields"
                                                             valueStateText="{i18n>addressValueState}"
                                                         />
-                                                    </f:content>
-                                                </f:SimpleForm>
-                                            </layout:BlockLayoutCell>
-                                        </layout:BlockLayoutRow>
-                                    </layout:BlockLayout>
-                                </layout:VerticalLayout>
-                            </blocks>
-                        </ObjectPageSubSection>
-                    </subSections>
-                </ObjectPageSection>
-                <ObjectPageSection
+													</f:content>
+												</f:SimpleForm>
+											</layout:BlockLayoutCell>
+										</layout:BlockLayoutRow>
+									</layout:BlockLayout>
+								</layout:VerticalLayout>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+				<ObjectPageSection
                     titleUppercase="false"
                     id="Document"
-                    title="Document"
+                    title="{i18n>Document}"
                 >
-                    <subSections>
-                        <ObjectPageSubSection
+					<subSections>
+						<ObjectPageSubSection
                             titleUppercase="false"
-                            title="Bank Details"
+                            title="{i18n>bankDetails}"
                         >
-                            <blocks>
-                                <f:SimpleForm
+							<blocks>
+								<f:SimpleForm
                                     layout="ColumnLayout"
                                     labelSpanXL="12"
                                     labelSpanL="12"
@@ -744,26 +679,26 @@
                                     columnsM="1"
                                     singleContainerFullSize="false"
                                 >
-                                    <f:toolbar>
-                                        <m:Toolbar>
-                                            <m:ToolbarSpacer />
-                                            <m:Button
+									<f:toolbar>
+										<m:Toolbar>
+											<m:ToolbarSpacer />
+											<m:Button
                                                 id="DocumentBtn"
                                                 text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }"
                                                 press="SS_onEditPress"
-                                                type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Ghost' }"
+                                                type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
                                                 tooltip="{i18n>editDetails}"
                                                 visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
-                                        </m:Toolbar>
-                                    </f:toolbar>
-                                    <f:content>
-                                        <m:Label
+										</m:Toolbar>
+									</f:toolbar>
+									<f:content>
+										<m:Label
                                             text="{i18n>accountHolder}"
                                             required="true"
                                             id="SS_id_Ah"
                                         />
-                                        <m:Input
+										<m:Input
                                             value="{sEmployeeModel>/0/AccountHolderName}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_AcName"
@@ -772,12 +707,12 @@
                                             placeholder="{i18n>placeAccountHolder}"
                                             valueStateText="{i18n>accountHolderValueState}"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>accountNo}"
                                             required="true"
                                             id="SS_id_An"
                                         />
-                                        <m:Input
+										<m:Input
                                             value="{sEmployeeModel>/0/AccountNo}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_Acno"
@@ -786,12 +721,12 @@
                                             placeholder="{i18n>placeAccountNo}"
                                             valueStateText="{i18n>accountnoValueState}"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>bankName}"
                                             required="true"
                                             id="SS_id_Bn"
                                         />
-                                        <m:Input
+										<m:Input
                                             value="{sEmployeeModel>/0/BankName}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_BankName"
@@ -800,12 +735,12 @@
                                             placeholder="{i18n>placeBankName}"
                                             valueStateText="{i18n>bankNameValueState}"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>bankBranch}"
                                             required="true"
                                             id="SS_id_Bb"
                                         />
-                                        <m:Input
+										<m:Input
                                             value="{sEmployeeModel>/0/BankBranch}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_Branch"
@@ -814,12 +749,12 @@
                                             placeholder="{i18n>placeBankBranch}"
                                             valueStateText="{i18n>placeBankBranch}"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>ifscCode}"
                                             required="true"
                                             id="SS_id_Ifc"
                                         />
-                                        <m:Input
+										<m:Input
                                             value="{sEmployeeModel>/0/IFSCCode}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_IfcsCode"
@@ -828,12 +763,12 @@
                                             placeholder="{i18n>placeIfscCode}"
                                             valueStateText="{i18n>ifcsCodeValueState}"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>bankAddress}"
                                             required="true"
                                             id="SS_id_Ba"
                                         />
-                                        <m:TextArea
+										<m:TextArea
                                             value="{sEmployeeModel>/0/BankAddress}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_Address"
@@ -842,16 +777,16 @@
                                             placeholder="{i18n>placeBankAddress}"
                                             valueStateText="{i18n>addressValueState}"
                                         />
-                                    </f:content>
-                                </f:SimpleForm>
-                            </blocks>
-                        </ObjectPageSubSection>
-                        <ObjectPageSubSection
+									</f:content>
+								</f:SimpleForm>
+							</blocks>
+						</ObjectPageSubSection>
+						<ObjectPageSubSection
                             titleUppercase="false"
-                            title="Personal Details"
+                            title="{i18n>PersonalDetails}"
                         >
-                            <blocks>
-                                <f:SimpleForm
+							<blocks>
+								<f:SimpleForm
                                     layout="ColumnLayout"
                                     labelSpanXL="12"
                                     labelSpanL="12"
@@ -867,13 +802,13 @@
                                     columnsM="1"
                                     singleContainerFullSize="false"
                                 >
-                                    <f:content>
-                                        <m:Label
+									<f:content>
+										<m:Label
                                             text="{i18n>panCardCommon}"
                                             required="true"
                                             id="SS_id_LPan"
                                         />
-                                        <m:Input
+										<m:Input
                                             value="{sEmployeeModel>/0/PANCard}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_Pan"
@@ -882,11 +817,11 @@
                                             placeholder="{i18n>placePan}"
                                             valueStateText="{i18n>panCardValueState}"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>adharCard}"
                                             required="true"
                                         />
-                                        <m:Input
+										<m:Input
                                             value="{sEmployeeModel>/0/AdharCard}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_idAdhar"
@@ -895,8 +830,8 @@
                                             placeholder="{i18n>placeAdhar}"
                                             valueStateText="{i18n>aadharNoValueState}"
                                         />
-                                        <m:Label text="{i18n>passport}" />
-                                        <m:Input
+										<m:Label text="{i18n>passport}" />
+										<m:Input
                                             value="{sEmployeeModel>/0/Passport}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_Passport"
@@ -905,8 +840,8 @@
                                             placeholder="{i18n>placePassport}"
                                             valueStateText="{i18n>passportNoValueState}"
                                         />
-                                        <m:Label text="{i18n>voterId}" />
-                                        <m:Input
+										<m:Label text="{i18n>voterId}" />
+										<m:Input
                                             value="{sEmployeeModel>/0/VoterId}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_Voterid"
@@ -915,17 +850,17 @@
                                             placeholder="{i18n>placeVoterId}"
                                             valueStateText="{i18n>voterIdValueState}"
                                         />
-                                    </f:content>
-                                </f:SimpleForm>
-                            </blocks>
-                        </ObjectPageSubSection>
-                        <ObjectPageSubSection
+									</f:content>
+								</f:SimpleForm>
+							</blocks>
+						</ObjectPageSubSection>
+						<ObjectPageSubSection
                             id="personalSS1"
                             title="{i18n>educationalDetails}"
                             titleUppercase="false"
                         >
-                            <blocks>
-                                <m:Table
+							<blocks>
+								<m:Table
                                     class="sapUiTinyMargin"
                                     growingScrollToLoad="true"
                                     busyIndicatorDelay="0"
@@ -938,13 +873,13 @@
                                     mode="SingleSelectLeft"
                                     selectionChange="EDF_onSelectionChange"
                                 >
-                                    <m:headerToolbar>
-                                        <m:OverflowToolbar>
-                                            <m:Title
+									<m:headerToolbar>
+										<m:OverflowToolbar>
+											<m:Title
                                                 text="{i18n>educationalDetails} ({= ${sEducationModel>/}.length})"
                                             />
-                                            <m:ToolbarSpacer />
-                                            <m:Button
+											<m:ToolbarSpacer />
+											<m:Button
                                                 text="{i18n>add}"
                                                 id="EdF_id_EduAdd"
                                                 tooltip="{i18n>toolEAddEdu}"
@@ -952,15 +887,15 @@
                                                 type="Accept"
                                                 visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
-                                            <m:Button
+											<m:Button
                                                 text="{i18n>edit}"
                                                 id="EdF_id_EduEdit"
                                                 tooltip="{i18n>toolEEditEdu}"
                                                 press="EDF_EditEducation"
-                                                type="Ghost"
+                                                type="Emphasized"
                                                 visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
-                                            <m:Button
+											<m:Button
                                                 text="{i18n>delete}"
                                                 id="EdF_id_EduDelete"
                                                 tooltip="{i18n>toolDeleteEdu}"
@@ -968,65 +903,65 @@
                                                 type="Reject"
                                                 visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
-                                        </m:OverflowToolbar>
-                                    </m:headerToolbar>
-                                    <m:columns>
-                                        <m:Column demandPopin="true">
-                                            <m:Text text="{i18n>collegeName}" />
-                                        </m:Column>
-                                        <m:Column
+										</m:OverflowToolbar>
+									</m:headerToolbar>
+									<m:columns>
+										<m:Column demandPopin="true">
+											<m:Text text="{i18n>collegeName}" />
+										</m:Column>
+										<m:Column
                                             minScreenWidth="Tablet"
                                             demandPopin="true"
                                         >
-                                            <m:Text text="{i18n>degree}" />
-                                        </m:Column>
-                                        <m:Column
+											<m:Text text="{i18n>degree}" />
+										</m:Column>
+										<m:Column
                                             minScreenWidth="Tablet"
                                             demandPopin="true"
                                         >
-                                            <m:Text text="{i18n>grade}" />
-                                        </m:Column>
-                                        <m:Column demandPopin="true">
-                                            <m:Text text="{i18n>startDate}" />
-                                        </m:Column>
-                                        <m:Column
+											<m:Text text="{i18n>grade}" />
+										</m:Column>
+										<m:Column demandPopin="true">
+											<m:Text text="{i18n>startDate}" />
+										</m:Column>
+										<m:Column
                                             minScreenWidth="Desktop"
                                             demandPopin="true"
                                         >
-                                            <m:Text text="{i18n>endDate}" />
-                                        </m:Column>
-                                    </m:columns>
-                                    <m:items>
-                                        <m:ColumnListItem>
-                                            <m:cells>
-                                                <m:Text
+											<m:Text text="{i18n>endDate}" />
+										</m:Column>
+									</m:columns>
+									<m:items>
+										<m:ColumnListItem>
+											<m:cells>
+												<m:Text
                                                     text="{sEducationModel>CollegeName}"
                                                 />
-                                                <m:Text
+												<m:Text
                                                     text="{sEducationModel>DegreeName}"
                                                 />
-                                                <m:Text
+												<m:Text
                                                     text="{parts: [ { path: 'sEducationModel>Grade' }, { path: 'sEducationModel>GradeType' }],formatter: '.Formatter.formatGradeWithType' }"
                                                 />
-                                                <m:Text
+												<m:Text
                                                     text="{path:'sEducationModel>EducationStartDate' ,formatter:'.Formatter.formatDate'}"
                                                 />
-                                                <m:Text
+												<m:Text
                                                     text="{path:'sEducationModel>EducationEndDate', formatter:'.Formatter.formatDate'}"
                                                 />
-                                            </m:cells>
-                                        </m:ColumnListItem>
-                                    </m:items>
-                                </m:Table>
-                            </blocks>
-                        </ObjectPageSubSection>
-                        <ObjectPageSubSection
+											</m:cells>
+										</m:ColumnListItem>
+									</m:items>
+								</m:Table>
+							</blocks>
+						</ObjectPageSubSection>
+						<ObjectPageSubSection
                             id="employmentSS1"
                             title="{i18n>employmentDetails}"
                             titleUppercase="false"
                         >
-                            <blocks>
-                                <m:Table
+							<blocks>
+								<m:Table
                                     class="sapUiTinyMargin"
                                     busyIndicatorDelay="0"
                                     id="EmpF_id_EmpTable"
@@ -1039,13 +974,13 @@
                                     mode="SingleSelectLeft"
                                     selectionChange="EmpF_onSelectionChange"
                                 >
-                                    <m:headerToolbar>
-                                        <m:OverflowToolbar>
-                                            <m:Title
+									<m:headerToolbar>
+										<m:OverflowToolbar>
+											<m:Title
                                                 text="{i18n>employmentDetails} ({= ${sEmploymentModel>/}.length})"
                                             />
-                                            <m:ToolbarSpacer />
-                                            <m:Button
+											<m:ToolbarSpacer />
+											<m:Button
                                                 id="EmpF_id_RefButton"
                                                 visible="true"
                                                 tooltip="{i18n>referenceDetails}"
@@ -1053,22 +988,22 @@
                                                 type="Ghost"
                                                 text="{i18n>referenceDetails}"
                                             />
-                                            <m:Button
+											<m:Button
                                                 text="{i18n>add}"
                                                 press="EmpF_onAddEmployment"
                                                 type="Accept"
                                                 tooltip="{i18n>toolAddEmp}"
                                                 visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
-                                            <m:Button
+											<m:Button
                                                 text="{i18n>edit}"
                                                 press="EmpF_onEditEmployment"
-                                                type="Ghost"
+                                                type="Emphasized"
                                                 tooltip="{i18n>toolEditEmp}"
                                                 id="EmpF_id_EmpEdit"
                                                 visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
-                                            <m:Button
+											<m:Button
                                                 text="{i18n>delete}"
                                                 press="EmpF_onDeletEmployment"
                                                 type="Reject"
@@ -1076,82 +1011,82 @@
                                                 id="EmpF_id_EmpDelete"
                                                 visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
-                                        </m:OverflowToolbar>
-                                    </m:headerToolbar>
-                                    <m:columns>
-                                        <m:Column demandPopin="true">
-                                            <m:Text text="{i18n>companyName}" />
-                                        </m:Column>
-                                        <m:Column
+										</m:OverflowToolbar>
+									</m:headerToolbar>
+									<m:columns>
+										<m:Column demandPopin="true">
+											<m:Text text="{i18n>companyName}" />
+										</m:Column>
+										<m:Column
                                             minScreenWidth="Tablet"
                                             demandPopin="true"
                                         >
-                                            <m:Text text="{i18n>designation}" />
-                                        </m:Column>
-                                        <m:Column
+											<m:Text text="{i18n>designation}" />
+										</m:Column>
+										<m:Column
                                             minScreenWidth="Tablet"
                                             demandPopin="true"
                                         >
-                                            <m:Text text="{i18n>startDate}" />
-                                        </m:Column>
-                                        <m:Column demandPopin="true">
-                                            <m:Text text="{i18n>endDate}" />
-                                        </m:Column>
-                                        <m:Column
+											<m:Text text="{i18n>startDate}" />
+										</m:Column>
+										<m:Column demandPopin="true">
+											<m:Text text="{i18n>endDate}" />
+										</m:Column>
+										<m:Column
                                             minScreenWidth="Desktop"
                                             demandPopin="true"
                                         >
-                                            <m:Text
+											<m:Text
                                                 text="{i18n>officeAddress}"
                                             />
-                                        </m:Column>
-                                    </m:columns>
-                                    <m:items>
-                                        <m:ColumnListItem>
-                                            <m:cells>
-                                                <m:Text
+										</m:Column>
+									</m:columns>
+									<m:items>
+										<m:ColumnListItem>
+											<m:cells>
+												<m:Text
                                                     text="{sEmploymentModel>CompanyName}"
                                                 />
-                                                <m:Text
+												<m:Text
                                                     text="{sEmploymentModel>Designation}"
                                                 />
-                                                <m:Text
+												<m:Text
                                                     text="{path:'sEmploymentModel>StartDate',formatter:'.Formatter.formatDate'}"
                                                 />
-                                                <m:Text
+												<m:Text
                                                     text="{path:'sEmploymentModel>EndDate',formatter:'.Formatter.formatDate'}"
                                                 />
-                                                <m:Text
+												<m:Text
                                                     text="{sEmploymentModel>OfficeAddress}"
                                                 />
-                                            </m:cells>
-                                        </m:ColumnListItem>
-                                    </m:items>
-                                </m:Table>
-                            </blocks>
-                        </ObjectPageSubSection>
-                    </subSections>
-                </ObjectPageSection>
-                <ObjectPageSection
+											</m:cells>
+										</m:ColumnListItem>
+									</m:items>
+								</m:Table>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+				<ObjectPageSection
                     titleUppercase="false"
                     id="connections1"
-                    title="Attachment"
+                    title="{i18n>Attachment}"
                 >
-                    <subSections>
-                        <ObjectPageSubSection
+					<subSections>
+						<ObjectPageSubSection
                             id="connectionsSS4"
                             titleUppercase="false"
                         >
-                            <blocks>
-                                <m:VBox>
-                                    <!-- MessageStrip appears first -->
-                                    <m:MessageStrip
+							<blocks>
+								<m:VBox>
+									<!-- MessageStrip appears first -->
+									<m:MessageStrip
                                         text="{i18n>uploadMsg}"
                                         type="Information"
                                         showIcon="true"
                                         class="sapUiTinyMarginBottom"
                                     />
-                                    <m:Table
+									<m:Table
                                         id="table-uploadSet"
                                         mode="SingleSelectLeft"
                                         items="{DocumentModel>/items}"
@@ -1161,33 +1096,33 @@
                                         alternateRowColors="true"
                                         selectionChange="onSelectionChange"
                                     >
-                                        <m:headerToolbar>
-                                            <m:OverflowToolbar>
-                                                <m:Title
+										<m:headerToolbar>
+											<m:OverflowToolbar>
+												<m:Title
                                                     text="{i18n>Documents} ({= ${DocumentModel>/items}.length})"
                                                     level="H2"
                                                 />
-                                                <m:ToolbarSpacer />
-                                                <m:Label
+												<m:ToolbarSpacer />
+												<m:Label
                                                     text="{i18n>documentType}"
                                                     showColon="true"
                                                     required="true"
                                                     visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                                 />
-                                                <m:ComboBox
+												<m:ComboBox
                                                     visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                                     items="{DocumentJson>/documents}"
                                                     id="SS_id_DocType"
                                                     change="onDocumentTypeChange"
                                                     valueStateText="{i18n>decumentType}"
                                                 >
-                                                    <core:Item
+													<core:Item
                                                         key="{DocumentJson>id}"
                                                         text="{DocumentJson>name}"
                                                     />
-                                                </m:ComboBox>
-                                                <m:ToolbarSeparator />
-                                                <u:FileUploader
+												</m:ComboBox>
+												<m:ToolbarSeparator />
+												<u:FileUploader
                                                     visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                                     fileSizeExceed="onFileSizeExceeds"
                                                     maximumFileSize="5MB"
@@ -1198,9 +1133,8 @@
                                                     buttonOnly="true"
                                                     sameFilenameAllowed="true"
                                                     iconFirst="true"
-                                                    class="sapUiSmallMarginBeginEnd"
                                                 />
-                                                <m:Button
+												<m:Button
                                                     visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                                     id="downloadSelectedButton"
                                                     text="{i18n>delete}"
@@ -1208,95 +1142,97 @@
                                                     press="onDeleteFiles"
                                                     enabled="false"
                                                 />
-                                                <m:Button
+												<m:Button
                                                     id="DeleteSelectedButton"
                                                     text="{i18n>Download}"
-                                                    type="Ghost"
+                                                    type="Attention"
                                                     press="onDownloadFiles"
                                                     enabled="false"
                                                 />
-                                            </m:OverflowToolbar>
-                                        </m:headerToolbar>
-                                        <m:columns>
-                                            <m:Column demandPopin="true">
-                                                <m:Label
+											</m:OverflowToolbar>
+										</m:headerToolbar>
+										<m:columns>
+											<m:Column demandPopin="true">
+												<m:Label
                                                     text="{i18n>fileName}"
                                                 />
-                                            </m:Column>
-                                            <m:Column demandPopin="true">
-                                                <m:Label
+											</m:Column>
+											<m:Column demandPopin="true">
+												<m:Label
                                                     text="{i18n>documentType}"
                                                 />
-                                            </m:Column>
-                                            <m:Column
+											</m:Column>
+											<m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
                                             >
-                                                <m:Label
+												<m:Label
                                                     text="{i18n>createdBy}"
                                                 />
-                                            </m:Column>
-                                            <m:Column
+											</m:Column>
+											<m:Column
                                                 demandPopin="true"
                                                 minScreenWidth="Tablet"
                                             >
-                                                <m:Label
+												<m:Label
                                                     text="{i18n>qCreateDate}"
                                                 />
-                                            </m:Column>
-                                        </m:columns>
-                                        <m:items>
-                                            <m:ColumnListItem>
-                                                <m:cells>
-                                                    <m:Link
+											</m:Column>
+										</m:columns>
+										<m:items>
+											<m:ColumnListItem>
+												<m:cells>
+													<m:Link
                                                         text="{DocumentModel>FileName}"
                                                         press="openPreviewDocument"
                                                     />
-                                                    <m:Text
+													<m:Text
                                                         text="{DocumentModel>DocumentType}"
                                                     />
-                                                    <m:Text
+													<m:Text
                                                         text="{DocumentModel>CreatedBy}"
                                                     />
-                                                    <m:Text
+													<m:Text
                                                         text="{path:'DocumentModel>CreatedOn', formatter:'.Formatter.formatDate'}"
                                                     />
-                                                </m:cells>
-                                            </m:ColumnListItem>
-                                        </m:items>
-                                    </m:Table>
-                                </m:VBox>
-                            </blocks>
-                        </ObjectPageSubSection>
-                    </subSections>
-                </ObjectPageSection>
-                <ObjectPageSection
+												</m:cells>
+											</m:ColumnListItem>
+										</m:items>
+									</m:Table>
+								</m:VBox>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+				<ObjectPageSection
                     titleUppercase="false"
                     id="idSalaryDetails"
-                    title="Salary Details"
+                    title="{i18n>salaryDetails}"
+                    visible="{= !${viewModel>/TraineeRole} }"
                 >
-                    <subSections>
-                        <ObjectPageSubSection
+					<subSections>
+						<ObjectPageSubSection
                             title=""
                             titleUppercase="false"
                         >
-                            <blocks>
-                                <m:VBox id="salaryVBox" />
-                            </blocks>
-                        </ObjectPageSubSection>
-                    </subSections>
-                </ObjectPageSection>
-                <ObjectPageSection
+							<blocks>
+								<m:VBox id="salaryVBox" />
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+				<ObjectPageSection
                     titleUppercase="false"
                     id="connections"
-                    title="Pay Slip"
+                    title="{i18n>paySlip}"
+                    visible="{= !${viewModel>/TraineeRole} }"
                 >
-                    <subSections>
-                        <ObjectPageSubSection
+					<subSections>
+						<ObjectPageSubSection
                             id="connectionsSS"
                             titleUppercase="false"
                         >
-                            <m:Table
+							<m:Table
                                 id="SS_id_PaySlipTable"
                                 busyIndicatorDelay="0"
                                 growing="true"
@@ -1311,48 +1247,48 @@
                                     }
                                 }"
                             >
-                                <m:columns>
-                                    <m:Column>
-                                        <m:Text text="{i18n>monthAndYear}" />
-                                    </m:Column>
-                                    <m:Column>
-                                        <m:Text text="{i18n>payableDays}" />
-                                    </m:Column>
-                                    <m:Column>
-                                        <m:Text text="{i18n>netPay}" />
-                                    </m:Column>
-                                </m:columns>
-                                <m:items>
-                                    <m:ColumnListItem
+								<m:columns>
+									<m:Column>
+										<m:Text text="{i18n>monthAndYear}" />
+									</m:Column>
+									<m:Column>
+										<m:Text text="{i18n>payableDays}" />
+									</m:Column>
+									<m:Column>
+										<m:Text text="{i18n>netPay}" />
+									</m:Column>
+								</m:columns>
+								<m:items>
+									<m:ColumnListItem
                                         type="Navigation"
                                         press="SS_onPressPayslipRow"
                                     >
-                                        <m:cells>
-                                            <m:Text text="{path: 'PaySlip>YearMonth', formatter: '.Formatter.formatMonthYear'}"/>
-                                        </m:cells>
-                                        <m:cells>
-                                            <m:Text text="{PaySlip>PayableDays}" />
-                                        </m:cells>
-                                        <m:cells>
-                                            <m:Text text="{PaySlip>NetPay}" />
-                                        </m:cells>
-                                    </m:ColumnListItem>
-                                </m:items>
-                            </m:Table>
-                        </ObjectPageSubSection>
-                    </subSections>
-                </ObjectPageSection>
-            </sections>
-        </ObjectPageLayout>
-        <m:footer>
-            <m:Bar>
-                <m:contentLeft>
-                    <core:Fragment
+										<m:cells>
+											<m:Text text="{path: 'PaySlip>YearMonth', formatter: '.Formatter.formatMonthYear'}"/>
+										</m:cells>
+										<m:cells>
+											<m:Text text="{PaySlip>PayableDays}" />
+										</m:cells>
+										<m:cells>
+											<m:Text text="{PaySlip>NetPay}" />
+										</m:cells>
+									</m:ColumnListItem>
+								</m:items>
+							</m:Table>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+			</sections>
+		</ObjectPageLayout>
+		<m:footer>
+			<m:Bar>
+				<m:contentLeft>
+					<core:Fragment
                         fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
                         type="XML"
                     />
-                </m:contentLeft>
-            </m:Bar>
-        </m:footer>
-    </m:Page>
+				</m:contentLeft>
+			</m:Bar>
+		</m:footer>
+	</m:Page>
 </mvc:View>
