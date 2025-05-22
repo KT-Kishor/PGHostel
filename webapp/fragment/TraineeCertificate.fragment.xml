@@ -22,7 +22,7 @@
             emptySpanM="0"
             emptySpanS="0"
             columnsXL="4"
-            columnsL="{= ${PDFData>/isTypeTrainee} ? 3 : 4 }"
+            columnsL="3"
             columnsM="2"
             singleContainerFullSize="false"
         >
@@ -49,22 +49,13 @@
                     id="TCF_id_Department"
                     items="{Departmentmodel>/}"
                     selectedKey="{traineeModel>Department}"
-					editable="{= ${PDFData>/isTypeTrainee} ? !${PDFData>/PreviewFlag} : false }"
+					editable="{= !${PDFData>/PreviewFlag} }"
                 >
                     <core:Item
                         key="{Departmentmodel>departmentName}"
                         text="{Departmentmodel>departmentName}"
                     />
                 </Select>
-                <Label text="{i18n>resignationStartDate}" />
-                <DatePicker
-                value="{sEmployeeModel>ResignationStartDate}"
-                    displayFormat="dd/MM/yyyy"
-                    valueFormat="dd/MM/yyyy"
-					editable="{= !${PDFData>/PreviewFlag} }"
-                    visible = "{= !${PDFData>/isTypeTrainee} }"                    
-                    id="TCF_id_StartDate"
-                />
                 <Label text="{i18n>reportingManager}" />
                 <Input
                     value="{traineeModel>ReportingManager}"
@@ -95,22 +86,6 @@
                     valueStateText="{i18n>projectValueState}"
                     placeholder="{i18n>projectValueState}"
 					editable="{= !${PDFData>/PreviewFlag} }"
-                    visible = "{= ${PDFData>/isTypeTrainee} }"
-                />
-                <Label
-                    text="{i18n>reasonForResign}"
-                    required="true"
-                />
-                <TextArea
-                    rows="4"
-                    id="TCF_id_ResignReason"
-                    liveChange="T_ValidateCommonFields"
-                    value="{traineeModel>ProjectName}"
-                    maxLength="60"
-                    valueStateText="{i18n>projectValueState}"
-                    placeholder="{i18n>projectValueState}"
-					editable="{= !${PDFData>/PreviewFlag} }"
-                    visible = "{= !${PDFData>/isTypeTrainee} }"
                 />
             </f:content>
         </f:SimpleForm>
