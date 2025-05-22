@@ -35,6 +35,7 @@
                         <m:ObjectIdentifier
                             title="{objectModel>/0/Model}"
                             text="{objectModel>/0/Description}"
+                            
                         />
                     </expandedContent>
                 </ObjectPageDynamicHeaderTitle>
@@ -53,20 +54,24 @@
                         <m:ObjectIdentifier
                             title="Serial Number"
                             text="{objectModel>/0/SerialNumber}"
+                            tooltip="Serial Number"
                         />
                     </layout:VerticalLayout>
                     <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
                         <m:ObjectIdentifier
                             title="Equipment Number"
                             text="{objectModel>/0/EquipmentNumber}"
+                            tooltip="Equipment Number"
                         />
                     </layout:VerticalLayout>
                     <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
                         <m:ObjectIdentifier
                             title="Asset Value"
                             class="sapUiTinyMarginBottom"
+                            tooltip="Asset Value"
                         />
-                        <m:ObjectNumber
+                        
+                        <!-- <m:ObjectNumber
                             number="{
                                 parts: [{
                                     path: 'objectModel>/0/AssetValue'
@@ -79,7 +84,31 @@
                                 }
                             }"
                             unit="{objectModel>/0/Currency}"
+                        /> -->
+                         <m:Text
+                            text="{objectModel>/0/Currency} {
+                            path: 'objectModel>/0/AssetValue',
+                            formatter: '.Formatter.formatCurrency'
+                        }"
                         />
+                    </layout:VerticalLayout>
+                     <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                        <m:VBox>
+                             <m:ObjectIdentifier
+                            title="Status"
+                            class="sapUiTinyMarginBottom"
+                            tooltip="Status"
+                        />
+                           <m:ObjectStatus
+                                inverted="false"
+                                text="{objectModel>/Status}"
+                                state="{
+                                    path: 'objectModel>/Status',
+                                    formatter: '.Formatter.formatObjectStatus'
+                                }"
+
+                            />
+                        </m:VBox>
                     </layout:VerticalLayout>
                 </m:FlexBox>
             </headerContent>
@@ -88,6 +117,7 @@
                     titleUppercase="false"
                     id="goals"
                     title="Timeline of Assets"
+                    tooltip="Timeline of Assets"
                 >
                     <subSections>
                         <ObjectPageSubSection titleUppercase="false">
@@ -102,6 +132,7 @@
                                     content="{Mymodel>/}"
                                     growingThreshold="999"
                                     showSearch="false"
+                                    
                                 >
                                     <suite:content>
                                         <suite:TimelineItem
@@ -119,6 +150,7 @@
                     titleUppercase="false"
                     id="idHistoryObjectPageSection"
                     title="{= 'History of '+ ${objectModel>/0/Model} + ' Asset' }"
+                    tooltip="History of asset"
                 >
                     <subSections>
                         <ObjectPageSubSection
@@ -137,22 +169,24 @@
                                 >
                                     <m:columns>
                                         <m:Column>
-                                            <m:Text text="{i18n>Assetdate}" />
+                                            <m:Text text="{i18n>Assetdate}"
+                                            tooltip="{i18n>Assetdate}" />
                                         </m:Column>
-                                        <m:Column>
+                                        <!-- <m:Column>
                                             <m:Text
                                                 text="{i18n>Pickeddetails}"
                                             />
-                                        </m:Column>
+                                        </m:Column> -->
                                         <!-- <m:Column>
                                             <m:Text text="{i18n>Assetdate}" />
                                         </m:Column> -->
                                         <!-- <m:Column>
                                             <m:Text text="Asset Creation Branch " />
                                         </m:Column> -->
-                                        <m:Column>
-                                            <m:Text text="{i18n>status}" />
-                                        </m:Column>
+                                        <!-- <m:Column>
+                                            <m:Text text="{i18n>status}" 
+                                            tooltip="{i18n>status}"/>
+                                        </m:Column> -->
                                         <!-- <m:Column>
                                             <m:Text text="{i18n>trashDate}" />
                                         </m:Column> -->
@@ -162,6 +196,7 @@
                                         <m:Column>
                                             <m:Text
                                                 text="{i18n>transferdetails}"
+                                                tooltip="{i18n>transferdetails}"
                                             />
                                         </m:Column>
                                         <!-- <m:Column>
@@ -176,6 +211,7 @@
                                         <m:Column>
                                             <m:Text
                                                 text="{i18n>assignedName}"
+                                                tooltip="{i18n>assignedName}"
                                             />
                                         </m:Column>
                                         <!-- <m:Column>
@@ -191,31 +227,53 @@
                                             <m:Text text="{i18n>transferby}" />
                                         </m:Column> -->
                                         <m:Column>
-                                            <m:Text text="{i18n>return}" />
+                                            <m:Text text="{i18n>return}" 
+                                            tooltip="{i18n>return}"/>
                                         </m:Column>
                                         <!-- <m:Column>
                                             <m:Text text="{i18n>returnDate}" />
                                         </m:Column> -->
                                         <m:Column>
-                                            <m:Text text="{i18n>trashby}" />
+                                            <m:Text text="{i18n>trashby}" 
+                                            tooltip="{i18n>trashby}"/>
                                         </m:Column>
                                     </m:columns>
                                     <m:items>
                                         <m:ColumnListItem>
                                             <m:cells>
                                                 <!-- <m:ObjectIdentifier title="{objectModel>PickedEmployeeName}" text="{objectModel>PickedEmployeeID}" /> -->
-                                                <m:ObjectIdentifier
+                                                <!-- <m:ObjectIdentifier
                                                     title="{= 'Date:' + ${
                                                           path: 'objectModel>AssetCreationDate',
                                                           formatter: '.Formatter.formatDate'
                                                            }}"
-                                                    text="{='Branch:'+${objectModel>AssignBranch}}"
-                                                />
-                                                <m:ObjectIdentifier
-                                                    title="{=${objectModel>PickedEmployeeName}?'By:'+${objectModel>PickedEmployeeName}+''+
+                                                    text="{=${objectModel>PickedBranch}?'Branch: '+${objectModel>PickedBranch}:''}" 
+                                                /> -->
+                                                <m:VBox>
+                        <m:Text text="{=${objectModel>PickedEmployeeName}?'Name: '+${objectModel>PickedEmployeeName}:''}" 
+                                                        class="sapUiTinyMarginBottom"
+
+                                         />
+                                   <m:Text text="{=${objectModel>PickedEmployeeID}?'ID: '+${objectModel>PickedEmployeeID}:''}" 
+                                                        class="sapUiTinyMarginBottom"
+                                                               />
+                            <m:Text text="{= ${objectModel>AssetCreationDate} ? 'Date: ' + ${
+                                path: 'objectModel>AssetCreationDate',
+                                formatter: '.Formatter.formatDate'
+                            } : ''}"
+                                class="sapUiTinyMarginBottom"
+                            />
+                            <m:Text text="{=${objectModel>PickedBranch}?'Branch: '+${objectModel>PickedBranch}:''}"
+                             />
+                        </m:VBox>
+                                                <!-- <m:ObjectIdentifier
+                                                    title="{=${objectModel>PickedEmployeeName}?'By:'+${objectModel>PickedEmployeeName}+' '+
                                            ${objectModel>PickedEmployeeID}:''}"
-                                                    text="{=${objectModel>PickedBranch}?'Branch:'+${objectModel>PickedBranch}:''}"
-                                                />
+                                                /> -->
+                                                 <!-- <m:ObjectIdentifier
+                                                    title="{objectModel>PickedEmployeeName}"
+                                                    text="{objectModel>PickedEmployeeID}" 
+                                                /> -->
                                                 <!-- <m:ObjectIdentifier title="{= 'Date:' + ${
                                                           path: 'objectModel>AssetCreationDate',
                                                           formatter: '.Formatter.formatDate'
@@ -225,14 +283,14 @@
                                                     formatter: '.Formatter.formatDate'
                                                 }" />
                                                 <m:Text text="{objectModel>AssignBranch}" /> -->
-                                                <m:ObjectStatus
+                                                <!-- <m:ObjectStatus
                                                     inverted="false"
                                                     text="{objectModel>Status}"
                                                     state="{
                                                         path: 'objectModel>Status',
                                                         formatter: '.Formatter.formatObjectStatus'
                                                     }"
-                                                />
+                                                /> -->
                                                 <!-- <m:Text text="{
                                                     path: 'objectModel>TrashDate',
                                                     formatter: '.Formatter.formatDate'
@@ -245,11 +303,12 @@
                                                     }}" /> -->
                                                 <m:VBox>
                                                     <m:Text
-                                                        text="{= ${objectModel>TransferByName} ? 'By: ' + ${objectModel>TransferByName} + ' ' +
-                                       ${objectModel>TransferByID} : ''}"
+                                                        text="{= ${objectModel>TransferByName} ? 'By: ' + ${objectModel>TransferByName}: ''}"
                                                         class="sapUiTinyMarginBottom"
                                                     />
-
+                                                      <m:Text text="{=${objectModel>TransferByID}?'ID: '+${objectModel>TransferByID}:''}"
+                                                        class="sapUiTinyMarginBottom"                        
+                                                                  />
                                                     <m:Text
                                                         text="{= ${objectModel>TransferBranch} ? 'Branch: ' + ${objectModel>TransferBranch} : ''}"
                                                         class="sapUiTinyMarginBottom"
@@ -272,13 +331,24 @@
                                                 <!-- <m:ObjectIdentifier title="{objectModel>AssignedByEmployeeName}" text="{objectModel>AssignedByEmployeeID}" /> -->
                                                 <m:VBox class="sapUiTinyMarginTopBottom">
                                                     <m:Text
-                                                        text="{= ${objectModel>AssignedByEmployeeName} ? 'By: ' + ${objectModel>AssignedByEmployeeName} + ' ' + ${objectModel>AssignedByEmployeeID} : ''}"
+                                                        text="{= ${objectModel>AssignedByEmployeeName} ? 'By: ' + ${objectModel>AssignedByEmployeeName} : ''}"
                                                         class="sapUiTinyMarginBottom"
                                                     />
+                                                      <m:Text text="{=${objectModel>AssignedByEmployeeID}?'ID: '+${objectModel>AssignedByEmployeeID}:''}"
+                                                        class="sapUiTinyMarginBottom"                        
+                                                                  />
                                                     <m:Text
-                                                        text="{= ${objectModel>AssignEmployeeName} ? 'To: ' + ${objectModel>AssignEmployeeName} + ' ' + ${objectModel>AssignEmployeeID} : ''}"
+                                                        text="{= ${objectModel>AssignEmployeeName} ? 'To: ' + ${objectModel>AssignEmployeeName} : ''}"
                                                         class="sapUiTinyMarginBottom"
                                                     />
+                                                     <m:Text text="{=${objectModel>AssignEmployeeID}?'ID: '+${objectModel>AssignEmployeeID}:''}"
+                                                        class="sapUiTinyMarginBottom"                        
+                                                                  />
+                                                     <m:Text
+                                                        text="{= ${objectModel>AssignBranch} ? 'Branch: ' + ${objectModel>AssignBranch} : ''}"
+                                                           class="sapUiTinyMarginBottom"
+
+                                                     />
                                                     <m:Text
                                                         text="{= ${objectModel>AssignedDate} ? 'Date: ' + ${
                                                             path: 'objectModel>AssignedDate',
@@ -298,9 +368,12 @@
                                                 <!-- <m:ObjectIdentifier title="{objectModel>TransferByName}" text="{objectModel>TransferByID}" /> -->
                                                 <m:VBox  class="sapUiTinyMarginTopBottom">
                              <m:Text
-                                text="{= ${objectModel>ReturnEmpName} ? 'To: ' + ${objectModel>ReturnEmpName} + ' ' + ${objectModel>ReturnEmpID} : ''}"
+                                text="{= ${objectModel>ReturnEmpName} ? 'To: ' + ${objectModel>ReturnEmpName} : ''}"
                                     class="sapUiTinyMarginBottom"
                             />
+                             <m:Text text="{=${objectModel>ReturnEmpID}?'ID: '+${objectModel>ReturnEmpID}:''}"
+                              class="sapUiTinyMarginBottom"                        
+                                  />
                             <m:Text
                                 text="{= ${objectModel>ReturnBranch} ? 'Branch: ' + ${objectModel>ReturnBranch} : ''}"
                                     class="sapUiTinyMarginBottom"

@@ -175,10 +175,12 @@
                         tooltip="Transfer"
                     />
                     <Button
+                       id="idTrashButton"
                         text="{i18n>trash}"
                         type="Ghost"
                         press="IA_onTrashButtonPress"
                         tooltip="Trash"
+                        visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Manager'}"
                     />
                     <Button
                         id="IA_id_Export"
@@ -194,26 +196,29 @@
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>vehicleModel}" />
+                    <Text text="{i18n>vehicleModel}" 
+                    tooltip="{i18n>vehicleModel}"/>
                 </Column>
                 <Column
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assetdetails}" />
+                    <Text text="{i18n>assetdetails}" 
+                    tooltip="{i18n>assetdetails}"/>
                 </Column>
                 <Column
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>Assetdate}" />
+                    <Text text="{i18n>Assetdate}" 
+                    tooltip="{i18n>Assetdate}"/>
                 </Column>
-                <Column
+                <!-- <Column
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
                     <Text text="{i18n>Pickeddetails}" />
-                </Column>
+                </Column> -->
                 <!-- <Column
                     minScreenWidth="Tablet"
                     demandPopin="true"
@@ -230,13 +235,15 @@
                     <Text text="{i18n>Assetdate}" />
                 </Column> -->
                 <Column>
-                    <Text text="{i18n>transferdetails}" />
+                    <Text text="{i18n>transferdetails}" 
+                    tooltip="{i18n>transferdetails}"/>
                 </Column>
                 <Column
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>trashby}" />
+                    <Text text="{i18n>trashby}" 
+                    tooltip="{i18n>trashby}"/>
                 </Column>
                 <!-- <Column>
                     <Text text="{i18n>transferdetails}" />
@@ -256,7 +263,8 @@
                     width="12%"
                     hAlign="Center"
                 >
-                    <Text text="{i18n>status}" />
+                    <Text text="{i18n>status}" 
+                    tooltip="{i18n>status}"/>
                 </Column>
                 <!-- <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>trashDate}"/>
@@ -266,7 +274,8 @@
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assetvalue}" />
+                    <Text text="{i18n>assetvalue}"
+                    tooltip="{i18n>assetvalue}" />
                 </Column>
                 <!-- <Column minScreenWidth="Tablet" demandPopin="true">
                     <Text text="{i18n>Transferdate}"/>
@@ -278,7 +287,8 @@
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>return}" />
+                    <Text text="{i18n>return}" 
+                    tooltip="{i18n>return}"/>
                 </Column>
             </columns>
             <items>
@@ -295,21 +305,34 @@
                             title="{= 'Sl No: ' + ${incomeModel>SerialNumber}}"
                             text="{='Eq No: '+ ${incomeModel>EquipmentNumber}}"
                         />
-                        <ObjectIdentifier
-                            title="{= 'Date: ' + ${
+                        <VBox>
+                        <Text text="{=${incomeModel>PickedEmployeeName}?'Name: '+${incomeModel>PickedEmployeeName}:''}"                     
+                         class="sapUiTinyMarginBottom"
+                                />
+                             <Text text="{=${incomeModel>PickedEmployeeID}?'ID: '+${incomeModel>PickedEmployeeID}:''}"
+                              class="sapUiTinyMarginBottom"                        
+                                  />
+                            <Text text="{=${incomeModel>PickedBranch}?'Branch: '+${incomeModel>PickedBranch}:''}"
+                                class="sapUiTinyMarginBottom"
+
+                             />
+                            <Text text="{= ${incomeModel>AssetCreationDate} ? 'Date: ' + ${
                                 path: 'incomeModel>AssetCreationDate',
                                 formatter: '.Formatter.formatDate'
-                            }}"
-                            text="{='Branch: '+${incomeModel>AssignBranch}}"
-                        />
+                            } : ''}"
+                            />
+                        </VBox>
                         <!-- <ObjectIdentifier
                             title="{incomeModel>PickedEmployeeName}"
                             text="{incomeModel>PickedEmployeeID}"
                         /> -->
-                        <ObjectIdentifier
+                        <!-- <ObjectIdentifier
                             title="{=${incomeModel>PickedEmployeeName}?'By: '+${incomeModel>PickedEmployeeName}+''+${incomeModel>PickedEmployeeID}:''}"
-                            text="{=${incomeModel>PickedBranch}?'Branch: '+${incomeModel>PickedBranch}:''}"
-                        />
+                        /> -->
+                        <!-- <ObjectIdentifier
+                             title="{=${incomeModel>PickedEmployeeName}?'By: '+${incomeModel>PickedEmployeeName}:''}"
+                            text="{incomeModel>PickedEmployeeID}"
+                        /> -->
                         <!-- <Text text="{incomeModel>SerialNumber}"/>
                         <Text text="{incomeModel>EquipmentNumber}"/> -->
                         <!-- <ObjectIdentifier
@@ -324,9 +347,12 @@
                             text="{incomeModel>AssignBranch}"
                         /> -->
                         <VBox>
-                            <Text text="{= ${incomeModel>TransferByName} ? 'By: ' + ${incomeModel>TransferByName} + ' ' + ${incomeModel>TransferByID} : ''}" 
+                            <Text text="{= ${incomeModel>TransferByName} ? 'By: ' + ${incomeModel>TransferByName} : ''}" 
                                     class="sapUiTinyMarginBottom"
                             />
+                             <Text text="{=${incomeModel>TransferByID}?'ID: '+${incomeModel>TransferByID}:''}"
+                              class="sapUiTinyMarginBottom"                        
+                                  />
 
                             <Text text="{= ${incomeModel>TransferBranch} ? 'Branch: ' + ${incomeModel>TransferBranch} : ''}"
                                     class="sapUiTinyMarginBottom"
@@ -337,15 +363,19 @@
                                 formatter: '.Formatter.formatDate'
                             }}" />
                         </VBox>                    
-                            <ObjectIdentifier
-                            title="{= ${incomeModel>TrashByEmployeeName} ? 'By: ' + ${incomeModel>TrashByEmployeeName} + ' ' 
-                                + ${incomeModel>TrashByEmployeeID} : ''}"
-                            text="{= ${incomeModel>TrashDate} ? 'Date: ' + ${
-                                    path: 'incomeModel>TrashDate',
-                                    formatter: '.Formatter.formatDate'
-                                } : ''}"
-                        />
-                        <!-- <Text text="{
+                                <VBox>
+                                    <Text text="{= ${incomeModel>TrashByEmployeeName} ? 'By: ' + ${incomeModel>TrashByEmployeeName}: ''}"
+                                        class="sapUiTinyMarginBottom"
+                                    />
+                                     <Text text="{=${incomeModel>TrashByEmployeeID}?'ID: '+${incomeModel>TrashByEmployeeID}:''}"
+                                    class="sapUiTinyMarginBottom"                        
+                                  />
+                                    <Text text="{= ${incomeModel>TrashDate} ? 'Date: ' + ${
+                                            path: 'incomeModel>TrashDate',
+                                            formatter: '.Formatter.formatDate'
+                                        } : ''}"
+                                    />
+                                </VBox>                        <!-- <Text text="{
                             path: 'incomeModel>TrashDate',
                             formatter: '.Formatter.formatDate'
                         }" /> -->
@@ -374,6 +404,8 @@
                                     path: 'incomeModel>Status',
                                     formatter: '.Formatter.formatObjectStatus'
                                 }"
+                                    class="sapUiTinyMarginBottom"
+
                             />
                             <Button
                                 id="IA_pickButton"
@@ -408,9 +440,12 @@
                         />
                         <VBox  >
                             <Text
-                                text="{= ${incomeModel>ReturnEmpName} ? 'To: ' + ${incomeModel>ReturnEmpName} + ' ' + ${incomeModel>ReturnEmpID} : ''}"
+                                text="{= ${incomeModel>ReturnEmpName} ? 'To: ' + ${incomeModel>ReturnEmpName}: ''}"
                                     class="sapUiTinyMarginBottom"
                             />
+                              <Text text="{=${incomeModel>ReturnEmpID}?'ID: '+${incomeModel>ReturnEmpID}:''}"
+                              class="sapUiTinyMarginBottom"                        
+                                  />
                             <Text
                                 text="{= ${incomeModel>ReturnBranch} ? 'Branch: ' + ${incomeModel>ReturnBranch} : ''}"
                                     class="sapUiTinyMarginBottom"

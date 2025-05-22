@@ -41,6 +41,24 @@
                         additionalText="{EmpModel>EmployeeID}"
                     />
                 </Select>
+                <Label text="{i18n>branch}" required="true" />
+                <ComboBox
+                    id="FCIA_id_branch"
+                    placeholder="Select Branch"
+                    change="FCIA_onbranchchange"
+                    selectionChange="FCIA_onselectionchange"
+                    valueStateText="Select Branch"
+                    value="{CreateIncomeAssetModel>/PickedBranch}"
+                    selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
+                    showSecondaryValues="true"
+                    items="{branchModel>/}"
+                >
+                    <core:ListItem
+                        key="{branchModel>city}" 
+                        text="{branchModel>city}"
+                        additionalText="{branchModel>branchCode}"
+                    />
+                </ComboBox>
                 <Label text="{i18n>vehicleModel}" required="true" />
                 <Input
                     id="FCIA_id_model"
@@ -90,15 +108,15 @@
                 />
                 
 
-                <Label text="{i18n>branch}" required="true" />
+                <!-- <Label text="{i18n>branch}" required="true" />
                 <ComboBox
                     id="FCIA_id_branch"
                     placeholder="Select Branch"
                     change="FCIA_onbranchchange"
                     selectionChange="FCIA_onselectionchange"
                     valueStateText="Select Branch"
-                    value="{CreateIncomeAssetModel>/AssignBranch}"
-                    selectedKey="{CreateIncomeAssetModel>/AssignBranch}"
+                    value="{CreateIncomeAssetModel>/PickedBranch}"
+                    selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
                     showSecondaryValues="true"
                     items="{branchModel>/}"
                 >
@@ -107,8 +125,8 @@
                         text="{branchModel>city}"
                         additionalText="{branchModel>branchCode}"
                     />
-                </ComboBox>
-                  <Label text="{i18n>pickedbranch}" required="true" />
+                </ComboBox> -->
+                <Label text="{i18n>pickedbranch}" required="true" />
                 <ComboBox
                     id="FCIA_id_pickbranch"
                     placeholder="Select branch"
@@ -133,7 +151,7 @@
                     value="{CreateIncomeAssetModel>/AssetValue}"
                     valueStateText="Enter Asset Value"
                     placeholder="Enter Asset Value"
-                    maxLength="7"
+                    maxLength="15"
                     liveChange="FCIA_assetammountlivechange"
                 />
 

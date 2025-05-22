@@ -17,16 +17,26 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("AssetObjectPage").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function (oEvent) {
-             var LoginFunction = await this.commonLoginFunction("AssetAssignment");
-                if (!LoginFunction) return;
-            this.Name =  oEvent.getParameter("arguments").Name;
+            var LoginFunction = await this.commonLoginFunction("AssetAssignment");
+            if (!LoginFunction) return;
+            this.getBusyDialog()
+            this.Name = oEvent.getParameter("arguments").Name;
             this.Slno = oEvent.getParameter("arguments").sPath;
             await this._fetchCommonData("IncomeAsset", "objectModel", {
                 SerialNumber: this.Slno,
             })
+
+
+            this.closeBusyDialog()
             var data = this.getOwnerComponent().getModel("objectModel").getData();
             var timelineData = [];
+            var currentItem = data.find(function (item) {
+                return item.IsCurrent == 1;
+            });
 
+            if (currentItem) {
+                this.getView().getModel("objectModel").setProperty("/Status", currentItem.Status);
+            }
             data.forEach(function (item) {
                 if (item.AssetCreationDate && item.Status != "Transferred") {
                     timelineData.push({
@@ -35,9 +45,10 @@ sap.ui.define([
                         // title: item.PickedEmployeeID,
                         // userName: item.PickedEmployeeName,
                         // Status: "Available",
-                        title:  "The asset was picked by " +  item.PickedEmployeeName  + " (" + item.PickedEmployeeID + ") " + item.AssignBranch + " "
-                        + "on " + new Date(item.AssetCreationDate).toLocaleDateString('en-GB')})            
-                       }
+                        title: "The asset was picked by " + item.PickedEmployeeName + " (" + item.PickedEmployeeID + ") " + item.AssignBranch + " "
+                            + "on " + new Date(item.AssetCreationDate).toLocaleDateString('en-GB')
+                    })
+                }
 
                 if (item.AssignedDate) {
                     timelineData.push({
@@ -46,13 +57,13 @@ sap.ui.define([
                         // title: item.AssignEmployeeID,
                         // userName: item.AssignEmployeeName,
                         // Status: "Assigned",
-                     title:  "The asset was assigned to " +  item.AssignEmployeeName  + " (" + item.AssignEmployeeID+ ") " + "by " +
-                      item.AssignedByEmployeeName 
-                        + " ("+ item.AssignedByEmployeeID +") " + item.AssignBranch +" "+"on " 
-                        + new Date(item.AssetCreationDate).toLocaleDateString('en-GB'),
-                        
+                        title: "The asset was assigned to " + item.AssignEmployeeName + " (" + item.AssignEmployeeID + ") " + "by " +
+                            item.AssignedByEmployeeName
+                            + " (" + item.AssignedByEmployeeID + ") " + item.AssignBranch + " " + "on "
+                            + new Date(item.AssignedDate).toLocaleDateString('en-GB'),
 
-});
+
+                    });
                 }
 
                 if (item.TrashDate) {
@@ -62,11 +73,11 @@ sap.ui.define([
                         // Status: "Trashed",
                         // Comments:item.Comments,
                         text: item.TrashComments ? "Comment: " + item.TrashComments : "",
-                        title:"The asset was Trashed by " + item.TrashByEmployeeName +"("+item.TrashByEmployeeID + ") on " +
-                        new Date(item.TrashDate).toLocaleDateString('en-GB')
+                        title: "The asset was Trashed by " + item.TrashByEmployeeName + " (" + item.TrashByEmployeeID + ") on " +
+                            new Date(item.TrashDate).toLocaleDateString('en-GB')
                     });
                 }
-                if (item.ReturnDate && item.ReturnDate !== "1899-11-30T00:00:00.000Z" ) {
+                if (item.ReturnDate && item.ReturnDate !== "1899-11-30T00:00:00.000Z") {
                     timelineData.push({
                         type: "Return",
                         // dateTime: item.ReturnDate,
@@ -75,9 +86,10 @@ sap.ui.define([
                         // Status: "Returned",
                         // Comments:item.Comments,
                         //  ReturnEmpName:"Return To " + item.ReturnEmpName + " " + item.ReturnEmpID,
-                        text: item.Comments ? "Comment: " + item.Comments : "",                         title:"The asset was return by "+item.AssignEmployeeName + " (" +item.AssignEmployeeID + ") to " + item.ReturnEmpName
-                         + " " + item.ReturnEmpID + " " + item.ReturnBranch + " " + "on " +new Date(item.ReturnDate).toLocaleDateString('en-GB')
-                        
+                        text: item.Comments ? "Comment: " + item.Comments : "",
+                        title: "The asset was return by " + item.AssignEmployeeName + " (" + item.AssignEmployeeID + ") to " + item.ReturnEmpName
+                            + " (" + item.ReturnEmpID + ") " + item.ReturnBranch + " " + "on " + new Date(item.ReturnDate).toLocaleDateString('en-GB')
+
                     });
                 }
                 if (item.TransferDate && item.TransferDate !== "1899-11-30T00:00:00.000Z") {
@@ -87,9 +99,9 @@ sap.ui.define([
                         // userName: item.TransferByName,
                         // title: item.TransferByID,
                         // Status: "Transferred",
-                        
-                       title:"The asset was transferby "+ item.TransferByName + " (" + item.TransferByID +") " + item.TransferBranch +"on "
-                       +new Date(item.TransferDate).toLocaleDateString('en-GB')
+
+                        title: "The asset was transferby " + item.TransferByName + " (" + item.TransferByID + ") " + item.TransferBranch + " "
+                            + "on " + new Date(item.TransferDate).toLocaleDateString('en-GB')
 
                     });
                 }
@@ -106,9 +118,9 @@ sap.ui.define([
             }
         },
         AOP_onButtonPress: function () {
-            if(this.Name === "Asset"){
+            if (this.Name === "Asset") {
                 this.getRouter().navTo("RouteAssetAssignment");
-            }else{
+            } else {
                 this.getRouter().navTo("RouteIncomeAsset");
             }
         }
