@@ -4,10 +4,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         return Controller.extend("sap.kt.com.minihrsolution.controller.SelfService", {
             Formatter: Formatter,
             onInit() {
-                // var oModel = new sap.ui.model.json.JSONModel(new Date());
-                // this.getView().setModel(oModel, "controller");
+                var oDateModel = new sap.ui.model.json.JSONModel();
+                oDateModel.setData({ maxDate: new Date(), focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1) });
+                this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("SelfService").attachMatched(this._onRouteMatched, this);
-        },
+            },
 
             _onRouteMatched: async function (oEvent) {
                 try {
@@ -160,38 +161,38 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
             SS_commonEduFunction() {
-            var eduModel = new JSONModel({
-                EmployeeID: this.EmployeeID,
-                CollegeName: "",
-                DegreeName: "",
-                EducationStartDate: "",
-                EducationEndDate: "",
-                Grade: "",
-                GradeType: "",
-            });
-            this.getView().setModel(eduModel, "educationModel");
-        },
+                var eduModel = new JSONModel({
+                    EmployeeID: this.EmployeeID,
+                    CollegeName: "",
+                    DegreeName: "",
+                    EducationStartDate: "",
+                    EducationEndDate: "",
+                    Grade: "",
+                    GradeType: "",
+                });
+                this.getView().setModel(eduModel, "educationModel");
+            },
             SS_commonEmpFunction() {
-            var empModel = new JSONModel({
-                EmployeeID: this.EmployeeID,
-                CompanyName: "",
-                Designation: "",
-                StartDate: "",
-                EndDate: "",
-                OfficeAddress: "",
-                RCISal: "",
-                RCIName: "",
-                RCIAddress: "",
-                RCIEmailID: "",
-                RCIMobileNo: "",
-                RCIISal: "",
-                RCIIName: "",
-                RCIIAddress: "",
-                RCIIEmailID: "",
-                RCIIMobileNo: "",
-            });
-            this.getView().setModel(empModel, "employmentModel");
-        },
+                var empModel = new JSONModel({
+                    EmployeeID: this.EmployeeID,
+                    CompanyName: "",
+                    Designation: "",
+                    StartDate: "",
+                    EndDate: "",
+                    OfficeAddress: "",
+                    RCISal: "",
+                    RCIName: "",
+                    RCIAddress: "",
+                    RCIEmailID: "",
+                    RCIMobileNo: "",
+                    RCIISal: "",
+                    RCIIName: "",
+                    RCIIAddress: "",
+                    RCIIEmailID: "",
+                    RCIIMobileNo: "",
+                });
+                this.getView().setModel(empModel, "employmentModel");
+            },
             SS_validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
             },
@@ -1678,23 +1679,22 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             onApplyResignation: async function () {
                 await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation");
             },
-            TCF_onPressCloseDialog: function () {
+            RF_onPressCloseDialog: function () {
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                 this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
-
                 this.SSReg_oDialog.close();
             },
-            TCF_onPressHandlePreview: function () {
+            RF_onPressHandlePreview: function () {
                 const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
                 if (bPreviewFlag) {
-                    this.TCF_onPressDownload();
+                    this._onPressDownload();
                 } else {
-                    this.TCF_onPressPreview();
+                    this._onPressPreview();
                 }
             },
 
             //download certificate
-            TCF_onPressPreview: function () {
+            _onPressPreview: function () {
                 if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("RF_id_ResignReason"), "ID")) {
                     MessageToast.show(this.i18nModel.getText("mandatoryFields"));
                     return;
@@ -1702,19 +1702,21 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var oEmployeeModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
                 var joinDate = Formatter.formatDate(oEmployeeModel.JoiningDate);
+                var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue();
                 var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue();
                 var resignComment = oEmployeeModel.ResignComment;
                 var designation = oEmployeeModel.Designation;
                 var managerName = oEmployeeModel.ManagerName;
 
                 var data = `
-    <div style="text-align: justify;">
-        <p>This is to formally acknowledge the resignation of <b>${empName}</b> from <b>${this.companyName}</b>, effective from <b>${endDate}</b>.</p>  
-        <p>During their tenure, ${empName} has served as <b>${designation}</b> and contributed significantly to the organization. Their dedication, skills, and professionalism have been appreciated by colleagues and management alike.</p>
-        <p>We thank ${empName} for their commitment and efforts, and we wish them success in all future professional endeavors.</p>
-        <p>${this.companyName} values the contributions made by ${empName}, and we hope for a fruitful career ahead.</p>
-        <p>The resign of resignation is  ${resignComment} </p>
-    </div>`;
+                <div style="text-align: justify;">
+                    <p>Dear <b>${managerName}</b>,</p>  
+                    <p>I hope this message finds you well.</p>
+                    <p>I <b>${empName}</b> writing to formally resign from my position as <b>${designation}</b> at <b>${this.companyName}</b>, effective <b>${startDate}</b>. My last working day will be <b>${endDate}</b>.</p>
+                    <p>I joined this organization on <b>${joinDate}</b>, and it has been an incredibly rewarding journey filled with learning, professional growth, and meaningful relationships. I want to sincerely thank you for your guidance and support throughout my tenure.</p>
+                    <p>The reason of resignation is ${resignComment} </p>
+                    <p>I will do my best during this transition period to ensure a smooth handover of my responsibilities. Please let me know how I can help during this time.</p>
+                </div>`;
 
                 this.getView().getModel("PDFData").setProperty("/RTEText", data);
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
@@ -1731,8 +1733,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
             //generate PDF function
-            TCF_onPressDownload: async function () {
-                var oRTE = sap.ui.getCore().byId("myRTE");
+            _onPressDownload: async function () {
+                this.getBusyDialog();
+                var oRTE = sap.ui.getCore().byId("RF_id_RTE");
                 var oEditor = oRTE._oEditor?.editorManager?.activeEditor;
                 if (oEditor) {
                     var plainText = oEditor.getContent({ format: 'text' });
@@ -1751,31 +1754,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     return;
                 }
                 try {
-                    this.getBusyDialog();
                     // Get selected trainee's data from the table
-                    let oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
-                    let oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
-                    this.getView().getModel("PDFData").setProperty("/CreateDate", Formatter.formatDate(new Date()));
-                    this.getView().getModel("PDFData").setProperty("/CertificateTitle", "TRAINEE CERTIFICATE");
-                    // Create the updated trainee data
-                    const oUpdatedData = {
-                        ID: oTraineeModel.ID,
-                        TraineeID: oTraineeModel.TraineeID,
-                        Department: sap.ui.getCore().byId("TCF_id_Department").getSelectedKey(),
-                        ProjectName: oTraineeModel.ProjectName,
-                        EndDate: oTraineeModel.EndDate,
-                        Role: "Trainee",
-                        Status: "Training Completed",
-                    };
-                    this.updateCallForTrainee(oUpdatedData, "downloadSucess");
-                    this.T_onSearch()
-                    this.byId("T_id_TraineeTable").removeSelections(true);
-                    this.byId("T_id_Download").setVisible(false);
+                var oEmployeeModel = this.getView().getModel("sEmployeeModel").getData()[0];
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
-                    let htmlContent = sap.ui.getCore().byId("myRTE").getValue();
-                    this.generateCertificatePDF(htmlContent, oTraineeModel.BranchCode);
-                    this.TC_oDialog.close();
-                    this.T_ButtonVisibility();
+                    let htmlContent = oRTE.getValue();
+                    this.generateCertificatePDF(htmlContent, oEmployeeModel.BranchCode);
+                    this.SSReg_oDialog.close();
                     this.closeBusyDialog();
                     this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview</b> to Preview the Certificate</p>");
                 } catch (error) {

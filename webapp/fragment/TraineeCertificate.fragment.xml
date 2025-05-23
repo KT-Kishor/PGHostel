@@ -33,14 +33,6 @@
                     value="{traineeModel>NameSalutation} {traineeModel>TraineeName}"
                     editable="false"
                 />
-                <Label text="{i18n>joiningDate}" />
-                <DatePicker
-                    value="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}"
-                    displayFormat="dd/MM/yyyy"
-                    valueFormat="dd/MM/yyyy"
-					editable="false"
-                    id="TCF_id_JoiningDate"
-                />
                 <Label
                     text="{i18n>department}"
                     required="true"
@@ -56,16 +48,19 @@
                         text="{Departmentmodel>departmentName}"
                     />
                 </Select>
-                <Label text="{i18n>reportingManager}" />
-                <Input
-                    value="{traineeModel>ReportingManager}"
-                    editable="false"
-                    id="TCF_id_ReportingManager"
+                <Label text="{i18n>joiningDate}" />
+                <DatePicker
+                    value="{path:'traineeModel>JoiningDate' ,formatter:'.Formatter.formatDate'}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+					editable="false"
+                    id="TCF_id_JoiningDate"
                 />
-                <Label
+                 <Label
                     text="{i18n>endDate}"
                     required="true"
                 />
+                
                 <DatePicker
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
@@ -73,6 +68,12 @@
                     value="{path:'traineeModel>EndDate' ,formatter:'.Formatter.formatDate'}"
                     minDate="{traineeModel>EndDate}"
 					editable="{= !${PDFData>/PreviewFlag} }"
+                />
+                <Label text="{i18n>reportingManager}" />
+                <Input
+                    value="{traineeModel>ReportingManager}"
+                    editable="false"
+                    id="TCF_id_ReportingManager"
                 />
                 <Label
                     text="{i18n>projectName}"

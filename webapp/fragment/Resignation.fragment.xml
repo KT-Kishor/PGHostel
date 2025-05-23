@@ -92,7 +92,7 @@
             </f:content>
         </f:SimpleForm>
         <rich:RichTextEditor
-            id="myRTE"
+            id="RF_id_RTE"
             width="100%"
             height="70vh"
             showGroupFontStyle="true"
@@ -105,13 +105,13 @@
             <Button
                 text="{= ${PDFData>/PreviewFlag} ? ${i18n>downloadcCertificate} : ${i18n>preview} }"
                 type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Emphasized' }"
-                press="TCF_onPressHandlePreview"
+                press="RF_onPressHandlePreview"
             />
         </beginButton>
         <endButton>
             <Button
                 text="{i18n>close}"
-                press="TCF_onPressCloseDialog"
+                press="RF_onPressCloseDialog"
                 type="Reject"
             />
         </endButton>

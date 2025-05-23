@@ -32,7 +32,7 @@
 							  id="AddEmp_id_Desig"
 							  change="Emp_onDesignationChange"
 							  valueStateText="{i18n>designationValueState}"
-							  selectedKey="{employmentModel>/Designation}"
+							  value="{employmentModel>/Designation}"
 							  showSecondaryValues="true"
 							  placeholder="{i18n>plaseDesignation}">
 						<core:Item key="{sDesignationModel>designationName}" 
