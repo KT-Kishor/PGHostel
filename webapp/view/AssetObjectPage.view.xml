@@ -160,12 +160,8 @@
                             <blocks>
                                 <m:Table
                                     items="{
-                                    path: 'objectModel>/',
-                                    sorter: {
-                                        path: 'AssetCreationDate',
-                                        descending: false
-                                    }
-                                }"
+                                        path: 'objectModel>/'
+                                    }"
                                 >
                                     <m:columns>
                                         <m:Column>

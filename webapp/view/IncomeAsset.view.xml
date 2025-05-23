@@ -163,6 +163,7 @@
                         tooltip="Create"
                     />
                     <Button
+                    id="idEditButton"
                         text="{i18n>edit}"
                         type="Emphasized"
                         press="IA_onUpadateButtonPress"

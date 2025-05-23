@@ -409,7 +409,7 @@ sap.ui.define([
                         "Status": "Available",
                         "TrashDate": null,
                         "PickedEmployeeID": sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText(),
-                        "PickedBranch":oModel.PickedBranch
+                        "PickedBranch":oModel.PickedBranch,
                     };
 
                     await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oPayLoad, filters: { ID: this.item } });
@@ -463,7 +463,7 @@ sap.ui.define([
                         "TransferByID":sap.ui.getCore().byId("FCIA_id_transferBy").getSelectedItem().getAdditionalText()
 
                     }
-                await this.ajaxCreateWithJQuery("IncomeAsset", { data: oPayLoad }).then( ()=>{
+                    await this.ajaxCreateWithJQuery("IncomeAsset", { data: oPayLoad }).then( ()=>{
                       MessageToast.show(this.i18nModel.getText("transfer"));
                     this.IA_onSearch();
                     this.FCIA_Dialog.close();
@@ -475,7 +475,7 @@ sap.ui.define([
                    sap.m.MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
                 }
             },
-            IA_onUpadateButtonPress: function () {
+            IA_onUpadateButtonPress:async function () {
 
                 var table = this.byId("IA_id_OdataTable");
                 var selected = table.getSelectedItem();
@@ -486,6 +486,9 @@ sap.ui.define([
                 }
                 var Model = selected.getBindingContext("incomeModel");
                 var data = Model.getObject();
+
+                   
+
                 var loginRole = this.getView().getModel("LoginModel").getProperty("/Role");
 
 
@@ -506,6 +509,16 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("returndata"));
                     return;
                 }
+                 await this.ajaxReadWithJQuery("IncomeAsset").then((oData) => {
+                    let loginModel = this.getView().getModel("LoginModel").getData();
+                    var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                   this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "EditModel");
+                     })
+                
+                            if(this.getView().getModel("EditModel").getData().filter((item) => item.SerialNumber === data.SerialNumber).length > 1) {
+                             MessageToast.show(this.i18nModel.getText("Editing this row is not allowed"));
+                                return;
+                            }
 
                 if (!this.FCIA_Dialog) {
                     var oView = this.getView();
@@ -629,6 +642,7 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_transferButton").setVisible(false)
                        sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
+                        sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true).setValueState("None").setSelectedKey(oRowData.TransferBranch).setEditable(false)
 
 
                         sap.ui.getCore().byId("FCIA_id_type").setVisible(false)
