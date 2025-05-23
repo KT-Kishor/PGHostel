@@ -429,6 +429,7 @@ sap.ui.define([
                         this.getBusyDialog();
 
                         if (originalStatus === "Returned") {
+                            delete oFormData.AssetCreationDate;
                             await this.ajaxCreateWithJQuery("IncomeAsset", { data: oFormData }, ["FAA_id_FormFrag"]);
                         } else {
                             await this.ajaxUpdateWithJQuery("IncomeAsset", {
