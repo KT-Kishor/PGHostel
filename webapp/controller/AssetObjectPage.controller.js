@@ -45,7 +45,7 @@ sap.ui.define([
                         // title: item.PickedEmployeeID,
                         // userName: item.PickedEmployeeName,
                         // Status: "Available",
-                        title: "The asset was picked by " + item.PickedEmployeeName + " (" + item.PickedEmployeeID + ") " + item.AssignBranch + " "
+                        title: "The asset was picked by " + item.PickedEmployeeName + " (" + item.PickedEmployeeID + ") " + item.PickedBranch + " "
                             + "on " + new Date(item.AssetCreationDate).toLocaleDateString('en-GB')
                     })
                 }

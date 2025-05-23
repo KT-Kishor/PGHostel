@@ -19,10 +19,11 @@ sap.ui.define(
                     this.getRouter().getRoute("RouteAdminApplyLeave").attachMatched(this._onRouteMatched, this);
                 },
 
-                _onRouteMatched: function () {
+                _onRouteMatched: async function () {
+                    var LoginFUnction = await this.commonLoginFunction("Leaves");
+                    if (!LoginFUnction) return;
                     var that = this;
                     that.getBusyDialog(); // Show busy dialog
-                    that.commonLoginFunction("ApplyLeave"); // Call common login function
                     that.onClearAndSearch("AL_id_leavefilterbar");// Clear and search function
                     that._makeDatePickersReadOnly(["AL_id_DateRangeSelection"]);
                     that.oModel = that.getOwnerComponent().getModel();
@@ -79,7 +80,7 @@ sap.ui.define(
                     try {
                         // Fetch data from backend
                         let oData = await this.ajaxCreateWithJQuery("LeavesFirstBarChart", jsonData);
-                          this.closeBusyDialog(); //  Close BusyDialog
+                        this.closeBusyDialog(); //  Close BusyDialog
                         // Filter data for first chart
                         let firstChartData = oData.results.filter(item => ["Submitted", "Approved", "Quota"].includes(item.LeaveStatus));
                         // Filter data for second chart
@@ -94,20 +95,20 @@ sap.ui.define(
                         // Configure charts
                         this._configureFirstChart("AL_id_VizFrame6", oFirstChartModel, this.i18nModel.getText("currentLeaveQuota"), leaveType);
                         this._configureSecondChart("AL_id_VizFrameAll", oSecondChartModel, this.i18nModel.getText("yearlyLeaveQuota"), leaveType);
-                        
-                
+
+
                     } catch (error) {
                         this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     }
                 },
-                
+
                 _configureFirstChart: function (chartId, oModel, titleText, leaveType) {
                     let oVizFrame = this.getView().byId(chartId);
                     if (!oVizFrame) return;
-                
+
                     oVizFrame.setModel(oModel);
-                
+
                     // Base rules
                     let rules = [
                         {
@@ -121,7 +122,7 @@ sap.ui.define(
                             displayName: "Approved"
                         }
                     ];
-                
+
                     // Add "Quota" only if leaveType is not LOP
                     if (leaveType !== "LOP") {
                         rules.push({
@@ -130,7 +131,7 @@ sap.ui.define(
                             displayName: "Quota"
                         });
                     }
-                
+
                     oVizFrame.setVizProperties({
                         legend: {
                             title: { visible: true, text: "All Measures" }
@@ -145,20 +146,20 @@ sap.ui.define(
                             }
                         }
                     });
-                
+
                     let popoverId = (chartId === "AL_id_VizFrame6") ? "AL_id_PieChart" : null;
                     let oPopOver = popoverId ? this.getView().byId(popoverId) : null;
                     if (oPopOver) {
                         oPopOver.connect(oVizFrame.getVizUid());
                     }
                 },
-                
+
                 _configureSecondChart: function (chartId, oModel, titleText, leaveType) {
                     let oVizFrame = this.getView().byId(chartId);
                     if (!oVizFrame) return;
-                
+
                     oVizFrame.setModel(oModel);
-                
+
                     let rules = [
                         {
                             dataContext: { LeaveType: "Submitted" },
@@ -171,7 +172,7 @@ sap.ui.define(
                             displayName: "Approved"
                         }
                     ];
-                
+
                     if (leaveType !== "LOP") {
                         rules.push({
                             dataContext: { LeaveType: "All Quota" },
@@ -179,7 +180,7 @@ sap.ui.define(
                             displayName: "Quota"
                         });
                     }
-                
+
                     oVizFrame.setVizProperties({
                         legend: {
                             title: { visible: true, text: "All Measures" }
@@ -194,20 +195,20 @@ sap.ui.define(
                             }
                         }
                     });
-                
+
                     let popoverId = (chartId === "AL_id_VizFrameAll") ? "AL_id_PieChartAll" : null;
                     let oPopOver = popoverId ? this.getView().byId(popoverId) : null;
                     if (oPopOver) {
                         oPopOver.connect(oVizFrame.getVizUid());
                     }
                 },
-                
+
                 // Function to display monthly bar chart
                 MonthBarDisplayFunction: async function (leaveType, selectedYear, userId) {
                     let jsonData = { "data": { "EmployeeID": userId, "selectYear": selectedYear, "LeaveType": leaveType } };
                     try {
                         let oData = await this.ajaxCreateWithJQuery("MonthyBarChart", jsonData);
-                          this.closeBusyDialog(); //  Close BusyDialog
+                        this.closeBusyDialog(); //  Close BusyDialog
                         let oLeaveModel = new JSONModel({ chartData: oData.results });
                         this.getView().setModel(oLeaveModel, "MonthleaveData");
                         var oVizFrame = this.getView().byId("AL_id_VizFrame");
@@ -219,7 +220,7 @@ sap.ui.define(
                         var oPopOver = this.getView().byId("AL_id_Popover");
                         oPopOver.connect(oVizFrame.getVizUid());
                     } catch (error) {
-                          this.closeBusyDialog(); //  Close BusyDialog
+                        this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(error.message || error.responseText);
                     }
                 },
@@ -229,7 +230,7 @@ sap.ui.define(
                     let jsonData = { "data": { "EmployeeID": userId } };
                     try {
                         let oData = await this.ajaxCreateWithJQuery("YearlyBarChart", jsonData);
-                          this.closeBusyDialog(); //  Close BusyDialog
+                        this.closeBusyDialog(); //  Close BusyDialog
                         let rawData = oData.results;
                         let result = [];
                         // Process raw data into chart format
@@ -252,7 +253,7 @@ sap.ui.define(
                         var oPopOver = this.getView().byId("AL_id_PopOver");
                         oPopOver.connect(oVizFrame.getVizUid());
                     } catch (error) {
-                          this.closeBusyDialog(); //  Close BusyDialog
+                        this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(error.message || error.responseText);
                     }
                 },
@@ -295,8 +296,8 @@ sap.ui.define(
                 // Leave type change handler
                 AL_onChangeLeaveType: function (oEvent) {
                     this.getBusyDialog(); // Show busy dialog
-                    var year = this.byId("AL_id_LeaveYear").getSelectedKey(); 
-                    var type = oEvent.getSource().getSelectedItem().getText() 
+                    var year = this.byId("AL_id_LeaveYear").getSelectedKey();
+                    var type = oEvent.getSource().getSelectedItem().getText()
                     this.BarDisplayFunction(type, year, this.userId);
                     this.MonthBarDisplayFunction(type, year, this.userId);
                 },
@@ -304,8 +305,8 @@ sap.ui.define(
                 // Year change handler
                 AL_onChangeYears: function (oEvent) {
                     this.getBusyDialog(); // Show busy dialog
-                    var type = this.byId("AL_id_TypeOfLeave").getSelectedItem().getText(); 
-                    var year = oEvent.getSource().getSelectedKey() 
+                    var type = this.byId("AL_id_TypeOfLeave").getSelectedItem().getText();
+                    var year = oEvent.getSource().getSelectedKey()
                     this.BarDisplayFunction(type, year, this.userId);
                     this.MonthBarDisplayFunction(type, year, this.userId);
                 },
@@ -323,7 +324,7 @@ sap.ui.define(
                         this.byId("AL_id_YearLabel").setVisible(false);
                         this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId).then(() => sap.ui.core.BusyIndicator.hide())
                             .catch((error) => {
-                                  this.closeBusyDialog(); //  Close BusyDialog
+                                this.closeBusyDialog(); //  Close BusyDialog
                                 MessageToast.show(error.message || error.responseText);
                             });
                     } else {
@@ -335,7 +336,7 @@ sap.ui.define(
                             this.MonthBarDisplayFunction("All In One Leave", this.currentYear, this.userId),
                             this.YearlyBarDisplayFunction(this.userId).then(() => sap.ui.core.BusyIndicator.hide())
                                 .catch((error) => {
-                                      this.closeBusyDialog(); //  Close BusyDialog
+                                    this.closeBusyDialog(); //  Close BusyDialog
                                     MessageToast.show(error.message || error.responseText);
                                 });
                     }
@@ -384,7 +385,8 @@ sap.ui.define(
                         width: "100%",
                         sortOldestFirst: true,
                         enableDoubleSided: false,
-                        content: aTimelineItems
+                        content: aTimelineItems,
+                        showHeaderBar: false
                     });
                     var oDialog = new sap.m.Dialog({
                         title: "Leave Comments",
@@ -395,6 +397,7 @@ sap.ui.define(
                         content: [oTimeline],
                         endButton: new sap.m.Button({
                             text: "Close",
+                            type: "Reject",
                             press: function () {
                                 oDialog.close();
                                 oDialog.destroy();
@@ -408,20 +411,20 @@ sap.ui.define(
                 onMarkCalendarDatesAndLeaves: function () {
                     var that = this;
                     this.oDatePicker.removeAllSpecialDates();
-                
+
                     // Get leave and holiday data
                     var leaveRecords = that.getView().getModel("LeaveModel").getData();
                     var holidays = that.getView().getModel("HolidayModel").getData();
-                
+
                     // Create a map of holiday date string -> holiday name
                     var holidayMap = new Map(holidays.map(function (holiday) {
-                        return [new Date(holiday.Date).toDateString(), holiday.Name]; 
+                        return [new Date(holiday.Date).toDateString(), holiday.Name];
                     }));
-                
+
                     var appliedLeaves = [];
                     var yearStart = new Date(new Date().getFullYear(), 0, 1);
                     var yearEnd = new Date(new Date().getFullYear(), 11, 31);
-                
+
                     // Process leave records
                     leaveRecords.forEach(function (record) {
                         if (record["Status"] !== "Rejected") {
@@ -437,21 +440,21 @@ sap.ui.define(
                             }
                         }
                     });
-                
+
                     var appliedLeavesSet = new Set(appliedLeaves.map(leave => leave.date.toDateString()));
-                
+
                     // Mark each day of the year
                     for (var d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
                         var day = d.getDay();
                         var isWeekend = (day === 0 || day === 6);
                         var isAppliedLeave = appliedLeavesSet.has(d.toDateString());
                         var holidayName = holidayMap.get(d.toDateString());
-                
+
                         var dateRange = new sap.ui.unified.DateTypeRange({
                             startDate: new Date(d),
                             endDate: new Date(d)
                         });
-                
+
                         if (holidayName) {
                             dateRange.setType("Type04");
                             dateRange.setTooltip("Holiday : " + holidayName);
@@ -469,17 +472,17 @@ sap.ui.define(
                     }
                     that.appliedLeavesSet = appliedLeavesSet;
                 },
-                
+
                 // Initialize calendar legend
                 onInitializeLegend: function (oEvent) {
                     this.oDatePicker = oEvent.getSource();
                     if (this.oDatePicker) {
                         var oLegend = new sap.ui.unified.CalendarLegend({
                             items: [
-                                new sap.ui.unified.CalendarLegendItem({type: "Type04", text: "Holiday"}),
-                                new sap.ui.unified.CalendarLegendItem({type: "Type09", text: "Weekend"}),
-                                new sap.ui.unified.CalendarLegendItem({type: "Type06", text: "Working Day"}),
-                                new sap.ui.unified.CalendarLegendItem({type: "Type05", text: "Applied Leaves"})
+                                new sap.ui.unified.CalendarLegendItem({ type: "Type04", text: "Holiday" }),
+                                new sap.ui.unified.CalendarLegendItem({ type: "Type09", text: "Weekend" }),
+                                new sap.ui.unified.CalendarLegendItem({ type: "Type06", text: "Working Day" }),
+                                new sap.ui.unified.CalendarLegendItem({ type: "Type05", text: "Applied Leaves" })
                             ]
                         });
                         this.oDatePicker.setLegend(oLegend);
@@ -554,7 +557,7 @@ sap.ui.define(
                             controller: this,
                         }).then(function (oLeaveDialog) {
                             this.oLeaveDialog = oLeaveDialog;
-                            oView.addDependent(this.oLeaveDialog); 
+                            oView.addDependent(this.oLeaveDialog);
                             this.oLeaveDialog.open();
                         }.bind(this));
                     } else {
@@ -583,7 +586,7 @@ sap.ui.define(
                     var parts = dateString.split('/');
                     return new Date(parts[2], parts[1] - 1, parts[0]);
                 },
-      
+
                 // Calculate leave days when dates change
                 onLiveChange: function () {
                     var oLeaveModel = this.getView().getModel("LeaveTempModel");
@@ -708,28 +711,28 @@ sap.ui.define(
                             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
                         ) {
                             var oData = this.getView().getModel("LeaveTempModel").getData();
-                
+
                             // Parse dates
                             var fromDateParts = oData.fromDate.split("/").map(Number);
                             var startDate = new Date(fromDateParts[2], fromDateParts[1] - 1, fromDateParts[0]);
                             var toDateParts = oData.toDate.split("/").map(Number);
                             var endDate = new Date(toDateParts[2], toDateParts[1] - 1, toDateParts[0]);
-                
+
                             // Allow last year leave only until Jan 31 of current year
                             var currentDate = new Date();
                             var jan31 = new Date(currentDate.getFullYear(), 0, 31);
                             var isFromLastYear = fromDateParts[2] === currentDate.getFullYear() - 1;
                             var isToLastYear = toDateParts[2] === currentDate.getFullYear() - 1;
                             var isCurrentYear = fromDateParts[2] === currentDate.getFullYear() && toDateParts[2] === currentDate.getFullYear();
-                
+
                             if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
                                 return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
                             }
-                             
-                             // Check if leave is on holiday
-                             if (oData.fromDate === oData.toDate) {
+
+                            // Check if leave is on holiday
+                            if (oData.fromDate === oData.toDate) {
                                 var isValid = true;
-                                var holidays = this.getView().getModel("HolidayModel").getData();  
+                                var holidays = this.getView().getModel("HolidayModel").getData();
                                 holidays.forEach((holiday) => {
                                     var holidayDate = new Date(holiday.Date);
                                     // Normalize both dates to ensure accurate comparison
@@ -745,9 +748,9 @@ sap.ui.define(
                             }
 
                             if (parseFloat(oData.NoofDays) <= 0) {
-                                return MessageBox.error(this.i18nModel.getText("holidaysMess")); 
+                                return MessageBox.error(this.i18nModel.getText("holidaysMess"));
                             }
-                            
+
                             // Check if leave is on weekend
                             if (parseFloat(oData.NoofDays) <= 2) {
                                 var isFromWeekend = (startDate.getDay() === 0 || startDate.getDay() === 6);
@@ -756,15 +759,15 @@ sap.ui.define(
                                     return MessageBox.error(this.i18nModel.getText("holidaysMess"));
                                 }
                             }
-                
-                           // Check if leave is already applied
+
+                            // Check if leave is already applied
                             if (this.isLeaveAlreadyApplied(oData.fromDate, oData.toDate)) {
                                 return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
                             }
 
                             // Calculate used leaves
                             var LeaveModel = this.getView().getModel("LeaveModel").getData();
-                         
+
                             // Filter leave data for current year
                             var filteredData = LeaveModel.filter((item) => {
                                 if (item.typeOfLeave !== "All In One Leave") return false;
@@ -800,7 +803,7 @@ sap.ui.define(
                                 oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.halfDay = oData.halfDay.toString();
                                 oData.status = "Submitted";
-                
+
                                 delete oData.Save;
                                 delete oData.Submit;
                                 delete oData.MinToDate;
@@ -808,31 +811,31 @@ sap.ui.define(
                                 delete oData.maxDate;
                                 delete oData.minDate;
                                 delete oData.isUpdate;
-                
+
                                 this.getBusyDialog(); // Show busy dialog
-                
+
                                 // Submit to backend
                                 this.ajaxCreateWithJQuery("Leaves", { data: oData }).then(response => {
-                                          this.closeBusyDialog(); //  Close BusyDialog
-                                        this._handleResponse(response, "leaveSubmitted");
-                                    }).catch((error) => {
-                                          this.closeBusyDialog(); //  Close BusyDialog
-                                        MessageToast.show(error.message || error.responseText);
-                                    });
+                                    this.closeBusyDialog(); //  Close BusyDialog
+                                    this._handleResponse(response, "leaveSubmitted");
+                                }).catch((error) => {
+                                    this.closeBusyDialog(); //  Close BusyDialog
+                                    MessageToast.show(error.message || error.responseText);
+                                });
                             } else {
                                 return MessageBox.error(this.i18nModel.getText("quotaExceeded"));
                             }
-                
+
                         } else {
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         }
                     } catch (error) {
-                          this.closeBusyDialog(); //  Close BusyDialog
+                        this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(error.message || error.responseText);
                     }
                 },
 
-                 // Save leave handler
+                // Save leave handler
                 AL_onPressSave: async function () {
                     try {
                         // Validate fields
@@ -842,28 +845,28 @@ sap.ui.define(
                             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
                         ) {
                             var oData = this.getView().getModel("LeaveTempModel").getData();
-                    
+
                             // Parse dates
                             var fromDateParts = oData.fromDate.split("/").map(Number);
                             var startDate = new Date(fromDateParts[2], fromDateParts[1] - 1, fromDateParts[0]);
                             var toDateParts = oData.toDate.split("/").map(Number);
                             var endDate = new Date(toDateParts[2], toDateParts[1] - 1, toDateParts[0]);
-                
-                           // Allow last year leave only until Jan 31 of current year
-                           var currentDate = new Date();
-                           var jan31 = new Date(currentDate.getFullYear(), 0, 31);
-                           var isFromLastYear = fromDateParts[2] === currentDate.getFullYear() - 1;
-                           var isToLastYear = toDateParts[2] === currentDate.getFullYear() - 1;
-                           var isCurrentYear = fromDateParts[2] === currentDate.getFullYear() && toDateParts[2] === currentDate.getFullYear();
-               
-                           if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
-                               return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
-                           }
-                            
+
+                            // Allow last year leave only until Jan 31 of current year
+                            var currentDate = new Date();
+                            var jan31 = new Date(currentDate.getFullYear(), 0, 31);
+                            var isFromLastYear = fromDateParts[2] === currentDate.getFullYear() - 1;
+                            var isToLastYear = toDateParts[2] === currentDate.getFullYear() - 1;
+                            var isCurrentYear = fromDateParts[2] === currentDate.getFullYear() && toDateParts[2] === currentDate.getFullYear();
+
+                            if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
+                                return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
+                            }
+
                             // Check if leave is on holiday
-                             if (oData.fromDate === oData.toDate) {
+                            if (oData.fromDate === oData.toDate) {
                                 var isValid = true;
-                                var holidays = this.getView().getModel("HolidayModel").getData();  
+                                var holidays = this.getView().getModel("HolidayModel").getData();
                                 holidays.forEach((holiday) => {
                                     var holidayDate = new Date(holiday.Date);
                                     // Normalize both dates to ensure accurate comparison
@@ -879,7 +882,7 @@ sap.ui.define(
                             }
 
                             if (parseFloat(oData.NoofDays) <= 0) {
-                                return MessageBox.error(this.i18nModel.getText("holidaysMess")); 
+                                return MessageBox.error(this.i18nModel.getText("holidaysMess"));
                             }
 
                             // Check if leave is on weekend
@@ -890,12 +893,12 @@ sap.ui.define(
                                     return MessageBox.error(this.i18nModel.getText("holidaysMess"));
                                 }
                             }
-                    
+
                             // Leave model filtering
                             var LeaveModel = this.getView().getModel("LeaveModel").getData();
-                           
-                             // Filter leave data for current year
-                             var filteredData = LeaveModel.filter((item) => {
+
+                            // Filter leave data for current year
+                            var filteredData = LeaveModel.filter((item) => {
                                 if (item.typeOfLeave !== "All In One Leave") return false;
 
                                 var fromDate = this.onFormatDate(this.Formatter.formatDate(item.fromDate));
@@ -911,9 +914,9 @@ sap.ui.define(
 
                             // Calculate total leave days
                             var totalNoofDays = filteredData.reduce((total, item) => {
-                            return total + parseFloat(item.NoofDays || 0);
+                                return total + parseFloat(item.NoofDays || 0);
                             }, 0)
-                    
+
                             // Quota model
                             var oLeaveModel = this.getView().getModel("secondLeaveData");
                             var leaveData = oLeaveModel.getProperty("/chartData");
@@ -921,7 +924,7 @@ sap.ui.define(
                             var quotaLeave = leaveData.find(function (leave) {
                                 return leave.LeaveStatus === "All Quota";
                             });
-                    
+
                             // Final quota check
                             var valid = true;
                             if (parseFloat(this.UpdateNoofDays) === parseFloat(oData.NoofDays)) {
@@ -936,7 +939,7 @@ sap.ui.define(
                                 oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.halfDay = oData.halfDay.toString();
                                 oData.status = "Submitted";
-                
+
                                 delete oData.Save;
                                 delete oData.Submit;
                                 delete oData.MinToDate;
@@ -944,30 +947,30 @@ sap.ui.define(
                                 delete oData.maxDate;
                                 delete oData.minDate;
                                 delete oData.isUpdate;
-                    
+
                                 this.getBusyDialog(); // Show busy dialog
-                    
+
                                 // Save to backend
                                 var requestData = { filters: { ID: oData.ID }, data: oData };
                                 this.ajaxUpdateWithJQuery("Leaves", requestData).then(response => {
-                                          this.closeBusyDialog(); //  Close BusyDialog
-                                        this._handleResponse(response, "leaveUpdatedSuccess");
-                                    }).catch((error) => {
-                                          this.closeBusyDialog(); //  Close BusyDialog
-                                        MessageToast.show(error.message || error.responseText);
-                                    });
+                                    this.closeBusyDialog(); //  Close BusyDialog
+                                    this._handleResponse(response, "leaveUpdatedSuccess");
+                                }).catch((error) => {
+                                    this.closeBusyDialog(); //  Close BusyDialog
+                                    MessageToast.show(error.message || error.responseText);
+                                });
                             } else {
                                 MessageBox.error(this.i18nModel.getText("quotaExceeded"));
                             }
                         }
                     } catch (error) {
-                          this.closeBusyDialog(); //  Close BusyDialog
+                        this.closeBusyDialog(); //  Close BusyDialog
                         MessageToast.show(error.message || error.responseText);
                     }
                 },
-                
-                 // Handle response from backend
-                 _handleResponse: async function (response, successMessageKey) {
+
+                // Handle response from backend
+                _handleResponse: async function (response, successMessageKey) {
                     if (response.success === true) {
                         MessageToast.show(this.i18nModel.getText(successMessageKey));
                         this.oLeaveDialog.close();
@@ -996,27 +999,27 @@ sap.ui.define(
                     var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                     var params = {};
                     aFilterItems.forEach(function (oItem) {
-                      var oControl = oItem.getControl();
-                      var sValue = oItem.getName();
-                      if (oControl && oControl.getValue()) {
-                        if (sValue === "dateRange") {
-                            var oFromDate = oControl.getDateValue();
-                            var oToDate = oControl.getSecondDateValue();
-                          params["fromDate"] = oDateFormat.format(oFromDate);
-                          params["toDate"] = oDateFormat.format(oToDate);
-                        } else {
-                          params[sValue] = oControl.getValue();
+                        var oControl = oItem.getControl();
+                        var sValue = oItem.getName();
+                        if (oControl && oControl.getValue()) {
+                            if (sValue === "dateRange") {
+                                var oFromDate = oControl.getDateValue();
+                                var oToDate = oControl.getSecondDateValue();
+                                params["fromDate"] = oDateFormat.format(oFromDate);
+                                params["toDate"] = oDateFormat.format(oToDate);
+                            } else {
+                                params[sValue] = oControl.getValue();
+                            }
                         }
-                      }
                     });
                     try {
                         await this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId, ...params });
-                      } catch (error) {
+                    } catch (error) {
                         sap.m.MessageToast.show(error.message || error.responseText);
-                      } finally {
+                    } finally {
                         this.closeBusyDialog(); // Close after call finishes
-                      }
-                    },
+                    }
+                },
 
                 // Clear filters in leave filter bar
                 AL_onClear: function () {

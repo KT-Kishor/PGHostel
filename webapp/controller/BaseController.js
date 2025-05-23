@@ -87,7 +87,8 @@ sap.ui.define([
             "MSA&SOW": "/GenerateMsaNda",
             "HrQuotation": "/QuotationApp",
             "PaySlip": "/PaySlip",
-            "CompanyInvoice":"/InvoiceApp"
+            "CompanyInvoice":"/InvoiceApp",
+            "Leaves":"/Leaves"
 
           };
 

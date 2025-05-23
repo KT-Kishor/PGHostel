@@ -336,6 +336,7 @@ sap.ui.define(
 
                 CR_onPressClose: function() {
                     this.oContractDialog.close();
+                    sap.ui.getCore().byId("CR_id_AssignmentStartDate").setValueState("None")
                     this.byId("C_id_ActivateBtn").setEnabled(false);
                     this.byId("C_id_Renewbtn").setEnabled(false);
                     this.byId("C_id_Salary").removeSelections(true);

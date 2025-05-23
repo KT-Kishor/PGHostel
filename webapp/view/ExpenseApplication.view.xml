@@ -73,8 +73,8 @@
                     <Title id="title" text="Expense Details ({= ${ExpenseModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
+					<Button  type="Ghost" text="{i18n>download}" press="Exp_onPressExpenseDownload" />
                    <Button  type="Accept" text="{i18n>expAddBtn}" tooltip="{i18n>expenseAddTooltip}" press="Exp_onPressAddExpense" />
-					<Button  type="Neutral" text="{i18n>download}" press="Exp_onPressExpenseDownload" />
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>
