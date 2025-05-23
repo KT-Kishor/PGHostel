@@ -24,23 +24,32 @@ sap.ui.define(
 
           this.HQ_onClearFilters();
         } else {
-          this.HQ_onSearch();
+
         }
         this.closeBusyDialog();
       },
       HQ_onSearch: function () {
         var aFilterItems = this.byId("HQ_id_QuotationFilterBar").getFilterGroupItems();
-        var params = {};
+        var aFilters = [];
+
         aFilterItems.forEach(function (oItem) {
           var oControl = oItem.getControl();
-          var sValue = oItem.getName();
-          if (oControl && oControl.getValue()) {
-            params[sValue] = oControl.getValue();
+          var sName = oItem.getName();
+          var sValue = oControl && oControl.getValue();
+
+          if (sValue) {
+            aFilters.push(new sap.ui.model.Filter(sName, sap.ui.model.FilterOperator.Contains, sValue));
           }
         });
-        this._fetchCommonData("Quotation", "CompanyQuotationModel", params);
 
+        var oTable = this.byId("HQ_id_QuotationItemTable"); // Make sure your table has this ID
+        var oBinding = oTable.getBinding("items");
+
+        if (oBinding) {
+          oBinding.filter(aFilters);
+        }
       },
+
       HQ_onClearFilters: function () {
         var oFilterBar = this.getView().byId("HQ_id_QuotationFilterBar");
         oFilterBar.getFilterGroupItems().forEach(function (oItem) {

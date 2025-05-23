@@ -203,6 +203,7 @@
                                             required="true"
                                         />
                                         <m:ComboBox
+                                        busyIndicatorDelay="0"
                                             items="{CurrencyModel>/}"
                                             width="100%"
                                             id="HQD_id_Curency"
@@ -323,7 +324,7 @@
                                                 <m:ToolbarSpacer />
                                                 <m:Button
                                                 text="{i18n>add}"
-                                                    visible="{visiablityPlay>/invBtn}"
+                                                    visible="{visiablityPlay>/editable}"
                                                     tooltip="{i18n>addItem}"
                                                     press="HQD_onPressAddQuotationItem"
                                                     type="Emphasized"
@@ -440,7 +441,7 @@
       showSecondaryValues="true"
       items="{path:'SACModel>/'}"
       value="{QuotationModel>SAC}"
-      editable="{QuotationModel>/GSTValid}"
+      editable="{visiablityPlay>/editable}"
       selectedKey="1"
       visible="{QuotationModel>/ShowSACAndGSTCalculation}"
     >
@@ -455,7 +456,7 @@
     <m:ComboBox
       value="{QuotationModel>GSTCalculation}"
       selectedKey="1"
-      editable="{QuotationModel>/GSTValid}"
+      editable="{visiablityPlay>/editable}"
       change="HQD_onChangeGSTCalculation"
       visible="{QuotationModel>/ShowSACAndGSTCalculation}"
     >
@@ -495,7 +496,7 @@
 
     <!-- Total (Column 8) -->
     <m:Input
-      value="{QuotationModel>Total}"
+      value="{path:'QuotationModel>Total',formatter:'.Formatter.numberFormater'}"
       editable="false"
       textAlign="End"
     />
@@ -552,6 +553,7 @@
   <m:Text
     text="{path:'QuotationModel>/CGST',formatter: '.Formatter.numberFormater'}"
     class="amountText"
+    id="HQD_id_CGST"
     textAlign="End"
     visible="{= ${QuotationModel>/CGSTVisible} === true }"
   />
