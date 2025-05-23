@@ -666,7 +666,7 @@ sap.ui.define([
                     }),
                     endButton: new sap.m.Button({
                         text: "Cancel",
-                        type: "Negative",
+                        type: "Reject",
                         press: function () {
                             dialog.close();
                         },

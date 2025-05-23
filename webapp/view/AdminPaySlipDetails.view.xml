@@ -64,7 +64,9 @@
                         src="{PaySlip>/EmpData/ProfilePhoto}"
                     />
 
-                    <layout:VerticalLayout class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiTinyMarginBottom">
+                    <layout:VerticalLayout
+                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiTinyMarginBottom"
+                    >
                         <layout:HorizontalLayout
                             class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
                         >
@@ -188,12 +190,12 @@
                                         id="APD_id_Employee"
                                         change="APD_onEmployeeIDChange"
                                         showClearIcon="true"
-                                        items="{EmpModel>/}"
+                                        items="{EmployeeModel>/}"
                                     >
                                         <core:ListItem
-                                            key="{EmpModel>EmployeeID}"
-                                            text="{EmpModel>EmployeeID}"
-                                            additionalText="{EmpModel>EmployeeName}"
+                                            key="{EmployeeModel>EmployeeID}"
+                                            text="{EmployeeModel>EmployeeID}"
+                                            additionalText="{EmployeeModel>EmployeeName}"
                                         />
                                     </m:ComboBox>
                                     <!-- <m:Label text="{i18n>selectMonth}" />
@@ -223,249 +225,238 @@
                         <!-- Salary Details SubSection -->
                         <ObjectPageSubSection
                             title="{i18n>Pay Slip Structure}"
-                            class="earnDedTable"
                             titleVisible="true"
                         >
-                            <m:VBox class="sapUiSmallMargin">
-                                <!-- GridContainer for Tables -->
-                                <g:GridContainer
-                                    columnsChange=".onGridColumnsChange"
+                            <m:VBox >
+                                <m:FlexBox
+                                    wrap="Wrap"
+                                    direction="Row"
+                                    justifyContent="SpaceBetween"
                                 >
-                                    <g:layout>
-                                        <g:GridContainerSettings
-                                            columnSize="49.5%"
-                                            gap="10px"
-                                        />
-                                    </g:layout>
-                                    <g:layoutXS>
-                                        <g:GridContainerSettings
-                                            columnSize="100%"
-                                            gap="10px"
-                                        />
-                                    </g:layoutXS>
-                                    <g:layoutS>
-                                        <g:GridContainerSettings
-                                            columnSize="100%"
-                                            gap="10px"
-                                        />
-                                    </g:layoutS>
-                                    <g:layoutM>
-                                        <g:GridContainerSettings
-                                            columnSize="100%"
-                                            gap="10px"
-                                        />
-                                    </g:layoutM>
-                                    <!-- Earnings m:Table -->
-                                    <g:Card>
-                                        <g:content>
-                                            <m:VBox
-                                                class="sapUiTinyMarginBeginEnd"
-                                            >
-                                                <m:Table
-                                                    id="APD_id_SalaryTable"
-                                                    items="{PaySlip>/EmpData/EarningData}"
-                                                >
-                                                    <m:headerToolbar>
-                                                        <m:OverflowToolbar>
-                                                            <m:Title
-                                                                text="{i18n>salaryDetails}"
-                                                                level="H2"
-                                                            />
-                                                            <m:ToolbarSpacer />
-                                                            <m:Button
-                                                                text="{i18n>add}"
-                                                                type="Accept"
-                                                                press="APD_onPressSalAdd"
-                                                                enabled="{PaySlip>/isIdSelected}"
-                                                                visible="{PaySlip>/isCreate}"
-                                                            />
-                                                        </m:OverflowToolbar>
-                                                    </m:headerToolbar>
-                                                    <m:columns>
-                                                        <m:Column
-                                                            minScreenWidth="Tablet"
-                                                            demandPopin="true"
-                                                        >
-                                                            <m:Text
-                                                                text="{i18n>desc}"
-                                                            />
-                                                        </m:Column>
-                                                        <m:Column
-                                                            minScreenWidth="Tablet"
-                                                            demandPopin="true"
-                                                        >
-                                                            <m:Text
-                                                                text="{i18n>amount}"
-                                                            />
-                                                        </m:Column>
-                                                        <m:Column
-                                                            minScreenWidth="Tablet"
-                                                            demandPopin="true"
-                                                        >
-                                                            <m:Text
-                                                                text="{i18n>yearlyAmount}"
-                                                            />
-                                                        </m:Column>
-                                                        <m:Column width="10%"/>
-                                                    </m:columns>
-                                                    <m:items>
-                                                        <m:ColumnListItem>
-                                                            <m:cells>
-                                                                <m:Input
-                                                                    value="{PaySlip>Description}"
-                                                                    maxLength="25"
-                                                                    editable="{= ${PaySlip>Flag} === true }"
+                                    <m:VBox
+                                        class="salaryBox sapUiTinyMargin"
+                                        width="100%"
+                                        layoutData="{@ui5:layoutData: {rowSpan: 1, columnSpan: 1}}"
+                                    >
+                                        <g:Card>
+                                            <g:content>
+                                                <m:VBox>
+                                                    <m:Table
+                                                        id="APD_id_SalaryTable"
+                                                        items="{PaySlip>/EmpData/EarningData}"
+                                                    >
+                                                        <m:headerToolbar>
+                                                            <m:OverflowToolbar>
+                                                                <m:Title
+                                                                    text="{i18n>salaryDetails}"
+                                                                    level="H2"
                                                                 />
-                                                                <m:Input
-                                                                    value="{PaySlip>Amount}"
-                                                                    change="APD_onAmountChange"
-                                                                    textAlign="End"
-                                                                    type="Number"
-                                                                />
-                                                                <m:Input
-                                                                    value="{PaySlip>YearlyAmount}"
-                                                                    editable="false"
-                                                                    textAlign="End"
+                                                                <m:ToolbarSpacer
                                                                 />
                                                                 <m:Button
-                                                                    icon="sap-icon://delete"
-                                                                    press="APD_onPressDeleteEarningFields"
-                                                                    type="Reject"
-                                                                    visible="{= ${PaySlip>Flag} === true }"
+                                                                    text="{i18n>add}"
+                                                                    type="Accept"
+                                                                    press="APD_onPressSalAdd"
+                                                                    enabled="{PaySlip>/isIdSelected}"
+                                                                    visible="{PaySlip>/isCreate}"
                                                                 />
-                                                            </m:cells>
-                                                        </m:ColumnListItem>
-                                                    </m:items>
-                                                </m:Table>
+                                                            </m:OverflowToolbar>
+                                                        </m:headerToolbar>
+                                                        <m:columns>
+                                                            <m:Column
+                                                                minScreenWidth="Tablet"
+                                                                demandPopin="true"
+                                                            >
+                                                                <m:Text
+                                                                    text="{i18n>desc}"
+                                                                />
+                                                            </m:Column>
+                                                            <m:Column
+                                                                minScreenWidth="Tablet"
+                                                                demandPopin="true"
+                                                            >
+                                                                <m:Text
+                                                                    text="{i18n>amount}"
+                                                                />
+                                                            </m:Column>
+                                                            <m:Column
+                                                                minScreenWidth="Tablet"
+                                                                demandPopin="true"
+                                                            >
+                                                                <m:Text
+                                                                    text="{i18n>yearlyAmount}"
+                                                                />
+                                                            </m:Column>
+                                                            <m:Column
+                                                                width="10%"
+                                                            />
+                                                        </m:columns>
+                                                        <m:items>
+                                                            <m:ColumnListItem>
+                                                                <m:cells>
+                                                                    <m:Input
+                                                                        value="{PaySlip>Description}"
+                                                                        maxLength="25"
+                                                                        editable="{= ${PaySlip>Flag} === true }"
+                                                                    />
+                                                                    <m:Input
+                                                                        value="{PaySlip>Amount}"
+                                                                        change="APD_onAmountChange"
+                                                                        textAlign="End"
+                                                                        type="Number"
+                                                                    />
+                                                                    <m:Input
+                                                                        value="{PaySlip>YearlyAmount}"
+                                                                        editable="false"
+                                                                        textAlign="End"
+                                                                    />
+                                                                    <m:Button
+                                                                        icon="sap-icon://delete"
+                                                                        press="APD_onPressDeleteEarningFields"
+                                                                        type="Reject"
+                                                                        visible="{= ${PaySlip>Flag} === true }"
+                                                                    />
+                                                                </m:cells>
+                                                            </m:ColumnListItem>
+                                                        </m:items>
+                                                    </m:Table>
 
-                                                <m:HBox
-                                                    class="customEarningBox sapUiTinyMarginBottom"
-                                                    width="100%"
-                                                >
-                                                    <m:Text
-                                                        class="boldBlackText"
-                                                        text="{i18n>totalEarningAmount} :"
-                                                        textAlign="End"
-                                                    />
-                                                    <m:Text
-                                                        class="boldBlackText"
-                                                        text="{path:'PaySlip>/EmpData/EarningsTotalMonthly', formatter: '.Formatter.fromatNumber'}"
-                                                        textAlign="End"
-                                                    />
-                                                    <m:Text
-                                                        class="boldBlackText"
-                                                        text="{path:'PaySlip>/EmpData/EarningsTotalYearly', formatter: '.Formatter.fromatNumber'}"
-                                                        textAlign="End"
-                                                    />
-                                                </m:HBox>
-                                            </m:VBox>
-                                        </g:content>
-                                    </g:Card>
-                                    <!-- Deductions m:Table -->
-                                    <g:Card>
-                                        <g:content>
-                                            <m:VBox
-                                                class="sapUiTinyMarginBeginEnd"
-                                            >
-                                                <m:Table
-                                                    items="{PaySlip>/EmpData/DeductionData}"
-                                                >
-                                                    <m:headerToolbar>
-                                                        <m:OverflowToolbar>
-                                                            <m:Title
-                                                                text="{i18n>Deduction Details}"
-                                                                level="H2"
-                                                            />
-                                                            <m:ToolbarSpacer />
-                                                            <m:Button
-                                                                text="{i18n>add}"
-                                                                type="Accept"
-                                                                press="APD_onPressDedAdd"
-                                                                enabled="{PaySlip>/isIdSelected}"
-                                                                visible="{PaySlip>/isCreate}"
-                                                            />
-                                                        </m:OverflowToolbar>
-                                                    </m:headerToolbar>
-                                                    <m:columns>
-                                                        <m:Column
-                                                            minScreenWidth="Tablet"
-                                                            demandPopin="true"
-                                                        >
-                                                            <m:Text
-                                                                text="{i18n>desc}"
-                                                            />
-                                                        </m:Column>
-                                                        <m:Column
-                                                            minScreenWidth="Tablet"
-                                                            demandPopin="true"
-                                                        >
-                                                            <m:Text
-                                                                text="{i18n>amount}"
-                                                            />
-                                                        </m:Column>
-                                                        <m:Column
-                                                            minScreenWidth="Tablet"
-                                                            demandPopin="true"
-                                                        >
-                                                            <m:Text
-                                                                text="{i18n>yearlyAmount}"
-                                                            />
-                                                        </m:Column>
-                                                        <m:Column width="10%"/>
-                                                    </m:columns>
-                                                    <m:items>
-                                                        <m:ColumnListItem>
-                                                            <m:cells>
-                                                                <m:Input
-                                                                    value="{PaySlip>Description}"
-                                                                    maxLength="25"
-                                                                    editable="{= ${PaySlip>Flag} === true }"
+                                                    <m:HBox
+                                                        class="customEarningBox sapUiTinyMarginBottom"
+                                                        width="100%"
+                                                    >
+                                                        <m:Text
+                                                            class="boldBlackText"
+                                                            text="{i18n>totalEarningAmount} :"
+                                                            textAlign="End"
+                                                        />
+                                                        <m:Text
+                                                            class="boldBlackText"
+                                                            text="{path:'PaySlip>/EmpData/EarningsTotalMonthly', formatter: '.Formatter.fromatNumber'}"
+                                                            textAlign="End"
+                                                        />
+                                                        <m:Text
+                                                            class="boldBlackText"
+                                                            text="{path:'PaySlip>/EmpData/EarningsTotalYearly', formatter: '.Formatter.fromatNumber'}"
+                                                            textAlign="End"
+                                                        />
+                                                    </m:HBox>
+                                                </m:VBox>
+                                            </g:content>
+                                        </g:Card>
+                                    </m:VBox>
+
+                                    <m:VBox
+                                        class="deductionBox sapUiTinyMargin"
+                                        width="100%"
+                                        layoutData="{@ui5:layoutData: {rowSpan: 1, columnSpan: 1}}"
+                                    >
+                                        <g:Card>
+                                            <g:content>
+                                                <m:VBox>
+                                                    <m:Table
+                                                        items="{PaySlip>/EmpData/DeductionData}"
+                                                    >
+                                                        <m:headerToolbar>
+                                                            <m:OverflowToolbar>
+                                                                <m:Title
+                                                                    text="{i18n>Deduction Details}"
+                                                                    level="H2"
                                                                 />
-                                                                <m:Input
-                                                                    value="{PaySlip>Amount}"
-                                                                    change="APD_onAmountChange"
-                                                                    textAlign="End"
-                                                                    type="Number"
-                                                                />
-                                                                <m:Input
-                                                                    value="{PaySlip>YearlyAmount}"
-                                                                    editable="false"
-                                                                    textAlign="End"
+                                                                <m:ToolbarSpacer
                                                                 />
                                                                 <m:Button
-                                                                    icon="sap-icon://delete"
-                                                                    press="APD_onPressDeleteDeductionFields"
-                                                                    type="Reject"
-                                                                    visible="{= ${PaySlip>Flag} === true }"
+                                                                    text="{i18n>add}"
+                                                                    type="Accept"
+                                                                    press="APD_onPressDedAdd"
+                                                                    enabled="{PaySlip>/isIdSelected}"
+                                                                    visible="{PaySlip>/isCreate}"
                                                                 />
-                                                            </m:cells>
-                                                        </m:ColumnListItem>
-                                                    </m:items>
-                                                </m:Table>
-                                                <m:HBox
-                                                    class="customDeductionBox sapUiTinyMarginBottom"
-                                                    width="100%"
-                                                >
-                                                    <m:Text
-                                                        class="boldBlackText"
-                                                        text="{i18n>totalDeductionAmount} :"
-                                                        textAlign="End"
-                                                    />
-                                                    <m:Text
-                                                        class="boldBlackText"
-                                                        text="{path:'PaySlip>/EmpData/DeductionsTotalMonthly', formatter: '.Formatter.fromatNumber'}"
-                                                        textAlign="Right"
-                                                    />
-                                                    <m:Text
-                                                        class="boldBlackText"
-                                                        text="{path:'PaySlip>/EmpData/DeductionsTotalYearly', formatter: '.Formatter.fromatNumber'}"
-                                                        textAlign="Right"
-                                                    />
-                                                </m:HBox>
-                                            </m:VBox>
-                                        </g:content>
-                                    </g:Card>
-                                </g:GridContainer>
+                                                            </m:OverflowToolbar>
+                                                        </m:headerToolbar>
+                                                        <m:columns>
+                                                            <m:Column
+                                                                minScreenWidth="Tablet"
+                                                                demandPopin="true"
+                                                            >
+                                                                <m:Text
+                                                                    text="{i18n>desc}"
+                                                                />
+                                                            </m:Column>
+                                                            <m:Column
+                                                                minScreenWidth="Tablet"
+                                                                demandPopin="true"
+                                                            >
+                                                                <m:Text
+                                                                    text="{i18n>amount}"
+                                                                />
+                                                            </m:Column>
+                                                            <m:Column
+                                                                minScreenWidth="Tablet"
+                                                                demandPopin="true"
+                                                            >
+                                                                <m:Text
+                                                                    text="{i18n>yearlyAmount}"
+                                                                />
+                                                            </m:Column>
+                                                            <m:Column
+                                                                width="10%"
+                                                            />
+                                                        </m:columns>
+                                                        <m:items>
+                                                            <m:ColumnListItem>
+                                                                <m:cells>
+                                                                    <m:Input
+                                                                        value="{PaySlip>Description}"
+                                                                        maxLength="25"
+                                                                        editable="{= ${PaySlip>Flag} === true }"
+                                                                    />
+                                                                    <m:Input
+                                                                        value="{PaySlip>Amount}"
+                                                                        change="APD_onAmountChange"
+                                                                        textAlign="End"
+                                                                        type="Number"
+                                                                    />
+                                                                    <m:Input
+                                                                        value="{PaySlip>YearlyAmount}"
+                                                                        editable="false"
+                                                                        textAlign="End"
+                                                                    />
+                                                                    <m:Button
+                                                                        icon="sap-icon://delete"
+                                                                        press="APD_onPressDeleteDeductionFields"
+                                                                        type="Reject"
+                                                                        visible="{= ${PaySlip>Flag} === true }"
+                                                                    />
+                                                                </m:cells>
+                                                            </m:ColumnListItem>
+                                                        </m:items>
+                                                    </m:Table>
+                                                    <m:HBox
+                                                        class="customDeductionBox sapUiTinyMarginBottom"
+                                                        width="100%"
+                                                    >
+                                                        <m:Text
+                                                            class="boldBlackText"
+                                                            text="{i18n>totalDeductionAmount} :"
+                                                            textAlign="End"
+                                                        />
+                                                        <m:Text
+                                                            class="boldBlackText"
+                                                            text="{path:'PaySlip>/EmpData/DeductionsTotalMonthly', formatter: '.Formatter.fromatNumber'}"
+                                                            textAlign="Right"
+                                                        />
+                                                        <m:Text
+                                                            class="boldBlackText"
+                                                            text="{path:'PaySlip>/EmpData/DeductionsTotalYearly', formatter: '.Formatter.fromatNumber'}"
+                                                            textAlign="Right"
+                                                        />
+                                                    </m:HBox>
+                                                </m:VBox>
+                                            </g:content>
+                                        </g:Card>
+                                    </m:VBox>
+                                </m:FlexBox>
                                 <m:HBox
                                     class="customNetPayBox"
                                     width="100%"

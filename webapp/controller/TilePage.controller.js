@@ -20,9 +20,19 @@ sap.ui.define(
           if (!LoginFunction) return;
 
           this.getBusyDialog();
-          this._fetchCommonData("AllLoginDetails", "EmpModel");
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.AppVisibilityReadCall();
+          await this._fetchCommonData("AllLoginDetails", "EmpModel");
+          this.CreateEmployeeModel();
+        },
+
+        CreateEmployeeModel: function () {
+          var empData = this.getView().getModel("EmpModel").getData() || [];
+          var filteredData = empData.filter(function (item) {
+            return item.Role !== "Trainee" && item.Role !== "Contractor";
+          });
+          var oFilteredModel = new JSONModel(filteredData);
+          this.getOwnerComponent().setModel(oFilteredModel, "EmployeeModel");
         },
 
         AppVisibilityReadCall: async function () {
@@ -46,17 +56,17 @@ sap.ui.define(
               "AppVisibilityModel"
             );
 
-            const tileNames = ["Home","Timesheet","Payslip","OfferGeneration","Invoice","Quotation","Expense","ManageAsset",];
+            const tileNames = ["Home", "Timesheet", "Payslip", "OfferGeneration", "Invoice", "Quotation", "Expense", "ManageAsset",];
 
             const tileKeys = firstEntry.TileKey?.split(",") || [];
             const tileMapping = tileNames.reduce((map, name, i) => {
-              map[name] = tileKeys[i] || "0"; 
+              map[name] = tileKeys[i] || "0";
               return map;
             }, {});
 
-            this.getView().setModel(new JSONModel(tileMapping),"TileAccessModel");
+            this.getView().setModel(new JSONModel(tileMapping), "TileAccessModel");
           } catch (oError) {
-            MessageToast.show("Error in AppVisibilityReadCall");         
+            MessageToast.show("Error in AppVisibilityReadCall");
           }
         },
 

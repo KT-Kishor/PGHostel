@@ -93,7 +93,14 @@ sap.ui.define([
                 this.oModel.setProperty("/isCreate", false);
                 this.oModel.setProperty("/isIdSelected", true);
                 this.oModel.setProperty("/BackRoute", "RouteAdminPaySlip");
-                this.oModel.setProperty("/SelectedID", this.oModel.getProperty(`${sPath}/EmployeeID`));
+                var month = this.oModel.getProperty(`${sPath}/YearMonth`).split("-")[1];
+                var filters = {
+                    ID: this.oModel.getProperty(`${sPath}/ID`),
+                    EmployeeID: this.oModel.getProperty(`${sPath}/EmployeeID`),
+                    FinancialYear: this.oModel.getProperty(`${sPath}/FinancialYear`),
+                    Month: month,
+                };
+                this.oModel.setProperty("/SelectedFilters", filters);
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             }
         });

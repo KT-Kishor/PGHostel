@@ -33,13 +33,13 @@
                             <ComboBox
                                 id="AP_id_Employee"
                                 showClearIcon="true"
-                                items="{EmpModel>/}"
+                                items="{EmployeeModel>/}"
                                 showSecondaryValues="true"
                             >
                                 <core:ListItem
-                                    key="{EmpModel>EmployeeID}"
-                                    text="{EmpModel>EmployeeID}"
-                                    additionalText="{EmpModel>EmployeeName}"
+                                    key="{EmployeeModel>EmployeeID}"
+                                    text="{EmployeeModel>EmployeeID}"
+                                    additionalText="{EmployeeModel>EmployeeName}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -98,19 +98,28 @@
                     <Column mergeDuplicates="true">
                         <Text text="{i18n>employeeID}" />
                     </Column>
-                    <Column mergeDuplicates="true">
-                        <Text text="{i18n>employeeName}" />
-                    </Column>
-                    <Column>
-                        <Text text="{i18n>baseLocation}" />
-                    </Column>
                     <Column>
                         <Text text="{i18n>monthAndYear}" />
                     </Column>
-                    <Column>
+                    <Column width="10%"
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
                         <Text text="{i18n>payableDays}" />
                     </Column>
-                    <Column>
+                    <Column hAlign="End"
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>totalEarningAmount}" />
+                    </Column>
+                    <Column hAlign="End"
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>totalDeductionAmount}" />
+                    </Column>
+                    <Column hAlign="End">
                         <Text text="{i18n>netPay}" />
                     </Column>
                 </columns>
@@ -120,13 +129,10 @@
                         press="AP_onPressPayslip"
                     >
                         <cells>
-                            <Text text="{PaySlip>EmployeeID}" />
-                        </cells>
-                        <cells>
-                            <Text text="{PaySlip>EmployeeName}" />
-                        </cells>
-                        <cells>
-                            <Text text="{PaySlip>BaseLocation}" />
+                            <ObjectIdentifier
+                                title="{PaySlip>EmployeeID}"
+                                text="{PaySlip>EmployeeName}"
+                            />
                         </cells>
                         <cells>
                             <Text
@@ -137,7 +143,13 @@
                             <Text text="{PaySlip>PayableDays}" />
                         </cells>
                         <cells>
-                            <Text text="{PaySlip>NetPay}" />
+                            <Text text="{path: 'PaySlip>EarningsTotalMonthly', formatter: '.Formatter.formatCurrencyInINRText'}" />
+                        </cells>
+                        <cells>
+                            <Text text="{path: 'PaySlip>DeductionsTotalMonthly', formatter: '.Formatter.formatCurrencyInINRText'}" />
+                        </cells>
+                        <cells>
+                            <Text text="{path: 'PaySlip>NetPay', formatter: '.Formatter.formatCurrencyInINRText'}" />
                         </cells>
                     </ColumnListItem>
                 </items>

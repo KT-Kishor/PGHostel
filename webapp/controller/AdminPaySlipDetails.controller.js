@@ -1,9 +1,7 @@
 sap.ui.define([
-    "./BaseController", //call base controller
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast", "sap/ui/core/BusyIndicator", "../model/formatter"
+    "./BaseController", "sap/m/MessageToast", "sap/ui/core/BusyIndicator", "../model/formatter", "sap/m/MessageBox"
 ],
-    function (BaseController, JSONModel, MessageToast, BusyIndicator, Formatter) {
+    function (BaseController, MessageToast, BusyIndicator, Formatter, MessageBox) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.AdminPaySlipDetails", {
             Formatter: Formatter,
@@ -15,11 +13,9 @@ sap.ui.define([
                 BusyIndicator.hide();
                 var LoginFunction = await this.commonLoginFunction("PaySlip");
                 if (!LoginFunction) return;
-                //this.getBusyDialog();
-                this.getView().byId("APD_id_Employee").setValue("");
+                this.getView().byId("APD_id_Employee").setSelectedKey("");
                 this.oModel = this.getView().getModel("PaySlip");
-                if (this.oModel.getProperty("/isIdSelected")) this._fetchPaySlip(this.oModel.getProperty("/SelectedID"));
-                //this.closeBusyDialog();
+                if (this.oModel.getProperty("/isIdSelected")) this._fetchPaySlip(this.oModel.getProperty("/SelectedFilters"));
             },
 
             APD_onPressBack: function () {
@@ -31,82 +27,64 @@ sap.ui.define([
             APD_onEmployeeIDChange: async function (oEvent) {
                 var sValue = oEvent.getSource().getValue();
                 if (sValue === "" || !sValue) return;
-                await this._fetchPaySlip(sValue);
+                await this._fetchPaySlip({ EmployeeID: sValue });
                 this.oModel.setProperty("/isIdSelected", true);
             },
 
-            _fetchPaySlip: async function (EmpID) {
+            _fetchPaySlip: async function (filters) {
                 this.getBusyDialog();
                 try {
-                    var response = await this.ajaxCreateWithJQuery("PaySlipDetails", { EmployeeID: EmpID });
+                    var response = await this.ajaxCreateWithJQuery("PaySlipDetails", filters);
                     if (response.success) {
                         var oData = response.result[0];
                         oData.YearMonth = this.getFirstDayOfMonth(oData.Month, oData.Year);
-                        oData.EarningData.forEach(function (item) {
-                            item.InitialYearly = item.YearlyAmount;
-                            item.InitialMonthly = item.Amount;
-                        });
-                        oData.DeductionData.forEach(function (item) {
-                            item.InitialYearly = item.YearlyAmount;
-                            item.InitialMonthly = item.Amount;
-                        });
+                        this.initializeCompAmounts(oData.EarningData);
+                        this.initializeCompAmounts(oData.DeductionData);
                         oData.Currency = "INR";
                         oData.ProfilePhoto = "data:image/png;base64," + oData.ProfilePhoto;
                         oData.PaySlipGenerationDate = new Date();
                         this.oModel.setProperty("/EmpData", oData);
-                        this.totalCalEarningAmount();
-                        this.totalCalDeductionAmount();
+                        this.totalCalculationAmount();
                     }
                 }
                 catch (e) {
                     console.warn(e);
-                    MessageToast.show("Error fetching Payslip of Employee ID: " + EmpID);
+                    if(response.success) MessageBox.error("Pay Slip not found for the selected Employee ID");
+                    else MessageBox.error("Error fetching Pay Slip");
                 }
                 finally {
                     this.closeBusyDialog();
                 }
             },
 
-            totalCalEarningAmount: function () {
-                var data = this.oModel.getProperty("/EmpData/EarningData");
-                this.oModel.setProperty("/EmpData/EarningsTotalMonthly", data.reduce((total, item) => total + Number(item.Amount), 0));
-                this.oModel.setProperty("/EmpData/EarningsTotalYearly", data.reduce((total, item) => total + Number(item.YearlyAmount), 0));
-            },
-
-            totalCalDeductionAmount: function () {
-                var data = this.oModel.getProperty("/EmpData/DeductionData");
-
-                // Calculate total deduction monthly and yearly
-                var totalDeductionMonth = data.reduce((total, item) => total + Number(item.Amount || 0), 0);
-                var totalDeductionYearly = data.reduce((total, item) => total + Number(item.YearlyAmount || 0), 0);
-
-                this.oModel.setProperty("/EmpData/DeductionsTotalMonthly", totalDeductionMonth);
-                this.oModel.setProperty("/EmpData/DeductionsTotalYearly", totalDeductionYearly);
-
-                // Get total earnings month from EarningModel
-                var TotalEarningMonth = this.oModel.getProperty("/EmpData/EarningsTotalMonthly") || 0;
-
-                // Calculate net pay
-                var totalNetPay = parseFloat(TotalEarningMonth) - totalDeductionMonth;
+            totalCalculationAmount: function () {
+                const getTotal = (data, key) => data.reduce((total, item) => total + Number(item[key] || 0), 0);
+                const empData = this.oModel.getProperty("/EmpData");
+                const earnData = empData.EarningData || [];
+                const dedData = empData.DeductionData || [];
+                const earningsTotalMonthly = getTotal(earnData, "Amount");
+                const earningsTotalYearly = getTotal(earnData, "YearlyAmount");
+                const deductionsTotalMonthly = getTotal(dedData, "Amount");
+                const deductionsTotalYearly = getTotal(dedData, "YearlyAmount");
+                this.oModel.setProperty("/EmpData/EarningsTotalMonthly", earningsTotalMonthly);
+                this.oModel.setProperty("/EmpData/EarningsTotalYearly", earningsTotalYearly);
+                this.oModel.setProperty("/EmpData/DeductionsTotalMonthly", deductionsTotalMonthly);
+                this.oModel.setProperty("/EmpData/DeductionsTotalYearly", deductionsTotalYearly);
+                const totalNetPay = earningsTotalMonthly - deductionsTotalMonthly;
                 this.oModel.setProperty("/EmpData/NetPay", totalNetPay);
-                this.oModel.setProperty("/EmpData/NetPayText", this.convertNumberToWords(totalNetPay, this.oModel.getProperty("/EmpData/Currency")));
+                this.oModel.setProperty("/EmpData/NetPayText", this.convertNumberToWords(totalNetPay, empData.Currency));
             },
 
             APD_onPressSalAdd: function () {
-                const oData = this.oModel.getProperty("/EmpData/EarningData");
-                const oNewSalaryField = {
-                    Description: "",
-                    Amount: "",
-                    YearlyAmount: "",
-                    Flag: true
-                };
-                oData.push(oNewSalaryField);
-                this.oModel.setProperty("/EmpData/EarningData", oData);
-                this.oModel.refresh(true);
+                this._addRow("/EmpData/EarningData");
             },
 
             APD_onPressDedAdd: function () {
-                const oData = this.oModel.getProperty("/EmpData/DeductionData");
+                this._addRow("/EmpData/DeductionData");
+            },
+
+            _addRow: function (sPath) {
+                const oData = this.oModel.getProperty(sPath);
                 const oNewSalaryField = {
                     Description: "",
                     Amount: "",
@@ -114,7 +92,7 @@ sap.ui.define([
                     Flag: true
                 };
                 oData.push(oNewSalaryField);
-                this.oModel.setProperty("/EmpData/DeductionData", oData);
+                this.oModel.setProperty(sPath, oData);
                 this.oModel.refresh(true);
             },
 
@@ -124,71 +102,115 @@ sap.ui.define([
                 const fYearlyAmount = parseFloat(this.oModel.getProperty(`${sPath}/InitialYearly`)) || 0;
                 const fTotal = fAmount + fYearlyAmount;
                 this.oModel.setProperty(`${sPath}/YearlyAmount`, fTotal);
-                this.totalCalEarningAmount();
-                this.totalCalDeductionAmount();
+                this.totalCalculationAmount();
             },
 
             APD_onPressDeleteEarningFields: function (oEvent) {
-                const oContext = oEvent.getSource().getBindingContext("PaySlip");
-                const sPath = oContext.getPath();
-                const aData = this.oModel.getProperty(sPath);
-                const aDataDeduction = this.oModel.getProperty("/EmpData/EarningData");
-
-                // Remove the selected item from the array
-                const index = aDataDeduction.indexOf(aData);
-                if (index > -1) {
-                    aDataDeduction.splice(index, 1);
-                    this.oModel.setProperty("/EmpData/EarningData", aDataDeduction);
-                    this.oModel.refresh(true);
-                    this.totalCalEarningAmount();
-                    this.totalCalDeductionAmount();
-                }
+                this._deleteRows(oEvent.getSource().getBindingContext("PaySlip").getPath(), "/EmpData/EarningData");
             },
 
             APD_onPressDeleteDeductionFields: function (oEvent) {
-                const oContext = oEvent.getSource().getBindingContext("PaySlip");
-                const sPath = oContext.getPath();
-                const aData = this.oModel.getProperty(sPath);
-                const aDataDeduction = this.oModel.getProperty("/EmpData/DeductionData");
+                this._deleteRows(oEvent.getSource().getBindingContext("PaySlip").getPath(), "/EmpData/DeductionData");
+            },
 
-                // Remove the selected item from the array
+            _deleteRows: function (rowPath, delPath) {
+                const aData = this.oModel.getProperty(rowPath);
+                const aDataDeduction = this.oModel.getProperty(delPath);
                 const index = aDataDeduction.indexOf(aData);
                 if (index > -1) {
                     aDataDeduction.splice(index, 1);
-                    this.oModel.setProperty("/EmpData/DeductionData", aDataDeduction);
+                    this.oModel.setProperty(delPath, aDataDeduction);
                     this.oModel.refresh(true);
-                    this.totalCalEarningAmount();
-                    this.totalCalDeductionAmount();
+                    this.totalCalculationAmount();
                 }
             },
 
-            APD_onPressSubmit: function () {
+            APD_onPressSubmit: async function () {
+                this.getBusyDialog();
                 var data = this.oModel.getData().EmpData;
                 var month = data.Month.substring(0, 3);
-                var earnData = this.oModel.getData().EmpData.EarningData;
-                earnData.forEach(function (item) {
-                    delete item.InitialYearly;
-                    delete item.InitialMonthly;
-                });
-                var dedData = this.oModel.getData().EmpData.DeductionData;
-                dedData.forEach(function (item) {
-                    delete item.InitialYearly;
-                    delete item.InitialMonthly;
-                });
+                var yearKey = month + "YearlyAmount";
+                var monthKey = month + "Amount";
+                var earnData = data.EarningData;
+                var dedData = data.DeductionData;
+                this.transformCompData(earnData, data, yearKey, monthKey);
+                this.transformCompData(dedData, data, yearKey, monthKey);
                 delete data.EarningData;
                 delete data.DeductionData;
                 delete data.ProfilePhoto;
+                delete data.Month;
                 delete data.Year;
                 delete data.NetPayText;
                 data.JoiningDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(new Date(data.JoiningDate));
-                data.PaySlipGenerationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(data.PaySlipGenerationDate); 
+                data.PaySlipGenerationDate = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(data.PaySlipGenerationDate);
                 data.YearMonth = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(data.YearMonth);
-                var oData = {
-                    "PaySlipDetails": data,
-                    "EarningData": earnData,
-                    "DeductionData": dedData
+                if (data.Type === "Create") {
+                    var oData = {
+                        "PaySlipDetails": data,
+                        "EarningData": earnData,
+                        "DeductionData": dedData
+                    }
                 }
-                console.log(oData);
+                else {
+                    var oData = {
+                        "PaySlipDetails": data,
+                        "EarningData": this._addFilters(earnData),
+                        "DeductionData": this._addFilters(dedData)
+                    }
+                }
+                try {
+                    var response = await this.ajaxCreateWithJQuery("createUpdateAllData", oData);
+                    if (response.success) {
+                        MessageBox.success("Pay Slip Created Successfully", {
+                            onClose: function () {
+                                this.getRouter().navTo("RouteAdminPaySlip");
+                            }.bind(this)
+                        });
+                    }
+                }
+                catch (e) {
+                    console.warn(e);
+                    MessageBox.error("Error Creating Pay Slip", {
+                        onClose: function () {
+                            this.getRouter().navTo("RouteAdminPaySlip");
+                        }.bind(this)
+                    });
+                }
+                finally {
+                    this.closeBusyDialog();
+                }
+            },
+
+            initializeCompAmounts: function (compData) {
+                compData.forEach(function (item) {
+                    item.YearlyAmount += item.Amount;
+                    item.InitialYearly = item.YearlyAmount;
+                    item.InitialMonthly = item.Amount;
+                });
+            },
+
+            transformCompData: function (compData, data, yearKey, monthKey) {
+                compData.forEach(function (item) {
+                    item.EmployeeID = data.EmployeeID;
+                    item.FinancialYear = data.FinancialYear;
+                    item.Month = data.Month;
+                    item[yearKey] = item.YearlyAmount;
+                    item[monthKey] = item.Amount;
+                    delete item.YearlyAmount;
+                    delete item.Amount;
+                    delete item.InitialYearly;
+                    delete item.InitialMonthly;
+                });
+            },
+
+            _addFilters: function (data) {
+                return data.map(function (item) {
+                    var { ID, ...rest } = item;
+                    return {
+                        data: rest,
+                        filters: { ID: ID }
+                    };
+                });
             }
         });
     });
