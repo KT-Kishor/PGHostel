@@ -4,8 +4,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         return Controller.extend("sap.kt.com.minihrsolution.controller.SelfService", {
             Formatter: Formatter,
             onInit() {
+                // var oModel = new sap.ui.model.json.JSONModel(new Date());
+                // this.getView().setModel(oModel, "controller");
                 this.getRouter().getRoute("SelfService").attachMatched(this._onRouteMatched, this);
-            },
+        },
 
             _onRouteMatched: async function (oEvent) {
                 try {
@@ -25,7 +27,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
                         fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(),
-                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, SetProfile: false, TraineeRole: false,
+                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, TraineeRole: false,
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
@@ -158,38 +160,38 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
             SS_commonEduFunction() {
-                var eduModel = new JSONModel({
-                    EmployeeID: this.EmployeeID,
-                    CollegeName: "",
-                    DegreeName: "",
-                    EducationStartDate: "",
-                    EducationEndDate: "",
-                    Grade: "",
-                    GradeType: "",
-                });
-                this.getView().setModel(eduModel, "educationModel");
-            },
+            var eduModel = new JSONModel({
+                EmployeeID: this.EmployeeID,
+                CollegeName: "",
+                DegreeName: "",
+                EducationStartDate: "",
+                EducationEndDate: "",
+                Grade: "",
+                GradeType: "",
+            });
+            this.getView().setModel(eduModel, "educationModel");
+        },
             SS_commonEmpFunction() {
-                var empModel = new JSONModel({
-                    EmployeeID: this.EmployeeID,
-                    CompanyName: "",
-                    Designation: "",
-                    StartDate: "",
-                    EndDate: "",
-                    OfficeAddress: "",
-                    RCISal: "",
-                    RCIName: "",
-                    RCIAddress: "",
-                    RCIEmailID: "",
-                    RCIMobileNo: "",
-                    RCIISal: "",
-                    RCIIName: "",
-                    RCIIAddress: "",
-                    RCIIEmailID: "",
-                    RCIIMobileNo: "",
-                });
-                this.getView().setModel(empModel, "employmentModel");
-            },
+            var empModel = new JSONModel({
+                EmployeeID: this.EmployeeID,
+                CompanyName: "",
+                Designation: "",
+                StartDate: "",
+                EndDate: "",
+                OfficeAddress: "",
+                RCISal: "",
+                RCIName: "",
+                RCIAddress: "",
+                RCIEmailID: "",
+                RCIMobileNo: "",
+                RCIISal: "",
+                RCIIName: "",
+                RCIIAddress: "",
+                RCIIEmailID: "",
+                RCIIMobileNo: "",
+            });
+            this.getView().setModel(empModel, "employmentModel");
+        },
             SS_validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
             },
@@ -1674,14 +1676,112 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             },
             onApplyResignation: async function () {
-             await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation");
+                await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation");
             },
-
             TCF_onPressCloseDialog: function () {
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                 this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+
                 this.SSReg_oDialog.close();
-                this.SSReg_oDialog.destroy();
+            },
+            TCF_onPressHandlePreview: function () {
+                const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
+                if (bPreviewFlag) {
+                    this.TCF_onPressDownload();
+                } else {
+                    this.TCF_onPressPreview();
+                }
+            },
+
+            //download certificate
+            TCF_onPressPreview: function () {
+                if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("RF_id_ResignReason"), "ID")) {
+                    MessageToast.show(this.i18nModel.getText("mandatoryFields"));
+                    return;
+                }
+                var oEmployeeModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
+                var joinDate = Formatter.formatDate(oEmployeeModel.JoiningDate);
+                var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue();
+                var resignComment = oEmployeeModel.ResignComment;
+                var designation = oEmployeeModel.Designation;
+                var managerName = oEmployeeModel.ManagerName;
+
+                var data = `
+    <div style="text-align: justify;">
+        <p>This is to formally acknowledge the resignation of <b>${empName}</b> from <b>${this.companyName}</b>, effective from <b>${endDate}</b>.</p>  
+        <p>During their tenure, ${empName} has served as <b>${designation}</b> and contributed significantly to the organization. Their dedication, skills, and professionalism have been appreciated by colleagues and management alike.</p>
+        <p>We thank ${empName} for their commitment and efforts, and we wish them success in all future professional endeavors.</p>
+        <p>${this.companyName} values the contributions made by ${empName}, and we hope for a fruitful career ahead.</p>
+        <p>The resign of resignation is  ${resignComment} </p>
+    </div>`;
+
+                this.getView().getModel("PDFData").setProperty("/RTEText", data);
+                this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
+            },
+            SS_ResignStartDateChange: function (oEvent) {
+                var oStartDate = oEvent.getSource().getDateValue(); // Get selected Start Date
+                var oEndDatePicker = sap.ui.getCore().byId("RF_id_EndDate");
+                if (oStartDate) {
+                    oEndDatePicker.setMinDate(oStartDate);
+                    var oEndDate = oEndDatePicker.getDateValue();
+                    if (oEndDate && oEndDate < oStartDate) {
+                        oEndDatePicker.setValue("");
+                    }
+                }
+            },
+            //generate PDF function
+            TCF_onPressDownload: async function () {
+                var oRTE = sap.ui.getCore().byId("myRTE");
+                var oEditor = oRTE._oEditor?.editorManager?.activeEditor;
+                if (oEditor) {
+                    var plainText = oEditor.getContent({ format: 'text' });
+                    var charCount = plainText.length;
+                    var lines = plainText.split(/\r\n|\r|\n/);
+                    var lineCount = lines.length;
+                    console.log("Characters:", charCount, "Lines:", lineCount);
+                } else {
+                    console.warn("Editor not ready yet.");
+                    this.closeBusyDialog();
+                    return;
+                }
+                if (charCount > 1000 || lineCount > 21) {
+                    this.closeBusyDialog();
+                    MessageBox.error("Certificate content exceeds the limit of 1000 characters or 21 lines.");
+                    return;
+                }
+                try {
+                    this.getBusyDialog();
+                    // Get selected trainee's data from the table
+                    let oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
+                    let oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
+                    this.getView().getModel("PDFData").setProperty("/CreateDate", Formatter.formatDate(new Date()));
+                    this.getView().getModel("PDFData").setProperty("/CertificateTitle", "TRAINEE CERTIFICATE");
+                    // Create the updated trainee data
+                    const oUpdatedData = {
+                        ID: oTraineeModel.ID,
+                        TraineeID: oTraineeModel.TraineeID,
+                        Department: sap.ui.getCore().byId("TCF_id_Department").getSelectedKey(),
+                        ProjectName: oTraineeModel.ProjectName,
+                        EndDate: oTraineeModel.EndDate,
+                        Role: "Trainee",
+                        Status: "Training Completed",
+                    };
+                    this.updateCallForTrainee(oUpdatedData, "downloadSucess");
+                    this.T_onSearch()
+                    this.byId("T_id_TraineeTable").removeSelections(true);
+                    this.byId("T_id_Download").setVisible(false);
+                    this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
+                    let htmlContent = sap.ui.getCore().byId("myRTE").getValue();
+                    this.generateCertificatePDF(htmlContent, oTraineeModel.BranchCode);
+                    this.TC_oDialog.close();
+                    this.T_ButtonVisibility();
+                    this.closeBusyDialog();
+                    this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview</b> to Preview the Certificate</p>");
+                } catch (error) {
+                    this.closeBusyDialog();
+                    MessageToast.show(error.message || error.responseText);
+                }
             },
         });
     });

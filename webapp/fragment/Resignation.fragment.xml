@@ -52,10 +52,12 @@
                 />
                 <Label text="{i18n>startDate}" />
                 <DatePicker
-                value="{sEmployeeModel>/0/ResignationStartDate}"
+                    value="{path:'sEmployeeModel>/0/ResignationStartDate' ,formatter:'.Formatter.formatDate'}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     id="RF_id_StartDate"
+                    change="SS_ResignStartDateChange"
+                    minDate="{viewModel>/Max}"
                 />
                 <Label text="{i18n>reportingManager}" />
                 <Input
@@ -71,20 +73,21 @@
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     id="RF_id_EndDate"
+                    minDate="{viewModel>/min}"
                     value="{path:'sEmployeeModel>/0/ResignationEndDate' ,formatter:'.Formatter.formatDate'}"
                 />
                 <Label
-                    text="{i18n>reasonForResign}"
+                    text="{i18n>resignComment}"
                     required="true"
                 />
                 <TextArea
                     rows="4"
                     id="RF_id_ResignReason"
-                    liveChange="T_ValidateCommonFields"
+                    liveChange="onDocumentTypeChange"
                     value="{sEmployeeModel>/0/ResignComment}"
                     maxLength="60"
-                    valueStateText="{i18n>projectValueState}"
-                    placeholder="{i18n>projectValueState}"
+                    valueStateText="{i18n>commentsValueState}"
+                    placeholder="{i18n>resignComment}"
                 />
             </f:content>
         </f:SimpleForm>
