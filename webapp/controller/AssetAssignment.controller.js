@@ -407,6 +407,18 @@ sap.ui.define([
                 if (this._checkValidation()) {
                     try {
                         var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
+                        var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
+                        var sAssetCreationDate = this.getView().getModel("myform").getProperty("/formData/data/AssetCreationDate");
+
+                        if (sAssetCreationDate) {
+                            var oAssetCreationDate = new Date(sAssetCreationDate);
+
+                            if (oAssignedDate < oAssetCreationDate) {
+                                MessageToast.show("Assigned Date cannot be before Asset Creation Date.");
+                                return;
+                            }
+                        }
+
                         delete oFormData.isEdit
                         var originalStatus = oFormData.Status;
                         var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
@@ -575,6 +587,7 @@ sap.ui.define([
                 formData.setProperty("/formData/data/AssetValue", (oSelectedData.AssetValue).toString());
                 formData.setProperty("/formData/data/Currency", oSelectedData.Currency);
                 formData.setProperty("/formData/data/Description", oSelectedData.Description);
+                formData.setProperty("/formData/data/AssetCreationDate", oSelectedData.AssetCreationDate);
                 var oAssignedDate;
                 var oMinDate;
                 if (oSelectedData.Status === "Returned" && oSelectedData.ReturnDate) {
