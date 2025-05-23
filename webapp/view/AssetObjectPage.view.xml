@@ -388,14 +388,31 @@
                                                         formatter: '.Formatter.formatDate'
                                                     }}"
                                                 /> -->
-                                                <m:ObjectIdentifier
+                                                <!-- <m:ObjectIdentifier
                                                     title="{= ${objectModel>TrashByEmployeeName} ? 'By:' + ${objectModel>TrashByEmployeeName} + ' ' 
                                 + ${objectModel>TrashByEmployeeID} : ''}"
                                                     text="{= ${objectModel>TrashDate} ? 'Date:' + ${
                                     path: 'objectModel>TrashDate',
                                     formatter: '.Formatter.formatDate'
                                 } : ''}"
-                                                />
+                                                /> -->
+                                                   <m:VBox>
+                                                    <m:Text
+                                                        text="{= ${objectModel>TrashByEmployeeName} ? 'By: ' + ${objectModel>TrashByEmployeeName}: ''}"
+                                                        class="sapUiTinyMarginBottom"
+                                                    />
+                                                      <m:Text text="{=${objectModel>TrashByEmployeeID}?'ID: '+${objectModel>TrashByEmployeeID}:''}"
+                                                        class="sapUiTinyMarginBottom"                        
+                                                                  />
+                                                   
+
+                                     <m:Text
+                                text="{= ${objectModel>TrashDate} === '1899-11-30T00:00:00.000Z' || ${objectModel>TrashDate} === null ? '' : 'Date: ' + ${
+                                path: 'objectModel>TrashDate',
+                                formatter: '.Formatter.formatDate'
+                            }}"                       
+                                    />
+                                                </m:VBox> 
                                             </m:cells>
                                         </m:ColumnListItem>
                                     </m:items>

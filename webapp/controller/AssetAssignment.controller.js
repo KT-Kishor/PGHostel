@@ -96,16 +96,22 @@ sap.ui.define([
             createTableSheet: function () {
                 return [
                     { label: "Employee ID", property: "AssignEmployeeID", type: "string" },
+                    { label: "Employee Name", property: "AssignEmployeeName", type: "string" },
                     { label: "Type", property: "Type", type: "string" },
                     { label: "Model", property: "Model", type: "Number" },
                     { label: "Equipment Number", property: "EquipmentNumber", type: "Number" },
                     { label: "Serial Number", property: "SerialNumber", type: "Number" },
-                    { label: "Assigned By", property: "AssignedByEmployeeName", type: "string" },
-                    { label: "Branch", property: "AssignBranch", type: "string" },
+                    { label: "Assigned By Name", property: "AssignedByEmployeeName", type: "string" },
+                    { label: "Assigned By ID", property: "AssignedByEmployeeID", type: "string" },
+                    { label: "Assign Branch", property: "AssignBranch", type: "string" },
                     { label: "Assigned Date", property: "AssignedDate", type: "Date" },
                     { label: "Asset Value", property: "AssetValue", type: "Number" },
                     { label: "Status", property: "Status", type: "string" },
                     { label: "Return Date", property: "ReturnDate", type: "Date" },
+                    { label: "Return Branch", property: "ReturnBranch", type: "string" },
+                    { label: "Returned Employee ID", property: "ReturnEmpID", type: "string" },
+                    { label: "Returned Employee Name", property: "ReturnEmpName", type: "string" },
+                    { label: "Comments", property: "Comments", type: "string" },
                 ];
             },
 
@@ -647,7 +653,7 @@ sap.ui.define([
                 var oCore = sap.ui.getCore();
                 var bIsEdit = this.getView().getModel("myform").getProperty("/formData/data/isEdit");
                 console.log(" isEdit flag inside validation:", bIsEdit);
-                
+
                 if (bIsEdit) {
                     return true;
                 }
