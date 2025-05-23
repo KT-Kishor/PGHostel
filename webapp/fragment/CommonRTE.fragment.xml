@@ -21,7 +21,7 @@
         />
         <beginButton>
             <Button
-                text="{i18n>tileUnit}"
+                text="{i18n>GeneratePDF}"
                 type="Accept"
                 press=".FCR_onDownloadPDF"
                 class="submit"

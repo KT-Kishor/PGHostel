@@ -1064,21 +1064,30 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 try {
                     // this.getBusyDialog();
                     const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") &&
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") &&
+                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID")
-                    // utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID") &&
-                    // utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressI"), "ID") &&
-                    // utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID") &&
-                    // utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID") &&
-                    // utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID") &&
-                    // utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AdEmp_id_RCAddressII"), "ID") &&
-                    // utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID") &&
-                    // utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID");
-
                     if (!isValid) {
                         //.closeBusyDialog();
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
+                    // Optional Fields Validation
+                    const name = sap.ui.getCore().byId("AdEmp_id_RCNameI").getValue().trim();
+                    const mail = sap.ui.getCore().byId("AdEmp_id_RCMailI").getValue().trim();
+                    const mobileNo = sap.ui.getCore().byId("AdEmp_id_RCMobileI").getValue().trim();
+                    const nameTwo = sap.ui.getCore().byId("AdEmp_id_RCNameII").getValue().trim();
+                    const mailTwo = sap.ui.getCore().byId("AdEmp_id_RCMailII").getValue().trim();
+                    const mobileNoTwo = sap.ui.getCore().byId("AdEmp_id_RCMobileII").getValue().trim();
+                    const optionalValid =
+                        (name === "" || utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID")) &&
+                        (mail === "" || utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID")) &&
+                        (mobileNo === "" || utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID")) &&
+                        (nameTwo === "" || utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID")) &&
+                        (mailTwo === "" || utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID")) &&
+                        (mobileNoTwo === "" || utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID"))
+                    if (!optionalValid) {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
                     }
@@ -1102,6 +1111,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         };
                         fnCall = this.ajaxCreateWithJQuery("EmploymentDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("empDataSaved");
+                        sap.ui.getCore().byId("AdEmp_id_RCNameI").setValueState("None");
+                        sap.ui.getCore().byId("AdEmp_id_RCMailI").setValueState("None");
+                        sap.ui.getCore().byId("AdEmp_id_RCMobileI").setValueState("None");
+                        sap.ui.getCore().byId("AdEmp_id_RCNameII").setValueState("None");
+                        sap.ui.getCore().byId("AdEmp_id_RCMailII").setValueState("None");
+                        sap.ui.getCore().byId("AdEmp_id_RCMobileII").setValueState("None");
                     } else {
                         oPayload = {
                             "data": oModel,
@@ -1111,6 +1126,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         };
                         fnCall = this.ajaxUpdateWithJQuery("EmploymentDetails", oPayload);
                         sSuccessMessage = this.i18nModel.getText("empDataupdate");
+                        sap.ui.getCore().byId("AdEmp_id_RCNameI").setValueState("None");
+                        sap.ui.getCore().byId("AdEmp_id_RCMailI").setValueState("None");
+                        sap.ui.getCore().byId("AdEmp_id_RCMobileI").setValueState("None");
+                        sap.ui.getCore().byId("AdEmp_id_RCNameII").setValueState("None");
+                        sap.ui.getCore().byId("AdEmp_id_RCMailII").setValueState("None");
+                        sap.ui.getCore().byId("AdEmp_id_RCMobileII").setValueState("None");
                     }
                     fnCall.then((oData) => {
                         this.closeBusyDialog();
@@ -1486,6 +1507,25 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
             },
 
+             SS_onDownloadTerminateLetter: function () {
+                var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var date = Formatter.formatDate(new Date());
+                var empName = oEmpModel.Salutation + " " + oEmpModel.EmployeeName;
+                var empDesig = oEmpModel.Designation;
+                this.getView().getModel("PDFData").setProperty("/CreateDate", date);
+                this.getView().getModel("PDFData").setProperty("/CertificateTitle", "TERMINATION LETTER");
+                var data = `
+                <div style="text-align: justify;">
+                    <p>This is to formally notify that <b>${empName}</b>, has been terminated from the services of <b>${this.companyName}</b> with effect from <b>${date}</b> due to reasons communicated during prior discussions. During their tenure as <b>${empDesig}</b>, we have reviewed the performance and discussed areas of concern in detail.</p> 
+                    <p>Despite efforts to resolve these concerns, we find it necessary to discontinue the employment relationship effective immediately. Please ensure that all company assets and materials in your possession are returned by the specified date. You are reminded of your obligation to maintain confidentiality and abide by other terms of the employment agreement.</p>
+                    <p>Kindly acknowledge the copy of the document for office records. We look forward to a fruitful association.</p>
+                    <p>We wish you the best of luck in your future endeavors</p>
+                </div>`;
+
+                this.getView().getModel("PDFData").setProperty("/RTEText", data);
+                this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
+            },
+
             FCR_onDownloadPDF: function () {
                 this.SSRTE_oDialog.close();
                 let htmlContent = sap.ui.getCore().byId("FCR_id_RTE").getValue();
@@ -1584,6 +1624,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 } catch (error) {
                     sap.m.MessageToast.show(error.message || error.responseText);
                 }
+            },
+            CC_onPressClose:function(){
+                this.oIdCardDialog.close();
             },
 
             onPressMerge: async function (employeeDetails) {
@@ -1755,7 +1798,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
                 try {
                     // Get selected trainee's data from the table
-                var oEmployeeModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                    var oEmployeeModel = this.getView().getModel("sEmployeeModel").getData()[0];
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                     let htmlContent = oRTE.getValue();
                     this.generateCertificatePDF(htmlContent, oEmployeeModel.BranchCode);
