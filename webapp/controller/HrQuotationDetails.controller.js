@@ -824,60 +824,51 @@ sap.ui.define(
         const that = this;
 
         try {
-          const oListItem = oEvent.getParameter("listItem");
+          const oListItem = oEvent.getParameter("listItem"); // This is the deleted row
           const oContext = oListItem.getBindingContext("QuotationModel");
+
           if (!oContext) throw new Error("Binding context not found for selected row.");
 
           const oItemData = oContext.getObject();
-          const iIndex = oContext.getProperty("$index");
-
-          // Check if in Edit mode (assuming you store this in your 'visiablityPlay' model)
-          const bIsEditMode = this.getView().getModel("visiablityPlay").getProperty("/editable");
-
-          if (bIsEditMode && oItemData.SlNo) {
-            // EDIT MODE: Confirm and delete from backend
-            const sQuotationNo = that.getView().getModel("SingleCompanyModel").getProperty("/QuotationNo");
-            if (!sQuotationNo) throw new Error("Quotation number is missing.");
-
-            const confirmed = await new Promise((resolve) => {
-              that.showConfirmationDialog(
-                that.i18nModel.getText("msgBoxConfirm"),
-                that.i18nModel.getText("commonMesBoxConfirmDelete"),
-                () => resolve(true),
-                () => resolve(false)
-              );
-            });
-
-            if (!confirmed) {
-              that.byId("HQD_id_SmartTableQuotationItem").setBusy(false);
-              return;
-            }
-
-            await that.ajaxDeleteWithJQuery("/QuotationItem", {
-              filters: {
-                QuotationNo: sQuotationNo,
-                SlNo: oItemData.SlNo
-              }
-            });
-
-            MessageToast.show(that.i18nModel.getText("msgQuotationitemdelete"));
-          } else {
-            // CREATE MODE: Delete item from local model
-            const oModel = this.getView().getModel("QuotationModel");
-            const aItems = oModel.getProperty("/QuotationItemModel");
-
-            aItems.splice(iIndex, 1);
-            oModel.setProperty("/QuotationItemModel", aItems);
-            MessageToast.show("Item removed.");
+          if (!oItemData || !oItemData.SlNo) {
+            throw new Error("Quotation item not found.");
           }
 
-          this.updateTotalAmount();
+          const sQuotationNo = that.getView().getModel("SingleCompanyModel").getProperty("/QuotationNo");
+          if (!sQuotationNo) {
+            throw new Error("Quotation number is missing.");
+          }
+
+          const confirmed = await new Promise((resolve) => {
+            that.showConfirmationDialog(
+              that.i18nModel.getText("msgBoxConfirm"),
+              that.i18nModel.getText("commonMesBoxConfirmDelete"),
+              () => resolve(true),
+              () => resolve(false)
+            );
+          });
+
+          if (!confirmed) {
+            that.byId("HQD_id_SmartTableQuotationItem").setBusy(false);
+            return;
+          }
+
+          await that.ajaxDeleteWithJQuery("/QuotationItem", {
+            filters: {
+              QuotationNo: sQuotationNo,
+              SlNo: oItemData.SlNo
+            }
+          });
+
+          MessageToast.show(that.i18nModel.getText("msgQuotationitemdelete"));
+          that.updateTotalAmount();
         } catch (error) {
           MessageToast.show(error.message || "Error deleting Quotation item");
         } finally {
-          this.byId("HQD_id_SmartTableQuotationItem").setBusy(false);
+          that.byId("HQD_id_SmartTableQuotationItem").setBusy(false);
         }
       },
+
 
 
       //   var oModel = this.getView().getModel("QuotationModel");

@@ -117,7 +117,6 @@ sap.ui.define(
           }
         },
         LP_onLogin: function () {
-          var oButton = this.byId("LP_id_loginBTn").setBusy(true);
           const oLoginModel = this.getView().getModel("LoginModel");
           const oVM = this.getView().getModel("LoginViewModel");
           // Validate User ID and Name
@@ -125,13 +124,11 @@ sap.ui.define(
             !utils._LCvalidateMandatoryField(this.byId("Lp_id_Userid"), "ID") ||
             !utils._LCvalidateName(this.byId("Lp_id_Username"), "ID")
           ) {
-            oButton.setBusy(false)
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
           }
           // Validate OTP if selected
           if (oVM.getProperty("/isOtpSelected") && !oVM.getProperty("/otp")) {
-            oButton.setBusy(false)
             MessageToast.show(this.i18nModel.getText("checkOTP"));
             return;
           }
@@ -139,14 +136,13 @@ sap.ui.define(
           if (oVM.getProperty("/isPasswordSelected")) {
             const isPasswordValid = utils._LCvalidateMandatoryField(this.byId("Lp_id_PasswordInput"), "ID");
             if (!isPasswordValid) {
-              oButton.setBusy(false)
               MessageToast.show(this.i18nModel.getText("mandetoryFields"));
               return;
             }
           }
           // Backend call using then-catch
           try {
-            oButton.setBusy(true);
+            this.getBusyDialog();
             this.ajaxReadWithJQuery("LoginDetails", {
               EmployeeID: this.byId("Lp_id_Userid").getValue(),
               EmployeeName: this.byId("Lp_id_Username").getValue(),
@@ -154,7 +150,7 @@ sap.ui.define(
               Password: oVM.getProperty("/isPasswordSelected") ? btoa(this.byId("Lp_id_PasswordInput").getValue()) : ""
             }).then((response) => {
               if (response?.success && response.data?.length > 0) {
-                oButton.setBusy(false);
+                this.closeBusyDialog();
                 const userData = response.data[0];
 
                 if (oVM.getProperty("/isOtpSelected")) {
@@ -191,23 +187,23 @@ sap.ui.define(
                     window.history.pushState(null, "", window.location.href);
                   })
                 } else {
-                  oButton.setBusy(false)
+                  this.closeBusyDialog();
                   MessageToast.show(this.i18nModel.getText("errorMsguser"));
                 }
               } else {
-                oButton.setBusy(false)
+                this.closeBusyDialog();
                 const backendMsg = response?.message || this.i18nModel.getText("commonErrorMessage");
                 MessageToast.show(backendMsg);
               }
             }).catch((error) => {
-              oButton.setBusy(false)
+              this.closeBusyDialog();
               const errorMsg = error?.responseText
                 ? JSON.parse(error.responseText).message
                 : this.i18nModel.getText("commonErrorMessage");
               MessageToast.show(errorMsg);
             });
           } catch (e) {
-            oButton.setBusy(false)
+            this.closeBusyDialog();
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
         },

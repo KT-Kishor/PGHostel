@@ -14,7 +14,7 @@
 		</headerContent>
 		<content>
 			<FlexBox class="sapUiMediumMargin" direction="Column" alignItems="End" justifyContent="End">
-				<form:SimpleForm editable="true" layout="ResponsiveGridLayout" 
+				<form:SimpleForm id="LP_id_Form" editable="true" layout="ResponsiveGridLayout" 
                 class="loginForm"
                 title="{i18n>loginDetails}" singleContainerFullSize="false" >
 					<form:content>
