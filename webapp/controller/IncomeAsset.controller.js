@@ -28,11 +28,17 @@ sap.ui.define([
 
                 this.commonLoginFunction("IncomeAsset");
                 let loginModel = this.getView().getModel("LoginModel").getData();
-                if (loginModel.Role === "IT Consultant") {
-                    this.IA_CommonReadCall(loginModel.Role);
-                } else {
-                    this.IA_CommonReadCall("");
-                }
+                // if (loginModel.Role === "IT Consultant") {
+                //   await  this._fetchCommonData("BaseLocation", "branchModel")
+                //     let branchData = await this.getOwnerComponent().getModel("branchModel").getData() || [];
+                //     let branch = branchData.find(item => item.branchCode == loginModel.BranchCode) ;
+                //        if (branch) {
+                //         loginModel.BranchName = branch.city;
+                //     }   
+                //         this.IA_CommonReadCall( loginModel.BranchName);            
+                //  } else {
+                //     this.IA_CommonReadCall("");
+                // }
                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 var model = new JSONModel({
                     "Type": "",
@@ -67,7 +73,7 @@ sap.ui.define([
                 var oModel = new JSONModel({ "Save": false, "Tranfer": false, "PicedBy": false, maxDate: new Date(new Date().setDate(new Date().getDate() - 30)), minDate: new Date() });
                 this.getView().setModel(oModel, "VisiableModel")
                 this.Visible = this.getView().getModel("VisiableModel");
-                // this.IA_CommonReadCall("");
+                this.IA_CommonReadCall("");
                 this._fetchCommonData("AssetType", "oAssetTypeModel");
                 this._fetchCommonData("Currency", "oCurrencyModel");
                 this._fetchCommonData("BaseLocation", "branchModel")
@@ -93,9 +99,14 @@ sap.ui.define([
                 this.ajaxReadWithJQuery("IncomeAsset", "IsCurrent=1").then((oData) => {
                     let loginModel = this.getView().getModel("LoginModel").getData();
                     var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                   this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "incomeModel");
 
-                        this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "incomeModel");
-                        this._populateUniqueFilterValues(oFCIAerData);
+                    // if (loginModel.Role === "IT Consultant") {
+                    //     const filteredData = oFCIAerData.filter(item => item.PickedBranch === loginModel.BranchName);
+                    //     this.getOwnerComponent().setModel(new JSONModel(filteredData), "incomeModel");
+                    // } else {
+                    // }
+                    this._populateUniqueFilterValues(oFCIAerData);
                                          
                     this.closeBusyDialog()
                 }).catch((error) => {
@@ -103,7 +114,8 @@ sap.ui.define([
 
                     MessageToast.show(error.message || error.responseText);
                 });
-            },            _populateUniqueFilterValues: function (data) {
+            },        
+                _populateUniqueFilterValues: function (data) {
                 let uniqueValues = {
                     IA_id_SlNo: new Set(),
                     IA_id_EqNo: new Set(),
@@ -186,8 +198,8 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_Date").setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
-                    sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey(oModel.getProperty("/PickedBranch")).setValueState("None");
-                    sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(true)
+                    // sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey(oModel.getProperty("/PickedBranch")).setValueState("None");
+                    // sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(true)
 
                     
                     // if (loginRole === "IT Consultant") {
