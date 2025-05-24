@@ -159,7 +159,7 @@
                                             liveChange="HQD_onComGSTLiveChange"
                                             valueStateText="{i18n>gstNoValueState}"
                                             change="HQD_onChangeGstNo"
-                                           editable="{SingleCompanyModel>/gstEditable}"
+                                            editable="{visiablityPlay>/editable}"
                                             maxLength="20"
                                         />
                                         <m:Label
@@ -174,7 +174,6 @@
     editable="{SingleCompanyModel>/gstEditable}"
         
 />
-
 <m:RadioButton  
     text="{i18n>igst}"
     id="HQD_id_CheckboxIGS"
@@ -194,6 +193,7 @@
     liveChange="HQD_onPercentageChange"
     editable="{SingleCompanyModel>/gstEditable}"
     maxLength="10"
+    valueStateText="{i18n>msaAmountMess}"
     id="HQD_id_Percentage"
    
 />
@@ -496,7 +496,7 @@
 
     <!-- Total (Column 8) -->
     <m:Input
-      value="{path:'QuotationModel>Total',formatter:'.Formatter.numberFormater'}"
+      value="{path:'QuotationModel>Total',formatter: '.Formatter.fromatNumber'}"
       editable="false"
       textAlign="End"
     />
@@ -519,7 +519,7 @@
                                                     visible="{= ${QuotationItemModel>/TotalSum} > 0}"
                                                 />
                                                 <m:Text
-                                                    text="{path:'QuotationModel>/SubTotalNotGST',formatter: '.Formatter.numberFormater'}"
+                                                    text="{path:'QuotationModel>/SubTotalNotGST',formatter: '.Formatter.fromatNumber'}"
                                                     id="id_Subtot"
                                                     class="amountText"
                                                     textAlign="End"
@@ -536,7 +536,7 @@
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
                                                 <m:Text
-                                                    text="{path:'QuotationModel>/SubTotal',formatter: '.Formatter.numberFormater'}"
+                                                    text="{path:'QuotationModel>/SubTotal',formatter: '.Formatter.fromatNumber'}"
                                                     id="HQD_id_Sub"
                                                     class="amountText"
                                                     textAlign="End"
@@ -551,7 +551,7 @@
     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
   />
   <m:Text
-    text="{path:'QuotationModel>/CGST',formatter: '.Formatter.numberFormater'}"
+    text="{path:'QuotationModel>/CGST',formatter: '.Formatter.fromatNumber'}"
     class="amountText"
     id="HQD_id_CGST"
     textAlign="End"
@@ -567,7 +567,7 @@
     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
   />
   <m:Text
-    text="{path:'QuotationModel>/SGST',formatter: '.Formatter.numberFormater'}"
+    text="{path:'QuotationModel>/SGST',formatter: '.Formatter.fromatNumber'}"
     class="amountText"
     textAlign="End"
     visible="{= ${QuotationModel>/SGSTVisible} === true }"
@@ -582,10 +582,10 @@
     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
   />
   <m:Text
-    text="{path:'QuotationModel>/IGST',formatter: '.Formatter.numberFormater'}"
+    text="{path:'QuotationModel>/IGST',formatter: '.Formatter.fromatNumber'}"
     class="amountText"
     textAlign="End"
-    visible="{= ${QuotationModel>/IGSTVisible} === true }"
+    visible="{QuotationModel>/IGSTVisible}"
   />
 </m:HBox>
 
@@ -599,7 +599,7 @@
                                                     visible="{= ${QuotationItemModel>/TotalSum} > 0}"
                                                 />
                                                 <m:Text
-                                                    text="{path:'QuotationModel>/TotalSum',formatter: '.Formatter.numberFormater'}"
+                                                    text="{path:'QuotationModel>/TotalSum',formatter: '.Formatter.fromatNumber'}"
                                                     id="HQD_TotalAmountI"
                                                     class="amountText"
                                                     textAlign="End"
@@ -630,8 +630,13 @@
         <m:footer>
             <m:Toolbar>
     <m:ToolbarSpacer />
-
-    <!-- Submit Button - Only for Create mode -->
+    <!-- <m:HBox justifyContent="Start">
+      
+       <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+    
+    </m:HBox> -->
+    <m:HBox  justifyContent="End">
+    
     <m:Button
         visible="{visiablityPlay>/createVisi}"
         text="{i18n>submit}"
@@ -640,7 +645,6 @@
         class="sendMail"
     />
 
-    <!-- Edit / Save Button - Only for Edit mode -->
     <m:Button
         visible="{visiablityPlay>/editVisi}"
         text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
@@ -648,7 +652,6 @@
         class="sendMail"
     />
 
-    <!-- Send Email Button - Only in Edit mode -->
     <m:Button
         text="{i18n>tileFooter}"
         id="HQD_id_QuotationMail"
@@ -664,6 +667,7 @@
         visible="{visiablityPlay>/merge}"
         type="Attention"
     />
+    </m:HBox>
 </m:Toolbar>
 
         </m:footer>
