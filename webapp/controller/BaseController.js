@@ -720,8 +720,8 @@ sap.ui.define([
         doc.setTextColor("#FFFFFF");
         doc.textWithLink(companyurl, 13, 38, { url: companyurl });
 
-        const addressLines = doc.splitTextToSize(address, 44);
-        doc.text(addressLines, 13, 45);
+        const addressLines = doc.splitTextToSize(address, 43.5);
+        doc.text(addressLines, 13, 44.5);
 
         // Add Back Page
         doc.addPage();

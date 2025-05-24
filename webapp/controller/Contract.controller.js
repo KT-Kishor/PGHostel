@@ -285,7 +285,7 @@ sap.ui.define(
                     var oTable = this.byId("C_id_Salary").getSelectedItem();
                     var oModelData = oTable.getBindingContext("ContractModel").getObject();
                     var rateType = oModelData.ConsultantRate.split(" ")[3];
-                    var varible = rateType === "Hr" ? 0 : rateType === "Day" ? 1 : 2;
+                    var varible = rateType === "Hour" ? 0 : rateType === "Day" ? 1 : 2;
 
                     var ContractActivejson = {
                         ContractNo: oModelData.ContractNo,
@@ -356,7 +356,7 @@ sap.ui.define(
                             }
 
                             const rateType = oModel.HrDaliyMonth;
-                            const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
+                            const rateText = rateType === 0 ? "Hour" : rateType === 1 ? "Day" : "Month";
                             const selectedCurrency = sap.ui.getCore().byId("CR_id_CurrencySelect").getSelectedKey();
                             const ConsultantRate = `${Formatter.fromatNumber(oModel.Amount)} ${selectedCurrency} Per ${rateText} Including all tax`;
                             const startDate = sap.ui.getCore().byId("CR_id_AssignmentStartDate").getDateValue();

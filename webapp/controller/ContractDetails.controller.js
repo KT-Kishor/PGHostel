@@ -47,7 +47,7 @@ sap.ui.define([
                             ConsultantAddress: "",
                             ContarctEmail: "",
                             ConsultingService: "",
-                            Rate: "Daily",
+                            Rate: "Day",
                             Amount: "",
                             Currency: "INR",
                             EndClientHirer: "",
@@ -146,7 +146,7 @@ sap.ui.define([
                         this.getView().getModel("oFilteredContractModel").setProperty("/Currency", oResult.ConsultantRate.split(" ")[1]);
 
                         var rateType = oResult.ConsultantRate.split(" ")[3];
-                        var varible = rateType === "Hr" ? 0 : rateType === "Day" ? 1 : 2;
+                        var varible = rateType === "Hour" ? 0 : rateType === "Day" ? 1 : 2;
                         this.getView().getModel("oFilteredContractModel").setProperty("/HrDaliyMonth", varible);
                         this.getView().byId("C_id_PageCreate").setVisible(false);
                         this.getView().byId("CUF_id_Contractpage").setVisible(true);
@@ -482,12 +482,12 @@ sap.ui.define([
                         var formattedText;
                         switch (this.RadioButton) {
                             case "Hour":
-                                formattedText = "Hr";
+                                formattedText = "Hour";
                                 break;
-                            case "Daily":
+                            case "Day":
                                 formattedText = "Day";
                                 break;
-                            case "Monthly":
+                            case "Month":
                                 formattedText = "Month";
                                 break;
                             default:
@@ -721,7 +721,7 @@ sap.ui.define([
                 }
 
                 const rateType = oModel.HrDaliyMonth;
-                const rateText = rateType === 0 ? "Hr" : rateType === 1 ? "Day" : "Month";
+                const rateText = rateType === 0 ? "Hour" : rateType === 1 ? "Day" : "Month";
                 const selectedCurrency = this.byId("CU_id_CurrencySelect").getSelectedKey();
                 const ConsultantRate = `${Formatter.fromatNumber(oModel.Amount)} ${selectedCurrency} Per ${rateText}`;
                 const LocationService = this.byId("CD_id_contractLocation").getSelectedKey();
@@ -823,7 +823,7 @@ sap.ui.define([
                 this.getView().getModel("oFilteredContractModel").setProperty("/Currency", oResult.ConsultantRate.split(" ")[1]);
 
                 var rateType = oResult.ConsultantRate.split(" ")[3];
-                var varible = rateType === "Hr" ? 0 : rateType === "Day" ? 1 : 2;
+                var varible = rateType === "Hour" ? 0 : rateType === "Day" ? 1 : 2;
                 this.getView().getModel("oFilteredContractModel").setProperty("/HrDaliyMonth", varible);
                 this.getView().byId("C_id_PageCreate").setVisible(false);
                 this.getView().byId("CUF_id_Contractpage").setVisible(true);

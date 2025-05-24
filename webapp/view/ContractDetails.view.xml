@@ -24,7 +24,7 @@
 							<Label text="{i18n>consultingService}" required="true"/>
 							<Input value="{ContractModelWizart>/ConsultingService}"  valueStateText="{i18n>placeConsultingService}" placeholder="{i18n>placeConsultingService}" id="CD_id_ConsultingService" change="onRole" liveChange="CD_ValidateConsultantName"  maxLength="50"/>
 							<Label text="{i18n>rate}" required="true" />
-							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="{= ${ContractModelWizart>/Rate} === 'Hour' ? 0 : (${ContractModelWizart>/Rate} === 'Daily' ? 1 : 2)}" select="RadioButtonSelect">
+							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="{= ${ContractModelWizart>/Rate} === 'Hour' ? 0 : (${ContractModelWizart>/Rate} === 'Day' ? 1 : 2)}" select="RadioButtonSelect">
 								<RadioButton text="{i18n>rateHour}" />
 								<RadioButton text="{i18n>rateDaily}" />
 								<RadioButton text="{i18n>rateMonthly}" />
