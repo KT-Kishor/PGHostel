@@ -12,8 +12,8 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmpID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="{MyInboxModelData>/}" change="" id="MI_id_EmpIDFilter" showClearIcon="true">
-								<core:ListItem key="{MyInboxModelData>EmpID}" text="{MyInboxModelData>EmpID}" additionalText="{MyInboxModelData>EmpName}" />
+							<ComboBox  showSecondaryValues= "true"  items="{oModelEmp>/}" change="" id="MI_id_EmpIDFilter" showClearIcon="true">
+								<core:ListItem key="{oModelEmp>EmpID}" text="{oModelEmp>EmpID}" additionalText="{oModelEmp>EmpName}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -70,6 +70,9 @@
 						<Text text="{i18n>subType}" />
 					</Column>
 					<Column demandPopin="true" >
+						<Text text="{i18n>submittedDate}" />
+					</Column>
+					<Column demandPopin="true" >
 						<Text text="{i18n>status}" />
 					</Column>
 				</columns>
@@ -82,6 +85,7 @@
 							<Text text="{path:'MyInboxModelData>EndDate',formatter:'.Formatter.formatDate'}"/>
 							<Text text="{MyInboxModelData>Type}"/>
 							<Text text="{MyInboxModelData>SubType}"/>
+							<Text text="{path:'MyInboxModelData>SubmittedDate',formatter:'.Formatter.formatDate'}"/>
 							<ObjectStatus text="{MyInboxModelData>Status}" inverted="true" state="{path: 'MyInboxModelData>Status', formatter: '.Formatter.formatObjectStatus'}" />
 						</cells>
 					</ColumnListItem>
