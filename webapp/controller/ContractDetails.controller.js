@@ -482,7 +482,7 @@ sap.ui.define([
                         var formattedText;
                         switch (this.RadioButton) {
                             case "Hour":
-                                formattedText = "HR";
+                                formattedText = "Hr";
                                 break;
                             case "Daily":
                                 formattedText = "Day";

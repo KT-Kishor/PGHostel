@@ -72,10 +72,10 @@
 					<Column demandPopin="true">
 						<Text text="{i18n>contractNo}"/>
 					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
+					<Column demandPopin="true">
 						<Text text="{i18n>consultantName}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
+					<Column demandPopin="true">
 						<Text text="{i18n>locationswhereServices}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">

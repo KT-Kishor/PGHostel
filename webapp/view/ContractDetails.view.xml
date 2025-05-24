@@ -84,8 +84,8 @@
 										   </ComboBox>
 										   
 							<Label text="{i18n>mobileNo}" required="true" />
-							<ComboBox items="{codeModel>/}" value="{ContractModelWizart>/STDCode}" showSecondaryValues= "true" id="CD_id_codeModel" change="CD_ValidateComboBox" valueStateText="{i18n>combovalueState}">
-								<core:ListItem key="{codeModel>country}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}"/>
+							<ComboBox items="{codeModel>/}" value="{ContractModelWizart>/STDCode}" showSecondaryValues= "true" id="CD_id_codeModel" change="CD_ValidateComboBox" valueStateText="{i18n>combovalueState}" filterSecondaryValues="true">
+								<core:ListItem key="{codeModel>calling_code}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
 							</ComboBox>
 
 							<Input value="{ContractModelWizart>/MobileNo}" placeholder="{i18n>mobileNo}"  liveChange="CD_validateMobileNo" maxLength="10" id="CD_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>

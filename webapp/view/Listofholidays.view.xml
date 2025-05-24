@@ -44,17 +44,17 @@
 						<Title  id="LOH_id_Title" text="{i18n>headerListOfHolidays} ({= ${HolidayModel>/}.length })"/>
 						<ToolbarSpacer />
 						<Button text="{i18n>import}" press="LOH_onOpenImport" type="Accept" visible="{= ${LoginModel>/Role} === 'Admin' }" />
-						<Button text="{i18n>download}"  press="LOH_onExport" type="Attention"/>
+						<Button text="{i18n>download}"  press="LOH_onExport" type="Ghost"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column minScreenWidth="Tablet" demandPopin="true">
+					<Column demandPopin="true">
 						<Text text="{i18n>holidayName}" textAlign="Center"></Text>
 					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true" >
+					<Column demandPopin="true" >
 						<Text text="{i18n>date}" textAlign="Center"></Text>
 					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
+					<Column demandPopin="true">
 						<Text text="{i18n>day}" textAlign="Center"></Text>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">

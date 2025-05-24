@@ -155,20 +155,7 @@ sap.ui.define(
                 },
 
                 CD_validateDate: function(oEvent) {
-                    var oStartDatePicker = sap.ui.getCore().byId("CR_id_AssignmentStartDate");
-                    var oEndDatePicker = sap.ui.getCore().byId("CR_id_AssignmentEndDate");
-                    const oSource = oEvent.getSource();
-                    const sId = oSource.getId();
-                    const sValue = oSource.getValue();
-                    const oDate = this.onFormatDate(sValue); // Convert "dd/MM/yyyy" to Date object
-
-                    if (!isNaN(oDate?.getTime?.())) {
-                        if (sId === oStartDatePicker.getId()) {
-                            oEndDatePicker.setMinDate(oDate); // Start Date changed — set minDate on End Date
-                        } else if (sId === oEndDatePicker.getId()) {
-                            oStartDatePicker.setMaxDate(oDate); // End Date changed — set maxDate on Start Date
-                        }
-                    }
+                    utils._LCvalidateDate(oEvent)
                 },
 
                 // Format date string to Date object
@@ -329,14 +316,22 @@ sap.ui.define(
                             this.oContractDialog.open();
                         }.bind(this));
                     } else {
+                         this._resetDialogFields(); // Reset fields to original data
                         this.CU_onChangeAggrementDate();
                         this.oContractDialog.open();
                     }
                 },
 
+                 _resetDialogFields: function () {
+                    sap.ui.getCore().byId("CR_id_AssignmentStartDate").setValueState("None")
+                      sap.ui.getCore().byId("CR_id_AssignmentEndDate").setValueState("None")
+                    sap.ui.getCore().byId("CR_id_EditAmountInput").setValueState("None")
+                    sap.ui.getCore().byId("CR_id_Mobile").setValueState("None")
+                    sap.ui.getCore().byId("CR_id_codeModel").setValueState("None")
+                },
+
                 CR_onPressClose: function() {
                     this.oContractDialog.close();
-                    sap.ui.getCore().byId("CR_id_AssignmentStartDate").setValueState("None")
                     this.byId("C_id_ActivateBtn").setEnabled(false);
                     this.byId("C_id_Renewbtn").setEnabled(false);
                     this.byId("C_id_Salary").removeSelections(true);
