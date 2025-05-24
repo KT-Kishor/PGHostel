@@ -264,7 +264,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
 
-            onPressSubmit: async function (oEvent) {
+           onPressSubmit: async function (oEvent) {
                 const that = this;
                 await this.ReadEmployeeDocument();
                 var oModel = this.getView().getModel("DocumentModel").getData();
@@ -272,16 +272,16 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     sap.m.MessageBox.warning(this.i18nModel.getText("uploadAtLeastOneDocumentMessage")); // You can add this key to your i18n model
                     return;
                 }
-                this.showConfirmationDialog(
-                    this.i18nModel.getText("confirmTitle"),
-                    this.i18nModel.getText("confirmSubmitMessage"),
-                    function () {
+                // this.showConfirmationDialog(
+                //     this.i18nModel.getText("confirmTitle"),
+                //     this.i18nModel.getText("confirmSubmitMessage"),
+                //     function () {
                         const ID = oEvent.getSource().getId().split("--").pop();
                         that.SS_onSavePress(ID);
-                    },
-                    function () {
-                        that.closeBusyDialog();
-                    });
+                    // },
+                    // function () {
+                    //     that.closeBusyDialog();
+                    // });
             },
 
             onChangeResigEndDate: function (oEvent) {
@@ -363,6 +363,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         oDataModel.EmergencyContactPerson2Realtion = oView.byId("SS_idRelS").getSelectedKey();
                     } else {
                         oDataModel.Type = "Submit";
+                        var Message = this.i18nModel.getText("confirmSubmitMessage");
                     }
 
                     const oPayload = {
@@ -371,7 +372,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             EmployeeID: this.EmployeeID
                         }
                     };
-
+                    
                     if (optionalValid) {
                         this.showConfirmationDialog(this.i18nModel.getText("confirmTitle"), Message,
                             function () {
@@ -811,8 +812,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this._oPreviewDialog.open();
             },
 
-            onFileSizeExceeds: function () {
-                MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
+                onFileSizeExceeds: function () {
+                MessageToast.show(this.i18nModel.getText("uploadDocSize"));
             },
 
             onPressSetPhoto: function () {

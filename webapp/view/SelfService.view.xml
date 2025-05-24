@@ -1127,7 +1127,7 @@
 												<u:FileUploader
                                                     visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                                     fileSizeExceed="onFileSizeExceeds"
-                                                    maximumFileSize="5MB"
+                                                    maximumFileSize="3MB"
                                                     typeMissmatch="onFileTypeMissmatch"
                                                     fileType="pdf,jpg,jpeg,png"
                                                     buttonText="Upload"
