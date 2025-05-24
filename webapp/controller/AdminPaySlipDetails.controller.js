@@ -89,7 +89,7 @@ sap.ui.define([
                 this.oModel.setProperty("/EmpData/EarningsTotalYearly", earningsTotalYearly);
                 this.oModel.setProperty("/EmpData/DeductionsTotalMonthly", deductionsTotalMonthly);
                 this.oModel.setProperty("/EmpData/DeductionsTotalYearly", deductionsTotalYearly);
-                var totalNetPay = earningsTotalMonthly - deductionsTotalMonthly;
+                var totalNetPay = +((earningsTotalMonthly - deductionsTotalMonthly).toFixed(2));
                 if(totalNetPay < 0) totalNetPay = 0;
                 this.oModel.setProperty("/EmpData/NetPay", totalNetPay);
                 this.oModel.setProperty("/EmpData/NetPayText", this.convertNumberToWords(totalNetPay, empData.Currency));
@@ -118,6 +118,12 @@ sap.ui.define([
 
             APD_onAmountChange: function (oEvent) {
                 const sPath = oEvent.getSource().getBindingContext("PaySlip").getPath();
+                let sValue = +(oEvent.getParameter("value"));
+                sValue = sValue.toFixed(2);
+                if (sValue && sValue.length > 10) {
+                    sValue = this.oModel.getProperty(`${sPath}/InitialMonthly`);
+                }
+                oEvent.getSource().setValue(+(sValue));
                 const fAmount = (parseFloat(this.oModel.getProperty(`${sPath}/Amount`)) || 0) - (parseFloat(this.oModel.getProperty(`${sPath}/InitialMonthly`)) || 0);
                 const fYearlyAmount = parseFloat(this.oModel.getProperty(`${sPath}/InitialYearly`)) || 0;
                 const fTotal = fAmount + fYearlyAmount;
