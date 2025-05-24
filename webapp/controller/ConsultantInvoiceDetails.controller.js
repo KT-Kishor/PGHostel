@@ -180,6 +180,7 @@ sap.ui.define(
 
                         var oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
                         oInvoiceModel.setProperty("/ConsultantInvoiceItem", items);
+                        this.byId("CI_id_ConsultantInvoiceDeatailTable").getBinding("items").refresh(true);
 
                     // Set GST values in oModelDataPro
                     var oModelDataPro = this.getView().getModel("oModelDataPro");
