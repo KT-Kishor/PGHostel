@@ -98,6 +98,11 @@
                 "uri": "model/Degree.json",
                 "preload": true
             },
+            "leaveTypeModel": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/LeaveModel.json",
+                "preload": true
+            },
             "ModeOfPayment": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/ModeOfPayment.json",
@@ -373,6 +378,13 @@
                     ]
                 },
                 {
+                    "name": "RouteLOPDetails",
+                    "pattern": "LOPDetails",
+                    "target": [
+                        "TargetLOPDetails"
+                    ]
+                },
+                {
                     "name": "RouteEmployeeDetails",
                     "pattern": "EmployeeDetails/{sPath}",
                     "target": [
@@ -429,6 +441,13 @@
                     "pattern": "ManageAssignment",
                     "target": [
                         "TargetManageAssignment"
+                    ]
+                },
+                {
+                    "name": "RouteDetailLeave",
+                    "pattern": "DetailLeave",
+                    "target": [
+                        "TargetDetailLeave"
                     ]
                 },
                 {
@@ -589,11 +608,23 @@
                     "viewId": "HomePage",
                     "viewName": "HomePage"
                 },
+                "TargetLOPDetails": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "viewId": "LOPDetails",
+                    "viewName": "LOPDetails"
+                },
                 "TargetLoginPage": {
                     "viewType": "XML",
                     "transition": "slide",
                     "viewId": "LoginPage",
                     "viewName": "LoginPage"
+                },
+                "TargetDetailLeave": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "viewId": "DetailLeave",
+                    "viewName": "DetailLeave"
                 },
                 "TargetTilePage": {
                     "viewType": "XML",

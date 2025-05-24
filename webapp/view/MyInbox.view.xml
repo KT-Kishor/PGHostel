@@ -47,7 +47,7 @@
 					<OverflowToolbar >
 						<Title id="MI_id_TitleTable" text="{i18n>headerEmpDetails}"/>
 						<ToolbarSpacer />
-						<Button icon="sap-icon://detail-view" visible="{modelButtonVisible>/LOPDataButt}" press="MI_onPressLOPData" tooltip="LOP Leave Details" />
+						<Button icon="sap-icon://detail-view" id="MI_id_LOPDetBut" press="MI_onPressLOPData" tooltip="LOP Leave Details" />
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns >

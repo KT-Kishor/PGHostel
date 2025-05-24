@@ -1,0 +1,33 @@
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.DetailLeave"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout">
+    <Page id="idDetailLeavePage" title="{i18n>titleInBox}" navButtonPress="DL_onBack" showNavButton="true">
+        <content>
+		<ObjectHeader
+		iconAlt="{oNavLeaveModel>/EmpName}"
+		responsive="true"
+		title="{oNavLeaveModel>/EmpName}"
+		intro="{oNavLeaveModel>/EmpID}"
+		backgroundDesign="Translucent"
+		class="sapUiResponsivePadding--header" >
+			<ObjectAttribute title=""  
+            text="{= ${oNavLeaveModel>/StartDate} + ' to ' + ${oNavLeaveModel>/EndDate} + ' (' + ${oNavLeaveModel>/NoofDays} + ' ' + (${oNavLeaveModel>/NoofDays} === 1 ? 'day' : 'days') + ')' }"/>         
+			<ObjectAttribute  title="{i18n>submittedDate}" text="{oNavLeaveModel>/SubmittedDate}" />
+			<statuses>
+			<ObjectStatus
+				title="{i18n>status}"
+				text="{oNavLeaveModel>/Status}"
+				  state="{= ${oNavLeaveModel>/Status} === 'Approved' ? 'Success' : 
+                  ${oNavLeaveModel>/Status} === 'Rejected' ? 'Error' : 
+                  ${oNavLeaveModel>/Status} === 'Submitted' ? 'Warning' : 'None'}"/>
+		    </statuses>
+			<ObjectAttribute title="{i18n>employeeComment}" text="{oNavLeaveModel>/EmpComment}" tooltip="{oNavLeaveModel>/EmpComment}" />
+			<ObjectAttribute class="customTitleStyle" title="{i18n>managerComment}" text="{oNavLeaveModel>/ManagerComment}"  tooltip="{oNavLeaveModel>/ManagerComment}"  />
+	    </ObjectHeader>
+		<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.LeaveBarChart" type="XML"/>	
+        </content>
+    </Page>
+</mvc:View>

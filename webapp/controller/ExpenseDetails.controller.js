@@ -26,6 +26,11 @@ sap.ui.define([
                     this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                     this.ExpenseID = oEvent.getParameter("arguments").sPath;
 
+                    if(this.ExpenseID.includes("MyInbox")){
+                      this.ExpenseID = this.ExpenseID.split("|")[0];
+                      this.MyInBox = true;
+                    }
+
                     this._fetchCommonData("Currency", "CurrencyModel");
                     await this._fetchCommonData("Expense", "FilteredExpenseModel", {
                         ExpenseID: this.ExpenseID,
@@ -219,6 +224,9 @@ sap.ui.define([
             },
 
             Exp_Det_onPressBackBtn: function () {
+                if(this.MyInBox){
+                    this.getRouter().navTo("RouteMyInbox", { sMyInBox : "ExpenseDetail" });
+                }else{
                 if (this.ViewModel.getProperty("/isEditMode")) {
                     this.showConfirmationDialog(
                         this.i18nModel.getText("ConfirmActionTitle"),
@@ -234,6 +242,7 @@ sap.ui.define([
                 this.byId("Exp_id_Source").setValueState("None");
                 this.byId("Exp_id_Destination").setValueState("None");
                 this.byId("Exp_id_EmpRemark").setValueState("None");
+            }
             },
 
             Exp_Det_onEditOrSavePress: function () {

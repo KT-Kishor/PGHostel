@@ -13,25 +13,51 @@ sap.ui.define([
       this.getRouter().getRoute("RouteMyInbox").attachMatched(this._onRouteMatched, this);
     },
 
-    _onRouteMatched: async function () {
-      const data = [{ type: "Leave" }, { type: "Expense" }, { type: "Resignation" }];
-      this.getView().setModel(new JSONModel(data), "oTypeModel");
-      const loginModel = this.getView().getModel("LoginModel");
-      loginModel.setProperty("/HeaderName", "Inbox Details");
-      this.oLoginModel = loginModel.getData();
-      this.idEmp = this.oLoginModel.EmployeeID;
-      var filter = this.oLoginModel.Role === "Accountant" ? { Status: "Send to account" } : { ManagerID: this.idEmp }
-      await this._fetchCommonData("InboxDetails", "MyInboxModelData", filter);
-      var response = await this.ajaxReadWithJQuery("InboxDetails", filter);
-      if(response.data.length > 0){
-      var dataEmp = [...new Map(
-        response.data.filter(item => item.EmpID && item.EmpID.trim() !== "").map(item => [item.EmpID.trim(), item])).values()];
-        var oModelEmp =new JSONModel(dataEmp)
-        this.getView().setModel(oModelEmp,"oModelEmp")
+    _onRouteMatched: async function (OEvent) {
+      const sParams = OEvent.getParameter("arguments").sMyInBox;
+      const oView = this.getView();
+      const oLoginModel = oView.getModel("LoginModel");
+      const oLoginData = oLoginModel.getData();
+      this.oLoginModel =oLoginData;
+      const oComponent = this.getOwnerComponent();
+      const isAccountMgr = oLoginData.Role === "Account Manager";
+
+      this.sParams = sParams;
+      oView.setModel(new JSONModel([{ type: "Leave" }, { type: "Expense" }, { type: "Resignation" }]), "oTypeModel");
+      oLoginModel.setProperty("/HeaderName", "Inbox Details");
+      this.i18nModel = oView.getModel("i18n").getResourceBundle;
+      this.idEmp = oLoginData.EmployeeID;
+
+      const statusFilter = isAccountMgr ? "Send to account" : "Submitted";
+      const filter = isAccountMgr ? { Status: statusFilter } : { ManagerID: this.idEmp, Status: statusFilter };
+
+      if (sParams === "MyInboxView") {
+        this.MI_onClearEmployeeDetails();
+        this.byId("MI_id_StatusFilter").setValue(statusFilter);
+        await this._fetchCommonData("InboxDetails", "MyInboxModelData", filter);
+      } else {
+        this.MI_onSearch();
       }
-      this.onBeforeShow();
+
+      oView.byId("MI_id_LOPDetBut").setVisible(isAccountMgr);
+      if (isAccountMgr) {
+        oComponent.getModel("MyInbox").setData([
+          { ID: 1, StatusName: "Send to account" },
+          { ID: 2, StatusName: "Paid" }
+        ]);
+      }
+
+      const response = await this.ajaxReadWithJQuery("InboxDetails", isAccountMgr ? { Status: "Send to account" } : { ManagerID: this.idEmp });
+      if (response.data?.length) {
+        const empData = [...new Map(response.data.filter(item => item.EmpID?.trim()).map(item => [item.EmpID.trim(), item])).values()];
+        oView.setModel(new JSONModel(empData), "oModelEmp");
+      }
     },
 
+    MI_onPressLOPData:function() {
+      //const oData = this.byId("MI_id_MyInboxTable").getSelectedItem().getBindingContext("MyInboxModelData").getObject();
+      this.getRouter().navTo("RouteLOPDetails");
+    },
     onPressback() {
       this.getRouter().navTo("RouteTilePage");
     },
@@ -81,8 +107,10 @@ sap.ui.define([
           }
         });
 
-        if(this.oLoginModel.Role !== "Accountant") params["ManagerID"] = this.idEmp;
-       // else params["Status"] = this.idEmp; 
+        if(this.oLoginModel.Role !== "Account Manager") params["ManagerID"] = this.idEmp;
+        else{    if (!params.hasOwnProperty("Status")) {
+        params["Status"] = "Send to account";
+        } }
         await this._fetchCommonData("InboxDetails", "MyInboxModelData", params);
         this.onBeforeShow();
         this.closeBusyDialog();
@@ -134,7 +162,7 @@ sap.ui.define([
       const { Status, Type } = this.oModelData;
 
       const isSubmitted = Status === "Submitted";
-      const isAccountant = role === "Accountant";
+      const isAccountant = role === "Account Manager";
       const isExpense = Type === "Expense";
 
       this.byId("MI_id_ButApprove").setVisible(isSubmitted && !isAccountant);
@@ -147,11 +175,13 @@ sap.ui.define([
       const oData = oEvent.getSource().getBindingContext("MyInboxModelData").getObject();
 
       if (oData.Type === "Expense") {
-        this.getRouter().navTo("RouteNavigationExpense", {
-          sPath: `${oData.ID} MyInBox`,
-          EmployeeID: oData.EmpID
+        this.getRouter().navTo("RouteExpensDetails", {
+          sPath: oData.ID+"|MyInbox"
         });
       } else if (oData.Type === "Leave") {
+        oData.StartDate = this.Formatter.formatDate(oData.StartDate);
+        oData.EndDate = this.Formatter.formatDate(oData.EndDate);  
+        oData.SubmittedDate = this.Formatter.formatDate(oData.SubmittedDate);
         this.getOwnerComponent().setModel(new JSONModel(oData), "oNavLeaveModel");
         this.getRouter().navTo("RouteDetailLeave");
       } else {
@@ -166,7 +196,7 @@ sap.ui.define([
       const mapStatus = {
         "Approve": this.oModelData.Type === "Expense" ? "Send to account" : "Approved",
         "Reject": "Rejected",
-        "Send Back": this.oLoginModel.Role === "Accountant" ? "Send back by account" : "Send back by manager",
+        "Send Back": this.oLoginModel.Role === "Account Manager" ? "Send back by account" : "Send back by manager",
         "Paid": "Paid"
       };
 
@@ -209,20 +239,20 @@ sap.ui.define([
       const remark = sap.ui.getCore().byId("MIF_id_remark").getValue();
       oModelData.Status = statusValue;
       oModelData.NoofDays = String(oModelData.NoofDays);
-      if (this.oLoginModel.Role === "Accountant") {
+      if (this.oLoginModel.Role === "Account Manager") {
         oModelData.AccountRemark = remark;
+        var filter = { Status: "Send to account" }
       } else {
         oModelData.ManagerComment = remark;
-
+        var filter = { ManagerID: this.idEmp }
       }
       this.oDialog.close();
-      sap.ui.core.BusyIndicator.show(0);
+    this.getBusyDialog();
       const requestData = { filters: { ID: oModelData.ID }, data: oModelData };
       this.ajaxUpdateWithJQuery("InboxDetails", requestData)
         .then(() => {
+          this._fetchCommonData("InboxDetails", "MyInboxModelData",filter );
           this.closeBusyDialog();
-          sap.ui.core.BusyIndicator.hide();
-          this._fetchCommonData("InboxDetails", "MyInboxModelData", { ManagerID: this.idEmp });
           this.onBeforeShow();
           sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText(successMsg));
         })
