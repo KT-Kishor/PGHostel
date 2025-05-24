@@ -104,9 +104,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 const sectionTitle = oEvent.getParameter("section").getTitle();
                 switch (sectionTitle) {
                     case "Basic Details":
-                        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
-                            EmployeeID: this.EmployeeID
-                        });
+                        if (this.getView().getModel("viewModel").getProperty("/isEditMode")) {
+                             sap.m.MessageBox.warning(this.i18nModel.getText("sectionChangeConfirm"));  
+                                return;
+                         }
+                        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {EmployeeID: this.EmployeeID});
                         this.getView().getModel("sEmployeeModel").refresh(true);
                         break;
                     case "Salary Details":
@@ -118,6 +120,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.getView().byId("SS_id_PaySlipTable").setBusy(false);
                         break;
                     case "Document":
+                         if (this.getView().getModel("viewModel").getProperty("/isEditMode")) {
+                            sap.m.MessageBox.warning(this.i18nModel.getText("sectionChangeConfirm")); 
+                            return
+                        }
                         this.byId("SS_id_AcName").setValueState("None");
                         this.byId("SS_id_Acno").setValueState("None");
                         this.byId("SS_id_BankName").setValueState("None");
@@ -196,6 +202,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
             SS_validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
+            },
+             SS_validateCombo: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
             },
             SS_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
@@ -303,7 +312,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                     utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
                                     utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
                                     utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
-                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_STDCode"), "ID") &&
+                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCode"), "ID") &&
                                     utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
                                     utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
                                     utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
@@ -1066,7 +1075,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 try {
                     // this.getBusyDialog();
                     const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Company"), "ID") &&
-                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") &&
+                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_Desig"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEmp_id_OfcAddress"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_StartDate"), "ID") &&
                         utils._LCvalidateDate(sap.ui.getCore().byId("AddEmp_id_EndDate"), "ID")

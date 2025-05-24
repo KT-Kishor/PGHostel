@@ -341,7 +341,7 @@
                                             id="SS_id_STDCode"
                                             items="{codeModel>/}"
                                             filterSecondaryValues="true"
-                                            change="Emp_onDesignationChange"
+                                            change="SS_validateCombo"
                                             valueStateText="{i18n>combovalueState}"
                                             editable="{viewModel>/isEditMode}"
                                         >
@@ -662,7 +662,6 @@
 					<subSections>
 						<ObjectPageSubSection
                             titleUppercase="false"
-                            title="{i18n>bankDetails}"
                         >
 							<blocks>
 								<f:SimpleForm
@@ -683,6 +682,10 @@
                                 >
 									<f:toolbar>
 										<m:Toolbar>
+                                        	<m:Title
+                                                text="{i18n>bankDetails}"
+                                            />
+
 											<m:ToolbarSpacer />
 											<m:Button
                                                 id="DocumentBtn"
@@ -837,7 +840,7 @@
                                             value="{sEmployeeModel>/0/Passport}"
                                             editable="{viewModel>/isEditMode}"
                                             id="SS_id_Passport"
-                                            maxLength="12"
+                                            maxLength="8"
                                             liveChange="SS_validatePassport"
                                             placeholder="{i18n>placePassport}"
                                             valueStateText="{i18n>passportNoValueState}"
@@ -867,8 +870,7 @@
                                     growingScrollToLoad="true"
                                     busyIndicatorDelay="0"
                                     width="auto"
-                                    items="{path:'sEducationModel>/'}"
-                                    id="EdF_id_EduTable"
+                                    items="{ path: 'sEducationModel>/', sorter: {path: 'EducationStartDate', descending: false} }"                                    id="EdF_id_EduTable"
                                     growing="true"
                                     growingThreshold="50"
                                     alternateRowColors="true"
@@ -969,7 +971,7 @@
                                     id="EmpF_id_EmpTable"
                                     growingScrollToLoad="true"
                                     width="auto"
-                                    items="{path:'sEmploymentModel>/'}"
+                                    items="{ path: 'sEmploymentModel>/', sorter: {path: 'EndDate', descending: true} }"                                    
                                     growing="true"
                                     growingThreshold="50"
                                     alternateRowColors="true"
@@ -1253,7 +1255,7 @@
 									<m:Column>
 										<m:Text text="{i18n>monthAndYear}" />
 									</m:Column>
-									<m:Column width="10%">
+									<m:Column demandPopin="true" minScreenWidth="Desktop" width="10%">
 										<m:Text text="{i18n>payableDays}" />
 									</m:Column>
 									<m:Column hAlign="End" demandPopin="true" minScreenWidth="Tablet">
