@@ -69,22 +69,22 @@
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
-                    <Column>
+                    <Column hAlign="Left" demandPopin="true">
                         <Text text="{i18n>quotationNo}" />
                     </Column>
-                    <Column>
+                    <Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
                         <Text text="{i18n>companyName}" />
                     </Column>
-                    <Column>
+                    <Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
                         <Text text="{i18n>date}" />
                     </Column>
-                    <Column>
+                    <Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                         <Text text="{i18n>companyGSTNO}" />
                     </Column>
-                    <Column>
+                    <Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                         <Text text="{i18n>customerName}" />
                     </Column>
-                    <Column>
+                    <Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                         <Text text="{i18n>customerGSTNO}" />
                     </Column>
                 </columns>

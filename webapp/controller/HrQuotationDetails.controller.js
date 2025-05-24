@@ -41,12 +41,9 @@ sap.ui.define(
       _onRouteMatched: async function (oEvent) {
         var oArgs = oEvent.getParameter("arguments");
         var sQuotationNo = decodeURIComponent(oArgs.sQuotationNo);
-
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
-
         this.getBusyDialog();
-
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
         await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
         await this._fetchCommonData("Currency", "CurrencyModel");
@@ -91,10 +88,10 @@ sap.ui.define(
           var oValidPicker = this.getView().byId("HQD_id_QuotationValid");
           oValidPicker.setMaxDate(oValidUntil);
           oValidPicker.setDateValue(oValidUntil); // Ensure UI shows it
-
         }
         else {
           // Edit Mode
+          this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
           var oSelectedQuotation = aQuotations.find(item => item.QuotationNo === sQuotationNo);
           if (oSelectedQuotation) {
@@ -874,20 +871,13 @@ sap.ui.define(
         const that = this;
 
         try {
-          const oListItem = oEvent.getParameter("listItem"); // This is the deleted row
+          const oListItem = oEvent.getParameter("listItem");
           const oContext = oListItem.getBindingContext("QuotationModel");
 
           if (!oContext) throw new Error("Binding context not found for selected row.");
 
           const oItemData = oContext.getObject();
-          if (!oItemData || !oItemData.SlNo) {
-            throw new Error("Quotation item not found.");
-          }
-
-          const sQuotationNo = that.getView().getModel("SingleCompanyModel").getProperty("/QuotationNo");
-          if (!sQuotationNo) {
-            throw new Error("Quotation number is missing.");
-          }
+          const sPath = oContext.getPath();
 
           const confirmed = await new Promise((resolve) => {
             that.showConfirmationDialog(
@@ -903,14 +893,33 @@ sap.ui.define(
             return;
           }
 
-          await that.ajaxDeleteWithJQuery("/QuotationItem", {
-            filters: {
-              QuotationNo: sQuotationNo,
-              SlNo: oItemData.SlNo
-            }
-          });
+          const oModel = that.getView().getModel("QuotationModel");
+          const aItems = oModel.getProperty("/QuotationItemModel");
 
-          MessageToast.show(that.i18nModel.getText("msgQuotationitemdelete"));
+          // Determine if item is from DB (Edit mode) or newly added in UI (Create mode)
+          const isEditMode = oItemData && oItemData.SlNo;
+
+          if (isEditMode) {
+            const sQuotationNo = that.getView().getModel("SingleCompanyModel").getProperty("/QuotationNo");
+            if (!sQuotationNo) {
+              throw new Error("Quotation number is missing.");
+            }
+
+            await that.ajaxDeleteWithJQuery("/QuotationItem", {
+              filters: {
+                QuotationNo: sQuotationNo,
+                SlNo: oItemData.SlNo
+              }
+            });
+
+            MessageToast.show(that.i18nModel.getText("msgQuotationitemdelete"));
+          }
+
+          // Remove from local model array (works for both Create and Edit mode)
+          const iIndex = parseInt(sPath.split("/").pop(), 10);
+          aItems.splice(iIndex, 1);
+          oModel.setProperty("/QuotationItemModel", aItems);
+
           that.updateTotalAmount();
         } catch (error) {
           MessageToast.show(error.message || "Error deleting Quotation item");
@@ -919,32 +928,111 @@ sap.ui.define(
         }
       },
 
-      //   var oModel = this.getView().getModel("QuotationModel");
-      //   var aItems = oModel.getProperty("/QuotationItemModel");
-      //   var oContext = oEvent.getParameter("listItem").getBindingContext("QuotationModel");
-      //   var iIndex = oContext.getProperty("$index");
-
-      //   // Remove the item from the array
-      //   aItems.splice(iIndex, 1);
-
-      //   // Update the model to reflect changes
-      //   oModel.setProperty("/QuotationItemModel", aItems);
-      //   this.updateTotalAmount()
-      // },
-
-
-      HQD_onPressSendEmail: function () {
-        if (!this.oDialogMail) {
+      EOD_commonOpenDialog: function (fragmentName) {
+        if (!this.EOU_oDialogMail) {
           sap.ui.core.Fragment.load({
-            name: "sap.kt.com.minihrsolution.fragment.CommonMail",
+            name: fragmentName,
             controller: this,
-          }).then(function (oDialogMail) {
-            this.oDialogMail = oDialogMail;
-            this.getView().addDependent(this.oDialogMail);
-            this.oDialogMail.open();
+          }).then(function (EOU_oDialogMail) {
+            this.EOU_oDialogMail = EOU_oDialogMail;
+            this.getView().addDependent(this.EOU_oDialogMail);
+            this.EOU_oDialogMail.open();
           }.bind(this));
         } else {
-          this.oDialogMail.open();
+          this.EOU_oDialogMail.open();
+        }
+      },
+      HQD_onPressSendEmail: function () {
+        var oEmployeeEmail = this.getView().getModel("SingleCompanyModel").getData().CustomerEmailID;
+        if (!oEmployeeEmail || oEmployeeEmail.length === 0) {
+          MessageBox.error("To Email is missing");
+          return;
+        }
+        var oUploaderDataModel = new JSONModel({
+          isEmailValid: true,
+          ToEmail: oEmployeeEmail,
+          CCEmail: this.getView().getModel("CCMailModel").getData()[0].CCEmailId,
+          name: "",
+          mimeType: "",
+          content: "",
+          isFileUploaded: false,
+          button: false
+        });
+        this.getView().setModel(oUploaderDataModel, "UploaderData");
+        this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
+        this.validateSendButton();
+      },
+      Mail_onPressClose: function () {
+        this.EOU_oDialogMail.destroy();
+        this.EOU_oDialogMail = null;
+      },
+      Mail_onUpload: function (oEvent) {
+        this.handleFileUpload(
+          oEvent,
+          this,                      // context
+          "UploaderData",            // model name
+          "/attachments",            // path to attachment array
+          "/name",                   // path to comma-separated file names
+          "/isFileUploaded",         // boolean flag path
+          "uploadSuccessfull",       // i18n success key
+          "fileAlreadyUploaded",     // i18n duplicate key
+          "noFileSelected",          // i18n no file selected
+          "fileReadError",           // i18n file read error
+          () => this.validateSendButton()
+        );
+      },
+      Mail_onEmailChange: function () {
+        this.validateSendButton();
+      },
+      validateSendButton: function () {
+        try {
+          const sendBtn = sap.ui.getCore().byId("SendMail_Button");
+          const emailField = sap.ui.getCore().byId("CCMail_TextArea");
+          const uploaderModel = this.getView().getModel("UploaderData");
+          if (!sendBtn || !emailField || !uploaderModel) {
+            return;
+          }
+          const isEmailValid = utils._LCvalidateEmail(emailField, "ID") === true;
+          const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
+          sendBtn.setEnabled(isEmailValid && isFileUploaded);
+        } catch (error) {
+          MessageToast.show(this.i18nModel.getText("technicalError"));
+        }
+      },
+      Mail_onSendEmail: function () {
+        try {
+          var oModel = this.getView().getModel("SingleCompanyModel").getData();
+
+          // Format date to DD/MM/YYYY
+          var oDate = new Date(oModel.Date); // Ensure it's a Date object
+          var sFormattedDate = [
+            ("0" + oDate.getDate()).slice(-2),
+            ("0" + (oDate.getMonth() + 1)).slice(-2),
+            oDate.getFullYear()
+          ].join("/");
+
+          var oPayload = {
+            "CustomerName": oModel.CustomerName,
+            "CustomerEmailID": oModel.CustomerEmailID,
+            "QuotationNo": oModel.QuotationNo,
+            "Date": sFormattedDate,
+            "TotalSum": (`${oModel.TotalSum} ${oModel.Currency}`),
+            "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
+            "attachments": this.getView().getModel("UploaderData").getProperty("/attachments")
+          };
+
+          this.getBusyDialog();
+          this.ajaxCreateWithJQuery("QuotationSendEmail", oPayload).then((oData) => {
+            MessageToast.show(this.i18nModel.getText("emailSuccess"));
+            this.closeBusyDialog();
+          }).catch((error) => {
+            this.closeBusyDialog();
+            MessageToast.show(error.responseText);
+          });
+          this.Mail_onPressClose();
+        } catch (error) {
+          this.closeBusyDialog();
+          MessageToast.show(error.responseText);
         }
       },
       resetHQDForm: function () {
@@ -967,17 +1055,7 @@ sap.ui.define(
         const oModel = this.getView().getModel("QuotationModel");
 
         //Clear calculation-related fields
-        oModel.setProperty("/QuotationItemModel", []);
-        oModel.setProperty("/SubTotal", "");
-        oModel.setProperty("/SubTotalNotGST", "");
-        oModel.setProperty("/CGST", "");
-        oModel.setProperty("/SGST", "");
-        oModel.setProperty("/IGST", "");
-        oModel.setProperty("/TotalSum", "");
-        oModel.setProperty("/CGSTVisible", false);
-        oModel.setProperty("/SGSTVisible", false);
-        oModel.setProperty("/IGSTVisible", false);
-
+        oModel.setProperty("/QuotationItemModel", []); oModel.setProperty("/SubTotal", ""); oModel.setProperty("/SubTotalNotGST", ""); oModel.setProperty("/CGST", ""); oModel.setProperty("/SGST", ""); oModel.setProperty("/IGST", ""); oModel.setProperty("/TotalSum", ""); oModel.setProperty("/CGSTVisible", false); oModel.setProperty("/SGSTVisible", false); oModel.setProperty("/IGSTVisible", false);
         // Also reset relevant fields in SingleCompanyModel
         const oSingleModel = this.getView().getModel("SingleCompanyModel");
         oSingleModel.setProperty("/Percentage", "");
@@ -986,9 +1064,7 @@ sap.ui.define(
 
       HQD_onChangeGSTCalculation: function (oEvent) {
         var oView = this.getView();
-        var oQuotationModel = oView.getModel("QuotationModel");
-
-        // Get selected value from ComboBox
+        var oQuotationModel = oView.getModel("QuotationModel");        // Get selected value from ComboBox
         var sSelectedKey = oEvent.getSource().getSelectedKey(); // "Yes" or "No"
 
         // Update each item's GSTCalculation field
@@ -997,17 +1073,13 @@ sap.ui.define(
         aItems.forEach(function (oItem) {
           oItem.GSTCalculation = sSelectedKey;
         });
-
         oQuotationModel.setProperty("/QuotationItemModel", aItems);
 
         // Optionally update global GSTCalculation too
         oQuotationModel.setProperty("/GSTCalculation", sSelectedKey);
-
         // Recalculate totals
         this.updateTotalAmount();
       },
-
-
       onPercentageChange: function (oEvent) {
         var sPercentage = oEvent.getParameter("value"); // Get the new value
         var oModel = this.getView().getModel("SingleCompanyModel");
@@ -1051,7 +1123,6 @@ sap.ui.define(
             utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCustomerAddress"), "ID") &&
             utils._LCvalidateGstNumber(this.byId("HQD_id_InputCustomerGSTNO"), "ID") &&
             (!isINR || utils._LCvalidateMandatoryField(this.byId("HQD_id_Percentage"), "ID"));
-
           if (!bIsValid) {
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
