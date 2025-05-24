@@ -541,10 +541,10 @@
                 </contentLeft>
                 <contentRight>
                     <Button
-                        text="{i18n>updatepassword2}"
-                        press="TP_onupdatepress"
-                        visible="{= ${LoginModel>/Role} === 'Admin' }"
-                    />
+    text="{i18n>updatepassword2}"
+    press="TP_onupdatepress"
+    visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Consultant' || ${LoginModel>/Role} === 'IT Manager' }"
+/>
                 </contentRight>
             </Bar>
         </footer>
