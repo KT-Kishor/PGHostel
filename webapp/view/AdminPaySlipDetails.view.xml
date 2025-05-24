@@ -198,20 +198,6 @@
                                             additionalText="{EmployeeModel>EmployeeName}"
                                         />
                                     </m:ComboBox>
-                                    <!-- <m:Label text="{i18n>selectMonth}" />
-                                    <m:ComboBox
-                                        showSecondaryValues="true"
-                                        id="APD_id_Month"
-                                        items="{MonthsModel>/results}"
-                                        value="{PaySlip>/Month}"
-                                        change="onMonthChange"
-                                        editable="false"
-                                    >
-                                        <core:Item
-                                            key="{MonthsModel>ID}"
-                                            text="{MonthsModel>Month}"
-                                        />
-                                    </m:ComboBox> -->
                                     <m:Label text="{i18n>monthAndYear}" />
                                     <m:DatePicker
                                         id="APD_id_Payroll"
@@ -224,7 +210,7 @@
                         </ObjectPageSubSection>
                         <!-- Salary Details SubSection -->
                         <ObjectPageSubSection
-                            title="{i18n>Pay Slip Structure}"
+                            title="{i18n>paySlipStructure}"
                             titleVisible="true"
                         >
                             <m:VBox >
@@ -360,7 +346,7 @@
                                                         <m:headerToolbar>
                                                             <m:OverflowToolbar>
                                                                 <m:Title
-                                                                    text="{i18n>Deduction Details}"
+                                                                    text="{i18n>deductionDetails}"
                                                                     level="H2"
                                                                 />
                                                                 <m:ToolbarSpacer

@@ -84,7 +84,7 @@
                     <Toolbar>
                         <Title
                             id="AP_id_Title"
-                            text="{i18n>paySlipDetails} ({PaySlip>/RowCount})"
+                            text="{= ${i18n>paySlipDetails} + ' (' + ${PaySlip>/EmpTable}.length + ')' }"
                         />
                         <ToolbarSpacer />
                         <Button

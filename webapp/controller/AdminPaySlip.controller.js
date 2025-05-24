@@ -1,10 +1,7 @@
 sap.ui.define([
-    "./BaseController", //call base controller
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
-    "../model/formatter", "sap/ui/core/BusyIndicator"
+    "./BaseController", "../model/formatter", "sap/ui/core/BusyIndicator"
 ],
-    function (BaseController, JSONModel, MessageToast, Formatter, BusyIndicator) {
+    function (BaseController, Formatter, BusyIndicator) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.AdminPaySlip", {
             Formatter: Formatter,
@@ -12,20 +9,13 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteAdminPaySlip").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: async function (oEvent) {
+            _onRouteMatched: async function () {
                 var LoginFunction = await this.commonLoginFunction("PaySlip");
                 if (!LoginFunction) return;
-                //this.getBusyDialog();
                 this.AP_onSearch();
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.oModel = this.getView().getModel("PaySlip");
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Generate Pay Slip");
-                var aData = this.oModel.getProperty("/EmpTable");
-                this.oModel.setProperty("/RowCount", aData ? aData.length : 0);
-                var oBinding = this.oModel.bindList("/EmpTable");
-                oBinding.attachChange(function () {
-                    this.oModel.setProperty("/RowCount", oBinding.getLength());
-                });
-                //this.closeBusyDialog();
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("paySlipTitle"));
             },
 
             AP_onPressAddPayslip: function () {
@@ -63,19 +53,7 @@ sap.ui.define([
             AP_onClear: function () {
                 var aFilterItems = this.byId("AP_id_AdminPaySlip").getFilterGroupItems();
                 aFilterItems.forEach(function (oItem) {
-                    oItem.getControl().setValue("");
-                    // var oControl = oItem.getControl(); // Get the associated control
-                    // if (oControl) {
-                    //     if (oControl.setValue) {
-                    //         oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
-                    //     }
-                    //     if (oControl.setSelectedKey) {
-                    //         oControl.setSelectedKey(""); // Reset selection for dropdowns
-                    //     }
-                    //     if (oControl.setSelected) {
-                    //         oControl.setSelected(false); // Reset selection for Checkboxes
-                    //     }
-                    // }
+                    (oItem.getControl().setSelectedKey) ? oItem.getControl().setSelectedKey("") : oItem.getControl().setValue("");
                 });
             },
 
@@ -92,6 +70,7 @@ sap.ui.define([
                 var sPath = oEvent.getSource().getBindingContext("PaySlip").getPath();
                 this.oModel.setProperty("/isCreate", false);
                 this.oModel.setProperty("/isIdSelected", true);
+                this.oModel.setProperty("/EmpData", {});
                 this.oModel.setProperty("/BackRoute", "RouteAdminPaySlip");
                 var month = this.oModel.getProperty(`${sPath}/YearMonth`).split("-")[1];
                 var filters = {

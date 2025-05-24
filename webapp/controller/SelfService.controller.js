@@ -1710,14 +1710,20 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             SS_onPressPayslipRow: function (oEvent) {
-                var oContext = oEvent.getSource().getBindingContext("PaySlip");
-                var sPath = oContext.getPath();
-                var oData = this.oModel.getProperty(sPath);
+                var sPath = oEvent.getSource().getBindingContext("PaySlip").getPath();
                 this.oModel.setProperty("/isCreate", false);
                 this.oModel.setProperty("/isIdSelected", true);
+                this.oModel.setProperty("/EmpData", {});
                 this.oModel.setProperty("/BackRoute", "SelfService");
                 this.oModel.setProperty("/BackPath", this.sPath);
-                this.oModel.setProperty("/EmpData", oData);
+                var month = this.oModel.getProperty(`${sPath}/YearMonth`).split("-")[1];
+                var filters = {
+                    ID: this.oModel.getProperty(`${sPath}/ID`),
+                    EmployeeID: this.oModel.getProperty(`${sPath}/EmployeeID`),
+                    FinancialYear: this.oModel.getProperty(`${sPath}/FinancialYear`),
+                    Month: month,
+                };
+                this.oModel.setProperty("/SelectedFilters", filters);
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             },
             onApplyResignation: async function () {

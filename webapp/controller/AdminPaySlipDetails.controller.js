@@ -1,7 +1,7 @@
 sap.ui.define([
-    "./BaseController", "sap/m/MessageToast", "sap/ui/core/BusyIndicator", "../model/formatter", "sap/m/MessageBox"
+    "./BaseController", "sap/ui/core/BusyIndicator", "../model/formatter", "sap/m/MessageBox"
 ],
-    function (BaseController, MessageToast, BusyIndicator, Formatter, MessageBox) {
+    function (BaseController, BusyIndicator, Formatter, MessageBox) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.AdminPaySlipDetails", {
             Formatter: Formatter,
@@ -13,6 +13,7 @@ sap.ui.define([
                 BusyIndicator.hide();
                 var LoginFunction = await this.commonLoginFunction("PaySlip");
                 if (!LoginFunction) return;
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.getView().byId("APD_id_Employee").setSelectedKey("");
                 this.oModel = this.getView().getModel("PaySlip");
                 if (this.oModel.getProperty("/isIdSelected")) this._fetchPaySlip(this.oModel.getProperty("/SelectedFilters"));
@@ -34,23 +35,41 @@ sap.ui.define([
             _fetchPaySlip: async function (filters) {
                 this.getBusyDialog();
                 try {
-                    var response = await this.ajaxCreateWithJQuery("PaySlipDetails", filters);
-                    if (response.success) {
-                        var oData = response.result[0];
-                        oData.YearMonth = this.getFirstDayOfMonth(oData.Month, oData.Year);
-                        this.initializeCompAmounts(oData.EarningData);
-                        this.initializeCompAmounts(oData.DeductionData);
-                        oData.Currency = "INR";
-                        oData.ProfilePhoto = "data:image/png;base64," + oData.ProfilePhoto;
-                        oData.PaySlipGenerationDate = new Date();
-                        this.oModel.setProperty("/EmpData", oData);
-                        this.totalCalculationAmount();
+                    if (this.oModel.getProperty("/isCreate")) {
+                        var response = await this.ajaxCreateWithJQuery("PaySlipDetails", filters);
+                        if (response.success) {
+                            var oData = response.result[0];
+                            oData.YearMonth = this.getFirstDayOfMonth(oData.Month, oData.Year);
+                            this.initializeCompAmounts(oData.EarningData);
+                            this.initializeCompAmounts(oData.DeductionData);
+                            oData.Currency = "INR";
+                            oData.ProfilePhoto = "data:image/png;base64," + oData.ProfilePhoto;
+                            oData.PaySlipGenerationDate = new Date();
+                            this.oModel.setProperty("/EmpData", oData);
+                            this.totalCalculationAmount();
+                        }
                     }
+                    else {
+                        var response = await this.ajaxCreateWithJQuery("createUpdateAllData", filters);
+                        if (response.success) {
+                            var oData = response.data.AdminPaySlip[0];
+                            oData.EarningData = response.data.Earning.filter(function (item) {
+                                return !(item.Amount == null && item.YearlyAmount == null);
+                            });
+                            oData.DeductionData = response.data.Deduction.filter(function (item) {
+                                return !(item.Amount == null && item.YearlyAmount == null);
+                            });
+                            oData.ProfilePhoto = "data:image/png;base64," + (oData.ProfilePhoto || "");
+                            this.oModel.setProperty("/EmpData", oData);
+                            this.totalCalculationAmount();
+                        }
+                    }
+
                 }
                 catch (e) {
                     console.warn(e);
-                    if(response.success) MessageBox.error("Pay Slip not found for the selected Employee ID");
-                    else MessageBox.error("Error fetching Pay Slip");
+                    if (response.success) MessageBox.error(this.i18nModel.getText("paySlipNotFound"));
+                    else MessageBox.error(this.i18nModel.getText("errorFetchingPaySlip"));
                 }
                 finally {
                     this.closeBusyDialog();
@@ -62,15 +81,16 @@ sap.ui.define([
                 const empData = this.oModel.getProperty("/EmpData");
                 const earnData = empData.EarningData || [];
                 const dedData = empData.DeductionData || [];
-                const earningsTotalMonthly = getTotal(earnData, "Amount");
-                const earningsTotalYearly = getTotal(earnData, "YearlyAmount");
-                const deductionsTotalMonthly = getTotal(dedData, "Amount");
-                const deductionsTotalYearly = getTotal(dedData, "YearlyAmount");
+                var earningsTotalMonthly = Math.max(0, getTotal(earnData, "Amount"));
+                var earningsTotalYearly = Math.max(0, getTotal(earnData, "YearlyAmount"));
+                var deductionsTotalMonthly = Math.max(0, getTotal(dedData, "Amount"));
+                var deductionsTotalYearly = Math.max(0, getTotal(dedData, "YearlyAmount"));
                 this.oModel.setProperty("/EmpData/EarningsTotalMonthly", earningsTotalMonthly);
                 this.oModel.setProperty("/EmpData/EarningsTotalYearly", earningsTotalYearly);
                 this.oModel.setProperty("/EmpData/DeductionsTotalMonthly", deductionsTotalMonthly);
                 this.oModel.setProperty("/EmpData/DeductionsTotalYearly", deductionsTotalYearly);
-                const totalNetPay = earningsTotalMonthly - deductionsTotalMonthly;
+                var totalNetPay = earningsTotalMonthly - deductionsTotalMonthly;
+                if(totalNetPay < 0) totalNetPay = 0;
                 this.oModel.setProperty("/EmpData/NetPay", totalNetPay);
                 this.oModel.setProperty("/EmpData/NetPayText", this.convertNumberToWords(totalNetPay, empData.Currency));
             },
@@ -161,7 +181,7 @@ sap.ui.define([
                 try {
                     var response = await this.ajaxCreateWithJQuery("createUpdateAllData", oData);
                     if (response.success) {
-                        MessageBox.success("Pay Slip Created Successfully", {
+                        MessageBox.success(this.i18nModel.getText("paySlipCreated"), {
                             onClose: function () {
                                 this.getRouter().navTo("RouteAdminPaySlip");
                             }.bind(this)
@@ -170,7 +190,7 @@ sap.ui.define([
                 }
                 catch (e) {
                     console.warn(e);
-                    MessageBox.error("Error Creating Pay Slip", {
+                    MessageBox.error(this.i18nModel.getText("errorCreatingPaySlip"), {
                         onClose: function () {
                             this.getRouter().navTo("RouteAdminPaySlip");
                         }.bind(this)
@@ -182,11 +202,19 @@ sap.ui.define([
             },
 
             initializeCompAmounts: function (compData) {
-                compData.forEach(function (item) {
+                for (var i = compData.length - 1; i >= 0; i--) {
+                    var item = compData[i];
+                    if (item.Amount == null && item.YearlyAmount == null) {
+                        compData.splice(i, 1); // Remove item
+                        continue;
+                    }
                     item.YearlyAmount += item.Amount;
                     item.InitialYearly = item.YearlyAmount;
                     item.InitialMonthly = item.Amount;
-                });
+                    if (item.Description === "Variable Pay") {
+                        item.Flag = true;
+                    }
+                }
             },
 
             transformCompData: function (compData, data, yearKey, monthKey) {
