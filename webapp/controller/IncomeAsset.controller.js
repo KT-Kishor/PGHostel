@@ -22,10 +22,6 @@ sap.ui.define([
             _onRouteMatched:async function () {
                  var LoginFunction = await this.commonLoginFunction("IncomeAsset");
                 if (!LoginFunction) return;
-
-
-                
-
                 this.commonLoginFunction("IncomeAsset");
                 let loginModel = this.getView().getModel("LoginModel").getData();
                 // if (loginModel.Role === "IT Consultant") {
@@ -202,11 +198,11 @@ sap.ui.define([
                     // sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(true)
 
                     
-                    // if (loginRole === "IT Consultant") {
-                    //     sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
-                    //     sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
+                    if (loginRole === "IT Consultant") {
+                        sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
                         
-                    // }
+                    }
 
  
                    table.removeSelections();
@@ -260,10 +256,10 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_transferButton").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(true)
 
-            //   if (loginRole === "IT Consultant") {
-            //             sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
-            //             sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
-            //                }
+              if (loginRole === "IT Consultant") {
+                        sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
+                           }
                     table.removeSelections();
 
                 }
@@ -561,9 +557,14 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_transferbranch").setVisible(false)
 
-                    //      if (loginRole === "IT Consultant") {
-                    //     sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
-                    // }
+                         if (loginRole === "IT Consultant") {
+                        sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
+
+                    }else{
+                              sap.ui.getCore().byId("FCIA_id_branch").setEditable(true);
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);
+                        }
                                  this.FCIA_Dialog.open();
                     }.bind(this));
                 } else {
@@ -603,9 +604,13 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
 
-                    //  if (loginRole === "IT Consultant") {
-                    //     sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
-                    // }
+                     if (loginRole === "IT Consultant") {
+                        sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
+                        }else{
+                              sap.ui.getCore().byId("FCIA_id_branch").setEditable(true);
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);
+                        }
 
                     this._FragmentDatePickersReadOnly(["FCIA_id_Date"])
                 }

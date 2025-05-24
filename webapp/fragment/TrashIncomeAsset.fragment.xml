@@ -43,6 +43,7 @@
 			<Label text="{i18n>trashDate}"/>
 				<DatePicker 
 					id="FTIA_id_Date"
+					tooltip="Pick Date"
 					minDate="{VisiableModel>/minDate}"
 				    change="FCIA_onInputLiveChange"
 					valueFormat="yyyy-MM-dd"

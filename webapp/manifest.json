@@ -560,6 +560,13 @@
                     "target":[
                         "TargetAssetObjectPage"
                     ]
+                },
+                 {
+                    "name":"MyAsset",
+                    "pattern": "MyAsset",
+                    "target":[
+                        "TargetMyAsset"
+                    ]
                 }
 
             ],
@@ -571,6 +578,10 @@
                   "TargetAssetObjectPage": {
                     "id": "AssetObjectPage",
                     "name": "AssetObjectPage"
+                },
+                "TargetMyAsset": {
+                    "id": "MyAsset",
+                    "name": "MyAsset"
                 },
                 "TargetHomePage": {
                     "viewType": "XML",

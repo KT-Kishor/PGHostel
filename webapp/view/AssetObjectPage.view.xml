@@ -381,22 +381,7 @@
                             }}"                       
                                     />
                         </m:VBox>
-                                                <!-- <m:Text
-                                                    text="{= ${objectModel>ReturnDate} === '1899-11-30T00:00:00.000Z' ? ''
-                                                    : ${
-                                                        path: 'objectModel>ReturnDate',
-                                                        formatter: '.Formatter.formatDate'
-                                                    }}"
-                                                /> -->
-                                                <!-- <m:ObjectIdentifier
-                                                    title="{= ${objectModel>TrashByEmployeeName} ? 'By:' + ${objectModel>TrashByEmployeeName} + ' ' 
-                                + ${objectModel>TrashByEmployeeID} : ''}"
-                                                    text="{= ${objectModel>TrashDate} ? 'Date:' + ${
-                                    path: 'objectModel>TrashDate',
-                                    formatter: '.Formatter.formatDate'
-                                } : ''}"
-                                                /> -->
-                                                   <m:VBox>
+                         <m:VBox>
                                                     <m:Text
                                                         text="{= ${objectModel>TrashByEmployeeName} ? 'By: ' + ${objectModel>TrashByEmployeeName}: ''}"
                                                         class="sapUiTinyMarginBottom"
@@ -413,6 +398,23 @@
                             }}"                       
                                     />
                                                 </m:VBox> 
+                                                <!-- <m:Text
+                                                    text="{= ${objectModel>ReturnDate} === '1899-11-30T00:00:00.000Z' ? ''
+                                                    : ${
+                                                        path: 'objectModel>ReturnDate',
+                                                        formatter: '.Formatter.formatDate'
+                                                    }}"
+                                                /> -->
+                                                <!-- <m:ObjectIdentifier
+                                                <!-- <m:ObjectIdentifier
+                                                    title="{= ${objectModel>TrashByEmployeeName} ? 'By:' + ${objectModel>TrashByEmployeeName} + ' ' 
+                                + ${objectModel>TrashByEmployeeID} : ''}"
+                                                    text="{= ${objectModel>TrashDate} ? 'Date:' + ${
+                                    path: 'objectModel>TrashDate',
+                                    formatter: '.Formatter.formatDate'
+                                } : ''}"
+                                                /> -->
+                                                  
                                             </m:cells>
                                         </m:ColumnListItem>
                                     </m:items>
