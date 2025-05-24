@@ -297,7 +297,8 @@ sap.ui.define([
                     this.getBusyDialog();
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
                     oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
-                    oModel.ManagerID = this.getView().byId("TU_id_Manager").getSelectedItem().getAdditionalText();
+                    var sSelectedKey = this.byId("TU_id_Manager").getSelectedKey();
+                    oModel.ManagerID = sSelectedKey ? sSelectedKey : oModel.ManagerID;
                     oModel.ReleaseDate = this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");
                     oModel.JoiningDate = this.byId("TU_id_JoinDate").getValue().split("/").reverse().join("-");
                     // Check and update the status if it is 'Rejected'

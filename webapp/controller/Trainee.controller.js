@@ -359,8 +359,8 @@ sap.ui.define([
                         Role: "Trainee",
                         Status: "Training Completed",
                     };
-                    this.updateCallForTrainee(oUpdatedData, "downloadSucess");
-                    this.T_onSearch()
+                    await this.updateCallForTrainee(oUpdatedData, "downloadSucess");
+                    this.T_onSearch();
                     this.byId("T_id_TraineeTable").removeSelections(true);
                     this.byId("T_id_Download").setVisible(false);
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);

@@ -52,7 +52,7 @@
 									<f:content>
 										<m:Label text="{i18n>traineeName}" required="true" />
 										<m:HBox width="100%" justifyContent="Start" alignItems="Center">
-											<m:VBox width="20%">
+											<m:VBox width="23%">
 												<m:Select
                                                 editable="{viewModel>/editable}"
                                                 selectedKey="{oTraineeDetails>/NameSalutation}"
@@ -61,12 +61,12 @@
 													<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 												</m:Select>
 											</m:VBox>
-											<m:VBox width="78%">
+											<m:VBox width="75%">
 												<m:Input id="TU_id_Name" value="{oTraineeDetails>/TraineeName}" editable="{viewModel>/editable}" maxLength="50" liveChange="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>placeTraineeName}"/>
 											</m:VBox>
 										</m:HBox>
 										<m:Label text="{i18n>reportingManager}" required="true" />
-										<m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"   value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}" selectedKey="1" editable="{viewModel>/editable}" valueStateText="{i18n>reportingManagerVs}">
+										<m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"   value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}"  editable="{viewModel>/editable}" valueStateText="{i18n>reportingManagerVs}">
 										<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}"  />
 										</m:ComboBox>
 										<m:Label text="{i18n>emailId}" required="true" />

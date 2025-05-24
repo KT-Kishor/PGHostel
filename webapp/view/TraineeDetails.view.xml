@@ -26,7 +26,7 @@
 						<f:content >
 							<Label text="{i18n>traineeName}" required="true" />
 							<HBox width="100%" justifyContent="Start" alignItems="Center">
-								<VBox width="20%">
+								<VBox width="23%">
 									<Select
                                                id="TD_id_NameSalutation"
                                                selectedKey="{oTraineeDetails>/NameSalutation}"
@@ -35,7 +35,7 @@
 										<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 									</Select>
 								</VBox>
-								<VBox width="78%">
+								<VBox width="75%">
 									<Input value="{oTraineeDetails>/TraineeName}" maxLength="50" placeholder="{i18n>placeTraineeName}" id="TD_id_Name" liveChange="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>placeTraineeName}"/>
 								</VBox>
 							</HBox>
