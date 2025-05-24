@@ -180,7 +180,6 @@ sap.ui.define(
                   oVM.setProperty("/userId", ""); oVM.setProperty("/userName", ""); oVM.setProperty("/otp", ""); oVM.setProperty("/password", ""); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isPasswordVisible", false); oVM.setProperty("/isSendOtpVisible", false); oVM.setProperty("/sendOtpText", this.i18nModel.getText("sendOtp")); oVM.setProperty("/isOtpSelected", false); oVM.setProperty("/isPasswordSelected", false); oVM.setProperty("/isForgotPasswordVisible", false);
                   // Navigate
                   this.getRouter().navTo("RouteTilePage");
-                  // this.getBusyDialog();
                   // Add this block after navigation
                   window.history.pushState(null, "", window.location.href);
                   window.addEventListener("popstate", function (event) {
@@ -207,6 +206,22 @@ sap.ui.define(
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           }
         },
+        onOTPlength: function (oEvent) {
+          var oInput = oEvent.getSource();
+          var sValue = oEvent.getParameter("value");
+
+          // Allow only digits and limit to 6 characters
+          sValue = sValue.replace(/\D/g, "").substring(0, 6);
+
+          oInput.setValue(sValue);
+
+          // Optionally update model if needed
+          var oModel = this.getView().getModel("LoginViewModel");
+          if (oModel) {
+            oModel.setProperty("/frgOtp", sValue);
+          }
+        },
+
         onLoginOptionChange: function (oEvent) {
           const oVM = this.getView().getModel("LoginViewModel");
           if (oEvent.getSource().getId().includes("PasswordRadio")) {

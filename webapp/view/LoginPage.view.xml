@@ -13,7 +13,7 @@
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
 		</headerContent>
 		<content>
-			<FlexBox class="sapUiMediumMargin" direction="Column" alignItems="End" justifyContent="End">
+			<FlexBox class="sapUiMediumMargin responsiveCenterFlex" direction="Column" alignItems="End" justifyContent="End">
 				<form:SimpleForm id="LP_id_Form" editable="true" layout="ResponsiveGridLayout" 
                 class="loginForm"
                 title="{i18n>loginDetails}" singleContainerFullSize="false" >
