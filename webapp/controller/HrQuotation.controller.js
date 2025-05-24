@@ -17,6 +17,7 @@ sap.ui.define(
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
         this.getBusyDialog()
+        // this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         await this._fetchCommonData("Quotation", "CompanyQuotationModel", {});
 
@@ -42,11 +43,17 @@ sap.ui.define(
           }
         });
 
-        var oTable = this.byId("HQ_id_QuotationItemTable"); // Make sure your table has this ID
+        var oTable = this.byId("HQ_id_QuotationItemTable");
         var oBinding = oTable.getBinding("items");
 
         if (oBinding) {
+          this.getBusyDialog(); // Show BusyDialog
           oBinding.filter(aFilters);
+
+          // Close BusyDialog after table is updated
+          oTable.attachEventOnce("updateFinished", function () {
+            this.closeBusyDialog();
+          }.bind(this));
         }
       },
 
@@ -61,26 +68,6 @@ sap.ui.define(
           }
         });
       },
-
-      // CommomQuotationReadCall: async function (filter) {
-      //   this.getBusyDialog();
-      //   await this.ajaxReadWithJQuery("Quotation", filter).then((oData) => {
-      //     var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-
-      //     // Always update the table view
-      //     this.getView().setModel(
-      //       new JSONModel({ results: offerData }),
-      //       "CompanyQuotationModel"
-      //     );
-
-      //     this.closeBusyDialog();
-      //   }).catch((Error) => {
-      //     this.closeBusyDialog();
-      //     MessageBox.error(
-      //       this.i18nModel.getText("commonReadingDataError")
-      //     );
-      //   });
-      // },
 
       HQ_onPressAddQuotation: function () {
         this.getRouter().navTo("RouteHrQuotationDetails", { sQuotationNo: "new" })

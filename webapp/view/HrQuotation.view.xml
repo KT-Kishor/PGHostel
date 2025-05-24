@@ -58,7 +58,7 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="{i18n>quotation}" />
+                        <Title text="{i18n>quotation}({= ${CompanyQuotationModel>/}.length })" />
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>create}"

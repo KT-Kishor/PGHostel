@@ -11,25 +11,26 @@ sap.ui.define(
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.RouteHrQuotationDetails", {
       Formatter: Formatter,
+
       onInit: function () {
         var QuotaionModel = {
-          QuotationItemModel: [],
-          QuotationNo: "",
-          Date: "",
-          ValidUntil: "",
-          CompanyName: "",
-          CompanyMobileNo: "",
-          CompanyEmailID: "",
-          Country: "",
-          CompanyAddress: "",
-          CompanyGSTNO: "",
-          Percentage: "",
-          CustomerName: "",
-          CustomerEmailID: "",
-          CustomerMobileNo: "",
-          CustomerAddress: "",
-          CustomerGSTNO: "",
-          Notes: ""
+          // QuotationItemModel: [],
+          // QuotationNo: "",
+          // Date: "",
+          // ValidUntil: "",
+          // CompanyName: "",
+          // CompanyMobileNo: "",
+          // CompanyEmailID: "",
+          // Country: "",
+          // CompanyAddress: "",
+          // CompanyGSTNO: "",
+          // Percentage: "",
+          // CustomerName: "",
+          // CustomerEmailID: "",
+          // CustomerMobileNo: "",
+          // CustomerAddress: "",
+          // CustomerGSTNO: "",
+          // Notes: ""
         }
         var oModel = new JSONModel(QuotaionModel);
         this.getView().setModel(oModel, "quotation");
@@ -100,6 +101,7 @@ sap.ui.define(
 
             // Ensure specific fields remain editable in edit mode
             oSelectedModel.setProperty("/gstEditable", true);
+            oSelectedModel.setProperty("/gstEditable", false);
           }
 
           try {
@@ -125,7 +127,6 @@ sap.ui.define(
             merge: false
           });
         } else {
-
           oVisiModel.setData({
             editable: false,
             createVisi: false,
@@ -252,11 +253,20 @@ sap.ui.define(
 
           if (oItem.GSTCalculation === "Yes") {
             subTotalTaxable += oItem.Total;
-            oItem.SAC = "998314";
+
+            // Only set SAC if not already set (or it's empty/undefined)
+            if (!oItem.SAC) {
+              oItem.SAC = "998314";
+            }
           } else {
             subTotalNonTaxable += oItem.Total;
-            oItem.SAC = "-";
+
+            // Only clear SAC if explicitly needed
+            if (!oItem.SAC || oItem.SAC === "998314") {
+              oItem.SAC = "-";
+            }
           }
+
         });
 
         // Update items back into model
@@ -418,20 +428,20 @@ sap.ui.define(
 
         if (sSelectedCurrency === "INR") {
           // Currency is INR — enable GST
-          oQuotationModel.setProperty("/CGSTVisible", true);
-          oQuotationModel.setProperty("/SGSTVisible", true);
+          oQuotationModel.setProperty("/CGSTVisible", false);
+          oQuotationModel.setProperty("/SGSTVisible", false);
           oQuotationModel.setProperty("/IGSTVisible", false);
           oQuotationModel.setProperty("/ShowGSTFields", true);
 
           oSingleCompanyModel.setProperty("/gstEditable", true);
-          oView.byId("CI_id_InputGSTNO")?.setEnabled(true);
-
+          oView.byId("HQD_id_CompGSTNO")?.setEnabled(true);
           // GST-related logic (optional if not already in another function)
           // Calculate Total with GST
           var fNewTotal = fTotal + fCGST + fSGST + fIGST;
           oModelDataPro.setProperty("/TotalSum", fNewTotal.toFixed(2));
         } else {
           // Currency is NOT INR — disable GST
+
           oQuotationModel.setProperty("/CGSTVisible", false);
           oQuotationModel.setProperty("/SGSTVisible", false);
           oQuotationModel.setProperty("/IGSTVisible", false);
@@ -442,7 +452,7 @@ sap.ui.define(
           oSingleCompanyModel.setProperty("/IGSTSelected", false);
           oSingleCompanyModel.setProperty("/CompanyGSTNO", "");
           oSingleCompanyModel.setProperty("/gstEditable", false);
-          oView.byId("CI_id_InputGSTNO")?.setEnabled(false);
+          oView.byId("HQD_id_CompGSTNO")?.setEnabled(false);
 
           // Recalculate Total without GST
           var updatedTotal = fTotal - (fCGST + fSGST + fIGST);
@@ -620,8 +630,30 @@ sap.ui.define(
           console.error(error);
         }
       },
+      //for converting number to words
+      numberToWords: function (num) {
+        const a = [
+          "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+          "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
+          "Eighteen", "Nineteen"
+        ];
+        const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+        function inWords(n) {
+          if (n < 20) return a[n];
+          if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+          if (n < 1000) return a[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " and " + inWords(n % 100) : "");
+          if (n < 100000) return inWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + inWords(n % 1000) : "");
+          if (n < 10000000) return inWords(Math.floor(n / 100000)) + " Lakh" + (n % 100000 ? " " + inWords(n % 100000) : "");
+          return inWords(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + inWords(n % 10000000) : "");
+        }
+
+        if (!num || isNaN(num)) return "Zero";
+        return inWords(Math.floor(num)) + " Only";
+      },
 
       HQD_onPressMerge: async function () {
+        // this.numberToWords()
         const oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
         const oData = this.getView().getModel("SingleCompanyModel").getData(); // Selected Quotation
         const oQuotaionItem = this.getView().getModel("QuotationModel").getData();
@@ -721,12 +753,12 @@ sap.ui.define(
         doc.line(105, lineY, 196, lineY);
         doc.setFont("helvetica", "bold");
         doc.text(`${this.i18nModel.getText("pdfTotal")} (${oData.Currency}): ${Formatter.fromatNumber(oData.TotalSum)}`, 190, lineY + 7, { align: "right" });
-
+        oData.AmountInWords = this.numberToWords(oData.TotalSum);
         // Amount in Words (optional)
         const amountY = lineY + 20;
         doc.text(this.i18nModel.getText("pdfaAmount"), 13, amountY);
         doc.setFont("helvetica", "normal");
-        // doc.text(oData.AmountInWords || "", 13, amountY + 5, { maxWidth: 180 });
+        doc.text(oData.AmountInWords || "", 13, amountY + 5, { maxWidth: 180 });
 
         // Terms & Conditions
         const termsY = amountY + 15;
@@ -803,32 +835,25 @@ sap.ui.define(
       },
       HQD_onchangeDiscount: function (oEvent) {
         var oInput = oEvent.getSource();
-        var sRawValue = oEvent.getParameter("value").trim();
+        var sUserInput = oEvent.getParameter("value").trim();
 
-        // Allow only digits, dot, and optional %
-        sRawValue = sRawValue.replace(/[^0-9.%]/g, "");
+        // Check if input includes %
+        var isPercentage = sUserInput.includes("%");
 
-        var isPercentage = sRawValue.includes("%");
-        var sCleanValue = sRawValue.replace("%", "");
+        // Remove % symbol and non-numeric chars except dot
+        var sCleanValue = sUserInput.replace(/[^0-9.]/g, "");
 
-        // Restrict to max 2 decimal places
+        // Limit to 2 decimal places
         var parts = sCleanValue.split(".");
         if (parts.length > 1) {
           parts[1] = parts[1].substring(0, 2);
           sCleanValue = parts.join(".");
         }
 
-        // Restore % if needed
-        if (isPercentage) {
-          sRawValue = sCleanValue + "%";
-        } else {
-          sRawValue = sCleanValue;
-        }
+        // Update input value with cleaned number (no % shown)
+        oInput.setValue(sCleanValue);
 
-        // Set cleaned value in input
-        oInput.setValue(sRawValue);
-
-        // Validate value
+        // Validate cleaned input
         var regex = /^[0-9]+(\.[0-9]{1,2})?$/;
         if (!sCleanValue || !regex.test(sCleanValue)) {
           oInput.setValueState("Error");
@@ -836,11 +861,12 @@ sap.ui.define(
           this.Discount = false;
           return;
         }
+
         oInput.setValueState("None");
         oInput.setValueStateText("");
         this.Discount = true;
 
-        // Get binding context and model
+        // Get QuotationModel context
         var oContext = oInput.getBindingContext("QuotationModel");
         if (!oContext) return;
 
@@ -851,23 +877,25 @@ sap.ui.define(
         var unitPrice = parseFloat(oItem.UnitPrice) || 0;
         var discountVal = parseFloat(sCleanValue) || 0;
 
+        // Calculate subtotal and discount
         var subtotal = days * unitPrice;
-        var total = 0;
+        var discountAmount = isPercentage ? (subtotal * discountVal / 100) : discountVal;
 
-        if (isPercentage) {
-          total = subtotal - (subtotal * discountVal / 100);
-        } else {
-          total = subtotal - discountVal;
-        }
-        if (total < 0) total = 0;
-        // Set total to item
+        if (discountAmount > subtotal) discountAmount = subtotal;
+
+        var total = subtotal - discountAmount;
+
+        // Update model with new total
         oModel.setProperty(oContext.getPath() + "/Total", total.toFixed(2));
+
+        // Update all totals
         this.updateTotalAmount();
       },
 
 
       HQD_onPressDelete: async function (oEvent) {
-        this.byId("HQD_id_SmartTableQuotationItem").setBusy(true);
+        // this.byId("HQD_id_SmartTableQuotationItem").getBusyDialog();
+        // this.getBusyDialog();
         const that = this;
 
         try {
@@ -882,14 +910,14 @@ sap.ui.define(
           const confirmed = await new Promise((resolve) => {
             that.showConfirmationDialog(
               that.i18nModel.getText("msgBoxConfirm"),
-              that.i18nModel.getText("commonMesBoxConfirmDelete"),
+              that.i18nModel.getText("msgBoxConfirmDelete"),
               () => resolve(true),
               () => resolve(false)
             );
           });
 
           if (!confirmed) {
-            that.byId("HQD_id_SmartTableQuotationItem").setBusy(false);
+            this.closeBusyDialog();
             return;
           }
 
@@ -904,14 +932,14 @@ sap.ui.define(
             if (!sQuotationNo) {
               throw new Error("Quotation number is missing.");
             }
-
+            this.getBusyDialog();
             await that.ajaxDeleteWithJQuery("/QuotationItem", {
               filters: {
                 QuotationNo: sQuotationNo,
                 SlNo: oItemData.SlNo
               }
             });
-
+            this.closeBusyDialog();
             MessageToast.show(that.i18nModel.getText("msgQuotationitemdelete"));
           }
 
@@ -924,7 +952,7 @@ sap.ui.define(
         } catch (error) {
           MessageToast.show(error.message || "Error deleting Quotation item");
         } finally {
-          that.byId("HQD_id_SmartTableQuotationItem").setBusy(false);
+          this.closeBusyDialog();
         }
       },
 
@@ -1063,23 +1091,24 @@ sap.ui.define(
       },
 
       HQD_onChangeGSTCalculation: function (oEvent) {
-        var oView = this.getView();
-        var oQuotationModel = oView.getModel("QuotationModel");        // Get selected value from ComboBox
-        var sSelectedKey = oEvent.getSource().getSelectedKey(); // "Yes" or "No"
+        var oSource = oEvent.getSource(); // The ComboBox that was changed
+        var sSelectedKey = oSource.getSelectedKey(); // "Yes" or "No"
+        var oContext = oSource.getBindingContext("QuotationModel"); // Get row context
 
-        // Update each item's GSTCalculation field
-        var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
+        if (!oContext) return;
 
-        aItems.forEach(function (oItem) {
-          oItem.GSTCalculation = sSelectedKey;
-        });
-        oQuotationModel.setProperty("/QuotationItemModel", aItems);
+        var sPath = oContext.getPath(); // e.g., /QuotationItemModel/0
+        var oModel = oContext.getModel();
 
-        // Optionally update global GSTCalculation too
-        oQuotationModel.setProperty("/GSTCalculation", sSelectedKey);
+        oModel.setProperty(sPath + "/GSTCalculation", sSelectedKey);
+
+        // Optionally, update global GSTCalculation (if required)
+        oModel.setProperty("/GSTCalculation", sSelectedKey);
+
         // Recalculate totals
         this.updateTotalAmount();
       },
+
       onPercentageChange: function (oEvent) {
         var sPercentage = oEvent.getParameter("value"); // Get the new value
         var oModel = this.getView().getModel("SingleCompanyModel");
@@ -1097,6 +1126,7 @@ sap.ui.define(
 
         if (!bEditable) {
           oModel.setProperty("/editable", true);
+          oModel.setProperty("/gstEditable", true);
 
         } else {
           // Already in edit mode => perform Save logic

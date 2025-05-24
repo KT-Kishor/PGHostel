@@ -90,6 +90,7 @@
                                             items="{codeModel>/}"
                                             filterSecondaryValues="true"
                                             change="HQD_STDCode"
+                                            editable="{visiablityPlay>/editable}"
                                             valueStateText="{i18n>combovalueState}"
                                         >
                                             <core:ListItem
@@ -206,6 +207,7 @@
                                         busyIndicatorDelay="0"
                                             items="{CurrencyModel>/}"
                                             width="100%"
+                                            editable="{visiablityPlay>/editable}"
                                             id="HQD_id_Curency"
                                             selectedKey="{SingleCompanyModel>/Currency}"
                                             valueStateText="{i18n>selectCurrency}"
@@ -313,7 +315,7 @@
                                         class="sapUiResponsiveMargin"
                                         width="auto"
                                         delete="HQD_onPressDelete"
-                                        mode="Delete"
+                                        mode="{= ${visiablityPlay>/editable} === true ? 'Delete' : 'None'}"
                                         items="{QuotationModel>/QuotationItemModel}"
                                     >
                                         <m:headerToolbar>
@@ -644,23 +646,23 @@
         press="HQD_onPressSubmit"
         class="sendMail"
     />
-
-    <m:Button
-        visible="{visiablityPlay>/editVisi}"
-        text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
-        press="HQD_onPressEdit"
-        class="sendMail"
-    />
-
     <m:Button
         text="{i18n>tileFooter}"
         id="HQD_id_QuotationMail"
         press="HQD_onPressSendEmail"
         visible="{visiablityPlay>/merge}"
         type="Ghost"
+        class="sendMail"
     />
 
-    <!-- Generate PDF Button - Only in Edit mode -->
+      <m:Button
+        visible="{visiablityPlay>/editVisi}"
+        text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
+        press="HQD_onPressEdit"
+        class="sendMail"
+        type="{= ${visiablityPlay>/editable} === true ? 'Accept' : 'Emphasized'}"
+    />
+
     <m:Button
         text="{i18n>jsPdf}"
         press="HQD_onPressMerge"

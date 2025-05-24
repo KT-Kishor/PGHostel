@@ -36,7 +36,7 @@ sap.ui.define([
                 this.byId("EO_id_RejectBtn").setEnabled(false);
                 this._fetchCommonData("BaseLocation", "BaseLocationModel"); // base location read call
                 this._fetchCommonData("Country", "CountryModel");
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
+                // this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 this.Filter = true;
                 if (this.oValue === "EmployeeOffer") {
