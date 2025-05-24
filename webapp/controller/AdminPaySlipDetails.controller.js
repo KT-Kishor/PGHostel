@@ -234,6 +234,9 @@ sap.ui.define([
                     delete item.Amount;
                     delete item.InitialYearly;
                     delete item.InitialMonthly;
+                    if(item.Flag && data.Type === "Create") {
+                        delete item.Flag; // Remove Flag if it's a new entry
+                    }
                 });
             },
 
