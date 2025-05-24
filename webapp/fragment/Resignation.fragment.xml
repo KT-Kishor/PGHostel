@@ -103,7 +103,7 @@
         />
         <beginButton>
             <Button
-                text="{= ${PDFData>/PreviewFlag} ? ${i18n>downloadcCertificate} : ${i18n>preview} }"
+                text="{= ${PDFData>/PreviewFlag} ? ${i18n>Download} : ${i18n>preview} }"
                 type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Emphasized' }"
                 press="RF_onPressHandlePreview"
             />

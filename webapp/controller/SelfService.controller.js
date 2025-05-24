@@ -16,6 +16,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     if (!LoginFUnction) return;
                     this.getBusyDialog();
                     const oView = this.getView();
+                    this.i18nModel = oView.getModel("i18n").getResourceBundle();
                     this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                     // Load dropdown data once
                     if (!oView.getModel("sDesignationModel")) {
@@ -38,6 +39,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan"];
                     this.sPath = oEvent.getParameter('arguments').sPath;
                     if (this.sPath === "SelfService") {
+                        this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileSelfSerciceFooter"));
                         this.ViewModel.setProperty("/SetProfile", true);
                         if (loginModel) this.EmployeeID = loginModel.getProperty("/EmployeeID");
                         aIds.forEach(function (sId) {
@@ -45,6 +47,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         }.bind(this));
                     } else {
                         this.EmployeeID = this.sPath;
+                        this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
                         if (loginModel.getProperty("/Role") === "Admin") {
                             this.ViewModel.setProperty("/RelievingLetter", true);
                         }
@@ -52,8 +55,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             this.getView().byId(sId).setRequired(false);
                         }.bind(this));
                     }
-                    this.i18nModel = oView.getModel("i18n").getResourceBundle();
-                    loginModel.setProperty("/HeaderName", "My Details");
                     var employeeModel = new JSONModel();
                     this.getOwnerComponent().setModel(employeeModel, "employeeModel");
                     if (this.EmployeeID) {
@@ -1507,7 +1508,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
             },
 
-             SS_onDownloadTerminateLetter: function () {
+            SS_onDownloadTerminateLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var date = Formatter.formatDate(new Date());
                 var empName = oEmpModel.Salutation + " " + oEmpModel.EmployeeName;
@@ -1625,7 +1626,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     sap.m.MessageToast.show(error.message || error.responseText);
                 }
             },
-            CC_onPressClose:function(){
+            CC_onPressClose: function () {
                 this.oIdCardDialog.close();
             },
 
