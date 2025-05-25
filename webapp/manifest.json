@@ -178,6 +178,11 @@
                 "uri":"model/Gender.json",
                 "preload":true
             },
+              "EmpType": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/EmployeeType.json",
+                "preload": true
+            },
             "SowModel": {
                 "type":"sap.ui.model.json.JSONModel",
                 "uri":"model/SowStatus.json",

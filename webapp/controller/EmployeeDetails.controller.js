@@ -17,7 +17,8 @@ sap.ui.define([
                     this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                     this.getView().getModel("LoginModel").setProperty("/HeaderName", "Employee Details");
                     await this._fetchCommonData("EmployeeDetailsData", "EmployeeModel");
-
+                    await this._fetchCommonData("BaseLocation", "BaseLocationModel"); // base location read call
+                    await this._fetchCommonData("AppVisibility", "RoleModel"); // common role get call
                     this.CommonReadCall();
                     this.Emp_det_onSearch();
                     this.closeBusyDialog();

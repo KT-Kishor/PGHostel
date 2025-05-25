@@ -19,10 +19,31 @@
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Tyoe" label="{i18n>type}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox  showSecondaryValues= "true"  items="{EmpType>/}" id="ED_id_TypeFilter" showClearIcon="true">
+								<core:ListItem key="{EmpType>ID}" text="{EmpType>Type}" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="ManagerName" label="{i18n>manager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox showSecondaryValues= "true"  items="{EmployeeModel>/}" id="ED_id_ManagerFilter" showClearIcon="true">
 								<core:ListItem key="{EmployeeModel>EmployeeID}" text="{EmployeeModel>EmployeeName}" additionalText="{EmployeeModel>EmployeeID}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="Role" label="{i18n>role}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox showSecondaryValues= "true"  items="{RoleModel>/}" id="ED_id_RoleFilter" showClearIcon="true">
+								<core:ListItem key="{RoleModel>Role}" text="{RoleModel>Role}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="BaseLocation" label="{i18n>baseLocation}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox items="{BaseLocationModel>/}" showClearIcon="true" showSecondaryValues="true" id="ED_id_BaseLFilter">
+								<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
