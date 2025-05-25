@@ -100,16 +100,21 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.closeBusyDialog();
                 }
                 this.oModel = this.getView().getModel("PaySlip");
+                this._currentSection = this.byId("ObjectPageLayout").getSelectedSection();
             },
 
             onSectionChange: async function (oEvent) {
+                if (this.getView().getModel("viewModel").getProperty("/isEditMode")) {
+                    sap.m.MessageBox.warning(this.i18nModel.getText("sectionChangeConfirm"));
+                    // If in edit mode, revert to the previous section
+                    this.byId("ObjectPageLayout").setSelectedSection(this._currentSection);
+                    return;
+                }
+                // If not in edit mode, accept and store new section
+                this._currentSection = oEvent.getParameter("section");
                 const sectionTitle = oEvent.getParameter("section").getTitle();
                 switch (sectionTitle) {
                     case "Basic Details":
-                        if (this.getView().getModel("viewModel").getProperty("/isEditMode")) {
-                            sap.m.MessageBox.warning(this.i18nModel.getText("sectionChangeConfirm"));
-                            return;
-                        }
                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                         this.getView().getModel("sEmployeeModel").refresh(true);
                         break;
@@ -122,10 +127,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.getView().byId("SS_id_PaySlipTable").setBusy(false);
                         break;
                     case "Document":
-                        if (this.getView().getModel("viewModel").getProperty("/isEditMode")) {
-                            sap.m.MessageBox.warning(this.i18nModel.getText("sectionChangeConfirm"));
-                            return
-                        }
                         this.byId("SS_id_AcName").setValueState("None");
                         this.byId("SS_id_Acno").setValueState("None");
                         this.byId("SS_id_BankName").setValueState("None");
