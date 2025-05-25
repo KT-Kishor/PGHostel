@@ -11,7 +11,9 @@ sap.ui.define([
                 this.getRouter().getRoute("RouteCompanyInvoiceDetails").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: function (oEvent) {
+            _onRouteMatched:async function (oEvent) {
+                var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
+                if (!LoginFUnction) return;
                 var sArg = oEvent.getParameter("arguments").sPath;
                 this.decodedPath = decodeURIComponent(decodeURIComponent(sArg));
                 var selectedCustomerModel = new JSONModel({
@@ -35,7 +37,8 @@ sap.ui.define([
                     SubTotalInGST: "0",
                     LUT: ""
                 });
-                this.getView().setModel(selectedCustomerModel, "SelectedCustomerModel")
+                this.getView().setModel(selectedCustomerModel, "SelectedCustomerModel");
+                this.SelectedCustomerModel = this.getView().getModel("SelectedCustomerModel");
                 var oFilteredSOWModel = new JSONModel({
                     results: [],
                     InvNo: this.newID,
@@ -54,6 +57,29 @@ sap.ui.define([
                 var visiablityPlay = new JSONModel({ createVisi: true, editVisi: false, editable: true, igstVisi: false, gstVisiable: false, flexVisiable: false, CInvoice: false, addInvBtn: true, merge: false, GST: true, payByDate: false, Form: true, Table: false, MultiEmail: true, Edit: true, TDS: true });
                 this.getView().setModel(visiablityPlay, "visiablityPlay");
             },
+
+            CID_ValidateCommonFields:async function(oEvent){
+                utils._LCvalidateMandatoryField(oEvent);
+                this.getBusyDialog();
+                this.SelectKey = oEvent.getSource().getSelectedKey();
+                var SelectedData = this.getView().getModel("ManageCustomerModel").getData().filter((item) => item.ID === this.SelectKey)[0];
+                this.SelectedCustomerModel.setProperty("/Name", SelectedData.name);
+                this.SelectedCustomerModel.setProperty("/PAN", SelectedData.PAN);
+                this.SelectedCustomerModel.setProperty("/GST", SelectedData.GST);
+                this.SelectedCustomerModel.setProperty("/Address", SelectedData.address);
+                this.SelectedCustomerModel.setProperty("/MailID", SelectedData.mailID);
+                this.SelectedCustomerModel.setProperty("/MobileNo", SelectedData.mobileNo);
+                await this.ajaxCreateWithJQuery("combineSowMsa", {MsaID:this.SelectKey}).then((oData) => {
+                        if (oData.success) {
+                            var oJson = new JSONModel({ items: oData.combinedData });
+                            this.getView().setModel(oJson,"CombinedData");
+                           this.closeBusyDialog();
+                        }
+                    }).catch((error) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.responseText);
+                    });
+            },
             
             CID_onPressback: function () {
                 this.getRouter().navTo("RouteCompanyInvoice", { sPath: "Company" });
@@ -61,10 +87,6 @@ sap.ui.define([
 
             CID_ValidateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
-            },
-
-            CID_ValidateCommonFields: function (oEvent) {
-                utils._LCvalidateMandatoryField(oEvent);
             },
             
              //Save the Data

@@ -24,15 +24,15 @@
               emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 									<f:content>
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>customerName}" required="true" />
-										<m:ComboBox id="CID_id_AddCustComboBox" visible="{visiablityPlay>/createVisi}" items="{ManageCustomerModel>/}" value="{SelectedCustomerModel>/Customer}" change="CID_ValidateCommonFields" valueStateText="{i18n>selectCustomer}">
-											<core:Item key="{ManageCustomerModel>ID}" text="{ManageCustomerModel>CompanyName}" />
+										<m:ComboBox change="CID_ValidateCommonFields" id="CID_id_AddCustComboBox" showButton="true" visible="{visiablityPlay>/createVisi}" items="{ManageCustomerModel>/}" value="{SelectedCustomerModel>/Customer}" valueStateText="{i18n>selectCustomer}" showSecondaryValues="true" >
+											<core:ListItem key="{ManageCustomerModel>ID}" text="{ManageCustomerModel>companyName}" additionalText="{ManageCustomerModel>salutation} {ManageCustomerModel>name}" />
 										</m:ComboBox>
 
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>customerName}"/>
 										<m:Input visible="{visiablityPlay>/editVisi}" id="CID_id_Custmer" value="{SelectedCustomerModel>/CustomerName}" editable="false"/>
 
-										<m:Label text="{i18n>invoiceNo}" />
-										<m:Input editable="false" value="{SelectedCustomerModel>/InvNo}" />
+										<!-- <m:Label text="{i18n>invoiceNo}" />
+										<m:Input editable="false" value="{SelectedCustomerModel>/InvNo}" /> -->
 
 										<m:Label visible="{visiablityPlay>/createVisi}"  text="{i18n>invoiceDate}" required="true" />
 										<m:DatePicker visible="{visiablityPlay>/createVisi}" id="CID_id_Invoice" value="{path:'SelectedCustomerModel>/InvoiceDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}" change="onChangeInvoiceDate" />
@@ -109,7 +109,7 @@
 								</f:SimpleForm>
 							</blocks>
 							<actions>
-								<m:Button visible="{visiablityPlay>/createVisi}" type="Transparent" icon="sap-icon://add" text="{i18n>addCustomerBtn}" press="CID_onPressAddCustomer" />
+								<m:Button visible="{visiablityPlay>/createVisi}" type="Transparent" text="{i18n>addCustomerBtn}" press="CID_onPressAddCustomer" />
 								<m:Button visible="{visiablityPlay>/createVisi}" type="Transparent" text="{i18n>ActiveSOW}" press="CID_onPressMSAandSOW" />
 							</actions>
 						</ObjectPageSubSection>
@@ -123,10 +123,7 @@
 												<m:Button text="{i18n>btnTransaction}" 
                       press="CID_onPressDisplayPaymentDetail" 
                       visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
-												<m:Button visible="{visiablityPlay>/addInvBtn}" 
-                      icon="sap-icon://add" 
-                      type="Default" 
-                      press="CID_onPressAddInvoiceItems" />
+												<m:Button visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Default" press="CID_onPressAddInvoiceItems" />
 												<m:ToolbarSeparator />
 											</m:Toolbar>
 										</m:headerToolbar>

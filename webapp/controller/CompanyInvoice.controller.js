@@ -1,6 +1,6 @@
 sap.ui.define(
   [
-    "./BaseController", //call base controller
+    "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
   ],
@@ -52,6 +52,10 @@ sap.ui.define(
           } finally {
             this.closeBusyDialog();
           }
+        },
+
+        onComboBoxSelectionChange:function(){
+          debugger
         },
 
         onPressClear: function () {

@@ -11,13 +11,14 @@
 				<HBox width="100%" justifyContent="Start" alignItems="Center">
 					<VBox width="20%">
 						<u:FileUploader  
-                                id="Mail_id_FileUploader"                                     
+                                id="Mail_id_FileUploader" 
+								 fileType="pdf,jpg,jpeg,png,doc,docx,xls,xlsx,ppt,pptx,txt.ppt"                                    
                                 name="myFileUpload"
                                 multiple="true"
                                 uploadUrl="upload/"
                                 tooltip="{i18n>toolTipMsgSM}"
                                 change="Mail_onUpload"
-                                buttonOnly="true"                  />
+                                buttonOnly="true"/>
 					</VBox>
 					<VBox width="80%" >
 						<Text text="{UploaderData>/name}"></Text>

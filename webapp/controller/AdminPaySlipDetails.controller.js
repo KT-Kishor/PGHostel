@@ -237,6 +237,10 @@ sap.ui.define([
                     if(item.Flag && data.Type === "Create") {
                         delete item.Flag; // Remove Flag if it's a new entry
                     }
+                    if(item.ID === null || item.ID === undefined) {
+                        delete item.ID; // Remove ID if it's a new entry
+                        item.Flag = true
+                    }
                 });
             },
 
