@@ -251,7 +251,7 @@ sap.ui.define([
       const requestData = { filters: { ID: oModelData.ID }, data: oModelData };
       this.ajaxUpdateWithJQuery("InboxDetails", requestData)
         .then(() => {
-          this._fetchCommonData("InboxDetails", "MyInboxModelData",filter );
+          this.MI_onSearch()
           this.closeBusyDialog();
           this.onBeforeShow();
           sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText(successMsg));
