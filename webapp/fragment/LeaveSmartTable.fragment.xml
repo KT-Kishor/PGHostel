@@ -17,7 +17,7 @@
 					<ToolbarSeparator/>
 					<Button press="AL_onPressBarChart" text="{i18n>openBarCharts}" type="Ghost" />
 					<Button press="AL_onPressApplyLeave" text="{i18n>applyLeave}"  type="Accept"/>
-					<Button id="AL_id_Updatebtn" text="{i18n>editDetails}" press="AL_onPressUpdate" visible="{= ${LeaveModel>status} === 'Submitted' }" type="Neutral"/>
+					<Button id="AL_id_Updatebtn" text="{i18n>editDetails}" press="AL_onPressUpdate" visible="{= ${LeaveModel>status} === 'Submitted' }" type="Emphasized"/>
 					<ToolbarSeparator/>
 				</Toolbar>
 			</headerToolbar>

@@ -35,8 +35,8 @@
 			   <ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{oEmpolyeeDetailsModel>/BaseLocation}" change="EO_onBaseLocationChange" id="idSelect" valueStateText="{i18n>selectBase}">
 						<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 				</ComboBox>
-				<Label text="{i18n>branchCode}" />
-				<Input value="{oEmpolyeeDetailsModel>/BranchCode}" editable="false" id="OE_id_BranchInput"/>
+				<!-- <Label text="{i18n>branchCode}" />
+				<Input value="{oEmpolyeeDetailsModel>/BranchCode}" editable="false" id="OE_id_BranchInput"/> -->
 				<Label text="{i18n>companyMailid}" required="true"/>
 				<Input value="{oEmpolyeeDetailsModel>/CompanyEmailID}" id="OEF_id_CompanyMail" maxLength="50" liveChange="validateEmail" placeholder="{i18n>companyMailid}" valueStateText="{i18n>emailValueState}"/>
 				<Label text="{i18n>permanentAddress}"  required="true" />
