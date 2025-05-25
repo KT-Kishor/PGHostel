@@ -36,7 +36,7 @@ sap.ui.define([
                 this.byId("EO_id_RejectBtn").setEnabled(false);
                 this._fetchCommonData("BaseLocation", "BaseLocationModel"); // base location read call
                 this._fetchCommonData("Country", "CountryModel");
-                // this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 this.Filter = true;
                 if (this.oValue === "EmployeeOffer") {
@@ -287,7 +287,7 @@ sap.ui.define([
                 try {
                     var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
                     if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Country"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idSelect"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID")
-                        && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_STDCode"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
+                        && utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_STDCode"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
                         var oPayload = {
                             tableName: "EmployeeDetails",
                             data: oModel

@@ -35,8 +35,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.ViewModel = this.getView().getModel("viewModel");
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
                     this.ViewModel.setProperty("/TraineeRole", loginModel.getProperty("/Role") === "Trainee");
-                    var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lc", "SS_id_lpa", "SS_id_lca", "SS_id_lds", "SS_id_Lmg", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_lbase", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
-                        "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan"];
+                    var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lc", "SS_id_lpa", "SS_id_lca", "SS_id_lds", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
+                        "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan",];
                     this.sPath = oEvent.getParameter('arguments').sPath;
                     if (this.sPath === "SelfService") {
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileSelfSerciceFooter"));
@@ -69,7 +69,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
 
                         const oObjectPage = this.byId("ObjectPageLayout");
-                        const oSection = this.byId("basicDetailsSection"); // Ensure the section has this ID in XML
+                        const oSection = this.byId("basicDetailsSection");
                         if (oObjectPage && oSection) {
                             oObjectPage.setSelectedSection(oSection);
                         }
@@ -203,7 +203,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             SS_validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
             },
-             SS_validateCombo: function (oEvent) {
+            SS_validateCombo: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
             },
             SS_validateName: function (oEvent) {
@@ -273,24 +273,24 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
 
-           onPressSubmit: async function (oEvent) {
+            onPressSubmit: async function (oEvent) {
                 const that = this;
                 await this.ReadEmployeeDocument();
                 var oModel = this.getView().getModel("DocumentModel").getData();
                 if (!oModel || oModel.items.length === 0) {
-                    sap.m.MessageBox.warning(this.i18nModel.getText("uploadAtLeastOneDocumentMessage")); // You can add this key to your i18n model
+                    sap.m.MessageBox.error(this.i18nModel.getText("uploadAtLeastOneDocumentMessage")); // You can add this key to your i18n model
                     return;
                 }
                 // this.showConfirmationDialog(
                 //     this.i18nModel.getText("confirmTitle"),
                 //     this.i18nModel.getText("confirmSubmitMessage"),
                 //     function () {
-                        const ID = oEvent.getSource().getId().split("--").pop();
-                        that.SS_onSavePress(ID);
-                    // },
-                    // function () {
-                    //     that.closeBusyDialog();
-                    // });
+                const ID = oEvent.getSource().getId().split("--").pop();
+                that.SS_onSavePress(ID);
+                // },
+                // function () {
+                //     that.closeBusyDialog();
+                // });
             },
 
             onChangeResigEndDate: function (oEvent) {
@@ -340,12 +340,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             }
                         }
 
-                        // Validate Manager field
-                        if (!utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID")) {
+                        // Validate Manager, Country, and Base Location fields
+                        if (
+                            !utils._LCstrictValidationComboBox(oView.byId("SS_id_Country"), "ID") ||
+                            !utils._LCstrictValidationComboBox(oView.byId("SS_id_BaseL"), "ID") ||
+                            !utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID")
+                        ) {
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                             return;
                         }
-
                         // Optional field validation
                         const passport = oView.byId("SS_id_Passport").getValue().trim();
                         const voterId = oView.byId("SS_id_Voterid").getValue().trim();
@@ -381,7 +384,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             EmployeeID: this.EmployeeID
                         }
                     };
-                    
+
                     if (optionalValid) {
                         this.showConfirmationDialog(this.i18nModel.getText("confirmTitle"), Message,
                             function () {
@@ -423,6 +426,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             onManagerChange: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 const oData = this.getView().getModel("sEmployeeModel").getProperty("/0");
                 oData.ManagerID = oEvent.getSource().getSelectedKey();
                 oData.ManagerName = oEvent.getSource().getSelectedItem().getText();
@@ -821,7 +825,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this._oPreviewDialog.open();
             },
 
-                onFileSizeExceeds: function () {
+            onFileSizeExceeds: function () {
                 MessageToast.show(this.i18nModel.getText("uploadDocSize"));
             },
 
@@ -1278,7 +1282,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     if (salaryDetailsArray.length > 1 && oEffectiveDate > oToday && this.getView().getModel("LoginModel").getProperty("/Role") === "Admin") {
                         var oDeleteButton = new sap.m.Button({
                             text: "Delete",
-                            type: "Negative",
+                            type: "Reject",
                             press: function () {
                                 this.onDeleteSalary(offerData);
                             }.bind(this)
@@ -1293,6 +1297,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             type: "Emphasized",
                             visible: this.ViewModel.getProperty("/RelievingLetter"), // You can keep this condition if needed
                             press: function () {
+                                this._fetchCommonData("TaxCalculation", "TDSModel", { Country: this.getView().getModel("sEmployeeModel").getData()[0].CountryCode });
                                 this.SS_commonOpenDialog("Appraisal", "sap.kt.com.minihrsolution.fragment.Appraisal", ["SS_id_Joinn"]);
                             }.bind(this)
                         }).addStyleClass("sapUiTinyMarginBegin");
@@ -1475,18 +1480,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
             },
-            SS_onBaseLocationChange: function (oEvent) {
-                var sSelectedKey = oEvent.getParameter("selectedItem").getKey(); // Get selected base location
-                var oModel = this.getView().getModel("sBaseLocationModel");
-                var aLocations = oModel.getData();
-                var oSelectedLocation = aLocations.find(function (location) {
-                    return location.city === sSelectedKey;
-                });
-                if (oSelectedLocation) {
-                    this.getView().getModel("sEmployeeModel").setProperty("/0/BranchCode", oSelectedLocation.branchCode);
-                }
-            },
 
+            SS_onBaseLocationChange: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                this.handleBaseLocationChange(
+                    oEvent,
+                    "sBaseLocationModel",         // Source model
+                    "sEmployeeModel",     // Target model
+                    "/0/BranchCode"                // Path in target model
+                );
+                this._LCstrictValidationComboBox()
+            },
             //  download Visiting Card
             onDownloadVisitCard: function () {
                 var oEmployeeData = this.getView().getModel("sEmployeeModel").getData();
@@ -1495,7 +1499,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         oEmployeeData[0].Designation, oEmployeeData[0].BranchCode);
                 }
             },
-
             SS_onDownloadExperienceLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var today = new Date();
@@ -1827,5 +1830,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     MessageToast.show(error.message || error.responseText);
                 }
             },
+            SS_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
+            }
         });
     });

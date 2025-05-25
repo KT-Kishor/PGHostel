@@ -263,7 +263,7 @@ sap.ui.define(
                     try {
                         let data = await this.ajaxReadWithJQuery(entity, value);
                         if (data && data.data && data.data.length > 0) {
-                            let joiningDateField = (entity === "Trainee") ? "JoiningDate" : "AppraisalDate";
+                            let joiningDateField = (entity === "Trainee") ? "JoiningDate" : "JoiningDate";
                             this.JoiningDate = this.Formatter.formatDate(data.data[0][joiningDateField]).split("/").map(Number);
                             let addYears = [];
                             let length = new Date().getFullYear() - this.JoiningDate[2];

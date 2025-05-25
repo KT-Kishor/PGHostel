@@ -78,7 +78,7 @@
 							<Text text="{sEmployeeDetails>Role}"/>
 							<Text text="{sEmployeeDetails>Designation}"/>
 							<Text text="{sEmployeeDetails>CompanyEmailID}"/>
-						    <Text text="{= ${sEmployeeDetails>ManagerName} + '\n(' + ${sEmployeeDetails>ManagerID} + ')' }" />
+							<ObjectIdentifier title="{sEmployeeDetails>ManagerName}" text="{sEmployeeDetails>ManagerID}" />
 							<Text text="{sEmployeeDetails>BaseLocation}"/>
 							<!-- <ObjectStatus text="{sEmployeeDetails>EmployeeStatus}" state="{path: 'sEmployeeDetails>EmployeeStatus', formatter: '.Formatter.statusState'}" /> -->
 						</cells>

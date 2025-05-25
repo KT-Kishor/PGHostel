@@ -472,7 +472,7 @@
 
                 <ux:ObjectPageSection
                     titleUppercase="false"
-                    title="Manage Asset's"
+                    title="Asset"
                      visible="{= ${TileAccessModel>/ManageAsset} === '1' ? true : false}"
                 >
                     <ux:subSections>
@@ -517,7 +517,7 @@
                                         header="{i18n>MyAssetTitle}"
                                         press="TileV_MyAsset"
                                         >
-                                        <TileContent unit="{i18n>subheader}">
+                                        <TileContent unit="{i18n>assetFooter}">
                                         <ImageContent
                                         src="sap-icon://my-view"
                                         />
