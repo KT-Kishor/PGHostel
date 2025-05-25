@@ -193,17 +193,19 @@
                                             required="true"
                                             id="SS_id_lb"
                                         />
-										<m:Select
-                                            selectedKey="{sEmployeeModel>/0/BloodGroup}"
+										<m:ComboBox
+                                            value="{sEmployeeModel>/0/BloodGroup}"
                                             items="{BloodGroup>/bloodgroup}"
                                             id="SS_id_BloodGroup"
+                                            change="SS_validateCombo"
+                                            valueStateText="{i18n>combovalueState}"
                                             editable="{viewModel>/isEditMode}"
                                         >
 											<core:Item
                                                 key="{BloodGroup>Code}"
                                                 text="{BloodGroup>Code}"
                                             />
-										</m:Select>
+										</m:ComboBox>
 										<m:Label
                                             text="{i18n>companyMailid}"
                                             required="true"

@@ -88,6 +88,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.byId("SS_idRelS").setValueState("None");
                     this.byId("SS_id_EmpMoS").setValueState("None");
                     this.byId("SS_id_PAddress").setValueState("None");
+                    this.byId("SS_id_Manager").setValueState("None");
+                    this.byId("SS_id_BloodGroup").setValueState("None");
                     this.byId("SS_id_CAdress").setValueState("None");
                     this.byId("SS_id_EmpAddS").setValueState("None");
                     this.byId("SS_id_MobileNo").setValueState("None");
@@ -105,10 +107,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 switch (sectionTitle) {
                     case "Basic Details":
                         if (this.getView().getModel("viewModel").getProperty("/isEditMode")) {
-                             sap.m.MessageBox.warning(this.i18nModel.getText("sectionChangeConfirm"));  
-                                return;
-                         }
-                        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {EmployeeID: this.EmployeeID});
+                            sap.m.MessageBox.warning(this.i18nModel.getText("sectionChangeConfirm"));
+                            return;
+                        }
+                        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                         this.getView().getModel("sEmployeeModel").refresh(true);
                         break;
                     case "Salary Details":
@@ -120,8 +122,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.getView().byId("SS_id_PaySlipTable").setBusy(false);
                         break;
                     case "Document":
-                         if (this.getView().getModel("viewModel").getProperty("/isEditMode")) {
-                            sap.m.MessageBox.warning(this.i18nModel.getText("sectionChangeConfirm")); 
+                        if (this.getView().getModel("viewModel").getProperty("/isEditMode")) {
+                            sap.m.MessageBox.warning(this.i18nModel.getText("sectionChangeConfirm"));
                             return
                         }
                         this.byId("SS_id_AcName").setValueState("None");
@@ -310,6 +312,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             if (ID === "BasicDetailsBtn") {
                                 isValid =
                                     utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
+                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_BloodGroup"), "ID") &&
                                     utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
                                     utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
                                     utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCode"), "ID") &&
