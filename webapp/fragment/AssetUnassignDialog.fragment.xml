@@ -52,7 +52,7 @@
                 />
                 <Label text="{i18n>assestAssignReturnBranch}" />
                 <ComboBox
-                    required="true"
+                    editable="false"
                     id="FAU_id_branch"
                     showSecondaryValues="true"
                     change="FAU_onReturnBranchChange"

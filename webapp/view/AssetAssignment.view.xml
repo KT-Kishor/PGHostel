@@ -144,7 +144,7 @@
                     <Button
                         text="{i18n>assestAssignEdit}"
                         tooltip="{i18n>assestAssignEdit}"
-                        type="Ghost"
+                        type="Emphasized"
                         press="AA_onPressEdit"
                         id="AA_EditBtn"
                         visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Manager'}"
@@ -170,69 +170,81 @@
                     hAlign="Left"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assestAssignEmployeeID}" tooltip="{i18n>assestAssignEmployeeID}"/>
+                    <Text
+                        text="{i18n>assestAssignEmployeeID}"
+                        tooltip="{i18n>assestAssignEmployeeID}"
+                    />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assestAssignModel}" tooltip="{i18n>assestAssignModel}" />
+                    <Text
+                        text="{i18n>assestAssignModel}"
+                        tooltip="{i18n>assestAssignModel}"
+                    />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assestAssignedByEmployeeName}" tooltip="{i18n>assestAssignedByEmployeeName}" />
+                    <Text
+                        text="{i18n>assestAssignedByEmployeeName}"
+                        tooltip="{i18n>assestAssignedByEmployeeName}"
+                    />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Desktop"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assignedDate}" tooltip="{i18n>assignedDate}" />
+                    <Text
+                        text="{i18n>assignedDate}"
+                        tooltip="{i18n>assignedDate}"
+                    />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Desktop"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assetAssignValue}" tooltip="{i18n>assetAssignValue}" />
+                    <Text
+                        text="{i18n>assetAssignValue}"
+                        tooltip="{i18n>assetAssignValue}"
+                    />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Desktop"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>status}" tooltip="{i18n>status}" />
-                </Column>
-                <Column
-                    hAlign="Left"
-                    minScreenWidth="Desktop"
-                    demandPopin="true"
-                >
-                    <Text text="{i18n>assestAssignReturnDate}" tooltip="{i18n>assestAssignReturnDate}"/>
+                    <Text
+                        text="{i18n>assestAssignReturn}"
+                        tooltip="{i18n>assestAssignReturn}"
+                    />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>assestAssignReturnID}" tooltip="{i18n>assestAssignReturnID}" />
+                    <Text
+                        text="{i18n>comments}"
+                        tooltip="{i18n>comments}"
+                    />
                 </Column>
                 <Column
                     hAlign="Left"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                 >
-                    <Text text="{i18n>comments}" tooltip="{i18n>comments}"/>
+                    <Text
+                        text="{i18n>status}"
+                        tooltip="{i18n>status}"
+                    />
                 </Column>
-                <Column
-                    hAlign="Left"
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                />
             </columns>
             <items>
                 <ColumnListItem
@@ -269,20 +281,34 @@
                         <Text
                             text="{assetModel>Currency} {path:'assetModel>AssetValue',formatter:'.Formatter.fromatNumber'}"
                         />
+                        <VBox class="sapUiTinyMarginTopBottom">
+                            <Text
+                                text="{= 'Returned To: ' + ${assetModel>ReturnEmpID}}"
+                                class="sapUiTinyMarginBottom"
+                            />
+                            <Text
+                                text="{= 'Returned to Name: ' + ${assetModel>ReturnEmpName}}"
+                                class="sapUiTinyMarginBottom"
+                            />
+                            <HBox>
+                                <Text
+                                    text="{ path: 'assetModel>ReturnDate', formatter:'.formatReturnBranchText'}"
+                                    class="sapUiTinyMarginBottom"
+                                />
+                            </HBox>
+
+                            <Text
+                                text="{= 'Return Branch: ' + ${assetModel>ReturnBranch}}"
+                                class="sapUiTinyMarginBottom"
+                            />
+                        </VBox>
+                        <Text text="{assetModel>Comments}" />
+
                         <ObjectStatus
                             inverted="false"
                             state="{= ${assetModel>Status} === 'Assigned' ? 'Success' : 'Error' }"
                             text="{assetModel>Status}"
                         />
-                        <ObjectIdentifier
-                            title="{= ${assetModel>ReturnDate} === '1899-11-30T00:00:00.000Z' || !${assetModel>ReturnDate} ? '' : ${assetModel>ReturnDate}.substring(8,10) + '/' + ${assetModel>ReturnDate}.substring(5,7) + '/' + ${assetModel>ReturnDate}.substring(0,4) }"
-                            text="{assetModel>ReturnBranch}"
-                        />
-                        <ObjectIdentifier
-                            title="{assetModel>ReturnEmpID}"
-                            text="{assetModel>ReturnEmpName}"
-                        />
-                        <Text text="{assetModel>Comments}" />
                     </cells>
                 </ColumnListItem>
             </items>

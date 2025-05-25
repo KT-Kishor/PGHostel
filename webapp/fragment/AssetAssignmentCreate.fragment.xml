@@ -26,7 +26,7 @@
                     required="true"
                     id="FAA_id_employeeID"
                     showSecondaryValues="true"
-                    items="{EmpModel>/}"
+                    items="{EmpModel>/}"    
                     change="FAA_onEmpIDChange"
                     value="{myform>/formData/data/AssignEmployeeID}"
                     valueStateText="{i18n>selectEmployeeID}"

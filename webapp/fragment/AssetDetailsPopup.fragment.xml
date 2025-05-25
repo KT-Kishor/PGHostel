@@ -30,7 +30,7 @@
                     <ColumnListItem
                         type="Active"
                         press="FDP_onVHDPick"
-                    >
+                    >    
                         <cells>
                             <Text text="{filteredAssetDetails>Model}" />
                             <Text
