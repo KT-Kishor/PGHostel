@@ -17,7 +17,11 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("AssetObjectPage").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function (oEvent) {
-            var LoginFunction = await this.commonLoginFunction("AssetAssignment");
+          
+         var Layout = this.byId("ObjectPageLayout");
+         Layout.setSelectedSection(this.byId("OB_Timeline")); 
+
+         var LoginFunction = await this.commonLoginFunction("AssetAssignment");
             if (!LoginFunction) return;
             this.getBusyDialog()
             this.Name = oEvent.getParameter("arguments").Name;
@@ -45,7 +49,7 @@ sap.ui.define([
                         // title: item.PickedEmployeeID,
                         // userName: item.PickedEmployeeName,
                         // Status: "Available",
-                        title: "The asset was picked by " + item.PickedEmployeeName + " (" + item.PickedEmployeeID + ") " + item.PickedBranch + " "
+                        title: "The asset was picked by " + item.PickedEmployeeName + " (" + item.PickedEmployeeID + ") at " + item.PickedBranch + " "
                             + "on " + new Date(item.AssetCreationDate).toLocaleDateString('en-GB')
                     })
                 }
@@ -59,7 +63,7 @@ sap.ui.define([
                         // Status: "Assigned",
                         title: "The asset was assigned to " + item.AssignEmployeeName + " (" + item.AssignEmployeeID + ") " + "by " +
                             item.AssignedByEmployeeName
-                            + " (" + item.AssignedByEmployeeID + ") " + item.AssignBranch + " " + "on "
+                            + " (" + item.AssignedByEmployeeID + ") at " + item.AssignBranch + " " + "on "
                             + new Date(item.AssignedDate).toLocaleDateString('en-GB'),
 
 
@@ -88,7 +92,7 @@ sap.ui.define([
                         //  ReturnEmpName:"Return To " + item.ReturnEmpName + " " + item.ReturnEmpID,
                         text: item.Comments ? "Comment: " + item.Comments : "",
                         title: "The asset was return by " + item.AssignEmployeeName + " (" + item.AssignEmployeeID + ") to " + item.ReturnEmpName
-                            + " (" + item.ReturnEmpID + ") " + item.ReturnBranch + " " + "on " + new Date(item.ReturnDate).toLocaleDateString('en-GB')
+                            + " (" + item.ReturnEmpID + ") at " + item.ReturnBranch + " " + "on " + new Date(item.ReturnDate).toLocaleDateString('en-GB')
 
                     });
                 }
@@ -99,8 +103,9 @@ sap.ui.define([
                         // userName: item.TransferByName,
                         // title: item.TransferByID,
                         // Status: "Transferred",
+                        text: item.ReferenceNumber ? "Reference Number: " + item.ReferenceNumber : "",
 
-                        title: "The asset was transferby " + item.TransferByName + " (" + item.TransferByID + ") " + item.TransferBranch + " "
+                        title: "The asset was transferby " + item.TransferByName + " (" + item.TransferByID + ") at " + item.TransferBranch + " "
                             + "on " + new Date(item.TransferDate).toLocaleDateString('en-GB')
 
                     });

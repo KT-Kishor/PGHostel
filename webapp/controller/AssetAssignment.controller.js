@@ -142,6 +142,8 @@ sap.ui.define([
 
 
             AA_onPressAssign: async function () {
+
+
                 try {
                     var response = await this.ajaxReadWithJQuery("IncomeAsset", {});
                     if (response.success) {
@@ -429,7 +431,13 @@ sap.ui.define([
                         this.getBusyDialog();
 
                         if (originalStatus === "Returned") {
-                            delete oFormData.AssetCreationDate;
+                            oFormData.AssetCreationDate;
+                            oFormData.PickedEmployeeName;
+
+                            oFormData.PickedEmployeeID;
+
+                            oFormData.PickedBranch;
+
                             await this.ajaxCreateWithJQuery("IncomeAsset", { data: oFormData }, ["FAA_id_FormFrag"]);
                         } else {
                             await this.ajaxUpdateWithJQuery("IncomeAsset", {
@@ -589,6 +597,12 @@ sap.ui.define([
                 formData.setProperty("/formData/data/Currency", oSelectedData.Currency);
                 formData.setProperty("/formData/data/Description", oSelectedData.Description);
                 formData.setProperty("/formData/data/AssetCreationDate", oSelectedData.AssetCreationDate);
+                formData.setProperty("/formData/data/PickedEmployeeName", oSelectedData.PickedEmployeeName);
+
+                formData.setProperty("/formData/data/PickedEmployeeID", oSelectedData.PickedEmployeeID);
+
+                formData.setProperty("/formData/data/PickedBranch", oSelectedData.PickedBranch);
+
                 var oAssignedDate;
                 var oMinDate;
                 if (oSelectedData.Status === "Returned" && oSelectedData.ReturnDate) {
@@ -624,22 +638,43 @@ sap.ui.define([
                     // Set empty model to show no data
                     var emptyModel = new sap.ui.model.json.JSONModel([]);
                     oView.setModel(emptyModel, "filteredAssetDetails");
-
                     if (!this._oValueHelpDialog) {
-                        this._oValueHelpDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetDetailsPopup", this);
+                        this._oValueHelpDialog =
+                            sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetDetailsPopup",
+                                this);
                         this.getView().addDependent(this._oValueHelpDialog);
                     }
-
                     this._oValueHelpDialog.open();
                     return;
                 }
-                var allData = this.getView().getModel("incomeModel").getProperty("/");
-                var filteredData = allData.filter(item => item.IsCurrent === "1" && item.Status === "Available" || item.IsCurrent === "1" && item.Status === "Returned");
-                var filteredModel = new sap.ui.model.json.JSONModel(filteredData);
+                var allData =
+                    this.getView().getModel("incomeModel").getProperty("/");
+                var loginModel = this.getOwnerComponent().getModel("LoginModel");
+                var branch = loginModel.getProperty("/BranchCode");
+                var role = loginModel.getProperty("/Role");
+                var baseLocationData =
+                    this.getView().getModel("BaseLocationModel").getData();
+                var cityFromBranch = "";
+                if (baseLocationData && Array.isArray(baseLocationData)) {
+                    var branchEntry = baseLocationData.find(item =>
+                        item.branchCode === branch);
+                    if (branchEntry) {
+                        cityFromBranch = branchEntry.city;
+                    }
+                }
+                var filteredData = allData.filter(item =>
+                   (item.IsCurrent === "1" && item.PickedBranch == branchEntry.city) 
+                    &&
+                    item.IsCurrent === "1" && item.Status === "Available" ||
+                    item.IsCurrent === "1" && item.Status === "Returned" );
+                var filteredModel = new
+                    sap.ui.model.json.JSONModel(filteredData);
                 oView.setModel(filteredModel, "filteredAssetDetails");
 
                 if (!this._oValueHelpDialog) {
-                    this._oValueHelpDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetDetailsPopup", this);
+                    this._oValueHelpDialog =
+                        sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetDetailsPopup",
+                            this);
                     this.getView().addDependent(this._oValueHelpDialog);
                 }
                 this._oValueHelpDialog.open();

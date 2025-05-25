@@ -410,9 +410,11 @@
                             />
                             <Button
                                 id="IA_pickButton"
-                                visible="{= ${incomeModel>Status} === 'Transferred' &amp;&amp; (${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Consultant'
-                                 || ${LoginModel>/Role} === 'IT Manager')}"
-                                text="{i18n>pickedBtn}"
+                              
+                                 visible="{= ${incomeModel>Status} === 'Transferred' &amp;&amp; (${LoginModel>/Role} === 'Admin'
+                                   || ${LoginModel>/Role} === 'IT Consultant'
+                                 || ${LoginModel>/Role} === 'IT Manager')&amp;&amp;
+                                  (${LoginModel>/Role} === 'IT Consultant' ? ${incomeModel>PickedBranch} === ${incomeModel>TransferBranch} : true)}"                                text="{i18n>pickedBtn}"
                                 type="Ghost"
                                 class="sapUiTinyMarginBegi"
                                 press="IA_onPickedButtonPress"

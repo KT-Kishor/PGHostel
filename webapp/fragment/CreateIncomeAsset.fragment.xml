@@ -209,6 +209,15 @@
                         additionalText="{branchModel>branchCode}"
                     />
                 </ComboBox>
+                 <Label text="{i18n>refrenceNo}" required="true" />
+                <Input
+                    id="FCIA_id_refrenceNo"
+                    value="{CreateIncomeAssetModel>/ReferenceNumber}"
+                    placeholder="Enter Reference Number"
+                    valueStateText="Enter Reference Number"
+                    liveChange="FCIA_onInputLiveChange"
+                    maxLength="30"
+                />
                 
             </f:content>
         </f:SimpleForm>

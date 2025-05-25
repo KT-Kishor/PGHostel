@@ -115,7 +115,7 @@
             <sections>
                 <ObjectPageSection
                     titleUppercase="false"
-                    id="goals"
+                    id="OB_Timeline"
                     title="Timeline of Assets"
                     tooltip="Timeline of Assets"
                 >
@@ -315,6 +315,11 @@
                             path: 'objectModel>TransferDate',
                             formatter: '.Formatter.formatDate'
                         }}"
+                                                        class="sapUiTinyMarginBottom"
+
+                                                    />
+                                                     <m:Text
+                                                        text="{= ${objectModel>ReferenceNumber} ? 'Reference No: ' + ${objectModel>ReferenceNumber} : ''}"
                                                     />
                                                 </m:VBox>
                                                 <!-- <m:Text text="{objectModel>TransferBranch}" /> -->
@@ -363,6 +368,17 @@
                                                 <!-- <m:Text text="{objectModel>ReturnBranch}" /> -->
                                                 <!-- <m:ObjectIdentifier title="{objectModel>TransferByName}" text="{objectModel>TransferByID}" /> -->
                                                 <m:VBox  class="sapUiTinyMarginTopBottom">
+                                                  <m:Text
+                                text="{= ${objectModel>ReturnEmpName} ?'By ' +  ${objectModel>AssignedByEmployeeName} : ''}"
+                                    class="sapUiTinyMarginBottom"
+                            />
+                                       <m:Text
+                                text="{= ${objectModel>ReturnEmpName} ? 'ID: ' + ${objectModel>AssignedByEmployeeID} : ''}"                                    class="sapUiTinyMarginBottom"
+                            />
+                            
+                             <!-- <m:Text text="{=${objectModel>AssignedByEmployeeID}?'ID: '+${objectModel>AssignedByEmployeeID}:''}"
+                              class="sapUiTinyMarginBottom"                        
+                                  /> -->
                              <m:Text
                                 text="{= ${objectModel>ReturnEmpName} ? 'To: ' + ${objectModel>ReturnEmpName} : ''}"
                                     class="sapUiTinyMarginBottom"
@@ -406,7 +422,7 @@
                                                     }}"
                                                 /> -->
                                                 <!-- <m:ObjectIdentifier
-                                                <!-- <m:ObjectIdentifier
+                                                <!<m:ObjectIdentifier
                                                     title="{= ${objectModel>TrashByEmployeeName} ? 'By:' + ${objectModel>TrashByEmployeeName} + ' ' 
                                 + ${objectModel>TrashByEmployeeID} : ''}"
                                                     text="{= ${objectModel>TrashDate} ? 'Date:' + ${
