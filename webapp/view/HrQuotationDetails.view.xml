@@ -16,11 +16,13 @@
             id="HQD_id_QuotationDetailsPage"
             enableLazyLoading="true"
             useIconTabBar="false"
+            
         >
             <sections>
                 <ObjectPageSection
                     id="HQD_id_Section"
                     titleUppercase="false"
+                    showTitle="false"
                 >
                     <subSections>
                         <ObjectPageSubSection
@@ -67,8 +69,41 @@
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_QuotationValid"
                                         />
+                                         <m:Label
+                                            text="{i18n>expCountry}"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            items="{CountryModel>/}"
+                                            selectedKey="{SingleCompanyModel>/Country}"
+                                            width="100%"
+                                            showSecondaryValues="true"
+                                            valueStateText="{i18n>countryValueState}"
+                                            editable="{visiablityPlay>/editable}"
+                                            id="HQD_id_Country"
+                                            change="HQD_onCountryChange"
+                                        >
+                                            <core:ListItem
+                                                key="{CountryModel>countryName}"
+                                                text="{CountryModel>countryName}"
+                                                additionalText="{CountryModel>code}"
+                                            />
+                                        </m:ComboBox>
+                                        <m:Label text="{i18n>branch}" />
+<m:ComboBox
+    id="HQD_id_BranchCode"
+    items="{BrachModel>/}" 
+    selectedKey="{SingleCompanyModel>/SelectedBranchCode}"
+    change="HQD_onBrachChange"
+    editable="{visiablityPlay>/editable}"
+     visible="{visiablityPlay>/showBranch}"
+>
+    <core:Item key="{BrachModel>branchCode}" text="{BrachModel>city}" />
+</m:ComboBox>
+
+                                     
                                         <m:Label
-                                            text="{i18n>compName}"
+                                            text="{i18n>companyName}"
                                             required="true"
                                         />
                                         <m:Input
@@ -120,39 +155,8 @@
                                             valueStateText="{i18n>emailValueState}"
                                             maxLength="100"
                                         />
-                                        <m:Label
-                                            text="{i18n>expCountry}"
-                                            required="true"
-                                        />
-                                        <m:ComboBox
-                                            items="{CountryModel>/}"
-                                            selectedKey="{SingleCompanyModel>/Country}"
-                                            width="100%"
-                                            showSecondaryValues="true"
-                                            valueStateText="{i18n>countryValueState}"
-                                            editable="{visiablityPlay>/editable}"
-                                            id="HQD_id_Country"
-                                            change="HQD_onCountryChange"
-                                        >
-                                            <core:ListItem
-                                                key="{CountryModel>countryName}"
-                                                text="{CountryModel>countryName}"
-                                                additionalText="{CountryModel>code}"
-                                            />
-                                        </m:ComboBox>
-                                        <m:Label
-                                            text="{i18n>companyAddress}"
-                                            required="true"
-                                        />
-                                        <m:TextArea
-                                            value="{SingleCompanyModel>/CompanyAddress}"
-                                            id="HQD_id_InputCompanyAddress"
-                                            liveChange="HQD_onAddressLiveChange"
-                                            rows="2"
-                                            valueStateText="{i18n>addressValueState}"
-                                            maxLength="120"
-                                            editable="{visiablityPlay>/editable}"
-                                        />
+                                       
+                                        
                                         <m:Label text="{i18n>companyGSTNO}" />
                                         <m:Input
                                             value="{SingleCompanyModel>/CompanyGSTNO}"
@@ -173,7 +177,6 @@
     selected="{SingleCompanyModel>/CGSTSelected}"
     select="onSelectCGST"
     editable="{SingleCompanyModel>/gstEditable}"
-        
 />
 <m:RadioButton  
     text="{i18n>igst}"
@@ -218,6 +221,19 @@
                                                 text="{CurrencyModel>currency}"
                                             />
                                         </m:ComboBox>
+                                        <m:Label
+                                            text="{i18n>companyAddress}"
+                                            required="true"
+                                        />
+                                        <m:TextArea
+                                            value="{SingleCompanyModel>/CompanyAddress}"
+                                            id="HQD_id_InputCompanyAddress"
+                                            liveChange="HQD_onAddressLiveChange"
+                                            rows="2"
+                                            valueStateText="{i18n>addressValueState}"
+                                            maxLength="120"
+                                            editable="{visiablityPlay>/editable}"
+                                        />
                                     </f:content>
                                 </f:SimpleForm>
                             </blocks>
@@ -251,7 +267,7 @@
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="100"
                                         />
-                                        <m:Label
+                                        <m:Label    
                                             text="{i18n>emailID}"
                                             required="true"
                                         />
@@ -267,6 +283,22 @@
                                             text="{i18n>customerMobileNo}"
                                             required="true"
                                         />
+                                         <m:ComboBox
+                                            value="{SingleCompanyModel>/CustomerSTDCode}"
+                                            showSecondaryValues="true"
+                                            id="HQD_id_CustomerNumber"
+                                            items="{codeModel>/}"
+                                            filterSecondaryValues="true"
+                                            change="HQD_STDCode"
+                                            editable="{visiablityPlay>/editable}"
+                                            valueStateText="{i18n>combovalueState}"
+                                        >
+                                            <core:ListItem
+                                                key="{codeModel>country}"
+                                                text="{codeModel>calling_code}"
+                                                additionalText="{codeModel>country_code}"
+                                            />
+                                        </m:ComboBox>
                                         <m:Input
                                             value="{SingleCompanyModel>/CustomerMobileNo}"
                                             id="HQD_id_InputCustomerMobileNo"
@@ -274,6 +306,15 @@
                                             valueStateText="{i18n>mobileNoValueState}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
+                                        />
+                                        <m:Label text="{i18n>customerGSTNO}" />
+                                        <m:Input
+                                            value="{SingleCompanyModel>/CustomerGSTNO}"
+                                            id="HQD_id_InputCustomerGSTNO"
+                                            valueStateText="{i18n>gstNoValueState}"
+                                            liveChange="HQD_onCustomerGSTLiveChange"
+                                            editable="{visiablityPlay>/editable}"
+                                            maxLength="20"
                                         />
                                         <m:Label
                                             text="{i18n>customerAddress}"
@@ -288,15 +329,7 @@
                                             rows="2"
                                             editable="{visiablityPlay>/editable}"
                                         />
-                                        <m:Label text="{i18n>customerGSTNO}" required="true"/>
-                                        <m:Input
-                                            value="{SingleCompanyModel>/CustomerGSTNO}"
-                                            id="HQD_id_InputCustomerGSTNO"
-                                            valueStateText="{i18n>gstNoValueState}"
-                                            liveChange="HQD_onCustomerGSTLiveChange"
-                                            editable="{visiablityPlay>/editable}"
-                                            maxLength="20"
-                                        />
+                                        
                                     </f:content>
                                 </f:SimpleForm>
                             </blocks>
@@ -331,7 +364,7 @@
                                                     press="HQD_onPressAddQuotationItem"
                                                     type="Emphasized"
                                                 />
-                                                <m:ToolbarSeparator />
+                                                
                                             </m:OverflowToolbar>
                                         </m:headerToolbar>
                                         <m:columns>
@@ -431,9 +464,10 @@
         <m:TextArea
           rows="2"
           value="{QuotationModel>Description}"
-          placeholder="Additional details"
+          placeholder="{i18n>itemDescription}"
           editable="{visiablityPlay>/editable}"
           maxLength="40"
+          width="100%"
         />
       </m:items>
     </m:VBox>
