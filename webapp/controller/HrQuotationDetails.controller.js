@@ -42,6 +42,8 @@ sap.ui.define(
         if (sQuotationNo === "new") {
           var oToday = new Date();
           oToday.setHours(0, 0, 0, 0); // Normalize
+          var oMinDate = new Date(oToday);
+          oMinDate.setFullYear(oToday.getFullYear() - 100);
           var oValidUntil = new Date(oToday);
           oValidUntil.setDate(oValidUntil.getDate() + 30);
           var oBlankModel = new JSONModel({
@@ -63,7 +65,8 @@ sap.ui.define(
           //  Set min date on Quotation Date
           var oDatePicker = this.getView().byId("HQD_id_Quotation");
           oDatePicker.setDateValue(oToday); // Ensure UI shows it
-
+          oDatePicker.setMinDate(oMinDate);
+          oDatePicker.setMaxDate(oToday);
           //  Set range on Valid Until Date
           var oValidPicker = this.getView().byId("HQD_id_QuotationValid");
           oValidPicker.setMaxDate(oValidUntil);
