@@ -50,8 +50,8 @@ sap.ui.define([
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
                 this.getView().setModel(oViewModel, "viewModel");
                 this.viewModel = this.getView().getModel("viewModel");
-                ["TD_id_Name", "TD_id_ReportingManager", "TD_id_EmailID", "TD_id_TrainingType", "TD_id_JoiningDate", "TD_id_ReleaseDate", "TD_id_TrainingAmount",
-                    "TU_id_Name", "TU_id_Manager", "TU_id_TraineeMail", "TU_id_JoinDate", "TU_id_TrainingType", "TU_id_TrainingAmount"].forEach(function (ids) {
+                ["TD_id_Name", "TD_id_ReportingManager", "TD_id_EmailID", "TD_id_TrainingType", "TD_id_JoiningDate", "TD_id_ReleaseDate", "TD_id_TrainingAmount","TD_id_Location","TD_Id_Country","TD_id_STDCode","TD_id_Mobile",
+                    "TU_id_Name", "TU_id_Manager", "TU_id_TraineeMail", "TU_id_JoinDate", "TU_id_TrainingType", "TU_id_TrainingAmount","TU_Id_Country","TU_id_Location","TU_id_STDCode","TU_id_Mobile"].forEach(function (ids) {
                         this.getView().byId(ids).setValueState("None");
                     }.bind(this));
                 if (this.sArgPara === "CreateTraineeFlag") {
@@ -88,7 +88,7 @@ sap.ui.define([
                         this.viewModel.setProperty("/isVisiable", true);
                         this.viewModel.setProperty("/editBut", true);
                     }
-                    if (this.getView().getModel("oTraineeDetails").getProperty("/Salutation") === "Dr.") {
+                    if (this.getView().getModel("oTraineeDetails").getProperty("/NameSalutation") === "Dr.") {
                         this.getView().byId("TU_id_Gender").setEnabled(true);
                     }
                     else {

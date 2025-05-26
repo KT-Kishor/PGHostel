@@ -36,6 +36,7 @@ sap.ui.define([
                     this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
                     this._fetchCommonData("AppVisibility", "RoleModel") // role get call
                     this._fetchCommonData("Designation", "DesignationModel");//designation get call
+                    this._fetchCommonData("Country", "CountryModel");
                     this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
                 }
                 var jsonData = {
