@@ -21,6 +21,8 @@ sap.ui.define([
                 this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeOffer" });
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 await this._fetchCommonData("EmployeeDetailsData", "empModel");
+                this._fetchCommonData("Country", "CountryModel");
+
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 this.byId("TD_id_TrainingDetailsBox").setVisible(false);
@@ -38,7 +40,11 @@ sap.ui.define([
                     "JoiningDate": "",
                     "TraineeEmail": "",
                     "TrainingDuration": "6 Month",
-                    "BaseLocation": "Kalaburagi"
+                    "BaseLocation": "Kalaburagi",
+                    "Country":"India",
+                    "MobileNumber": "",
+                    "STDCode": "",
+                    "Gender":""
                 };
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
@@ -512,6 +518,31 @@ sap.ui.define([
                     oView.byId("TD_id_TrainingAmount").setValue("");
                     oView.byId("TD_id_TrainingAmount").setValueState("None");
                 }
-            }
+            },
+            
+            TD_CreateSalutationChange: function (oEvent) {
+                this.onSalutationChangeCommon(
+                    oEvent,
+                    "oTraineeDetails",       // name of the model
+                    "/Gender",           // path to gender property
+                    "TD_id_Genderr"        // ID of the gender control
+                );
+            },
+                TU_EditSalutationChange: function (oEvent) {
+                this.onSalutationChangeCommon(
+                    oEvent,
+                    "employeeModel",       // name of the model
+                    "/Gender",           // path to gender property
+                    "TU_id_Gender"        // ID of the gender control
+                );
+            },
+             TD_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                this.onCountryChange(oEvent, { stdCodeCombo: "TD_id_STDCode", baseLocationCombo: "TD_id_Location", branchInput: "TD_id_BranchCode", mobileInput: "TD_id_Mobile" });
+            },
+              TU_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                this.onCountryChange(oEvent, { stdCodeCombo: "TU_id_STDCode", baseLocationCombo: "TU_id_Location", branchInput: "TU_id_BranchCode", mobileInput: "TU_id_Mobile" });
+            },
         });
     });
