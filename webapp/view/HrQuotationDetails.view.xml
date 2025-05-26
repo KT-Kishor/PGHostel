@@ -93,7 +93,7 @@
 <m:ComboBox
     id="HQD_id_BranchCode"
     items="{BrachModel>/}" 
-    selectedKey="{SingleCompanyModel>/SelectedBranchCode}"
+    selectedKey="{SingleCompanyModel>/Branch}"
     change="HQD_onBrachChange"
     editable="{visiablityPlay>/editable}"
      visible="{visiablityPlay>/showBranch}"

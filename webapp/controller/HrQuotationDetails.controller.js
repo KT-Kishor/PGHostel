@@ -56,7 +56,7 @@ sap.ui.define(
             CompanyMobileNo: "",
             STDCode: "",
             Country: "",
-            SelectedBranchCode: "",
+            Branch: "",
             Percentage: "",
             Currency: "",
             gstEditable: true
@@ -183,7 +183,7 @@ sap.ui.define(
           // Clear other dependent fields if needed
           oSingleCompanyModel.setProperty("/STDCode", "");
           oSingleCompanyModel.setProperty("/Currency", "");
-          oSingleCompanyModel.setProperty("/SelectedBranchCode", "");
+          oSingleCompanyModel.setProperty("/Branch", "");
         }
 
         // Reset value state if no value
@@ -523,7 +523,9 @@ sap.ui.define(
         const oView = this.getView();
         // Validate RichTextEditor content
         const oRichTextEditor = this.byId("HQD_id_Notes");
-        const oNotesText = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'text' }) || "";
+        // const oNotesText = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'text' }) || "";
+        const oRTE = this.byId("HQD_id_Notes");
+        const htmlContent = oRTE.getValue()
         const oCurrency1 = this.byId("HQD_id_Curency").getSelectedKey();
 
         const isINR = oCurrency1 === "INR";
@@ -550,7 +552,7 @@ sap.ui.define(
           MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           return;
         }
-        if (!oNotesText.trim()) {
+        if (!htmlContent.trim()) {
           MessageToast.show("Notes field is required.");
           return;
         }
@@ -577,7 +579,7 @@ sap.ui.define(
         const oCustomerAddress = this.byId("HQD_id_InputCustomerAddress").getValue();
         const oCustomerGST = this.byId("HQD_id_InputCustomerGSTNO").getValue();
 
-        const oNotes = oNotesText; // Already extracted
+        const oNotes = htmlContent; // Already extracted
 
 
 
@@ -689,7 +691,6 @@ sap.ui.define(
         } else {
           currencyText = "Currency";
         }
-
         return word + " " + currencyText + " Only";
       },
 
@@ -712,20 +713,20 @@ sap.ui.define(
         // Logo
         const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
         const img = await this._convertBLOBToImage(imgblob);
-        doc.addImage(img, "PNG", 13, y, 50, 50);
+        doc.addImage(img, "PNG", 13, y, 45, 45);
         y += 60;
 
         // Header Title
         doc.setFontSize(25);
-        doc.setFont("helvetica", "bold");
+        doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("quotation"), 135, 40);
 
         // Company Info
         doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
+        doc.setFont("times", "bold");
         doc.text(oData.CompanyName, 13, y);
         y += 5;
-        doc.setFont("helvetica", "normal");
+        doc.setFont("times", "normal");
         const companyAddrHeight = doc.getTextDimensions(oData.CompanyAddress).h;
         doc.text(oData.CompanyAddress, 13, y, { maxWidth: 60 });
         y += companyAddrHeight + 20;
@@ -735,27 +736,27 @@ sap.ui.define(
         doc.text(this.i18nModel.getText("pdfemail") + oData.CompanyEmailID, 13, y);
         y += 10;
 
-        // Quotation Meta
-        doc.setFont("helvetica", "bold");
+        // Quotation Metas
+        doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("pdfquotationNo"), 168, y - 45, { align: "right" });
         doc.text(this.i18nModel.getText("pdfDate"), 168, y - 40, { align: "right" });
         doc.text(this.i18nModel.getText("pdfValiduntil"), 168, y - 35, { align: "right" });
 
-        doc.setFont("helvetica", "normal");
+        doc.setFont("times", "normal");
         doc.text(oData.QuotationNo, 172, y - 45);
         doc.text(Formatter.formatDate(oData.Date), 172, y - 40);
         doc.text(Formatter.formatDate(oData.ValidUntil), 172, y - 35);
 
         // Customer Info
 
-        doc.setFont("helvetica", "bold");
+        doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("pdfto"), 13, y);
         y += 5;
 
         doc.text(oData.CustomerName, 13, y);
         y += 5;
 
-        doc.setFont("helvetica", "normal");
+        doc.setFont("times", "normal");
 
         //  Properly wrap address and calculate height
         const splitAddress = doc.splitTextToSize(oData.CustomerAddress || "", 80);
@@ -803,7 +804,7 @@ sap.ui.define(
           theme: 'grid',
           headStyles: { fillColor: [41, 128, 185] },
           styles: {
-            font: "helvetica",
+            font: "times",
             fontSize: 10,
             cellPadding: 3
           },
@@ -837,7 +838,7 @@ sap.ui.define(
         }
 
         // SubTotal Without GST
-        doc.setFont("helvetica", "bold");
+        doc.setFont("times", "bold");
         doc.setFontSize(12);
         doc.text(`${this.i18nModel.getText("subTotalNotGST")} (${oData.Currency}): ${Formatter.fromatNumber(oData.SubTotalNotGST)}`, 190, y, { align: "right" });
         y += 8;
@@ -849,16 +850,24 @@ sap.ui.define(
         if (oData.Currency !== "USD") {
           const cgstValue = parseFloat(oData.CGST) || 0;
           const sgstValue = parseFloat(oData.SGST) || 0;
+          const igstValue = parseFloat(oData.IGST) || 0;
           const percentage = oData.Percentage || 0;
 
-          const cgst = Formatter.fromatNumber(cgstValue.toFixed(2));
-          const sgst = Formatter.fromatNumber(sgstValue.toFixed(2));
+          if (cgstValue > 0 || sgstValue > 0) {
+            const cgst = Formatter.fromatNumber(cgstValue.toFixed(2));
+            const sgst = Formatter.fromatNumber(sgstValue.toFixed(2));
 
-          doc.text(`CGST (${percentage}%): ${cgst}`, 190, y, { align: "right" });
-          y += 8;
-          doc.text(`SGST (${percentage}%): ${sgst}`, 190, y, { align: "right" });
-          y += 10;
+            doc.text(`CGST (${percentage}%): ${cgst}`, 190, y, { align: "right" });
+            y += 8;
+            doc.text(`SGST (${percentage}%): ${sgst}`, 190, y, { align: "right" });
+            y += 10;
+          } else if (igstValue > 0) {
+            const igst = Formatter.fromatNumber(igstValue.toFixed(2));
+            doc.text(`IGST (${percentage}%): ${igst}`, 190, y, { align: "right" });
+            y += 10;
+          }
         }
+
         // Total
         doc.setDrawColor(0);
         doc.setLineWidth(0.5);
@@ -869,20 +878,20 @@ sap.ui.define(
 
         // Amount in Words
         oData.AmountInWords = this.numberToWords(oData.TotalSum, oData.Currency, { maxWidth: 80 });
-        doc.setFont("helvetica", "bold");
+        doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("pdfaAmount"), 13, y);
         y += 5;
-        doc.setFont("helvetica", "normal");
+        doc.setFont("times", "normal");
         const amountHeight = doc.getTextDimensions(oData.AmountInWords || "").h;
         doc.text(oData.AmountInWords || "", 13, y, { maxWidth: 180 });
         y += amountHeight + 10;
 
         // Terms & Conditions with page break support
-        doc.setFont("helvetica", "bold");
+        doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("pdftermconditaion"), 13, y);
         y += 5;
 
-        doc.setFont("helvetica", "normal");
+        doc.setFont("times", "normal");
         const htmlNotes = oData.Notes || "";
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = htmlNotes;
@@ -1272,11 +1281,13 @@ sap.ui.define(
       HQD_onPressEdit: async function () {
         const oView = this.getView();
         const oModel = oView.getModel("visiablityPlay");
+        const oRadiobtn = oView.getModel("SingleCompanyModel");
+
         const bEditable = oModel.getProperty("/editable");
 
         if (!bEditable) {
           oModel.setProperty("/editable", true);
-          oModel.setProperty("/gstEditable", true);
+          oRadiobtn.setProperty("/gstEditable", true);
 
         } else {
           // Already in edit mode => perform Save logic
@@ -1327,8 +1338,11 @@ sap.ui.define(
             CompanyAddress: this.byId("HQD_id_InputCompanyAddress").getValue(),
             Date: sQuotationDate,
             ValidUntil: sValidUntilDate,
+            Country: this.byId("HQD_id_Country").getSelectedKey(),
+            Branch: this.byId("HQD_id_BranchCode").getSelectedKey(),
             CompanyGSTNO: this.byId("HQD_id_CompGSTNO").getValue(),
             CompanyMobileNo: this.byId("HQD_id_InputCompanyMobileNo").getValue(),
+            CustomerSTDCode: this.byId("HQD_id_CustomerNumber").getValue(),
             CompanyEmailID: this.byId("HQD_id_CompanyEmailID").getValue(),
             CustomerName: this.byId("HQD_id_CustomerName").getValue(),
             CustomerAddress: this.byId("HQD_id_InputCustomerAddress").getValue(),
