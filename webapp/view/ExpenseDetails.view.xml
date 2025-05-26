@@ -8,7 +8,7 @@
 >
 
 <m:Page id="id_Expense_Details" title="{i18n>expDetails}" navButtonPress="Exp_Det_onPressBackBtn" showNavButton="true">
-	<ObjectPageLayout enableLazyLoading="true" beforeNavigate="onBeforeNavigate" useIconTabBar="true" showTitleInHeaderContent="true" upperCaseAnchorBar="false" headerContentPinnable="true" sectionChange="onSectionChange" id="objectPageLayoutExpence" class="sapUiSmallmarginResponsive">
+	<ObjectPageLayout enableLazyLoading="true" navigate="onSectionChange" beforeNavigate="onBeforeNavigate" useIconTabBar="true" showTitleInHeaderContent="true" upperCaseAnchorBar="false" headerContentPinnable="true" sectionChange="onSectionChange" id="objectPageLayoutExpence" class="sapUiSmallmarginResponsive">
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
 					<expandedHeading>
@@ -20,16 +20,15 @@
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
 			<sections>
-				<ObjectPageSection titleUppercase="false" id="idObjectPageSection" >
-					<subSections>
-						<ObjectPageSubSection titleUppercase="false" title="{i18n>expBasicInformation}">
+                <ObjectPageSection titleUppercase="false" title="{i18n>expBasicInformation}">
+                    <subSections>
+						<ObjectPageSubSection>
 							<blocks>
 								<f:SimpleForm id="Exp_Det_id_DimpleForm" editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 											<f:toolbar>
 											<m:Toolbar>												
 												<m:ToolbarSpacer />
-												<m:Button type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" 
-                    press="Exp_Det_onEditOrSavePress" icon="{= ${viewModel>/isEditMode} ? '' : '' }" visible="{viewModel>/status}"  />
+												<m:Button type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="Exp_Det_onEditOrSavePress" icon="{= ${viewModel>/isEditMode} ? '' : '' }" visible="{viewModel>/status}"  />
 											</m:Toolbar>
 										</f:toolbar>
 									<!-- <f:content> -->
@@ -87,8 +86,8 @@
 										<m:Label text="{i18n>expEmployeeRemark}" required="true"/>
 										<m:TextArea id="Exp_id_EmpRemark" valueStateText="{i18n>expValStaEmployeeRemark}" liveChange="onLiveChangeEmployeeRemark" rows="4" value="{FilteredExpenseModel>/0/comments/0/Comment}"  editable="{viewModel>/editable}" maxLength="1000"/>
 
-										<m:Label text="{i18n>comments}" />										
-										<m:Button  text="{i18n>View}" press="AL_onShowEmployeeComments" />
+										<!-- <m:Label text="{i18n>comments}" />										
+										<m:Button  text="{i18n>View}" press="AL_onShowEmployeeComments" /> -->
 									<!-- </f:content> -->
 								</f:SimpleForm>
 							</blocks>
@@ -133,10 +132,20 @@
 											</m:Column>
 										</m:columns>
 										<m:items>
-											<m:ColumnListItem type="Navigation" press="onCheckExpenseDetails">
+											<m:ColumnListItem press="onCheckExpenseDetails">
 												<m:cells>
 													<m:Text text="{ItemExpenseModel>IndexNo}" />
-													<m:Link text="{ItemExpenseModel>ItemType}" press="OnPressAttachment" />
+													<m:HBox>
+													<m:Text
+														text="{ItemExpenseModel>ItemType}"
+														visible="{= ${ItemExpenseModel>ItemType} === 'Peridiem' }" />
+
+													<m:Link
+														text="{ItemExpenseModel>ItemType}"
+														visible="{= ${ItemExpenseModel>ItemType} !== 'Peridiem' }"
+														press="OnPressAttachment" />
+												</m:HBox>
+
 													<m:Text text="{path:'ItemExpenseModel>ExpenseDate',formatter: '.Formatter.formatDate'}" />
 													<m:Text text="{path:'ItemExpenseModel>ExpenseAmount', formatter: '.Formatter.fromatNumber'}" />		
 													<m:VBox alignItems="Center">
@@ -157,14 +166,21 @@
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
-				</ObjectPageSection>
-			</sections>
+                </ObjectPageSection>
+                <ObjectPageSection titleUppercase="false" title="Comments" tooltip="History of asset">
+                    <subSections>
+					<ObjectPageSubSection id="commentSubSection" title="Comments">
+						<blocks>
+							<m:VBox id="timelineContainer" />
+						</blocks>
+					</ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+            </sections>
 		</ObjectPageLayout>
 		<m:footer>
-
 			<m:Bar>
-		
-					    <m:contentLeft>
+				<m:contentLeft>
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </m:contentLeft>
 				<m:contentRight>					

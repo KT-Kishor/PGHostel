@@ -53,8 +53,12 @@
 					<Label text="{i18n>expConversionRate}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" required="true" />
 					<Input id="ExpDet_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="Exp_Frg_onChangeConverstionRate"/>	
 					<VBox>
+						<MessageStrip text="{i18n>attachmentMessage}" type="Warning" enableFormattedText="true" showIcon="true" showCloseButton="false" class="sapUiMediumMarginBottom"/>
 						<Label text="Attachment" required="true" />
+						<HBox >
 						<u:FileUploader fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png" buttonText="Upload" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true"  iconFirst="true" class="sapUiSmallMarginBeginEnd" />
+						<Tokenizer id="tokenizer" width="100%"	tokenDelete=".onTokenDelete" />
+						</HBox>
 					</VBox>								
 
 					<Label text="{i18n>comments}" required="true" ></Label>

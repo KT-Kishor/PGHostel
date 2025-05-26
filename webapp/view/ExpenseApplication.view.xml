@@ -17,8 +17,8 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="{= ${LoginModel>/Role} === 'Admin' ? true : false}">
 					<fb:control>
-						<ComboBox name="EmployeeID" change="onChangeEmployeeID" showSecondaryValues="true" showClearIcon="true" items="{EmpModel>/}" id="Exp_id_EmployeeName">
-							<core:ListItem key="{EmpModel>EmployeeID}" text="{EmpModel>EmployeeID}" additionalText="{EmpModel>EmployeeName}" />
+						<ComboBox name="EmployeeID" change="onChangeEmployeeID" showSecondaryValues="true" showClearIcon="true" items="{ManagerModel>/}" id="Exp_id_EmployeeName">
+							<core:ListItem key="{EmpModel>EmployeeID}" text="{ManagerModel>EmployeeID}" additionalText="{ManagerModel>EmployeeName}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>

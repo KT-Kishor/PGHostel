@@ -26,9 +26,9 @@ sap.ui.define([
                     this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                     this.ExpenseID = oEvent.getParameter("arguments").sPath;
 
-                    if(this.ExpenseID.includes("MyInbox")){
-                      this.ExpenseID = this.ExpenseID.split("|")[0];
-                      this.MyInBox = true;
+                    if (this.ExpenseID.includes("MyInbox")) {
+                        this.ExpenseID = this.ExpenseID.split("|")[0];
+                        this.MyInBox = true;
                     }
 
                     this._fetchCommonData("Currency", "CurrencyModel");
@@ -92,9 +92,7 @@ sap.ui.define([
             IndexNoIncreent: function () {
                 var that = this;
                 var oView = this.getView();
-                var table = that.byId("exp_Id_ExpenseTable");
-                table.setBusy(true);
-
+                this.getBusyDialog();
                 this._fetchCommonData("ItemExpense", "ItemExpenseModel", {
                     EmployeeID: that.FilteredExpenseModel[0].EmployeeID,
                     ExpenseID: that.ExpenseID
@@ -118,7 +116,7 @@ sap.ui.define([
                         that.IndexNo = 0;
                     })
                     .finally(function () {
-                        table.setBusy(false);
+                        that.closeBusyDialog();
                     });
             },
             //Download Perdiem Declaration
@@ -212,6 +210,12 @@ sap.ui.define([
                 };
                 var oExpenseCreateModel = new JSONModel(jsonExpense);
                 this.getView().setModel(oExpenseCreateModel, "ExpenseCreateModel");
+                var oTokenizer = sap.ui.getCore().byId("tokenizer");
+                var oNewToken = new sap.m.Token({
+                    text: this.SelectedData.AttachmentName,
+                    key: this.SelectedData.AttachmentName
+                });
+                oTokenizer.addToken(oNewToken);
             },
             // close Fragment
             Exp_Det_onPressClose: function () {
@@ -224,25 +228,25 @@ sap.ui.define([
             },
 
             Exp_Det_onPressBackBtn: function () {
-                if(this.MyInBox){
-                    this.getRouter().navTo("RouteMyInbox", { sMyInBox : "ExpenseDetail" });
-                }else{
-                if (this.ViewModel.getProperty("/isEditMode")) {
-                    this.showConfirmationDialog(
-                        this.i18nModel.getText("ConfirmActionTitle"),
-                        this.i18nModel.getText("backConfirmation"),
-                        function () {
-                            this.getRouter().navTo("RouteExpensePage");
-                        }.bind(this),
-                    );
+                if (this.MyInBox) {
+                    this.getRouter().navTo("RouteMyInbox", { sMyInBox: "ExpenseDetail" });
                 } else {
-                    this.getRouter().navTo("RouteExpensePage");
+                    if (this.ViewModel.getProperty("/isEditMode")) {
+                        this.showConfirmationDialog(
+                            this.i18nModel.getText("ConfirmActionTitle"),
+                            this.i18nModel.getText("backConfirmation"),
+                            function () {
+                                this.getRouter().navTo("RouteExpensePage");
+                            }.bind(this),
+                        );
+                    } else {
+                        this.getRouter().navTo("RouteExpensePage");
+                    }
+                    this.byId("Exp_id_Country").setValueState("None");
+                    this.byId("Exp_id_Source").setValueState("None");
+                    this.byId("Exp_id_Destination").setValueState("None");
+                    this.byId("Exp_id_EmpRemark").setValueState("None");
                 }
-                this.byId("Exp_id_Country").setValueState("None");
-                this.byId("Exp_id_Source").setValueState("None");
-                this.byId("Exp_id_Destination").setValueState("None");
-                this.byId("Exp_id_EmpRemark").setValueState("None");
-            }
             },
 
             Exp_Det_onEditOrSavePress: function () {
@@ -420,22 +424,50 @@ sap.ui.define([
             },
 
             onBeforeUploadStarts: function (oEvent) {
+                var oTokenizer = sap.ui.getCore().byId("tokenizer");
+                var aTokens = oTokenizer.getTokens();
+                if (aTokens.length >= 1) {
+                    MessageToast.show("Only one file can be uploaded at a time.");
+                    return;
+                }
                 var oFile = oEvent.getParameter("files")[0];
                 if (oFile) {
                     var reader = new FileReader();
                     var that = this;
                     reader.onload = function (e) {
                         var base64 = e.target.result.split(',')[1];
+                        // Set model data
                         var oUploadModel = that.getView().getModel("UploadModel");
                         oUploadModel.setData({
                             File: base64,
                             FileName: oFile.name,
                             FileType: oFile.type
                         });
+                        // Add token
+                        var oNewToken = new sap.m.Token({
+                            text: oFile.name,
+                            key: oFile.name
+                        });
+                        oTokenizer.addToken(oNewToken);
+                        // Show success message
                         MessageToast.show("File uploaded successfully: " + oFile.name);
                     };
                     reader.readAsDataURL(oFile);
                 }
+            },
+            onTokenDelete: function (oEvent) {
+                var oTokenizer = oEvent.getSource();
+                // Get the tokens that were requested for deletion
+                var aTokensToDelete = oEvent.getParameter("tokens");
+                // Remove each token
+                aTokensToDelete.forEach(function (oToken) {
+                    oTokenizer.removeToken(oToken);
+                });
+
+                var oUploadModel = this.getView().getModel("UploadModel");
+                oUploadModel.setProperty("/File", "");
+                oUploadModel.setProperty("/FileName", "");
+                oUploadModel.setProperty("/FileType", "");
             },
 
             async Exp_Det_onPressSubmit() {
@@ -641,8 +673,7 @@ sap.ui.define([
                                         TotalAmount: oModelData.TotalAmount,
                                         Status: oModelData.Status === "Send back by account" ? "Send to account" : "Submitted",
                                         ManagerRemark: oModelData.ManagerRemark,
-                                        AccountingRemark: oModelData.AccountingRemark,
-                                        FolderID: `https://workplace.zoho.in/#workdrive_app/home/63sop752ea6e63ddd4a8880466f5ae509b85a/privatespace/sharedwithme/allusers/${oModelData.FolderID}`,
+                                        AccountingRemark: oModelData.AccountingRemark
                                     },
                                     filters: {
                                         ExpenseID: oModelData.ExpenseID
@@ -752,45 +783,43 @@ sap.ui.define([
                 oDialog.open();
             },
 
-             AL_onShowEmployeeComments: function(oEvent) {
-            var aData = this.getView().getModel("FilteredExpenseModel").getData();
-            var oData = Array.isArray(aData) && aData.length > 0 ? aData[0] : {};
-            var aComments = oData.comments || [];
-            var aTimelineItems = aComments.map(function(oComment) {
-                return new TimelineItem({
-                    dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
-                    title: oComment.CommentedBy || "Anonymous",
-                    text: oComment.Comment || "No comment provided",
-                    userNameClickable: false,
-                    icon: "sap-icon://comment"
-                });
-            });           
-            var oTimeline = new Timeline({
-                showHeader: false,
-                enableBusyIndicator: false,
-                width: "100%",
-                sortOldestFirst: true,
-                enableDoubleSided: false,
-                content: aTimelineItems,
-                showHeaderBar:false
-            });
-                var oDialog = new sap.m.Dialog({
-                    title: "Expense Comments",
-                    contentWidth: "25rem",
-                    contentHeight: "15rem",
-                    draggable: true,
-                    resizable: true,
-                    content: [oTimeline],
-                    endButton: new sap.m.Button({
-                        text: "Close",
-                        type: "Reject",
-                        press: function () {
-                            oDialog.close();
-                            oDialog.destroy();
-                        }
-                    })
-                });
-                oDialog.open();
+            onSectionChange: function (oEvent) {
+                var oSection = oEvent.getParameter("section");
+                if (oSection.getTitle() === 'Comments') {
+                    this.AL_onShowEmployeeComments(oEvent);
+                }
             },
+
+            AL_onShowEmployeeComments: function (oEvent) {
+                var oView = this.getView();
+                var aData = oView.getModel("FilteredExpenseModel").getData();
+                var oData = Array.isArray(aData) && aData.length > 0 ? aData[0] : {};
+                var aComments = oData.comments || [];
+
+                var aTimelineItems = aComments.map(function (oComment) {
+                    return new sap.suite.ui.commons.TimelineItem({
+                        dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
+                        title: oComment.CommentedBy || "Anonymous",
+                        text: oComment.Comment || "No comment provided",
+                        userNameClickable: false,
+                        icon: "sap-icon://comment"
+                    });
+                });
+
+                var oTimeline = new sap.suite.ui.commons.Timeline({
+                    showHeader: false,
+                    enableBusyIndicator: false,
+                    width: "100%",
+                    sortOldestFirst: true,
+                    enableDoubleSided: false,
+                    content: aTimelineItems,
+                    showHeaderBar: false
+                });
+
+                // Inject into VBox in the ObjectPageSubSection
+                var oVBox = oView.byId("timelineContainer");
+                oVBox.removeAllItems(); // Clear previous content if any
+                oVBox.addItem(oTimeline);
+            }
         });
     });

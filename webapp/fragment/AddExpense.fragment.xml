@@ -7,10 +7,20 @@
 	<Dialog
         title="{i18n>expCreateTitle}">
 		<f:SimpleForm id="Exp_id_SimpleFrom"
-            editable="true" layout="ColumnLayout"
-              labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12"
-              adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"
-              emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
+            editable="true"
+                                    layout="ColumnLayout"
+                                    labelSpanXL="12"
+                                    labelSpanL="12"
+                                    labelSpanM="12"
+                                    labelSpanS="12"
+                                    adjustLabelSpan="false"
+                                    emptySpanXL="0"
+                                    emptySpanL="0"
+                                    emptySpanM="0"
+                                    emptySpanS="0"
+                                    columnsXL="2"
+                                    columnsL="2"
+                                    columnsM="1">
 			<f:content>
 				<!-- Employee ID -->
 				<Label text="{i18n>employeeID}"/>
@@ -23,10 +33,10 @@
 				<Input value="{CreateExpenseModel>/ExpenseName}" valueStateText="{i18n>expenseNamePlaceholder}" id="exp-Id-ExpenseName" liveChange="Exp_onLiveExpenseName" placeholder="{i18n>expenseNamePlaceholder}" change="onInputChange" maxLength="50" />
 				<!-- Start Date -->
 				<Label text="{i18n>startDate}" required="true" />
-				<DatePicker id="exp-Id-StartDate" maxDate="{viewModel>/minDate}" valueStateText="{i18n>expValStaStartDate}" value="{CreateExpenseModel>/ExpStartDate}" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="Exp_onDatePickerChange"/>
+				<DatePicker id="exp-Id-StartDate" minDate="{viewModel>/finacialStart}" maxDate="{viewModel>/minDate}" valueStateText="{i18n>expValStaStartDate}" value="{CreateExpenseModel>/ExpStartDate}" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="Exp_onDatePickerChange"/>
 				<!-- End Date -->
 				<Label text="{i18n>endDate}" required="true" />
-				<DatePicker id="exp-Id-EndDate" valueStateText="{i18n>expValStaEndDate}" value="{CreateExpenseModel>/ExpEndDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Exp_onEndDateChange" />
+				<DatePicker id="exp-Id-EndDate" maxDate="{viewModel>/finacialEnd}" valueStateText="{i18n>expValStaEndDate}" value="{CreateExpenseModel>/ExpEndDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Exp_onEndDateChange" />
 				<!-- Travel Allowance -->
 				<Label text="{i18n>expTravelAllowance}" required="true"></Label>
 				<Select id="exp-Id-TravelAllowance" showSecondaryValues="true"  selectedKey="{CreateExpenseModel>/TravelAllowance}">
