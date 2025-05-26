@@ -1,7 +1,7 @@
 sap.ui.define([
-    "./BaseController", "sap/ui/core/BusyIndicator", "../model/formatter", "sap/m/MessageBox"
+    "./BaseController", "sap/ui/core/BusyIndicator", "../model/formatter", "sap/m/MessageBox", "../utils/PaySlipPDF"
 ],
-    function (BaseController, BusyIndicator, Formatter, MessageBox) {
+    function (BaseController, BusyIndicator, Formatter, MessageBox, jsPDF) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.AdminPaySlipDetails", {
             Formatter: Formatter,
@@ -17,6 +17,7 @@ sap.ui.define([
                 this.getView().byId("APD_id_Employee").setSelectedKey("");
                 this.oModel = this.getView().getModel("PaySlip");
                 if (this.oModel.getProperty("/isIdSelected")) this._fetchPaySlip(this.oModel.getProperty("/SelectedFilters"));
+                this.flagID = false;
             },
 
             APD_onPressBack: function () {
@@ -30,6 +31,7 @@ sap.ui.define([
                 if (sValue === "" || !sValue) return;
                 await this._fetchPaySlip({ EmployeeID: sValue });
                 this.oModel.setProperty("/isIdSelected", true);
+                this.flagID = false;
             },
 
             _fetchPaySlip: async function (filters) {
@@ -90,9 +92,9 @@ sap.ui.define([
                 this.oModel.setProperty("/EmpData/DeductionsTotalMonthly", deductionsTotalMonthly);
                 this.oModel.setProperty("/EmpData/DeductionsTotalYearly", deductionsTotalYearly);
                 var totalNetPay = +((earningsTotalMonthly - deductionsTotalMonthly).toFixed(2));
-                if(totalNetPay < 0) totalNetPay = 0;
+                if (totalNetPay < 0) totalNetPay = 0;
                 this.oModel.setProperty("/EmpData/NetPay", totalNetPay);
-                this.oModel.setProperty("/EmpData/NetPayText", this.convertNumberToWords(totalNetPay, empData.Currency));
+                this.oModel.setProperty("/EmpData/NetPayText", this.convertNumberToWords(totalNetPay, "Rupees"));
             },
 
             APD_onPressSalAdd: function () {
@@ -127,7 +129,7 @@ sap.ui.define([
                 const fAmount = (parseFloat(this.oModel.getProperty(`${sPath}/Amount`)) || 0) - (parseFloat(this.oModel.getProperty(`${sPath}/InitialMonthly`)) || 0);
                 const fYearlyAmount = parseFloat(this.oModel.getProperty(`${sPath}/InitialYearly`)) || 0;
                 const fTotal = fAmount + fYearlyAmount;
-                this.oModel.setProperty(`${sPath}/YearlyAmount`, fTotal);
+                this.oModel.setProperty(`${sPath}/YearlyAmount`, +(fTotal.toFixed(2)));
                 this.totalCalculationAmount();
             },
 
@@ -214,7 +216,7 @@ sap.ui.define([
                         compData.splice(i, 1); // Remove item
                         continue;
                     }
-                    item.YearlyAmount += item.Amount;
+                    item.YearlyAmount = +((item.Amount + item.YearlyAmount).toFixed(2));
                     item.InitialYearly = item.YearlyAmount;
                     item.InitialMonthly = item.Amount;
                     if (item.Description === "Variable Pay") {
@@ -234,10 +236,10 @@ sap.ui.define([
                     delete item.Amount;
                     delete item.InitialYearly;
                     delete item.InitialMonthly;
-                    if(item.Flag && data.Type === "Create") {
+                    if (item.Flag && data.Type === "Create") {
                         delete item.Flag; // Remove Flag if it's a new entry
                     }
-                    if(item.ID === null || item.ID === undefined) {
+                    if (item.ID === null || item.ID === undefined) {
                         delete item.ID; // Remove ID if it's a new entry
                         item.Flag = true
                     }
@@ -252,6 +254,84 @@ sap.ui.define([
                         filters: { ID: ID }
                     };
                 });
+            },
+
+            APD_onPressViewSalary: async function () {
+                try {
+                    if (!this.flagID) {
+                        this.getBusyDialog();
+                        var date = this.checkDate();
+                        var response = await this.ajaxReadWithJQuery("SalaryDetails", {
+                            EmployeeID: this.oModel.getProperty("/EmpData/EmployeeID"),
+                            YearMonth: date
+                        });
+                        if (response.success) this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(response.data[0]), "salaryData");
+                        this.flagID = true;
+                    }
+                    if (!this.APD_oDialog) {
+                        sap.ui.core.Fragment.load({
+                            name: "sap.kt.com.minihrsolution.fragment.ViewSalary",
+                            controller: this,
+                        }).then(function (oDialog) {
+                            this.APD_oDialog = oDialog;
+                            this.getView().addDependent(this.APD_oDialog);
+                            this.APD_oDialog.open();
+                        }.bind(this));
+                    } else {
+                        this.APD_oDialog.open();
+                    }
+                }
+                catch (e) {
+                    console.warn(e);
+                    MessageBox.error(this.i18nModel.getText("errorFetchingSalaryDetails"));
+                }
+                finally {
+                    this.closeBusyDialog();
+                }
+            },
+
+            VSF_onCloseDialog: function () {
+                if (this.APD_oDialog) {
+                    this.APD_oDialog.close();
+                }
+            },
+
+            APD_onPressGeneratePdf: async function () {
+                this.getBusyDialog();
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
+                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.backgroundLogoBase64) {
+                    try {
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
+                        const [logoBase64, backgroundBase64] = await Promise.all([
+                            this._convertBLOBToImage(logoBlob),
+                            this._convertBLOBToImage(backgroundBlob)
+                        ]);
+                        oCompanyDetailsModel.companylogo64 = logoBase64;
+                        oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+                    } catch (err) {
+                        this.closeBusyDialog();
+                        console.error(err);
+                        MessageBox.error(this.i18nModel.getText("errorGeneratingPdf"));
+                    }
+                }
+                jsPDF._GeneratePDF(this, this.oModel.getProperty("/EmpData"), oCompanyDetailsModel);
+            },
+
+            checkDate: function () {
+                var joiningDate = new Date(this.oModel.getProperty("/EmpData/JoiningDate"));
+                var yearMonth = new Date(this.oModel.getProperty("/EmpData/YearMonth"));
+
+                const sameYear = joiningDate.getFullYear() === yearMonth.getFullYear();
+                const sameMonth = joiningDate.getMonth() === yearMonth.getMonth(); // getMonth() is 0-based
+
+                if(sameMonth && sameYear) {
+                    return sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(joiningDate);
+                }
+                else{
+                    return sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(yearMonth);
+                }
             }
         });
     });

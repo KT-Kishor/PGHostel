@@ -121,7 +121,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     case "Salary Details":
                         this.SS_readSalaryDetails(this.EmployeeID);
                         break;
-                    case "Pay Slip":
+                    case "Payslip":
                         this.getView().byId("SS_id_PaySlipTable").setBusy(true);
                         await this._commonGETCall("AdminPaySlip", "EmpTable", { EmployeeID: this.EmployeeID });
                         this.getView().byId("SS_id_PaySlipTable").setBusy(false);
