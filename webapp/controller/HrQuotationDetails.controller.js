@@ -567,6 +567,7 @@ sap.ui.define(
         const omobilenumber = this.byId("HQD_id_InputCompanyMobileNo").getValue();
         const oCompanyEmail = this.byId("HQD_id_CompanyEmailID").getValue();
         const oCompanyStdCode = this.byId("HQD_id_mobileNumber").getValue();
+        const oCustomerStdcode = this.byId("HQD_id_CustomerNumber").getValue();
         const oCountry = this.byId("HQD_id_Country").getSelectedKey();
         const oBranch = this.byId("HQD_id_BranchCode").getSelectedKey();
         const oAddress = this.byId("HQD_id_InputCompanyAddress").getValue();
@@ -601,6 +602,7 @@ sap.ui.define(
           CompanyEmailID: oCompanyEmail,
           Country: oCountry,
           Branch: oBranch,
+          CustomerSTDCode: oCustomerStdcode,
           CompanyAddress: oAddress,
           CompanyGSTNO: oCompanyGST,
           Percentage: oPercentage,
