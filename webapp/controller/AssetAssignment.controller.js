@@ -160,7 +160,7 @@ sap.ui.define([
                 });
             },
 
-
+            
             AA_onPressAssign: async function () {
                 var params;
                 (this.oLoginModel.getProperty("/Role") === "IT Consultant") ? params = { PickedBranch: this.oLoginModel.getProperty("/BranchName"), ReturnBranch: this.oLoginModel.getProperty("/BranchName") } : params = {};
@@ -199,23 +199,6 @@ sap.ui.define([
                     oView.setModel(oFormModel, "myform");
                 }
                 oFormModel.setProperty("/formData/data", oNewData);
-                // oFormModel.setProperty("/formData/data/isEdit", false);
-                // oFormModel.setProperty("/formData/data", {
-                //     AssignEmployeeID: "",
-                //     AssignEmployeeName: "",
-                //     Type: "",
-                //     Model: "",
-                //     AssignBranch: "",
-                //     ReturnBranch: "",
-                //     EquipmentNumber: "",
-                //     SerialNumber: "",
-                //     AssetValue: "",
-                //     AssignedDate: new Date(),
-                //     Status: "",
-                //     ReturnDate: "",
-                //     AssignedByEmployeeName: this.oLoginModel.getProperty("/EmployeeName"),
-                //     AssignedByEmployeeID: this.oLoginModel.getProperty("/EmployeeID")
-                // });
                 var allData = this.getView().getModel("incomeModel").getProperty("/");
                 var filteredData = allData.filter(item =>
 
@@ -378,7 +361,7 @@ sap.ui.define([
             FAA_onTypeChange: async function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 sap.ui.getCore().byId("FAA_id_Model").setBusy(true);
-               
+
                 var params;
                 (this.oLoginModel.getProperty("/Role") === "IT Consultant") ? params = { PickedBranch: this.oLoginModel.getProperty("/BranchName"), ReturnBranch: this.oLoginModel.getProperty("/BranchName") } : params = {};
                 try {
@@ -731,7 +714,7 @@ sap.ui.define([
                         item.PickedBranch === cityFromBranch &&
                         item.Type === oTypeSelected
                     );
-                } 
+                }
                 var filteredModel = new sap.ui.model.json.JSONModel(filteredData);
                 oView.setModel(filteredModel, "filteredAssetDetails");
 

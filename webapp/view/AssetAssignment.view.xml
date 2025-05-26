@@ -281,7 +281,8 @@
                         <Text
                             text="{assetModel>Currency} {path:'assetModel>AssetValue',formatter:'.Formatter.fromatNumber'}"
                         />
-                        <VBox class="sapUiTinyMarginTopBottom">
+                        <VBox class="sapUiTinyMarginTopBottom"
+                        visible="{= ${assetModel>Status}!== 'Assigned'}">
                             <Text
                                 text="{= 'Returned To: ' + ${assetModel>ReturnEmpID}}"
                                 class="sapUiTinyMarginBottom"
@@ -306,7 +307,7 @@
 
                         <ObjectStatus
                             inverted="false"
-                            state="{= ${assetModel>Status} === 'Assigned' ? 'Success' : 'Error' }"
+                            state="{= ${assetModel>Status} === 'Assigned' ? 'Indication05' : 'Success' }"
                             text="{assetModel>Status}"
                         />
                     </cells>
