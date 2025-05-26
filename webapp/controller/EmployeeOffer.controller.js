@@ -203,6 +203,7 @@ sap.ui.define([
                                 BloodGroup: "",
                                 EmployeeStatus: "Active",
                                 CTC: oSelectedData.CTC,
+                                Currency:"INR",
                                 JoiningBonus: oSelectedData.JoiningBonus,
                                 BasicSalary: oSelectedData.BasicSalary,
                                 HRA: oSelectedData.HRA,
