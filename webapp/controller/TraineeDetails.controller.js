@@ -322,7 +322,8 @@ sap.ui.define([
                 try {
                     this.getBusyDialog();
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
-                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TU_id_Location").getSelectedKey();
+                    oModel.BaseLocation=this.byId("TU_id_Location").getSelectedKey()
+                    //  oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TU_id_Location").getSelectedKey();
                      oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
     
                     var sSelectedKey = this.byId("TU_id_Manager").getSelectedKey();

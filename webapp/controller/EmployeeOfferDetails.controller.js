@@ -99,11 +99,11 @@ sap.ui.define([
                 this.getView().byId("EODF_id_PageUpdate").setVisible(updatePage); // update page visibilty
                 this.getView().byId("EOD_id_Submit").setEnabled(false);
                 this._makeDatePickersReadOnly(["EOD_id_Reldate", "EOD_id_Joindate", "EOUF_id_Reldate", "EOUF_id_Joindate"]); // make date only read
-                if (this.getView().getModel("employeeModel").getProperty("/Salutation") === "Dr.") {
-                    this.getView().byId("EOD_id_Gender").setEnabled(true);
-                }
-                else {
-                    this.getView().byId("EOD_id_Gender").setEnabled(false);
+                const salutation = this.getView().getModel("employeeModel").getProperty("/Salutation");
+                if (salutation === "Dr.") {
+                    this.getView().byId("EOU_id_Gender").setEnabled(true);
+                } else if (salutation === "Ms." || salutation === "Mrs.") {
+                    this.getView().getModel("employeeModel").setProperty("/Gender", "Female");
                 }
             },
             //Edit or save in update case
