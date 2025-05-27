@@ -43,7 +43,7 @@ sap.ui.define([
                     "BaseLocation": "Kalaburagi",
                     "Country": "India",
                     "MobileNumber": "",
-                    "STDCode": "",
+                    "STDCode": "+91",
                     "Gender": ""
                 };
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
