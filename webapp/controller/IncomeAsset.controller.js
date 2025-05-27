@@ -697,7 +697,7 @@ sap.ui.define([
                     }).then(function (FCIA_Dialog) {
                         this.FCIA_Dialog = FCIA_Dialog;
                         oView.addDependent(this.FCIA_Dialog);
-                        sap.ui.getCore().byId("FCIA_id_pickbranch").setSelectedKey(oRowData.TransferBranch)
+              
 
                         var oSimpleForm = sap.ui.getCore().byId("FCIA_id_SimpleFormChange354wide");
                         if (oSimpleForm) {
@@ -712,7 +712,7 @@ sap.ui.define([
                             oMaxDate.setDate(oMaxDate.getDate() + 365);
                             sap.ui.getCore().byId("FCIA_id_Date").setMinDate(oMinDate).setMaxDate(oMaxDate);
                         }
-
+                        sap.ui.getCore().byId("FCIA_id_pickbranch").setSelectedKey(oRowData.TransferBranch)
                         sap.ui.getCore().byId("FCIA_id_pickButton").setVisible(true)
                         sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_transferButton").setVisible(false)
@@ -781,7 +781,7 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
 
-                      if (loginModel.Role === "IT Consultant"){
+                    if (loginModel.Role === "IT Consultant"){
                                   sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(false)
                              }else{
                                   sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(true)

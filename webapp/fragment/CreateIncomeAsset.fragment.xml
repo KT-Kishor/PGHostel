@@ -133,8 +133,8 @@
                     change="FCIA_onbranchchange"
                     selectionChange="FCIA_onselectionchange"
                     valueStateText="Select Branch"
-                    value="{CreateIncomeAssetModel>/PickedBranch}"
                     selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
+                    value="{CreateIncomeAssetModel>/PickedBranch}"
                     showSecondaryValues="true"
                     items="{branchModel>/}"
                 >

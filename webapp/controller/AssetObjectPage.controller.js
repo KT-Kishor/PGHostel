@@ -42,6 +42,20 @@ sap.ui.define([
                 this.getView().getModel("objectModel").setProperty("/Status", currentItem.Status);
             }
             data.forEach(function (item) {
+                 if (item.TransferDate && item.TransferDate !== "1899-11-30T00:00:00.000Z") {
+                    timelineData.push({
+                        type: "Transfer",
+                        // dateTime: item.TransferDate,
+                        // userName: item.TransferByName,
+                        // title: item.TransferByID,
+                        // Status: "Transferred",
+                        text: item.ReferenceNumber ? "Reference Number: " + item.ReferenceNumber : "",
+
+                        title: "The asset was transferred by " + item.TransferByName + " (" + item.TransferByID + ") to " + item.TransferBranch + " "
+                            + "on " + new Date(item.TransferDate).toLocaleDateString('en-GB')
+
+                    });
+                }
                 if (item.AssetCreationDate && item.Status != "Transferred") {
                     timelineData.push({
                         type: "Asset Creation",
@@ -91,25 +105,25 @@ sap.ui.define([
                         // Comments:item.Comments,
                         //  ReturnEmpName:"Return To " + item.ReturnEmpName + " " + item.ReturnEmpID,
                         text: item.Comments ? "Comment: " + item.Comments : "",
-                        title: "The asset was return by " + item.AssignEmployeeName + " (" + item.AssignEmployeeID + ") to " + item.ReturnEmpName
+                        title: "The asset was returned by " + item.AssignEmployeeName + " (" + item.AssignEmployeeID + ") to " + item.ReturnEmpName
                             + " (" + item.ReturnEmpID + ") at " + item.ReturnBranch + " " + "on " + new Date(item.ReturnDate).toLocaleDateString('en-GB')
 
                     });
                 }
-                if (item.TransferDate && item.TransferDate !== "1899-11-30T00:00:00.000Z") {
-                    timelineData.push({
-                        type: "Transfer",
-                        // dateTime: item.TransferDate,
-                        // userName: item.TransferByName,
-                        // title: item.TransferByID,
-                        // Status: "Transferred",
-                        text: item.ReferenceNumber ? "Reference Number: " + item.ReferenceNumber : "",
+                // if (item.TransferDate && item.TransferDate !== "1899-11-30T00:00:00.000Z") {
+                //     timelineData.push({
+                //         type: "Transfer",
+                //         // dateTime: item.TransferDate,
+                //         // userName: item.TransferByName,
+                //         // title: item.TransferByID,
+                //         // Status: "Transferred",
+                //         text: item.ReferenceNumber ? "Reference Number: " + item.ReferenceNumber : "",
 
-                        title: "The asset was transferred by " + item.TransferByName + " (" + item.TransferByID + ") at " + item.TransferBranch + " "
-                            + "on " + new Date(item.TransferDate).toLocaleDateString('en-GB')
+                //         title: "The asset was transferred by " + item.TransferByName + " (" + item.TransferByID + ") to " + item.TransferBranch + " "
+                //             + "on " + new Date(item.TransferDate).toLocaleDateString('en-GB')
 
-                    });
-                }
+                //     });
+                // }
             });
             var oModel = new sap.ui.model.json.JSONModel(timelineData);
             this.getView().setModel(oModel, "Mymodel");

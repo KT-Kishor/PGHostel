@@ -128,6 +128,7 @@
                                     width="100%"
                                     height="100%"
                                     sortOldestFirst="true"
+
                                     enableDoubleSided="true"
                                     content="{Mymodel>/}"
                                     growingThreshold="999"
@@ -370,7 +371,7 @@
                                                 <!-- <m:ObjectIdentifier title="{objectModel>TransferByName}" text="{objectModel>TransferByID}" /> -->
                                                 <m:VBox  class="sapUiTinyMarginTopBottom">
                                                   <m:Text
-                                text="{= ${objectModel>ReturnEmpName} ?'By ' +  ${objectModel>AssignedByEmployeeName} : ''}"
+                                text="{= ${objectModel>ReturnEmpName} ?'By: ' +  ${objectModel>AssignedByEmployeeName} : ''}"
                                     class="sapUiTinyMarginBottom"
                             />
                                        <m:Text

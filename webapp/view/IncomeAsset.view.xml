@@ -417,9 +417,9 @@
                             />
                             <Button
                                 id="IA_pickButton"
-                                   text="{i18n>pickedBtn}"
-                                   visible="{incomeModel>showPickButton}"            
-                                    
+                                text="{i18n>pickedBtn}"
+                                visible="{incomeModel>showPickButton}"            
+                                tooltip="{i18n>pickedBtn}"
                                 type="Ghost"
                                 class="sapUiTinyMarginBegin"
                                 press="IA_onPickedButtonPress"
