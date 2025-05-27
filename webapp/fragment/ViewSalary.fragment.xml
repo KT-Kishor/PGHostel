@@ -6,6 +6,8 @@
         title="Salary Breakup"
         contentWidth="85%"
         contentHeight="75%"
+        draggable="true"
+        resizable="true"
     >
         <core:Fragment
             fragmentName="sap.kt.com.minihrsolution.fragment.SalaryDisplay"

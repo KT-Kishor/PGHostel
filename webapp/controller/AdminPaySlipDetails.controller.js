@@ -30,7 +30,6 @@ sap.ui.define([
                 var sValue = oEvent.getSource().getValue();
                 if (sValue === "" || !sValue) return;
                 await this._fetchPaySlip({ EmployeeID: sValue });
-                this.oModel.setProperty("/isIdSelected", true);
                 this.flagID = false;
             },
 
@@ -42,6 +41,12 @@ sap.ui.define([
                         if (response.success) {
                             var oData = response.result[0];
                             oData.YearMonth = this.getFirstDayOfMonth(oData.Month, oData.Year);
+                            if (!oData.BankName || oData.BankName === "" || !oData.BankAccountNo || oData.BankAccountNo === "") {
+                                this.oModel.setProperty("/EmpData", {});
+                                this.oModel.setProperty("/isIdSelected", false);
+                                MessageBox.error(this.i18nModel.getText("bankDetailsNotFound"));
+                                return;
+                            }
                             this.initializeCompAmounts(oData.EarningData);
                             this.initializeCompAmounts(oData.DeductionData);
                             oData.Currency = "INR";
@@ -66,9 +71,11 @@ sap.ui.define([
                             this.totalCalculationAmount();
                         }
                     }
-
+                    this.oModel.setProperty("/isIdSelected", true);
                 }
                 catch (e) {
+                    this.oModel.setProperty("/EmpData", {});
+                    this.oModel.setProperty("/isIdSelected", false);
                     console.warn(e);
                     if (response.success) MessageBox.error(this.i18nModel.getText("paySlipNotFound"));
                     else MessageBox.error(this.i18nModel.getText("errorFetchingPaySlip"));
@@ -326,10 +333,10 @@ sap.ui.define([
                 const sameYear = joiningDate.getFullYear() === yearMonth.getFullYear();
                 const sameMonth = joiningDate.getMonth() === yearMonth.getMonth(); // getMonth() is 0-based
 
-                if(sameMonth && sameYear) {
+                if (sameMonth && sameYear) {
                     return sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(joiningDate);
                 }
-                else{
+                else {
                     return sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(yearMonth);
                 }
             }
