@@ -1145,7 +1145,7 @@
 												<m:Button
                                                     id="DeleteSelectedButton"
                                                     text="{i18n>Download}"
-                                                    type="Attention"
+                                                    type="Ghost"
                                                     press="onDownloadFiles"
                                                     enabled="false"
                                                 />
