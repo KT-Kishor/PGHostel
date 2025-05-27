@@ -84,7 +84,6 @@
                         />
                     </fb:control>
                 </fb:FilterGroupItem>
-
                 <fb:FilterGroupItem
                     name="Status"
                     label="{i18n>status}"
@@ -284,11 +283,11 @@
                         <VBox class="sapUiTinyMarginTopBottom"
                         visible="{= ${assetModel>Status}!== 'Assigned'}">
                             <Text
-                                text="{= 'Returned To: ' + ${assetModel>ReturnEmpID}}"
+                                text="{= 'To: ' + ${assetModel>ReturnEmpID}}"
                                 class="sapUiTinyMarginBottom"
                             />
                             <Text
-                                text="{= 'Returned to Name: ' + ${assetModel>ReturnEmpName}}"
+                                text="{= 'Name: ' + ${assetModel>ReturnEmpName}}"
                                 class="sapUiTinyMarginBottom"
                             />
                             <HBox>
@@ -299,11 +298,12 @@
                             </HBox>
 
                             <Text
-                                text="{= 'Return Branch: ' + ${assetModel>ReturnBranch}}"
+                                text="{= 'Branch: ' + ${assetModel>ReturnBranch}}"
                                 class="sapUiTinyMarginBottom"
                             />
                         </VBox>
-                        <Text text="{assetModel>Comments}" />
+							<Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore"
+                            visible="{= ${assetModel>Status}!== 'Assigned'}" />
 
                         <ObjectStatus
                             inverted="false"
