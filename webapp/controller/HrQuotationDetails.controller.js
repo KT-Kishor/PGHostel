@@ -115,6 +115,12 @@ sap.ui.define(
 
             oSelectedModel.setProperty("/gstEditable", false); // Disable editing
             this.getView().setModel(oSelectedModel, "SingleCompanyModel");
+            // Convert Notes from HTML to plain text for display
+            if (oSelectedQuotation.Notes) {
+              var tmpDiv = document.createElement("div");
+              tmpDiv.innerHTML = oSelectedQuotation.Notes;
+              oSelectedQuotation.NotesTextOnly = tmpDiv.textContent || tmpDiv.innerText || "";
+            }
 
             // Set flags in QuotationModel after fetching items
             try {
@@ -541,7 +547,7 @@ sap.ui.define(
         const oView = this.getView();
         // Validate RichTextEditor content
         const oRichTextEditor = this.byId("HQD_id_Notes");
-        const oNotesText = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'text' }) || "";
+        const oNotesHTML = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'html' }) || "";
 
         const oCurrency1 = this.byId("HQD_id_Curency").getSelectedKey();
 
@@ -571,7 +577,9 @@ sap.ui.define(
           MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           return;
         }
-        if (!oNotesText.trim()) {
+        const tmpDiv = document.createElement("div");
+        tmpDiv.innerHTML = oNotesHTML;
+        if (!tmpDiv.textContent.trim()) {
           MessageToast.show("Notes field is required.");
           return;
         }
@@ -597,7 +605,7 @@ sap.ui.define(
         const oCustomerMobile = this.byId("HQD_id_InputCustomerMobileNo").getValue();
         const oCustomerAddress = this.byId("HQD_id_InputCustomerAddress").getValue();
         const oCustomerGST = this.byId("HQD_id_InputCustomerGSTNO").getValue();
-        const oNotes = oNotesText; // Already extracted
+        const oNotes = oNotesHTML; // Already extracted
 
         // Get values from QuotationModel
         const oQuotationModel = oView.getModel("QuotationModel");
@@ -985,11 +993,24 @@ sap.ui.define(
         doc.text(this.i18nModel.getText("pdftermconditaion"), 13, y);
         y += 5;
         doc.setFont("times", "normal");
+        const convertHtmlToTextLines = (html, maxWidth) => {
+          const div = document.createElement("div");
+          div.innerHTML = html;
+
+          div.querySelectorAll("br").forEach(br => br.replaceWith("\n"));
+          div.querySelectorAll("p").forEach(p => p.appendChild(document.createTextNode("\n")));
+          div.querySelectorAll("li").forEach(li => {
+            const bullet = document.createTextNode(`• ${li.textContent}\n`);
+            li.replaceWith(bullet);
+          });
+
+          const text = div.innerText || div.textContent || "";
+          return doc.splitTextToSize(text.trim(), maxWidth);
+        };
+
         const htmlNotes = oData.Notes || "";
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = htmlNotes;
-        const plainText = tempDiv.innerText || tempDiv.textContent || "";
-        const noteLines = doc.splitTextToSize(plainText, 180);
+        const noteLines = convertHtmlToTextLines(htmlNotes, 180);
+
 
         const lineHeight = 5;
         const availableHeight = pageHeight - y;
@@ -1386,7 +1407,7 @@ sap.ui.define(
         } else {
           // Already in edit mode => perform Save logic
           const oRichTextEditor = this.byId("HQD_id_Notes");
-          const oNotesText = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'text' }) || "";
+          const oNotesHTML = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'html' }) || "";
 
           const oCurrency1 = this.byId("HQD_id_Curency").getSelectedKey();
           const isINR = oCurrency1 === "INR";
@@ -1412,7 +1433,9 @@ sap.ui.define(
             return;
           }
 
-          if (!oNotesText.trim()) {
+          const tmpDiv = document.createElement("div");
+          tmpDiv.innerHTML = oNotesHTML;
+          if (!tmpDiv.textContent.trim()) {
             MessageToast.show("Notes field is required.");
             return;
           }
@@ -1443,7 +1466,7 @@ sap.ui.define(
             CustomerEmailID: this.byId("HQD_id_CustomerEmailID").getValue(),
             Currency: this.byId("HQD_id_Curency").getSelectedKey(),
             Percentage: this.byId("HQD_id_Percentage").getValue(),
-            Notes: oNotesText,
+            Notes: oNotesHTML,
             CGST: oQuotationItem.getProperty("/CGST"),
             SGST: oQuotationItem.getProperty("/SGST"),
             IGST: oQuotationItem.getProperty("/IGST"),

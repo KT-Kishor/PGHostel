@@ -20,7 +20,7 @@ sap.ui.define(
         // this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         await this._fetchCommonData("Quotation", "CompanyQuotationModel", {});
-
+        this.getView().getModel("LoginModel").setProperty("/HeaderName", "Create Quotation");
         if (this.oValue === "HrQuotation") {
 
           this.HQ_onClearFilters();
