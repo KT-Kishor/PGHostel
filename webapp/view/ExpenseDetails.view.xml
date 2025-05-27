@@ -21,12 +21,13 @@
 			</headerTitle>
 			<sections>
                 <ObjectPageSection titleUppercase="false" title="{i18n>expBasicInformation}">
-                    <subSections>
-						<ObjectPageSubSection>
+					<subSections>
+						<ObjectPageSubSection title="{i18n>expBasicInformation}"  titleUppercase="false">
 							<blocks>
 								<f:SimpleForm id="Exp_Det_id_DimpleForm" editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 											<f:toolbar>
-											<m:Toolbar>												
+											<m:Toolbar>	
+											<m:Title title="{i18n>expBasicInformation}" />											
 												<m:ToolbarSpacer />
 												<m:Button type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="Exp_Det_onEditOrSavePress" icon="{= ${viewModel>/isEditMode} ? '' : '' }" visible="{viewModel>/status}"  />
 											</m:Toolbar>
@@ -92,12 +93,12 @@
 								</f:SimpleForm>
 							</blocks>
 						</ObjectPageSubSection>
-						<ObjectPageSubSection title="" titleUppercase="false">
+						<ObjectPageSubSection title="{i18n>ExpenseItemDetails} ({= ${ItemExpenseModel>/}.length })" titleUppercase="false">
 							<blocks>
 								<m:Table id="exp_Id_ExpenseTable" items="{ItemExpenseModel>/}" class="sapUiResponsiveMargin" growing="true" growingThreshold="50"  alternateRowColors="true" growingScrollToLoad="true" width="auto" mode="SingleSelectLeft" selectionChange="Exp_Det_onChangeExpanesItem" busyIndicatorDelay="0" >
 									<m:headerToolbar>
 										<m:OverflowToolbar>
-										<m:Title  text="Expense Item Details ({= ${ItemExpenseModel>/}.length })"/>
+										<!-- <m:Title  text=""/> -->
 											<m:ToolbarSpacer />
 											<m:ToolbarSeparator />
 											<m:Button type="Accept"  text="{i18n>add}" tooltip="{i18n>expenseAddTooltip}" press="Exp_Det_onPressAddExpenseItem" visible="{viewModel>/status}" id="idAddExpBtn" enabled="{viewModel>/enable}" />											
@@ -147,13 +148,14 @@
 												</m:HBox>
 
 													<m:Text text="{path:'ItemExpenseModel>ExpenseDate',formatter: '.Formatter.formatDate'}" />
-													<m:Text text="{path:'ItemExpenseModel>ExpenseAmount', formatter: '.Formatter.fromatNumber'}" />		
-													<m:VBox alignItems="Center">
+
+													<m:Text text="INR {path:'ItemExpenseModel>ExpenseAmount', formatter: '.Formatter.fromatNumber'}" />		
+													<m:VBox>
 														<m:HBox >
 															<m:Text text="{ItemExpenseModel>Currency} {path:'ItemExpenseModel>ForeignAmount',formatter:'.Formatter.fromatNumber'}" />
 														</m:HBox>
 														<m:HBox >
-															<m:Text text="{i18n>expConversionRate} : {path:'ItemExpenseModel>ConversionRate',formatter:'.Formatter.fromatNumber'}" visible="{= ${ItemExpenseModel>Currency} !== 'INR'}" />
+															<m:Text text="{i18n>expConversionRateExp} : {path:'ItemExpenseModel>ConversionRate',formatter:'.Formatter.fromatNumber'}" visible="{= ${ItemExpenseModel>Currency} !== 'INR'}" />
 														</m:HBox>
 													</m:VBox>								
 													<m:ObjectStatus inverted="true" text="{ItemExpenseModel>ModeOfPayment}" state="{path: 'ItemExpenseModel>ModeOfPayment', formatter: '.Formatter.formatObjectStatus'}" />
@@ -167,7 +169,7 @@
 						</ObjectPageSubSection>
 					</subSections>
                 </ObjectPageSection>
-                <ObjectPageSection titleUppercase="false" title="Comments" tooltip="History of asset">
+                <ObjectPageSection titleUppercase="false" title="Comments">
                     <subSections>
 					<ObjectPageSubSection id="commentSubSection" title="Comments">
 						<blocks>

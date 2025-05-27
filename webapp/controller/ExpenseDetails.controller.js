@@ -6,7 +6,8 @@ sap.ui.define([
     "../model/formatter",
     "sap/m/MessageBox",
     "sap/suite/ui/commons/Timeline",
-    "sap/suite/ui/commons/TimelineItem"
+    "sap/suite/ui/commons/TimelineItem",
+	"sap/collaboration/components/fiori/sharing/attachment/Attachment"
 ],
     function (Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Timeline, TimelineItem) {
         "use strict";
@@ -77,7 +78,8 @@ sap.ui.define([
                     if (this.FilteredExpenseModel[0].TripType !== "Customer Facing") {
                         this.ViewModel.setProperty("/required", false);
                     }
-
+                    var oTokenModel = new JSONModel({ tokens: [] });
+                    this.getView().setModel(oTokenModel, "tokenModel");
                     this.CountryAndCity();
                     this.closeBusyDialog();
                 } catch (error) {
@@ -180,6 +182,7 @@ sap.ui.define([
                 };
                 var oExpenseCreateModel = new JSONModel(jsonExpense);
                 this.getView().setModel(oExpenseCreateModel, "ExpenseCreateModel");
+                this.getView().getModel("tokenModel").setProperty("/tokens", [])
                 this.openFragment();
             },
             //Update Expense Items
@@ -205,17 +208,18 @@ sap.ui.define([
                     Attachment: this.SelectedData.Attachment,
                     AttachmentType: this.SelectedData.AttachmentType,
                     AttachmentName: this.SelectedData.AttachmentName,
+                    TotalAmount: this.SelectedData.ExpenseAmount,
                     Submit: false,
                     Save: true,
                 };
                 var oExpenseCreateModel = new JSONModel(jsonExpense);
                 this.getView().setModel(oExpenseCreateModel, "ExpenseCreateModel");
-                var oTokenizer = sap.ui.getCore().byId("tokenizer");
-                var oNewToken = new sap.m.Token({
-                    text: this.SelectedData.AttachmentName,
-                    key: this.SelectedData.AttachmentName
-                });
-                oTokenizer.addToken(oNewToken);
+                var oModel = this.getView().getModel("tokenModel");
+                // Replace entire token list with just the new one
+                oModel.setProperty("/tokens", [{
+                    key: this.SelectedData.AttachmentName,
+                    text: this.SelectedData.AttachmentName
+                }]);
             },
             // close Fragment
             Exp_Det_onPressClose: function () {
@@ -271,6 +275,7 @@ sap.ui.define([
             // Conversion Rate validation
             LC_ExpConversionRate: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
+                this.Exp_Frg_onChangeConverstionRate();
             },
             //Comments Validation
             LC_ExpComments: function (oEvent) {
@@ -424,50 +429,68 @@ sap.ui.define([
             },
 
             onBeforeUploadStarts: function (oEvent) {
-                var oTokenizer = sap.ui.getCore().byId("tokenizer");
-                var aTokens = oTokenizer.getTokens();
+                const oFile = oEvent.getParameter("files")[0];
+                if (!oFile) {
+                    MessageToast.show("No file selected.");
+                    return;
+                }
+                const oModel = this.getView().getModel("tokenModel");
+                let aTokens = oModel.getProperty("/tokens") || [];
+
+                // Restrict to one file
                 if (aTokens.length >= 1) {
                     MessageToast.show("Only one file can be uploaded at a time.");
                     return;
                 }
-                var oFile = oEvent.getParameter("files")[0];
-                if (oFile) {
-                    var reader = new FileReader();
-                    var that = this;
-                    reader.onload = function (e) {
-                        var base64 = e.target.result.split(',')[1];
-                        // Set model data
-                        var oUploadModel = that.getView().getModel("UploadModel");
-                        oUploadModel.setData({
-                            File: base64,
-                            FileName: oFile.name,
-                            FileType: oFile.type
-                        });
-                        // Add token
-                        var oNewToken = new sap.m.Token({
-                            text: oFile.name,
-                            key: oFile.name
-                        });
-                        oTokenizer.addToken(oNewToken);
-                        // Show success message
-                        MessageToast.show("File uploaded successfully: " + oFile.name);
-                    };
-                    reader.readAsDataURL(oFile);
-                }
+
+                const reader = new FileReader();
+                const that = this;
+
+                reader.onload = function (e) {
+                    const base64 = e.target.result.split(',')[1];
+                    const oUploadModel = that.getView().getModel("UploadModel");
+                    if (!oUploadModel) {
+                        that.getView().setModel(new sap.ui.model.json.JSONModel(), "UploadModel");
+                    }
+                    that.getView().getModel("UploadModel").setData({
+                        File: base64,
+                        FileName: oFile.name,
+                        FileType: oFile.type
+                    });
+                    aTokens.push({ key: oFile.name, text: oFile.name });
+                    oModel.setProperty("/tokens", aTokens);
+
+                    MessageToast.show("File uploaded successfully: " + oFile.name);
+                };
+
+                reader.readAsDataURL(oFile);
             },
             onTokenDelete: function (oEvent) {
-                var oTokenizer = oEvent.getSource();
-                // Get the tokens that were requested for deletion
+                // Get the model
+                var oModel = this.getView().getModel("tokenModel");
+                var aTokens = oModel.getProperty("/tokens") || [];
+
+                // Get deleted tokens from event
                 var aTokensToDelete = oEvent.getParameter("tokens");
-                // Remove each token
-                aTokensToDelete.forEach(function (oToken) {
-                    oTokenizer.removeToken(oToken);
+
+                // Filter out deleted tokens
+                aTokensToDelete.forEach(function (oDeletedToken) {
+                    var sKey = oDeletedToken.getKey();
+                    aTokens = aTokens.filter(function (token) {
+                        return token.key !== sKey;
+                    });
                 });
 
-                var oUploadModel = this.getView().getModel("UploadModel");
-                oUploadModel.setProperty("/File", "");
-                oUploadModel.setProperty("/FileName", "");
-                oUploadModel.setProperty("/FileType", "");
+                // Update model
+                oModel.setProperty("/tokens", aTokens);
+
+                // Clear upload model if all tokens are deleted
+                if (aTokens.length === 0) {
+                    var oUploadModel = this.getView().getModel("UploadModel");
+                    oUploadModel.setProperty("/File", "");
+                    oUploadModel.setProperty("/FileName", "");
+                    oUploadModel.setProperty("/FileType", "");
+                }
             },
 
             async Exp_Det_onPressSubmit() {
@@ -475,9 +498,12 @@ sap.ui.define([
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
                 if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Peridiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
                     // ❗ Attachment validation
-                    if (!oUploadModel.File) {
+                    
+                    var Attachment = this.getView().getModel("tokenModel").getData();
+                    if (!Attachment.tokens || Attachment.tokens.length === 0) {
                         return sap.m.MessageBox.warning("Please upload an attachment before submitting.");
                     }
+
                     var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var oData = {
@@ -526,8 +552,8 @@ sap.ui.define([
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
                 if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
-                    // ❗ Attachment validation
-                    if (!oUploadModel.File) {
+                    var Attachment = this.getView().getModel("tokenModel").getData();
+                    if (!Attachment.tokens.length > 0) {
                         return sap.m.MessageBox.warning("Please upload an attachment before submitting.");
                     }
                     var oData = {

@@ -97,7 +97,7 @@
 						<Label text="{i18n>totalAmount}" />
 					</Column>
 					<Column  minScreenWidth="Desktop" demandPopin="true">
-						<Label text="{i18n>expReimbursementAmount}"  tooltip="{i18n>expReimbursementAmount}"/>
+						<Label text="{i18n>expReimbursementAmountExp}"  tooltip="{i18n>expReimbursementAmount}"/>
 					</Column>
 					<!-- <Column minScreenWidth="Desktop" demandPopin="true">
 						<Label text="{i18n>status}" />
@@ -114,8 +114,8 @@
 							<Text text="{path:'ExpenseModel>ExpStartDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{path:'ExpenseModel>ExpEndDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{ExpenseModel>Destination}" />
-							<Text text="{path:'ExpenseModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" />
-							<Text text="{path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />						
+							<Text text="INR {path:'ExpenseModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" />
+							<Text text="INR {path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />						
 							<!-- <ObjectStatus text="{ExpenseModel>Status}" state="{path:'ExpenseModel>Status', formatter: '.Formatter.formatObjectStatus'}" /> -->
 							<Button icon="sap-icon://delete" visible="{= ${ExpenseModel>Status} === 'Draft' }" press="Exp_onPressDeleteExpense" />
 						</cells>

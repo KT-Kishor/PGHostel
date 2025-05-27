@@ -21,7 +21,8 @@
 			columnsXL="2"
 			columnsL="1"
 			columnsM="1">
-				<f:content>					
+				<f:content>	
+				<MessageStrip text="{i18n>attachmentMessage}" type="Warning" enableFormattedText="true" showIcon="true" showCloseButton="false"/>
 					<Label text="{i18n>itemID}"/>
 					<Input value="{ExpenseCreateModel>/IndexNo}" editable="false" />
 					<!-- Item Type -->
@@ -39,11 +40,11 @@
 					<DatePicker minDate="{viewModel>/MinDate}" id="ExpDet_id_ExpenseDate"  maxDate="{viewModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{ExpenseCreateModel>/ExpenseDate}"/>
 					<!-- Expense Amount -->
 					<Label text="{i18n>expDetExpenseAmount}" required="true"/>
-					<HBox width="100%">
-						<VBox width="70%">
+					<HBox width="100%" justifyContent="SpaceBetween">
+						<VBox  width="calc(70% - 10px)">
 							<Input id="ExpDet_id_Amount" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ExpenseAmount}" liveChange="LC_ExpAmount" placeholder="{i18n>placeAmount}" enabled="{viewModel>/enable}" maxLength="15"/>
 						</VBox>
-						<VBox width="30%">
+						<VBox width="calc(30% - 10px)">
 							<Select items="{CurrencyModel>/}" change="onChangeCurrency" selectedKey="{ExpenseCreateModel>/Currency}"  id="idCurrency" enabled="{viewModel>/enable}">
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
@@ -51,15 +52,23 @@
 					</HBox>
 					<!-- Conversion Rate -->
 					<Label text="{i18n>expConversionRate}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" required="true" />
-					<Input id="ExpDet_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="Exp_Frg_onChangeConverstionRate"/>	
-					<VBox>
-						<MessageStrip text="{i18n>attachmentMessage}" type="Warning" enableFormattedText="true" showIcon="true" showCloseButton="false" class="sapUiMediumMarginBottom"/>
-						<Label text="Attachment" required="true" />
-						<HBox >
+					<HBox width="100%" justifyContent="SpaceBetween">
+					<VBox width="calc(50% - 10px)">
+						<Input id="ExpDet_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="Exp_Frg_onChangeConverstionRate"/>	
+					</VBox>
+					<VBox width="calc(50% - 10px)">
+						<Input value="{ExpenseCreateModel>/TotalAmount}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" editable="false"></Input>
+					</VBox>
+					</HBox>
+					<Label text="{i18n>Attachment}" required="true" />
+					<HBox >
 						<u:FileUploader fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png" buttonText="Upload" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true"  iconFirst="true" class="sapUiSmallMarginBeginEnd" />
-						<Tokenizer id="tokenizer" width="100%"	tokenDelete=".onTokenDelete" />
+						
+						<Tokenizer id="tokenizer"	width="100%" tokenDelete="onTokenDelete" tokens="{tokenModel>/tokens}">
+							<Token key="{tokenModel>key}" text="{tokenModel>text}" />
+						</Tokenizer>
 						</HBox>
-					</VBox>								
+													
 
 					<Label text="{i18n>comments}" required="true" ></Label>
 					<TextArea id="ExpDet_id_Comments" valueStateText="{i18n>enterComments}" liveChange="LC_ExpComments" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
