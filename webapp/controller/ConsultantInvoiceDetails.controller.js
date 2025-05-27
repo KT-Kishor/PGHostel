@@ -934,12 +934,12 @@ sap.ui.define(
                             }
 
                             if (!this.Discount) {
-                            sap.m.MessageBox.error(that.i18nModelMess.getText("mandetoryFields"));
+                            sap.m.MessageBox.error(that.i18nModel.getText("mandetoryFields"));
                             return; // Prevent further processing
                             }
 
                             if (!this.UnitAmount) {
-                            sap.m.MessageBox.error(that.i18nModelMess.getText("mandetoryFields"));
+                            sap.m.MessageBox.error(that.i18nModel.getText("mandetoryFields"));
                             return; // Prevent further processing
                             }
 
@@ -1077,12 +1077,12 @@ sap.ui.define(
                           }
 
                            if (!this.Discount) {
-                            sap.m.MessageBox.error(that.i18nModelMess.getText("mandetoryFields"));
+                            sap.m.MessageBox.error(this.i18nModel.getText("mandetoryFields"));
                             return; // Prevent further processing
                             }
 
                             if (!this.UnitAmount) {
-                            sap.m.MessageBox.error(that.i18nModelMess.getText("mandetoryFields"));
+                            sap.m.MessageBox.error(this.i18nModel.getText("mandetoryFields"));
                             return; // Prevent further processing
                             }
 
@@ -1185,7 +1185,7 @@ sap.ui.define(
                               }
                           } catch (error) {
                                this.closeBusyDialog(); // <-- Close custom BusyDialog
-                              sap.m.MessageBox.error(error.message || error.responseText);
+                              sap.m.MessageBox.error(error.message || error.responseText || this.i18nModel.getText("mandetoryFields"));
                           }
                       }
                   },
@@ -1291,7 +1291,32 @@ sap.ui.define(
                 this.closeBusyDialog();
                 this.Mail_onPressClose();
             },
-
+             
+            CD_onDiscountInfoPress: function (oEvent) {
+                if (!this._oPopover) {
+                    this._oPopover = new sap.m.Popover({
+                        contentWidth: "400px",
+                        contentHeight: "auto",
+                        showHeader: false,
+                        placement: sap.m.PlacementType.Bottom,
+                        content: [
+                            new sap.m.VBox({
+                                alignItems: "Center",
+                                justifyContent: "Center",
+                                width: "100%",
+                                items: [
+                                    new sap.m.Text({
+                                        text: this.i18nModel.getText("discountInfoText"),
+                                        wrapping: true
+                                    })
+                                ]
+                            }).addStyleClass("customPopoverContent")
+                        ]
+                    });
+                    this.getView().addDependent(this._oPopover);
+                }
+                this._oPopover.openBy(oEvent.getSource());
+            },
       }
     );
   }

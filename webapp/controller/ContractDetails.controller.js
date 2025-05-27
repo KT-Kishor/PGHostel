@@ -152,6 +152,7 @@ sap.ui.define([
                         this.getView().byId("CUF_id_Contractpage").setVisible(true);
                         this.pdfData = this.getView().getModel("oFilteredContractModel").getData();
                         this.CU_onChangeAggrementDate();
+                        this.CU_CommonID();
                         this.closeBusyDialog(); // Close BusyDialog
                     } catch (error) {
                         this.closeBusyDialog(); // Close BusyDialog
@@ -166,6 +167,14 @@ sap.ui.define([
                     this.byId(id).setValueState("None");
                 });
             },
+
+            CU_CommonID: function() {
+                const ids = ["CU_id_ConsultantName", "CU_id_Role", "CU_id_ContractEmailID",  "CU_id_ContractAddress", "CU_id_EndClient", "CU_id_ClientReportContact", "CU_id_EditAmountInput", "CU_id_Country", "CU_id_ContractCity", "CU_id_codeModel",
+                    "CU_id_Mobile", "CU_id_Comments", ]
+                ids.forEach((id) => {
+                    this.byId(id).setValueState("None");
+                });
+            }, 
 
             // Reset wizard to initial state
             CD_onResetWizard: function() {
@@ -680,6 +689,8 @@ sap.ui.define([
                     utils._LCvalidateName(this.byId("CU_id_ConsultantName"), "ID") &&
                     utils._LCvalidateEmail(this.byId("CU_id_ContractEmailID"), "ID") &&
                     utils._LCvalidateDate(this.byId("CU_id_AgreementDate"), "ID") &&
+                    utils._LCvalidateDate(this.byId("CU_id_AssignmentStartDate"), "ID") &&
+                    utils._LCvalidateDate(this.byId("CU_id_AssignmentEndDate"), "ID") &&
                     utils._LCvalidateMandatoryField(this.byId("CU_id_ContractAddress"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_Role"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_EndClient"), "ID") &&
@@ -827,6 +838,7 @@ sap.ui.define([
                 this.getView().getModel("oFilteredContractModel").setProperty("/HrDaliyMonth", varible);
                 this.getView().byId("C_id_PageCreate").setVisible(false);
                 this.getView().byId("CUF_id_Contractpage").setVisible(true);
+                this.CU_CommonID();
             },
 
             CUD_commonOpenDialog: function(fragmentName) {
