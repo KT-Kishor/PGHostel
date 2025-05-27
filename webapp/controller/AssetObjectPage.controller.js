@@ -63,7 +63,7 @@ sap.ui.define([
                         // Status: "Assigned",
                         title: "The asset was assigned to " + item.AssignEmployeeName + " (" + item.AssignEmployeeID + ") " + "by " +
                             item.AssignedByEmployeeName
-                            + " (" + item.AssignedByEmployeeID + ") at " + item.AssignBranch + " " + "on "
+                            + " (" + item.AssignedByEmployeeID + ") in " + item.AssignBranch + " " + "on "
                             + new Date(item.AssignedDate).toLocaleDateString('en-GB'),
 
 
@@ -105,7 +105,7 @@ sap.ui.define([
                         // Status: "Transferred",
                         text: item.ReferenceNumber ? "Reference Number: " + item.ReferenceNumber : "",
 
-                        title: "The asset was transferby " + item.TransferByName + " (" + item.TransferByID + ") at " + item.TransferBranch + " "
+                        title: "The asset was transferred by " + item.TransferByName + " (" + item.TransferByID + ") at " + item.TransferBranch + " "
                             + "on " + new Date(item.TransferDate).toLocaleDateString('en-GB')
 
                     });

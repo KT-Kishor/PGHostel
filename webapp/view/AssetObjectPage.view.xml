@@ -132,7 +132,8 @@
                                     content="{Mymodel>/}"
                                     growingThreshold="999"
                                     showSearch="false"
-                                    
+                                    showHeaderBar="false"
+                                    enableScroll="false"
                                 >
                                     <suite:content>
                                         <suite:TimelineItem

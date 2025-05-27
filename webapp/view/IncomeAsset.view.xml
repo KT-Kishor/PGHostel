@@ -313,10 +313,13 @@
                              <Text text="{=${incomeModel>PickedEmployeeID}?'ID: '+${incomeModel>PickedEmployeeID}:''}"
                               class="sapUiTinyMarginBottom"                        
                                   />
-                            <Text text="{=${incomeModel>PickedBranch}?'Branch: '+${incomeModel>PickedBranch}:''}"
-                                class="sapUiTinyMarginBottom"
+                            <Text text="{= ${incomeModel>Status} !== 'Transferred' ? 'Branch: ' + ${incomeModel>PickedBranch} : ''} {= ${incomeModel>Status} === 'Transferred' ? 'Branch: ' + ${incomeModel>TransferBranch} : ''}"                
+                                            class="sapUiTinyMarginBottom"
 
                              />
+                              <!-- <Text text="{=${incomeModel>PickedBranch}?'Branch: '+${incomeModel>PickedBranch}:''}"
+                              class="sapUiTinyMarginBottom"                        
+                                  /> -->
                             <Text text="{= ${incomeModel>AssetCreationDate} ? 'Date: ' + ${
                                 path: 'incomeModel>AssetCreationDate',
                                 formatter: '.Formatter.formatDate'
@@ -348,21 +351,25 @@
                             text="{incomeModel>AssignBranch}"
                         /> -->
                         <VBox>
-                            <Text text="{= ${incomeModel>TransferByName} ? 'By: ' + ${incomeModel>TransferByName} : ''}" 
+                            <Text text="{= ${incomeModel>Status} === 'Transferred' ? 'By: ' + ${incomeModel>TransferByName} : ''}" 
                                     class="sapUiTinyMarginBottom"
                             />
-                             <Text text="{=${incomeModel>TransferByID}?'ID: '+${incomeModel>TransferByID}:''}"
+                             <Text text="{= ${incomeModel>Status} === 'Transferred' ?'ID: '+${incomeModel>TransferByID}:''}"
                               class="sapUiTinyMarginBottom"                        
                                   />
 
-                            <Text text="{= ${incomeModel>TransferBranch} ? 'Branch: ' + ${incomeModel>TransferBranch} : ''}"
+                            <!-- <Text text="{= ${incomeModel>TransferBranch} ? 'From: ' + ${incomeModel>TransferBranch} : ''}"
                                     class="sapUiTinyMarginBottom"
+                             /> -->
+                             <Text text="{= ${incomeModel>Status} === 'Transferred' ? 'From: ' + ${incomeModel>PickedBranch} : ''}"                
+                                            class="sapUiTinyMarginBottom"
+
                              />
 
-                            <Text text="{= ${incomeModel>TransferDate} === '1899-11-30T00:00:00.000Z' ? '' : 'Date: ' + ${
+                            <Text text="{= ${incomeModel>Status} === 'Transferred' &amp;&amp; ${incomeModel>TransferDate} !== '1899-11-30T00:00:00.000Z' ? 'Date: ' + ${
                                 path: 'incomeModel>TransferDate',
                                 formatter: '.Formatter.formatDate'
-                            }}" />
+                            } : ''}" />
                         </VBox>                    
                                 <VBox>
                                     <Text text="{= ${incomeModel>TrashByEmployeeName} ? 'By: ' + ${incomeModel>TrashByEmployeeName}: ''}"
@@ -410,13 +417,11 @@
                             />
                             <Button
                                 id="IA_pickButton"
-                              
-                                 visible="{= ${incomeModel>Status} === 'Transferred' &amp;&amp; (${LoginModel>/Role} === 'Admin'
-                                   || ${LoginModel>/Role} === 'IT Consultant'
-                                 || ${LoginModel>/Role} === 'IT Manager')&amp;&amp;
-                                  (${LoginModel>/Role} === 'IT Consultant' ? ${incomeModel>PickedBranch} === ${incomeModel>TransferBranch} : true)}"                                text="{i18n>pickedBtn}"
+                                   text="{i18n>pickedBtn}"
+                                   visible="{incomeModel>showPickButton}"            
+                                    
                                 type="Ghost"
-                                class="sapUiTinyMarginBegi"
+                                class="sapUiTinyMarginBegin"
                                 press="IA_onPickedButtonPress"
                             />
                         </VBox>
