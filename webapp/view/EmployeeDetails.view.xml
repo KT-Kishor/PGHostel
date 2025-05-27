@@ -72,19 +72,19 @@
 					<Column minScreenWidth="Tablet" demandPopin="true" >
 						<Text text="{i18n>employeeName}" />
 					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
+					<Column  demandPopin="true">
 						<Text text="{i18n>role}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>designation}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true" width="15%">
+					<Column minScreenWidth="Desktop" demandPopin="true" width="20%">
 						<Text text="{i18n>email}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true" >
+					<Column demandPopin="true" >
 						<Text text="{i18n>manager}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
+					<Column  demandPopin="true">
 						<Text text="{i18n>baseLocation}" />
 					</Column>
 					<!-- <Column minScreenWidth="Desktop" demandPopin="true">
