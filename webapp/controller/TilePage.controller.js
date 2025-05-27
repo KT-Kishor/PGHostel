@@ -359,7 +359,7 @@ sap.ui.define(
         TileV_onPressHrQuotation: function () {
           this.getRouter().navTo("RouteHrQuotation");
         },
-        TileV_MyAsset:function(){
+        TileV_MyAsset: function () {
           this.getRouter().navTo("MyAsset");
 
         }

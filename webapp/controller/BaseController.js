@@ -87,8 +87,8 @@ sap.ui.define([
             "MSA&SOW": "/GenerateMsaNda",
             "HrQuotation": "/QuotationApp",
             "PaySlip": "/PaySlip",
-            "CompanyInvoice":"/InvoiceApp",
-            "Leaves":"/Leaves"
+            "CompanyInvoice": "/InvoiceApp",
+            "Leaves": "/Leaves"
 
           };
 
@@ -881,6 +881,12 @@ sap.ui.define([
       }
 
       return result + " Only";
+    },
+    scrollToSection: function (pageId, sectionId) {
+      var page = this.byId(pageId);
+      if (page && sectionId) {
+        page.scrollToSection(this.byId(sectionId).getId());
+      }
     },
 
   })

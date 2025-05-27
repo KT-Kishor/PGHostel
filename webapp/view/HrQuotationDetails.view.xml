@@ -175,14 +175,14 @@
                                        <m:RadioButton
     text="{i18n>cgst}"
     id="HQD_id_CheckboxCGS"
-    selected="{SingleCompanyModel>/CGSTSelected}"
+    selected="{QuotationModel>/CGSTSelected}"
     select="onSelectCGST"
     editable="{SingleCompanyModel>/gstEditable}"
 />
 <m:RadioButton  
     text="{i18n>igst}"
     id="HQD_id_CheckboxIGS"
-    selected="{SingleCompanyModel>/IGSTSelected}"
+    selected="{QuotationModel>/IGSTSelected}"
     select="onSelectIGST"
     editable="{SingleCompanyModel>/gstEditable}"
 />
@@ -369,7 +369,7 @@
                                             </m:OverflowToolbar>
                                         </m:headerToolbar>
                                         <m:columns>
-                                            <m:Column width="100px" visible="false">
+                                            <m:Column width="100px" visible="false" >
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
@@ -378,7 +378,7 @@
                                                 </m:customData>
                                                 <m:Text text="{i18n>sNo}"  />
                                             </m:Column>
-                                            <m:Column width="300px" >
+                                            <m:Column width="300px" hAlign="Left" demandPopin="true"> 
                                                 <m:customData >
                                                     <core:CustomData
                                                         key="p13nData"
@@ -388,7 +388,7 @@
                                                 <m:Text text="{i18n>item}" />
                                             </m:Column>
                                             <!-- SAC Column -->
-<m:Column id="HQD_id_SAC" visible="{QuotationModel>/ShowSACAndGSTCalculation}">
+<m:Column id="HQD_id_SAC" visible="{QuotationModel>/ShowSACAndGSTCalculation}" hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
     <m:customData>
         <core:CustomData
             key="p13nData"
@@ -399,7 +399,7 @@
 </m:Column>
 
 <!-- GSTCalculation Column -->
-<m:Column id="HQD_id_GSTCalculaton" visible="{QuotationModel>/ShowSACAndGSTCalculation}">
+<m:Column id="HQD_id_GSTCalculaton" visible="{QuotationModel>/ShowSACAndGSTCalculation}" hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
     <m:customData>
         <core:CustomData
             key="p13nData"
@@ -409,7 +409,7 @@
     <m:Text text="{i18n>GSTCalculation}" />
 </m:Column>
 
-                                            <m:Column>
+                                            <m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
@@ -418,7 +418,7 @@
                                                 </m:customData>
                                                 <m:Text text="{i18n>days}" />
                                             </m:Column>
-                                            <m:Column>
+                                            <m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
@@ -429,7 +429,7 @@
                                                     text="{i18n>unitPrice}"
                                                 />
                                             </m:Column>
-                                            <m:Column>
+                                            <m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
@@ -440,7 +440,7 @@
                                                     text="{i18n>discount}"
                                                 />
                                             </m:Column>
-                                            <m:Column>
+                                            <m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
@@ -467,8 +467,11 @@
           value="{QuotationModel>Description}"
           placeholder="{i18n>itemDescription}"
           editable="{visiablityPlay>/editable}"
-          maxLength="40"
+          maxLength="200"
+        liveChange="HQD_onItemDescriptionLiveChange"
+          id="HQD_id_ItemDescription"
           width="100%"
+          valueStateText="{i18n>itemDescriptionValueState}"
         />
       </m:items>
     </m:VBox>
