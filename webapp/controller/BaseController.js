@@ -838,51 +838,38 @@ sap.ui.define([
       return new Date(year, monthIndex, 1);
     },
 
-    convertNumberToWords: function (num, currency) {
-      if (num === 0) return "Zero " + currency + " Only";
+   //for converting number to words
+      convertNumberToWords: function (num, currency) {
+        const a = [
+          "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+          "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
+          "Eighteen", "Nineteen"
+        ];
+        const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
 
-      const belowTwenty = [
-        '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
-        'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen',
-        'Eighteen', 'Nineteen'
-      ];
-      const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-      const thousands = ['', 'Thousand', 'Lakh', 'Crore'];
-
-      function helper(n) {
-        if (n === 0) return '';
-        else if (n < 20) return belowTwenty[n] + ' ';
-        else if (n < 100) return tens[Math.floor(n / 10)] + ' ' + helper(n % 10);
-        else return belowTwenty[Math.floor(n / 100)] + ' Hundred ' + helper(n % 100);
-      }
-
-      let result = '';
-      let i = 0;
-
-      let integerPart = Math.floor(num);
-      let fractionalPart = Math.round((num - integerPart) * 100);
-
-      while (integerPart > 0) {
-        let divisor = i === 0 ? 1000 : 100;
-        const remainder = integerPart % divisor;
-
-        if (remainder !== 0) {
-          result = helper(remainder) + thousands[i] + ' ' + result;
+        function inWords(n) {
+          if (n < 20) return a[n];
+          if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+          if (n < 1000) return a[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " and " + inWords(n % 100) : "");
+          if (n < 100000) return inWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + inWords(n % 1000) : "");
+          if (n < 10000000) return inWords(Math.floor(n / 100000)) + " Lakh" + (n % 100000 ? " " + inWords(n % 100000) : "");
+          return inWords(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + inWords(n % 10000000) : "");
         }
 
-        integerPart = Math.floor(integerPart / divisor);
-        i++;
-      }
+        if (!num || isNaN(num)) return "Zero";
 
-      result = result.trim() + ` ${currency}`;
+        const word = inWords(Math.floor(num));
+        let currencyText = "";
 
-      // Add fractional part (Paise/Cents)
-      if (fractionalPart > 0) {
-        result += " and " + helper(fractionalPart) + (currency === "Rupees" ? "Paise" : "Cents");
-      }
-
-      return result + " Only";
-    },
+        if (currency === "INR") {
+          currencyText = "Rupees";
+        } else if (currency === "USD") {
+          currencyText = "Dollars";
+        } else {
+          currencyText = "Currency";
+        }
+        return word + " " + currencyText + " Only";
+      },
     scrollToSection: function (pageId, sectionId) {
       var page = this.byId(pageId);
       if (page && sectionId) {

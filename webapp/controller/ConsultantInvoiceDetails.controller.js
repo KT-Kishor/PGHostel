@@ -1081,7 +1081,7 @@ sap.ui.define(
                                 }
                             } catch (error) {
                                 this.closeBusyDialog();
-                                sap.m.MessageBox.error(error.message || error.responseText || this.i18nModel.getText("mandetoryFields"));
+                               MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                             }
                         } 
                     } catch (error) {
@@ -1258,7 +1258,7 @@ sap.ui.define(
                               }
                           } catch (error) {
                                this.closeBusyDialog(); // <-- Close custom BusyDialog
-                              sap.m.MessageBox.error(error.message || error.responseText || this.i18nModel.getText("mandetoryFields"));
+                               MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                           }
                       }
                   },
@@ -1487,9 +1487,11 @@ sap.ui.define(
             currentY += InvoiceAddressLines.length * 5;
 
             if (oModel.CompanyGSTNO !== undefined && oModel.CompanyGSTNO !== "") {
-              doc.text(`GSTIN : ${oModel.CompanyGSTNO}`, margin, currentY);
-              currentY += 2;
+                doc.text(`GSTIN : ${oModel.CompanyGSTNO}`, margin, currentY);
+                currentY += 2;
             }
+
+            currentY += 5; // always add a little space before the next section
 
             const body = oConsultantItemModel.map((item, index) => {
                 const row = [
@@ -1514,7 +1516,7 @@ sap.ui.define(
                 body: body,
                 theme: 'grid',
                 headStyles: { fillColor: [41, 128, 185] },
-                styles: { font: "times", fontSize: 10, cellPadding: 3 },
+                styles: {font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30] },
                 columnStyles: {
                     0: { halign: 'center' },
                     1: { halign: 'left' },
@@ -1540,40 +1542,82 @@ sap.ui.define(
                 currentY = 20;
             }
 
-            doc.setFont("times", "bold").setFontSize(12);
-            // Show Sub-Total ( Non-Taxable ) only if > 0
+            // Create summary table body
+            const summaryBody = [];
+
+            // SubTotal Without GST
             if (oModel.SubTotalNotGST > 0) {
-                const nonTaxableText = `Sub-Total ( Non-Taxable ) (${oModel.Currency}) : ${Formatter.fromatNumber(oModel.SubTotalNotGST)}`;
-                doc.text(nonTaxableText, 190, currentY, { align: "right" });
-                currentY += 8;
+                summaryBody.push([
+                    `Sub-Total ( Non-Taxable ) (${oModel.Currency})`,
+                    Formatter.fromatNumber(oModel.SubTotalNotGST)
+                ]);
             }
-              // Show Sub-Total ( Taxable )
+
+            // SubTotal With GST
             if (oModel.SubTotal > 0) {
-                const taxableText = `Sub-Total ( Taxable ) (${oModel.Currency}) : ${Formatter.fromatNumber(oModel.SubTotal)}`;
-                doc.text(taxableText, 190, currentY, { align: "right" });
-                currentY += 8;
+                summaryBody.push([
+                    `Sub-Total ( Taxable ) (${oModel.Currency})`,
+                    Formatter.fromatNumber(oModel.SubTotal)
+                ]);
             }
+
+            // GST Breakdown
             if (oModel.Currency !== "USD") {
                 const cgstValue = parseFloat(oModel.CGST) || 0;
                 const sgstValue = parseFloat(oModel.SGST) || 0;
                 const igstValue = parseFloat(oModel.IGST) || 0;
-              
+
                 if (cgstValue > 0 || sgstValue > 0) {
-                    doc.text(`CGST (${oModel.Percentage}%) : ${Formatter.fromatNumber(cgstValue.toFixed(2))}`, 190, currentY, { align: "right" });
-                    currentY += 8;
-                    doc.text(`SGST (${oModel.Percentage}%) : ${Formatter.fromatNumber(sgstValue.toFixed(2))}`, 190, currentY, { align: "right" });
-                    currentY += 10;
+                    summaryBody.push([
+                        `CGST (${oModel.Percentage}%)`,
+                        Formatter.fromatNumber(cgstValue.toFixed(2))
+                    ]);
+                    summaryBody.push([
+                        `SGST (${oModel.Percentage}%)`,
+                        Formatter.fromatNumber(sgstValue.toFixed(2))
+                    ]);
                 } else if (igstValue > 0) {
-                    doc.text(`IGST (${oModel.Percentage}%) : ${Formatter.fromatNumber(igstValue.toFixed(2))}`, 190, currentY, { align: "right" });
-                    currentY += 10;
+                    summaryBody.push([
+                        `IGST (${oModel.Percentage}%)`,
+                        Formatter.fromatNumber(igstValue.toFixed(2))
+                    ]);
                 }
             }
 
-            doc.setDrawColor(0).setLineWidth(0.5);
-            doc.line(105, currentY, 196, currentY);
-            currentY += 5;
-            doc.text(`Total (${oModel.Currency}) : ${Formatter.fromatNumber(oModel.TotalSum)}`, 190, currentY, { align: "right" });
-            currentY += 5;
+            // Total row
+            const totalRowIndex = summaryBody.length;
+            summaryBody.push([
+                `Total (${oModel.Currency})`,
+                Formatter.fromatNumber(oModel.TotalSum)
+            ]);
+
+            doc.autoTable({
+                startY: currentY,
+                head: [],
+                body: summaryBody,
+                theme: 'plain',
+                styles: {
+                    font: "helvetica",
+                    fontSize: 10,
+                    halign: "right",
+                    cellPadding: 2
+                },
+                columnStyles: {
+                    0: { halign: "right", cellWidth: 60 },
+                    1: { halign: "right", cellWidth: 40 }
+                },
+                margin: { left: 96 },
+                didParseCell: function (data) {
+                    if (data.row.index === totalRowIndex) {
+                        // Apply top border only for the total row (last row)
+                        data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
+                        data.cell.styles.lineColor = [0, 0, 0];
+                        data.cell.styles.fontStyle = 'bold';
+                    }
+                }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 10;
 
             oModel.AmountInWords = this.convertNumberToWords(oModel.TotalSum, oModel.Currency, { maxWidth: 80 });
             doc.setFont("times", "bold");
@@ -1585,7 +1629,7 @@ sap.ui.define(
             currentY += amountHeight + 10;
 
             doc.setFont("helvetica", "bold").setFontSize(11);
-            doc.text("PAYMENT METHOD :", margin, currentY);
+            doc.text("PAYMENT METHOD :", margin - 2, currentY);
             currentY += 5;
 
             const paymentDetails = [
@@ -1600,9 +1644,9 @@ sap.ui.define(
                 doc.setFont("helvetica", "bold");
                 const label = `${detail.label} :`;
                 const labelWidth = doc.getTextWidth(label);
-                doc.text(label, margin, currentY);
+                doc.text(label, margin - 2, currentY);
                 doc.setFont("helvetica", "normal");
-                doc.text(detail.value, margin + labelWidth + 2, currentY);
+                doc.text(detail.value, margin + labelWidth, currentY);
                 currentY += 5;
             });
 
@@ -1614,9 +1658,9 @@ sap.ui.define(
             currentY += 15;
 
             doc.setFont("helvetica", "normal").setFontSize(11);
-            doc.text("Thank you for your business!", margin, currentY);
+            doc.text("Thank you for your business!", margin - 2, currentY);
 
-        doc.save(`${oModel.ConsultantName}-${oModel.InvoiceNo}-Invoice.pdf`);
+            doc.save(`${oModel.ConsultantName}-${oModel.InvoiceNo}-Invoice.pdf`);
         }
       }
     );
