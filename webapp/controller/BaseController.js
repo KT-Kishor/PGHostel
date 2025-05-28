@@ -481,6 +481,27 @@ sap.ui.define([
       // Clear uploader for next selection
       oFileUploader.setValue("");
     },
+    onCommonTokenDelete: function (oEvent) {
+    // You may set these as data-* attributes on the Tokenizer or use fixed conventions
+    var sModelName = "UploaderData";
+    var sAttachmentPath = "/attachments";
+    var sNamePath = "/name";
+    var sUploadFlagPath = "/isFileUploaded";
+    var oModel = this.getView().getModel(sModelName);
+    var aAttachments = oModel.getProperty(sAttachmentPath) || [];
+    // Support both single and multiple token deletion
+    var oTokens = oEvent.getParameter("tokens") || [oEvent.getParameter("token")];
+    oTokens.forEach(function(oToken) {
+        var sFileName = oToken.getKey();
+        aAttachments = aAttachments.filter(function(file) {
+            return file.filename !== sFileName;
+        });
+    });
+    oModel.setProperty(sAttachmentPath, aAttachments);
+    var aNames = aAttachments.map(function (file) { return file.filename; });
+    oModel.setProperty(sNamePath, aNames.join(", "));
+    oModel.setProperty(sUploadFlagPath, aAttachments.length > 0);
+},
 
     async generateCertificatePDF(content, branchCode) {
       this.getBusyDialog(); // open BusyDialog immediately
