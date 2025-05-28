@@ -1247,6 +1247,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 oDialog.open();
             },
 
+            // Function to display salary panels and handle Appraisal button logic
+
             SS_readSalaryDetails: async function (filter) {
                 try {
                     this.getBusyDialog();
@@ -1263,6 +1265,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
 
+            // Function to display salary data in UI panels
             displaySalaryPanels: function (salaryDetailsArray) {
                 var AppraisalModel = new JSONModel({
                     CtcPercentage: "",
@@ -1274,15 +1277,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 oVBox.removeAllItems();
                 var oToday = new Date();
                 salaryDetailsArray.forEach((offerData, index) => {
+                    var oEffectiveDate = new Date(offerData.EffectiveDate);
                     var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
                     var oTitleText = new sap.m.Text({
                         text: sTitleText,
                         wrapping: true
                     });
-                    // Array to hold buttons
                     var aButtonContent = [];
-                    var oEffectiveDate = new Date(offerData.EffectiveDate);
-                    // Show "Delete" button if EffectiveDate is greater than today
+                    // Delete button
                     if (salaryDetailsArray.length > 1 && oEffectiveDate > oToday && this.getView().getModel("LoginModel").getProperty("/Role") === "Admin") {
                         var oDeleteButton = new sap.m.Button({
                             text: "Delete",
@@ -1291,61 +1293,74 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 this.onDeleteSalary(offerData);
                             }.bind(this)
                         }).addStyleClass("sapUiTinyMarginBegin");
-
                         aButtonContent.push(oDeleteButton);
                     }
-                    // Show "Appraisal" button only for the first item (index 0) and if EffectiveDate is less than today
+                    // Appraisal button
                     if (index === 0 && oEffectiveDate < oToday) {
                         var oAppraisalButton = new sap.m.Button({
                             text: "Appraisal",
                             type: "Emphasized",
-                            visible: this.ViewModel.getProperty("/RelievingLetter"), // You can keep this condition if needed
+                            visible: this.ViewModel.getProperty("/RelievingLetter"),
                             press: function () {
                                 this._fetchCommonData("TaxCalculation", "TDSModel", { Country: this.getView().getModel("sEmployeeModel").getData()[0].CountryCode });
                                 this.SS_commonOpenDialog("Appraisal", "sap.kt.com.minihrsolution.fragment.Appraisal", ["SS_id_Joinn"]);
+                                setTimeout(() => {
+                                    this.onAppraisalDialogReady(offerData);
+                                }, 300);
                             }.bind(this)
                         }).addStyleClass("sapUiTinyMarginBegin");
-
                         aButtonContent.push(oAppraisalButton);
                     }
-                    // Wrap buttons in a right-aligned HBox
                     var oButtonBox = new sap.m.HBox({
                         items: aButtonContent,
                         alignItems: "Center",
                         justifyContent: "End",
                         wrap: "Wrap"
                     });
-                    // Header HBox: Left = text, Right = buttons
                     var oHeaderBox = new sap.m.HBox({
                         items: [oTitleText, oButtonBox],
                         justifyContent: "SpaceBetween",
                         alignItems: "Center",
                         width: "100%"
                     });
-                    // Create the panel with header
                     var oPanel = new sap.m.Panel({
                         expandable: true,
                         expanded: true,
-                        headerToolbar: new sap.m.Toolbar({
-                            content: [oHeaderBox]
-                        })
+                        headerToolbar: new sap.m.Toolbar({ content: [oHeaderBox] })
                     });
                     oPanel.addStyleClass("sapUiSmallMarginBottom");
-
-                    // Set individual salary data model
                     var oFragModel = new sap.ui.model.json.JSONModel(offerData);
                     oPanel.setModel(oFragModel, "salaryData");
-
-                    // Load salary display fragment
                     var oFragment = sap.ui.xmlfragment(
                         this.getView().getId(),
                         "sap.kt.com.minihrsolution.fragment.SalaryDisplay",
                         this
                     );
                     oPanel.addContent(oFragment);
-                    // Add panel to VBox
                     oVBox.addItem(oPanel);
                 });
+            },
+
+            // Function to initialize dialog values
+            onAppraisalDialogReady: function (latestSalaryData) {
+                const EmployeePF = parseFloat(latestSalaryData.EmployeePF) || 0;
+                const EmployerPF = parseFloat(latestSalaryData.EmployerPF) || 0;
+                const oRadioGroup = sap.ui.getCore().byId("AF_id_RadioButTds");
+                const oTDSRadio = sap.ui.getCore().byId("AF_id_TDSRadio");
+                const oPFRadio = oRadioGroup.getButtons()[1];
+                const oVariablePay = sap.ui.getCore().byId("AF_id_VariablePay");
+                if (!oRadioGroup || !oTDSRadio || !oPFRadio) return;
+                oTDSRadio.setVisible(true);
+                oPFRadio.setVisible(true);
+                oTDSRadio.setEnabled(true);
+                oPFRadio.setEnabled(true);
+                if (EmployeePF > 0 && EmployerPF > 0) {
+                    oRadioGroup.setSelectedIndex(1); // Select PF
+                } else {
+                    oRadioGroup.setSelectedIndex(0); // Select TDS
+                }
+                const existingVarPay = latestSalaryData.VariablePay || "0";
+                oVariablePay.setValue(existingVarPay);
             },
 
             onPressAppraisalClose: function () {
