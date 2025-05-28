@@ -481,6 +481,13 @@
                     visible="{PaySlip>/isIdSelected}"
                 />
                 <m:Button
+                    class="salUploadBtn"
+                    press="APD_onPressViewLOP"
+                    type="Transparent"
+                    text="{i18n>viewLOP}"
+                    visible="{PaySlip>/isIdSelected}"
+                />
+                <m:Button
                     text="{i18n>submit}"
                     type="Emphasized"
                     press="APD_onPressSubmit"

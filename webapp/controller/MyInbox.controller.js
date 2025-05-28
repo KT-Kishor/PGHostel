@@ -14,6 +14,7 @@ sap.ui.define([
     },
 
     _onRouteMatched: async function (OEvent) {
+      this.getView().getModel("PaySlip").setProperty("/isRouteLOP", false);
       const sParams = OEvent.getParameter("arguments").sMyInBox;
       const oView = this.getView();
       const oLoginModel = oView.getModel("LoginModel");

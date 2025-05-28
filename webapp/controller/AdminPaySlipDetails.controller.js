@@ -14,10 +14,13 @@ sap.ui.define([
                 var LoginFunction = await this.commonLoginFunction("PaySlip");
                 if (!LoginFunction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this.getView().byId("APD_id_Employee").setSelectedKey("");
                 this.oModel = this.getView().getModel("PaySlip");
-                if (this.oModel.getProperty("/isIdSelected")) this._fetchPaySlip(this.oModel.getProperty("/SelectedFilters"));
-                this.flagID = false;
+                if (!this.oModel.getProperty("/isRouteLOP")) {
+                    this.getView().byId("APD_id_Employee").setSelectedKey("");
+                    if (this.oModel.getProperty("/isIdSelected")) this._fetchPaySlip(this.oModel.getProperty("/SelectedFilters"));
+                    this.oModel.setProperty("/isRouteLOP", false);
+                    this.flagID = false;
+                }
             },
 
             APD_onPressBack: function () {
@@ -226,9 +229,6 @@ sap.ui.define([
                     item.YearlyAmount = +((item.Amount + item.YearlyAmount).toFixed(2));
                     item.InitialYearly = item.YearlyAmount;
                     item.InitialMonthly = item.Amount;
-                    if (item.Description === "Variable Pay") {
-                        item.Flag = true;
-                    }
                 }
             },
 
@@ -249,6 +249,9 @@ sap.ui.define([
                     if (item.ID === null || item.ID === undefined) {
                         delete item.ID; // Remove ID if it's a new entry
                         item.Flag = true
+                    }
+                    if (item.Description === "Variable Pay") {
+                        item.Flag = true;
                     }
                 });
             },
@@ -301,6 +304,11 @@ sap.ui.define([
                 if (this.APD_oDialog) {
                     this.APD_oDialog.close();
                 }
+            },
+
+            APD_onPressViewLOP: function () {
+                this.oModel.setProperty("/isRouteLOP", true);
+                this.getRouter().navTo("RouteLOPDetails");
             },
 
             APD_onPressGeneratePdf: async function () {
