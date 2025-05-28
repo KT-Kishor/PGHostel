@@ -98,7 +98,6 @@
     <core:ListItem key="{BrachModel>branchCode}" text="{BrachModel>city}" additionalText="{BrachModel>branchCode}" />
 </m:ComboBox>
 
-                                     
                                         <m:Label
                                             text="{i18n>companyName}"
                                             required="true"
