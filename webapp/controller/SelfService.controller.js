@@ -4,8 +4,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         return Controller.extend("sap.kt.com.minihrsolution.controller.SelfService", {
             Formatter: Formatter,
             onInit() {
+                const today = new Date();
+                const nextMonthFirstDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
                 var oDateModel = new sap.ui.model.json.JSONModel();
-                oDateModel.setData({ maxDate: new Date(), focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1) });
+                oDateModel.setData({ maxDate: new Date(), focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1), nextMonthMinDate: nextMonthFirstDate });
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("SelfService").attachMatched(this._onRouteMatched, this);
             },
@@ -1267,10 +1269,13 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
             // Function to display salary data in UI panels
             displaySalaryPanels: function (salaryDetailsArray) {
+                var nextMonthDate = this.getView().getModel("controller").getProperty("/nextMonthMinDate"); // Fetch the pre-set next month's date
                 var AppraisalModel = new JSONModel({
                     CtcPercentage: "",
                     VariablePay: "0",
-                    EffectiveDate: new Date()
+                    TotalCTC: "0",
+                    TotalVariablePay: "0",
+                    EffectiveDate: nextMonthDate 
                 });
                 this.getView().setModel(AppraisalModel, "AppraisalModel");
                 var oVBox = this.byId("salaryVBox");
@@ -1343,27 +1348,28 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
             // Function to initialize dialog values
             onAppraisalDialogReady: function (latestSalaryData) {
-                const EmployeePF = parseFloat(latestSalaryData.EmployeePF) || 0;
-                const EmployerPF = parseFloat(latestSalaryData.EmployerPF) || 0;
-                const oRadioGroup = sap.ui.getCore().byId("AF_id_RadioButTds");
-                const oTDSRadio = sap.ui.getCore().byId("AF_id_TDSRadio");
-                const oPFRadio = oRadioGroup.getButtons()[1];
-                const oVariablePay = sap.ui.getCore().byId("AF_id_VariablePay");
-                if (!oRadioGroup || !oTDSRadio || !oPFRadio) return;
-                oTDSRadio.setVisible(true);
-                oPFRadio.setVisible(true);
-                oTDSRadio.setEnabled(true);
-                oPFRadio.setEnabled(true);
-                if (EmployeePF > 0 && EmployerPF > 0) {
-                    oRadioGroup.setSelectedIndex(1); // Select PF
-                } else {
-                    oRadioGroup.setSelectedIndex(0); // Select TDS
-                }
-                const existingVarPay = latestSalaryData.VariablePercentage || "0";
-                oVariablePay.setValue(existingVarPay);
-            },
+    const EmployeePF = parseFloat(latestSalaryData.EmployeePF) || 0;
+    const EmployerPF = parseFloat(latestSalaryData.EmployerPF) || 0;
+    const oRadioGroup = sap.ui.getCore().byId("AF_id_RadioButTds");
+    const oTDSRadio = sap.ui.getCore().byId("AF_id_TDSRadio");
+    const oPFRadio = oRadioGroup.getButtons()[1];
+
+    if (!oRadioGroup || !oTDSRadio || !oPFRadio) return;
+
+    // Check if both PF values exist
+    if (EmployeePF > 0 && EmployerPF > 0) {
+        oRadioGroup.setVisible(false); // Hide entire radio button group
+    } else {
+        oRadioGroup.setVisible(true); // Show the radio button group when PF is not applicable
+    }
+},
 
             onPressAppraisalClose: function () {
+                sap.ui.getCore().byId("AF_id_CTC").setValue("")
+                sap.ui.getCore().byId("AF_idTextCTC").setText("")
+                sap.ui.getCore().byId("AE_idTextVP").setText("")
+                sap.ui.getCore().byId("AF_id_CTC").setValueState("None");
+                sap.ui.getCore().byId("AF_id_VariablePay").setValueState("None")
                 this.Appraisal.close();
             },
 
@@ -1390,12 +1396,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
             EOD_validateAmount: function (oEvent) {
                 var CTCType = sap.ui.getCore().byId("ED_Frg_idAppraisalType")._getSelectedItemText();
-                this.CommonCalculation();
                 if (CTCType === 'Percentage') {
                     utils._LCvalidateTraineeAmount(oEvent);
                 } else {
                     utils._LCvalidateCTC(oEvent);
                 }
+                this.CommonCalculation();
             },
 
             CommonCalculation: function () {
@@ -1419,6 +1425,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var variablePay = AppraisalModel.getProperty("/VariablePay");
                 this.getView().getModel("employeeModel").setProperty("/VariablePercentage", variablePay);
                 this._calculateSalaryComponents(type);
+                AppraisalModel.setProperty("/TotalCTC", this.Formatter.fromatNumber(NewCTC));
+                AppraisalModel.setProperty("/TotalVariablePay", this.Formatter.fromatNumber(this.getView().getModel("employeeModel").getData().VariablePay));
             },
             EOD_validatevariable: function (oEvent) {
                 utils._LCvalidateVariablePay(oEvent);
@@ -1462,12 +1470,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             onSelectChange: function (oEvent) {
+                // Validate CTC based on selected type      
                 oEvent.getSource().getSelectedItem().getText() === "Percentage" ? utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("AF_id_CTC"), "ID")
                     : utils._LCvalidateAmount(sap.ui.getCore().byId("AF_id_CTC"), "ID");
-            },
-
-            EOD_validateAmountAppraisal: function (oEvent) {
-                utils._LCvalidateAmount(oEvent);
             },
 
             onPressAppraisalSave: async function () {
