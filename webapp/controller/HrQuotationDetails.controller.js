@@ -191,6 +191,7 @@ sap.ui.define(
           // Reset all tax selections and visibility
           oQuotationModel.setProperty("/CGSTSelected", true); oQuotationModel.setProperty("/IGSTSelected", false); oQuotationModel.setProperty("/CGSTVisible", true); oQuotationModel.setProperty("/SGSTVisible", true); oQuotationModel.setProperty("/IGSTVisible", false); oSingleCompanyModel.setProperty("/Percentage", 9);
           oQuotationModel.setProperty("/ShowGSTFields", true); oSingleCompanyModel.setProperty("/Currency", "INR"); oVisibilityModel.setProperty("/showBranch", true);
+          oSingleCompanyModel.setProperty("/Branch", "KLB01");
         }
         else {
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
