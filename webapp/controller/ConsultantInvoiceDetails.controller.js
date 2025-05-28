@@ -3,15 +3,17 @@ sap.ui.define(
     "./BaseController", //call base controller
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "../utils/validation"
+    "../utils/validation",
+     "../model/formatter",
   ],
   function (
-    BaseController,JSONModel,MessageToast,utils
+    BaseController,JSONModel,MessageToast,utils,Formatter
   ) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.ConsultantInvoiceDetails",
       {
+        Formatter: Formatter,
         onInit: function () {
           this.getRouter().getRoute("RouteNavConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
         },
@@ -53,14 +55,20 @@ sap.ui.define(
                         invBtn: true, pasteBtn: true, merge: false });
                     this.getView().setModel(visibilityPlay, "visiablityPlay");
 
-                    var sUserType = this.getView().getModel("LoginModel").getProperty("/Role");
+                  var loginModel = this.getOwnerComponent().getModel("LoginModel");
                     var oComboBox = this.getView().byId("CI_id_Cont");
                     var isEditMode = sPath !== "X" && oPath !== "Y";
 
-                    if (sUserType === "Admin" && !isEditMode) {
-                        oComboBox.setVisible(true);
+                    if (loginModel) {
+                        this.sUserType = loginModel.getProperty("/Role");
+
+                        if (this.sUserType === "Admin" && !isEditMode) {
+                            oComboBox.setVisible(true);
+                        } else {
+                            oComboBox.setVisible(false);
+                        }
                     } else {
-                        oComboBox.setVisible(false);
+                        oComboBox.setVisible(false); 
                     }
 
                     if (sPath === "X" && oPath === "Y") {
@@ -834,7 +842,7 @@ sap.ui.define(
                     if (gstInput === "") {
                         var updatedTotalSum = totalSum;
                         var oData = oConsultantModel.getData();
-
+                       
                         if (oData.CGSTSelected) {
                             updatedTotalSum -= (cgst + sgst);
                         } else if (oData.IGSTSelected) {
@@ -901,6 +909,7 @@ sap.ui.define(
                CI_onPressSubmit: async function () {
                     try {
                         const that = this;
+
                         // Validate all required fields
                         if (
                             utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
@@ -921,26 +930,31 @@ sap.ui.define(
                             const itemModel = that.getView().getModel("oModelDataPro");
                             const itemData = itemModel.getData();
 
+                            var isValid = true;
+                            if (invoiceData.GSTNO && !utils._LCvalidateGstNumber(this.byId("CI_id_InputGSTNO"), "ID")) 
+                                isValid = false;
+
+                            if (invoiceData.CompanyGSTNO && !utils._LCvalidateGstNumber(this.byId("CI_id_InputCompGSTNO"), "ID")) 
+                                isValid = false;
+
+                            if (!isValid) {
+                                MessageToast.show(this.i18nModel.getText("mandetoryChecks"));
+                                return;
+                            }
+
                             if (!itemData.TotalSum || itemData.TotalSum <= 0) {
                                 MessageBox.error("Please ensure that at least one item is filled!");
                                 return;
                             }
 
-                            if (invoiceData.GSTNO && invoiceData.Percentage && invoiceData.CGSTSelected &&
-                                invoiceData.IGSTVisible
-                            ) {
+                            if (invoiceData.GSTNO && invoiceData.Percentage && invoiceData.CGSTSelected && invoiceData.IGSTVisible) {
                                 MessageBox.error("Checkbox and the percentage field are filled in before Submit");
                                 return;
                             }
 
-                            if (!this.Discount) {
-                            sap.m.MessageBox.error(that.i18nModel.getText("mandetoryFields"));
-                            return; // Prevent further processing
-                            }
-
-                            if (!this.UnitAmount) {
-                            sap.m.MessageBox.error(that.i18nModel.getText("mandetoryFields"));
-                            return; // Prevent further processing
+                            if (!this.Discount || !this.UnitAmount) {
+                                sap.m.MessageBox.error(that.i18nModel.getText("mandetoryFields"));
+                                return;
                             }
 
                             // Clean up unnecessary fields
@@ -951,9 +965,9 @@ sap.ui.define(
                             delete invoiceData.InvoiceItems;
 
                             const invoiceItemData = this.byId("CI_id_ConsultantInvoiceDeatailTable").getModel("ConsultantInvoiceModel")
-                             .getData().ConsultantInvoiceItem;
+                            .getData().ConsultantInvoiceItem;
 
-                              // Format dates
+                            // Format dates
                             const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
                             const sInvoiceDate = oDateFormat.format(this.byId("CI_id_InDate").getDateValue());
                             const sPayByDate = oDateFormat.format(this.byId("CI_id_PaybyInv").getDateValue());
@@ -974,8 +988,7 @@ sap.ui.define(
                                         Total: parseFloat(cleanItem.Total),
                                         Currency: invoiceData.Currency,
                                     };
-                                })
-                                : [];
+                                }) : [];
 
                             const consultantInvoicePayload = {
                                 EmployeeID: invoiceData.EmployeeID,
@@ -1008,23 +1021,60 @@ sap.ui.define(
                                 Items: cleanedInvoiceItems
                             };
 
+                            // Submit invoice
+                            this.getBusyDialog();
                             try {
-                                this.getBusyDialog(); // <-- Open custom BusyDialog
                                 const response = await that.ajaxCreateWithJQuery("ConsultantInvoice", combinedPayload);
+                                this.closeBusyDialog();
+
                                 if (response.success === true) {
-                                     this.closeBusyDialog(); // <-- Close custom BusyDialog
-                                    that.getRouter().navTo("RouteConsultantInvoiceApplication");
+                                    invoiceModel.setProperty("/CGST", consultantInvoicePayload.CGST);
+                                    invoiceModel.setProperty("/SGST", consultantInvoicePayload.SGST);
+                                    invoiceModel.setProperty("/IGST", consultantInvoicePayload.IGST);
+                                    invoiceModel.setProperty("/SubTotal", consultantInvoicePayload.SubTotal);
+                                    invoiceModel.setProperty("/SubTotalNotGST", consultantInvoicePayload.SubTotalNotGST);
+                                    invoiceModel.setProperty("/TotalSum", consultantInvoicePayload.TotalSum);
+                                    invoiceData.InvoiceNo = response.InvoiceNo;
+                                    var oDialog = new sap.m.Dialog({
+                                        title: this.i18nModel.getText("success"),
+                                        type: sap.m.DialogType.Message,
+                                        state: sap.ui.core.ValueState.Success,
+                                        content: new sap.m.Text({
+                                            text: this.i18nModel.getText("invoiceCreatemsg")
+                                        }),
+                                        beginButton: new sap.m.Button({
+                                            text: "OK",
+                                            type: "Accept",
+                                            press: function () {
+                                                oDialog.close();
+                                                that.getRouter().navTo("RouteConsultantInvoiceApplication");
+                                            }
+                                        }),
+                                        endButton: new sap.m.Button({
+                                            text: "Generate PDF",
+                                            type: "Attention",
+                                            press: function () {
+                                                oDialog.close();
+                                                that.CI_onPressGeneratePdf();
+                                                that.getRouter().navTo("RouteConsultantInvoiceApplication");
+                                            }
+                                        }),
+                                        afterClose: function () {
+                                            oDialog.destroy();
+                                        }
+                                    });
+
+                                    oDialog.open();
                                 } else {
-                                    MessageToast.show("Failed to create invoice.");
+                                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                                 }
-                            } catch (createError) {
-                                MessageToast.show("Error while creating invoice: " + createError.statusText);
+                            } catch (error) {
+                                this.closeBusyDialog();
+                                sap.m.MessageBox.error(error.message || error.responseText || this.i18nModel.getText("mandetoryFields"));
                             }
-                        } else {
-                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        }
+                        } 
                     } catch (error) {
-                         this.closeBusyDialog(); // <-- Close custom BusyDialog
+                        this.closeBusyDialog();
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     }
                 },
@@ -1084,6 +1134,18 @@ sap.ui.define(
                             if (!this.UnitAmount) {
                             sap.m.MessageBox.error(this.i18nModel.getText("mandetoryFields"));
                             return; // Prevent further processing
+                            }
+
+                            var isValid = true;
+                            if (oConsultantInvoiceModel.GSTNO && !utils._LCvalidateGstNumber(this.byId("CI_id_InputGSTNO"), "ID")) 
+                                isValid = false;
+
+                            if (oConsultantInvoiceModel.CompanyGSTNO && !utils._LCvalidateGstNumber(this.byId("CI_id_InputCompGSTNO"), "ID")) 
+                                isValid = false;
+
+                            if (!isValid) {
+                                MessageToast.show(this.i18nModel.getText("mandetoryChecks"));
+                                return;
                             }
 
                           // Prepare main invoice data payload
@@ -1317,6 +1379,232 @@ sap.ui.define(
                 }
                 this._oPopover.openBy(oEvent.getSource());
             },
+
+          CI_onPressGeneratePdf: function () {
+            const { jsPDF } = window.jspdf;
+            const oView = this.getView();
+            const oModel = oView.getModel("ConsultantInvoiceModel").getData();
+            
+            // Get the ConsultantInvoiceItem data directly from the model
+            const oConsultantItemModel = oModel.ConsultantInvoiceItem || [];
+            
+            let currency = "Rupees";
+            if (oModel.Currency !== "INR") {
+                currency = oModel.Currency;
+            }
+            let totalInWords = this.convertNumberToWords(oModel.TotalSum, currency);
+
+            if (oModel.Currency !== "INR") {
+                totalInWords = totalInWords
+                    .replaceAll("Lakh", "Million")
+                    .replaceAll("Crore", "Billion")
+                    .replaceAll("Paise", "Cents")
+                    .replaceAll("Rupees", "Dollars");
+            }
+
+            const showSAC = oModel.GSTNO !== undefined && oModel.GSTNO !== "";
+
+            const margin = 15;
+            const doc = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4"
+            });
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const usableWidth = pageWidth - 2 * margin;
+            const footerHeight = 15;
+            const headerMargin = 25.4;
+            let currentY = headerMargin;
+
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            let headerLabel = (oModel.GSTNO === undefined || oModel.GSTNO === "") ? "INVOICE" : "TAX-INVOICE";
+            doc.text(headerLabel, pageWidth - 18, currentY, { align: "right" });
+
+            currentY += 10;
+
+            const detailsStartY = currentY;
+            const rowHeight = 6.5;
+            const columnWidths = [30, 30];
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            const rightAlignX = pageWidth - 13.5 - columnWidths[0] - columnWidths[1];
+
+            const detailsTable = [
+                { label: 'Invoice No. :', value: oModel.InvoiceNo },
+                { label: 'Date :', value: Formatter.formatDate(oModel.InvoiceDate) },
+            ];
+
+            detailsTable.forEach(row => {
+                doc.setFont("helvetica", "bold");
+                doc.text(row.label, rightAlignX + columnWidths[0] - doc.getTextWidth(row.label), currentY + 5);
+                doc.setFont("helvetica", "normal");
+                doc.text(row.value, rightAlignX + columnWidths[0] + 2, currentY + 5);
+                currentY += rowHeight;
+            });
+
+            currentY = detailsStartY + 5;
+            doc.setFont("helvetica", "bold");
+            doc.text("From,", margin, currentY);
+            currentY = detailsStartY + 10;
+            doc.setFontSize(12);
+            doc.text(oModel.ConsultantName, margin, currentY);
+            currentY += 5;
+
+            const ConsultantAddressLines = doc.splitTextToSize(oModel.ConsultantAddress, usableWidth / 2 - 10);
+            doc.setFont("helvetica", "normal");
+            doc.text(ConsultantAddressLines, margin, currentY);
+            currentY += ConsultantAddressLines.length * 5;
+
+            if (oModel.GSTNO !== undefined && oModel.GSTNO !== "") {
+                doc.text(`GSTIN : ${oModel.GSTNO}`, margin, currentY);
+                currentY += 5;
+            }
+
+            currentY += 5;
+            doc.setFont("helvetica", "bold");
+            doc.text("To,", margin, currentY);
+            currentY += 5;
+            doc.text(oModel.InvoiceTo, margin, currentY);
+            currentY += 5;
+
+            const InvoiceAddressLines = doc.splitTextToSize(oModel.InvoiceAddress, usableWidth / 2 - 10);
+            doc.setFont("helvetica", "normal");
+            doc.text(InvoiceAddressLines, margin, currentY);
+            currentY += InvoiceAddressLines.length * 5;
+
+            if (oModel.CompanyGSTNO !== undefined && oModel.CompanyGSTNO !== "") {
+              doc.text(`GSTIN : ${oModel.CompanyGSTNO}`, margin, currentY);
+              currentY += 2;
+            }
+
+            const body = oConsultantItemModel.map((item, index) => {
+                const row = [
+                    index + 1,
+                    item.Item,
+                    item.Days, 
+                    Formatter.fromatNumber(item.UnitPrice),
+                    Formatter.fromatNumber(item.Discount),
+                    Formatter.fromatNumber(item.Total)
+                ];
+                if (showSAC) row.splice(3, 0, item.SAC); // Insert SAC as 4th column if required
+                return row;
+            });
+
+            const head = showSAC
+                ? [['Sl.No.', 'Item Description', 'Days', 'SAC', 'Unit Price', 'Discount', 'Total']]
+                : [['Sl.No.', 'Item Description', 'Days', 'Unit Price', 'Discount', 'Total']];
+
+            doc.autoTable({
+                startY: currentY,
+                head: head,
+                body: body,
+                theme: 'grid',
+                headStyles: { fillColor: [41, 128, 185] },
+                styles: { font: "times", fontSize: 10, cellPadding: 3 },
+                columnStyles: {
+                    0: { halign: 'center' },
+                    1: { halign: 'left' },
+                    ...(showSAC ? { 
+                        2: { halign: 'center' }, 
+                        3: { halign: 'center' }, 
+                        4: { halign: 'left' }, 
+                        5: { halign: 'left' }, 
+                        6: { halign: 'left' } 
+                    } : { 
+                        2: { halign: 'center' }, 
+                        3: { halign: 'left' }, 
+                        4: { halign: 'left' }, 
+                        5: { halign: 'left' } 
+                    })
+                }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 10;
+
+            if (currentY + 40 > pageHeight) {
+                doc.addPage();
+                currentY = 20;
+            }
+
+            doc.setFont("times", "bold").setFontSize(12);
+            // Show Sub-Total ( Non-Taxable ) only if > 0
+            if (oModel.SubTotalNotGST > 0) {
+                const nonTaxableText = `Sub-Total ( Non-Taxable ) (${oModel.Currency}) : ${Formatter.fromatNumber(oModel.SubTotalNotGST)}`;
+                doc.text(nonTaxableText, 190, currentY, { align: "right" });
+                currentY += 8;
+            }
+            // Show Sub-Total ( Taxable )
+            const taxableText = `Sub-Total ( Taxable ) (${oModel.Currency}) : ${Formatter.fromatNumber(oModel.SubTotal)}`;
+            doc.text(taxableText, 190, currentY, { align: "right" });
+            currentY += 8;
+            if (oModel.Currency !== "USD") {
+                const cgstValue = parseFloat(oModel.CGST) || 0;
+                const sgstValue = parseFloat(oModel.SGST) || 0;
+                const igstValue = parseFloat(oModel.IGST) || 0;
+              
+                if (cgstValue > 0 || sgstValue > 0) {
+                    doc.text(`CGST (${oModel.Percentage}%) : ${Formatter.fromatNumber(cgstValue.toFixed(2))}`, 190, currentY, { align: "right" });
+                    currentY += 8;
+                    doc.text(`SGST (${oModel.Percentage}%) : ${Formatter.fromatNumber(sgstValue.toFixed(2))}`, 190, currentY, { align: "right" });
+                    currentY += 10;
+                } else if (igstValue > 0) {
+                    doc.text(`IGST (${oModel.Percentage}%) : ${Formatter.fromatNumber(igstValue.toFixed(2))}`, 190, currentY, { align: "right" });
+                    currentY += 10;
+                }
+            }
+
+            doc.setDrawColor(0).setLineWidth(0.5);
+            doc.line(105, currentY, 196, currentY);
+            currentY += 5;
+            doc.text(`Total (${oModel.Currency}) : ${Formatter.fromatNumber(oModel.TotalSum)}`, 190, currentY, { align: "right" });
+            currentY += 5;
+
+            oModel.AmountInWords = this.convertNumberToWords(oModel.TotalSum, oModel.Currency, { maxWidth: 80 });
+            doc.setFont("times", "bold");
+            doc.text("Amount in Words:", 13, currentY);
+            currentY += 5;
+            doc.setFont("times", "normal");
+            const amountHeight = doc.getTextDimensions(oModel.AmountInWords || "").h;
+            doc.text(oModel.AmountInWords || "", 13, currentY, { maxWidth: 180 });
+            currentY += amountHeight + 10;
+
+            doc.setFont("helvetica", "bold").setFontSize(11);
+            doc.text("PAYMENT METHOD :", margin, currentY);
+            currentY += 5;
+
+            const paymentDetails = [
+                { label: "Bank Name", value: oModel.BankName },
+                { label: "Account Name", value: oModel.AccountName },
+                { label: "Account No", value: oModel.AccountNo },
+                { label: "IFSC Code", value: oModel.IFSCCode },
+                { label: "Pay By", value: oModel.PayBy }
+            ];
+
+            paymentDetails.forEach(detail => {
+                doc.setFont("helvetica", "bold");
+                const label = `${detail.label} :`;
+                const labelWidth = doc.getTextWidth(label);
+                doc.text(label, margin, currentY);
+                doc.setFont("helvetica", "normal");
+                doc.text(detail.value, margin + labelWidth + 2, currentY);
+                currentY += 5;
+            });
+
+            currentY += 10;
+            doc.setFont("helvetica", "bold").setFontSize(12);
+            const forLabelText = "For : " + oModel.ConsultantName;
+            const totalTextWidth = doc.getTextWidth(forLabelText);
+            doc.text(forLabelText, rightAlignX - totalTextWidth + 55, currentY);
+            currentY += 15;
+
+            doc.setFont("helvetica", "normal").setFontSize(11);
+            doc.text("Thank you for your business!", margin, currentY);
+
+        doc.save(`${oModel.ConsultantName}-${oModel.InvoiceNo}-Invoice.pdf`);
+        }
       }
     );
   }

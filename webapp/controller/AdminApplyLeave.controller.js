@@ -501,10 +501,25 @@ sap.ui.define(
                 AL_onPressApplyLeave: function () {
                     var oView = this.getView();
                     var loginData = this.getOwnerComponent().getModel("LoginModel").getData();
+                    
                     if (!this.JoiningDate || this.JoiningDate.length < 3) {
-                            sap.m.MessageToast.show("Joining date is not available or invalid.");
-                            return;
-                        }
+                        sap.m.MessageToast.show("Joining date is not available or invalid.");
+                        return;
+                    }
+
+                    // Parse joining date
+                    var joiningDay = parseInt(this.JoiningDate[0]);
+                    var joiningMonth = parseInt(this.JoiningDate[1]) - 1; // JS months are 0-based
+                    var joiningYear = parseInt(this.JoiningDate[2]);
+
+                    var currentYear = new Date().getFullYear();
+
+                    // Check if joining year is in the future
+                    if (joiningYear > currentYear) {
+                        sap.m.MessageToast.show("Joining year is in the future. You cannot apply leave for future year.");
+                        return;
+                    }
+
                     // Create leave JSON model
                     var leaveJson = {
                         employeeID: loginData.EmployeeID,
@@ -520,10 +535,11 @@ sap.ui.define(
                         halfDay: false,
                         MinToDate: null,
                         managerRemark: "",
-                        maxDate: new Date(this.currentYear, 11, 31),
-                        minDate: new Date(this.JoiningDate[2], this.JoiningDate[1] - 1, this.JoiningDate[0]),
+                        maxDate: new Date(currentYear, 11, 31),
+                        minDate: new Date(joiningYear, joiningMonth, joiningDay),
                         isUpdate: false,
                     };
+
                     var oLeaveTempModel = new JSONModel(leaveJson);
                     oView.setModel(oLeaveTempModel, "LeaveTempModel");
                     this.openLeaveDialog(oView);

@@ -6,11 +6,11 @@
 	xmlns:core="sap.ui.core"
 	xmlns:m="sap.m">
 	<m:Page title="{i18n>generateConsultantInvoice}" navButtonPress="CI_onPressback" showNavButton="true">
-		<ObjectPageLayout id="CI_id_NavConsultantInvoicePage" enableLazyLoading="true" useIconTabBar="false">
+		<ObjectPageLayout id="CI_id_NavConsultantInvoicePage">
 			<sections>
-				<ObjectPageSection id="CI_id_FirstSection">
+				<ObjectPageSection id="CI_id_FirstSection" title="{i18n>invoiceHeaderDetails}">
 					<subSections>
-						<ObjectPageSubSection title="{i18n>invoiceHeaderDetails}">
+						<ObjectPageSubSection >
 							<blocks>
 								<m:VBox >
 									<m:HBox justifyContent="Center">
@@ -99,7 +99,12 @@
 								</m:VBox>
 							</blocks>
 						</ObjectPageSubSection>
-						<ObjectPageSubSection title="{i18n>ConsultantHeaderDetails}">
+					</subSections>
+				</ObjectPageSection>
+				<ObjectPageSection title="{i18n>ConsultantHeaderDetails}"  titleUppercase="false">
+					<subSections>
+						<ObjectPageSubSection
+                            titleUppercase="false">
 							<blocks>
 								<f:SimpleForm
                                     editable="true"
@@ -138,7 +143,13 @@
 								</f:SimpleForm>
 							</blocks>
 						</ObjectPageSubSection>
-						<ObjectPageSubSection title="{i18n>invoiceBankDetails}">
+					</subSections>
+				</ObjectPageSection>
+				<ObjectPageSection  title="{i18n>invoiceBankDetails}" titleUppercase="false">
+					<subSections>
+						<ObjectPageSubSection
+                            titleUppercase="false"
+                        >
 							<blocks>
 								<f:SimpleForm
                                     editable="true"
@@ -163,7 +174,13 @@
 								</f:SimpleForm>
 							</blocks>
 						</ObjectPageSubSection>
-						<ObjectPageSubSection title="{i18n>invoiceItemDetails}">
+					</subSections>
+				</ObjectPageSection>
+				<ObjectPageSection title="{i18n>invoiceItemDetails}" titleUppercase="false">
+					<subSections>
+						<ObjectPageSubSection
+                            titleUppercase="false"
+                        >
 							<blocks>
 								<m:VBox>
 									<!-- Toolbar -->
