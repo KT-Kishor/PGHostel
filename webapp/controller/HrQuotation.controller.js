@@ -3,8 +3,9 @@ sap.ui.define(
     "./BaseController", //import base controller
     "../model/formatter",
     "sap/m/MessageBox",
+    "sap/ui/model/json/JSONModel",
   ],
-  function (BaseController, Formatter, MessageBox) {
+  function (BaseController, Formatter, MessageBox, JSONModel) {
     "use strict";
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.HrQuotation", {
@@ -20,7 +21,9 @@ sap.ui.define(
         // this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         await this._fetchCommonData("Quotation", "CompanyQuotationModel", {});
-        this.getView().getModel("LoginModel").setProperty("/HeaderName", "Create Quotation");
+        this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
+        // this.getView().setModel(new JSONModel({ filteredLength: 0 }), "ViewModel");
+
         if (this.oValue === "HrQuotation") {
 
           this.HQ_onClearFilters();
@@ -30,13 +33,27 @@ sap.ui.define(
         this.closeBusyDialog();
       },
       HQ_onSearch: function () {
-        var aFilterItems = this.byId("HQ_id_QuotationFilterBar").getFilterGroupItems();
+        var oFilterBar = this.byId("HQ_id_QuotationFilterBar");
+        var aFilterItems = oFilterBar.getFilterGroupItems();
         var aFilters = [];
 
         aFilterItems.forEach(function (oItem) {
-          var oControl = oItem.getControl();
           var sName = oItem.getName();
-          var sValue = oControl && oControl.getValue();
+          var oControl = oFilterBar.determineControlByFilterItem(oItem); //  Get actual control
+          var sValue;
+
+          if (oControl.isA("sap.m.ComboBox")) {
+            sValue = oControl.getSelectedKey(); //  Use selectedKey for ComboBox
+          } else if (oControl.isA("sap.m.DatePicker")) {
+            sValue = oControl.getDateValue(); //  Use getDateValue for DatePicker
+            if (sValue) {
+              // Format to your model's format, e.g., 'yyyy-MM-dd' or 'dd/MM/yyyy'
+              var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+              sValue = oDateFormat.format(sValue);
+            }
+          } else if (oControl.getValue) {
+            sValue = oControl.getValue(); // fallback
+          }
 
           if (sValue) {
             aFilters.push(new sap.ui.model.Filter(sName, sap.ui.model.FilterOperator.Contains, sValue));
@@ -50,12 +67,12 @@ sap.ui.define(
           this.getBusyDialog(); // Show BusyDialog
           oBinding.filter(aFilters);
 
-          // Close BusyDialog after table is updated
           oTable.attachEventOnce("updateFinished", function () {
             this.closeBusyDialog();
           }.bind(this));
         }
       },
+
 
       HQ_onClearFilters: function () {
         var oFilterBar = this.getView().byId("HQ_id_QuotationFilterBar");

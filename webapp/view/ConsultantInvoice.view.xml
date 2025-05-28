@@ -72,7 +72,7 @@
 							<Text text="{path:'ConsultantModel>InvoiceDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{path:'ConsultantModel>PayBy' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{ConsultantModel>GSTNO}" />
-							<Text text="{ConsultantModel>TotalSum}" />
+							<Text text="{path:'ConsultantModel>TotalSum',formatter: '.Formatter.fromatNumber'}" />
 							<Text text="{ConsultantModel>Currency}" />
 						</cells>
 					</ColumnListItem>

@@ -14,20 +14,16 @@
     >
         <ObjectPageLayout
             id="HQD_id_QuotationDetailsPage"
-            enableLazyLoading="true"
-            useIconTabBar="false"
-            
         >
             <sections>
                 <ObjectPageSection
                     id="HQD_id_Section"
+                    title="{i18n>from}"
                     titleUppercase="false"
-                    showTitle="false"
                 >
                     <subSections>
                         <ObjectPageSubSection
                             titleUppercase="false"
-                            title="{i18n>from}"
                         >
                             <blocks>
                                 <f:SimpleForm
@@ -44,7 +40,7 @@
                                     <f:content>
                                        
                                         <m:Label
-                                            text="{i18n>date}"
+                                            text="{i18n>quotaiodate}"
                                             required="true"
                                         />
                                         <m:DatePicker
@@ -239,9 +235,18 @@
                                 </f:SimpleForm>
                             </blocks>
                         </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+
+                 <ObjectPageSection
+                    id="HQD_id_Section1"
+                     title="{i18n>billTo}"
+                    titleUppercase="false"
+                >
+                    <subSections>
                         <ObjectPageSubSection
                             titleUppercase="false"
-                            title="{i18n>billTo}"
+                          
                         >
                             <blocks>
                                 <f:SimpleForm
@@ -335,10 +340,14 @@
                                 </f:SimpleForm>
                             </blocks>
                         </ObjectPageSubSection>
-
+                       
+                    </subSections>
+</ObjectPageSection>
+                        <ObjectPageSection 
+                        title="{i18n>quotationItemDetails}" titleUppercase="false">
+                        <subSections>
                         <ObjectPageSubSection
                             titleUppercase="false"
-                            title="{i18n>quotationItemDetails}"
                         >
                             <blocks>
                                 <m:VBox>
@@ -458,7 +467,6 @@
       value="{= ${$index} + 1 }"
       editable="false"
     />
-
     <!-- Item (Column 2) -->
     <m:VBox>
       <m:items>
@@ -471,7 +479,7 @@
         liveChange="HQD_onItemDescriptionLiveChange"
           id="HQD_id_ItemDescription"
           width="100%"
-          valueStateText="{i18n>itemDescriptionValueState}"
+          valueStateText="{i18n>itemplaceholder}"
         />
       </m:items>
     </m:VBox>
@@ -500,8 +508,8 @@
       change="HQD_onChangeGSTCalculation"
       visible="{QuotationModel>/ShowSACAndGSTCalculation}"
     >
-      <core:Item key="Yes" text="{i18n>yes}" />
-      <core:Item key="No" text="{i18n>no}" />
+      <core:Item key="Yes" text="{i18n>quotaionyes}" />
+      <core:Item key="No" text="{i18n>quotaionno}" />
     </m:ComboBox>
 
     <!-- Days (Column 5) -->
@@ -526,7 +534,7 @@
 
     <!-- Discount (Column 7) -->
     <m:Input
-      value="{QuotationModel>Discount}"
+      value="{path:'QuotationModel>Discount',formatter: '.Formatter.fromatNumber'}"
       editable="{visiablityPlay>/editable}"
       liveChange="HQD_onchangeDiscount"
       maxLength="20"
@@ -662,19 +670,15 @@
                                     />
                                 </m:VBox>
                             </blocks>
-                        </ObjectPageSubSection>
-                    </subSections>
-                </ObjectPageSection>
+                         </ObjectPageSubSection>
+                         </subSections>
+                         </ObjectPageSection>
             </sections>
         </ObjectPageLayout>
         <m:footer>
             <m:Toolbar>
     <m:ToolbarSpacer />
-    <!-- <m:HBox justifyContent="Start">
-      
-       <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
-    
-    </m:HBox> -->
+   
     <m:HBox  justifyContent="End">
     
     <m:Button
