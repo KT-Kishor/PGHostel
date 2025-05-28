@@ -1497,9 +1497,9 @@ sap.ui.define(
                 const row = [
                     index + 1,
                     item.Item,
-                    item.Days, 
-                    Formatter.fromatNumber(item.UnitPrice),
-                    Formatter.fromatNumber(item.Discount),
+                    item.Days || "-",
+                    Formatter.fromatNumber(item.UnitPrice) || "-",
+                    Formatter.fromatNumber(item.Discount) || "-",
                     Formatter.fromatNumber(item.Total)
                 ];
                 if (showSAC) row.splice(3, 0, item.SAC); // Insert SAC as 4th column if required
@@ -1519,22 +1519,40 @@ sap.ui.define(
                 styles: {font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30] },
                 columnStyles: {
                     0: { halign: 'center' },
-                    1: { halign: 'left' },
+                    1: { halign: 'center' },
                     ...(showSAC ? { 
                         2: { halign: 'center' }, 
                         3: { halign: 'center' }, 
-                        4: { halign: 'left' }, 
-                        5: { halign: 'left' }, 
-                        6: { halign: 'left' } 
+                        4: { halign: 'right' }, 
+                        5: { halign: 'right' }, 
+                        6: { halign: 'right' } 
                     } : { 
                         2: { halign: 'center' }, 
-                        3: { halign: 'left' }, 
-                        4: { halign: 'left' }, 
-                        5: { halign: 'left' } 
+                        3: { halign: 'right' }, 
+                        4: { halign: 'right' }, 
+                        5: { halign: 'right' } 
                     })
+                },
+                 didParseCell: function (data) {
+                if (data.section === 'head') {
+                // Adjust header alignment for numeric columns
+                if (showSAC) {
+                    if ([4, 5, 6].includes(data.column.index)) {
+                    data.cell.styles.halign = 'right';
+                    } else {
+                    data.cell.styles.halign = 'center';
+                    }
+                } else {
+                    if ([3, 4, 5].includes(data.column.index)) {
+                    data.cell.styles.halign = 'right';
+                    } else {
+                    data.cell.styles.halign = 'center';
+                    }
                 }
+                }
+            }
             });
-
+    
             currentY = doc.lastAutoTable.finalY + 10;
 
             if (currentY + 40 > pageHeight) {
