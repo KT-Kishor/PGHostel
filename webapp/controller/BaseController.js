@@ -88,7 +88,8 @@ sap.ui.define([
             "HrQuotation": "/QuotationApp",
             "PaySlip": "/PaySlip",
             "CompanyInvoice": "/InvoiceApp",
-            "Leaves": "/Leaves"
+            "Leaves": "/Leaves",
+            "ConsultantInvoice":"/ConsultantInvoice"
 
           };
 

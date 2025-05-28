@@ -12,7 +12,9 @@ sap.ui.define(
         onInit: function () {
           this.getRouter().getRoute("RouteConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
         },
-        _onRouteMatched: function () {
+        _onRouteMatched: async function () {
+          var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
+          if (!LoginFUnction) return;
           // Get i18n resource bundle
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           // Set header name in LoginModel

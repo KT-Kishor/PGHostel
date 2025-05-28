@@ -18,7 +18,9 @@ sap.ui.define(
           this.getRouter().getRoute("RouteNavConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
         },
 
-       _onRouteMatched: function(oEvent) {
+       _onRouteMatched: async function(oEvent) {
+        var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
+          if (!LoginFUnction) return;
                     this._makeDatePickersReadOnly(["CI_id_InDate", "CI_id_PaybyInv"]);
                     this.i18nModel = this.getView().getModel('i18n').getResourceBundle();
                      if(!this.getView().getModel("InvoiceSACModel")){
@@ -81,6 +83,7 @@ sap.ui.define(
                         this.setVisibilityForEdit();
                     }
                     oComboBox.setSelectedKey("");
+                     this.scrollToSection("CI_id_NavConsultantInvoicePage", "CI_id_FirstSection");
                 },
 
                 CI_CommonID: function() {
@@ -109,10 +112,10 @@ sap.ui.define(
                 },
 
                 // Common function to fetch invoice data
-                commonFetchInvoiceData: function(invoiceNo, userId) {
+                commonFetchInvoiceData:async function(invoiceNo, userId) {
                     const requestData = {InvoiceNo: invoiceNo, EmployeeID: userId};
                      this.getBusyDialog(); // <-- Open custom BusyDialog
-                    this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
+                 await   this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
                             this.InvoiceNo = oData.data;
                             this.EmployeeID = oData.data;
                             if (oData.data.length > 0) {
@@ -148,10 +151,10 @@ sap.ui.define(
                 },
 
                  // Common function to fetch invoice items
-                commonFetchInvoiceItems: function(invoiceNo, userId) {
+                commonFetchInvoiceItems: async function(invoiceNo, userId) {
                      this.getBusyDialog(); // <-- Open custom BusyDialog
                     const requestData = { InvoiceNo: invoiceNo, EmployeeID: userId };
-                    this.ajaxReadWithJQuery("ConsultantInvoiceItem", requestData)
+                    await this.ajaxReadWithJQuery("ConsultantInvoiceItem", requestData)
                         .then(function(oData) {
                             this.processInvoiceItems(oData.data);
                         }.bind(this))
@@ -748,6 +751,13 @@ sap.ui.define(
                         getSource: () => gstInputField
                     });
                     oConsultantModel.setProperty("/GSTValid", isGSTValid && gstInputField !== "");
+                    var gstValue = gstInputField.getValue().trim();
+
+                     // Handle GST empty case
+                    if (gstValue === "") {
+                        gstInputField.setValueState("None");
+                        oConsultantModel.setProperty("/GSTValid", false);
+                    }
 
                     var oGSTColumn = this.byId("CI_id_ColumnGST");
                     var oGSTCalColumn = this.byId("CI_id_GSTCalc");
@@ -781,6 +791,7 @@ sap.ui.define(
                         oConsultantModel.setProperty("/GSTValid", false);
                         this.getView().byId("CI_id_InputGSTNO").setEnabled(false);
                     } else {
+                        gstInputField.setValueState("None");
                         this.getView().byId("CI_id_InputGSTNO").setEnabled(true);
                     }
                 },
@@ -1536,10 +1547,12 @@ sap.ui.define(
                 doc.text(nonTaxableText, 190, currentY, { align: "right" });
                 currentY += 8;
             }
-            // Show Sub-Total ( Taxable )
-            const taxableText = `Sub-Total ( Taxable ) (${oModel.Currency}) : ${Formatter.fromatNumber(oModel.SubTotal)}`;
-            doc.text(taxableText, 190, currentY, { align: "right" });
-            currentY += 8;
+              // Show Sub-Total ( Taxable )
+            if (oModel.SubTotal > 0) {
+                const taxableText = `Sub-Total ( Taxable ) (${oModel.Currency}) : ${Formatter.fromatNumber(oModel.SubTotal)}`;
+                doc.text(taxableText, 190, currentY, { align: "right" });
+                currentY += 8;
+            }
             if (oModel.Currency !== "USD") {
                 const cgstValue = parseFloat(oModel.CGST) || 0;
                 const sgstValue = parseFloat(oModel.SGST) || 0;
@@ -1580,7 +1593,7 @@ sap.ui.define(
                 { label: "Account Name", value: oModel.AccountName },
                 { label: "Account No", value: oModel.AccountNo },
                 { label: "IFSC Code", value: oModel.IFSCCode },
-                { label: "Pay By", value: oModel.PayBy }
+                { label: "Pay By", value: Formatter.formatDate(oModel.PayBy) }
             ];
 
             paymentDetails.forEach(detail => {
