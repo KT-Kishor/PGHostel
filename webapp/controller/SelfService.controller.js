@@ -1359,7 +1359,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 } else {
                     oRadioGroup.setSelectedIndex(0); // Select TDS
                 }
-                const existingVarPay = latestSalaryData.VariablePay || "0";
+                const existingVarPay = latestSalaryData.VariablePercentage || "0";
                 oVariablePay.setValue(existingVarPay);
             },
 
