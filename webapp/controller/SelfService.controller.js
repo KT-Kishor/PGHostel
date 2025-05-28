@@ -1275,7 +1275,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     VariablePay: "0",
                     TotalCTC: "0",
                     TotalVariablePay: "0",
-                    EffectiveDate: nextMonthDate 
+                    EffectiveDate: nextMonthDate
                 });
                 this.getView().setModel(AppraisalModel, "AppraisalModel");
                 var oVBox = this.byId("salaryVBox");
@@ -1348,21 +1348,27 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
             // Function to initialize dialog values
             onAppraisalDialogReady: function (latestSalaryData) {
-    const EmployeePF = parseFloat(latestSalaryData.EmployeePF) || 0;
-    const EmployerPF = parseFloat(latestSalaryData.EmployerPF) || 0;
-    const oRadioGroup = sap.ui.getCore().byId("AF_id_RadioButTds");
-    const oTDSRadio = sap.ui.getCore().byId("AF_id_TDSRadio");
-    const oPFRadio = oRadioGroup.getButtons()[1];
+                const AppraisalModel = this.getView().getModel("AppraisalModel");
+                const lastCTC = parseFloat(latestSalaryData.CTC?.toString().replaceAll(",", "")) || 0;
+                const lastVariablePay = parseFloat(latestSalaryData.VariablePay) || 0;
 
-    if (!oRadioGroup || !oTDSRadio || !oPFRadio) return;
+                AppraisalModel.setProperty("/PreviousGrossPay", this.Formatter.fromatNumber(lastCTC));
+                AppraisalModel.setProperty("/PreviousVariablePay", this.Formatter.fromatNumber(lastVariablePay));
+                const EmployeePF = parseFloat(latestSalaryData.EmployeePF) || 0;
+                const EmployerPF = parseFloat(latestSalaryData.EmployerPF) || 0;
+                const oRadioGroup = sap.ui.getCore().byId("AF_id_RadioButTds");
+                const oTDSRadio = sap.ui.getCore().byId("AF_id_TDSRadio");
+                const oPFRadio = oRadioGroup.getButtons()[1];
 
-    // Check if both PF values exist
-    if (EmployeePF > 0 && EmployerPF > 0) {
-        oRadioGroup.setVisible(false); // Hide entire radio button group
-    } else {
-        oRadioGroup.setVisible(true); // Show the radio button group when PF is not applicable
-    }
-},
+                if (!oRadioGroup || !oTDSRadio || !oPFRadio) return;
+
+                // Check if both PF values exist
+                if (EmployeePF > 0 && EmployerPF > 0) {
+                    oRadioGroup.setVisible(false); // Hide entire radio button group
+                } else {
+                    oRadioGroup.setVisible(true); // Show the radio button group when PF is not applicable
+                }
+            },
 
             onPressAppraisalClose: function () {
                 sap.ui.getCore().byId("AF_id_CTC").setValue("")

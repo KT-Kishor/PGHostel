@@ -210,7 +210,7 @@ sap.ui.define(
           oSingleCompanyModel.setProperty("/Branch", "KLB01");
           oSingleCompanyModel.setProperty("/Percentage", 9);
           oSingleCompanyModel.setProperty("/gstEditable", true);
-          oSingleCompanyModel.setProperty("/CGSTSelected", true);
+          oQuotationModel.setProperty("/CGSTSelected", true);
           oSingleCompanyModel.setProperty("/CompanyAddress", oRawData.longAddress);
           oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName);
           oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin);
