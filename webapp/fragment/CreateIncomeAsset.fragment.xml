@@ -33,12 +33,12 @@
                     id="FCIA_id_pickedby"
                     selectedKey="{CreateIncomeAssetModel>/PickedEmployeeName}"
                     showSecondaryValues="true"
-                    items="{EmpModel>/}"
+                    items="{AdminModel>/}"
                 >
                     <core:ListItem
-                        text="{EmpModel>EmployeeName}"
-                        key="{EmpModel>EmployeeName}"
-                        additionalText="{EmpModel>EmployeeID}"
+                        text="{AdminModel>EmployeeName}"
+                        key="{AdminModel>EmployeeName}"
+                        additionalText="{AdminModel>EmployeeID}"
                     />
                 </Select>
                 <Label text="{i18n>branch}" required="true" />
@@ -134,7 +134,6 @@
                     selectionChange="FCIA_onselectionchange"
                     valueStateText="Select Branch"
                     selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
-                    value="{CreateIncomeAssetModel>/PickedBranch}"
                     showSecondaryValues="true"
                     items="{branchModel>/}"
                 >

@@ -32,6 +32,9 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
+            <Column>
+                    <Text text="Type" />
+                </Column>
                 <Column>
                     <Text text="Model" />
                 </Column>
@@ -54,6 +57,7 @@
             <items>
                 <ColumnListItem>
                     <cells>
+                        <Text text="{incomeModel>Type}" />
                         <Text text="{incomeModel>Model}" />
                         <Text text="{incomeModel>Description}" />
 

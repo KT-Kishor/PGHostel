@@ -80,15 +80,15 @@
                     <fb:control>
                         <ComboBox
                             id="IA_id_PickedBy"
-                            items="{EmpModel>/}"
+                            items="{pickedByModel>/}"
                             showClearIcon="true"
                             showSecondaryValues="true"
                         >
                             <items>
                                 <core:ListItem
-                                    text="{EmpModel>EmployeeName}"
-                                    key="{EmpModel>EmployeeName}"
-                                    additionalText="{EmpModel>EmployeeID}"
+                                    text="{pickedByModel>EmployeeName}"
+                                    key="{pickedByModel>EmployeeName}"
+                                    additionalText="{pickedByModel>EmployeeID}"
                                 />
                             </items>
                         </ComboBox>
