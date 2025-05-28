@@ -32,7 +32,11 @@ sap.ui.define([
                 try {
                     this.getBusyDialog();
                     const aFilterItems = this.byId("ED_id_FilterBar").getFilterGroupItems();
-                    const params = {};
+                    if(this.getView().getModel("LoginModel").getProperty("/Role") === "Admin") {
+                        var params = {}; // Initialize with empty object for Admin
+                    }else{
+                        var params = {EmployeeID: this.getView().getModel("LoginModel").getProperty("/EmployeeID"),ManagerID: this.getView().getModel("LoginModel").getProperty("/EmployeeID")}; // Initialize with ManageID
+                    }
 
                     // Collect parameters from filter bar
                     aFilterItems.forEach(function (oItem) {
@@ -46,7 +50,7 @@ sap.ui.define([
                             }
                         }
                     });
-                    await this._fetchCommonData("EmployeeDetails", "sEmployeeDetails", {}); // Fetch all
+                    await this._fetchCommonData("EmployeeDetails", "sEmployeeDetails", params); // Fetch all
                     const allData = this.getView().getModel("sEmployeeDetails").getData();
                     // Now apply filters manually
                     let filteredData = allData.filter((item) => {
