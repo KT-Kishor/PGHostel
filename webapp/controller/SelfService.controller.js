@@ -36,8 +36,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
-                    var sEmployeeID = loginModel.getProperty("/EmployeeID");
-                    var bHideSalarySection = sEmployeeID.startsWith("KT-T");
+                    var sLoggedInEmployeeID = loginModel.getProperty("/EmployeeID"); // From session
+                    var sNavigatedEmployeeID = oEvent.getParameter("arguments").sPath; // From selected row
+                    // Hide section if either Employee ID starts with "KT-T"
+                    var bHideSalarySection = sLoggedInEmployeeID.startsWith("KT-T") || sNavigatedEmployeeID.startsWith("KT-T");
                     this.getView().getModel("viewModel").setProperty("/SalarySectionVisible", !bHideSalarySection);
                     // this.ViewModel.setProperty("/TraineeRole", loginModel.getProperty("/Role") === "Trainee");
                     var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lc", "SS_id_lpa", "SS_id_lca", "SS_id_lds", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
