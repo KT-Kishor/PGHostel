@@ -35,14 +35,14 @@
                             name="AssignEmployeeName"
                             showClearIcon="true"
                             id="AA_id_EmployeeName"
-                            items="{EmpModel>/}"
+                            items="{AdminModel>/}"
                             showSecondaryValues="true"
                         >
                             <items>
                                 <core:ListItem
-                                    key="{EmpModel>EmployeeName}"
-                                    text="{EmpModel>EmployeeName}"
-                                    additionalText="{EmpModel>EmployeeID}"
+                                    key="{AdminModel>EmployeeName}"
+                                    text="{AdminModel>EmployeeName}"
+                                    additionalText="{AdminModel>EmployeeID}"
                                 />
                             </items>
                         </ComboBox>
@@ -118,13 +118,13 @@
                             id="AA_id_Status"
                         >
                             <core:ListItem
-                                key="{AssetAssignmentStatus>/0/ID}"
+                                key="{AssetAssignmentStatus>/0/Value}"
                                 text="{AssetAssignmentStatus>/0/Value}"
                             />
-                            <core:ListItem
+                            <!-- <core:ListItem
                                 key="{AssetAssignmentStatus>/1/ID}"
                                 text="{AssetAssignmentStatus>/1/Value}"
-                            />
+                            /> -->
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>

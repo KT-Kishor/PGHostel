@@ -57,7 +57,7 @@ sap.ui.define([
                     this._fetchCommonData("AssetType", "assetType");
                 }
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === "Admin" || item.Role === "IT Manager" || item.Role === "IT Consultant"));
+                var oModel = new JSONModel(this.getView().getModel("EmpModel").getData());
                 this.getView().setModel(oModel, "AdminModel");
                 this.AA_CoomonReadCall();
                 this.oLoginModel.setProperty("/HeaderName", "Asset Assignment");
@@ -65,7 +65,7 @@ sap.ui.define([
                 this.closeBusyDialog();
                 if (this.oLoginModel.getProperty("/Role") === "IT Consultant") {
                     var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.BranchCode === this.oLoginModel.getProperty("/BranchCode")));
-                    this.getView().setModel(oModel, "EmpModel");
+                    this.getView().setModel(oModel, "AdminModel");
                 }
             },
             getModelData: function () {
@@ -205,6 +205,11 @@ sap.ui.define([
                 //     console.log(e);
                 //     MessageToast.show(this.i18nModel.getText("Error"));
                 // }
+               this.oLoginModel =this.getView().getModel("LoginModel")
+                  if (this.oLoginModel.getProperty("/Role") === "IT Consultant") {
+                    var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.BranchCode === this.oLoginModel.getProperty("/BranchCode")));
+                    this.getView().setModel(oModel, "AdminModel");
+                }
                 this._dialogMode = "Assign";
                 var oView = this.getView();
                 var oFormModel = oView.getModel("myform");
@@ -230,12 +235,15 @@ sap.ui.define([
                     oView.setModel(oFormModel, "myform");
                 }
                 oFormModel.setProperty("/formData/data", oNewData);
-                var allData = this.getView().getModel("incomeModel").getProperty("/");
-                var filteredData = allData.filter(item =>
+                // var allData = this.getView().getModel("incomeModel").getProperty("/");
+                  await  this.ajaxReadWithJQuery("IncomeAsset", "IsCurrent=1").then((oData) => {
+                    var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                var filteredData = oFCIAerData.filter(item =>
 
                     item.IsCurrent === "1" &&
                     (item.Status === "Available" || item.Status === "Returned")
                 );
+          
                 // Extract unique types
                 var uniqueTypes = [];
                 var typeSet = new Set();
@@ -248,6 +256,7 @@ sap.ui.define([
                 // Set to a new JSON model bound to ComboBox
                 var typeModel = new sap.ui.model.json.JSONModel(uniqueTypes);
                 this.getView().setModel(typeModel, "typeModel");
+                  })
                 if (!this.FAA_Dialog) {
                     var oView = this.getView();
                     this.FAA_Dialog = sap.ui.core.Fragment.load({
@@ -529,7 +538,8 @@ sap.ui.define([
             },
 
              AA_onSearch: async function () {
-                try {
+            //    var status= sap.ui.getCore().byId("AA_id_Status").getValue()
+            //     try {
                     this.getBusyDialog();
                     var aFilterItems = this.byId("AA_id_FilterBarAsset").getFilterGroupItems();
                     var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
@@ -541,15 +551,21 @@ sap.ui.define([
                             if (sValue === "AssignedDate") {
                                 params["AssignedStartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
                                 params["AssignedEndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
-                            } else {
+                            }
+                             else if(sValue ==="AssignBranch"){
+                                  params[sValue] = oControl.getValue()
+                                 params["Status"]="Assigned"   
+                            }
+                            
+                            else {
                                 params[sValue] = oControl.getValue();
                             }
                         }   
                     });
                     await this.AA_CoomonReadCall(params); // read call for trainee after filter
-                } catch (error) {
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
-                }
+                // } catch (error) {
+                //     MessageToast.show(this.i18nModel.getText("technicalError"));
+                // }
             },
 
             FAU_onChangeReturnTo: function (oEvent) {
