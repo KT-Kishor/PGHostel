@@ -152,6 +152,8 @@
                     id="IA_id_branch"
                     showSecondaryValues="true"
                     items="{branchModel>/}"
+                    showClearIcon="true"
+
                 >
                     <core:ListItem
                         key="{branchModel>city}" 

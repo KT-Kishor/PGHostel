@@ -121,10 +121,10 @@
                                 key="{AssetAssignmentStatus>/0/Value}"
                                 text="{AssetAssignmentStatus>/0/Value}"
                             />
-                            <!-- <core:ListItem
+                            <core:ListItem
                                 key="{AssetAssignmentStatus>/1/ID}"
                                 text="{AssetAssignmentStatus>/1/Value}"
-                            /> -->
+                            />
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
