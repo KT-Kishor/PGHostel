@@ -38,7 +38,6 @@
                                     columnsM="1"
                                 >
                                     <f:content>
-                                       
                                         <m:Label
                                             text="{i18n>quotaiodate}"
                                             required="true"
@@ -316,7 +315,7 @@
                                         <m:Input
                                             value="{SingleCompanyModel>/CustomerGSTNO}"
                                             id="HQD_id_InputCustomerGSTNO"
-                                            valueStateText="{i18n>gstNoValueState}"
+                                            valueStateText="GST number should be in proper format (Eg:22AAAAA0000A1Z5)"
                                             liveChange="HQD_onCustomerGSTLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="20"

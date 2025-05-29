@@ -32,7 +32,8 @@ sap.ui.define(
         }
         this.closeBusyDialog();
       },
-      HQ_onSearch: function () {
+      HQ_onSearch: async function () {
+        await this._fetchCommonData("Quotation", "CompanyQuotationModel", {});
         var oFilterBar = this.byId("HQ_id_QuotationFilterBar");
         var aFilterItems = oFilterBar.getFilterGroupItems();
         var aFilters = [];

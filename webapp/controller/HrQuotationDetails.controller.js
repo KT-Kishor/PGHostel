@@ -27,31 +27,42 @@ sap.ui.define(
         var sQuotationNo = decodeURIComponent(oArgs.sQuotationNo);
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
+
         this.getBusyDialog();
-        this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section")
+        this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
-        this._fetchCommonData("Currency", "CurrencyModel");
-        this._fetchCommonData("Country", "CountryModel");
-        this._fetchCommonData("BaseLocation", "BrachModel");
-        this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         var oVisiModel = new JSONModel();
 
         if (sQuotationNo === "new") {
+          //  Set Busy true on dropdowns
+          this.byId("HQD_id_Country").setBusy(true);
+          this.byId("HQD_id_BranchCode").setBusy(true);
+          this.byId("HQD_id_Curency").setBusy(true);
+
+          await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
+          await this._fetchCommonData("Currency", "CurrencyModel");
+          await this._fetchCommonData("Country", "CountryModel");
+          await this._fetchCommonData("BaseLocation", "BrachModel");
+          await this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
+
+          //  Set Busy false after data has loaded
+          this.byId("HQD_id_Country").setBusy(false);
+          this.byId("HQD_id_BranchCode").setBusy(false);
+          this.byId("HQD_id_Curency").setBusy(false);
+
+          // ... continue with your model binding and setup
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
           var oToday = new Date();
-          oToday.setHours(0, 0, 0, 0); // Normalize
+          oToday.setHours(0, 0, 0, 0);
           var oMinDate = new Date(oToday);
           oMinDate.setFullYear(oToday.getFullYear() - 100);
           var oValidUntil = new Date(oToday);
           oValidUntil.setDate(oValidUntil.getDate() + 30);
 
           var sMobileNo = oRawData.mobileNo || "";
-          var sActualMobileNo = sMobileNo;
-          if (sMobileNo.startsWith("+91")) {
-            sActualMobileNo = sMobileNo.slice(3); // remove +91
-          }
+          var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;
+
           var oBlankModel = new JSONModel({
             Date: oToday,
             ValidUntil: oValidUntil,
@@ -71,7 +82,9 @@ sap.ui.define(
             SGSTVisible: true,
             IGSTVisible: false
           });
+
           this.getView().setModel(oBlankModel, "SingleCompanyModel");
+
           var oQuotationModel = new JSONModel({
             QuotationItemModel: [],
             CGSTSelected: true,
@@ -81,24 +94,21 @@ sap.ui.define(
             IGSTVisible: false,
             ShowGSTFields: true
           });
+
           this.getView().setModel(oQuotationModel, "QuotationModel");
 
-          // 3. Call updateTotalAmount() to trigger tax calculation
           this.updateTotalAmount();
 
-          //  Set min date on Quotation Date
           var oDatePicker = this.getView().byId("HQD_id_Quotation");
-          oDatePicker.setDateValue(oToday); // Ensure UI shows it
+          oDatePicker.setDateValue(oToday);
           oDatePicker.setMinDate(oMinDate);
           oDatePicker.setMaxDate(oToday);
-          //  Set range on Valid Until Date
+
           var oValidPicker = this.getView().byId("HQD_id_QuotationValid");
           oValidPicker.setMaxDate(oValidUntil);
-          oValidPicker.setDateValue(oValidUntil); // Ensure UI shows it
+          oValidPicker.setDateValue(oValidUntil);
 
-          // Show input fields as editable
           oVisiModel.setData({ editable: true });
-
           this.getView().setModel(oVisiModel, "visiablityPlay");
         }
         // Inside the onRouteMatched function's else block (edit mode)
@@ -177,7 +187,6 @@ sap.ui.define(
             merge: true
           });
         }
-
         this.getView().setModel(oVisiModel, "visiablityPlay");
         this.closeBusyDialog();
       },
@@ -192,16 +201,16 @@ sap.ui.define(
         var oQuotationModel = this.getView().getModel("QuotationModel");
         var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
         var oVisibilityModel = this.getView().getModel("visiablityPlay");
-
+       
         if (sSelectedKey === "India") {
           oSTDCodeField.setValue("+91");
           oCustomerSTDCodeField.setValue("+91");
           oCurrencyCombo.setSelectedKey("INR");
-
           // Reset all tax selections and visibility
           oQuotationModel.setProperty("/CGSTSelected", true); oQuotationModel.setProperty("/IGSTSelected", false); oQuotationModel.setProperty("/CGSTVisible", true); oQuotationModel.setProperty("/SGSTVisible", true); oQuotationModel.setProperty("/IGSTVisible", false); oSingleCompanyModel.setProperty("/Percentage", 9);
+          this._fetchCommonData("BaseLocation", "BrachModel");
           oQuotationModel.setProperty("/ShowGSTFields", true); oSingleCompanyModel.setProperty("/Currency", "INR"); oVisibilityModel.setProperty("/showBranch", true);
-          oSingleCompanyModel.setProperty("/Branch", "KLB01");
+          
         }
         else {
           this.CountryAndCity()
@@ -211,7 +220,8 @@ sap.ui.define(
           if (sMobileNo.startsWith("+91")) {
             sActualMobileNo = sMobileNo.slice(3); // remove +91
           }
-          oSingleCompanyModel.setProperty("/Currency", "INR"); oSingleCompanyModel.setProperty("/STDCode", "+91"); oSingleCompanyModel.setProperty("/Country", sSelectedKey); oSingleCompanyModel.setProperty("/Branch", "KLB01"); oSingleCompanyModel.setProperty("/gstEditable", true);
+          oSingleCompanyModel.setProperty("/Branch", "");
+          oSingleCompanyModel.setProperty("/Currency", "INR"); oSingleCompanyModel.setProperty("/STDCode", "+91"); oSingleCompanyModel.setProperty("/Country", sSelectedKey); oSingleCompanyModel.setProperty("/gstEditable", true);
           oSingleCompanyModel.setProperty("/CompanyAddress", oRawData.longAddress); oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName); oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin); oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail); oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
         }
         // Reset value state if no value
@@ -267,7 +277,6 @@ sap.ui.define(
         var oCGSTPercent = oView.byId("HQD_id_Percentage");
 
         var oModel = oView.getModel("QuotationModel");
-        var oSelected = oView.getModel("SingleCompanyModel");
 
         // If GST is valid (valueState is "None") and not empty
         if (sValueState === "None" && sGST) {
@@ -291,8 +300,8 @@ sap.ui.define(
           oIGSTRadio.setEditable(false);
           oCGSTPercent.setEditable(false);
           oModel.setProperty("/ShowSACAndGSTCalculation", false);
-          oSelected.setProperty("/CGSTSelected", false);
-          oSelected.setProperty("/IGSTSelected", false);
+          oModel.setProperty("/CGSTSelected", false);
+          oModel.setProperty("/IGSTSelected", false);
           oModel.setProperty("/CGSTPercent", "");
           oCGSTPercent.setValue("");
         }
@@ -593,6 +602,12 @@ sap.ui.define(
           MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           return;
         }
+        const oCustomerGSTInput = this.byId("HQD_id_InputCustomerGSTNO");
+         if (oCustomerGSTInput.getValue() && oCustomerGSTInput.getValueState() === sap.ui.core.ValueState.None) {
+            MessageToast.show(this.i18nModel.getText("gstNoValueState")); 
+          return;
+               }
+
         // Get values from QuotationModel
         const oQuotationModel = oView.getModel("QuotationModel");
         const oQuotationData = oQuotationModel.getData();
