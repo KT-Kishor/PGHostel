@@ -92,7 +92,7 @@
 										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" id="CU_id_AssignmentStartDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}" maxDate="{oFilteredContractModel>/MaxFromDate}"/>
 										<!-- Assignment End Date -->
 										<m:Label text="{i18n>assignmentEndDate}" required="true"/>
-										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentEndDate' ,formatter:'.Formatter.formatDate'}"  id="CU_id_AssignmentEndDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" valueStateText="{i18n>dateValueState}" minDate="{oFilteredContractModel>/MinToDate}"/>
+										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentEndDate' ,formatter:'.Formatter.formatDate'}"  id="CU_id_AssignmentEndDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" valueStateText="{i18n>dateValueState}" minDate="{oFilteredContractModel>/MinToDate}" change="CD_validateDate"/>
 										<!-- Rate Type -->
 										<m:Label text="{i18n>rate}" required="true" />
 										<m:RadioButtonGroup id="CU_id_rbg3" columns="3" selectedIndex="{oFilteredContractModel>/HrDaliyMonth}" select="RadioButtonSelect" editable="{simpleForm>/editable}" >

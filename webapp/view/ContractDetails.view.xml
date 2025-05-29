@@ -52,10 +52,10 @@
 								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
 							</Select>
 							<Label text="{i18n>startDate}" required="true"/>
-							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}" maxDate="{ContractModelWizart>/MaxFromDate}"/>
+							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}" maxDate="{ContractModelWizart>/MaxFromDate}"/>
 							<Label text="{i18n>endDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy"  
-							displayFormat="dd/MM/yyyy" change="CD_validateDate" valueStateText="{i18n>dateValueState}" minDate="{ContractModelWizart>/MinToDate}"/>
+							displayFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}" minDate="{ContractModelWizart>/MinToDate}"/>
 							<Label text="{i18n>specificInsuranceRequirement}"  />
 
 							<Select id="CD_id_InsuranceReq" selectedKey="{ContractModelWizart>/InsuranceRequirement}" items="{TravelAllowance>/type}">
