@@ -63,12 +63,12 @@
                         >
                             <core:ListItem
                                 key="{assetType>Type}"
-                                text="{assetType>Type}"
+                                text="{assetType>Type}"  
                             />
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
-
+                
                 <fb:FilterGroupItem
                     name="AssignedDate"
                     label="{i18n>assignedDate}"
@@ -84,6 +84,28 @@
                         />
                     </fb:control>
                 </fb:FilterGroupItem>
+
+                  <fb:FilterGroupItem
+                    name="AssignBranch"
+                    label="{i18n>branch}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            showClearIcon="true"
+                            id="AA_id_Branch"
+                            items="{BaseLocationModel>/}"
+                            showSecondaryValues="true"
+                        >
+                            <core:ListItem
+                                key="{BaseLocationModel>city}"
+                                text="{BaseLocationModel>city}"
+                            />
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+
                 <fb:FilterGroupItem
                     name="Status"
                     label="{i18n>status}"

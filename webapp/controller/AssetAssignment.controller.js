@@ -465,15 +465,21 @@ sap.ui.define([
                 if (this._checkValidation()) {
                     try {
                         var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
-                        var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
+                        var oAssignedDate = new Date(sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue());
                         var sAssetCreationDate = this.getView().getModel("myform").getProperty("/formData/data/AssetCreationDate");
                         if (sAssetCreationDate) {
                             var oAssetCreationDate = new Date(sAssetCreationDate);
+                            oAssetCreationDate.setHours(0, 0, 0, 0);
                             if (oAssignedDate < oAssetCreationDate) {
                                 MessageToast.show("Assigned Date cannot be before Asset Creation Date.");
                                 return;
                             }
+                            //     else  if (oAssetCreationDate > oAssignedDate) {
+                            //         MessageToast.show("Assigned Date cannot be before Asset Creation Date.");
+                            //         return;
+                            //     }
                         }
+
                         // var sReturnDate = this.getView().getModel("myform").getProperty("/formData/data/ReturnDate");
                         // if (sReturnDate && sReturnDate !== "" && sReturnDate !== "0000-00-00") {
                         //     var oReturnDate = new Date(sReturnDate);
@@ -551,25 +557,65 @@ sap.ui.define([
                 });
             },
 
-            AA_onSearch: function () {
-                this.getBusyDialog();
-                var aFilterItems = this.byId("AA_id_FilterBarAsset").getFilterGroupItems();
-                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
-                var params = {};
-                aFilterItems.forEach(function (oItem) {
-                    var oControl = oItem.getControl();
-                    var sValue = oItem.getName();
-                    if (oControl && oControl.getValue()) {
-                        if (sValue === "AssignedDate") {
-                            params["AssignedStartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
-                            params["AssignedEndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
-                        } else {
-                            params[sValue] = oControl.getValue();
-                        }
-                    }
-                });
-                this.AA_CoomonReadCall(params);
-                this.closeBusyDialog();
+            // AA_onSearch: function () {
+            //     this.getBusyDialog();
+            //     var aFilterItems = this.byId("AA_id_FilterBarAsset").getFilterGroupItems();
+            //     var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
+            //     var params = {};
+            //     aFilterItems.forEach(function (oItem) {
+            //         var oControl = oItem.getControl();
+            //         var sValue = oItem.getName();
+            //         if (oControl && oControl.getValue()) {
+            //             if (sValue === "AssignedDate") {
+            //                 params["AssignedStartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
+            //                 params["AssignedEndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
+            //             } else {
+            //                 params[sValue] = oControl.getValue();
+            //             }
+            //         }
+            //     });
+            //     //   var oBranch = this.byId("AA_id_Branch");
+            //     //     var oStatus = this.byId("AA_id_Status");
+            //     //     var oTable = this.byId("AA_id_AssestTable");
+            //     //     var oBinding = oTable.getBinding("items");
+            //     //     var branch = oBranch.getSelectedKey();
+            //     //     var status = oStatus.getSelectedKey();
+            //     //     var filters = [];
+            //     //     if (branch) {
+            //     //         filters.push(new sap.ui.model.Filter("Branch", sap.ui.model.FilterOperator.EQ, branch));
+            //     //     }
+            //     //     if (status) {
+            //     //         filters.push(new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, status));
+            //     //     }
+            //     // oBinding.filter(filters)
+            //     this.AA_CoomonReadCall(params);
+            //     this.closeBusyDialog();
+            // },
+
+
+
+             AA_onSearch: async function () {
+                try {
+                    this.getBusyDialog();
+                    var aFilterItems = this.byId("AA_id_FilterBarAsset").getFilterGroupItems();
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+                    var params = {};
+                    aFilterItems.forEach(function (oItem) {
+                        var oControl = oItem.getControl();
+                        var sValue = oItem.getName();
+                        if (oControl && oControl.getValue()) {
+                            if (sValue === "AssignedDate") {
+                                params["AssignedStartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
+                                params["AssignedEndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
+                            } else {
+                                params[sValue] = oControl.getValue();
+                            }
+                        }   
+                    });
+                    await this.AA_CoomonReadCall(params); // read call for trainee after filter
+                } catch (error) {
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                }
             },
 
             FAU_onChangeReturnTo: function (oEvent) {
@@ -685,6 +731,8 @@ sap.ui.define([
 
                 var oAssignedDate;
                 var oMinDate;
+                var today = new Date();
+                today.setHours(0, 0, 0, 0);
                 if (oSelectedData.Status === "Returned" && oSelectedData.ReturnDate) {
                     oAssignedDate = new Date(oSelectedData.ReturnDate);
                     oMinDate = new Date(oSelectedData.ReturnDate);
@@ -692,12 +740,18 @@ sap.ui.define([
                     oAssignedDate = new Date(oSelectedData.AssetCreationDate);
                     oMinDate = new Date(oSelectedData.AssetCreationDate);
                 }
-                if (oSelectedData.Status === "Returned" && oSelectedData.ReturnDate) {
-                    var oMinDate = new Date(oSelectedData.ReturnDate);
-                } else {
-                    var oMinDate = new Date(oSelectedData.AssetCreationDate);
-                }
+                var oDatePicker = sap.ui.getCore().byId("FAA_id_AssignedDate");
+                oDatePicker.setMinDate(oMinDate);         //allow assigning from asset creation or return date
+                oDatePicker.setMaxDate(null);
                 sap.ui.getCore().byId("FAA_id_AssignedDate").setMinDate(oMinDate);
+                if (today < oMinDate) {
+                    oDatePicker.setDateValue(oMinDate);
+                    // sap.ui.getCore().byId("FAA_id_AssignedDate").setDateValue(oMinDate);
+                }
+                else {
+                    oDatePicker.setDateValue(today);
+                    // sap.ui.getCore().byId("FAA_id_AssignedDate").setDateValue(today);
+                }
                 var sBranch = "";
                 if (oSelectedData.Status === "Returned" && oSelectedData.ReturnBranch) {
                     sBranch = oSelectedData.ReturnBranch;
@@ -810,7 +864,8 @@ sap.ui.define([
             },
 
             formatReturnBranchText: function (sDate) {
-                if (!sDate || sDate === "1899-11-30T00:00:00" || sDate === "1899-11-30" || sDate.includes("1899-11-30")) {
+                var sDateStr = sDate ? String(sDate):""; 
+                if (!sDate || sDateStr === "1899-11-30T00:00:00" || sDateStr === "1899-11-30" || sDateStr.includes("1899-11-30")) {
                     return "Return Date:";
                 }
                 const oFormatter = this.getView().getController().Formatter;
