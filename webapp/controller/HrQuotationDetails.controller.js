@@ -1,6 +1,6 @@
 sap.ui.define(
   [
-    "./BaseController", //import base controller
+    "./BaseController",  //import base controller
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "../model/formatter",
@@ -40,10 +40,10 @@ sap.ui.define(
           this.byId("HQD_id_Country").setBusy(true);
           this.byId("HQD_id_BranchCode").setBusy(true);
           this.byId("HQD_id_Curency").setBusy(true);
-            await this._fetchCommonData("Currency", "CurrencyModel");
-            await this._fetchCommonData("Country", "CountryModel");
-            await this._fetchCommonData("BaseLocation", "BrachModel");
-            this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
+          this._fetchCommonData("Currency", "CurrencyModel");
+          this._fetchCommonData("Country", "CountryModel");
+          this._fetchCommonData("BaseLocation", "BrachModel");
+          this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
 
           //  Set Busy false after data has loaded
           this.byId("HQD_id_Country").setBusy(false);
@@ -112,9 +112,9 @@ sap.ui.define(
         }
         // Inside the onRouteMatched function's else block (edit mode)
         else {
-          await this._fetchCommonData("Currency", "CurrencyModel");
-          await this._fetchCommonData("Country", "CountryModel");
-          await this._fetchCommonData("BaseLocation", "BrachModel");
+          this._fetchCommonData("Currency", "CurrencyModel");
+          this._fetchCommonData("Country", "CountryModel");
+          this._fetchCommonData("BaseLocation", "BrachModel");
           this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
           // Edit Mode
           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
@@ -782,20 +782,34 @@ sap.ui.define(
           return inWords(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + inWords(n % 10000000) : "");
         }
 
-        if (!num || isNaN(num)) return "Zero";
+        if (num === undefined || isNaN(num)) return "Zero";
 
-        const word = inWords(Math.floor(num));
-        let currencyText = "";
+        num = parseFloat(num).toFixed(2); // Keep 2 decimal places
+        const parts = num.toString().split(".");
+        const integerPart = parseInt(parts[0]);
+        const decimalPart = parseInt(parts[1]);
 
-        if (currency === "INR") {
-          currencyText = "Rupees";
-        } else if (currency === "USD") {
-          currencyText = "Dollars";
-        } else {
-          currencyText = "Currency";
+        const currencyText = currency === "INR" ? "Rupees" : currency === "USD" ? "Dollars" : "Currency";
+        const subCurrencyText = currency === "INR" ? "Paise" : currency === "USD" ? "Cents" : "Subunits";
+
+        let words = "";
+
+        if (integerPart > 0) {
+          words += inWords(integerPart) + " " + currencyText;
         }
-        return word + " " + currencyText + " Only";
+
+        if (decimalPart > 0) {
+          if (words) words += " and ";
+          words += inWords(decimalPart) + " " + subCurrencyText;
+        }
+
+        if (!words) {
+          words = "Zero " + currencyText;
+        }
+
+        return words + " Only";
       },
+
 
       HQD_onPressMerge: async function () {
         const oView = this.getView();
