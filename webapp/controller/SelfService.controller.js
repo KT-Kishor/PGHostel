@@ -30,7 +30,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     }
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
-                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false,
+                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false,
                         isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false,
                     });
                     oView.setModel(viewModel, "viewModel");
@@ -52,15 +52,26 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         aIds.forEach(function (sId) {
                             this.getView().byId(sId).setRequired(true);
                         }.bind(this));
-                    } else {
+                    }
+                    else {
                         this.EmployeeID = this.sPath;
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
+                        if (this.sPath !== "SelfService" && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {
+                            this.ViewModel.setProperty("/Letter", true);
+                        } else {
+                            this.ViewModel.setProperty("/Letter", false);
+                        }
                         if (loginModel.getProperty("/Role") === "Admin") {
                             this.ViewModel.setProperty("/RelievingLetter", true);
                         }
                         aIds.forEach(function (sId) {
                             this.getView().byId(sId).setRequired(false);
                         }.bind(this));
+                    }
+                    if (this.sPath === "SelfService" && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {
+                        this.ViewModel.setProperty("/ResignationVisible", true);
+                    } else {
+                        this.ViewModel.setProperty("/ResignationVisible", false);
                     }
                     var employeeModel = new JSONModel();
                     this.getOwnerComponent().setModel(employeeModel, "employeeModel");
