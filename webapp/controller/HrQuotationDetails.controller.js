@@ -31,6 +31,7 @@ sap.ui.define(
         this.getBusyDialog();
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
+        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         var oVisiModel = new JSONModel();
 
@@ -39,12 +40,10 @@ sap.ui.define(
           this.byId("HQD_id_Country").setBusy(true);
           this.byId("HQD_id_BranchCode").setBusy(true);
           this.byId("HQD_id_Curency").setBusy(true);
-
-          await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
           await this._fetchCommonData("Currency", "CurrencyModel");
           await this._fetchCommonData("Country", "CountryModel");
           await this._fetchCommonData("BaseLocation", "BrachModel");
-          await this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
+          this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
 
           //  Set Busy false after data has loaded
           this.byId("HQD_id_Country").setBusy(false);
@@ -201,7 +200,7 @@ sap.ui.define(
         var oQuotationModel = this.getView().getModel("QuotationModel");
         var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
         var oVisibilityModel = this.getView().getModel("visiablityPlay");
-       
+
         if (sSelectedKey === "India") {
           oSTDCodeField.setValue("+91");
           oCustomerSTDCodeField.setValue("+91");
@@ -210,7 +209,7 @@ sap.ui.define(
           oQuotationModel.setProperty("/CGSTSelected", true); oQuotationModel.setProperty("/IGSTSelected", false); oQuotationModel.setProperty("/CGSTVisible", true); oQuotationModel.setProperty("/SGSTVisible", true); oQuotationModel.setProperty("/IGSTVisible", false); oSingleCompanyModel.setProperty("/Percentage", 9);
           this._fetchCommonData("BaseLocation", "BrachModel");
           oQuotationModel.setProperty("/ShowGSTFields", true); oSingleCompanyModel.setProperty("/Currency", "INR"); oVisibilityModel.setProperty("/showBranch", true);
-          
+
         }
         else {
           this.CountryAndCity()
@@ -573,6 +572,7 @@ sap.ui.define(
       },
       HQD_onPressSubmit: async function () {
         const oView = this.getView();
+        var that = this
         // Validate RichTextEditor content
         const oRichTextEditor = this.byId("HQD_id_Notes");
         const oNotesHTML = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'html' }) || "";
@@ -602,15 +602,12 @@ sap.ui.define(
           MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           return;
         }
-        const oCustomerGSTInput = this.byId("HQD_id_InputCustomerGSTNO");
-         if (oCustomerGSTInput.getValue() && oCustomerGSTInput.getValueState() === sap.ui.core.ValueState.None) {
-            MessageToast.show(this.i18nModel.getText("gstNoValueState")); 
-          return;
-               }
 
         // Get values from QuotationModel
         const oQuotationModel = oView.getModel("QuotationModel");
         const oQuotationData = oQuotationModel.getData();
+        const oData = oView.getModel("SingleCompanyModel");
+        const ovalaue = oData.getData();
         // Validate all item descriptions are filled
         const aItemArray1 = oQuotationModel.getProperty("/QuotationItemModel") || [];
         const bAllDescriptionsFilled = aItemArray1.every(item =>
@@ -710,9 +707,50 @@ sap.ui.define(
           this.closeBusyDialog();
 
           if (response.success === true) {
-            MessageToast.show(`Quotation No ${response.QuotationNo} Created successfully!`);
-            this.resetHQDForm(); // <-- Make sure this resets the RichTextEditor too
-            this.getRouter().navTo("RouteHrQuotation");
+            oView.getModel("SingleCompanyModel").setProperty("/QuotationNo", response.QuotationNo);
+            oView.getModel("SingleCompanyModel").setProperty("/TotalSum", data.TotalSum);
+
+
+            // Force model updates before generating PDF
+            oView.getModel("SingleCompanyModel").updateBindings(true);
+            oView.getModel("QuotationModel").updateBindings(true);
+
+            var oDialog = new sap.m.Dialog({
+              title: this.i18nModel.getText("success"),
+              type: sap.m.DialogType.Message,
+              state: sap.ui.core.ValueState.Success,
+              content: new sap.m.Text({
+                text: this.i18nModel.getText("quotaionmsg")
+              }),
+              beginButton: new sap.m.Button({
+                text: "OK",
+                type: "Accept",
+                press: function () {
+                  oDialog.close();
+                  that.resetHQDForm();
+                  that.getRouter().navTo("RouteHrQuotation");
+                }
+              }),
+              endButton: new sap.m.Button({
+                text: "Generate PDF",
+                type: "Attention",
+                press: function () {
+                  oDialog.close();
+                  // Use setTimeout to ensure UI updates complete
+                  setTimeout(function () {
+                    that.HQD_onPressMerge().then(function () {
+                      that.resetHQDForm();
+                      that.getRouter().navTo("RouteHrQuotation");
+                    });
+                  }, 100);
+                }
+              }),
+              afterClose: function () {
+                oDialog.destroy();
+              }
+            });
+            oDialog.open();
+
           } else {
             MessageToast.show("Failed to create quotation.");
           }

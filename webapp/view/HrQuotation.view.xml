@@ -133,7 +133,7 @@
                             <Text text="{CompanyQuotationModel>CustomerName}" />
                             <Text text="{CompanyQuotationModel>CustomerGSTNO}" />
                             <Text text="{CompanyQuotationModel>CustomerEmailID}" />
-                            <Text text="{CompanyQuotationModel>CustomerSTDCode}{CompanyQuotationModel>CustomerMobileNo}" />
+    <Text text="{CompanyQuotationModel>CustomerSTDCode} {CompanyQuotationModel>CustomerMobileNo}" />
                             <Text text="{path:'CompanyQuotationModel>TotalSum',formatter: '.Formatter.fromatNumber'}" />
 
                         </cells>

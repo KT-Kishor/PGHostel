@@ -657,20 +657,34 @@
                                             </m:HBox>
                                         </m:VBox>
                                     </m:FlexBox>
+                                     </m:VBox>
+                            </blocks>
+                                     </ObjectPageSubSection>
+                         </subSections>
+                         </ObjectPageSection>
+
+                                    <ObjectPageSection 
+                        title="{i18n>notes}" titleUppercase="false">
+                        <subSections>
+                        <ObjectPageSubSection
+                            titleUppercase="false"
+                        >
+                        <m:VBox   >
                                     <m:Label
                                         text="{i18n>notes}"
                                         required="true"
                                     />
+                                    
                                     <rich:RichTextEditor
                                         value="{SingleCompanyModel>/Notes}"
                                         editable="{visiablityPlay>/editable}"
-                                        class="sapUiContentPadding"
+                                        class="sapUiContentPadding rich-vbox"
                                         width="100%"
                                         id="HQD_id_Notes"
                                         change="HQD_onNotesChange"
                                     />
-                                </m:VBox>
-                            </blocks>
+                                    </m:VBox >
+                               
                          </ObjectPageSubSection>
                          </subSections>
                          </ObjectPageSection>

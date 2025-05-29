@@ -521,7 +521,11 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 
 .custom-vbox {
-  align-items: flex-end;
+  align-items:flex-end;
+  width: 100%;
+}
+.rich-vbox{
+align-items:flex-start;
   width: 100%;
 }
 
