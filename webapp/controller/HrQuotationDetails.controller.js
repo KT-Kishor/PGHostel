@@ -40,10 +40,10 @@ sap.ui.define(
           this.byId("HQD_id_Country").setBusy(true);
           this.byId("HQD_id_BranchCode").setBusy(true);
           this.byId("HQD_id_Curency").setBusy(true);
-          await this._fetchCommonData("Currency", "CurrencyModel");
-          await this._fetchCommonData("Country", "CountryModel");
-          await this._fetchCommonData("BaseLocation", "BrachModel");
-          this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
+            await this._fetchCommonData("Currency", "CurrencyModel");
+            await this._fetchCommonData("Country", "CountryModel");
+            await this._fetchCommonData("BaseLocation", "BrachModel");
+            this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
 
           //  Set Busy false after data has loaded
           this.byId("HQD_id_Country").setBusy(false);
@@ -112,6 +112,10 @@ sap.ui.define(
         }
         // Inside the onRouteMatched function's else block (edit mode)
         else {
+          await this._fetchCommonData("Currency", "CurrencyModel");
+          await this._fetchCommonData("Country", "CountryModel");
+          await this._fetchCommonData("BaseLocation", "BrachModel");
+          this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
           // Edit Mode
           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
@@ -823,7 +827,7 @@ sap.ui.define(
         // Header Title
         doc.setFontSize(25);
         doc.setFont("times", "bold");
-        doc.text(this.i18nModel.getText("quotation"), 135, 40);
+        doc.text(this.i18nModel.getText("quotation"), 158, 40);
 
         // Company Info
         doc.setFontSize(12);
@@ -843,14 +847,14 @@ sap.ui.define(
 
         // Quotation Metas
         doc.setFont("times", "bold");
-        doc.text(this.i18nModel.getText("pdfquotationNo"), 168, y - 43, { align: "right" });
-        doc.text(this.i18nModel.getText("pdfDate"), 168, y - 38, { align: "right" });
-        doc.text(this.i18nModel.getText("pdfValiduntil"), 168, y - 33, { align: "right" });
+        doc.text(this.i18nModel.getText("pdfquotationNo"), 168, y - 36, { align: "right" });
+        doc.text(this.i18nModel.getText("pdfDate"), 168, y - 31, { align: "right" });
+        doc.text(this.i18nModel.getText("pdfValiduntil"), 168, y - 26, { align: "right" });
 
         doc.setFont("times", "normal");
-        doc.text(oData.QuotationNo, 172, y - 43);
-        doc.text(Formatter.formatDate(oData.Date), 172, y - 38);
-        doc.text(Formatter.formatDate(oData.ValidUntil), 172, y - 33);
+        doc.text(oData.QuotationNo, 172, y - 36);
+        doc.text(Formatter.formatDate(oData.Date), 172, y - 31);
+        doc.text(Formatter.formatDate(oData.ValidUntil), 172, y - 26);
 
         // Customer Info
         doc.setFont("times", "bold");
@@ -1024,7 +1028,7 @@ sap.ui.define(
           body: summaryBody,
           theme: 'plain',
           styles: {
-            font: "helvetica",
+            font: "times",
             fontSize: 10,
             halign: "right",
             cellPadding: 3
