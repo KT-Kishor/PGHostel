@@ -40,7 +40,7 @@ sap.ui.define([
 
                 var empData = this.getView().getModel("EmpModel").getData();
 
-                var filteredEmp = empData.filter(emp => (emp.Role.includes("Admin") ||
+                var filteredEmp = empData.filter(emp =>emp.BranchCode === loginModel.BranchCode && (emp.Role.includes("Admin") ||
                     emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
 
                 var oModel = new JSONModel(filteredEmp);
@@ -596,13 +596,14 @@ sap.ui.define([
 
                 var oModel = new JSONModel(filteredEmp);
                 this.getView().setModel(oModel, "AdminModel");
-
                 var table = this.byId("IA_id_OdataTable");
                 var selected = table.getSelectedItem();
                 if (!selected) {
                     MessageToast.show(this.i18nModel.getText("selectUpdateRow"));
                     return;
                 }
+              this.getBusyDialog();
+             
                 var Model = selected.getBindingContext("incomeModel");
                 var data = Model.getObject();
 
