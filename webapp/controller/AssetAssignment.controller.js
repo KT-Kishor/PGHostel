@@ -44,6 +44,8 @@ sap.ui.define([
                     },
 
                 });
+                    this._fetchCommonData("AssetType", "Type");
+
                 this.commonLoginFunction("AssetAssignment");
                 this._makeDatePickersReadOnly(["AA_id_Date"]);
                 this.onClearAndSearch("AA_id_FilterBarAsset");// Clear and search function
@@ -65,8 +67,6 @@ sap.ui.define([
                     var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.BranchCode === this.oLoginModel.getProperty("/BranchCode")));
                     this.getView().setModel(oModel, "EmpModel");
                 }
-
-
             },
             getModelData: function () {
                 this.getOwnerComponent().getModel("EmpModel");

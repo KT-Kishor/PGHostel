@@ -602,7 +602,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("selectUpdateRow"));
                     return;
                 }
-              this.getBusyDialog();
+            //   this.getBusyDialog();
              
                 var Model = selected.getBindingContext("incomeModel");
                 var data = Model.getObject();

@@ -59,11 +59,11 @@
                             name="Type"
                             showClearIcon="true"
                             id="AA_id_Type"
-                            items="{assetType>/}"
+                            items="{Type>/}"
                         >
                             <core:ListItem
-                                key="{assetType>Type}"
-                                text="{assetType>Type}"  
+                                key="{Type>Type}"
+                                text="{Type>Type}"  
                             />
                         </ComboBox>
                     </fb:control>
