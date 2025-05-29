@@ -1283,7 +1283,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var oToday = new Date();
                 salaryDetailsArray.forEach((offerData, index) => {
                     var oEffectiveDate = new Date(offerData.EffectiveDate);
-                    var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
+                    var isLastRecord = index === salaryDetailsArray.length - 1; // Check if it's the latest record
+                    var sTitleText = isLastRecord
+                        ? `Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`
+                        : `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
                     var oTitleText = new sap.m.Text({
                         text: sTitleText,
                         wrapping: true

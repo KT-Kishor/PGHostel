@@ -35,7 +35,7 @@ sap.ui.define([
                     if(this.getView().getModel("LoginModel").getProperty("/Role") === "Admin") {
                         var params = {}; // Initialize with empty object for Admin
                     }else{
-                        var params = {EmployeeID: this.getView().getModel("LoginModel").getProperty("/EmployeeID"),ManagerID: this.getView().getModel("LoginModel").getProperty("/EmployeeID")}; // Initialize with ManageID
+                        var params = {ManagerID: this.getView().getModel("LoginModel").getProperty("/EmployeeID")}; // Initialize with ManageID
                     }
 
                     // Collect parameters from filter bar

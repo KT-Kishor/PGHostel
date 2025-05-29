@@ -19,13 +19,13 @@
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Type" label="{i18n>type}" groupName="Group1" visibleInFilterBar="true">
+					<!-- <fb:FilterGroupItem name="Type" label="{i18n>type}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox  showSecondaryValues= "true"  items="{EmpType>/}" id="ED_id_TypeFilter" showClearIcon="true">
 								<core:ListItem key="{EmpType>ID}" text="{EmpType>Type}" />
 							</ComboBox>
 						</fb:control>
-					</fb:FilterGroupItem>
+					</fb:FilterGroupItem> -->
 					<fb:FilterGroupItem name="ManagerName" label="{i18n>manager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox showSecondaryValues= "true"  items="{EmployeeModel>/}" id="ED_id_ManagerFilter" showClearIcon="true">
