@@ -65,24 +65,7 @@ sap.ui.define([
                     var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.BranchCode === this.oLoginModel.getProperty("/BranchCode")));
                     this.getView().setModel(oModel, "EmpModel");
                 }
-                // var role = this.oLoginModel.getProperty("/Role");
-                // var allEmployees = this.getView().getModel("EmpModel").getData();
-                // var filteredEmployees;
 
-                // if (role === "IT Consultant") {
-                //     var branchCode = this.oLoginModel.getProperty("/BranchCode");
-                //     filteredEmployees = allEmployees.filter(emp =>
-                //         emp.BranchCode === branchCode &&
-                //         ["Admin", "IT Manager", "IT Consultant"].includes(emp.Role)
-                //     );
-                // } else if (role === "Admin" || role === "IT Manager") {
-                //     filteredEmployees = allEmployees.filter(emp =>
-                //         ["Admin", "IT Manager", "IT Consultant"].includes(emp.Role)
-                //     );
-                // } else {
-                //     filteredEmployees = allEmployees; // fallback, unlikely used
-                // }
-                // this.getView().setModel(new JSONModel(filteredEmployees), "EmpModel");
 
             },
             getModelData: function () {
@@ -474,20 +457,8 @@ sap.ui.define([
                                 MessageToast.show("Assigned Date cannot be before Asset Creation Date.");
                                 return;
                             }
-                            //     else  if (oAssetCreationDate > oAssignedDate) {
-                            //         MessageToast.show("Assigned Date cannot be before Asset Creation Date.");
-                            //         return;
-                            //     }
+                           
                         }
-
-                        // var sReturnDate = this.getView().getModel("myform").getProperty("/formData/data/ReturnDate");
-                        // if (sReturnDate && sReturnDate !== "" && sReturnDate !== "0000-00-00") {
-                        //     var oReturnDate = new Date(sReturnDate);
-                        //     if (oAssignedDate < oReturnDate) {
-                        //         MessageToast.show("Assigned Date cannot be before Return Date.");
-                        //         return;
-                        //     }
-                        // }
                         delete oFormData.isEdit
                         var originalStatus = oFormData.Status;
                         var oAssignedDate = sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue();
@@ -556,43 +527,6 @@ sap.ui.define([
                     }
                 });
             },
-
-            // AA_onSearch: function () {
-            //     this.getBusyDialog();
-            //     var aFilterItems = this.byId("AA_id_FilterBarAsset").getFilterGroupItems();
-            //     var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
-            //     var params = {};
-            //     aFilterItems.forEach(function (oItem) {
-            //         var oControl = oItem.getControl();
-            //         var sValue = oItem.getName();
-            //         if (oControl && oControl.getValue()) {
-            //             if (sValue === "AssignedDate") {
-            //                 params["AssignedStartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
-            //                 params["AssignedEndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
-            //             } else {
-            //                 params[sValue] = oControl.getValue();
-            //             }
-            //         }
-            //     });
-            //     //   var oBranch = this.byId("AA_id_Branch");
-            //     //     var oStatus = this.byId("AA_id_Status");
-            //     //     var oTable = this.byId("AA_id_AssestTable");
-            //     //     var oBinding = oTable.getBinding("items");
-            //     //     var branch = oBranch.getSelectedKey();
-            //     //     var status = oStatus.getSelectedKey();
-            //     //     var filters = [];
-            //     //     if (branch) {
-            //     //         filters.push(new sap.ui.model.Filter("Branch", sap.ui.model.FilterOperator.EQ, branch));
-            //     //     }
-            //     //     if (status) {
-            //     //         filters.push(new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, status));
-            //     //     }
-            //     // oBinding.filter(filters)
-            //     this.AA_CoomonReadCall(params);
-            //     this.closeBusyDialog();
-            // },
-
-
 
              AA_onSearch: async function () {
                 try {
