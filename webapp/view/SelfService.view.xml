@@ -40,8 +40,8 @@
 						<m:Button text="{i18n>headerIdCard}"  type="Ghost" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>headerIdCard}" id="IC_id_Idcard" press="CC_onPressIdCardDetails" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
 						<m:Button text="{i18n>visit}" press="onDownloadVisitCard" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Attention" tooltip="{i18n>visit}" visible="{= !${viewModel>/TraineeRole} }"/>
 						<!-- <m:Button text="{i18n>resignationletter}" press="onApplyResignation"  type="Reject" tooltip="{i18n>resignationletter}" /> -->
-						<m:Button text="{i18n>terminateLetter}" type="Reject" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>terminateLetter}" id="SS_idTermination" press="SS_onDownloadTerminateLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
-						<m:Button text="{i18n>relievingletter}" type="Accept" visible="{viewModel>/RelievingLetter}" tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
+						<m:Button text="{i18n>terminateLetter}" type="Reject"  visible="{= !${viewModel>/TraineeRole} }" tooltip="{i18n>terminateLetter}" id="SS_idTermination" press="SS_onDownloadTerminateLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
+						<m:Button text="{i18n>relievingletter}" type="Accept"  visible="{= !${viewModel>/TraineeRole} }" tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
 					</actions>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
@@ -1208,7 +1208,7 @@
                     titleUppercase="false"
                     id="idSalaryDetails"
                     title="{i18n>salaryDetails}"
-                   visible="{viewModel>/SalarySectionVisible}">
+                   visible="{= !${viewModel>/TraineeRole} }">
 
 					<subSections>
 						<ObjectPageSubSection
@@ -1225,7 +1225,7 @@
                     titleUppercase="false"
                     id="connections"
                     title="{i18n>paySlip}"
-                   visible="{viewModel>/SalarySectionVisible}">
+                   visible="{= !${viewModel>/TraineeRole} }">
 					<subSections>
 						<ObjectPageSubSection
                             id="connectionsSS"

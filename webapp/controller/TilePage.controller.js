@@ -296,7 +296,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteAdminPaySlip");
         },
         TileV_onpressSelfservice: function () {
-          this.getRouter().navTo("SelfService", { sPath: "SelfService" });
+          this.getRouter().navTo("SelfService", { sPath: "SelfService",Role: "Role" });
         },
         TileV_onpressInbox: function () {
           this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInboxView" });

@@ -102,7 +102,11 @@ sap.ui.define([
 
             ED_onPressEmployeeRow: function (oEvent) {
                 var EmployeeID = oEvent.getSource().getBindingContext("sEmployeeDetails").getProperty("EmployeeID");
-                this.getRouter().navTo("SelfService", { sPath: EmployeeID });
+                var EmployeeRole = oEvent.getSource().getBindingContext("sEmployeeDetails").getProperty("Role");
+                this.getRouter().navTo("SelfService", {
+                     sPath: EmployeeID,
+                        Role: EmployeeRole
+                     });
             }
 
 

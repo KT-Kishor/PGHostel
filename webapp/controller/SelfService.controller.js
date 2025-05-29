@@ -30,18 +30,18 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     }
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
-                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(),
+                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false,
                         isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false,
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
-                    var sLoggedInEmployeeID = loginModel.getProperty("/EmployeeID"); // From session
-                    var sNavigatedEmployeeID = oEvent.getParameter("arguments").sPath; // From selected row
-                    // Hide section if either Employee ID starts with "KT-T"
-                    var bHideSalarySection = sLoggedInEmployeeID.startsWith("KT-T") || sNavigatedEmployeeID.startsWith("KT-T");
-                    this.getView().getModel("viewModel").setProperty("/SalarySectionVisible", !bHideSalarySection);
-                    // this.ViewModel.setProperty("/TraineeRole", loginModel.getProperty("/Role") === "Trainee");
+                    var sLoggedInRole = loginModel.getProperty("/Role");
+                    var sNavigatedRole = oEvent.getParameter("arguments").Role; // Role from navigation
+                    // sections if role is "Trainee" from either login or navigation
+                    var bHideSalarySection = sLoggedInRole === "Trainee" || sNavigatedRole === "Trainee";
+                    this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
+
                     var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lc", "SS_id_lpa", "SS_id_lca", "SS_id_lds", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
                         "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan",];
                     this.sPath = oEvent.getParameter('arguments').sPath;

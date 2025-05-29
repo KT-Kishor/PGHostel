@@ -370,7 +370,7 @@
                 },
                 {
                     "name": "SelfService",
-                    "pattern": "SelfService/{sPath}",
+                    "pattern": "SelfService/{sPath}/{Role}",
                     "target": [
                         "SelfServiceTarget"
                     ]
