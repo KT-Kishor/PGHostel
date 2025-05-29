@@ -95,7 +95,7 @@
                         <Title text="{i18n>quotaionDetails} ({= ${CompanyQuotationModel>/}.length })" />
                         <ToolbarSpacer />
                         <Button
-                            text="{i18n>create}"
+                            text="{i18n>headerQuotation}"
                             tooltip="{i18n>addQuotation}"
                             press="HQ_onPressAddQuotation"
                             type="Accept"

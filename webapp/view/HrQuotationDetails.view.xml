@@ -153,7 +153,7 @@
                                         />
                                        
                                         
-                                        <m:Label text="{i18n>companyGSTNO}" />
+                                        <m:Label text="{i18n>companyGSTNO}"  required="true"/>
                                         <m:Input
                                             value="{SingleCompanyModel>/CompanyGSTNO}"
                                             id="HQD_id_CompGSTNO"
@@ -190,7 +190,7 @@
 
 <m:Input
     value="{SingleCompanyModel>/Percentage}"
-    liveChange="HQD_onPercentageChange"
+    change="HQD_onPercentageChange"
     editable="{SingleCompanyModel>/gstEditable}"
     maxLength="10"
     valueStateText="{i18n>msaAmountMess}"
@@ -291,7 +291,7 @@
                                          <m:ComboBox
                                             value="{SingleCompanyModel>/CustomerSTDCode}"
                                             showSecondaryValues="true"
-                                            id="HQD_id_CustomerNumber"
+                                            id="HQD_id_CustomerNumberSTD"
                                             items="{codeModel>/}"
                                             filterSecondaryValues="true"
                                             change="HQD_STDCode"
@@ -539,6 +539,9 @@
       maxLength="20"
       textAlign="End"
       type="Text"
+      showValueHelp="true"
+	valueHelpRequest="HQD_onDiscountInfoPress" 
+    valueHelpIconSrc="sap-icon://message-information" 
     />
 
     <!-- Total (Column 8) -->
