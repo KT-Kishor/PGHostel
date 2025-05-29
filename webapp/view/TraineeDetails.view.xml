@@ -146,7 +146,7 @@
 							<Text text="{oTraineeDetails>/JoiningDate}"/>
 							<Label text="{i18n>traineeDuration}" />
 							<Text text="{oTraineeDetails>/TrainingDuration}"/>
-							<Label text="{i18n>country}" />
+							<Label text="{i18n>expCountry}" />
 							<Text text="{oTraineeDetails>/Country}"/>
 							<Label text="{i18n>baseLocation}" />
 							<Text text="{oTraineeDetails>/BaseLocation}"/>

@@ -31,12 +31,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
                         fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(),
-                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, TraineeRole: false,
+                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false,
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
-                    this.ViewModel.setProperty("/TraineeRole", loginModel.getProperty("/Role") === "Trainee");
+                    var sEmployeeID = loginModel.getProperty("/EmployeeID");
+                    var bHideSalarySection = sEmployeeID.startsWith("KT-T");
+                    this.getView().getModel("viewModel").setProperty("/SalarySectionVisible", !bHideSalarySection);
+                    // this.ViewModel.setProperty("/TraineeRole", loginModel.getProperty("/Role") === "Trainee");
                     var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lc", "SS_id_lpa", "SS_id_lca", "SS_id_lds", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
                         "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan",];
                     this.sPath = oEvent.getParameter('arguments').sPath;
@@ -260,20 +263,23 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     utils._LCvalidateGrade(oGradeField, "ID", "AddEd_id_GradeType");
                 }
             },
-            //Edit buttton visibility
+            // Edit button visibility with role-based access control
             SS_onEditPress: function (oEvent) {
                 var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
                 var Role = this.getView().getModel("LoginModel").getProperty("/Role");
+                // Allowed roles for editing Employee Details
+                var allowedRoles = ["Admin", "HR Manager", "HR"];
                 if (isEditMode) {
-                    if (this.SS_onSavePress(oEvent.getSource().getId().split('--').pop())) { // Call Save function and check validation
+                    if (this.SS_onSavePress(oEvent.getSource().getId().split('--').pop())) { // Validate before disabling edit mode
                         this.getView().getModel("viewModel").setProperty("/isEditMode", false);
                     }
                 } else {
-                    this.getView().getModel("viewModel").setProperty("/isEditMode", true);
-                    if (Role === "Admin" && this.sPath !== "SelfService") {
-                        this.getView().getModel("viewModel").setProperty("/AdminRole", true);
+                    // Enable edit mode for authorized roles in role-based scenario
+                    if (allowedRoles.includes(Role)) {
+                        this.getView().getModel("viewModel").setProperty("/isEditMode", true);
+                        this.getView().getModel("viewModel").setProperty("/AdminRole", Role === "Admin");
                     } else {
-                        this.getView().getModel("viewModel").setProperty("/AdminRole", false);
+                        sap.m.MessageToast.show("You don't have permission to edit Employee Details."); // Alert unauthorized users
                     }
                 }
             },

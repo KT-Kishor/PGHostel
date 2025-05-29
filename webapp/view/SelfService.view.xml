@@ -1208,8 +1208,8 @@
                     titleUppercase="false"
                     id="idSalaryDetails"
                     title="{i18n>salaryDetails}"
-                    visible="{= !${viewModel>/TraineeRole} }"
-                >
+                   visible="{viewModel>/SalarySectionVisible}">
+
 					<subSections>
 						<ObjectPageSubSection
                             title=""
@@ -1225,8 +1225,7 @@
                     titleUppercase="false"
                     id="connections"
                     title="{i18n>paySlip}"
-                    visible="{= !${viewModel>/TraineeRole} }"
-                >
+                   visible="{viewModel>/SalarySectionVisible}">
 					<subSections>
 						<ObjectPageSubSection
                             id="connectionsSS"

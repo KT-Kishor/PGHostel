@@ -83,7 +83,7 @@ sap.ui.define([
                 this.byId("ED_id_EmpIDFilter").setValue("");
                 this.byId("ED_id_ManagerFilter").setValue("");
                 this.byId("ED_id_Status").setValue("");
-                this.byId("ED_id_TypeFilter").setValue("");
+               // this.byId("ED_id_TypeFilter").setValue("");
                 this.byId("ED_id_RoleFilter").setValue("");
                 this.byId("ED_id_BaseLFilter").setValue("");
             },
