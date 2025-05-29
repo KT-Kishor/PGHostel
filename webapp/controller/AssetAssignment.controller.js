@@ -193,18 +193,18 @@ sap.ui.define([
             },
 
             AA_onPressAssign: async function () {
-                var params;
-                (this.oLoginModel.getProperty("/Role") === "IT Consultant") ? params = { PickedBranch: this.oLoginModel.getProperty("/BranchName"), ReturnBranch: this.oLoginModel.getProperty("/BranchName") } : params = {};
-                try {
-                    var response = await this.ajaxReadWithJQuery("IncomeAsset", params);
-                    if (response.success) {
-                        this.getOwnerComponent().setModel(new JSONModel(response.data), "incomeModel");
-                    }
-                }
-                catch (e) {
-                    console.log(e);
-                    MessageToast.show(this.i18nModel.getText("Error"));
-                }
+                // var params;
+                // (this.oLoginModel.getProperty("/Role") === "IT Consultant") ? params = { PickedBranch: this.oLoginModel.getProperty("/BranchName"), ReturnBranch: this.oLoginModel.getProperty("/BranchName") } : params = {};
+                // try {
+                //     var response = await this.ajaxReadWithJQuery("IncomeAsset", params);
+                //     if (response.success) {
+                //         this.getOwnerComponent().setModel(new JSONModel(response.data), "incomeModel");
+                //     }
+                // }
+                // catch (e) {
+                //     console.log(e);
+                //     MessageToast.show(this.i18nModel.getText("Error"));
+                // }
                 this._dialogMode = "Assign";
                 var oView = this.getView();
                 var oFormModel = oView.getModel("myform");
@@ -699,7 +699,7 @@ sap.ui.define([
             },
 
 
-            FAA_onOpenVHD: function () {
+            FAA_onOpenVHD:async function () {
                 var oView = this.getView();
                 var oCore = sap.ui.getCore();
                 var oTypeSelected = oCore.byId("FAA_id_Type").getSelectedKey();
@@ -716,7 +716,9 @@ sap.ui.define([
                     this._oValueHelpDialog.open();
                     return;
                 }
-                var allData = oView.getModel("incomeModel").getProperty("/");
+                  await  this.ajaxReadWithJQuery("IncomeAsset", "IsCurrent=1").then((oData) => {
+                    var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                // var allData = oView.getModel("incomeModel").getProperty("/");
                 var loginModel = this.getOwnerComponent().getModel("LoginModel");
                 var branch = loginModel.getProperty("/BranchCode");
                 var role = loginModel.getProperty("/Role");
@@ -730,13 +732,13 @@ sap.ui.define([
                 }
                 var filteredData = [];
                 if (role === "Admin" || role === "IT Manager") {
-                    filteredData = allData.filter(item =>
+                    filteredData = oFCIAerData.filter(item =>
                         item.IsCurrent === "1" &&
                         (item.Status === "Available" || item.Status === "Returned") &&
                         item.Type === oTypeSelected
                     );
                 } else if (role === "IT Consultant") {
-                    filteredData = allData.filter(item =>
+                    filteredData = oFCIAerData.filter(item =>
                         item.IsCurrent === "1" &&
                         (item.Status === "Available" || item.Status === "Returned") &&
                         item.PickedBranch === cityFromBranch &&
@@ -745,7 +747,7 @@ sap.ui.define([
                 }
                 var filteredModel = new sap.ui.model.json.JSONModel(filteredData);
                 oView.setModel(filteredModel, "filteredAssetDetails");
-
+   })
                 if (!this._oValueHelpDialog) {
                     this._oValueHelpDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetDetailsPopup", this);
                     this.getView().addDependent(this._oValueHelpDialog);
