@@ -413,8 +413,12 @@
                                 text="{= ${objectModel>TrashDate} === '1899-11-30T00:00:00.000Z' || ${objectModel>TrashDate} === null ? '' : 'Date: ' + ${
                                 path: 'objectModel>TrashDate',
                                 formatter: '.Formatter.formatDate'
-                            }}"                       
+                            }}"                    
+                                                        class="sapUiTinyMarginBottom"                        
+
                                     />
+                                     <m:Text text="{=${objectModel>TrashBranch}?'Branch: '+${objectModel>TrashBranch}:''}"
+                                                                  />
                                                 </m:VBox> 
                                                 <!-- <m:Text
                                                     text="{= ${objectModel>ReturnDate} === '1899-11-30T00:00:00.000Z' ? ''

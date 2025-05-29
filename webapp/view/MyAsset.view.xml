@@ -24,11 +24,11 @@
                         level="H1"
                     />
                     <ToolbarSpacer />
-                    <Button
+                    <!-- <Button
                         text="{i18n>return}"
                         type="Accept"
                         tooltip="{i18n>return}"
-                    />
+                    /> -->
                 </OverflowToolbar>
             </headerToolbar>
             <columns>

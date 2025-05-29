@@ -39,13 +39,13 @@ sap.ui.define([
                 }
 
                 var empData = this.getView().getModel("EmpModel").getData();
-                
-                var filteredEmp = empData.filter(emp =>(emp.Role.includes("Admin") || 
-                emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant") ));
+
+                var filteredEmp = empData.filter(emp => (emp.Role.includes("Admin") ||
+                    emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
 
                 var oModel = new JSONModel(filteredEmp);
                 this.getView().setModel(oModel, "pickedByModel");
-                
+
                 //             var aIncomeData = this.getView().getModel("incomeModel").getData();
                 // var oButton = this.getView().byId("IA_pickButton");
 
@@ -105,7 +105,8 @@ sap.ui.define([
                     "TransferByID": "",
                     "TrashByEmployeeName": "",
                     "TrashByEmployeeID": "",
-                    "ReferenceNumber": ""
+                    "ReferenceNumber": "",
+                    "TrashBranch":""
 
 
 
@@ -128,10 +129,10 @@ sap.ui.define([
 
 
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Company Asset");
-               this.getView().byId("IA_id_SlNo").setSelectedKey("");
-               this.getView().byId("IA_id_PickedBy").setSelectedKey("");
+                this.getView().byId("IA_id_SlNo").setSelectedKey("");
+                this.getView().byId("IA_id_PickedBy").setSelectedKey("");
 
-               this.getView().byId("IA_id_PickedBy").setSelectedKey("");
+                this.getView().byId("IA_id_PickedBy").setSelectedKey("");
 
 
 
@@ -145,14 +146,14 @@ sap.ui.define([
             IA_CommonReadCall: function (filter) {
                 this.getBusyDialog();
                 this.ajaxReadWithJQuery("IncomeAsset", "IsCurrent=1").then((oData) => {
-                   
+
                     let loginModel = this.getView().getModel("LoginModel").getData();
                     var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
 
                     oFCIAerData.forEach(function (item) {
                         var isStatusTransferred = item.Status === "Transferred";
                         var isRoleAllowed = ["Admin", "IT Consultant", "IT Manager"].includes(loginModel.Role);
-                        var branchCondition = true; 
+                        var branchCondition = true;
 
                         if (loginModel.Role === "IT Consultant") {
                             branchCondition = (item.PickedBranch === item.TransferBranch) || (loginModel.BranchName === item.TransferBranch);
@@ -160,24 +161,24 @@ sap.ui.define([
 
                         item.showPickButton = isStatusTransferred && isRoleAllowed && branchCondition;
                     });
-                   
+
 
                     if (loginModel.Role === "IT Consultant") {
                         const filteredData = oFCIAerData.filter(item =>
                             item.PickedBranch === loginModel.BranchName ||
                             item.TransferBranch === loginModel.BranchName
                         );
- 
+
                         this.getOwnerComponent().setModel(new JSONModel(filteredData), "incomeModel");
-                        
+
                         this._populateUniqueFilterValues(filteredData);
 
                     } else {
                         this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "incomeModel");
                         this._populateUniqueFilterValues(oFCIAerData);
-                        
+
                     }
-                    
+
 
 
 
@@ -192,6 +193,7 @@ sap.ui.define([
                 let uniqueValues = {
                     IA_id_SlNo: new Set(),
                     IA_id_EqNo: new Set(),
+
                 };
 
                 data.forEach(item => {
@@ -233,13 +235,13 @@ sap.ui.define([
                 if (this.Branchname) {
                     this.Branchname()
                 }
-                
+
 
                 var oModel = this.getView().getModel("CreateIncomeAssetModel")
                 var table = this.getView().byId("IA_id_OdataTable")
                 var data = this.getView().getModel("incomeModel").getData()
                 var loginRole = this.getView().getModel("LoginModel").getProperty("/Role");
-                  let loginModel = this.getView().getModel("LoginModel").getData();
+                let loginModel = this.getView().getModel("LoginModel").getData();
 
                 var empData = this.getView().getModel("EmpModel").getData();
                 var branchData = this.getView().getModel("branchModel").getData();
@@ -247,11 +249,12 @@ sap.ui.define([
                 // var matchedBranch = branchData.find(branch => branch.city === data.PickedBranch);
                 // var branchCode = matchedBranch ? matchedBranch.branchCode : null;
 
-                var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode &&   (emp.Role.includes("Admin") || 
-                emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant") ));
+                var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode && (emp.Role.includes("Admin") ||
+                    emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
 
                 var oModel = new JSONModel(filteredEmp);
                 this.getView().setModel(oModel, "AdminModel");
+                
                 if (!this.FCIA_Dialog) {
                     var oView = this.getView();
                     this.FCIA_Dialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.CreateIncomeAsset", this);
@@ -303,9 +306,9 @@ sap.ui.define([
                         // sap.ui.getCore().byId("FCIA_id_pickedby").setEnabled(false);
 
 
-                    }else{
+                    } else {
                         sap.ui.getCore().byId("FCIA_id_branch").setEditable(true);
-                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);  
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);
                         // sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);  
 
                     }
@@ -367,9 +370,9 @@ sap.ui.define([
                     if (loginRole === "IT Consultant") {
                         sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
                         sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
-                    }else{
+                    } else {
                         sap.ui.getCore().byId("FCIA_id_branch").setEditable(true);
-                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);  
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);
                     }
                     table.removeSelections();
 
@@ -446,14 +449,17 @@ sap.ui.define([
                             "TransferDate": "",
                             "IsCurrent": "1",
                             "Status": "Available",
-                            "TrashDate": null,
-                            "PickedEmployeeID": sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText()
+                            "TrashDate": null
+                            // "PickedEmployeeID": sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText()
+
+
                         };
 
 
                         if (!selected) {
-                            await this.ajaxCreateWithJQuery("IncomeAsset", { data: oPayLoad });
-                            MessageToast.show(this.i18nModel.getText("assetcreate"));
+                          var pickedEmployeeId = sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText();
+                          
+                            await this.ajaxCreateWithJQuery("IncomeAsset", { data: {...oPayLoad, PickedEmployeeID: pickedEmployeeId} });                            MessageToast.show(this.i18nModel.getText("assetcreate"));
 
 
 
@@ -581,36 +587,45 @@ sap.ui.define([
                 }
             },
             IA_onUpadateButtonPress: async function () {
+                var empData = this.getView().getModel("EmpModel").getData();
+                var branchData = this.getView().getModel("branchModel").getData();
+                let loginModel = this.getView().getModel("LoginModel").getData();
+
+                var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode && (emp.Role.includes("Admin") ||
+                    emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
+
+                var oModel = new JSONModel(filteredEmp);
+                this.getView().setModel(oModel, "AdminModel");
 
                 var table = this.byId("IA_id_OdataTable");
                 var selected = table.getSelectedItem();
                 if (!selected) {
                     MessageToast.show(this.i18nModel.getText("selectUpdateRow"));
-                     return;
+                    return;
                 }
                 var Model = selected.getBindingContext("incomeModel");
                 var data = Model.getObject();
 
-
-
                 var loginRole = this.getView().getModel("LoginModel").getProperty("/Role");
-
 
                 var oModel = this.getView().getModel("CreateIncomeAssetModel");
                 if (data.Status === "Trashed") {
-                    MessageToast.show(this.i18nModel.getText("updatemessage"));
+                    MessageToast.show(this.i18nModel.getText("returndata"));
+
                     return;
                 }
                 if (data.Status === "Assigned") {
-                    MessageToast.show(this.i18nModel.getText("assignedstatus"));
-                    return;
+                    MessageToast.show(this.i18nModel.getText("returndata"));
+                            return;
                 }
                 if (data.Status === "Transferred") {
-                    MessageToast.show(this.i18nModel.getText("transferredstatus"));
+                    MessageToast.show(this.i18nModel.getText("returndata"));
+
                     return;
                 }
                 if (data.Status === "Returned") {
                     MessageToast.show(this.i18nModel.getText("returndata"));
+
                     return;
                 }
                 await this.ajaxReadWithJQuery("IncomeAsset").then((oData) => {
@@ -650,8 +665,8 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(true)
                         sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
-                       sap.ui.getCore().byId("FCIA_id_type").setSelectedKey(data.Type).setEnabled(true).setVisible(true);
-
+                        sap.ui.getCore().byId("FCIA_id_type").setSelectedKey(data.Type).setEnabled(true).setVisible(true);
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(data.PickedEmployeeName)
 
                         oModel.setProperty("/Type", data.Type);
                         oModel.setProperty("/Model", data.Model);
@@ -667,16 +682,16 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_transferbranch").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
 
-
                         if (loginRole === "IT Consultant") {
                             sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
                             sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
 
                         } else {
                             sap.ui.getCore().byId("FCIA_id_branch").setEditable(true);
-                            sap.ui.getCore().byId("FCIA_id_pickedby").setEnabled(true);
+                            sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);
                         }
                         this.FCIA_Dialog.open();
+
                     }.bind(this));
                 } else {
                     var oSimpleForm = sap.ui.getCore().byId("FCIA_id_SimpleFormChange354wide");
@@ -716,32 +731,32 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
 
-
                     if (loginRole === "IT Consultant") {
                         sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
                         sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
+
                     } else {
                         sap.ui.getCore().byId("FCIA_id_branch").setEditable(true);
-                        sap.ui.getCore().byId("FCIA_id_pickedby").setEnabled(true);
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true).setValue(data.PickedEmployeeName);
                     }
 
                     this._FragmentDatePickersReadOnly(["FCIA_id_Date"])
+
                 }
             },
-
             IA_onPickedButtonPress: function (oEvent) {
                 this.item = oEvent.getSource().getBindingContext("incomeModel").getObject().ID
                 var oRowData = oEvent.getSource().getBindingContext("incomeModel").getObject();
                 var oModel = this.getView().getModel("CreateIncomeAssetModel");
                 let loginModel = this.getView().getModel("LoginModel").getData();
 
-                 var empData = this.getView().getModel("EmpModel").getData();
+                var empData = this.getView().getModel("EmpModel").getData();
                 var branchData = this.getView().getModel("branchModel").getData();
 
-               
 
-                var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode &&   (emp.Role.includes("Admin") || 
-                emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant") ));
+
+                var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode && (emp.Role.includes("Admin") ||
+                    emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
                 var oModel = new JSONModel(filteredEmp);
                 this.getView().setModel(oModel, "AdminModel");
                 if (!this.FCIA_Dialog) {
@@ -752,7 +767,7 @@ sap.ui.define([
                     }).then(function (FCIA_Dialog) {
                         this.FCIA_Dialog = FCIA_Dialog;
                         oView.addDependent(this.FCIA_Dialog);
-              
+
 
                         var oSimpleForm = sap.ui.getCore().byId("FCIA_id_SimpleFormChange354wide");
                         if (oSimpleForm) {
@@ -767,8 +782,8 @@ sap.ui.define([
                             oMaxDate.setDate(oMaxDate.getDate() + 365);
                             sap.ui.getCore().byId("FCIA_id_Date").setMinDate(oMinDate).setMaxDate(oMaxDate);
                         }
-                        if(oRowData.PickedBranch===oRowData.TransferBranch){
-                        sap.ui.getCore().byId("FCIA_id_pickbranch").setSelectedKey(oRowData.TransferBranch)
+                        if (oRowData.PickedBranch === oRowData.TransferBranch) {
+                            sap.ui.getCore().byId("FCIA_id_pickbranch").setSelectedKey(oRowData.TransferBranch)
 
                         }
                         sap.ui.getCore().byId("FCIA_id_pickButton").setVisible(true)
@@ -783,7 +798,7 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_ID_DescriptionTextArea").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_eqno").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_slno").setVisible(false)
-                      
+
                         sap.ui.getCore().byId("FCIA_id_Date").setVisible(true).setValueState("None").setEditable(true)
                         sap.ui.getCore().byId("FCIA_id_branch").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true).setSelectedKey(oRowData.TransferBranch).setValueState("None").setEditable(false)
@@ -792,14 +807,14 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_transferbranch").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
-                
-                             if (loginModel.Role === "IT Consultant"){
-                                  sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEnabled(false)
-                             }else{
-                                  sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEnabled(true)
 
-                             }
-                  
+                        if (loginModel.Role === "IT Consultant") {
+                            sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEnabled(false)
+                        } else {
+                            sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEnabled(true)
+
+                        }
+
 
                         this.FCIA_Dialog.open();
                     }.bind(this));
@@ -839,12 +854,12 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
 
-                    if (loginModel.Role === "IT Consultant"){
-                                  sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(false)
-                             }else{
-                                  sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(true)
+                    if (loginModel.Role === "IT Consultant") {
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(false)
+                    } else {
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(true)
 
-                             }
+                    }
 
                     this._FragmentDatePickersReadOnly(["FCIA_id_Date"])
                 }
@@ -863,7 +878,7 @@ sap.ui.define([
                 var data = Model.getObject();
 
 
-                 var pickedBranchName = data.PickedBranch;
+                var pickedBranchName = data.PickedBranch;
 
 
                 var empData = this.getView().getModel("EmpModel").getData();
@@ -872,8 +887,8 @@ sap.ui.define([
 
                 var branchCode = matchedBranch ? matchedBranch.branchCode : null;
 
-                var filteredEmp = empData.filter(emp => emp.BranchCode === branchCode && (emp.Role.includes("Admin") || 
-                emp.Role.includes("IT Manager")));
+                var filteredEmp = empData.filter(emp => emp.BranchCode === branchCode && (emp.Role.includes("Admin") ||
+                    emp.Role.includes("IT Manager")));
 
                 var oModel = new JSONModel(filteredEmp);
                 this.getView().setModel(oModel, "AdminModel");
@@ -972,15 +987,15 @@ sap.ui.define([
                 let loginModel = this.getView().getModel("LoginModel").getData();
                 var empData = this.getView().getModel("EmpModel").getData();
                 var branchData = this.getView().getModel("branchModel").getData();
-                if(data.Status==="Available"){
-                var matchedBranch = branchData.find(branch => branch.city === pickedBranchName);
-                }else if(data.Status==="Returned"){
-                var matchedBranch = branchData.find(branch => branch.city === data.ReturnBranch);
-                    }
+                if (data.Status === "Available") {
+                    var matchedBranch = branchData.find(branch => branch.city === pickedBranchName);
+                } else if (data.Status === "Returned") {
+                    var matchedBranch = branchData.find(branch => branch.city === data.ReturnBranch);
+                }
                 var branchCode = matchedBranch ? matchedBranch.branchCode : null;
 
-                var filteredEmp = empData.filter(emp => emp.BranchCode === branchCode &&   (emp.Role.includes("Admin") || 
-                emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant") ));
+                var filteredEmp = empData.filter(emp => emp.BranchCode === branchCode && (emp.Role.includes("Admin") ||
+                    emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
 
                 var oModel = new JSONModel(filteredEmp);
                 this.getView().setModel(oModel, "AdminModel");
@@ -1016,7 +1031,7 @@ sap.ui.define([
                     } else if (data.ReturnDate) {
                         var oMinDate = new Date(data.ReturnDate);
                         sap.ui.getCore().byId("FCIA_id_transferdate").setMinDate(oMinDate);
-                            sap.ui.getCore().byId("FCIA_id_transferdate").setMaxDate(new Date());
+                        sap.ui.getCore().byId("FCIA_id_transferdate").setMaxDate(new Date());
 
                     }
 
@@ -1087,7 +1102,7 @@ sap.ui.define([
                     } else if (data.ReturnDate) {
                         var oMinDate = new Date(data.ReturnDate);
                         sap.ui.getCore().byId("FCIA_id_transferdate").setMinDate(oMinDate);
-                            sap.ui.getCore().byId("FCIA_id_transferdate").setMaxDate(new Date());
+                        sap.ui.getCore().byId("FCIA_id_transferdate").setMaxDate(new Date());
 
                     }
 
@@ -1157,7 +1172,8 @@ sap.ui.define([
                             "TrashDate": Date,
                             "TrashByEmployeeName": sap.ui.getCore().byId("FCIA_id_trashBy").getSelectedKey(),
                             "TrashByEmployeeID": sap.ui.getCore().byId("FCIA_id_trashBy").getSelectedItem().getAdditionalText(),
-                            "TrashComments": sap.ui.getCore().byId("FTIA_id_Comments").getValue()
+                            "TrashComments": sap.ui.getCore().byId("FTIA_id_Comments").getValue(),
+                            "TrashBranch":oModel.TrashBranch,
                         };
                         await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oPayLoad, filters: { ID: selectedData.ID }, });
                         MessageToast.show(this.i18nModel.getText("Trashed"));
@@ -1180,17 +1196,39 @@ sap.ui.define([
 
                 var sEqNo = this.getView().byId("IA_id_EqNo").getSelectedKey();
                 var sPickedBy = this.getView().byId("IA_id_PickedBy").getSelectedKey();
+
                 var oDateRange = this.getView().byId("idOdataDateComboBox");
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
                 var oStartDate = oDateRange.getDateValue();
                 var oEndDate = oDateRange.getSecondDateValue();
                 var slNo = this.getView().byId("IA_id_SlNo").getSelectedKey();
                 var status = this.getView().byId("IA_id_Status").getSelectedKey();
+                var sBranch = this.getView().byId("IA_id_branch").getSelectedKey();
+
 
                 var filters = {
                     IsCurrent: "1"
                 };
 
+                if (sBranch) {
+                    if (status === "" || status === "Available") {
+                        filters.PickedBranch = sBranch;
+                        filters.Status = "Available";
+                    }else if(status=="Assigned"){
+                        filters.AssignBranch = sBranch;
+                        filters.Status = "Assigned";
+                    }else if(status=="Transferred"){
+                        filters.TransferBranch  = sBranch;
+                        filters.Status = "Transferred";
+
+                }else if(status=="Returned"){
+                        filters.ReturnBranch = sBranch;
+                        filters.Status = "Returned";
+                    }else if(status=="Trashed"){
+                        filters.TrashBranch = sBranch;
+                        filters.Status = "Trashed";
+                     }
+                    }
                 if (sEqNo) {
                     filters.EquipmentNumber = sEqNo;
                 }
@@ -1210,54 +1248,6 @@ sap.ui.define([
                     filters.Status = status;
                 }
                 this.getBusyDialog();
-                // let loginModel = this.getView().getModel("LoginModel").getData()
-                //  if (loginModel.Role === "IT Consultant") {
-                //     this._fetchCommonData("BaseLocation", "branchModel")
-                //      let branchData =  this.getOwnerComponent().getModel("branchModel").getData() || [];
-                //      let branch = branchData.find(item => item.branchCode == loginModel.BranchCode) ;
-                //     if (branch) {
-                //          loginModel.BranchName = branch.city;
-                //  }   
-                //                   }
-                //                 if (loginModel.Role === "IT Consultant") {
-                //                     filters.PickedBranch = loginModel.BranchName
-                //                 }
-
-                //         this._fetchCommonData("IncomeAsset", "incomeModel", filters).then(() => {
-                //              let loginModel = this.getView().getModel("LoginModel").getData();
-
-
-                // const data = this.getView().getModel("incomeModel").getData();
-
-                // let loginModel = this.getView().getModel("LoginModel").getData();
-
-                //      if (loginModel.Role === "IT Consultant") {
-                //    this._fetchCommonData("BaseLocation", "branchModel")
-                //     let branchData =  this.getOwnerComponent().getModel("branchModel").getData() || [];
-                //     let branch = branchData.find(item => item.branchCode == loginModel.BranchCode) ;
-                //        if (branch) {
-                //         loginModel.BranchName = branch.city;
-                //     }   
-                //         this.IA_CommonReadCall(loginModel.BranchName);            
-                //  } else {
-                //     this.IA_CommonReadCall("");
-                // }
-                //     this._populateUniqueFilterValues(data); 
-                // }).finally(() => {
-                //     this.closeBusyDialog()
-
-                // });
-                //     let loginModel = this.getView().getModel("LoginModel").getData();
-
-                //  if (loginModel.Role === "IT Consultant") {
-                //      this._fetchCommonData("BaseLocation", "branchModel")
-                //     let branchData =  this.getOwnerComponent().getModel("branchModel").getData() || [];
-                //     let branch = branchData.find(item => item.branchCode == loginModel.BranchCode);
-                //     if (branch) {
-                //         loginModel.BranchName = branch.city;
-                //     }
-                // }
-                     
                 this.ajaxReadWithJQuery("IncomeAsset", filters).then((oData) => {
                     let loginModel = this.getView().getModel("LoginModel").getData();
                     var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -1265,7 +1255,7 @@ sap.ui.define([
                     oFCIAerData.forEach(function (item) {
                         var isStatusTransferred = item.Status === "Transferred";
                         var isRoleAllowed = ["Admin", "IT Consultant", "IT Manager"].includes(loginModel.Role);
-                        var branchCondition = true; 
+                        var branchCondition = true;
 
                         if (loginModel.Role === "IT Consultant") {
                             branchCondition = (item.PickedBranch === item.TransferBranch) || (loginModel.BranchName === item.TransferBranch);
@@ -1279,26 +1269,25 @@ sap.ui.define([
                             item.PickedBranch === loginModel.BranchName ||
                             item.TransferBranch === loginModel.BranchName
                         );
-                            this.getOwnerComponent().setModel(new JSONModel(filteredData), "incomeModel");
-                            // this._populateUniqueFilterValues(filteredData);
-                                                 this.ajaxReadWithJQuery("IncomeAsset","IsCurrent=1").then((oData) => {
-                                        var oFCIAerData1 = Array.isArray(oData.data) ? oData.data : [oData.data];
-                                        let loginModel = this.getView().getModel("LoginModel").getData();
-                                        const filteredData = oFCIAerData1.filter(item => item.PickedBranch === loginModel.BranchName);
-                                            this._populateUniqueFilterValues(filteredData);
-                                              })   
+                        this.getOwnerComponent().setModel(new JSONModel(filteredData), "incomeModel");
+                        this.ajaxReadWithJQuery("IncomeAsset", "IsCurrent=1").then((oData) => {
+                            var oFCIAerData1 = Array.isArray(oData.data) ? oData.data : [oData.data];
+                            let loginModel = this.getView().getModel("LoginModel").getData();
+                            const filteredData = oFCIAerData1.filter(item => item.PickedBranch === loginModel.BranchName);
+                            this._populateUniqueFilterValues(filteredData);
+                        })
                     } else {
                         this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "incomeModel");
-                           this.ajaxReadWithJQuery("IncomeAsset").then((oData) => {
-                    var oFCIAerData1 = Array.isArray(oData.data) ? oData.data : [oData.data]
-                        this._populateUniqueFilterValues(oFCIAerData1);
-                          })     
+                        this.ajaxReadWithJQuery("IncomeAsset").then((oData) => {
+                            var oFCIAerData1 = Array.isArray(oData.data) ? oData.data : [oData.data]
+                            this._populateUniqueFilterValues(oFCIAerData1);
+                        })
 
-                    }           
-                          
+                    }
+
                     this.closeBusyDialog()
                 })
-                  
+
 
 
             },
@@ -1308,6 +1297,8 @@ sap.ui.define([
                 this.getView().byId("idOdataDateComboBox").setValue("");
                 this.getView().byId("IA_id_SlNo").setSelectedKey("");
                 this.getView().byId("IA_id_Status").setSelectedKey("");
+                 this.getView().byId("IA_id_branch").setSelectedKey("");
+
             },
             FTIA_onCancelPress: function () {
                 var table = this.byId("IA_id_OdataTable");

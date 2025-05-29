@@ -91,7 +91,7 @@ sap.ui.define([
                         // Status: "Trashed",
                         // Comments:item.Comments,
                         text: item.TrashComments ? "Comment: " + item.TrashComments : "",
-                        title: "The asset was Trashed by " + item.TrashByEmployeeName + " (" + item.TrashByEmployeeID + ") on " +
+                        title: "The asset was Trashed by " + item.TrashByEmployeeName + " (" + item.TrashByEmployeeID + ") at " + item.TrashBranch  + " on "+
                             new Date(item.TrashDate).toLocaleDateString('en-GB')
                     });
                 }

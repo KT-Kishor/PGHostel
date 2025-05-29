@@ -131,6 +131,36 @@
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
+                 <fb:FilterGroupItem
+                    name="Branch"
+                    label="{i18n>branch}"
+                    groupName="Group"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <!-- <ComboBox
+                            id="IA_id_branch"
+                            showClearIcon="true"
+                             items="{branchModel>/}"
+                        >
+                                 <core:ListItem
+                                  key="{branchModel>city}" 
+                                    text="{branchModel>city}"
+                                />
+                        </ComboBox> -->
+                         <ComboBox
+                    id="IA_id_branch"
+                    showSecondaryValues="true"
+                    items="{branchModel>/}"
+                >
+                    <core:ListItem
+                        key="{branchModel>city}" 
+                        text="{branchModel>city}"
+                        additionalText="{branchModel>branchCode}"
+                    />
+                </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
             </fb:filterGroupItems>
         </fb:FilterBar>
         <Table
@@ -377,6 +407,10 @@
                                     />
                                      <Text text="{=${incomeModel>TrashByEmployeeID}?'ID: '+${incomeModel>TrashByEmployeeID}:''}"
                                     class="sapUiTinyMarginBottom"                        
+                                  />
+                                     <Text text="{=${incomeModel>TrashBranch}?'Branch: '+${incomeModel>TrashBranch}:''}"
+                                    class="sapUiTinyMarginBottom"
+
                                   />
                                     <Text text="{= ${incomeModel>TrashDate} ? 'Date: ' + ${
                                             path: 'incomeModel>TrashDate',
