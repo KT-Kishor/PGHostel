@@ -1593,6 +1593,27 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
             },
 
+            SS_onDownloadWorkLetter:function(){
+                var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var today = new Date();
+                var date = Formatter.formatDate(today);
+                var joiningDate = Formatter.formatDate(oEmpModel.JoiningDate);
+                var empName = oEmpModel.Salutation + " " + oEmpModel.EmployeeName;
+                var empDesig = oEmpModel.Designation;
+                var empID = oEmpModel.EmployeeID;
+                this.getView().getModel("PDFData").setProperty("/CreateDate", date);
+                this.getView().getModel("PDFData").setProperty("/CertificateTitle", "WORK LETTER");
+                var data = `
+                <div style="text-align: justify;">
+                    <p>This is to certify that <b>${empName}</b>, holding <b>${empID}</b>, was employed with <b>${this.companyName}</b> as a <b>${empDesig}</b> from <b>${joiningDate}</b> to <b>${date}</b> During their tenure with us, they exhibited a high level of professionalism, dedication, and a strong sense of responsibility towards assigned tasks. They consistently met project deadlines, and contributed positively to the success of the team.</p> 
+                    <p>${empName} demonstrated sound technical knowledge and excellent interpersonal skills. Maintained good relationships with colleagues, clients, actively participated in various organizational activities.</p>
+                    <p>We thank ${empName} for their services and wish them all the very best in their future endeavors.</p>
+                </div>`;
+
+                this.getView().getModel("PDFData").setProperty("/RTEText", data);
+                this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
+            },
+
             FCR_onDownloadPDF: function () {
                 this.SSRTE_oDialog.close();
                 let htmlContent = sap.ui.getCore().byId("FCR_id_RTE").getValue();
