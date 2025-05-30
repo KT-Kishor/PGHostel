@@ -55,7 +55,7 @@
                 <ComboBox
                     id="FCIA_id_trashbranch"
                     placeholder="Select Branch"
-                    change="FCIA_onbranchchange"
+                    change="FCIA_onInputLiveChange"
                     valueStateText="Select Branch"
                     value="{CreateIncomeAssetModel>/TrashBranch}"
                     selectedKey="{CreateIncomeAssetModel>/TrashBranch}"
