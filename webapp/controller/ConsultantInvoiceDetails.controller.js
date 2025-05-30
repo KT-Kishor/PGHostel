@@ -615,22 +615,18 @@ sap.ui.define(
 
                     if (!confirmed) return;
 
-                    this.getBusyDialog();
-
                     try {
                         const updatedItems = aItems.filter(item => item.IndexNo !== oItemData.IndexNo);
 
-                        // Reindex the remaining items
                         updatedItems.forEach((item, idx) => {
                             item.IndexNo = idx + 1;
                         });
 
                         oModel.setProperty("/ConsultantInvoiceItem", updatedItems);
-
-                        // Check if the item is already saved (existing in DB)
                         const isSavedItem = oItemData.InvoiceNo && oItemData.SlNo;
 
-                       if (isSavedItem) {
+                        if (isSavedItem) {
+                             this.getBusyDialog();
                             const sUrl = "/ConsultantInvoiceItem";
                             const oPayload = {
                                 filters: {
@@ -642,7 +638,7 @@ sap.ui.define(
                             await this.ajaxDeleteWithJQuery(sUrl, oPayload);
                             sap.m.MessageToast.show("Invoice item deleted successfully.");
                         } else {
-                            sap.m.MessageToast.show("Draft invoice item removed.");
+                            sap.m.MessageToast.show("Invoice item deleted successfully.");
                         }
 
                         this.CI_updateTotalAmount();
@@ -1283,10 +1279,6 @@ sap.ui.define(
                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                           }
                       }
-                  },
-
-                 CI_onChangeGSTCalculation: function () {
-                    this.CI_updateTotalAmount();
                   },
 
                 CI_commonOpenDialog: function(fragmentName) {
