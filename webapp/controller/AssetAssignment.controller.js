@@ -387,7 +387,6 @@ sap.ui.define([
                 var oAssignedDateControl = sap.ui.getCore().byId("FAA_id_AssignedDate");
                 if (oAssignedDateControl) {
                     var oMinDate;
-
                     if (oSelectedData.Status === "Returned" && oSelectedData.ReturnDate) {
                         oMinDate = new Date(oSelectedData.ReturnDate);
                     } else if (oSelectedData.AssignedDate) {
@@ -395,9 +394,7 @@ sap.ui.define([
                     } else if (oSelectedData.AssetCreationDate) {
                         oMinDate = new Date(oSelectedData.AssetCreationDate);
                     }
-
                     var oMaxDate = new Date();
-
                     if (oMinDate) {
                         oAssignedDateControl.setMinDate(oMinDate);
                     }
@@ -434,7 +431,7 @@ sap.ui.define([
             },
 
             FAA_onTypeSelectionChange: function () {
-                const properties = ["Model", "EquipmentNumber", "SerialNumber", "AssetValue"];
+                const properties = ["Model", "AssignBranch", "EquipmentNumber", "SerialNumber", "AssetValue"];
                 properties.forEach(prop => {
                     this.getView().getModel("myform").setProperty(`/formData/data/${prop}`, "");
                 });
@@ -497,11 +494,14 @@ sap.ui.define([
                         this.getBusyDialog();
                         if (originalStatus === "Returned") {
                             // oFormData.AssetCreationDate;
-                            oFormData.PickedEmployeeName;
-                            oFormData.PickedEmployeeID;
-                            oFormData.PickedBranch;
+                            oFormData.PickedEmployeeName = oFormData.ReturnEmpName;
+                            oFormData.PickedEmployeeID = oFormData.ReturnEmpID;
+                            oFormData.PickedBranch = oFormData.ReturnBranch;
                             oFormData.AssetCreationDate = oFormData.ReturnDate;
                             delete oFormData.ReturnDate
+                            delete oFormData.ReturnBranch
+                            delete oFormData.ReturnEmpID
+                            delete oFormData.ReturnEmpName
                             await this.ajaxCreateWithJQuery("IncomeAsset", { data: oFormData }, ["FAA_id_FormFrag"]);
                         } else {
                             await this.ajaxUpdateWithJQuery("IncomeAsset", {
@@ -575,16 +575,12 @@ sap.ui.define([
                             params[sValue] = oControl.getValue()
                             params["Status"] = "Assigned"
                         }
-
                         else {
                             params[sValue] = oControl.getValue();
                         }
                     }
                 });
-                await this.AA_CoomonReadCall(params); // read call for trainee after filter
-                // } catch (error) {
-                //     MessageToast.show(this.i18nModel.getText("technicalError"));
-                // }
+                await this.AA_CoomonReadCall(params); 
             },
 
             FAU_onChangeReturnTo: function (oEvent) {
@@ -634,23 +630,23 @@ sap.ui.define([
                         var oReturnDatePicker = sap.ui.getCore().byId("FAU_id_unassignDate");
                         oReturnDatePicker.setMinDate(oMinDate);
                         oReturnDatePicker.setMaxDate(oMaxDate);
-                        if (role === "Admin" || role === "IT Manager") {
-                            var allAdmins = this.getView().getModel("AdminModel").getProperty("/");
-                            var oAssignedBranch = oSelectedData.AssignBranch; // e.g., "Kalaburagi"
-                            var baseLocationData = this.getView().getModel("BaseLocationModel").getData();
-                            var allowedRoles = ["Admin",
-                                "IT Manager",
-                                "IT Consultant"];
-                            var filteredAdmins = allAdmins.filter(emp => {
-                                var empBranchCode = emp.BranchCode;
-                                var branchEntry = baseLocationData.find(item => item.branchCode === empBranchCode);
-                                var empCity = branchEntry ? branchEntry.city : "";
+                        // if (role === "Admin" || role === "IT Manager") {
+                        //     var allAdmins = this.getView().getModel("AdminModel").getProperty("/");
+                        //     var oAssignedBranch = oSelectedData.AssignBranch; // e.g., "Kalaburagi"
+                        //     var baseLocationData = this.getView().getModel("BaseLocationModel").getData();
+                        //     var allowedRoles = ["Admin",
+                        //         "IT Manager",
+                        //         "IT Consultant"];
+                        //     var filteredAdmins = allAdmins.filter(emp => {
+                        //         var empBranchCode = emp.BranchCode;
+                        //         var branchEntry = baseLocationData.find(item => item.branchCode === empBranchCode);
+                        //         var empCity = branchEntry ? branchEntry.city : "";
 
-                                return empCity === oAssignedBranch && allowedRoles.includes(emp.Role);
-                            });
-                            var oFilteredModel = new sap.ui.model.json.JSONModel(filteredAdmins);
-                            sap.ui.getCore().byId("FAU_id_returnTo").setModel(oFilteredModel, "AdminModel");
-                        }
+                        //         return empCity === oAssignedBranch && allowedRoles.includes(emp.Role);
+                        //     });
+                        //     var oFilteredModel = new sap.ui.model.json.JSONModel(filteredAdmins);
+                        //     sap.ui.getCore().byId("FAU_id_returnTo").setModel(oFilteredModel, "AdminModel");
+                        // }
 
                     } else {
                         this.closeBusyDialog();
@@ -697,6 +693,9 @@ sap.ui.define([
                 formData.setProperty("/formData/data/PickedEmployeeID", oSelectedData.PickedEmployeeID);
                 formData.setProperty("/formData/data/PickedBranch", oSelectedData.PickedBranch);
                 formData.setProperty("/formData/data/ReturnDate", oSelectedData.ReturnDate);
+                 formData.setProperty("/formData/data/ReturnEmpID", oSelectedData.ReturnEmpID);
+                  formData.setProperty("/formData/data/ReturnEmpName", oSelectedData.ReturnEmpName);
+                   formData.setProperty("/formData/data/ReturnBranch", oSelectedData.ReturnBranch);
 
                 var oAssignedDate;
                 var oMinDate;
@@ -804,9 +803,9 @@ sap.ui.define([
                     this._unassignDialog.close();
                     this.byId("AA_id_AssestTable").removeSelections(true);
                 }
-                else {
-                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                }
+                // else {
+                //     MessageToast.show(this.i18nModel.getText("correctMessagewhilereturn"));
+                // }
             },
 
             _checkValidation: function () {
