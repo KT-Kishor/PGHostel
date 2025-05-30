@@ -373,18 +373,36 @@ sap.ui.define([
                         oControl.setEditable(aEditableFields.includes(id));
                     }
                 });
+                // var oAssignedDateControl = sap.ui.getCore().byId("FAA_id_AssignedDate");
+                // if (oAssignedDateControl) {
+                //     // Get minDate from AssetCreationDate
+                //     var sAssetCreationDate = oSelectedData.AssetCreationDate;
+                //     var oMinDate = sAssetCreationDate ? new Date(sAssetCreationDate) : null;
+                //     var oMaxDate = new Date();
+                //     if (oMinDate) {
+                //         oAssignedDateControl.setMinDate(oMinDate);
+                //     }
+                //     oAssignedDateControl.setMaxDate(oMaxDate);
+                // }
                 var oAssignedDateControl = sap.ui.getCore().byId("FAA_id_AssignedDate");
                 if (oAssignedDateControl) {
-                    // Get minDate from AssetCreationDate
-                    var sAssetCreationDate = oSelectedData.AssetCreationDate;
-                    var oMinDate = sAssetCreationDate ? new Date(sAssetCreationDate) : null;
+                    var oMinDate;
+
+                    if (oSelectedData.Status === "Returned" && oSelectedData.ReturnDate) {
+                        oMinDate = new Date(oSelectedData.ReturnDate);
+                    } else if (oSelectedData.AssignedDate) {
+                        oMinDate = new Date(oSelectedData.AssignedDate);
+                    } else if (oSelectedData.AssetCreationDate) {
+                        oMinDate = new Date(oSelectedData.AssetCreationDate);
+                    }
+
                     var oMaxDate = new Date();
+
                     if (oMinDate) {
                         oAssignedDateControl.setMinDate(oMinDate);
                     }
                     oAssignedDateControl.setMaxDate(oMaxDate);
                 }
-
             },
 
             FAA_onEmpIDChange: function (oEvent) {
