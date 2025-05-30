@@ -27,7 +27,7 @@ sap.ui.define(
         var sQuotationNo = decodeURIComponent(oArgs.sQuotationNo);
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
-
+ 
         this.getBusyDialog();
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
@@ -40,9 +40,9 @@ sap.ui.define(
           this.byId("HQD_id_Country").setBusy(true);
           this.byId("HQD_id_BranchCode").setBusy(true);
           this.byId("HQD_id_Curency").setBusy(true);
-          this._fetchCommonData("Currency", "CurrencyModel");
-          this._fetchCommonData("Country", "CountryModel");
-          this._fetchCommonData("BaseLocation", "BrachModel");
+         await this._fetchCommonData("Currency", "CurrencyModel");
+         await this._fetchCommonData("Country", "CountryModel");
+         await this._fetchCommonData("BaseLocation", "BrachModel");
           this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
 
           //  Set Busy false after data has loaded
@@ -112,10 +112,7 @@ sap.ui.define(
         }
         // Inside the onRouteMatched function's else block (edit mode)
         else {
-          this._fetchCommonData("Currency", "CurrencyModel");
-          this._fetchCommonData("Country", "CountryModel");
-          this._fetchCommonData("BaseLocation", "BrachModel");
-          this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
+          this._fetchCommonData("Currency", "CurrencyModel");this._fetchCommonData("Country", "CountryModel");this._fetchCommonData("BaseLocation", "BrachModel");this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
           // Edit Mode
           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
@@ -432,8 +429,27 @@ sap.ui.define(
         this.updateTotalAmount();
       },
       HQD_onBack: function () {
-        this.getRouter().navTo("RouteHrQuotation");
-        this.resetHQDForm()
+          var isEditMode = this.getView().getModel("visiablityPlay").getProperty("/editable");
+                    if (isEditMode) {
+                        this.showConfirmationDialog(
+                            this.i18nModel.getText("ConfirmActionTitle"),
+                            this.i18nModel.getText("backConfirmation"),
+                            function () {
+                                // Reset edit-related flags
+                                this.getView().getModel("visiablityPlay").setProperty("/editable", false);
+                                this.getView().getModel("visiablityPlay").setProperty("/merge", true);
+                                    this.resetHQDForm()
+                                // Navigate back
+                                 this.getRouter().navTo("RouteHrQuotation");
+                            }.bind(this)
+                        );
+                    } else {
+                       this.resetHQDForm()
+                         this.getRouter().navTo("RouteHrQuotation");
+                    }
+
+       
+       
       },
       HQD_DateValidate: function (oEvent) {
         var oView = this.getView();
