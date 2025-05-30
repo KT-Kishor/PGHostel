@@ -43,7 +43,7 @@
     <Button
         text="{i18n>relievingletter}"
         type="Accept"
-        visible="{viewModel>/Letter}"
+        visible="{viewModel>/WorkCompletedVisible}"
         tooltip="{i18n>relievingletter}"
         id="SS_idExperience"
         press="SS_onDownloadExperienceLetter"

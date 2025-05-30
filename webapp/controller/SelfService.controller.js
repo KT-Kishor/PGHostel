@@ -19,8 +19,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getBusyDialog();
                     const oView = this.getView();
                     this.i18nModel = oView.getModel("i18n").getResourceBundle();
-                    this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
-                    // Load dropdown data once
+                    this.companyName = "Kalpavriksha Technologies";
                     if (!oView.getModel("sDesignationModel")) {
                         this._fetchCommonData("Designation", "sDesignationModel");
                         this._fetchCommonData("BaseLocation", "sBaseLocationModel");
@@ -28,11 +27,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this._fetchCommonData("AppVisibility", "RoleModel");
                         this._fetchCommonData("Country", "CountryModel");
                     }
-                    // this._fetchCommonData("ApplyResignationEmail", "resignModel");
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
                         fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false,
-                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false,
+                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
@@ -57,7 +55,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     else {
                         this.EmployeeID = this.sPath;
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
-                        if ( this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee" ) {
+                        if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {
                             this.ViewModel.setProperty("/Letter", true);
                         } else {
                             this.ViewModel.setProperty("/Letter", false);
@@ -87,6 +85,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         if (!oModelAllData.EContactIStdCode) oModelAllData.EContactIStdCode = "+91";
                         if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
 
+                        // --- Releving letter Button Visibility Logic ---
+                        if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee" && oModelAllData.EmployeeStatus === "Inactive") {
+                            this.ViewModel.setProperty("/WorkCompletedVisible", true);
+                        } else {
+                            this.ViewModel.setProperty("/WorkCompletedVisible", false);
+                        }
                         const oObjectPage = this.byId("ObjectPageLayout");
                         const oSection = this.byId("basicDetailsSection");
                         if (oObjectPage && oSection) {
@@ -164,6 +168,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.ReadEmployeeDocument();
                         break;
                 }
+            },
+            onOpenActionBtn: function (oEvent) {
+                var oBtn = oEvent.getSource();
+                if (!this._oActionBtn) {
+                    this._oActionBtn = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.SelfServiceActionDialog", this);
+                    this.getView().addDependent(this._oActionBtn);
+                }
+                this._oActionBtn.openBy(oBtn);
             },
             SS_readEducationalDetails: async function (filter) {
                 try {
@@ -1593,7 +1605,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
             },
 
-            SS_onDownloadWorkLetter:function(){
+            SS_onDownloadWorkLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var today = new Date();
                 var date = Formatter.formatDate(today);
