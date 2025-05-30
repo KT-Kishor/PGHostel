@@ -37,7 +37,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
                     var sLoggedInRole = loginModel.getProperty("/Role");
                     var sNavigatedRole = oEvent.getParameter("arguments").Role; // Role from navigation
-                    // sections if role is "Trainee" from either login or navigation
+                     // sections if role is "Trainee" from either login or navigation
                     var bHideSalarySection = sLoggedInRole === "Trainee" || sNavigatedRole === "Trainee";
                     this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
 
@@ -60,7 +60,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         } else {
                             this.ViewModel.setProperty("/Letter", false);
                         }
-                        if (loginModel.getProperty("/Role") === "Admin") {
+                        if (loginModel.getProperty("/Role") === "Admin" ) {
                             this.ViewModel.setProperty("/RelievingLetter", true);
                         }
                         aIds.forEach(function (sId) {
@@ -86,8 +86,23 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
 
                         // --- Releving letter Button Visibility Logic ---
-                        if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee" && oModelAllData.EmployeeStatus === "Inactive") {
-                            this.ViewModel.setProperty("/WorkCompletedVisible", true);
+                        if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {if (oModelAllData.EmployeeStatus === "Inactive") {
+                                this.ViewModel.setProperty("/WorkCompletedVisible", true);
+                                this.ViewModel.setProperty("/Letter", false); // Hide other letter buttons
+                                this.ViewModel.setProperty("/TraineeRole", true);
+                                this.ViewModel.setProperty("/RelievingLetter", false);
+                            } else if (oModelAllData.EmployeeStatus === "Active") {
+                                this.ViewModel.setProperty("/WorkCompletedVisible", false);
+                                this.ViewModel.setProperty("/Letter", true); // Show  buttons for active
+                                this.ViewModel.setProperty("/TraineeRole", false);
+                                this.ViewModel.setProperty("/RelievingLetter", true);
+                            
+                            } else {
+                                this.ViewModel.setProperty("/WorkCompletedVisible", false);
+                                this.ViewModel.setProperty("/Letter", false);
+                                 this.ViewModel.setProperty("/TraineeRole", true);
+                                 this.ViewModel.setProperty("/RelievingLetter", false);      
+                            }
                         } else {
                             this.ViewModel.setProperty("/WorkCompletedVisible", false);
                         }
@@ -1927,7 +1942,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         CC: [oEmployeeModel.CompanyEmailID],
                     };
                     this.getBusyDialog();
-                    await this.ajaxCreateWithJQuery("ResignationMail", (oPayload));
+                    await this.ajaxCreateWithJQuery("ResignationMail", oPayload);
                     MessageToast.show(this.i18nModel.getText("resignationMailSent"));
                     // Show Withdraw button (set a flag in your model)
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
@@ -1969,7 +1984,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 CC: [oEmployeeModel.CompanyEmailID],
                             };
                             that.getBusyDialog();
-                            await that.ajaxCreateWithJQuery("ResignationMail", (oPayload));
+                            await that.ajaxCreateWithJQuery("ResignationMail", oPayload);
                             MessageToast.show(that.i18nModel.getText("withdrawMailSent"));
                             that.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
                             that.SSReg_oDialog.close();
