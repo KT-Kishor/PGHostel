@@ -226,25 +226,28 @@ sap.ui.define(
                     }
                 },
 
-                CI_onChangeContractDetails: function(oEvent) {
+              CI_onChangeContractDetails: function (oEvent) {
                     let sValue = oEvent.getSource().getValue().split(' - ');
-                    var contractID = sValue[0];
-                    var contractName = sValue[1];
-                    var oMsgText = this.i18nModel.getText("selectContractNo");
+                    let contractID = sValue[0];
+                    let contractName = sValue[1];
+                    let oMsgText = this.i18nModel.getText("selectContractNo");
 
-                    // Use MessageBox to ask for confirmation
-                    sap.m.MessageBox.confirm(oMsgText, {
-                        actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
-                        onClose: function(sAction) {
-                            if (sAction === sap.m.MessageBox.Action.OK) {
-                                // User clicked OK, proceed with the contract change
-                                this.selectedContractID = contractID;
-                                this.Copy = true;
-                                this.readFunction("/ConsultantInvoice", "ConsultantInvoiceModel", true, contractID, contractName);
-                                MessageToast.show(this.i18nModel.getText("datadestroy"));
-                            }
-                        }.bind(this)
-                    });
+                    // Use common confirmation dialog
+                    this.showConfirmationDialog(
+                        this.i18nModel.getText("confirmationTitle"), // Title like "Confirm"
+                        oMsgText,                                    // Message body
+                        function () {
+                            // On Confirm
+                            this.selectedContractID = contractID;
+                            this.Copy = true;
+                            this.readFunction("/ConsultantInvoice", "ConsultantInvoiceModel", true, contractID, contractName);
+                            sap.m.MessageToast.show(this.i18nModel.getText("datadestroy"));
+                        }.bind(this),
+                        function () {
+                        }.bind(this),
+                        this.i18nModel.getText("ok"),     // OK button text (optional)
+                        this.i18nModel.getText("cancel")  // Cancel button text (optional)
+                    );
                 },
 
                 readFunction: function(entitySet, modelName, isCreate, contractID, contractName) {
@@ -1414,16 +1417,10 @@ sap.ui.define(
             const { jsPDF } = window.jspdf;
             const oView = this.getView();
             const oModel = oView.getModel("ConsultantInvoiceModel").getData();
-            
-            // Get the ConsultantInvoiceItem data directly from the model
             const oConsultantItemModel = oModel.ConsultantInvoiceItem || [];
             
-            let currency = "Rupees";
-            if (oModel.Currency !== "INR") {
-                currency = oModel.Currency;
-            }
+            let currency = oModel.Currency === "INR" ? "Rupees" : oModel.Currency;
             let totalInWords = this.convertNumberToWords(oModel.TotalSum, currency);
-
             if (oModel.Currency !== "INR") {
                 totalInWords = totalInWords
                     .replaceAll("Lakh", "Million")
@@ -1444,7 +1441,6 @@ sap.ui.define(
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
             const usableWidth = pageWidth - 2 * margin;
-            const footerHeight = 15;
             const headerMargin = 25.4;
             let currentY = headerMargin;
 
@@ -1656,7 +1652,7 @@ sap.ui.define(
 
             currentY = doc.lastAutoTable.finalY + 10;
 
-            oModel.AmountInWords = this.convertNumberToWords(oModel.TotalSum, oModel.Currency, { maxWidth: 80 });
+            oModel.AmountInWords = totalInWords;
             doc.setFont("times", "bold");
             doc.text("Amount in Words:", 13, currentY);
             currentY += 5;

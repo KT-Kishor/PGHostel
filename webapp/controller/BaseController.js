@@ -860,50 +860,52 @@ sap.ui.define([
     },
 
     //Common Convert number to words function
-    convertNumberToWords: function (num, currency) {
-      if (num === 0) return "Zero " + currency + " Only";
+      convertNumberToWords: function (num, currency) {
+        if (num === 0) return "Zero " + currency + " Only";
 
-      const belowTwenty = [
-        '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
-        'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen',
-        'Eighteen', 'Nineteen'
-      ];
-      const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-      const thousands = ['', 'Thousand', 'Lakh', 'Crore'];
+        const belowTwenty = [
+            '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+            'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen',
+            'Eighteen', 'Nineteen'
+        ];
+        const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+        const thousands = ['', 'Thousand', 'Lakh', 'Crore'];
 
-      function helper(n) {
-        if (n === 0) return '';
-        else if (n < 20) return belowTwenty[n] + ' ';
-        else if (n < 100) return tens[Math.floor(n / 10)] + ' ' + helper(n % 10);
-        else return belowTwenty[Math.floor(n / 100)] + ' Hundred ' + helper(n % 100);
-      }
-
-      let result = '';
-      let i = 0;
-
-      let integerPart = Math.floor(num);
-      let fractionalPart = Math.round((num - integerPart) * 100);
-
-      while (integerPart > 0) {
-        let divisor = i === 0 ? 1000 : 100;
-        const remainder = integerPart % divisor;
-
-        if (remainder !== 0) {
-          result = helper(remainder) + thousands[i] + ' ' + result;
+        function helper(n) {
+            if (n === 0) return '';
+            else if (n < 20) return belowTwenty[n] + ' ';
+            else if (n < 100) return tens[Math.floor(n / 10)] + ' ' + helper(n % 10);
+            else return belowTwenty[Math.floor(n / 100)] + ' Hundred ' + helper(n % 100);
         }
 
-        integerPart = Math.floor(integerPart / divisor);
-        i++;
-      }
+        let result = '';
+        let i = 0;
 
-      result = result.trim() + "${currency}";
+        let integerPart = Math.floor(num);
+        let fractionalPart = Math.round((num - integerPart) * 100);
 
-      // Add fractional part (Paise/Cents)
-      if (fractionalPart > 0) {
-        result += " and " + helper(fractionalPart) + (currency === "INR" ? "Paise" : "Cents");
-      }
+        while (integerPart > 0) {
+            let divisor = (i === 0) ? 1000 : 100;
+            const remainder = integerPart % divisor;
 
-      return result + " Only";
+            if (remainder !== 0) {
+                result = helper(remainder) + thousands[i] + ' ' + result;
+            }
+
+            integerPart = Math.floor(integerPart / divisor);
+            i++;
+        }
+
+        result = result.trim() + ` ${currency}`;
+
+        // Add fractional part (lowercase + correct suffix)
+        if (fractionalPart > 0) {
+            const fractionalWords = helper(fractionalPart).trim().toLowerCase();
+            const suffix = (currency === "Rupees") ? "paise" : "cents";
+            result += " and " + fractionalWords + ' ' + suffix;
+        }
+
+        return result + " Only";
     },
 
     scrollToSection: function (pageId, sectionId) {
