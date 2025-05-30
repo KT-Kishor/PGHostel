@@ -27,7 +27,7 @@ sap.ui.define(
         var sQuotationNo = decodeURIComponent(oArgs.sQuotationNo);
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
- 
+
         this.getBusyDialog();
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
@@ -40,9 +40,9 @@ sap.ui.define(
           this.byId("HQD_id_Country").setBusy(true);
           this.byId("HQD_id_BranchCode").setBusy(true);
           this.byId("HQD_id_Curency").setBusy(true);
-         await this._fetchCommonData("Currency", "CurrencyModel");
-         await this._fetchCommonData("Country", "CountryModel");
-         await this._fetchCommonData("BaseLocation", "BrachModel");
+          await this._fetchCommonData("Currency", "CurrencyModel");
+          await this._fetchCommonData("Country", "CountryModel");
+          await this._fetchCommonData("BaseLocation", "BrachModel");
           this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
 
           //  Set Busy false after data has loaded
@@ -112,7 +112,7 @@ sap.ui.define(
         }
         // Inside the onRouteMatched function's else block (edit mode)
         else {
-          this._fetchCommonData("Currency", "CurrencyModel");this._fetchCommonData("Country", "CountryModel");this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
+          this._fetchCommonData("Currency", "CurrencyModel"); this._fetchCommonData("Country", "CountryModel");
           // Edit Mode
           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
@@ -132,6 +132,10 @@ sap.ui.define(
             var cgstSelected = (cgst > 0 || sgst > 0);
             var igstSelected = (igst > 0);
             oSelectedModel.setProperty("/gstEditable", false); // Disable editing
+            var sCurrency = oSelectedQuotation.Currency;
+
+  // Determine if SAC and GST Calculation should be visible
+  var bShowSAC = sCurrency === "INR";
 
             // Convert Notes from HTML to plain text for display
             var sNotes = oSelectedModel.getProperty("/Notes");
@@ -159,7 +163,8 @@ sap.ui.define(
                   IGSTSelected: igstSelected,
                   CGSTVisible: cgstVisible,
                   SGSTVisible: sgstVisible,
-                  IGSTVisible: igstVisible
+                  IGSTVisible: igstVisible,
+                    ShowSACAndGSTCalculation: bShowSAC
                 });
                 this.getView().setModel(oQuotationModel, "QuotationModel");
                 this.updateTotalAmount();
@@ -168,10 +173,8 @@ sap.ui.define(
               console.error("Error loading items", e);
             }
           }
-
           oVisiModel.setData({ editable: false });
         }
-
         if (sQuotationNo === "new") {
           oVisiModel.setData({
             editable: true,
@@ -220,7 +223,7 @@ sap.ui.define(
           if (sMobileNo.startsWith("+91")) {
             sActualMobileNo = sMobileNo.slice(3); // remove +91
           }
-          oSingleCompanyModel.setProperty("/Branch", "");
+          oSingleCompanyModel.setProperty("/Branch", "KLB02");
           oSingleCompanyModel.setProperty("/Currency", "INR"); oSingleCompanyModel.setProperty("/STDCode", "+91"); oSingleCompanyModel.setProperty("/Country", sSelectedKey); oSingleCompanyModel.setProperty("/gstEditable", true);
           oSingleCompanyModel.setProperty("/CompanyAddress", oRawData.longAddress); oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName); oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin); oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail); oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
         }
@@ -236,6 +239,7 @@ sap.ui.define(
       },
 
       HQD_onBrachChange: function (oEvent) {
+        utils._LCstrictValidationComboBox(oEvent);
         var sSelectedBranchCode = oEvent.getSource().getSelectedKey();
         var aCompanyDetails = this.getView().getModel("CompanyCodeDetailsModel").getData();
 
@@ -429,27 +433,27 @@ sap.ui.define(
         this.updateTotalAmount();
       },
       HQD_onBack: function () {
-          var isEditMode = this.getView().getModel("visiablityPlay").getProperty("/editable");
-                    if (isEditMode) {
-                        this.showConfirmationDialog(
-                            this.i18nModel.getText("ConfirmActionTitle"),
-                            this.i18nModel.getText("backConfirmation"),
-                            function () {
-                                // Reset edit-related flags
-                                this.getView().getModel("visiablityPlay").setProperty("/editable", false);
-                                this.getView().getModel("visiablityPlay").setProperty("/merge", true);
-                                    this.resetHQDForm()
-                                // Navigate back
-                                 this.getRouter().navTo("RouteHrQuotation");
-                            }.bind(this)
-                        );
-                    } else {
-                       this.resetHQDForm()
-                         this.getRouter().navTo("RouteHrQuotation");
-                    }
+        var isEditMode = this.getView().getModel("visiablityPlay").getProperty("/editable");
+        if (isEditMode) {
+          this.showConfirmationDialog(
+            this.i18nModel.getText("ConfirmActionTitle"),
+            this.i18nModel.getText("backConfirmation"),
+            function () {
+              // Reset edit-related flags
+              this.getView().getModel("visiablityPlay").setProperty("/editable", false);
+              this.getView().getModel("visiablityPlay").setProperty("/merge", true);
+              this.resetHQDForm()
+              // Navigate back
+              this.getRouter().navTo("RouteHrQuotation");
+            }.bind(this)
+          );
+        } else {
+          this.resetHQDForm()
+          this.getRouter().navTo("RouteHrQuotation");
+        }
 
-       
-       
+
+
       },
       HQD_DateValidate: function (oEvent) {
         var oView = this.getView();
@@ -528,7 +532,7 @@ sap.ui.define(
           oQuotationModel.setProperty("/ShowGSTFields", false);
           oSingleCompanyModel.setProperty("/Percentage", "");
           oQuotationModel.setProperty("/CGSTSelected", false);
-          oSingleCompanyModel.setProperty("/IGSTSelected", false);
+          oQuotationModel.setProperty("/IGSTSelected", false);
           oSingleCompanyModel.setProperty("/CompanyGSTNO", "");
           oSingleCompanyModel.setProperty("/gstEditable", false);
           oView.byId("HQD_id_CompGSTNO")?.setEnabled(false);
@@ -563,7 +567,16 @@ sap.ui.define(
       },
 
       HQD_onCustomerGSTLiveChange: function (oEvent) {
-        utils._LCvalidateGstNumber(oEvent)
+        const sGSTIN = oEvent.getSource().getValue();
+        const oInput = oEvent.getSource();
+        const regexGSTIN = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
+        if (sGSTIN && !regexGSTIN.test(sGSTIN)) {
+          oInput.setValueState(sap.ui.core.ValueState.Error);
+          oInput.setValueStateText("GST number should be in proper format (Eg:22AAAAA0000A1Z5)");
+        } else {
+          oInput.setValueState(sap.ui.core.ValueState.None);
+        }
       },
       HQD_onDiscountInfoPress: function (oEvent) {
         if (!this._oPopover) {
@@ -622,6 +635,13 @@ sap.ui.define(
           MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           return;
         }
+        // Additional Customer GST validation based on valueState
+        const oCustomerGSTInput = this.byId("HQD_id_InputCustomerGSTNO");
+        if (oCustomerGSTInput.getValue() && oCustomerGSTInput.getValueState() !== sap.ui.core.ValueState.None) {
+          MessageToast.show("Please fix the Customer GST number format before submitting.");
+          return;
+        }
+
 
         // Get values from QuotationModel
         const oQuotationModel = oView.getModel("QuotationModel");
@@ -1525,6 +1545,7 @@ sap.ui.define(
 
         if (!bEditable) {
           oModel.setProperty("/editable", true);
+          oModel.setProperty("/merge", false);
           oRadiobtn.setProperty("/gstEditable", true);
 
         } else {
@@ -1656,6 +1677,7 @@ sap.ui.define(
             if (response.success === true) {
               MessageToast.show(`Quotation updated successfully!`);
               oModel.setProperty("/editable", false); // Exit edit mode
+              oModel.setProperty("/merge", true); // Exit edit mode
               oRadiobtn.setProperty("/gstEditable", false);
             } else {
               MessageToast.show("Failed to update quotation.");

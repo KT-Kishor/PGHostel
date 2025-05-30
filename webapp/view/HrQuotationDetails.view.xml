@@ -92,7 +92,9 @@
     change="HQD_onBrachChange"
     editable="{visiablityPlay>/editable}"
      visible="{visiablityPlay>/showBranch}"
+     valueStateText="Enter Branch"
      showSecondaryValues="true"
+    
 >
     <core:ListItem key="{BrachModel>branchCode}" text="{BrachModel>city}" additionalText="{BrachModel>branchCode}" />
 </m:ComboBox>
@@ -151,8 +153,7 @@
                                             maxLength="100"
                                         />
                                        
-                                        
-                                        <m:Label text="{i18n>companyGSTNO}"  required="true"/>
+                                        <m:Label text="{i18n>companyGSTNO}"  required="{QuotationModel>/ShowGSTFields}"/>
                                         <m:Input
                                             value="{SingleCompanyModel>/CompanyGSTNO}"
                                             id="HQD_id_CompGSTNO"
@@ -164,7 +165,7 @@
                                         />
                                         <m:Label
                                             text="{i18n>type}"
-                                            required="true"
+                                            required="{QuotationModel>/ShowGSTFields}"
                                         />
                                        <m:RadioButton
     text="{i18n>cgst}"
@@ -191,7 +192,7 @@
     value="{SingleCompanyModel>/Percentage}"
     change="HQD_onPercentageChange"
     editable="{SingleCompanyModel>/gstEditable}"
-    maxLength="10"
+    type="Number"
     valueStateText="{i18n>msaAmountMess}"
     id="HQD_id_Percentage"
    
@@ -497,7 +498,6 @@
         text="{SACModel>sac}"
       />
     </m:ComboBox>
-
     <!-- GSTCalculation (Column 4) -->
     <m:ComboBox
       value="{QuotationModel>GSTCalculation}"
