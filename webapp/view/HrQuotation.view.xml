@@ -134,7 +134,7 @@
                             <Text text="{CompanyQuotationModel>CustomerGSTNO}" />
                             <Text text="{CompanyQuotationModel>CustomerEmailID}" />
     <Text text="{CompanyQuotationModel>CustomerSTDCode} {CompanyQuotationModel>CustomerMobileNo}" />
-                            <Text text="{path:'CompanyQuotationModel>TotalSum',formatter: '.Formatter.fromatNumber'} {CompanyQuotationModel>Currency}" />
+                            <Text text="{CompanyQuotationModel>Currency} {path:'CompanyQuotationModel>TotalSum',formatter: '.Formatter.fromatNumber'}" />
 
                         </cells>
                     </ColumnListItem>

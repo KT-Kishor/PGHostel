@@ -161,7 +161,7 @@
                                             valueStateText="{i18n>gstNoValueState}"
                                             change="HQD_onChangeGstNo"
                                             editable="{visiablityPlay>/editable}"
-                                            maxLength="20"
+                                            maxLength="15"
                                         />
                                         <m:Label
                                             text="{i18n>type}"

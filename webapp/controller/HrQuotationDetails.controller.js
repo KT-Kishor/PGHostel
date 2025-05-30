@@ -527,6 +527,7 @@ sap.ui.define(
           var fNewTotal = fTotal + fCGST + fSGST + fIGST;
           oModelDataPro.setProperty("/TotalSum", fNewTotal.toFixed(2));
         } else {
+          this.updateTotalAmount()
           // Currency is NOT INR — disable GST
           oQuotationModel.setProperty("/CGSTVisible", false); oQuotationModel.setProperty("/SGSTVisible", false); oQuotationModel.setProperty("/IGSTVisible", false);
           oQuotationModel.setProperty("/ShowGSTFields", false);
@@ -1102,7 +1103,8 @@ sap.ui.define(
         // Update Y position
         y = doc.lastAutoTable.finalY + 5;
         // Amount in Words
-        oData.AmountInWords = this.numberToWords(oData.TotalSum, oData.Currency, { maxWidth: 80 });
+      oData.AmountInWords = this.numberToWords(parseFloat(oQuotaionItem.TotalSum || 0), oData.Currency);
+
         doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("pdfaAmount"), 13, y);
         y += 5;
