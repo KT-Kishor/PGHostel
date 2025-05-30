@@ -42,6 +42,8 @@
 						<m:Button text="{i18n>resignationletter}" press="onApplyResignation"  type="Reject" tooltip="{i18n>resignationletter}" visible="{viewModel>/ResignationVisible}"/>
 						<m:Button text="{i18n>terminateLetter}" type="Reject"  visible="{viewModel>/Letter}" tooltip="{i18n>terminateLetter}" id="SS_idTermination" press="SS_onDownloadTerminateLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
 						<m:Button text="{i18n>relievingletter}" type="Accept"  visible="{viewModel>/Letter}" tooltip="{i18n>relievingletter}" id="SS_idExperience" press="SS_onDownloadExperienceLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
+						<m:Button text="{i18n>workCertificate}" type="Success"  visible="{viewModel>/Letter}" tooltip="{i18n>}" id="SS_idWorkBtn" press="SS_onDownloadRelLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
+						<m:Button text="{i18n>salaryCertificate}" type="Ghost"  visible="{viewModel>/Letter}" tooltip="{i18n>}" id="SS_idSalarybtn" press="SS_onDownloadSalLetter" enabled="{= ${viewModel>/isEditMode} === true ? false : true}"/>
 					</actions>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>

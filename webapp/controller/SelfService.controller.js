@@ -28,7 +28,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this._fetchCommonData("AppVisibility", "RoleModel");
                         this._fetchCommonData("Country", "CountryModel");
                     }
-                       // this._fetchCommonData("ApplyResignationEmail", "resignModel");
+                    // this._fetchCommonData("ApplyResignationEmail", "resignModel");
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
                         fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false,
@@ -57,7 +57,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     else {
                         this.EmployeeID = this.sPath;
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
-                        if (this.sPath !== "SelfService" && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {
+                        if ( this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee" ) {
                             this.ViewModel.setProperty("/Letter", true);
                         } else {
                             this.ViewModel.setProperty("/Letter", false);
@@ -1885,16 +1885,16 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             </div>
         `;
                     var oPayload = {
-                        from: oEmployeeModel.CompanyEmailID || oEmployeeModel.CompanyEmail || "",
+                        from: oEmployeeModel.CompanyEmailID,
                         fromName: empName,
-                        to: this.getView().getModel("resignModel").getData()[0].ManagerID,
-                        toName: this.getView().getModel("resignModel").getData()[0].ManagerName,
+                        to: "",
+                        toName: "",
                         subject: subject,
                         body: body,
                         CC: [oEmployeeModel.CompanyEmailID],
                     };
                     this.getBusyDialog();
-                    await this.ajaxCreateWithJQuery("ApplyResignationEmail", { data: oPayload });
+                    await this.ajaxCreateWithJQuery("ResignationMail", (oPayload));
                     MessageToast.show(this.i18nModel.getText("resignationMailSent"));
                     // Show Withdraw button (set a flag in your model)
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
@@ -1909,14 +1909,13 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var that = this;
                 this.showConfirmationDialog(
                     this.i18nModel.getText("msgBoxConfirm"),
-                    this.i18nModel.getText("withdrawConfirmMessage"), // Add this key to your i18n: "Are you sure you want to withdraw your resignation?"
+                    this.i18nModel.getText("withdrawConfirmMessage"),
                     async function () {
                         try {
                             var oEmployeeModel = that.getView().getModel("sEmployeeModel").getData()[0];
                             var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
                             var designation = oEmployeeModel.Designation;
                             var managerName = oEmployeeModel.ManagerName;
-                            var managerEmail = oEmployeeModel.ManagerEmailID || oEmployeeModel.ManagerEmail || "";
 
                             var subject = `Withdrawal of Resignation: ${empName}`;
                             var body = `
@@ -1927,19 +1926,18 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 </div>
                             `;
                             var oPayload = {
-                                from: oEmployeeModel.CompanyEmailID || oEmployeeModel.CompanyEmail || "",
+                                isWithdraw: isWithdraw,
+                                from: oEmployeeModel.CompanyEmailID,
                                 fromName: empName,
-                                to: that.getView().getModel("resignModel").getData()[0].ManagerID,
-                                toName: that.getView().getModel("resignModel").getData()[0].ManagerName,
+                                to: oEmployeeModel.CompanyEmailID,
+                                to: empName,
                                 subject: subject,
                                 body: body,
                                 CC: [oEmployeeModel.CompanyEmailID],
                             };
-
                             that.getBusyDialog();
-                            await that.ajaxCreateWithJQuery("ApplyResignationEmail", { data: oPayload });
+                            await that.ajaxCreateWithJQuery("ResignationMail", (oPayload));
                             MessageToast.show(that.i18nModel.getText("withdrawMailSent"));
-                            // Hide Withdraw button after action
                             that.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
                             that.SSReg_oDialog.close();
                         } catch (error) {
@@ -1949,7 +1947,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         }
                     },
                     function () {
-                        // On Cancel: do nothing or add logic if needed
                     }
                 );
             },
