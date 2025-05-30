@@ -192,6 +192,8 @@
 									<m:Table id="CI_id_ConsultantInvoiceDeatailTable" 
 											mode="Delete" 
 											delete="CI_onPressDelete" 
+											growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0"
+											growingScrollToLoad="true" width="auto"
 											items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}">
 										<m:columns>
 											<m:Column width="100px">

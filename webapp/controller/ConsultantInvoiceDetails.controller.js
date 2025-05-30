@@ -913,28 +913,52 @@ sap.ui.define(
                         if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
                 },
 
-                CI_onPressback: function() {
-                    this.getRouter().navTo("RouteConsultantInvoiceApplication");
+               CI_onPressback: function () {
+                    var isEditMode = this.getView().getModel("visiablityPlay").getProperty("/editable");
+                    if (isEditMode) {
+                        this.showConfirmationDialog(
+                            this.i18nModel.getText("ConfirmActionTitle"),
+                            this.i18nModel.getText("backConfirmation"),
+                            function () {
+                                // Reset edit-related flags
+                                this.getView().getModel("visiablityPlay").setProperty("/editable", false);
+                                this.getView().getModel("visiablityPlay").setProperty("/invBtn", false);
+                                this.getView().getModel("visiablityPlay").setProperty("/copyBtn", true);
+                                this.getView().getModel("visiablityPlay").setProperty("/merge", true);
+                                
+                                // Set table mode back to default (e.g., "None")
+                                this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("None");
+
+                                // Navigate back
+                                this.getRouter().navTo("RouteConsultantInvoiceApplication");
+                            }.bind(this)
+                        );
+                    } else {
+                        this.getRouter().navTo("RouteConsultantInvoiceApplication");
+                    }
                 },
 
                CI_onPressSubmit: async function () {
                     try {
                         const that = this;
-
-                        // Validate all required fields
-                        if (
+                         var isMandatoryValid = (
                             utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
                             utils._LCvalidateDate(this.byId("CI_id_PaybyInv"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceTo"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceAddress"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_ConsultantName"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.byId("CI_id_codeModel"), "ID") &&
                             utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputAccountName"), "ID") &&
                             utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
-                            utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID")
-                        ) {
+                            utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID"));
+                            if (!isMandatoryValid) {
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                                return;
+                            }
+                        {
                             const invoiceModel = that.getView().getModel("ConsultantInvoiceModel");
                             const invoiceData = invoiceModel.getData();
 
@@ -949,22 +973,22 @@ sap.ui.define(
                                 isValid = false;
 
                             if (!isValid) {
-                                MessageToast.show(this.i18nModel.getText("mandetoryChecks"));
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                                 return;
                             }
 
                             if (!itemData.TotalSum || itemData.TotalSum <= 0) {
-                                MessageBox.error("Please ensure that at least one item is filled!");
+                                MessageToast.show("Please ensure that at least one item is filled!");
                                 return;
                             }
 
                             if (invoiceData.GSTNO && invoiceData.Percentage && invoiceData.CGSTSelected && invoiceData.IGSTVisible) {
-                                MessageBox.error("Checkbox and the percentage field are filled in before Submit");
+                                MessageToast.show("Checkbox and the percentage field are filled in before Submit");
                                 return;
                             }
 
                             if (!this.Discount || !this.UnitAmount) {
-                                sap.m.MessageBox.error(that.i18nModel.getText("mandetoryFields"));
+                                MessageToast.show(that.i18nModel.getText("mandetoryFields"));
                                 return;
                             }
 
@@ -1086,7 +1110,7 @@ sap.ui.define(
                         } 
                     } catch (error) {
                         this.closeBusyDialog();
-                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
                 },
 
@@ -1101,24 +1125,26 @@ sap.ui.define(
                         const sInvoiceDate = oDateFormat.format(this.byId("CI_id_InDate").getDateValue());
                         const sPayByDate = oDateFormat.format(this.byId("CI_id_PaybyInv").getDateValue());
 
-                      // Perform validations
-                      if (
-                          utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
-                          utils._LCvalidateDate(this.byId("CI_id_PaybyInv"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceTo"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceAddress"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_ConsultantName"), "ID") &&
-                          utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_InputAccountName"), "ID") &&
-                          utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
-                          utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID")
-                      ) {
+                        var isMandatoryValid = (
+                            utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
+                            utils._LCvalidateDate(this.byId("CI_id_PaybyInv"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceTo"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceAddress"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_ConsultantName"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.byId("CI_id_codeModel"), "ID") &&
+                            utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputAccountName"), "ID") &&
+                            utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
+                            utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID"));
+                            if (!isMandatoryValid) {
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                                return;
+                            }{
                           // TotalSum check
                           if (!oModelDataPro.TotalSum || oModelDataPro.TotalSum <= 0) {
-                            this.closeBusyDialog(); // <-- Close custom BusyDialog
-                              sap.m.MessageBox.error("Please ensure that at least one item is filled!");
+                              MessageToast.show("Please ensure that at least one item is filled!");
                               return;
                           }
 
@@ -1126,25 +1152,18 @@ sap.ui.define(
                           if (oConsultantInvoiceModel.GSTNO && oConsultantInvoiceModel.GSTNO !== "") {
                               if (oConsultantInvoiceModel.Percentage && oConsultantInvoiceModel.Percentage !== "") {
                                   if (oConsultantInvoiceModel.CGSTSelected && oConsultantInvoiceModel.IGSTVisible) {
-                                       this.closeBusyDialog(); // <-- Close custom BusyDialog
-                                      sap.m.MessageBox.error("Both CGST and IGST are selected. Please review your GST setup.");
+                                      MessageToast.show("Both CGST and IGST are selected. Please review your GST setup.");
                                       return;
                                   }
                               } else {
-                                   this.closeBusyDialog(); // <-- Close custom BusyDialog
-                                  sap.m.MessageBox.error("GST percentage is required when GST No is provided.");
+                                  MessageToast.show("GST percentage is required when GST No is provided.");
                                   return;
                               }
                           }
 
-                           if (!this.Discount) {
-                            sap.m.MessageBox.error(this.i18nModel.getText("mandetoryFields"));
-                            return; // Prevent further processing
-                            }
-
-                            if (!this.UnitAmount) {
-                            sap.m.MessageBox.error(this.i18nModel.getText("mandetoryFields"));
-                            return; // Prevent further processing
+                           if (!this.Discount || !this.UnitAmount) {
+                                MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+                                return;
                             }
 
                             var isValid = true;
@@ -1155,7 +1174,7 @@ sap.ui.define(
                                 isValid = false;
 
                             if (!isValid) {
-                                MessageToast.show(this.i18nModel.getText("mandetoryChecks"));
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                                 return;
                             }
 
@@ -1267,7 +1286,7 @@ sap.ui.define(
                     this.CI_updateTotalAmount();
                   },
 
-                  CI_commonOpenDialog: function(fragmentName) {
+                CI_commonOpenDialog: function(fragmentName) {
                 if (!this.CI_oDialogMail) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -1430,7 +1449,7 @@ sap.ui.define(
             let currentY = headerMargin;
 
             doc.setFontSize(16);
-            doc.setFont("helvetica", "bold");
+            doc.setFont("times", "bold");
             let headerLabel = (oModel.GSTNO === undefined || oModel.GSTNO === "") ? "INVOICE" : "TAX-INVOICE";
             doc.text(headerLabel, pageWidth - 18, currentY, { align: "right" });
 
@@ -1440,7 +1459,7 @@ sap.ui.define(
             const rowHeight = 6.5;
             const columnWidths = [30, 30];
             doc.setFontSize(12);
-            doc.setFont("helvetica", "normal");
+            doc.setFont("times", "normal");
             const rightAlignX = pageWidth - 13.5 - columnWidths[0] - columnWidths[1];
 
             const detailsTable = [
@@ -1449,15 +1468,15 @@ sap.ui.define(
             ];
 
             detailsTable.forEach(row => {
-                doc.setFont("helvetica", "bold");
+                doc.setFont("times", "bold");
                 doc.text(row.label, rightAlignX + columnWidths[0] - doc.getTextWidth(row.label), currentY + 5);
-                doc.setFont("helvetica", "normal");
+                doc.setFont("times", "normal");
                 doc.text(row.value, rightAlignX + columnWidths[0] + 2, currentY + 5);
                 currentY += rowHeight;
             });
 
             currentY = detailsStartY + 5;
-            doc.setFont("helvetica", "bold");
+            doc.setFont("times", "bold");
             doc.text("From,", margin, currentY);
             currentY = detailsStartY + 10;
             doc.setFontSize(12);
@@ -1465,7 +1484,7 @@ sap.ui.define(
             currentY += 5;
 
             const ConsultantAddressLines = doc.splitTextToSize(oModel.ConsultantAddress, usableWidth / 2 - 10);
-            doc.setFont("helvetica", "normal");
+            doc.setFont("times", "normal");
             doc.text(ConsultantAddressLines, margin, currentY);
             currentY += ConsultantAddressLines.length * 5;
 
@@ -1475,14 +1494,14 @@ sap.ui.define(
             }
 
             currentY += 5;
-            doc.setFont("helvetica", "bold");
+            doc.setFont("times", "bold");
             doc.text("To,", margin, currentY);
             currentY += 5;
             doc.text(oModel.InvoiceTo, margin, currentY);
             currentY += 5;
 
             const InvoiceAddressLines = doc.splitTextToSize(oModel.InvoiceAddress, usableWidth / 2 - 10);
-            doc.setFont("helvetica", "normal");
+            doc.setFont("times", "normal");
             doc.text(InvoiceAddressLines, margin, currentY);
             currentY += InvoiceAddressLines.length * 5;
 
@@ -1615,7 +1634,7 @@ sap.ui.define(
                 body: summaryBody,
                 theme: 'plain',
                 styles: {
-                    font: "helvetica",
+                    font: "times",
                     fontSize: 10,
                     halign: "right",
                     cellPadding: 2
@@ -1646,7 +1665,7 @@ sap.ui.define(
             doc.text(oModel.AmountInWords || "", 13, currentY, { maxWidth: 180 });
             currentY += amountHeight + 10;
 
-            doc.setFont("helvetica", "bold").setFontSize(11);
+            doc.setFont("times", "bold").setFontSize(11);
             doc.text("PAYMENT METHOD :", margin - 2, currentY);
             currentY += 5;
 
@@ -1659,23 +1678,23 @@ sap.ui.define(
             ];
 
             paymentDetails.forEach(detail => {
-                doc.setFont("helvetica", "bold");
+                doc.setFont("times", "bold");
                 const label = `${detail.label} :`;
                 const labelWidth = doc.getTextWidth(label);
                 doc.text(label, margin - 2, currentY);
-                doc.setFont("helvetica", "normal");
+                doc.setFont("times", "normal");
                 doc.text(detail.value, margin + labelWidth, currentY);
                 currentY += 5;
             });
 
             currentY += 10;
-            doc.setFont("helvetica", "bold").setFontSize(12);
+            doc.setFont("times", "bold").setFontSize(12);
             const forLabelText = "For : " + oModel.ConsultantName;
             const totalTextWidth = doc.getTextWidth(forLabelText);
             doc.text(forLabelText, rightAlignX - totalTextWidth + 55, currentY);
             currentY += 15;
 
-            doc.setFont("helvetica", "normal").setFontSize(11);
+            doc.setFont("times", "normal").setFontSize(11);
             doc.text("Thank you for your business!", margin - 2, currentY);
 
             doc.save(`${oModel.ConsultantName}-${oModel.InvoiceNo}-Invoice.pdf`);

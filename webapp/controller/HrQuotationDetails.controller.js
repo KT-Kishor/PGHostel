@@ -112,7 +112,7 @@ sap.ui.define(
         }
         // Inside the onRouteMatched function's else block (edit mode)
         else {
-          this._fetchCommonData("Currency", "CurrencyModel");this._fetchCommonData("Country", "CountryModel");this._fetchCommonData("BaseLocation", "BrachModel");this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
+          this._fetchCommonData("Currency", "CurrencyModel");this._fetchCommonData("Country", "CountryModel");this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
           // Edit Mode
           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
