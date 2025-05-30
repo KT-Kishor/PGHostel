@@ -15,7 +15,11 @@
                 type="XML"
             />
         </headerContent>
-        <Table items="{incomeModel>/}">
+        <Table
+            class="sapUiResponsiveMargin"
+            alternateRowColors="true"
+            width="auto"
+         items="{incomeModel>/}">
             <headerToolbar>
                 <OverflowToolbar>
                     <Title
@@ -47,6 +51,9 @@
                 <Column>
                     <Text text="Equipment Number" />
                 </Column>
+                 <Column>
+                    <Text text="Assigned Date" />
+                </Column>
                 <Column>
                     <Text text="Asset Value" />
                 </Column>
@@ -64,13 +71,19 @@
                         <Text text="{incomeModel>SerialNumber}" />
 
                         <Text text="{incomeModel>EquipmentNumber}" />
-
+                       
+                         <Text
+                            text="{path: 'incomeModel>AssignedDate',
+                             formatter: '.Formatter.formatDate'
+                             }"
+                        />
                         <Text
                             text="{incomeModel>Currency} {
                             path: 'incomeModel>AssetValue',
                             formatter: '.Formatter.formatCurrency'
                         }"
                         />
+                      
                         <ObjectStatus
                             inverted="false"
                             text="{incomeModel>Status}"

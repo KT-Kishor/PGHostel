@@ -18,11 +18,11 @@ sap.ui.define([
         },
         _onRouteMatched: async function (oEvent) {
           
-         var Layout = this.byId("ObjectPageLayout");
-         Layout.setSelectedSection(this.byId("OB_Timeline")); 
-
-         var LoginFunction = await this.commonLoginFunction("AssetAssignment");
+            
+            var LoginFunction = await this.commonLoginFunction("AssetAssignment");
             if (!LoginFunction) return;
+            var Layout = this.byId("ObjectPageLayout");
+            Layout.setSelectedSection(this.byId("OB_Timeline")); 
             this.getBusyDialog()
             this.Name = oEvent.getParameter("arguments").Name;
             this.Slno = oEvent.getParameter("arguments").sPath;
@@ -84,17 +84,6 @@ sap.ui.define([
                     });
                 }
 
-                if (item.TrashDate) {
-                    timelineData.push({
-                        type: "Trash",
-                        // dateTime: item.TrashDate,
-                        // Status: "Trashed",
-                        // Comments:item.Comments,
-                        text: item.TrashComments ? "Comment: " + item.TrashComments : "",
-                        title: "The asset was Trashed by " + item.TrashByEmployeeName + " (" + item.TrashByEmployeeID + ") at " + item.TrashBranch  + " on "+
-                            new Date(item.TrashDate).toLocaleDateString('en-GB')
-                    });
-                }
                 if (item.ReturnDate && item.ReturnDate !== "1899-11-30T00:00:00.000Z") {
                     timelineData.push({
                         type: "Return",
@@ -108,6 +97,17 @@ sap.ui.define([
                         title: "The asset was returned by " + item.AssignEmployeeName + " (" + item.AssignEmployeeID + ") to " + item.ReturnEmpName
                             + " (" + item.ReturnEmpID + ") at " + item.ReturnBranch + " " + "on " + new Date(item.ReturnDate).toLocaleDateString('en-GB')
 
+                    });
+                }
+                if (item.TrashDate) {
+                    timelineData.push({
+                        type: "Trash",
+                        // dateTime: item.TrashDate,
+                        // Status: "Trashed",
+                        // Comments:item.Comments,
+                        text: item.TrashComments ? "Comment: " + item.TrashComments : "",
+                        title: "The asset was Trashed by " + item.TrashByEmployeeName + " (" + item.TrashByEmployeeID + ") at " + item.TrashBranch  + " on "+
+                            new Date(item.TrashDate).toLocaleDateString('en-GB')
                     });
                 }
                 // if (item.TransferDate && item.TransferDate !== "1899-11-30T00:00:00.000Z") {
