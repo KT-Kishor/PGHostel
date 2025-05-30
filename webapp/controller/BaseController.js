@@ -89,7 +89,7 @@ sap.ui.define([
             "PaySlip": "/PaySlip",
             "CompanyInvoice": "/InvoiceApp",
             "Leaves": "/Leaves",
-            "ConsultantInvoice":"/ConsultantInvoice"
+            "ConsultantInvoice": "/ConsultantInvoice"
 
           };
 
@@ -482,26 +482,26 @@ sap.ui.define([
       oFileUploader.setValue("");
     },
     onCommonTokenDelete: function (oEvent) {
-    // You may set these as data-* attributes on the Tokenizer or use fixed conventions
-    var sModelName = "UploaderData";
-    var sAttachmentPath = "/attachments";
-    var sNamePath = "/name";
-    var sUploadFlagPath = "/isFileUploaded";
-    var oModel = this.getView().getModel(sModelName);
-    var aAttachments = oModel.getProperty(sAttachmentPath) || [];
-    // Support both single and multiple token deletion
-    var oTokens = oEvent.getParameter("tokens") || [oEvent.getParameter("token")];
-    oTokens.forEach(function(oToken) {
+      // You may set these as data-* attributes on the Tokenizer or use fixed conventions
+      var sModelName = "UploaderData";
+      var sAttachmentPath = "/attachments";
+      var sNamePath = "/name";
+      var sUploadFlagPath = "/isFileUploaded";
+      var oModel = this.getView().getModel(sModelName);
+      var aAttachments = oModel.getProperty(sAttachmentPath) || [];
+      // Support both single and multiple token deletion
+      var oTokens = oEvent.getParameter("tokens") || [oEvent.getParameter("token")];
+      oTokens.forEach(function (oToken) {
         var sFileName = oToken.getKey();
-        aAttachments = aAttachments.filter(function(file) {
-            return file.filename !== sFileName;
+        aAttachments = aAttachments.filter(function (file) {
+          return file.filename !== sFileName;
         });
-    });
-    oModel.setProperty(sAttachmentPath, aAttachments);
-    var aNames = aAttachments.map(function (file) { return file.filename; });
-    oModel.setProperty(sNamePath, aNames.join(", "));
-    oModel.setProperty(sUploadFlagPath, aAttachments.length > 0);
-},
+      });
+      oModel.setProperty(sAttachmentPath, aAttachments);
+      var aNames = aAttachments.map(function (file) { return file.filename; });
+      oModel.setProperty(sNamePath, aNames.join(", "));
+      oModel.setProperty(sUploadFlagPath, aAttachments.length > 0);
+    },
 
     async generateCertificatePDF(content, branchCode) {
       this.getBusyDialog(); // open BusyDialog immediately
@@ -859,10 +859,10 @@ sap.ui.define([
       return new Date(year, monthIndex, 1);
     },
 
-   //Common Convert number to words function
+    //Common Convert number to words function
     convertNumberToWords: function (num, currency) {
       if (num === 0) return "Zero " + currency + " Only";
- 
+
       const belowTwenty = [
         '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
         'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen',
@@ -870,39 +870,39 @@ sap.ui.define([
       ];
       const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
       const thousands = ['', 'Thousand', 'Lakh', 'Crore'];
- 
+
       function helper(n) {
         if (n === 0) return '';
         else if (n < 20) return belowTwenty[n] + ' ';
         else if (n < 100) return tens[Math.floor(n / 10)] + ' ' + helper(n % 10);
         else return belowTwenty[Math.floor(n / 100)] + ' Hundred ' + helper(n % 100);
       }
- 
+
       let result = '';
       let i = 0;
- 
+
       let integerPart = Math.floor(num);
       let fractionalPart = Math.round((num - integerPart) * 100);
- 
+
       while (integerPart > 0) {
         let divisor = i === 0 ? 1000 : 100;
         const remainder = integerPart % divisor;
- 
+
         if (remainder !== 0) {
           result = helper(remainder) + thousands[i] + ' ' + result;
         }
- 
+
         integerPart = Math.floor(integerPart / divisor);
         i++;
       }
- 
-      result = result.trim() +  "${currency}";
- 
+
+      result = result.trim() + "${currency}";
+
       // Add fractional part (Paise/Cents)
       if (fractionalPart > 0) {
         result += " and " + helper(fractionalPart) + (currency === "INR" ? "Paise" : "Cents");
       }
- 
+
       return result + " Only";
     },
 
@@ -911,6 +911,32 @@ sap.ui.define([
       if (page && sectionId) {
         page.scrollToSection(this.byId(sectionId).getId());
       }
+    },
+    //Variable pay function
+    EOD_onVariablePayInfoPress: function (oEvent) {
+      if (!this._oPopover) {
+        this._oPopover = new sap.m.Popover({
+          contentWidth: "400px",
+          contentHeight: "auto",
+          showHeader: false,
+          placement: sap.m.PlacementType.Bottom,
+          content: [
+            new sap.m.VBox({
+              alignItems: "Center",
+              justifyContent: "Center",
+              width: "100%",
+              items: [
+                new sap.m.Text({
+                  text: this.i18nModel.getText("variablePayMsg"),
+                  wrapping: true
+                })
+              ]
+            }).addStyleClass("customPopoverContent")
+          ]
+        });
+        this.getView().addDependent(this._oPopover);
+      }
+      this._oPopover.openBy(oEvent.getSource());
     },
 
   })

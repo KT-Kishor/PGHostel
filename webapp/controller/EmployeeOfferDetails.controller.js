@@ -652,32 +652,6 @@ sap.ui.define([
                     }
                 }
             },
-            //Variable pay function
-            EOD_onVariablePayInfoPress: function (oEvent) {
-                if (!this._oPopover) {
-                    this._oPopover = new sap.m.Popover({
-                        contentWidth: "400px",
-                        contentHeight: "auto",
-                        showHeader: false,
-                        placement: sap.m.PlacementType.Bottom,
-                        content: [
-                            new sap.m.VBox({
-                                alignItems: "Center",
-                                justifyContent: "Center",
-                                width: "100%",
-                                items: [
-                                    new sap.m.Text({
-                                        text: this.i18nModel.getText("variablePayMsg"),
-                                        wrapping: true
-                                    })
-                                ]
-                            }).addStyleClass("customPopoverContent")
-                        ]
-                    });
-                    this.getView().addDependent(this._oPopover);
-                }
-                this._oPopover.openBy(oEvent.getSource());
-            },
             onSalutationChange: function (oEvent) {
                 this.onSalutationChangeCommon(
                     oEvent,

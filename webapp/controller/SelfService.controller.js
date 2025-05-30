@@ -28,9 +28,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this._fetchCommonData("AppVisibility", "RoleModel");
                         this._fetchCommonData("Country", "CountryModel");
                     }
+                       // this._fetchCommonData("ApplyResignationEmail", "resignModel");
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
-                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false,
+                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false,
                         isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false,
                     });
                     oView.setModel(viewModel, "viewModel");
@@ -1802,7 +1803,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             RF_onPressHandlePreview: function () {
                 const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
                 if (bPreviewFlag) {
-                    this._onPressDownload();
+                    this._onPressApplyResign();
                 } else {
                     this._onPressPreview();
                 }
@@ -1810,8 +1811,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
             //download certificate
             _onPressPreview: function () {
-                if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("RF_id_ResignReason"), "ID")) {
-                    MessageToast.show(this.i18nModel.getText("mandatoryFields"));
+                if (
+                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("RF_id_ResignReason"), "ID") ||
+                    !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_StartDate"), "ID") ||
+                    !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_EndDate"), "ID")
+                ) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
                 var oEmployeeModel = this.getView().getModel("sEmployeeModel").getData()[0];
@@ -1846,41 +1851,107 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         oEndDatePicker.setValue("");
                     }
                 }
+                utils._LCvalidateDate(oEvent.getSource(), "ID");
             },
-            //generate PDF function
-            _onPressDownload: async function () {
-                this.getBusyDialog();
-                var oRTE = sap.ui.getCore().byId("RF_id_RTE");
-                var oEditor = oRTE._oEditor?.editorManager?.activeEditor;
-                if (oEditor) {
-                    var plainText = oEditor.getContent({ format: 'text' });
-                    var charCount = plainText.length;
-                    var lines = plainText.split(/\r\n|\r|\n/);
-                    var lineCount = lines.length;
-                    console.log("Characters:", charCount, "Lines:", lineCount);
-                } else {
-                    console.warn("Editor not ready yet.");
-                    this.closeBusyDialog();
-                    return;
-                }
-                if (charCount > 1000 || lineCount > 21) {
-                    this.closeBusyDialog();
-                    MessageBox.error("Certificate content exceeds the limit of 1000 characters or 21 lines.");
-                    return;
-                }
+            //apply for resignation send mail to manager
+            _onPressApplyResign: async function () {
                 try {
-                    // Get selected trainee's data from the table
+                    // Validate fields
+                    if (
+                        !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("RF_id_ResignReason"), "ID") ||
+                        !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_StartDate"), "ID") ||
+                        !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_EndDate"), "ID")
+                    ) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
                     var oEmployeeModel = this.getView().getModel("sEmployeeModel").getData()[0];
-                    this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
-                    let htmlContent = oRTE.getValue();
-                    this.generateCertificatePDF(htmlContent, oEmployeeModel.BranchCode);
+                    var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
+                    var joinDate = Formatter.formatDate(oEmployeeModel.JoiningDate);
+                    var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue();
+                    var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue();
+                    var resignComment = sap.ui.getCore().byId("RF_id_ResignReason").getValue();
+                    var designation = oEmployeeModel.Designation;
+                    var managerName = oEmployeeModel.ManagerName;
+                    var subject = `Resignation Notice: ${empName}`;
+                    var body = `
+            <div style="text-align: justify;">
+                <p>Dear <b>${managerName}</b>,</p>  
+                <p>I hope this message finds you well.</p>
+                <p>I, <b>${empName}</b>, am writing to formally resign from my position as <b>${designation}</b> at <b>${this.companyName}</b>, effective <b>${startDate}</b>. My last working day will be <b>${endDate}</b>.</p>
+                <p>I joined this organization on <b>${joinDate}</b>, and it has been an incredibly rewarding journey filled with learning, professional growth, and meaningful relationships. I want to sincerely thank you for your guidance and support throughout my tenure.</p>
+                <p>The reason for resignation is: ${resignComment}</p>
+                <p>I will do my best during this transition period to ensure a smooth handover of my responsibilities. Please let me know how I can help during this time.</p>
+            </div>
+        `;
+                    var oPayload = {
+                        from: oEmployeeModel.CompanyEmailID || oEmployeeModel.CompanyEmail || "",
+                        fromName: empName,
+                        to: this.getView().getModel("resignModel").getData()[0].ManagerID,
+                        toName: this.getView().getModel("resignModel").getData()[0].ManagerName,
+                        subject: subject,
+                        body: body,
+                        CC: [oEmployeeModel.CompanyEmailID],
+                    };
+                    this.getBusyDialog();
+                    await this.ajaxCreateWithJQuery("ApplyResignationEmail", { data: oPayload });
+                    MessageToast.show(this.i18nModel.getText("resignationMailSent"));
+                    // Show Withdraw button (set a flag in your model)
+                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
                     this.SSReg_oDialog.close();
-                    this.closeBusyDialog();
-                    this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview</b> to Preview the Certificate</p>");
                 } catch (error) {
+                    MessageToast.show(error.message || "Failed to send resignation email.");
+                } finally {
                     this.closeBusyDialog();
-                    MessageToast.show(error.message || error.responseText);
                 }
+            },
+            onWithdrawResignation: async function () {
+                var that = this;
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("msgBoxConfirm"),
+                    this.i18nModel.getText("withdrawConfirmMessage"), // Add this key to your i18n: "Are you sure you want to withdraw your resignation?"
+                    async function () {
+                        try {
+                            var oEmployeeModel = that.getView().getModel("sEmployeeModel").getData()[0];
+                            var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
+                            var designation = oEmployeeModel.Designation;
+                            var managerName = oEmployeeModel.ManagerName;
+                            var managerEmail = oEmployeeModel.ManagerEmailID || oEmployeeModel.ManagerEmail || "";
+
+                            var subject = `Withdrawal of Resignation: ${empName}`;
+                            var body = `
+                                <div style="text-align: justify;">
+                                    <p>Dear <b>${managerName}</b>,</p>
+                                    <p>I, <b>${empName}</b>, would like to formally withdraw my resignation from the position of <b>${designation}</b> at <b>${that.companyName}</b>. Please consider this as my intent to continue my employment.</p>
+                                    <p>Thank you for your understanding.</p>
+                                </div>
+                            `;
+                            var oPayload = {
+                                from: oEmployeeModel.CompanyEmailID || oEmployeeModel.CompanyEmail || "",
+                                fromName: empName,
+                                to: that.getView().getModel("resignModel").getData()[0].ManagerID,
+                                toName: that.getView().getModel("resignModel").getData()[0].ManagerName,
+                                subject: subject,
+                                body: body,
+                                CC: [oEmployeeModel.CompanyEmailID],
+                            };
+
+                            that.getBusyDialog();
+                            await that.ajaxCreateWithJQuery("ApplyResignationEmail", { data: oPayload });
+                            MessageToast.show(that.i18nModel.getText("withdrawMailSent"));
+                            // Hide Withdraw button after action
+                            that.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
+                            that.SSReg_oDialog.close();
+                        } catch (error) {
+                            MessageToast.show(error.message || "Failed to send withdrawal email.");
+                        } finally {
+                            that.closeBusyDialog();
+                        }
+                    },
+                    function () {
+                        // On Cancel: do nothing or add logic if needed
+                    }
+                );
             },
             SS_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");

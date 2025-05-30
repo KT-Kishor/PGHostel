@@ -31,8 +31,10 @@
 								<Label text="{i18n>EmpOfferVariablePay}" required="true" />
 								<Input id="AF_id_VariablePay" value="{AppraisalModel>/VariablePay}"
 									placeholder="{i18n>variablePayPer}" liveChange="EOD_validatevariable"
-									maxLength="5" showValueHelp="false"
-									valueStateText="{i18n>variabelPayValueStae}" />
+                                    showValueHelp="true"
+                                    valueHelpRequest="EOD_onVariablePayInfoPress"
+                                     valueHelpIconSrc="sap-icon://message-information"
+									maxLength="5" valueStateText="{i18n>variabelPayValueStae}" />
 								<!-- Effective Date -->
 								<Label text="{i18n>EffectiveDate}" required="true" />
 								<DatePicker minDate="{controller>/nextMonthMinDate}"

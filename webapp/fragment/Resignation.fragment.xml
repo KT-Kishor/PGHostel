@@ -74,6 +74,7 @@
                     valueFormat="dd/MM/yyyy"
                     id="RF_id_EndDate"
                     minDate="{viewModel>/min}"
+                    change="SS_validateDate"
                     value="{path:'sEmployeeModel>/0/ResignationEndDate' ,formatter:'.Formatter.formatDate'}"
                 />
                 <Label
@@ -101,19 +102,25 @@
             value="{PDFData>/RTEText}"
 			visible="true"
         />
-        <beginButton>
+        <FlexBox justifyContent="End" >
+        	<Button
+    text="{i18n>withdrawResignation}"
+    visible="{viewModel>/CanWithdrawResignation}"
+    type="Emphasized"
+    press="onWithdrawResignation" class="submit"/>
+       
             <Button
-                text="{= ${PDFData>/PreviewFlag} ? ${i18n>Download} : ${i18n>preview} }"
+                text="{= ${PDFData>/PreviewFlag} ? ${i18n>apply} : ${i18n>preview} }"
                 type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Emphasized' }"
-                press="RF_onPressHandlePreview"
+                press="RF_onPressHandlePreview" class="submit"
             />
-        </beginButton>
-        <endButton>
+        
             <Button
                 text="{i18n>close}"
                 press="RF_onPressCloseDialog"
                 type="Reject"
+                class="submit"
             />
-        </endButton>
+        </FlexBox>   
     </Dialog>
 </core:FragmentDefinition>
