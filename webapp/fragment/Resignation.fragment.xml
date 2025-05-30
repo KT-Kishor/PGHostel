@@ -8,6 +8,7 @@
         title="{i18n>applyResign}"
         contentWidth="85%"
         contentHeight="75%"
+        id="RF_dialog"
     >
         <f:SimpleForm
             editable="true"
@@ -104,7 +105,7 @@
         />
         <FlexBox justifyContent="End" >
         	<Button
-    text="{i18n>withdrawResignation}"
+    text="{i18n>withdrawResign}"
     visible="{viewModel>/CanWithdrawResignation}"
     type="Emphasized"
     press="onWithdrawResignation" class="submit"/>
@@ -112,7 +113,7 @@
             <Button
                 text="{= ${PDFData>/PreviewFlag} ? ${i18n>apply} : ${i18n>preview} }"
                 type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Emphasized' }"
-                press="RF_onPressHandlePreview" class="submit"
+                press="RF_onPressHandlePreview" class="submit" visible="{viewModel>/BtnVisible}"
             />
         
             <Button
