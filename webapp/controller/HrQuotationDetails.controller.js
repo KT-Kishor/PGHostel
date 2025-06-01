@@ -11,14 +11,12 @@ sap.ui.define(
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.RouteHrQuotationDetails", {
       Formatter: Formatter,
-
       onInit: function () {
         var QuotaionModel = {
         }
         var oModel = new JSONModel(QuotaionModel);
         this.getView().setModel(oModel, "quotation");
         var oQuotationModel = new JSONModel();
-
         this.getView().setModel(oQuotationModel, "QuotationModel");
         this.getRouter().getRoute("RouteHrQuotationDetails").attachMatched(this._onRouteMatched, this);
       },
@@ -112,6 +110,7 @@ sap.ui.define(
         }
         // Inside the onRouteMatched function's else block (edit mode)
         else {
+
           this._fetchCommonData("Currency", "CurrencyModel"); this._fetchCommonData("Country", "CountryModel");
           // Edit Mode
           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
@@ -134,8 +133,21 @@ sap.ui.define(
             oSelectedModel.setProperty("/gstEditable", false); // Disable editing
             var sCurrency = oSelectedQuotation.Currency;
 
-  // Determine if SAC and GST Calculation should be visible
-  var bShowSAC = sCurrency === "INR";
+            if (sCurrency !== "INR") {
+  // Set GST fields as non-editable
+  oSelectedModel.setProperty("/gstEditable", false);
+  var oQuotationModelData = this.getView().getModel("QuotationModel").getData();
+  oQuotationModelData.ShowGSTFields = false; // Hide required markings if needed
+  this.getView().getModel("QuotationModel").setData(oQuotationModelData);
+} else {
+  oSelectedModel.setProperty("/gstEditable", false); // Already there, keep this
+  var oQuotationModelData = this.getView().getModel("QuotationModel").getData();
+  oQuotationModelData.ShowGSTFields = true;
+  this.getView().getModel("QuotationModel").setData(oQuotationModelData);
+}
+
+            // Determine if SAC and GST Calculation should be visible
+            var bShowSAC = sCurrency === "INR";
 
             // Convert Notes from HTML to plain text for display
             var sNotes = oSelectedModel.getProperty("/Notes");
@@ -164,7 +176,7 @@ sap.ui.define(
                   CGSTVisible: cgstVisible,
                   SGSTVisible: sgstVisible,
                   IGSTVisible: igstVisible,
-                    ShowSACAndGSTCalculation: bShowSAC
+                  ShowSACAndGSTCalculation: bShowSAC
                 });
                 this.getView().setModel(oQuotationModel, "QuotationModel");
                 this.updateTotalAmount();
@@ -211,11 +223,12 @@ sap.ui.define(
           oCurrencyCombo.setSelectedKey("INR");
           // Reset all tax selections and visibility
           oQuotationModel.setProperty("/CGSTSelected", true); oQuotationModel.setProperty("/IGSTSelected", false); oQuotationModel.setProperty("/CGSTVisible", true); oQuotationModel.setProperty("/SGSTVisible", true); oQuotationModel.setProperty("/IGSTVisible", false); oSingleCompanyModel.setProperty("/Percentage", 9);
-          this._fetchCommonData("BaseLocation", "BrachModel");
+          this._fetchCommonData("BaseLocation", "BrachModel");oSingleCompanyModel.setProperty("/Branch", "KLB01");
           oQuotationModel.setProperty("/ShowGSTFields", true); oSingleCompanyModel.setProperty("/Currency", "INR"); oVisibilityModel.setProperty("/showBranch", true);
-
+          
         }
         else {
+          oSingleCompanyModel.setProperty("/Branch", " ");
           this.CountryAndCity()
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
           var sMobileNo = oRawData.mobileNo || "";
@@ -223,7 +236,7 @@ sap.ui.define(
           if (sMobileNo.startsWith("+91")) {
             sActualMobileNo = sMobileNo.slice(3); // remove +91
           }
-          oSingleCompanyModel.setProperty("/Branch", "KLB02");
+          
           oSingleCompanyModel.setProperty("/Currency", "INR"); oSingleCompanyModel.setProperty("/STDCode", "+91"); oSingleCompanyModel.setProperty("/Country", sSelectedKey); oSingleCompanyModel.setProperty("/gstEditable", true);
           oSingleCompanyModel.setProperty("/CompanyAddress", oRawData.longAddress); oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName); oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin); oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail); oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
         }
@@ -527,30 +540,44 @@ sap.ui.define(
           var fNewTotal = fTotal + fCGST + fSGST + fIGST;
           oModelDataPro.setProperty("/TotalSum", fNewTotal.toFixed(2));
         } else {
-          this.updateTotalAmount()
           // Currency is NOT INR — disable GST
-          oQuotationModel.setProperty("/CGSTVisible", false); oQuotationModel.setProperty("/SGSTVisible", false); oQuotationModel.setProperty("/IGSTVisible", false);
+          oQuotationModel.setProperty("/CGSTVisible", false);
+          oQuotationModel.setProperty("/SGSTVisible", false);
+          oQuotationModel.setProperty("/IGSTVisible", false);
           oQuotationModel.setProperty("/ShowGSTFields", false);
-          oSingleCompanyModel.setProperty("/Percentage", "");
           oQuotationModel.setProperty("/CGSTSelected", false);
           oQuotationModel.setProperty("/IGSTSelected", false);
+
+          oSingleCompanyModel.setProperty("/Percentage", "");
           oSingleCompanyModel.setProperty("/CompanyGSTNO", "");
           oSingleCompanyModel.setProperty("/gstEditable", false);
           oView.byId("HQD_id_CompGSTNO")?.setEnabled(false);
+          oQuotationModel.setProperty("/ShowSACAndGSTCalculation", false);
 
-          // Recalculate Total without GST
-          var updatedTotal = fTotal - (fCGST + fSGST + fIGST);
-          oModelDataPro.setProperty("/SubTotalNotGST", updatedTotal.toFixed(2));
-          oModelDataPro.setProperty("/TotalSum", updatedTotal.toFixed(2));
-          oModelDataPro.setProperty("/SubTotal", "");
-          oModelDataPro.setProperty("/ShowSACAndGSTCalculation", false);;
+          // Mark all items as non-taxable (GSTCalculation = "No")
+          var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
 
-          // Clear GST values
-          oModelDataPro.setProperty("/CGST", "0");
-          oModelDataPro.setProperty("/SGST", "0");
-          oModelDataPro.setProperty("/IGST", "0");
+          for (var i = 0; i < aItems.length; i++) {
+            aItems[i].GSTCalculation = "No";
+          }
+
+          // Force update to model (important)
+          oQuotationModel.setProperty("/QuotationItemModel", aItems);
+
+          // Reset GST values
+          oQuotationModel.setProperty("/CGST", 0);
+          oQuotationModel.setProperty("/SGST", 0);
+          oQuotationModel.setProperty("/IGST", 0);
+
+          // Clear Taxable subtotal (important)
+          oQuotationModel.setProperty("/SubTotal", 0);
+
+          // Recalculate totals — this will move everything to SubTotalNotGST
+          this.updateTotalAmount();
         }
+
       },
+
       HQD_onCustomerNameLiveChange: function (oEvent) {
         utils._LCvalidateName(oEvent);
       },
@@ -1103,7 +1130,7 @@ sap.ui.define(
         // Update Y position
         y = doc.lastAutoTable.finalY + 5;
         // Amount in Words
-      oData.AmountInWords = this.numberToWords(parseFloat(oQuotaionItem.TotalSum || 0), oData.Currency);
+        oData.AmountInWords = this.numberToWords(parseFloat(oQuotaionItem.TotalSum || 0), oData.Currency);
 
         doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("pdfaAmount"), 13, y);

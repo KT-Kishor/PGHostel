@@ -580,16 +580,19 @@
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${QuotationItemModel>/SubTotal} > 0  }"
                                             >
-                                                <m:Label
-                                                    text="{i18n>subTotal} ({i18n>Taxable}) ({SingleCompanyModel>/Currency}) :"
-                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-                                                />
-                                                <m:Text
-                                                    text="{path:'QuotationModel>/SubTotal',formatter: '.Formatter.fromatNumber'}"
-                                                    id="HQD_id_Sub"
-                                                    class="amountText"
-                                                    textAlign="End"
-                                                />
+                                               <m:Label
+    text="{i18n>subTotal} ({i18n>Taxable}) ({SingleCompanyModel>/Currency}) :"
+    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+    visible="{= ${QuotationModel>/SubTotal} > 0 }"
+/>
+<m:Text
+    text="{path:'QuotationModel>/SubTotal',formatter: '.Formatter.fromatNumber'}"
+    id="HQD_id_Sub"
+    class="amountText"
+    textAlign="End"
+    visible="{= ${QuotationModel>/SubTotal} > 0 }"
+/>
+
                                             </m:HBox>
                                           
                                            <!-- CGST -->
