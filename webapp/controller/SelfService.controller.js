@@ -305,23 +305,34 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     utils._LCvalidateGrade(oGradeField, "ID", "AddEd_id_GradeType");
                 }
             },
-            // Edit button visibility with role-based access control
+            // Edit button visibility with role-based access control and SelfService 
             SS_onEditPress: function (oEvent) {
                 var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
                 var Role = this.getView().getModel("LoginModel").getProperty("/Role");
-                // Allowed roles for editing Employee Details
                 var allowedRoles = ["Admin", "HR Manager", "HR"];
+                // Allow all users to edit in SelfService mode
+                if (this.sPath === "SelfService") {
+                    if (isEditMode) {
+                        if (this.SS_onSavePress(oEvent.getSource().getId().split('--').pop())) {
+                            this.getView().getModel("viewModel").setProperty("/isEditMode", false);
+                        }
+                    } else {
+                        this.getView().getModel("viewModel").setProperty("/isEditMode", true);
+                        this.getView().getModel("viewModel").setProperty("/AdminRole", false);
+                    }
+                    return;
+                }
+                // Role-based edit for other cases
                 if (isEditMode) {
-                    if (this.SS_onSavePress(oEvent.getSource().getId().split('--').pop())) { // Validate before disabling edit mode
+                    if (this.SS_onSavePress(oEvent.getSource().getId().split('--').pop())) {
                         this.getView().getModel("viewModel").setProperty("/isEditMode", false);
                     }
                 } else {
-                    // Enable edit mode for authorized roles in role-based scenario
                     if (allowedRoles.includes(Role)) {
                         this.getView().getModel("viewModel").setProperty("/isEditMode", true);
                         this.getView().getModel("viewModel").setProperty("/AdminRole", Role === "Admin");
                     } else {
-                        sap.m.MessageToast.show("You don't have permission to edit Employee Details."); // Alert unauthorized users
+                        sap.m.MessageToast.show(this.i18nModel.getText("permissionDenied"));
                     }
                 }
             },

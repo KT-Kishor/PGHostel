@@ -145,8 +145,7 @@
                                                 press="SS_onEditPress"
                                                 type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
                                                 tooltip="{i18n>editDetails}"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
-                                            />
+                                                visible="{ = ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"                                            />
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
@@ -399,8 +398,7 @@
                                             value="{sEmployeeModel>/0/ResignationEndDate}"
                                             change="onChangeResigEndDate"
                                             displayFormat="dd/MM/yyyy"
-                                            editable="{viewModel>/AdminRole}"
-                                            valueFormat="dd/MM/yyyy"
+                                            editable="{ = ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  || ${LoginModel>/Role} === 'HR'}"                                             valueFormat="dd/MM/yyyy"
                                             visible="{viewModel>/RelievingLetter}"
                                         />
 									</f:content>
@@ -685,7 +683,7 @@
                                                 press="SS_onEditPress"
                                                 type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
                                                 tooltip="{i18n>editDetails}"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{ = ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}" 
                                             />
 										</m:Toolbar>
 									</f:toolbar>
