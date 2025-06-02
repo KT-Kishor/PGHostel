@@ -28,11 +28,13 @@ sap.ui.define([
                     this.ExpenseID = oEvent.getParameter("arguments").sPath;
 
                     if (this.ExpenseID.includes("MyInbox")) {
+                        await this._fetchCommonData("Country", "CountryModel");
+                        await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                         this.ExpenseID = this.ExpenseID.split("|")[0];
                         this.MyInBox = true;
                     }
 
-                    this._fetchCommonData("Currency", "CurrencyModel");
+                    await this._fetchCommonData("Currency", "CurrencyModel");
                     await this._fetchCommonData("Expense", "FilteredExpenseModel", {
                         ExpenseID: this.ExpenseID,
                     });

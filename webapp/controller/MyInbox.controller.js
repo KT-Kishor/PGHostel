@@ -19,9 +19,9 @@ sap.ui.define([
       const oView = this.getView();
       const oLoginModel = oView.getModel("LoginModel");
       const oLoginData = oLoginModel.getData();
-      this.oLoginModel =oLoginData;
+      this.oLoginModel = oLoginData;
       const oComponent = this.getOwnerComponent();
-      const isAccountMgr = oLoginData.Role === "Account Manager";
+      const isAccountMgr = oLoginData.Role === "Account Manager" || oLoginData.Role === "Account Consultant";
 
       this.sParams = sParams;
       oView.setModel(new JSONModel([{ type: "Leave" }, { type: "Expense" }, { type: "Resignation" }]), "oTypeModel");
@@ -55,7 +55,7 @@ sap.ui.define([
       }
     },
 
-    MI_onPressLOPData:function() {
+    MI_onPressLOPData: function () {
       //const oData = this.byId("MI_id_MyInboxTable").getSelectedItem().getBindingContext("MyInboxModelData").getObject();
       this.getRouter().navTo("RouteLOPDetails");
     },
@@ -108,10 +108,12 @@ sap.ui.define([
           }
         });
 
-        if(this.oLoginModel.Role !== "Account Manager") params["ManagerID"] = this.idEmp;
-        else{    if (!params.hasOwnProperty("Status")) {
-        params["Status"] = "Send to account";
-        } }
+        if (this.oLoginModel.Role !== "Account Manager" && this.oLoginModel.Role !== "Account Consultant") params["ManagerID"] = this.idEmp;
+        else {
+          if (!params.hasOwnProperty("Status")) {
+            params["Status"] = "Send to account";
+          }
+        }
         await this._fetchCommonData("InboxDetails", "MyInboxModelData", params);
         this.onBeforeShow();
         this.closeBusyDialog();
@@ -163,7 +165,7 @@ sap.ui.define([
       const { Status, Type } = this.oModelData;
 
       const isSubmitted = Status === "Submitted";
-      const isAccountant = role === "Account Manager";
+      const isAccountant = role === "Account Manager" || role === "Account Consultant";
       const isExpense = Type === "Expense";
 
       this.byId("MI_id_ButApprove").setVisible(isSubmitted && !isAccountant);
@@ -177,11 +179,11 @@ sap.ui.define([
 
       if (oData.Type === "Expense") {
         this.getRouter().navTo("RouteExpensDetails", {
-          sPath: oData.ID+"|MyInbox"
+          sPath: oData.ID + "|MyInbox"
         });
       } else if (oData.Type === "Leave") {
         oData.StartDate = this.Formatter.formatDate(oData.StartDate);
-        oData.EndDate = this.Formatter.formatDate(oData.EndDate);  
+        oData.EndDate = this.Formatter.formatDate(oData.EndDate);
         oData.SubmittedDate = this.Formatter.formatDate(oData.SubmittedDate);
         this.getOwnerComponent().setModel(new JSONModel(oData), "oNavLeaveModel");
         this.getRouter().navTo("RouteDetailLeave");
@@ -197,7 +199,7 @@ sap.ui.define([
       const mapStatus = {
         "Approve": this.oModelData.Type === "Expense" ? "Send to account" : "Approved",
         "Reject": "Rejected",
-        "Send Back": this.oLoginModel.Role === "Account Manager" ? "Send back by account" : "Send back by manager",
+        "Send Back": this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant" ? "Send back by account" : "Send back by manager",
         "Paid": "Paid"
       };
 
@@ -240,15 +242,13 @@ sap.ui.define([
       const remark = sap.ui.getCore().byId("MIF_id_remark").getValue();
       oModelData.Status = statusValue;
       oModelData.NoofDays = String(oModelData.NoofDays);
-      if (this.oLoginModel.Role === "Account Manager") {
+      if (this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant") {
         oModelData.AccountRemark = remark;
-        var filter = { Status: "Send to account" }
       } else {
         oModelData.ManagerComment = remark;
-        var filter = { ManagerID: this.idEmp }
       }
       this.oDialog.close();
-    this.getBusyDialog();
+      this.getBusyDialog();
       const requestData = { filters: { ID: oModelData.ID }, data: oModelData };
       this.ajaxUpdateWithJQuery("InboxDetails", requestData)
         .then(() => {
