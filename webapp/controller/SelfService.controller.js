@@ -1,5 +1,5 @@
-sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/BusyIndicator", "sap/m/MessageToast",],
-    (Controller, Formatter, utils, JSONModel, BusyIndicator, MessageToast) => {
+sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/BusyIndicator", "sap/m/MessageToast","sap/m/MessageBox"],
+    (Controller, Formatter, utils, JSONModel, BusyIndicator, MessageToast,MessageBox) => {
         "use strict";
         return Controller.extend("sap.kt.com.minihrsolution.controller.SelfService", {
             Formatter: Formatter,
@@ -443,29 +443,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.showConfirmationDialog(this.i18nModel.getText("confirmTitle"), Message,
                             function () {
                                 this.getBusyDialog();
-                                this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload)
-                                    .then((oData) => {
-                                        if (oData.success) {
-                                            if (ID === 'Submit') {
-                                                this.ViewModel.setProperty("/SelfService", false);
-                                            }
-                                            MessageToast.show(this.i18nModel.getText("dataSaved"));
-                                            oView.getModel("viewModel").setProperty("/isEditMode", false);
-                                            oView.getModel("viewModel").setProperty("/AdminRole", false);
-                                            this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
-                                                EmployeeID: this.EmployeeID
-                                            });
-                                            this.byId("SS_id_Passport").setValueState("None");
-                                            this.byId("SS_id_Voterid").setValueState("None");
-                                        } else {
-                                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                                        }
-                                        this.closeBusyDialog();
-                                    })
-                                    .catch((oError) => {
-                                        this.closeBusyDialog();
-                                        MessageToast.show(oError.responseText || oError.message);
-                                    });
+                                this.updateFunctionForSelf(oPayload);
                             }.bind(this),
                             function () {
                                 this.closeBusyDialog();
@@ -478,12 +456,119 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     MessageToast.show(error.message || "Unexpected error");
                 }
             },
-
+            updateFunctionForSelf: function (oPayload) {
+                this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload)
+                    .then((oData) => {
+                        if (oData.success) {
+                            if (ID === 'Submit') {
+                                this.ViewModel.setProperty("/SelfService", false);
+                            }
+                            MessageToast.show(this.i18nModel.getText("dataSaved"));
+                            oView.getModel("viewModel").setProperty("/isEditMode", false);
+                            oView.getModel("viewModel").setProperty("/AdminRole", false);
+                            this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
+                                EmployeeID: this.EmployeeID
+                            });
+                            this.byId("SS_id_Passport").setValueState("None");
+                            this.byId("SS_id_Voterid").setValueState("None");
+                        } else {
+                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                        }
+                        this.closeBusyDialog();
+                    })
+                    .catch((oError) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(oError.responseText || oError.message);
+                    });
+            },
             onManagerChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 const oData = this.getView().getModel("sEmployeeModel").getProperty("/0");
+                const requestData = { ManagerID: oData.ManagerID, Status: "Submitted" };
+                sap.ui.core.BusyIndicator.show();
                 oData.ManagerID = oEvent.getSource().getSelectedKey();
                 oData.ManagerName = oEvent.getSource().getSelectedItem().getText();
+                const oPayload = {
+                    data: oData,
+                    filters: {
+                        EmployeeID: this.EmployeeID
+                    }
+                };
+          //      var that = this;
+                this.ajaxReadWithJQuery("InboxDetails", requestData)
+                    .then((oData) => {
+                        if (oData.data && oData.data.length > 0) {
+                            MessageBox.show(this.getView().getModel("i18n").getResourceBundle().getText("managerChangeMsg"), {
+                                icon: sap.m.MessageBox.Icon.INFORMATION,
+                                title: "Confirmation",
+                                actions: [sap.m.MessageBox.Action.OK, "Cancle"],
+                                onClose: async function (sAction) {
+                                    if (sAction === "OK") {
+                                       // oData.ManagerID = managerId;
+                                        this.updateFunctionForSelf(oPayload);
+                                        var flag = false;
+                                        for (let i = 0; i < oData.results.length; i++) {
+                                            oData.results[i].ManagerName = oPayload.data.ManagerName
+                                            oData.results[i].ManagerID = oPayload.data.ManagerID
+
+                                          const  payLoad = {
+                                                data: oData,
+                                                filters: {
+                                                    EmployeeID: oData.results[i].ID
+                                                }
+                                            }
+                                            this.ajaxUpdateWithJQuery("InboxDetails", payLoad)
+                                                .then(() => {
+                                                   flag = true;
+                                                })
+                                                .catch(() => {
+                                                    flag = false;
+                                                    sap.ui.core.BusyIndicator.hide(0);
+                                                    return;
+                                                });
+
+                                        };
+                                        if(flag){
+                                            sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("managerUpdate"));
+                                        }else{
+                                            sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("commomerror"));
+                                        }
+                                        // this.oModel.setUseBatch(true);
+                                        // this.oModel.setDeferredGroups(["batchGroup"]);
+                                        // oData.results.forEach(record => {
+                                        //     var path = "/" + "InboxDetails('" + record.ID + "')";
+                                        //     record.ManagerName = oModel.ManagerName,
+                                        //         record.ManagerID = this.byId("idMangr").getSelectedKey()
+                                        //     record.NoofDays = String(record.NoofDays)
+                                        //     this.oModel.update(path, record, {
+                                        //         groupId: "batchGroup"
+                                        //     });
+                                        // });
+                                        // this.oModel.submitChanges({
+                                        //     groupId: "batchGroup",
+                                        //     success: function (oBatchResponse) {
+                                        //         sap.ui.core.BusyIndicator.hide();
+                                        //         sap.m.MessageToast.show(this.i18nmodel.getText("managerUpdate"));
+                                        //     }.bind(this),
+                                        //     error: function (oError) {
+                                        //         sap.m.MessageBox.error(oError)
+                                        //     }.bind(this)
+                                        // })
+
+                                    } else {
+                                        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
+                                            EmployeeID: this.EmployeeID
+                                        });
+                                    }
+                                }.bind(this)
+                            });
+                        } else {
+                            this.updateEmployeeManager(oPayload);
+                        }
+                    }).bind(this)
+                    .catch((oError) => {
+                        MessageToast.show(oError)
+                    });
                 this.getView().getModel("sEmployeeModel").refresh();
                 this.byId("SS_id_Manager").setValueState("None")
             },
@@ -1057,15 +1142,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.closeBusyDialog();
                 }
             },
-            onAfterRendering: function () {
-                var canvasElement = document.getElementById("canvas");
-                if (canvasElement) {
-                    var context = canvasElement.getContext("2d");
-                    if (context) {
-                        context.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                    }
-                }
-            },
+            // onAfterRendering: function () {
+            //     var canvasElement = document.getElementById("canvas");
+            //     if (canvasElement) {
+            //         var context = canvasElement.getContext("2d");
+            //         if (context) {
+            //             context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            //         }
+            //     }
+            // },
 
             saveEducationDetails: async function (bIsCreate) {
                 try {
@@ -1957,7 +2042,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 ResignationStartDate: startDate,
                                 ResignationEndDate: endDate,
                                 ResignComment: resignComment,
-                                Inbox:oEmployeeModel
+                                Inbox: oEmployeeModel
                             };
                             that.getBusyDialog();
                             await that.ajaxCreateWithJQuery("ResignationMail", oPayload);
@@ -2011,7 +2096,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 body: body,
                                 CC: [oEmployeeModel.CompanyEmailID],
                                 EmployeeID: that.EmployeeID,
-                                Inbox:oEmployeeModel
+                                Inbox: oEmployeeModel
                             };
                             that.getBusyDialog();
                             await that.ajaxCreateWithJQuery("ResignationMail", oPayload);
