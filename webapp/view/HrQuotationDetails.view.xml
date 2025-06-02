@@ -94,7 +94,6 @@
      visible="{visiablityPlay>/showBranch}"
      valueStateText="Enter Branch"
      showSecondaryValues="true"
-    
 >
     <core:ListItem key="{BrachModel>branchCode}" text="{BrachModel>city}" additionalText="{BrachModel>branchCode}" />
 </m:ComboBox>
@@ -162,6 +161,7 @@
                                             change="HQD_onChangeGstNo"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="15"
+
                                         />
                                         <m:Label
                                             text="{i18n>type}"
@@ -181,7 +181,6 @@
     select="onSelectIGST"
     editable="{SingleCompanyModel>/gstEditable}"
 />
-
 <m:Label
     text="{i18n>percentage}"
     required="{QuotationModel>/ShowGSTFields}"
@@ -583,14 +582,14 @@
                                                <m:Label
     text="{i18n>subTotal} ({i18n>Taxable}) ({SingleCompanyModel>/Currency}) :"
     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-    visible="{= ${QuotationModel>/SubTotal} > 0 }"
+    visible="{= ${QuotationItemModel>/SubTotal} > 0 }"
 />
 <m:Text
     text="{path:'QuotationModel>/SubTotal',formatter: '.Formatter.fromatNumber'}"
     id="HQD_id_Sub"
     class="amountText"
     textAlign="End"
-    visible="{= ${QuotationModel>/SubTotal} > 0 }"
+    visible="{= ${QuotationItemModel>/SubTotal} > 0 }"
 />
 
                                             </m:HBox>
