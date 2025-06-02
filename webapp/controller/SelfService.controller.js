@@ -1842,7 +1842,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             },
             onApplyResignation: async function () {
-                await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation");
+                await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation", ["RF_id_StartDate", "RF_id_EndDate"]);
             },
             RF_onPressCloseDialog: function () {
                 // Only clear if resignation is NOT applied
@@ -1897,11 +1897,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var oStartDate = oEvent.getSource().getDateValue(); // Get selected Start Date
                 var oEndDatePicker = sap.ui.getCore().byId("RF_id_EndDate");
                 if (oStartDate) {
+                    // Set min date for end date
                     oEndDatePicker.setMinDate(oStartDate);
-                    var oEndDate = oEndDatePicker.getDateValue();
-                    if (oEndDate && oEndDate < oStartDate) {
-                        oEndDatePicker.setValue("");
-                    }
+                    // Calculate 60 days after start date
+                    var oEndDate = new Date(oStartDate);
+                    oEndDate.setDate(oEndDate.getDate() + 60);
+                    // Set the value of End Date picker (format as needed)
+                    var oLocale = sap.ui.getCore().getConfiguration().getFormatSettings().getFormatLocale();
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy", locale: oLocale });
+                    oEndDatePicker.setValue(oDateFormat.format(oEndDate));
                 }
                 utils._LCvalidateDate(oEvent.getSource(), "ID");
             },
@@ -1949,6 +1953,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 subject: subject,
                                 body: body,
                                 CC: [oEmployeeModel.CompanyEmailID],
+                                EmployeeID: that.EmployeeID,
+                                ResignationStartDate: startDate,
+                                ResignationEndDate: endDate,
+                                ResignComment: resignComment,
+                                Inbox:oEmployeeModel
                             };
                             that.getBusyDialog();
                             await that.ajaxCreateWithJQuery("ResignationMail", oPayload);
@@ -2001,6 +2010,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 subject: subject,
                                 body: body,
                                 CC: [oEmployeeModel.CompanyEmailID],
+                                EmployeeID: that.EmployeeID,
+                                Inbox:oEmployeeModel
                             };
                             that.getBusyDialog();
                             await that.ajaxCreateWithJQuery("ResignationMail", oPayload);
