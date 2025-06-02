@@ -71,7 +71,7 @@ sap.ui.define(
             STDCode: "+91",
             CustomerSTDCode: "+91",
             Country: "India",
-            Branch: "KLB01",
+            Branch: "Kalaburagi",
             Currency: "INR",
             gstEditable: true,
             IGSTSelected: false,
@@ -80,7 +80,7 @@ sap.ui.define(
             SGSTVisible: true,
             IGSTVisible: false
           });
-
+          this.byId("HQD_id_CompGSTNO").setEditable(true);
           this.getView().setModel(oBlankModel, "SingleCompanyModel");
 
           var oQuotationModel = new JSONModel({
@@ -108,6 +108,7 @@ sap.ui.define(
 
           oVisiModel.setData({ editable: true });
           this.getView().setModel(oVisiModel, "visiablityPlay");
+
         }
         // Inside the onRouteMatched function's else block (edit mode)
         else {
@@ -135,7 +136,6 @@ sap.ui.define(
             var sCurrency = oSelectedQuotation.Currency;
             // Determine if SAC and GST Calculation should be visible
             var bShowSAC = sCurrency === "INR";
-
             // Convert Notes from HTML to plain text for display
             var sNotes = oSelectedModel.getProperty("/Notes");
             if (sNotes) {
@@ -144,14 +144,13 @@ sap.ui.define(
               oSelectedModel.setProperty("/Notes", tmpDiv.textContent || tmpDiv.innerText || "");
             }
             this.getView().setModel(oSelectedModel, "SingleCompanyModel");
-            // if (sCurrency !== "INR") {
-            //   oSelectedModel.setProperty("/gstEditable", false); // Already done
-            //   // Disable GST radio buttons and percentage fields
-            //   this.byId("HQD_id_CGSTRadio")?.setEnabled(false);
-            //   this.byId("HQD_id_IGSTRadio")?.setEnabled(false);
-            //   this.byId("HQD_id_PercentageInput")?.setEnabled(false);
-            //   this.byId("HQD_id_CompanyGSTIN")?.setEnabled(false); // ID for Company GST Input
-            // }
+            const sCountry = oSelectedQuotation.Country;
+            if (sCountry === "India") {
+              await this._fetchCommonData("BaseLocation", "BrachModel");
+            } else {
+              this.CountryAndCity();
+            }
+
             setTimeout(() => {
               const oEditor = this.byId("HQD_id_Notes");
               if (oEditor && sNotes) {
@@ -217,9 +216,8 @@ sap.ui.define(
           oCurrencyCombo.setSelectedKey("INR");
           // Reset all tax selections and visibility
           oQuotationModel.setProperty("/CGSTSelected", true); oQuotationModel.setProperty("/IGSTSelected", false); oQuotationModel.setProperty("/CGSTVisible", true); oQuotationModel.setProperty("/SGSTVisible", true); oQuotationModel.setProperty("/IGSTVisible", false); oSingleCompanyModel.setProperty("/Percentage", 9);
-          this._fetchCommonData("BaseLocation", "BrachModel"); oSingleCompanyModel.setProperty("/Branch", "KLB01");
+          this._fetchCommonData("BaseLocation", "BrachModel"); oSingleCompanyModel.setProperty("/Branch", "Kalaburagi");
           oQuotationModel.setProperty("/ShowGSTFields", true); oSingleCompanyModel.setProperty("/Currency", "INR"); oVisibilityModel.setProperty("/showBranch", true);
-
         }
         else {
           oSingleCompanyModel.setProperty("/Branch", " ");
@@ -231,7 +229,7 @@ sap.ui.define(
             sActualMobileNo = sMobileNo.slice(3); // remove +91
           }
 
-           oSingleCompanyModel.setProperty("/STDCode", "+91"); oSingleCompanyModel.setProperty("/Country", sSelectedKey); oSingleCompanyModel.setProperty("/gstEditable", true);
+          oSingleCompanyModel.setProperty("/STDCode", "+91"); oSingleCompanyModel.setProperty("/Country", sSelectedKey); oSingleCompanyModel.setProperty("/gstEditable", true);
           oSingleCompanyModel.setProperty("/CompanyAddress", oRawData.longAddress); oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName); oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin); oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail); oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
         }
         // Reset value state if no value
@@ -1608,7 +1606,7 @@ sap.ui.define(
           } else {
             // Re-enable Percentage field for INR case
             this.byId("HQD_id_Percentage").setEditable(true);
-            // this.byId("HQD_id_CompGSTNO").setEditable(true);
+
           }
 
         } else {
