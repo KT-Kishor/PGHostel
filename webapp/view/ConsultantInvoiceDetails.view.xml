@@ -193,39 +193,85 @@
 											mode="Delete" 
 											delete="CI_onPressDelete" 
 											growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0"
-											growingScrollToLoad="true" width="auto"
+											growingScrollToLoad="true" width="auto" class="sapUiResponsiveMargin"
 											items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}">
 										<m:columns>
-											<m:Column width="100px">
+											<m:Column width="100px" >
+												<m:customData>
+													<core:CustomData key="p13nData" 
+                                                            value='{"columnKey": "SNo", "leadingProperty": "SNo", "sortProperty": "SNo", "filterProperty": "SNo", "columnIndex": 1}' />
+												</m:customData>
 												<m:Text text="{i18n>siNo}" />
 											</m:Column>
-											<m:Column width="300px">
+											<m:Column width="300px"  hAlign="Left" demandPopin="true">
+												<m:customData>
+													<core:CustomData key="p13nData" 
+                                                            value='{"columnKey": "Item", "leadingProperty": "Item", "sortProperty": "Item", "filterProperty": "Item", "columnIndex": 2}' />
+												</m:customData>
 												<m:Text text="{i18n>item}" />
 											</m:Column>
-											<m:Column id="CI_id_ColumnGST">
+											<!-- SAC Column -->
+											<m:Column id="CI_id_ColumnGST" hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
+												<m:customData >
+													<core:CustomData key="p13nData"
+														value='{"columnKey": "SAC", "leadingProperty": "SAC", "sortProperty": "SAC", "filterProperty": "SAC", "columnIndex": 3 }' />
+												</m:customData>
 												<m:Text text="{i18n>SAC}" />
 											</m:Column>
-											<m:Column id="CI_id_GSTCalc">
+											<!-- GSTCalculation Column -->
+											<m:Column id="CI_id_GSTCalc" hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
+												<m:customData>
+													<core:CustomData key="p13nData"
+														value='\{"columnKey": "GSTCalculation", "leadingProperty": "GSTCalculation", "sortProperty": "GSTCalculation", "filterProperty": "GSTCalculation", "columnIndex": 4}' />
+												</m:customData>
 												<m:Text text="{i18n>GSTCalculation}" />
 											</m:Column>
-											<m:Column>
+											<!-- Days -->
+											<m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
+												<m:customData>
+													<core:CustomData key="p13nData" 
+                                                            value='{"columnKey": "Days", "leadingProperty": "Days", "sortProperty": "Days", "filterProperty": "Days", "columnIndex": 5}' />
+												</m:customData>
 												<m:Text text="{i18n>days}" />
 											</m:Column>
-											<m:Column>
+											<!-- Unit Price -->
+											<m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
+												<m:customData>
+													<core:CustomData key="p13nData" 
+                                                            value='{"columnKey": "UnitPrice", "leadingProperty": "UnitPrice", "sortProperty": "UnitPrice", "filterProperty": "UnitPrice", "columnIndex": 6}' />
+												</m:customData>
 												<m:Text text="{i18n>unitPrice}" />
 											</m:Column>
-											<m:Column>
+											<!-- Discount Column -->
+											<m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
+												<m:customData>
+													<core:CustomData key="p13nData"
+														value='\{"columnKey": "Discount", "leadingProperty": "Discount", "sortProperty": "Discount", "filterProperty": "Discount", "columnIndex": 7}' />
+												</m:customData>
 												<m:Text text="{i18n>discount}" />
 											</m:Column>
-											<m:Column>
+											<!-- Total Column -->
+											<m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
+												<m:customData>
+													<core:CustomData key="p13nData" 
+                                                            value='{"columnKey": "Total", "leadingProperty": "Total", "sortProperty": "Total", "filterProperty": "Total", "columnIndex": 8}' />
+												</m:customData>
 												<m:Text text="{i18n>total}" />
 											</m:Column>
 										</m:columns>
 										<m:items>
 											<m:ColumnListItem >
 												<m:cells>
+												<!-- SNo (Column 1) -->
 													<m:Input value="{ConsultantInvoiceModel>IndexNo}" editable="false" />
-													<m:Input value="{ConsultantInvoiceModel>Item}" editable="{visiablityPlay>/editable}" maxLength="60" />
+												<!-- Item (Column 2) -->
+													<m:VBox>
+														<m:items>
+															<m:TextArea rows="2" value="{ConsultantInvoiceModel>Item}"  editable="{visiablityPlay>/editable}" placeholder="{i18n>itemDescription}" maxLength="200"
+         													 liveChange="CID_onItemDescriptionLiveChange" width="100%" valueStateText="{i18n>itemplaceholder}"/>
+														</m:items>
+													</m:VBox>
+													<!-- SAC (Column 3) -->
 													<m:ComboBox 
 														showSecondaryValues="true"
 														items="{InvoiceSACModel>/}"
@@ -236,6 +282,7 @@
 																	additionalText="{InvoiceSACModel>description}" 
 																	text="{InvoiceSACModel>sac}" />
 													</m:ComboBox>
+													 <!-- GSTCalculation (Column 4) -->
 													<m:ComboBox 
 														value="{ConsultantInvoiceModel>GSTCalculation}" 
 														selectedKey="1" 
@@ -244,10 +291,14 @@
 														<core:Item key="Yes" text="{i18n>yes}" />
 														<core:Item key="No" text="{i18n>no}" />
 													</m:ComboBox>
-													<m:Input value="{ConsultantInvoiceModel>Days}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End" />
-													<m:Input value="{ConsultantInvoiceModel>UnitPrice}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End" />
+													 <!-- Days (Column 5) -->
+													<m:Input value="{ConsultantInvoiceModel>Days}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End"  type="Number"/>
+													 <!-- UnitPrice (Column 6) -->
+													<m:Input value="{ConsultantInvoiceModel>UnitPrice}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End"  type="Number"/>
+													 <!-- Discount (Column 7) -->
 													<m:Input  value="{ConsultantInvoiceModel>Discount}" editable="{visiablityPlay>/editable}" liveChange="CI_onchangeDiscount" maxLength="10" textAlign="End"  showValueHelp="true"
 													valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" valueStateText="{i18n>discountInfoText}"/>
+													 <!-- Total (Column 8) -->
 													<m:Input value="{path:'ConsultantInvoiceModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />
 												</m:cells>
 											</m:ColumnListItem>
@@ -329,7 +380,7 @@
 			<m:Toolbar>
 				<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				<m:ToolbarSpacer/>
-				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Emphasized" press="CI_onPressSubmit" class="sendMail" />
+				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Accept" press="CI_onPressSubmit" class="sendMail" />
 				<m:Button text="{i18n>tileFooter}" id="CI_id_ContractMail" press="CI_onSendEmail" visible="{visiablityPlay>/merge}"
 				type="Ghost"/>
 				<m:Button visible="{visiablityPlay>/editVisi}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"  press="CI_onPressEdit" class="sendMail" type="{= ${visiablityPlay>/editable} ? 'Accept' : 'Emphasized' }"/>

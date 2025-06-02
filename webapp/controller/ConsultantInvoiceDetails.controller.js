@@ -912,6 +912,10 @@ sap.ui.define(
                         if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
                 },
 
+                CID_onItemDescriptionLiveChange: function (oEvent) {
+                    utils._LCvalidateMandatoryField(oEvent);
+                },
+
                CI_onPressback: function () {
                     var isEditMode = this.getView().getModel("visiablityPlay").getProperty("/editable");
                     if (isEditMode) {
@@ -967,13 +971,22 @@ sap.ui.define(
                             var isValid = true;
                             if (invoiceData.GSTNO && !utils._LCvalidateGstNumber(this.byId("CI_id_InputGSTNO"), "ID")) 
                                 isValid = false;
-
                             if (invoiceData.CompanyGSTNO && !utils._LCvalidateGstNumber(this.byId("CI_id_InputCompGSTNO"), "ID")) 
                                 isValid = false;
-
                             if (!isValid) {
                                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                                 return;
+                            }
+
+                            // Validate all item descriptions are filled
+                            const aItemArray1 = invoiceModel.getProperty("/ConsultantInvoiceItem") || [];
+                            const bAllDescriptionsFilled = aItemArray1.every(item =>
+                            item.Item && item.Item.trim().length > 0
+                            );
+
+                            if (!bAllDescriptionsFilled) {
+                            MessageToast.show(this.i18nModel.getText("quotaionMsgDes"));
+                            return;
                             }
 
                             if (!itemData.TotalSum || itemData.TotalSum <= 0) {
@@ -1210,6 +1223,16 @@ sap.ui.define(
                               EmployeeID: oConsultantInvoiceModel.EmployeeID
                             };
 
+                            const aItemArray2 = oView.getModel("ConsultantInvoiceModel").getProperty("/ConsultantInvoiceItem") || [];
+                            const bAllDescriptionsFilled1 = aItemArray2.every(item =>
+                                item.Item && item.Item.trim().length > 0
+                            );
+
+                            if (!bAllDescriptionsFilled1) {
+                                MessageToast.show("Each item must have a description.");
+                                return;
+                            }
+
                             const aItemArray = oView.getModel("ConsultantInvoiceModel").getProperty("/ConsultantInvoiceItem") || [];
 
                             const Items = aItemArray.map((item) => {
@@ -1361,7 +1384,7 @@ sap.ui.define(
                     "ConsultantName":oModel.ConsultantName,
                     "InvoiceNo":oModel.InvoiceNo,
                     "InvoiceDate":sFormattedDate,
-                    "TotalSum":oModel.TotalSum,
+                    "TotalSum": (`${Formatter.fromatNumber(oModel.TotalSum)} ${oModel.Currency}`),
                     "InvoiceTo":oModel.InvoiceTo,
                     "toEmailID": oModel.ContarctEmail,
                     "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
