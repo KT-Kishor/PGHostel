@@ -37,7 +37,7 @@
 											showSecondaryValues="true" 
 											placeholder="Select Contract ID" 
 											change="CI_onChangeContractDetails" 
-											width="{= ${visiablityPlay>/copyBtn} || ${visiablityPlay>/pasteBtn} ? '300px' : '500px'}"
+											width="auto"
 											items="{contractModel>/contractDetails}">
 												<core:ListItem 
 												key="{contractModel>ContractNo}" 
@@ -377,15 +377,18 @@
 			</sections>
 		</ObjectPageLayout>
 		<m:footer>
-			<m:Toolbar>
-				<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
-				<m:ToolbarSpacer/>
-				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Accept" press="CI_onPressSubmit" class="sendMail" />
+			<m:Bar>
+				<m:contentLeft>
+					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+				</m:contentLeft>
+				<m:contentRight>
+					<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Accept" press="CI_onPressSubmit" class="sendMail" />
 				<m:Button text="{i18n>tileFooter}" id="CI_id_ContractMail" press="CI_onSendEmail" visible="{visiablityPlay>/merge}"
 				type="Ghost"/>
 				<m:Button visible="{visiablityPlay>/editVisi}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"  press="CI_onPressEdit" class="sendMail" type="{= ${visiablityPlay>/editable} ? 'Accept' : 'Emphasized' }"/>
 				<m:Button text="{i18n>GeneratePDF}" press="CI_onPressGeneratePdf"  visible="{visiablityPlay>/merge}" type="Attention"/>
-			</m:Toolbar>
-		</m:footer>
+				</m:contentRight>
+			</m:Bar>
+			</m:footer>
 	</m:Page>
 </mvc:View>

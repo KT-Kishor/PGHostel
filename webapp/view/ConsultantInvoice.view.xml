@@ -38,29 +38,26 @@
 					</Toolbar>
 				</headerToolbar>
 				<columns>
-					<Column>
+					<Column  demandPopin="true">
 						<Text text="{i18n>consultantName}" />
 					</Column>
-					<Column>
+					<Column  demandPopin="true">
 						<Text text="{i18n>invoiceNo}" />
 					</Column>
-					<Column>
+					<Column  demandPopin="true">
 						<Text text="{i18n>invoiceTo}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>invoiceDate}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>payBy}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>GSTNO}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>totalAmount}" />
-					</Column>
-					<Column>
-						<Text text="{i18n>currency}" />
 					</Column>
 				</columns>
 				<items>
@@ -72,8 +69,7 @@
 							<Text text="{path:'ConsultantModel>InvoiceDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{path:'ConsultantModel>PayBy' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{ConsultantModel>GSTNO}" />
-							<Text text="{path:'ConsultantModel>TotalSum',formatter: '.Formatter.fromatNumber'}" />
-							<Text text="{ConsultantModel>Currency}" />
+						<Text text="{ConsultantModel>Currency} {path:'ConsultantModel>TotalSum',formatter: '.Formatter.fromatNumber'}" />
 						</cells>
 					</ColumnListItem>
 				</items>
