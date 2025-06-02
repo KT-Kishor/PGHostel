@@ -38,6 +38,11 @@
                                     columnsM="1"
                                 >
                                     <f:content>
+                                     <m:Label text="{i18n>quotaionNo}" visible="{visiablityPlay>/editVisi}" />
+<m:Input value="{SingleCompanyModel>/QuotationNo}"
+         editable="false"
+         visible="{visiablityPlay>/editVisi}" />
+
                                         <m:Label
                                             text="{i18n>quotaiodate}"
                                             required="true"
@@ -64,6 +69,8 @@
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_QuotationValid"
                                         />
+                                     
+
                                          <m:Label
                                             text="{i18n>expCountry}"
                                             required="true"
@@ -122,6 +129,7 @@
                                             items="{codeModel>/}"
                                             filterSecondaryValues="true"
                                             change="HQD_STDCode"
+                                        
                                             editable="{visiablityPlay>/editable}"
                                             valueStateText="{i18n>combovalueState}"
                                         >
@@ -138,6 +146,7 @@
                                             liveChange="HQD_onMNumberLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
+                                        
                                             valueStateText="{i18n>mobileNoValueState}"
                                         />
                                         <m:Label
@@ -295,6 +304,7 @@
                                             items="{codeModel>/}"
                                             filterSecondaryValues="true"
                                             change="HQD_STDCode"
+                                         
                                             editable="{visiablityPlay>/editable}"
                                             valueStateText="{i18n>combovalueState}"
                                         >
@@ -311,6 +321,7 @@
                                             valueStateText="{i18n>mobileNoValueState}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
+                                            
                                         />
                                         <m:Label text="{i18n>customerGSTNO}" />
                                         <m:Input
@@ -367,11 +378,11 @@
                                                 />
                                                 <m:ToolbarSpacer />
                                                 <m:Button
-                                                text="{i18n>add}"
+                                                text="{i18n>quotaionitembutton}"
                                                     visible="{visiablityPlay>/editable}"
                                                     tooltip="{i18n>addItem}"
                                                     press="HQD_onPressAddQuotationItem"
-                                                    type="Emphasized"
+                                                    type="Accept"
                                                 />
                                                 
                                             </m:OverflowToolbar>

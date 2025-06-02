@@ -40,7 +40,7 @@ sap.ui.define(
           this.byId("HQD_id_Curency").setBusy(true);
           await this._fetchCommonData("Currency", "CurrencyModel");
           await this._fetchCommonData("Country", "CountryModel");
-          await this._fetchCommonData("BaseLocation", "BrachModel");
+          this._fetchCommonData("BaseLocation", "BrachModel");
           this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
 
           //  Set Busy false after data has loaded
@@ -146,7 +146,9 @@ sap.ui.define(
             this.getView().setModel(oSelectedModel, "SingleCompanyModel");
             const sCountry = oSelectedQuotation.Country;
             if (sCountry === "India") {
+            
               await this._fetchCommonData("BaseLocation", "BrachModel");
+        
             } else {
               this.CountryAndCity();
             }
@@ -206,10 +208,11 @@ sap.ui.define(
         var oCustomerSTDCodeField = this.byId("HQD_id_CustomerNumberSTD");
         // var oMobileNumberField = this.byId("HQD_id_InputCompanyMobileNo");
         var oCurrencyCombo = this.byId("HQD_id_Curency");
+        const oBranchComboBox = this.byId("HQD_id_BranchCode");
         var oQuotationModel = this.getView().getModel("QuotationModel");
         var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
         var oVisibilityModel = this.getView().getModel("visiablityPlay");
-
+ oBranchComboBox.setBusy(true);
         if (sSelectedKey === "India") {
           oSTDCodeField.setValue("+91");
           oCustomerSTDCodeField.setValue("+91");
@@ -232,6 +235,7 @@ sap.ui.define(
           oSingleCompanyModel.setProperty("/STDCode", "+91"); oSingleCompanyModel.setProperty("/Country", sSelectedKey); oSingleCompanyModel.setProperty("/gstEditable", true);
           oSingleCompanyModel.setProperty("/CompanyAddress", oRawData.longAddress); oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName); oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin); oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail); oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
         }
+          oBranchComboBox.setBusy(false);
         // Reset value state if no value
         if (oEvent.getSource().getValue() === '') {
           oEvent.getSource().setValueState("None");
@@ -866,11 +870,9 @@ sap.ui.define(
           if (words) words += " and ";
           words += inWords(decimalPart) + " " + subCurrencyText;
         }
-
         if (!words) {
           words = "Zero " + currencyText;
         }
-
         return words + " Only";
       },
 
@@ -933,9 +935,9 @@ sap.ui.define(
         doc.text(this.i18nModel.getText("pdfValiduntil"), 168, y - 26, { align: "right" });
 
         doc.setFont("times", "normal");
-        doc.text(oData.QuotationNo, 172, y - 36);
-        doc.text(Formatter.formatDate(oData.Date), 172, y - 31);
-        doc.text(Formatter.formatDate(oData.ValidUntil), 172, y - 26);
+        doc.text(oData.QuotationNo, 169, y - 36);
+        doc.text(Formatter.formatDate(oData.Date), 169, y - 31);
+        doc.text(Formatter.formatDate(oData.ValidUntil), 169, y - 26);
 
         // Customer Info
         doc.setFont("times", "bold");
@@ -971,27 +973,31 @@ sap.ui.define(
             ? Formatter.fromatNumber(item.Discount)
             : "0.00";
 
-          const row = [
-            index + 1,
-            item.Description,
-            item.Days,
-            Formatter.fromatNumber(item.UnitPrice),
-            formattedDiscount,
-            Formatter.fromatNumber(item.Total)
-          ];
-
-          // Insert GST Calculation as 2nd column if INR
-          if (isINR) {
-            row.splice(1, 0, item.GSTCalculation);
-          }
-
-          return row;
+          return isINR
+            ? [
+              index + 1,
+              item.Description,
+              item.Days,
+              Formatter.fromatNumber(item.UnitPrice),
+              formattedDiscount,
+              item.GSTCalculation,
+              Formatter.fromatNumber(item.Total)
+            ]
+            : [
+              index + 1,
+              item.Description,
+              item.Days,
+              Formatter.fromatNumber(item.UnitPrice),
+              formattedDiscount,
+              Formatter.fromatNumber(item.Total)
+            ];
         });
+
 
 
         // Build table head dynamically
         const head = isINR
-          ? [['Sl.No.', 'Tax', 'Description', 'Days', 'Unit Price', 'Discount', 'Total']]
+          ? [['Sl.No.', 'Description', 'Days', 'Unit Price', 'Discount', 'Tax', 'Total']]
           : [['Sl.No.', 'Description', 'Days', 'Unit Price', 'Discount', 'Total']];
 
         doc.autoTable({
@@ -1014,16 +1020,16 @@ sap.ui.define(
           columnStyles: isINR
             ? {
               0: { halign: 'center' }, // Sl.No.
-              1: { halign: 'center' }, // Tax
-              2: { halign: 'center' }, // Description
-              3: { halign: 'center' }, // Days
-              4: { halign: 'right' },  // Unit Price
-              5: { halign: 'right' },  // Discount
-              6: { halign: 'right' }   // Total
+              1: { halign: 'left' },
+              2: { halign: 'center' },
+              3: { halign: 'right' },
+              4: { halign: 'right' },
+              5: { halign: 'cenetr' },
+              6: { halign: 'right' }
             }
             : {
               0: { halign: 'center' }, // Sl.No.
-              1: { halign: 'center' }, // Description
+              1: { halign: 'right' }, // Description
               2: { halign: 'center' }, // Days
               3: { halign: 'right' },  // Unit Price
               4: { halign: 'right' },  // Discount
@@ -1102,7 +1108,8 @@ sap.ui.define(
           `${this.i18nModel.getText("pdfTotal")} (${oData.Currency})`,
           Formatter.fromatNumber(oQuotaionItem.TotalSum)
         ]);
-
+        // Add ":" to labels
+       summaryBody.forEach(row => row[0] = `${row[0]} :`);
         doc.autoTable({
           startY: y,
           head: [],
@@ -1112,7 +1119,7 @@ sap.ui.define(
             font: "times",
             fontSize: 10,
             halign: "right",
-            cellPadding: 3
+            cellPadding: { top: 1, right: 3, bottom: 1, left: 3 }
           },
           columnStyles: {
             0: { halign: "right", cellWidth: 60 },
@@ -1123,13 +1130,14 @@ sap.ui.define(
             const lastRowIndex = summaryBody.length - 1;
 
             if (data.row.index === lastRowIndex) {
-              // Apply top border only for the total row (last row)
               data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
               data.cell.styles.lineColor = [0, 0, 0];
               data.cell.styles.fontStyle = 'bold';
             }
           }
         });
+
+
         // Update Y position
         y = doc.lastAutoTable.finalY + 5;
         // Amount in Words
@@ -1188,7 +1196,8 @@ sap.ui.define(
         }
 
         // Save PDF
-        doc.save("Quotation.pdf");
+        doc.save(`${oData.CustomerName}.Quotation.pdf`);
+
       },
       HQD_onPressAddQuotationItem: function () {
         var oView = this.getView();
