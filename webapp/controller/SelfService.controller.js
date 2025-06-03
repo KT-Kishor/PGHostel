@@ -86,26 +86,25 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
 
                         // --- Releving letter Button Visibility Logic ---
-                        if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {
+                        if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sNavigatedRole !== "Trainee") {
+                            this.byId("SS_id_Action").setVisible(true);
+                            this.ViewModel.setProperty("/TraineeRole", false);
                             if (oModelAllData.EmployeeStatus === "Inactive") {
                                 this.ViewModel.setProperty("/WorkCompletedVisible", true);
                                 this.ViewModel.setProperty("/Letter", false); // Hide other letter buttons
-                                this.ViewModel.setProperty("/TraineeRole", true);
                                 this.ViewModel.setProperty("/RelievingLetter", false);
+                                this.ViewModel.setProperty("/isVisitMode", false);
                             } else if (oModelAllData.EmployeeStatus === "Active") {
                                 this.ViewModel.setProperty("/WorkCompletedVisible", false);
+                                this.ViewModel.setProperty("/isVisitMode", true);
                                 this.ViewModel.setProperty("/Letter", true); // Show  buttons for active
-                                this.ViewModel.setProperty("/TraineeRole", false);
                                 this.ViewModel.setProperty("/RelievingLetter", true);
-
-                            } else {
-                                this.ViewModel.setProperty("/WorkCompletedVisible", false);
-                                this.ViewModel.setProperty("/Letter", false);
-                                this.ViewModel.setProperty("/TraineeRole", true);
-                                this.ViewModel.setProperty("/RelievingLetter", false);
                             }
+
                         } else {
                             this.ViewModel.setProperty("/WorkCompletedVisible", false);
+                            if (oModelAllData.EmployeeStatus === "Inactive")
+                            this.byId("SS_id_Action").setVisible(false);
                         }
                         const oObjectPage = this.byId("ObjectPageLayout");
                         const oSection = this.byId("basicDetailsSection");
@@ -2079,8 +2078,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     <p>I hope this message finds you well.</p>
                     <p>I <b>${empName}</b> writing to formally resign from my position as <b>${designation}</b> at <b>${this.companyName}</b>, effective <b>${startDate}</b>. My last working day will be <b>${endDate}</b>.</p>
                     <p>I joined this organization on <b>${joinDate}</b>, and it has been an incredibly rewarding journey filled with learning, professional growth, and meaningful relationships. I want to sincerely thank you for your guidance and support throughout my tenure.</p>
-                    <p>The reason of resignation is ${resignComment} </p>
-                    <p>I will do my best during this transition period to ensure a smooth handover of my responsibilities. Please let me know how I can help during this time.</p>
+                    <p>The reason of resignation is as follows:</p>
+                    <p>${resignComment}</p>                   
+         <p>I will do my best during this transition period to ensure a smooth handover of my responsibilities. Please let me know how I can help during this time.</p>
         <p>Thanks & Best Regards,<br/>
         ${empName}<br/>
         ${designation}<br/>

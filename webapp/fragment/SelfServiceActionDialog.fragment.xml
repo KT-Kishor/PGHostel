@@ -20,7 +20,7 @@
         press="onDownloadVisitCard"
         enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
         type="Attention"
-        visible="{= !${viewModel>/TraineeRole} }"
+        visible="{viewModel>/isVisitMode}"
     />
     <Button
         text="{i18n>resignationletter}"

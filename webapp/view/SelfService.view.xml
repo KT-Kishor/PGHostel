@@ -37,7 +37,7 @@
 					<actions>
 						<m:Button id="Submit" text="{i18n>submit}" press="onPressSubmit" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Accept" visible="{viewModel>/SelfService}" />
 						<m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Ghost" />
-                        <m:Button icon="sap-icon://action" text="Actions" press="onOpenActionBtn"/>
+                        <m:Button icon="sap-icon://action" text="Actions" press="onOpenActionBtn" id="SS_id_Action"/>
 					</actions>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
