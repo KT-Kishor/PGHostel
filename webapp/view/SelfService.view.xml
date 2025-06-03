@@ -391,15 +391,15 @@
 										<m:Label
                                             text="{i18n>ResigEndDate}"
                                             required="{= ${sEmployeeModel>/0/EmployeeStatus} === 'Inactive' ? true : false}"
-                                            visible="{viewModel>/RelievingLetter}"
+                                            visible="{viewModel>/WorkCompletedVisible}"
                                         />
 										<m:DatePicker
                                             id="SS_id_ResgEndDate"
-                                            value="{sEmployeeModel>/0/ResignationEndDate}"
+                                            value="{path:'sEmployeeModel>/0/ResignationEndDate', formatter:'.Formatter.formatDate'}"
                                             change="onChangeResigEndDate"
                                             displayFormat="dd/MM/yyyy"
-                                            editable="{ = ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  || ${LoginModel>/Role} === 'HR'}"                                             valueFormat="dd/MM/yyyy"
-                                            visible="{viewModel>/RelievingLetter}"
+                                            editable="{viewModel>/AdminRole}"
+                                            visible="{viewModel>/WorkCompletedVisible}"
                                         />
 									</f:content>
 								</f:SimpleForm>
