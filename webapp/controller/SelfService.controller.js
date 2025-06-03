@@ -467,7 +467,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     MessageToast.show(error.message || "Unexpected error");
                 }
             },
-            updateFunctionForSelf: function (oPayload) {
+                  updateFunctionForSelf: function (oPayload,ID) {
+                var oView = this.getView() ;
                 this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload)
                     .then((oData) => {
                         if (oData.success) {
@@ -486,6 +487,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         }
                         this.closeBusyDialog();
+                        sap.ui.core.BusyIndicator.hide(0);
                     })
                     .catch((oError) => {
                         this.closeBusyDialog();
@@ -505,80 +507,70 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         EmployeeID: this.EmployeeID
                     }
                 };
-                //      var that = this;
+          //      var that = this;
                 this.ajaxReadWithJQuery("InboxDetails", requestData)
                     .then((oData) => {
-                        if (oData.data && oData.data.length > 0) {
-                            MessageBox.show(this.getView().getModel("i18n").getResourceBundle().getText("managerChangeMsg"), {
-                                icon: sap.m.MessageBox.Icon.INFORMATION,
-                                title: "Confirmation",
-                                actions: [sap.m.MessageBox.Action.OK, "Cancle"],
-                                onClose: async function (sAction) {
-                                    if (sAction === "OK") {
-                                        // oData.ManagerID = managerId;
-                                        this.updateFunctionForSelf(oPayload);
+                         sap.ui.core.BusyIndicator.hide(0);
+                         if (oData.data && oData.data.length > 0) {
+                             MessageBox.show(this.getView().getModel("i18n").getResourceBundle().getText("managerChangeMsg"), {
+                                 icon: sap.m.MessageBox.Icon.INFORMATION,
+                                 title: "Confirmation",
+                                 actions: [sap.m.MessageBox.Action.OK, "Cancle"],
+                                 onClose: async function (sAction) {
+                                     if (sAction === "OK") {
+                                        sap.ui.core.BusyIndicator.show();
+                                       // oData.ManagerID = managerId;
+                                        await this.updateFunctionForSelf(oPayload,"");
                                         var flag = false;
-                                        for (let i = 0; i < oData.results.length; i++) {
-                                            oData.results[i].ManagerName = oPayload.data.ManagerName
-                                            oData.results[i].ManagerID = oPayload.data.ManagerID
+                                        for (let i = 0; i < oData.data.length; i++) {
+                                            oData.data[i].ManagerName = oPayload.data.ManagerName
+                                            oData.data[i].ManagerID = oPayload.data.ManagerID
+                                            oData.data[i].ManagerChanges = "Manager Changes"
 
-                                            const payLoad = {
-                                                data: oData,
+                                          const  payLoad = {
+                                                data: oData.data[i],
                                                 filters: {
-                                                    EmployeeID: oData.results[i].ID
+                                                    ID: oData.data[i].ID
                                                 }
                                             }
-                                            this.ajaxUpdateWithJQuery("InboxDetails", payLoad)
-                                                .then(() => {
-                                                    flag = true;
+                                         await this.ajaxUpdateWithJQuery("InboxDetails", payLoad)
+                                                .then((oData) => {
+                                                   flag = true;
                                                 })
-                                                .catch(() => {
+                                                .catch((oError) => {
                                                     flag = false;
                                                     sap.ui.core.BusyIndicator.hide(0);
                                                     return;
                                                 });
 
                                         };
-                                        if (flag) {
+                                        if(flag){
                                             sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("managerUpdate"));
-                                        } else {
+                                        }else{
                                             sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("commomerror"));
                                         }
-                                        // this.oModel.setUseBatch(true);
-                                        // this.oModel.setDeferredGroups(["batchGroup"]);
-                                        // oData.results.forEach(record => {
-                                        //     var path = "/" + "InboxDetails('" + record.ID + "')";
-                                        //     record.ManagerName = oModel.ManagerName,
-                                        //         record.ManagerID = this.byId("idMangr").getSelectedKey()
-                                        //     record.NoofDays = String(record.NoofDays)
-                                        //     this.oModel.update(path, record, {
-                                        //         groupId: "batchGroup"
-                                        //     });
-                                        // });
-                                        // this.oModel.submitChanges({
-                                        //     groupId: "batchGroup",
-                                        //     success: function (oBatchResponse) {
-                                        //         sap.ui.core.BusyIndicator.hide();
-                                        //         sap.m.MessageToast.show(this.i18nmodel.getText("managerUpdate"));
-                                        //     }.bind(this),
-                                        //     error: function (oError) {
-                                        //         sap.m.MessageBox.error(oError)
-                                        //     }.bind(this)
-                                        // })
+                                        //sap.ui.core.BusyIndicator.hide(0);
 
                                     } else {
                                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
                                             EmployeeID: this.EmployeeID
+                                        }).then(async() => { 
+                                           oPayload = this.getView().getModel("sEmployeeModel").getData()[0];
+                                           await this.updateFunctionForSelf(oPayload,"");
                                         });
+                                        sap.ui.core.BusyIndicator.hide(0);
                                     }
                                 }.bind(this)
                             });
                         } else {
-                            this.updateFunctionForSelf(oPayload);
+                            sap.ui.core.BusyIndicator.show();
+                            this.updateFunctionForSelf(oPayload,"");
+                            // sap.ui.core.BusyIndicator.hide(0);
                         }
                     }).bind(this)
                     .catch((oError) => {
                         MessageToast.show(oError)
+                        sap.ui.core.BusyIndicator.hide(0);
                     });
                 this.getView().getModel("sEmployeeModel").refresh();
                 this.byId("SS_id_Manager").setValueState("None")
