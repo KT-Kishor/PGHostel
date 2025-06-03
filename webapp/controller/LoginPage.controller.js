@@ -14,7 +14,7 @@ sap.ui.define(
           this.getRouter().getRoute("RouteLoginPage").attachMatched(this._onRouteMatched, this);
           const model = new JSONModel({
             // for Database connection
-            url: "https://www.rest.kalpavrikshatechnologies.com/",
+            url: "https://rest.kalpavrikshatechnologies.com/",
             headers: {
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
               password:

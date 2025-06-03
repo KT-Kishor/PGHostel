@@ -574,7 +574,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 }.bind(this)
                             });
                         } else {
-                            this.updateEmployeeManager(oPayload);
+                            this.updateFunctionForSelf(oPayload);
                         }
                     }).bind(this)
                     .catch((oError) => {
