@@ -467,7 +467,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     MessageToast.show(error.message || "Unexpected error");
                 }
             },
-                  updateFunctionForSelf: function (oPayload,ID) {
+            updateFunctionForSelf: function (oPayload,ID) {
                 var oView = this.getView() ;
                 this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload)
                     .then((oData) => {
@@ -507,19 +507,19 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         EmployeeID: this.EmployeeID
                     }
                 };
-          //      var that = this;
+                //      var that = this;
                 this.ajaxReadWithJQuery("InboxDetails", requestData)
                     .then((oData) => {
-                         sap.ui.core.BusyIndicator.hide(0);
-                         if (oData.data && oData.data.length > 0) {
-                             MessageBox.show(this.getView().getModel("i18n").getResourceBundle().getText("managerChangeMsg"), {
-                                 icon: sap.m.MessageBox.Icon.INFORMATION,
-                                 title: "Confirmation",
-                                 actions: [sap.m.MessageBox.Action.OK, "Cancle"],
-                                 onClose: async function (sAction) {
-                                     if (sAction === "OK") {
+                        sap.ui.core.BusyIndicator.hide(0);
+                        if (oData.data && oData.data.length > 0) {
+                            MessageBox.show(this.getView().getModel("i18n").getResourceBundle().getText("managerChangeMsg"), {
+                                icon: sap.m.MessageBox.Icon.INFORMATION,
+                                title: "Confirmation",
+                                actions: [sap.m.MessageBox.Action.OK, "Cancle"],
+                                onClose: async function (sAction) {
+                                    if (sAction === "OK") {
                                         sap.ui.core.BusyIndicator.show();
-                                       // oData.ManagerID = managerId;
+                                        // oData.ManagerID = managerId;
                                         await this.updateFunctionForSelf(oPayload,"");
                                         var flag = false;
                                         for (let i = 0; i < oData.data.length; i++) {
@@ -527,15 +527,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                             oData.data[i].ManagerID = oPayload.data.ManagerID
                                             oData.data[i].ManagerChanges = "Manager Changes"
 
-                                          const  payLoad = {
+                                            const  payLoad = {
                                                 data: oData.data[i],
                                                 filters: {
                                                     ID: oData.data[i].ID
                                                 }
                                             }
-                                         await this.ajaxUpdateWithJQuery("InboxDetails", payLoad)
+                                            await this.ajaxUpdateWithJQuery("InboxDetails", payLoad)
                                                 .then((oData) => {
-                                                   flag = true;
+                                                    flag = true;
                                                 })
                                                 .catch((oError) => {
                                                     flag = false;
@@ -554,9 +554,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                     } else {
                                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
                                             EmployeeID: this.EmployeeID
-                                        }).then(async() => { 
-                                           oPayload = this.getView().getModel("sEmployeeModel").getData()[0];
-                                           await this.updateFunctionForSelf(oPayload,"");
+                                        }).then(async() => {
+                                            oPayload = this.getView().getModel("sEmployeeModel").getData()[0];
+                                            await this.updateFunctionForSelf(oPayload,"");
                                         });
                                         sap.ui.core.BusyIndicator.hide(0);
                                     }
@@ -2081,8 +2081,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     <p>I joined this organization on <b>${joinDate}</b>, and it has been an incredibly rewarding journey filled with learning, professional growth, and meaningful relationships. I want to sincerely thank you for your guidance and support throughout my tenure.</p>
                     <p>The reason of resignation is ${resignComment} </p>
                     <p>I will do my best during this transition period to ensure a smooth handover of my responsibilities. Please let me know how I can help during this time.</p>
-                </div>`;
-
+        <p>Thanks & Best Regards,<br/>
+        ${empName}<br/>
+        ${designation}<br/>
+        ${this.companyName}</p>
+    </div>
+`;
                 this.getView().getModel("PDFData").setProperty("/RTEText", data);
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
             },
@@ -2122,8 +2126,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             var oEmployeeModel = that.getView().getModel("sEmployeeModel").getData()[0];
                             var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
                             var joinDate = Formatter.formatDate(oEmployeeModel.JoiningDate);
-                            var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue();
-                            var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue();
+                            var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue().split("/").reverse().join("-");
+                            var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue().split("/").reverse().join("-");
                             var resignComment = sap.ui.getCore().byId("RF_id_ResignReason").getValue();
                             var designation = oEmployeeModel.Designation;
                             var managerName = oEmployeeModel.ManagerName;
@@ -2136,8 +2140,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 <p>I joined this organization on <b>${joinDate}</b>, and it has been an incredibly rewarding journey filled with learning, professional growth, and meaningful relationships. I want to sincerely thank you for your guidance and support throughout my tenure.</p>
                 <p>The reason for resignation is: ${resignComment}</p>
                 <p>I will do my best during this transition period to ensure a smooth handover of my responsibilities. Please let me know how I can help during this time.</p>
-            </div>
-        `;
+        <p>Thanks & Best Regards,<br/>
+        ${empName}<br/>
+        ${designation}<br/>
+        ${that.companyName}</p>
+    </div>
+`;
                             var oPayload = {
                                 from: oEmployeeModel.CompanyEmailID,
                                 fromName: empName,
