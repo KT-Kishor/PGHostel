@@ -150,6 +150,18 @@ sap.ui.define([], function () {
             return null;
         },
 
+        formatCompanyAndDescription: function (companyName, description , startDate , EndDate) {
+            if (companyName && description) {
+                return companyName + " - " + description + " " +"("+ startDate+ " - " +EndDate + ")";
+            } else if (companyName) {
+                return companyName;
+            } else if (description) {
+                return description;
+            } else {
+                return "";
+            }
+        },
+
         fromatNumber: function (avalue) {
             if (avalue === "0" || avalue === 0) {
                 return "0.00";
@@ -248,6 +260,13 @@ sap.ui.define([], function () {
             else {
                 return "Date not available";
             }
+        },
+
+         formatCustomerTypeValue: function (sType, sValue) {
+            if (sValue && sValue !== "") {
+                return `${sType} (${sValue}%)`;
+            }
+            return sType; 
         },
 
         formatId: function (status, pickId, assigneId) {

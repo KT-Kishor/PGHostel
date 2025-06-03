@@ -193,6 +193,16 @@
                 "uri":"model/STDCode.json",
                 "preload":true
             },
+            "SowStatusModel": {
+                "type":"sap.ui.model.json.JSONModel",
+                "uri":"model/SowFilter.json",
+                "preload":true
+            },
+            "InvoiceSAC": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/InvoiceSAC.json",
+                "preload": true
+            },
             "StatusEmp": {
                 "type":"sap.ui.model.json.JSONModel",
                 "uri":"model/StatusEmp.json",
@@ -398,7 +408,7 @@
                 },
                 {
                     "name": "RouteCompanyInvoice",
-                    "pattern": "CompanyInvoice/{sPath}",
+                    "pattern": "CompanyInvoice",
                     "target": [
                         "TargetCompanyInvoice"
                     ]

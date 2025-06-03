@@ -54,9 +54,7 @@ sap.ui.define(
           }
         },
 
-        onComboBoxSelectionChange:function(){
-          debugger
-        },
+        CI_onPressMSASOW: function () { this.getRouter().navTo("RouteMSA"); },
 
         onPressClear: function () {
           this.byId("CI_id_InvNo").setValue("");
@@ -67,6 +65,10 @@ sap.ui.define(
 
         CI_onPressAddInvoice: function () {
           this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: "X" });
+        },
+
+        CI_onPressInvoiceRow:function(oEvent){
+          this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath:encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModel").getObject().InvNo) });
         },
 
         onPressback: function () {

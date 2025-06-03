@@ -51,6 +51,10 @@ sap.ui.define([
                 }
             },
 
+            MsaE_GoToInvoice:function () {
+                this.getRouter().navTo("RouteCompanyInvoice");
+            },
+
             MSADetailsReadCall: async function () {
                 this.getBusyDialog();
                 try {

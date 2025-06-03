@@ -21,6 +21,9 @@ sap.ui.define([
             onPressClear:function(){
                 this.byId("MSA_id_CompanyName").setValue('');
             }, 
+            MSA_onAddCustomer:function () {
+                this.getRouter().navTo("RouteManageCustomer",{value:"MSA"});
+            },
             onLogout: function () {
                 this.CommonLogoutFunction();
             },

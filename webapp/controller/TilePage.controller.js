@@ -302,7 +302,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInboxView" });
         },
         TileV_onpressInvoiceApp: function () {
-          this.getRouter().navTo("RouteCompanyInvoice", { sPath: "Invoice" });
+          this.getRouter().navTo("RouteCompanyInvoice");
         },
         TileV_onpressQuotation: function () {
           sap.ui.core.BusyIndicator.show(0);
