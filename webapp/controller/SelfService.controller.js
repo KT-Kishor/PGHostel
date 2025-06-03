@@ -41,7 +41,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     var bHideSalarySection = sLoggedInRole === "Trainee" || sNavigatedRole === "Trainee";
                     this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
 
-                    var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lc", "SS_id_lpa", "SS_id_lca", "SS_id_lds", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
+                    var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lpa", "SS_id_lca", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
                         "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan",];
                     this.sPath = oEvent.getParameter('arguments').sPath;
                     if (this.sPath === "SelfService") {
@@ -51,9 +51,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         aIds.forEach(function (sId) {
                             this.getView().byId(sId).setRequired(true);
                         }.bind(this));
+                        this.byId("SS_id_lc").setRequired(false)
+                        this.byId("SS_id_lbase").setRequired(false)
+                        this.byId("SS_id_lds").setRequired(false)
+                        this.byId("SS_id_Lmg").setRequired(false)
                     }
                     else {
                         this.EmployeeID = this.sPath;
+                        this.byId("SS_id_lc").setRequired(true)
+                        this.byId("SS_id_lbase").setRequired(true)
+                        this.byId("SS_id_Lmg").setRequired(true)
+
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
                         if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {
                             this.ViewModel.setProperty("/Letter", true);
@@ -134,6 +142,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.byId("SS_id_STDCode").setValueState("None");
                     this.byId("SS_id_STDCodeRI").setValueState("None");
                     this.byId("SS_id_STDCodeRII").setValueState("None");
+                    this.byId("SS_id_FatherName").setValueState("None");
+                    this.byId("SS_id_Compmail").setValueState("None");
                 } catch (error) { } finally {
                     this.closeBusyDialog();
                 }
@@ -403,9 +413,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 return;
                             }
                         }
-
-                        // Validate Manager, Country, and Base Location fields
+                        // Validate company mail, Manager, Country, and Base Location fields
                         if (
+                            !utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID") ||
                             !utils._LCstrictValidationComboBox(oView.byId("SS_id_Country"), "ID") ||
                             !utils._LCstrictValidationComboBox(oView.byId("SS_id_BaseL"), "ID") ||
                             !utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID")
@@ -453,7 +463,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.showConfirmationDialog(this.i18nModel.getText("confirmTitle"), Message,
                             function () {
                                 this.getBusyDialog();
-                                this.updateFunctionForSelf(oPayload);
+                                this.updateFunctionForSelf(oPayload,ID);
                             }.bind(this),
                             function () {
                                 this.closeBusyDialog();
@@ -497,15 +507,18 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 const oData = this.getView().getModel("sEmployeeModel").getProperty("/0");
                 const requestData = { ManagerID: oData.ManagerID, Status: "Submitted" };
-                sap.ui.core.BusyIndicator.show();
                 oData.ManagerID = oEvent.getSource().getSelectedKey();
-                oData.ManagerName = oEvent.getSource().getSelectedItem().getText();
+                oData.ManagerName = oEvent.getSource().getSelectedItem() ?oEvent.getSource().getSelectedItem().getText() : oEvent.getSource().getValue();
                 const oPayload = {
                     data: oData,
                     filters: {
                         EmployeeID: this.EmployeeID
                     }
                 };
+                if(!oData.ManagerName &&  !oData.ManagerID){
+                    return
+                }
+                sap.ui.core.BusyIndicator.show();
                 //      var that = this;
                 this.ajaxReadWithJQuery("InboxDetails", requestData)
                     .then((oData) => {

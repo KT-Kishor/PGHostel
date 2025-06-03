@@ -167,6 +167,24 @@
                                             id="SS_id_Joinn"
                                             editable="false"
                                         />
+                                        <m:Label
+                                            text="{i18n>companyMailid}"
+                                            required="true"
+                                            id="SS_id_lc"
+                                        />
+										<m:Input
+                                            valueStateText="{i18n>emailValueState}"
+                                            value="{sEmployeeModel>/0/CompanyEmailID}"
+                                            liveChange="SS_validateEmail"
+                                            editable="{viewModel>/AdminRole}"
+                                            id="SS_id_Compmail"
+                                            placeholder="{i18n>companyMailid}"
+                                            maxLength="100"
+                                        />
+                                        <m:Label text="{i18n>fatherName}" />
+										<m:Input
+                                            value="{sEmployeeModel>/0/FatherName}" editable="{viewModel>/isEditMode}" liveChange="SS_validateName" id="SS_id_FatherName"
+                                        />
 										<m:Label
                                             text="{i18n>dateOfBirth}"
                                             required="true"
@@ -202,20 +220,6 @@
                                                 text="{BloodGroup>Code}"
                                             />
 										</m:ComboBox>
-										<m:Label
-                                            text="{i18n>companyMailid}"
-                                            required="true"
-                                            id="SS_id_lc"
-                                        />
-										<m:Input
-                                            valueStateText="{i18n>emailValueState}"
-                                            value="{sEmployeeModel>/0/CompanyEmailID}"
-                                            liveChange="SS_validateEmail"
-                                            editable="{viewModel>/AdminRole}"
-                                            id="SS_id_Compmail"
-                                            placeholder="{i18n>companyMailid}"
-                                            maxLength="100"
-                                        />
 										<m:Label
                                             text="{i18n>permanentAddress}"
                                             required="true"
