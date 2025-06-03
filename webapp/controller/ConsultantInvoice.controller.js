@@ -33,7 +33,7 @@ sap.ui.define(
                       filterObj = {
                           EmployeeID: userData.EmployeeID
                       };
-                  } else if (userData.Role === "Admin" || userData.Role === "Accountant") {
+                  } else if (userData.Role === "Admin" || userData.Role === "Account Manager") {
                       oView.byId("CI_filterItem_EmployeeID").setVisible(true);
                       filterObj = {}; // fetch all
                       this.logindata();

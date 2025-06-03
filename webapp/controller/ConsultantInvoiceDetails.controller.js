@@ -18,72 +18,82 @@ sap.ui.define(
           this.getRouter().getRoute("RouteNavConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
         },
 
-       _onRouteMatched: async function(oEvent) {
-        var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
-          if (!LoginFUnction) return;
-                    this._makeDatePickersReadOnly(["CI_id_InDate", "CI_id_PaybyInv"]);
-                    this.i18nModel = this.getView().getModel('i18n').getResourceBundle();
-                     if(!this.getView().getModel("InvoiceSACModel")){
-                        this._fetchCommonData("CompanyInvoiceSAC", "InvoiceSACModel");
-                        this._fetchCommonData("Currency", "CurrencyModel");
-                    }
-                    this._fetchCommonData("EmailContent", "CCMailModel", {Type: "ConsultantInvoice"  });
-                    this.CI_CommonID();
-                    this.getView().byId("CI_id_ColumnGST").setVisible(false);
-                    this.getView().byId("CI_id_GSTCalc").setVisible(false);
-                    var sPath = oEvent.getParameter("arguments").sPath;
-                    var oPath = oEvent.getParameter("arguments").oPath;
-                    this.decodedPath = decodeURIComponent(decodeURIComponent(sPath));
-                    this.decodedEmployeeID = decodeURIComponent(oPath);
-                    this.Discount = true;
-                    this.UnitAmount = true;
+      _onRouteMatched: async function(oEvent) {
+                    try {
+                        var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
+                        if (!LoginFUnction) return;
+                        this._makeDatePickersReadOnly(["CI_id_InDate", "CI_id_PaybyInv"]);
+                        this.i18nModel = this.getView().getModel('i18n').getResourceBundle();
+                        this.CI_CommonID();
 
-                    var oInvoiceModel = new JSONModel({
-                    EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",
-                    InvoiceNo: "", InvoiceDate: "", ConsultantAddress: "", GSTNO: "",
-                    CompanyGSTNO: "", MobileNo: "", CGST: false, SGST: false, IGST: false,
-                    BankName: "", AccountName: "", AccountNo: "", IFSCCode: "", PayBy: "",
-                    GSTValid: false, CGSTSelected: false, IGSTSelected: false, Percentage: "",
-                    Currency: "INR", STDCode: "+91"});
-                    this.getView().setModel(oInvoiceModel, "ConsultantInvoiceModel");
-           
-                    var oInvoiceItemModel = new JSONModel({
-                        SlNo: "", EmployeeID: "", Item: "", Days: "", SAC: "", UnitPrice: "",
-                        Total: "", SubTotal: "", TotalSum: "", Currency: "INR"});
-                    this.getView().setModel(oInvoiceItemModel, "oModelDataPro");
-           
-                    var visibilityPlay = new JSONModel({
-                        createVisi: true, editVisi: false, editable: true,
-                        invBtn: true, pasteBtn: true, merge: false });
-                    this.getView().setModel(visibilityPlay, "visiablityPlay");
+                        this.getView().byId("CI_id_ColumnGST").setVisible(false);
+                        this.getView().byId("CI_id_GSTCalc").setVisible(false);
 
-                  var loginModel = this.getOwnerComponent().getModel("LoginModel");
-                    var oComboBox = this.getView().byId("CI_id_Cont");
-                    var isEditMode = sPath !== "X" && oPath !== "Y";
-
-                    if (loginModel) {
-                        this.sUserType = loginModel.getProperty("/Role");
-
-                        if (this.sUserType === "Admin" && !isEditMode) {
-                            oComboBox.setVisible(true);
-                        } else {
-                            oComboBox.setVisible(false);
+                        var sPath = oEvent.getParameter("arguments").sPath;
+                        var oPath = oEvent.getParameter("arguments").oPath;
+                        this.decodedPath = decodeURIComponent(decodeURIComponent(sPath));
+                        this.decodedEmployeeID = decodeURIComponent(oPath);
+                        this.Discount = true;
+                        this.UnitAmount = true;
+                        this.getBusyDialog()
+                        if (!this.getView().getModel("InvoiceSACModel")) {
+                             this._fetchCommonData("CompanyInvoiceSAC", "InvoiceSACModel");
+                             this._fetchCommonData("Currency", "CurrencyModel");
                         }
-                    } else {
-                        oComboBox.setVisible(false); 
-                    }
+                        await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice" });
+                        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
+                        var oInvoiceModel = new JSONModel({
+                            EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",
+                            InvoiceNo: "", InvoiceDate: "", ConsultantAddress: "", GSTNO: "",
+                            CompanyGSTNO: "", MobileNo: "", CGST: false, SGST: false, IGST: false,
+                            BankName: "", AccountName: "", AccountNo: "", IFSCCode: "", PayBy: "",
+                            GSTValid: false, CGSTSelected: false, IGSTSelected: false, Percentage: "",
+                            Currency: "INR", STDCode: "+91"
+                        });
+                        this.getView().setModel(oInvoiceModel, "ConsultantInvoiceModel");
 
-                    if (sPath === "X" && oPath === "Y") {
-                        this.readFunction("ConsultantInvoice", "ConsultantInvoiceModel", true);
-                        this.readFunction("ConsultantInvoiceItem", "oModelDataPro", true);
-                        this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("Delete");
-                    } else {
-                        this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID);
-                        this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID);
-                        this.setVisibilityForEdit();
+                        var oInvoiceItemModel = new JSONModel({
+                            SlNo: "", EmployeeID: "", Item: "", Days: "", SAC: "", UnitPrice: "",
+                            Total: "", SubTotal: "", TotalSum: "", Currency: "INR"
+                        });
+                        this.getView().setModel(oInvoiceItemModel, "oModelDataPro");
+
+                        var visibilityPlay = new JSONModel({
+                            createVisi: true, editVisi: false, editable: true,
+                            invBtn: true, pasteBtn: true, merge: false
+                        });
+                        this.getView().setModel(visibilityPlay, "visiablityPlay");
+
+                        var loginModel = this.getOwnerComponent().getModel("LoginModel");
+                        var oComboBox = this.getView().byId("CI_id_Cont");
+                        var isEditMode = sPath !== "X" && oPath !== "Y";
+
+                        if (loginModel) {
+                            this.sUserType = loginModel.getProperty("/Role");
+                            if (this.sUserType === "Admin" && !isEditMode) {
+                                oComboBox.setVisible(true);
+                            } else {
+                                oComboBox.setVisible(false);
+                            }
+                        }
+
+                        if (sPath === "X" && oPath === "Y") {
+                            this.readFunction("ConsultantInvoice", "ConsultantInvoiceModel", true);
+                            this.readFunction("ConsultantInvoiceItem", "oModelDataPro", true);
+                            this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("Delete");
+                        } else {
+                            this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID);
+                            this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID);
+                            this.setVisibilityForEdit();
+                        }
+                        this.onFetchContractDetails();
+                        oComboBox.setSelectedKey("");
+                        this.scrollToSection("CI_id_NavConsultantInvoicePage", "CI_id_FirstSection");
+                    }catch (error) {
+                        sap.m.MessageToast.show(error.message || error.responseText);
+                    } finally {
+                        this.closeBusyDialog(); // Close after async call finishes
                     }
-                    oComboBox.setSelectedKey("");
-                     this.scrollToSection("CI_id_NavConsultantInvoicePage", "CI_id_FirstSection");
                 },
 
                 CI_CommonID: function() {
@@ -95,8 +105,6 @@ sap.ui.define(
 
                 onFetchContractDetails: async function() {
                     try {
-                        // Contract list
-                        this.getBusyDialog(); // <-- Open custom BusyDialog
                         const contractData = await this.ajaxReadWithJQuery("EmployeeContract", {
                             Type: "Contract"
                         });
@@ -114,8 +122,8 @@ sap.ui.define(
                 // Common function to fetch invoice data
                 commonFetchInvoiceData:async function(invoiceNo, userId) {
                     const requestData = {InvoiceNo: invoiceNo, EmployeeID: userId};
-                     this.getBusyDialog(); // <-- Open custom BusyDialog
-                 await   this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
+                    this.getBusyDialog(); // <-- Open custom BusyDialog
+                    await this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
                             this.InvoiceNo = oData.data;
                             this.EmployeeID = oData.data;
                             if (oData.data.length > 0) {
@@ -152,7 +160,7 @@ sap.ui.define(
 
                  // Common function to fetch invoice items
                 commonFetchInvoiceItems: async function(invoiceNo, userId) {
-                     this.getBusyDialog(); // <-- Open custom BusyDialog
+                    this.getBusyDialog(); // <-- Open custom BusyDialog
                     const requestData = { InvoiceNo: invoiceNo, EmployeeID: userId };
                     await this.ajaxReadWithJQuery("ConsultantInvoiceItem", requestData)
                         .then(function(oData) {
@@ -226,7 +234,7 @@ sap.ui.define(
                     }
                 },
 
-              CI_onChangeContractDetails: function (oEvent) {
+                CI_onChangeContractDetails: function (oEvent) {
                     let sValue = oEvent.getSource().getValue().split(' - ');
                     let contractID = sValue[0];
                     let contractName = sValue[1];
@@ -234,7 +242,7 @@ sap.ui.define(
 
                     // Use common confirmation dialog
                     this.showConfirmationDialog(
-                        this.i18nModel.getText("confirmationTitle"), // Title like "Confirm"
+                        this.i18nModel.getText("confirmTitle"), // Title like "Confirm"
                         oMsgText,                                    // Message body
                         function () {
                             // On Confirm
@@ -251,7 +259,6 @@ sap.ui.define(
                 },
 
                 readFunction: function(entitySet, modelName, isCreate, contractID, contractName) {
-                    this.onFetchContractDetails();
                     this.ajaxReadWithJQuery(entitySet, {}).then(function(oData) {
                         var oJSONModel = new sap.ui.model.json.JSONModel(oData);
                         this.getView().setModel(oJSONModel, modelName);
@@ -265,7 +272,7 @@ sap.ui.define(
                             var loginData = this.getOwnerComponent().getModel("LoginModel").getData();
 
                             if (this.Copy !== true) {
-                                filters.push(new sap.ui.model.Filter("EmployeeID", sap.ui.model.FilterOperator.EQ, loginData.userIds));
+                                filters.push(new sap.ui.model.Filter("EmployeeID", sap.ui.model.FilterOperator.EQ, loginData.EmployeeID));
                                 this.Copy = true;
                             } else if (this.selectedContractID) {
                                 filters.push(new sap.ui.model.Filter("EmployeeID", sap.ui.model.FilterOperator.EQ, this.selectedContractID));
@@ -293,6 +300,15 @@ sap.ui.define(
                             var oValidUntil = new Date(oToday);
                             oValidUntil.setDate(oValidUntil.getDate() + 30);
 
+                             var sPath = "/0";
+                            var oCompanyDetails = this.getView().getModel("CompanyCodeDetailsModel").getProperty(sPath);
+
+                            var InvoiceTo = oCompanyDetails.companyName;
+                            var InvoiceAddress = oCompanyDetails.longAddress;
+                            var CompanyGSTNO = oCompanyDetails.gstin;
+                            oInvoiceModel.setProperty("/InvoiceTo", InvoiceTo);
+                            oInvoiceModel.setProperty("/InvoiceAddress", InvoiceAddress);
+                            oInvoiceModel.setProperty("/CompanyGSTNO", CompanyGSTNO);
                             oInvoiceModel.setProperty("/InvoiceDate", oToday);
                             oInvoiceModel.setProperty("/PayBy", oValidUntil);
                             oInvoiceModel.setProperty("/GSTValid", false);
@@ -309,6 +325,7 @@ sap.ui.define(
                             this.CI_onPressPasteBtn();
                         }
                     }.bind(this)).catch(function(error) {
+                    this.closeBusyDialog();
                        MessageToast.show(error.message || error.responseText);
                     });
                 },
@@ -418,7 +435,7 @@ sap.ui.define(
                     this.CI_updateTotalAmount();
                 },
 
-                CI_updateTotalAmount: function() {
+                CI_updateTotalAmount: function () {
                     var oModel = this.getView().getModel("oModelDataPro");
                     var oConsultantInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
                     var aItems = oConsultantInvoiceModel.getProperty("/ConsultantInvoiceItem") || [];
@@ -430,24 +447,29 @@ sap.ui.define(
                         igst = 0,
                         totalSum = 0;
 
-                    aItems.forEach(function(oItem) {
-                        var iItemTotal = oItem.Days ?
-                            parseFloat(oItem.Days) * parseFloat(oItem.UnitPrice || 0) :
-                            parseFloat(oItem.UnitPrice || 0);
+                    aItems.forEach(function (oItem) {
+                        var unit = parseFloat(oItem.Days) || 0;
+                        var rate = parseFloat(oItem.UnitPrice || 0);
+                        var baseAmount = unit * rate;
 
-                        var iDiscount = oItem.Discount ? parseFloat(oItem.Discount) || 0 : 0;
-
-                        if (typeof oItem.Discount === 'string' && oItem.Discount.trim().endsWith('%')) {
-                            var percentage = iDiscount / 100;
-                            var iUpdatedTotal = iItemTotal - (iItemTotal * percentage);
-                            oItem.Total = iUpdatedTotal.toFixed(2);
-                            oItem.Discount = (iItemTotal * percentage).toFixed(2); // Separate field for discount value
+                        let discountAmount = 0;
+                        if (typeof oItem.Discount === "string" && oItem.Discount.trim().endsWith("%")) {
+                        const percent = parseFloat(oItem.Discount) / 100;
+                        discountAmount = baseAmount * percent;
+                        oItem.Discount = discountAmount.toFixed(2);
                         } else {
-                            var iUpdatedTotal = iItemTotal - iDiscount;
-                            oItem.Total = iUpdatedTotal.toFixed(2);
+                        discountAmount = parseFloat(oItem.Discount) || 0;
                         }
 
-                        // Update subtotals
+                        const finalAmount = baseAmount - discountAmount;
+                        if(finalAmount < 0){
+                        oItem.Total = '0.00';
+                        oItem.Discount = unit * rate;
+                        }else{
+                        oItem.Total = finalAmount.toFixed(2);
+                        }
+
+                        // GST-related subtotal
                         if (oItem.GSTCalculation === "YES") {
                             subTotalTaxable += parseFloat(oItem.Total);
                             oItem.SAC = "998314";
@@ -495,7 +517,7 @@ sap.ui.define(
                     oModel.refresh();
                 },
 
-                CI_onchangeDiscount: function(oEvent) {
+                 CI_onchangeDiscount: function(oEvent) {
                     var sValue = oEvent.getParameter("value").trim();
                     var regex = /^[0-9]+(\.[0-9]{1,2})?%?$/;
                     var oInput = oEvent.getSource();

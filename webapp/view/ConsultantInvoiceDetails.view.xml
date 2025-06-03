@@ -296,7 +296,7 @@
 													 <!-- UnitPrice (Column 6) -->
 													<m:Input value="{ConsultantInvoiceModel>UnitPrice}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End"  type="Number"/>
 													 <!-- Discount (Column 7) -->
-													<m:Input  value="{ConsultantInvoiceModel>Discount}" editable="{visiablityPlay>/editable}" liveChange="CI_onchangeDiscount" maxLength="10" textAlign="End"  showValueHelp="true"
+													<m:Input  value="{ConsultantInvoiceModel>Discount}" editable="{visiablityPlay>/editable}" change="CI_onchangeDiscount" maxLength="10" textAlign="End"  showValueHelp="true"
 													valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" valueStateText="{i18n>discountInfoText}"/>
 													 <!-- Total (Column 8) -->
 													<m:Input value="{path:'ConsultantInvoiceModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />
