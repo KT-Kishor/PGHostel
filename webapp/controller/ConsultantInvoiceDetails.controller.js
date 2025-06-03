@@ -120,7 +120,7 @@ sap.ui.define(
                 },
 
                 // Common function to fetch invoice data
-                commonFetchInvoiceData:async function(invoiceNo, userId) {
+                commonFetchInvoiceData: async function(invoiceNo, userId) {
                     const requestData = {InvoiceNo: invoiceNo, EmployeeID: userId};
                     this.getBusyDialog(); // <-- Open custom BusyDialog
                     await this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
@@ -158,29 +158,17 @@ sap.ui.define(
                         });
                 },
 
-                 // Common function to fetch invoice items
-                commonFetchInvoiceItems: async function(invoiceNo, userId) {
-                    this.getBusyDialog(); // <-- Open custom BusyDialog
+                 commonFetchInvoiceItems: async function(invoiceNo, userId) {
+                    this.getBusyDialog(); // Open custom BusyDialog
                     const requestData = { InvoiceNo: invoiceNo, EmployeeID: userId };
-                    await this.ajaxReadWithJQuery("ConsultantInvoiceItem", requestData)
-                        .then(function(oData) {
-                            this.processInvoiceItems(oData.data);
-                        }.bind(this))
-                        .catch(function(error) {
-                             this.closeBusyDialog(); // <-- Close custom BusyDialog
-                            MessageToast.show(error.message || error.responseText);
-                        });
-                },
-
-               processInvoiceItems: function(items) {
                     try {
-                        // Sort items
-                        items.sort((a, b) => {
+                        const oData = await this.ajaxReadWithJQuery("ConsultantInvoiceItem", requestData);
+                        const items = oData.data;
+                        items.sort((a, b) => {   // Sort items
                             const valueA = a.Item || '';
                             const valueB = b.Item || '';
                             const isNumericA = !isNaN(valueA);
                             const isNumericB = !isNaN(valueB);
-
                             if (isNumericA && isNumericB) {
                                 return parseFloat(valueA) - parseFloat(valueB);
                             } else if (isNumericA) {
@@ -197,40 +185,37 @@ sap.ui.define(
                             item.IndexNo = index + 1;
                         });
 
+                        // Set ConsultantInvoiceItem in model
                         var oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
                         oInvoiceModel.setProperty("/ConsultantInvoiceItem", items);
                         this.byId("CI_id_ConsultantInvoiceDeatailTable").getBinding("items").refresh(true);
 
-                    // Set GST values in oModelDataPro
-                    var oModelDataPro = this.getView().getModel("oModelDataPro");
-                    var cgst = parseFloat(items[0]?.CGST) || 0;
-                    var sgst = parseFloat(items[0]?.SGST) || 0;
-                    var igst = parseFloat(items[0]?.IGST) || 0;
+                        var invoiceItemData = oData.data[0]
+                        var oModelDataPro = this.getView().getModel("oModelDataPro");
+                        oModelDataPro.setProperty("/CGST", parseFloat(invoiceItemData.CGST) || 0);
+                        oModelDataPro.setProperty("/SGST", parseFloat(invoiceItemData.SGST) || 0);
+                        oModelDataPro.setProperty("/IGST", parseFloat(invoiceItemData.IGST) || 0);
 
-                    oModelDataPro.setProperty("/CGST", cgst);
-                    oModelDataPro.setProperty("/SGST", sgst);
-                    oModelDataPro.setProperty("/IGST", igst);
+                         // Set visibility for CGST/SGST or IGST
+                        oModelDataPro.setProperty("/CGSTVisible", invoiceItemData.CGST && invoiceItemData.SGST ? true : false);
+                        oModelDataPro.setProperty("/SGSTVisible", invoiceItemData.SGST ? true : false);
+                        oModelDataPro.setProperty("/IGSTVisible", invoiceItemData.IGST && (!invoiceItemData.CGST || !invoiceItemData.SGST) ? true : false);
 
-                    oModelDataPro.setProperty("/CGSTVisible", cgst && sgst);
-                    oModelDataPro.setProperty("/SGSTVisible", !!sgst);
-                    oModelDataPro.setProperty("/IGSTVisible", igst && (!cgst || !sgst));
+                        // Update total amount
+                        this.CI_updateTotalAmount();
 
-                    // Update total amount
-                    this.CI_updateTotalAmount();
+                        // Control column visibility based on GSTNO
+                        var gstNo = oInvoiceModel.getProperty("/GSTNO");
+                        var isGSTNOVisible = !!gstNo;
+                        this.byId("CI_id_ConsultantInvoiceDeatailTable").getColumns()[2].setVisible(isGSTNOVisible);
 
-                    // Control column visibility based on GSTNO
-                    var gstNo = oInvoiceModel.getProperty("/GSTNO");
-                    var isGSTNOVisible = !!gstNo;
-                    this.byId("CI_id_ConsultantInvoiceDeatailTable").getColumns()[2].setVisible(isGSTNOVisible);
-
-                    // Show/hide GSTCalculation column
-                    var allEmptyGST = items.every(item => !item.GSTCalculation || item.GSTCalculation.trim() === "");
-                    this.byId("CI_id_GSTCalc").setVisible(!allEmptyGST);
+                        // Show/hide GSTCalculation column
+                        var allEmptyGST = items.every(item => !item.GSTCalculation || item.GSTCalculation.trim() === "");
+                        this.byId("CI_id_GSTCalc").setVisible(!allEmptyGST);
                     } catch (error) {
-                       MessageToast.show(error.message || error.responseText);
+                        MessageToast.show(error.message || error.responseText);
                     } finally {
-                        // Always close BusyDialog
-                        this.closeBusyDialog();
+                        this.closeBusyDialog(); // Always close BusyDialog
                     }
                 },
 
@@ -258,8 +243,8 @@ sap.ui.define(
                     );
                 },
 
-                readFunction: function(entitySet, modelName, isCreate, contractID, contractName) {
-                    this.ajaxReadWithJQuery(entitySet, {}).then(function(oData) {
+                readFunction: async function(entitySet, modelName, isCreate, contractID, contractName) {
+                    await this.ajaxReadWithJQuery(entitySet, {}).then(function(oData) {
                         var oJSONModel = new sap.ui.model.json.JSONModel(oData);
                         this.getView().setModel(oJSONModel, modelName);
 
