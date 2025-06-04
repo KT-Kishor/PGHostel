@@ -188,7 +188,7 @@ sap.ui.define([
         this.getOwnerComponent().setModel(new JSONModel(oData), "oNavLeaveModel");
         this.getRouter().navTo("RouteDetailLeave");
       } else {
-        this.getRouter().navTo("RouteSelfService", { sPara: `${oData.EmpID} MyInBoxResignation` });
+        this.getRouter().navTo("SelfService", { sPath: oData.EmpID,Role: "MyInboxResignation" });
       }
     },
 

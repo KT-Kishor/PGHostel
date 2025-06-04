@@ -37,13 +37,20 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
                     var sLoggedInRole = loginModel.getProperty("/Role");
                     var sNavigatedRole = oEvent.getParameter("arguments").Role; // Role from navigation
+                    this.sPath = oEvent.getParameter('arguments').sPath;
                     // sections if role is "Trainee" from either login or navigation
+                      if(sNavigatedRole === "MyInboxResignation"){
+                        this.sFlag = true
+                        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
+                            EmployeeID: this.sPath
+                        });
+                        this.onApplyResignation();
+                    }else{
                     var bHideSalarySection = sLoggedInRole === "Trainee" || sNavigatedRole === "Trainee";
                     this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
 
                     var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lpa", "SS_id_lca", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
                         "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan",];
-                    this.sPath = oEvent.getParameter('arguments').sPath;
                     if (this.sPath === "SelfService") {
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileSelfSerciceFooter"));
                         this.ViewModel.setProperty("/SetProfile", true);
@@ -144,6 +151,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.byId("SS_id_STDCodeRII").setValueState("None");
                     this.byId("SS_id_FatherName").setValueState("None");
                     this.byId("SS_id_Compmail").setValueState("None");
+                }
                 } catch (error) { } finally {
                     this.closeBusyDialog();
                 }
@@ -778,6 +786,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 } else {
                     if (this.sPath === "SelfService") {
                         this.getRouter().navTo("RouteTilePage");
+                    }else if(this.sFlag === true){
+                        this.getRouter().navTo("RouteMyInbox",{sMyInBox : "MyInbox"});
                     } else {
                         this.getRouter().navTo("RouteEmployeeDetails", { sPath: "SelfService" });
                     }
@@ -1157,15 +1167,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.closeBusyDialog();
                 }
             },
-            // onAfterRendering: function () {
-            //     var canvasElement = document.getElementById("canvas");
-            //     if (canvasElement) {
-            //         var context = canvasElement.getContext("2d");
-            //         if (context) {
-            //             context.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            //         }
-            //     }
-            // },
+            onAfterRendering: function () {
+                var canvasElement = document.getElementById("canvas");
+                if (canvasElement) {
+                    var context = canvasElement.getContext("2d");
+                    if (context) {
+                        context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                    }
+                }
+            },
 
             saveEducationDetails: async function (bIsCreate) {
                 try {
