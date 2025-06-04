@@ -14,9 +14,10 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="InvoiceNo" label="{i18n>invoiceNo}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_InvoiceNo" items="{path:'ConsultantModel>/', length:1000}"
-                			showSecondaryValues="true" showClearIcon="true">
-								<core:ListItem key="{ConsultantModel>InvoiceNo}" text="{ConsultantModel>InvoiceNo}" additionalText="{ConsultantModel>EmployeeID}"/>
+							<ComboBox id="CI_id_InvoiceNo" items="{path:'InvoiceModel>/', length:1000}"
+							showSecondaryValues="true" showClearIcon="true">
+							<core:ListItem key="{= ${InvoiceModel>InvoiceNo} + '|' + ${InvoiceModel>EmployeeID} }"
+							    text="{InvoiceModel>InvoiceNo}" additionalText="{InvoiceModel>EmployeeID}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>

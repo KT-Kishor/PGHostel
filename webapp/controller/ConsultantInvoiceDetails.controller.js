@@ -17,10 +17,9 @@ sap.ui.define(
         onInit: function () {
           this.getRouter().getRoute("RouteNavConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
         },
-
-      _onRouteMatched: async function(oEvent) {
+                    _onRouteMatched: async function(oEvent) {
                     try {
-                        var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
+                        var LoginFUnction =  this.commonLoginFunction("ConsultantInvoice");
                         if (!LoginFUnction) return;
                         this._makeDatePickersReadOnly(["CI_id_InDate", "CI_id_PaybyInv"]);
                         this.i18nModel = this.getView().getModel('i18n').getResourceBundle();
@@ -36,12 +35,16 @@ sap.ui.define(
                         this.Discount = true;
                         this.UnitAmount = true;
                         this.getBusyDialog()
+                         // Initialize default models only once
                         if (!this.getView().getModel("InvoiceSACModel")) {
-                             this._fetchCommonData("CompanyInvoiceSAC", "InvoiceSACModel");
-                             this._fetchCommonData("Currency", "CurrencyModel");
+                                this._fetchCommonData("CompanyInvoiceSAC", "InvoiceSACModel"),
+                                this._fetchCommonData("Currency", "CurrencyModel")
                         }
-                        await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice" });
-                        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
+
+                        await Promise.all([
+                            this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice" }),
+                            this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel")
+                        ]);
                         var oInvoiceModel = new JSONModel({
                             EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",
                             InvoiceNo: "", InvoiceDate: "", ConsultantAddress: "", GSTNO: "",
@@ -82,11 +85,11 @@ sap.ui.define(
                             this.readFunction("ConsultantInvoiceItem", "oModelDataPro", true);
                             this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("Delete");
                         } else {
-                            this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID);
-                            this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID);
+                            this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID),
+                            this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
                             this.setVisibilityForEdit();
                         }
-                        this.onFetchContractDetails();
+                        await this.onFetchContractDetails();
                         oComboBox.setSelectedKey("");
                         this.scrollToSection("CI_id_NavConsultantInvoicePage", "CI_id_FirstSection");
                     }catch (error) {
@@ -100,12 +103,12 @@ sap.ui.define(
                 const ids = ["CI_id_InDate", "CI_id_PaybyInv", "CI_id_InputInvoiceTo", "CI_id_InputInvoiceAddress", "CI_id_InputCompGSTNO",  "CI_id_ConsultantName", "CI_id_codeModel", "CI_id_InputMobile", "CI_id_InputConsultantAddress", "CI_id_InputGSTNO", "CI_id_InputBankName", "CI_id_InputAccountName", "CI_id_InputAccountNo", "CI_id_InputIFSCCode"]
                 ids.forEach((id) => {
                     this.byId(id).setValueState("None");
-               });
+                });
                 },
 
-                onFetchContractDetails: async function() {
+                onFetchContractDetails: function() {
                     try {
-                        const contractData = await this.ajaxReadWithJQuery("EmployeeContract", {
+                        const contractData = this.ajaxReadWithJQuery("EmployeeContract", {
                             Type: "Contract"
                         });
                         var jsonModel = new sap.ui.model.json.JSONModel({
@@ -120,10 +123,10 @@ sap.ui.define(
                 },
 
                 // Common function to fetch invoice data
-                commonFetchInvoiceData: async function(invoiceNo, userId) {
+                commonFetchInvoiceData:  function(invoiceNo, userId) {
                     const requestData = {InvoiceNo: invoiceNo, EmployeeID: userId};
                     this.getBusyDialog(); // <-- Open custom BusyDialog
-                    await this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
+                    this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
                             this.InvoiceNo = oData.data;
                             this.EmployeeID = oData.data;
                             if (oData.data.length > 0) {
@@ -158,17 +161,18 @@ sap.ui.define(
                         });
                 },
 
-                 commonFetchInvoiceItems: async function(invoiceNo, userId) {
-                    this.getBusyDialog(); // Open custom BusyDialog
+                commonFetchInvoiceItems: async function(invoiceNo, userId) {
                     const requestData = { InvoiceNo: invoiceNo, EmployeeID: userId };
                     try {
                         const oData = await this.ajaxReadWithJQuery("ConsultantInvoiceItem", requestData);
                         const items = oData.data;
-                        items.sort((a, b) => {   // Sort items
+                        // Sort items
+                        items.sort((a, b) => {
                             const valueA = a.Item || '';
                             const valueB = b.Item || '';
                             const isNumericA = !isNaN(valueA);
                             const isNumericB = !isNaN(valueB);
+
                             if (isNumericA && isNumericB) {
                                 return parseFloat(valueA) - parseFloat(valueB);
                             } else if (isNumericA) {
@@ -186,31 +190,31 @@ sap.ui.define(
                         });
 
                         // Set ConsultantInvoiceItem in model
-                        var oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
+                        const oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
                         oInvoiceModel.setProperty("/ConsultantInvoiceItem", items);
                         this.byId("CI_id_ConsultantInvoiceDeatailTable").getBinding("items").refresh(true);
 
-                        var invoiceItemData = oData.data[0]
-                        var oModelDataPro = this.getView().getModel("oModelDataPro");
+                        const invoiceItemData = oData.data[0];
+                        const oModelDataPro = this.getView().getModel("oModelDataPro");
                         oModelDataPro.setProperty("/CGST", parseFloat(invoiceItemData.CGST) || 0);
                         oModelDataPro.setProperty("/SGST", parseFloat(invoiceItemData.SGST) || 0);
                         oModelDataPro.setProperty("/IGST", parseFloat(invoiceItemData.IGST) || 0);
 
-                         // Set visibility for CGST/SGST or IGST
+                        // Set visibility for CGST/SGST or IGST
                         oModelDataPro.setProperty("/CGSTVisible", invoiceItemData.CGST && invoiceItemData.SGST ? true : false);
                         oModelDataPro.setProperty("/SGSTVisible", invoiceItemData.SGST ? true : false);
                         oModelDataPro.setProperty("/IGSTVisible", invoiceItemData.IGST && (!invoiceItemData.CGST || !invoiceItemData.SGST) ? true : false);
 
                         // Update total amount
-                        this.CI_updateTotalAmount();
+                        await this.CI_updateTotalAmount();
 
                         // Control column visibility based on GSTNO
-                        var gstNo = oInvoiceModel.getProperty("/GSTNO");
-                        var isGSTNOVisible = !!gstNo;
+                        const gstNo = oInvoiceModel.getProperty("/GSTNO");
+                        const isGSTNOVisible = !!gstNo;
                         this.byId("CI_id_ConsultantInvoiceDeatailTable").getColumns()[2].setVisible(isGSTNOVisible);
 
                         // Show/hide GSTCalculation column
-                        var allEmptyGST = items.every(item => !item.GSTCalculation || item.GSTCalculation.trim() === "");
+                        const allEmptyGST = items.every(item => !item.GSTCalculation || item.GSTCalculation.trim() === "");
                         this.byId("CI_id_GSTCalc").setVisible(!allEmptyGST);
                     } catch (error) {
                         MessageToast.show(error.message || error.responseText);
@@ -220,31 +224,48 @@ sap.ui.define(
                 },
 
                 CI_onChangeContractDetails: function (oEvent) {
+                    // Extract contract ID and name
                     let sValue = oEvent.getSource().getValue().split(' - ');
                     let contractID = sValue[0];
                     let contractName = sValue[1];
+
+                    // Confirmation message
                     let oMsgText = this.i18nModel.getText("selectContractNo");
 
-                    // Use common confirmation dialog
+                    // Get contract model data
+                    let oModelData = this.getView().getModel("contractModel").getData();
+                    let aContractData = Array.isArray(oModelData) ? oModelData : oModelData.results || [];
+
+                    // Find the matching contract
+                    let oSelectedContract = aContractData.find(contract => contract.ContractNo === contractID);
+
+                    if (!oSelectedContract) {
+                        sap.m.MessageToast.show("Selected contract not found.");
+                        return;
+                    }
+
+                    // Get required fields
+                    let sMobileNo = oSelectedContract.MobileNo || "";
+                    let sConsultantAddress = oSelectedContract.ConsultantAddress || "";
+
+                    // Show confirmation dialog
                     this.showConfirmationDialog(
-                        this.i18nModel.getText("confirmTitle"), // Title like "Confirm"
-                        oMsgText,                                    // Message body
+                        this.i18nModel.getText("confirmTitle"),
+                        oMsgText,
                         function () {
-                            // On Confirm
                             this.selectedContractID = contractID;
                             this.Copy = true;
-                            this.readFunction("/ConsultantInvoice", "ConsultantInvoiceModel", true, contractID, contractName);
+                            this.readFunction("/ConsultantInvoice", "ConsultantInvoiceModel", true, contractID, contractName, sMobileNo, sConsultantAddress);
                             sap.m.MessageToast.show(this.i18nModel.getText("datadestroy"));
                         }.bind(this),
-                        function () {
-                        }.bind(this),
-                        this.i18nModel.getText("ok"),     // OK button text (optional)
-                        this.i18nModel.getText("cancel")  // Cancel button text (optional)
+                        function () {}, // Cancel
+                        this.i18nModel.getText("OkButton"),
+                        this.i18nModel.getText("CancelButton")
                     );
                 },
 
-                readFunction: async function(entitySet, modelName, isCreate, contractID, contractName) {
-                    await this.ajaxReadWithJQuery(entitySet, {}).then(function(oData) {
+                readFunction: async function (entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress) {
+                     await this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
                         var oJSONModel = new sap.ui.model.json.JSONModel(oData);
                         this.getView().setModel(oJSONModel, modelName);
 
@@ -267,6 +288,8 @@ sap.ui.define(
                             }
 
                             var oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
+                            oInvoiceModel.setProperty("/MobileNo", MobileNo || "");
+                            oInvoiceModel.setProperty("/ConsultantAddress", ConsultantAddress || "");
 
                             if (this.Copy === false && this.Copy !== undefined) {
                                 oInvoiceModel.setProperty("/EmployeeID", this.EmployeeID);
@@ -280,17 +303,18 @@ sap.ui.define(
                             }
 
                             var oToday = new Date();
-                            oToday.setHours(0, 0, 0, 0); // Normalize
+                            oToday.setHours(0, 0, 0, 0);
 
                             var oValidUntil = new Date(oToday);
                             oValidUntil.setDate(oValidUntil.getDate() + 30);
 
-                             var sPath = "/0";
+                            var sPath = "/0";
                             var oCompanyDetails = this.getView().getModel("CompanyCodeDetailsModel").getProperty(sPath);
 
                             var InvoiceTo = oCompanyDetails.companyName;
                             var InvoiceAddress = oCompanyDetails.longAddress;
                             var CompanyGSTNO = oCompanyDetails.gstin;
+
                             oInvoiceModel.setProperty("/InvoiceTo", InvoiceTo);
                             oInvoiceModel.setProperty("/InvoiceAddress", InvoiceAddress);
                             oInvoiceModel.setProperty("/CompanyGSTNO", CompanyGSTNO);
@@ -299,6 +323,7 @@ sap.ui.define(
                             oInvoiceModel.setProperty("/GSTValid", false);
                             oInvoiceModel.setProperty("/Currency", "INR");
                             oInvoiceModel.setProperty("/STDCode", "+91");
+
                             this.getView().byId("CI_id_ColumnGST").setVisible(false);
                             this.getView().byId("CI_id_GSTCalc").setVisible(false);
                             this.getView().getModel("visiablityPlay").setProperty("/copyBtn", false);
@@ -309,10 +334,10 @@ sap.ui.define(
 
                             this.CI_onPressPasteBtn();
                         }
-                    }.bind(this)).catch(function(error) {
-                    this.closeBusyDialog();
-                       MessageToast.show(error.message || error.responseText);
-                    });
+                    }.bind(this)).catch(function (error) {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.message || error.responseText);
+                    }.bind(this));
                 },
 
                 setVisibilityForEdit: function() {
@@ -350,8 +375,7 @@ sap.ui.define(
                         oData.ConsultantInvoiceItem = [];
                     }
 
-                    var gstInput = this.byId("CI_id_InputGSTNO").getValue();
-                    var GSTCalculationValue = gstInput ? "YES" : "NO";
+                  const currency = this.byId("CI_id_Currency").getSelectedKey()
 
                     var loginData = this.getOwnerComponent().getModel("LoginModel").getData();
                     var employeeID = loginData.EmployeeID;
@@ -367,7 +391,7 @@ sap.ui.define(
                         EmployeeID: employeeID,
                         Item: "",
                         SAC: "",
-                        GSTCalculation: GSTCalculationValue,
+                        GSTCalculation: (currency === "INR") ? "YES" : "",
                         Days: "",
                         UnitPrice: "",
                         Total: "",
@@ -420,7 +444,7 @@ sap.ui.define(
                     this.CI_updateTotalAmount();
                 },
 
-                CI_updateTotalAmount: function () {
+                CI_updateTotalAmount: async function () {
                     var oModel = this.getView().getModel("oModelDataPro");
                     var oConsultantInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
                     var aItems = oConsultantInvoiceModel.getProperty("/ConsultantInvoiceItem") || [];
@@ -435,7 +459,7 @@ sap.ui.define(
                     aItems.forEach(function (oItem) {
                         var unit = parseFloat(oItem.Days) || 0;
                         var rate = parseFloat(oItem.UnitPrice || 0);
-                        var baseAmount = unit * rate;
+                        const baseAmount = unit ? unit * rate : rate;
 
                         let discountAmount = 0;
                         if (typeof oItem.Discount === "string" && oItem.Discount.trim().endsWith("%")) {
@@ -565,6 +589,7 @@ sap.ui.define(
                     oModel.setProperty("/CGSTVisible", true);
                     oModel.setProperty("/SGSTVisible", true);
                     oModel.setProperty("/IGSTVisible", false);
+                    oModel.setProperty("/IGST", 0);
 
                     oConsultantInvoiceModel.setProperty("/CGSTVisible", true);
                     oConsultantInvoiceModel.setProperty("/SGSTVisible", true);
@@ -588,6 +613,8 @@ sap.ui.define(
                     oModel.setProperty("/CGSTVisible", false);
                     oModel.setProperty("/SGSTVisible", false);
                     oModel.setProperty("/IGSTVisible", true);
+                      oModel.setProperty("/CGST", 0);
+                    oModel.setProperty("/SGST", 0);
 
                     oConsultantInvoiceModel.setProperty("/CGSTVisible", false);
                     oConsultantInvoiceModel.setProperty("/SGSTVisible", false);
@@ -895,6 +922,12 @@ sap.ui.define(
                       if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
                 },
 
+                CID_ValidateName: function(oEvent) {
+                   var oInput = oEvent.getSource();
+                    utils._LCvalidateName(oEvent);
+                      if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+                },
+
                 CID_ValidateMobileNo: function(oEvent) {
                    var oInput = oEvent.getSource();
                     utils._LCvalidateMobileNumber(oEvent);
@@ -961,7 +994,7 @@ sap.ui.define(
                             utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
-                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputAccountName"), "ID") &&
+                            utils._LCvalidateName(this.byId("CI_id_InputAccountName"), "ID") &&
                             utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
                             utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID"));
                             if (!isMandatoryValid) {
@@ -985,15 +1018,16 @@ sap.ui.define(
                                 return;
                             }
 
-                            // Validate all item descriptions are filled
+                            // Validate all item descriptions and unit prices are filled and valid
                             const aItemArray1 = invoiceModel.getProperty("/ConsultantInvoiceItem") || [];
-                            const bAllDescriptionsFilled = aItemArray1.every(item =>
-                            item.Item && item.Item.trim().length > 0
+                            const bAllItemsValid = aItemArray1.every(item =>
+                                item.Item && item.Item.trim().length > 0 &&
+                                item.UnitPrice && parseFloat(item.UnitPrice) > 0
                             );
 
-                            if (!bAllDescriptionsFilled) {
-                            MessageToast.show(this.i18nModel.getText("quotaionMsgDes"));
-                            return;
+                            if (!bAllItemsValid) {
+                                MessageToast.show(this.i18nModel.getText("quotaionMsgDes"));
+                                return;
                             }
 
                             if (!itemData.TotalSum || itemData.TotalSum <= 0) {
@@ -1006,7 +1040,7 @@ sap.ui.define(
                                 return;
                             }
 
-                            if (!this.Discount || !this.UnitAmount) {
+                            if (!this.Discount) {
                                 MessageToast.show(that.i18nModel.getText("mandetoryFields"));
                                 return;
                             }
@@ -1016,7 +1050,6 @@ sap.ui.define(
                             delete invoiceData.GSTValid;
                             delete invoiceData.CGSTSelected;
                             delete invoiceData.IGSTSelected;
-                            delete invoiceData.InvoiceItems;
 
                             const invoiceItemData = this.byId("CI_id_ConsultantInvoiceDeatailTable").getModel("ConsultantInvoiceModel")
                             .getData().ConsultantInvoiceItem;
@@ -1154,7 +1187,7 @@ sap.ui.define(
                             utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
-                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputAccountName"), "ID") &&
+                            utils._LCvalidateName(this.byId("CI_id_InputAccountName"), "ID") &&
                             utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
                             utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID"));
                             if (!isMandatoryValid) {
@@ -1180,7 +1213,7 @@ sap.ui.define(
                               }
                           }
 
-                           if (!this.Discount || !this.UnitAmount) {
+                           if (!this.Discount) {
                                 MessageToast.show(that.i18nModel.getText("mandetoryFields"));
                                 return;
                             }
@@ -1232,7 +1265,8 @@ sap.ui.define(
 
                             const aItemArray2 = oView.getModel("ConsultantInvoiceModel").getProperty("/ConsultantInvoiceItem") || [];
                             const bAllDescriptionsFilled1 = aItemArray2.every(item =>
-                                item.Item && item.Item.trim().length > 0
+                                item.Item && item.Item.trim().length > 0 &&
+                                item.UnitPrice && parseFloat(item.UnitPrice) > 0
                             );
 
                             if (!bAllDescriptionsFilled1) {
@@ -1622,7 +1656,7 @@ sap.ui.define(
                 const sgstValue = parseFloat(oModel.SGST) || 0;
                 const igstValue = parseFloat(oModel.IGST) || 0;
 
-                if (cgstValue > 0 || sgstValue > 0) {
+                if(oModel.Currency === "INR" && oModel.CGST && oModel.SGST && oModel.CGSTVisible === true) {
                     summaryBody.push([
                         `CGST (${oModel.Percentage}%)`,
                         Formatter.fromatNumber(cgstValue.toFixed(2))
@@ -1631,7 +1665,7 @@ sap.ui.define(
                         `SGST (${oModel.Percentage}%)`,
                         Formatter.fromatNumber(sgstValue.toFixed(2))
                     ]);
-                } else if (igstValue > 0) {
+                } else if (oModel.IGST && oModel.Currency === "INR"  && oModel.IGSTVisible === true) {
                     summaryBody.push([
                         `IGST (${oModel.Percentage}%)`,
                         Formatter.fromatNumber(igstValue.toFixed(2))

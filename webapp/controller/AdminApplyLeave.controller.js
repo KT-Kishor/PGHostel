@@ -62,7 +62,7 @@ sap.ui.define(
                         if (that.Type !== "Trainee") {
                             return that.EmployeeDetReadCall("EmployeeDetails", { "EmployeeID": that.userId });
                         } else {
-                            return that.EmployeeDetReadCall("Trainee", { "TraineeID": that.userId });
+                            return that.EmployeeDetReadCall("EmployeeDetails", { "EmployeeID": that.userId });
                         }
                     }).then(() => {
                         this.closeBusyDialog(); //  Close  BusyDialog
@@ -549,7 +549,8 @@ sap.ui.define(
                 AL_onPressUpdate: function () {
                     var oView = this.getView();
                     var oTable = this.byId("AL_id_LeaveTableStandard").getSelectedItem();
-                    var oModelData = oTable.getBindingContext("LeaveModel").getObject();
+                    var oModelData = JSON.parse(JSON.stringify(oTable.getBindingContext("LeaveModel").getObject()));
+                    this._originalLeaveData = JSON.parse(JSON.stringify(oModelData));
                     this.UpdateNoofDays = oModelData.NoofDays;
                     this.previousLeaveDates = [];
                     let prevFrom = this.onFormatDate(this.Formatter.formatDate(oModelData.fromDate));
@@ -558,7 +559,7 @@ sap.ui.define(
                         this.previousLeaveDates.push(d.toDateString());
                     }
 
-                    // Create leave JSON model with existing data
+                    // Prepare leave data for dialog model
                     var leaveJson = {
                         ID: oModelData.ID,
                         employeeID: oModelData.employeeID,
@@ -575,8 +576,9 @@ sap.ui.define(
                         managerRemark: oModelData.ManagerRemark,
                         maxDate: new Date(this.currentYear, 11, 31),
                         minDate: new Date(this.JoiningDate[2], this.JoiningDate[1] - 1, this.JoiningDate[0]),
-                        isUpdate: true,
+                        isUpdate: true
                     };
+                    // Set data into LeaveTempModel
                     var oLeaveTempModel = new JSONModel(leaveJson);
                     oView.setModel(oLeaveTempModel, "LeaveTempModel");
                     this.openLeaveDialog(oView);
@@ -608,12 +610,21 @@ sap.ui.define(
                     sap.ui.getCore().byId("AL_id_LeaveComments").setValueState("None");
                 },
 
-                // Close the leave dialog fragment
+               // Close the leave dialog fragment
                 AL_onPressClose: function () {
                     this.oLeaveDialog.close();
                     this.byId("AL_id_LeaveTableStandard").removeSelections(true); // Clear table selection
                     this.byId("AL_id_Updatebtn").setVisible(false);
                     this.byId("AL_id_Deletebtn").setVisible(false);
+                    if (this._originalLeaveData) {
+                        var aLeaveData = this.getView().getModel("LeaveModel").getProperty("/");
+                        var iIndex = aLeaveData.findIndex(item => item.ID === this._originalLeaveData.ID);
+                        if (iIndex > -1) {
+                            aLeaveData[iIndex] = JSON.parse(JSON.stringify(this._originalLeaveData));
+                            this.getView().getModel("LeaveModel").setProperty("/", aLeaveData);
+                        }
+                        this._originalLeaveData = null;
+                    }
                 },
 
                 // Format date string to Date object
