@@ -16,6 +16,8 @@ sap.ui.define([
             this.getRouter().getRoute("PurchaseOrder").attachPatternMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function () {
+
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
             if (!LoginFUnction) return;
             await this.PO_ReadCall()
@@ -88,13 +90,18 @@ sap.ui.define([
 
             }
         },
-        PO_onEditPurchaseOrder: function () {
+        PO_onEditPurchaseOrder:async function (e) {
+          
             var Table = this.getView().byId("PO_id_Table");
             var selectedItem = Table.getSelectedItem();
+          var data= await this.ajaxReadWithJQuery("PurchaseOrderItems",{PoNumber:selectedItem.getBindingContext("POModel").getObject().PoNumber}).then((oData) => {
+                var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                // this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "PO");
+                return oFCIAerData;
+            }); 
+            
 
-            var Model = selectedItem.getBindingContext("POModel");
-            var data = Model.getObject();
-            var oModel = this.getView().getModel("PurchaseOrderModel")
+             var oModel = this.getView().getModel("PurchaseOrderModel")
             if (!this.PO_oDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.kt.com.minihrsolution.fragment.PurchaseOrder",
@@ -104,31 +111,35 @@ sap.ui.define([
                     this.getView().addDependent(this.PO_oDialog);
                     this._FragmentDatePickersReadOnly(["PO_id_StartDate", "PO_id_EndDate", "PO_id_Date"]);
 
-                    oModel.setProperty("/CustomerName", data.CustomerName);
-                    oModel.setProperty("/Address", data.Address);
-                    oModel.setProperty("/PAN", data.PAN);
+                    oModel.setProperty("/CustomerName", data[0].PurchaseOrder[0].CustomerName);
+                    oModel.setProperty("/Address", data[0].PurchaseOrder[0].Address);
+                    oModel.setProperty("/PAN", data[0].PurchaseOrder[0].PAN);
                     oModel.setProperty("/Description", data.Description);
-                    oModel.setProperty("/Type", data.Type || "internal");
-                    sap.ui.getCore().byId("PO_id_StartDate").setDateValue(new Date(data.StartDate));
-                    sap.ui.getCore().byId("PO_id_EndDate").setDateValue(new Date(data.EndDate));
-                    sap.ui.getCore().byId("PO_id_Date").setDateValue(new Date(data.CurrentDate));
+                    oModel.setProperty("/Type",data[0].PurchaseOrder[0].Type || "internal");
+                    oModel.setProperty("/PurchaseOrders", data[0].PurchaseOrderItems);
+                    // sap.ui.getCore().byId("PO_id_Description").setValue(data[0].PurchaseOrderItems[0].Description);
+                    sap.ui.getCore().byId("PO_id_StartDate").setDateValue(new Date(data[0].PurchaseOrder[0].StartDate));
+                    sap.ui.getCore().byId("PO_id_EndDate").setDateValue(new Date(data[0].PurchaseOrder[0].EndDate));
+                    sap.ui.getCore().byId("PO_id_Date").setDateValue(new Date(data[0].PurchaseOrder[0].CurrentDate));
                     sap.ui.getCore().byId("PO_id_Address").setEditable(false);
                     sap.ui.getCore().byId("PO_id_PanNo").setEditable(false);
-
 
 
                     this.PO_oDialog.open();
                 }.bind(this));
             } else {
-                this.PO_oDialog.open();
-             oModel.setProperty("/CustomerName", data.CustomerName);
-                    oModel.setProperty("/Address", data.Address);
-                    oModel.setProperty("/PAN", data.PAN);
+                 this.PO_oDialog.open();
+                    oModel.setProperty("/CustomerName", data[0].PurchaseOrder[0].CustomerName);
+                    oModel.setProperty("/Address", data[0].PurchaseOrder[0].Address);
+                    oModel.setProperty("/PAN", data[0].PurchaseOrder[0].PAN);
                     oModel.setProperty("/Description", data.Description);
-                    oModel.setProperty("/Type", data.Type || "internal");
-                    sap.ui.getCore().byId("PO_id_StartDate").setDateValue(new Date(data.StartDate));
-                    sap.ui.getCore().byId("PO_id_EndDate").setDateValue(new Date(data.EndDate));
-                    sap.ui.getCore().byId("PO_id_Date").setDateValue(new Date(data.CurrentDate));
+                    oModel.setProperty("/Type",data[0].PurchaseOrder[0].Type || "internal");
+                    oModel.setProperty("/PurchaseOrders", data[0].PurchaseOrderItems);
+                    // sap.ui.getCore().byId("PO_id_Description").setValue(data[0].PurchaseOrderItems[0].Description);
+
+                    sap.ui.getCore().byId("PO_id_StartDate").setDateValue(new Date(data[0].PurchaseOrder[0].StartDate));
+                    sap.ui.getCore().byId("PO_id_EndDate").setDateValue(new Date(data[0].PurchaseOrder[0].EndDate));
+                    sap.ui.getCore().byId("PO_id_Date").setDateValue(new Date(data[0].PurchaseOrder[0].CurrentDate));
                     sap.ui.getCore().byId("PO_id_Address").setEditable(false);
                     sap.ui.getCore().byId("PO_id_PanNo").setEditable(false);
 
@@ -153,10 +164,10 @@ sap.ui.define([
         },
         PO_onCloseFrag: function () {
             this.PO_oDialog.close();
-            var oModel = this.getView().getModel("PurchaseOrderModel");
+            // var oModel = this.getView().getModel("PurchaseOrderModel");
 
-            // Clear the PurchaseOrders array
-            oModel.setProperty("/PurchaseOrders", []);
+            // // Clear the PurchaseOrders array
+            // oModel.setProperty("/PurchaseOrders", []);
 
 
         },
@@ -172,7 +183,11 @@ sap.ui.define([
             sap.ui.getCore().byId("PO_id_PanNo").setEditable(false);
             sap.ui.getCore().byId("PO_id_CustomerName").setValueState("None");
         },
-        PO_onsavepress: function () {
+        PO_onAmountInputChange:function(oEvent){
+            utils._LCvalidateAmount(oEvent);
+        },
+       
+           PO_onsavepress: function () {
             var Table = this.getView().byId("PO_id_Table");
             var selectedItem = Table.getSelectedItem();
             var oModel = this.getView().getModel("PurchaseOrderModel").getData()
@@ -258,12 +273,18 @@ sap.ui.define([
             if (!selectedItem) {
                 return;
             }
-           var PoNumber= selectedItem.getBindingContext("POModel").getProperty("PoNumber");
-            this.ajaxDeleteWithJQuery("PurchaseOrder", {filters :{ PoNumber:PoNumber} } ).then(() => {
-                this.PO_ReadCall();
-            })
-        },
-          onColumnListItemPress: function (oEvent) {
+            var PoNumber = selectedItem.getBindingContext("POModel").getProperty("PoNumber");
+            this.showConfirmationDialog(
+                "Delete Confirmation",
+                "Are you sure you want to delete this Purchase Order?",
+                () => {
+                    this.ajaxDeleteWithJQuery("PurchaseOrder", {filters: {PoNumber: PoNumber}}).then(() => {
+                        this.PO_ReadCall();
+                    });
+                }
+            );
+        },       
+           onColumnListItemPress: function (oEvent) {
 
                 var PoNumber = oEvent.getSource().getBindingContext("POModel").getObject().PoNumber;
                 var onav = this.getOwnerComponent().getRouter()

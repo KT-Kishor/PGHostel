@@ -12,11 +12,13 @@ sap.ui.define([
 			this.getOwnerComponent().getRouter().getRoute("PurchaseOrderObject").attachMatched(this._onRouteMatched, this);
 		},
 		_onRouteMatched: async function (oEvent) {
+			this.getBusyDialog()
 			this.PoNumber = oEvent.getParameter("arguments").sPath;
 			  await this.ajaxReadWithJQuery("PurchaseOrderItems",{PoNumber: this.PoNumber}).then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "objectModel");
             });
+			this.closeBusyDialog()
 		},
 		PO_onButtonPress: function () {
 			this.getRouter().navTo("PurchaseOrder");

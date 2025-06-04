@@ -1,115 +1,78 @@
-<mvc:View
-    controllerName="sap.kt.com.minihrsolution.controller.PurchaseOrderObject"
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.PurchaseOrderObject"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:m="sap.m"
     xmlns:suite="sap.suite.ui.commons"
     xmlns="sap.uxap"
     xmlns:layout="sap.ui.layout"
-    xmlns:c="sap.ui.core"
-    displayBlock="true"
-    height="100%"
-    busyIndicatorDelay="0"
->
-    <m:Page
-        navButtonPress="PO_onButtonPress"
-        showNavButton="true"
-    >
-         <ObjectPageLayout
-            id="ObjectPageLayout1"
-            enableLazyLoading="true"
-            useIconTabBar="true"
-            showTitleInHeaderContent="true"
-            upperCaseAnchorBar="false"
-        >
+    xmlns:c="sap.ui.core" displayBlock="true" height="100%" busyIndicatorDelay="0">
+    <m:Page navButtonPress="PO_onButtonPress" showNavButton="true">
+        <ObjectPageLayout id="ObjectPageLayout1" enableLazyLoading="true" useIconTabBar="true" showTitleInHeaderContent="true" upperCaseAnchorBar="false">
             <headerTitle>
                 <ObjectPageDynamicHeaderTitle>
                     <expandedHeading>
-                        <m:Title
-                            text="{objectModel>/0/PurchaseOrder/0/CustomerName}"
-                            wrapping="true"
-                        />
+                        <m:Title text="{objectModel>/0/PurchaseOrder/0/CustomerName}" wrapping="true" />
                     </expandedHeading>
                     <snappedHeading />
-               
+
                 </ObjectPageDynamicHeaderTitle>
             </headerTitle>
-			 <headerContent>
-                <m:FlexBox
-                    wrap="Wrap"
-                    fitContainer="true"
-                >
-                    <m:Avatar
-                        class="sapUiSmallMarginEnd"
-                        src="../image/logo.jpg"
-                        displaySize="L"
-                    />
+            <headerContent>
+                <m:FlexBox wrap="Wrap" fitContainer="true">
+                    <m:Avatar class="sapUiSmallMarginEnd" src="../image/logo.jpg" displaySize="L" />
                     <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
-                        <m:ObjectIdentifier
-                            title="Customer Address"
-							text="{objectModel>/0/PurchaseOrder/0/Address}"
-                            tooltip="Customer Address"
-                        />
+                        <m:ObjectIdentifier title="Customer Address" text="{objectModel>/0/PurchaseOrder/0/Address}" tooltip="Customer Address" />
                     </layout:VerticalLayout>
                     <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
-                        <m:ObjectIdentifier
-                            title="PAN Number"
-							text="{objectModel>/0/PurchaseOrder/0/PAN}"
-                            tooltip="PAN Number"
-                        />
+                        <m:ObjectIdentifier title="PAN Number" text="{objectModel>/0/PurchaseOrder/0/PAN}" tooltip="PAN Number" />
                     </layout:VerticalLayout>
                     <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
-                        <m:ObjectIdentifier
-                            title="Type"
-							text="{objectModel>/0/PurchaseOrder/0/Type}"
-                            tooltip="Type"
-                        />
-                        
+                        <m:ObjectIdentifier title="Type" text="{objectModel>/0/PurchaseOrder/0/Type}" tooltip="Type" />
+
                     </layout:VerticalLayout>
-                    
+
                 </m:FlexBox>
             </headerContent>
-					<sections>
-						<ObjectPageSection titleUppercase="false" id="purchaseOrderSection" title="Purchase Order Details">
-							<subSections>
-								<ObjectPageSubSection id="purchaseOrderSectionSS1">
-									<blocks>
-										<m:Table
-											id="purchaseOrderTable"
-											items="{objectModel>/0/PurchaseOrder/0/Items}"
-											mode="None"
-											growing="true"
-											growingThreshold="5"
-											growingScrollToLoad="true">
-											<m:columns>
-												<m:Column>
-													<m:Text text="Item Name" />
-												</m:Column>
-												<m:Column>
-													<m:Text text="Quantity" />
-												</m:Column>
-												<m:Column>
-													<m:Text text="Price" />
-												</m:Column>
-												<m:Column>
-													<m:Text text="Total" />
-												</m:Column>
-											</m:columns>
-											<m:items>
-												<m:ColumnListItem>
-													<m:cells>
-														<m:Text text="{objectModel>ItemName}" />
-														<m:Text text="{objectModel>Quantity}" />
-														<m:Text text="{objectModel>Price}" />
-														<m:Text text="{objectModel>Total}" />
-													</m:cells>
-												</m:ColumnListItem>
-											</m:items>
-										</m:Table>
-									</blocks>
-								</ObjectPageSubSection>
-							</subSections>
-						</ObjectPageSection>
-					</sections>								 </ObjectPageLayout>
+            <sections>
+                <ObjectPageSection titleUppercase="false" id="purchaseOrderSection" title="Purchase Order Details">
+                    <subSections>
+                        <ObjectPageSubSection id="purchaseOrderSectionSS1">
+                            <blocks>
+                                <m:Table id="purchaseOrderTable" items="{objectModel>/0/PurchaseOrderItems}"
+                                 mode="None" 
+                                 growing="true" 
+                                 growingThreshold="5" 
+                                 growingScrollToLoad="true">
+                                    <m:columns>
+                                        <m:Column>
+                                            <m:Text text="Description" />
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Unit" />
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Amount" />
+                                        </m:Column>
+                                        <m:Column>
+                                            <m:Text text="Currency" />
+                                        </m:Column>
+                                    </m:columns>
+                                    <m:items>
+                                        <m:ColumnListItem>
+                                            <m:cells>
+                                                <m:Text text="{objectModel>Description}" />
+                                                <m:Text text="{objectModel>Unit}" />
+                                                <m:Text text="{objectModel>Amount}" />
+                                                <m:Text text="{objectModel>Currency}" />
+                                            </m:cells>
+                                        </m:ColumnListItem>
+                                    </m:items>
+                                </m:Table>
+                            </blocks>
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+            </sections>
+        </ObjectPageLayout>
 
-</m:Page>
+    </m:Page>
 </mvc:View>

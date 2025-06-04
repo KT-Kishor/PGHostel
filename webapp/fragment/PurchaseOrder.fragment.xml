@@ -131,6 +131,7 @@
                 <Input 
                 id="PO_id_AmountInput"
                 liveChange="PO_onAmountInputChange"
+                valueStateText="Please enter a valid amount"
                 value="{PurchaseOrderModel>Amount}" 
                 maxLength="10"
                  width="100%" />
