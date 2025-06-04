@@ -89,7 +89,8 @@ sap.ui.define([
             "PaySlip": "/PaySlip",
             "CompanyInvoice": "/InvoiceApp",
             "Leaves": "/Leaves",
-            "ConsultantInvoice": "/ConsultantInvoice"
+            "ConsultantInvoice": "/ConsultantInvoice",
+            "MyInbox": "/MyInbox",
 
           };
 

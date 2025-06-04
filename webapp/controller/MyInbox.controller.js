@@ -14,6 +14,8 @@ sap.ui.define([
     },
 
     _onRouteMatched: async function (OEvent) {
+      var LoginFUnction = await this.commonLoginFunction("MyInbox");
+      if (!LoginFUnction) return; 
       this.getView().getModel("PaySlip").setProperty("/isRouteLOP", false);
       const sParams = OEvent.getParameter("arguments").sMyInBox;
       const oView = this.getView();
@@ -112,6 +114,7 @@ sap.ui.define([
         else {
           if (!params.hasOwnProperty("Status")) {
             params["Status"] = "Send to account";
+            params["Status"] = "Paid"
           }
         }
         await this._fetchCommonData("InboxDetails", "MyInboxModelData", params);
@@ -155,7 +158,9 @@ sap.ui.define([
 
     valueSetFunction(text, oDialogTitle) {
       sap.ui.getCore().byId("MIF_id_OkBtn").setText(text);
-      sap.ui.getCore().byId("MIF_id_remark").setValue(this.oModelData?.ManagerComment || "");
+      var isAccount = this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant"
+      var oValue = isAccount ? this.oModelData?.AccountRemark : this.oModelData?.ManagerComment;
+      sap.ui.getCore().byId("MIF_id_remark").setValue(oValue || "");
       sap.ui.getCore().byId("MIF_id_DialogManRemark").setTitle(oDialogTitle);
     },
 
