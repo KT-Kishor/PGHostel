@@ -362,7 +362,11 @@ sap.ui.define(
         TileV_MyAsset: function () {
           this.getRouter().navTo("MyAsset");
 
+        },
+         TileV_onpressPoApp:function(){
+          this.getRouter().navTo("PurchaseOrder");
         }
+        
       }
     );
   }

@@ -1,0 +1,86 @@
+<mvc:View
+    controllerName="sap.kt.com.minihrsolution.controller.PurchaseOrder"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:m="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:core="sap.ui.core"
+    displayBlock="true"
+    height="100%"
+    busyIndicatorDelay="0"
+>
+<Page >
+    <headerContent>
+            <core:Fragment
+                fragmentName="sap.kt.com.minihrsolution.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+    <Table
+    id="PO_id_Table" 
+    mode="SingleSelectLeft"
+    items="{POModel>/}">
+        <headerToolbar>
+            <Toolbar>
+                <Title text="Purchase Order List" />
+                <ToolbarSpacer />
+                <Button
+                    text="Create Purchase Order"
+                    press="PO_onCreatePurchaseOrder"
+                    type="Accept"
+                />
+                 <Button
+                    text="Edit"
+                    press="PO_onEditPurchaseOrder"
+                    type="Emphasized"
+                />
+                <Button
+                    text="Delete"
+                    press="PO_onDeleteButtonPress"
+                    type="Emphasized"
+                />
+            </Toolbar>
+        </headerToolbar>
+        <columns>
+            <Column>
+                <Text text="Customer Name" />
+            </Column>
+            <Column>
+                <Text text="Customer Address" />
+            </Column>
+            <Column>
+                <Text text="Type" />
+            </Column>
+            <Column>
+                <Text text="PAN No" />
+            </Column>
+            <Column>
+                <Text text="Start Date" />
+            </Column>
+            <Column>
+                <Text text="End Date" />
+            </Column>
+            <Column>
+                <Text text="PO Creation Date" />
+            </Column>
+        </columns>
+        <items>
+            <ColumnListItem type="Navigation" press="onColumnListItemPress">
+                <cells>
+                    <Text text="{POModel>CustomerName}" />
+                    <Text text="{POModel>Address}" />
+                    <Text text="{POModel>Type}"/>
+                    <Text text="{POModel>PAN}"/>
+                    <Text text="{path:'POModel>StartDate', formatter: '.formatter.formatDate'}"/>
+                    <Text text="{path:'POModel>EndDate', formatter: '.formatter.formatDate'}"/>
+                    <Text text="{path:'POModel>CurrentDate', formatter: '.formatter.formatDate'}"/>
+
+                    <!-- <Text text="{POModel>StartDate}"/> -->
+                    <!-- <Text text="{POModel>EndDate}"/> -->
+                    <!-- <Text text="{path:'POModel>CurrentDate',formatter:'.Formatter.formatDate' }" /> -->
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+    </Page>
+</mvc:View>

@@ -601,6 +601,20 @@
                     "target":[
                         "TargetMyAsset"
                     ]
+                },
+                 {
+                    "name":"PurchaseOrder",
+                    "pattern": "PurchaseOrder",
+                    "target":[
+                        "TargetPurchaseOrder"
+                    ]
+                },
+                   {
+                    "name":"PurchaseOrderObject",
+                    "pattern": "PurchaseOrderObjectPage/{sPath}",
+                    "target":[
+                        "TargetPurchaseOrderObject"
+                    ]
                 }
 
             ],
@@ -617,6 +631,15 @@
                     "id": "MyAsset",
                     "name": "MyAsset"
                 },
+                "TargetPurchaseOrder": {
+                    "id": "PurchaseOrder",
+                    "name": "PurchaseOrder"
+                },
+                "TargetPurchaseOrderObject": {
+                    "id": "PurchaseOrderObject",
+                    "name": "PurchaseOrderObject"
+                },
+
                 "TargetHomePage": {
                     "viewType": "XML",
                     "transition": "slide",
