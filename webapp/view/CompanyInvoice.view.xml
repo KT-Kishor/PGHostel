@@ -46,9 +46,9 @@
 						<Title id="CI_id_Title" text="{i18n>invoiceapp} ({= ${CompanyInvoiceModel>/}.length})"/>
 						<ToolbarSpacer />
 						<ToolbarSeparator />
-						<Button text="{i18n>InvoiceAddBtn}" tooltip="{i18n>addInvoice}" press="CI_onPressAddInvoice" />
+						<Button text="{i18n>InvoiceAddBtn}" type="Accept" tooltip="{i18n>addInvoice}" press="CI_onPressAddInvoice" />
 						<ToolbarSeparator />
-						<Button text="{i18n>msasow}" tooltip="{i18n>addInvoice}" press="CI_onPressMSASOW"/>
+						<Button text="{i18n>msasow}" type="Gosht" tooltip="{i18n>addInvoice}" press="CI_onPressMSASOW"/>
 					</Toolbar>
 				</headerToolbar>
 				<columns>

@@ -22,15 +22,17 @@ sap.ui.define([
 
                 if (!this.getView().getModel("CurrencyModel")) {
                     this._fetchCommonData("Currency", "CurrencyModel");
+                    this._fetchCommonData("EmailContent", "CCMailModel", { Type: "CompanyInvoice" }); 
                 }
                 this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status", "CID_id_CurrencySelect"]);
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                this.loginModel = this.getView().getModel("LoginModel");
                 this.decodedPath = decodeURIComponent(decodeURIComponent(sArg));
                 this.Discount = true;
-                this.RateUnit = true;
+                    this.RateUnit = true;
                 this.Particulars = true;
-                this.ResivedTDS = true;
+                this.ResivedTDSFlag = true;
 
                 const oView = this.getView();
 
@@ -721,11 +723,11 @@ sap.ui.define([
 
             onChangeReceivedTDS: function (oEvent) {
                 if (parseFloat(oEvent.getSource().getValue()) >= parseFloat(this.ResivedTDS)) {
-                    this.ResivedTDS = false;
+                    this.ResivedTDSFlag = false;
                     sap.ui.getCore().byId("idReceivedTDS").setValueState("Error");
                     sap.ui.getCore().byId("idReceivedTDS").setValueStateText(this.i18nModel.getText("tdsAmountError")); // add this key in i18n
                 } else {
-                    this.ResivedTDS = true;
+                    this.ResivedTDSFlag = true;
                     sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
                     this.onChangeReceivedAmount();
                 }
@@ -768,7 +770,7 @@ sap.ui.define([
                 const isValid =
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idTransactionID"), "ID") &&
                     utils._LCvalidateAmount(sap.ui.getCore().byId("idReceivedAmount"), "ID") &&
-                    this.ResivedAmount && this.ResivedTDS &&
+                    this.ResivedAmount && this.ResivedTDSFlag &&
                     (paymentModel.Currency !== "INR"
                         ? utils._LCvalidateAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID")
                         : utils._LCvalidateAmount(sap.ui.getCore().byId("idReceivedTDS"), "ID"));
@@ -854,8 +856,8 @@ sap.ui.define([
                 var sIndex = oContext.getPath().split("/")[2];
 
                 var aData = oModel.getData();
-                var selectedItem = aData[sIndex];
-                if (selectedItem && oContext.getObject().ItemID) {
+                
+                if (oContext.getObject().ItemID) {
                     this.showConfirmationDialog(
                         this.i18nModel.getText("msgBoxConfirm"),
                         this.i18nModel.getText("msgBoxConfirmDelete"),
@@ -864,12 +866,12 @@ sap.ui.define([
                             that.ajaxDeleteWithJQuery("/CompanyInvoiceItem", {
                                 filters: { ItemID: oContext.getObject().ItemID }
                             }).then(() => {
-                                MessageToast.show(that.i18nModel.getText("sowDeleteSuccess"));
                                 aData.CompanyInvoiceItem.splice(oContext.getPath().split('/')[2], 1);
                                 aData.CompanyInvoiceItem.forEach((item, index) => item.IndexNo = index + 1);
                                 oModel.setProperty("/CompanyInvoiceItem", aData.CompanyInvoiceItem);
                                 that.SNoValue = aData.CompanyInvoiceItem.length;
                                 that.totalAmountCalculation();
+                                MessageToast.show(that.i18nModel.getText("CompanyInvoiceDeleteSuccess"));
                                 that.closeBusyDialog();
                             }).catch((error) => {
                                 that.closeBusyDialog();
@@ -887,7 +889,163 @@ sap.ui.define([
                 }
             },
 
+            CID_onPressSendEmail: function (oEvent) {
+                var that = this;
+                that.loginModel.setProperty("/RichText", true);
+                that.loginModel.setProperty("/SimpleForm", false);
+                var modelData = that.getView().getModel("SelectedCustomerModel").getData();
 
+                var oUploaderDataModel = new JSONModel({
+                    isEmailValid: true,
+                    ToEmail: modelData.MailID,
+                    ToName:modelData.CustomerName,
+                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].CCEmailId,
+                    name: "",
+                    mimeType: "",
+                    content: "",
+                    isFileUploaded: false,
+                    button: true,
+                    Subject: "KALPAVRIKSHA TECHNOLOGIES - INVOICE PAYMENT REMINDER",
+                    htmlbody: `<p>Dear Finance Team,</p>
+                    <p>I hope you're doing well. This is a friendly reminder that payment for invoice ${modelData.InvNo}, issued on  ${modelData.InvoiceDate}, is still outstanding.</p>
+                    <li><b>Invoice No : ${modelData.InvNo}</b></li>
+                    <li><b>Due Date : ${modelData.PayByDate}</b></li>
+                    <li><b>Invoice Amount : ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</b></li>
+                    <li><b>Received Amount : ${this.Formatter.fromatNumber(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount"))} ${modelData.Currency}</b></li>                   
+                    <li><b>Due Amount : ${this.Formatter.fromatNumber(parseFloat(modelData.TotalAmount) - parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount")))} ${modelData.Currency}</b></li>                   
+                    <li><b>Description : ${modelData.InvoiceDescription}</b></li>
+
+                    <p>If you’ve already made the payment, kindly disregard this reminder. Otherwise, we would appreciate it if you could arrange payment as soon as possible.</p>
+                    <p>If you have any questions or need further information, please don't hesitate to contact us.</p>
+                    <p>Thank you for your attention to this matter.</p>
+                   <p style="margin: 0;">Best regards,</p>                   
+                   <p style="margin: 0;">Finance Department</p>
+                    <p style="margin: 0; margin-bottom: 10px;">
+                        <a href="https://www.kalpavrikshatechnologies.com/">Kalpavriksha Technologies</a>
+                    </p>`
+                });
+                this.getView().setModel(oUploaderDataModel,"UploaderData");
+                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail",true);
+            },
+
+            CID_onPressSendMultipalEmail: function () {
+                var that = this;
+                that.loginModel.setProperty("/RichText", true);
+                that.loginModel.setProperty("/SimpleForm", true);
+                var modelData = that.getView().getModel("SelectedCustomerModel").getData();
+                // that.getView().getModel("TextDisplay").setProperty("/name", "");
+                var EmailData = that.getView().getModel("SelectedCustomerModel");
+
+                var oUploaderDataModel = new JSONModel({
+                    isEmailValid: true,
+                    ToEmail: modelData.MailID,
+                    ToName:modelData.CustomerName,
+                    CCEmail: this.getView().getModel("CCMailModel").getData()[0].CCEmailId,
+                    name: "",
+                    mimeType: "",
+                    content: "",
+                    isFileUploaded: false,
+                    button: false,
+                    Subject: `${modelData.CustomerName} - ${modelData.InvoiceDescription}`,
+                    htmlbody: `<p>Dear Finance Team,</p>
+                    <p>Please find the following invoice detail below:</p>
+                    <li><b>Invoice No : ${modelData.InvNo}</b></li>
+                    <li><b>Invoice Date : ${modelData.InvoiceDate}</b></li>
+                    <li><b>Total Amount : ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</b></li>
+                    <li><b>Description : ${modelData.InvoiceDescription}</b></li>
+
+                    <p>If you have any questions or require further information, please do not hesitate to contact us.</p>
+                   <p style="margin: 0;">Best regards,</p>
+                   <p style="margin: 0;">Nikhil Shah,</p>
+                   <p style="margin: 0;">Accountant Manager</p>
+                    <p style="margin: 0; margin-bottom: 10px;">
+                        <a href="https://www.kalpavrikshatechnologies.com/">Kalpavriksha Technologies</a>
+                    </p>`
+                });
+               this.getView().setModel(oUploaderDataModel,"UploaderData");
+                this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail",false);
+                this.validateSendButton();
+            },
+
+            Mail_onPressClose: function () {              
+                this.EOU_oDialogMail.close();
+            },
+
+            EOD_commonOpenDialog:async function (fragmentName,value) {
+                if (!this.EOU_oDialogMail) {
+                    sap.ui.core.Fragment.load({
+                        name: fragmentName,
+                        controller: this,
+                    }).then(function (EOU_oDialogMail) {
+                        this.EOU_oDialogMail = EOU_oDialogMail;
+                        this.getView().addDependent(this.EOU_oDialogMail);
+                        this.EOU_oDialogMail.open();
+                        if(value === true)  sap.ui.getCore().byId("SendMail_Button").setEnabled(true);
+                    }.bind(this));
+                } else {
+                    this.EOU_oDialogMail.open();
+                    if(value === true)  sap.ui.getCore().byId("SendMail_Button").setEnabled(true);
+                }
+            },
+
+            Mail_onUpload: function (oEvent) {
+                this.handleFileUpload(
+                    oEvent,
+                    this,                      // context
+                    "UploaderData",            // model name
+                    "/attachments",            // path to attachment array
+                    "/name",                   // path to comma-separated file names
+                    "/isFileUploaded",         // boolean flag path
+                    "uploadSuccessfull",       // i18n success key
+                    "fileAlreadyUploaded",     // i18n duplicate key
+                    "noFileSelected",          // i18n no file selected
+                    "fileReadError",           // i18n file read error
+                    () => this.validateSendButton()
+                );
+            },
+            //Mail dialog button visibility
+            validateSendButton: function () {
+                const sendBtn = sap.ui.getCore().byId("SendMail_Button");
+                const emailField = sap.ui.getCore().byId("CCMail_TextArea");
+                const uploaderModel = this.getView().getModel("UploaderData");
+                if (!sendBtn || !emailField || !uploaderModel) {
+                    return;
+                }
+                const isEmailValid = utils._LCvalidateEmail(emailField, "ID") === true;
+                const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
+
+                sendBtn.setEnabled(isEmailValid && isFileUploaded);
+            },
+
+            Mail_onEmailChange: function () {
+                this.validateSendButton();
+            },
+            //Send mail
+            Mail_onSendEmail: function () {
+                try {
+                    var oModel = this.getView().getModel("UploaderData").getData();
+                    var oPayload = {
+                        "toEmailID": [oModel.ToEmail],
+                        "toName": oModel.ToName,
+                        "subject": oModel.Subject,
+                        "body": oModel.htmlbody,
+                        "CCEmailId": oModel.CCEmail,
+                        "attachments": oModel.attachMatched
+                    };
+                    this.getBusyDialog();               
+                    this.ajaxCreateWithJQuery("CompanyInvoiceEmail", oPayload).then((oData) => {
+                        MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                        this.closeBusyDialog();
+                    }).catch((error) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.responseText);
+                    });
+                    this.Mail_onPressClose();
+                } catch (error) {
+                    this.closeBusyDialog();
+                    MessageToast.show(error.responseText);
+                }
+            },
 
 
 

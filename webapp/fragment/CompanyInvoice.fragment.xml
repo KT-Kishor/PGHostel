@@ -120,11 +120,11 @@
 			<Toolbar >
 				<VBox alignContent="End" width="100%">
 					<HBox justifyContent="End" width="100%" visible="{visiablityPlay>/Form}">
-						<Button text="{i18n>submit}" type="Emphasized" press="onChangePaymentRecived" />
+						<Button text="{i18n>submit}" type="Accept " press="onChangePaymentRecived" />
 						<Button text="{i18n>close}" class="spaceBetween" press="onPressInvClose" />
 					</HBox>
-					<HBox justifyContent="End" width="100%" visible="{visiablityPlay>/Table}">
-						<Button text="{i18n>close}" class="spaceBetween" press="onPressInvClose" />
+					<HBox justifyContent="End" width="100%" type="Reject" visible="{visiablityPlay>/Table}">
+						<Button text="{i18n>close}" type="Reject" class="spaceBetween" press="onPressInvClose" />
 					</HBox>
 				</VBox>
 			</Toolbar>

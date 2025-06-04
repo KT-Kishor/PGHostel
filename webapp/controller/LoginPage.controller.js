@@ -176,6 +176,8 @@ sap.ui.define(
                   oLoginModel.setProperty("/EmploymentDetailFolderID", userData.EmploymentDetailFolderID);
                   oLoginModel.setProperty("/BranchCode", userData.BranchCode);
                   oLoginModel.setProperty("/MobileNo", userData.MobileNo);
+                  oLoginModel.setProperty("/RichText", false);
+                  oLoginModel.setProperty("/SimpleForm", true);
 
                   // Reset LoginViewModel
                   oVM.setProperty("/userId", ""); oVM.setProperty("/userName", ""); oVM.setProperty("/otp", ""); oVM.setProperty("/password", ""); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isPasswordVisible", false); oVM.setProperty("/isSendOtpVisible", false); oVM.setProperty("/sendOtpText", this.i18nModel.getText("sendOtp")); oVM.setProperty("/isOtpSelected", false); oVM.setProperty("/isPasswordSelected", false); oVM.setProperty("/isForgotPasswordVisible", false);

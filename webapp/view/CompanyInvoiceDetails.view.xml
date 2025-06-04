@@ -101,8 +101,8 @@
 								</f:SimpleForm>
 							</blocks>
 							<actions>
-								<m:Button visible="{visiablityPlay>/createVisi}" type="Transparent" text="{i18n>addCustomerBtn}" press="CID_onPressAddCustomer" />
-								<m:Button visible="{visiablityPlay>/createVisi}" type="Transparent" text="{i18n>ActiveSOW}" press="CID_onPressMSAandSOW" />
+								<m:Button type="Accept" visible="{visiablityPlay>/createVisi}" text="{i18n>addCustomerBtn}" press="CID_onPressAddCustomer" />
+								<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>ActiveSOW}" type="Gosht" press="CID_onPressMSAandSOW" />
 							</actions>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection>
@@ -112,8 +112,8 @@
 										<m:headerToolbar>
 											<m:Toolbar>
 												<m:ToolbarSpacer />
-												<m:Button text="{i18n>btnTransaction}" press="CID_onPressDisplayPaymentDetail" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
-												<m:Button visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Default" press="CID_onPressAddInvoiceItems" />
+												<m:Button type="Attention" text="{i18n>btnTransaction}" press="CID_onPressDisplayPaymentDetail" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
+												<m:Button visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Accept" press="CID_onPressAddInvoiceItems" />
 												<m:ToolbarSeparator />
 											</m:Toolbar>
 										</m:headerToolbar>
@@ -149,7 +149,7 @@
 													<m:Input value="{CompanyInvoiceItemModel>IndexNo}" editable="false" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Particulars}" editable="{visiablityPlay>/editable}" maxLength="60" liveChange="onParticularsInputLiveChange" />
+													<m:Input value="{CompanyInvoiceItemModel>Particulars}" valueStateText="{i18n>ParticularValueText}" editable="{visiablityPlay>/editable}" maxLength="60" liveChange="onParticularsInputLiveChange" />
 												</m:cells>
 												<m:cells>
 													<m:ComboBox showSecondaryValues="true" items="{InvoiceSAC>/}" editable="{visiablityPlay>/editable}" value="{CompanyInvoiceItemModel>SAC}" selectedKey="1">
@@ -163,14 +163,14 @@
 													</m:ComboBox>
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Unit}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="20"  />
+													<m:Input value="{CompanyInvoiceItemModel>Unit}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="20" valueStateText="{i18n>UnitValueText}" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Rate}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="20" />
+													<m:Input value="{CompanyInvoiceItemModel>Rate}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" valueStateText="{i18n>RateValueText}" textAlign="End" maxLength="20" />
 												</m:cells>
 												<m:cells>
 													<m:Input value="{CompanyInvoiceItemModel>Discount}" showValueHelp="true"
-													valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="20" />
+													valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="20" valueStateText="{i18n>discountInfoText}" />
 												</m:cells>
 												<m:cells>
 													<m:Input value="{path:'CompanyInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />
@@ -233,11 +233,11 @@
 			<m:Toolbar>
 				<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				<m:ToolbarSpacer/>
-				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Emphasized" press="CID_onPressSubmit" class="sendMail" />
-				<m:Button text="{i18n>companyInvoiceSendEmail}" press="CID_onPressSendEmail" visible="{visiablityPlay>/payByDate}" />
+				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Accept" press="CID_onPressSubmit" class="sendMail" />
+				<m:Button text="{i18n>companyInvoiceSendEmail}" type="Gosht" press="CID_onPressSendEmail" visible="{visiablityPlay>/payByDate}" />
 				<m:Button visible="{visiablityPlay>/Edit}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}" press="CID_onPressEdit" class="sendMail" />
-				<m:Button text="{i18n>sendInvoiceText}" press="CID_onPressSendMultipalEmail" visible="{visiablityPlay>/MultiEmail}"/>
-				<m:Button text="{i18n>GeneratePDF}" press="CID_onPressGeneratePdf" visible="{visiablityPlay>/merge}" />
+				<m:Button text="{i18n>sendInvoiceText}" type="Gosht" press="CID_onPressSendMultipalEmail" visible="{visiablityPlay>/MultiEmail}"/>
+				<m:Button text="{i18n>GeneratePDF}" press="CID_onPressGeneratePdf" visible="{visiablityPlay>/merge}" type="Attention" />
 			</m:Toolbar>
 		</m:footer>
 	</m:Page>
