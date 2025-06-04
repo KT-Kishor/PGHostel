@@ -30,7 +30,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
                         fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false,
-                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false
+                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false, SelfServiceBtn:false
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
@@ -52,6 +52,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lpa", "SS_id_lca", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
                         "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan",];
                     if (this.sPath === "SelfService") {
+                        this.ViewModel.setProperty("/SelfServiceBtn", false);
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileSelfSerciceFooter"));
                         this.ViewModel.setProperty("/SetProfile", true);
                         if (loginModel) this.EmployeeID = loginModel.getProperty("/EmployeeID");
@@ -64,6 +65,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.byId("SS_id_Lmg").setRequired(false)
                     }
                     else {
+                        this.ViewModel.setProperty("/SelfServiceBtn", true);
                         this.EmployeeID = this.sPath;
                         this.byId("SS_id_lc").setRequired(true)
                         this.byId("SS_id_lbase").setRequired(true)

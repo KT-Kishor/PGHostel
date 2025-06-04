@@ -145,7 +145,8 @@
                                                 press="SS_onEditPress"
                                                 type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
                                                 tooltip="{i18n>editDetails}"
-                                                visible="{ = ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"                                            />
+                                                visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}" />
+
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
@@ -687,9 +688,8 @@
                                                 press="SS_onEditPress"
                                                 type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
                                                 tooltip="{i18n>editDetails}"
-                                                visible="{ = ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}" 
-                                            />
-										</m:Toolbar>
+                                                visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}" />										
+                                  </m:Toolbar>
 									</f:toolbar>
 									<f:content>
 										<m:Label
@@ -883,7 +883,7 @@
                                                 tooltip="{i18n>toolEAddEdu}"
                                                 press="EdF_AddEdu"
                                                 type="Accept"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                               visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                             />
 											<m:Button
                                                 text="{i18n>edit}"
@@ -891,7 +891,7 @@
                                                 tooltip="{i18n>toolEEditEdu}"
                                                 press="EDF_EditEducation"
                                                 type="Emphasized"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                             />
 											<m:Button
                                                 text="{i18n>delete}"
@@ -899,7 +899,7 @@
                                                 tooltip="{i18n>toolDeleteEdu}"
                                                 press="EdF_DeletEdu"
                                                 type="Reject"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                             />
 										</m:OverflowToolbar>
 									</m:headerToolbar>
@@ -991,7 +991,7 @@
                                                 press="EmpF_onAddEmployment"
                                                 type="Accept"
                                                 tooltip="{i18n>toolAddEmp}"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                             />
 											<m:Button
                                                 text="{i18n>edit}"
@@ -999,7 +999,7 @@
                                                 type="Emphasized"
                                                 tooltip="{i18n>toolEditEmp}"
                                                 id="EmpF_id_EmpEdit"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                             />
 											<m:Button
                                                 text="{i18n>delete}"
@@ -1007,7 +1007,7 @@
                                                 type="Reject"
                                                 tooltip="{i18n>toolDelEmp}"
                                                 id="EmpF_id_EmpDelete"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                             />
 										</m:OverflowToolbar>
 									</m:headerToolbar>
@@ -1105,10 +1105,10 @@
                                                     text="{i18n>documentType}"
                                                     showColon="true"
                                                     required="true"
-                                                    visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                    visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                                 />
 												<m:ComboBox
-                                                    visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                   visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                                     items="{DocumentJson>/documents}"
                                                     id="SS_id_DocType"
                                                     change="onDocumentTypeChange"
@@ -1121,19 +1121,19 @@
 												</m:ComboBox>
 												<m:ToolbarSeparator />
 												<u:FileUploader
-                                                    visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                    visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                                     fileSizeExceed="onFileSizeExceeds"
                                                     maximumFileSize="3MB"
                                                     typeMissmatch="onFileTypeMissmatch"
                                                     fileType="pdf,jpg,jpeg,png"
-                                                    buttonText="Upload"
+                                                    buttonText="{i18n>upload}"
                                                     change="onBeforeUploadStarts"
                                                     buttonOnly="true"
                                                     sameFilenameAllowed="true"
                                                     iconFirst="true"
                                                 />
 												<m:Button
-                                                    visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                    visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                                     id="downloadSelectedButton"
                                                     text="{i18n>delete}"
                                                     type="Reject"
@@ -1144,6 +1144,7 @@
                                                     id="DeleteSelectedButton"
                                                     text="{i18n>Download}"
                                                     type="Ghost"
+                                                    visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                                     press="onDownloadFiles"
                                                     enabled="false"
                                                 />
