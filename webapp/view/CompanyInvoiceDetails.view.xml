@@ -48,25 +48,25 @@
 										<m:Text visible="{visiablityPlay>/GST}" text="{ parts: [{path: 'SelectedCustomerModel>/Type'}, {path: 'SelectedCustomerModel>/Value'}], formatter: '.Formatter.formatCustomerTypeValue' }" id="CID_id_Type"/>
 
 										<m:Label visible="{visiablityPlay>/gstVisiable}" text="{i18n>cgs}" required="true"/>
-										<m:Input visible="{visiablityPlay>/gstVisiable}" value="{path:'SelectedCustomerModel>/CGST',formatter: '.Formatter.fromatNumber'}" editable="{visiablityPlay>/editable}" maxLength="50"/>
+										<m:Input visible="{visiablityPlay>/gstVisiable}" value="{path:'SelectedCustomerModel>/CGST',formatter: '.Formatter.fromatNumber'}" editable="{visiablityPlay>/editable}" maxLength="15"/>
 
 										<m:Label visible="{visiablityPlay>/igstVisi}" text="{i18n>igst}" required="true"/>
-										<m:Input visible="{visiablityPlay>/igstVisi}" value="{path:'SelectedCustomerModel>/IGST',formatter: '.Formatter.fromatNumber'}" editable="{visiablityPlay>/editable}" maxLength="50" />
+										<m:Input visible="{visiablityPlay>/igstVisi}" value="{path:'SelectedCustomerModel>/IGST',formatter: '.Formatter.fromatNumber'}" editable="{visiablityPlay>/editable}" maxLength="15" />
 
 										<m:Label visible="{visiablityPlay>/gstVisiable}" text="{i18n>sgst}" required="true"/>
-										<m:Input visible="{visiablityPlay>/gstVisiable}" value="{path:'SelectedCustomerModel>/SGST',formatter: '.Formatter.fromatNumber'}" editable="{visiablityPlay>/editable}" maxLength="50"/>
+										<m:Input visible="{visiablityPlay>/gstVisiable}" value="{path:'SelectedCustomerModel>/SGST',formatter: '.Formatter.fromatNumber'}" editable="{visiablityPlay>/editable}" maxLength="15"/>
 
 										<m:Label visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" text="{i18n>expConversionRate}" required="true" />
 										<m:Input id="CID_id_ConversionRate" visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" placeholder="{i18n>companyInvoiceConversionRatePlace}" value="{SelectedCustomerModel>/ConversionRate}" change="onChangeConversionRate" valueStateText="{i18n>convValueStateText}" maxLength="15" editable="{visiablityPlay>/editable}" liveChange="onChnageConvertion"/>
 
 										<m:Label visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" text="{i18n>amountInINR}" required="true" />
-										<m:Input visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" value="{path:'SelectedCustomerModel>/AmountInFCurrency',formatter: '.Formatter.fromatNumber'}" maxLength="50" editable="false"/>
+										<m:Input visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" value="{path:'SelectedCustomerModel>/AmountInFCurrency',formatter: '.Formatter.fromatNumber'}" maxLength="20" editable="false"/>
 
 										<m:Label visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" text="{i18n>custLutVa}" />
-										<m:Input visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" value="{SelectedCustomerModel>/LUT}" maxLength="50" editable="{visiablityPlay>/editable}"/>
+										<m:Input visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" value="{SelectedCustomerModel>/LUT}" maxLength="20" editable="{visiablityPlay>/editable}"/>
 
 										<m:Label text="{i18n>panCardCommon}" />
-										<m:Input value="{SelectedCustomerModel>/PAN}" id="CID_id_InputPAN" liveChange="CID_onPressLiveChange" maxLength="50" editable="{visiablityPlay>/CInvoice}" />
+										<m:Input value="{SelectedCustomerModel>/PAN}" id="CID_id_InputPAN" liveChange="CID_onPressLiveChange" maxLength="15" editable="{visiablityPlay>/CInvoice}" />
 
 										<m:Label text="{i18n>gstNo}" visible="{visiablityPlay>/GST}"/>
 										<m:Input value="{SelectedCustomerModel>/GST}" id="CID_id_InputGST" liveChange="CID_onPressLiveChange" maxLength="50" editable="{visiablityPlay>/CInvoice}" visible="{visiablityPlay>/GST}" />
@@ -89,7 +89,7 @@
 										</m:ComboBox>
 
 										<m:Label text="{i18n>currency}" required="true"/>
-										<m:ComboBox items="{CurrencyModel>/}" showClearIcon="true" value="{FilteredSOWModel>/Currency}" id="CID_id_CurrencySelect" change="CID_ValidateCommonFields" valueStateText="{i18n>selectCurrency}">
+										<m:ComboBox items="{CurrencyModel>/}" value="{FilteredSOWModel>/Currency}" id="CID_id_CurrencySelect" change="CID_ValidateCommonFields" valueStateText="{i18n>selectCurrency}">
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:ComboBox>
 
@@ -235,7 +235,7 @@
 				<m:ToolbarSpacer/>
 				<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Accept" press="CID_onPressSubmit" class="sendMail" />
 				<m:Button text="{i18n>companyInvoiceSendEmail}" type="Gosht" press="CID_onPressSendEmail" visible="{visiablityPlay>/payByDate}" />
-				<m:Button visible="{visiablityPlay>/Edit}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}" press="CID_onPressEdit" class="sendMail" />
+				<m:Button visible="{visiablityPlay>/Edit}" type="Emphasized" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}" press="CID_onPressEdit" class="sendMail" />
 				<m:Button text="{i18n>sendInvoiceText}" type="Gosht" press="CID_onPressSendMultipalEmail" visible="{visiablityPlay>/MultiEmail}"/>
 				<m:Button text="{i18n>GeneratePDF}" press="CID_onPressGeneratePdf" visible="{visiablityPlay>/merge}" type="Attention" />
 			</m:Toolbar>

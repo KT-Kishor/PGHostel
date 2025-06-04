@@ -40,7 +40,8 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="CI_id_InvoiceTable" items="{CompanyInvoiceModel>/}">
+			<Table id="CI_id_InvoiceTable" items="{
+                path: 'CompanyInvoiceModel>/', sorter: {path: 'CustomerName',descending: false,group: true}}">
 				<headerToolbar>
 					<Toolbar>
 						<Title id="CI_id_Title" text="{i18n>invoiceapp} ({= ${CompanyInvoiceModel>/}.length})"/>
