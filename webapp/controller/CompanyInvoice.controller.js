@@ -20,33 +20,37 @@ sap.ui.define(
           if (!LoginFUnction) return;
           this.getView().getModel("LoginModel").setProperty("/HeaderName", "Company Invoice Application");
           await this.CompanyInvoice_onSearch();
-          if (!this.getView().getModel("ManageCustomerModel")) await this._fetchCommonData("ManageCustomer","ManageCustomerModel");
-          await this._fetchCommonData("CompanyInvoice","CompanyInvoiceFilterModel");
+          this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
+          this._fetchCommonData("CompanyInvoice", "CompanyInvoiceFilterModel");
         },
 
         CompanyInvoice_onSearch: async function () {
           try {
             this.getBusyDialog();
-            const aFilterItems = this.byId(
-              "CI_id_InvoiceFilterBar"
-            ).getFilterGroupItems();
+
+            const filterItems = this.byId("CI_id_InvoiceFilterBar").getFilterGroupItems();
             const params = {};
 
-            aFilterItems.forEach(function (oItem) {
-              const oControl = oItem.getControl();
-              const sKey = oItem.getName();
+            filterItems.forEach((item) => {
+              const control = item.getControl();
+              const key = item.getName();
 
-              if (oControl && typeof oControl.getValue === "function") {
-                const sValue = oControl.getValue().trim();
-                if (sValue === "InvoiceDate") {
-                  params["InvoiceStartDate"] = oDateFormat.format(new Date(oControl.getValue().split("-")[0]));
-                  params["InvoiceEndDate"] = oDateFormat.format(new Date(oControl.getValue().split("-")[1]));
+              if (control && typeof control.getValue === "function") {
+                const value = control.getValue().trim();
+
+                if (key === "InvoiceDate" && value.includes("-")) {
+                  const [start, end] = value.split("-").map(date =>
+                    date.trim().split("/").reverse().join("-")
+                  );
+                  params.InvoiceStartDate = start;
+                  params.InvoiceEndDate = end;
                 } else {
-                  params[sKey] = sValue;
+                  params[key] = value;
                 }
               }
             });
-            await this._fetchCommonData("CompanyInvoice","CompanyInvoiceModel",params);
+
+            await this._fetchCommonData("CompanyInvoice", "CompanyInvoiceModel", params);
           } catch (error) {
             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
           } finally {
@@ -67,8 +71,8 @@ sap.ui.define(
           this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: "X" });
         },
 
-        CI_onPressInvoiceRow:function(oEvent){
-          this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath:encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModel").getObject().InvNo) });
+        CI_onPressInvoiceRow: function (oEvent) {
+          this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModel").getObject().InvNo) });
         },
 
         onPressback: function () {

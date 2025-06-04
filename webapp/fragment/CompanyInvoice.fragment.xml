@@ -33,16 +33,16 @@
 					<DatePicker displayFormat="dd/MM/yyyy" id="idReceivedDate" valueFormat="dd/MM/yyyy" value="{PaymentModel>/ReceivedDate}"  />
 
 					<Label text="{i18n>invoiceReceivedAmount}" required="true"/>
-					<Input value="{PaymentModel>/ReceivedAmount}" id="idReceivedAmount" liveChange="onChangeReceivedAmount" valueStateText="{i18n>invoiceRecievedAmountMessage}" placeholder="Enter received amount" maxLength="30"/>
+					<Input value="{PaymentModel>/ReceivedAmount}" id="idReceivedAmount" change="onChangeReceivedAmount" valueStateText="{i18n>invoiceRecievedAmountMessage}" placeholder="Enter received amount" maxLength="15"/>
 
 					<Label text="{i18n>invoiceReceivedTDS}" required="true" visible="{= ${PaymentModel>/Currency} === 'INR'}" />
-					<Input value="{PaymentModel>/ReceivedTDS}" id="idReceivedTDS" liveChange="onLiveReceivedTDS" change="onChangeReceivedTDS" placeholder="Enter received TDS" maxLength="20" visible="{= ${PaymentModel>/Currency} === 'INR'}" valueStateText="{i18n>}" />
+					<Input value="{PaymentModel>/ReceivedTDS}" id="idReceivedTDS" change="onChangeReceivedTDS" placeholder="Enter received TDS" maxLength="15" visible="{= ${PaymentModel>/Currency} === 'INR'}" valueStateText="{i18n>}" />
 
 					<Label text=""/>
 					<HBox width="100%" justifyContent="SpaceBetween" visible="{= ${PaymentModel>/Currency} !== 'INR'}">
 						<VBox width="calc(50% - 10px)">
 						<Label text="{i18n>expConversionRate}" required="true"></Label>
-							<Input value="{PaymentModel>/ConversionRate}" id="idFrgConvertionRate" liveChange="onLiveConversion" change="onChangePaymentConvertionRate" />
+							<Input value="{PaymentModel>/ConversionRate}" id="idFrgConvertionRate" change="onChangePaymentConvertionRate" maxLength="15"/>
 						</VBox>
 						<VBox width="calc(50% - 10px)">
 							<Label text="{i18n>amountInINR}" required="true"></Label>
@@ -87,32 +87,30 @@
                     <Column>
 						<Text text="{i18n>invoiceReceivedAmount}" />
 					</Column>
-					<Column>
+					<Column visible="{= ${PaymentModel>/Currency} === 'INR'}">
 						<Text text="{i18n>invoiceReceivedTDS}" />
 					</Column>
 					<Column>
 						<Text text="{i18n>invoiceDueAmount}" />
 					</Column>
-					<Column>
+					<Column visible="{= ${PaymentModel>/Currency} !== 'INR'}">
 						<Text text="{i18n>expConversionRate}" />
 					</Column>
-					<Column>
-						<Text text="{i18n>invoiceReceivedDate}" />
+					<Column visible="{= ${PaymentModel>/Currency} !== 'INR'}">
+						<Text text="{i18n>amountInINR}" />
 					</Column>
 				</columns>
 				<items>
 					<ColumnListItem>
 						<cells>
-							<Text text="{PaymentDetailModel>}" />
-							<Text text="{PaymentDetailModel>}" />
-							<Text text="{PaymentDetailModel>}" />
-							<Text text="{PaymentDetailModel>}" />
-							<Text text="{PaymentDetailModel>}" />
-							<Text text="{PaymentDetailModel>}" />
-							<Text text="{PaymentDetailModel>}" />
-							<Text text="{PaymentDetailModel>}" />
-							<Text text="{PaymentDetailModel>}" />
-							<Text text="{PaymentDetailModel>}" />
+							<Text text="{PaymentDetailModel>TransactionId}" />
+							<Text text="{PaymentDetailModel>ReceivedDate}" />
+							<Text text="{PaymentDetailModel>TotalAmount}" />
+							<Text text="{PaymentDetailModel>ReceivedAmount}" />
+							<Text text="{PaymentDetailModel>ReceivedTDS}" />
+							<Text text="{PaymentDetailModel>DueAmount}" />
+							<Text text="{PaymentDetailModel>ConversionRate}" />
+							<Text text="{PaymentDetailModel>AmountInINR}" />
 						</cells>
 					</ColumnListItem>
 				</items>

@@ -21,7 +21,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="InvoiceDate" label="{i18n>invoiceDate}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<DateRangeSelection id="CI_id_InvoiceDatePicker" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
+							<DateRangeSelection id="CI_id_InvoiceDatePicker" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="CustomerName" label="{i18n>customerName}" groupName="ConsultantInvoice" visibleInFilterBar="true">

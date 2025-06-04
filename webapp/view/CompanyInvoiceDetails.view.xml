@@ -57,7 +57,7 @@
 										<m:Input visible="{visiablityPlay>/gstVisiable}" value="{path:'SelectedCustomerModel>/SGST',formatter: '.Formatter.fromatNumber'}" editable="{visiablityPlay>/editable}" maxLength="50"/>
 
 										<m:Label visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" text="{i18n>expConversionRate}" required="true" />
-										<m:Input id="CID_id_ConversionRate" visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" placeholder="{i18n>companyInvoiceConversionRatePlace}" value="{SelectedCustomerModel>/ConversionRate}" change="onChangeConversionRate" maxLength="50" type="Number" editable="{visiablityPlay>/editable}" liveChange="onChnageConvertion"/>
+										<m:Input id="CID_id_ConversionRate" visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" placeholder="{i18n>companyInvoiceConversionRatePlace}" value="{SelectedCustomerModel>/ConversionRate}" change="onChangeConversionRate" valueStateText="{i18n>convValueStateText}" maxLength="15" editable="{visiablityPlay>/editable}" liveChange="onChnageConvertion"/>
 
 										<m:Label visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" text="{i18n>amountInINR}" required="true" />
 										<m:Input visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" value="{path:'SelectedCustomerModel>/AmountInFCurrency',formatter: '.Formatter.fromatNumber'}" maxLength="50" editable="false"/>
@@ -149,7 +149,7 @@
 													<m:Input value="{CompanyInvoiceItemModel>IndexNo}" editable="false" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Particulars}" editable="{visiablityPlay>/editable}" maxLength="60" />
+													<m:Input value="{CompanyInvoiceItemModel>Particulars}" editable="{visiablityPlay>/editable}" maxLength="60" liveChange="onParticularsInputLiveChange" />
 												</m:cells>
 												<m:cells>
 													<m:ComboBox showSecondaryValues="true" items="{InvoiceSAC>/}" editable="{visiablityPlay>/editable}" value="{CompanyInvoiceItemModel>SAC}" selectedKey="1">
@@ -169,7 +169,8 @@
 													<m:Input value="{CompanyInvoiceItemModel>Rate}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="20" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Discount}" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="20" />
+													<m:Input value="{CompanyInvoiceItemModel>Discount}" showValueHelp="true"
+													valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="20" />
 												</m:cells>
 												<m:cells>
 													<m:Input value="{path:'CompanyInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />
