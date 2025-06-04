@@ -104,9 +104,9 @@ sap.ui.define(
         this.navigateToRouteView1(); // Navigate to RouteView1 and clear user ID and Name
       },
 
-      CommonReadcall: function (sPath, oModel, oParameters) {
+      // CommonReadcall: function (sPath, oModel, oParameters) {
 
-      },
+      // },
       HQ_onPressQuotation: function (oEvent) {
         var oContext = oEvent.getSource().getBindingContext("CompanyQuotationModel");
         var oData = oContext.getObject(); // get full object

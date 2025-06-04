@@ -169,7 +169,6 @@
                                             liveChange="HQD_onComGSTLiveChange"
                                             valueStateText="{i18n>gstNoValueState}"
                                             change="HQD_onChangeGstNo"
-                                            editable="{visiablityPlay>/editable}"
                                             maxLength="15"
 
                                         />
@@ -196,7 +195,6 @@
     required="{QuotationModel>/ShowGSTFields}"
     
 />
-
 <m:Input
     value="{SingleCompanyModel>/Percentage}"
     change="HQD_onPercentageChange"
@@ -213,7 +211,7 @@
                                         />
                                         <m:ComboBox
                                         busyIndicatorDelay="0"
-                                            items="{CurrencyModel>/}"
+                                            items="{codeModel>/}"
                                             width="100%"
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_Curency"
@@ -222,8 +220,8 @@
                                             change="HQD_onCurrencyChange"
                                         >
                                             <core:Item
-                                                key="{CurrencyModel>currency}"
-                                                text="{CurrencyModel>currency}"
+                                                key="{codeModel>currency_code}"
+                                                text="{codeModel>currency_code}"
                                             />
                                         </m:ComboBox>
                                         <m:Label
@@ -288,7 +286,7 @@
                                         <m:Input
                                             value="{SingleCompanyModel>/CustomerEmailID}"
                                             id="HQD_id_CustomerEmailID"
-                                            liveChange="HQD_EmailIDLiveChange"
+                                            liveChange="HQD_EmailIDLiveChange"  
                                             valueStateText="{i18n>emailValueState}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="100"
@@ -501,6 +499,7 @@
       value="{QuotationModel>SAC}"
       editable="{visiablityPlay>/editable}"
       selectedKey="1"
+      id="HQD_id_SACCombo"
       visible="{QuotationModel>/ShowSACAndGSTCalculation}"
     >
       <core:ListItem
@@ -512,7 +511,6 @@
     <!-- GSTCalculation (Column 4) -->
     <m:ComboBox
       value="{QuotationModel>GSTCalculation}"
-      selectedKey="1"
       editable="{visiablityPlay>/editable}"
       change="HQD_onChangeGSTCalculation"
       visible="{QuotationModel>/ShowSACAndGSTCalculation}"

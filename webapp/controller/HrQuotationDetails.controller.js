@@ -37,8 +37,7 @@ sap.ui.define(
           //  Set Busy true on dropdowns
           this.byId("HQD_id_Country").setBusy(true);
           this.byId("HQD_id_BranchCode").setBusy(true);
-          this.byId("HQD_id_Curency").setBusy(true);
-          await this._fetchCommonData("Currency", "CurrencyModel");
+
           await this._fetchCommonData("Country", "CountryModel");
           this._fetchCommonData("BaseLocation", "BrachModel");
           this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
@@ -46,7 +45,6 @@ sap.ui.define(
           //  Set Busy false after data has loaded
           this.byId("HQD_id_Country").setBusy(false);
           this.byId("HQD_id_BranchCode").setBusy(false);
-          this.byId("HQD_id_Curency").setBusy(false);
 
           // ... continue with your model binding and setup
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
@@ -112,10 +110,8 @@ sap.ui.define(
         }
         // Inside the onRouteMatched function's else block (edit mode)
         else {
-
-          this._fetchCommonData("Currency", "CurrencyModel"); this._fetchCommonData("Country", "CountryModel");
           // Edit Mode
-          this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
+          this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" }); this._fetchCommonData("Country", "CountryModel");
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
           var oSelectedQuotation = aQuotations.find(item => item.QuotationNo === sQuotationNo);
           if (oSelectedQuotation) {
@@ -134,8 +130,7 @@ sap.ui.define(
             var igstSelected = (igst > 0);
             oSelectedModel.setProperty("/gstEditable", false); // Disable editing
             var sCurrency = oSelectedQuotation.Currency;
-            // Determine if SAC and GST Calculation should be visible
-            var bShowSAC = sCurrency === "INR";
+
             // Convert Notes from HTML to plain text for display
             var sNotes = oSelectedModel.getProperty("/Notes");
             if (sNotes) {
@@ -146,9 +141,9 @@ sap.ui.define(
             this.getView().setModel(oSelectedModel, "SingleCompanyModel");
             const sCountry = oSelectedQuotation.Country;
             if (sCountry === "India") {
-            
+
               await this._fetchCommonData("BaseLocation", "BrachModel");
-        
+
             } else {
               this.CountryAndCity();
             }
@@ -171,7 +166,7 @@ sap.ui.define(
                   CGSTVisible: cgstVisible,
                   SGSTVisible: sgstVisible,
                   IGSTVisible: igstVisible,
-                  ShowSACAndGSTCalculation: bShowSAC
+
                 });
                 this.getView().setModel(oQuotationModel, "QuotationModel");
                 this.updateTotalAmount();
@@ -203,44 +198,101 @@ sap.ui.define(
 
       HQD_onCountryChange: function (oEvent) {
         utils._LCstrictValidationComboBox(oEvent);
-        var sSelectedKey = oEvent.getSource().getSelectedKey();
+        var sSelectedKey = oEvent.getSource().getSelectedKey(); // country name
+        var oCodeModel = this.getView().getModel("codeModel");
+        var aCodeData = oCodeModel.getProperty("/") || [];
+
         var oSTDCodeField = this.byId("HQD_id_mobileNumber");
         var oCustomerSTDCodeField = this.byId("HQD_id_CustomerNumberSTD");
-        // var oMobileNumberField = this.byId("HQD_id_InputCompanyMobileNo");
         var oCurrencyCombo = this.byId("HQD_id_Curency");
-        const oBranchComboBox = this.byId("HQD_id_BranchCode");
-        var oQuotationModel = this.getView().getModel("QuotationModel");
         var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
+        var oQuotationModel = this.getView().getModel("QuotationModel");
         var oVisibilityModel = this.getView().getModel("visiablityPlay");
- oBranchComboBox.setBusy(true);
-        if (sSelectedKey === "India") {
-          oSTDCodeField.setValue("+91");
-          oCustomerSTDCodeField.setValue("+91");
-          oCurrencyCombo.setSelectedKey("INR");
-          // Reset all tax selections and visibility
-          oQuotationModel.setProperty("/CGSTSelected", true); oQuotationModel.setProperty("/IGSTSelected", false); oQuotationModel.setProperty("/CGSTVisible", true); oQuotationModel.setProperty("/SGSTVisible", true); oQuotationModel.setProperty("/IGSTVisible", false); oSingleCompanyModel.setProperty("/Percentage", 9);
-          this._fetchCommonData("BaseLocation", "BrachModel"); oSingleCompanyModel.setProperty("/Branch", "Kalaburagi");
-          oQuotationModel.setProperty("/ShowGSTFields", true); oSingleCompanyModel.setProperty("/Currency", "INR"); oVisibilityModel.setProperty("/showBranch", true);
-        }
-        else {
-          oSingleCompanyModel.setProperty("/Branch", " ");
-          this.CountryAndCity()
-          var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-          var sMobileNo = oRawData.mobileNo || "";
-          var sActualMobileNo = sMobileNo;
-          if (sMobileNo.startsWith("+91")) {
-            sActualMobileNo = sMobileNo.slice(3); // remove +91
-          }
+        const oBranchComboBox = this.byId("HQD_id_BranchCode");
 
-          oSingleCompanyModel.setProperty("/STDCode", "+91"); oSingleCompanyModel.setProperty("/Country", sSelectedKey); oSingleCompanyModel.setProperty("/gstEditable", true);
-          oSingleCompanyModel.setProperty("/CompanyAddress", oRawData.longAddress); oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName); oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin); oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail); oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
+        oBranchComboBox.setBusy(true);
+
+        // Find matching entry from codeModel based on country
+        var oCountryData = aCodeData.find(function (item) {
+          return item.country === sSelectedKey;
+        });
+
+        if (oCountryData) {
+          // Set STD code and Currency
+          var sSTDCode = oCountryData.calling_code;
+          var sCurrency = oCountryData.currency_code;
+
+          oSTDCodeField.setValue(sSTDCode);
+          oCustomerSTDCodeField.setValue(sSTDCode);
+          oCurrencyCombo.setSelectedKey(sCurrency);
+          oSingleCompanyModel.setProperty("/STDCode", sSTDCode);
+          oSingleCompanyModel.setProperty("/Currency", sCurrency);
+          oSingleCompanyModel.setProperty("/CustomerSTDCode", sSTDCode);
         }
-          oBranchComboBox.setBusy(false);
-        // Reset value state if no value
+
+        if (sSelectedKey === "India") {
+          var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+          oSingleCompanyModel.setProperty("/Branch", "Kalaburagi");
+          this._fetchCommonData("BaseLocation", "BrachModel");
+          oVisibilityModel.setProperty("/showBranch", true);
+          oQuotationModel.setProperty("/ShowGSTFields", true);
+          oQuotationModel.setProperty("/CGSTSelected", true);
+          oQuotationModel.setProperty("/IGSTSelected", false);
+          oQuotationModel.setProperty("/CGSTVisible", true);
+          oQuotationModel.setProperty("/SGSTVisible", true);
+          oQuotationModel.setProperty("/IGSTVisible", false);
+          oSingleCompanyModel.setProperty("/Percentage", 9);
+          oSingleCompanyModel.setProperty("/gstEditable", true);
+
+          // Set Mobile number
+          var sMobileNo = oRawData.mobileNo || "";
+          var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;
+          oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
+        } else {
+          this.CountryAndCity(); // fetch cities for other countries
+          var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+          oSingleCompanyModel.setProperty("/Branch", " ");
+          oSingleCompanyModel.setProperty("/gstEditable", true);
+          oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName);
+          oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin);
+          oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail);
+          oSingleCompanyModel.setProperty("/CompanyAddress", oRawData.longAddress);
+          oSingleCompanyModel.setProperty("/CompanyMobileNo", "");
+          // oSingleCompanyModel.setProperty("/CustomerSTDCode", "");
+
+          // Hide GST fields and update percentage
+          oQuotationModel.setProperty("/ShowGSTFields", false);
+          oQuotationModel.setProperty("/CGSTSelected", false);
+          oQuotationModel.setProperty("/IGSTSelected", true);
+          oQuotationModel.setProperty("/CGSTVisible", false);
+          oQuotationModel.setProperty("/SGSTVisible", false);
+          oQuotationModel.setProperty("/IGSTVisible", false);
+          oSingleCompanyModel.setProperty("/Percentage", 18);
+        }
+
+        // Reset tax-related values
+        oQuotationModel.setProperty("/CGST", 0);
+        oQuotationModel.setProperty("/SGST", 0);
+        oQuotationModel.setProperty("/IGST", 0);
+        oQuotationModel.setProperty("/SubTotal", 0);
+
+        // Update GSTCalculation field in each item
+        var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
+        aItems.forEach(function (item) {
+          item.GSTCalculation = (sSelectedKey === "India") ? "Yes" : "No";
+        });
+        oQuotationModel.setProperty("/QuotationItemModel", aItems);
+      
+        this.updateTotalAmount();
+  
+        // Clear value state if blank
         if (oEvent.getSource().getValue() === '') {
           oEvent.getSource().setValueState("None");
         }
+
+        oBranchComboBox.setBusy(false);
       },
+
       CountryAndCity: function () {
         var Code = this.getView().getModel("CountryModel").getData().filter((item) => item.countryName === this.byId("HQD_id_Country").getValue());
         var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, Code[0].code);
@@ -276,7 +328,20 @@ sap.ui.define(
           oSingleCompanyModel.setProperty("/STDCode", sSTDCode);
         }
       },
+      // _setSACBasedOnGST: function (sGSTCalc) {
+      //   var oSACModel = this.getView().getModel("SACModel");
+      //   var oQuotationModel = this.getView().getModel("QuotationModel");
+      //   var oSACCombo = this.byId("HQD_id_SACCombo");
+      //   var aSACItems = oSACModel.getProperty("/") || [];
 
+      //   if (aSACItems.length >= 2) {
+      //     var sSelectedKey = sGSTCalc === "Yes" ? aSACItems[0].id : aSACItems[1].id;
+
+      //     // Update UI and Model
+      //     oSACCombo.setSelectedKey(sSelectedKey);
+      //     oQuotationModel.setProperty("/SAC", sSelectedKey);
+      //   }
+      // },
       HQD_onComGSTLiveChange: function (oEvent) {
         utils._LCvalidateGstNumber(oEvent);
         var oInput = oEvent.getSource();
@@ -336,9 +401,10 @@ sap.ui.define(
 
         aItems.forEach(function (oItem) {
           // Enforce GSTCalculation flag based on currency
-          if (!bIsINR) {
-            oItem.GSTCalculation = "No";
+          if (!bIsINR && oItem.GSTCalculation !== "No") {
+
           }
+
 
           var iItemTotal = oItem.Days
             ? parseFloat(oItem.Days) * parseFloat(oItem.UnitPrice || 0)
@@ -473,9 +539,6 @@ sap.ui.define(
           this.resetHQDForm()
           this.getRouter().navTo("RouteHrQuotation");
         }
-
-
-
       },
       HQD_DateValidate: function (oEvent) {
         var oView = this.getView();
@@ -511,7 +574,6 @@ sap.ui.define(
 
       HQD_EmailIDLiveChange: function (oEvent) {
         utils._LCvalidateEmail(oEvent);
-
       },
 
       HQD_onAddressLiveChange: function (oEvent) {
@@ -542,12 +604,27 @@ sap.ui.define(
           oQuotationModel.setProperty("/CGSTVisible", false); oQuotationModel.setProperty("/SGSTVisible", false); oQuotationModel.setProperty("/IGSTVisible", false);
           oQuotationModel.setProperty("/ShowGSTFields", true);
           oSingleCompanyModel.setProperty("/gstEditable", true);
-          oView.byId("HQD_id_CompGSTNO")?.setEnabled(true);
-          oModelDataPro.setProperty("/ShowSACAndGSTCalculation", true);;
+          oQuotationModel.setProperty("/CGSTSelected", true);
+          oQuotationModel.setProperty("/IGSTSelected", false);
+          oQuotationModel.setProperty("/CGSTVisible", true);
+          oQuotationModel.setProperty("/SGSTVisible", true);
+          oQuotationModel.setProperty("/IGSTVisible", false);
+
+          oSingleCompanyModel.setProperty("/Percentage", 9);
           // GST-related logic (optional if not already in another function)
           // Calculate Total with GST
           var fNewTotal = fTotal + fCGST + fSGST + fIGST;
           oModelDataPro.setProperty("/TotalSum", fNewTotal.toFixed(2));
+
+          var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
+          aItems.forEach(function (item) {
+            item.GSTCalculation = "Yes"; // Enforce GST
+          });
+
+          // Force update to model to reflect change
+          oQuotationModel.setProperty("/QuotationItemModel", JSON.parse(JSON.stringify(aItems)));
+          this.updateTotalAmount();
+
         } else {
           // Currency is NOT INR — disable GST
           oQuotationModel.setProperty("/CGSTVisible", false);
@@ -555,31 +632,27 @@ sap.ui.define(
           oQuotationModel.setProperty("/IGSTVisible", false);
           oQuotationModel.setProperty("/ShowGSTFields", false);
           oQuotationModel.setProperty("/CGSTSelected", false);
-          oQuotationModel.setProperty("/IGSTSelected", false);
+          oQuotationModel.setProperty("/IGSTSelected", true);
 
-          oSingleCompanyModel.setProperty("/Percentage", "");
-          oSingleCompanyModel.setProperty("/CompanyGSTNO", "");
-          oSingleCompanyModel.setProperty("/gstEditable", false);
-          oView.byId("HQD_id_CompGSTNO")?.setEnabled(false);
-          oQuotationModel.setProperty("/ShowSACAndGSTCalculation", false);
-          // Mark all items as non-taxable (GSTCalculation = "No")
+          oSingleCompanyModel.setProperty("/Percentage", 18);
+
+          //  Mark all items as non-taxable (GSTCalculation = "No")
           var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
+          aItems.forEach(function (item) {
+            item.GSTCalculation = "No"; //  This affects the ComboBox
+          });
 
-          for (var i = 0; i < aItems.length; i++) {
-            aItems[i].GSTCalculation = "No";
-          }
-          // Force update to model (important)
           oQuotationModel.setProperty("/QuotationItemModel", aItems);
-          // Reset GST values
+
+          // Clear tax values
           oQuotationModel.setProperty("/CGST", 0);
           oQuotationModel.setProperty("/SGST", 0);
           oQuotationModel.setProperty("/IGST", 0);
-          // Clear Taxable subtotal (important)
           oQuotationModel.setProperty("/SubTotal", 0);
-          // Recalculate totals — this will move everything to SubTotalNotGST
+
+          //  Recalculate totals
           this.updateTotalAmount();
         }
-
       },
 
       HQD_onCustomerNameLiveChange: function (oEvent) {
@@ -993,13 +1066,9 @@ sap.ui.define(
             ];
         });
 
-
-
         // Build table head dynamically
-        const head = isINR
-          ? [['Sl.No.', 'Description', 'Days', 'Unit Price', 'Discount', 'Tax', 'Total']]
-          : [['Sl.No.', 'Description', 'Days', 'Unit Price', 'Discount', 'Total']];
 
+        const head = [['Sl.No.', 'Description', 'Days', 'Unit Price', 'Discount', 'Tax', 'Total']]
         doc.autoTable({
           startY: y,
           head: head,
@@ -1017,24 +1086,16 @@ sap.ui.define(
             lineWidth: 0.5,
             lineColor: [30, 30, 30],
           },
-          columnStyles: isINR
-            ? {
-              0: { halign: 'center' }, // Sl.No.
-              1: { halign: 'left' },
-              2: { halign: 'center' },
-              3: { halign: 'right' },
-              4: { halign: 'right' },
-              5: { halign: 'cenetr' },
-              6: { halign: 'right' }
-            }
-            : {
-              0: { halign: 'center' }, // Sl.No.
-              1: { halign: 'right' }, // Description
-              2: { halign: 'center' }, // Days
-              3: { halign: 'right' },  // Unit Price
-              4: { halign: 'right' },  // Discount
-              5: { halign: 'right' }   // Total
-            },
+          columnStyles:
+          {
+            0: { halign: 'center' }, // Sl.No.
+            1: { halign: 'left' }, //Description
+            2: { halign: 'center' }, //Days
+            3: { halign: 'right' }, //Unit Price
+            4: { halign: 'right' }, //Discount
+            5: { halign: 'cenetr' }, //Tax
+            6: { halign: 'right' }  //Total
+          },
           didParseCell: function (data) {
             if (data.section === 'head') {
               // Adjust header alignment for numeric columns
@@ -1109,7 +1170,7 @@ sap.ui.define(
           Formatter.fromatNumber(oQuotaionItem.TotalSum)
         ]);
         // Add ":" to labels
-       summaryBody.forEach(row => row[0] = `${row[0]} :`);
+        summaryBody.forEach(row => row[0] = `${row[0]} :`);
         doc.autoTable({
           startY: y,
           head: [],
@@ -1203,21 +1264,21 @@ sap.ui.define(
         var oView = this.getView();
         var oQuotationModel = oView.getModel("QuotationModel");
         var oVisibilityModel = oView.getModel("visiablityPlay");
-        var oSingleCompanyModel = oView.getModel("SingleCompanyModel");
+        // var oSingleCompanyModel = oView.getModel("SingleCompanyModel");
 
         var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
         var bEditMode = oVisibilityModel.getProperty("/editable");
 
         // Get selected currency
-        var sSelectedCurrency = oSingleCompanyModel.getProperty("/Currency");
+        // var sSelectedCurrency = oSingleCompanyModel.getProperty("/Currency");
 
         // Determine GST applicability
-        var bIsINRCurrency = sSelectedCurrency === "INR";
+        // var bIsINRCurrency = sSelectedCurrency === "INR";
 
         var oNewItem = {
           Description: "",
           SAC: "",
-          GSTCalculation: bIsINRCurrency ? "Yes" : "No", // 🛠️ Fix: Set properly
+          GSTCalculation: "Yes", // 🛠️ Fix: Set properly
           Days: "",
           UnitPrice: "",
           Discount: "",
@@ -1571,7 +1632,7 @@ sap.ui.define(
 
         // Recalculate totals
         this.updateTotalAmount();
-      },
+      }, 
 
 
       onPercentageChange: function (oEvent) {
