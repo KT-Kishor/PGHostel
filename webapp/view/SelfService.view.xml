@@ -183,7 +183,7 @@
                                         />
                                         <m:Label text="{i18n>fatherName}" />
 										<m:Input
-                                            value="{sEmployeeModel>/0/FatherName}" editable="{viewModel>/isEditMode}" liveChange="SS_validateName" id="SS_id_FatherName"
+                                            value="{sEmployeeModel>/0/FatherName}" editable="{viewModel>/isEditMode}" liveChange="SS_validateName" id="SS_id_FatherName" valueStateText="{i18n>commonNameValueState}"
                                         />
 										<m:Label
                                             text="{i18n>dateOfBirth}"
@@ -883,7 +883,7 @@
                                                 tooltip="{i18n>toolEAddEdu}"
                                                 press="EdF_AddEdu"
                                                 type="Accept"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
 											<m:Button
                                                 text="{i18n>edit}"
@@ -891,7 +891,7 @@
                                                 tooltip="{i18n>toolEEditEdu}"
                                                 press="EDF_EditEducation"
                                                 type="Emphasized"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR' || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
 											<m:Button
                                                 text="{i18n>delete}"
@@ -899,7 +899,7 @@
                                                 tooltip="{i18n>toolDeleteEdu}"
                                                 press="EdF_DeletEdu"
                                                 type="Reject"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
 										</m:OverflowToolbar>
 									</m:headerToolbar>
@@ -991,7 +991,7 @@
                                                 press="EmpF_onAddEmployment"
                                                 type="Accept"
                                                 tooltip="{i18n>toolAddEmp}"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
 											<m:Button
                                                 text="{i18n>edit}"
@@ -999,7 +999,7 @@
                                                 type="Emphasized"
                                                 tooltip="{i18n>toolEditEmp}"
                                                 id="EmpF_id_EmpEdit"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
 											<m:Button
                                                 text="{i18n>delete}"
@@ -1007,7 +1007,7 @@
                                                 type="Reject"
                                                 tooltip="{i18n>toolDelEmp}"
                                                 id="EmpF_id_EmpDelete"
-                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${sEmployeeModel>/0/Type} === 'Save' }"
+                                                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'HR Manager' || ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save' }"
                                             />
 										</m:OverflowToolbar>
 									</m:headerToolbar>
