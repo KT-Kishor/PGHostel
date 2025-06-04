@@ -980,7 +980,7 @@
 											<m:ToolbarSpacer />
 											<m:Button
                                                 id="EmpF_id_RefButton"
-                                                visible="true"
+                                                visible="{= ${viewModel>/SelfServiceBtn} || ${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR'  || ${sEmployeeModel>/0/Type} === 'Save'}"
                                                 tooltip="{i18n>referenceDetails}"
                                                 press="EmpF_onReferenceDetails"
                                                 type="Ghost"
