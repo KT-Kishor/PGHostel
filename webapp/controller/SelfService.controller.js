@@ -77,7 +77,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             } else {
                                 this.ViewModel.setProperty("/Letter", false);
                             }
-                            if (loginModel.getProperty("/Role") === "Admin") {
+                            if (["Admin", "HR Manager", "HR"].includes(loginModel.getProperty("/Role"))) {
                                 this.ViewModel.setProperty("/RelievingLetter", true);
                             }
                             aIds.forEach(function (sId) {
@@ -349,7 +349,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 } else {
                     if (allowedRoles.includes(Role)) {
                         this.getView().getModel("viewModel").setProperty("/isEditMode", true);
-                        this.getView().getModel("viewModel").setProperty("/AdminRole", Role === "Admin");
+                        this.getView().getModel("viewModel").setProperty("/AdminRole", ["Admin", "HR Manager", "HR"].includes(Role));
                     } else {
                         sap.m.MessageToast.show(this.i18nModel.getText("permissionDenied"));
                     }
