@@ -111,7 +111,7 @@ sap.ui.define(
         // Inside the onRouteMatched function's else block (edit mode)
         else {
           // Edit Mode
-          this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" }); this._fetchCommonData("Country", "CountryModel");
+          this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" }); this._fetchCommonData("Country", "CountryModel");this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
           var oSelectedQuotation = aQuotations.find(item => item.QuotationNo === sQuotationNo);
           if (oSelectedQuotation) {
@@ -1142,16 +1142,16 @@ sap.ui.define(
           if (cgstValue > 0 || sgstValue > 0) {
             summaryBody.push([
               `CGST (${percentage}%)`,
-              Formatter.formatNumber(cgstValue.toFixed(2))
+              Formatter.fromatNumber(cgstValue.toFixed(2))
             ]);
             summaryBody.push([
               `SGST (${percentage}%)`,
-              Formatter.formatNumber(sgstValue.toFixed(2))
+              Formatter.fromatNumber(sgstValue.toFixed(2))
             ]);
           } else if (igstValue > 0 && oData.Currency === "INR") {
             summaryBody.push([
               `IGST (${percentage}%)`,
-              Formatter.formatNumber(igstValue.toFixed(2))
+              Formatter.fromatNumber(igstValue.toFixed(2))
             ]);
           }
         }
