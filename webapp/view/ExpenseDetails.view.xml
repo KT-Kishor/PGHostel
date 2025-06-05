@@ -20,7 +20,7 @@
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
 			<sections>
-                <ObjectPageSection titleUppercase="false" title="{i18n>expBasicInformation}">
+                <ObjectPageSection titleUppercase="false" id="idExpObjectPageSection" title="{i18n>expBasicInformation}">
 					<subSections>
 						<ObjectPageSubSection title="{i18n>expBasicInformation}"  titleUppercase="false">
 							<blocks>

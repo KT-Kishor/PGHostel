@@ -27,13 +27,13 @@
 										<m:Input visible="{visiablityPlay>/editVisi}" id="CID_id_Custmer" value="{SelectedCustomerModel>/CustomerName}" editable="false"/>
 
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>invoiceDate}" required="true" />
-										<m:DatePicker visible="{visiablityPlay>/createVisi}" id="CID_id_Invoice" value="{path:'SelectedCustomerModel>/InvoiceDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}" change="onChangeInvoiceDate" />
+										<m:DatePicker minDate="{visiablityPlay>/minDate}" visible="{visiablityPlay>/createVisi}" id="CID_id_Invoice" value="{path:'SelectedCustomerModel>/InvoiceDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}" change="onChangeInvoiceDate" />
 
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>PayByDate}" required="true" />
 										<m:DatePicker visible="{visiablityPlay>/createVisi}" id="CID_id_Payby" value="{path:'SelectedCustomerModel>/PayByDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"/>
 
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>invoiceDate}" required="true" />
-										<m:DatePicker visible="{visiablityPlay>/editVisi}" id="CID_id_NavInvoice" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/InvoiceDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDate"/>
+										<m:DatePicker minDate="{visiablityPlay>/minDate}" visible="{visiablityPlay>/editVisi}" id="CID_id_NavInvoice" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/InvoiceDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDate"/>
 
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>PayByDate}" required="true" />
 										<m:DatePicker visible="{visiablityPlay>/editVisi}" id="CID_id_NavPayby" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/PayByDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDate"/>
@@ -80,7 +80,8 @@
 										<m:Label text="{i18n>mobileNo}" />
 										<m:Input value="{SelectedCustomerModel>/MobileNo}" id="CID_id_InputMobileNo" maxLength="10" liveChange="CID_onPressLiveChange" editable="{visiablityPlay>/CInvoice}" />
 
-										<m:Label visible="{visiablityPlay>/IncomeTax}" text="{i18n>TDS}" />
+										<m:Label visible="{visiablityPlay>/IncomeTax}" required="true" text="{i18n>TDS}" />
+										<m:Input visible="{visiablityPlay>/IncomeTax}" value="{SelectedCustomerModel>/IncomePerc}" id="CID_id_IncomeTaxPercentage" editable="{visiablityPlay>/editable}" maxLength="2" valueStateText="{i18n>incomeTaxValue}" liveChange="onIncomeTaxPercentageInputLiveChange"/>
 										<m:Input visible="{visiablityPlay>/IncomeTax}" value="{SelectedCustomerModel>/IncomeTax}" id="CID_id_TDS" editable="{visiablityPlay>/editable}" liveChange="CID_ValidateCommonFields" maxLength="25" valueStateText="{i18n>invoiceTransaction}"/>
 
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>selectSOW}" />
@@ -204,6 +205,11 @@
 											<m:HBox justifyContent="SpaceBetween" visible="{= ${SelectedCustomerModel>/Type} === 'IGST' }">
 												<m:Label text="{i18n>IGST} ({SelectedCustomerModel>/Value}%) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{path: 'FilteredSOWModel>/gstAmount', formatter: '.Formatter.fromatNumber'}" textAlign="End" />
+											</m:HBox>
+											<!-- Round of -->
+											<m:HBox justifyContent="SpaceBetween">
+												<m:Label text="{i18n>roundOf} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text class="amountText" text="{FilteredSOWModel>/RoundOf}" textAlign="End" />
 											</m:HBox>
 											<!-- Total Amount -->
 											<m:HBox justifyContent="SpaceBetween">

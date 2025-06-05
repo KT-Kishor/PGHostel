@@ -22,6 +22,7 @@ sap.ui.define([
                 var LoginFUnction = await this.commonLoginFunction("Expense");
                 if (!LoginFUnction) return;
                 this.getBusyDialog();
+                this.scrollToSection("objectPageLayoutExpence","idExpObjectPageSection");
                 try {
                     this.byId("objectPageLayoutExpence").setHeaderContentPinned(true); /// Header content pinned
                     this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -33,6 +34,7 @@ sap.ui.define([
                         this.ExpenseID = this.ExpenseID.split("|")[0];
                         this.MyInBox = true;
                     }
+                    this.getView().byId("EODF_id_ObjectPageLayoutEmp").setSelectedSection(this.getView().byId("idExpObjectPageSection"));
 
                     await this._fetchCommonData("Currency", "CurrencyModel");
                     await this._fetchCommonData("Expense", "FilteredExpenseModel", {

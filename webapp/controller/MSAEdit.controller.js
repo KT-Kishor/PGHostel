@@ -16,21 +16,21 @@ sap.ui.define([
 
             _onRouteMatched: async function (oEvent) {
                 var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
-                if (!LoginFUnction) return;                
+                if (!LoginFUnction) return;
                 this.getBusyDialog();
-                if (!this.getView().getModel("ContractpaymentModel") && !this.getView().getModel("BaseLocationModel")) {
-                     this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
-                     this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                     this._fetchCommonData("Currency", "CurrencyModel");
-                      this._fetchCommonData("EmailContent", "CCMailModel", { Type: "MSA" }); 
-                }
+                this.scrollToSection("MsaE_id_ObjectPageLayout", "MsaE_id_SowDetailsSection");
+                if (!this.getView().getModel("ContractpaymentModel")) this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+                if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
+                if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "MSA" });
+                if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
 
                 this.MSAID = oEvent.getParameter("arguments").sPath;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                
-                var editable = new JSONModel({ editable: false, isEnabled: true, Mode: "Delete", save: false, submitBtn: false, ExpendBtn: false, RelesedBtn: false, Recruitment:true , BtnEnable:false, addSowBtn:false, ExpendBtn:false });
+
+                var editable = new JSONModel({ editable: false, isEnabled: true, Mode: "Delete", save: false, submitBtn: false, ExpendBtn: false, RelesedBtn: false, Recruitment: true, BtnEnable: false, addSowBtn: false, ExpendBtn: false });
                 this.getView().setModel(editable, "simpleForm");
-                
+
                 this.SimpleFormModel = this.getView().getModel("simpleForm");
                 var oModelDataPro = new JSONModel();
                 this.getView().setModel(oModelDataPro, "oModelDataPro");
@@ -43,22 +43,22 @@ sap.ui.define([
                 this.closeBusyDialog();
             },
 
-            onRadioButtonGroupSelect:function(oEvent){
-                if(oEvent.getSource().getSelectedButton().getText() === 'Recruitment'){
+            onRadioButtonGroupSelect: function (oEvent) {
+                if (oEvent.getSource().getSelectedButton().getText() === 'Recruitment') {
                     this.SimpleFormModel.setProperty("/Recruitment", true);
-                }else{                    
+                } else {
                     this.SimpleFormModel.setProperty("/Recruitment", false);
                 }
             },
 
-            MsaE_GoToInvoice:function () {
+            MsaE_GoToInvoice: function () {
                 this.getRouter().navTo("RouteCompanyInvoice");
             },
 
             MSADetailsReadCall: async function () {
                 this.getBusyDialog();
                 try {
-                    await this._fetchCommonData("MSADetails", "FilteredMsaModel", {MsaID: this.MSAID});                    
+                    await this._fetchCommonData("MSADetails", "FilteredMsaModel", { MsaID: this.MSAID });
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
@@ -76,6 +76,9 @@ sap.ui.define([
             },
             MsaE_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
+            },
+            MSACountryComboBox:function(oEvent){
+                utils._LCvalidateMandatoryField(oEvent);
             },
             MsaE_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
@@ -102,7 +105,7 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            Msa_onComboBoxChange:function(oEvent){
+            Msa_onComboBoxChange: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
@@ -111,10 +114,10 @@ sap.ui.define([
                 const oModelData = this.getView().getModel("FilteredMsaModel").getData()[0];
                 const [day, month, year] = this.byId("MsaE_id_CreateMSADate").getValue().split('/');
                 const assignmentEndDate = new Date(year, month - 1, day);
-        
+
                 const contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]);
                 assignmentEndDate.setMonth(assignmentEndDate.getMonth() + contractPeriod);
-        
+
                 oModelData.MsaContractPeriodEndDate = assignmentEndDate.toISOString().split('T')[0];
                 oModelData.CreateMSADate = this.byId("MsaE_id_CreateMSADate").getValue().split("/").reverse().join("-");
             },
@@ -131,14 +134,14 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            LC_MSA_RateCharge:function(oEvent){
+            LC_MSA_RateCharge: function (oEvent) {
                 utils._LCvalidateTraineeAmount(oEvent);
                 this.validateStep();
             },
 
             MsaE_onEditOrSavePress: async function () {
                 var type = this.getView().getModel("FilteredMsaModel").getData()[0].Type;
-                ( type === "Recruitment") ? this.SimpleFormModel.setProperty("/Recruitment",true) : this.SimpleFormModel.setProperty("/Recruitment",false); 
+                (type === "Recruitment") ? this.SimpleFormModel.setProperty("/Recruitment", true) : this.SimpleFormModel.setProperty("/Recruitment", false);
                 if (!this.MSA_oDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.MSAUpdate",
@@ -148,19 +151,21 @@ sap.ui.define([
                         this.getView().addDependent(this.MSA_oDialog);
                         this.MSA_oDialog.open();
                         type !== "Recruitment"
+                            ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
+                            : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0);
+                    }.bind(this));
+                } else {
+                    this.MSA_oDialog.open();
+                    type !== "Recruitment"
                         ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
-                        : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0);                        }.bind(this));
-                    } else {
-                        this.MSA_oDialog.open();
-                        type !== "Recruitment"
-                        ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
-                        : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0);                }
+                        : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0);
+                }
             },
 
-            MSA_Frg_Close:function(){
+            MSA_Frg_Close: function () {
                 this.MSA_oDialog.close();
             },
-            
+
             MSA_Frg_Update: async function () {
                 this.getBusyDialog();
                 if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_CompanyName"), "ID") &&
@@ -170,8 +175,9 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_MsaPanCard"), "ID") &&
                     utils._LCvalidateEmail(sap.ui.getCore().byId("MsaE_id_MSAEmail"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_MsaAddress"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MSA_Nav_Id_Country"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_Id_Branch"), "ID")) {
-                        var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
+                    var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
                     var oData = {
                         "data": oModel,
                         "filters": {
@@ -194,62 +200,63 @@ sap.ui.define([
                         })
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                    this.closeBusyDialog();                }
+                    this.closeBusyDialog();
+                }
             },
 
-            CommonReadCallForSow: async function(){
-                this.getBusyDialog();   
+            CommonReadCallForSow: async function () {
+                this.getBusyDialog();
                 const selectedKey = this.byId("MsaE_id_SowStatus").getValue();
-                let oFilter = {MsaID: this.MSAID};
-                if (selectedKey !== "All") oFilter.Status = selectedKey;   
-            
-                await this._fetchCommonData("SowDetails", "SowReadModel",oFilter);
+                let oFilter = { MsaID: this.MSAID };
+                if (selectedKey !== "All") oFilter.Status = selectedKey;
+
+                await this._fetchCommonData("SowDetails", "SowReadModel", oFilter);
                 this.closeBusyDialog();
             },
 
-            MsaE_onChangeSowStatus: async function () {            
+            MsaE_onChangeSowStatus: async function () {
                 await this.CommonReadCallForSow();
-            },            
+            },
 
-            SOW_onSaveFrag:async function () {
+            SOW_onSaveFrag: async function () {
                 this.getBusyDialog();
-                    if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID")) {
-                        var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
-                        var sowCreateModel = this.getView().getModel("sowCreateModel").getData();
-                        var oJson = { 
-                            "data": oModelDataPro.map(oModelDataPro => ({
-                              "MsaID": sowCreateModel.MsaID,
-                              "SowID": sowCreateModel.SowID,
-                              "Description": sowCreateModel.Description,
-                              "SNo": oModelDataPro.SNo,
-                              "Salutation": oModelDataPro.Salutation,
-                              "ConsultantName": oModelDataPro.ConsultantName,
-                              "Designation": oModelDataPro.Designation,
-                              "StartDate": sowCreateModel.StartDate.split('/').reverse().join('-'),
-                              "EndDate": sowCreateModel.EndDate.split('/').reverse().join('-'),
-                              "Rate": (sowCreateModel.Currency === 'INR') ? oModelDataPro.Rate + " " + sowCreateModel.Currency + " GST " + oModelDataPro.PerDay : oModelDataPro.Rate + " " + sowCreateModel.Currency + " " + oModelDataPro.PerDay,
-                              "Status": oModelDataPro.Status
-                            }))
-                          };                          
+                if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID")) {
+                    var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
+                    var sowCreateModel = this.getView().getModel("sowCreateModel").getData();
+                    var oJson = {
+                        "data": oModelDataPro.map(oModelDataPro => ({
+                            "MsaID": sowCreateModel.MsaID,
+                            "SowID": sowCreateModel.SowID,
+                            "Description": sowCreateModel.Description,
+                            "SNo": oModelDataPro.SNo,
+                            "Salutation": oModelDataPro.Salutation,
+                            "ConsultantName": oModelDataPro.ConsultantName,
+                            "Designation": oModelDataPro.Designation,
+                            "StartDate": sowCreateModel.StartDate.split('/').reverse().join('-'),
+                            "EndDate": sowCreateModel.EndDate.split('/').reverse().join('-'),
+                            "Rate": (sowCreateModel.Currency === 'INR') ? oModelDataPro.Rate + " " + sowCreateModel.Currency + " GST " + oModelDataPro.PerDay : oModelDataPro.Rate + " " + sowCreateModel.Currency + " " + oModelDataPro.PerDay,
+                            "Status": oModelDataPro.Status
+                        }))
+                    };
 
-                        await this.ajaxCreateWithJQuery("SowDetails", oJson).then((oData) => {
-                            if (oData.success) {
-                                this.byId("MsaE_id_SowStatus").setValue("New");
-                                this.CommonReadCallForSow();
-                                this.SOW_oDialog.close();
-                                MessageToast.show(this.i18nModel.getText("sowSuccess"));                                
-                            }else{
-                                MessageToast.show(this.i18nModel.getText("sowFailed"));
-                            }    
-                            this.closeBusyDialog();                           
-                        }).catch((error) => {                       
+                    await this.ajaxCreateWithJQuery("SowDetails", oJson).then((oData) => {
+                        if (oData.success) {
+                            this.byId("MsaE_id_SowStatus").setValue("New");
+                            this.CommonReadCallForSow();
+                            this.SOW_oDialog.close();
+                            MessageToast.show(this.i18nModel.getText("sowSuccess"));
+                        } else {
+                            MessageToast.show(this.i18nModel.getText("sowFailed"));
+                        }
+                        this.closeBusyDialog();
+                    }).catch((error) => {
                         MessageToast.show(error.responseText);
                         this.closeBusyDialog();
                     });
                 } else {
                     this.closeBusyDialog();
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                    }
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                }
             },
 
             FragmentOpen: function () {
@@ -290,10 +297,10 @@ sap.ui.define([
                 var oModel = this.getView().getModel("oModelDataPro");
                 var oContext = oEvent.getParameter("listItem").getBindingContext("oModelDataPro");
                 var sIndex = oContext.getPath().split("/")[1];
-            
+
                 var aData = oModel.getData();
                 var selectedItem = aData[sIndex]; // Capture item before modifying array
-            
+
                 // Check if the item is from DB (e.g., has ConsultantName or any DB-specific flag)
                 if (selectedItem && selectedItem.ConsultantName) {
                     this.showConfirmationDialog(
@@ -305,13 +312,13 @@ sap.ui.define([
                                 filters: { SNo: selectedItem.SNo }
                             }).then(() => {
                                 MessageToast.show(that.i18nModel.getText("sowDeleteSuccess"));
-                                this.CommonReadCallForSow();            
+                                this.CommonReadCallForSow();
                                 // Now safely delete from model
                                 aData.splice(sIndex, 1);
                                 aData.forEach((item, index) => item.IndexNo = index + 1);
                                 oModel.setData(aData);
                                 that.SNoValue = aData.length;
-            
+
                                 that.closeBusyDialog();
                             }).catch((error) => {
                                 that.closeBusyDialog();
@@ -327,14 +334,14 @@ sap.ui.define([
                     oModel.setData(aData);
                     this.SNoValue = aData.length;
                 }
-            },            
+            },
 
             MsaE_onPressCreateSow: function () {
                 this.SimpleFormModel.setProperty("/save", true);
                 this.SimpleFormModel.setProperty("/submitBtn", false);
                 this.SimpleFormModel.setProperty("/ExpendBtn", false);
                 this.SimpleFormModel.setProperty("/RelesedBtn", false);
-                this.SimpleFormModel.setProperty("/addSowBtn",true);
+                this.SimpleFormModel.setProperty("/addSowBtn", true);
                 this.FragmentOpen();
                 var jsonProData = [];
                 this.SNoValue = 0;
@@ -356,13 +363,13 @@ sap.ui.define([
                 this.getView().getModel("sowCreateModel").setData(jsonSow);
             },
 
-            onPressChangeSow:function(oEvent){
+            onPressChangeSow: function (oEvent) {
                 this.Selected = oEvent.getParameter("listItem").getBindingContext("SowReadModel").getObject();
-                if(this.Selected) this.SimpleFormModel.setProperty("/BtnEnable",true);
+                if (this.Selected) this.SimpleFormModel.setProperty("/BtnEnable", true);
             },
 
-            MsaE_onPressSOWActive: async function(oEvent) {
-                if(!this.byId("Sow_Id_ReadTable").getSelectedItem()){
+            MsaE_onPressSOWActive: async function (oEvent) {
+                if (!this.byId("Sow_Id_ReadTable").getSelectedItem()) {
                     return MessageToast.show(this.i18nModel.getText("noRowSelected"))
                 }
                 var FilterData = this.getView().getModel("SowReadModel").getData().filter((item) => item.SowID === this.Selected.SowID);
@@ -374,26 +381,26 @@ sap.ui.define([
                                 "Status": Status
                             },
                             "filters": {
-                                "SowID": item.SowID 
+                                "SowID": item.SowID
                             }
                         };
                     })
-                };   
+                };
                 this.byId("MsaE_id_SowStatus").setValue(Status);
                 var Message = (Status === "Inactive") ? this.i18nModel.getText("sowAllInactive") : this.i18nModel.getText("sowAllActive");
-                await this.CommonUpdateCall(oData,Message);   
-                this.SimpleFormModel.setProperty("/BtnEnable",false);          
+                await this.CommonUpdateCall(oData, Message);
+                this.SimpleFormModel.setProperty("/BtnEnable", false);
             },
-            
-            CommonUpdateCall:async function(Data , Message){                
+
+            CommonUpdateCall: async function (Data, Message) {
                 this.getBusyDialog();
                 try {
                     var responce = await this.ajaxUpdateWithJQuery("SowDetails", Data);
-                    if(responce){
+                    if (responce) {
                         MessageToast.show(Message);
                         await this.CommonReadCallForSow();
                         this.closeBusyDialog();
-                    }else{
+                    } else {
                         MessageToast.show("Sow updated failed");
                         this.closeBusyDialog();
                     }
@@ -402,12 +409,12 @@ sap.ui.define([
                     this.closeBusyDialog();
                 }
             },
-            
-            TableGetData:function(value){
+
+            TableGetData: function (value) {
                 var SowReadModel = this.getView().getModel("SowReadModel").getData();
                 var FilterData = SowReadModel.filter((item) => item.SowID === this.Selected.SowID);
                 var sowCreateModel = this.getView().getModel("sowCreateModel");
-                if(value === 'Expend'){                    
+                if (value === 'Expend') {
                     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
                     var result = ""
                     for (var i = 0; i < 10; i++) {
@@ -421,40 +428,40 @@ sap.ui.define([
                 }
                 sowCreateModel.setProperty("/SowID", value !== "Expend" ? FilterData[0].SowID : result);
                 sowCreateModel.setProperty("/EndDate", this.Formatter.formatDate(value !== "Expend" ? FilterData[0].EndDate : EndDate));
-                sowCreateModel.setProperty("/StartDate",  this.Formatter.formatDate(value !== "Expend" ? FilterData[0].StartDate : StartDate));
+                sowCreateModel.setProperty("/StartDate", this.Formatter.formatDate(value !== "Expend" ? FilterData[0].StartDate : StartDate));
                 sowCreateModel.setProperty("/Description", FilterData[0].Description);
                 sowCreateModel.setProperty("/Currency", FilterData[0].Rate.split(" ")[1]);
 
-                
+
                 var oFilteredData = FilterData;
                 oFilteredData.forEach((selectedData, index) => {
-                  var rateString = selectedData.Rate;
-                  selectedData.IndexNo = index + 1;
-                  this.SNoValue = selectedData.IndexNo; 
-                
-                  if (rateString) {
-                    var rateParts = rateString.split(" ").filter(Boolean);
-                
-                    var rateValue = rateParts[0];
-                    var currency = rateParts[1];
-                
-                    var rateType = currency === "INR" ? rateParts.slice(3).join(" ") : rateParts.slice(2).join(" ");
-                
-                    selectedData.Rate = rateValue;
-                    selectedData.Currency = currency;
-                    selectedData.PerDay = rateType;
-                  }
-                });                
-                if(value === "Relesed"){
+                    var rateString = selectedData.Rate;
+                    selectedData.IndexNo = index + 1;
+                    this.SNoValue = selectedData.IndexNo;
+
+                    if (rateString) {
+                        var rateParts = rateString.split(" ").filter(Boolean);
+
+                        var rateValue = rateParts[0];
+                        var currency = rateParts[1];
+
+                        var rateType = currency === "INR" ? rateParts.slice(3).join(" ") : rateParts.slice(2).join(" ");
+
+                        selectedData.Rate = rateValue;
+                        selectedData.Currency = currency;
+                        selectedData.PerDay = rateType;
+                    }
+                });
+                if (value === "Relesed") {
                     oFilteredData = oFilteredData.filter((item) => item.Status !== "Inactive");
                 }
                 this.getView().getModel("oModelDataPro").setData(oFilteredData)
-            },         
+            },
 
             MsaE_onPressRelesedSow: function () {
-                this.SimpleFormModel.setProperty("/addSowBtn",false);
+                this.SimpleFormModel.setProperty("/addSowBtn", false);
                 this.TableGetData("Relesed");
-                this.SimpleFormModel.setProperty("/ExpendBtn",false);
+                this.SimpleFormModel.setProperty("/ExpendBtn", false);
                 this.SimpleFormModel.setProperty("/save", false);
                 this.SimpleFormModel.setProperty("/Mode", "MultiSelect");
                 this.SimpleFormModel.setProperty("/submitBtn", false);
@@ -468,10 +475,10 @@ sap.ui.define([
                 var currentDate = new Date();
                 var timeDiff = endDateObj.getTime() - currentDate.getTime();
                 var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-        
-                if (daysDiff > 30) return sap.m.MessageBox.error(this.i18nModel.getText("sowExtend30Days"));                
-                this.SimpleFormModel.setProperty("/ExpendBtn",true);
-                this.SimpleFormModel.setProperty("/addSowBtn",true);
+
+                if (daysDiff > 30) return sap.m.MessageBox.error(this.i18nModel.getText("sowExtend30Days"));
+                this.SimpleFormModel.setProperty("/ExpendBtn", true);
+                this.SimpleFormModel.setProperty("/addSowBtn", true);
                 this.TableGetData("Expend");
                 this.SimpleFormModel.setProperty("/save", false);
                 this.SimpleFormModel.setProperty("/Mode", "MultiSelect");
@@ -482,8 +489,8 @@ sap.ui.define([
             },
 
             MsaE_onPressUpdateSOW: function () {
-                this.SimpleFormModel.setProperty("/ExpendBtn",false);
-                this.SimpleFormModel.setProperty("/addSowBtn",true);
+                this.SimpleFormModel.setProperty("/ExpendBtn", false);
+                this.SimpleFormModel.setProperty("/addSowBtn", true);
                 this.TableGetData("Update");
                 this.SimpleFormModel.setProperty("/save", false);
                 this.SimpleFormModel.setProperty("/Mode", "Delete");
@@ -493,17 +500,17 @@ sap.ui.define([
                 this.FragmentOpen();
             },
 
-            SOW_onExpendFrag: async function () {  
-                var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");                    
+            SOW_onExpendFrag: async function () {
+                var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
                 if (!oTable.getSelectedItem()) {
                     return MessageToast.show(this.i18nModel.getText("msaSelectMess"));
-                }                
-                this.getBusyDialog();          
+                }
+                this.getBusyDialog();
                 var aSelectedItems = oTable.getSelectedItems();
                 var aSelectedData = aSelectedItems.map(function (oItem) {
                     return oItem.getBindingContext("oModelDataPro").getObject();
                 });
-            
+
                 var SowId = sap.ui.getCore().byId("SOW_id_SowID").getValue();
                 var StartDate = sap.ui.getCore().byId("SOW_id_StartDate").getValue();
                 var EndDate = sap.ui.getCore().byId("SOW_id_EndDate").getValue();
@@ -512,42 +519,42 @@ sap.ui.define([
                 var commonMsaID = aSelectedData.length > 0 ? aSelectedData[0].MsaID : null;
                 var oJson = {
                     data: aSelectedData.map((item) => ({
-                            MsaID: commonMsaID,
-                            SowID: SowId,
-                            Description: Desc,                           
-                            Salutation: item.Salutation,
-                            ConsultantName: item.ConsultantName,
-                            Designation: item.Designation,
-                            StartDate: StartDate.split('/').reverse().join('-'),
-                            EndDate: EndDate.split('/').reverse().join('-'),
-                            Rate: (sowCreateModel.Currency === 'INR') ? `${item.Rate} ${sowCreateModel.Currency} GST ${item.PerDay}` : `${item.Rate} ${sowCreateModel.Currency} ${item.PerDay}`,
-                            Status: "New"                        
+                        MsaID: commonMsaID,
+                        SowID: SowId,
+                        Description: Desc,
+                        Salutation: item.Salutation,
+                        ConsultantName: item.ConsultantName,
+                        Designation: item.Designation,
+                        StartDate: StartDate.split('/').reverse().join('-'),
+                        EndDate: EndDate.split('/').reverse().join('-'),
+                        Rate: (sowCreateModel.Currency === 'INR') ? `${item.Rate} ${sowCreateModel.Currency} GST ${item.PerDay}` : `${item.Rate} ${sowCreateModel.Currency} ${item.PerDay}`,
+                        Status: "New"
                     }))
                 };
-                                                 
+
                 try {
-                    const oData = await this.ajaxCreateWithJQuery("SowDetails", oJson);            
+                    const oData = await this.ajaxCreateWithJQuery("SowDetails", oJson);
                     if (oData.success) {
                         this.byId("MsaE_id_SowStatus").setValue("New");
-                        await this.CommonReadCallForSow();                        
+                        await this.CommonReadCallForSow();
                         MessageToast.show(this.i18nModel.getText("sowExpendCreate"));
-                        this.SimpleFormModel.setProperty("/BtnEnable",false);
+                        this.SimpleFormModel.setProperty("/BtnEnable", false);
                     } else {
                         MessageToast.show(this.i18nModel.getText("sowFailed"));
                     }
                 } catch (error) {
                     MessageToast.show(error.responseText || this.i18nModel.getText("sowExpendCreateFailed"));
                 } finally {
-                    this.SOW_oDialog.close();                   
+                    this.SOW_oDialog.close();
                 }
-            },            
+            },
 
-            SOW_onReleaseFrag: async function(){  
-                var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");                  
-                if(!sap.ui.getCore().byId("SOW_id_oTableCreateSow").getSelectedItem()){
+            SOW_onReleaseFrag: async function () {
+                var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
+                if (!sap.ui.getCore().byId("SOW_id_oTableCreateSow").getSelectedItem()) {
                     return MessageToast.show(this.i18nModel.getText("msaSelectMess"))
                 }
-                this.closeBusyDialog();  
+                this.closeBusyDialog();
                 var aSelectedItems = oTable.getSelectedItems();
                 var aSelectedData = aSelectedItems.map(function (oItem) {
                     return oItem.getBindingContext("oModelDataPro").getObject();
@@ -555,7 +562,7 @@ sap.ui.define([
                 var oJson = {
                     data: aSelectedData.map((item) => ({
                         data: {
-                            Status: "Inactive"  
+                            Status: "Inactive"
                         },
                         filters: {
                             SNo: item.SNo
@@ -563,16 +570,16 @@ sap.ui.define([
                     }))
                 };
                 this.byId("MsaE_id_SowStatus").setValue("Inactive");
-                await this.CommonUpdateCall(oJson,this.i18nModel.getText("sowAllRelesedUpdate")); 
+                await this.CommonUpdateCall(oJson, this.i18nModel.getText("sowAllRelesedUpdate"));
                 this.SOW_oDialog.close();
-                this.SimpleFormModel.setProperty("/BtnEnable",false);
+                this.SimpleFormModel.setProperty("/BtnEnable", false);
             },
 
             SOW_onSubmitFrag: async function () {
                 this.getBusyDialog();
                 const oModelDataPro = this.getView().getModel("oModelDataPro").getData();
                 const sowCreateModel = this.getView().getModel("sowCreateModel").getData();
-            
+
                 const transformedData = oModelDataPro.map((item) => ({
                     MsaID: item.MsaID,
                     SowID: sowCreateModel.SowID,
@@ -590,24 +597,24 @@ sap.ui.define([
                     data: transformedData.map((item) => ({
                         data: item,
                         filters: {
-                            SNo : item.SNo 
+                            SNo: item.SNo
                         }
                     }))
                 };
                 this.byId("MsaE_id_SowStatus").setValue("New");
-              await this.CommonUpdateCall(oData,this.i18nModel.getText("sowUpdate"));
-              this.SOW_oDialog.close();
-              this.SimpleFormModel.setProperty("/BtnEnable",false);
-            },            
+                await this.CommonUpdateCall(oData, this.i18nModel.getText("sowUpdate"));
+                this.SOW_oDialog.close();
+                this.SimpleFormModel.setProperty("/BtnEnable", false);
+            },
 
             onOpenActionSheet: function (oEvent) {
-                var oButton = oEvent.getSource();            
+                var oButton = oEvent.getSource();
                 if (!this._oActionSheet) {
                     this._oActionSheet = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.ActionsDialog", this);
                     this.getView().addDependent(this._oActionSheet);
-                }            
+                }
                 this._oActionSheet.openBy(oButton);
-            }, 
+            },
 
             MsaE_onSendEmailMSA: function (oEvent) {
                 this.Type = oEvent.getSource().sId.split('--').pop();
@@ -631,7 +638,7 @@ sap.ui.define([
                 this.validateSendButton();
             },
 
-            Mail_onPressClose: function () {              
+            Mail_onPressClose: function () {
                 this.EOU_oDialogMail.close();
             },
 
@@ -693,8 +700,8 @@ sap.ui.define([
                         "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
                         "attachments": this.getView().getModel("UploaderData").getProperty("/attachments")
                     };
-                    this.getBusyDialog();               
-                    this.ajaxCreateWithJQuery(this.Type === 'MSA' ? "MSAEmail":"SOWEmail", oPayload).then((oData) => {
+                    this.getBusyDialog();
+                    this.ajaxCreateWithJQuery(this.Type === 'MSA' ? "MSAEmail" : "SOWEmail", oPayload).then((oData) => {
                         MessageToast.show(this.i18nModel.getText("emailSuccess"));
                         this.closeBusyDialog();
                     }).catch((error) => {
@@ -711,24 +718,24 @@ sap.ui.define([
             SOW_onDeleteExtendItem: function () {
                 var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
                 var oModel = this.getView().getModel("oModelDataPro");
-                var aData = oModel.getData();            
+                var aData = oModel.getData();
                 var aSelectedPaths = oTable.getSelectedItems().map(function (oItem) {
                     return oItem.getBindingContext("oModelDataPro").getPath(); // Full path like '/data/2'
-                });            
+                });
                 // Extract indexes and sort in descending order to prevent reindexing issues while splicing
                 var aIndexesToDelete = aSelectedPaths.map(function (path) {
                     return parseInt(path.split("/").pop());
                 }).sort(function (a, b) {
                     return b - a;
-                });            
+                });
                 // Remove items from data array
                 aIndexesToDelete.forEach(function (index) {
                     aData.splice(index, 1);
-                });            
+                });
                 // Update the model with the new data
-                oModel.setProperty("/data", aData);            
+                oModel.setProperty("/data", aData);
                 oTable.removeSelections();
-            },                      
+            },
 
             async MsaE_onPressMerge() {
                 this.getBusyDialog();
@@ -761,14 +768,14 @@ sap.ui.define([
                         const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
                         const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
                         const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
-            
+
                         const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
                             this._convertBLOBToImage(logoBlob),
                             this._convertBLOBToImage(signBlob),
                             this._convertBLOBToImage(backgroundBlob),
                             this._convertBLOBToImage(emailBlob)
                         ]);
-            
+
                         oCompanyDetailsModel.companylogo64 = logoBase64;
                         oCompanyDetailsModel.signature64 = signBase64;
                         oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;

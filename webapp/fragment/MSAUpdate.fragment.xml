@@ -91,7 +91,12 @@
 										<Input id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/0/PanCard}" liveChange="Msa_LC_PanCard"/>
 
 										<Label text="{i18n>emailId}" required="true"/>
-										<TextArea liveChange="Msa_LC_EmailID"  maxLength="500" id="MsaE_id_MSAEmail" value="{FilteredMsaModel>/0/MsaEmail}"  />																																							
+										<TextArea liveChange="Msa_LC_EmailID"  maxLength="500" id="MsaE_id_MSAEmail" value="{FilteredMsaModel>/0/MsaEmail}"  />			
+
+										<Label text="{i18n>expCountry}" required="true"/>
+										<ComboBox valueStateText="{i18n>expValStaCountry}" change="MSACountryComboBox" id="MSA_Nav_Id_Country" items="{path:'CountryModel>/',length:1000}" value="{FilteredMsaModel>/0/Country}" showSecondaryValues="true">
+											<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+										</ComboBox>																																				
 
 										<Label text="{i18n>Address}" required="true"/>
 										<TextArea  id="MsaE_id_MsaAddress" value="{FilteredMsaModel>/0/Address}" maxLength="120"  liveChange="Msa_LC_Address"/>

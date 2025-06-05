@@ -11,6 +11,7 @@
             enableLazyLoading="true"
             useIconTabBar="true"
             showTitleInHeaderContent="true"
+			id="MsaE_id_ObjectPageLayout"
             upperCaseAnchorBar="false">
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
@@ -148,7 +149,7 @@
 				</m:FlexBox>
 			</headerContent>
 			<sections>
-				<ObjectPageSection titleUppercase="false" title="Sow Details">
+				<ObjectPageSection titleUppercase="false" title="Sow Details" id="MsaE_id_SowDetailsSection">
 					<subSections>
 						<ObjectPageSubSection title=" " titleUppercase="false">
 							<blocks>

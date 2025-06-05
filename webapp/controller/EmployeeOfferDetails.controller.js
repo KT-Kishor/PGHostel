@@ -32,13 +32,13 @@ sap.ui.define([
 
                 // Update the model with sorted data
                 oModel.setData(aData);
-                if (!this.getView().getModel("CurrencyModel")) {
-                    this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
-                    this._fetchCommonData("AppVisibility", "RoleModel") // role get call
-                    this._fetchCommonData("Designation", "DesignationModel");//designation get call
-                    this._fetchCommonData("Country", "CountryModel");
-                    this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
-                }
+                 
+                    if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
+                    if (!this.getView().getModel("RoleModel")) this._fetchCommonData("AppVisibility", "RoleModel") // role get call
+                    if (!this.getView().getModel("DesignationModel")) this._fetchCommonData("Designation", "DesignationModel");//designation get call
+                    if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
+                    if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
+                
                 var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",

@@ -19,8 +19,8 @@ sap.ui.define([
             _onRouteMatched: async function (oEvent) {
                 var sArg = oEvent.getParameter("arguments").sPath;
                 if (!(await this.commonLoginFunction("CompanyInvoice"))) return;
-
-                if (!this.getView().getModel("CurrencyModel")) {
+                this.scrollToSection("CID_id_CmpInvObjectPageLayout","CID_id_CmpInvGoals");
+                if (!this.getView().getModel("CurrencyModel" && !this.getView().getModel("CCMailModel"))) {
                     this._fetchCommonData("Currency", "CurrencyModel");
                     this._fetchCommonData("EmailContent", "CCMailModel", { Type: "CompanyInvoice" });
                 }
@@ -44,7 +44,7 @@ sap.ui.define([
                 oView.setModel(new JSONModel({
                     CustomerName: "", InvNo: "", InvoiceDate: new Date(), Name: "", PAN: "", GST: "", Address: "", MailID: "", MobileNo: "",
                     SOWDetails: "", Type: "", InvoiceDescription: "", Currency: "INR", PayByDate: new Date(), POSOW: "", Status: "Submitted",
-                    SubTotalNotGST: "0", SubTotalInGST: "0", LUT: ""
+                    SubTotalNotGST: "0", SubTotalInGST: "0", LUT: "",IncomePerc: "10"
                 }), "SelectedCustomerModel");
 
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
@@ -57,7 +57,7 @@ sap.ui.define([
                 oView.setModel(new JSONModel({
                     createVisi: true, editVisi: false, editable: true, igstVisi: false, gstVisiable: false,
                     flexVisiable: false, CInvoice: false, addInvBtn: true, merge: false, GST: true, payByDate: false,
-                    Form: true, Table: false, MultiEmail: true, Edit: true, IncomeTax: true
+                    Form: true, Table: false, MultiEmail: true, Edit: true, IncomeTax: true, minDate: new Date(this.getView().getModel("CompanyInvoiceModel").getData()[0].InvoiceDate)
                 }), "visiablityPlay");
 
                 this.visiablityPlay = oView.getModel("visiablityPlay");
@@ -71,6 +71,7 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/editVisi", true);
                 this.visiablityPlay.setProperty("/editable", false);
                 this.visiablityPlay.setProperty("/addInvBtn", false);
+                this.visiablityPlay.setProperty("/MultiEmail", false);
                 this.byId("CID_id_TableInvoiceItem").setMode("None");
                 this.byId("CID_id_CurrencySelect").setEditable(false);
 
@@ -190,7 +191,7 @@ sap.ui.define([
                 const oSelectedCustomerModel = this.getView().getModel("SelectedCustomerModel");
                 if (oData.success) {
                     var paymentDateObj = new Date(oSelectedCustomerModel.getData().InvoiceDate);
-                    var paymentDay = parseInt(oData.data[0].ContractPeriod);
+                    var paymentDay = parseInt(oData.data[0].PaymentTerms);
                     paymentDateObj.setDate(paymentDateObj.getDate() + paymentDay);
                     oSelectedCustomerModel.setProperty("/PayByDate", paymentDateObj);
                 } else {
@@ -366,8 +367,13 @@ sap.ui.define([
                     oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
                 }
 
+                let roundedAmount = Math.round(finalAmount);
+                let difference = (roundedAmount - finalAmount).toFixed(2);
+                let RoundOf = difference > 0 ? `+${difference}` : difference;
+
+                oSOWModel.setProperty("/RoundOf", RoundOf);
+                oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
-                oSOWModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
                 oCustomerModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
 
                 this.onChangeConversionRate();
@@ -411,7 +417,7 @@ sap.ui.define([
 
                 if (oNavigationData.Currency === "INR") {
                     const subTotal = parseFloat(oNavigationData.SubTotalInGST) || 0;
-                    const tds = ((subTotal * 10) / 100).toFixed(2);
+                    const tds = ((subTotal * parseFloat(oNavigationData.IncomePerc)) / 100).toFixed(2);
                     oNavigationModel.setProperty("/IncomeTax", tds);
                 }
             },
@@ -459,7 +465,7 @@ sap.ui.define([
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
                     Address: String(oSelectedCustomerModel.Address),
                     PAN: String(oSelectedCustomerModel.PAN),
-                    MobileNo: String(oSelectedCustomerModel.MobileNo),
+                    MobileNo: oSelectedCustomerModel.MobileNo != null ? String(oSelectedCustomerModel.MobileNo) : '',
                     AmountInFCurrency: FilterModel.Currency === "INR"
                         ? (!isNaN(oSelectedCustomerModel.AmountInFCurrency) ? oSelectedCustomerModel.AmountInFCurrency : "0")
                         : parseFloat(oModel.subTotal) || 0,
@@ -482,7 +488,8 @@ sap.ui.define([
                     POSOW: oSelectedCustomerModel.POSOW,
                     SubTotalNotGST: parseFloat(oSelectedCustomerModel.SubTotalNotGST) || 0,
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
-                    LUT: String(oSelectedCustomerModel.LUT)
+                    LUT: String(oSelectedCustomerModel.LUT),
+                    IncomePerc: oSelectedCustomerModel.IncomePerc || "10",
                 };
                 const aItemsRaw = oCompanyInvoiceItemModel.CompanyInvoiceItem || [];
                 const aItems = aItemsRaw.map(item => {
@@ -537,7 +544,7 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowPO"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowDetails"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_CurrencySelect"), "ID");
-                    const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateMandatoryField(this.byId("CID_id_TDS"), "ID") : true;
+                    const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateMandatoryField(this.byId("CID_id_TDS"), "ID") && utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"),"ID"): true;
                     const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;
                     const bOptionalValid = !!this.Discount && !!this.RateUnit && !!this.Particulars;
                     const bIsValid = bMandatoryValid && bTDSValid && bOptionalValid && bConversionRateValid;
@@ -794,7 +801,13 @@ sap.ui.define([
                 invoiceModel.refresh(true);
             },
 
-            onPressInvClose: function () { this.oDialog.close() },
+            onPressInvClose: function () { 
+                sap.ui.getCore().byId("idTransactionID").setValueState("None");
+                sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
+                sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
+                sap.ui.getCore().byId("idFrgConvertionRate").setValueState("None");
+                this.oDialog.close() 
+            },
             onLiveTransactionID: function (oEvent) { utils._LCvalidateMandatoryField(oEvent) },
 
             onChangePaymentRecived: async function () {
@@ -805,8 +818,8 @@ sap.ui.define([
                     utils._LCvalidateAmount(sap.ui.getCore().byId("idReceivedAmount"), "ID") &&
                     this.ResivedAmount && this.ResivedTDSFlag &&
                     (paymentModel.Currency !== "INR"
-                        ? utils._LCvalidateAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID")
-                        : utils._LCvalidateAmount(sap.ui.getCore().byId("idReceivedTDS"), "ID"));
+                        ? utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID")
+                        : utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("idReceivedTDS"), "ID"));
 
                 if (!this.ResivedAmount) sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
 
@@ -1079,6 +1092,17 @@ sap.ui.define([
                 } catch (error) {
                     this.closeBusyDialog();
                     MessageToast.show(error.responseText);
+                }
+            },
+
+            onIncomeTaxPercentageInputLiveChange:function (oEvent) { 
+                utils._LCvalidateVariablePay(oEvent);
+                const oNavigationModel = this.getView().getModel("SelectedCustomerModel");
+                const oNavigationData = oNavigationModel.getData();
+                if (oNavigationData.Currency === "INR") {
+                    const subTotal = parseFloat(oNavigationData.SubTotalInGST) || 0;
+                    const tds = ((subTotal * parseFloat(oNavigationData.IncomePerc)) / 100).toFixed(2);
+                    oNavigationModel.setProperty("/IncomeTax", tds);
                 }
             },
 
