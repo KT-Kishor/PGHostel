@@ -125,7 +125,7 @@ sap.ui.define(
             // Calculate visibility and selection flags
             var cgstVisible = (cgst > 0 || sgst > 0);
             var sgstVisible = cgstVisible;
-            var igstVisible = (igst > 0);
+            // var igstVisible = (igst > 0);
             var cgstSelected = (cgst > 0 || sgst > 0);
             var igstSelected = (igst > 0);
             oSelectedModel.setProperty("/gstEditable", false); // Disable editing
@@ -145,7 +145,7 @@ sap.ui.define(
               await this._fetchCommonData("BaseLocation", "BrachModel");
 
             } else {
-              this.CountryAndCity();
+              // this.CountryAndCity();
             }
 
             setTimeout(() => {
@@ -165,7 +165,7 @@ sap.ui.define(
                   IGSTSelected: igstSelected,
                   CGSTVisible: cgstVisible,
                   SGSTVisible: sgstVisible,
-                  IGSTVisible: igstVisible,
+                  // IGSTVisible: igstVisible,
 
                 });
                 this.getView().setModel(oQuotationModel, "QuotationModel");
@@ -282,9 +282,9 @@ sap.ui.define(
           item.GSTCalculation = (sSelectedKey === "India") ? "Yes" : "No";
         });
         oQuotationModel.setProperty("/QuotationItemModel", aItems);
-      
+
         this.updateTotalAmount();
-  
+
         // Clear value state if blank
         if (oEvent.getSource().getValue() === '') {
           oEvent.getSource().setValueState("None");
@@ -1046,24 +1046,16 @@ sap.ui.define(
             ? Formatter.fromatNumber(item.Discount)
             : "0.00";
 
-          return isINR
-            ? [
-              index + 1,
-              item.Description,
-              item.Days,
-              Formatter.fromatNumber(item.UnitPrice),
-              formattedDiscount,
-              item.GSTCalculation,
-              Formatter.fromatNumber(item.Total)
-            ]
-            : [
-              index + 1,
-              item.Description,
-              item.Days,
-              Formatter.fromatNumber(item.UnitPrice),
-              formattedDiscount,
-              Formatter.fromatNumber(item.Total)
-            ];
+          return [
+            index + 1,
+            item.Description,
+            item.Days,
+            Formatter.fromatNumber(item.UnitPrice),
+            formattedDiscount,
+            item.GSTCalculation,
+            Formatter.fromatNumber(item.Total)
+          ]
+
         });
 
         // Build table head dynamically
@@ -1096,24 +1088,24 @@ sap.ui.define(
             5: { halign: 'cenetr' }, //Tax
             6: { halign: 'right' }  //Total
           },
-          didParseCell: function (data) {
-            if (data.section === 'head') {
-              // Adjust header alignment for numeric columns
-              if (isINR) {
-                if ([4, 5, 6].includes(data.column.index)) {
-                  data.cell.styles.halign = 'right';
-                } else {
-                  data.cell.styles.halign = 'center';
-                }
-              } else {
-                if ([3, 4, 5].includes(data.column.index)) {
-                  data.cell.styles.halign = 'right';
-                } else {
-                  data.cell.styles.halign = 'center';
-                }
-              }
-            }
-          }
+          // didParseCell: function (data) {
+          //   if (data.section === 'head') {
+          //     // Adjust header alignment for numeric columns
+          //     if (isINR) {
+          //       if ([4, 5, 6].includes(data.column.index)) {
+          //         data.cell.styles.halign = 'right';
+          //       } else {
+          //         data.cell.styles.halign = 'center';
+          //       }
+          //     } else {
+          //       if ([3, 4, 5].includes(data.column.index)) {
+          //         data.cell.styles.halign = 'right';
+          //       } else {
+          //         data.cell.styles.halign = 'center';
+          //       }
+          //     }
+          //   }
+          // }
         });
 
         y = doc.lastAutoTable.finalY;
@@ -1150,19 +1142,20 @@ sap.ui.define(
           if (cgstValue > 0 || sgstValue > 0) {
             summaryBody.push([
               `CGST (${percentage}%)`,
-              Formatter.fromatNumber(cgstValue.toFixed(2))
+              Formatter.formatNumber(cgstValue.toFixed(2))
             ]);
             summaryBody.push([
               `SGST (${percentage}%)`,
-              Formatter.fromatNumber(sgstValue.toFixed(2))
+              Formatter.formatNumber(sgstValue.toFixed(2))
             ]);
-          } else if (igstValue > 0) {
+          } else if (igstValue > 0 && oData.Currency === "INR") {
             summaryBody.push([
               `IGST (${percentage}%)`,
-              Formatter.fromatNumber(igstValue.toFixed(2))
+              Formatter.formatNumber(igstValue.toFixed(2))
             ]);
           }
         }
+
 
         const totalRowIndex = summaryBody.length; // This is after pushing total row
         summaryBody.push([
@@ -1257,7 +1250,7 @@ sap.ui.define(
         }
 
         // Save PDF
-        doc.save(`${oData.CustomerName}.Quotation.pdf`);
+        doc.save(`${oData.CustomerName}_Quotation.pdf`);
 
       },
       HQD_onPressAddQuotationItem: function () {
@@ -1632,7 +1625,7 @@ sap.ui.define(
 
         // Recalculate totals
         this.updateTotalAmount();
-      }, 
+      },
 
 
       onPercentageChange: function (oEvent) {
