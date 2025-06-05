@@ -88,7 +88,7 @@ sap.ui.define([
       try {
         this.getBusyDialog();
         const filterItems = this.byId("MI_id_FilterBar").getFilterGroupItems();
-        const params = {};
+        var params = {};
         const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
 
         filterItems.forEach(oItem => {
@@ -114,7 +114,6 @@ sap.ui.define([
         else {
           if (!params.hasOwnProperty("Status")) {
             params["Status"] = "Send to account";
-            params["Status"] = "Paid"
           }
         }
         await this._fetchCommonData("InboxDetails", "MyInboxModelData", params);
