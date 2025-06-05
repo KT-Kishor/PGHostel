@@ -5,8 +5,9 @@ sap.ui.define([
     "sap/m/MessageToast",
     "../model/formatter",
     "sap/m/MessageBox",
+ "../utils/CommonAgreementPDF",
 ],
-    function (BaseController, utils, JSONModel, MessageToast, Formatter, MessageBox) {
+    function (BaseController, utils, JSONModel, MessageToast, Formatter, MessageBox, jsPDF) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSADetails", {
             Formatter: Formatter,
@@ -191,7 +192,8 @@ sap.ui.define([
                 this.byId("MsaD_id_Type").setEditable(false);
             },
 
-            MsaD_reviewSubmit: async function () {
+           MsaD_reviewSubmit: async function () {
+                 var that = this;
                 const oWizard = this.byId("MsaD_id_Wizard");
                 if (!oWizard.getSteps()[0].getValidated()) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -220,20 +222,37 @@ sap.ui.define([
                     const oCreateResponse = await this.ajaxCreateWithJQuery("MSADetails", { data: oModelData });
 
                     if (oCreateResponse) {
-                        this.closeBusyDialog();
-                        MessageBox.success(this.getView().getModel("i18n").getResourceBundle().getText("msaCreatedMsg"), {
-                            icon: MessageBox.Icon.SUCCESS,
-                            title: "Success",
-                            actions: [sap.m.MessageBox.Action.OK, "Generate PDF"],
-                            onClose: (sAction) => {
-                                if (sAction === "OK") {
-                                    this.getRouter().navTo("RouteMSA");
-                                    this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
-                                } else {
-                                    this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
+                       var oDialog = new sap.m.Dialog({
+                            title: this.i18nModel.getText("success"),
+                            type: sap.m.DialogType.Message,
+                            state: sap.ui.core.ValueState.Success,
+                            content: new sap.m.Text({
+                                text: this.i18nModel.getText("msaCreatedMsg")
+                            }),
+                            beginButton: new sap.m.Button({
+                                text: "OK",
+                                type: "Accept",
+                                press: function () {
+                                    oDialog.close();
+                                    that.getRouter().navTo("RouteMSA");
+                                    that.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
                                 }
+                            }),
+                            endButton: new sap.m.Button({
+                                text: "Generate PDF",
+                                type: "Attention",
+                                press: function () {
+                                    oDialog.close();
+                                    that.MsaE_onPressMerge();
+                                    that.getRouter().navTo("RouteMSA");
+                                    that.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
+                                }
+                            }),
+                            afterClose: function () {
+                                oDialog.destroy();
                             }
                         });
+                        oDialog.open();
                     } else {
                         this.closeBusyDialog();
                         MessageToast.show(this.i18nModel.getText("expenseCreatedMessFailed"));
@@ -242,7 +261,65 @@ sap.ui.define([
                     this.closeBusyDialog();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
-            }
+            },
+
+            async MsaE_onPressMerge() {
+                this.getBusyDialog();
+                var oModel = this.getView().getModel("msaModelWizart").getData();
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oModel.BranchCode });
+                var msa = "MSA", nda = "NDA";
+                if (oModel.Type === "Recruitment") { msa = "R-MSA"; nda = "R-NDA"; }
+                await this._fetchCommonData("PDFCondition", "PDFNDAModel", { Type: nda });
+                await this._fetchCommonData("PDFCondition", "PDFMSAModel", { Type: msa });
+                var oPDFModel = this.getView().getModel("PDFData");
+                oPDFModel.setProperty("/AgreementDate", Formatter.formatDate(oModel.CreateMSADate));
+                oPDFModel.setProperty("/AgreementEndDate", Formatter.formatDate(oModel.MsaContractPeriodEndDate));
+                oPDFModel.setProperty("/ClientCompanyName", oModel.CompanyName);
+                oPDFModel.setProperty("/ClientCompanyAddress", oModel.Address);
+                oPDFModel.setProperty("/ClientName", oModel.Salutation + " " + oModel.CompanyHeadName);
+                oPDFModel.setProperty("/ClientRole", oModel.CompanyHeadPosition);
+                oPDFModel.setProperty("/AgreementDuration", oModel.ContractPeriod);
+                oPDFModel.setProperty("/PaymentTerms", oModel.PaymentTerms);
+                oPDFModel.setProperty("/PaymentPerc", oModel.RateCharge);
+                oPDFModel.setProperty("/FirstHalfPerc", oModel.PaymentAdvance);
+                oPDFModel.setProperty("/SecondHalfPerc", oModel.PaymentBalance);
+                oPDFModel.setProperty("/CandidateWorkingMonths", oModel.ReplacementMonth);
+                oPDFModel.setProperty("/LatePaymentThreshold", oModel.ReplacementRefund);
+                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                var oPDFNDAModel = this.getView().getModel("PDFNDAModel").getData();
+                var oPDFMSAModel = this.getView().getModel("PDFMSAModel").getData();
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
+                    try {
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
+                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+
+                        const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
+                            this._convertBLOBToImage(logoBlob),
+                            this._convertBLOBToImage(signBlob),
+                            this._convertBLOBToImage(backgroundBlob),
+                            this._convertBLOBToImage(emailBlob)
+                        ]);
+
+                        oCompanyDetailsModel.companylogo64 = logoBase64;
+                        oCompanyDetailsModel.signature64 = signBase64;
+                        oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+                        oCompanyDetailsModel.emailLogoBase64 = emailBase64;
+                    } catch (err) {
+                        this.closeBusyDialog();
+                        console.error("Image compression failed:", err);
+                    }
+                }
+                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                    if (typeof jsPDF !== "undefined" && typeof jsPDF._GenerateAgreementPDF === "function") {
+                        jsPDF._GenerateAgreementPDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFNDAModel, oPDFMSAModel);
+                    } else {
+                        this.closeBusyDialog();
+                        console.error("Error: jsPDF._GenerateAgreementPDF function not found.");
+                    }
+                }
+            },
 
         });
     });

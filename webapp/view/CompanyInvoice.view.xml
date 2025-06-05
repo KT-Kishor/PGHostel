@@ -69,12 +69,6 @@
 						<Text text="{i18n>totalAmount}" />
 					</Column>
 					<Column>
-						<Text text="{i18n>currency}" />
-					</Column>
-					<Column>
-						<Text text="{i18n>customerName}" />
-					</Column>
-					<Column>
 						<Text text="{i18n>status}" />
 					</Column>
 				</columns>
@@ -85,9 +79,7 @@
 							<Text text="{path:'CompanyInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}" />
 							<ObjectStatus text="{path:'CompanyInvoiceModel>PayByDate',formatter:'.Formatter.formatDate'}" inverted="true" state="{ parts: [{path: 'CompanyInvoiceModel>PayByDate'},{path: 'CompanyInvoiceModel>Status'}], formatter: '.Formatter.companyInvoicePayByDate'}" />
 							<Text text="{CompanyInvoiceModel>InvoiceDescription}" />
-							<Text text="{path: 'CompanyInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" textAlign="End" />
-							<Text text="{CompanyInvoiceModel>Currency}" textAlign="End" />
-							<Text text="{CompanyInvoiceModel>CustomerName}" />
+			<Text text="{CompanyInvoiceModel>Currency} {path: 'CompanyInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" textAlign="End" />
 							<ObjectStatus text="{CompanyInvoiceModel>Status}" inverted="false" state="{path: 'CompanyInvoiceModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
 						</cells>
 					</ColumnListItem>

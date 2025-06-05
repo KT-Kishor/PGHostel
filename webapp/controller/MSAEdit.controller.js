@@ -80,7 +80,7 @@ sap.ui.define([
             MsaE_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
             },
-            MSACountryComboBox:function(oEvent){
+            MSACountryComboBox: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
             MsaE_ValidateCommonFields: function (oEvent) {
@@ -223,9 +223,18 @@ sap.ui.define([
 
             SOW_onSaveFrag: async function () {
                 if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID")) {
-                    this.getBusyDialog();
-                    var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
                     var sowCreateModel = this.getView().getModel("sowCreateModel").getData();
+                    var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
+                    if (!oModelDataPro || oModelDataPro.length === 0) return MessageToast.show(this.i18nModel.getText("msaTableValidation"));
+
+                    for (let i = 0; i < oModelDataPro.length; i++) {
+                        let row = oModelDataPro[i];
+                        if (!row.Salutation || !row.ConsultantName || !row.Designation || !row.Rate) {
+                            sap.m.MessageBox.error(`Please fill all mandatory fields in row ${i + 1}`);
+                            return; // 🛑 Stop submission
+                        }
+                    }
+                    this.getBusyDialog();
                     var oJson = {
                         "data": oModelDataPro.map(oModelDataPro => ({
                             "MsaID": sowCreateModel.MsaID,
@@ -404,12 +413,22 @@ sap.ui.define([
             },
 
             CommonUpdateCall: async function (Data, Message) {
+                var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
+                if (!oModelDataPro || oModelDataPro.length === 0) return MessageToast.show(this.i18nModel.getText("msaTableValidation"));
+                for (let i = 0; i < oModelDataPro.length; i++) {
+                    let row = oModelDataPro[i];
+                    if (!row.Salutation || !row.ConsultantName || !row.Designation || !row.Rate) {
+                        sap.m.MessageBox.error(`Please fill all mandatory fields in row ${i + 1}`);
+                        return; 
+                    }
+                }
                 this.getBusyDialog();
                 try {
                     var responce = await this.ajaxUpdateWithJQuery("SowDetails", Data);
                     if (responce) {
                         MessageToast.show(Message);
                         await this.CommonReadCallForSow();
+                        this.SOW_oDialog.close();
                         this.closeBusyDialog();
                     } else {
                         MessageToast.show("Sow updated failed");
@@ -582,7 +601,7 @@ sap.ui.define([
                 };
                 this.byId("MsaE_id_SowStatus").setValue("Inactive");
                 await this.CommonUpdateCall(oJson, this.i18nModel.getText("sowAllRelesedUpdate"));
-                this.SOW_oDialog.close();
+                // this.SOW_oDialog.close();
                 this.SimpleFormModel.setProperty("/BtnEnable", false);
             },
 
@@ -614,7 +633,7 @@ sap.ui.define([
                 };
                 this.byId("MsaE_id_SowStatus").setValue("New");
                 await this.CommonUpdateCall(oData, this.i18nModel.getText("sowUpdate"));
-                this.SOW_oDialog.close();
+                // this.SOW_oDialog.close();
                 this.SimpleFormModel.setProperty("/BtnEnable", false);
             },
 

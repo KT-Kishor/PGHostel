@@ -82,6 +82,8 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/MultiEmail", false);
                 this.byId("CID_id_TableInvoiceItem").setMode("None");
                 this.byId("CID_id_CurrencySelect").setEditable(false);
+                this.visiablityPlay.setProperty("/merge", true);
+                this.visiablityPlay.setProperty("/MultiEmail", true);
 
                 this.getBusyDialog();
 
@@ -435,12 +437,45 @@ sap.ui.define([
             },
 
             Comp_OnChangeDiscount: async function (oEvent) {
-                this.Discount = utils._LCvalidateAmount(oEvent);
+                var sValue = oEvent.getParameter("value").trim();
+                var regex = /^[0-9]+(\.[0-9]{1,2})?%?$/;
+                var oInput = oEvent.getSource();
+                sValue = sValue.replace(/[^0-9.%]/g, "");
+
+                var isPercentage = sValue.indexOf('%') !== -1;
+                if (isPercentage) {
+                    sValue = sValue.replace('%', '');
+                }
+
+                var parts = sValue.split('.');
+                if (parts.length > 1) {
+                    parts[1] = parts[1].substring(0, 2);
+                    sValue = parts.join('.');
+                }
+
+                if (isPercentage) {
+                    sValue = sValue + '%';
+                }
+                oInput.setValue(sValue);
+
+                if (!sValue) {
+                    oInput.setValueState("None");
+                    oInput.setValueStateText("");
+                    this.CI_updateTotalAmount();
+                    this.Discount = true;
+                } else if (!regex.test(sValue)) {
+                    oInput.setValueState("Error");
+                    oInput.setValueStateText(this.i18nModel.getText("discountValueText"));
+                    this.Discount = false;
+                } else {
+                    oInput.setValueState("None");
+                    oInput.setValueStateText("");
+                    this.Discount = true;
+                }
                 await this.totalAmountCalculation();
                 var oNavigationModel = this.getView().getModel("SelectedCustomerModel");
                 if (oNavigationModel.getData().Currency === "INR") oNavigationModel.setProperty("/IncomeTax", parseInt((oNavigationModel.getData().SubTotalInGST * 10) / 100).toFixed(2));
             },
-
             CID_onPressAddCustomer: function () { this.getRouter().navTo("RouteManageCustomer", { value: "Data" }); },
 
             CID_onPressMSAandSOW: function () {
@@ -454,6 +489,20 @@ sap.ui.define([
             CID_onPressback: function () { this.getRouter().navTo("RouteCompanyInvoice") },
 
             CID_ValidateDate: function (oEvent) { utils._LCvalidateDate(oEvent) },
+
+            CID_ValidateDatePayByDate: function (oEvent) {
+                utils._LCvalidateDate(oEvent)
+                var [day, month, year] = oEvent.getSource().getValue().split('/').map(Number);
+                var payByDate = new Date(year, month - 1, day);
+                var today = new Date();
+                var timeDiff = payByDate - today;
+                var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                if (daysDiff <= 10) {
+                    this.ReminderEmail = true;
+                } else {
+                    this.ReminderEmail = false;
+                }
+            },
 
             SubmitPayload: async function (sMode) {
                 const oView = this.getView();
@@ -500,6 +549,19 @@ sap.ui.define([
                     IncomePerc: oSelectedCustomerModel.IncomePerc || "10",
                 };
                 const aItemsRaw = oCompanyInvoiceItemModel.CompanyInvoiceItem || [];
+                if( aItemsRaw.length === 0) {
+                    this.getBusyDialog();
+                    MessageToast.show(this.i18nModel.getText("companyTableValidation"));
+                    return false;
+                }
+                for (let i = 0; i < aItemsRaw.length; i++) {
+                    const item = aItemsRaw[i];
+                    if (!item.Particulars || !item.Unit || !item.Rate) {
+                        this.getBusyDialog();
+                        sap.m.MessageBox.error(`Please fill all mandatory fields (Particulars, Unit, Rate) in item row ${i + 1}`);
+                        return false; 
+                    }
+                }
                 const aItems = aItemsRaw.map(item => {
                     const itemData = {
                         InvNo: oSelectedCustomerModel.InvNo,
@@ -561,6 +623,10 @@ sap.ui.define([
                     }
                     this.getBusyDialog();
                     const oPayload = await this.SubmitPayload("Create");
+                    if(oPayload === false) {
+                        this.closeBusyDialog();
+                        return;
+                    }
                     try {
                         var response = await that.ajaxCreateWithJQuery("CompanyInvoice", { data: oPayload.payload, Items: oPayload.items });
                         const oSelectedCustomerModel = that.getView().getModel("SelectedCustomerModel");
@@ -637,7 +703,12 @@ sap.ui.define([
 
                     this.getBusyDialog();
                     const oPayload = await this.SubmitPayload("update");
-
+                    if(oPayload === false) {
+                        this.closeBusyDialog();
+                        return;
+                    }else{
+                        var Status = oPayload.payload.Status;
+                    }
                     try {
                         await this.ajaxUpdateWithJQuery("CompanyInvoice", { data: oPayload.payload, filtres: oPayload.filters, Items: oPayload.items });
                         this.visiablityPlay.setProperty("/editable", false);
@@ -646,7 +717,7 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/addInvBtn", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/MultiEmail", true);
-                        this.visiablityPlay.setProperty("/payByDate", true);
+                        if(Status !== "Payment Received") this.visiablityPlay.setProperty("/payByDate", this.ReminderEmail);
                         MessageToast.show(this.i18nModel.getText("invoiceUpdateMess"));
                         this.closeBusyDialog();
                     } catch (error) {

@@ -28,7 +28,7 @@
             press="MsaE_onSendEmailMSA" 
         />
 						<m:Button 
-            text="{i18n>tileUnit}" 
+            text="{i18n>GeneratePDF}" 
             enabled="{simpleForm>/isEnabled}"  
             press="MsaE_onPressMerge"  
         />

@@ -36,7 +36,7 @@
 										<m:DatePicker minDate="{visiablityPlay>/minDate}" visible="{visiablityPlay>/editVisi}" id="CID_id_NavInvoice" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/InvoiceDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDate"/>
 
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>PayByDate}" required="true" />
-										<m:DatePicker visible="{visiablityPlay>/editVisi}" id="CID_id_NavPayby" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/PayByDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDate"/>
+										<m:DatePicker visible="{visiablityPlay>/editVisi}" id="CID_id_NavPayby" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/PayByDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDatePayByDate"/>
 
 										<m:Label text="{i18n>invoiceDescription}" required="true" />
 										<m:Input id="CID_id_InvoiceDesc" value="{SelectedCustomerModel>/InvoiceDescription}" placeholder="{i18n>companyInvoiceDescPlaceH}" editable="{visiablityPlay>/editable}" liveChange="CID_ValidateCommonFields" maxLength="120" valueStateText="{i18n>companyInvoiceDescPlaceH}" />

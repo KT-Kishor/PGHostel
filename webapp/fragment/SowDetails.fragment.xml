@@ -92,7 +92,7 @@
             <cells>
                 <HBox width="100%" justifyContent="Start" alignItems="Center">
                     <VBox width="60%">
-                        <Input value="{oModelDataPro>Rate}" maxLength="50" width="100%" type="Number" textAlign="End" id="SOW_id-Rate" liveChange="onRateChange"/>
+                        <Input value="{oModelDataPro>Rate}" maxLength="50" width="100%" textAlign="End" id="SOW_id-Rate" liveChange="onRateChange"/>
                     </VBox>                   
                     <VBox width="40%">
                         <ComboBox items="{RateType>/}" selectedKey="Per Day" value="{oModelDataPro>PerDay}" width="100%">
