@@ -3,15 +3,18 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "../utils/validation",
-    "sap/ui/model/odata/type/Currency"
+    "sap/ui/model/odata/type/Currency",
+      "../model/formatter",
 ],
     function (BaseController,
         JSONModel,
         MessageToast,
         utils,
-        Currency) {
+        Currency,
+        Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.CompanyInvoiceDetails", {
+            Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("RouteCompanyInvoiceDetails").attachMatched(this._onRouteMatched, this);
             },
@@ -23,6 +26,7 @@ sap.ui.define([
                 if (!this.getView().getModel("CurrencyModel" && !this.getView().getModel("CCMailModel"))) {
                     this._fetchCommonData("Currency", "CurrencyModel");
                     this._fetchCommonData("EmailContent", "CCMailModel", { Type: "CompanyInvoice" });
+                    this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
                 }
                 this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status", "CID_id_CurrencySelect"]);
 
@@ -554,7 +558,11 @@ sap.ui.define([
                     this.getBusyDialog();
                     const oPayload = await this.SubmitPayload("Create");
                     try {
-                        await that.ajaxCreateWithJQuery("CompanyInvoice", { data: oPayload.payload, Items: oPayload.items });
+                         var response =  await that.ajaxCreateWithJQuery("CompanyInvoice", { data: oPayload.payload, Items: oPayload.items });
+                      const oSelectedCustomerModel = that.getView().getModel("SelectedCustomerModel");  
+                       oSelectedCustomerModel.setProperty("/InvNo", response.InvoiceNo);
+                       var CustomerName= oSelectedCustomerModel.getProperty("/Customer");
+                       oSelectedCustomerModel.setProperty("/CustomerName",CustomerName)
                         that.closeBusyDialog();
                         var oDialog = new sap.m.Dialog({
                             title: this.i18nModel.getText("success"),
@@ -576,6 +584,7 @@ sap.ui.define([
                                 type: "Attention",
                                 press: function () {
                                     oDialog.close();
+                                    that.CID_onPressGeneratePdf();
                                     that.getRouter().navTo("RouteCompanyInvoice");
                                 }
                             }),
@@ -1106,7 +1115,326 @@ sap.ui.define([
                 }
             },
 
+             CID_onPressGeneratePdf: async function () {
+                const { jsPDF } = window.jspdf;
+                const oView = this.getView();
+                const oModel = oView.getModel("SelectedCustomerModel").getData();
+                const oCompanyInvoiceItemModel = oView.getModel("CompanyInvoiceItemModel").getData();
+                const oCompanyItemModel = oCompanyInvoiceItemModel.CompanyInvoiceItem || [];
+                const type = this.getView().byId("CID_id_Type").getText();
+                const oCompanyDetailsModel = oView.getModel("CompanyCodeDetailsModel").getProperty("/0");
+
+                const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+                const img = await this._convertBLOBToImage(imgblob);
+                const signature = await this._convertBLOBToImage(signBlob);
+
+                let currency = oModel.Currency === "INR" ? "Rupees" : oModel.Currency;
+                let totalInWords = this.convertNumberToWords(oModel.TotalAmount, currency);
+                if (oModel.Currency !== "INR") {
+                    totalInWords = totalInWords
+                        .replaceAll("Lakh", "Million")
+                        .replaceAll("Crore", "Billion")
+                        .replaceAll("Paise", "Cents")
+                        .replaceAll("Rupees", "Dollars");
+                }
+
+                const showSAC = oModel.GST !== undefined && oModel.GST !== "";
+
+                const margin = 15;
+                const doc = new jsPDF({
+                    orientation: "portrait",
+                    unit: "mm",
+                    format: "a4"
+                });
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const usableWidth = pageWidth - 2 * margin;
+                const footerHeight = 18;
+                let currentY = 0;
+
+                const checkPageSpace = (requiredSpace = 40) => {
+                    if (currentY + requiredSpace > pageHeight - footerHeight) {
+                        doc.addPage();
+                        currentY = 20;
+                    }
+                };
+
+                const headerMargin = 25.4;
+                doc.setFontSize(14).setFont("times", "bold");
+                doc.text("TAX - INVOICE", pageWidth - 18, headerMargin, { align: "right" });
+                doc.addImage(img, 'PNG', margin, 15, 40, 40);
+
+                const detailsStartY = 35;
+                const rowHeight = 6.5;
+                const columnWidths = [30, 30];
+                const rightAlignX = pageWidth - 18 - columnWidths[0] - columnWidths[1];
+
+                const detailsTable = [
+                    { label: 'Invoice No. :', value: oModel.InvNo },
+                    { label: 'PO/SOW :', value: oModel.POSOW.toString() },
+                    { label: 'Date :', value: Formatter.formatDate(oModel.InvoiceDate) }
+                ];
+
+                currentY = detailsStartY;
+
+                detailsTable.forEach(row => {
+                    doc.setFont("times", "bold");
+                    doc.text(row.label, rightAlignX + columnWidths[0] - doc.getTextWidth(row.label), currentY + 5);
+                    doc.setFont("times", "normal");
+                    doc.text(row.value, rightAlignX + columnWidths[0] + 5, currentY + 5);
+                    currentY += rowHeight;
+                });
+
+                currentY += 15;
+                doc.setFont("times", "bold").setFontSize(11);
+                doc.text("To,", margin, currentY);
+                currentY += 5;
+                doc.setFont("times", "normal").setFontSize(11);
+                doc.text(oModel.CustomerName, margin, currentY);
+                currentY += 5;
+
+                const customerAddressLines = doc.splitTextToSize(oModel.Address, usableWidth / 2 - 10);
+                doc.text(customerAddressLines, margin, currentY);
+                currentY += customerAddressLines.length * 5;
+
+                if (oModel.GST !== "") {
+                    doc.text(`GSTIN : ${oModel.GST}`, margin, currentY);
+                    currentY += 5;
+                }
+
+                currentY += 5;
+
+                const body = oCompanyItemModel.map((item, index) => {
+                    const row = [
+                        index + 1,
+                        item.Particulars,
+                        item.Unit || "-",
+                        Formatter.fromatNumber(item.Rate) || '0.00',
+                        Formatter.fromatNumber(item.Discount) || '0.00',
+                        Formatter.fromatNumber(item.Total) || '0.00'
+                    ];
+                    if (showSAC) row.splice(2, 0, item.SAC);
+                    return row;
+                });
+
+                const head = showSAC
+                    ? [['Sl.No.', 'Particulars', 'SAC', 'Unit', 'Rate', 'Discount', 'Total']]
+                    : [['Sl.No.', 'Particulars', 'Unit', 'Rate', 'Discount', 'Total']];
+
+                doc.autoTable({
+                    startY: currentY,
+                    head: head,
+                    body: body,
+                    theme: 'grid',
+                    headStyles: { fillColor: [41, 128, 185] },
+                    styles: {
+                        font: "times",
+                        fontSize: 10,
+                        cellPadding: 3,
+                        lineWidth: 0.5,
+                        lineColor: [30, 30, 30]
+                    },
+                    columnStyles: {
+                        0: { halign: 'center' },
+                        1: { halign: 'center' },
+                        ...(showSAC ? {
+                            2: { halign: 'center' },
+                            3: { halign: 'center' },
+                            4: { halign: 'right' },
+                            5: { halign: 'right' },
+                            6: { halign: 'right' }
+                        } : {
+                            2: { halign: 'center' },
+                            3: { halign: 'right' },
+                            4: { halign: 'right' },
+                            5: { halign: 'right' }
+                        })
+                    },
+                    didParseCell: function (data) {
+                        if (data.section === 'head') {
+                            if (showSAC) {
+                                if ([4, 5, 6].includes(data.column.index)) {
+                                    data.cell.styles.halign = 'right';
+                                } else {
+                                    data.cell.styles.halign = 'center';
+                                }
+                            } else {
+                                if ([3, 4, 5].includes(data.column.index)) {
+                                    data.cell.styles.halign = 'right';
+                                } else {
+                                    data.cell.styles.halign = 'center';
+                                }
+                            }
+                        }
+                    }
+                });
+
+                currentY = doc.lastAutoTable.finalY + 10;
+                checkPageSpace(50);
+
+                const summaryBody = [];
+
+                if (oModel.SubTotalNotGST > 0) {
+                    summaryBody.push([
+                        `Sub-Total ( Non-Taxable ) (${oModel.Currency})`,
+                        Formatter.fromatNumber(oModel.SubTotalNotGST)
+                    ]);
+                }
+
+                if (oModel.SubTotalInGST > 0) {
+                    summaryBody.push([
+                        `Sub-Total ( Taxable ) (${oModel.Currency})`,
+                        Formatter.fromatNumber(oModel.SubTotalInGST)
+                    ]);
+                }
+
+                const percentageText = oModel.Value !== undefined ? `(${oModel.Value}%)` : `(${type.split(" ")[1]})`;
+                const cgstPercentage = percentageText;
+                const sgstPercentage = percentageText;
+                const igstPercentage = percentageText;
+
+                if (oModel.Currency !== "USD") {
+                    const cgstValue = parseFloat(oModel.CGST) || 0;
+                    const sgstValue = parseFloat(oModel.SGST) || 0;
+                    const igstValue = parseFloat(oModel.IGST) || 0;
+
+                    if (oModel.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST")) {
+                        summaryBody.push([`CGST ${cgstPercentage}`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
+                        summaryBody.push([`SGST ${sgstPercentage}`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
+                    } else if ((oModel.Type === "IGST" && oModel.Currency === "INR") || type.split(" ")[0] === "IGST") {
+                        summaryBody.push([`IGST ${igstPercentage}`, Formatter.fromatNumber(igstValue.toFixed(2))]);
+                    }
+                }
+
+                const totalRowIndex = summaryBody.length;
+                summaryBody.push([`Total (${oModel.Currency})`, Formatter.fromatNumber(oModel.TotalAmount)]);
+
+                doc.autoTable({
+                    startY: currentY,
+                    head: [],
+                    body: summaryBody,
+                    theme: 'plain',
+                    styles: {
+                        font: "times",
+                        fontSize: 10,
+                        halign: "right",
+                        cellPadding: 2
+                    },
+                    columnStyles: {
+                        0: { halign: "right", cellWidth: 60 },
+                        1: { halign: "right", cellWidth: 40 }
+                    },
+                    margin: { left: 96 },
+                    didParseCell: function (data) {
+                        if (data.row.index === totalRowIndex) {
+                            data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
+                            data.cell.styles.lineColor = [0, 0, 0];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+
+                currentY = doc.lastAutoTable.finalY + 10;
+                checkPageSpace(25);
+
+                oModel.AmountInWords = totalInWords;
+                doc.setFont("times", "bold");
+                doc.text("Amount in Words:", 13, currentY);
+                currentY += 5;
+                doc.setFont("times", "normal");
+                const amountHeight = doc.getTextDimensions(oModel.AmountInWords || "").h;
+                doc.text(oModel.AmountInWords || "", 13, currentY, { maxWidth: 180 });
+                currentY += amountHeight + 10;
+
+                checkPageSpace(40);
+                doc.setFont("times", "bold").setFontSize(11);
+                doc.text("PAYMENT METHOD :", margin - 2, currentY);
+                currentY += 5;
+
+                const paymentDetails = [
+                    { label: "Bank Name", value: "Kotak Mahindra Bank Limited" },
+                    { label: "Account Name", value: "Kalpavriksha Technologies" },
+                    { label: "Account No", value: "0648506056" },
+                    { label: "IFSC Code", value: "KKBK0008249" },
+                    { label: "Swift Code", value: "KKBKINBBCPC" },
+                    { label: "Pay By ", value: Formatter.formatDate(oModel.PayByDate) }
+                ];
+
+                paymentDetails.forEach(detail => {
+                    doc.setFont("times", "bold");
+                    const label = `${detail.label} :`;
+                    const labelWidth = doc.getTextWidth(label);
+                    doc.text(label, margin - 2, currentY);
+                    doc.setFont("times", "normal");
+                    doc.text(detail.value, margin + labelWidth, currentY);
+                    currentY += 5;
+                });
+
+                checkPageSpace(35);
+                const forLabelY = currentY + 5;
+                doc.setFont("helvetica", "bold").setFontSize(11);
+                doc.text("For: " + oCompanyDetailsModel.companyName, rightAlignX + 2, forLabelY);
+
+                const logoXPosition = rightAlignX + 20;
+                const logoYPosition = forLabelY + 2;
+                doc.addImage(signature, 'JPEG', logoXPosition, logoYPosition, 57, 13);
+
+                const partnersYPosition = logoYPosition + 18;
+                doc.setFont("helvetica", "bold").setFontSize(11);
+                doc.text(oCompanyDetailsModel.headOfCompany, rightAlignX + 38, partnersYPosition);
+                doc.text(oCompanyDetailsModel.designation, rightAlignX + 28, partnersYPosition + 5);
+
+                doc.setFont("times", "normal").setFontSize(11);
+                doc.text("Thank you for your business!", margin - 2, partnersYPosition + 10);
+
+                const totalPages = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    doc.setPage(i);
+                    this.addFooter(doc, oCompanyDetailsModel, pageWidth, pageHeight, i, totalPages);
+                }
+
+                doc.save(`${oModel.CustomerName}-${oModel.InvNo}-Invoice.pdf`);
+            },
 
 
+            addFooter: function (doc, oCompanyDetailsModel, pageWidth, pageHeight, currentPage, totalPages) {
+                const compFooterAddress = oCompanyDetailsModel.longAddress || "";
+                const CompGSTIN = oCompanyDetailsModel.gstin || "";
+                const CompLUTNo = oCompanyDetailsModel.lutno || "";
+                const CompMobileNo = oCompanyDetailsModel.mobileNo || "";
+                const CompJURISDICTION = oCompanyDetailsModel.city || "";
+
+                const footerHeight = 18;
+                const footerYPosition = pageHeight - footerHeight;
+                const footerWidth = pageWidth;
+
+                doc.setFillColor(128, 128, 128);
+                doc.rect(0, footerYPosition, footerWidth, footerHeight, 'F'); // Grey footer background
+
+                doc.setFont("helvetica", "normal").setFontSize(8);
+                doc.setTextColor(255, 255, 255); // White text
+
+                const textYPosition = footerYPosition + 5;
+                const lineHeight = 5;
+
+                doc.setFontSize(8);
+                doc.text(`SUBJECT TO ${CompJURISDICTION} JURISDICTION`, footerWidth / 2, textYPosition, { align: 'center' });
+
+                doc.setFontSize(10);
+                const addressLines = doc.splitTextToSize(compFooterAddress, footerWidth - 100);
+                let currentYPosition = textYPosition + 5;
+
+                doc.setFontSize(10);
+                doc.text(` GSTIN : ${CompGSTIN}`, footerWidth - 5, currentYPosition, { align: 'right' });
+                doc.text(` Mobile No : ${CompMobileNo}`, footerWidth / 2 - 44, currentYPosition + 5, { align: 'center' });
+                doc.text(`LUT No : ${CompLUTNo}`, footerWidth - 5, currentYPosition + 5, { align: 'right' });
+
+                addressLines.forEach((line) => {
+                    doc.text(line, 5, currentYPosition);
+                    currentYPosition += lineHeight;
+                });
+            }
         });
     });

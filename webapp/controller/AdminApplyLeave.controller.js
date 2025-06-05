@@ -427,7 +427,7 @@ sap.ui.define(
 
                     // Process leave records
                     leaveRecords.forEach(function (record) {
-                        if (record["Status"] !== "Rejected") {
+                        if (record["status"] !== "Rejected") {
                             var fromDate = that.onFormatDate(that.Formatter.formatDate(record.fromDate));
                             var toDate = that.onFormatDate(that.Formatter.formatDate(record.toDate));
                             if (fromDate && toDate) {

@@ -125,7 +125,6 @@ sap.ui.define(
                 // Common function to fetch invoice data
                 commonFetchInvoiceData:  function(invoiceNo, userId) {
                     const requestData = {InvoiceNo: invoiceNo, EmployeeID: userId};
-                    this.getBusyDialog(); // <-- Open custom BusyDialog
                     this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
                             this.InvoiceNo = oData.data;
                             this.EmployeeID = oData.data;
@@ -165,7 +164,8 @@ sap.ui.define(
                     const requestData = { InvoiceNo: invoiceNo, EmployeeID: userId };
                     try {
                         const oData = await this.ajaxReadWithJQuery("ConsultantInvoiceItem", requestData);
-                        const items = oData.data;
+                        if(oData && oData.data){
+                            var items = Array.isArray(oData.data) ? oData.data : [oData.data];
                         // Sort items
                         items.sort((a, b) => {
                             const valueA = a.Item || '';
@@ -189,11 +189,11 @@ sap.ui.define(
                             item.IndexNo = index + 1;
                         });
 
-                        // Set ConsultantInvoiceItem in model
+                        //  Set ConsultantInvoiceItem in model
                         const oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
-                        oInvoiceModel.setProperty("/ConsultantInvoiceItem", items);
+                        oInvoiceModel.setProperty("/ConsultantInvoiceItem", items || []);
                         this.byId("CI_id_ConsultantInvoiceDeatailTable").getBinding("items").refresh(true);
-
+                    
                         const invoiceItemData = oData.data[0];
                         const oModelDataPro = this.getView().getModel("oModelDataPro");
                         oModelDataPro.setProperty("/CGST", parseFloat(invoiceItemData.CGST) || 0);
@@ -206,16 +206,23 @@ sap.ui.define(
                         oModelDataPro.setProperty("/IGSTVisible", invoiceItemData.IGST && (!invoiceItemData.CGST || !invoiceItemData.SGST) ? true : false);
 
                         // Update total amount
-                        await this.CI_updateTotalAmount();
+                       this.CI_updateTotalAmount();
 
-                        // Control column visibility based on GSTNO
-                        const gstNo = oInvoiceModel.getProperty("/GSTNO");
-                        const isGSTNOVisible = !!gstNo;
+                        var gstNo = oInvoiceModel.getProperty("/GSTNO");
+                        var isGSTNOVisible = !!gstNo; // Check if GSTNO exists 
                         this.byId("CI_id_ConsultantInvoiceDeatailTable").getColumns()[2].setVisible(isGSTNOVisible);
 
-                        // Show/hide GSTCalculation column
-                        const allEmptyGST = items.every(item => !item.GSTCalculation || item.GSTCalculation.trim() === "");
-                        this.byId("CI_id_GSTCalc").setVisible(!allEmptyGST);
+                        var gstCalculation = items.every(function (item) {
+                        return !item.GSTCalculation || item.GSTCalculation.trim() === "";
+                        });
+
+                        var gstColumn = this.byId("CI_id_GSTCalc");
+                        if (gstCalculation) {
+                        gstColumn.setVisible(false);
+                        } else {
+                        gstColumn.setVisible(true);
+                        }
+                        }
                     } catch (error) {
                         MessageToast.show(error.message || error.responseText);
                     } finally {
@@ -264,8 +271,8 @@ sap.ui.define(
                     );
                 },
 
-                readFunction: async function (entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress) {
-                     await this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
+                readFunction:function (entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress) {
+                        this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
                         var oJSONModel = new sap.ui.model.json.JSONModel(oData);
                         this.getView().setModel(oJSONModel, modelName);
 
@@ -394,6 +401,7 @@ sap.ui.define(
                         GSTCalculation: (currency === "INR") ? "YES" : "",
                         Days: "",
                         UnitPrice: "",
+                        Discount: "",
                         Total: "",
                         Currency: "INR"
                     };
@@ -444,7 +452,7 @@ sap.ui.define(
                     this.CI_updateTotalAmount();
                 },
 
-                CI_updateTotalAmount: async function () {
+                CI_updateTotalAmount:function () {
                     var oModel = this.getView().getModel("oModelDataPro");
                     var oConsultantInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
                     var aItems = oConsultantInvoiceModel.getProperty("/ConsultantInvoiceItem") || [];
