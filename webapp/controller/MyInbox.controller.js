@@ -158,7 +158,7 @@ sap.ui.define([
     valueSetFunction(text, oDialogTitle) {
       sap.ui.getCore().byId("MIF_id_OkBtn").setText(text);
       var isAccount = this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant"
-      var oValue = isAccount ? this.oModelData?.AccountRemark : this.oModelData?.ManagerComment;
+      var oValue = isAccount && this.oModelData?.AccountRemark ? this.oModelData?.AccountRemark : this.oModelData?.ManagerComment;
       sap.ui.getCore().byId("MIF_id_remark").setValue(oValue || "");
       sap.ui.getCore().byId("MIF_id_DialogManRemark").setTitle(oDialogTitle);
     },
