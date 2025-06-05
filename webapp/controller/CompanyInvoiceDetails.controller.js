@@ -59,9 +59,9 @@ sap.ui.define([
                 }), "FilteredSOWModel");
 
                 if(this.getView().getModel("CompanyInvoiceModel").getData().length === 0) {
-                    var LastInvoiceDate = new Date(this.getView().getModel("CompanyInvoiceModel").getData()[0].InvoiceDate)
-                }else{
                     var LastInvoiceDate = new Date()
+                }else{
+                    var LastInvoiceDate = new Date(this.getView().getModel("CompanyInvoiceModel").getData()[0].InvoiceDate)
                 }
 
                 oView.setModel(new JSONModel({
