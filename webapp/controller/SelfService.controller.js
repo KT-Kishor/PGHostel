@@ -2050,8 +2050,19 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.oModel.setProperty("/SelectedFilters", filters);
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             },
+
             onApplyResignation: async function () {
                 await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation", ["RF_id_StartDate", "RF_id_EndDate"]);
+                let oModel = this.getView().getModel("sEmployeeModel");
+                let oData = oModel.getProperty("/0");
+                if (oData.ResignationStartDate && oData.ResignationEndDate && oData.ResignComment) {
+                    this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
+                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
+                    this._onPressPreview("Initial");
+                } else {
+                    this.getView().getModel("viewModel").setProperty("/BtnVisible", true);
+                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
+                }
             },
             RF_onPressCloseDialog: function () {
                 // Only clear if resignation is NOT applied
@@ -2066,25 +2077,30 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 if (bPreviewFlag) {
                     this._onPressApplyResign();
                 } else {
-                    this._onPressPreview();
+                    this._onPressPreview("Preview");
                 }
             },
 
             //download certificate
-            _onPressPreview: function () {
-                if (
-                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("RF_id_ResignReason"), "ID") ||
-                    !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_StartDate"), "ID") ||
-                    !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_EndDate"), "ID")
-                ) {
-                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                    return;
-                }
+            _onPressPreview: function (flag) {
                 var oEmployeeModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var startDate = Formatter.formatDate(oEmployeeModel.ResignationStartDate)
+                var endDate = Formatter.formatDate(oEmployeeModel.ResignationEndDate)
+                if (flag !== "Initial") {
+                    if (
+                        !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("RF_id_ResignReason"), "ID") ||
+                        !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_StartDate"), "ID") ||
+                        !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_EndDate"), "ID")
+                    ) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
+
+                    var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue();
+                    var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue();
+                }
                 var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
                 var joinDate = Formatter.formatDate(oEmployeeModel.JoiningDate);
-                var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue();
-                var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue();
                 var resignComment = oEmployeeModel.ResignComment;
                 var designation = oEmployeeModel.Designation;
                 var managerName = oEmployeeModel.ManagerName;
@@ -2169,10 +2185,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             // Show Withdraw button (set a flag in your model)
                             that.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
                             that.getView().getModel("viewModel").setProperty("/BtnVisible", false);
-                            sap.ui.getCore().byId("RF_id_StartDate").setEnabled(false);
-                            sap.ui.getCore().byId("RF_id_EndDate").setEnabled(false);
-                            sap.ui.getCore().byId("RF_id_ResignReason").setEnabled(false);
-                            sap.ui.getCore().byId("RF_id_RTE").setEditable(false);
+                            that.getView().getModel("viewModel").setProperty("/editableResignatin",false)
+                            ;
                             that.SSReg_oDialog.close();
                         } catch (error) {
                             MessageToast.show(error.message || "Failed to send resignation email.");
@@ -2228,12 +2242,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             sap.ui.getCore().byId("RF_id_EndDate").setValue("");
                             sap.ui.getCore().byId("RF_id_ResignReason").setValue("");
                             sap.ui.getCore().byId("RF_id_RTE").setValue(""); // If you want to clear the RTE
-                            sap.ui.getCore().byId("RF_id_RTE").setEditable(true);
-                            sap.ui.getCore().byId("RF_id_StartDate").setEnabled(true);
-                            sap.ui.getCore().byId("RF_id_EndDate").setEnabled(true);
-                            sap.ui.getCore().byId("RF_id_ResignReason").setEnabled(true);
-
-                            // Reset preview flag and text in PDFData model
+                            that.getView().getModel("viewModel").setProperty("/editableResignatin",true)
+                                                       // Reset preview flag and text in PDFData model
                             that.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                             that.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
 
