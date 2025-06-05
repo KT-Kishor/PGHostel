@@ -22,7 +22,7 @@
 			columnsL="1"
 			columnsM="1">
 				<f:content>	
-				<MessageStrip text="{i18n>attachmentMessage}" type="Warning" enableFormattedText="true" showIcon="true" showCloseButton="false"/>
+				<MessageStrip text="{i18n>attachmentMessage}" type="Information" enableFormattedText="true" showIcon="true" showCloseButton="false"/>
 					<Label text="{i18n>itemID}"/>
 					<Input value="{ExpenseCreateModel>/IndexNo}" editable="false" />
 					<!-- Item Type -->
