@@ -58,11 +58,16 @@ sap.ui.define([
                     Total: "", gstAmount: "", TotalAmount: "", subTotal: ""
                 }), "FilteredSOWModel");
 
+                if(this.getView().getModel("CompanyInvoiceModel").getData().length === 0) {
+                    var LastInvoiceDate = new Date(this.getView().getModel("CompanyInvoiceModel").getData()[0].InvoiceDate)
+                }else{
+                    var LastInvoiceDate = new Date()
+                }
+
                 oView.setModel(new JSONModel({
                     createVisi: true, editVisi: false, editable: true, igstVisi: false, gstVisiable: false,
                     flexVisiable: false, CInvoice: false, addInvBtn: true, merge: false, GST: true, payByDate: false,
-                    Form: true, Table: false, MultiEmail: true, Edit: true, IncomeTax: true, minDate: new Date(this.getView().getModel("CompanyInvoiceModel").getData()[0].InvoiceDate)
-                }), "visiablityPlay");
+                    Form: true, Table: false, MultiEmail: true, Edit: true, IncomeTax: true, minDate: LastInvoiceDate}), "visiablityPlay");
 
                 this.visiablityPlay = oView.getModel("visiablityPlay");
                 this.visiablityPlay.setProperty("/Edit", false);

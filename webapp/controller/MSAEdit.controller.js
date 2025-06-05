@@ -71,6 +71,9 @@ sap.ui.define([
             },
 
             SOW_onCloseFrag: function () {
+                sap.ui.getCore().byId("SOW_id_MsaDesc").setValueState("None");
+                sap.ui.getCore().byId("SOW_id_EndDate").setValueState("None");
+                sap.ui.getCore().byId("SOW_id_StartDate").setValueState("None");
                 this.SOW_oDialog.close();
                 this.byId("Sow_Id_ReadTable").removeSelections();
             },
@@ -219,8 +222,8 @@ sap.ui.define([
             },
 
             SOW_onSaveFrag: async function () {
-                this.getBusyDialog();
                 if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID")) {
+                    this.getBusyDialog();
                     var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
                     var sowCreateModel = this.getView().getModel("sowCreateModel").getData();
                     var oJson = {
@@ -268,9 +271,17 @@ sap.ui.define([
                         this.SOW_oDialog = SOW_oDialog;
                         this.getView().addDependent(this.SOW_oDialog);
                         this.SOW_oDialog.open();
+                        var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
+                        if (oTable) {
+                            oTable.removeSelections(true); // true = clears selection without triggering events
+                        }
                     }.bind(this));
                 } else {
                     this.SOW_oDialog.open();
+                    var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
+                    if (oTable) {
+                        oTable.removeSelections(true); // true = clears selection without triggering events
+                    }
                 }
             },
 
@@ -576,7 +587,7 @@ sap.ui.define([
             },
 
             SOW_onSubmitFrag: async function () {
-                this.getBusyDialog();
+                // this.getBusyDialog();
                 const oModelDataPro = this.getView().getModel("oModelDataPro").getData();
                 const sowCreateModel = this.getView().getModel("sowCreateModel").getData();
 
