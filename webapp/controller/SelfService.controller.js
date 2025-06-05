@@ -2055,13 +2055,21 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation", ["RF_id_StartDate", "RF_id_EndDate"]);
                 let oModel = this.getView().getModel("sEmployeeModel");
                 let oData = oModel.getProperty("/0");
+                if (!oData) {
+                    // Data not loaded yet, fetch and retry
+                    await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
+                    oData = oModel.getProperty("/0");
+                }
                 if (oData.ResignationStartDate && oData.ResignationEndDate && oData.ResignComment) {
                     this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
+                    this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
+
                     this._onPressPreview("Initial");
                 } else {
                     this.getView().getModel("viewModel").setProperty("/BtnVisible", true);
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
+                    this.getView().getModel("viewModel").setProperty("/editableResignatin", true)
                 }
             },
             RF_onPressCloseDialog: function () {
@@ -2185,8 +2193,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             // Show Withdraw button (set a flag in your model)
                             that.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
                             that.getView().getModel("viewModel").setProperty("/BtnVisible", false);
-                            that.getView().getModel("viewModel").setProperty("/editableResignatin",false)
-                            ;
+                            that.getView().getModel("viewModel").setProperty("/editableResignatin", false)
+                                ;
                             that.SSReg_oDialog.close();
                         } catch (error) {
                             MessageToast.show(error.message || "Failed to send resignation email.");
@@ -2242,8 +2250,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             sap.ui.getCore().byId("RF_id_EndDate").setValue("");
                             sap.ui.getCore().byId("RF_id_ResignReason").setValue("");
                             sap.ui.getCore().byId("RF_id_RTE").setValue(""); // If you want to clear the RTE
-                            that.getView().getModel("viewModel").setProperty("/editableResignatin",true)
-                                                       // Reset preview flag and text in PDFData model
+                            that.getView().getModel("viewModel").setProperty("/editableResignatin", true)
+                            // Reset preview flag and text in PDFData model
                             that.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                             that.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
 
