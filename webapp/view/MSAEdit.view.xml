@@ -208,7 +208,7 @@
 						</ObjectPageSubSection>
 					</subSections>
 				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" title="PO">
+				<!-- <ObjectPageSection titleUppercase="false" title="PO">
 					<subSections>
 						<ObjectPageSubSection title=" " titleUppercase="false">
 							<blocks>
@@ -216,7 +216,7 @@
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
-				</ObjectPageSection>
+				</ObjectPageSection> -->
 			</sections>
 		</ObjectPageLayout>
 	</m:Page>
