@@ -1520,8 +1520,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 // Check if both PF values exist
                 if (EmployeePF > 0 && EmployerPF > 0) {
                     oRadioGroup.setVisible(false); // Hide entire radio button group
+                    oRadioGroup.setSelectedIndex(1);
                 } else {
                     oRadioGroup.setVisible(true); // Show the radio button group when PF is not applicable
+                    oRadioGroup.setSelectedIndex(0);
                 }
             },
 
@@ -1565,7 +1567,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.CommonCalculation();
             },
 
-            CommonCalculation: function () {
+            CommonCalculation:async function () {
                 var AppraisalModel = this.getView().getModel("AppraisalModel");
                 var salaryData = this.getView().getModel("salaryData").getData();
 
@@ -1637,6 +1639,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             onPressAppraisalSave: async function () {
+                await this.CommonCalculation();
                 var oSelect = sap.ui.getCore().byId("ED_Frg_idAppraisalType");
                 var CTCType = oSelect.getSelectedItem().getText();
 
