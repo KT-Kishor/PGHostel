@@ -3,11 +3,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         "use strict";
         return Controller.extend("sap.kt.com.minihrsolution.controller.SelfService", {
             Formatter: Formatter,
-            onInit() {
+            onInit: function () {
                 const today = new Date();
                 const nextMonthFirstDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+                const maxDate18YearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
                 var oDateModel = new sap.ui.model.json.JSONModel();
-                oDateModel.setData({ maxDate: new Date(), focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1), nextMonthMinDate: nextMonthFirstDate });
+                oDateModel.setData({maxDate: maxDate18YearsAgo,focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1), nextMonthMinDate: nextMonthFirstDate});
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("SelfService").attachMatched(this._onRouteMatched, this);
             },
@@ -560,7 +561,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
                                         };
                                         if (flag) {
-                                           // sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("managerUpdate"));
+                                            // sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("managerUpdate"));
                                         } else {
                                             sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("commomerror"));
                                         }
@@ -2079,7 +2080,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
                         this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
                     }
-                    
+
                     this._onPressPreview("Initial");
                 } else {
                     this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)

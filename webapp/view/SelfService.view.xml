@@ -404,6 +404,7 @@
                                             value="{path:'sEmployeeModel>/0/ResignationEndDate', formatter:'.Formatter.formatDate'}"
                                             change="onChangeResigEndDate"
                                             displayFormat="dd/MM/yyyy"
+                                            valueFormat="dd/MM/yyyy"
                                             editable="{viewModel>/AdminRole}"
                                              visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                         />
