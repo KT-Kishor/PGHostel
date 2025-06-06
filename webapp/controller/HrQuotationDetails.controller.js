@@ -1077,6 +1077,7 @@ sap.ui.define(
             cellPadding: 3,
             lineWidth: 0.5,
             lineColor: [30, 30, 30],
+            halign: "center"
           },
           columnStyles:
           {
