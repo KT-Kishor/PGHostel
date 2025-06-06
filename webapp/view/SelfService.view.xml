@@ -145,7 +145,7 @@
                                                 press="SS_onEditPress"
                                                 type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
                                                 tooltip="{i18n>editDetails}"
-                                                visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}" />
+                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
 
 										</m:Toolbar>
 									</f:toolbar>
@@ -688,8 +688,8 @@
                                                 press="SS_onEditPress"
                                                 type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
                                                 tooltip="{i18n>editDetails}"
-                                                visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}"  />										
-                                  </m:Toolbar>
+                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>      
+                                    </m:Toolbar>
 									</f:toolbar>
 									<f:content>
 										<m:Label
@@ -883,21 +883,21 @@
                                                 tooltip="{i18n>toolEAddEdu}"
                                                 press="EdF_AddEdu"
                                                 type="Accept"
-                                               visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}" />
+                                               visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
 											<m:Button
                                                 text="{i18n>edit}"
                                                 id="EdF_id_EduEdit"
                                                 tooltip="{i18n>toolEEditEdu}"
                                                 press="EDF_EditEducation"
                                                 type="Emphasized"
-                                                visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}" />
+                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
 											<m:Button
                                                 text="{i18n>delete}"
                                                 id="EdF_id_EduDelete"
                                                 tooltip="{i18n>toolDeleteEdu}"
                                                 press="EdF_DeletEdu"
                                                 type="Reject"
-                                                visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}" />
+                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
 										</m:OverflowToolbar>
 									</m:headerToolbar>
 									<m:columns>
@@ -977,7 +977,7 @@
 											<m:ToolbarSpacer />
 											<m:Button
                                                 id="EmpF_id_RefButton"
-                                                visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}"
+                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                                 tooltip="{i18n>referenceDetails}"
                                                 press="EmpF_onReferenceDetails"
                                                 type="Ghost"
@@ -988,7 +988,7 @@
                                                 press="EmpF_onAddEmployment"
                                                 type="Accept"
                                                 tooltip="{i18n>toolAddEmp}"
-                                                visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}"
+                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                             />
 											<m:Button
                                                 text="{i18n>edit}"
@@ -996,7 +996,7 @@
                                                 type="Emphasized"
                                                 tooltip="{i18n>toolEditEmp}"
                                                 id="EmpF_id_EmpEdit"
-                                                visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}"
+                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                             />
 											<m:Button
                                                 text="{i18n>delete}"
@@ -1004,7 +1004,7 @@
                                                 type="Reject"
                                                 tooltip="{i18n>toolDelEmp}"
                                                 id="EmpF_id_EmpDelete"
-                                                visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}"
+                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                             />
 										</m:OverflowToolbar>
 									</m:headerToolbar>
@@ -1102,10 +1102,10 @@
                                                     text="{i18n>documentType}"
                                                     showColon="true"
                                                     required="true"
-                                                    visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}"
+                                                    visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                                 />
 												<m:ComboBox
-                                                   visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}"
+                                                   visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                                     items="{DocumentJson>/documents}"
                                                     id="SS_id_DocType"
                                                     change="onDocumentTypeChange"
@@ -1118,7 +1118,7 @@
 												</m:ComboBox>
 												<m:ToolbarSeparator />
 												<u:FileUploader
-                                                    visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}"
+                                                    visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                                     fileSizeExceed="onFileSizeExceeds"
                                                     maximumFileSize="3MB"
                                                     typeMissmatch="onFileTypeMissmatch"
@@ -1130,7 +1130,7 @@
                                                     iconFirst="true"
                                                 />
 												<m:Button
-                                                    visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}"
+                                                    visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                                     id="downloadSelectedButton"
                                                     text="{i18n>delete}"
                                                     type="Reject"
@@ -1141,7 +1141,7 @@
                                                     id="DeleteSelectedButton"
                                                     text="{i18n>Download}"
                                                     type="Ghost"
-                                                    visible="{= ( ${viewModel>/SelfServiceBtn} &amp;&amp; (${LoginModel>/Role} === 'Admin'  || ${LoginModel>/Role} === 'HR Manager'  ||  ${LoginModel>/Role} === 'HR')) || ${sEmployeeModel>/0/Type} === 'Save'}"
+                                                    visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                                     press="onDownloadFiles"
                                                     enabled="false"
                                                 />
