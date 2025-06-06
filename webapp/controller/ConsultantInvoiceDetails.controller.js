@@ -19,7 +19,7 @@ sap.ui.define(
         },
                     _onRouteMatched: async function(oEvent) {
                     try {
-                        var LoginFUnction =  this.commonLoginFunction("ConsultantInvoice");
+                        var LoginFUnction =  await this.commonLoginFunction("ConsultantInvoice");
                         if (!LoginFUnction) return;
                         this._makeDatePickersReadOnly(["CI_id_InDate", "CI_id_PaybyInv"]);
                         this.i18nModel = this.getView().getModel('i18n').getResourceBundle();
@@ -35,23 +35,18 @@ sap.ui.define(
                         this.Discount = true;
                         this.UnitAmount = true;
                         this.getBusyDialog()
-                         // Initialize default models only once
-                        if (!this.getView().getModel("InvoiceSACModel")) {
-                                this._fetchCommonData("CompanyInvoiceSAC", "InvoiceSACModel"),
-                                this._fetchCommonData("Currency", "CurrencyModel")
-                        }
+                        if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
+                        if (!this.getView().getModel("InvoiceSACModel")) this._fetchCommonData("CompanyInvoiceSAC", "InvoiceSACModel");
+                        if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice" });
+                        if (!this.getView().getModel("CompanyCodeDetailsModel")) this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
 
-                        await Promise.all([
-                            this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice" }),
-                            this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel")
-                        ]);
                         var oInvoiceModel = new JSONModel({
                             EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",
                             InvoiceNo: "", InvoiceDate: "", ConsultantAddress: "", GSTNO: "",
                             CompanyGSTNO: "", MobileNo: "", CGST: false, SGST: false, IGST: false,
                             BankName: "", AccountName: "", AccountNo: "", IFSCCode: "", PayBy: "",
                             GSTValid: false, CGSTSelected: false, IGSTSelected: false, Percentage: "",
-                            Currency: "INR", STDCode: "+91"
+                            Currency: "INR", STDCode: "+91",ConsultantInvoiceItem:[]
                         });
                         this.getView().setModel(oInvoiceModel, "ConsultantInvoiceModel");
 
@@ -106,9 +101,9 @@ sap.ui.define(
                 });
                 },
 
-                onFetchContractDetails: function() {
+                onFetchContractDetails: async function() {
                     try {
-                        const contractData = this.ajaxReadWithJQuery("EmployeeContract", {
+                        const contractData = await this.ajaxReadWithJQuery("EmployeeContract", {
                             Type: "Contract"
                         });
                         var jsonModel = new sap.ui.model.json.JSONModel({
@@ -192,8 +187,8 @@ sap.ui.define(
                         //  Set ConsultantInvoiceItem in model
                         const oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
                         oInvoiceModel.setProperty("/ConsultantInvoiceItem", items || []);
-                        this.byId("CI_id_ConsultantInvoiceDeatailTable").getBinding("items").refresh(true);
-                    
+                        oInvoiceModel.refresh(true);
+                        
                         const invoiceItemData = oData.data[0];
                         const oModelDataPro = this.getView().getModel("oModelDataPro");
                         oModelDataPro.setProperty("/CGST", parseFloat(invoiceItemData.CGST) || 0);

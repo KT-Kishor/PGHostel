@@ -189,12 +189,12 @@
 										<m:Button visible="{visiablityPlay>/invBtn}"  text="{i18n>addItem}" tooltip="{i18n>addItem}" press="CI_onPressAddInvoiceDetails" type="Accept" />
 										<m:ToolbarSeparator />
 									</m:OverflowToolbar>
-									<m:Table id="CI_id_ConsultantInvoiceDeatailTable" 
+									<m:Table id="CI_id_ConsultantInvoiceDeatailTable"  
+									items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}"
 											mode="Delete" 
 											delete="CI_onPressDelete" 
 											growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0"
-											growingScrollToLoad="true" width="auto" class="sapUiResponsiveMargin"
-											items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}">
+											growingScrollToLoad="true" width="auto" class="sapUiResponsiveMargin">
 										<m:columns>
 											<m:Column width="100px" >
 												<m:customData>
