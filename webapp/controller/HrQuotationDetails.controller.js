@@ -125,7 +125,7 @@ sap.ui.define(
             // Calculate visibility and selection flags
             var cgstVisible = (cgst > 0 || sgst > 0);
             var sgstVisible = cgstVisible;
-            // var igstVisible = (igst > 0);
+            var igstVisible = (igst > 0);
             var cgstSelected = (cgst > 0 || sgst > 0);
             var igstSelected = (igst > 0);
             oSelectedModel.setProperty("/gstEditable", false); // Disable editing
@@ -165,7 +165,7 @@ sap.ui.define(
                   IGSTSelected: igstSelected,
                   CGSTVisible: cgstVisible,
                   SGSTVisible: sgstVisible,
-                  // IGSTVisible: igstVisible,
+                  IGSTVisible: igstVisible,
 
                 });
                 this.getView().setModel(oQuotationModel, "QuotationModel");
@@ -391,7 +391,7 @@ sap.ui.define(
         var sCurrency = this.getView().getModel("SingleCompanyModel").getProperty("/Currency");
         var bIsINR = sCurrency === "INR";
 
-        // 🔧 Declare required variables
+        //  Declare required variables
         var subTotalTaxable = 0;
         var subTotalNonTaxable = 0;
         var cgst = 0;
