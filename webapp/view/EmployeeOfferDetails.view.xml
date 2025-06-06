@@ -30,16 +30,16 @@
                                              items="{Salutation>/salutation}">
 												<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 											</Select>
-											<Label text="{i18n>consultantName}" required="true" />
+											<Label text="{i18n>employeeName}" required="true" />
 											<Input
                                              value="{employeeModel>/ConsultantName}"
-                                             placeholder="{i18n>consultantName}"
+                                             placeholder="{i18n>placeEmpName}"
                                              required="true"
                                              editable="true"
                                              id="EOD_id_Name"
                                              liveChange="EOD_validateName"
                                              maxLength="50"
-                                             valueStateText="{i18n>placeConsultantName}">
+                                             valueStateText="{i18n>placeEmpName}">
 												<layoutData>
 													<l:GridData span="XL4 L4 M6 S9" />
 												</layoutData>

@@ -397,7 +397,7 @@
 										<m:Label
                                             text="{i18n>ResigEndDate}"
                                             required="{= ${sEmployeeModel>/0/EmployeeStatus} === 'Inactive' ? true : false}"
-                                            visible="{viewModel>/WorkCompletedVisible}"
+                                             visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                         />
 										<m:DatePicker
                                             id="SS_id_ResgEndDate"
@@ -405,7 +405,7 @@
                                             change="onChangeResigEndDate"
                                             displayFormat="dd/MM/yyyy"
                                             editable="{viewModel>/AdminRole}"
-                                            visible="{viewModel>/WorkCompletedVisible}"
+                                             visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                         />
 									</f:content>
 								</f:SimpleForm>
@@ -526,7 +526,7 @@
                                                             id="SS_id_AddF"
                                                             editable="{viewModel>/isEditMode}"
                                                             liveChange="SS_ValidateCommonFields"
-                                                            maxLength="120"
+                                                            maxLength="120"                                                           
                                                             valueStateText="{i18n>addressValueState}"
                                                         />
 													</f:content>

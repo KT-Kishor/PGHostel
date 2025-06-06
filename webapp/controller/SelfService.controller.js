@@ -27,7 +27,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this._fetchCommonData("AppVisibility", "RoleModel");
                         this._fetchCommonData("Country", "CountryModel");
                     }
-                    this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
+                    this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
                         fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false,
                         isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false, SelfServiceBtn: false
