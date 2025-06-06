@@ -1700,7 +1700,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             <div style="text-align: justify;">
                 <p> This is to certify that <b>${empName}</b> with Employee ID <b>${empID}</b> has worked with our company <b>${this.companyName}</b> as a <b>${empDesig}</b> from <b>${joiningDate}</b> to <b>${date}</b>. During his tenure with us his contributions to the organization are highly appreciated. He possesses good moral values and the right attitude</p> 
                 <p>With reference to your resignation, you stand relieved from the services of ${this.companyName} with effect from the close of working hours <b>${relievingDate}</b>. We would like you to continue to be bound by the conditions of confidentiality and other relevant terms of the employment agreement you signed with ${this.companyName}</p>
-                <p>Wishing you all the best in your future endeavors</p>
+                <p>Wishing you all the best in your future endeavors.</p>
             </div>`;
                 this.getView().getModel("PDFData").setProperty("/RTEText", data);
                 this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
@@ -2075,6 +2075,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             RF_onPressCloseDialog: function () {
                 // Only clear if resignation is NOT applied
                 if (!this.getView().getModel("viewModel").getProperty("/CanWithdrawResignation")) {
+                    // Clear values
+                    sap.ui.getCore().byId("RF_id_StartDate").setValue("");
+                    sap.ui.getCore().byId("RF_id_EndDate").setValue("");
+                    sap.ui.getCore().byId("RF_id_ResignReason").setValue("");
+                    sap.ui.getCore().byId("RF_id_ResignReason").setValueState("None");
+                    // Reset preview
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                     this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
                 }
