@@ -272,24 +272,17 @@
 														</m:items>
 													</m:VBox>
 													<!-- SAC (Column 3) -->
-													<m:ComboBox 
-														showSecondaryValues="true"
-														items="{InvoiceSACModel>/}"
-														value="{ConsultantInvoiceModel>SAC}"
-														editable="{ConsultantInvoiceModel>/GSTValid}" 
-														selectedKey="1">
-														<core:ListItem key="{InvoiceSACModel>id}" 
-																	additionalText="{InvoiceSACModel>description}" 
-																	text="{InvoiceSACModel>sac}" />
+													<m:ComboBox showSecondaryValues="true" items="{InvoiceSAC>/}" editable="{ConsultantInvoiceModel>/GSTValid}"  value="{ConsultantInvoiceModel>SAC}" selectedKey="1">
+													<core:ListItem key="{InvoiceSAC>ID}" additionalText="{InvoiceSAC>Description}" text="{InvoiceSAC>SAC}" />
 													</m:ComboBox>
 													 <!-- GSTCalculation (Column 4) -->
 													<m:ComboBox 
 														value="{ConsultantInvoiceModel>GSTCalculation}" 
-														selectedKey="1" 
+														selectedKey="Yes" 
 														editable="{ConsultantInvoiceModel>/GSTValid}" 
 														change="CI_onChangeGSTCalculation">
-														<core:Item key="Yes" text="{i18n>yes}" />
-														<core:Item key="No" text="{i18n>no}" />
+														<core:Item key="{i18n>yes}" text="{i18n>yes}"/>
+														<core:Item key="{i18n>no}" text="{i18n>no}"/>
 													</m:ComboBox>
 													 <!-- Days (Column 5) -->
 													<m:Input value="{ConsultantInvoiceModel>Days}" editable="{visiablityPlay>/editable}" change="CI_onInputChange" maxLength="10" textAlign="End"  type="Number"/>

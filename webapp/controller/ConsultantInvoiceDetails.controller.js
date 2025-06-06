@@ -36,9 +36,8 @@ sap.ui.define(
                         this.UnitAmount = true;
                         this.getBusyDialog()
                         if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
-                        if (!this.getView().getModel("InvoiceSACModel")) this._fetchCommonData("CompanyInvoiceSAC", "InvoiceSACModel");
                         if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice" });
-                        if (!this.getView().getModel("CompanyCodeDetailsModel")) this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
+                        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel")
 
                         var oInvoiceModel = new JSONModel({
                             EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",
@@ -80,9 +79,9 @@ sap.ui.define(
                             this.readFunction("ConsultantInvoiceItem", "oModelDataPro", true);
                             this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("Delete");
                         } else {
-                            this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID),
-                            this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
-                            this.setVisibilityForEdit();
+                            await this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID),
+                            await this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
+                            await this.setVisibilityForEdit();
                         }
                         await this.onFetchContractDetails();
                         oComboBox.setSelectedKey("");
@@ -110,7 +109,6 @@ sap.ui.define(
                             contractDetails: contractData.data
                         });
                         this.getView().setModel(jsonModel, "contractModel");
-                         this.closeBusyDialog(); // <-- Close custom BusyDialog
                     } catch (error) {
                          this.closeBusyDialog(); // <-- Close custom BusyDialog
                          MessageToast.show(error.message || error.responseText);
@@ -118,9 +116,9 @@ sap.ui.define(
                 },
 
                 // Common function to fetch invoice data
-                commonFetchInvoiceData:  function(invoiceNo, userId) {
+                commonFetchInvoiceData: async  function(invoiceNo, userId) {
                     const requestData = {InvoiceNo: invoiceNo, EmployeeID: userId};
-                    this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
+                    await this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
                             this.InvoiceNo = oData.data;
                             this.EmployeeID = oData.data;
                             if (oData.data.length > 0) {
@@ -147,7 +145,6 @@ sap.ui.define(
                                 this.getView().setModel(oNavigationModel, "ConsultantInvoiceModel");
                                 this.getView().byId("CI_id_InputGSTNO").setEnabled(invoiceData.Currency === "INR");
                             }
-                             this.closeBusyDialog(); // <-- Close custom BusyDialog
                         }.bind(this))
                         .catch(function(error) {
                              this.closeBusyDialog(); // <-- Close custom BusyDialog
@@ -266,8 +263,8 @@ sap.ui.define(
                     );
                 },
 
-                readFunction:function (entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress) {
-                        this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
+                readFunction:async function (entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress) {
+                       await  this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
                         var oJSONModel = new sap.ui.model.json.JSONModel(oData);
                         this.getView().setModel(oJSONModel, modelName);
 
@@ -289,10 +286,7 @@ sap.ui.define(
                                 this.Copy = false;
                             }
 
-                            var oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
-                            oInvoiceModel.setProperty("/MobileNo", MobileNo || "");
-                            oInvoiceModel.setProperty("/ConsultantAddress", ConsultantAddress || "");
-
+                            var oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");                        
                             if (this.Copy === false && this.Copy !== undefined) {
                                 oInvoiceModel.setProperty("/EmployeeID", this.EmployeeID);
                                 oInvoiceModel.setProperty("/ConsultantName", this.ConsultantName);
@@ -303,6 +297,9 @@ sap.ui.define(
                                 oInvoiceModel.setProperty("/EmployeeID", loginData.EmployeeID);
                                 oInvoiceModel.setProperty("/ConsultantName", loginData.EmployeeName);
                             }
+
+                            oInvoiceModel.setProperty("/MobileNo", MobileNo || "");
+                            oInvoiceModel.setProperty("/ConsultantAddress", ConsultantAddress || "");
 
                             var oToday = new Date();
                             oToday.setHours(0, 0, 0, 0);
@@ -389,7 +386,6 @@ sap.ui.define(
                         IndexNo: oData.ConsultantInvoiceItem.length > 0
                             ? oData.ConsultantInvoiceItem[oData.ConsultantInvoiceItem.length - 1].IndexNo + 1
                             : 1,
-                        SlNo: globalThis.crypto.randomUUID(),
                         EmployeeID: employeeID,
                         Item: "",
                         SAC: "",
