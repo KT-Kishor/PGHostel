@@ -1752,30 +1752,31 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
             },
 
-            SS_onDownloadSalLetter: async function () {
-                const { jsPDF } = window.jspdf;
+                       SS_onDownloadSalLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var today = new Date();
+                var date = Formatter.formatDate(today);
+                var joiningDate = Formatter.formatDate(oEmpModel.JoiningDate);
                 var empID = oEmpModel.EmployeeID;
                 var empDesig = oEmpModel.Designation;
                 var department = oEmpModel.Department;
                 var empName = oEmpModel.Salutation + " " + oEmpModel.EmployeeName;
-                var joiningDate = Formatter.formatDate(oEmpModel.JoiningDate);
-                var today = new Date();
-                var date = Formatter.formatDate(today);
-
-                // HTML data to show in PDF
+                this.getView().getModel("PDFData").setProperty("/CreateDate", date);
+                this.getView().getModel("PDFData").setProperty("/CertificateTitle", "SALARY CERTIFICATE");
                 var data = `
-        <div style="text-align: justify; font-family: Times;">
-            <h2 style="text-align: center;">SALARY CERTIFICATE</h2>
-            <p>Date: <b>${date}</b></p>
-            <p>To Whom It May Concern,</p>
-            <p>This is to certify that <b>${empName}</b>, holding Employee ID <b>${empID}</b>, has been employed with <b>${this.companyName}</b>, an IT services organization, as a <b>${empDesig}</b> in the <b>${department}</b> since <b>${joiningDate}</b>.</p>
-            <p>As of the date of issuance, the details of their current monthly salary are as follows:</p>
-        </div>`;
+                <div style="text-align: justify; font-family: Times;">
+                    <p> This is to certify that <b>${empName}</b>, holding the position of <b>${empDesig}</b> with <b>${this.companyName}</b>, has been employed with us since <b>${joiningDate}</b>.</p>
+                    <p> As of the date of this certificate, the details of their current salary structure are as follows: </p>
+                </div>`;
+                this.getView().getModel("PDFData").setProperty("/RTEText", data);
+                this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
+            },
 
+            FCR_onDownloadPDF: async function () {
                 try {
+                    const empID = this.getView().getModel("sEmployeeModel").getData()[0].EmployeeID;
+                    const empData = this.getView().getModel("sEmployeeModel").getData()[0];
                     const salaryResponse = await this.ajaxReadWithJQuery("SalaryDetails", { EmployeeID: empID });
-
                     let latestSalary;
                     if (Array.isArray(salaryResponse.data)) {
                         const sortedSalaries = salaryResponse.data.sort((a, b) => new Date(a.EffectiveDate) - new Date(b.EffectiveDate));
@@ -1783,81 +1784,24 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     } else {
                         latestSalary = salaryResponse.data;
                     }
-
-                    // Setup jsPDF
-                    const doc = new jsPDF("p", "pt", "a4");
-
-                    // Create invisible container for HTML
-                    const container = document.createElement("div");
-                    container.style.position = "absolute";
-                    container.style.left = "-9999px";
-                    container.innerHTML = data;
-                    document.body.appendChild(container);
-
-                    // Render HTML
-                    await doc.html(container, {
-                        x: 40,
-                        y: 40,
-                        width: 520,
-                        windowWidth: 800,
-                        html2canvas: { scale: 0.6 },
-                        callback: function (doc) {
-                            document.body.removeChild(container); // remove the div
-
-                            //  Insert autoTable below the rendered HTML
-                            const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : doc.previousAutoTable ? doc.previousAutoTable.finalY + 20 : 300;
-
-                            doc.autoTable({
-                                startY: finalY,
-                                head: [['Salary Component', 'Amount (INR)']],
-                                body: [
-                                    ['Basic Salary', Formatter.fromatNumber(latestSalary.BasicSalary)],
-                                    ['House Rent Allowance (HRA)', Formatter.fromatNumber(latestSalary.HRA)],
-                                    ['Conveyance Allowance', Formatter.fromatNumber(latestSalary.Conveyance)],
-                                    ['Special Allowance / Bonus', Formatter.fromatNumber(latestSalary.Bonus)],
-                                    ['Provident Fund (Employer)', Formatter.fromatNumber(latestSalary.EmployerPF)],
-                                    [
-                                        { content: 'Gross Monthly Salary', styles: { fontStyle: 'bold' } },
-                                        { content: Formatter.fromatNumber(latestSalary.GrossSalary), styles: { fontStyle: 'bold' } }
-                                    ],
-                                    [
-                                        { content: 'Net Monthly Salary (Approx.)', styles: { fontStyle: 'bold' } },
-                                        { content: Formatter.fromatNumber(latestSalary.NetSalary), styles: { fontStyle: 'bold' } }
-                                    ]
-                                ],
-                                theme: 'grid',
-                                headStyles: {
-                                    fillColor: [41, 128, 185],
-                                    font: "times",
-                                    fontSize: 10
-                                },
-                                styles: {
-                                    font: "times",
-                                    fontSize: 10,
-                                    cellPadding: 3,
-                                    lineWidth: 0.5,
-                                    lineColor: [30, 30, 30],
-                                },
-                                columnStyles: {
-                                    0: { halign: 'left' },
-                                    1: { halign: 'right' }
-                                }
-                            });
-
-                            // Save final PDF
-                            doc.save(`${empName}_Salary_Certificate.pdf`);
-                        }
-                    });
-
-                    // For RTE preview
-                    this.getView().getModel("PDFData").setProperty("/RTEText", data);
-                    this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
-
+                    var oPDFModel = this.getView().getModel("PDFData");
+                    oPDFModel.setProperty("/YearlyComponents/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.Total));
+                    oPDFModel.setProperty("/YearlyComponents/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.BasicSalary));
+                    oPDFModel.setProperty("/YearlyComponents/2/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.HRA));
+                    oPDFModel.setProperty("/YearlyComponents/3/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.EmployerPF));
+                    oPDFModel.setProperty("/YearlyComponents/4/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.MedicalInsurance));
+                    oPDFModel.setProperty("/YearlyComponents/5/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.Gratuity));
+                    oPDFModel.setProperty("/Deductions/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.TotalDeduction));
+                    oPDFModel.setProperty("/Deductions/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.IncomeTax));
+                    oPDFModel.setProperty("/Deductions/2/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.EmployeePF));
+                    oPDFModel.setProperty("/Deductions/3/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.PT));
+                    oPDFModel.setProperty("/VariableComponents/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.VariablePay));
+                    oPDFModel.setProperty("/GrossPay/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.GrossPay));
+                    oPDFModel.setProperty("/GrossPay/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.GrossPayMontly));
+                    oPDFModel.setProperty("/EmpCTC", empData.Currency + " " + Formatter.fromatNumber(latestSalary.CostofCompany));
                 } catch (error) {
                     MessageToast.show("Failed to fetch salary data.");
                 }
-            },
-            FCR_onDownloadPDF: function () {
                 this.SSRTE_oDialog.close();
                 let htmlContent = sap.ui.getCore().byId("FCR_id_RTE").getValue();
                 this.generateCertificatePDF(htmlContent, this.getView().getModel("sEmployeeModel").getData()[0].BranchCode);
