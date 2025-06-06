@@ -99,215 +99,206 @@ sap.ui.define([
             }
         },
 
-      visibilityFormatter: function (selfServiceBtn, role, type) {
-            var hasPermission = selfServiceBtn 
-                var roleData = (role === 'Admin' || role === 'HR Manager' || role === 'HR');
-
-            var isSaveType = type === 'Save';
-            if(roleData){
-                return hasPermission && roleData || isSaveType ;
-            }else{
-                if(hasPermission === true){
-                    if(isSaveType === true){
-                        return true;
-                    }
-                }else{
-                    return false;
-                }
+        visibilityFormatter: function (selfServiceBtn, role, type) {
+            var isAllowedRole = (role === 'Admin' || role === 'HR Manager' || role === 'HR');
+            var isSaveOrSubmit = (type === 'Save' || type === 'Submit');
+            // Self Service: show only if type is 'Save'
+            if (selfServiceBtn) {
+                return type === 'Save';
             }
-    },
+            return isAllowedRole && isSaveOrSubmit;
+        },
+        formatGrade: function (value) {
+            if (!value) {
+                return "";
+            }
+            if (value.includes("Percentage")) {
+                var data = value.split(" ")
+                return data[0] + " " + "%";
+            }
+            return value;
+        },
 
-    formatGrade: function (value) {
-        if (!value) {
-            return "";
-        }
-        if (value.includes("Percentage")) {
-            var data = value.split(" ")
-            return data[0] + " " + "%";
-        }
-        return value;
-    },
+        companyInvoicePayByDate: function (payByDate, status) {
+            if (!payByDate) return "None";
 
-    companyInvoicePayByDate: function (payByDate, status) {
-        if (!payByDate) return "None";
+            var dueDate = new Date(payByDate);
+            var today = new Date();
 
-        var dueDate = new Date(payByDate);
-        var today = new Date();
+            // Reset time part for accurate comparison
+            dueDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
 
-        // Reset time part for accurate comparison
-        dueDate.setHours(0, 0, 0, 0);
-        today.setHours(0, 0, 0, 0);
+            var timeDiff = dueDate - today;
+            var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-        var timeDiff = dueDate - today;
-        var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            if (status === "Submitted") {
+                return "Indication17";
+            } else if (status === "Payment Received") {
+                return "Success";
+            } else if (status === "Invoice Sent" && daysDiff >= 0) {
+                return "Warning";
+            } else if (status === "Invoice Sent" && daysDiff < 0) {
+                return "Error";
+            } else {
+                return "Indication01";
+            }
+        },
 
-        if (status === "Submitted") {
-            return "Indication17";
-        } else if (status === "Payment Received") {
-            return "Success";
-        } else if (status === "Invoice Sent" && daysDiff >= 0) {
-            return "Warning";
-        } else if (status === "Invoice Sent" && daysDiff < 0) {
-            return "Error";
-        } else {
-            return "Indication01";
-        }
-    },
+        formatMaxDate: function () {
+            var oDate = new Date()
+            if (oDate) {
+                return new Date(oDate.getFullYear(), oDate.getMonth(), oDate.getDate());
+            }
+            return null;
+        },
 
-    formatMaxDate: function () {
-        var oDate = new Date()
-        if (oDate) {
-            return new Date(oDate.getFullYear(), oDate.getMonth(), oDate.getDate());
-        }
-        return null;
-    },
+        formatMinDate: function () {
+            var oDate = new Date()
+            if (oDate) {
+                return new Date(oDate.getFullYear(), oDate.getMonth(), oDate.getDate());
+            }
+            return null;
+        },
 
-    formatMinDate: function () {
-        var oDate = new Date()
-        if (oDate) {
-            return new Date(oDate.getFullYear(), oDate.getMonth(), oDate.getDate());
-        }
-        return null;
-    },
+        formatCompanyAndDescription: function (companyName, description, startDate, EndDate) {
+            if (companyName && description) {
+                return companyName + " - " + description + " " + "(" + startDate + " - " + EndDate + ")";
+            } else if (companyName) {
+                return companyName;
+            } else if (description) {
+                return description;
+            } else {
+                return "";
+            }
+        },
 
-    formatCompanyAndDescription: function (companyName, description, startDate, EndDate) {
-        if (companyName && description) {
-            return companyName + " - " + description + " " + "(" + startDate + " - " + EndDate + ")";
-        } else if (companyName) {
-            return companyName;
-        } else if (description) {
-            return description;
-        } else {
-            return "";
-        }
-    },
+        fromatNumber: function (avalue) {
+            if (avalue === "0" || avalue === 0) {
+                return "0.00";
+            }
+            var numericValue = parseFloat(avalue);
+            if (isNaN(numericValue)) {
+                return "";
+            }
 
-    fromatNumber: function (avalue) {
-        if (avalue === "0" || avalue === 0) {
-            return "0.00";
-        }
-        var numericValue = parseFloat(avalue);
-        if (isNaN(numericValue)) {
-            return "";
-        }
+            var oFormatOptions = {
+                groupingBaseSize: 3,
+                groupingSize: 2,
+                minIntegerDigits: 1,
+                minFractionDigits: 2,
+                maxFractionDigits: 4
+            };
 
-        var oFormatOptions = {
-            groupingBaseSize: 3,
-            groupingSize: 2,
-            minIntegerDigits: 1,
-            minFractionDigits: 2,
-            maxFractionDigits: 4
-        };
+            var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
+            return oFloatFormat.format(numericValue);
+        },
 
-        var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
-        return oFloatFormat.format(numericValue);
-    },
+        fullNameFormatter: function (salutation, consultantName) {
+            if (salutation && consultantName) {
+                return salutation + " " + consultantName;
+            }
+            return consultantName || salutation;
+        },
 
-    fullNameFormatter: function (salutation, consultantName) {
-        if (salutation && consultantName) {
-            return salutation + " " + consultantName;
-        }
-        return consultantName || salutation;
-    },
+        YearlyToMontlyConv: function (value) {
+            var Data = parseFloat(value);
+            if (isNaN(Data)) {
+                return "INR 0.00";
+            }
+            var oFormatOptions = {
+                groupingBaseSize: 3,
+                groupingSize: 2,
+                minIntegerDigits: 1,
+                minFractionDigits: 2,
+                maxFractionDigits: 2
+            };
 
-    YearlyToMontlyConv: function (value) {
-        var Data = parseFloat(value);
-        if (isNaN(Data)) {
-            return "INR 0.00";
-        }
-        var oFormatOptions = {
-            groupingBaseSize: 3,
-            groupingSize: 2,
-            minIntegerDigits: 1,
-            minFractionDigits: 2,
-            maxFractionDigits: 2
-        };
+            var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
+            // return oFloatFormat.format(numericValue);
+            var monthlyValue = Data / 12;
+            return "INR " + oFloatFormat.format(monthlyValue);
+        },
 
-        var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
-        // return oFloatFormat.format(numericValue);
-        var monthlyValue = Data / 12;
-        return "INR " + oFloatFormat.format(monthlyValue);
-    },
+        formatGradeWithType: function (sGrade, sGradeType) {
+            if (!sGrade || isNaN(sGrade)) return "";
+            var formattedGrade = parseFloat(sGrade).toFixed(2);
+            if (sGradeType === "Percentage") {
+                return formattedGrade + " %";
+            } else if (sGradeType === "CGPA") {
+                return formattedGrade + " CGPA";
+            } else {
+                return formattedGrade;
+            }
+        },
 
-    formatGradeWithType: function (sGrade, sGradeType) {
-        if (!sGrade || isNaN(sGrade)) return "";
-        var formattedGrade = parseFloat(sGrade).toFixed(2);
-        if (sGradeType === "Percentage") {
-            return formattedGrade + " %";
-        } else if (sGradeType === "CGPA") {
-            return formattedGrade + " CGPA";
-        } else {
-            return formattedGrade;
-        }
-    },
+        getImageSrc: function (base64Str) {
+            if (base64Str) {
+                return "data:image/png;base64," + base64Str;
+            }
+            return ""; // fallback
+        },
 
-    getImageSrc: function (base64Str) {
-        if (base64Str) {
-            return "data:image/png;base64," + base64Str;
-        }
-        return ""; // fallback
-    },
+        statusState: function (Status) {
+            if (Status === "Active") {
+                return "Success";
+            } else {
+                return "Error";
+            }
+        },
 
-    statusState: function (Status) {
-        if (Status === "Active") {
-            return "Success";
-        } else {
-            return "Error";
-        }
-    },
+        formatTimelineDate: function (status, creationDate, assignedDate, returnDate, trashDate, transferDate) {
+            var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" });
 
-    formatTimelineDate: function (status, creationDate, assignedDate, returnDate, trashDate, transferDate) {
-        var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" });
+            if (status === "Assigned" && assignedDate) {
+                return oDateFormat.format(new Date(assignedDate));
+            }
+            else if (status === "Returned" && returnDate) {
+                return oDateFormat.format(new Date(returnDate))
 
-        if (status === "Assigned" && assignedDate) {
-            return oDateFormat.format(new Date(assignedDate));
-        }
-        else if (status === "Returned" && returnDate) {
-            return oDateFormat.format(new Date(returnDate))
+            } else if (status === "Trashed" && trashDate) {
+                return oDateFormat.format(new Date(trashDate))
 
-        } else if (status === "Trashed" && trashDate) {
-            return oDateFormat.format(new Date(trashDate))
+            }
+            else if (status === "Transferred" && transferDate) {
+                return oDateFormat.format(new Date(transferDate))
 
-        }
-        else if (status === "Transferred" && transferDate) {
-            return oDateFormat.format(new Date(transferDate))
+            }
+            else if (creationDate) {
+                return oDateFormat.format(new Date(creationDate))
+            }
 
-        }
-        else if (creationDate) {
-            return oDateFormat.format(new Date(creationDate))
-        }
+            else {
+                return "Date not available";
+            }
+        },
 
-        else {
-            return "Date not available";
-        }
-    },
+        formatCustomerTypeValue: function (sType, sValue) {
+            if (sValue && sValue !== "") {
+                return `${sType} (${sValue}%)`;
+            }
+            return sType;
+        },
 
-    formatCustomerTypeValue: function (sType, sValue) {
-        if (sValue && sValue !== "") {
-            return `${sType} (${sValue}%)`;
-        }
-        return sType;
-    },
+        formatId: function (status, pickId, assigneId) {
+            if (status === "Assigned" && assigneId) {
+                return assigneId;
+            } else if (status === "Available" && pickId) {
+                return pickId;
+            } else {
+                return " ";
+            }
+        },
 
-    formatId: function (status, pickId, assigneId) {
-        if (status === "Assigned" && assigneId) {
-            return assigneId;
-        } else if (status === "Available" && pickId) {
-            return pickId;
-        } else {
-            return " ";
-        }
-    },
+        formatName: function (status, pickName, assigneByName, assigneName) {
+            if (status === "Assigned" && assigneByName) {
+                return assigneByName;
+            } else if (status === "Available" && pickName) {
+                return pickName;
+            } else if (status === "Returned" && assigneName) {
+                return assigneName;
 
-    formatName: function (status, pickName, assigneByName, assigneName) {
-        if (status === "Assigned" && assigneByName) {
-            return assigneByName;
-        } else if (status === "Available" && pickName) {
-            return pickName;
-        } else if (status === "Returned" && assigneName) {
-            return assigneName;
-
+            }
         }
     }
-}
 });
