@@ -171,6 +171,7 @@ sap.ui.define([
                 this.getView().getModel("FilteredSOWModel").setProperty("/TotalAmount", "0.00");
                 this.SelectedCustomerModel.setProperty("/AllDueAmount", "0.00");
                 this.SelectedCustomerModel.setProperty("/AllReceivedAmount", "0.00");
+                this.SelectedCustomerModel.setProperty("/AllReceivedTDS", "0.00");
                 this.SelectedCustomerModel.setProperty("/Name", SelectedData.name);
                 this.SelectedCustomerModel.setProperty("/PAN", SelectedData.PAN);
                 this.SelectedCustomerModel.setProperty("/GST", SelectedData.GST);
@@ -284,9 +285,17 @@ sap.ui.define([
                     }
                     await this.totalAmountCalculation();
                     if (isINR) {
-                        const subTotal = parseFloat(oSelectedCustomerModel.getProperty("/SubTotalInGST")) || 0;
-                        oSelectedCustomerModel.setProperty("/IncomeTax", ((subTotal * parseFloat(this.getView().getModel("SelectedCustomerModel").getData().IncomePerc)) / 100).toFixed(2));
-                    }
+                    const oModel = oSelectedCustomerModel;
+                    const oData = oModel.getData();
+
+                    const subTotalInGST = parseFloat(oData.SubTotalInGST) || 0;
+                    const subTotalNotGST = parseFloat(oData.SubTotalNotGST) || 0;
+                    const incomePerc = parseFloat(oData.IncomePerc) || 0;
+
+                    const total = subTotalInGST + subTotalNotGST;
+                    const tds = ((total * incomePerc) / 100).toFixed(2);
+                    oModel.setProperty("/IncomeTax", Math.round(tds));
+                }
                 } catch (error) {
                     MessageToast.show(error.responseText);
                 } finally {
@@ -383,7 +392,7 @@ sap.ui.define([
                 oSOWModel.setProperty("/RoundOf", RoundOf);
                 oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
-                oCustomerModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
+                oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
 
                 this.onChangeConversionRate();
             },
@@ -425,10 +434,18 @@ sap.ui.define([
                 const oNavigationData = oNavigationModel.getData();
 
                 if (oNavigationData.Currency === "INR") {
-                    const subTotal = parseFloat(oNavigationData.SubTotalInGST) || 0;
-                    const tds = ((subTotal * parseFloat(oNavigationData.IncomePerc)) / 100).toFixed(2);
-                    oNavigationModel.setProperty("/IncomeTax", tds);
+                const subTotalInGST = parseFloat(oNavigationData.SubTotalInGST) || 0;
+                const subTotalNotGST = parseFloat(oNavigationData.SubTotalNotGST) || 0;
+                const incomePerc = parseFloat(oNavigationData.IncomePerc) || 0;
+
+                const totalAmount = subTotalInGST + subTotalNotGST;
+                const tds = ((totalAmount * incomePerc) / 100).toFixed(2);
+
+                oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
+                } else {
+                    oNavigationModel.setProperty("/IncomeTax", "0.00");
                 }
+
             },
 
             onParticularsInputLiveChange: function (oEvent) {
@@ -472,8 +489,17 @@ sap.ui.define([
                     this.Discount = true;
                 }
                 await this.totalAmountCalculation();
-                var oNavigationModel = this.getView().getModel("SelectedCustomerModel");
-                if (oNavigationModel.getData().Currency === "INR") oNavigationModel.setProperty("/IncomeTax", parseInt((oNavigationModel.getData().SubTotalInGST * parseFloat(oNavigationModel.getData().IncomePerc)) / 100).toFixed(2));
+               var oNavigationModel = this.getView().getModel("SelectedCustomerModel");
+                var oData = oNavigationModel.getData();
+
+                if (oData.Currency === "INR") {
+                    var subTotalInGST = parseFloat(oData.SubTotalInGST) || 0;
+                    var subTotalNotGST = parseFloat(oData.SubTotalNotGST) || 0;
+                    var incomePerc = parseFloat(oData.IncomePerc) || 0;
+
+                    var tds = ((subTotalInGST + subTotalNotGST) * incomePerc / 100).toFixed(2);
+                    oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
+                }
             },
             CID_onPressAddCustomer: function () { this.getRouter().navTo("RouteManageCustomer", { value: "Data" }); },
 
@@ -1194,10 +1220,15 @@ sap.ui.define([
                 utils._LCvalidateVariablePay(oEvent);
                 const oNavigationModel = this.getView().getModel("SelectedCustomerModel");
                 const oNavigationData = oNavigationModel.getData();
+
                 if (oNavigationData.Currency === "INR") {
-                    const subTotal = parseFloat(oNavigationData.SubTotalInGST) || 0;
-                    const tds = ((subTotal * parseFloat(oNavigationData.IncomePerc)) / 100).toFixed(2);
-                    oNavigationModel.setProperty("/IncomeTax", tds);
+                    const subTotalInGST = parseFloat(oNavigationData.SubTotalInGST) || 0;
+                    const subTotalNotGST = parseFloat(oNavigationData.SubTotalNotGST) || 0;
+                    const incomePerc = parseFloat(oNavigationData.IncomePerc) || 0;
+
+                    const total = subTotalInGST + subTotalNotGST;
+                    const tds = ((total * incomePerc) / 100).toFixed(2);
+                    oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
                 }
             },
 
