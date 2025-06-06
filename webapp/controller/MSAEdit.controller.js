@@ -829,7 +829,7 @@ sap.ui.define([
                 }
             },
 
-            async MsaE_onPressMergeSoo() {
+            async MsaE_onPressMergeSow() {
                 this.getBusyDialog();
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/TableData", this.getView().getModel("SowReadModel").getData().filter((item) => item.SowID === this.Selected.SowID));
@@ -842,6 +842,7 @@ sap.ui.define([
                 oPDFModel.setProperty("/ClientName", oModel.Salutation + " " + oModel.CompanyHeadName);
                 oPDFModel.setProperty("/ClientRole", oModel.CompanyHeadPosition);
                 oPDFModel.setProperty("/AgreementDuration", oModel.ContractPeriod);
+                oPDFModel.setProperty("/SOWCreateDate", Formatter.formatDate(new Date()));
                 oPDFModel.setProperty("/SOWStartDate", Formatter.formatDate(oPDFModel.getProperty("/TableData/0/StartDate")));
                 oPDFModel.setProperty("/SOWEndDate", Formatter.formatDate(oPDFModel.getProperty("/TableData/0/EndDate")));
                 oPDFModel.setProperty("/SOWDescription", oPDFModel.getProperty("/TableData/0/Description"));

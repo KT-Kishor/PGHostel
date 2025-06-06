@@ -345,7 +345,8 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             }, 1000);
         },
 
-        _GenerateSOWPDF: function (that, oModel, oCompanyModel, content) {
+        _GenerateSOWPDF: function (that2, oModel, oCompanyModel, content) {
+            var that = this;
             setTimeout(function () {
 
                 var { jsPDF } = window.jspdf;
@@ -669,7 +670,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.setFont("times", "normal");
                 let headofCoRoleY = headofCoNameY + 5;
                 doc.text(oCompanyModel.designation, margin, headofCoRoleY);
-                doc.text(oModel.AgreementDate, margin, headofCoRoleY + 5);
+                doc.text(oModel.SOWCreateDate, margin, headofCoRoleY + 5);
 
                 doc.setFont("times", "bold");
                 doc.text(`For ${oModel.ClientCompanyName}`, pageMiddle + 10, forCoNameY);
@@ -679,10 +680,10 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                 doc.setFont("times", "normal");
                 doc.text(oModel.ClientRole, pageMiddle + 10, headofCoRoleY);
-                doc.text(oModel.AgreementDate, pageMiddle + 10, headofCoRoleY + 5);
+                doc.text(oModel.SOWCreateDate, pageMiddle + 10, headofCoRoleY + 5);
 
                 doc.save("SOW.pdf");
-                that.closeBusyDialog();
+                that2.closeBusyDialog();
             }, 1000);
         },
 
