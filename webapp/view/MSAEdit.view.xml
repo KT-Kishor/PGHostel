@@ -22,7 +22,7 @@
             type="{= ${simpleForm>/editable} ? 'Accept' : 'Transparent' }" 
             press="MsaE_onEditOrSavePress" 
         /> -->
-						<m:Button 
+						<m:Button id="MSA"
             text="{i18n>tileFooter}" 
             enabled="{simpleForm>/isEnabled}" 
             press="MsaE_onSendEmailMSA" 
@@ -168,9 +168,9 @@
 										</m:OverflowToolbar>
 									</m:headerToolbar>
 									<m:columns>
-										<m:Column demandPopin="true">
+										<!-- <m:Column demandPopin="true">
 											<m:Text text="{i18n>sowId}"/>
-										</m:Column>
+										</m:Column> -->
 										<m:Column demandPopin="true">
 											<m:Text text="{i18n>consultantName}" />
 										</m:Column>
@@ -193,7 +193,7 @@
 									<m:items>
 										<m:ColumnListItem >
 											<m:cells>
-												<m:Text text="{SowReadModel>SowID}"/>
+												<!-- <m:Text text="{SowReadModel>SowID}"/> -->
 												<m:Text text="{SowReadModel>ConsultantName}"/>
 												<m:Text text="{SowReadModel>Description}"/>
 												<m:Text text="{path:'SowReadModel>StartDate',formatter: '.Formatter.formatDate'}"/>

@@ -82,7 +82,7 @@
 
 										<m:Label visible="{visiablityPlay>/IncomeTax}" required="true" text="{i18n>TDS}" />
 										<m:Input visible="{visiablityPlay>/IncomeTax}" value="{SelectedCustomerModel>/IncomePerc}" id="CID_id_IncomeTaxPercentage" editable="{visiablityPlay>/editable}" maxLength="2" valueStateText="{i18n>incomeTaxValue}" liveChange="onIncomeTaxPercentageInputLiveChange"/>
-										<m:Input visible="{visiablityPlay>/IncomeTax}" value="{SelectedCustomerModel>/IncomeTax}" id="CID_id_TDS" editable="{visiablityPlay>/editable}" liveChange="CID_ValidateCommonFields" maxLength="25" valueStateText="{i18n>invoiceTransaction}"/>
+										<m:Input visible="{visiablityPlay>/IncomeTax}" value="{SelectedCustomerModel>/IncomeTax}" id="CID_id_TDS" editable="false" />
 
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>selectSOW}" />
 										<m:ComboBox visible="{visiablityPlay>/createVisi}" showClearIcon="true" items="{CombinedData>/items}" value="{SelectedCustomerModel>/SOWDetails}" change="OnChangeSowDetails" valueStateText="{i18n>selectSOW}" id="CID_id_SowDetails">

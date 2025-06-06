@@ -40,7 +40,7 @@ sap.ui.define([
                 this.byId("CID_id_SowPO").setValueState("None");
                 this.byId("CID_id_ConversionRate").setValueState("None");
                 this.byId("CID_id_InputMailID").setValueState("None");
-                this.byId("CID_id_TDS").setValueState("None");
+                this.byId("CID_id_IncomeTaxPercentage").setValueState("None");
                 this.byId("CID_id_SowDetails").setValueState("None");
                 const oView = this.getView();
                 oView.setModel(new JSONModel({
@@ -70,6 +70,8 @@ sap.ui.define([
 
                 this.visiablityPlay = oView.getModel("visiablityPlay");
                 this.visiablityPlay.setProperty("/Edit", false);
+                this.visiablityPlay.setProperty("/MultiEmail", false);
+                this.visiablityPlay.setProperty("/merge", false);
                 oView.setModel(new JSONModel(), "CompanyInvoiceItemModel");
                 this.Update = false;
                 if (sArg === "X") return;
@@ -144,6 +146,7 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/createVisi", false);
                         this.visiablityPlay.setProperty("/Edit", false);
                         this.visiablityPlay.setProperty("/MultiEmail", false);
+                        this.visiablityPlay.setProperty("/merge", false);
                     }
                     this.Status = Status;
                     this.totalAmountCalculation();
@@ -153,10 +156,6 @@ sap.ui.define([
                 } finally {
                     this.closeBusyDialog();
                 }
-            },
-
-            CID_ValidateCommonFields: function (oEvent) {
-                utils._LCvalidateMandatoryField(oEvent);
             },
 
             onChangeAddCustomer: async function (oEvent) {
@@ -549,17 +548,17 @@ sap.ui.define([
                     IncomePerc: oSelectedCustomerModel.IncomePerc || "10",
                 };
                 const aItemsRaw = oCompanyInvoiceItemModel.CompanyInvoiceItem || [];
-                if( aItemsRaw.length === 0) {
+                if (aItemsRaw.length === 0) {
                     this.getBusyDialog();
                     MessageToast.show(this.i18nModel.getText("companyTableValidation"));
                     return false;
                 }
                 for (let i = 0; i < aItemsRaw.length; i++) {
                     const item = aItemsRaw[i];
-                    if (!item.Particulars || !item.Unit || !item.Rate) {
+                    if (!item.Particulars || !item.Rate) {
                         this.getBusyDialog();
-                        sap.m.MessageBox.error(`Please fill all mandatory fields (Particulars, Unit, Rate) in item row ${i + 1}`);
-                        return false; 
+                        sap.m.MessageBox.error(`Please fill all mandatory fields (Particulars, Rate) in item row ${i + 1}`);
+                        return false;
                     }
                 }
                 const aItems = aItemsRaw.map(item => {
@@ -614,7 +613,7 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowPO"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowDetails"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_CurrencySelect"), "ID");
-                    const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateMandatoryField(this.byId("CID_id_TDS"), "ID") && utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"), "ID") : true;
+                    const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"), "ID") : true;
                     const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;
                     const bOptionalValid = !!this.Discount && !!this.RateUnit && !!this.Particulars;
                     const bIsValid = bMandatoryValid && bTDSValid && bOptionalValid && bConversionRateValid;
@@ -623,7 +622,7 @@ sap.ui.define([
                     }
                     this.getBusyDialog();
                     const oPayload = await this.SubmitPayload("Create");
-                    if(oPayload === false) {
+                    if (oPayload === false) {
                         this.closeBusyDialog();
                         return;
                     }
@@ -695,7 +694,7 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowPO"), "ID") &&
                         utils._LCvalidateEmail(this.byId("CID_id_InputMailID"), "ID") &&
                         (!!this.Discount && !!this.RateUnit && !!this.Particulars) &&
-                        (oModel.Currency === "INR" ? utils._LCvalidateMandatoryField(this.byId("CID_id_TDS"), "ID") : utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID"));
+                        (oModel.Currency === "INR" ? utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"), "ID") : utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID"));
 
                     if (!bIsValid) {
                         return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
@@ -703,10 +702,10 @@ sap.ui.define([
 
                     this.getBusyDialog();
                     const oPayload = await this.SubmitPayload("update");
-                    if(oPayload === false) {
+                    if (oPayload === false) {
                         this.closeBusyDialog();
                         return;
-                    }else{
+                    } else {
                         var Status = oPayload.payload.Status;
                     }
                     try {
@@ -717,7 +716,12 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/addInvBtn", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/MultiEmail", true);
-                        if(Status !== "Payment Received") this.visiablityPlay.setProperty("/payByDate", this.ReminderEmail);
+                        if (Status !== "Payment Received") this.visiablityPlay.setProperty("/payByDate", this.ReminderEmail);
+                        if (Status === "Payment Received") {
+                            this.visiablityPlay.setProperty("/merge", false);
+                            this.visiablityPlay.setProperty("/MultiEmail", false);
+                            this.visiablityPlay.setProperty("/Edit", false);
+                        }
                         MessageToast.show(this.i18nModel.getText("invoiceUpdateMess"));
                         this.closeBusyDialog();
                     } catch (error) {
@@ -845,14 +849,17 @@ sap.ui.define([
                 (isNaN(AmountInINR)) ? oModelData.setProperty("/AmountInINR", '0.00') : oModelData.setProperty("/AmountInINR", AmountInINR.toFixed(2));
             },
 
-            onChangeReceivedTDS: function (oEvent) {
-                if (parseFloat(oEvent.getSource().getValue()) >= parseFloat(this.ResivedTDS)) {
+            onChangeReceivedTDS: async function () {
+                var oInput = sap.ui.getCore().byId("idReceivedTDS");
+                var sValue = oInput.getValue();
+
+                if (parseFloat(sValue) > parseFloat(this.ResivedTDS)) {
                     this.ResivedTDSFlag = false;
-                    sap.ui.getCore().byId("idReceivedTDS").setValueState("Error");
-                    sap.ui.getCore().byId("idReceivedTDS").setValueStateText(this.i18nModel.getText("tdsAmountError")); // add this key in i18n
+                    oInput.setValueState("Error");
+                    oInput.setValueStateText(this.i18nModel.getText("tdsAmountError")); // Make sure this key exists in i18n
                 } else {
                     this.ResivedTDSFlag = true;
-                    sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
+                    oInput.setValueState("None");
                     this.onChangeReceivedAmount();
                 }
             },
@@ -897,14 +904,18 @@ sap.ui.define([
             onChangePaymentRecived: async function () {
                 var paymentModel = this.getView().getModel("PaymentModel").getData();
 
-                const isValid =
+                const isMandatoryValid =
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idTransactionID"), "ID") &&
-                    utils._LCvalidateAmount(sap.ui.getCore().byId("idReceivedAmount"), "ID") &&
-                    this.ResivedAmount && this.ResivedTDSFlag &&
-                    (paymentModel.Currency !== "INR"
-                        ? utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID")
-                        : utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("idReceivedTDS"), "ID"));
+                    utils._LCvalidateAmount(sap.ui.getCore().byId("idReceivedAmount"), "ID");
 
+                let isCurrencyValid = true;
+                if (paymentModel.Currency !== "INR") {
+                    isCurrencyValid = utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID");
+                } else {
+                    await this.onChangeReceivedTDS(); // now returns boolean
+                }
+
+                const isValid = isMandatoryValid && isCurrencyValid && this.ResivedAmount && this.ResivedTDSFlag;
                 if (!this.ResivedAmount) sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
 
                 if (!isValid) {
@@ -1274,7 +1285,7 @@ sap.ui.define([
                 doc.text(customerAddressLines, margin, currentY);
                 currentY += customerAddressLines.length * 5;
 
-                if (oModel.GST !== "") {
+                if (oModel.GST !== undefined && oModel.GST !== "") {
                     doc.text(`GSTIN : ${oModel.GST}`, margin, currentY);
                     currentY += 5;
                 }

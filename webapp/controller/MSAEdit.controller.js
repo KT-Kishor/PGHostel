@@ -170,7 +170,6 @@ sap.ui.define([
             },
 
             MSA_Frg_Update: async function () {
-                this.getBusyDialog();
                 if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_CompanyName"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_HeadPosition"), "ID") &&
                     utils._LCvalidateName(sap.ui.getCore().byId("MsaE_id_MsaHead"), "ID") &&
@@ -187,6 +186,7 @@ sap.ui.define([
                             "MsaID": oModel.MsaID
                         }
                     }
+                    this.getBusyDialog();
                     await this.ajaxUpdateWithJQuery("MSADetails", oData).then((oData) => {
                         if (oData) {
                             MessageToast.show(this.i18nModel.getText("msaupdateSuccess"));
@@ -419,7 +419,7 @@ sap.ui.define([
                     let row = oModelDataPro[i];
                     if (!row.Salutation || !row.ConsultantName || !row.Designation || !row.Rate) {
                         sap.m.MessageBox.error(`Please fill all mandatory fields in row ${i + 1}`);
-                        return; 
+                        return;
                     }
                 }
                 this.getBusyDialog();
@@ -733,6 +733,7 @@ sap.ui.define([
                     this.getBusyDialog();
                     this.ajaxCreateWithJQuery(this.Type === 'MSA' ? "MSAEmail" : "SOWEmail", oPayload).then((oData) => {
                         MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                        this.byId("Sow_Id_ReadTable").removeSelections();
                         this.closeBusyDialog();
                     }).catch((error) => {
                         this.closeBusyDialog();
@@ -765,6 +766,9 @@ sap.ui.define([
                 // Update the model with the new data
                 oModel.setProperty("/data", aData);
                 oTable.removeSelections();
+                if (oTable) {
+                    oTable.removeSelections(true); // true = clears selection without triggering events
+                }
             },
 
             async MsaE_onPressMerge() {

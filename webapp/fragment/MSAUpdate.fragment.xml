@@ -85,13 +85,13 @@
 										</ComboBox>								
 
 										<Label text="{i18n>createMSADate}" required="true"/>
-										<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Msa_ChangeMsaDate" value="{path:'FilteredMsaModel>/0/CreateMSADate',formatter: '.Formatter.formatDate'}"  id="MsaE_id_CreateMSADate"/>
+										<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Msa_ChangeMsaDate" value="{path:'FilteredMsaModel>/0/CreateMSADate',formatter: '.Formatter.formatDate'}" valueStateText="{i18n>CreateMSADateVST}" id="MsaE_id_CreateMSADate"/>
 
-										<Label text="{i18n>panCard}" required="true"/>
-										<Input id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/0/PanCard}" liveChange="Msa_LC_PanCard"/>
+										<Label text="{i18n>panCardCommon}" required="true"/>
+										<Input id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/0/PanCard}" valueStateText="{i18n>panCardValueState}" liveChange="Msa_LC_PanCard"/>
 
 										<Label text="{i18n>emailId}" required="true"/>
-										<TextArea liveChange="Msa_LC_EmailID"  maxLength="500" id="MsaE_id_MSAEmail" value="{FilteredMsaModel>/0/MsaEmail}"  />			
+										<TextArea liveChange="Msa_LC_EmailID"  maxLength="500" id="MsaE_id_MSAEmail" valueStateText="{i18n>emailValueState}" value="{FilteredMsaModel>/0/MsaEmail}"  />			
 
 										<Label text="{i18n>expCountry}" required="true"/>
 										<ComboBox valueStateText="{i18n>expValStaCountry}" change="MSACountryComboBox" id="MSA_Nav_Id_Country" items="{path:'CountryModel>/',length:1000}" value="{FilteredMsaModel>/0/Country}" showSecondaryValues="true">
@@ -99,7 +99,7 @@
 										</ComboBox>																																				
 
 										<Label text="{i18n>Address}" required="true"/>
-										<TextArea  id="MsaE_id_MsaAddress" value="{FilteredMsaModel>/0/Address}" maxLength="120"  liveChange="Msa_LC_Address"/>
+										<TextArea  id="MsaE_id_MsaAddress" value="{FilteredMsaModel>/0/Address}" maxLength="120" valueStateText="{i18n>addressValueState}"  liveChange="Msa_LC_Address"/>
 
 										<Label text="{i18n>paymentterms}" required="true"/>
 										<Select items="{ContractpaymentModel>/}" selectedKey="{FilteredMsaModel>/0/PaymentTerms}" >

@@ -13,7 +13,8 @@ sap.ui.define([
       },
 
       _onRouteMatched: async function (oEvent) {
-        this.commonLoginFunction("Customer"); // Call common login function
+        var LoginFUnction = await this.commonLoginFunction("Customer");
+        if (!LoginFUnction) return;
         this.getBusyDialog(); // Show busy dialog
         await this._fetchCommonData("Country", "CountryModel");
         await this._fetchCommonData("BaseLocation", "BaseLocationModel");
@@ -110,6 +111,12 @@ sap.ui.define([
         sap.ui.getCore().byId("MC_id_codeModel").setValueState("None");
         sap.ui.getCore().byId("MC_id_CustAddress").setValueState("None");
         if (bIsEdit && this._originalCustomerData) {
+          this._originalCustomerData.stdCode !== "" ? this._originalCustomerData.stdCode : "+91"; 
+          this._originalCustomerData.GST !== null ? this._originalCustomerData.GST : ""; 
+          this._originalCustomerData.LUT !== null ? this._originalCustomerData.LUT : ""; 
+          this._originalCustomerData.mobileNo !== null ? this._originalCustomerData.mobileNo : ""; 
+          this._originalCustomerData.type !== null ? this._originalCustomerData.type : ""; 
+          this._originalCustomerData.value !== null ? this._originalCustomerData.value : ""; 
           this.getView().getModel("CustomerModel").setData(JSON.parse(JSON.stringify(this._originalCustomerData)));
         } // Reset fields to original data
       },

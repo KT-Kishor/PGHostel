@@ -36,13 +36,13 @@
 					<Input value="{PaymentModel>/ReceivedAmount}" id="idReceivedAmount" change="onChangeReceivedAmount" valueStateText="{i18n>invoiceRecievedAmountMessage}" placeholder="Enter received amount" maxLength="15"/>
 
 					<Label text="{i18n>invoiceReceivedTDS}" required="true" visible="{= ${PaymentModel>/Currency} === 'INR'}" />
-					<Input value="{PaymentModel>/ReceivedTDS}" id="idReceivedTDS" change="onChangeReceivedTDS" placeholder="Enter received TDS" maxLength="15" visible="{= ${PaymentModel>/Currency} === 'INR'}" valueStateText="{i18n>}" />
+					<Input value="{PaymentModel>/ReceivedTDS}" id="idReceivedTDS" change="onChangeReceivedTDS" placeholder="Enter received TDS" maxLength="15" visible="{= ${PaymentModel>/Currency} === 'INR'}" valueStateText="Received TDS is required" />
 
 					<Label text=""/>
 					<HBox width="100%" justifyContent="SpaceBetween" visible="{= ${PaymentModel>/Currency} !== 'INR'}">
 						<VBox width="calc(50% - 10px)">
 						<Label text="{i18n>expConversionRate}" required="true"></Label>
-							<Input value="{PaymentModel>/ConversionRate}" id="idFrgConvertionRate" change="onChangePaymentConvertionRate" maxLength="15"/>
+							<Input value="{PaymentModel>/ConversionRate}" placeholder="{i18n>expenseConversionRatePlaceholder}" id="idFrgConvertionRate" change="onChangePaymentConvertionRate" maxLength="15"/>
 						</VBox>
 						<VBox width="calc(50% - 10px)">
 							<Label text="{i18n>amountInINR}" required="true"></Label>
