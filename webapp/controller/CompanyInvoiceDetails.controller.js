@@ -43,9 +43,14 @@ sap.ui.define([
                 this.byId("CID_id_IncomeTaxPercentage").setValueState("None");
                 this.byId("CID_id_SowDetails").setValueState("None");
                 const oView = this.getView();
+                if (this.getView().getModel("CompanyInvoiceModel").getData().length === 0) {
+                    var LastInvoiceDate = new Date()
+                } else {
+                    var LastInvoiceDate = new Date(this.getView().getModel("CompanyInvoiceModel").getData()[0].InvoiceDate)
+                }
                 oView.setModel(new JSONModel({
-                    CustomerName: "", InvNo: "", InvoiceDate: new Date(), Name: "", PAN: "", GST: "", Address: "", MailID: "", MobileNo: "",
-                    SOWDetails: "", Type: "", InvoiceDescription: "", Currency: "INR", PayByDate: new Date(), POSOW: "", Status: "Submitted",
+                    CustomerName: "", InvNo: "", InvoiceDate: "", Name: "", PAN: "", GST: "", Address: "", MailID: "", MobileNo: "",
+                    SOWDetails: "", Type: "", InvoiceDescription: "", Currency: "INR", PayByDate: "", POSOW: "", Status: "Submitted",
                     SubTotalNotGST: "0", SubTotalInGST: "0", LUT: "", IncomePerc: "10"
                 }), "SelectedCustomerModel");
 
@@ -55,12 +60,6 @@ sap.ui.define([
                     results: [], InvNo: this.newID, IndexNo: "", ItemID: "", Particulars: "", SAC: "", Rate: "", Currency: "INR",
                     Total: "", gstAmount: "", TotalAmount: "", subTotal: ""
                 }), "FilteredSOWModel");
-
-                if (this.getView().getModel("CompanyInvoiceModel").getData().length === 0) {
-                    var LastInvoiceDate = new Date()
-                } else {
-                    var LastInvoiceDate = new Date(this.getView().getModel("CompanyInvoiceModel").getData()[0].InvoiceDate)
-                }
 
                 oView.setModel(new JSONModel({
                     createVisi: true, editVisi: false, editable: true, igstVisi: false, gstVisiable: false,
@@ -253,16 +252,16 @@ sap.ui.define([
                         aFilteredSOWDetails.push({
                             ...oSOW,
                             IndexNo: this.itemIDCounter++,
-                            ItemID: globalThis.crypto.randomUUID(),
                             InvNo: this.newID,
                             Particulars: oSOW.ConsultantName,
                             SAC: "998314",
                             GSTCalculation: (currency === "INR") ? "YES" : "",
                             Unit: multiplier,
+                            UnitText:(currency === "INR") ? unit : b,
                             Rate: rateValue,
                             Currency: currency,
                             Discount: "",
-                            Total: total
+                            Total: total,
                         });
                     });
 
@@ -635,6 +634,8 @@ sap.ui.define([
                     var oModel = this.getView().getModel("FilteredSOWModel").getData();
                     const bMandatoryValid =
                         utils._LCvalidateMandatoryField(this.byId("CID_id_AddCustComboBox"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CID_id_Invoice"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CID_id_Payby"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowPO"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowDetails"), "ID") &&
@@ -788,35 +789,32 @@ sap.ui.define([
                             oView.addDependent(that.oDialog);
                             that.oDialog.open();
                             that.modelFunction();
-                            that.FragmentDatePickersReadOnly(["idReceivedDate"]);
                         }.bind(that));
                     } else {
                         that.oDialog.open();
                         that.modelFunction();
-                        that.FragmentDatePickersReadOnly(["idReceivedDate"]);
                     }
                 }
             },
 
             modelFunction: function () {
                 var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
+                var ResivedTDSData = (
+                        oNavigationModel.Currency === "INR"
+                            ? parseFloat(oNavigationModel.IncomeTax) - parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedTDS") || 0) : 0).toFixed(2)
                 var oModel = new JSONModel({
                     InvNo: oNavigationModel.InvNo,
                     TransactionId: "",
-                    ReceivedDate: this.Formatter.formatDate(new Date()),
+                    ReceivedDate: "",
                     ReceivedAmount: "",
                     TotalAmount: parseFloat(oNavigationModel.TotalAmount).toFixed(2),
                     DueAmount: (
                         this.getView().getModel("InvoicePayment").getData().length !== 0
-                            ? parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount"))
+                            ? parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount")) - parseFloat(ResivedTDSData || 0)
                             : parseFloat(oNavigationModel.TotalAmount) - parseFloat(oNavigationModel.IncomeTax)
                     ).toFixed(2),
                     Currency: oNavigationModel.Currency,
-                    ReceivedTDS: (
-                        oNavigationModel.Currency === "INR"
-                            ? parseFloat(oNavigationModel.IncomeTax) - parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedTDS") || 0)
-                            : 0
-                    ).toFixed(2),
+                    ReceivedTDS:ResivedTDSData ,
                     ConversionRate: "",
                     AmountInINR: ""
                 });
@@ -926,13 +924,13 @@ sap.ui.define([
                 this.oDialog.close()
             },
             onLiveTransactionID: function (oEvent) { utils._LCvalidateMandatoryField(oEvent) },
-
+            onReceivedDateDatePickerChange:function (oEvent) {utils._LCvalidateDate(oEvent);},
             onChangePaymentRecived: async function () {
                 var paymentModel = this.getView().getModel("PaymentModel").getData();
 
                 const isMandatoryValid =
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idTransactionID"), "ID") &&
-                    utils._LCvalidateAmount(sap.ui.getCore().byId("idReceivedAmount"), "ID");
+                    utils._LCvalidateAmount(sap.ui.getCore().byId("idReceivedAmount"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("idReceivedDate"), "ID");
 
                 let isCurrencyValid = true;
                 if (paymentModel.Currency !== "INR") {
@@ -989,6 +987,8 @@ sap.ui.define([
                     this.closeBusyDialog();
                 }
             },
+
+            CID_ValidateCommonFields:function(oEvent){utils._LCvalidateMandatoryField(oEvent);},
 
             CD_onDiscountInfoPress: function (oEvent) {
                 if (!this._oPopover) {

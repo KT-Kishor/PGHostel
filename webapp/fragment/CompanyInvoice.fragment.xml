@@ -30,7 +30,7 @@
 					<Input value="{PaymentModel>/TransactionId}" id="idTransactionID" liveChange="onLiveTransactionID" placeholder="Enter transaction Id" valueStateText="{i18n>invoiceTransactionIDValueText}" maxLength="30"/>
 
 					<Label text="{i18n>invoiceReceivedDate}" required="true" />
-					<DatePicker displayFormat="dd/MM/yyyy" id="idReceivedDate" valueFormat="dd/MM/yyyy" value="{PaymentModel>/ReceivedDate}"  />
+					<DatePicker displayFormat="dd/MM/yyyy" id="idReceivedDate" valueFormat="dd/MM/yyyy" value="{PaymentModel>/ReceivedDate}" change="onReceivedDateDatePickerChange" />
 
 					<Label text="{i18n>invoiceReceivedAmount}" required="true"/>
 					<Input value="{PaymentModel>/ReceivedAmount}" id="idReceivedAmount" change="onChangeReceivedAmount" valueStateText="{i18n>invoiceRecievedAmountMessage}" placeholder="Enter received amount" maxLength="15"/>
