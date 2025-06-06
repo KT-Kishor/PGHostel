@@ -26,7 +26,7 @@ sap.ui.define([
         var barDataModel = new JSONModel({ Name: 'line', type: 'column', AllStatus: 'column' });
         that.getView().setModel(barDataModel, "MonthlyBar");
         this.getBusyDialog();
-        if (that.userId.includes("KT")) {
+        if (that.userId.includes("KT-T")) {
             that.EmployeeDetReadCall("Trainee", { "TraineeID": that.userId });
             that.getView().byId("AL_id_YearlyChart").setVisible(false);
             that.getView().byId("AL_id_MonthlyChart").setVisible(false);

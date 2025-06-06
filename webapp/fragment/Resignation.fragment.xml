@@ -121,9 +121,17 @@
             />
         
             <Button
+                visible="{viewModel>/closeButtonVisible}"
                 text="{i18n>close}"
                 press="RF_onPressCloseDialog"
                 type="Reject"
+                class="submit"
+            />
+            <Button
+                visible="{viewModel>/backButtonVisible}"
+                text="{i18n>back}"
+                press="RF_onPressbackButton"
+                type="Emphasized"
                 class="submit"
             />
         </FlexBox>   

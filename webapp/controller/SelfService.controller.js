@@ -129,6 +129,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 oObjectPage.setSelectedSection(oSection);
                             }
                         }
+                        this.managerID = this.getView().getModel("sEmployeeModel").getProperty("/0/ManagerID");
                         var oTextModel = new JSONModel({ name: "" });
                         this.getView().setModel(oTextModel, "TextDisplay");
                         var oIdCardModel = this.getView().getModel("IdCardModel");
@@ -507,25 +508,25 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
             onManagerChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-                const oData = this.getView().getModel("sEmployeeModel").getProperty("/0");
-                const requestData = { ManagerID: oData.ManagerID, Status: "Submitted" };
-                oData.ManagerID = oEvent.getSource().getSelectedKey();
-                oData.ManagerName = oEvent.getSource().getSelectedItem() ? oEvent.getSource().getSelectedItem().getText() : oEvent.getSource().getValue();
-                const oPayload = {
-                    data: oData,
+                const oDataModel = this.getView().getModel("sEmployeeModel").getProperty("/0");
+                const requestData = { ManagerID: oDataModel.ManagerID, Status: "Submitted" };
+                oDataModel.ManagerID = oEvent.getSource().getSelectedKey();
+                oDataModel.ManagerName = oEvent.getSource().getSelectedItem() ? oEvent.getSource().getSelectedItem().getText() : oEvent.getSource().getValue();
+                var oPayload = {
+                    data: oDataModel,
                     filters: {
                         EmployeeID: this.EmployeeID
                     }
                 };
-                if (!oData.ManagerName && !oData.ManagerID) {
+                if (!oDataModel.ManagerName && !oDataModel.ManagerID) {
                     return
                 }
                 sap.ui.core.BusyIndicator.show();
-                //      var that = this;
+                var that = this;
                 this.ajaxReadWithJQuery("InboxDetails", requestData)
                     .then((oData) => {
                         sap.ui.core.BusyIndicator.hide(0);
-                        if (oData.data && oData.data.length > 0) {
+                        if (oData.data && oData.data.length > 0 && this.managerID !== oDataModel.ManagerID) {
                             MessageBox.show(this.getView().getModel("i18n").getResourceBundle().getText("managerChangeMsg"), {
                                 icon: sap.m.MessageBox.Icon.INFORMATION,
                                 title: "Confirmation",
@@ -559,7 +560,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
                                         };
                                         if (flag) {
-                                            sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("managerUpdate"));
+                                           // sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("managerUpdate"));
                                         } else {
                                             sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("commomerror"));
                                         }
@@ -569,8 +570,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
                                             EmployeeID: this.EmployeeID
                                         }).then(async () => {
-                                            oPayload = this.getView().getModel("sEmployeeModel").getData()[0];
-                                            await this.updateFunctionForSelf(oPayload, "");
+                                            oPayload.data = that.getView().getModel("sEmployeeModel").getData()[0]
+                                            that.getView().byId("SS_id_Manager").setSelectedKey(oPayload.data.ManagerID);
+                                            //await that.updateFunctionForSelf(oPayload, "");
                                         });
                                         sap.ui.core.BusyIndicator.hide(0);
                                     }
@@ -2064,15 +2066,32 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     oData = oModel.getProperty("/0");
                 }
                 if (oData.ResignationStartDate && oData.ResignationEndDate && oData.ResignComment) {
-                    this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
-                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
-                    this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
-
+                    if(this.sFlag){
+                        this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
+                        this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
+                        this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
+                        this.getView().getModel("viewModel").setProperty("/closeButtonVisible", false)
+                        this.getView().getModel("viewModel").setProperty("/backButtonVisible", true)
+                    }else{
+                        this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
+                        this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
+                        this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
+                        this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
+                        this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
+                    }
+                    
                     this._onPressPreview("Initial");
                 } else {
+                    this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
+                    this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
                     this.getView().getModel("viewModel").setProperty("/BtnVisible", true);
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
                     this.getView().getModel("viewModel").setProperty("/editableResignatin", true)
+                }
+            },
+            RF_onPressbackButton:function(){
+                if(this.sFlag){
+                    this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInbox" });
                 }
             },
             RF_onPressCloseDialog: function () {

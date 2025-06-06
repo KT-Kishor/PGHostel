@@ -34,13 +34,12 @@ sap.ui.define([
                         this.ExpenseID = this.ExpenseID.split("|")[0];
                         this.MyInBox = true;
                     }
-                    this.getView().byId("EODF_id_ObjectPageLayoutEmp").setSelectedSection(this.getView().byId("idExpObjectPageSection"));
-
+                    
                     await this._fetchCommonData("Currency", "CurrencyModel");
                     await this._fetchCommonData("Expense", "FilteredExpenseModel", {
                         ExpenseID: this.ExpenseID,
                     });
-
+                    
                     var viewModel = new JSONModel({
                         isEditMode: false,
                         status: true,
@@ -51,24 +50,24 @@ sap.ui.define([
                         SubmitBtn: false,
                         SaveBtn: false,
                     });
-
+                    
                     this.getView().setModel(viewModel, "viewModel");
                     this.LoginModel = this.getView().getModel("LoginModel");
                     this.ViewModel = this.getView().getModel("viewModel");
-
+                    
                     var oUploadModel = new sap.ui.model.json.JSONModel({ File: "", FileName: "", FileType: "" });
                     this.getView().setModel(oUploadModel, "UploadModel");
-
+                    
                     this.FilteredExpenseModel = this.getView().getModel("FilteredExpenseModel").getData();
-
+                    
                     this.IndexNoIncreent();
-
+                    
                     if (this.FilteredExpenseModel[0].Status === "Submitted" || this.FilteredExpenseModel[0].Status === "Send to account") {
                         this.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
                     } else {
                         this.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.SingleSelectLeft);
                     }
-
+                    
                     if (
                         this.FilteredExpenseModel[0].Status === "Draft" ||
                         this.FilteredExpenseModel[0].Status === "Send back by manager" ||
@@ -78,7 +77,7 @@ sap.ui.define([
                     } else {
                         this.ViewModel.setProperty("/status", false);
                     }
-
+                    
                     if (this.FilteredExpenseModel[0].TripType !== "Customer Facing") {
                         this.ViewModel.setProperty("/required", false);
                     }
