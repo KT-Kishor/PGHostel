@@ -169,7 +169,7 @@
 														<m:Input value="{CompanyInvoiceItemModel>Unit}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="20" valueStateText="{i18n>UnitValueText}" />
 													</m:VBox>
 													<m:VBox width="49%">
-														<m:Input value="{CompanyInvoiceItemModel>UnitText}" editable="false" />
+														<m:Input value="{CompanyInvoiceItemModel>UnitText}" editable="{visiablityPlay>/editable}" maxLength="20" />
 													</m:VBox>
 												</m:HBox>
 												</m:cells>

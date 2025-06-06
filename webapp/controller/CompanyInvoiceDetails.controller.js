@@ -57,7 +57,7 @@ sap.ui.define([
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
 
                 oView.setModel(new JSONModel({
-                    results: [], InvNo: this.newID, IndexNo: "", ItemID: "", Particulars: "", SAC: "", Rate: "", Currency: "INR",
+                    results: [], InvNo: this.newID, IndexNo: "", ItemID: "", UnitText : "", Particulars: "", SAC: "", Rate: "", Currency: "INR",
                     Total: "", gstAmount: "", TotalAmount: "", subTotal: ""
                 }), "FilteredSOWModel");
 
@@ -101,6 +101,7 @@ sap.ui.define([
                     oView.setModel(new JSONModel({ CompanyInvoiceItem: aItems }), "CompanyInvoiceItemModel");
 
                     const { IGST = "0", SGST = "0", CGST = "0", Value, Currency, PayByDate, Status, InvNo } = oHeader;
+                    this.getView().getModel("FilteredSOWModel").setProperty("/Currency", Currency);
                     if (IGST === "0") {
                         this.visiablityPlay.setProperty("/igstVisi", false);
                         this.visiablityPlay.setProperty("/gstVisiable", true);
@@ -145,7 +146,6 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/createVisi", false);
                         this.visiablityPlay.setProperty("/Edit", false);
                         this.visiablityPlay.setProperty("/MultiEmail", false);
-                        this.visiablityPlay.setProperty("/merge", false);
                     }
                     this.Status = Status;
                     this.totalAmountCalculation();
@@ -591,6 +591,7 @@ sap.ui.define([
                         InvNo: oSelectedCustomerModel.InvNo,
                         SAC: item.SAC,
                         Unit: item.Unit,
+                        UnitText: item.UnitText,
                         Particulars: item.Particulars,
                         Rate: item.Rate,
                         Total: item.Total,
@@ -745,7 +746,6 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/MultiEmail", true);
                         if (Status !== "Payment Received") this.visiablityPlay.setProperty("/payByDate", this.ReminderEmail);
                         if (Status === "Payment Received") {
-                            this.visiablityPlay.setProperty("/merge", false);
                             this.visiablityPlay.setProperty("/MultiEmail", false);
                             this.visiablityPlay.setProperty("/Edit", false);
                         }
@@ -970,10 +970,10 @@ sap.ui.define([
                         this.Readcall("InvoicePaymentDetail", { InvNo: this.decodedPath });
                         this.Readcall("CompanyInvoice", { InvNo: this.decodedPath });
 
-                        const hasDue = parseFloat(oData.DueAmount) > 0;
+                        const hasDue = parseFloat(paymentModel.DueAmount) > 0;
                         this.visiablityPlay.setProperty("/payByDate", hasDue ? this.ReminderEmail : false);
                         this.visiablityPlay.setProperty("/MultiEmail", hasDue);
-                        this.visiablityPlay.setProperty("/Edit", !hasDue);
+                        this.visiablityPlay.setProperty("/Edit", hasDue);
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         this.visiablityPlay.setProperty("/merge", true);

@@ -105,12 +105,12 @@
 						<cells>
 							<Text text="{PaymentDetailModel>TransactionId}" />
 							<Text text="{PaymentDetailModel>ReceivedDate}" />
-							<Text text="{PaymentDetailModel>TotalAmount}" />
-							<Text text="{PaymentDetailModel>ReceivedAmount}" />
-							<Text text="{PaymentDetailModel>ReceivedTDS}" />
-							<Text text="{PaymentDetailModel>DueAmount}" />
-							<Text text="{PaymentDetailModel>ConversionRate}" />
-							<Text text="{PaymentDetailModel>AmountInINR}" />
+							<Text text="{path:'PaymentDetailModel>TotalAmount',formatter: '.Formatter.fromatNumber'}" />
+							<Text text="{path:'PaymentDetailModel>ReceivedAmount',formatter: '.Formatter.fromatNumber'}" />
+							<Text text="{path:'PaymentDetailModel>ReceivedTDS',formatter: '.Formatter.fromatNumber'}" />
+							<Text text="{path:'PaymentDetailModel>DueAmount',formatter: '.Formatter.fromatNumber'}" />
+							<Text text="{path:'PaymentDetailModel>ConversionRate',formatter: '.Formatter.fromatNumber'}" />
+							<Text text="{path:'PaymentDetailModel>AmountInINR',formatter: '.Formatter.fromatNumber'}" />
 						</cells>
 					</ColumnListItem>
 				</items>
