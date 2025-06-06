@@ -359,6 +359,7 @@
 										<m:Label
                                             text="{i18n>role}"
                                             id="SS_id_lr"
+                                            visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                         />
 										<m:Select
                                             editable="{viewModel>/AdminRole}"
@@ -366,7 +367,7 @@
                                             showSecondaryValues="true"
                                             id="SS_id_RoleEmpSele"
                                             items="{RoleModel>/}"
-                                            visible="{viewModel>/RelievingLetter}"
+                                            visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                             valueStateText="{i18n>combovalueState}"
                                         >
 											<core:ListItem
@@ -378,7 +379,7 @@
                                             text="{i18n>employeeStatus}"
                                             id="SS_id_les"
                                             required="true"
-                                            visible="{viewModel>/RelievingLetter}"
+                                            visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                         />
 										<m:Select
                                             change="SS_onStatusChange"
@@ -386,7 +387,7 @@
                                             editable="{viewModel>/AdminRole}"
                                             selectedKey="{sEmployeeModel>/0/EmployeeStatus}"
                                             items="{StatusEmp>/}"
-                                            visible="{viewModel>/RelievingLetter}"
+                                            visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                         >
 											<core:Item
                                                 key="{StatusEmp>Value}"

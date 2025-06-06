@@ -100,12 +100,15 @@ sap.ui.define([
         },
 
       visibilityFormatter: function (selfServiceBtn, role, type) {
-            var hasPermission = selfServiceBtn &&
-                (role === 'Admin' || role === 'HR Manager' || role === 'HR');
+            var hasPermission = selfServiceBtn 
+                var roleData = (role === 'Admin' || role === 'HR Manager' || role === 'HR');
 
             var isSaveType = type === 'Save';
-
-            return hasPermission && isSaveType;
+            if(roleData){
+                return hasPermission && roleData || isSaveType ;
+            }else{
+                return hasPermission && isSaveType;
+            }
     },
 
     formatGrade: function (value) {
