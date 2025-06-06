@@ -428,7 +428,7 @@ sap.ui.define([
                     if (responce) {
                         MessageToast.show(Message);
                         await this.CommonReadCallForSow();
-                        this.SOW_oDialog.close();
+                        if(this.SOW_oDialog) this.SOW_oDialog.close();
                         this.closeBusyDialog();
                     } else {
                         MessageToast.show("Sow updated failed");
