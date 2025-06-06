@@ -230,7 +230,7 @@ sap.ui.define([
       // Validate PAN Card on Input
       MC_ValidatePanCard: function (oEvent) {
         var oInput = oEvent.getSource();
-        utils._LCvalidatePanCard(oEvent);
+        utils._LCvalidateMandatoryField(oEvent);
         if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
       },
 
@@ -296,7 +296,7 @@ sap.ui.define([
           var oData = this.getView().getModel("CustomerModel").getData();
           var isValid = true;
           // Optional Field Validations
-          if (oData.PAN && !utils._LCvalidatePanCard(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
+          if (oData.PAN && !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
           if (oData.GST && !utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID")) isValid = false;
           if (oData.mobileNo && !utils._LCvalidateMobileNumber(sap.ui.getCore().byId("MC_id_CustMob"), "ID")) isValid = false;
           if (oData.LUT && !utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID")) isValid = false;
@@ -357,7 +357,7 @@ sap.ui.define([
           var sCustomerId = oSelectedItem.getBindingContext("CreateCustomerModel").getProperty("ID");
           var isValid = true;
           // Optional Field Validations
-          if (oUpdatedData.PAN && !utils._LCvalidatePanCard(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
+          if (oUpdatedData.PAN && !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
           if (oUpdatedData.GST && !utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID")) isValid = false;
           if (oUpdatedData.mobileNo && !utils._LCvalidateMobileNumber(sap.ui.getCore().byId("MC_id_CustMob"), "ID")) isValid = false;
           if (oUpdatedData.LUT && !utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID")) isValid = false;

@@ -285,7 +285,7 @@ sap.ui.define([
                     await this.totalAmountCalculation();
                     if (isINR) {
                         const subTotal = parseFloat(oSelectedCustomerModel.getProperty("/SubTotalInGST")) || 0;
-                        oSelectedCustomerModel.setProperty("/IncomeTax", ((subTotal * 10) / 100).toFixed(2));
+                        oSelectedCustomerModel.setProperty("/IncomeTax", ((subTotal * parseFloat(this.getView().getModel("SelectedCustomerModel").getData().IncomePerc)) / 100).toFixed(2));
                     }
                 } catch (error) {
                     MessageToast.show(error.responseText);
@@ -473,7 +473,7 @@ sap.ui.define([
                 }
                 await this.totalAmountCalculation();
                 var oNavigationModel = this.getView().getModel("SelectedCustomerModel");
-                if (oNavigationModel.getData().Currency === "INR") oNavigationModel.setProperty("/IncomeTax", parseInt((oNavigationModel.getData().SubTotalInGST * 10) / 100).toFixed(2));
+                if (oNavigationModel.getData().Currency === "INR") oNavigationModel.setProperty("/IncomeTax", parseInt((oNavigationModel.getData().SubTotalInGST * parseFloat(oNavigationModel.getData().IncomePerc)) / 100).toFixed(2));
             },
             CID_onPressAddCustomer: function () { this.getRouter().navTo("RouteManageCustomer", { value: "Data" }); },
 

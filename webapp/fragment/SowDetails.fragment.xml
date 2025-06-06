@@ -66,8 +66,8 @@
                 <Input value="{oModelDataPro>IndexNo}" maxLength="10" width="100%" />
             </cells>
             <cells>
-                <HBox width="100%" justifyContent="Start" alignItems="Center">
-                    <VBox width="30%">
+                <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center">
+                    <VBox width="28%">
                         <ComboBox 
                             items="{Salutation>/salutation}" 
                             selectedKey="{oModelDataPro>/Salutation}" 
@@ -76,7 +76,7 @@
                             <core:Item key="{Salutation>text}" text="{Salutation>text}" />
                         </ComboBox>                       
                     </VBox>
-                    <VBox width="70%">
+                    <VBox width="68%">
                         <Input value="{oModelDataPro>ConsultantName}" maxLength="50" width="100%" />
                     </VBox>
                 </HBox>
@@ -90,11 +90,11 @@
                 </ComboBox>
             </cells>
             <cells>
-                <HBox width="100%" justifyContent="Start" alignItems="Center">
-                    <VBox width="60%">
+                <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center">
+                    <VBox width="58%">
                         <Input value="{oModelDataPro>Rate}" maxLength="50" width="100%" textAlign="End" id="SOW_id-Rate" liveChange="onRateChange"/>
                     </VBox>                   
-                    <VBox width="40%">
+                    <VBox width="38%">
                         <ComboBox items="{RateType>/}" selectedKey="Per Day" value="{oModelDataPro>PerDay}" width="100%">
                             <core:Item key="{RateType>ID}" text="{RateType>RateType}" />                           
                         </ComboBox>

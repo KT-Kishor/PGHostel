@@ -1,19 +1,24 @@
 sap.ui.define([
     "./BaseController",  
-    "sap/ui/core/BusyIndicator",  
 ],
-    function (BaseController,BusyIndicator) {
+    function (BaseController,) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSA", {
             onInit: function () {
                 this.getRouter().getRoute("RouteMSA").attachMatched(this._onRouteMatched, this);
                 this._fetchCommonData("ManageCustomer", "CompanyNameModel");
             },
-            _onRouteMatched: async function () {               
+            _onRouteMatched: async function () {   
+                try{
                 var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
                 if (!LoginFUnction) return;
                 await this.MSA_onSearch();
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");            
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");  
+                } catch (error) {
+                  sap.m.MessageToast.show(error.message || error.responseText);
+                } finally {
+                    this.closeBusyDialog(); // Close after async call finishes
+                }                  
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
