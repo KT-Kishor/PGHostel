@@ -107,7 +107,13 @@ sap.ui.define([
             if(roleData){
                 return hasPermission && roleData || isSaveType ;
             }else{
-                return hasPermission && isSaveType;
+                if(hasPermission === true){
+                    if(isSaveType === true){
+                        return true;
+                    }
+                }else{
+                    return false;
+                }
             }
     },
 
