@@ -187,7 +187,6 @@
 									<m:OverflowToolbar>
 										<m:ToolbarSpacer />
 										<m:Button visible="{visiablityPlay>/invBtn}"  text="{i18n>addItem}" tooltip="{i18n>addItem}" press="CI_onPressAddInvoiceDetails" type="Accept" />
-										<m:ToolbarSeparator />
 									</m:OverflowToolbar>
 									<m:Table id="CI_id_ConsultantInvoiceDeatailTable"  
 									items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}"
@@ -201,7 +200,7 @@
 													<core:CustomData key="p13nData" 
                                                             value='{"columnKey": "SNo", "leadingProperty": "SNo", "sortProperty": "SNo", "filterProperty": "SNo", "columnIndex": 1}' />
 												</m:customData>
-												<m:Text text="{i18n>siNo}" />
+												<m:Text text="{i18n>invoiiceitemsiNo}" />
 											</m:Column>
 											<m:Column width="300px"  hAlign="Left" demandPopin="true">
 												<m:customData>
@@ -263,7 +262,8 @@
 											<m:ColumnListItem >
 												<m:cells>
 												<!-- SNo (Column 1) -->
-													<m:Input value="{ConsultantInvoiceModel>IndexNo}" editable="false" />
+												<m:Text text="{ConsultantInvoiceModel>IndexNo}" ></m:Text>
+
 												<!-- Item (Column 2) -->
 													<m:VBox>
 														<m:items>

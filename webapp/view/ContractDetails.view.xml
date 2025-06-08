@@ -46,7 +46,7 @@
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
 							<Input value="{ContractModelWizart>/ClientReportContact}"
-                             placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" liveChange="CD_validateName" valueStateText="{i18n>commonNameValueState}"/>
+                             placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" change="CD_validateName" valueStateText="{i18n>commonNameValueState}"/>
 							<Label text="{i18n>locationswhereServices}" />
 							<Select id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}">
 								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
@@ -124,7 +124,7 @@
 							<Label text="{i18n>consultantEmailID}"/>
 							<Text text="{ContractModelWizart>/ContarctEmail}"/>
 							<Label text="{i18n>amount}"/>
-							<Text text="{path:'ContractModelWizart>/Amount', formatter: '.Formatter.formatCurrency'} {ContractModelWizart>/Currency} Per {ContractModelWizart>/Rate}" />	
+							<Text text="{path:'ContractModelWizart>/Amount', formatter: '.Formatter.formatCurrencyInINRText'} {ContractModelWizart>/Currency} Per {ContractModelWizart>/Rate}" />	
 							<Label text="{i18n>endClientHirer}"/>
 							<Text text="{ContractModelWizart>/EndClientHirer}"/>
 							<Label text="{i18n>locationswhereServices}"/>

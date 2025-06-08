@@ -223,29 +223,22 @@ sap.ui.define(
                 },
 
                 CI_onChangeContractDetails: function (oEvent) {
-                    // Extract contract ID and name
-                    let sValue = oEvent.getSource().getValue().split(' - ');
+                    let sValue = oEvent.getSource().getValue().split(' - ');   // Extract contract ID and name
                     let contractID = sValue[0];
                     let contractName = sValue[1];
-
-                    // Confirmation message
-                    let oMsgText = this.i18nModel.getText("selectContractNo");
-
-                    // Get contract model data
-                    let oModelData = this.getView().getModel("contractModel").getData();
+                    let oMsgText = this.i18nModel.getText("selectContractNo"); // Confirmation message
+                    let oModelData = this.getView().getModel("contractModel").getData(); // Get contract model data
                     let aContractData = Array.isArray(oModelData) ? oModelData : oModelData.results || [];
 
                     // Find the matching contract
                     let oSelectedContract = aContractData.find(contract => contract.ContractNo === contractID);
-
                     if (!oSelectedContract) {
                         sap.m.MessageToast.show("Selected contract not found.");
                         return;
                     }
 
-                    // Get required fields
-                    let sMobileNo = oSelectedContract.MobileNo || "";
-                    let sConsultantAddress = oSelectedContract.ConsultantAddress || "";
+                    let sMobileNo = oSelectedContract.MobileNo || "";  // Get required fields
+                    let sConsultantAddress = oSelectedContract.ConsultantAddress || "";  // Get required fields
 
                     // Show confirmation dialog
                     this.showConfirmationDialog(
@@ -263,8 +256,8 @@ sap.ui.define(
                     );
                 },
 
-                readFunction:async function (entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress) {
-                       await  this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
+                readFunction: function (entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress) {
+                         this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
                         var oJSONModel = new sap.ui.model.json.JSONModel(oData);
                         this.getView().setModel(oJSONModel, modelName);
 
@@ -612,7 +605,7 @@ sap.ui.define(
                     oModel.setProperty("/CGSTVisible", false);
                     oModel.setProperty("/SGSTVisible", false);
                     oModel.setProperty("/IGSTVisible", true);
-                      oModel.setProperty("/CGST", 0);
+                    oModel.setProperty("/CGST", 0);
                     oModel.setProperty("/SGST", 0);
 
                     oConsultantInvoiceModel.setProperty("/CGSTVisible", false);
@@ -1572,13 +1565,13 @@ sap.ui.define(
                     Formatter.fromatNumber(item.Discount) || "-",
                     Formatter.fromatNumber(item.Total)
                 ];
-                if (showSAC) row.splice(3, 0, item.SAC); // Insert SAC as 4th column if required
+                if (showSAC) row.splice(2, 0, item.SAC); // Insert SAC as 4th column if required
                 return row;
             });
 
             const head = showSAC
-                ? [['Sl.No.', 'Item Description', 'Days', 'SAC', 'Unit Price', 'Discount', 'Total']]
-                : [['Sl.No.', 'Item Description', 'Days', 'Unit Price', 'Discount', 'Total']];
+                ? [['Sl.No.', 'Item Description', 'SAC', 'Days/Unit', 'Unit Price', 'Discount', 'Total']]
+                : [['Sl.No.', 'Item Description', 'Days/Unit', 'Unit Price', 'Discount', 'Total']];
 
             doc.autoTable({
                 startY: currentY,
@@ -1586,13 +1579,14 @@ sap.ui.define(
                 body: body,
                 theme: 'grid',
                 headStyles: { fillColor: [41, 128, 185] },
-                styles: {font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30] },
+                styles: {font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30],
+                halign: "center"},
                 columnStyles: {
                     0: { halign: 'center' },
-                    1: { halign: 'center' },
+                    1: { halign: 'left' },
                     ...(showSAC ? { 
                         2: { halign: 'center' }, 
-                        3: { halign: 'center' }, 
+                        3: { halign: 'right' }, 
                         4: { halign: 'right' }, 
                         5: { halign: 'right' }, 
                         6: { halign: 'right' } 
@@ -1603,24 +1597,24 @@ sap.ui.define(
                         5: { halign: 'right' } 
                     })
                 },
-                 didParseCell: function (data) {
-                if (data.section === 'head') {
-                // Adjust header alignment for numeric columns
-                if (showSAC) {
-                    if ([4, 5, 6].includes(data.column.index)) {
-                    data.cell.styles.halign = 'right';
-                    } else {
-                    data.cell.styles.halign = 'center';
-                    }
-                } else {
-                    if ([3, 4, 5].includes(data.column.index)) {
-                    data.cell.styles.halign = 'right';
-                    } else {
-                    data.cell.styles.halign = 'center';
-                    }
-                }
-                }
-            }
+            //      didParseCell: function (data) {
+            //     if (data.section === 'head') {
+            //     // Adjust header alignment for numeric columns
+            //     if (showSAC) {
+            //         if ([4, 5, 6].includes(data.column.index)) {
+            //         data.cell.styles.halign = 'right';
+            //         } else {
+            //         data.cell.styles.halign = 'center';
+            //         }
+            //     } else {
+            //         if ([3, 4, 5].includes(data.column.index)) {
+            //         data.cell.styles.halign = 'right';
+            //         } else {
+            //         data.cell.styles.halign = 'center';
+            //         }
+            //     }
+            //     }
+            // }
             });
     
             currentY = doc.lastAutoTable.finalY + 10;

@@ -323,7 +323,9 @@ sap.ui.define([
             CD_validateName: function(oEvent) {
                 const oSource = oEvent.getSource();
                 const selectedKey = oSource.getSelectedKey?.().trim();
-                const value = oSource.getSelectedItem().getAdditionalText()
+                const selectedItem = oSource.getSelectedItem();
+                const value = selectedItem ? selectedItem.getAdditionalText() : ""; // Check if selectedItem is not null
+                
                 let oModel, oInput;
                 if (this.sArgPara === "CreateContractFlag") {
                     oModel = this.getView().getModel("ContractModelWizart");
@@ -332,6 +334,7 @@ sap.ui.define([
                     oModel = this.getView().getModel("oFilteredContractModel");
                     oInput = this.byId("CU_id_ClientReportContact");
                 }
+
                 if (oModel) {
                     if (selectedKey) {
                         oModel.setProperty("/Salutation2", selectedKey);
@@ -342,9 +345,9 @@ sap.ui.define([
                     } else {
                         oModel.setProperty("/Salutation2", "");
                         oModel.setProperty("/ClientReportContact", "");
-
                     }
                 }
+
                 utils._LCvalidateName(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); // Validation step for wizard flow

@@ -1346,46 +1346,41 @@ sap.ui.define([
                     body: body,
                     theme: 'grid',
                     headStyles: { fillColor: [41, 128, 185] },
-                    styles: {
-                        font: "times",
-                        fontSize: 10,
-                        cellPadding: 3,
-                        lineWidth: 0.5,
-                        lineColor: [30, 30, 30]
-                    },
+                    styles: {font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30],
+                     halign: "center"},
                     columnStyles: {
-                        0: { halign: 'center' },
-                        1: { halign: 'center' },
-                        ...(showSAC ? {
-                            2: { halign: 'center' },
-                            3: { halign: 'center' },
-                            4: { halign: 'right' },
-                            5: { halign: 'right' },
-                            6: { halign: 'right' }
-                        } : {
-                            2: { halign: 'center' },
-                            3: { halign: 'right' },
-                            4: { halign: 'right' },
-                            5: { halign: 'right' }
-                        })
-                    },
-                    didParseCell: function (data) {
-                        if (data.section === 'head') {
-                            if (showSAC) {
-                                if ([4, 5, 6].includes(data.column.index)) {
-                                    data.cell.styles.halign = 'right';
-                                } else {
-                                    data.cell.styles.halign = 'center';
-                                }
-                            } else {
-                                if ([3, 4, 5].includes(data.column.index)) {
-                                    data.cell.styles.halign = 'right';
-                                } else {
-                                    data.cell.styles.halign = 'center';
-                                }
-                            }
-                        }
-                    }
+                    0: { halign: 'center' },
+                    1: { halign: 'left' },
+                    ...(showSAC ? { 
+                        2: { halign: 'center' }, 
+                        3: { halign: 'right' }, 
+                        4: { halign: 'right' }, 
+                        5: { halign: 'right' }, 
+                        6: { halign: 'right' } 
+                    } : { 
+                        2: { halign: 'center' }, 
+                        3: { halign: 'right' }, 
+                        4: { halign: 'right' }, 
+                        5: { halign: 'right' } 
+                    })
+                },
+                    // didParseCell: function (data) {
+                    //     if (data.section === 'head') {
+                    //         if (showSAC) {
+                    //             if ([4, 5, 6].includes(data.column.index)) {
+                    //                 data.cell.styles.halign = 'right';
+                    //             } else {
+                    //                 data.cell.styles.halign = 'center';
+                    //             }
+                    //         } else {
+                    //             if ([3, 4, 5].includes(data.column.index)) {
+                    //                 data.cell.styles.halign = 'right';
+                    //             } else {
+                    //                 data.cell.styles.halign = 'center';
+                    //             }
+                    //         }
+                    //     }
+                    // }
                 });
 
                 currentY = doc.lastAutoTable.finalY + 10;
