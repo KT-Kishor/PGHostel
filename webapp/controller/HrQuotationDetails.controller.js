@@ -22,7 +22,7 @@ sap.ui.define(
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
         this.getBusyDialog();
-        this._ViewDatePickersReadOnly(["HQD_id_Quotation", "HQD_id_QuotationValid"],this.getView())
+        this._ViewDatePickersReadOnly(["HQD_id_Quotation", "HQD_id_QuotationValid"], this.getView())
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
         await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
@@ -34,7 +34,7 @@ sap.ui.define(
           this.byId("HQD_id_Country").setBusy(true);
           this.byId("HQD_id_BranchCode").setBusy(true);
 
-          if (!this.getView().getModel("CountryModel"))await this._fetchCommonData("Country", "CountryModel");
+          if (!this.getView().getModel("CountryModel")) await this._fetchCommonData("Country", "CountryModel");
           if (!this.getView().getModel("BrachModel")) this._fetchCommonData("BaseLocation", "BrachModel");
           if (!this.getView().getModel("SACModel")) this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
 
@@ -108,7 +108,7 @@ sap.ui.define(
           // Edit Mode
           if (!this.getView().getModel("CCMailModel")) await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
           if (!this.getView().getModel("CountryModel")) await this._fetchCommonData("Country", "CountryModel");
-           if (!this.getView().getModel("SACModel")) await this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
+          if (!this.getView().getModel("SACModel")) await this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
           var oSelectedQuotation = aQuotations.find(item => item.QuotationNo === sQuotationNo);
           if (oSelectedQuotation) {
@@ -138,7 +138,7 @@ sap.ui.define(
             const sCountry = oSelectedQuotation.Country;
             if (sCountry === "India") {
               await this._fetchCommonData("BaseLocation", "BrachModel");
-            }else{
+            } else {
 
             }
 
@@ -160,7 +160,7 @@ sap.ui.define(
                   CGSTVisible: cgstVisible,
                   SGSTVisible: sgstVisible,
                   IGSTVisible: igstVisible,
-                  
+
                 });
                 this.getView().setModel(oQuotationModel, "QuotationModel");
                 this.updateTotalAmount();
@@ -385,7 +385,7 @@ sap.ui.define(
         var sCurrency = this.getView().getModel("SingleCompanyModel").getProperty("/Currency");
         var bIsINR = sCurrency === "INR";
 
-        //  Declare required variables
+        // Declare required variables
         var subTotalTaxable = 0;
         var subTotalNonTaxable = 0;
         var cgst = 0;
@@ -396,13 +396,15 @@ sap.ui.define(
         aItems.forEach(function (oItem) {
           // Enforce GSTCalculation flag based on currency
           if (!bIsINR && oItem.GSTCalculation !== "No") {
-
+            // Your existing code
           }
 
+          // Fix: Handle cases where Days is 0 or undefined
+          var iDays = parseFloat(oItem.Days) || 0;
+          var iUnitPrice = parseFloat(oItem.UnitPrice) || 0;
 
-          var iItemTotal = oItem.Days
-            ? parseFloat(oItem.Days) * parseFloat(oItem.UnitPrice || 0)
-            : parseFloat(oItem.UnitPrice || 0);
+          // Calculate item total - if Days is 0, just use UnitPrice
+          var iItemTotal = iDays ? iDays * iUnitPrice : iUnitPrice;
 
           var iDiscount = 0;
           if (oItem.IsDiscountPercentage) {
@@ -426,6 +428,7 @@ sap.ui.define(
           }
         });
 
+        // Rest of your existing code remains the same...
         // Update items back into model
         oQuotationModel.setProperty("/QuotationItemModel", aItems);
         oQuotationModel.setProperty("/SubTotal", parseFloat(subTotalTaxable.toFixed(2)));

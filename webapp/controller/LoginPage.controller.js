@@ -33,6 +33,7 @@ sap.ui.define(
             "userName": "",
             "password": "",
             "otp": "",
+            "SetUser": "",
             "isPasswordSelected": true,
             "isOtpSelected": false,
             "isPasswordVisible": true,
@@ -50,6 +51,7 @@ sap.ui.define(
             "frgOtp": "",
             "frgOtpValueState": "None",
             "frgOtpVisible": false,
+            "Setvisibleuser": false,
             "frgNewPassword": "",
             "frgNewPasswordValueState": "None",
             "frgNewPasswordVisible": false,
@@ -59,9 +61,9 @@ sap.ui.define(
           });
           this.getView().setModel(oLoginModel, "LoginViewModel");
           //this.LoginModel = oLoginModel;
-       
+
         },
-   
+
         onpresshome: function () {
           this.getRouter().navTo("RouteHomePage");
         },
@@ -77,6 +79,9 @@ sap.ui.define(
         },
         LP_onpresPassword(oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
+        },
+        FSM_setUsername: function (oEvent) {
+          utils._LCvalidateName(oEvent);
         },
         //for OTPsend
         LP_onOtppress: async function () {
@@ -272,7 +277,7 @@ sap.ui.define(
         SM_onPressCancle: function () {
           const oFragModel = this.getView().getModel("LoginViewModel");
           // Reset all values and value states in the model
-          oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserIdValueState", "None"); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgUserNameValueState", "None"); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpValueState", "None"); oFragModel.setProperty("/frgOtpVisible", false);
+          oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserIdValueState", "None"); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgUserNameValueState", "None"); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpValueState", "None"); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/Setvisibleuser", false);
           oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgNewPasswordValueState", "None");
           oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgConfirmPasswordValueState", "None"); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
           // Reset value states on input fields themselves
@@ -305,9 +310,9 @@ sap.ui.define(
         LP_onTogglePasswordVisibility: function (oEvent) {
           this.SM_onTogglePasswordVisibility(oEvent)
         },
-        FSM_username: function (oEvent) {
-          utils._LCvalidateName(oEvent);
-        },
+        // FSM_username: function (oEvent) {
+        //   utils._LCvalidateName(oEvent);
+        // },
         FSM_userID: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
@@ -375,7 +380,7 @@ sap.ui.define(
                   sap.ui.getCore().byId("FSM_id_userIdInput").setEditable(false);
                   sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(false);
                   sap.ui.getCore().byId("FSM_id_otpInput").setEditable(false);
-                  oFragModel.setProperty("/frgOtpVerified", true); oFragModel.setProperty("/frgNewPasswordVisible", true); oFragModel.setProperty("/frgConfirmPasswordVisible", true);
+                  oFragModel.setProperty("/frgOtpVerified", true); oFragModel.setProperty("/frgNewPasswordVisible", true); oFragModel.setProperty("/frgConfirmPasswordVisible", true); oFragModel.setProperty("/Setvisibleuser", true);
                 } else {
                   this.closeBusyDialog();
                   MessageToast.show(this.i18nModel.getText("invalidOTP"));
@@ -407,7 +412,7 @@ sap.ui.define(
           try {
             this.getBusyDialog();
             await this.ajaxUpdateWithJQuery("LoginDetails", {
-              data: { Password: btoa(sap.ui.getCore().byId("FSM_id_newPasswordInput").getValue()) },
+              data: { Password: btoa(sap.ui.getCore().byId("FSM_id_newPasswordInput").getValue()), EmployeeName: sap.ui.getCore().byId("FSM_id_setusername").getValue() },
               filters: { EmployeeID: sap.ui.getCore().byId("FSM_id_userIdInput").getValue() }
             }).then((response) => {
               if (response.success === true) {
@@ -418,7 +423,7 @@ sap.ui.define(
                 sap.ui.getCore().byId("FSM_id_SaveBTN").setText(this.i18nModel.getText("continue"));
                 sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
                 oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserName", "");
-                oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
+                oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false); oFragModel.setProperty("/Setvisibleuser", false); oFragModel.setProperty("/SetUser", "");
 
                 if (this.oPassforgot) {
                   this.oPassforgot.close();
@@ -441,7 +446,7 @@ sap.ui.define(
         OnOTPverify: function () {
           this.SM_onPressSave()
         },
-       
+
         FSM_onConfirm: function () {
           const oFragModel = this.getView().getModel("LoginViewModel");
           if (oFragModel.getProperty("/frgNewPassword") !== oFragModel.getProperty("/frgConfirmPassword")) {
@@ -452,7 +457,7 @@ sap.ui.define(
             sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
           }
         },
-         FSM_onConfirmPass:function(){
+        FSM_onConfirmPass: function () {
           this.SM_onPressSave()
         },
       }
