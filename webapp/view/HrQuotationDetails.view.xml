@@ -30,7 +30,7 @@
                                     editable="true"
                                     layout="ColumnLayout"
                                     labelSpanXL="4"
-                                    labelSpanL="3"
+                                    labelSpanL="3"  
                                     labelSpanM="4"
                                     labelSpanS="12"
                                     columnsXL="2"

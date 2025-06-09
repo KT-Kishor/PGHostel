@@ -129,12 +129,12 @@
                     <ColumnListItem type="Navigation" press="HQ_onPressQuotation">
                         <cells>
                             <Text text="{CompanyQuotationModel>QuotationNo}" />
-                            <Text text="{path:'CompanyQuotationModel>Date',formatter:'.Formatter.formatDate'}" />
+                            <Text text="{path:'CompanyQuotationModel>Date',formatter:'.Formatter.formatDate'}"/>
                             <Text text="{CompanyQuotationModel>CustomerName}" />
                             <Text text="{CompanyQuotationModel>CustomerGSTNO}" />
                             <Text text="{CompanyQuotationModel>CustomerEmailID}" />
-    <Text text="{CompanyQuotationModel>CustomerSTDCode} {CompanyQuotationModel>CustomerMobileNo}" />
-                            <Text text="{CompanyQuotationModel>Currency} {path:'CompanyQuotationModel>TotalSum',formatter: '.Formatter.fromatNumber'}" />
+                            <Text text="{CompanyQuotationModel>CustomerSTDCode} {CompanyQuotationModel>CustomerMobileNo}" />
+                            <Text text="{CompanyQuotationModel>Currency} {path:'CompanyQuotationModel>TotalSum',formatter: '.Formatter.fromatNumber'}"/>
 
                         </cells>
                     </ColumnListItem>

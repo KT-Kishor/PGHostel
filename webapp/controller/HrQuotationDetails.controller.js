@@ -12,10 +12,6 @@ sap.ui.define(
     return BaseController.extend("sap.kt.com.minihrsolution.controller.RouteHrQuotationDetails", {
       Formatter: Formatter,
       onInit: function () {
-        var QuotaionModel = {
-        }
-        var oModel = new JSONModel(QuotaionModel);
-        this.getView().setModel(oModel, "quotation");
         var oQuotationModel = new JSONModel();
         this.getView().setModel(oQuotationModel, "QuotationModel");
         this.getRouter().getRoute("RouteHrQuotationDetails").attachMatched(this._onRouteMatched, this);
@@ -25,8 +21,8 @@ sap.ui.define(
         var sQuotationNo = decodeURIComponent(oArgs.sQuotationNo);
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
-
         this.getBusyDialog();
+        this._ViewDatePickersReadOnly(["HQD_id_Quotation", "HQD_id_QuotationValid"],this.getView())
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
         await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
@@ -38,9 +34,9 @@ sap.ui.define(
           this.byId("HQD_id_Country").setBusy(true);
           this.byId("HQD_id_BranchCode").setBusy(true);
 
-          await this._fetchCommonData("Country", "CountryModel");
-          this._fetchCommonData("BaseLocation", "BrachModel");
-          this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
+          if (!this.getView().getModel("CountryModel"))await this._fetchCommonData("Country", "CountryModel");
+          if (!this.getView().getModel("BrachModel")) this._fetchCommonData("BaseLocation", "BrachModel");
+          if (!this.getView().getModel("SACModel")) this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
 
           //  Set Busy false after data has loaded
           this.byId("HQD_id_Country").setBusy(false);
@@ -106,17 +102,17 @@ sap.ui.define(
 
           oVisiModel.setData({ editable: true });
           this.getView().setModel(oVisiModel, "visiablityPlay");
-
         }
         // Inside the onRouteMatched function's else block (edit mode)
         else {
           // Edit Mode
-          this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" }); this._fetchCommonData("Country", "CountryModel");this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
+          if (!this.getView().getModel("CCMailModel")) await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
+          if (!this.getView().getModel("CountryModel")) await this._fetchCommonData("Country", "CountryModel");
+           if (!this.getView().getModel("SACModel")) await this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
           var oSelectedQuotation = aQuotations.find(item => item.QuotationNo === sQuotationNo);
           if (oSelectedQuotation) {
             var oSelectedModel = new JSONModel(oSelectedQuotation);
-
             // Determine GST values
             var cgst = parseFloat(oSelectedQuotation.CGST || 0);
             var sgst = parseFloat(oSelectedQuotation.SGST || 0);
@@ -141,11 +137,9 @@ sap.ui.define(
             this.getView().setModel(oSelectedModel, "SingleCompanyModel");
             const sCountry = oSelectedQuotation.Country;
             if (sCountry === "India") {
-
               await this._fetchCommonData("BaseLocation", "BrachModel");
+            }else{
 
-            } else {
-              // this.CountryAndCity();
             }
 
             setTimeout(() => {
@@ -166,7 +160,7 @@ sap.ui.define(
                   CGSTVisible: cgstVisible,
                   SGSTVisible: sgstVisible,
                   IGSTVisible: igstVisible,
-
+                  
                 });
                 this.getView().setModel(oQuotationModel, "QuotationModel");
                 this.updateTotalAmount();

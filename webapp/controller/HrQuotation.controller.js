@@ -18,6 +18,7 @@ sap.ui.define(
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
         this.getBusyDialog()
+        this._ViewDatePickersReadOnly(["HQ_id_Quotaiondate"],this.getView())
         // this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         await this._fetchCommonData("Quotation", "CompanyQuotationModel", {});
