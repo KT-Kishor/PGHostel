@@ -399,7 +399,6 @@ sap.ui.define(
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
           }
-
           if (oFragModel.getProperty("/frgNewPassword") !== oFragModel.getProperty("/frgConfirmPassword")) {
             MessageToast.show(this.i18nModel.getText("misPasswords"));
             return;
@@ -442,6 +441,7 @@ sap.ui.define(
         OnOTPverify: function () {
           this.SM_onPressSave()
         },
+       
         FSM_onConfirm: function () {
           const oFragModel = this.getView().getModel("LoginViewModel");
           if (oFragModel.getProperty("/frgNewPassword") !== oFragModel.getProperty("/frgConfirmPassword")) {
@@ -451,9 +451,10 @@ sap.ui.define(
           } else {
             sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
           }
-
-
-        }
+        },
+         FSM_onConfirmPass:function(){
+          this.SM_onPressSave()
+        },
       }
     );
   }
