@@ -41,6 +41,7 @@ sap.ui.define([
                 await this.MSADetailsReadCall();
                 await this.CommonReadCallForSow();
                 this.closeBusyDialog();
+                this.AdvanceBalance = true;
             },
 
             onRadioButtonGroupSelect: function (oEvent) {
@@ -81,7 +82,13 @@ sap.ui.define([
                 utils._LCvalidateDate(oEvent);
             },
             MSACountryComboBox: function (oEvent) {
-                utils._LCvalidateMandatoryField(oEvent);
+                utils._LCstrictValidationComboBox(oEvent);
+                var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+                var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+                sap.ui.getCore().byId("MSA_Nav_Id_Country").getBinding("items").filter(oFilter);
+            },
+            MSA_onChangeCity: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
             },
             MsaE_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
@@ -142,6 +149,57 @@ sap.ui.define([
                 this.validateStep();
             },
 
+            LC_MSA_RateCharge: function (oEvent) {
+                utils._LCvalidateTraineeAmount(oEvent);
+            },
+
+            onPaymentAdvanceInputChange: function (oEvent) {
+                var sAdvanceInput = this.byId("Msa_Id_PayAdvance");
+                var sBalanceInput = this.byId("Msa_Id_PayBalance");
+
+                var sAdvanceValue = sAdvanceInput.getValue();
+                var sBalanceValue = sBalanceInput.getValue();
+
+                // Regular expression: Up to 2 digits before decimal, optional 1 digit after
+                var regex = /^(?:\d{1,2})(?:\.\d{1})?$/;
+
+                var bAdvanceValid = regex.test(sAdvanceValue);
+                var bBalanceValid = regex.test(sBalanceValue);
+
+                if (!bAdvanceValid || !bBalanceValid) {
+                    sAdvanceInput.setValueState("Error");
+                    sAdvanceInput.setValueStateText("Enter up to 2 digits and 1 decimal place (e.g. 99.9)");
+                    sBalanceInput.setValueState("Error");
+                    sBalanceInput.setValueStateText("Enter up to 2 digits and 1 decimal place (e.g. 99.9)");
+                    this.AdvanceBalance = false;
+                    return;
+                }
+
+                var nAdvance = parseFloat(sAdvanceValue) || 0;
+                var nBalance = parseFloat(sBalanceValue) || 0;
+                var nTotal = nAdvance + nBalance;
+
+                if (nTotal > 100) {
+                    this.AdvanceBalance = false;
+                    var sMsg = "Total of Advance and Balance should not exceed 100%";
+                    sAdvanceInput.setValueState("Error");
+                    sAdvanceInput.setValueStateText(sMsg);
+                    sBalanceInput.setValueState("Error");
+                    sBalanceInput.setValueStateText(sMsg);
+                } else {
+                    this.AdvanceBalance = true;
+                    sAdvanceInput.setValueState("None");
+                    sBalanceInput.setValueState("None");
+                }
+                utils._LCvalidateTraineeAmount(oEvent);
+                this.validateStep();
+            },
+
+
+            LC_MSA_RateCharge: function (oEvent) {
+                utils._LCvalidateTraineeAmount(oEvent);
+            },
+
             MsaE_onEditOrSavePress: async function () {
                 var type = this.getView().getModel("FilteredMsaModel").getData()[0].Type;
                 (type === "Recruitment") ? this.SimpleFormModel.setProperty("/Recruitment", true) : this.SimpleFormModel.setProperty("/Recruitment", false);
@@ -170,37 +228,54 @@ sap.ui.define([
             },
 
             MSA_Frg_Update: async function () {
-                if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_CompanyName"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_HeadPosition"), "ID") &&
-                    utils._LCvalidateName(sap.ui.getCore().byId("MsaE_id_MsaHead"), "ID") &&
-                    utils._LCvalidateDate(sap.ui.getCore().byId("MsaE_id_CreateMSADate"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_MsaPanCard"), "ID") &&
-                    utils._LCvalidateEmail(sap.ui.getCore().byId("MsaE_id_MSAEmail"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_id_MsaAddress"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MSA_Nav_Id_Country"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MsaE_Id_Branch"), "ID")) {
-                    var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
-                    var oData = {
-                        "data": oModel,
-                        "filters": {
-                            "MsaID": oModel.MsaID
+                const isRecruitment = sap.ui.getCore().byId("MsaE_id_Type").getSelectedIndex() === 0;
+
+                const get = sap.ui.getCore().byId.bind(sap.ui.getCore());
+
+                const validationsPassed =
+                    utils._LCvalidateMandatoryField(get("MsaE_id_CompanyName"), "ID") &&
+                    utils._LCvalidateMandatoryField(get("MsaE_id_HeadPosition"), "ID") &&
+                    utils._LCvalidateName(get("MsaE_id_MsaHead"), "ID") &&
+                    utils._LCvalidateDate(get("MsaE_id_CreateMSADate"), "ID") &&
+                    utils._LCvalidateMandatoryField(get("MsaE_id_MsaPanCard"), "ID") &&
+                    utils._LCvalidateEmail(get("MsaE_id_MSAEmail"), "ID") &&
+                    utils._LCvalidateMandatoryField(get("MsaE_id_MsaAddress"), "ID") &&
+                    utils._LCvalidateMandatoryField(get("MSA_Nav_Id_Country"), "ID") &&
+                    utils._LCvalidateMandatoryField(get("MSA_Nav_Id_City"), "ID") &&
+                    utils._LCvalidateMandatoryField(get("MsaE_Id_Branch"), "ID") &&
+                    (!isRecruitment || (
+                        utils._LCvalidateTraineeAmount(get("Msa_Id_RateCharge"), "ID") &&
+                        utils._LCvalidateTraineeAmount(get("Msa_Id_Refund"), "ID") &&
+                        this.AdvanceBalance &&
+                        utils._LCvalidateTraineeAmount(get("Msa_Id_PayAdvance"), "ID") &&
+                        utils._LCvalidateTraineeAmount(get("Msa_Id_PayBalance"), "ID")
+                    ));
+
+                if (validationsPassed) {
+                    const oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
+                    const oPayload = {
+                        data: oModel,
+                        filters: {
+                            MsaID: oModel.MsaID
                         }
-                    }
+                    };
+
                     this.getBusyDialog();
-                    await this.ajaxUpdateWithJQuery("MSADetails", oData).then((oData) => {
-                        if (oData) {
-                            MessageToast.show(this.i18nModel.getText("msaupdateSuccess"));
-                            this.MSA_oDialog.close();
-                        } else {
-                            MessageToast.show(this.i18nModel.getText("msaupdateFailed"));
-                            this.MSA_oDialog.close();
-                        }
+
+                    try {
+                        const oResponse = await this.ajaxUpdateWithJQuery("MSADetails", oPayload);
+                        const messageKey = oResponse
+                            ? "msaupdateSuccess"
+                            : "msaupdateFailed";
+
+                        MessageToast.show(this.i18nModel.getText(messageKey));
+                        this.MSA_oDialog.close();
+                    } catch (error) {
+                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                    } finally {
                         this.closeBusyDialog();
-                    })
-                        .catch((oError) => {
-                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                            this.closeBusyDialog();
-                        })
+                    }
+
                 } else {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     this.closeBusyDialog();
@@ -300,7 +375,6 @@ sap.ui.define([
                 var oDataPro = oModelPro.getProperty("/");
                 oDataPro.push({
                     "IndexNo": String(this.SNoValue),
-                    "SNo": globalThis.crypto.randomUUID(),
                     "ConsultantName": "",
                     "Designation": "",
                     "Rate": "",
@@ -321,24 +395,21 @@ sap.ui.define([
                 var aData = oModel.getData();
                 var selectedItem = aData[sIndex]; // Capture item before modifying array
 
-                // Check if the item is from DB (e.g., has ConsultantName or any DB-specific flag)
-                if (selectedItem && selectedItem.ConsultantName) {
+                if (selectedItem && selectedItem.SNo) {
                     this.showConfirmationDialog(
                         this.i18nModel.getText("msgBoxConfirm"),
-                        this.i18nModel.getText("edudeletConfirmation"),
+                        this.i18nModel.getText("msgBoxConfirmDelete"),
                         function () {
                             that.getBusyDialog();
                             that.ajaxDeleteWithJQuery("/SowDetails", {
                                 filters: { SNo: selectedItem.SNo }
                             }).then(() => {
                                 MessageToast.show(that.i18nModel.getText("sowDeleteSuccess"));
-                                this.CommonReadCallForSow();
-                                // Now safely delete from model
+                                that.CommonReadCallForSow();
                                 aData.splice(sIndex, 1);
                                 aData.forEach((item, index) => item.IndexNo = index + 1);
                                 oModel.setData(aData);
                                 that.SNoValue = aData.length;
-
                                 that.closeBusyDialog();
                             }).catch((error) => {
                                 that.closeBusyDialog();
@@ -428,7 +499,7 @@ sap.ui.define([
                     if (responce) {
                         MessageToast.show(Message);
                         await this.CommonReadCallForSow();
-                        if(this.SOW_oDialog) this.SOW_oDialog.close();
+                        if (this.SOW_oDialog) this.SOW_oDialog.close();
                         this.closeBusyDialog();
                     } else {
                         MessageToast.show("Sow updated failed");
@@ -611,7 +682,7 @@ sap.ui.define([
                 const sowCreateModel = this.getView().getModel("sowCreateModel").getData();
 
                 const transformedData = oModelDataPro.map((item) => ({
-                    MsaID: item.MsaID,
+                    MsaID: this.MSAID,
                     SowID: sowCreateModel.SowID,
                     Description: sowCreateModel.Description,
                     SNo: item.SNo,

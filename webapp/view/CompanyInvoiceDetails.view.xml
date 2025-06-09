@@ -119,29 +119,29 @@
 											</m:Toolbar>
 										</m:headerToolbar>
 										<m:columns>
-											<m:Column>
+											<m:Column width="3rem" minScreenWidth="Tablet">
 												<m:Text text="{i18n>itemID}" />
 											</m:Column>
-											<m:Column>
+											<m:Column minScreenWidth="Tablet">
 												<m:Text text="{i18n>particulars}" />
 											</m:Column>
-											<m:Column id="idSAC">
+											<m:Column id="idSAC" width="8rem" minScreenWidth="Tablet" demandPopin="true">
 												<m:Text text="{i18n>SAC}" />
-											</m:Column>
-											<m:Column id="idGSTCalculation">
+											</m:Column >
+											<m:Column id="idGSTCalculation" width="8rem" minScreenWidth="Tablet" demandPopin="true">
 												<m:Text text="{i18n>GSTCalculation}" />
 											</m:Column>
-											<m:Column>
-												<m:Text text="{i18n>Unit}" />
+											<m:Column minScreenWidth="Tablet" demandPopin="true">
+												<m:Text text="{i18n>Unit}" width="8rem"/>
 											</m:Column>
-											<m:Column>
-												<m:Text text="{i18n>rate}" />
+											<m:Column minScreenWidth="Tablet" demandPopin="true">
+												<m:Text text="{i18n>rate}" width="8rem"/>
 											</m:Column>
-											<m:Column>
-												<m:Text text="{i18n>discount}" />
+											<m:Column minScreenWidth="Tablet" demandPopin="true">
+												<m:Text text="{i18n>discount}" width="8rem" />
 											</m:Column>
-											<m:Column>
-												<m:Text text="{i18n>total}" />
+											<m:Column minScreenWidth="Tablet" demandPopin="true">
+												<m:Text text="{i18n>total}" width="8rem"/>
 											</m:Column>
 										</m:columns>
 										<m:items>
@@ -164,21 +164,23 @@
 													</m:ComboBox>
 												</m:cells>
 												<m:cells>
-												<m:HBox width="100%" justifyContent="SpaceBetween">
-													<m:VBox width="49%">
-														<m:Input value="{CompanyInvoiceItemModel>Unit}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="20" valueStateText="{i18n>UnitValueText}" />
-													</m:VBox>
-													<m:VBox width="49%">
-														<m:Input value="{CompanyInvoiceItemModel>UnitText}" editable="{visiablityPlay>/editable}" maxLength="20" />
-													</m:VBox>
-												</m:HBox>
+													<m:HBox width="100%" justifyContent="SpaceBetween">
+														<m:VBox width="49%">
+															<m:Input value="{CompanyInvoiceItemModel>Unit}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="20" valueStateText="{i18n>UnitValueText}" />
+														</m:VBox>
+														<m:VBox width="49%">
+															<m:ComboBox items="{RateType>/}" selectedKey="Per Day" value="{CompanyInvoiceItemModel>UnitText}" editable="{visiablityPlay>/editable}" width="100%">
+																<core:Item key="{RateType>ID}" text="{RateType>RateType}" />
+															</m:ComboBox>
+															<!-- <m:Input value="{CompanyInvoiceItemModel>UnitText}" editable="{visiablityPlay>/editable}" maxLength="20" /> -->
+														</m:VBox>
+													</m:HBox>
 												</m:cells>
 												<m:cells>
 													<m:Input value="{CompanyInvoiceItemModel>Rate}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" valueStateText="{i18n>RateValueText}" textAlign="End" maxLength="20" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Discount}" showValueHelp="true"
-													valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="20" valueStateText="{i18n>discountInfoText}" />
+													<m:Input value="{CompanyInvoiceItemModel>Discount}" showValueHelp="true" valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="20" valueStateText="{i18n>discountInfoText}" />
 												</m:cells>
 												<m:cells>
 													<m:Input value="{path:'CompanyInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />

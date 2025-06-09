@@ -18,6 +18,7 @@ sap.ui.define(
         _onRouteMatched: async function () {
           var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
           if (!LoginFUnction) return;
+          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("LoginModel").setProperty("/HeaderName", "Company Invoice Application");
           await this.CompanyInvoice_onSearch();
           this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
@@ -111,6 +112,35 @@ sap.ui.define(
           this.byId("CI_id_InvoiceDatePicker").setValue("");
           this.byId("CI_id_CustomerNameComboBox").setValue("");
           this.byId("CI_id_StatusComboBox").setValue("");
+        },
+
+        onSelectionChange:function (oEvent) {
+          this.data = oEvent.getSource().getSelectedItem().getBindingContext("CompanyInvoiceModel").getObject();
+          if(this.data.Status === "Submitted"){
+            this.byId("CI_InvoiceDelete").setEnabled(true);
+          }else{
+            this.byId("CI_InvoiceDelete").setEnabled(false);
+          }
+        },
+
+        CI_OnPressDeleteInvoice:function () {
+           var that = this;
+            this.showConfirmationDialog(
+                that.i18nModel.getText("msgBoxConfirm"),
+                that.i18nModel.getText("msgBoxConfirmDelete"),
+                async function () {
+                   that.getBusyDialog();
+                    try {
+                        await that.ajaxDeleteWithJQuery("/CompanyInvoice", { filters: { InvNo: that.data.InvNo } });
+                        MessageToast.show(that.i18nModel.getText("CompanyDeleteMess"));
+                        that.CompanyInvoice_onSearch();
+                    } catch (error) {
+                        MessageToast.show(error.responseText || "Error deleting expense");
+                    } finally {
+                        that.closeBusyDialog();
+                    }
+                },
+                function () { that.closeBusyDialog(); })
         },
 
         CI_onPressAddInvoice: function () {

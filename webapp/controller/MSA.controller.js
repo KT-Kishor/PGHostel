@@ -60,7 +60,7 @@ sap.ui.define([
                         }
                     });
                     await this._fetchCommonData("MSADetails", "MSADisplayModel", params);					
-            
+                    this.closeBusyDialog();
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {

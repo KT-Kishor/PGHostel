@@ -6,7 +6,6 @@
 	showCancelButton="true"
 	placement="Bottom">
 	<Button text="{i18n>headerCompanyInvoice}" press="MsaE_GoToInvoice"/>
-	<Button text="{i18n>addSOW}" press="MsaE_onPressCreateSow"  />
 	<Button text="{i18n>active}" id="MsaE_id_ActiveBtn" press="MsaE_onPressSOWActive" enabled="{simpleForm>/BtnEnable}"/>
 	<Button text="{i18n>inactive}" id="Msa_id_InactiveBtn" press="MsaE_onPressSOWActive" enabled="{simpleForm>/BtnEnable}"/>
 	<Button id="MsaE_id_RelesedBtn" press="MsaE_onPressRelesedSow" text="{i18n>ReleaseBtn}" enabled="{simpleForm>/BtnEnable}"/>

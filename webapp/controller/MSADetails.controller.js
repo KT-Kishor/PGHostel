@@ -5,7 +5,7 @@ sap.ui.define([
     "sap/m/MessageToast",
     "../model/formatter",
     "sap/m/MessageBox",
- "../utils/CommonAgreementPDF",
+    "../utils/CommonAgreementPDF",
 ],
     function (BaseController, utils, JSONModel, MessageToast, Formatter, MessageBox, jsPDF) {
         "use strict";
@@ -47,13 +47,15 @@ sap.ui.define([
                     PaymentBalance: "",
                     ReplacementMonth: "12 Months",
                     ReplacementRefund: "",
-                    Country: "India",
+                    Country: "",
+                    City: ""
                 });
                 this.getView().setModel(oModelMSA, "msaModelWizart");
 
                 var oModel = new JSONModel({ Recruitment: false });
                 this.getView().setModel(oModel, "VisibleModel")
                 this.AdvanceBalance = true;
+                this.byId("MsaD_id_Type").setSelectedIndex(0);
             },
 
             onRadioButtonGroupSelect: function (oEvent) {
@@ -122,6 +124,8 @@ sap.ui.define([
                 this.byId("MsaD_id_Email").setValueState("None");
                 this.byId("MsaD_id_Address").setValueState("None");
                 this.byId("MsaD_id_PanCard").setValueState("None");
+                this.byId("MSA_Id_Country").setValueState("None");
+                this.byId("MSA_Id_City").setValueState("None");
             },
             MsaD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
@@ -153,6 +157,14 @@ sap.ui.define([
             MSACountryComboBox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 this.validateStep();
+                var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+                var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+                this.byId("MSA_Id_City").getBinding("items").filter(oFilter);
+            },
+
+            MSA_onChangeCity: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
+                this.validateStep();
             },
 
             validateStep: function () {
@@ -172,6 +184,7 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_Address"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_Branch"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_City"), "ID") &&
                         (
                             !isRecruitment || (
                                 utils._LCvalidateTraineeAmount(this.byId("Msa_Id_RateCharge"), "ID") &&
@@ -192,8 +205,8 @@ sap.ui.define([
                 this.byId("MsaD_id_Type").setEditable(false);
             },
 
-           MsaD_reviewSubmit: async function () {
-                 var that = this;
+            MsaD_reviewSubmit: async function () {
+                var that = this;
                 const oWizard = this.byId("MsaD_id_Wizard");
                 if (!oWizard.getSteps()[0].getValidated()) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -222,7 +235,7 @@ sap.ui.define([
                     const oCreateResponse = await this.ajaxCreateWithJQuery("MSADetails", { data: oModelData });
 
                     if (oCreateResponse) {
-                       var oDialog = new sap.m.Dialog({
+                        var oDialog = new sap.m.Dialog({
                             title: this.i18nModel.getText("success"),
                             type: sap.m.DialogType.Message,
                             state: sap.ui.core.ValueState.Success,

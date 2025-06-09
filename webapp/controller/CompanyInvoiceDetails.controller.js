@@ -57,7 +57,7 @@ sap.ui.define([
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
 
                 oView.setModel(new JSONModel({
-                    results: [], InvNo: this.newID, IndexNo: "", ItemID: "", UnitText : "", Particulars: "", SAC: "", Rate: "", Currency: "INR",
+                    results: [], InvNo: this.newID, IndexNo: "", ItemID: "", UnitText: "", Particulars: "", SAC: "", Rate: "", Currency: "INR",
                     Total: "", gstAmount: "", TotalAmount: "", subTotal: ""
                 }), "FilteredSOWModel");
 
@@ -94,7 +94,10 @@ sap.ui.define([
                     if (!oData.success) throw new Error("Invalid data structure");
 
                     var oHeader = oData.data.CompanyInvoice?.[0] || {};
+                    this.byId("CID_id_Payby").setMinDate(new Date(oHeader.InvoiceDate));
+                    this.byId("CID_id_NavPayby").setMinDate(new Date(oHeader.InvoiceDate));
                     oHeader.InvoiceDate = this.Formatter.formatDate(oHeader.InvoiceDate);
+
                     this.SelectedCustomerModel.setData(oHeader);
 
                     const aItems = oData.data.CompanyInvoiceItem.map((item, index) => ({ ...item, IndexNo: index + 1 }));
@@ -197,6 +200,8 @@ sap.ui.define([
 
             onChangeInvoiceDate: async function (oEvent) {
                 utils._LCvalidateDate(oEvent);
+                this.byId("CID_id_Payby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
+                this.byId("CID_id_NavPayby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
                 const oData = await this.ajaxReadWithJQuery("MSADetails", { MsaID: this.SelectKey });
                 const oSelectedCustomerModel = this.getView().getModel("SelectedCustomerModel");
                 if (oData.success) {
@@ -211,7 +216,7 @@ sap.ui.define([
                 }
             },
 
-             onPayByDateDatePickerChange:function(oEvent){
+            onPayByDateDatePickerChange: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
             },
 
@@ -262,7 +267,7 @@ sap.ui.define([
                             SAC: "998314",
                             GSTCalculation: (currency === "INR") ? "YES" : "",
                             Unit: multiplier,
-                            UnitText:(currency === "INR") ? unit : b,
+                            UnitText: (currency === "INR") ? unit : b,
                             Rate: rateValue,
                             Currency: currency,
                             Discount: "",
@@ -289,17 +294,17 @@ sap.ui.define([
                     }
                     await this.totalAmountCalculation();
                     if (isINR) {
-                    const oModel = oSelectedCustomerModel;
-                    const oData = oModel.getData();
+                        const oModel = oSelectedCustomerModel;
+                        const oData = oModel.getData();
 
-                    const subTotalInGST = parseFloat(oData.SubTotalInGST) || 0;
-                    const subTotalNotGST = parseFloat(oData.SubTotalNotGST) || 0;
-                    const incomePerc = parseFloat(oData.IncomePerc) || 0;
+                        const subTotalInGST = parseFloat(oData.SubTotalInGST) || 0;
+                        const subTotalNotGST = parseFloat(oData.SubTotalNotGST) || 0;
+                        const incomePerc = parseFloat(oData.IncomePerc) || 0;
 
-                    const total = subTotalInGST + subTotalNotGST;
-                    const tds = ((total * incomePerc) / 100).toFixed(2);
-                    oModel.setProperty("/IncomeTax", Math.round(tds));
-                }
+                        const total = subTotalInGST + subTotalNotGST;
+                        const tds = ((total * incomePerc) / 100).toFixed(2);
+                        oModel.setProperty("/IncomeTax", Math.round(tds));
+                    }
                 } catch (error) {
                     MessageToast.show(error.responseText);
                 } finally {
@@ -438,14 +443,14 @@ sap.ui.define([
                 const oNavigationData = oNavigationModel.getData();
 
                 if (oNavigationData.Currency === "INR") {
-                const subTotalInGST = parseFloat(oNavigationData.SubTotalInGST) || 0;
-                const subTotalNotGST = parseFloat(oNavigationData.SubTotalNotGST) || 0;
-                const incomePerc = parseFloat(oNavigationData.IncomePerc) || 0;
+                    const subTotalInGST = parseFloat(oNavigationData.SubTotalInGST) || 0;
+                    const subTotalNotGST = parseFloat(oNavigationData.SubTotalNotGST) || 0;
+                    const incomePerc = parseFloat(oNavigationData.IncomePerc) || 0;
 
-                const totalAmount = subTotalInGST + subTotalNotGST;
-                const tds = ((totalAmount * incomePerc) / 100).toFixed(2);
+                    const totalAmount = subTotalInGST + subTotalNotGST;
+                    const tds = ((totalAmount * incomePerc) / 100).toFixed(2);
 
-                oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
+                    oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
                 } else {
                     oNavigationModel.setProperty("/IncomeTax", "0.00");
                 }
@@ -493,7 +498,7 @@ sap.ui.define([
                     this.Discount = true;
                 }
                 await this.totalAmountCalculation();
-               var oNavigationModel = this.getView().getModel("SelectedCustomerModel");
+                var oNavigationModel = this.getView().getModel("SelectedCustomerModel");
                 var oData = oNavigationModel.getData();
 
                 if (oData.Currency === "INR") {
@@ -544,6 +549,14 @@ sap.ui.define([
                     gstAmount: oSelectedCustomerModel.gstAmount,
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
+
+                if (FilterModel.Currency === "INR") {
+                    if (!oSelectedCustomerModel.GST || oSelectedCustomerModel.GST.trim() === "") {
+                        sap.m.MessageBox.error(this.i18nModel.getText("gstMessage"));
+                        return;
+                    }
+                }
+
 
                 const oPayload = {
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : oSelectedCustomerModel.InvoiceDate?.toISOString().split('T')[0] || "",
@@ -805,8 +818,8 @@ sap.ui.define([
             modelFunction: function () {
                 var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
                 var ResivedTDSData = (
-                        oNavigationModel.Currency === "INR"
-                            ? parseFloat(oNavigationModel.IncomeTax) - parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedTDS") || 0) : 0).toFixed(2)
+                    oNavigationModel.Currency === "INR"
+                        ? parseFloat(oNavigationModel.IncomeTax) - parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedTDS") || 0) : 0).toFixed(2)
                 var oModel = new JSONModel({
                     InvNo: oNavigationModel.InvNo,
                     TransactionId: "",
@@ -819,7 +832,7 @@ sap.ui.define([
                             : parseFloat(oNavigationModel.TotalAmount) - parseFloat(oNavigationModel.IncomeTax)
                     ).toFixed(2),
                     Currency: oNavigationModel.Currency,
-                    ReceivedTDS:ResivedTDSData ,
+                    ReceivedTDS: ResivedTDSData,
                     ConversionRate: "",
                     AmountInINR: ""
                 });
@@ -929,7 +942,7 @@ sap.ui.define([
                 this.oDialog.close()
             },
             onLiveTransactionID: function (oEvent) { utils._LCvalidateMandatoryField(oEvent) },
-            onReceivedDateDatePickerChange:function (oEvent) {utils._LCvalidateDate(oEvent);},
+            onReceivedDateDatePickerChange: function (oEvent) { utils._LCvalidateDate(oEvent); },
             onChangePaymentRecived: async function () {
                 var paymentModel = this.getView().getModel("PaymentModel").getData();
 
@@ -993,7 +1006,7 @@ sap.ui.define([
                 }
             },
 
-            CID_ValidateCommonFields:function(oEvent){utils._LCvalidateMandatoryField(oEvent);},
+            CID_ValidateCommonFields: function (oEvent) { utils._LCvalidateMandatoryField(oEvent); },
 
             CD_onDiscountInfoPress: function (oEvent) {
                 if (!this._oPopover) {
@@ -1351,24 +1364,26 @@ sap.ui.define([
                     body: body,
                     theme: 'grid',
                     headStyles: { fillColor: [41, 128, 185] },
-                    styles: {font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30],
-                     halign: "center"},
+                    styles: {
+                        font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30],
+                        halign: "center"
+                    },
                     columnStyles: {
-                    0: { halign: 'center' },
-                    1: { halign: 'left' },
-                    ...(showSAC ? { 
-                        2: { halign: 'center' }, 
-                        3: { halign: 'right' }, 
-                        4: { halign: 'right' }, 
-                        5: { halign: 'right' }, 
-                        6: { halign: 'right' } 
-                    } : { 
-                        2: { halign: 'center' }, 
-                        3: { halign: 'right' }, 
-                        4: { halign: 'right' }, 
-                        5: { halign: 'right' } 
-                    })
-                },
+                        0: { halign: 'center' },
+                        1: { halign: 'left' },
+                        ...(showSAC ? {
+                            2: { halign: 'center' },
+                            3: { halign: 'right' },
+                            4: { halign: 'right' },
+                            5: { halign: 'right' },
+                            6: { halign: 'right' }
+                        } : {
+                            2: { halign: 'center' },
+                            3: { halign: 'right' },
+                            4: { halign: 'right' },
+                            5: { halign: 'right' }
+                        })
+                    },
                     // didParseCell: function (data) {
                     //     if (data.section === 'head') {
                     //         if (showSAC) {

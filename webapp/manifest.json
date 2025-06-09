@@ -233,6 +233,11 @@
                 "uri": "model/TravelAllowance.json",
                 "preload": true
             },
+            "ContractPeriodThree": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/ThreeMonthGap.json",
+                "preload": true
+            },
             "PaySlip": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/PaySlip.json",

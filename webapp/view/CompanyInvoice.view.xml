@@ -40,7 +40,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="CI_id_InvoiceTable" items="{
+			<Table mode="SingleSelectLeft" selectionChange="onSelectionChange" id="CI_id_InvoiceTable" items="{
                 path: 'CompanyInvoiceModel>/', sorter: {path: 'CustomerName',descending: false,group: true}}">
 				<headerToolbar>
 					<Toolbar>
@@ -48,6 +48,8 @@
 						<ToolbarSpacer />
 						<ToolbarSeparator />
 						<Button text="{i18n>InvoiceAddBtn}" type="Accept" tooltip="{i18n>addInvoice}" press="CI_onPressAddInvoice" />
+						<ToolbarSeparator />
+						<Button text="{i18n>InvoiceDeleteBtn}" id="CI_InvoiceDelete" type="Reject" press="CI_OnPressDeleteInvoice" enabled="false" />
 						<ToolbarSeparator />
 						<Button text="{i18n>msasow}" type="Gosht" tooltip="{i18n>addInvoice}" press="CI_onPressMSASOW"/>
 					</Toolbar>
@@ -60,13 +62,13 @@
 						<Text text="{i18n>invoiceDate}" />
 					</Column>
 					<Column>
-						<Text text="{i18n>PayByDate}" />
-					</Column>
-					<Column>
 						<Text text="{i18n>invoiceDescription}" />
 					</Column>
 					<Column>
 						<Text text="{i18n>totalAmount}" />
+					</Column>
+					<Column>
+						<Text text="{i18n>PayByDate}" />
 					</Column>
 					<Column>
 						<Text text="{i18n>status}" />
@@ -77,9 +79,9 @@
 						<cells>
 							<Text text="{CompanyInvoiceModel>InvNo}" />
 							<Text text="{path:'CompanyInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}" />
-							<ObjectStatus text="{path:'CompanyInvoiceModel>PayByDate',formatter:'.Formatter.formatDate'}" inverted="true" state="{ parts: [{path: 'CompanyInvoiceModel>PayByDate'},{path: 'CompanyInvoiceModel>Status'}], formatter: '.Formatter.companyInvoicePayByDate'}" />
 							<Text text="{CompanyInvoiceModel>InvoiceDescription}" />
-			<Text text="{CompanyInvoiceModel>Currency} {path: 'CompanyInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" textAlign="End" />
+							<Text text="{path: 'CompanyInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'} {CompanyInvoiceModel>Currency}" textAlign="End" />
+							<ObjectStatus text="{path:'CompanyInvoiceModel>PayByDate',formatter:'.Formatter.formatDate'}" inverted="true" state="{ parts: [{path: 'CompanyInvoiceModel>PayByDate'},{path: 'CompanyInvoiceModel>Status'}], formatter: '.Formatter.companyInvoicePayByDate'}" />
 							<ObjectStatus text="{CompanyInvoiceModel>Status}" inverted="false" state="{path: 'CompanyInvoiceModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
 						</cells>
 					</ColumnListItem>
