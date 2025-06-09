@@ -131,6 +131,8 @@
 						<f:content>
 							<Label text="{i18n>traineeName}"/>
 							<Text text="{= ${oTraineeDetails>/NameSalutation} + ' ' + ${oTraineeDetails>/TraineeName}}"/>
+							<Label text="{i18n>gender}"/>
+							<Text text="{oTraineeDetails>/Gender}"/>
 							<Label text="{i18n>reportingManager}" />
 							<Text text="{oTraineeDetails>/ReportingManager}"/>
 							<Label text="{i18n>emailId}" />
