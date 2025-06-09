@@ -195,7 +195,8 @@ sap.ui.define([
                 });
             },
 
-            onChangeInvoiceDate: async function () {
+            onChangeInvoiceDate: async function (oEvent) {
+                utils._LCvalidateDate(oEvent);
                 const oData = await this.ajaxReadWithJQuery("MSADetails", { MsaID: this.SelectKey });
                 const oSelectedCustomerModel = this.getView().getModel("SelectedCustomerModel");
                 if (oData.success) {
@@ -208,6 +209,10 @@ sap.ui.define([
                     currentDate.setDate(currentDate.getDate() + 30);
                     oSelectedCustomerModel.setProperty("/PayByDate", currentDate);
                 }
+            },
+
+             onPayByDateDatePickerChange:function(oEvent){
+                utils._LCvalidateDate(oEvent);
             },
 
             OnChangeSowDetails: async function (oEvent) {

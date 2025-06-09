@@ -54,14 +54,7 @@
 			</fb:FilterBar>
 
 <Table id="exp_Id_ExpenseTable"
-       items="{
-         path: 'ExpenseModel>/',
-         sorter: {
-           path: 'Status',
-           descending: false,
-           group: true
-         }
-       }"
+       items="{path: 'ExpenseModel>/', sorter: {path: 'Status',descending: false,group: true}}"
        class="sapUiResponsiveMargin"
        growing="true"
        growingThreshold="50"

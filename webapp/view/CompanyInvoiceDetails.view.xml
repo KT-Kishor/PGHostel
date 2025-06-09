@@ -27,16 +27,16 @@
 										<m:Input visible="{visiablityPlay>/editVisi}" id="CID_id_Custmer" value="{SelectedCustomerModel>/CustomerName}" editable="false"/>
 
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>invoiceDate}" required="true" />
-										<m:DatePicker minDate="{visiablityPlay>/minDate}" visible="{visiablityPlay>/createVisi}" id="CID_id_Invoice" value="{path:'SelectedCustomerModel>/InvoiceDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}" change="onChangeInvoiceDate" />
+										<m:DatePicker valueStateText="{i18n>dateValueState}" minDate="{visiablityPlay>/minDate}" visible="{visiablityPlay>/createVisi}" id="CID_id_Invoice" value="{path:'SelectedCustomerModel>/InvoiceDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}" change="onChangeInvoiceDate" />
 
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>PayByDate}" required="true" />
-										<m:DatePicker visible="{visiablityPlay>/createVisi}" id="CID_id_Payby" value="{path:'SelectedCustomerModel>/PayByDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"/>
+										<m:DatePicker valueStateText="{i18n>dateValueState}" visible="{visiablityPlay>/createVisi}" id="CID_id_Payby" value="{path:'SelectedCustomerModel>/PayByDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}" change="onPayByDateDatePickerChange"/>
 
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>invoiceDate}" required="true" />
-										<m:DatePicker minDate="{visiablityPlay>/minDate}" visible="{visiablityPlay>/editVisi}" id="CID_id_NavInvoice" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/InvoiceDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDate"/>
+										<m:DatePicker valueStateText="{i18n>dateValueState}" minDate="{visiablityPlay>/minDate}" visible="{visiablityPlay>/editVisi}" id="CID_id_NavInvoice" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/InvoiceDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDate"/>
 
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>PayByDate}" required="true" />
-										<m:DatePicker visible="{visiablityPlay>/editVisi}" id="CID_id_NavPayby" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/PayByDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDatePayByDate"/>
+										<m:DatePicker valueStateText="{i18n>dateValueState}" visible="{visiablityPlay>/editVisi}" id="CID_id_NavPayby" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/PayByDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDatePayByDate"/>
 
 										<m:Label text="{i18n>invoiceDescription}" required="true" />
 										<m:Input id="CID_id_InvoiceDesc" value="{SelectedCustomerModel>/InvoiceDescription}" placeholder="{i18n>companyInvoiceDescPlaceH}" editable="{visiablityPlay>/editable}" liveChange="CID_ValidateCommonFields" maxLength="120" valueStateText="{i18n>companyInvoiceDescPlaceH}" />
@@ -80,9 +80,9 @@
 										<m:Label text="{i18n>mobileNo}" />
 										<m:Input value="{SelectedCustomerModel>/MobileNo}" id="CID_id_InputMobileNo" maxLength="10" liveChange="CID_onPressLiveChange" editable="{visiablityPlay>/CInvoice}" />
 
-										<m:Label visible="{visiablityPlay>/IncomeTax}" required="true" text="{i18n>TDS}" />
-										<m:Input visible="{visiablityPlay>/IncomeTax}" value="{SelectedCustomerModel>/IncomePerc}" id="CID_id_IncomeTaxPercentage" editable="{visiablityPlay>/editable}" maxLength="2" valueStateText="{i18n>incomeTaxValue}" liveChange="onIncomeTaxPercentageInputLiveChange"/>
-										<m:Input visible="{visiablityPlay>/IncomeTax}" value="{SelectedCustomerModel>/IncomeTax}" id="CID_id_TDS" editable="false" />
+										<m:Label visible="{visiablityPlay>/TDS}" required="true" text="{i18n>TDS}" />
+										<m:Input visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/IncomePerc}" id="CID_id_IncomeTaxPercentage" editable="{visiablityPlay>/editable}" maxLength="2" valueStateText="{i18n>incomeTaxValue}" liveChange="onIncomeTaxPercentageInputLiveChange"/>
+										<m:Input visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/IncomeTax}" id="CID_id_TDS" editable="false" />
 
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>selectSOW}" required="true"/>
 										<m:ComboBox visible="{visiablityPlay>/createVisi}" showClearIcon="true" items="{CombinedData>/items}" value="{SelectedCustomerModel>/SOWDetails}" change="OnChangeSowDetails" valueStateText="{i18n>selectSOW}" id="CID_id_SowDetails">

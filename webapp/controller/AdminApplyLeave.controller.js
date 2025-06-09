@@ -113,7 +113,7 @@ sap.ui.define(
                     let rules = [
                         {
                             dataContext: { LeaveType: "Submitted" },
-                            properties: { color: "#fc7b03" },
+                            properties: { color: "#FFB347" },
                             displayName: "Submitted"
                         },
                         {
@@ -163,7 +163,7 @@ sap.ui.define(
                     let rules = [
                         {
                             dataContext: { LeaveType: "Submitted" },
-                            properties: { color: "#fc7b03" },
+                            properties: { color: "#FFB347" },
                             displayName: "Submitted"
                         },
                         {

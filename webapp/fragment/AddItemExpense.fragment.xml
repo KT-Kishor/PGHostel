@@ -1,33 +1,17 @@
-<core:FragmentDefinition
-	xmlns="sap.m"
+<core:FragmentDefinition xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:u="sap.ui.unified"
 	xmlns:core="sap.ui.core">
-	<Dialog
-        title="{i18n>addItemExpense}">		
+	<Dialog title="{i18n>addItemExpense}">
 		<VBox>
-			<f:SimpleForm   
-			id="Exp_id_SimpleFromtwo"      
-            editable="true"
-			layout="ResponsiveGridLayout"
-			labelSpanXL="4"
-			labelSpanL="3"
-			labelSpanM="4"
-			labelSpanS="12"
-			emptySpanXL="0"
-			emptySpanL="4"
-			emptySpanM="0"
-			emptySpanS="0"
-			columnsXL="2"
-			columnsL="1"
-			columnsM="1">
-				<f:content>	
-				<MessageStrip text="{i18n>attachmentMessage}" type="Information" enableFormattedText="true" showIcon="true" showCloseButton="false"/>
+			<f:SimpleForm id="Exp_id_SimpleFromtwo" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" emptySpanXL="0" emptySpanL="4" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1">
+				<f:content>
+					<MessageStrip text="{i18n>attachmentMessage}" type="Information" enableFormattedText="true" showIcon="true" showCloseButton="false"/>
 					<Label text="{i18n>itemID}"/>
 					<Input value="{ExpenseCreateModel>/IndexNo}" editable="false" />
 					<!-- Item Type -->
 					<Label text="{i18n>expDetItemType}" required="true"/>
-					<ComboBox  items="{ExpenseTypeModel>/}" id="ExpDet_id_ItemType" change="Exp_Frg_onItemTypeChange"  selectedKey="{ExpenseCreateModel>/ItemType}" valueStateText="{i18n>expItemTypeMess}">
+					<ComboBox items="{ExpenseTypeModel>/}" id="ExpDet_id_ItemType" change="Exp_Frg_onItemTypeChange" selectedKey="{ExpenseCreateModel>/ItemType}" valueStateText="{i18n>expItemTypeMess}">
 						<core:Item key="{ExpenseTypeModel>itemName}" text="{ExpenseTypeModel>itemName}" />
 					</ComboBox>
 					<!-- Mode Of Payment -->
@@ -37,15 +21,15 @@
 					</Select>
 					<!-- Expense Date -->
 					<Label text="{i18n>expDetExpenseDate}" required="true" />
-					<DatePicker minDate="{viewModel>/MinDate}" id="ExpDet_id_ExpenseDate"  maxDate="{viewModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{ExpenseCreateModel>/ExpenseDate}"/>
+					<DatePicker minDate="{viewModel>/MinDate}" id="ExpDet_id_ExpenseDate" maxDate="{viewModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{ExpenseCreateModel>/ExpenseDate}"/>
 					<!-- Expense Amount -->
 					<Label text="{i18n>expDetExpenseAmount}" required="true"/>
 					<HBox width="100%" justifyContent="SpaceBetween">
-						<VBox  width="calc(70% - 10px)">
+						<VBox width="calc(70% - 5px)">
 							<Input id="ExpDet_id_Amount" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ExpenseAmount}" liveChange="LC_ExpAmount" placeholder="{i18n>placeAmount}" enabled="{viewModel>/enable}" maxLength="15"/>
 						</VBox>
-						<VBox width="calc(30% - 10px)">
-							<Select items="{CurrencyModel>/}" change="onChangeCurrency" selectedKey="{ExpenseCreateModel>/Currency}"  id="idCurrency" enabled="{viewModel>/enable}">
+						<VBox width="calc(30% - 5px)">
+							<Select items="{CurrencyModel>/}" width="100%" change="onChangeCurrency" selectedKey="{ExpenseCreateModel>/Currency}" id="idCurrency" enabled="{viewModel>/enable}">
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</Select>
 						</VBox>
@@ -53,36 +37,36 @@
 					<!-- Conversion Rate -->
 					<Label text="{i18n>expConversionRate}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" required="true" />
 					<HBox width="100%" justifyContent="SpaceBetween">
-					<VBox width="calc(50% - 10px)">
-						<Input id="ExpDet_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="Exp_Frg_onChangeConverstionRate"/>	
-					</VBox>
-					<VBox width="calc(50% - 10px)">
-						<Input value="{ExpenseCreateModel>/TotalAmount}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" editable="false"></Input>
-					</VBox>
+						<VBox width="calc(50% - 5px)">
+							<Input id="ExpDet_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="Exp_Frg_onChangeConverstionRate"/>
+						</VBox>
+						<VBox width="calc(50% - 5px)">
+							<Input value="{ExpenseCreateModel>/TotalAmount}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" editable="false"></Input>
+						</VBox>
 					</HBox>
 					<Label text="{i18n>Attachment}" required="true" />
-					<HBox >
-						<u:FileUploader fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png" buttonText="Upload" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true"  iconFirst="true" class="sapUiSmallMarginBeginEnd" />
-						
-						<Tokenizer id="tokenizer"	width="100%" tokenDelete="onTokenDelete" tokens="{tokenModel>/tokens}">
+					<HBox alignItems="Center" width="100%" renderType="Bare" class="sapUiSmallMarginBottom">
+						<u:FileUploader fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png" buttonText="Upload" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true" iconFirst="true" class="sapUiSmallMarginBeginEnd" />
+
+						<Tokenizer id="tokenizer" width="100%" tokenDelete="onTokenDelete" tokens="{tokenModel>/tokens}">
 							<Token key="{tokenModel>key}" text="{tokenModel>text}" />
 						</Tokenizer>
-						</HBox>
-													
+					</HBox>
 
-					<Label text="{i18n>comments}" required="true" ></Label>
+					<Label text="{i18n>comments}" required="true"></Label>
 					<TextArea id="ExpDet_id_Comments" valueStateText="{i18n>enterComments}" liveChange="LC_ExpComments" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
 				</f:content>
 			</f:SimpleForm>
 		</VBox>
 		<footer>
-    <Toolbar>
-        <ToolbarSpacer /> <!-- This pushes the buttons to the right -->
-        <Button text="{i18n>submit}" type="Accept" press="Exp_Det_onPressSubmit" visible="{viewModel>/SubmitBtn}" />
-        <Button text="{i18n>save}" type="Accept" press="Exp_Det_onPressSaveExpense" visible="{viewModel>/SaveBtn}" />
-        <Button text="{i18n>close}" type="Reject" class="spaceBetween sendMail" press="Exp_Det_onPressClose" />
-    </Toolbar>
-</footer>
+			<Toolbar>
+				<ToolbarSpacer />
+				<!-- This pushes the buttons to the right -->
+				<Button text="{i18n>submit}" type="Accept" press="Exp_Det_onPressSubmit" visible="{viewModel>/SubmitBtn}" />
+				<Button text="{i18n>save}" type="Accept" press="Exp_Det_onPressSaveExpense" visible="{viewModel>/SaveBtn}" />
+				<Button text="{i18n>close}" type="Reject" class="spaceBetween sendMail" press="Exp_Det_onPressClose" />
+			</Toolbar>
+		</footer>
 
 	</Dialog>
 </core:FragmentDefinition>
