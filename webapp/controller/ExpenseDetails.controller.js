@@ -35,7 +35,7 @@ sap.ui.define([
                         this.MyInBox = true;
                     }
 
-                    await this._fetchCommonData("Currency", "CurrencyModel");
+                    if(!this.getView().getModel("CurrencyModel")) await this._fetchCommonData("Currency", "CurrencyModel");
                     await this._fetchCommonData("Expense", "FilteredExpenseModel", {
                         ExpenseID: this.ExpenseID,
                     });
@@ -723,7 +723,8 @@ sap.ui.define([
                                         TotalAmount: oModelData.TotalAmount,
                                         Status: oModelData.Status === "Send back by account" ? "Send to account" : "Submitted",
                                         ManagerRemark: oModelData.ManagerRemark,
-                                        AccountingRemark: oModelData.AccountingRemark
+                                        AccountingRemark: oModelData.AccountingRemark,
+                                        Visible :commentTextArea.getVisible()
                                     },
                                     filters: {
                                         ExpenseID: oModelData.ExpenseID
@@ -733,6 +734,7 @@ sap.ui.define([
                                 that.getBusyDialog();
                                 that.ajaxUpdateWithJQuery("Expense", inboxData).then((oData) => {
                                     if (oData) {
+                                        that._fetchCommonData("Expense", "FilteredExpenseModel", {ExpenseID: this.ExpenseID,});
                                         that.ViewModel.setProperty("/status", false);
                                         that.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
                                         dialog.close();
@@ -773,34 +775,6 @@ sap.ui.define([
                 if (oModelExpenseCreate.Currency !== "INR") {
                     var oData = parseFloat(oModelExpenseCreate.ExpenseAmount) * parseFloat(oModelExpenseCreate.ConversionRate);
                     oModel.setProperty("/TotalAmount", oData.toFixed(2));
-                }
-            },
-
-            Exp_Det_onPressOpenFolder: function () {
-                var oModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
-                var folderUrl = `https://workplace.zoho.in/#workdrive_app/home/63sop752ea6e63ddd4a8880466f5ae509b85a/privatespace/sharedwithme/allusers/${oModel.FolderID}`;
-                window.open(folderUrl, "_blank");
-            },
-
-            Exp_Det_onPressNewFolder: async function () {
-                var oData = {
-                    "data": {
-                        FolderID: this.LoginModel.getProperty("/FolderID"),
-                        FolderName: `${this.FilteredExpenseModel[0].ExpenseName} ${this.FilteredExpenseModel[0].ExpStartDate} to ${this.FilteredExpenseModel[0].ExpEndDate}`,
-                        ExpenseID: this.ExpenseID
-                    }
-                }
-                try {
-                    const oCreateResponse = await this.ajaxCreateWithJQuery("NewFolder", oData);
-                    if (oCreateResponse) {
-                        MessageToast.show(this.i18nModel.getText("expenseFolderCreate"));
-                        await this._fetchCommonData("Expense", "FilteredExpenseModel", {
-                            ExpenseID: this.ExpenseID
-                        });
-                    }
-                } catch (oError) {
-                    this.closeBusyDialog();
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
             },
 
