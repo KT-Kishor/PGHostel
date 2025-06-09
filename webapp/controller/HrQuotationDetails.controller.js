@@ -24,8 +24,10 @@ sap.ui.define(
         this.getBusyDialog();
         this._ViewDatePickersReadOnly(["HQD_id_Quotation", "HQD_id_QuotationValid"], this.getView())
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
-        await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
+        // await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
+        if (!this.getView().getModel("QuotationPDFModel")) await this._fetchCommonData("Quotation", "QuotationPDFModel");
+        if (!this.getView().getModel("CompanyCodeDetailsModel")) await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+        // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         var oVisiModel = new JSONModel();
 
@@ -1086,24 +1088,7 @@ sap.ui.define(
             5: { halign: 'cenetr' }, //Tax
             6: { halign: 'right' }  //Total
           },
-          // didParseCell: function (data) {
-          //   if (data.section === 'head') {
-          //     // Adjust header alignment for numeric columns
-          //     if (isINR) {
-          //       if ([4, 5, 6].includes(data.column.index)) {
-          //         data.cell.styles.halign = 'right';
-          //       } else {
-          //         data.cell.styles.halign = 'center';
-          //       }
-          //     } else {
-          //       if ([3, 4, 5].includes(data.column.index)) {
-          //         data.cell.styles.halign = 'right';
-          //       } else {
-          //         data.cell.styles.halign = 'center';
-          //       }
-          //     }
-          //   }
-          // }
+         
         });
 
         y = doc.lastAutoTable.finalY;
