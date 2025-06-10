@@ -30,20 +30,16 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                     sPath: sPath
                 });
             },
-            TSD_ReadTimesheetEntries: async function (filter) {
+              TSD_ReadTimesheetEntries: async function (filter) {
                 try {
-                    //this.getBusyDialog();
-                    await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID }).then((oData) => {
-                        var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                        this.getOwnerComponent().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
-                        this.closeBusyDialog();
-                    }).catch((error) => {
-                        //this.closeBusyDialog();
-                        MessageToast.show(error.message || error.responseText);
-                    });
+                    this.getBusyDialog();
+                    const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: filter },);
+                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    this.getOwnerComponent().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
+                    this.closeBusyDialog();
                 } catch (error) {
-                    // this.closeBusyDialog();
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                    MessageToast.show(error.message || error.responseText);
+                    this.closeBusyDialog();
                 }
             },
 
