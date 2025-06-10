@@ -60,4 +60,12 @@
         press="SS_onDownloadSalLetter"
         enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
     />
+       <Button
+        text="{i18n>spotAward}"
+        type="Ghost"
+        visible="{viewModel>/Letter}"
+        id="SS_idAwardbtn"
+        press="SS_onDownloadSpotAward"
+        enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
+    />
 </ActionSheet>

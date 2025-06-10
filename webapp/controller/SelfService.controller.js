@@ -1,5 +1,5 @@
-sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/BusyIndicator", "sap/m/MessageToast", "sap/m/MessageBox"],
-    (Controller, Formatter, utils, JSONModel, BusyIndicator, MessageToast, MessageBox) => {
+sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/BusyIndicator", "sap/m/MessageToast", "sap/m/MessageBox", "../utils/SalaryCertificatePDF"],
+    (Controller, Formatter, utils, JSONModel, BusyIndicator, MessageToast, MessageBox, jsPDF) => {
         "use strict";
         return Controller.extend("sap.kt.com.minihrsolution.controller.SelfService", {
             Formatter: Formatter,
@@ -325,6 +325,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 if (oGradeField) {
                     utils._LCvalidateGrade(oGradeField, "ID", "AddEd_id_GradeType");
                 }
+            },
+
+            FSA_onInputLiveChange: function (oEvent) {
+                // utils._LCvalidateMandatoryField(oEvent);
+                utils._LCvalidateName(oEvent);
+
+            },
+
+            FSA_onNomineNameLiveChange: function (oEvent) {
+                // utils._LCvalidateMandatoryField(oEvent);
+                utils._LCvalidateName(oEvent);
             },
             // Edit button visibility with role-based access control and SelfService 
             SS_onEditPress: function (oEvent) {
@@ -1807,12 +1818,183 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     MessageToast.show("Failed to fetch salary data.");
                 }
                 this.SSRTE_oDialog.close();
-                let htmlContent = sap.ui.getCore().byId("FCR_id_RTE").getValue();
-                this.generateCertificatePDF(htmlContent, this.getView().getModel("sEmployeeModel").getData()[0].BranchCode);
+                var oModel = this.getView().getModel("PDFData").getData();
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: this.getView().getModel("sEmployeeModel").getData()[0].BranchCode });
+                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64) {
+                    try {
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
+
+                        const [logoBase64, signBase64, backgroundBase64] = await Promise.all([
+                            this._convertBLOBToImage(logoBlob),
+                            this._convertBLOBToImage(signBlob),
+                            this._convertBLOBToImage(backgroundBlob)
+                        ]);
+
+                        oCompanyDetailsModel.companylogo64 = logoBase64;
+                        oCompanyDetailsModel.signature64 = signBase64;
+                        oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+                    } catch (err) {
+                        console.error("Image compression failed:", err);
+                        this.closeBusyDialog();
+                    }
+                }
+                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                    if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                        jsPDF._GeneratePDF(this, sap.ui.getCore().byId("FCR_id_RTE").getValue(), oCompanyDetailsModel, oModel);
+                    }
+                }
             },
 
             FCR_onCloseDialog: function () {
                 this.SSRTE_oDialog.close();
+            },
+
+            SS_onDownloadSpotAward: function () {
+                var oView = this.getView();
+                var resetFields = function () {
+                    let aInputIds = ["FSA_id_name", "FSA_id_nominatedName"];
+                    aInputIds.forEach(function (sId) {
+                        let oControl = sap.ui.getCore().byId(sId);
+                        if (oControl) {
+                            oControl.setValueState("None");
+                            oControl.setValue("");
+                        }
+                        let oDatePicker = sap.ui.getCore().byId("FSA_id_Date");
+                        if (oDatePicker) {
+                            let oToday = this.Formatter.formatDate(new Date());
+                            oDatePicker.setValue(oToday);
+                        }
+                    }.bind(this));
+                }.bind(this);
+                if (!this.oDialog) {
+                    sap.ui.core.Fragment.load({
+                        name: "sap.kt.com.minihrsolution.fragment.SpotAward",
+                        controller: this
+                    }).then(function (oDialog) {
+                        this.oDialog = oDialog;
+                        oView.addDependent(this.oDialog);
+                        this.oDialog.attachAfterOpen(resetFields);
+                        this.oDialog.open();
+                    }.bind(this));
+                } else {
+                    resetFields();
+                    this.oDialog.open();
+                }
+            },
+
+            FSA_onPressSubmit: async function () {
+                const oName = sap.ui.getCore().byId("FSA_id_name").getValue();
+                const oNominee = sap.ui.getCore().byId("FSA_id_nominatedName").getValue();
+                const oDate = sap.ui.getCore().byId("FSA_id_Date").getValue();
+                if (!oName || !oNominee || !oDate) {
+                    sap.m.MessageToast.show("Please fill all required fields.");
+                    return;
+                }
+                // const drawDottedLine = function (doc, startX, startY, endX, segmentLength = 0.2, gapLength = 0.15) {
+                //     let x = startX;
+                //     while (x < endX) {
+                //         const nextX = Math.min(x + segmentLength, endX);
+                //         doc.line(x, startY, nextX, startY);
+                //         x = nextX + gapLength;
+                //     }
+                // };
+                // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+                // var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                // let compLogoBase64 = oCompanyDetailsModel.companylogo64;
+                // if (!compLogoBase64 && oCompanyDetailsModel.companylogo?.data) {
+                //     const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo.data)], { type: "image/png" });
+                //     compLogoBase64 = await this._convertBLOBtoBASE64(logoBlob);
+                //     oCompanyDetailsModel.companylogo64 = compLogoBase64; // cache it
+                // }
+                // Initialize jsPDF
+                const doc = new window.jsPDF({
+                    orientation: "landscape",
+                    unit: "cm",
+                    format: "a4"
+                });
+
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageMiddle = pageWidth / 2;
+
+                // const logoWidth = 4;
+                // const logoHeight = 4;
+                // const logoX = pageWidth - logoWidth - 1; // 1 cm right margin
+                // const logoY = 1;
+                // doc.addImage(compLogoBase64, "PNG", logoX, logoY, logoWidth, logoHeight);
+
+                // Add background image (base64)
+                const imgData = this.getView().getModel("PDFData").getProperty("/DemoBase64");
+                doc.addImage(imgData, 0, 0, pageWidth, pageHeight);
+
+                doc.setFont("Arial", "boldnormal");
+                doc.setFontSize(33);
+                doc.text("SPOT AWARD", pageMiddle, 4, { align: "center" });
+
+                doc.setFont("Arial", "normal");
+                doc.setFontSize(25);
+                doc.text("This certificate is proudly presented to", pageMiddle, 6, { align: "center" });
+
+                doc.setFont("times", "bolditalic");
+                doc.setFontSize(30);
+                doc.setTextColor(0, 0, 0);
+                doc.text(oName, pageMiddle, 8.5, { align: "center" });
+                // drawDottedLine(doc, 5.5, 9, pageWidth - 4);
+
+                doc.setFont("times", "normal");
+                doc.setFontSize(15);
+                doc.text(".............................................................................................................", pageMiddle, 9, { align: "center" });
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(15);
+                doc.text("Excellence in overcoming challenges and timely delivery of solution", pageMiddle, 10, { align: "center" });
+                doc.text("in new technology areas.", pageMiddle, 11, { align: "center" });
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(16);
+                doc.text(oNominee, 7, 15, { align: "center" }); // left
+                doc.setFont("times", "normal");
+                doc.setFontSize(15);
+                doc.text("...............................", 7, 15.5, { align: "center" });
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(16);
+                doc.text(oDate, pageMiddle, 15, { align: "center" }); // center
+                doc.setFont("times", "normal");
+                doc.setFontSize(15);
+                doc.text("...............................", pageMiddle, 15.5, { align: "center" });
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(16);
+                doc.text("Kishor Shah", pageWidth - 7, 15, { align: "center" }); // right
+                doc.setFont("times", "normal");
+                doc.setFontSize(15);
+                doc.text("...............................", pageWidth - 7, 15.5, { align: "center" });
+                // Labels
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(12);
+                doc.text("Nominated by", 7, 16, { align: "center" });
+                // drawDottedLine(doc, 2, 15, 4);
+                doc.text("Date", pageMiddle, 16, { align: "center" });
+                // drawDottedLine(doc, pageMiddle - 1.2, 18.0, pageMiddle + 1.2);
+                doc.text("Managing Partner", pageWidth - 7, 16, { align: "center" });
+                // drawDottedLine(doc, pageWidth - 4, 18.0, pageWidth - 3.2);
+
+                // doc.setFont("helvetica", "normal");
+                // doc.setFontSize(15);
+                // doc.text(oNominee, 6.5, 19.5);
+                // doc.text(oDate, pageMiddle, 19.5, { align: "center" });
+                // doc.text("Kishor Shah", 24.5, 19.5,);
+
+                // Save PDF
+                doc.save("SpotAward_Certificate.pdf");
+                this.oDialog.close();
+            },
+
+            FSA_onPressClose: function () {
+                this.oDialog.close();
             },
 
             CC_onPressIdCardDetails: function () {
