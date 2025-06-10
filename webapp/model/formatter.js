@@ -108,6 +108,11 @@ sap.ui.define([
             }
             return isAllowedRole && isSaveOrSubmit;
         },
+        resignationEndDateVisible: function (resignationEndDate, role) {
+            var isAllowedRole = (role === 'Admin' || role === 'HR Manager' || role === 'HR');
+            return !!resignationEndDate && isAllowedRole;
+        },
+        
         formatGrade: function (value) {
             if (!value) {
                 return "";
