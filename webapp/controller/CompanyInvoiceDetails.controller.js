@@ -199,9 +199,11 @@ sap.ui.define([
             },
 
             onChangeInvoiceDate: async function (oEvent) {
-                if (oEvent) utils._LCvalidateDate(oEvent);
-                this.byId("CID_id_Payby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
-                this.byId("CID_id_NavPayby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
+                if (oEvent) {
+                    utils._LCvalidateDate(oEvent);
+                    this.byId("CID_id_Payby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
+                    this.byId("CID_id_NavPayby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
+                }
                 const oData = await this.ajaxReadWithJQuery("MSADetails", { MsaID: this.SelectKey });
                 const oSelectedCustomerModel = this.getView().getModel("SelectedCustomerModel");
                 if (oData.success) {
@@ -248,7 +250,7 @@ sap.ui.define([
 
                     if (!oData.success) return;
 
-                    const unitMultiplier = { Day: 20, Month: 1, Hour: 168 };
+                    const unitMultiplier = { Day: 20, Month: 1, Hour: 168, Bid: 1 };
                     let aFilteredSOWDetails = [];
                     this.itemIDCounter = 1;
 
@@ -257,7 +259,10 @@ sap.ui.define([
 
                         const [rateValue, currency, a, b, unit] = oSOW.Rate.split(" ");
                         const multiplier = unitMultiplier[(currency === "INR") ? unit : b] || 0;
-                        const total = parseFloat(rateValue) * multiplier;
+                        const rate = (isNaN(parseFloat(rateValue)) || parseFloat(rateValue) === 0) ? 1 : parseFloat(rateValue);
+                        const factor = (isNaN(parseFloat(multiplier)) || parseFloat(multiplier) === 0) ? 1 : parseFloat(multiplier);
+
+                        const total = rate * factor;
 
                         aFilteredSOWDetails.push({
                             ...oSOW,
@@ -267,7 +272,7 @@ sap.ui.define([
                             SAC: "998314",
                             GSTCalculation: (currency === "INR") ? "YES" : "",
                             Unit: multiplier,
-                            UnitText: (currency === "INR") ? unit : b,
+                            UnitText: (currency === "INR") ? b + " " + unit : a + " " + b,
                             Rate: rateValue,
                             Currency: currency,
                             Discount: "",
@@ -325,6 +330,7 @@ sap.ui.define([
                     GSTCalculation: (currency === "INR") ? "YES" : "",
                     Unit: "",
                     Rate: "",
+                    UnitText: "Per Day",
                     Currency: currency,
                     Discount: "",
                     Total: "",
@@ -362,7 +368,7 @@ sap.ui.define([
                     }
 
                     // ✅ NEW: If discount > rate OR discount > baseAmount, reset discount to 0
-                    if (discountAmount > rate || discountAmount > baseAmount) {
+                    if (discountAmount > baseAmount) {
                         discountAmount = 0;
                         item.Discount = "0.00";
                     } else {
@@ -414,7 +420,7 @@ sap.ui.define([
                 oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
                 oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
-
+                oInvoiceModel.refresh(true);
                 this.onChangeConversionRate();
             },
 

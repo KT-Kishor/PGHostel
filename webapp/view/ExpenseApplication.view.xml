@@ -92,9 +92,6 @@
 					<Column  minScreenWidth="Desktop" demandPopin="true">
 						<Label text="{i18n>expReimbursementAmountExp}"  tooltip="{i18n>expReimbursementAmount}"/>
 					</Column>
-					<!-- <Column minScreenWidth="Desktop" demandPopin="true">
-						<Label text="{i18n>status}" />
-					</Column> -->
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Label text="" />
 					</Column>
@@ -102,14 +99,13 @@
 				<items>
 					<ColumnListItem type="Navigation" press="Exp_onCheckExpenseDetails">
 						<cells>
-							<Text text="{ExpenseModel>EmployeeID}" />
+							<ObjectIdentifier title="{ExpenseModel>EmployeeID}" text="{ExpenseModel>EmployeeName}"/>
 							<Text text="{ExpenseModel>ExpenseName}" />
 							<Text text="{path:'ExpenseModel>ExpStartDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{path:'ExpenseModel>ExpEndDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{ExpenseModel>Destination}" />
 							<Text text="INR {path:'ExpenseModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" />
 							<Text text="INR {path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />						
-							<!-- <ObjectStatus text="{ExpenseModel>Status}" state="{path:'ExpenseModel>Status', formatter: '.Formatter.formatObjectStatus'}" /> -->
 							<Button icon="sap-icon://delete" visible="{= ${ExpenseModel>Status} === 'Draft' }" press="Exp_onPressDeleteExpense" />
 						</cells>
 					</ColumnListItem>

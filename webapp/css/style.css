@@ -679,3 +679,11 @@ align-items:flex-start;
     }
 }
 
+.tokenStyle .sapMTokenText {
+    max-width: 100px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+}
