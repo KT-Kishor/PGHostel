@@ -126,8 +126,8 @@ sap.ui.define([
             },
             //Download Perdiem Declaration
             Exp_Det_onPressExpenseDownload: function () {
-                let fileUrl = window.location.href.split("index")[0] + "/Perdiem_DeclarationForm.doc";
-                sap.m.URLHelper.redirect(fileUrl, true);
+               let fileUrl = window.location.origin.split("index")[0] + "/Perdiem_DeclarationForm.doc";
+            sap.m.URLHelper.redirect(fileUrl, true)
             },
             //Open Fragment in Expeanse Item Create and Update 
             openFragment: function () {
