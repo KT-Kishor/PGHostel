@@ -482,7 +482,7 @@ sap.ui.define([
                     sValue = sValue + '%';
                 }
                 oInput.setValue(sValue);
-
+                await this.totalAmountCalculation();
                 if (!sValue) {
                     oInput.setValueState("None");
                     oInput.setValueStateText("");
@@ -497,7 +497,7 @@ sap.ui.define([
                     oInput.setValueStateText("");
                     this.Discount = true;
                 }
-                await this.totalAmountCalculation();
+                
                 var oNavigationModel = this.getView().getModel("SelectedCustomerModel");
                 var oData = oNavigationModel.getData();
 

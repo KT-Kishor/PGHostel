@@ -122,26 +122,26 @@
 											<m:Column width="3rem" minScreenWidth="Tablet">
 												<m:Text text="{i18n>itemID}" />
 											</m:Column>
-											<m:Column minScreenWidth="Tablet">
+											<m:Column minScreenWidth="Tablet" width="7rem">
 												<m:Text text="{i18n>particulars}" />
 											</m:Column>
-											<m:Column id="idSAC" width="8rem" minScreenWidth="Tablet" demandPopin="true">
+											<m:Column id="idSAC" width="7rem" minScreenWidth="Tablet" demandPopin="true">
 												<m:Text text="{i18n>SAC}" />
 											</m:Column >
-											<m:Column id="idGSTCalculation" width="8rem" minScreenWidth="Tablet" demandPopin="true">
+											<m:Column id="idGSTCalculation" width="7rem" minScreenWidth="Tablet" demandPopin="true">
 												<m:Text text="{i18n>GSTCalculation}" />
 											</m:Column>
-											<m:Column minScreenWidth="Tablet" demandPopin="true">
-												<m:Text text="{i18n>Unit}" width="8rem"/>
+											<m:Column minScreenWidth="Tablet" demandPopin="true" width="11rem">
+												<m:Text text="{i18n>Unit}" />
 											</m:Column>
-											<m:Column minScreenWidth="Tablet" demandPopin="true">
-												<m:Text text="{i18n>rate}" width="8rem"/>
+											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
+												<m:Text text="{i18n>rate}" />
 											</m:Column>
-											<m:Column minScreenWidth="Tablet" demandPopin="true">
-												<m:Text text="{i18n>discount}" width="8rem" />
+											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
+												<m:Text text="{i18n>discount}"  />
 											</m:Column>
-											<m:Column minScreenWidth="Tablet" demandPopin="true">
-												<m:Text text="{i18n>total}" width="8rem"/>
+											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
+												<m:Text text="{i18n>total}" />
 											</m:Column>
 										</m:columns>
 										<m:items>

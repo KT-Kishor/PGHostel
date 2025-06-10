@@ -30,15 +30,15 @@
 
 
 				<Label text="{i18n>msaRateCharge}" required="true" visible="{simpleForm>/Recruitment}"></Label>
-				<Input value="{FilteredMsaModel>/0/RateCharge}" visible="{simpleForm>/Recruitment}" maxLength="2" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}"/>
+				<Input value="{FilteredMsaModel>/0/RateCharge}" visible="{simpleForm>/Recruitment}" maxLength="5" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}"/>
 
 				<Label text="{i18n>paymentLabel}" required="true" visible="{simpleForm>/Recruitment}"></Label>
 				<HBox width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{simpleForm>/Recruitment}">
 					<VBox width="49%">
-						<Input value="{FilteredMsaModel>/0/PaymentAdvance}" maxLength="2" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="onPaymentAdvanceInputChange" valueStateText="{i18n>msaAmountMess}"/>
+						<Input value="{FilteredMsaModel>/0/PaymentAdvance}" maxLength="5" placeholder="Advance in percentage" id="Msa_Id_PayAdvance" liveChange="onPaymentAdvanceInputChange" valueStateText="{i18n>msaAmountMess}"/>
 					</VBox>
 					<VBox width="49%">
-						<Input value="{FilteredMsaModel>/0/PaymentBalance}" maxLength="2" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="onPaymentAdvanceInputChange" valueStateText="{i18n>msaAmountMess}" />
+						<Input value="{FilteredMsaModel>/0/PaymentBalance}" maxLength="5" placeholder="Balance in percentage" id="Msa_Id_PayBalance" liveChange="onPaymentAdvanceInputChange" valueStateText="{i18n>msaAmountMess}" />
 					</VBox>
 				</HBox>
 
@@ -50,7 +50,7 @@
 						</Select>
 					</VBox>
 					<VBox width="49%">
-						<Input value="{FilteredMsaModel>/0/ReplacementRefund}" maxLength="2" placeholder="{i18n>refundPlaceholder}" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}"/>
+						<Input value="{FilteredMsaModel>/0/ReplacementRefund}" maxLength="5" placeholder="{i18n>refundPlaceholder}" id="Msa_Id_Refund" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}"/>
 					</VBox>
 				</HBox>
 

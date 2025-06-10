@@ -45,7 +45,7 @@ sap.ui.define([
                     RateCharge: "",
                     PaymentAdvance: "",
                     PaymentBalance: "",
-                    ReplacementMonth: "12 Months",
+                    ReplacementMonth: "2 Months",
                     ReplacementRefund: "",
                     Country: "",
                     City: ""
@@ -81,7 +81,7 @@ sap.ui.define([
                 var sBalanceValue = sBalanceInput.getValue();
 
                 // Regular expression: Up to 2 digits before decimal, optional 1 digit after
-                var regex = /^(?:\d{1,2})(?:\.\d{1})?$/;
+                var regex = /^(?:\d{1,2})(?:\.\d{2})?$/;
 
                 var bAdvanceValid = regex.test(sAdvanceValue);
                 var bBalanceValid = regex.test(sBalanceValue);
@@ -203,6 +203,7 @@ sap.ui.define([
                 this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(false);
                 this.byId("MsaD_id_Submit").setEnabled(true);
                 this.byId("MsaD_id_Type").setEditable(false);
+                this.byId("reviewPageType").setText(this.byId("MsaD_id_Type").getSelectedButton().getText());
             },
 
             MsaD_reviewSubmit: async function () {

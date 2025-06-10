@@ -52,7 +52,7 @@
 
 
 							<Label text="{i18n>msaRateCharge}" required="true" visible="{VisibleModel>/Recruitment}" ></Label>
-							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="3" placeholder="{i18n>msaRateChargePlac}" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}" />
+							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="5" placeholder="{i18n>msaRateChargePlac}" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}" />
 
 							<!-- Payment Section -->
 							<Label text="{i18n>paymentLabel}" required="true" visible="{VisibleModel>/Recruitment}" />
@@ -60,7 +60,7 @@
 								<VBox width="49%">
 									<Input 
 										value="{msaModelWizart>/PaymentAdvance}" 
-										maxLength="3" 
+										maxLength="5" 
 										placeholder="{i18n>advancePlaceholder}" 
 										id="Msa_Id_PayAdvance" 
 										liveChange="onPaymentAdvanceInputChange" 
@@ -69,7 +69,7 @@
 								<VBox width="49%">
 									<Input 
 										value="{msaModelWizart>/PaymentBalance}" 
-										maxLength="3" 
+										maxLength="5" 
 										placeholder="{i18n>balancePlaceholder}" 
 										id="Msa_Id_PayBalance" 
 										liveChange="onPaymentAdvanceInputChange" 
@@ -91,7 +91,7 @@
 								<VBox width="49%">
 									<Input 
 										value="{msaModelWizart>/ReplacementRefund}" 
-										maxLength="3" 
+										maxLength="5" 
 										placeholder="{i18n>refundPlaceholder}" 
 										id="Msa_Id_Refund" 
 										liveChange="LC_MSA_RateCharge" 
@@ -157,6 +157,8 @@
 			singleContainerFullSize="false"
 			ariaLabelledBy="Title1">
 						<f:content>
+							<Label text="{i18n>type}" />
+							<Text id="reviewPageType" />
 							<Label text="{i18n>companyName}" />
 							<Text text="{msaModelWizart>/CompanyName}" />
 							<Label text="{i18n>companyHeadName}" />
@@ -165,15 +167,15 @@
 							<Text text="{msaModelWizart>/CompanyHeadPosition}" />
 
 							<Label text="{i18n>msaRateCharge}" visible="{VisibleModel>/Recruitment}"/>
-							<Text text="{msaModelWizart>/RateCharge}%" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/RateCharge} %" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="Payment Advance" visible="{VisibleModel>/Recruitment}"/>
-							<Text text="{msaModelWizart>/PaymentAdvance}%" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/PaymentAdvance} %" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="Payment Balance" visible="{VisibleModel>/Recruitment}"/>
-							<Text text="{msaModelWizart>/PaymentBalance}%" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/PaymentBalance} %" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="Replacement Gratuity Month" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/ReplacementMonth}" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="Replacement Gratuity Refund" visible="{VisibleModel>/Recruitment}"/>
-							<Text text="{msaModelWizart>/ReplacementRefund}%" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/ReplacementRefund} %" visible="{VisibleModel>/Recruitment}"/>
 
 							<Label text="{i18n>contractPeriod}" />
 							<Text text="{msaModelWizart>/ContractPeriod}" />

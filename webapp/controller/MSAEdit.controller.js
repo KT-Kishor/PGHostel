@@ -28,7 +28,7 @@ sap.ui.define([
                 this.MSAID = oEvent.getParameter("arguments").sPath;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
-                var editable = new JSONModel({ editable: false, isEnabled: true, Mode: "Delete", save: false, submitBtn: false, ExpendBtn: false, RelesedBtn: false, Recruitment: true, BtnEnable: false, addSowBtn: false, ExpendBtn: false });
+                var editable = new JSONModel({ editable: false, isEnabled: true, Mode: "Delete", save: false, submitBtn: false, ExpendBtn: false, RelesedBtn: false, Recruitment: true, BtnEnable: false, addSowBtn: false, ExpendBtn: false, minDate: new Date(),secondMinDate: new Date() });
                 this.getView().setModel(editable, "simpleForm");
 
                 this.SimpleFormModel = this.getView().getModel("simpleForm");
@@ -37,7 +37,7 @@ sap.ui.define([
                 var oSowCreateModel = new JSONModel();
                 this.getView().setModel(oSowCreateModel, "sowCreateModel");
                 this._makeDatePickersReadOnly(["MsaE_id_SowStatus"]);
-                this.byId("MsaE_id_SowStatus").setValue("Active");
+                this.byId("MsaE_id_SowStatus").setValue("All");
                 await this.MSADetailsReadCall();
                 await this.CommonReadCallForSow();
                 this.closeBusyDialog();
@@ -60,6 +60,7 @@ sap.ui.define([
                 this.getBusyDialog();
                 try {
                     await this._fetchCommonData("MSADetails", "FilteredMsaModel", { MsaID: this.MSAID });
+                    this.SimpleFormModel.setProperty("/minDate", new Date(this.getView().getModel("FilteredMsaModel").getData()[0].CreateMSADate));
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
@@ -79,6 +80,9 @@ sap.ui.define([
                 this.byId("Sow_Id_ReadTable").removeSelections();
             },
             MsaE_validateDate: function (oEvent) {
+                if (oEvent.getParameter('id').split('_').pop() === 'StartDate') {
+                    sap.ui.getCore().byId("SOW_id_EndDate").setMinDate(new Date(oEvent.getParameter('value').split('/').reverse().join('-')));
+                }
                 utils._LCvalidateDate(oEvent);
             },
             MSACountryComboBox: function (oEvent) {
@@ -532,6 +536,8 @@ sap.ui.define([
                 sowCreateModel.setProperty("/StartDate", this.Formatter.formatDate(value !== "Expend" ? FilterData[0].StartDate : StartDate));
                 sowCreateModel.setProperty("/Description", FilterData[0].Description);
                 sowCreateModel.setProperty("/Currency", FilterData[0].Rate.split(" ")[1]);
+
+                this.SimpleFormModel.setProperty("/secondMinDate", new Date(FilterData[0].StartDate));
 
 
                 var oFilteredData = FilterData;
