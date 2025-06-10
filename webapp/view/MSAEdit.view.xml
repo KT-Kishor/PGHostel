@@ -92,7 +92,7 @@
                 <m:Text text="{FilteredMsaModel>/0/ContractPeriod}" />
             </layout:HorizontalLayout>
             <layout:HorizontalLayout>
-                <m:Label showColon="true" text="{i18n>panCard}" />
+                <m:Label showColon="true" text="{i18n>panCardCommon}" />
                 <m:Text text="{FilteredMsaModel>/0/PanCard}" />
             </layout:HorizontalLayout>
             <layout:HorizontalLayout>

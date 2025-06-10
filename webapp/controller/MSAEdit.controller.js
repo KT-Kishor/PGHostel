@@ -42,6 +42,9 @@ sap.ui.define([
                 await this.CommonReadCallForSow();
                 this.closeBusyDialog();
                 this.AdvanceBalance = true;
+                this.Rate = true;
+                this.Desiganation = true;
+                this.ConsultantName = true;
             },
 
             onRadioButtonGroupSelect: function (oEvent) {
@@ -301,7 +304,7 @@ sap.ui.define([
             },
 
             SOW_onSaveFrag: async function () {
-                if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID")) {
+                if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID") && this.Rate && this.Desiganation && this.ConsultantName) {
                     var sowCreateModel = this.getView().getModel("sowCreateModel").getData();
                     var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
                     if (!oModelDataPro || oModelDataPro.length === 0) return MessageToast.show(this.i18nModel.getText("msaTableValidation"));
@@ -468,7 +471,7 @@ sap.ui.define([
                     return MessageToast.show(this.i18nModel.getText("noRowSelected"))
                 }
                 var FilterData = this.getView().getModel("SowReadModel").getData().filter((item) => item.SowID === this.Selected.SowID);
-                var Status = oEvent.getSource().getText();
+                var Status = (oEvent.getSource().getText() === "Inactive All") ? "Inactive" : "Active";
                 var oData = {
                     "data": FilterData.map((item) => {
                         return {
@@ -496,6 +499,9 @@ sap.ui.define([
                         sap.m.MessageBox.error(`Please fill all mandatory fields in row ${i + 1}`);
                         return;
                     }
+                }
+                if(this.ConsultantName === false || this.Desiganation === false || this.Rate === false) {
+                    return MessageToast.show(this.i18nModel.getText("mandatoryFieldsSow"));
                 }
                 this.getBusyDialog();
                 try {
@@ -712,6 +718,18 @@ sap.ui.define([
                 await this.CommonUpdateCall(oData, this.i18nModel.getText("sowUpdate"));
                 // this.SOW_oDialog.close();
                 this.SimpleFormModel.setProperty("/BtnEnable", false);
+            },
+
+            onLiveConsultantName: function (oEvent) {
+                this.ConsultantName = utils._LCvalidateName(oEvent);
+            },
+
+            onLiveChangeDesiganation: function (oEvent) {
+                this.Desiganation = utils._LCvalidateMandatoryField(oEvent);
+            },
+
+            onRateChange:function(oEvent) {
+                this.Rate = utils._LCvalidateTraineeAmount(oEvent);
             },
 
             onOpenActionSheet: function (oEvent) {

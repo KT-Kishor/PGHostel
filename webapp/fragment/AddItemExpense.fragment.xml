@@ -46,7 +46,7 @@
 					</HBox>
 					<Label text="{i18n>Attachment}" required="true" />
 					<HBox alignItems="Center" width="100%" renderType="Bare" class="sapUiSmallMarginBottom">
-						<u:FileUploader fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png" buttonText="Upload" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true" iconFirst="true" class="sapUiSmallMarginBeginEnd" />
+						<u:FileUploader fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png,doc,docx" buttonText="Upload" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true" iconFirst="true" class="sapUiSmallMarginBeginEnd" />
 
 						<Tokenizer id="tokenizer" width="100%" tokenDelete="onTokenDelete" tokens="{tokenModel>/tokens}">
 							<Token key="{tokenModel>key}" text="{tokenModel>text}" />

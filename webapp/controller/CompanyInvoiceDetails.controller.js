@@ -199,7 +199,7 @@ sap.ui.define([
             },
 
             onChangeInvoiceDate: async function (oEvent) {
-                utils._LCvalidateDate(oEvent);
+                if (oEvent) utils._LCvalidateDate(oEvent);
                 this.byId("CID_id_Payby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
                 this.byId("CID_id_NavPayby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
                 const oData = await this.ajaxReadWithJQuery("MSADetails", { MsaID: this.SelectKey });
@@ -345,29 +345,41 @@ sap.ui.define([
                 let aSOWDetails = oInvoiceModel.getProperty("/CompanyInvoiceItem") || [];
                 let totalWithGST = 0;
                 let totalWithoutGST = 0;
+
                 aSOWDetails.forEach((item) => {
-                    const rate = parseFloat(item.Rate) || 0;
-                    const unit = parseFloat(item.Unit) || 0;
-                    const baseAmount = unit ? unit * rate : rate;
+                    const rate = (isNaN(parseFloat(item.Rate)) || parseFloat(item.Rate) === 0) ? 1 : parseFloat(item.Rate);
+                    const unit = (isNaN(parseFloat(item.Unit)) || parseFloat(item.Unit) === 0) ? 1 : parseFloat(item.Unit);
+                    const baseAmount = unit * rate;
 
                     let discountAmount = 0;
+
+                    // Check if discount is in percentage format
                     if (typeof item.Discount === "string" && item.Discount.trim().endsWith("%")) {
                         const percent = parseFloat(item.Discount) / 100;
                         discountAmount = baseAmount * percent;
-                        item.Discount = discountAmount.toFixed(2);
                     } else {
                         discountAmount = parseFloat(item.Discount) || 0;
                     }
-                    const finalAmount = baseAmount - discountAmount;
-                    if (finalAmount < 0) {
-                        item.Total = '0.00';
-                        item.Discount = unit * rate;
+
+                    // ✅ NEW: If discount > rate OR discount > baseAmount, reset discount to 0
+                    if (discountAmount > rate || discountAmount > baseAmount) {
+                        discountAmount = 0;
+                        item.Discount = "0.00";
                     } else {
-                        item.Total = finalAmount.toFixed(2);
+                        item.Discount = discountAmount.toFixed(2);
                     }
+
+                    let finalAmount = baseAmount - discountAmount;
+                    item.Total = finalAmount.toFixed(2);
+
                     const isGSTApplicable = item.GSTCalculation === "YES" && oCustomerModel.getProperty("/Currency") === "INR";
                     item.SAC = isGSTApplicable ? "998314" : "-";
-                    isGSTApplicable ? totalWithGST += finalAmount : totalWithoutGST += finalAmount;
+
+                    if (isGSTApplicable) {
+                        totalWithGST += finalAmount;
+                    } else {
+                        totalWithoutGST += finalAmount;
+                    }
                 });
 
                 const subTotalGST = totalWithGST.toFixed(2);
@@ -454,7 +466,6 @@ sap.ui.define([
                 } else {
                     oNavigationModel.setProperty("/IncomeTax", "0.00");
                 }
-
             },
 
             onParticularsInputLiveChange: function (oEvent) {
@@ -497,7 +508,7 @@ sap.ui.define([
                     oInput.setValueStateText("");
                     this.Discount = true;
                 }
-                
+
                 var oNavigationModel = this.getView().getModel("SelectedCustomerModel");
                 var oData = oNavigationModel.getData();
 
