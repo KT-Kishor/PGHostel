@@ -65,7 +65,7 @@
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>joiningDate}" />
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true" >
+					<Column minScreenWidth="Desktop" demandPopin="true" width="300px">
 						<Text text="{i18n>emailId}" />
 					</Column>
 					<Column demandPopin="true">

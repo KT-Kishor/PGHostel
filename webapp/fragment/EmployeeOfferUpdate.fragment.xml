@@ -88,8 +88,8 @@
 										<m:DatePicker id="EOUF_id_Joindate" editable="{viewModel>/editable}" placeholder="{i18n>joiningDate}" minDate="{viewModel>/maxDate}"
                                             value="{path:'employeeModel>/JoiningDate',formatter:'.Formatter.formatDate'}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"  valueStateText="{i18n>dateValueState}"/>
 										<!-- Consultant Address TextArea -->
-										<m:Label text="{i18n>consultantAddress}" required="true" />
-										<m:TextArea  editable="{viewModel>/editable}" value="{employeeModel>/ConsultantAddress}" placeholder="{i18n>consultantAddress}" liveChange="EOD_ValidateCommonFields"
+										<m:Label text="{i18n>EmpAddress}" required="true" />
+										<m:TextArea  editable="{viewModel>/editable}" value="{employeeModel>/ConsultantAddress}" placeholder="{i18n>EmpAddress}" liveChange="EOD_ValidateCommonFields"
                                             id="EOUF_id_Address" maxLength="120" valueStateText="{i18n>addressValueState}"/>
 										<!-- Employment Bond Year ComboBox -->
 										<m:Label text="{i18n>pinCode}"  required="true" />
