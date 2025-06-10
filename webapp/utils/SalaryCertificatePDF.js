@@ -70,10 +70,17 @@ sap.ui.define([], function () {
                     doc.setGState(new doc.GState({ opacity: 0.1 }));
                     doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                     doc.setGState(new doc.GState({ opacity: 1 }));
-
-                    doc.setTextColor(0, 0, 0);
+                    footerContent();
                     doc.setLineWidth(0.6);
-                    let headerY = rteY + 50;
+                    let headerY = rteY + 40 + (193.34 - endYmm);
+                    if (headerY > 180) {
+                        doc.addPage();
+                        doc.setGState(new doc.GState({ opacity: 0.1 }));
+                        doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
+                        doc.setGState(new doc.GState({ opacity: 1 }));
+                        headerY = margin;
+                        footerContent();
+                    }
                     let tableX = margin + 15;
                     let tablemaxWidth = pageWidth - 2 * tableX;
                     doc.line(tableX, headerY, pageWidth - tableX, headerY);
@@ -274,17 +281,25 @@ sap.ui.define([], function () {
                     doc.text("COST TO COMPANY", tableX + 3, grossPayY);
                     doc.text(grossPayText, grossPayTextX, grossPayY);
                     doc.setTextColor(0, 0, 0);
-                    
+
                     doc.line(pageMiddle + 10, yearlyCompTitleBotLineY, pageMiddle + 10, monComp0BotLineY);
                     doc.line(pageMiddle + 10, deductionsTitleBotLineY, pageMiddle + 10, deductions0BotLineY);
                     doc.line(pageMiddle + 10, varCompTitleBotLineY, pageMiddle + 10, varComp0BotLineY);
                     doc.line(pageMiddle + 10, grossTitleBotLineY, pageMiddle + 10, grossPayBotLineY);
                     doc.line(tableX, headerY, tableX, grossPayBotLineY);
                     doc.line(pageWidth - tableX, headerY, pageWidth - tableX, grossPayBotLineY);
+                    let forCoNameY = grossPayBotLineY + 20;
 
+                    if (pageHeight - grossPayBotLineY < 75) {
+                        doc.addPage();
+                        doc.setGState(new doc.GState({ opacity: 0.1 }));
+                        doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
+                        doc.setGState(new doc.GState({ opacity: 1 }));
+                        forCoNameY = margin;
+                        footerContent();
+                    }
                     doc.setFont("times", "bold").setFontSize(11);
                     doc.setTextColor(0, 0, 0);
-                    let forCoNameY = bottomLimit - 40;
                     doc.text(`For ${oCompanyModel.companyName}.`, margin, forCoNameY);
 
                     let coSignY = forCoNameY + 5;
@@ -297,34 +312,38 @@ sap.ui.define([], function () {
                     let headofCoRoleY = headofCoNameY + 5;
                     doc.text(oCompanyModel.designation, margin, headofCoRoleY);
 
-                    doc.setFont("times", "normal");
-                    doc.setFillColor(128, 128, 128);
-                    doc.rect(0, bottomLimit + 6, pageWidth, pageHeight - (bottomLimit + 6), 'F');
-                    doc.setFontSize(12);
-                    doc.setTextColor(255, 255, 255);
-                    const addressLines = doc.splitTextToSize(oCompanyModel.longAddress, 120);
-                    let addressY = bottomLimit + 14;
-                    addressLines.forEach((line) => {
-                        doc.text(line, 8, addressY);
-                        addressY += 6.5;
-                    });
+                    function footerContent() {
+                        doc.setFont("times", "normal");
+                        doc.setFillColor(128, 128, 128);
+                        doc.rect(0, bottomLimit + 6, pageWidth, pageHeight - (bottomLimit + 6), 'F');
+                        doc.setFontSize(12);
+                        doc.setTextColor(255, 255, 255);
+                        const addressLines = doc.splitTextToSize(oCompanyModel.longAddress, 120);
+                        let addressY = bottomLimit + 14;
+                        addressLines.forEach((line) => {
+                            doc.text(line, 8, addressY);
+                            addressY += 6.5;
+                        });
 
-                    const gstinNo = `GSTIN: ${oCompanyModel.gstin}`;
-                    const gstinWidth = doc.getTextWidth(gstinNo);
-                    const gstinX = pageWidth - gstinWidth - 8;
-                    doc.text(gstinNo, gstinX, bottomLimit + 14);
+                        const gstinNo = `GSTIN: ${oCompanyModel.gstin}`;
+                        const gstinWidth = doc.getTextWidth(gstinNo);
+                        const gstinX = pageWidth - gstinWidth - 8;
+                        doc.text(gstinNo, gstinX, bottomLimit + 14);
 
-                    const lutNo = `LUT No.: ${oCompanyModel.lutno}`;
-                    const lutWidth = doc.getTextWidth(lutNo);
-                    const lutX = pageWidth - lutWidth - 8;
-                    doc.text(lutNo, lutX, bottomLimit + 20.5);
+                        const lutNo = `LUT No.: ${oCompanyModel.lutno}`;
+                        const lutWidth = doc.getTextWidth(lutNo);
+                        const lutX = pageWidth - lutWidth - 8;
+                        doc.text(lutNo, lutX, bottomLimit + 20.5);
+                        doc.setTextColor(0, 0, 0);
+                    }
 
                     document.body.removeChild(container);
                     doc.save(`${oModel.CertificateTitle}.pdf`);
                     that.closeBusyDialog();
                 }
             });
-              function findHtmlEndYmm(doc, pageNumber = 1) {
+
+            function findHtmlEndYmm(doc, pageNumber = 1) {
                 const pageCommands = doc.internal.pages[pageNumber];
                 if (!Array.isArray(pageCommands)) {
                     console.warn(`No page #${pageNumber} found.`);
