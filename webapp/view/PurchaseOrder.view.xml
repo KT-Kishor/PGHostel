@@ -4,7 +4,8 @@
     xmlns="sap.m"
     xmlns:m="sap.m"
     xmlns:c="sap.ui.core"
-    xmlns:core="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar"
+     xmlns:core="sap.ui.core"
     displayBlock="true"
     height="100%"
     busyIndicatorDelay="0"
@@ -16,6 +17,83 @@
                 type="XML"
             />
         </headerContent>
+         <fb:FilterBar
+            id="PO_id_FilterbarEmployee"
+            persistencyKey="myPersKey"
+            useToolbar="false"
+            clear="PO_onPressClear"
+            showClearOnFB="true"
+            search="PO_onSearch"
+            filterChange="IA_.onFilterChange"
+            afterVariantLoad="IA_.onAfterVariantLoad"
+            showFilterConfiguration="false"
+        >
+            <fb:filterGroupItems>
+                <fb:FilterGroupItem
+                    name="Customer Name"
+                    label="Customer Name"
+                    groupName="Group"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                       <ComboBox 
+                         id="PO_id_CustomerName"
+                         items="{ManageCustomerModel>/}"
+                            showClearIcon="true"
+
+                               >
+                  <core:Item
+                   key="{ManageCustomerModel>name}"
+                   text="{ManageCustomerModel>name}"
+                  />         
+           </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+            </fb:filterGroupItems>
+
+             <fb:filterGroupItems>
+                <fb:FilterGroupItem
+                    name="Po Number"
+                    label="PO Number"
+                    groupName="Group"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                       <ComboBox 
+                         id="PO_id_PoNumber"
+                         items="{POModel>/}"
+                            showClearIcon="true"
+
+                               >
+                  <core:Item
+                   key="{POModel>PoNumber}"
+                   text="{POModel>PoNumber}"
+                  />         
+           </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+            </fb:filterGroupItems>
+
+              <fb:filterGroupItems>
+                <fb:FilterGroupItem
+                    name="Creation Date"
+                    label="Creation Date"
+                    groupName="Group"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                     <DateRangeSelection
+                        id="PO_idECreationDatePicker"
+                        displayFormat="dd/MM/yyyy"
+                          valueFormat="yyyy-MM-dd"
+                   />
+                         
+                    
+                    </fb:control>
+                </fb:FilterGroupItem>
+            </fb:filterGroupItems>
+
+        </fb:FilterBar>
     <Table
     id="PO_id_Table" 
     mode="SingleSelectLeft"
@@ -29,44 +107,52 @@
                     press="PO_onCreatePurchaseOrder"
                     type="Accept"
                 />
-                 <Button
-                    text="Edit"
-                    press="PO_onEditPurchaseOrder"
-                    type="Emphasized"
-                />
                 <Button
                     text="Delete"
                     press="PO_onDeleteButtonPress"
-                    type="Emphasized"
+                    type="Reject"
                 />
             </Toolbar>
         </headerToolbar>
         <columns>
-            <Column>
-                <Text text="Customer Name" />
+         <Column>
+                <Text 
+                text="{i18n>ponumber}" 
+                tooltip="{i18n>ponumber}"/>
             </Column>
             <Column>
-                <Text text="Customer Address" />
+                <Text text="{i18n>customername}" 
+                tooltip="{i18n>customername}"/>
             </Column>
             <Column>
-                <Text text="Type" />
+                <Text text="{i18n>customerAddress}" 
+                tooltip="{i18n>customerAddress}"/>
             </Column>
             <Column>
-                <Text text="PAN No" />
+                <Text text="{i18n>type}" 
+                tooltip="{i18n>type}"/>
             </Column>
             <Column>
-                <Text text="Start Date" />
+                <Text text="{i18n>pan}" 
+                tooltip="{i18n>pan}"/>
             </Column>
             <Column>
-                <Text text="End Date" />
+                <Text text="{i18n>sdate}" 
+                tooltip="{i18n>sdate}"/>
             </Column>
             <Column>
-                <Text text="PO Creation Date" />
+                <Text text="{i18n>edate}" 
+                tooltip="{i18n>edate}"/>
+            </Column>
+            <Column>
+                <Text text="{i18n>podate}" 
+                tooltip="{i18n>podate}"/>
             </Column>
         </columns>
         <items>
             <ColumnListItem type="Navigation" press="onColumnListItemPress">
                 <cells>
+                    <Text text="{POModel>PoNumber}" />
                     <Text text="{POModel>CustomerName}" />
                     <Text text="{POModel>Address}" />
                     <Text text="{POModel>Type}"/>
