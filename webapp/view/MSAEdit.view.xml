@@ -10,7 +10,7 @@
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
 					<actions>
-						<m:Button text="Edit" type="Ghost" press="MsaE_onEditOrSavePress" />
+						<m:Button text="Edit" type="Emphasized" press="MsaE_onEditOrSavePress" />
 						<!-- <m:Button text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" type="{= ${simpleForm>/editable} ? 'Accept' : 'Transparent' }" press="MsaE_onEditOrSavePress" /> -->
 						<m:Button id="MSA" type="Ghost" text="{i18n>msaSendEmail}" enabled="{simpleForm>/isEnabled}" press="MsaE_onSendEmailMSA" />
 						<m:Button type="Attention" text="{i18n>GeneratePDF}" enabled="{simpleForm>/isEnabled}" press="MsaE_onPressMerge" />
@@ -62,22 +62,22 @@
         />
 
         <!-- Company Head Info -->
-        <layout:VerticalLayout class="sapUiSmallMarginBottom sapUiSmallMarginEnd sectionBlock">
+        <layout:VerticalLayout class="sapUiSmallMarginBottom sapUiSmallMarginEnd ">
             <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
-                <m:Label showColon="true" text="{i18n>companyHeadName}" />
-                <m:Text text="{FilteredMsaModel>/0/Salutation} {FilteredMsaModel>/0/CompanyHeadName}" />
+                <m:Label showColon="true" text="{i18n>companyHeadName}"  />
+                <m:Text text="{FilteredMsaModel>/0/Salutation} {FilteredMsaModel>/0/CompanyHeadName}" class="sapUiTinyMarginBegin" />
             </layout:HorizontalLayout>
             <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
                 <m:Label showColon="true" text="{i18n>companyHeadPosition}" />
-                <m:Text text="{FilteredMsaModel>/0/CompanyHeadPosition}" />
+                <m:Text text="{FilteredMsaModel>/0/CompanyHeadPosition}" class="sapUiTinyMarginBegin"/>
             </layout:HorizontalLayout>
             <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
                 <m:Label showColon="true" text="{i18n>branch}" />
-                <m:Text text="{FilteredMsaModel>/0/BranchCode}" />
+                <m:Text text="{FilteredMsaModel>/0/BranchCode}" class="sapUiTinyMarginBegin" />
             </layout:HorizontalLayout>
             <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
                 <m:Label showColon="true" text="{i18n>createMSADate}" />
-                <m:Text text="{path:'FilteredMsaModel>/0/CreateMSADate', formatter: '.Formatter.formatDate'}" />
+                <m:Text text="{path:'FilteredMsaModel>/0/CreateMSADate', formatter: '.Formatter.formatDate'}" class="sapUiTinyMarginBegin" />
             </layout:HorizontalLayout>
         </layout:VerticalLayout>
 
@@ -85,24 +85,24 @@
         <layout:VerticalLayout class="sapUiSmallMarginBeginEnd sapUiMediumMarginEnd sapUiSmallMarginBottom sectionBlock">
             <layout:HorizontalLayout>
                 <m:Label showColon="true" text="{i18n>paymentterms}" />
-                <m:Text text="{FilteredMsaModel>/0/PaymentTerms}" />
+                <m:Text text="{FilteredMsaModel>/0/PaymentTerms}" class="sapUiTinyMarginBegin" />
             </layout:HorizontalLayout>
             <layout:HorizontalLayout>
                 <m:Label showColon="true" text="{i18n>contractPeriod}" />
-                <m:Text text="{FilteredMsaModel>/0/ContractPeriod}" />
+                <m:Text text="{FilteredMsaModel>/0/ContractPeriod}"  class="sapUiTinyMarginBegin"/>
             </layout:HorizontalLayout>
             <layout:HorizontalLayout>
                 <m:Label showColon="true" text="{i18n>panCardCommon}" />
-                <m:Text text="{FilteredMsaModel>/0/PanCard}" />
+                <m:Text text="{FilteredMsaModel>/0/PanCard}" class="sapUiTinyMarginBegin" />
             </layout:HorizontalLayout>
             <layout:HorizontalLayout>
                 <m:Label showColon="true" text="{i18n>emailId}" />
-                <m:Text text="{FilteredMsaModel>/0/MsaEmail}" />
+                <m:Text text="{FilteredMsaModel>/0/MsaEmail}" class="sapUiTinyMarginBegin"/>
             </layout:HorizontalLayout>
         </layout:VerticalLayout>
 
         <!-- Address -->
-        <layout:VerticalLayout class="sapUiTinyMarginBottom sapUiSmallMarginBegin sectionBlock">
+        <layout:VerticalLayout class="sapUiTinyMarginBottom sapUiSmallMarginBegin ">
             <layout:HorizontalLayout>
                 <m:Label showColon="true" text="{i18n>Address}" />
                 <m:Text
@@ -110,7 +110,17 @@
                     width="300px"
                     wrapping="true"
                     wrappingType="Normal"
+					class="sapUiTinyMarginBegin"
                 />
+				
+            </layout:HorizontalLayout>
+			<layout:HorizontalLayout>
+                <m:Label showColon="true" text="{i18n>type}" />
+                <m:Text
+                    text="{FilteredMsaModel>/0/Type}"
+					class="sapUiTinyMarginBegin"
+                />
+				
             </layout:HorizontalLayout>
         </layout:VerticalLayout>
     </m:FlexBox>
