@@ -4,24 +4,26 @@ sap.ui.define(
         "sap/ui/model/json/JSONModel",
         "sap/m/MessageToast"
     ],
-    function(
-        BaseController, JSONModel, MessageToast, ) {
+    function (
+        BaseController, JSONModel, MessageToast,) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.ConsultantInvoice", {
-            onInit: function() {
+            onInit: function () {
                 this.getRouter().getRoute("RouteConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: async function() {
+            _onRouteMatched: async function () {
                 var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
                 if (!LoginFUnction) return;
                 // Get i18n resource bundle
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 // Set header name in LoginModel
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("consultantInvoice"));
+                this.CI_OnSearch()
                 this.ContractReadCall();
+
             },
 
-            ContractReadCall: async function() {
+            ContractReadCall: async function () {
                 try {
                     var oView = this.getView();
                     var userData = this.getOwnerComponent().getModel("LoginModel").getData();
@@ -46,7 +48,7 @@ sap.ui.define(
 
                     this.getBusyDialog(); // Show Busy Dialog
 
-                    await this.ajaxReadWithJQuery("ConsultantInvoice", filterObj).then(function(oData) {
+                    await this.ajaxReadWithJQuery("ConsultantInvoice", filterObj).then(function (oData) {
                         sap.ui.core.BusyIndicator.hide();
 
                         // Set full result to ConsultantModel (for table)
@@ -58,7 +60,7 @@ sap.ui.define(
                         this.getView().setModel(oInvoiceModel, "InvoiceModel");
 
                         this.closeBusyDialog(); // Hide Busy Dialog
-                    }.bind(this)).catch(function(error) {
+                    }.bind(this)).catch(function (error) {
                         this.closeBusyDialog();
                         MessageToast.show(error.message || error.responseText);
                     });
@@ -70,7 +72,7 @@ sap.ui.define(
             },
 
 
-            logindata: async function() {
+            logindata: async function () {
                 try {
                     await this.ajaxReadWithJQuery("AllLoginDetails", "EmpModel").then((data) => {
                         if (data.success) {
@@ -87,14 +89,14 @@ sap.ui.define(
                 }
             },
 
-            CI_onPressAddInvoice: function() {
+            CI_onPressAddInvoice: function () {
                 this.getRouter().navTo("RouteNavConsultantInvoiceApplication", {
                     sPath: "X",
                     oPath: "Y",
                 });
             },
 
-            CI_onPressInvoice: function(oEvent) {
+            CI_onPressInvoice: function (oEvent) {
                 var oBindingContext = oEvent.getSource().getBindingContext("ConsultantModel");
                 var oInvoiceNo = oBindingContext.getProperty("InvoiceNo");
                 var oEmployeeID = oBindingContext.getProperty("EmployeeID");
@@ -104,15 +106,15 @@ sap.ui.define(
                 });
             },
 
-            onPressback: function() {
+            onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
 
-            onLogout: function() {
+            onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
 
-            CI_onClearFilters: function() {
+            CI_onClearFilters: function () {
                 const oFilterBar = this.getView().byId("CI_id_ConsultantInvoiceFilterBar");
                 oFilterBar.getFilterGroupItems().forEach((oItem) => {
                     const oControl = oItem.getControl();
@@ -126,51 +128,110 @@ sap.ui.define(
                 });
             },
 
-            CI_OnSearch: async function() {
-                this.getBusyDialog();
+            CI_OnSearch: async function () {
+                try {
+                    this.getBusyDialog();
+                    const oFilterBar = this.byId("CI_id_ConsultantInvoiceFilterBar");
+                    const aFilterItems = oFilterBar.getFilterGroupItems();
+                    const params = {};
 
-                const oFilterBar = this.byId("CI_id_ConsultantInvoiceFilterBar");
-                const aFilterItems = oFilterBar.getFilterGroupItems();
-                const params = {};
+                    // Get current financial year range
+                    const { fyStart, fyEnd, financialYearLabel } = this._getFinancialYearRange();
+                    const formatDate = (date) => date.toISOString().split("T")[0];
 
-                aFilterItems.forEach(function(oItem) {
-                    const oControl = oItem.getControl();
-                    const sParamKey = oItem.getName();
+                    let invoiceDateProvided = false;
 
-                    if (oControl) {
-                        if (oControl.isA("sap.m.ComboBox")) {
-                            const selectedKey = oControl.getSelectedKey();
-                            if (selectedKey && sParamKey === "InvoiceNo") {
-                                // Expected format: "2025/26-001|KT-C001"
-                                const [invoiceNo, employeeId] = selectedKey.split("|");
-                                if (invoiceNo) {
-                                    params["InvoiceNo"] = invoiceNo;
+                    // Process filter items
+                    aFilterItems.forEach((oItem) => {
+                        const oControl = oItem.getControl();
+                        const sParamKey = oItem.getName();
+
+                        if (oControl) {
+                            if (oControl.isA("sap.m.ComboBox")) {
+                                const selectedKey = oControl.getSelectedKey();
+                                if (selectedKey && sParamKey === "InvoiceNo") {
+                                    const [invoiceNo, employeeId] = selectedKey.split("|");
+                                    if (invoiceNo) params["InvoiceNo"] = invoiceNo;
+                                    if (employeeId) params["EmployeeID"] = employeeId;
+                                } else if (selectedKey) {
+                                    params[sParamKey] = selectedKey;
                                 }
-                                if (employeeId) {
-                                    params["EmployeeID"] = employeeId;
-                                }
-                            } else if (selectedKey) {
-                                params[sParamKey] = selectedKey;
                             }
-                        } else if (oControl.getValue && oControl.getValue()) {
-                            params[sParamKey] = oControl.getValue();
+                            else if (oControl.isA("sap.m.DateRangeSelection")) {
+                                const value = oControl.getValue();
+                                if (value && value.includes("-")) {
+                                    const [start, end] = value.split("-").map(date =>
+                                        date.trim().split("/").reverse().join("-")
+                                    );
+                                    params["InvoiceStartDate"] = start;
+                                    params["InvoiceEndDate"] = end;
+                                    invoiceDateProvided = true;
+                                }
+                            }
+                            else if (oControl.getValue && oControl.getValue()) {
+                                params[sParamKey] = oControl.getValue();
+                            }
+                        }
+                    });
+
+                    // Set default financial year dates if none provided
+                    if (!invoiceDateProvided) {
+                        params.InvoiceStartDate = formatDate(fyStart);
+                        params.InvoiceEndDate = formatDate(fyEnd);
+                        params.FinancialYear = financialYearLabel;
+
+                        // Update the DateRangeSelection control to show financial year range
+                        const dateRangeControl = this.byId("CI_id_DatePicker");
+                        if (dateRangeControl) {
+                            dateRangeControl.setDateValue(fyStart);
+                            dateRangeControl.setSecondDateValue(fyEnd);
+                        }
+                    } else {
+                        // Check if selected dates match financial year exactly
+                        const startDate = new Date(params.InvoiceStartDate);
+                        const endDate = new Date(params.InvoiceEndDate);
+
+                        if (startDate.getTime() === fyStart.getTime() &&
+                            endDate.getTime() === fyEnd.getTime()) {
+                            params.FinancialYear = financialYearLabel;
                         }
                     }
-                });
 
-                try {
+                    // Fetch data
                     const oData = await this.ajaxReadWithJQuery("ConsultantInvoice", params);
                     if (oData && Array.isArray(oData.data)) {
                         const oModel = new sap.ui.model.json.JSONModel(oData.data);
                         this.getView().setModel(oModel, "ConsultantModel");
                     }
                 } catch (error) {
-                    sap.m.MessageToast.show(error.message || error.responseText);
+                    sap.m.MessageToast.show(error.message || error.responseText || this.i18nModel.getText("technicalError"));
+                   
                 } finally {
                     this.closeBusyDialog();
                 }
-            }
+            },
 
-        });
+            // Helper function to get financial year range
+            _getFinancialYearRange: function () {
+                const today = new Date();
+                const currentYear = today.getFullYear();
+                const currentMonth = today.getMonth(); // 0 = Jan, 3 = April
+
+                let fyStart, fyEnd, financialYearLabel;
+
+                if (currentMonth >= 3) { // April or later
+                    fyStart = new Date(currentYear, 3, 1); // April 1st
+                    fyEnd = new Date(currentYear + 1, 2, 31); // March 31st next year
+                    financialYearLabel = `${currentYear}-${currentYear + 1}`;
+                } else {
+                    fyStart = new Date(currentYear - 1, 3, 1); // April 1st last year
+                    fyEnd = new Date(currentYear, 2, 31); // March 31st this year
+                    financialYearLabel = `${currentYear - 1}-${currentYear}`;
+                }
+
+                return { fyStart, fyEnd, financialYearLabel };
+            }
+        })
     }
-);
+    
+)

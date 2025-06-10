@@ -51,7 +51,7 @@
 						<ToolbarSeparator />
 						<Button text="{i18n>InvoiceDeleteBtn}" id="CI_InvoiceDelete" type="Reject" press="CI_OnPressDeleteInvoice" enabled="false" />
 						<ToolbarSeparator />
-						<Button text="{i18n>msasow}" type="Gosht" tooltip="{i18n>addInvoice}" press="CI_onPressMSASOW"/>
+						<Button text="{i18n>msasow}" type="Ghost" tooltip="{i18n>addInvoice}" press="CI_onPressMSASOW"/>
 					</Toolbar>
 				</headerToolbar>
 				<columns>
@@ -68,10 +68,10 @@
 						<Text text="{i18n>totalAmount}" />
 					</Column>
 					<Column>
-						<Text text="{i18n>PayByDate}" />
+						<Text text="{i18n>PayByDate}"  />
 					</Column>
 					<Column>
-						<Text text="{i18n>status}" />
+						<Text text="{i18n>status}"  />
 					</Column>
 				</columns>
 				<items>
@@ -81,7 +81,9 @@
 							<Text text="{path:'CompanyInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{CompanyInvoiceModel>InvoiceDescription}" />
 							<Text text="{path: 'CompanyInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'} {CompanyInvoiceModel>Currency}" textAlign="End" />
+
 							<ObjectStatus text="{path:'CompanyInvoiceModel>PayByDate',formatter:'.Formatter.formatDate'}" inverted="false" state="{ parts: [{path: 'CompanyInvoiceModel>PayByDate'},{path: 'CompanyInvoiceModel>Status'}], formatter: '.Formatter.companyInvoicePayByDate'}" />
+
 							<ObjectStatus text="{CompanyInvoiceModel>Status}" inverted="false" state="{path: 'CompanyInvoiceModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
 						</cells>
 					</ColumnListItem>

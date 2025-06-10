@@ -1420,7 +1420,7 @@ sap.ui.define([
                     // }
                 });
 
-                currentY = doc.lastAutoTable.finalY + 10;
+                currentY = doc.lastAutoTable.finalY ;
                 checkPageSpace(50);
 
                 const summaryBody = [];

@@ -28,6 +28,11 @@
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="InvoiceDate" label="{i18n>consultantdate}" groupName="ConsultantInvoice" visibleInFilterBar="true">
+						<fb:control>
+							<DateRangeSelection id="CI_id_DatePicker" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
+						</fb:control>
+					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table  class="sapUiResponsiveMargin" items="{path: 'ConsultantModel>/', sorter: {path: 'EmployeeID',descending: false,group: true}}" growingScrollToLoad="true" width="auto" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0"  id="CI_id_ConsultantInvoiceTable">

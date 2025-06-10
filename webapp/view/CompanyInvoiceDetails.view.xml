@@ -4,15 +4,15 @@
 	xmlns:m="sap.m"
 	xmlns="sap.uxap"
 	xmlns:f="sap.ui.layout.form">
-	<m:Page title="{i18n>invoiceDetails}" showNavButton="true" navButtonPress="CID_onPressback" id="CID_id_MyPageId">
+	<m:Page title="{i18n>invoiceDetails}"  showNavButton="true" navButtonPress="CID_onPressback" id="CID_id_MyPageId">
 		<!-- <m:ScrollContainer > -->
-		<ObjectPageLayout id="CID_id_CmpInvObjectPageLayout" enableLazyLoading="true" useIconTabBar="false" class="sapUiSmallmarginResponsive">
+		<ObjectPageLayout  id="CID_id_CmpInvObjectPageLayout"  useIconTabBar="false" class="sapUiSmallmarginResponsive" >
 			<!-- Sections in the ObjectPage -->
 			<sections>
 				<!-- First section containing MSA details -->
-				<ObjectPageSection id="CID_id_CmpInvGoals">
-					<subSections>
-						<ObjectPageSubSection id="CID_id_CmpInvGoalsSS1" title="{i18n>invoiceBasicDetails}">
+				<ObjectPageSection id="CID_id_CmpInvGoals" showTitle = "false" >
+					<subSections >
+						<ObjectPageSubSection id="CID_id_CmpInvGoalsSS1" title="{i18n>invoiceBasicDetails}" >
 							<blocks>
 								<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 									<f:content>

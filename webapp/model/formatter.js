@@ -138,7 +138,7 @@ sap.ui.define([
             var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
             if (status === "Submitted") {
-                return "Indication17";
+                return "Indication07";
             } else if (status === "Payment Received") {
                 return "Success";
             } else if (status === "Invoice Sent" && daysDiff >= 0) {
