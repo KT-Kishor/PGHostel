@@ -86,6 +86,16 @@ sap.ui.define([
         },
 
         onValueHelpRequest: function () {
+            // Validate that a date is selected before opening the dialog
+            const oCalendar = this.getView().byId("calendar");
+            const selectedDates = oCalendar ? oCalendar.getSelectedDates() : [];
+            const selectedDateObj = selectedDates[0]?.getStartDate();
+
+            if (!selectedDateObj) {
+                MessageToast.show(this.i18nModel.getText("selectDateT") || "Please select a date first.");
+                return;
+            }
+
             if (!this.TSD_oDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.kt.com.minihrsolution.fragment.TimesheetTask",
