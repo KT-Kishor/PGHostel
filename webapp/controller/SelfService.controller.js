@@ -430,6 +430,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         // Optional field validation
                         const passport = oView.byId("SS_id_Passport").getValue().trim();
                         const voterId = oView.byId("SS_id_Voterid").getValue().trim();
+                        if (oDataModel.EmployeeStatus === 'Inactive' && !oView.byId("SS_id_ResgEndDate").getValue()) {
+                            MessageToast.show(this.i18nModel.getText("resignationEndDateRequired"));
+                            return;
+                        }
                         const optionalValid =
                             (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
                             (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) &&
@@ -1752,7 +1756,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
             },
 
-                       SS_onDownloadSalLetter: function () {
+            SS_onDownloadSalLetter: function () {
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var today = new Date();
                 var date = Formatter.formatDate(today);

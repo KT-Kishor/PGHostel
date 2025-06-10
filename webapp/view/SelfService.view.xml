@@ -359,7 +359,7 @@
 										<m:Label
                                             text="{i18n>role}"
                                             id="SS_id_lr"
-                                            visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
+                                            visible="{viewModel>/RelievingLetter }"
                                         />
 										<m:Select
                                             editable="{viewModel>/AdminRole}"
@@ -367,7 +367,7 @@
                                             showSecondaryValues="true"
                                             id="SS_id_RoleEmpSele"
                                             items="{RoleModel>/}"
-                                            visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
+                                            visible="{viewModel>/RelievingLetter}"
                                             valueStateText="{i18n>combovalueState}"
                                         >
 											<core:ListItem
@@ -379,7 +379,7 @@
                                             text="{i18n>employeeStatus}"
                                             id="SS_id_les"
                                             required="true"
-                                            visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
+                                            visible="{viewModel>/RelievingLetter}"
                                         />
 										<m:Select
                                             change="SS_onStatusChange"
@@ -387,7 +387,7 @@
                                             editable="{viewModel>/AdminRole}"
                                             selectedKey="{sEmployeeModel>/0/EmployeeStatus}"
                                             items="{StatusEmp>/}"
-                                            visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
+                                            visible="{viewModel>/RelievingLetter}"
                                         >
 											<core:Item
                                                 key="{StatusEmp>Value}"
@@ -397,7 +397,7 @@
 										<m:Label
                                             text="{i18n>ResigEndDate}"
                                             required="{= ${sEmployeeModel>/0/EmployeeStatus} === 'Inactive' ? true : false}"
-                                             visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
+                                             visible="{viewModel>/RelievingLetter}"
                                         />
 										<m:DatePicker
                                             id="SS_id_ResgEndDate"
@@ -406,7 +406,7 @@
                                             displayFormat="dd/MM/yyyy"
                                             valueFormat="dd/MM/yyyy"
                                             editable="{viewModel>/AdminRole}"
-                                             visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
+                                             visible="{viewModel>/RelievingLetter}"
                                         />
 									</f:content>
 								</f:SimpleForm>
