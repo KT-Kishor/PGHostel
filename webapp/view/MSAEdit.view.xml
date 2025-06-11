@@ -127,14 +127,14 @@
 </headerContent>
 
 			<sections>
-				<ObjectPageSection titleUppercase="false" title="Sow Details" id="MsaE_id_SowDetailsSection">
+				<ObjectPageSection titleUppercase="false" title="Sow Details" showTitle="false" id="MsaE_id_SowDetailsSection">
 					<subSections>
 						<ObjectPageSubSection title=" " titleUppercase="false">
 							<blocks>
 								<m:Table items="{path:'SowReadModel>/',sorter: {path: 'SowID',descending: false,group: true}}" busyIndicatorDelay="0" id="Sow_Id_ReadTable" mode="SingleSelectLeft" selectionChange="onPressChangeSow">
 									<m:headerToolbar>
 										<m:OverflowToolbar>
-											<m:Title text="{i18n>sowTitle}"/>
+											<m:Title text="{i18n>sowTitle} ({= ${SowReadModel>/}.length })"/>
 											<m:ToolbarSpacer />
 											<m:ComboBox id="MsaE_id_SowStatus" items="{SowStatusModel>/SowStatus}" width="10%" change="MsaE_onChangeSowStatus">
 												<core:Item key="{SowStatusModel>ID}" text="{SowStatusModel>Status}" />

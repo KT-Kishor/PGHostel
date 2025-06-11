@@ -34,7 +34,7 @@
 			<Table id="MSA_id_Table" class="sapUiTinyMargin" items="{MSADisplayModel>/}" busyIndicatorDelay="0" width="auto" growingScrollToLoad="true" growing="true" growingThreshold="50" alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar >
-						<Title id="MSA_id_Title" text="{i18n>msaDetails}"/>
+						<Title id="MSA_id_Title" text="{i18n>msaDetails} ({= ${MSADisplayModel>/}.length })"/>
 						<ToolbarSpacer/>
 						<Button text="{i18n>addMSA}" id="MSA_id_Add" type="Accept" press="MSA_AddmsaDetails" />
 						<Button text="{i18n>headerCustomer}" id="MSA_id_Customer" type="Emphasized" press="MSA_onAddCustomer"/>

@@ -570,10 +570,9 @@ sap.ui.define([
                 if (FilterModel.Currency === "INR") {
                     if (!oSelectedCustomerModel.GST || oSelectedCustomerModel.GST.trim() === "") {
                         sap.m.MessageBox.error(this.i18nModel.getText("gstMessage"));
-                        return;
+                        return false;
                     }
                 }
-
 
                 const oPayload = {
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : oSelectedCustomerModel.InvoiceDate?.toISOString().split('T')[0] || "",

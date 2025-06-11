@@ -112,6 +112,7 @@
 									<m:Table id="CID_id_TableInvoiceItem" items="{CompanyInvoiceItemModel>/CompanyInvoiceItem}" mode="Delete" delete="CID_onPressDelete">
 										<m:headerToolbar>
 											<m:Toolbar>
+											<m:Title text="{i18n>InvoiceItemDetails} ({= ${CompanyInvoiceItemModel>/CompanyInvoiceItem}.length })"></m:Title>
 												<m:ToolbarSpacer />
 												<m:Button type="Attention" text="{i18n>btnTransaction}" press="CID_onPressDisplayPaymentDetail" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
 												<m:Button visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Accept" press="CID_onPressAddInvoiceItems" />
