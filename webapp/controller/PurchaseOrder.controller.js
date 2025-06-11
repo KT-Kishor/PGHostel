@@ -57,7 +57,8 @@ sap.ui.define([
         },
         PO_onCreatePurchaseOrder: function () {
             
-            this.getRouter().navTo("PurchaseOrderObject",{sPath:"null"});
+            this.getRouter().navTo("PurchaseOrderObject",{sPath:"PurchaseOrder"});
+
         },
         PO_onEditPurchaseOrder: async function (e) {
 
@@ -311,10 +312,12 @@ sap.ui.define([
                 () => {
                     this.ajaxDeleteWithJQuery("PurchaseOrder", { filters: { PoNumber: PoNumber } }).then(() => {
                         MessageToast.show(this.i18nModel.getText("purchaseOrderDeleted"));
-                        this.PO_ReadCall();
+                         this.PO_ReadCall();
                     });
-                }
+                },
+                 function () { Table.removeSelections() }
             );
+
         },
         onColumnListItemPress: function (oEvent) {
 
@@ -344,10 +347,11 @@ sap.ui.define([
                 filters.StartDate = odateFormat.format(oStartDate);
                 filters.EndDate = odateFormat.format(oEndDate);
             }
+            this.getBusyDialog()
             this.ajaxReadWithJQuery("PurchaseOrder", filters).then((oData) => {
                 var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 this.getOwnerComponent().setModel(new JSONModel(PoData), "POModel");
-
+                      this.closeBusyDialog()
             });
         },
         PO_onPressClear: function () {

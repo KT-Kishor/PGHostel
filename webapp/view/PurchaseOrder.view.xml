@@ -100,7 +100,7 @@
     items="{POModel>/}">
         <headerToolbar>
             <Toolbar>
-                <Title text="Purchase Order List" />
+                <Title text="Purchase Order List ({=${POModel>/}.length})" />
                 <ToolbarSpacer />
                 <Button
                     text="Create Purchase Order"
@@ -121,8 +121,8 @@
                 tooltip="{i18n>ponumber}"/>
             </Column>
             <Column>
-                <Text text="{i18n>customername}" 
-                tooltip="{i18n>customername}"/>
+                <Text text="{i18n>companyname}" 
+                tooltip="{i18n>companyname}"/>
             </Column>
             <Column>
                 <Text text="{i18n>customerAddress}" 
