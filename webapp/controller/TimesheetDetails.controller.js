@@ -166,35 +166,59 @@ sap.ui.define([
                     MessageToast.show("Invalid hour value.");
                     return;
                 }
-
                 if (sEnteredHours > sActualHours) {
                     MessageToast.show(this.i18nModel.getText("hoursExceedError") || "Entered hours cannot exceed actual assignment hours.");
                     return;
                 }
-                // Step 4: Prepare payload
-                const oPayload = {
-                    TaskID: oData.TaskID,
-                    TaskName: oData.TaskName,
-                    EmployeeID: oData.EmployeeID,
-                    EmployeeName: oData.EmployeeName,
-                    ManagerName: oData.ManagerName || "Unknown",
-                    ManagerID: oData.ManagerID || "Unknown",
-                    HoursWorked: sEnteredHours.toString(),
-                    EmployeeComments: this.byId("TSD_id_EmpComment").getValue(),
-                    Date: selectedDateObj.toISOString().split("T")[0],
-                    Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
-                    Year: selectedDateObj.getFullYear(),
-                    Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
-                    Status: "Saved",
-                    ManagerComments: oData.ManagerComments || ""
-                };
 
-                // Step 5: Submit to backend
-                this.getBusyDialog(); try {
+                // Step 4: Duplicate check (backend)
+                const selectedDateStr = selectedDateObj.toISOString().split("T")[0];
+                const taskId = oData.TaskID;
+                const employeeId = oData.EmployeeID;
+
+                this.getBusyDialog();
+                try {
+                    // Make a backend call to check for duplicate
+                    const duplicate = await this.ajaxReadWithJQuery("Timesheet", {
+                        EmployeeID: employeeId,
+                        TaskID: taskId,
+                        Date: selectedDateStr
+                    });
+
+                    // If backend returns any data, it's a duplicate
+                    if (duplicate.data && (
+                        (Array.isArray(duplicate.data) && duplicate.data.length > 0) ||
+                        (!Array.isArray(duplicate.data) && Object.keys(duplicate.data).length > 0)
+                    )) {
+                        this.closeBusyDialog();
+                        MessageToast.show("You have already filled this assignment for the selected date.");
+                        return;
+                    }
+
+                    // Step 5: Prepare payload
+                    const oPayload = {
+                        TaskID: oData.TaskID,
+                        TaskName: oData.TaskName,
+                        EmployeeID: oData.EmployeeID,
+                        EmployeeName: oData.EmployeeName,
+                        ManagerName: oData.ManagerName || "Unknown",
+                        ManagerID: oData.ManagerID || "Unknown",
+                        HoursWorked: sEnteredHours.toString(),
+                        EmployeeComments: this.byId("TSD_id_EmpComment").getValue(),
+                        Date: selectedDateStr,
+                        Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
+                        Year: selectedDateObj.getFullYear(),
+                        Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
+                        Status: "Saved",
+                        ManagerComments: oData.ManagerComments || ""
+                    };
+
+                    // Step 6: Submit to backend
                     await this.ajaxCreateWithJQuery("Timesheet", { data: oPayload });
                     MessageToast.show(this.i18nModel.getText("timesheetSuccess"));
                     this.clearTimesheetForm();
                 } catch (backendErr) {
+                    this.closeBusyDialog();
                     MessageToast.show(backendErr.message || backendErr.responseText);
                 } finally {
                     this.closeBusyDialog();

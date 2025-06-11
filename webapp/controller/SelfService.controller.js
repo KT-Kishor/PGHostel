@@ -391,9 +391,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 let isValid = true;
                 let optionalValid = true;
                 var Message = this.i18nModel.getText("selfServiceUpdateAdmin");
-                if (this.sNavigatedRole === "Trainee") {
-                } else {
-                    if (ID !== "Submit" && oDataModel.EmployeeStatus === 'Inactive' && !oView.byId("SS_id_ResgEndDate").getValue() ) {
+                if (this.sNavigatedRole !== "Trainee") {
+                    if (ID !== "Submit" && oDataModel.EmployeeStatus === 'Inactive' && !oView.byId("SS_id_ResgEndDate").getValue()) {
                         MessageToast.show(this.i18nModel.getText("resignationEndDateRequired"));
                         return;
                     }
@@ -471,7 +470,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         oDataModel.EmergencyContactPerson2Realtion = oView.byId("SS_idRelS").getSelectedKey();
                     } else {
                         oDataModel.Type = "Submit";
-                       var Message = this.i18nModel.getText("confirmSubmitMessage");
+                        var Message = this.i18nModel.getText("confirmSubmitMessage");
                     }
 
                     const oPayload = {
@@ -1588,7 +1587,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.CommonCalculation();
             },
 
-            CommonCalculation:async function () {
+            CommonCalculation: async function () {
                 var AppraisalModel = this.getView().getModel("AppraisalModel");
                 var salaryData = this.getView().getModel("salaryData").getData();
 
@@ -2200,13 +2199,13 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     oData = oModel.getProperty("/0");
                 }
                 if (oData.ResignationStartDate && oData.ResignationEndDate && oData.ResignComment) {
-                    if(this.sFlag){
+                    if (this.sFlag) {
                         this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
                         this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
                         this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
                         this.getView().getModel("viewModel").setProperty("/closeButtonVisible", false)
                         this.getView().getModel("viewModel").setProperty("/backButtonVisible", true)
-                    }else{
+                    } else {
                         this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
                         this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
                         this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
@@ -2223,8 +2222,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getView().getModel("viewModel").setProperty("/editableResignatin", true)
                 }
             },
-            RF_onPressbackButton:function(){
-                if(this.sFlag){
+            RF_onPressbackButton: function () {
+                if (this.sFlag) {
                     this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInbox" });
                 }
             },
