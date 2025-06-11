@@ -7,7 +7,10 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                 this.getRouter().getRoute("RouteTimesheet").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: function () {
+            _onRouteMatched:async function () {
+                var LoginFunction = await this.commonLoginFunction("Timesheet");
+                if (!LoginFunction) return;
+                this.getBusyDialog();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oViewModel = new JSONModel();
                 oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });

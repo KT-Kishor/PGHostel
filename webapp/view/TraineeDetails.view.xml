@@ -140,8 +140,8 @@
 							<Label text="{i18n>trainingType}" />
 							<Text  text="{oTraineeDetails>/Type}"/>
 							<!-- Stipend Amount -->
-							<Label text="{i18n>amount}" />
-							<Text text="{path:'oTraineeDetails>/Amount', formatter: '.Formatter.formatCurrency'} {oTraineeDetails>/Currency}"/>		 
+                            <Label text="{i18n>amount}" />
+                            <Text text="{path:'oTraineeDetails>/Amount', formatter: '.Formatter.formatCurrencyInINRText'} {oTraineeDetails>/Currency}"/>	 
 							<Label text="{i18n>releaseDateT}" />
 							<Text text="{oTraineeDetails>/ReleaseDate}"/>
 							<Label text="{i18n>joiningDate}" />

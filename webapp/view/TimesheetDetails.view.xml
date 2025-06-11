@@ -49,7 +49,7 @@
                     <Input id="TSD_id_Assignment"  
                         showSuggestion="true"
                         liveChange="TD_ValidateCommonFields"
-                        value="{AssignModel>/selectedAssignment}"  
+                        value="{newModel>/TaskName}"  
                         showValueHelp="true"  
                         valueHelpRequest="onValueHelpRequest"
                         valueStateText="{i18n>selectAssignment}"
@@ -58,7 +58,7 @@
                     <!-- Hours Worked -->
                     <Label text="{i18n>hoursWorked}" />
                     <TimePicker
-                        value="{AssignModel>/HoursWorked}"  
+                        value="{newModel>/HoursWorked}"  
                         id="TSD_id_TimeHours"
                         displayFormat="HH"  
                         valueFormat="HH"  
