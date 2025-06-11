@@ -386,13 +386,14 @@ sap.ui.define(
                         oData.ConsultantInvoiceItem = [];
                     }
 
-                  const currency = this.byId("CI_id_Currency").getSelectedKey()
-
                     var loginData = this.getOwnerComponent().getModel("LoginModel").getData();
                     var employeeID = loginData.EmployeeID;
 
                      var oVisibilityModel = this.getView().getModel("visiablityPlay");
                      var bEditMode = oVisibilityModel.getProperty("/editable");
+
+                    var gstInput = this.byId("CI_id_InputGSTNO").getValue();
+                    var GSTCalculationValue = gstInput ? "YES" : "NO";
 
                     var oNewInvoiceItem = {
                         IndexNo: oData.ConsultantInvoiceItem.length > 0
@@ -401,7 +402,7 @@ sap.ui.define(
                         EmployeeID: employeeID,
                         Item: "",
                         SAC: "",
-                        GSTCalculation: (currency === "INR") ? "YES" : "",
+                        GSTCalculation: GSTCalculationValue,
                         Days: "",
                         UnitPrice: "",
                         Discount: "",
@@ -1176,12 +1177,12 @@ sap.ui.define(
                                 }
                             } catch (error) {
                                 this.closeBusyDialog();
-                               MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                               MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                             }
                         } 
                     } catch (error) {
                         this.closeBusyDialog();
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     }
                 },
 

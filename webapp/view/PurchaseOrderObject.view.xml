@@ -72,26 +72,30 @@
                                 >
                                     <f:content>
                                         <m:Label
-                                            text="Customer Name"
+                                            text="Company Name"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
                                         <m:ComboBox
                                             id="FPO_id_CustomerName"
                                             change="PO_onComboBoxChange"
-                                            placeholder="Select Customer Name"
+                                            placeholder="Select Company Name"
+                                            valueStateText="Please Enter a Valid Company Name"
                                             selectedKey="{PurchaseOrderModel>/CustomerName}"
+                                            filterSecondaryValues="true"
+                                            showSecondaryValues="true"
                                             items="{ManageCustomerModel>/}"
                                         >
-                                            <c:Item
-                                                key="{ManageCustomerModel>name}"
-                                                text="{ManageCustomerModel>name}"
-                                            />
+                                            <c:ListItem
+                                                key="{ManageCustomerModel>companyName}"
+                                                text="{ManageCustomerModel>companyName}"
+                                                additionalText="{ManageCustomerModel>name}"
+                                                
+                                                 />
                                         </m:ComboBox>
                                         <m:Label
                                             text="Mobile No"
                                             class="oSowFragLabel"
-                                            required="true"
                                         />
                                              <m:Select
                                              id="FPO_idSTD"
@@ -113,7 +117,6 @@
                                               <m:Label
                                             text="Email"
                                             class="oSowFragLabel"
-                                            required="true"
                                         />
                                         <m:Input
                                             id="FPO_id_Email"
@@ -123,7 +126,6 @@
                                         <m:Label
                                             text="GSTIN"
                                             class="oSowFragLabel"
-                                            required="true"
                                         />
                                         <m:Input
                                             id="FPO_id_GSTIN"
@@ -134,7 +136,6 @@
                                          <m:Label
                                             text="Tax Percentage"
                                             class="oSowFragLabel"
-                                            required="true"
                                         />
                                         <m:Input
                                             id="FPO_id_tax"
@@ -144,7 +145,6 @@
                                         <m:Label
                                             text="Address"
                                             class="oSowFragLabel"
-                                            required="true"
                                         />
                                         <m:TextArea
                                             id="FPO_id_Address"
@@ -155,7 +155,6 @@
                                         <m:Label
                                             text="PAN No"
                                             class="oSowFragLabel"
-                                            required="true"
                                         />
                                         <m:Input
                                             value="{PurchaseOrderModel>/PAN}"
@@ -166,7 +165,6 @@
                                          <m:Label
                                             text="LUT"
                                             class="oSowFragLabel"
-                                            required="true"
                                         />
                                         <m:Input
                                             value="{PurchaseOrderModel>/LUT}"
@@ -203,6 +201,7 @@
                                         <m:DatePicker
                                             id="FPO_id_StartDate"
                                             change="FPO_onDateChange"
+                                            valueStateText="Select Start Date"
                                             value="{PurchaseOrderModel>/StartDate}"
                                             valueFormat="dd/MM/yyyy"
                                             displayFormat="dd/MM/yyyy"
@@ -215,6 +214,8 @@
                                         <m:DatePicker
                                             id="FPO_id_EndDate"
                                             change="FPO_onDateChange"
+                                            valueStateText="Select End Date"
+
                                             value="{PurchaseOrderModel>/EndDate}"
                                             valueFormat="dd/MM/yyyy"
                                             displayFormat="dd/MM/yyyy"
@@ -227,10 +228,28 @@
                                         <m:DatePicker
                                             id="FPO_id_Date"
                                             change="FPO_onDateChange"
+                                            valueStateText="Select Creation Date"
                                             value="{PurchaseOrderModel>/CurrentDate}"
                                             valueFormat="dd/MM/yyyy"
                                             displayFormat="dd/MM/yyyy"
                                         />
+                                          <m:Label
+                                            text="Currency"
+                                            class="oSowFragLabel"
+                                            required="true"
+                                        />
+                                         <m:Select
+                                                    items="{CurrencyModel>/}"
+                                                    selectedKey="{PurchaseOrderModel>Currency}"
+                                                    width="100%"
+                                                    editable="{PurchaseOrderModel>/Editable}"
+
+                                                >
+                                                    <c:Item
+                                                        key="{CurrencyModel>currency}"
+                                                        text="{CurrencyModel>currency}"
+                                                    />
+                                                </m:Select>
                                     </f:content>
                                 </f:SimpleForm>
                             </blocks>
@@ -254,7 +273,6 @@
                                 >
                                     <m:headerToolbar>
                                         <m:Toolbar>
-                                            <m:Title text="Purchase order Details" />
                                             <m:ToolbarSpacer />
                                             <m:Button
                                             id="POO_idAddItemButton"
@@ -264,6 +282,9 @@
                                         </m:Toolbar>
                                     </m:headerToolbar>
                                     <m:columns>
+                                       <m:Column width="100px">
+                                            <m:Text text="Sl No" />
+                                        </m:Column>
                                         <m:Column>
                                             <m:Text text="Consultant Name" />
                                         </m:Column>
@@ -277,19 +298,26 @@
                                             <m:Text text="Amount" />
                                         </m:Column>
                                         <m:Column width="130px"/>
-                                        <m:Column>
+                                        <!-- <m:Column>
                                             <m:Text text="Currency" />
-                                        </m:Column>
+                                        </m:Column> -->
                                     </m:columns>
                                     <m:items>
                                         <m:ColumnListItem>
                                             <m:cells>
+                                         <m:Input 
+                                          editable="{PurchaseOrderModel>/Editable}"
+                                          value="{PurchaseOrderModel>SerialNo}"
+                                          maxLength="10" 
+                                          width="100%"/>
+                                            
                                                 <m:Input
                                                     id="PO_id_Consultantname"
+                                                
                                                     value="{PurchaseOrderModel>ConsultantName}"
-                                                    liveChange="onDescriptionInputLiveChange"
+                                                    liveChange="PO_onConsultantnameLiveChange"
                                                     valueStateText="Please Enter a Valid Name"
-                                                    maxLength="250"
+                                                    maxLength="30"
                                                     width="100%"
                                                     editable="{PurchaseOrderModel>/Editable}"
                                                 />
@@ -304,6 +332,9 @@
                                                 <m:Input
                                                     id="PO_id_Unit"
                                                     type="Number"
+                                                    liveChange="PO_onAmountInputChange"
+                                                    valueStateText="Please enter a valid unit"
+
                                                     value="{PurchaseOrderModel>Unit}"
                                                     maxLength="10"
                                                     width="100%"
@@ -320,24 +351,17 @@
                                                 />
                                                 <m:Select
                                                     id="PO_id_day"
-                                                    selectedKey="{PurchaseOrderModel>/Period}"
+                                                    selectedKey="{PurchaseOrderModel>Period}"
                                                     editable="{PurchaseOrderModel>/Editable}"
-
-                                                >
+                                                     items="{RateType>/}"
+                                                   >
                                                     <c:Item
-                                                        key="Per Day"
-                                                        text="Per Day"
+                                                        key="{RateType>RateType}"
+                                                        text="{RateType>RateType}"
                                                     />
-                                                    <c:Item
-                                                        key="Per Month"
-                                                        text="Per Month"
-                                                    />
-                                                    <c:Item
-                                                        key="Per Hour"
-                                                        text="Per Hour"
-                                                    />
+                                                    
                                                 </m:Select>
-                                                <m:Select
+                                                <!-- <m:Select
                                                     items="{CurrencyModel>/}"
                                                     selectedKey="{PurchaseOrderModel>Currency}"
                                                     width="100%"
@@ -348,7 +372,7 @@
                                                         key="{CurrencyModel>currency}"
                                                         text="{CurrencyModel>currency}"
                                                     />
-                                                </m:Select>
+                                                </m:Select> -->
                                             </m:cells>
                                         </m:ColumnListItem>
                                     </m:items>
@@ -368,7 +392,6 @@
                             <blocks>
                                 <m:VBox>
                                     <m:Toolbar>
-                                        <m:Title text="Notes" />
                                         <m:ToolbarSpacer />
                                         <m:Button
                                             id="POO_idClearButton"
@@ -398,6 +421,12 @@
                         type="Emphasized"
                         press="POO_onSubmitButtonPress"
                     />
+                     <m:Button
+                        id="POO_idmailButton"
+                        text="Send Mail"
+                        type="Ghost"
+                        press="POO_onmailButtonPress"
+                    />
                       <m:Button
                         id="POO_ideditButton"
                         visible="{=${PurchaseOrderModel>/Editable}===false}"   
@@ -410,6 +439,12 @@
                         text="Save"
                         type="Accept"
                         press="POO_onSaveButtonPress"
+                    />
+                     <m:Button
+                        id="POO_idPDFButton"
+                        text="Genarate PDF"
+                        type="Attention"
+                        press="POO_onPDFButtonPress"
                     />
                 </m:contentRight>
             </m:Bar>

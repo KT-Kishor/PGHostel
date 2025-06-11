@@ -35,7 +35,7 @@ sap.ui.define([
                         this.MyInBox = true;
                     }
 
-                    if(!this.getView().getModel("CurrencyModel")) await this._fetchCommonData("Currency", "CurrencyModel");
+                    if (!this.getView().getModel("CurrencyModel")) await this._fetchCommonData("Currency", "CurrencyModel");
                     await this._fetchCommonData("Expense", "FilteredExpenseModel", {
                         ExpenseID: this.ExpenseID,
                     });
@@ -126,8 +126,8 @@ sap.ui.define([
             },
             //Download Perdiem Declaration
             Exp_Det_onPressExpenseDownload: function () {
-               let fileUrl = window.location.origin.split("index")[0] + "/Perdiem_DeclarationForm.doc";
-            sap.m.URLHelper.redirect(fileUrl, true)
+                let fileUrl = window.location.origin.split("index")[0] + "/Perdiem_DeclarationForm.doc";
+                sap.m.URLHelper.redirect(fileUrl, true)
             },
             //Open Fragment in Expeanse Item Create and Update 
             openFragment: function () {
@@ -724,7 +724,7 @@ sap.ui.define([
                                         Status: oModelData.Status === "Send back by account" ? "Send to account" : "Submitted",
                                         ManagerRemark: oModelData.ManagerRemark,
                                         AccountingRemark: oModelData.AccountingRemark,
-                                        Visible :commentTextArea.getVisible()
+                                        Visible: commentTextArea.getVisible()
                                     },
                                     filters: {
                                         ExpenseID: oModelData.ExpenseID
@@ -734,7 +734,7 @@ sap.ui.define([
                                 that.getBusyDialog();
                                 that.ajaxUpdateWithJQuery("Expense", inboxData).then((oData) => {
                                     if (oData) {
-                                        that._fetchCommonData("Expense", "FilteredExpenseModel", {ExpenseID: this.ExpenseID,});
+                                        that._fetchCommonData("Expense", "FilteredExpenseModel", { ExpenseID: this.ExpenseID, });
                                         that.ViewModel.setProperty("/status", false);
                                         that.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
                                         dialog.close();
@@ -784,7 +784,7 @@ sap.ui.define([
                 var oComment = oData.Comments || {}; // Assuming single comment object
 
                 var oTimelineItem = new sap.suite.ui.commons.TimelineItem({
-                    dateTime: new Date(oData.ExpenseDate).toLocaleString(),
+                    dateTime: this.Formatter.formatDate(oData.ExpenseDate),
                     title: oData.ItemType || "Anonymous",
                     text: oComment || "No comment provided",
                     userNameClickable: false,

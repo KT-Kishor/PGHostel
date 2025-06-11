@@ -498,6 +498,7 @@
                                                             items="{codeModel>/}"
                                                             filterSecondaryValues="true"
                                                             change="Emp_onDesignationChange"
+                                                            selectedKey="+91"
                                                             valueStateText="{i18n>combovalueState}"
                                                             editable="{viewModel>/isEditMode}"
                                                         >
@@ -609,6 +610,7 @@
                                                             items="{codeModel>/}"
                                                             filterSecondaryValues="true"
                                                             change="Emp_onDesignationChange"
+                                                            selectedKey="+91"
                                                             valueStateText="{i18n>combovalueState}"
                                                             editable="{viewModel>/isEditMode}"
                                                         >

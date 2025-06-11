@@ -13,12 +13,19 @@ sap.ui.define([
     onInit() {
       this.getRouter().getRoute("RouteDetailLeave").attachMatched(this._onRouteMatched, this);
     },
-    _onRouteMatched: async function () {
+    _onRouteMatched: async function (oEvent) {
+        const sParams = oEvent.getParameter("arguments").sLeaveID;
+        const response = await this.ajaxReadWithJQuery("InboxDetails", { ID : sParams });
+        response.data[0].StartDate = this.Formatter.formatDate(response.data[0].StartDate);
+        response.data[0].EndDate = this.Formatter.formatDate(response.data[0].EndDate);
+        response.data[0].SubmittedDate = this.Formatter.formatDate(response.data[0].SubmittedDate);
+        this.getOwnerComponent().setModel(new JSONModel(response.data[0]), "oNavLeaveModel");
         this.modelData = this.getOwnerComponent().getModel("oNavLeaveModel").getData();
         var that = this;
        // that.currentYear = new Date().getFullYear();
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         that.userId = this.modelData.EmpID;
+      
         //that.byId("AL_id_LeaveBarChart").setVisible(false);
         that.byId("AL_id_SmartTableCharBut").setVisible(false);
         //that.byId("AL_id_leavefilterbar").setVisible(true);

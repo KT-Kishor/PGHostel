@@ -27,6 +27,7 @@
         press="onApplyResignation"
         type="Reject"
         visible="{viewModel>/ResignationVisible}"
+        enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
     />
     <Button
         text="{i18n>terminateLetter}"
@@ -63,7 +64,7 @@
        <Button
         text="{i18n>spotAward}"
         type="Ghost"
-        visible="{viewModel>/Letter}"
+        visible="{viewModel>/RelievingLetter}"
         id="SS_idAwardbtn"
         press="SS_onDownloadSpotAward"
         enabled="{= ${viewModel>/isEditMode} === true ? false : true}"

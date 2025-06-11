@@ -342,9 +342,6 @@ sap.ui.define([
                         if (oInput) {
                             oInput.setValueState("None");
                         }
-                    } else {
-                        oModel.setProperty("/Salutation2", "");
-                        oModel.setProperty("/ClientReportContact", "");
                     }
                 }
 

@@ -2,10 +2,11 @@ sap.ui.define(
     [
         "./BaseController", //call base controller
         "sap/ui/model/json/JSONModel",
-        "sap/m/MessageToast"
+        "sap/m/MessageToast",
+          "../model/formatter",
     ],
     function (
-        BaseController, JSONModel, MessageToast,) {
+        BaseController, JSONModel, MessageToast,Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.ConsultantInvoice", {
             onInit: function () {
@@ -72,11 +73,42 @@ sap.ui.define(
                         dateControl.setSecondDateValue(fyEnd);
                     }
 
+                    const oTable = this.getView().byId("CI_id_ConsultantInvoiceTable");
+                    const oSorter = [];
+
+                    if (userData.Role === "Admin" || userData.Role === "Account Manager") {
+                        oSorter.push(new sap.ui.model.Sorter("EmployeeID", false, true));
+                    } else if (userData.Role === "Contractor") {
+                        oSorter.push(new sap.ui.model.Sorter("InvoiceDate", false, true));
+                    }
+
+                    oTable.bindItems({
+                        path: "ConsultantModel>/",
+                        sorter: oSorter,
+                        template: oTable.getBindingInfo("items").template,
+                        groupHeaderFactory: this._createGroupHeader.bind(this)
+                    });
+
                     this.closeBusyDialog();
                 } catch (error) {
                     this.closeBusyDialog();
                     MessageToast.show(error.message || error.responseText);
                 }
+            },
+
+           _createGroupHeader: function (oGroup) {
+                let sKey = oGroup.key;
+                const userData = this.getView().getModel("LoginModel").getData();
+
+                // Format InvoiceDate group headers if grouping by InvoiceDate
+                if (userData.Role === "Contractor" && oGroup) {
+                    sKey = this.Formatter.formatDate(sKey);
+                }
+
+                return new sap.m.GroupHeaderListItem({
+                    title: sKey,
+                    upperCase: false
+                });
             },
 
             logindata: async function () {

@@ -52,7 +52,7 @@
 					<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 				</ComboBox>
 
-				<Label text="{i18n>mobileNo}" required="true" />
+				<Label text="{i18n>mobileNo}"/>
 				<HBox width="100%" justifyContent="Start" alignItems="Center">
 					<VBox width="22%">
 						<ComboBox selectedKey="{CustomerModel>/stdCode}" showSecondaryValues="true" change="MC_ValidateComboBox" id="MC_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}">
