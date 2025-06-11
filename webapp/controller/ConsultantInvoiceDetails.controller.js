@@ -80,10 +80,10 @@ sap.ui.define(
                             this.readFunction("ConsultantInvoiceItem", "oModelDataPro", true);
                             this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("Delete");
                         } else {
-                            this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID),
-                            this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
-                            this.setVisibilityForEdit();
-                            this.onFetchContractDetails();
+                            await this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID),
+                            await this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
+                            await this.setVisibilityForEdit();
+                            await this.onFetchContractDetails();
                         }
                         oComboBox.setSelectedKey("");
                         this.scrollToSection("CI_id_NavConsultantInvoicePage", "CI_id_FirstSection");
@@ -117,9 +117,9 @@ sap.ui.define(
                 },
 
                 // Common function to fetch invoice data
-                commonFetchInvoiceData:   function(invoiceNo, userId) {
+                commonFetchInvoiceData: async function(invoiceNo, userId) {
                     const requestData = {InvoiceNo: invoiceNo, EmployeeID: userId};
-                     this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
+                    await this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
                             this.InvoiceNo = oData.data;
                             this.EmployeeID = oData.data;
                             if (oData.data.length > 0) {
@@ -878,6 +878,10 @@ sap.ui.define(
                     var isGSTValid = utils._LCvalidateGstNumber({
                         getSource: () => gstInputField
                     });
+
+                    if (gstInput === "") {
+                        gstInputField.setValueState("None"); 
+                    }
 
                     if(isGSTValid){
                         this.CI_onSelectCGST();

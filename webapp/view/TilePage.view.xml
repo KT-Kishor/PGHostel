@@ -379,6 +379,7 @@
                                         </TileContent>
                                     </GenericTile>
                                     <GenericTile
+                                    visible="{= ${AppVisibilityModel>/PurchaseOrder} === '1' ? true : false}"
                                         class="sapUiMediumMargin"
                                         header="{i18n>headerPoGenarate}"
                                         press="TileV_onpressPoApp"
