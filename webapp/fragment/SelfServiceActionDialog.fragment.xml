@@ -27,6 +27,7 @@
         press="onApplyResignation"
         type="Reject"
         visible="{viewModel>/ResignationVisible}"
+        enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
     />
     <Button
         text="{i18n>terminateLetter}"

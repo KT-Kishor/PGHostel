@@ -61,6 +61,16 @@ sap.ui.define([
                     this.getView().getModel("editModel").setProperty("/editableBut", true);
                 }
             }
+            // Set current date as selected in the calendar
+            var oCalendar = this.byId("calendar");
+            if (oCalendar) {
+                var oToday = new Date();
+                var oDateRange = new sap.ui.unified.DateRange({ startDate: oToday });
+                oCalendar.removeAllSelectedDates();
+                oCalendar.addSelectedDate(oDateRange);
+                this.onInitializeLegend({ getSource: () => oCalendar });
+                this.onDateSelect({ getSource: () => oCalendar });
+            }
             this.closeBusyDialog();
         },
 

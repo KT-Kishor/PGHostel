@@ -8,7 +8,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 const nextMonthFirstDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
                 const maxDate18YearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
                 var oDateModel = new sap.ui.model.json.JSONModel();
-                oDateModel.setData({maxDate: maxDate18YearsAgo,focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1), nextMonthMinDate: nextMonthFirstDate});
+                oDateModel.setData({ maxDate: maxDate18YearsAgo, focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1), nextMonthMinDate: nextMonthFirstDate });
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("SelfService").attachMatched(this._onRouteMatched, this);
             },
@@ -37,17 +37,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.ViewModel = this.getView().getModel("viewModel");
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
                     var sLoggedInRole = loginModel.getProperty("/Role");
-                    var sNavigatedRole = oEvent.getParameter("arguments").Role; // Role from navigation
+                    this.sNavigatedRole = oEvent.getParameter("arguments").Role; // Role from navigation
                     this.sPath = oEvent.getParameter('arguments').sPath;
                     // sections if role is "Trainee" from either login or navigation
-                    if (sNavigatedRole === "MyInboxResignation") {
+                    if (this.sNavigatedRole === "MyInboxResignation") {
                         this.sFlag = true
                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
                             EmployeeID: this.sPath
                         });
                         this.onApplyResignation();
                     } else {
-                        var bHideSalarySection = sLoggedInRole === "Trainee" || sNavigatedRole === "Trainee";
+                        var bHideSalarySection = sLoggedInRole === "Trainee" || this.sNavigatedRole === "Trainee";
                         this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
 
                         var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lpa", "SS_id_lca", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
@@ -73,7 +73,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             this.byId("SS_id_Lmg").setRequired(true)
 
                             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
-                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {
+                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee") {
                                 this.ViewModel.setProperty("/Letter", true);
                             } else {
                                 this.ViewModel.setProperty("/Letter", false);
@@ -85,7 +85,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 this.getView().byId(sId).setRequired(false);
                             }.bind(this));
                         }
-                        if (this.sPath === "SelfService" && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {
+                        if (this.sPath === "SelfService" && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee") {
                             this.ViewModel.setProperty("/ResignationVisible", true);
                         } else {
                             this.ViewModel.setProperty("/ResignationVisible", false);
@@ -104,7 +104,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
 
                             // --- Releving letter Button Visibility Logic ---
-                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sNavigatedRole !== "Trainee") {
+                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && this.sNavigatedRole !== "Trainee") {
                                 this.byId("SS_id_Action").setVisible(true);
                                 this.ViewModel.setProperty("/TraineeRole", false);
                                 if (oModelAllData.EmployeeStatus === "Inactive") {
@@ -390,7 +390,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
                 let isValid = true;
                 let optionalValid = true;
-                var Message = this.i18nModel.getText("selfServiceUpdateAdmin")
+                var Message = this.i18nModel.getText("selfServiceUpdateAdmin");
+                if (this.sNavigatedRole === "Trainee") {
+                } else {
+                    if (ID !== "Submit" && oDataModel.EmployeeStatus === 'Inactive' && !oView.byId("SS_id_ResgEndDate").getValue() ) {
+                        MessageToast.show(this.i18nModel.getText("resignationEndDateRequired"));
+                        return;
+                    }
+                }
                 try {
                     if (ID !== "Submit") {
                         if (this.sPath === 'SelfService') {
@@ -441,10 +448,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         // Optional field validation
                         const passport = oView.byId("SS_id_Passport").getValue().trim();
                         const voterId = oView.byId("SS_id_Voterid").getValue().trim();
-                        if (oDataModel.EmployeeStatus === 'Inactive' && !oView.byId("SS_id_ResgEndDate").getValue()) {
-                            MessageToast.show(this.i18nModel.getText("resignationEndDateRequired"));
-                            return;
-                        }
                         const optionalValid =
                             (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
                             (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) &&
@@ -453,7 +456,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             (oDataModel.IFSCCode == null || oDataModel.IFSCCode.trim() === "" || utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID")) &&
                             (oDataModel.PANCard == null || oDataModel.PANCard.trim() === "" || utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID")) &&
                             (oDataModel.AdharCard == null || oDataModel.AdharCard.trim() === "" || utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID")) &&
-                            (oDataModel.EmployeeStatus === 'Inactive' ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
+                            (oDataModel.EmployeeStatus === 'Inactive' && this.sNavigatedRole !== "Trainee" ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
 
                         if (!optionalValid) {
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -468,7 +471,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         oDataModel.EmergencyContactPerson2Realtion = oView.byId("SS_idRelS").getSelectedKey();
                     } else {
                         oDataModel.Type = "Submit";
-                        var Message = this.i18nModel.getText("confirmSubmitMessage");
+                       var Message = this.i18nModel.getText("confirmSubmitMessage");
                     }
 
                     const oPayload = {
