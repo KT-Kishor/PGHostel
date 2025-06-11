@@ -69,8 +69,6 @@
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_QuotationValid"
                                         />
-                                     
-
                                          <m:Label
                                             text="{i18n>expCountry}"
                                             required="true"
