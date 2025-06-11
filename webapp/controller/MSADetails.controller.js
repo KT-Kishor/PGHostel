@@ -248,6 +248,7 @@ sap.ui.define([
                                 type: "Accept",
                                 press: function () {
                                     oDialog.close();
+                                    that.closeBusyDialog();
                                     that.getRouter().navTo("RouteMSA");
                                     that.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
                                 }
@@ -258,6 +259,7 @@ sap.ui.define([
                                 press: function () {
                                     oDialog.close();
                                     that.MsaE_onPressMerge();
+                                    that.closeBusyDialog();
                                     that.getRouter().navTo("RouteMSA");
                                     that.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
                                 }
