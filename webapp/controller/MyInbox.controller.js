@@ -157,9 +157,11 @@ sap.ui.define([
 
     valueSetFunction(text, oDialogTitle) {
       sap.ui.getCore().byId("MIF_id_OkBtn").setText(text);
+      const i18n = this.getView().getModel("i18n").getResourceBundle();
       var isAccount = this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant"
-      var oValue = isAccount && this.oModelData?.AccountRemark ? this.oModelData?.AccountRemark : this.oModelData?.ManagerComment;
-      sap.ui.getCore().byId("MIF_id_remark").setValue(oValue || "");
+      var oValue = isAccount ? i18n.getText("accountRemarksLeave") : i18n.getText("managerRemarksLeave");
+      sap.ui.getCore().byId("MIF_id_RemarkLabel").setText(oValue);
+      sap.ui.getCore().byId("MIF_id_remark").setValue("");
       sap.ui.getCore().byId("MIF_id_DialogManRemark").setTitle(oDialogTitle);
     },
 
@@ -186,11 +188,7 @@ sap.ui.define([
           sPath: oData.ID + "|MyInbox"
         });
       } else if (oData.Type === "Leave") {
-        oData.StartDate = this.Formatter.formatDate(oData.StartDate);
-        oData.EndDate = this.Formatter.formatDate(oData.EndDate);
-        oData.SubmittedDate = this.Formatter.formatDate(oData.SubmittedDate);
-        this.getOwnerComponent().setModel(new JSONModel(oData), "oNavLeaveModel");
-        this.getRouter().navTo("RouteDetailLeave");
+        this.getRouter().navTo("RouteDetailLeave",{sLeaveID : oData.ID });
       } else {
         this.getRouter().navTo("SelfService", { sPath: oData.EmpID,Role: "MyInboxResignation" });
       }
@@ -248,6 +246,7 @@ sap.ui.define([
       oModelData.NoofDays = String(oModelData.NoofDays);
       if (this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant") {
         oModelData.AccountRemark = remark;
+        oModelData.AccountName = this.oLoginModel.EmployeeName;
       } else {
         oModelData.ManagerComment = remark;
       }
