@@ -45,8 +45,8 @@
 				<Label text="{i18n>replacementGratuityLabel}" required="true" visible="{simpleForm>/Recruitment}"></Label>
 				<HBox width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{simpleForm>/Recruitment}">
 					<VBox width="49%">
-						<Select items="{ContractPeriodThree>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ReplacementMonth}" width="100%">
-							<core:Item key="{ContractPeriodThree>Months}" text="{ContractPeriodThree>Months}" />
+						<Select items="{ContractPeriod>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ReplacementMonth}" width="100%">
+							<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 						</Select>
 					</VBox>
 					<VBox width="49%">
@@ -55,8 +55,8 @@
 				</HBox>
 
 				<Label text="{i18n>contractPeriod}" required="true"/>
-				<Select items="{ContractPeriod>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ContractPeriod}">
-					<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
+				<Select items="{ContractPeriodThree>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ContractPeriod}">
+					<core:Item key="{ContractPeriodThree>Months}" text="{ContractPeriodThree>Months}" />
 				</Select>
 
 				<Label text="{i18n>branch}" required="true" />

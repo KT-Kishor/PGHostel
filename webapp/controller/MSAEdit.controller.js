@@ -729,7 +729,7 @@ sap.ui.define([
             },
 
             onRateChange:function(oEvent) {
-                this.Rate = utils._LCvalidateTraineeAmount(oEvent);
+                this.Rate = utils._LCvalidateAmount(oEvent);
             },
 
             onOpenActionSheet: function (oEvent) {

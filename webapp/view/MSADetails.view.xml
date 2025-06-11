@@ -27,8 +27,8 @@
 						<f:content>
 						<Label text="{i18n>type}" required="true" />
 							<RadioButtonGroup id="MsaD_id_Type" columns="5" selectedIndex="0"  valueState="None" select="onRadioButtonGroupSelect">
-								<RadioButton id="RB3-1" text="Service"/>
-								<RadioButton id="RB3-2" text="Recruitment"/>
+								<RadioButton id="RB3-1" text="{i18n>Service}"/>
+								<RadioButton id="RB3-2" text="{i18n>Recruitment}"/>
 							</RadioButtonGroup>
 							<Label text="{i18n>companyName}" required="true" />
 							<Input value="{msaModelWizart>/CompanyName}" maxLength="50" placeholder="{i18n>placeCompany}" id="MsaD_id_CompanyName" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeCompany}" />

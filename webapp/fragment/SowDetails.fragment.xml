@@ -26,7 +26,7 @@
             <Label text="{i18n>sowId}" class="oSowFragLabel" required="true"/>
             <Input value="{sowCreateModel>/SowID}" id="SOW_id_SowID" editable="false" maxLength="15"/>
 
-             <Label text="{i18n>assignmentDes}" class="oSowFragLabel" required="true"/>
+             <Label text="{i18n>desc}" class="oSowFragLabel" required="true"/>
             <Input value="{sowCreateModel>/Description}"  maxLength="50" id="SOW_id_MsaDesc" placeholder="{i18n>companyInvoiceDescPlaceH}" liveChange="MsaE_ValidateCommonFields" valueStateText="{i18n>companyInvoiceDescPlaceH}"/>
             
             <Label text="{i18n>startDate}" class="oSowFragLabel" required="true"/>
