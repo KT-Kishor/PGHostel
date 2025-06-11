@@ -192,7 +192,7 @@
 									items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}"
 											mode="Delete" 
 											delete="CI_onPressDelete" 
-											growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0"
+											growingThreshold="50" busyIndicatorDelay="0"
 											growingScrollToLoad="true" width="auto" class="sapUiResponsiveMargin">
 										<m:columns>
 											<m:Column width="100px" >
