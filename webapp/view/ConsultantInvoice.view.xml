@@ -28,7 +28,7 @@
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="InvoiceDate" label="{i18n>consultantdate}" groupName="ConsultantInvoice" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="InvoiceDate" label="{i18n>invoiceDate}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
 							<DateRangeSelection id="CI_id_DatePicker" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
 						</fb:control>

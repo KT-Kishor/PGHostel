@@ -62,6 +62,12 @@
 										<!-- Agreement Date -->
 										<m:Label text="{i18n>agreementDate}" required="true"/>
 										<m:DatePicker value="{path:'oFilteredContractModel>/AgreementDate' ,formatter:'.Formatter.formatDate'}" editable="{simpleForm>/editable}" id="CU_id_AgreementDate" valueFormat="dd/MM/yyyy" displayFormat="dd/M/yyyy" change="onChangeAggrementDate" valueStateText="{i18n>dateValueState}"/>
+											<!-- Assignment Start Date -->
+										<m:Label text="{i18n>assignmentStartDate}" required="true"/>
+										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" id="CU_id_AssignmentStartDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}" maxDate="{oFilteredContractModel>/MaxFromDate}"/>
+										<!-- Assignment End Date -->
+										<m:Label text="{i18n>assignmentEndDate}" required="true"/>
+										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentEndDate' ,formatter:'.Formatter.formatDate'}"  id="CU_id_AssignmentEndDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" valueStateText="{i18n>dateValueState}" minDate="{oFilteredContractModel>/MinToDate}" change="CD_validateDate"/>
 										<!-- Consultant Address -->
 										<m:Label text="{i18n>consultantAddress}" required="true"/>
 										<m:TextArea value="{oFilteredContractModel>/ConsultantAddress}" valueStateText="{i18n>addressValueState}" liveChange="CD_ValidateCommonFields" id="CU_id_ContractAddress" maxLength="120" editable="{simpleForm>/editable}" rows="2"/>
@@ -87,12 +93,6 @@
 										<m:Select selectedKey="{oFilteredContractModel>/LocationService}" id="CD_id_contractLocation" items="{WorkingMode>/location}" editable="{simpleForm>/editable}">
 											<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
 										</m:Select>									
-										<!-- Assignment Start Date -->
-										<m:Label text="{i18n>assignmentStartDate}" required="true"/>
-										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" id="CU_id_AssignmentStartDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}" maxDate="{oFilteredContractModel>/MaxFromDate}"/>
-										<!-- Assignment End Date -->
-										<m:Label text="{i18n>assignmentEndDate}" required="true"/>
-										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentEndDate' ,formatter:'.Formatter.formatDate'}"  id="CU_id_AssignmentEndDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" valueStateText="{i18n>dateValueState}" minDate="{oFilteredContractModel>/MinToDate}" change="CD_validateDate"/>
 										<!-- Rate Type -->
 										<m:Label text="{i18n>rate}" required="true" />
 										<m:RadioButtonGroup id="CU_id_rbg3" columns="3" selectedIndex="{oFilteredContractModel>/HrDaliyMonth}" select="RadioButtonSelect" editable="{simpleForm>/editable}" >

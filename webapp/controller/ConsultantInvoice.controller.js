@@ -18,59 +18,66 @@ sap.ui.define(
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 // Set header name in LoginModel
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("consultantInvoice"));
-                this.CI_OnSearch()
                 this.ContractReadCall();
-
             },
 
             ContractReadCall: async function () {
                 try {
-                    var oView = this.getView();
-                    var userData = this.getOwnerComponent().getModel("LoginModel").getData();
-                    var filterObj = {};
+                    const oView = this.getView();
+                    const userData = this.getOwnerComponent().getModel("LoginModel").getData();
+                    let filterObj = {};
 
+                    // Set role-based filters
                     if (userData.Role === "Contractor") {
                         oView.byId("CI_filterItem_EmployeeID").setVisible(false);
-                        filterObj = {
-                            EmployeeID: userData.EmployeeID
-                        };
-                    } else if (userData.Role === "Admin" || userData.Role === "Account Manager") {
-                        oView.byId("CI_filterItem_EmployeeID").setVisible(true);
-                        filterObj = {};
-                        this.logindata();
+                        filterObj.EmployeeID = userData.EmployeeID;
                     } else {
                         oView.byId("CI_filterItem_EmployeeID").setVisible(true);
-                        filterObj = {
-                            EmployeeID: userData.EmployeeID
-                        };
-                        this.logindata();
+                        if (userData.Role === "Admin" || userData.Role === "Account Manager") {
+                            this.logindata();
+                        } else {
+                            filterObj.EmployeeID = userData.EmployeeID;
+                            this.logindata();
+                        }
                     }
 
-                    this.getBusyDialog(); // Show Busy Dialog
+                    // Add financial year date range to filter
+                    const currentYear = new Date().getFullYear();
+                    let fyStart, fyEnd;
+                    if (new Date().getMonth() >= 3) { // April or later
+                        fyStart = new Date(currentYear, 3, 1);   // April 1st
+                        fyEnd = new Date(currentYear + 1, 2, 31); // March 31st next year
+                    } else {
+                        fyStart = new Date(currentYear - 1, 3, 1); // April 1st last year
+                        fyEnd = new Date(currentYear, 2, 31);      // March 31st this year
+                    }
 
-                    await this.ajaxReadWithJQuery("ConsultantInvoice", filterObj).then(function (oData) {
-                        sap.ui.core.BusyIndicator.hide();
+                    const formatDate = (date) => date.toISOString().split("T")[0];
+                    filterObj.InvoiceStartDate = formatDate(fyStart);
+                    filterObj.InvoiceEndDate = formatDate(fyEnd);
 
-                        // Set full result to ConsultantModel (for table)
-                        var oConsultantModel = new sap.ui.model.json.JSONModel(oData.data);
-                        this.getView().setModel(oConsultantModel, "ConsultantModel");
+                    this.getBusyDialog();
 
-                        // Set same data to InvoiceModel (for ComboBox)
-                        var oInvoiceModel = new sap.ui.model.json.JSONModel(oData.data);
-                        this.getView().setModel(oInvoiceModel, "InvoiceModel");
+                    const oData = await this.ajaxReadWithJQuery("ConsultantInvoice", filterObj);
+                    const oConsultantModel = new sap.ui.model.json.JSONModel(oData.data);
+                    this.getView().setModel(oConsultantModel, "ConsultantModel");
 
-                        this.closeBusyDialog(); // Hide Busy Dialog
-                    }.bind(this)).catch(function (error) {
-                        this.closeBusyDialog();
-                        MessageToast.show(error.message || error.responseText);
-                    });
+                    const oInvoiceModel = new sap.ui.model.json.JSONModel(oData.data);
+                    this.getView().setModel(oInvoiceModel, "InvoiceModel");
 
+                    // Set default range in date picker control
+                    const dateControl = this.byId("CI_id_DatePicker");
+                    if (dateControl) {
+                        dateControl.setDateValue(fyStart);
+                        dateControl.setSecondDateValue(fyEnd);
+                    }
+
+                    this.closeBusyDialog();
                 } catch (error) {
                     this.closeBusyDialog();
                     MessageToast.show(error.message || error.responseText);
                 }
             },
-
 
             logindata: async function () {
                 try {

@@ -75,15 +75,16 @@ sap.ui.define(
                         }
 
                         if (sPath === "X" && oPath === "Y") {
+                            this.onFetchContractDetails();
                             this.readFunction("ConsultantInvoice", "ConsultantInvoiceModel", true);
                             this.readFunction("ConsultantInvoiceItem", "oModelDataPro", true);
                             this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("Delete");
                         } else {
-                            await this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID),
-                            await this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
-                            await this.setVisibilityForEdit();
+                            this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID),
+                            this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
+                            this.setVisibilityForEdit();
+                            this.onFetchContractDetails();
                         }
-                        await this.onFetchContractDetails();
                         oComboBox.setSelectedKey("");
                         this.scrollToSection("CI_id_NavConsultantInvoicePage", "CI_id_FirstSection");
                     }catch (error) {
@@ -116,9 +117,9 @@ sap.ui.define(
                 },
 
                 // Common function to fetch invoice data
-                commonFetchInvoiceData: async  function(invoiceNo, userId) {
+                commonFetchInvoiceData:   function(invoiceNo, userId) {
                     const requestData = {InvoiceNo: invoiceNo, EmployeeID: userId};
-                    await this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
+                     this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
                             this.InvoiceNo = oData.data;
                             this.EmployeeID = oData.data;
                             if (oData.data.length > 0) {
@@ -227,8 +228,9 @@ sap.ui.define(
                     let contractID = sValue[0];
                     let contractName = sValue[1];
                     let oMsgText = this.i18nModel.getText("selectContractNo"); // Confirmation message
+
                     let oModelData = this.getView().getModel("contractModel").getData(); // Get contract model data
-                    let aContractData = Array.isArray(oModelData) ? oModelData : oModelData.results || [];
+                    let aContractData = Array.isArray(oModelData.contractDetails) ? oModelData.contractDetails : [];
 
                     // Find the matching contract
                     let oSelectedContract = aContractData.find(contract => contract.ContractNo === contractID);
@@ -257,7 +259,7 @@ sap.ui.define(
                 },
 
                 readFunction: function (entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress) {
-                         this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
+                        this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
                         var oJSONModel = new sap.ui.model.json.JSONModel(oData);
                         this.getView().setModel(oJSONModel, modelName);
 
@@ -291,9 +293,6 @@ sap.ui.define(
                                 oInvoiceModel.setProperty("/ConsultantName", loginData.EmployeeName);
                             }
 
-                            oInvoiceModel.setProperty("/MobileNo", MobileNo || "");
-                            oInvoiceModel.setProperty("/ConsultantAddress", ConsultantAddress || "");
-
                             var oToday = new Date();
                             oToday.setHours(0, 0, 0, 0);
 
@@ -323,6 +322,26 @@ sap.ui.define(
 
                             var currency = oInvoiceModel.getProperty("/Currency");
                             this.getView().byId("CI_id_InputGSTNO").setEnabled(currency === "INR");
+
+                             const contData = this.getView().getModel("contractModel").getData();
+                            if (loginData.Role === "Contractor" && contData) {
+                              const contData = this.getView().getModel("contractModel").getData();
+                                const aCData = Array.isArray(contData.contractDetails) ? contData.contractDetails : [];
+
+                                const oSelectedContract = aCData.find(contract => contract.ContractNo === loginData.EmployeeID);
+                                if (!oSelectedContract) {
+                                    sap.m.MessageToast.show("Selected contract not found.");
+                                    return;
+                                }
+
+                                // Set from contract details
+                                oInvoiceModel.setProperty("/MobileNo", oSelectedContract.MobileNo || "");
+                                oInvoiceModel.setProperty("/ConsultantAddress", oSelectedContract.ConsultantAddress || "");
+                            } else {
+                                // For Admin/Manager, use passed values or fallback
+                                oInvoiceModel.setProperty("/MobileNo", MobileNo || "");
+                                oInvoiceModel.setProperty("/ConsultantAddress", ConsultantAddress || "");
+                            }
 
                             this.CI_onPressPasteBtn();
                         }
@@ -859,6 +878,10 @@ sap.ui.define(
                     var isGSTValid = utils._LCvalidateGstNumber({
                         getSource: () => gstInputField
                     });
+
+                    if(isGSTValid){
+                        this.CI_onSelectCGST();
+                    }
 
                     var oConsultantModel = this.getView().getModel("ConsultantInvoiceModel");
                     oConsultantModel.setProperty("/GSTValid", isGSTValid && gstInput !== "");
