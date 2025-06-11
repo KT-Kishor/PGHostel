@@ -1275,13 +1275,13 @@
 											<m:Text text="{PaySlip>PayableDays}" />
 										</m:cells>
                                         <m:cells>
-                                            <m:Text text="{path: 'PaySlip>EarningsTotalMonthly', formatter: '.Formatter.formatCurrencyInINRText'}" />
+                                            <m:Text text="{path: 'PaySlip>EarningsTotalMonthly', formatter: '.Formatter.CurrencyInINRText'}" />
                                         </m:cells>
                                         <m:cells>
-                                            <m:Text text="{path: 'PaySlip>DeductionsTotalMonthly', formatter: '.Formatter.formatCurrencyInINRText'}" />
+                                            <m:Text text="{path: 'PaySlip>DeductionsTotalMonthly', formatter: '.Formatter.CurrencyInINRText'}" />
                                         </m:cells>
                                         <m:cells>
-                                            <m:Text text="{path: 'PaySlip>NetPay', formatter: '.Formatter.formatCurrencyInINRText'}" />
+                                            <m:Text text="{path: 'PaySlip>NetPay', formatter: '.Formatter.CurrencyInINRText'}" />
                                         </m:cells>
 									</m:ColumnListItem>
 								</m:items>

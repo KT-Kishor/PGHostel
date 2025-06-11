@@ -1270,6 +1270,7 @@ sap.ui.define([
                 const { jsPDF } = window.jspdf;
                 const oView = this.getView();
                 const oModel = oView.getModel("SelectedCustomerModel").getData();
+                var data = this.getView().getModel("FilteredSOWModel").getData();
                 const oCompanyInvoiceItemModel = oView.getModel("CompanyInvoiceItemModel").getData();
                 const oCompanyItemModel = oCompanyInvoiceItemModel.CompanyInvoiceItem || [];
                 const type = this.getView().byId("CID_id_Type").getText();
@@ -1321,6 +1322,7 @@ sap.ui.define([
                 const rowHeight = 6.5;
                 const columnWidths = [30, 30];
                 const rightAlignX = pageWidth - 18 - columnWidths[0] - columnWidths[1];
+                doc.setFontSize(12).setFont("times", "bold");
 
                 const detailsTable = [
                     { label: 'Invoice No. :', value: oModel.InvNo },
@@ -1333,7 +1335,7 @@ sap.ui.define([
                 detailsTable.forEach(row => {
                     doc.setFont("times", "bold");
                     doc.text(row.label, rightAlignX + columnWidths[0] - doc.getTextWidth(row.label), currentY + 5);
-                    doc.setFont("times", "normal");
+                    doc.setFont("times", "bold");
                     doc.text(row.value, rightAlignX + columnWidths[0] + 5, currentY + 5);
                     currentY += rowHeight;
                 });
@@ -1400,23 +1402,6 @@ sap.ui.define([
                             5: { halign: 'right' }
                         })
                     },
-                    // didParseCell: function (data) {
-                    //     if (data.section === 'head') {
-                    //         if (showSAC) {
-                    //             if ([4, 5, 6].includes(data.column.index)) {
-                    //                 data.cell.styles.halign = 'right';
-                    //             } else {
-                    //                 data.cell.styles.halign = 'center';
-                    //             }
-                    //         } else {
-                    //             if ([3, 4, 5].includes(data.column.index)) {
-                    //                 data.cell.styles.halign = 'right';
-                    //             } else {
-                    //                 data.cell.styles.halign = 'center';
-                    //             }
-                    //         }
-                    //     }
-                    // }
                 });
 
                 currentY = doc.lastAutoTable.finalY ;
@@ -1454,6 +1439,10 @@ sap.ui.define([
                     } else if ((oModel.Type === "IGST" && oModel.Currency === "INR") || type.split(" ")[0] === "IGST") {
                         summaryBody.push([`IGST ${igstPercentage}`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                     }
+                }
+
+                if (data.RoundOf){
+                    summaryBody.push([`Round Of (${data.Currency})`,(data.RoundOf)]);
                 }
 
                 const totalRowIndex = summaryBody.length;
@@ -1531,7 +1520,7 @@ sap.ui.define([
 
                 const partnersYPosition = logoYPosition + 18;
                 doc.setFont("helvetica", "bold").setFontSize(11);
-                doc.text(oCompanyDetailsModel.headOfCompany, rightAlignX + 38, partnersYPosition);
+                doc.text(oCompanyDetailsModel.headOfCompany, rightAlignX + 30, partnersYPosition);
                 doc.text(oCompanyDetailsModel.designation, rightAlignX + 28, partnersYPosition + 5);
 
                 doc.setFont("times", "normal").setFontSize(11);

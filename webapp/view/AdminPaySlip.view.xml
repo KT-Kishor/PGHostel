@@ -143,13 +143,13 @@
                             <Text text="{PaySlip>PayableDays}" />
                         </cells>
                         <cells>
-                            <Text text="{path: 'PaySlip>EarningsTotalMonthly', formatter: '.Formatter.formatCurrencyInINRText'}" />
+                            <Text text="{path: 'PaySlip>EarningsTotalMonthly', formatter: '.Formatter.CurrencyInINRText'}" />
                         </cells>
                         <cells>
-                            <Text text="{path: 'PaySlip>DeductionsTotalMonthly', formatter: '.Formatter.formatCurrencyInINRText'}" />
+                            <Text text="{path: 'PaySlip>DeductionsTotalMonthly', formatter: '.Formatter.CurrencyInINRText'}" />
                         </cells>
                         <cells>
-                            <Text text="{path: 'PaySlip>NetPay', formatter: '.Formatter.formatCurrencyInINRText'}" />
+                            <Text text="{path: 'PaySlip>NetPay', formatter: '.Formatter.CurrencyInINRText'}" />
                         </cells>
                     </ColumnListItem>
                 </items>

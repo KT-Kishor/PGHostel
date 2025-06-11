@@ -32,14 +32,14 @@ sap.ui.define([
             return "";
         },
 
-        formatCurrencyInINRText: function (sValue) {
+        CurrencyInINRText: function (sValue) {
             if (sValue || sValue === 0) {
                 return "INR" + " " + parseFloat(sValue).toLocaleString('en-IN');
             }
             return "";
         },
 
-        formatCurrencyInINR: function (sValue) {
+        CurrencyInINR: function (sValue) {
             if (sValue || sValue === 0) {
                 return  parseFloat(sValue).toLocaleString('en-IN');
             }
