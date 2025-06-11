@@ -26,9 +26,9 @@
 			ariaLabelledBy="Title1">
 						<f:content>
 						<Label text="{i18n>type}" required="true" />
-							<RadioButtonGroup id="MsaD_id_Type" columns="5" valueState="Warning" select="onRadioButtonGroupSelect">
-								<RadioButton id="RB3-1" text="Service"/>
-								<RadioButton id="RB3-2" text="Recruitment"/>
+							<RadioButtonGroup id="MsaD_id_Type" columns="5" selectedIndex="0"  valueState="None" select="onRadioButtonGroupSelect">
+								<RadioButton id="RB3-1" text="{i18n>Service}"/>
+								<RadioButton id="RB3-2" text="{i18n>Recruitment}"/>
 							</RadioButtonGroup>
 							<Label text="{i18n>companyName}" required="true" />
 							<Input value="{msaModelWizart>/CompanyName}" maxLength="50" placeholder="{i18n>placeCompany}" id="MsaD_id_CompanyName" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeCompany}" />
@@ -52,7 +52,7 @@
 
 
 							<Label text="{i18n>msaRateCharge}" required="true" visible="{VisibleModel>/Recruitment}" ></Label>
-							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="3" placeholder="{i18n>msaRateChargePlac}" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}" />
+							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="5" placeholder="{i18n>msaRateChargePlac}" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}" />
 
 							<!-- Payment Section -->
 							<Label text="{i18n>paymentLabel}" required="true" visible="{VisibleModel>/Recruitment}" />
@@ -60,7 +60,7 @@
 								<VBox width="49%">
 									<Input 
 										value="{msaModelWizart>/PaymentAdvance}" 
-										maxLength="3" 
+										maxLength="5" 
 										placeholder="{i18n>advancePlaceholder}" 
 										id="Msa_Id_PayAdvance" 
 										liveChange="onPaymentAdvanceInputChange" 
@@ -69,7 +69,7 @@
 								<VBox width="49%">
 									<Input 
 										value="{msaModelWizart>/PaymentBalance}" 
-										maxLength="3" 
+										maxLength="5" 
 										placeholder="{i18n>balancePlaceholder}" 
 										id="Msa_Id_PayBalance" 
 										liveChange="onPaymentAdvanceInputChange" 
@@ -91,7 +91,7 @@
 								<VBox width="49%">
 									<Input 
 										value="{msaModelWizart>/ReplacementRefund}" 
-										maxLength="3" 
+										maxLength="5" 
 										placeholder="{i18n>refundPlaceholder}" 
 										id="Msa_Id_Refund" 
 										liveChange="LC_MSA_RateCharge" 
@@ -100,12 +100,12 @@
 							</HBox>
 
 							<Label text="{i18n>contractPeriod}" required="true" />
-							<Select id="MsaD_id_ContractPeriod" items="{ContractPeriod>/ContractPeriod}" selectedKey="{msaModelWizart>/ContractPeriod}">
-								<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
+							<Select id="MsaD_id_ContractPeriod" items="{ContractPeriodThree>/ContractPeriod}" selectedKey="{msaModelWizart>/ContractPeriod}">
+								<core:Item key="{ContractPeriodThree>Months}" text="{ContractPeriodThree>Months}" />
 							</Select>
 							
 							<Label text="{i18n>branch}" required="true" />
-							<ComboBox change="Msa_BranchChange" valueStateText="{i18n>expValStaSource}" selectedKey="{LoginModel>/BranchCode}" id="MsaD_id_Branch" items="{BaseLocationModel>/}" value="{msaModelWizart>/BranchCode}" showSecondaryValues="true" >
+							<ComboBox change="Msa_BranchChange" filterSecondaryValues="true" valueStateText="{i18n>selectBranch}" selectedKey="{LoginModel>/BranchCode}" id="MsaD_id_Branch" items="{BaseLocationModel>/}" value="{msaModelWizart>/BranchCode}" showSecondaryValues="true" >
 								<core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>branchCode}" additionalText="{BaseLocationModel>city}" />
 							</ComboBox>							
 
@@ -117,6 +117,16 @@
 
 							<Label text="{i18n>emailId}" required="true" />
 							<TextArea  value="{msaModelWizart>/MsaEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" valueStateText="{i18n>emailValueState}" />
+
+							<Label text="{i18n>expCountry}" required="true"/>
+							<ComboBox valueStateText="{i18n>expValStaCountry}" change="MSACountryComboBox" id="MSA_Id_Country" items="{path:'CountryModel>/',length:1000}" value="{msaModelWizart>/Country}" showSecondaryValues="true">
+								<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+							</ComboBox>
+
+							<Label text="{i18n>city}"  required="true"/>
+							<ComboBox change="MSA_onChangeCity" valueStateText="{i18n>cityValueText}" id="MSA_Id_City" items="{BaseLocationModel>/}"  value="{msaModelWizart>/City}" >
+								<core:ListItem key="{BaseLocationModel>CountryCode}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+							</ComboBox>
 
 							<Label text="{i18n>address}" required="true" />
 							<TextArea value="{msaModelWizart>/Address}" placeholder="{i18n>placeAddress}" id="MsaD_id_Address"  liveChange="MsaD_ValidateCommonFields"  maxLength="120" valueStateText="{i18n>addressValueState}"/>
@@ -147,6 +157,8 @@
 			singleContainerFullSize="false"
 			ariaLabelledBy="Title1">
 						<f:content>
+							<Label text="{i18n>type}" />
+							<Text id="reviewPageType" />
 							<Label text="{i18n>companyName}" />
 							<Text text="{msaModelWizart>/CompanyName}" />
 							<Label text="{i18n>companyHeadName}" />
@@ -155,15 +167,15 @@
 							<Text text="{msaModelWizart>/CompanyHeadPosition}" />
 
 							<Label text="{i18n>msaRateCharge}" visible="{VisibleModel>/Recruitment}"/>
-							<Text text="{msaModelWizart>/RateCharge}%" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/RateCharge} %" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="Payment Advance" visible="{VisibleModel>/Recruitment}"/>
-							<Text text="{msaModelWizart>/PaymentAdvance}%" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/PaymentAdvance} %" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="Payment Balance" visible="{VisibleModel>/Recruitment}"/>
-							<Text text="{msaModelWizart>/PaymentBalance}%" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/PaymentBalance} %" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="Replacement Gratuity Month" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/ReplacementMonth}" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="Replacement Gratuity Refund" visible="{VisibleModel>/Recruitment}"/>
-							<Text text="{msaModelWizart>/ReplacementRefund}%" visible="{VisibleModel>/Recruitment}"/>
+							<Text text="{msaModelWizart>/ReplacementRefund} %" visible="{VisibleModel>/Recruitment}"/>
 
 							<Label text="{i18n>contractPeriod}" />
 							<Text text="{msaModelWizart>/ContractPeriod}" />
@@ -173,6 +185,10 @@
 							<Text text="{msaModelWizart>/PanCard}" />
 							<Label text="{i18n>emailId}" />
 							<Text text="{msaModelWizart>/MsaEmail}" />
+							<Label text="{i18n>expCountry}"/>
+							<Text text="{msaModelWizart>/Country}" />
+							<Label text="{i18n>city}"/>
+							<Text text="{msaModelWizart>/City}" />
 							<Label text="{i18n>address}" />
 							<Text text="{msaModelWizart>/Address}" />
 							<Label text="{i18n>paymentterms}" />
@@ -188,7 +204,7 @@
 					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</contentLeft>
 				<contentRight>
-					<Button text="{i18n>submit}" press="MsaD_reviewSubmit" id="MsaD_id_Submit" type="Success" enabled="false"/>
+					<Button text="{i18n>submit}" press="MsaD_reviewSubmit" id="MsaD_id_Submit" type="Accept" enabled="false"/>
 				</contentRight>
 			</Bar>
 		</footer>

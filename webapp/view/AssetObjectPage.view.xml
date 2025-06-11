@@ -128,11 +128,13 @@
                                     width="100%"
                                     height="100%"
                                     sortOldestFirst="true"
-                                    enableDoubleSided="true"
+
+                                    enableDoubleSided="false"
                                     content="{Mymodel>/}"
                                     growingThreshold="999"
                                     showSearch="false"
-                                    
+                                    showHeaderBar="false"
+                                    enableScroll="false"
                                 >
                                     <suite:content>
                                         <suite:TimelineItem
@@ -368,12 +370,17 @@
                                                 <!-- <m:Text text="{objectModel>ReturnBranch}" /> -->
                                                 <!-- <m:ObjectIdentifier title="{objectModel>TransferByName}" text="{objectModel>TransferByID}" /> -->
                                                 <m:VBox  class="sapUiTinyMarginTopBottom">
+                                                 <!-- <m:Text
+                                                        text="{= ${objectModel>AssignEmployeeName} ? 'To: ' + ${objectModel>AssignEmployeeName} : ''}"
+                                                        class="sapUiTinyMarginBottom"
+                                                    /> -->
                                                   <m:Text
-                                text="{= ${objectModel>ReturnEmpName} ?'By ' +  ${objectModel>AssignedByEmployeeName} : ''}"
+                                text="{= ${objectModel>ReturnEmpName} ?'By: ' +  ${objectModel>AssignEmployeeName} : ''}"
                                     class="sapUiTinyMarginBottom"
                             />
                                        <m:Text
-                                text="{= ${objectModel>ReturnEmpName} ? 'ID: ' + ${objectModel>AssignedByEmployeeID} : ''}"                                    class="sapUiTinyMarginBottom"
+                                text="{= ${objectModel>ReturnEmpName} ? 'ID: ' + ${objectModel>AssignEmployeeID} : ''}"                    
+                                                class="sapUiTinyMarginBottom"
                             />
                             
                              <!-- <m:Text text="{=${objectModel>AssignedByEmployeeID}?'ID: '+${objectModel>AssignedByEmployeeID}:''}"
@@ -411,8 +418,12 @@
                                 text="{= ${objectModel>TrashDate} === '1899-11-30T00:00:00.000Z' || ${objectModel>TrashDate} === null ? '' : 'Date: ' + ${
                                 path: 'objectModel>TrashDate',
                                 formatter: '.Formatter.formatDate'
-                            }}"                       
+                            }}"                    
+                                                        class="sapUiTinyMarginBottom"                        
+
                                     />
+                                     <m:Text text="{=${objectModel>TrashBranch}?'Branch: '+${objectModel>TrashBranch}:''}"
+                                                                  />
                                                 </m:VBox> 
                                                 <!-- <m:Text
                                                     text="{= ${objectModel>ReturnDate} === '1899-11-30T00:00:00.000Z' ? ''

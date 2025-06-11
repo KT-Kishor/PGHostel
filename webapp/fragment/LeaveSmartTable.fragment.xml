@@ -11,24 +11,23 @@
             alternateRowColors="true"
 			class="sapUiResponsiveContentPadding centeredTable">
 			<headerToolbar>
-				<Toolbar>
+				 <OverflowToolbar >
 				 <Title id="Al_id_Title" text="{i18n>appliedLeave} ({= ${LeaveModel>/}.length })"/>
-					<ToolbarSpacer/> 
-					<ToolbarSeparator/>
+					 <ToolbarSpacer/>
 					<Button press="AL_onPressBarChart" text="{i18n>openBarCharts}" type="Ghost" />
 					<Button press="AL_onPressApplyLeave" text="{i18n>applyLeave}"  type="Accept"/>
 					<Button id="AL_id_Updatebtn" text="{i18n>editDetails}" press="AL_onPressUpdate" visible="{= ${LeaveModel>status} === 'Submitted' }" type="Emphasized"/>
-					<ToolbarSeparator/>
-				</Toolbar>
-			</headerToolbar>
+					<Button id="AL_id_Deletebtn" text="{i18n>deleteLeave}" press="AL_onPressDelete" visible="{= ${LeaveModel>status} === 'Submitted' }" type="Reject"/>
+					 </OverflowToolbar>
+            </headerToolbar>
 			<columns>
-				<Column minScreenWidth="Tablet" demandPopin="true">
+				<Column demandPopin="true">
 					<Text text="{i18n>fromDate}" />
 				</Column>
-				<Column minScreenWidth="Tablet" demandPopin="true">
+				<Column demandPopin="true">
 					<Text text="{i18n>toDate}" />
 				</Column>
-				<Column minScreenWidth="Tablet" demandPopin="true">
+				<Column demandPopin="true">
 					<Text text="{i18n>noOfDays}" />
 				</Column>
 				<Column minScreenWidth="Tablet" demandPopin="true">

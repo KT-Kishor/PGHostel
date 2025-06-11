@@ -1,11 +1,14 @@
-sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/BusyIndicator", "sap/m/MessageToast",],
-    (Controller, Formatter, utils, JSONModel, BusyIndicator, MessageToast) => {
+sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/BusyIndicator", "sap/m/MessageToast", "sap/m/MessageBox", "../utils/SalaryCertificatePDF"],
+    (Controller, Formatter, utils, JSONModel, BusyIndicator, MessageToast, MessageBox, jsPDF) => {
         "use strict";
         return Controller.extend("sap.kt.com.minihrsolution.controller.SelfService", {
             Formatter: Formatter,
-            onInit() {
+            onInit: function () {
+                const today = new Date();
+                const nextMonthFirstDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+                const maxDate18YearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
                 var oDateModel = new sap.ui.model.json.JSONModel();
-                oDateModel.setData({ maxDate: new Date(), focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1) });
+                oDateModel.setData({maxDate: maxDate18YearsAgo,focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1), nextMonthMinDate: nextMonthFirstDate});
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("SelfService").attachMatched(this._onRouteMatched, this);
             },
@@ -17,8 +20,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getBusyDialog();
                     const oView = this.getView();
                     this.i18nModel = oView.getModel("i18n").getResourceBundle();
-                    this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
-                    // Load dropdown data once
+                    this.companyName = "Kalpavriksha Technologies";
                     if (!oView.getModel("sDesignationModel")) {
                         this._fetchCommonData("Designation", "sDesignationModel");
                         this._fetchCommonData("BaseLocation", "sBaseLocationModel");
@@ -26,76 +28,134 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this._fetchCommonData("AppVisibility", "RoleModel");
                         this._fetchCommonData("Country", "CountryModel");
                     }
-                    this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate"]);
+                    this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
-                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(),
-                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, TraineeRole: false,
+                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false,
+                        isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false, SelfServiceBtn: false
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
-                    this.ViewModel.setProperty("/TraineeRole", loginModel.getProperty("/Role") === "Trainee");
-                    var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lc", "SS_id_lpa", "SS_id_lca", "SS_id_lds", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
-                        "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan",];
+                    var sLoggedInRole = loginModel.getProperty("/Role");
+                    var sNavigatedRole = oEvent.getParameter("arguments").Role; // Role from navigation
                     this.sPath = oEvent.getParameter('arguments').sPath;
-                    if (this.sPath === "SelfService") {
-                        this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileSelfSerciceFooter"));
-                        this.ViewModel.setProperty("/SetProfile", true);
-                        if (loginModel) this.EmployeeID = loginModel.getProperty("/EmployeeID");
-                        aIds.forEach(function (sId) {
-                            this.getView().byId(sId).setRequired(true);
-                        }.bind(this));
-                    } else {
-                        this.EmployeeID = this.sPath;
-                        this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
-                        if (loginModel.getProperty("/Role") === "Admin") {
-                            this.ViewModel.setProperty("/RelievingLetter", true);
-                        }
-                        aIds.forEach(function (sId) {
-                            this.getView().byId(sId).setRequired(false);
-                        }.bind(this));
-                    }
-                    var employeeModel = new JSONModel();
-                    this.getOwnerComponent().setModel(employeeModel, "employeeModel");
-                    if (this.EmployeeID) {
+                    // sections if role is "Trainee" from either login or navigation
+                    if (sNavigatedRole === "MyInboxResignation") {
+                        this.sFlag = true
                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
-                            EmployeeID: this.EmployeeID
+                            EmployeeID: this.sPath
                         });
-                        oView.getModel("sEmployeeModel").refresh(true);
-                        var oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
-                        if (this.sPath === "SelfService" && oModelAllData.Type !== "Submit") this.ViewModel.setProperty("/SelfService", true);
+                        this.onApplyResignation();
+                    } else {
+                        var bHideSalarySection = sLoggedInRole === "Trainee" || sNavigatedRole === "Trainee";
+                        this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
 
-                        if (!oModelAllData.EContactIStdCode) oModelAllData.EContactIStdCode = "+91";
-                        if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
-
-                        const oObjectPage = this.byId("ObjectPageLayout");
-                        const oSection = this.byId("basicDetailsSection");
-                        if (oObjectPage && oSection) {
-                            oObjectPage.setSelectedSection(oSection);
+                        var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lpa", "SS_id_lca", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
+                            "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan",];
+                        if (this.sPath === "SelfService") {
+                            this.ViewModel.setProperty("/SelfServiceBtn", true);
+                            this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileSelfSerciceFooter"));
+                            this.ViewModel.setProperty("/SetProfile", true);
+                            if (loginModel) this.EmployeeID = loginModel.getProperty("/EmployeeID");
+                            aIds.forEach(function (sId) {
+                                this.getView().byId(sId).setRequired(true);
+                            }.bind(this));
+                            this.byId("SS_id_lc").setRequired(false)
+                            this.byId("SS_id_lbase").setRequired(false)
+                            this.byId("SS_id_lds").setRequired(false)
+                            this.byId("SS_id_Lmg").setRequired(false)
                         }
+                        else {
+                            this.ViewModel.setProperty("/SelfServiceBtn", false);
+                            this.EmployeeID = this.sPath;
+                            this.byId("SS_id_lc").setRequired(true)
+                            this.byId("SS_id_lbase").setRequired(true)
+                            this.byId("SS_id_Lmg").setRequired(true)
+
+                            this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
+                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {
+                                this.ViewModel.setProperty("/Letter", true);
+                            } else {
+                                this.ViewModel.setProperty("/Letter", false);
+                            }
+                            if (["Admin", "HR Manager", "HR"].includes(loginModel.getProperty("/Role"))) {
+                                this.ViewModel.setProperty("/RelievingLetter", true);
+                            }
+                            aIds.forEach(function (sId) {
+                                this.getView().byId(sId).setRequired(false);
+                            }.bind(this));
+                        }
+                        if (this.sPath === "SelfService" && sLoggedInRole !== "Trainee" && sNavigatedRole !== "Trainee") {
+                            this.ViewModel.setProperty("/ResignationVisible", true);
+                        } else {
+                            this.ViewModel.setProperty("/ResignationVisible", false);
+                        }
+                        var employeeModel = new JSONModel();
+                        this.getOwnerComponent().setModel(employeeModel, "employeeModel");
+                        if (this.EmployeeID) {
+                            await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
+                                EmployeeID: this.EmployeeID
+                            });
+                            oView.getModel("sEmployeeModel").refresh(true);
+                            var oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
+                            if (this.sPath === "SelfService" && oModelAllData.Type !== "Submit") this.ViewModel.setProperty("/SelfService", true);
+
+                            if (!oModelAllData.EContactIStdCode) oModelAllData.EContactIStdCode = "+91";
+                            if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
+
+                            // --- Releving letter Button Visibility Logic ---
+                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sNavigatedRole !== "Trainee") {
+                                this.byId("SS_id_Action").setVisible(true);
+                                this.ViewModel.setProperty("/TraineeRole", false);
+                                if (oModelAllData.EmployeeStatus === "Inactive") {
+                                    this.ViewModel.setProperty("/WorkCompletedVisible", true);
+                                    this.ViewModel.setProperty("/Letter", false); // Hide other letter buttons
+                                    this.ViewModel.setProperty("/RelievingLetter", false);
+                                    this.ViewModel.setProperty("/isVisitMode", false);
+                                } else if (oModelAllData.EmployeeStatus === "Active") {
+                                    this.ViewModel.setProperty("/WorkCompletedVisible", false);
+                                    this.ViewModel.setProperty("/isVisitMode", true);
+                                    this.ViewModel.setProperty("/Letter", true); // Show  buttons for active
+                                    this.ViewModel.setProperty("/RelievingLetter", true);
+                                }
+
+                            } else {
+                                this.ViewModel.setProperty("/WorkCompletedVisible", false);
+                                if (oModelAllData.EmployeeStatus === "Inactive")
+                                    this.byId("SS_id_Action").setVisible(false);
+                            }
+                            const oObjectPage = this.byId("ObjectPageLayout");
+                            const oSection = this.byId("basicDetailsSection");
+                            if (oObjectPage && oSection) {
+                                oObjectPage.setSelectedSection(oSection);
+                            }
+                        }
+                        this.managerID = this.getView().getModel("sEmployeeModel").getProperty("/0/ManagerID");
+                        var oTextModel = new JSONModel({ name: "" });
+                        this.getView().setModel(oTextModel, "TextDisplay");
+                        var oIdCardModel = this.getView().getModel("IdCardModel");
+                        if (oIdCardModel) {
+                            oIdCardModel.attachPropertyChange(this.IC_onPressDisplayImageOnCanvas.bind(this));
+                        }
+                        this.byId("SS_id_EmeNameF").setValueState("None");
+                        this.byId("SS_idRelF").setValueState("None");
+                        this.byId("SS_id_EmpMoF").setValueState("None");
+                        this.byId("SS_id_AddF").setValueState("None");
+                        this.byId("SS_id_NameS").setValueState("None");
+                        this.byId("SS_idRelS").setValueState("None");
+                        this.byId("SS_id_EmpMoS").setValueState("None");
+                        this.byId("SS_id_PAddress").setValueState("None");
+                        this.byId("SS_id_Manager").setValueState("None");
+                        this.byId("SS_id_BloodGroup").setValueState("None");
+                        this.byId("SS_id_CAdress").setValueState("None");
+                        this.byId("SS_id_EmpAddS").setValueState("None");
+                        this.byId("SS_id_MobileNo").setValueState("None");
+                        this.byId("SS_id_STDCode").setValueState("None");
+                        this.byId("SS_id_STDCodeRI").setValueState("None");
+                        this.byId("SS_id_STDCodeRII").setValueState("None");
+                        this.byId("SS_id_FatherName").setValueState("None");
+                        this.byId("SS_id_Compmail").setValueState("None");
                     }
-                    var oTextModel = new JSONModel({ name: "" });
-                    this.getView().setModel(oTextModel, "TextDisplay");
-                    var oIdCardModel = this.getView().getModel("IdCardModel");
-                    if (oIdCardModel) {
-                        oIdCardModel.attachPropertyChange(this.IC_onPressDisplayImageOnCanvas.bind(this));
-                    }
-                    this.byId("SS_id_EmeNameF").setValueState("None");
-                    this.byId("SS_idRelF").setValueState("None");
-                    this.byId("SS_id_EmpMoF").setValueState("None");
-                    this.byId("SS_id_AddF").setValueState("None");
-                    this.byId("SS_id_NameS").setValueState("None");
-                    this.byId("SS_idRelS").setValueState("None");
-                    this.byId("SS_id_EmpMoS").setValueState("None");
-                    this.byId("SS_id_PAddress").setValueState("None");
-                    this.byId("SS_id_Manager").setValueState("None");
-                    this.byId("SS_id_BloodGroup").setValueState("None");
-                    this.byId("SS_id_CAdress").setValueState("None");
-                    this.byId("SS_id_EmpAddS").setValueState("None");
-                    this.byId("SS_id_MobileNo").setValueState("None");
-                    this.byId("SS_id_STDCode").setValueState("None");
-                    this.byId("SS_id_STDCodeRI").setValueState("None");
-                    this.byId("SS_id_STDCodeRII").setValueState("None");
                 } catch (error) { } finally {
                     this.closeBusyDialog();
                 }
@@ -121,7 +181,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     case "Salary Details":
                         this.SS_readSalaryDetails(this.EmployeeID);
                         break;
-                    case "Pay Slip":
+                    case "Payslip":
                         this.getView().byId("SS_id_PaySlipTable").setBusy(true);
                         await this._commonGETCall("AdminPaySlip", "EmpTable", { EmployeeID: this.EmployeeID });
                         this.getView().byId("SS_id_PaySlipTable").setBusy(false);
@@ -145,6 +205,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.ReadEmployeeDocument();
                         break;
                 }
+            },
+            onOpenActionBtn: function (oEvent) {
+                var oBtn = oEvent.getSource();
+                if (!this._oActionBtn) {
+                    this._oActionBtn = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.SelfServiceActionDialog", this);
+                    this.getView().addDependent(this._oActionBtn);
+                }
+                this._oActionBtn.openBy(oBtn);
             },
             SS_readEducationalDetails: async function (filter) {
                 try {
@@ -258,20 +326,45 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     utils._LCvalidateGrade(oGradeField, "ID", "AddEd_id_GradeType");
                 }
             },
-            //Edit buttton visibility
+
+            FSA_onInputLiveChange: function (oEvent) {
+                // utils._LCvalidateMandatoryField(oEvent);
+                utils._LCvalidateName(oEvent);
+
+            },
+
+            FSA_onNomineNameLiveChange: function (oEvent) {
+                // utils._LCvalidateMandatoryField(oEvent);
+                utils._LCvalidateName(oEvent);
+            },
+            // Edit button visibility with role-based access control and SelfService 
             SS_onEditPress: function (oEvent) {
                 var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
                 var Role = this.getView().getModel("LoginModel").getProperty("/Role");
+                var allowedRoles = ["Admin", "HR Manager", "HR"];
+                // Allow all users to edit in SelfService mode
+                if (this.sPath === "SelfService") {
+                    if (isEditMode) {
+                        if (this.SS_onSavePress(oEvent.getSource().getId().split('--').pop())) {
+                            this.getView().getModel("viewModel").setProperty("/isEditMode", false);
+                        }
+                    } else {
+                        this.getView().getModel("viewModel").setProperty("/isEditMode", true);
+                        this.getView().getModel("viewModel").setProperty("/AdminRole", false);
+                    }
+                    return;
+                }
+                // Role-based edit for other cases
                 if (isEditMode) {
-                    if (this.SS_onSavePress(oEvent.getSource().getId().split('--').pop())) { // Call Save function and check validation
+                    if (this.SS_onSavePress(oEvent.getSource().getId().split('--').pop())) {
                         this.getView().getModel("viewModel").setProperty("/isEditMode", false);
                     }
                 } else {
-                    this.getView().getModel("viewModel").setProperty("/isEditMode", true);
-                    if (Role === "Admin" && this.sPath !== "SelfService") {
-                        this.getView().getModel("viewModel").setProperty("/AdminRole", true);
+                    if (allowedRoles.includes(Role)) {
+                        this.getView().getModel("viewModel").setProperty("/isEditMode", true);
+                        this.getView().getModel("viewModel").setProperty("/AdminRole", ["Admin", "HR Manager", "HR"].includes(Role));
                     } else {
-                        this.getView().getModel("viewModel").setProperty("/AdminRole", false);
+                        sap.m.MessageToast.show(this.i18nModel.getText("permissionDenied"));
                     }
                 }
             },
@@ -281,19 +374,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 await this.ReadEmployeeDocument();
                 var oModel = this.getView().getModel("DocumentModel").getData();
                 if (!oModel || oModel.items.length === 0) {
-                    sap.m.MessageBox.error(this.i18nModel.getText("uploadAtLeastOneDocumentMessage")); // You can add this key to your i18n model
-                    return;
+                    sap.m.MessageBox.error(this.i18nModel.getText("uploadAtLeastOneDocumentMessage"),
+                        { title: this.i18nModel.getText("selfsubmitErr") }); return;
                 }
-                // this.showConfirmationDialog(
-                //     this.i18nModel.getText("confirmTitle"),
-                //     this.i18nModel.getText("confirmSubmitMessage"),
-                //     function () {
                 const ID = oEvent.getSource().getId().split("--").pop();
                 that.SS_onSavePress(ID);
-                // },
-                // function () {
-                //     that.closeBusyDialog();
-                // });
             },
 
             onChangeResigEndDate: function (oEvent) {
@@ -343,9 +428,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 return;
                             }
                         }
-
-                        // Validate Manager, Country, and Base Location fields
+                        // Validate company mail, Manager, Country, and Base Location fields
                         if (
+                            !utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID") ||
                             !utils._LCstrictValidationComboBox(oView.byId("SS_id_Country"), "ID") ||
                             !utils._LCstrictValidationComboBox(oView.byId("SS_id_BaseL"), "ID") ||
                             !utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID")
@@ -356,6 +441,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         // Optional field validation
                         const passport = oView.byId("SS_id_Passport").getValue().trim();
                         const voterId = oView.byId("SS_id_Voterid").getValue().trim();
+                        if (oDataModel.EmployeeStatus === 'Inactive' && !oView.byId("SS_id_ResgEndDate").getValue()) {
+                            MessageToast.show(this.i18nModel.getText("resignationEndDateRequired"));
+                            return;
+                        }
                         const optionalValid =
                             (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
                             (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) &&
@@ -393,29 +482,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.showConfirmationDialog(this.i18nModel.getText("confirmTitle"), Message,
                             function () {
                                 this.getBusyDialog();
-                                this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload)
-                                    .then((oData) => {
-                                        if (oData.success) {
-                                            if (ID === 'Submit') {
-                                                this.ViewModel.setProperty("/SelfService", false);
-                                            }
-                                            MessageToast.show(this.i18nModel.getText("dataSaved"));
-                                            oView.getModel("viewModel").setProperty("/isEditMode", false);
-                                            oView.getModel("viewModel").setProperty("/AdminRole", false);
-                                            this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
-                                                EmployeeID: this.EmployeeID
-                                            });
-                                            this.byId("SS_id_Passport").setValueState("None");
-                                            this.byId("SS_id_Voterid").setValueState("None");
-                                        } else {
-                                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                                        }
-                                        this.closeBusyDialog();
-                                    })
-                                    .catch((oError) => {
-                                        this.closeBusyDialog();
-                                        MessageToast.show(oError.responseText || oError.message);
-                                    });
+                                this.updateFunctionForSelf(oPayload, ID);
                             }.bind(this),
                             function () {
                                 this.closeBusyDialog();
@@ -428,12 +495,115 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     MessageToast.show(error.message || "Unexpected error");
                 }
             },
-
+            updateFunctionForSelf: function (oPayload, ID) {
+                var oView = this.getView();
+                this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload)
+                    .then((oData) => {
+                        if (oData.success) {
+                            if (ID === 'Submit') {
+                                this.ViewModel.setProperty("/SelfService", false);
+                            }
+                            MessageToast.show(this.i18nModel.getText("dataSaved"));
+                            oView.getModel("viewModel").setProperty("/isEditMode", false);
+                            oView.getModel("viewModel").setProperty("/AdminRole", false);
+                            this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
+                                EmployeeID: this.EmployeeID
+                            });
+                            this.byId("SS_id_Passport").setValueState("None");
+                            this.byId("SS_id_Voterid").setValueState("None");
+                        } else {
+                            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                        }
+                        this.closeBusyDialog();
+                        sap.ui.core.BusyIndicator.hide(0);
+                    })
+                    .catch((oError) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(oError.responseText || oError.message);
+                    });
+            },
             onManagerChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-                const oData = this.getView().getModel("sEmployeeModel").getProperty("/0");
-                oData.ManagerID = oEvent.getSource().getSelectedKey();
-                oData.ManagerName = oEvent.getSource().getSelectedItem().getText();
+                const oDataModel = this.getView().getModel("sEmployeeModel").getProperty("/0");
+                const requestData = { ManagerID: oDataModel.ManagerID, Status: "Submitted" };
+                oDataModel.ManagerID = oEvent.getSource().getSelectedKey();
+                oDataModel.ManagerName = oEvent.getSource().getSelectedItem() ? oEvent.getSource().getSelectedItem().getText() : oEvent.getSource().getValue();
+                var oPayload = {
+                    data: oDataModel,
+                    filters: {
+                        EmployeeID: this.EmployeeID
+                    }
+                };
+                if (!oDataModel.ManagerName && !oDataModel.ManagerID) {
+                    return
+                }
+                sap.ui.core.BusyIndicator.show();
+                var that = this;
+                this.ajaxReadWithJQuery("InboxDetails", requestData)
+                    .then((oData) => {
+                        sap.ui.core.BusyIndicator.hide(0);
+                        if (oData.data && oData.data.length > 0 && this.managerID !== oDataModel.ManagerID) {
+                            MessageBox.show(this.getView().getModel("i18n").getResourceBundle().getText("managerChangeMsg"), {
+                                icon: sap.m.MessageBox.Icon.INFORMATION,
+                                title: "Confirmation",
+                                actions: [sap.m.MessageBox.Action.OK, "Cancle"],
+                                onClose: async function (sAction) {
+                                    if (sAction === "OK") {
+                                        sap.ui.core.BusyIndicator.show();
+                                        // oData.ManagerID = managerId;
+                                        await this.updateFunctionForSelf(oPayload, "");
+                                        var flag = false;
+                                        for (let i = 0; i < oData.data.length; i++) {
+                                            oData.data[i].ManagerName = oPayload.data.ManagerName
+                                            oData.data[i].ManagerID = oPayload.data.ManagerID
+                                            oData.data[i].ManagerChanges = "Manager Changes"
+
+                                            const payLoad = {
+                                                data: oData.data[i],
+                                                filters: {
+                                                    ID: oData.data[i].ID
+                                                }
+                                            }
+                                            await this.ajaxUpdateWithJQuery("InboxDetails", payLoad)
+                                                .then((oData) => {
+                                                    flag = true;
+                                                })
+                                                .catch((oError) => {
+                                                    flag = false;
+                                                    sap.ui.core.BusyIndicator.hide(0);
+                                                    return;
+                                                });
+
+                                        };
+                                        if (flag) {
+                                            // sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("managerUpdate"));
+                                        } else {
+                                            sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("commomerror"));
+                                        }
+                                        //sap.ui.core.BusyIndicator.hide(0);
+
+                                    } else {
+                                        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
+                                            EmployeeID: this.EmployeeID
+                                        }).then(async () => {
+                                            oPayload.data = that.getView().getModel("sEmployeeModel").getData()[0]
+                                            that.getView().byId("SS_id_Manager").setSelectedKey(oPayload.data.ManagerID);
+                                            //await that.updateFunctionForSelf(oPayload, "");
+                                        });
+                                        sap.ui.core.BusyIndicator.hide(0);
+                                    }
+                                }.bind(this)
+                            });
+                        } else {
+                            sap.ui.core.BusyIndicator.show();
+                            this.updateFunctionForSelf(oPayload, "");
+                            // sap.ui.core.BusyIndicator.hide(0);
+                        }
+                    }).bind(this)
+                    .catch((oError) => {
+                        MessageToast.show(oError)
+                        sap.ui.core.BusyIndicator.hide(0);
+                    });
                 this.getView().getModel("sEmployeeModel").refresh();
                 this.byId("SS_id_Manager").setValueState("None")
             },
@@ -628,6 +798,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 } else {
                     if (this.sPath === "SelfService") {
                         this.getRouter().navTo("RouteTilePage");
+                    } else if (this.sFlag === true) {
+                        this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInbox" });
                     } else {
                         this.getRouter().navTo("RouteEmployeeDetails", { sPath: "SelfService" });
                     }
@@ -1247,6 +1419,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 oDialog.open();
             },
 
+            // Function to display salary panels and handle Appraisal button logic
+
             SS_readSalaryDetails: async function (filter) {
                 try {
                     this.getBusyDialog();
@@ -1263,26 +1437,32 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
 
+            // Function to display salary data in UI panels
             displaySalaryPanels: function (salaryDetailsArray) {
+                var nextMonthDate = this.getView().getModel("controller").getProperty("/nextMonthMinDate"); // Fetch the pre-set next month's date
                 var AppraisalModel = new JSONModel({
                     CtcPercentage: "",
                     VariablePay: "0",
-                    EffectiveDate: new Date()
+                    TotalCTC: "0",
+                    TotalVariablePay: "0",
+                    EffectiveDate: nextMonthDate
                 });
                 this.getView().setModel(AppraisalModel, "AppraisalModel");
                 var oVBox = this.byId("salaryVBox");
                 oVBox.removeAllItems();
                 var oToday = new Date();
                 salaryDetailsArray.forEach((offerData, index) => {
-                    var sTitleText = `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
+                    var oEffectiveDate = new Date(offerData.EffectiveDate);
+                    var isLastRecord = index === salaryDetailsArray.length - 1; // Check if it's the latest record
+                    var sTitleText = isLastRecord
+                        ? `Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`
+                        : `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
                     var oTitleText = new sap.m.Text({
                         text: sTitleText,
                         wrapping: true
                     });
-                    // Array to hold buttons
                     var aButtonContent = [];
-                    var oEffectiveDate = new Date(offerData.EffectiveDate);
-                    // Show "Delete" button if EffectiveDate is greater than today
+                    // Delete button
                     if (salaryDetailsArray.length > 1 && oEffectiveDate > oToday && this.getView().getModel("LoginModel").getProperty("/Role") === "Admin") {
                         var oDeleteButton = new sap.m.Button({
                             text: "Delete",
@@ -1291,64 +1471,86 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 this.onDeleteSalary(offerData);
                             }.bind(this)
                         }).addStyleClass("sapUiTinyMarginBegin");
-
                         aButtonContent.push(oDeleteButton);
                     }
-                    // Show "Appraisal" button only for the first item (index 0) and if EffectiveDate is less than today
+                    // Appraisal button
                     if (index === 0 && oEffectiveDate < oToday) {
                         var oAppraisalButton = new sap.m.Button({
                             text: "Appraisal",
                             type: "Emphasized",
-                            visible: this.ViewModel.getProperty("/RelievingLetter"), // You can keep this condition if needed
+                            visible: this.ViewModel.getProperty("/RelievingLetter"),
                             press: function () {
                                 this._fetchCommonData("TaxCalculation", "TDSModel", { Country: this.getView().getModel("sEmployeeModel").getData()[0].CountryCode });
                                 this.SS_commonOpenDialog("Appraisal", "sap.kt.com.minihrsolution.fragment.Appraisal", ["SS_id_Joinn"]);
+                                setTimeout(() => {
+                                    this.onAppraisalDialogReady(offerData);
+                                }, 300);
                             }.bind(this)
                         }).addStyleClass("sapUiTinyMarginBegin");
-
                         aButtonContent.push(oAppraisalButton);
                     }
-                    // Wrap buttons in a right-aligned HBox
                     var oButtonBox = new sap.m.HBox({
                         items: aButtonContent,
                         alignItems: "Center",
                         justifyContent: "End",
                         wrap: "Wrap"
                     });
-                    // Header HBox: Left = text, Right = buttons
                     var oHeaderBox = new sap.m.HBox({
                         items: [oTitleText, oButtonBox],
                         justifyContent: "SpaceBetween",
                         alignItems: "Center",
                         width: "100%"
                     });
-                    // Create the panel with header
                     var oPanel = new sap.m.Panel({
                         expandable: true,
                         expanded: true,
-                        headerToolbar: new sap.m.Toolbar({
-                            content: [oHeaderBox]
-                        })
+                        headerToolbar: new sap.m.Toolbar({ content: [oHeaderBox] })
                     });
                     oPanel.addStyleClass("sapUiSmallMarginBottom");
-
-                    // Set individual salary data model
                     var oFragModel = new sap.ui.model.json.JSONModel(offerData);
                     oPanel.setModel(oFragModel, "salaryData");
-
-                    // Load salary display fragment
                     var oFragment = sap.ui.xmlfragment(
                         this.getView().getId(),
                         "sap.kt.com.minihrsolution.fragment.SalaryDisplay",
                         this
                     );
                     oPanel.addContent(oFragment);
-                    // Add panel to VBox
                     oVBox.addItem(oPanel);
                 });
             },
 
+            // Function to initialize dialog values
+            onAppraisalDialogReady: function (latestSalaryData) {
+                const AppraisalModel = this.getView().getModel("AppraisalModel");
+                const lastCTC = parseFloat(latestSalaryData.CTC?.toString().replaceAll(",", "")) || 0;
+                const lastVariablePay = parseFloat(latestSalaryData.VariablePay) || 0;
+
+                AppraisalModel.setProperty("/PreviousGrossPay", this.Formatter.fromatNumber(lastCTC));
+                AppraisalModel.setProperty("/PreviousVariablePay", this.Formatter.fromatNumber(lastVariablePay));
+                const EmployeePF = parseFloat(latestSalaryData.EmployeePF) || 0;
+                const EmployerPF = parseFloat(latestSalaryData.EmployerPF) || 0;
+                const oRadioGroup = sap.ui.getCore().byId("AF_id_RadioButTds");
+                const oTDSRadio = sap.ui.getCore().byId("AF_id_TDSRadio");
+                const oPFRadio = oRadioGroup.getButtons()[1];
+
+                if (!oRadioGroup || !oTDSRadio || !oPFRadio) return;
+
+                // Check if both PF values exist
+                if (EmployeePF > 0 && EmployerPF > 0) {
+                    oRadioGroup.setVisible(false); // Hide entire radio button group
+                    oRadioGroup.setSelectedIndex(1);
+                } else {
+                    oRadioGroup.setVisible(true); // Show the radio button group when PF is not applicable
+                    oRadioGroup.setSelectedIndex(0);
+                }
+            },
+
             onPressAppraisalClose: function () {
+                sap.ui.getCore().byId("AF_id_CTC").setValue("")
+                sap.ui.getCore().byId("AF_idTextCTC").setText("")
+                sap.ui.getCore().byId("AE_idTextVP").setText("")
+                sap.ui.getCore().byId("AF_id_CTC").setValueState("None");
+                sap.ui.getCore().byId("AF_id_VariablePay").setValueState("None")
                 this.Appraisal.close();
             },
 
@@ -1375,15 +1577,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
             EOD_validateAmount: function (oEvent) {
                 var CTCType = sap.ui.getCore().byId("ED_Frg_idAppraisalType")._getSelectedItemText();
-                this.CommonCalculation();
                 if (CTCType === 'Percentage') {
                     utils._LCvalidateTraineeAmount(oEvent);
                 } else {
                     utils._LCvalidateCTC(oEvent);
                 }
+                this.CommonCalculation();
             },
 
-            CommonCalculation: function () {
+            CommonCalculation:async function () {
                 var AppraisalModel = this.getView().getModel("AppraisalModel");
                 var salaryData = this.getView().getModel("salaryData").getData();
 
@@ -1404,6 +1606,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var variablePay = AppraisalModel.getProperty("/VariablePay");
                 this.getView().getModel("employeeModel").setProperty("/VariablePercentage", variablePay);
                 this._calculateSalaryComponents(type);
+                AppraisalModel.setProperty("/TotalCTC", this.Formatter.fromatNumber(NewCTC));
+                AppraisalModel.setProperty("/TotalVariablePay", this.Formatter.fromatNumber(this.getView().getModel("employeeModel").getData().VariablePay));
             },
             EOD_validatevariable: function (oEvent) {
                 utils._LCvalidateVariablePay(oEvent);
@@ -1447,15 +1651,13 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             onSelectChange: function (oEvent) {
+                // Validate CTC based on selected type      
                 oEvent.getSource().getSelectedItem().getText() === "Percentage" ? utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("AF_id_CTC"), "ID")
                     : utils._LCvalidateAmount(sap.ui.getCore().byId("AF_id_CTC"), "ID");
             },
 
-            EOD_validateAmountAppraisal: function (oEvent) {
-                utils._LCvalidateAmount(oEvent);
-            },
-
             onPressAppraisalSave: async function () {
+                await this.CommonCalculation();
                 var oSelect = sap.ui.getCore().byId("ED_Frg_idAppraisalType");
                 var CTCType = oSelect.getSelectedItem().getText();
 
@@ -1519,7 +1721,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             <div style="text-align: justify;">
                 <p> This is to certify that <b>${empName}</b> with Employee ID <b>${empID}</b> has worked with our company <b>${this.companyName}</b> as a <b>${empDesig}</b> from <b>${joiningDate}</b> to <b>${date}</b>. During his tenure with us his contributions to the organization are highly appreciated. He possesses good moral values and the right attitude</p> 
                 <p>With reference to your resignation, you stand relieved from the services of ${this.companyName} with effect from the close of working hours <b>${relievingDate}</b>. We would like you to continue to be bound by the conditions of confidentiality and other relevant terms of the employment agreement you signed with ${this.companyName}</p>
-                <p>Wishing you all the best in your future endeavors</p>
+                <p>Wishing you all the best in your future endeavors.</p>
             </div>`;
                 this.getView().getModel("PDFData").setProperty("/RTEText", data);
                 this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
@@ -1544,14 +1746,255 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
             },
 
-            FCR_onDownloadPDF: function () {
+            SS_onDownloadWorkLetter: function () {
+                var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var today = new Date();
+                var date = Formatter.formatDate(today);
+                var joiningDate = Formatter.formatDate(oEmpModel.JoiningDate);
+                var empName = oEmpModel.Salutation + " " + oEmpModel.EmployeeName;
+                var empDesig = oEmpModel.Designation;
+                var empID = oEmpModel.EmployeeID;
+                this.getView().getModel("PDFData").setProperty("/CreateDate", date);
+                this.getView().getModel("PDFData").setProperty("/CertificateTitle", "WORK LETTER");
+                var data = `
+                <div style="text-align: justify;">
+                    <p>This is to certify that <b>${empName}</b>, holding <b>${empID}</b>, was employed with <b>${this.companyName}</b> as a <b>${empDesig}</b> from <b>${joiningDate}</b> to <b>${date}</b> During their tenure with us, they exhibited a high level of professionalism, dedication, and a strong sense of responsibility towards assigned tasks. They consistently met project deadlines, and contributed positively to the success of the team.</p> 
+                    <p>${empName} demonstrated sound technical knowledge and excellent interpersonal skills. Maintained good relationships with colleagues, clients, actively participated in various organizational activities.</p>
+                    <p>We thank ${empName} for their services and wish them all the very best in their future endeavors.</p>
+                </div>`;
+
+                this.getView().getModel("PDFData").setProperty("/RTEText", data);
+                this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
+            },
+
+            SS_onDownloadSalLetter: function () {
+                var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var today = new Date();
+                var date = Formatter.formatDate(today);
+                var joiningDate = Formatter.formatDate(oEmpModel.JoiningDate);
+                var empID = oEmpModel.EmployeeID;
+                var empDesig = oEmpModel.Designation;
+                var department = oEmpModel.Department;
+                var empName = oEmpModel.Salutation + " " + oEmpModel.EmployeeName;
+                this.getView().getModel("PDFData").setProperty("/CreateDate", date);
+                this.getView().getModel("PDFData").setProperty("/CertificateTitle", "SALARY CERTIFICATE");
+                var data = `
+                <div style="text-align: justify; font-family: Times;">
+                    <p> This is to certify that <b>${empName}</b>, holding the position of <b>${empDesig}</b> with <b>${this.companyName}</b>, has been employed with us since <b>${joiningDate}</b>.</p>
+                    <p> As of the date of this certificate, the details of their current salary structure are as follows: </p>
+                </div>`;
+                this.getView().getModel("PDFData").setProperty("/RTEText", data);
+                this.SS_commonOpenDialog("SSRTE_oDialog", "sap.kt.com.minihrsolution.fragment.CommonRTE");
+            },
+
+            FCR_onDownloadPDF: async function () {
+                try {
+                    const empID = this.getView().getModel("sEmployeeModel").getData()[0].EmployeeID;
+                    const empData = this.getView().getModel("sEmployeeModel").getData()[0];
+                    const salaryResponse = await this.ajaxReadWithJQuery("SalaryDetails", { EmployeeID: empID });
+                    let latestSalary;
+                    if (Array.isArray(salaryResponse.data)) {
+                        const sortedSalaries = salaryResponse.data.sort((a, b) => new Date(a.EffectiveDate) - new Date(b.EffectiveDate));
+                        latestSalary = sortedSalaries[sortedSalaries.length - 1];
+                    } else {
+                        latestSalary = salaryResponse.data;
+                    }
+                    var oPDFModel = this.getView().getModel("PDFData");
+                    oPDFModel.setProperty("/YearlyComponents/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.Total));
+                    oPDFModel.setProperty("/YearlyComponents/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.BasicSalary));
+                    oPDFModel.setProperty("/YearlyComponents/2/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.HRA));
+                    oPDFModel.setProperty("/YearlyComponents/3/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.EmployerPF));
+                    oPDFModel.setProperty("/YearlyComponents/4/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.MedicalInsurance));
+                    oPDFModel.setProperty("/YearlyComponents/5/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.Gratuity));
+                    oPDFModel.setProperty("/Deductions/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.TotalDeduction));
+                    oPDFModel.setProperty("/Deductions/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.IncomeTax));
+                    oPDFModel.setProperty("/Deductions/2/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.EmployeePF));
+                    oPDFModel.setProperty("/Deductions/3/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.PT));
+                    oPDFModel.setProperty("/VariableComponents/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.VariablePay));
+                    oPDFModel.setProperty("/GrossPay/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.GrossPay));
+                    oPDFModel.setProperty("/GrossPay/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.GrossPayMontly));
+                    oPDFModel.setProperty("/EmpCTC", empData.Currency + " " + Formatter.fromatNumber(latestSalary.CostofCompany));
+                } catch (error) {
+                    MessageToast.show("Failed to fetch salary data.");
+                }
                 this.SSRTE_oDialog.close();
-                let htmlContent = sap.ui.getCore().byId("FCR_id_RTE").getValue();
-                this.generateCertificatePDF(htmlContent, this.getView().getModel("sEmployeeModel").getData()[0].BranchCode);
+                var oModel = this.getView().getModel("PDFData").getData();
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: this.getView().getModel("sEmployeeModel").getData()[0].BranchCode });
+                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64) {
+                    try {
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
+
+                        const [logoBase64, signBase64, backgroundBase64] = await Promise.all([
+                            this._convertBLOBToImage(logoBlob),
+                            this._convertBLOBToImage(signBlob),
+                            this._convertBLOBToImage(backgroundBlob)
+                        ]);
+
+                        oCompanyDetailsModel.companylogo64 = logoBase64;
+                        oCompanyDetailsModel.signature64 = signBase64;
+                        oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+                    } catch (err) {
+                        console.error("Image compression failed:", err);
+                        this.closeBusyDialog();
+                    }
+                }
+                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                    if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                        jsPDF._GeneratePDF(this, sap.ui.getCore().byId("FCR_id_RTE").getValue(), oCompanyDetailsModel, oModel);
+                    }
+                }
             },
 
             FCR_onCloseDialog: function () {
                 this.SSRTE_oDialog.close();
+            },
+
+            SS_onDownloadSpotAward: function () {
+                var oView = this.getView();
+                var resetFields = function () {
+                    let aInputIds = ["FSA_id_name", "FSA_id_nominatedName"];
+                    aInputIds.forEach(function (sId) {
+                        let oControl = sap.ui.getCore().byId(sId);
+                        if (oControl) {
+                            oControl.setValueState("None");
+                            oControl.setValue("");
+                        }
+                        let oDatePicker = sap.ui.getCore().byId("FSA_id_Date");
+                        if (oDatePicker) {
+                            let oToday = this.Formatter.formatDate(new Date());
+                            oDatePicker.setValue(oToday);
+                        }
+                    }.bind(this));
+                }.bind(this);
+                if (!this.oDialog) {
+                    sap.ui.core.Fragment.load({
+                        name: "sap.kt.com.minihrsolution.fragment.SpotAward",
+                        controller: this
+                    }).then(function (oDialog) {
+                        this.oDialog = oDialog;
+                        oView.addDependent(this.oDialog);
+                        this.oDialog.attachAfterOpen(resetFields);
+                        this.oDialog.open();
+                    }.bind(this));
+                } else {
+                    resetFields();
+                    this.oDialog.open();
+                }
+            },
+
+            FSA_onPressSubmit: async function () {
+                const oName = sap.ui.getCore().byId("FSA_id_name").getValue();
+                const oNominee = sap.ui.getCore().byId("FSA_id_nominatedName").getValue();
+                const oDate = sap.ui.getCore().byId("FSA_id_Date").getValue();
+                if (!oName || !oNominee || !oDate) {
+                    sap.m.MessageToast.show("Please fill all required fields.");
+                    return;
+                }
+                // const drawDottedLine = function (doc, startX, startY, endX, segmentLength = 0.2, gapLength = 0.15) {
+                //     let x = startX;
+                //     while (x < endX) {
+                //         const nextX = Math.min(x + segmentLength, endX);
+                //         doc.line(x, startY, nextX, startY);
+                //         x = nextX + gapLength;
+                //     }
+                // };
+                // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+                // var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                // let compLogoBase64 = oCompanyDetailsModel.companylogo64;
+                // if (!compLogoBase64 && oCompanyDetailsModel.companylogo?.data) {
+                //     const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo.data)], { type: "image/png" });
+                //     compLogoBase64 = await this._convertBLOBtoBASE64(logoBlob);
+                //     oCompanyDetailsModel.companylogo64 = compLogoBase64; // cache it
+                // }
+                // Initialize jsPDF
+                const doc = new window.jsPDF({
+                    orientation: "landscape",
+                    unit: "cm",
+                    format: "a4"
+                });
+
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageMiddle = pageWidth / 2;
+
+                // const logoWidth = 4;
+                // const logoHeight = 4;
+                // const logoX = pageWidth - logoWidth - 1; // 1 cm right margin
+                // const logoY = 1;
+                // doc.addImage(compLogoBase64, "PNG", logoX, logoY, logoWidth, logoHeight);
+
+                // Add background image (base64)
+                const imgData = this.getView().getModel("PDFData").getProperty("/DemoBase64");
+                doc.addImage(imgData, 0, 0, pageWidth, pageHeight);
+
+                doc.setFont("Arial", "boldnormal");
+                doc.setFontSize(33);
+                doc.text("SPOT AWARD", pageMiddle, 4, { align: "center" });
+
+                doc.setFont("Arial", "normal");
+                doc.setFontSize(25);
+                doc.text("This certificate is proudly presented to", pageMiddle, 6, { align: "center" });
+
+                doc.setFont("times", "bolditalic");
+                doc.setFontSize(30);
+                doc.setTextColor(0, 0, 0);
+                doc.text(oName, pageMiddle, 8.5, { align: "center" });
+                // drawDottedLine(doc, 5.5, 9, pageWidth - 4);
+
+                doc.setFont("times", "normal");
+                doc.setFontSize(15);
+                doc.text(".............................................................................................................", pageMiddle, 9, { align: "center" });
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(15);
+                doc.text("Excellence in overcoming challenges and timely delivery of solution", pageMiddle, 10, { align: "center" });
+                doc.text("in new technology areas.", pageMiddle, 11, { align: "center" });
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(16);
+                doc.text(oNominee, 7, 15, { align: "center" }); // left
+                doc.setFont("times", "normal");
+                doc.setFontSize(15);
+                doc.text("...............................", 7, 15.5, { align: "center" });
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(16);
+                doc.text(oDate, pageMiddle, 15, { align: "center" }); // center
+                doc.setFont("times", "normal");
+                doc.setFontSize(15);
+                doc.text("...............................", pageMiddle, 15.5, { align: "center" });
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(16);
+                doc.text("Kishor Shah", pageWidth - 7, 15, { align: "center" }); // right
+                doc.setFont("times", "normal");
+                doc.setFontSize(15);
+                doc.text("...............................", pageWidth - 7, 15.5, { align: "center" });
+                // Labels
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(12);
+                doc.text("Nominated by", 7, 16, { align: "center" });
+                // drawDottedLine(doc, 2, 15, 4);
+                doc.text("Date", pageMiddle, 16, { align: "center" });
+                // drawDottedLine(doc, pageMiddle - 1.2, 18.0, pageMiddle + 1.2);
+                doc.text("Managing Partner", pageWidth - 7, 16, { align: "center" });
+                // drawDottedLine(doc, pageWidth - 4, 18.0, pageWidth - 3.2);
+
+                // doc.setFont("helvetica", "normal");
+                // doc.setFontSize(15);
+                // doc.text(oNominee, 6.5, 19.5);
+                // doc.text(oDate, pageMiddle, 19.5, { align: "center" });
+                // doc.text("Kishor Shah", 24.5, 19.5,);
+
+                // Save PDF
+                doc.save("SpotAward_Certificate.pdf");
+                this.oDialog.close();
+            },
+
+            FSA_onPressClose: function () {
+                this.oDialog.close();
             },
 
             CC_onPressIdCardDetails: function () {
@@ -1743,34 +2186,88 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.oModel.setProperty("/SelectedFilters", filters);
                 this.getRouter().navTo("RouteNavAdminPaySlipApp");
             },
+
             onApplyResignation: async function () {
-                await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation");
+                await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation", ["RF_id_StartDate", "RF_id_EndDate"]);
+                let oModel = this.getView().getModel("sEmployeeModel");
+                let oData = oModel.getProperty("/0");
+                if (!oData) {
+                    // Data not loaded yet, fetch and retry
+                    await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
+                    oData = oModel.getProperty("/0");
+                }
+                if (oData.ResignationStartDate && oData.ResignationEndDate && oData.ResignComment) {
+                    if(this.sFlag){
+                        this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
+                        this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
+                        this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
+                        this.getView().getModel("viewModel").setProperty("/closeButtonVisible", false)
+                        this.getView().getModel("viewModel").setProperty("/backButtonVisible", true)
+                    }else{
+                        this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
+                        this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
+                        this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
+                        this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
+                        this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
+                    }
+
+                    this._onPressPreview("Initial");
+                } else {
+                    this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
+                    this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
+                    this.getView().getModel("viewModel").setProperty("/BtnVisible", true);
+                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
+                    this.getView().getModel("viewModel").setProperty("/editableResignatin", true)
+                }
+            },
+            RF_onPressbackButton:function(){
+                if(this.sFlag){
+                    this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInbox" });
+                }
             },
             RF_onPressCloseDialog: function () {
-                this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
-                this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+                // Only clear if resignation is NOT applied
+                if (!this.getView().getModel("viewModel").getProperty("/CanWithdrawResignation")) {
+                    // Clear values
+                    sap.ui.getCore().byId("RF_id_StartDate").setValue("");
+                    sap.ui.getCore().byId("RF_id_EndDate").setValue("");
+                    sap.ui.getCore().byId("RF_id_ResignReason").setValue("");
+                    sap.ui.getCore().byId("RF_id_ResignReason").setValueState("None");
+                    // Reset preview
+                    this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
+                    this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+                }
                 this.SSReg_oDialog.close();
             },
             RF_onPressHandlePreview: function () {
                 const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
                 if (bPreviewFlag) {
-                    this._onPressDownload();
+                    this._onPressApplyResign();
                 } else {
-                    this._onPressPreview();
+                    this._onPressPreview("Preview");
                 }
             },
 
             //download certificate
-            _onPressPreview: function () {
-                if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("RF_id_ResignReason"), "ID")) {
-                    MessageToast.show(this.i18nModel.getText("mandatoryFields"));
-                    return;
-                }
+            _onPressPreview: function (flag) {
                 var oEmployeeModel = this.getView().getModel("sEmployeeModel").getData()[0];
+                var startDate = Formatter.formatDate(oEmployeeModel.ResignationStartDate)
+                var endDate = Formatter.formatDate(oEmployeeModel.ResignationEndDate)
+                if (flag !== "Initial") {
+                    if (
+                        !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("RF_id_ResignReason"), "ID") ||
+                        !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_StartDate"), "ID") ||
+                        !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_EndDate"), "ID")
+                    ) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
+
+                    var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue();
+                    var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue();
+                }
                 var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
                 var joinDate = Formatter.formatDate(oEmployeeModel.JoiningDate);
-                var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue();
-                var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue();
                 var resignComment = oEmployeeModel.ResignComment;
                 var designation = oEmployeeModel.Designation;
                 var managerName = oEmployeeModel.ManagerName;
@@ -1781,10 +2278,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     <p>I hope this message finds you well.</p>
                     <p>I <b>${empName}</b> writing to formally resign from my position as <b>${designation}</b> at <b>${this.companyName}</b>, effective <b>${startDate}</b>. My last working day will be <b>${endDate}</b>.</p>
                     <p>I joined this organization on <b>${joinDate}</b>, and it has been an incredibly rewarding journey filled with learning, professional growth, and meaningful relationships. I want to sincerely thank you for your guidance and support throughout my tenure.</p>
-                    <p>The reason of resignation is ${resignComment} </p>
-                    <p>I will do my best during this transition period to ensure a smooth handover of my responsibilities. Please let me know how I can help during this time.</p>
-                </div>`;
-
+                    <p>The reason of resignation is as follows:</p>
+                    <p>${resignComment}</p>                   
+         <p>I will do my best during this transition period to ensure a smooth handover of my responsibilities. Please let me know how I can help during this time.</p>
+        <p>Thanks & Best Regards,<br/>
+        ${empName}<br/>
+        ${designation}<br/>
+        ${this.companyName}</p>
+    </div>
+`;
                 this.getView().getModel("PDFData").setProperty("/RTEText", data);
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
             },
@@ -1792,47 +2294,137 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var oStartDate = oEvent.getSource().getDateValue(); // Get selected Start Date
                 var oEndDatePicker = sap.ui.getCore().byId("RF_id_EndDate");
                 if (oStartDate) {
+                    // Set min date for end date
                     oEndDatePicker.setMinDate(oStartDate);
-                    var oEndDate = oEndDatePicker.getDateValue();
-                    if (oEndDate && oEndDate < oStartDate) {
-                        oEndDatePicker.setValue("");
-                    }
+                    // Calculate 60 days after start date
+                    var oEndDate = new Date(oStartDate);
+                    oEndDate.setDate(oEndDate.getDate() + 60);
+                    // Set the value of End Date picker (format as needed)
+                    var oLocale = sap.ui.getCore().getConfiguration().getFormatSettings().getFormatLocale();
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy", locale: oLocale });
+                    oEndDatePicker.setValue(oDateFormat.format(oEndDate));
                 }
+                utils._LCvalidateDate(oEvent.getSource(), "ID");
             },
-            //generate PDF function
-            _onPressDownload: async function () {
-                this.getBusyDialog();
-                var oRTE = sap.ui.getCore().byId("RF_id_RTE");
-                var oEditor = oRTE._oEditor?.editorManager?.activeEditor;
-                if (oEditor) {
-                    var plainText = oEditor.getContent({ format: 'text' });
-                    var charCount = plainText.length;
-                    var lines = plainText.split(/\r\n|\r|\n/);
-                    var lineCount = lines.length;
-                    console.log("Characters:", charCount, "Lines:", lineCount);
-                } else {
-                    console.warn("Editor not ready yet.");
-                    this.closeBusyDialog();
-                    return;
-                }
-                if (charCount > 1000 || lineCount > 21) {
-                    this.closeBusyDialog();
-                    MessageBox.error("Certificate content exceeds the limit of 1000 characters or 21 lines.");
-                    return;
-                }
-                try {
-                    // Get selected trainee's data from the table
-                    var oEmployeeModel = this.getView().getModel("sEmployeeModel").getData()[0];
-                    this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
-                    let htmlContent = oRTE.getValue();
-                    this.generateCertificatePDF(htmlContent, oEmployeeModel.BranchCode);
-                    this.SSReg_oDialog.close();
-                    this.closeBusyDialog();
-                    this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview</b> to Preview the Certificate</p>");
-                } catch (error) {
-                    this.closeBusyDialog();
-                    MessageToast.show(error.message || error.responseText);
-                }
+            //apply for resignation send mail to manager
+            _onPressApplyResign: async function () {
+                var that = this;
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("confirmTitle"),
+                    this.i18nModel.getText("confirmResgn"),
+                    async function () {
+                        try {
+                            // Validate fields
+                            if (
+                                !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("RF_id_ResignReason"), "ID") ||
+                                !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_StartDate"), "ID") ||
+                                !utils._LCvalidateDate(sap.ui.getCore().byId("RF_id_EndDate"), "ID")
+                            ) {
+                                MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+                                return;
+                            }
+                            var oEmployeeModel = that.getView().getModel("sEmployeeModel").getData()[0];
+                            var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
+                            var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue().split("/").reverse().join("-");
+                            var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue().split("/").reverse().join("-");
+                            var resignComment = sap.ui.getCore().byId("RF_id_ResignReason").getValue();
+                            var subject = `Resignation Notice: ${empName}`;
+                            // Use the RTE content as the email body
+                            var body = sap.ui.getCore().byId("RF_id_RTE").getValue();
+
+                            var oPayload = {
+                                from: oEmployeeModel.CompanyEmailID,
+                                fromName: empName,
+                                to: "",
+                                toName: "",
+                                subject: subject,
+                                body: body,
+                                CC: [oEmployeeModel.CompanyEmailID],
+                                EmployeeID: that.EmployeeID,
+                                ResignationStartDate: startDate,
+                                ResignationEndDate: endDate,
+                                ResignComment: resignComment,
+                                Inbox: oEmployeeModel
+                            };
+                            that.getBusyDialog();
+                            await that.ajaxCreateWithJQuery("ResignationMail", oPayload);
+                            MessageToast.show(that.i18nModel.getText("resignConfirmation"));
+                            // Show Withdraw button (set a flag in your model)
+                            that.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
+                            that.getView().getModel("viewModel").setProperty("/BtnVisible", false);
+                            that.getView().getModel("viewModel").setProperty("/editableResignatin", false)
+                                ;
+                            that.SSReg_oDialog.close();
+                        } catch (error) {
+                            MessageToast.show(error.message || "Failed to send resignation email.");
+                        } finally {
+                            that.closeBusyDialog();
+                        }
+                    },
+                    function () { }
+                );
+            },
+            onWithdrawResignation: async function () {
+                var that = this;
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("confirmTitle"),
+                    this.i18nModel.getText("withdrawConf"),
+                    async function () {
+                        try {
+                            var oEmployeeModel = that.getView().getModel("sEmployeeModel").getData()[0];
+                            var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
+                            var designation = oEmployeeModel.Designation;
+                            var subject = "Confirmation of Resignation Withdrawal";
+
+                            var body = `
+    <div style="text-align: justify; font-family: Arial, sans-serif;">
+        <p>Dear <b>${empName}</b>,</p>
+        <p>We acknowledge receipt of your request to withdraw your resignation from the position of <b>${designation}</b> at <b>${that.companyName}</b>.</p>
+        <p>We are pleased to inform you that your request has been accepted, and your resignation has been officially withdrawn. You will continue in your current role with no change to your employment status or responsibilities.</p>
+        <p>We appreciate your continued commitment to the organization and look forward to your continued contributions.</p>
+        <p>Best regards,<br/>
+        HR Department<br/>
+        ${that.companyName}</p>
+    </div>
+`;
+                            var oPayload = {
+                                isWithdraw: "isWithdraw",
+                                from: oEmployeeModel.CompanyEmailID,
+                                fromName: empName,
+                                to: oEmployeeModel.CompanyEmailID,
+                                to: empName,
+                                subject: subject,
+                                body: body,
+                                CC: [oEmployeeModel.CompanyEmailID],
+                                EmployeeID: that.EmployeeID,
+                                Inbox: oEmployeeModel
+                            };
+                            that.getBusyDialog();
+                            await that.ajaxCreateWithJQuery("ResignationMail", oPayload);
+                            MessageToast.show(that.i18nModel.getText("resignWithdrw"));
+                            that.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
+
+                            // Reset all fields in the resignation fragment
+                            sap.ui.getCore().byId("RF_id_StartDate").setValue("");
+                            sap.ui.getCore().byId("RF_id_EndDate").setValue("");
+                            sap.ui.getCore().byId("RF_id_ResignReason").setValue("");
+                            sap.ui.getCore().byId("RF_id_RTE").setValue(""); // If you want to clear the RTE
+                            that.getView().getModel("viewModel").setProperty("/editableResignatin", true)
+                            // Reset preview flag and text in PDFData model
+                            that.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
+                            that.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+
+                            // Show the preview button again if you have a flag for it
+                            that.getView().getModel("viewModel").setProperty("/BtnVisible", true);
+                            that.SSReg_oDialog.close();
+                        } catch (error) {
+                            MessageToast.show(error.message || "Failed to send withdrawal email.");
+                        } finally {
+                            that.closeBusyDialog();
+                        }
+                    },
+                    function () { }
+                );
             },
             SS_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");

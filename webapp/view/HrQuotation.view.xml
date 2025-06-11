@@ -45,10 +45,44 @@
                                 />
                             </ComboBox>
                         </fb:control>
+                       
+                    </fb:FilterGroupItem>
+                     <fb:FilterGroupItem
+                        name="CustomerName"
+                        label="{i18n>customerName}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                             
+                                items="{path: 'CompanyQuotationModel>/'}"
+                                showClearIcon="true"
+                                id="HQ_id_CustomerName"
+                            >
+                                <core:ListItem
+                                    key="{CompanyQuotationModel>CustomerName}"
+                                    text="{CompanyQuotationModel>CustomerName}"
+                                  
+                                />
+                            </ComboBox>
+                        </fb:control>
+                       
+                    </fb:FilterGroupItem>
+                     <fb:FilterGroupItem
+                        name="Date"
+                        label="{i18n>quotaiodate}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                           <DatePicker id="HQ_id_Quotaiondate" displayFormat="dd/MM/yyyy"/>
+                        </fb:control>
+                       
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
             </fb:FilterBar>
-            <Table
+                <Table
                 items="{path: 'CompanyQuotationModel>/'}"
                 alternateRowColors="true"
                 busyIndicatorDelay="0"
@@ -58,10 +92,10 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="{i18n>quotation}({= ${CompanyQuotationModel>/}.length })" />
+                        <Title text="{i18n>quotaionDetails} ({= ${CompanyQuotationModel>/}.length })" />
                         <ToolbarSpacer />
                         <Button
-                            text="{i18n>create}"
+                            text="{i18n>headerQuotation}"
                             tooltip="{i18n>addQuotation}"
                             press="HQ_onPressAddQuotation"
                             type="Accept"
@@ -73,13 +107,7 @@
                         <Text text="{i18n>quotationNo}" />
                     </Column>
                     <Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
-                        <Text text="{i18n>companyName}" />
-                    </Column>
-                    <Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
-                        <Text text="{i18n>date}" />
-                    </Column>
-                    <Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
-                        <Text text="{i18n>companyGSTNO}" />
+                        <Text text="{i18n>quotaiodate}" />
                     </Column>
                     <Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                         <Text text="{i18n>customerName}" />
@@ -87,16 +115,27 @@
                     <Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                         <Text text="{i18n>customerGSTNO}" />
                     </Column>
+                    <Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>email}" />
+                    </Column>
+                    <Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>mobileNo}" />
+                    </Column>
+                    <Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>pdfTotal}" />
+                    </Column>
                 </columns>
                 <items>
                     <ColumnListItem type="Navigation" press="HQ_onPressQuotation">
                         <cells>
                             <Text text="{CompanyQuotationModel>QuotationNo}" />
-                            <Text text="{CompanyQuotationModel>CompanyName}" />
-                            <Text text="{path:'CompanyQuotationModel>Date',formatter:'.Formatter.formatDate'}" />
-                            <Text text="{CompanyQuotationModel>CompanyGSTNO}" />
+                            <Text text="{path:'CompanyQuotationModel>Date',formatter:'.Formatter.formatDate'}"/>
                             <Text text="{CompanyQuotationModel>CustomerName}" />
                             <Text text="{CompanyQuotationModel>CustomerGSTNO}" />
+                            <Text text="{CompanyQuotationModel>CustomerEmailID}" />
+                            <Text text="{CompanyQuotationModel>CustomerSTDCode} {CompanyQuotationModel>CustomerMobileNo}" />
+                            <Text text="{CompanyQuotationModel>Currency} {path:'CompanyQuotationModel>TotalSum',formatter: '.Formatter.fromatNumber'}"/>
+
                         </cells>
                     </ColumnListItem>
                 </items>

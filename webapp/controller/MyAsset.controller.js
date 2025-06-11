@@ -21,10 +21,19 @@ sap.ui.define([
      this.getRouter().getRoute("MyAsset").attachMatched(this._onRouteMatched, this);
 
       },
-      _onRouteMatched:function(){
+      _onRouteMatched:async function(){
+          var LoginFunction = await this.commonLoginFunction("MyAsset");
+                if (!LoginFunction) return;
+           this.getBusyDialog()
                    this.ajaxReadWithJQuery("IncomeAsset", "Status=Assigned").then((oData) => {
+                    let loginModel = this.getView().getModel("LoginModel").getData();
+
                     var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                   this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "incomeModel");
+                      const filteredData = oFCIAerData.filter(item =>
+                            item.AssignEmployeeID === loginModel.EmployeeID
+                        );
+                   this.getOwnerComponent().setModel(new JSONModel(filteredData), "incomeModel");
+                   this.closeBusyDialog()
                 })
       },
        onPressback: function () {

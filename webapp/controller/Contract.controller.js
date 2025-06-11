@@ -314,11 +314,18 @@ sap.ui.define(
                             oView.addDependent(this.oContractDialog);
                             this.CU_onChangeAggrementDate();
                             this.oContractDialog.open();
+                            this.oContractDialog.open();
+                        this.oContractDialog.attachAfterOpen(function() {
+                            document.activeElement.blur();
+                        });
                         }.bind(this));
                     } else {
                          this._resetDialogFields(); // Reset fields to original data
                         this.CU_onChangeAggrementDate();
-                        this.oContractDialog.open();
+                       this.oContractDialog.open();
+                        this.oContractDialog.attachAfterOpen(function() {
+                            document.activeElement.blur();
+                        });
                     }
                 },
 

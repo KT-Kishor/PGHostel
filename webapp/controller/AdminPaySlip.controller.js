@@ -15,6 +15,7 @@ sap.ui.define([
                 this.AP_onSearch();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.oModel = this.getView().getModel("PaySlip");
+                this.oModel.setProperty("/isRouteLOP", false);
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("paySlipTitle"));
             },
 
@@ -31,7 +32,7 @@ sap.ui.define([
             },
 
             AP_onSearch: async function () {
-                this.getView().byId("AP_id_AdminPaySlipTable").setBusy(true);
+                this.getBusyDialog();
                 var aFilterItems = this.byId("AP_id_AdminPaySlip").getFilterGroupItems();
                 var params = {};
                 aFilterItems.forEach(function (oItem) {
@@ -47,7 +48,7 @@ sap.ui.define([
                     }
                 });
                 await this._commonGETCall("AdminPaySlip", "EmpTable", params);
-                this.getView().byId("AP_id_AdminPaySlipTable").setBusy(false);
+                this.closeBusyDialog();
             },
 
             AP_onClear: function () {

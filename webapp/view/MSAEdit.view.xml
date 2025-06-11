@@ -1,5 +1,4 @@
-<mvc:View
-    controllerName="sap.kt.com.minihrsolution.controller.MSAEdit"
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.MSAEdit"
 	xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
 	xmlns:f="sap.ui.layout.form"
 	xmlns="sap.uxap"
@@ -7,51 +6,23 @@
 	xmlns:layout="sap.ui.layout"
 	xmlns:m="sap.m">
 	<m:Page id="MsaE_id_Page" title="{i18n>msaDetails}" navButtonPress="MsaE_onBack" showNavButton="true">
-		<ObjectPageLayout  busyIndicatorDelay="0"
-            enableLazyLoading="true"
-            useIconTabBar="true"
-            showTitleInHeaderContent="true"
-            upperCaseAnchorBar="false">
+		<ObjectPageLayout busyIndicatorDelay="0" enableLazyLoading="true" useIconTabBar="true" showTitleInHeaderContent="true" id="MsaE_id_ObjectPageLayout" upperCaseAnchorBar="false">
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
 					<actions>
-					<m:Button text="Edit"  type="Transparent" press="MsaE_onEditOrSavePress" />
-						<!-- <m:Button  
-            text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" 
-            type="{= ${simpleForm>/editable} ? 'Accept' : 'Transparent' }" 
-            press="MsaE_onEditOrSavePress" 
-        /> -->
-						<m:Button 
-            text="{i18n>tileFooter}" 
-            enabled="{simpleForm>/isEnabled}" 
-            press="MsaE_onSendEmailMSA" 
-        />
-						<m:Button 
-            text="{i18n>tileUnit}" 
-            enabled="{simpleForm>/isEnabled}"  
-            press="MsaE_onPressMerge"  
-        />
+						<m:Button text="Edit" type="Emphasized" press="MsaE_onEditOrSavePress" />
+						<!-- <m:Button text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" type="{= ${simpleForm>/editable} ? 'Accept' : 'Transparent' }" press="MsaE_onEditOrSavePress" /> -->
+						<m:Button id="MSA" type="Ghost" text="{i18n>msaSendEmail}" enabled="{simpleForm>/isEnabled}" press="MsaE_onSendEmailMSA" />
+						<m:Button type="Attention" text="{i18n>GeneratePDF}" enabled="{simpleForm>/isEnabled}" press="MsaE_onPressMerge" />
 					</actions>
 					<expandedHeading>
-						<m:Title
-                text="{FilteredMsaModel>/0/CompanyName}"
-                wrapping="true"
-            />
+						<m:Title text="{FilteredMsaModel>/0/CompanyName}" wrapping="true" />
 					</expandedHeading>
 					<!-- Snapped Header Title (with Avatar + Title) -->
 					<snappedHeading>
 						<m:FlexBox fitContainer="true" alignItems="Center">
-							<m:Avatar
-                    displayShape="Circle"
-                    displaySize="M"
-                    backgroundColor="Accent1"
-                    initials="{= ${FilteredMsaModel>/0/CompanyName} ? ${FilteredMsaModel>/0/CompanyName}.substring(0,2).toUpperCase() : '' }"
-                    class="sapUiSmallMarginEnd"
-                />
-							<m:Title
-                    text="{FilteredMsaModel>/0/CompanyName}"
-                    wrapping="true"
-                />
+							<m:Avatar displayShape="Circle" displaySize="M" backgroundColor="Accent1" initials="{= ${FilteredMsaModel>/0/CompanyName} ? ${FilteredMsaModel>/0/CompanyName}.substring(0,2).toUpperCase() : '' }" class="sapUiSmallMarginEnd" />
+							<m:Title text="{FilteredMsaModel>/0/CompanyName}" wrapping="true" />
 						</m:FlexBox>
 					</snappedHeading>
 					<!-- Expanded Content -->
@@ -64,10 +35,7 @@
 							<m:Text text="{FilteredMsaModel>/0/PanCard}" />
 							<layout:HorizontalLayout class="sapUiTinyMarginTop">
 								<m:Label text="{i18n>companyHeadName}" showColon="true" />
-								<m:Text
-                        class="sapUiTinyMarginBegin"
-                        text="{FilteredMsaModel>/0/Salutation} {FilteredMsaModel>/0/CompanyHeadName}"
-                    />
+								<m:Text class="sapUiTinyMarginBegin" text="{FilteredMsaModel>/0/Salutation} {FilteredMsaModel>/0/CompanyHeadName}" />
 							</layout:HorizontalLayout>
 						</layout:VerticalLayout>
 					</snappedContent>
@@ -75,106 +43,114 @@
 			</headerTitle>
 			<!-- 3-Column Header Content -->
 			<headerContent>
-				<m:FlexBox
-                    busyIndicatorDelay="0"
-                    id="QF_id_HeaderContent"
-                    wrap="Wrap"
-                    fitContainer="true"
-                >
-					<m:Avatar
-                displayShape="Circle"
-                displaySize="M"
-                backgroundColor="Accent1"
-                initials="{= ${FilteredMsaModel>/0/CompanyName} ? ${FilteredMsaModel>/0/CompanyName}.substring(0,2).toUpperCase() : '' }"
-                class="sapUiLargeMarginEnd"
-            />
-					<layout:VerticalLayout
-                        class="sapUiSmallMarginBottom sapUiSmallMarginEnd"
-                    >
-						<layout:HorizontalLayout
-                            class="sapUiSmallMarginBeginEnd"
-                        >
-							<m:Label showColon="true" text="{i18n>companyHeadName}" />
-							<m:Text text="{FilteredMsaModel>/0/Salutation} {FilteredMsaModel>/0/CompanyHeadName}" />
-						</layout:HorizontalLayout>
-						<layout:HorizontalLayout
-                            class="sapUiSmallMarginBeginEnd"
-                        >
-							<m:Label text="{i18n>companyHeadPosition}" showColon="true" />
-							<m:Text text="{FilteredMsaModel>/0/CompanyHeadPosition}" />
-						</layout:HorizontalLayout>
-						<layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
-							<m:Label text="{i18n>branch}" showColon="true" />
-							<m:Text text="{FilteredMsaModel>/0/BranchCode}" />
-						</layout:HorizontalLayout>
-						<layout:HorizontalLayout
-                            class="sapUiSmallMarginBeginEnd"
-                        >
-							<m:Label text="{i18n>createMSADate}" showColon="true" />
-							<m:Text text="{path:'FilteredMsaModel>/0/CreateMSADate', formatter: '.Formatter.formatDate'}" />
-						</layout:HorizontalLayout>
-					</layout:VerticalLayout>
-					<layout:VerticalLayout
-                        class="sapUiSmallMarginBeginEnd sapUiMediumMarginEnd sapUiSmallMarginBottom"
-                    >
-						<layout:HorizontalLayout>
-							<m:Label text="{i18n>paymentterms}" showColon="true" />
-							<m:Text text="{FilteredMsaModel>/0/PaymentTerms}" />
-						</layout:HorizontalLayout>
-						<layout:HorizontalLayout>
-							<m:Label text="{i18n>contractPeriod}" showColon="true" />
-							<m:Text text="{FilteredMsaModel>/0/ContractPeriod}" />
-						</layout:HorizontalLayout>
-						<layout:HorizontalLayout>
-							<m:Label text="{i18n>panCard}" showColon="true" />
-							<m:Text text="{FilteredMsaModel>/0/PanCard}" />
-						</layout:HorizontalLayout>
-						<layout:HorizontalLayout>
-							<m:Label text="{i18n>emailId}" showColon="true" />
-							<m:Text text="{FilteredMsaModel>/0/MsaEmail}" />
-						</layout:HorizontalLayout>
-						<layout:HorizontalLayout />
-					</layout:VerticalLayout>
-					<layout:VerticalLayout
-                        class="sapUiTinyMarginBottom sapUiSmallMarginBegin"
-                    >
-						<layout:HorizontalLayout>
-							<m:Label text="{i18n>Address}" showColon="true" />
-							<m:Text text="{FilteredMsaModel>/0/Address}" width="300px"
-                            wrapping="true"
-                            wrappingType="Normal" />
-						</layout:HorizontalLayout>
-					</layout:VerticalLayout>
-				</m:FlexBox>
-			</headerContent>
+    <m:FlexBox
+        id="QF_id_HeaderContent"
+        wrap="Wrap"
+        fitContainer="true"
+        class="sapUiMediumMargin headerContentBox"
+        justifyContent="Start"
+        alignItems="Start"
+        busyIndicatorDelay="0"
+    >
+        <!-- Avatar -->
+        <m:Avatar
+            displayShape="Circle"
+            displaySize="M"
+            backgroundColor="Accent1"
+            initials="{= ${FilteredMsaModel>/0/CompanyName} ? ${FilteredMsaModel>/0/CompanyName}.substring(0,2).toUpperCase() : '' }"
+            class="sapUiLargeMarginEnd"
+        />
+
+        <!-- Company Head Info -->
+        <layout:VerticalLayout class="sapUiSmallMarginBottom sapUiSmallMarginEnd ">
+            <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
+                <m:Label showColon="true" text="{i18n>companyHeadName}"  />
+                <m:Text text="{FilteredMsaModel>/0/Salutation} {FilteredMsaModel>/0/CompanyHeadName}" class="sapUiTinyMarginBegin" />
+            </layout:HorizontalLayout>
+            <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
+                <m:Label showColon="true" text="{i18n>companyHeadPosition}" />
+                <m:Text text="{FilteredMsaModel>/0/CompanyHeadPosition}" class="sapUiTinyMarginBegin"/>
+            </layout:HorizontalLayout>
+            <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
+                <m:Label showColon="true" text="{i18n>branch}" />
+                <m:Text text="{FilteredMsaModel>/0/BranchCode}" class="sapUiTinyMarginBegin" />
+            </layout:HorizontalLayout>
+            <layout:HorizontalLayout class="sapUiSmallMarginBeginEnd">
+                <m:Label showColon="true" text="{i18n>createMSADate}" />
+                <m:Text text="{path:'FilteredMsaModel>/0/CreateMSADate', formatter: '.Formatter.formatDate'}" class="sapUiTinyMarginBegin" />
+            </layout:HorizontalLayout>
+        </layout:VerticalLayout>
+
+        <!-- Contract Info -->
+        <layout:VerticalLayout class="sapUiSmallMarginBeginEnd sapUiMediumMarginEnd sapUiSmallMarginBottom sectionBlock">
+            <layout:HorizontalLayout>
+                <m:Label showColon="true" text="{i18n>paymentterms}" />
+                <m:Text text="{FilteredMsaModel>/0/PaymentTerms}" class="sapUiTinyMarginBegin" />
+            </layout:HorizontalLayout>
+            <layout:HorizontalLayout>
+                <m:Label showColon="true" text="{i18n>contractPeriod}" />
+                <m:Text text="{FilteredMsaModel>/0/ContractPeriod}"  class="sapUiTinyMarginBegin"/>
+            </layout:HorizontalLayout>
+            <layout:HorizontalLayout>
+                <m:Label showColon="true" text="{i18n>panCardCommon}" />
+                <m:Text text="{FilteredMsaModel>/0/PanCard}" class="sapUiTinyMarginBegin" />
+            </layout:HorizontalLayout>
+            <layout:HorizontalLayout>
+                <m:Label showColon="true" text="{i18n>emailId}" />
+                <m:Text text="{FilteredMsaModel>/0/MsaEmail}" class="sapUiTinyMarginBegin"/>
+            </layout:HorizontalLayout>
+        </layout:VerticalLayout>
+
+        <!-- Address -->
+        <layout:VerticalLayout class="sapUiTinyMarginBottom sapUiSmallMarginBegin ">
+            <layout:HorizontalLayout>
+                <m:Label showColon="true" text="{i18n>Address}" />
+                <m:Text
+                    text="{FilteredMsaModel>/0/Address}"
+                    width="300px"
+                    wrapping="true"
+                    wrappingType="Normal"
+					class="sapUiTinyMarginBegin"
+                />
+				
+            </layout:HorizontalLayout>
+			<layout:HorizontalLayout>
+                <m:Label showColon="true" text="{i18n>type}" />
+                <m:Text
+                    text="{FilteredMsaModel>/0/Type}"
+					class="sapUiTinyMarginBegin"
+                />
+				
+            </layout:HorizontalLayout>
+        </layout:VerticalLayout>
+    </m:FlexBox>
+</headerContent>
+
 			<sections>
-				<ObjectPageSection titleUppercase="false" title="Sow Details">
+				<ObjectPageSection titleUppercase="false" title="Sow Details" showTitle="false" id="MsaE_id_SowDetailsSection">
 					<subSections>
 						<ObjectPageSubSection title=" " titleUppercase="false">
 							<blocks>
-								<m:Table items="{path:'SowReadModel>/',sorter: {path: 'SowID',descending: false,group: true}}"  busyIndicatorDelay="0" id="Sow_Id_ReadTable"  mode="SingleSelectLeft" selectionChange="onPressChangeSow">
+								<m:Table items="{path:'SowReadModel>/',sorter: {path: 'SowID',descending: false,group: true}}" busyIndicatorDelay="0" id="Sow_Id_ReadTable" mode="SingleSelectLeft" selectionChange="onPressChangeSow">
 									<m:headerToolbar>
 										<m:OverflowToolbar>
-											<m:Title text="{i18n>sowTitle}"/>
+											<m:Title text="{i18n>sowTitle} ({= ${SowReadModel>/}.length })"/>
 											<m:ToolbarSpacer />
-											<!-- <m:ToolbarSeparator /> -->
 											<m:ComboBox id="MsaE_id_SowStatus" items="{SowStatusModel>/SowStatus}" width="10%" change="MsaE_onChangeSowStatus">
 												<core:Item key="{SowStatusModel>ID}" text="{SowStatusModel>Status}" />
 											</m:ComboBox>
 											<m:ToolbarSeparator />
+											<m:Button text="{i18n>addSOW}" type="Accept" press="MsaE_onPressCreateSow" />
+											<m:ToolbarSeparator />
 											<m:Button icon="sap-icon://action" text="Actions" press="onOpenActionSheet"/>
-											
 										</m:OverflowToolbar>
 									</m:headerToolbar>
 									<m:columns>
 										<m:Column demandPopin="true">
-											<m:Text text="{i18n>sowId}"/>
-										</m:Column>
-										<m:Column demandPopin="true">
 											<m:Text text="{i18n>consultantName}" />
 										</m:Column>
 										<m:Column minScreenWidth="Tablet" demandPopin="true">
-											<m:Text text="{i18n>assignmentDes}" />
+											<m:Text text="{i18n>desc}" />
 										</m:Column>
 										<m:Column minScreenWidth="Desktop" demandPopin="true">
 											<m:Text text="{i18n>startDate}" />
@@ -192,7 +168,6 @@
 									<m:items>
 										<m:ColumnListItem >
 											<m:cells>
-												<m:Text text="{SowReadModel>SowID}"/>
 												<m:Text text="{SowReadModel>ConsultantName}"/>
 												<m:Text text="{SowReadModel>Description}"/>
 												<m:Text text="{path:'SowReadModel>StartDate',formatter: '.Formatter.formatDate'}"/>
@@ -207,7 +182,7 @@
 						</ObjectPageSubSection>
 					</subSections>
 				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" title="PO">
+				<!-- <ObjectPageSection titleUppercase="false" title="PO">
 					<subSections>
 						<ObjectPageSubSection title=" " titleUppercase="false">
 							<blocks>
@@ -215,7 +190,7 @@
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
-				</ObjectPageSection>
+				</ObjectPageSection> -->
 			</sections>
 		</ObjectPageLayout>
 	</m:Page>

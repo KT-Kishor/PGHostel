@@ -14,7 +14,7 @@ sap.ui.define(
           this.getRouter().getRoute("RouteLoginPage").attachMatched(this._onRouteMatched, this);
           const model = new JSONModel({
             // for Database connection
-            url: "https://www.rest.kalpavrikshatechnologies.com/",
+            url: "https://rest.kalpavrikshatechnologies.com/",
             headers: {
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
               password:
@@ -33,6 +33,7 @@ sap.ui.define(
             "userName": "",
             "password": "",
             "otp": "",
+            // "SetUser": "",
             "isPasswordSelected": true,
             "isOtpSelected": false,
             "isPasswordVisible": true,
@@ -50,6 +51,7 @@ sap.ui.define(
             "frgOtp": "",
             "frgOtpValueState": "None",
             "frgOtpVisible": false,
+            // "Setvisibleuser": false,
             "frgNewPassword": "",
             "frgNewPasswordValueState": "None",
             "frgNewPasswordVisible": false,
@@ -59,6 +61,7 @@ sap.ui.define(
           });
           this.getView().setModel(oLoginModel, "LoginViewModel");
           //this.LoginModel = oLoginModel;
+
         },
 
         onpresshome: function () {
@@ -77,6 +80,9 @@ sap.ui.define(
         LP_onpresPassword(oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
+        // FSM_setUsername: function (oEvent) {
+        //   utils._LCvalidateName(oEvent);
+        // },
         //for OTPsend
         LP_onOtppress: async function () {
           const oModel = this.getView().getModel("LoginViewModel");
@@ -175,6 +181,8 @@ sap.ui.define(
                   oLoginModel.setProperty("/EmploymentDetailFolderID", userData.EmploymentDetailFolderID);
                   oLoginModel.setProperty("/BranchCode", userData.BranchCode);
                   oLoginModel.setProperty("/MobileNo", userData.MobileNo);
+                  oLoginModel.setProperty("/RichText", false);
+                  oLoginModel.setProperty("/SimpleForm", true);
 
                   // Reset LoginViewModel
                   oVM.setProperty("/userId", ""); oVM.setProperty("/userName", ""); oVM.setProperty("/otp", ""); oVM.setProperty("/password", ""); oVM.setProperty("/isOtpVisible", false); oVM.setProperty("/isPasswordVisible", false); oVM.setProperty("/isSendOtpVisible", false); oVM.setProperty("/sendOtpText", this.i18nModel.getText("sendOtp")); oVM.setProperty("/isOtpSelected", false); oVM.setProperty("/isPasswordSelected", false); oVM.setProperty("/isForgotPasswordVisible", false);
@@ -269,7 +277,8 @@ sap.ui.define(
         SM_onPressCancle: function () {
           const oFragModel = this.getView().getModel("LoginViewModel");
           // Reset all values and value states in the model
-          oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserIdValueState", "None"); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgUserNameValueState", "None"); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpValueState", "None"); oFragModel.setProperty("/frgOtpVisible", false);
+          oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserIdValueState", "None"); oFragModel.setProperty("/frgUserName", ""); oFragModel.setProperty("/frgUserNameValueState", "None"); oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpValueState", "None"); oFragModel.setProperty("/frgOtpVisible", false); 
+          // oFragModel.setProperty("/Setvisibleuser", false);
           oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgNewPasswordValueState", "None");
           oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgConfirmPasswordValueState", "None"); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
           // Reset value states on input fields themselves
@@ -302,9 +311,9 @@ sap.ui.define(
         LP_onTogglePasswordVisibility: function (oEvent) {
           this.SM_onTogglePasswordVisibility(oEvent)
         },
-        FSM_username: function (oEvent) {
-          utils._LCvalidateName(oEvent);
-        },
+        // FSM_username: function (oEvent) {
+        //   utils._LCvalidateName(oEvent);
+        // },
         FSM_userID: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
@@ -373,6 +382,7 @@ sap.ui.define(
                   sap.ui.getCore().byId("FSM_id_userNameInput").setEditable(false);
                   sap.ui.getCore().byId("FSM_id_otpInput").setEditable(false);
                   oFragModel.setProperty("/frgOtpVerified", true); oFragModel.setProperty("/frgNewPasswordVisible", true); oFragModel.setProperty("/frgConfirmPasswordVisible", true);
+                  //  oFragModel.setProperty("/Setvisibleuser", true);
                 } else {
                   this.closeBusyDialog();
                   MessageToast.show(this.i18nModel.getText("invalidOTP"));
@@ -396,12 +406,11 @@ sap.ui.define(
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
             return;
           }
-
           if (oFragModel.getProperty("/frgNewPassword") !== oFragModel.getProperty("/frgConfirmPassword")) {
             MessageToast.show(this.i18nModel.getText("misPasswords"));
             return;
           }
-
+           //  EmployeeName: sap.ui.getCore().byId("FSM_id_setusername").getValue()
           try {
             this.getBusyDialog();
             await this.ajaxUpdateWithJQuery("LoginDetails", {
@@ -416,7 +425,9 @@ sap.ui.define(
                 sap.ui.getCore().byId("FSM_id_SaveBTN").setText(this.i18nModel.getText("continue"));
                 sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
                 oFragModel.setProperty("/frgUserId", ""); oFragModel.setProperty("/frgUserName", "");
-                oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false);
+                oFragModel.setProperty("/frgOtp", ""); oFragModel.setProperty("/frgOtpVisible", false); oFragModel.setProperty("/frgOtpVerified", false); oFragModel.setProperty("/frgNewPassword", ""); oFragModel.setProperty("/frgConfirmPassword", ""); oFragModel.setProperty("/frgNewPasswordVisible", false); oFragModel.setProperty("/frgConfirmPasswordVisible", false); 
+                //  oFragModel.setProperty("/Setvisibleuser", false);
+                //  oFragModel.setProperty("/SetUser", "");
 
                 if (this.oPassforgot) {
                   this.oPassforgot.close();
@@ -439,6 +450,7 @@ sap.ui.define(
         OnOTPverify: function () {
           this.SM_onPressSave()
         },
+
         FSM_onConfirm: function () {
           const oFragModel = this.getView().getModel("LoginViewModel");
           if (oFragModel.getProperty("/frgNewPassword") !== oFragModel.getProperty("/frgConfirmPassword")) {
@@ -448,9 +460,10 @@ sap.ui.define(
           } else {
             sap.ui.getCore().byId("FSM_id_confirmPasswordInput").setValueState("None")
           }
-
-
-        }
+        },
+        FSM_onConfirmPass: function () {
+          this.SM_onPressSave()
+        },
       }
     );
   }

@@ -1,64 +1,78 @@
 sap.ui.define([
-    "./BaseController",  
-    "sap/ui/core/BusyIndicator",  
+    "./BaseController",
 ],
-    function (BaseController,BusyIndicator) {
+    function (BaseController,) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSA", {
             onInit: function () {
                 this.getRouter().getRoute("RouteMSA").attachMatched(this._onRouteMatched, this);
-                this._fetchCommonData("ManageCustomer", "CompanyNameModel");
             },
-            _onRouteMatched: async function () {               
-                var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
-                if (!LoginFUnction) return;
-                await this.MSA_onSearch();
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");            
+            _onRouteMatched: async function () {
+                try {
+                    var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
+                    if (!LoginFUnction) return;
+                    this._fetchCommonData("ManageCustomer", "CompanyNameModel");
+                    await this.MSA_onSearch();
+                    this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");
+                } catch (error) {
+                    sap.m.MessageToast.show(error.message || error.responseText);
+                } finally {
+                    this.closeBusyDialog(); // Close after async call finishes
+                }
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
-            onPressClear:function(){
+            onPressClear: function () {
                 this.byId("MSA_id_CompanyName").setValue('');
-            }, 
+                this.byId("MSA_id_Type").setValue('');
+                this.byId("id_msa_date").setValue('');
+            },
+            MSA_onAddCustomer: function () {
+                this.getRouter().navTo("RouteManageCustomer", { value: "MSA" });
+            },
             onLogout: function () {
                 this.CommonLogoutFunction();
             },
-            MSA_AddmsaDetails:function(){
-                this.getRouter().navTo("RouteMSADetails");                
+            MSA_AddmsaDetails: function () {
+                this.getRouter().navTo("RouteMSADetails");
             },
-                       
-            OnPressNavigationMsaDet:function(oEvent){               
+
+            OnPressNavigationMsaDet: function (oEvent) {
                 var MsaID = oEvent.getSource().getBindingContext("MSADisplayModel").getProperty("MsaID");
-                this.getRouter().navTo("RouteMSAEdit",{sPath:MsaID})
+                this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID })
             },
 
             MSA_onSearch: async function () {
                 try {
                     this.getBusyDialog();
-                    const aFilterItems = this.byId("MSA_id_AdminFilter").getFilterGroupItems();
-                    const params = {};
-            
+                    var aFilterItems = this.byId("MSA_id_AdminFilter").getFilterGroupItems();
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
+                    var params = {};
                     aFilterItems.forEach(function (oItem) {
-                        const oControl = oItem.getControl();
-                        const sKey = oItem.getName();
-            
-                        if (oControl && typeof oControl.getValue === "function") {
-                            const sValue = oControl.getValue().trim();
-            
-                            if (sValue) {
-                                params[sKey] = sValue;
+                        var oControl = oItem.getControl();
+                        var sValue = oItem.getName();
+                        if (oControl && oControl.getValue()) {
+                            if (sValue === "CreateMSADate") {
+                                params["StartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
+                                params["EndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
+                            } else {
+                                params[sValue] = oControl.getValue();
                             }
                         }
                     });
-                    await this._fetchCommonData("MSADetails", "MSADisplayModel", params);					
-            
+                    if (params && Object.keys(params).length > 0) {
+                        this.Filter = false;
+                    }
+                    await this._fetchCommonData("MSADetails", "MSADisplayModel", params);
+                    this.closeBusyDialog();
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
                     this.closeBusyDialog();
                 }
             },
+
 
         });
     });

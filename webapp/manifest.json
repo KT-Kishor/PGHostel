@@ -193,6 +193,16 @@
                 "uri":"model/STDCode.json",
                 "preload":true
             },
+            "SowStatusModel": {
+                "type":"sap.ui.model.json.JSONModel",
+                "uri":"model/SowFilter.json",
+                "preload":true
+            },
+            "InvoiceSAC": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/InvoiceSAC.json",
+                "preload": true
+            },
             "StatusEmp": {
                 "type":"sap.ui.model.json.JSONModel",
                 "uri":"model/StatusEmp.json",
@@ -221,6 +231,11 @@
             "TravelAllowance": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TravelAllowance.json",
+                "preload": true
+            },
+            "ContractPeriodThree": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/ThreeMonthGap.json",
                 "preload": true
             },
             "PaySlip": {
@@ -370,7 +385,7 @@
                 },
                 {
                     "name": "SelfService",
-                    "pattern": "SelfService/{sPath}",
+                    "pattern": "SelfService/{sPath}/{Role}",
                     "target": [
                         "SelfServiceTarget"
                     ]
@@ -398,7 +413,7 @@
                 },
                 {
                     "name": "RouteCompanyInvoice",
-                    "pattern": "CompanyInvoice/{sPath}",
+                    "pattern": "CompanyInvoice",
                     "target": [
                         "TargetCompanyInvoice"
                     ]
@@ -591,6 +606,20 @@
                     "target":[
                         "TargetMyAsset"
                     ]
+                },
+                 {
+                    "name":"PurchaseOrder",
+                    "pattern": "PurchaseOrder",
+                    "target":[
+                        "TargetPurchaseOrder"
+                    ]
+                },
+                   {
+                    "name":"PurchaseOrderObject",
+                    "pattern": "PurchaseOrderObjectPage/{sPath}",
+                    "target":[
+                        "TargetPurchaseOrderObject"
+                    ]
                 }
 
             ],
@@ -607,6 +636,15 @@
                     "id": "MyAsset",
                     "name": "MyAsset"
                 },
+                "TargetPurchaseOrder": {
+                    "id": "PurchaseOrder",
+                    "name": "PurchaseOrder"
+                },
+                "TargetPurchaseOrderObject": {
+                    "id": "PurchaseOrderObject",
+                    "name": "PurchaseOrderObject"
+                },
+
                 "TargetHomePage": {
                     "viewType": "XML",
                     "transition": "slide",

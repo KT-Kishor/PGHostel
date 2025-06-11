@@ -13,10 +13,11 @@ sap.ui.define([
       },
 
       _onRouteMatched: async function (oEvent) {
-        this.commonLoginFunction("Customer"); // Call common login function
+        var LoginFUnction = await this.commonLoginFunction("Customer");
+        if (!LoginFUnction) return;
         this.getBusyDialog(); // Show busy dialog
-        await this._fetchCommonData("Country", "CountryModel"); 
-         await this._fetchCommonData("BaseLocation", "BaseLocationModel");
+        await this._fetchCommonData("Country", "CountryModel");
+        await this._fetchCommonData("BaseLocation", "BaseLocationModel");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
         this.byId("MC_id_CustTable").removeSelections(true); // Clear table selection
         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerCustomer")); // Set header name
@@ -110,6 +111,12 @@ sap.ui.define([
         sap.ui.getCore().byId("MC_id_codeModel").setValueState("None");
         sap.ui.getCore().byId("MC_id_CustAddress").setValueState("None");
         if (bIsEdit && this._originalCustomerData) {
+          this._originalCustomerData.stdCode !== "" ? this._originalCustomerData.stdCode : "+91"; 
+          this._originalCustomerData.GST !== null ? this._originalCustomerData.GST : ""; 
+          this._originalCustomerData.LUT !== null ? this._originalCustomerData.LUT : ""; 
+          this._originalCustomerData.mobileNo !== null ? this._originalCustomerData.mobileNo : ""; 
+          this._originalCustomerData.type !== null ? this._originalCustomerData.type : ""; 
+          this._originalCustomerData.value !== null ? this._originalCustomerData.value : ""; 
           this.getView().getModel("CustomerModel").setData(JSON.parse(JSON.stringify(this._originalCustomerData)));
         } // Reset fields to original data
       },
@@ -160,41 +167,56 @@ sap.ui.define([
       },
 
       // Validate STDCode on Input
-       MC_ValidateComboBox: function (oEvent) {
-         var oInput = oEvent.getSource();
-          utils._LCstrictValidationComboBox(oEvent);
-          if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+      MC_ValidateComboBox: function (oEvent) {
+        var oInput = oEvent.getSource();
+        utils._LCstrictValidationComboBox(oEvent);
+        if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
       },
 
       // Validate GST Number on Input
       MC_ValidateGstNumber: function (oEvent) {
-        // Get input field and its value
         const oInput = sap.ui.getCore().byId("MC_id_CustomGst");
         const sInputValue = oInput.getValue();
-        // Get models
         const dataModel = this.getView().getModel("CustomerModel");
         const visiModel = this.getView().getModel("visiblePlay");
-        // GST regex pattern
+
+        // GST regex
         const testPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]{1}Z[0-9A-Z]{1}$/;
-        // Case: Valid GST Number
+
         if (testPattern.test(sInputValue) && sInputValue) {
           visiModel.setProperty("/CC_id_CustInput", true);
-          // Set tax values based on selected index
-          const isIGST = visiModel.getProperty("/selectedIndex") === 1;
-          dataModel.setProperty("/value", isIGST ? "18" : "9");
-          dataModel.setProperty("/type", isIGST ? "IGST" : "CGST/SGST");
+
+          // Extract first 2 digits (state code)
+          const stateCode = sInputValue.substring(0, 2);
+
+          // If state code is 29 (Karnataka)
+          if (stateCode === "29") {
+            sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(0);
+            // visiModel.setProperty("/isRadioEditable", false); // Make radios non-editable
+            dataModel.setProperty("/value", "9");
+            dataModel.setProperty("/type", "CGST/SGST");
+          } else {
+            sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(1);
+            // visiModel.setProperty("/isRadioEditable", false); // Allow change
+            // visiModel.setProperty("/isRadioEditable", false); // Make radios non-editable
+            dataModel.setProperty("/value", "18" );
+            dataModel.setProperty("/type", "IGST");
+          }
+
           oInput.setValueState("None");
-          // Case: Empty input
         } else if (!sInputValue) {
+          // Empty input
           dataModel.setProperty("/value", "0");
           dataModel.setProperty("/type", "");
           oInput.setValueState("None");
           visiModel.setProperty("/CC_id_CustInput", false);
-          // Case: Invalid GST format
+          // visiModel.setProperty("/isRadioEditable", true);
         } else {
+          // Invalid GST
           visiModel.setProperty("/CC_id_CustInput", false);
           oInput.setValueState("Error");
           oInput.setValueStateText(this.i18nModel.getText("gstNoValueState"));
+          // visiModel.setProperty("/isRadioEditable", true);
         }
       },
 
@@ -208,7 +230,7 @@ sap.ui.define([
       // Validate PAN Card on Input
       MC_ValidatePanCard: function (oEvent) {
         var oInput = oEvent.getSource();
-        utils._LCvalidatePanCard(oEvent);
+        utils._LCvalidateMandatoryField(oEvent);
         if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
       },
 
@@ -219,38 +241,38 @@ sap.ui.define([
         if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
       },
 
-       MC_onBaseLocationChange: function (oEvent) {
+      MC_onBaseLocationChange: function (oEvent) {
         utils._LCstrictValidationComboBox(oEvent);
       },
 
       MC_onChangeCountry: function (oEvent) {
-          utils._LCstrictValidationComboBox(oEvent, "oEvent");
+        utils._LCstrictValidationComboBox(oEvent, "oEvent");
 
-          const oSource = oEvent.getSource();
-          const selectedKey = oSource.getSelectedKey?.();
-          const oModel = this.getView().getModel("CustomerModel");
+        const oSource = oEvent.getSource();
+        const selectedKey = oSource.getSelectedKey?.();
+        const oModel = this.getView().getModel("CustomerModel");
 
-          // Also handle related dropdowns (calling code & base city)
-          this.onCountryChange(oEvent, { 
-              stdCodeCombo: "MC_id_codeModel", 
-              baseLocationCombo: "MC_id_BaseCity" ,
-              mobileInput: "MC_id_CustMob" 
-          });
+        // Also handle related dropdowns (calling code & base city)
+        this.onCountryChange(oEvent, {
+          stdCodeCombo: "MC_id_codeModel",
+          baseLocationCombo: "MC_id_BaseCity",
+          mobileInput: "MC_id_CustMob"
+        });
 
-          if (oModel) {
-              if (selectedKey) {
-                  oModel.setProperty("/country", selectedKey);
+        if (oModel) {
+          if (selectedKey) {
+            oModel.setProperty("/country", selectedKey);
 
-                  const oCodeCombo = this.byId("MC_id_codeModel");
-                  const stdCodeValue = oCodeCombo ? oCodeCombo.getSelectedKey() : "";
-                  oModel.setProperty("/stdCode", stdCodeValue);
-              } else {
-                  oModel.setProperty("/country", "");
-                  oModel.setProperty("/stdCode", "");
-              }
-
-              oSource.setValueState("None");
+            const oCodeCombo = this.byId("MC_id_codeModel");
+            const stdCodeValue = oCodeCombo ? oCodeCombo.getSelectedKey() : "";
+            oModel.setProperty("/stdCode", stdCodeValue);
+          } else {
+            oModel.setProperty("/country", "");
+            oModel.setProperty("/stdCode", "");
           }
+
+          oSource.setValueState("None");
+        }
       },
 
       // Submit Customer Data
@@ -274,7 +296,7 @@ sap.ui.define([
           var oData = this.getView().getModel("CustomerModel").getData();
           var isValid = true;
           // Optional Field Validations
-          if (oData.PAN && !utils._LCvalidatePanCard(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
+          if (oData.PAN && !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
           if (oData.GST && !utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID")) isValid = false;
           if (oData.mobileNo && !utils._LCvalidateMobileNumber(sap.ui.getCore().byId("MC_id_CustMob"), "ID")) isValid = false;
           if (oData.LUT && !utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID")) isValid = false;
@@ -335,7 +357,7 @@ sap.ui.define([
           var sCustomerId = oSelectedItem.getBindingContext("CreateCustomerModel").getProperty("ID");
           var isValid = true;
           // Optional Field Validations
-          if (oUpdatedData.PAN && !utils._LCvalidatePanCard(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
+          if (oUpdatedData.PAN && !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
           if (oUpdatedData.GST && !utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID")) isValid = false;
           if (oUpdatedData.mobileNo && !utils._LCvalidateMobileNumber(sap.ui.getCore().byId("MC_id_CustMob"), "ID")) isValid = false;
           if (oUpdatedData.LUT && !utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID")) isValid = false;
@@ -449,7 +471,7 @@ sap.ui.define([
           this.closeBusyDialog(); // <-- Close custom BusyDialog
         });
       },
-      
+
       // Handle Table Row Selection - Enable/Disable Buttons
       MC_onTableSelectionChange: function () {
         var aSelectedItems = this.byId("MC_id_CustTable").getSelectedItems();

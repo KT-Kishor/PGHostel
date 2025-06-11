@@ -169,7 +169,7 @@
                 >
                     <subSections>
                         <ObjectPageSubSection
-                            title="{i18n>selectID}"
+                            showTitle="false"
                             visible="{PaySlip>/isCreate}"
                         >
                             <f:SimpleForm
@@ -213,7 +213,7 @@
                             title="{i18n>paySlipStructure}"
                             titleVisible="true"
                         >
-                            <m:VBox >
+                            <m:VBox>
                                 <m:FlexBox
                                     wrap="Wrap"
                                     direction="Row"
@@ -290,6 +290,7 @@
                                                                         change="APD_onAmountChange"
                                                                         textAlign="End"
                                                                         type="Number"
+                                                                        editable="{PaySlip>/isCreate}"
                                                                     />
                                                                     <m:Input
                                                                         value="{PaySlip>YearlyAmount}"
@@ -297,9 +298,9 @@
                                                                         textAlign="End"
                                                                     />
                                                                     <m:Button
-                                                                        icon="sap-icon://delete"
+                                                                        icon="sap-icon://decline"
                                                                         press="APD_onPressDeleteEarningFields"
-                                                                        type="Reject"
+                                                                        type="Transparent"
                                                                         visible="{= ${PaySlip>Flag} === true }"
                                                                     />
                                                                 </m:cells>
@@ -402,6 +403,7 @@
                                                                         change="APD_onAmountChange"
                                                                         textAlign="End"
                                                                         type="Number"
+                                                                        editable="{PaySlip>/isCreate}"
                                                                     />
                                                                     <m:Input
                                                                         value="{PaySlip>YearlyAmount}"
@@ -409,9 +411,9 @@
                                                                         textAlign="End"
                                                                     />
                                                                     <m:Button
-                                                                        icon="sap-icon://delete"
+                                                                        icon="sap-icon://decline"
                                                                         press="APD_onPressDeleteDeductionFields"
-                                                                        type="Reject"
+                                                                        type="Transparent"
                                                                         visible="{= ${PaySlip>Flag} === true }"
                                                                     />
                                                                 </m:cells>
@@ -471,6 +473,20 @@
                     type="XML"
                 />
                 <m:ToolbarSpacer />
+                <m:Button
+                    class="salUploadBtn"
+                    press="APD_onPressViewSalary"
+                    type="Transparent"
+                    text="{i18n>viewsalary}"
+                    visible="{PaySlip>/isIdSelected}"
+                />
+                <m:Button
+                    class="salUploadBtn"
+                    press="APD_onPressViewLOP"
+                    type="Transparent"
+                    text="{i18n>viewLOP}"
+                    visible="{PaySlip>/isIdSelected}"
+                />
                 <m:Button
                     text="{i18n>submit}"
                     type="Emphasized"

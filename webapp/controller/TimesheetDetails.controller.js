@@ -6,14 +6,16 @@ sap.ui.define([
     "sap/ui/unified/DateTypeRange",
     "sap/ui/unified/CalendarDayType",
     "sap/ui/unified/CalendarLegendItem",
-    "sap/ui/core/BusyIndicator"
-], function (BaseController, utils, JSONModel, MessageToast, DateTypeRange, CalendarDayType, CalendarLegendItem, BusyIndicator) {
+], function (BaseController, utils, JSONModel, MessageToast, DateTypeRange, CalendarDayType, CalendarLegendItem) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetDetails", {
         onInit: function () {
             this.getRouter().getRoute("RouteTimesheetDetails").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function (oEvent) {
+            var LoginFunction = await this.commonLoginFunction("Timesheet");
+            if (!LoginFunction) return;
+            this.getBusyDialog();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.branch = this.getOwnerComponent().getModel("LoginModel").getProperty("/BranchCode");
             this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
@@ -31,7 +33,7 @@ sap.ui.define([
             this.sArg = oEvent.getParameter("arguments").sPath;
 
             if (this.sArg !== "Timesheet") {
-                this.readCallTimesheet();
+                await this.readCallTimesheet();
                 // Edit Case
                 oViewModel.setProperty("/isUpdate", true);
                 oViewModel.setProperty("/isCreate", false);
@@ -41,8 +43,25 @@ sap.ui.define([
                 oViewModel.setProperty("/isUpdate", false);
                 oViewModel.setProperty("/isCreate", true);
                 oViewModel.setProperty("/isEditing", true);
-                this.getView().getModel("editModel").setProperty("/editableBut", true);
+                // Set empty newModel for create
+                const emptyData = {
+                    TaskID: "",
+                    TaskName: "",
+                    HoursWorked: "",
+                    EmployeeComments: "",
+                    ActualHours: "",
+                    EmployeeID: this.EmployeeID,
+                    EmployeeName: "",
+                    ManagerName: "",
+                    ManagerID: "",
+                    ManagerComments: ""
+                };
+                this.getView().setModel(new sap.ui.model.json.JSONModel(emptyData), "newModel");
+                if (this.getView().getModel("editModel")) {
+                    this.getView().getModel("editModel").setProperty("/editableBut", true);
+                }
             }
+            this.closeBusyDialog();
         },
 
         readCallTimesheet: async function () {
@@ -54,7 +73,7 @@ sap.ui.define([
                     // Find the selected row using sPath (SrNo)
                     var selectedEntry = offerData.find(entry => entry.SrNo === this.sArg);
                     if (selectedEntry) {
-                        this.getOwnerComponent().setModel(new JSONModel(selectedEntry), "newModel");
+                        this.getView().setModel(new JSONModel(selectedEntry), "newModel");
                     }
                     this.closeBusyDialog();
 
@@ -86,6 +105,16 @@ sap.ui.define([
         },
 
         onValueHelpRequest: function () {
+            // Validate that a date is selected before opening the dialog
+            const oCalendar = this.getView().byId("calendar");
+            const selectedDates = oCalendar ? oCalendar.getSelectedDates() : [];
+            const selectedDateObj = selectedDates[0]?.getStartDate();
+
+            if (!selectedDateObj) {
+                MessageToast.show(this.i18nModel.getText("selectDateT") || "Please select a date first.");
+                return;
+            }
+
             if (!this.TSD_oDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.kt.com.minihrsolution.fragment.TimesheetTask",
@@ -151,18 +180,17 @@ sap.ui.define([
                 };
 
                 // Step 5: Submit to backend
-                BusyIndicator.show(0);
-                try {
+                this.getBusyDialog(); try {
                     await this.ajaxCreateWithJQuery("Timesheet", { data: oPayload });
                     MessageToast.show(this.i18nModel.getText("timesheetSuccess"));
                     this.clearTimesheetForm();
                 } catch (backendErr) {
                     MessageToast.show(backendErr.message || backendErr.responseText);
                 } finally {
-                    BusyIndicator.hide();
+                    this.closeBusyDialog();
                 }
             } catch (err) {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             }
         },
@@ -280,22 +308,24 @@ sap.ui.define([
             if (oSelectedItem) {
                 const AllData = oSelectedItem.getBindingContext("AssignModel").getObject();
                 if (AllData) {
-                    // Optional: Show actual hours somewhere in the UI
+                    // Show actual hours in the UI
                     this.getView().getModel("AssignModel").setProperty("/selectedAssignment", AllData.TaskName);
                     this.getView().getModel("AssignModel").setProperty("/HoursWorked", AllData.HoursWorked);
                     this.getView().byId("idTextActHour").setText("Actual Hours: " + (AllData.HoursWorked || "0"));
-                    // Save assignment details into newModel
-                    const oNewModel = new sap.ui.model.json.JSONModel({
-                        TaskID: AllData.TaskID,
-                        TaskName: AllData.TaskName,
-                        EmployeeID: this.EmployeeID,
-                        EmployeeName: AllData.EmployeeName,
-                        ManagerName: AllData.ManagerName,
-                        ManagerID: AllData.ManagerID,
-                        ManagerComments: AllData.ManagerComments || "",
-                        ActualHours: AllData.HoursWorked
-                    });
-                    this.getView().setModel(oNewModel, "newModel");
+
+                    // Merge with existing newModel data (preserve comments, etc.)
+                    var oNewModelData = this.getView().getModel("newModel")?.getData() || {};
+                    oNewModelData.TaskID = AllData.TaskID;
+                    oNewModelData.TaskName = AllData.TaskName;
+                    oNewModelData.HoursWorked = AllData.HoursWorked;
+                    oNewModelData.ActualHours = AllData.HoursWorked;
+                    oNewModelData.EmployeeID = this.EmployeeID;
+                    oNewModelData.EmployeeName = AllData.EmployeeName;
+                    oNewModelData.ManagerName = AllData.ManagerName;
+                    oNewModelData.ManagerID = AllData.ManagerID;
+                    oNewModelData.ManagerComments = AllData.ManagerComments || "";
+
+                    this.getView().getModel("newModel").setData(oNewModelData);
                 } else {
                     console.warn("No data found for selected item.");
                 }
@@ -306,18 +336,16 @@ sap.ui.define([
         TSD_onToggleEdit: function () {
             var oViewModel = this.getView().getModel("viewModel");
             var isEditing = oViewModel.getProperty("/isEditing");
-
             if (isEditing) {
                 // Save action (handle update logic)
                 this.TSD_onUpdate();
             }
-
             // Toggle editing mode
             oViewModel.setProperty("/isEditing", !isEditing);
         },
         TSD_onUpdate: async function () {
             try {
-                //this.getBusyDialog();
+                this.getBusyDialog();
                 var oViewModel = this.getView().getModel("viewModel");
                 var oModel = this.getView().getModel("newModel").getData();
                 oModel = {
@@ -337,11 +365,11 @@ sap.ui.define([
                         this.getView().getModel("newModel").refresh(true);
                     }
                 }).catch((error) => {
-                    // this.closeBusyDialog();
+                    this.closeBusyDialog();
                     MessageToast.show(error.message || error.responseText);
                 });
             } catch (error) {
-                //this.closeBusyDialog();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("technicalError"));
             }
         },

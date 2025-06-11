@@ -6,7 +6,8 @@ sap.ui.define([
     "../model/formatter",
     "sap/m/MessageBox",
     "sap/suite/ui/commons/Timeline",
-    "sap/suite/ui/commons/TimelineItem"
+    "sap/suite/ui/commons/TimelineItem",
+    "sap/collaboration/components/fiori/sharing/attachment/Attachment"
 ],
     function (Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Timeline, TimelineItem) {
         "use strict";
@@ -21,17 +22,20 @@ sap.ui.define([
                 var LoginFUnction = await this.commonLoginFunction("Expense");
                 if (!LoginFUnction) return;
                 this.getBusyDialog();
+                this.scrollToSection("objectPageLayoutExpence", "idExpObjectPageSection");
                 try {
                     this.byId("objectPageLayoutExpence").setHeaderContentPinned(true); /// Header content pinned
                     this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                     this.ExpenseID = oEvent.getParameter("arguments").sPath;
 
                     if (this.ExpenseID.includes("MyInbox")) {
+                        await this._fetchCommonData("Country", "CountryModel");
+                        await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                         this.ExpenseID = this.ExpenseID.split("|")[0];
                         this.MyInBox = true;
                     }
 
-                    this._fetchCommonData("Currency", "CurrencyModel");
+                    if(!this.getView().getModel("CurrencyModel")) await this._fetchCommonData("Currency", "CurrencyModel");
                     await this._fetchCommonData("Expense", "FilteredExpenseModel", {
                         ExpenseID: this.ExpenseID,
                     });
@@ -77,7 +81,8 @@ sap.ui.define([
                     if (this.FilteredExpenseModel[0].TripType !== "Customer Facing") {
                         this.ViewModel.setProperty("/required", false);
                     }
-
+                    var oTokenModel = new JSONModel({ tokens: [] });
+                    this.getView().setModel(oTokenModel, "tokenModel");
                     this.CountryAndCity();
                     this.closeBusyDialog();
                 } catch (error) {
@@ -121,8 +126,8 @@ sap.ui.define([
             },
             //Download Perdiem Declaration
             Exp_Det_onPressExpenseDownload: function () {
-                let fileUrl = window.location.href.split("index")[0] + "/Perdiem_DeclarationForm.doc";
-                sap.m.URLHelper.redirect(fileUrl, true);
+               let fileUrl = window.location.origin.split("index")[0] + "/Perdiem_DeclarationForm.doc";
+            sap.m.URLHelper.redirect(fileUrl, true)
             },
             //Open Fragment in Expeanse Item Create and Update 
             openFragment: function () {
@@ -180,6 +185,7 @@ sap.ui.define([
                 };
                 var oExpenseCreateModel = new JSONModel(jsonExpense);
                 this.getView().setModel(oExpenseCreateModel, "ExpenseCreateModel");
+                this.getView().getModel("tokenModel").setProperty("/tokens", [])
                 this.openFragment();
             },
             //Update Expense Items
@@ -205,17 +211,18 @@ sap.ui.define([
                     Attachment: this.SelectedData.Attachment,
                     AttachmentType: this.SelectedData.AttachmentType,
                     AttachmentName: this.SelectedData.AttachmentName,
+                    TotalAmount: this.SelectedData.ExpenseAmount,
                     Submit: false,
                     Save: true,
                 };
                 var oExpenseCreateModel = new JSONModel(jsonExpense);
                 this.getView().setModel(oExpenseCreateModel, "ExpenseCreateModel");
-                var oTokenizer = sap.ui.getCore().byId("tokenizer");
-                var oNewToken = new sap.m.Token({
-                    text: this.SelectedData.AttachmentName,
-                    key: this.SelectedData.AttachmentName
-                });
-                oTokenizer.addToken(oNewToken);
+                var oModel = this.getView().getModel("tokenModel");
+                // Replace entire token list with just the new one
+                oModel.setProperty("/tokens", [{
+                    key: this.SelectedData.AttachmentName,
+                    text: this.SelectedData.AttachmentName
+                }]);
             },
             // close Fragment
             Exp_Det_onPressClose: function () {
@@ -267,10 +274,12 @@ sap.ui.define([
             //Amount Validation
             LC_ExpAmount: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
+                this.Exp_Frg_onChangeConverstionRate();
             },
             // Conversion Rate validation
             LC_ExpConversionRate: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
+                this.Exp_Frg_onChangeConverstionRate();
             },
             //Comments Validation
             LC_ExpComments: function (oEvent) {
@@ -424,50 +433,68 @@ sap.ui.define([
             },
 
             onBeforeUploadStarts: function (oEvent) {
-                var oTokenizer = sap.ui.getCore().byId("tokenizer");
-                var aTokens = oTokenizer.getTokens();
-                if (aTokens.length >= 1) {
-                    MessageToast.show("Only one file can be uploaded at a time.");
+                const oFile = oEvent.getParameter("files")[0];
+                if (!oFile) {
+                    MessageToast.show("No file selected.");
                     return;
                 }
-                var oFile = oEvent.getParameter("files")[0];
-                if (oFile) {
-                    var reader = new FileReader();
-                    var that = this;
-                    reader.onload = function (e) {
-                        var base64 = e.target.result.split(',')[1];
-                        // Set model data
-                        var oUploadModel = that.getView().getModel("UploadModel");
-                        oUploadModel.setData({
-                            File: base64,
-                            FileName: oFile.name,
-                            FileType: oFile.type
-                        });
-                        // Add token
-                        var oNewToken = new sap.m.Token({
-                            text: oFile.name,
-                            key: oFile.name
-                        });
-                        oTokenizer.addToken(oNewToken);
-                        // Show success message
-                        MessageToast.show("File uploaded successfully: " + oFile.name);
-                    };
-                    reader.readAsDataURL(oFile);
+                const oModel = this.getView().getModel("tokenModel");
+                let aTokens = oModel.getProperty("/tokens") || [];
+
+                // Restrict to one file
+                if (aTokens.length >= 1) {
+                    sap.m.MessageBox.error("Only one file can be uploaded at a time.");
+                    return;
                 }
+
+                const reader = new FileReader();
+                const that = this;
+
+                reader.onload = function (e) {
+                    const base64 = e.target.result.split(',')[1];
+                    const oUploadModel = that.getView().getModel("UploadModel");
+                    if (!oUploadModel) {
+                        that.getView().setModel(new sap.ui.model.json.JSONModel(), "UploadModel");
+                    }
+                    that.getView().getModel("UploadModel").setData({
+                        File: base64,
+                        FileName: oFile.name,
+                        FileType: oFile.type
+                    });
+                    aTokens.push({ key: oFile.name, text: oFile.name });
+                    oModel.setProperty("/tokens", aTokens);
+
+                    MessageToast.show("File uploaded successfully: " + oFile.name);
+                };
+
+                reader.readAsDataURL(oFile);
             },
             onTokenDelete: function (oEvent) {
-                var oTokenizer = oEvent.getSource();
-                // Get the tokens that were requested for deletion
+                // Get the model
+                var oModel = this.getView().getModel("tokenModel");
+                var aTokens = oModel.getProperty("/tokens") || [];
+
+                // Get deleted tokens from event
                 var aTokensToDelete = oEvent.getParameter("tokens");
-                // Remove each token
-                aTokensToDelete.forEach(function (oToken) {
-                    oTokenizer.removeToken(oToken);
+
+                // Filter out deleted tokens
+                aTokensToDelete.forEach(function (oDeletedToken) {
+                    var sKey = oDeletedToken.getKey();
+                    aTokens = aTokens.filter(function (token) {
+                        return token.key !== sKey;
+                    });
                 });
 
-                var oUploadModel = this.getView().getModel("UploadModel");
-                oUploadModel.setProperty("/File", "");
-                oUploadModel.setProperty("/FileName", "");
-                oUploadModel.setProperty("/FileType", "");
+                // Update model
+                oModel.setProperty("/tokens", aTokens);
+
+                // Clear upload model if all tokens are deleted
+                if (aTokens.length === 0) {
+                    var oUploadModel = this.getView().getModel("UploadModel");
+                    oUploadModel.setProperty("/File", "");
+                    oUploadModel.setProperty("/FileName", "");
+                    oUploadModel.setProperty("/FileType", "");
+                }
             },
 
             async Exp_Det_onPressSubmit() {
@@ -475,9 +502,12 @@ sap.ui.define([
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
                 if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Peridiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
                     // ❗ Attachment validation
-                    if (!oUploadModel.File) {
-                        return sap.m.MessageBox.warning("Please upload an attachment before submitting.");
+
+                    var Attachment = this.getView().getModel("tokenModel").getData();
+                    if (!Attachment.tokens || Attachment.tokens.length === 0) {
+                        return sap.m.MessageBox.error(this.i18nModel.getText("expUploadMessage"));
                     }
+
                     var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var oData = {
@@ -526,9 +556,9 @@ sap.ui.define([
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
                 if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
-                    // ❗ Attachment validation
-                    if (!oUploadModel.File) {
-                        return sap.m.MessageBox.warning("Please upload an attachment before submitting.");
+                    var Attachment = this.getView().getModel("tokenModel").getData();
+                    if (!Attachment.tokens.length > 0) {
+                        return sap.m.MessageBox.warning(this.i18nModel.getText("expUploadMessage"));
                     }
                     var oData = {
                         data: {
@@ -558,16 +588,13 @@ sap.ui.define([
                                 this.ExpenseTotalCalculation();
                                 this.ExpenseItem.close();
                                 MessageToast.show(this.i18nModel.getText("expenseUpdateMess"));
-                                // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
                                 this.closeBusyDialog();
                             } else {
                                 MessageToast.show(this.i18nModel.getText("expenseUpdateMessFailed"));
-                                // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
                                 this.closeBusyDialog();
                             }
                         })
                         .catch((oError) => {
-                            // sap.ui.getCore().byId("Exp_id_SimpleFromtwo").setBusy(false);
                             this.closeBusyDialog();
                             MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                         });
@@ -628,13 +655,13 @@ sap.ui.define([
             Exp_Det_onPressSubmitExpenseItems: function () {
                 var that = this;
                 var oModelData = that.getView().getModel("FilteredExpenseModel").getData()[0];
-                // Check if Total Amount is valid
+
                 if (oModelData.TotalAmount <= 0) {
                     return MessageBox.error(that.i18nModel.getText("expenseTotalAmountMess"));
                 }
+
                 var itemExpenses = that.getView().getModel("ItemExpenseModel").getData();
 
-                // Validate Travel Allowance and Per Diem Declaration
                 if (oModelData.TravelAllowance === "YES") {
                     var hasPerDiemDeclaration = itemExpenses.some(function (item) {
                         return item.ItemType === "Peridiem Declaration";
@@ -644,21 +671,44 @@ sap.ui.define([
                         return MessageBox.error(that.i18nModel.getText("expensePerdiemDeclarationValidation"));
                     }
                 }
+
                 // Checkbox for confirmation
                 var checkbox = new sap.m.CheckBox({
                     text: that.i18nModel.getText("expenseSubmittedMess"),
-                    selected: false,
+                    selected: false
                 });
+
+                // TextArea for comments (visible only when status !== "Draft")
+                var commentTextArea = new sap.m.TextArea({
+                    placeholder: that.i18nModel.getText("enterComments"),
+                    rows: 3,
+                    width: "100%",
+                    visible: oModelData.Status !== "Draft",
+                    value: "",
+                    valueState: sap.ui.core.ValueState.None
+                });
+
                 // Dialog for submission confirmation
                 var dialog = new sap.m.Dialog({
                     title: that.i18nModel.getText("confirmTitle"),
                     type: sap.m.DialogType.Message,
-                    content: [checkbox],
+                    content: [checkbox, commentTextArea],
                     beginButton: new sap.m.Button({
                         text: "OK",
                         type: "Accept",
                         press: function () {
                             if (checkbox.getSelected()) {
+                                // 🔴 Validate if comment is required and empty
+                                if (commentTextArea.getVisible() && !commentTextArea.getValue().trim()) {
+                                    commentTextArea.setValueState(sap.ui.core.ValueState.Error);
+                                    commentTextArea.setValueStateText(that.i18nModel.getText("commentsValueState"));
+                                    return;
+                                } else {
+                                    commentTextArea.setValueState(sap.ui.core.ValueState.None); // reset if valid
+                                }
+
+                                var userComment = commentTextArea.getVisible() ? commentTextArea.getValue().trim() : "";
+
                                 var inboxData = {
                                     data: {
                                         ExpenseID: oModelData.ExpenseID,
@@ -669,52 +719,53 @@ sap.ui.define([
                                         ExpStartDate: oModelData.ExpStartDate.split("T")[0],
                                         ExpEndDate: oModelData.ExpEndDate.split("T")[0],
                                         SubmittedDate: that.Formatter.formatDate(new Date()),
-                                        Comments: oModelData.comments[0].Comment,
+                                        Comments: userComment || (oModelData.comments?.[0]?.Comment || ""),
                                         TotalAmount: oModelData.TotalAmount,
                                         Status: oModelData.Status === "Send back by account" ? "Send to account" : "Submitted",
                                         ManagerRemark: oModelData.ManagerRemark,
-                                        AccountingRemark: oModelData.AccountingRemark
+                                        AccountingRemark: oModelData.AccountingRemark,
+                                        Visible :commentTextArea.getVisible()
                                     },
                                     filters: {
                                         ExpenseID: oModelData.ExpenseID
-                                    },
+                                    }
                                 };
+
                                 that.getBusyDialog();
                                 that.ajaxUpdateWithJQuery("Expense", inboxData).then((oData) => {
                                     if (oData) {
+                                        that._fetchCommonData("Expense", "FilteredExpenseModel", {ExpenseID: this.ExpenseID,});
                                         that.ViewModel.setProperty("/status", false);
                                         that.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
                                         dialog.close();
                                         MessageToast.show(that.i18nModel.getText("expenseSubmittedStatus"));
                                         that.closeBusyDialog();
                                     } else {
-                                        MessageToast.show(this.i18nModel.getText("expenseSubmittedStatusFailed"));
+                                        MessageToast.show(that.i18nModel.getText("expenseSubmittedStatusFailed"));
                                         that.closeBusyDialog();
                                     }
-                                })
-                                    .catch((oError) => {
-                                        dialog.close();
-                                        that.closeBusyDialog();
-                                        MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
-                                    });
+                                }).catch((oError) => {
+                                    dialog.close();
+                                    that.closeBusyDialog();
+                                    MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
+                                });
                             } else {
-                                MessageToast.show(
-                                    that.i18nModel.getText("checkboxUnselectedMessage")
-                                );
+                                MessageToast.show(that.i18nModel.getText("checkboxUnselectedMessage"));
                             }
-                        },
+                        }
                     }),
                     endButton: new sap.m.Button({
                         text: "Cancel",
                         type: "Reject",
                         press: function () {
                             dialog.close();
-                        },
+                        }
                     }),
                     afterClose: function () {
                         dialog.destroy();
-                    },
+                    }
                 });
+
                 dialog.open();
             },
 
@@ -727,59 +778,46 @@ sap.ui.define([
                 }
             },
 
-            Exp_Det_onPressOpenFolder: function () {
-                var oModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
-                var folderUrl = `https://workplace.zoho.in/#workdrive_app/home/63sop752ea6e63ddd4a8880466f5ae509b85a/privatespace/sharedwithme/allusers/${oModel.FolderID}`;
-                window.open(folderUrl, "_blank");
-            },
-
-            Exp_Det_onPressNewFolder: async function () {
-                var oData = {
-                    "data": {
-                        FolderID: this.LoginModel.getProperty("/FolderID"),
-                        FolderName: `${this.FilteredExpenseModel[0].ExpenseName} ${this.FilteredExpenseModel[0].ExpStartDate} to ${this.FilteredExpenseModel[0].ExpEndDate}`,
-                        ExpenseID: this.ExpenseID
-                    }
-                }
-                try {
-                    const oCreateResponse = await this.ajaxCreateWithJQuery("NewFolder", oData);
-                    if (oCreateResponse) {
-                        MessageToast.show(this.i18nModel.getText("expenseFolderCreate"));
-                        await this._fetchCommonData("Expense", "FilteredExpenseModel", {
-                            ExpenseID: this.ExpenseID
-                        });
-                    }
-                } catch (oError) {
-                    this.closeBusyDialog();
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                }
-            },
-
             onShowMore: function (oEvent) {
-                var oBindingContext = oEvent.getSource().getBindingContext("ItemExpenseModel");
-                var sFullText = oBindingContext.getObject().Comments;
+                var oContext = oEvent.getSource().getBindingContext("ItemExpenseModel");
+                var oData = oContext.getObject();
+                var oComment = oData.Comments || {}; // Assuming single comment object
 
-                var formattedReferenceData = `
-    <div style="padding: 15px; word-wrap: break-word; max-width: 100%; overflow-wrap: anywhere;">
-        <p>${sFullText}</p>
-    </div>`;
+                var oTimelineItem = new sap.suite.ui.commons.TimelineItem({
+                    dateTime: new Date(oData.ExpenseDate).toLocaleString(),
+                    title: oData.ItemType || "Anonymous",
+                    text: oComment || "No comment provided",
+                    userNameClickable: false,
+                    icon: "sap-icon://comment"
+                });
+
+                var oTimeline = new sap.suite.ui.commons.Timeline({
+                    showHeader: false,
+                    enableBusyIndicator: false,
+                    width: "100%",
+                    sortOldestFirst: true,
+                    enableDoubleSided: false,
+                    content: [oTimelineItem],
+                    showHeaderBar: false
+                });
 
                 var oDialog = new sap.m.Dialog({
-                    title: this.getView().getModel("i18n").getProperty("comments"),
+                    title: "Expense Item Comment",
+                    contentWidth: "25rem",
+                    contentHeight: "15rem",
                     draggable: true,
                     resizable: true,
-                    contentWidth: "500px",
-                    contentHeight: "auto",
-                    content: new sap.ui.core.HTML({
-                        content: formattedReferenceData
-                    }),
-                    beginButton: new sap.m.Button({
-                        text: this.getView().getModel("i18n").getProperty("close"),
+                    content: [oTimeline],
+                    endButton: new sap.m.Button({
+                        text: "Close",
+                        type: "Reject",
                         press: function () {
-                            oDialog.close()
+                            oDialog.close();
+                            oDialog.destroy();
                         }
                     })
                 });
+
                 oDialog.open();
             },
 

@@ -18,23 +18,22 @@ sap.ui.define([
             this.getBusyDialog();
             try {
                 this.LoginModel = this.getView().getModel("LoginModel");
-                if (!this.getView().getModel("BaseLocationModel")) {
-                    this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                    this._fetchCommonData("Country", "CountryModel");
-                    this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
-                    this._fetchCommonData("ManagerFunction", "ManagerModel",{ManagerID: this.LoginModel.getProperty("/EmployeeID")});
-                }
+
+                if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
+                if (!this.getView().getModel("ExpenseTypeModel")) this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
+                if (!this.getView().getModel("ManagerModel")) this._fetchCommonData("ManagerFunction", "ManagerModel", { ManagerID: this.LoginModel.getProperty("/EmployeeID") });
 
                 let today = new Date();
                 let year = today.getFullYear();
                 let startDate, endDate;
 
                 if (today.getMonth() + 1 < 4) {
-                    startDate = new Date(year - 1, 3, 1); 
+                    startDate = new Date(year - 1, 3, 1);
                     endDate = new Date(year, 2, 31);
                 } else {
-                    startDate = new Date(year, 3, 1);     
-                    endDate = new Date(year + 1, 2, 31); 
+                    startDate = new Date(year, 3, 1);
+                    endDate = new Date(year + 1, 2, 31);
                 }
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 var View = new JSONModel({
@@ -42,8 +41,8 @@ sap.ui.define([
                     SubmitBtn: false,
                     required: true,
                     minDate: new Date(),
-                    finacialStart : startDate,
-                    finacialEnd : endDate
+                    finacialStart: startDate,
+                    finacialEnd: endDate
                 });
                 this.getOwnerComponent().setModel(View, "viewModel");
                 this.ViewModel = this.getView().getModel("viewModel");

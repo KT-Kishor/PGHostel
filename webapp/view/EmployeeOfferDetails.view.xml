@@ -30,16 +30,16 @@
                                              items="{Salutation>/salutation}">
 												<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 											</Select>
-											<Label text="{i18n>consultantName}" required="true" />
+											<Label text="{i18n>employeeName}" required="true" />
 											<Input
                                              value="{employeeModel>/ConsultantName}"
-                                             placeholder="{i18n>consultantName}"
+                                             placeholder="{i18n>placeEmpName}"
                                              required="true"
                                              editable="true"
                                              id="EOD_id_Name"
                                              liveChange="EOD_validateName"
                                              maxLength="50"
-                                             valueStateText="{i18n>placeConsultantName}">
+                                             valueStateText="{i18n>placeEmpName}">
 												<layoutData>
 													<l:GridData span="XL4 L4 M6 S9" />
 												</layoutData>
@@ -73,8 +73,8 @@
 											<Label text="{i18n>emailId}" required="true" />
 											<Input value="{employeeModel>/EmployeeEmail}" placeholder="{i18n>placeEmplyeeEmail}" 
                                              id="EOD_id_mail" maxLength="50" liveChange="EOD_validateEmail" valueStateText="{i18n>emailValueState}"/>
-											<Label text="{i18n>consultantAddress}" required="true" />
-											<TextArea value="{employeeModel>/ConsultantAddress}" placeholder="{i18n>consultantAddress}" liveChange="EOD_ValidateCommonFields"
+											<Label text="{i18n>EmpAddress}" required="true" />
+											<TextArea value="{employeeModel>/ConsultantAddress}" placeholder="{i18n>EmpAddress}" liveChange="EOD_ValidateCommonFields"
                                             id="EOD_id_Address" maxLength="120" valueStateText="{i18n>addressValueState}"/>
 											<Label text="{i18n>pinCode}" required="true" />
 											<Input value="{employeeModel>/PinCode}" placeholder="{i18n>enterPinCode}" id="EOD_id_PinCode" liveChange="EOD_validatePinCode" valueStateText="{i18n>enterPinCode}"/>

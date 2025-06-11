@@ -54,14 +54,7 @@
 			</fb:FilterBar>
 
 <Table id="exp_Id_ExpenseTable"
-       items="{
-         path: 'ExpenseModel>/',
-         sorter: {
-           path: 'Status',
-           descending: false,
-           group: true
-         }
-       }"
+       items="{path: 'ExpenseModel>/', sorter: {path: 'Status',descending: false,group: true}}"
        class="sapUiResponsiveMargin"
        growing="true"
        growingThreshold="50"
@@ -97,11 +90,8 @@
 						<Label text="{i18n>totalAmount}" />
 					</Column>
 					<Column  minScreenWidth="Desktop" demandPopin="true">
-						<Label text="{i18n>expReimbursementAmount}"  tooltip="{i18n>expReimbursementAmount}"/>
+						<Label text="{i18n>expReimbursementAmountExp}"  tooltip="{i18n>expReimbursementAmount}"/>
 					</Column>
-					<!-- <Column minScreenWidth="Desktop" demandPopin="true">
-						<Label text="{i18n>status}" />
-					</Column> -->
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Label text="" />
 					</Column>
@@ -109,14 +99,13 @@
 				<items>
 					<ColumnListItem type="Navigation" press="Exp_onCheckExpenseDetails">
 						<cells>
-							<Text text="{ExpenseModel>EmployeeID}" />
+							<ObjectIdentifier title="{ExpenseModel>EmployeeID}" text="{ExpenseModel>EmployeeName}"/>
 							<Text text="{ExpenseModel>ExpenseName}" />
 							<Text text="{path:'ExpenseModel>ExpStartDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{path:'ExpenseModel>ExpEndDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{ExpenseModel>Destination}" />
-							<Text text="{path:'ExpenseModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" />
-							<Text text="{path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />						
-							<!-- <ObjectStatus text="{ExpenseModel>Status}" state="{path:'ExpenseModel>Status', formatter: '.Formatter.formatObjectStatus'}" /> -->
+							<Text text="INR {path:'ExpenseModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" />
+							<Text text="INR {path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />						
 							<Button icon="sap-icon://delete" visible="{= ${ExpenseModel>Status} === 'Draft' }" press="Exp_onPressDeleteExpense" />
 						</cells>
 					</ColumnListItem>

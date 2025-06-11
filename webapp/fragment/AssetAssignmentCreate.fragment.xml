@@ -26,15 +26,15 @@
                     required="true"
                     id="FAA_id_employeeID"
                     showSecondaryValues="true"
-                    items="{EmpModel>/}"    
+                    items="{AdminModel>/}"    
                     change="FAA_onEmpIDChange"
                     value="{myform>/formData/data/AssignEmployeeID}"
                     valueStateText="{i18n>selectEmployeeID}"
                 >
 					<core:ListItem
-                        key="{EmpModel>EmployeeID}"
-                        text="{EmpModel>EmployeeID}"
-                        additionalText="{EmpModel>EmployeeName}"
+                        key="{AdminModel>EmployeeID}"
+                        text="{AdminModel>EmployeeID}"
+                        additionalText="{AdminModel>EmployeeName}"
                     />
 				</ComboBox>
 				<Label text="{i18n>employeeName}" />

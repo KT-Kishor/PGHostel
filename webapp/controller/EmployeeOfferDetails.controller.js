@@ -32,12 +32,13 @@ sap.ui.define([
 
                 // Update the model with sorted data
                 oModel.setData(aData);
-                if (!this.getView().getModel("CurrencyModel")) {
-                    this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
-                    this._fetchCommonData("AppVisibility", "RoleModel") // role get call
-                    this._fetchCommonData("Designation", "DesignationModel");//designation get call
-                    this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
-                }
+                 
+                    if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
+                    if (!this.getView().getModel("RoleModel")) this._fetchCommonData("AppVisibility", "RoleModel") // role get call
+                    if (!this.getView().getModel("DesignationModel")) this._fetchCommonData("Designation", "DesignationModel");//designation get call
+                    if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
+                    if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
+                
                 var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",
@@ -74,7 +75,7 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false, });
                 this.getView().setModel(oViewModel, "viewModel");
-                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOD_id_Location", "EOD_Id_Country", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay", "EOUF_id_VariablePerc", "EOD_id_PinCode", "EOUF_id_PinCode", "EOUF_id_Location", "EUD_Id_Country"].forEach(function (ids) {
+                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOD_id_Location", "EOD_Id_Country", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay", "EOUF_id_VariablePerc", "EOD_id_PinCode", "EOUF_id_PinCode", "EOUF_id_Location", "EUD_Id_Country","EOUF_id_Designation"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 //create case
@@ -98,11 +99,11 @@ sap.ui.define([
                 this.getView().byId("EODF_id_PageUpdate").setVisible(updatePage); // update page visibilty
                 this.getView().byId("EOD_id_Submit").setEnabled(false);
                 this._makeDatePickersReadOnly(["EOD_id_Reldate", "EOD_id_Joindate", "EOUF_id_Reldate", "EOUF_id_Joindate"]); // make date only read
-                if (this.getView().getModel("employeeModel").getProperty("/Salutation") === "Dr.") {
+                const salutation = this.getView().getModel("employeeModel").getProperty("/Salutation");
+                if (salutation === "Dr.") {
                     this.getView().byId("EOD_id_Gender").setEnabled(true);
-                }
-                else {
-                    this.getView().byId("EOD_id_Gender").setEnabled(false);
+                } else if (salutation === "Ms." || salutation === "Mrs.") {
+                    this.getView().getModel("employeeModel").setProperty("/Gender", "Female");
                 }
             },
             //Edit or save in update case
@@ -650,32 +651,6 @@ sap.ui.define([
                         jsPDF._GeneratePDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
                     }
                 }
-            },
-            //Variable pay function
-            EOD_onVariablePayInfoPress: function (oEvent) {
-                if (!this._oPopover) {
-                    this._oPopover = new sap.m.Popover({
-                        contentWidth: "400px",
-                        contentHeight: "auto",
-                        showHeader: false,
-                        placement: sap.m.PlacementType.Bottom,
-                        content: [
-                            new sap.m.VBox({
-                                alignItems: "Center",
-                                justifyContent: "Center",
-                                width: "100%",
-                                items: [
-                                    new sap.m.Text({
-                                        text: this.i18nModel.getText("variablePayMsg"),
-                                        wrapping: true
-                                    })
-                                ]
-                            }).addStyleClass("customPopoverContent")
-                        ]
-                    });
-                    this.getView().addDependent(this._oPopover);
-                }
-                this._oPopover.openBy(oEvent.getSource());
             },
             onSalutationChange: function (oEvent) {
                 this.onSalutationChangeCommon(

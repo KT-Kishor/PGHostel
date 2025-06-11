@@ -7,7 +7,10 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                 this.getRouter().getRoute("RouteTimesheet").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: function () {
+            _onRouteMatched:async function () {
+                var LoginFunction = await this.commonLoginFunction("Timesheet");
+                if (!LoginFunction) return;
+                this.getBusyDialog();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oViewModel = new JSONModel();
                 oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
@@ -30,20 +33,16 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                     sPath: sPath
                 });
             },
-            TSD_ReadTimesheetEntries: async function (filter) {
+              TSD_ReadTimesheetEntries: async function (filter) {
                 try {
-                    //this.getBusyDialog();
-                    await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID }).then((oData) => {
-                        var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                        this.getOwnerComponent().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
-                        this.closeBusyDialog();
-                    }).catch((error) => {
-                        //this.closeBusyDialog();
-                        MessageToast.show(error.message || error.responseText);
-                    });
+                    this.getBusyDialog();
+                    const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: filter },);
+                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    this.getOwnerComponent().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
+                    this.closeBusyDialog();
                 } catch (error) {
-                    // this.closeBusyDialog();
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                    MessageToast.show(error.message || error.responseText);
+                    this.closeBusyDialog();
                 }
             },
 

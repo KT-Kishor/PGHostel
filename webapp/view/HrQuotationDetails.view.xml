@@ -14,27 +14,23 @@
     >
         <ObjectPageLayout
             id="HQD_id_QuotationDetailsPage"
-            enableLazyLoading="true"
-            useIconTabBar="false"
-            
         >
             <sections>
                 <ObjectPageSection
                     id="HQD_id_Section"
+                    title="{i18n>from}"
                     titleUppercase="false"
-                    showTitle="false"
                 >
                     <subSections>
                         <ObjectPageSubSection
                             titleUppercase="false"
-                            title="{i18n>from}"
                         >
                             <blocks>
                                 <f:SimpleForm
                                     editable="true"
                                     layout="ColumnLayout"
                                     labelSpanXL="4"
-                                    labelSpanL="3"
+                                    labelSpanL="3"  
                                     labelSpanM="4"
                                     labelSpanS="12"
                                     columnsXL="2"
@@ -42,9 +38,13 @@
                                     columnsM="1"
                                 >
                                     <f:content>
-                                       
+                                     <m:Label text="{i18n>quotaionNo}" visible="{visiablityPlay>/editVisi}" />
+<m:Input value="{SingleCompanyModel>/QuotationNo}"
+         editable="false"
+         visible="{visiablityPlay>/editVisi}" />
+
                                         <m:Label
-                                            text="{i18n>date}"
+                                            text="{i18n>quotaiodate}"
                                             required="true"
                                         />
                                         <m:DatePicker
@@ -69,6 +69,8 @@
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_QuotationValid"
                                         />
+                                     
+
                                          <m:Label
                                             text="{i18n>expCountry}"
                                             required="true"
@@ -93,15 +95,17 @@
 <m:ComboBox
     id="HQD_id_BranchCode"
     items="{BrachModel>/}" 
-    selectedKey="{SingleCompanyModel>/SelectedBranchCode}"
+    selectedKey="{SingleCompanyModel>/Branch}"
+    value="{SingleCompanyModel>/Branch}"
     change="HQD_onBrachChange"
     editable="{visiablityPlay>/editable}"
      visible="{visiablityPlay>/showBranch}"
+     valueStateText="Enter Branch"
+     showSecondaryValues="true"
 >
-    <core:Item key="{BrachModel>branchCode}" text="{BrachModel>city}" />
+    <core:ListItem key="{BrachModel>branchCode}" text="{BrachModel>city}" additionalText="{BrachModel>branchCode}" />
 </m:ComboBox>
 
-                                     
                                         <m:Label
                                             text="{i18n>companyName}"
                                             required="true"
@@ -125,6 +129,7 @@
                                             items="{codeModel>/}"
                                             filterSecondaryValues="true"
                                             change="HQD_STDCode"
+                                        
                                             editable="{visiablityPlay>/editable}"
                                             valueStateText="{i18n>combovalueState}"
                                         >
@@ -141,6 +146,7 @@
                                             liveChange="HQD_onMNumberLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
+                                        
                                             valueStateText="{i18n>mobileNoValueState}"
                                         />
                                         <m:Label
@@ -156,47 +162,45 @@
                                             maxLength="100"
                                         />
                                        
-                                        
-                                        <m:Label text="{i18n>companyGSTNO}" />
+                                        <m:Label text="{i18n>companyGSTNO}"  required="{QuotationModel>/ShowGSTFields}"/>
                                         <m:Input
                                             value="{SingleCompanyModel>/CompanyGSTNO}"
                                             id="HQD_id_CompGSTNO"
+                                            editable="{visiablityPlay>/editable}"
                                             liveChange="HQD_onComGSTLiveChange"
                                             valueStateText="{i18n>gstNoValueState}"
                                             change="HQD_onChangeGstNo"
-                                            editable="{visiablityPlay>/editable}"
-                                            maxLength="20"
+                                            maxLength="15"
+
                                         />
                                         <m:Label
                                             text="{i18n>type}"
-                                            required="true"
+                                            required="{QuotationModel>/ShowGSTFields}"
                                         />
                                        <m:RadioButton
     text="{i18n>cgst}"
     id="HQD_id_CheckboxCGS"
-    selected="{SingleCompanyModel>/CGSTSelected}"
+    selected="{QuotationModel>/CGSTSelected}"
     select="onSelectCGST"
     editable="{SingleCompanyModel>/gstEditable}"
 />
 <m:RadioButton  
     text="{i18n>igst}"
     id="HQD_id_CheckboxIGS"
-    selected="{SingleCompanyModel>/IGSTSelected}"
+    selected="{QuotationModel>/IGSTSelected}"
     select="onSelectIGST"
     editable="{SingleCompanyModel>/gstEditable}"
 />
-
 <m:Label
     text="{i18n>percentage}"
     required="{QuotationModel>/ShowGSTFields}"
     
 />
-
 <m:Input
     value="{SingleCompanyModel>/Percentage}"
-    liveChange="HQD_onPercentageChange"
+    change="HQD_onPercentageChange"
     editable="{SingleCompanyModel>/gstEditable}"
-    maxLength="10"
+    type="Number"
     valueStateText="{i18n>msaAmountMess}"
     id="HQD_id_Percentage"
    
@@ -208,7 +212,7 @@
                                         />
                                         <m:ComboBox
                                         busyIndicatorDelay="0"
-                                            items="{CurrencyModel>/}"
+                                            items="{codeModel>/}"
                                             width="100%"
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_Curency"
@@ -217,8 +221,8 @@
                                             change="HQD_onCurrencyChange"
                                         >
                                             <core:Item
-                                                key="{CurrencyModel>currency}"
-                                                text="{CurrencyModel>currency}"
+                                                key="{codeModel>currency_code}"
+                                                text="{codeModel>currency_code}"
                                             />
                                         </m:ComboBox>
                                         <m:Label
@@ -238,9 +242,18 @@
                                 </f:SimpleForm>
                             </blocks>
                         </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+
+                 <ObjectPageSection
+                    id="HQD_id_Section1"
+                     title="{i18n>billTo}"
+                    titleUppercase="false"
+                >
+                    <subSections>
                         <ObjectPageSubSection
                             titleUppercase="false"
-                            title="{i18n>billTo}"
+                          
                         >
                             <blocks>
                                 <f:SimpleForm
@@ -274,7 +287,7 @@
                                         <m:Input
                                             value="{SingleCompanyModel>/CustomerEmailID}"
                                             id="HQD_id_CustomerEmailID"
-                                            liveChange="HQD_EmailIDLiveChange"
+                                            liveChange="HQD_EmailIDLiveChange"  
                                             valueStateText="{i18n>emailValueState}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="100"
@@ -286,10 +299,11 @@
                                          <m:ComboBox
                                             value="{SingleCompanyModel>/CustomerSTDCode}"
                                             showSecondaryValues="true"
-                                            id="HQD_id_CustomerNumber"
+                                            id="HQD_id_CustomerNumberSTD"
                                             items="{codeModel>/}"
                                             filterSecondaryValues="true"
                                             change="HQD_STDCode"
+                                         
                                             editable="{visiablityPlay>/editable}"
                                             valueStateText="{i18n>combovalueState}"
                                         >
@@ -306,12 +320,14 @@
                                             valueStateText="{i18n>mobileNoValueState}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
+                                             placeholder="{i18n>mobileNo}"
+                                            
                                         />
                                         <m:Label text="{i18n>customerGSTNO}" />
                                         <m:Input
                                             value="{SingleCompanyModel>/CustomerGSTNO}"
                                             id="HQD_id_InputCustomerGSTNO"
-                                            valueStateText="{i18n>gstNoValueState}"
+                                            valueStateText="GST number should be in proper format (Eg:22AAAAA0000A1Z5)"
                                             liveChange="HQD_onCustomerGSTLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="20"
@@ -334,10 +350,14 @@
                                 </f:SimpleForm>
                             </blocks>
                         </ObjectPageSubSection>
-
+                       
+                    </subSections>
+</ObjectPageSection>
+                        <ObjectPageSection 
+                        title="{i18n>quotationItemDetails}" titleUppercase="false">
+                        <subSections>
                         <ObjectPageSubSection
                             titleUppercase="false"
-                            title="{i18n>quotationItemDetails}"
                         >
                             <blocks>
                                 <m:VBox>
@@ -358,17 +378,17 @@
                                                 />
                                                 <m:ToolbarSpacer />
                                                 <m:Button
-                                                text="{i18n>add}"
+                                                text="{i18n>quotaionitembutton}"
                                                     visible="{visiablityPlay>/editable}"
                                                     tooltip="{i18n>addItem}"
                                                     press="HQD_onPressAddQuotationItem"
-                                                    type="Emphasized"
+                                                    type="Accept"
                                                 />
                                                 
                                             </m:OverflowToolbar>
                                         </m:headerToolbar>
                                         <m:columns>
-                                            <m:Column width="100px" visible="false">
+                                            <m:Column width="100px" visible="false" >
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
@@ -377,7 +397,7 @@
                                                 </m:customData>
                                                 <m:Text text="{i18n>sNo}"  />
                                             </m:Column>
-                                            <m:Column width="300px" >
+                                            <m:Column width="300px" hAlign="Left" demandPopin="true"> 
                                                 <m:customData >
                                                     <core:CustomData
                                                         key="p13nData"
@@ -387,7 +407,7 @@
                                                 <m:Text text="{i18n>item}" />
                                             </m:Column>
                                             <!-- SAC Column -->
-<m:Column id="HQD_id_SAC" visible="{QuotationModel>/ShowSACAndGSTCalculation}">
+<m:Column id="HQD_id_SAC" visible="{QuotationModel>/ShowSACAndGSTCalculation}" hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
     <m:customData>
         <core:CustomData
             key="p13nData"
@@ -398,7 +418,7 @@
 </m:Column>
 
 <!-- GSTCalculation Column -->
-<m:Column id="HQD_id_GSTCalculaton" visible="{QuotationModel>/ShowSACAndGSTCalculation}">
+<m:Column id="HQD_id_GSTCalculaton" visible="{QuotationModel>/ShowSACAndGSTCalculation}" hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
     <m:customData>
         <core:CustomData
             key="p13nData"
@@ -408,7 +428,7 @@
     <m:Text text="{i18n>GSTCalculation}" />
 </m:Column>
 
-                                            <m:Column>
+                                            <m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
@@ -417,7 +437,7 @@
                                                 </m:customData>
                                                 <m:Text text="{i18n>days}" />
                                             </m:Column>
-                                            <m:Column>
+                                            <m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
@@ -428,7 +448,7 @@
                                                     text="{i18n>unitPrice}"
                                                 />
                                             </m:Column>
-                                            <m:Column>
+                                            <m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
@@ -439,7 +459,7 @@
                                                     text="{i18n>discount}"
                                                 />
                                             </m:Column>
-                                            <m:Column>
+                                            <m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
                                                 <m:customData>
                                                     <core:CustomData
                                                         key="p13nData"
@@ -457,7 +477,6 @@
       value="{= ${$index} + 1 }"
       editable="false"
     />
-
     <!-- Item (Column 2) -->
     <m:VBox>
       <m:items>
@@ -466,8 +485,11 @@
           value="{QuotationModel>Description}"
           placeholder="{i18n>itemDescription}"
           editable="{visiablityPlay>/editable}"
-          maxLength="40"
+          maxLength="200"
+        liveChange="HQD_onItemDescriptionLiveChange"
+          id="HQD_id_ItemDescription"
           width="100%"
+          valueStateText="{i18n>itemplaceholder}"
         />
       </m:items>
     </m:VBox>
@@ -479,6 +501,7 @@
       value="{QuotationModel>SAC}"
       editable="{visiablityPlay>/editable}"
       selectedKey="1"
+      id="HQD_id_SACCombo"
       visible="{QuotationModel>/ShowSACAndGSTCalculation}"
     >
       <core:ListItem
@@ -487,17 +510,15 @@
         text="{SACModel>sac}"
       />
     </m:ComboBox>
-
     <!-- GSTCalculation (Column 4) -->
     <m:ComboBox
       value="{QuotationModel>GSTCalculation}"
-      selectedKey="1"
       editable="{visiablityPlay>/editable}"
       change="HQD_onChangeGSTCalculation"
       visible="{QuotationModel>/ShowSACAndGSTCalculation}"
     >
-      <core:Item key="Yes" text="{i18n>yes}" />
-      <core:Item key="No" text="{i18n>no}" />
+      <core:Item key="Yes" text="{i18n>quotaionyes}" />
+      <core:Item key="No" text="{i18n>quotaionno}" />
     </m:ComboBox>
 
     <!-- Days (Column 5) -->
@@ -522,12 +543,15 @@
 
     <!-- Discount (Column 7) -->
     <m:Input
-      value="{QuotationModel>Discount}"
+      value="{path:'QuotationModel>Discount',formatter: '.Formatter.fromatNumber'}"
       editable="{visiablityPlay>/editable}"
       liveChange="HQD_onchangeDiscount"
       maxLength="20"
       textAlign="End"
       type="Text"
+      showValueHelp="true"
+	valueHelpRequest="HQD_onDiscountInfoPress" 
+    valueHelpIconSrc="sap-icon://message-information" 
     />
 
     <!-- Total (Column 8) -->
@@ -567,16 +591,19 @@
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${QuotationItemModel>/SubTotal} > 0  }"
                                             >
-                                                <m:Label
-                                                    text="{i18n>subTotal} ({i18n>Taxable}) ({SingleCompanyModel>/Currency}) :"
-                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-                                                />
-                                                <m:Text
-                                                    text="{path:'QuotationModel>/SubTotal',formatter: '.Formatter.fromatNumber'}"
-                                                    id="HQD_id_Sub"
-                                                    class="amountText"
-                                                    textAlign="End"
-                                                />
+                                               <m:Label
+    text="{i18n>subTotal} ({i18n>Taxable}) ({SingleCompanyModel>/Currency}) :"
+    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+    visible="{= ${QuotationItemModel>/SubTotal} > 0 }"
+/>
+<m:Text
+    text="{path:'QuotationModel>/SubTotal',formatter: '.Formatter.fromatNumber'}"
+    id="HQD_id_Sub"
+    class="amountText"
+    textAlign="End"
+    visible="{= ${QuotationItemModel>/SubTotal} > 0 }"
+/>
+
                                             </m:HBox>
                                           
                                            <!-- CGST -->
@@ -644,33 +671,43 @@
                                             </m:HBox>
                                         </m:VBox>
                                     </m:FlexBox>
+                                     </m:VBox>
+                            </blocks>
+                                     </ObjectPageSubSection>
+                         </subSections>
+                         </ObjectPageSection>
+
+                                    <ObjectPageSection 
+                        title="{i18n>notes}" titleUppercase="false">
+                        <subSections>
+                        <ObjectPageSubSection
+                            titleUppercase="false"
+                        >
+                        <m:VBox   >
                                     <m:Label
                                         text="{i18n>notes}"
                                         required="true"
                                     />
+                                    
                                     <rich:RichTextEditor
                                         value="{SingleCompanyModel>/Notes}"
                                         editable="{visiablityPlay>/editable}"
-                                        class="sapUiContentPadding"
+                                        class="sapUiContentPadding rich-vbox"
                                         width="100%"
                                         id="HQD_id_Notes"
                                         change="HQD_onNotesChange"
                                     />
-                                </m:VBox>
-                            </blocks>
-                        </ObjectPageSubSection>
-                    </subSections>
-                </ObjectPageSection>
+                                    </m:VBox >
+                               
+                         </ObjectPageSubSection>
+                         </subSections>
+                         </ObjectPageSection>
             </sections>
         </ObjectPageLayout>
         <m:footer>
             <m:Toolbar>
     <m:ToolbarSpacer />
-    <!-- <m:HBox justifyContent="Start">
-      
-       <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
-    
-    </m:HBox> -->
+   
     <m:HBox  justifyContent="End">
     
     <m:Button

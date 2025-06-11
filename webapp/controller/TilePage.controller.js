@@ -296,13 +296,13 @@ sap.ui.define(
           this.getRouter().navTo("RouteAdminPaySlip");
         },
         TileV_onpressSelfservice: function () {
-          this.getRouter().navTo("SelfService", { sPath: "SelfService" });
+          this.getRouter().navTo("SelfService", { sPath: "SelfService",Role: "Role" });
         },
         TileV_onpressInbox: function () {
           this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInboxView" });
         },
         TileV_onpressInvoiceApp: function () {
-          this.getRouter().navTo("RouteCompanyInvoice", { sPath: "Invoice" });
+          this.getRouter().navTo("RouteCompanyInvoice");
         },
         TileV_onpressQuotation: function () {
           sap.ui.core.BusyIndicator.show(0);
@@ -359,10 +359,14 @@ sap.ui.define(
         TileV_onPressHrQuotation: function () {
           this.getRouter().navTo("RouteHrQuotation");
         },
-        TileV_MyAsset:function(){
+        TileV_MyAsset: function () {
           this.getRouter().navTo("MyAsset");
 
+        },
+         TileV_onpressPoApp:function(){
+          this.getRouter().navTo("PurchaseOrder");
         }
+        
       }
     );
   }

@@ -85,26 +85,26 @@
 							<Label text="{i18n>joiningDate}"   required="true" />
 							<DatePicker value="{oTraineeDetails>/JoiningDate}" id="TD_id_JoiningDate"  change="TD_validateDate"  displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" valueStateText="{i18n>dateValueState}"/>
 							<Label text="{i18n>expCountry}" required="true"/>
-				            <ComboBox change="TD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="TD_Id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{oTraineeDetails>/Country}" showSecondaryValues="true"  >
+				            <ComboBox change="TD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="TD_Id_Country" items="{path:'CountryModel>/',length:1000}" value="{oTraineeDetails>/Country}" showSecondaryValues="true" selectedKey="1"  >
 					        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				            </ComboBox>
 							<Label text="{i18n>baseLocation}" required="true" />
-							<Select items="{BaseLocationModel>/}" id="TD_id_Location" showSecondaryValues="true" selectedKey="{oTraineeDetails>/BaseLocation}">
-								<items>
-									<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
-								</items>
-							</Select>
+							<ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{oTraineeDetails>/BaseLocation}" id="TD_id_Location" valueStateText="{i18n>selectBase}" change="TD_validateCombo" selectedKey="{employeeModel>/BaseLocation}">
+							<items>
+						    <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+							</items>
+				            </ComboBox>
 								<!-- <Label text="{i18n>branchCode}" />
 										<Input id="TD_id_BranchCode" value="{oTraineeDetails>BranchCode}"  editable="false" /> -->
                           <Label text="{i18n>mobileNo}" required="true" />
 							<HBox width="100%" justifyContent="Start" alignItems="Center">
 								<VBox width="23%">
-									<ComboBox value="{oTraineeDetails>/STDCode}" showSecondaryValues= "true" id="TD_id_STDCode" items="{codeModel>/}" filterSecondaryValues="true" change="validateCombo" valueStateText="{i18n>combovalueState}">
+									<ComboBox value="{oTraineeDetails>/STDCode}" showSecondaryValues= "true" id="TD_id_STDCode" items="{codeModel>/}" filterSecondaryValues="true" change="TD_validateCombo" valueStateText="{i18n>combovalueState}">
 					<core:ListItem key="{codeModel>country}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}"/>
 				    </ComboBox>
 								</VBox>
 								<VBox width="76%">
-				<Input value="{oTraineeDetails>/MobileNumber}" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo" maxLength="10" id="TD_id_Mobile" valueStateText="{i18n>mobileNoValueState}" class="sapUiTinyMarginBegin"/>
+				<Input value="{oTraineeDetails>/MobileNumber}" placeholder="{i18n>mobileNo}" liveChange="TD_validateMobile" maxLength="10" id="TD_id_Mobile" valueStateText="{i18n>mobileNoValueState}" class="sapUiTinyMarginBegin"/>
 								</VBox>
 							</HBox>
 						</f:content>
@@ -131,6 +131,8 @@
 						<f:content>
 							<Label text="{i18n>traineeName}"/>
 							<Text text="{= ${oTraineeDetails>/NameSalutation} + ' ' + ${oTraineeDetails>/TraineeName}}"/>
+							<Label text="{i18n>gender}"/>
+							<Text text="{oTraineeDetails>/Gender}"/>
 							<Label text="{i18n>reportingManager}" />
 							<Text text="{oTraineeDetails>/ReportingManager}"/>
 							<Label text="{i18n>emailId}" />
@@ -138,15 +140,15 @@
 							<Label text="{i18n>trainingType}" />
 							<Text  text="{oTraineeDetails>/Type}"/>
 							<!-- Stipend Amount -->
-							<Label text="{i18n>amount}" />
-							<Text text="{path:'oTraineeDetails>/Amount', formatter: '.Formatter.formatCurrency'} {oTraineeDetails>/Currency}"/>		 
+                            <Label text="{i18n>amount}" />
+                            <Text text="{path:'oTraineeDetails>/Amount', formatter: '.Formatter.formatCurrencyInINRText'} {oTraineeDetails>/Currency}"/>	 
 							<Label text="{i18n>releaseDateT}" />
 							<Text text="{oTraineeDetails>/ReleaseDate}"/>
 							<Label text="{i18n>joiningDate}" />
 							<Text text="{oTraineeDetails>/JoiningDate}"/>
 							<Label text="{i18n>traineeDuration}" />
 							<Text text="{oTraineeDetails>/TrainingDuration}"/>
-							<Label text="{i18n>country}" />
+							<Label text="{i18n>expCountry}" />
 							<Text text="{oTraineeDetails>/Country}"/>
 							<Label text="{i18n>baseLocation}" />
 							<Text text="{oTraineeDetails>/BaseLocation}"/>

@@ -3,89 +3,106 @@ sap.ui.define(
     "./BaseController", //call base controller
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "../utils/validation"
+    "../utils/validation",
+     "../model/formatter",
   ],
   function (
-    BaseController,JSONModel,MessageToast,utils
+    BaseController,JSONModel,MessageToast,utils,Formatter
   ) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.ConsultantInvoiceDetails",
       {
+        Formatter: Formatter,
         onInit: function () {
           this.getRouter().getRoute("RouteNavConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
         },
+                    _onRouteMatched: async function(oEvent) {
+                    try {
+                        var LoginFUnction =  await this.commonLoginFunction("ConsultantInvoice");
+                        if (!LoginFUnction) return;
+                        this._makeDatePickersReadOnly(["CI_id_InDate", "CI_id_PaybyInv"]);
+                        this.i18nModel = this.getView().getModel('i18n').getResourceBundle();
+                        this.CI_CommonID();
 
-       _onRouteMatched: function(oEvent) {
-                    this._makeDatePickersReadOnly(["CI_id_InDate", "CI_id_PaybyInv"]);
-                    this.i18nModel = this.getView().getModel('i18n').getResourceBundle();
-                     if(!this.getView().getModel("InvoiceSACModel")){
-                        this._fetchCommonData("CompanyInvoiceSAC", "InvoiceSACModel");
-                        this._fetchCommonData("Currency", "CurrencyModel");
+                        this.getView().byId("CI_id_ColumnGST").setVisible(false);
+                        this.getView().byId("CI_id_GSTCalc").setVisible(false);
+
+                        var sPath = oEvent.getParameter("arguments").sPath;
+                        var oPath = oEvent.getParameter("arguments").oPath;
+                        this.decodedPath = decodeURIComponent(decodeURIComponent(sPath));
+                        this.decodedEmployeeID = decodeURIComponent(oPath);
+                        this.Discount = true;
+                        this.UnitAmount = true;
+                        this.getBusyDialog()
+                        if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
+                        if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice" });
+                        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel")
+
+                        var oInvoiceModel = new JSONModel({
+                            EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",
+                            InvoiceNo: "", InvoiceDate: "", ConsultantAddress: "", GSTNO: "",
+                            CompanyGSTNO: "", MobileNo: "", CGST: false, SGST: false, IGST: false,
+                            BankName: "", AccountName: "", AccountNo: "", IFSCCode: "", PayBy: "",
+                            GSTValid: false, CGSTSelected: false, IGSTSelected: false, Percentage: "",
+                            Currency: "INR", STDCode: "+91",ConsultantInvoiceItem:[]
+                        });
+                        this.getView().setModel(oInvoiceModel, "ConsultantInvoiceModel");
+
+                        var oInvoiceItemModel = new JSONModel({
+                            SlNo: "", EmployeeID: "", Item: "", Days: "", SAC: "", UnitPrice: "",
+                            Total: "", SubTotal: "", TotalSum: "", Currency: "INR"
+                        });
+                        this.getView().setModel(oInvoiceItemModel, "oModelDataPro");
+
+                        var visibilityPlay = new JSONModel({
+                            createVisi: true, editVisi: false, editable: true,
+                            invBtn: true, pasteBtn: true, merge: false
+                        });
+                        this.getView().setModel(visibilityPlay, "visiablityPlay");
+
+                        var loginModel = this.getOwnerComponent().getModel("LoginModel");
+                        var oComboBox = this.getView().byId("CI_id_Cont");
+                        var isEditMode = sPath !== "X" && oPath !== "Y";
+
+                        if (loginModel) {
+                            this.sUserType = loginModel.getProperty("/Role");
+                            if (this.sUserType === "Admin" && !isEditMode) {
+                                oComboBox.setVisible(true);
+                            } else {
+                                oComboBox.setVisible(false);
+                            }
+                        }
+
+                        if (sPath === "X" && oPath === "Y") {
+                            this.onFetchContractDetails();
+                            this.readFunction("ConsultantInvoice", "ConsultantInvoiceModel", true);
+                            this.readFunction("ConsultantInvoiceItem", "oModelDataPro", true);
+                            this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("Delete");
+                        } else {
+                            await this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID),
+                            await this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
+                            await this.setVisibilityForEdit();
+                            await this.onFetchContractDetails();
+                        }
+                        oComboBox.setSelectedKey("");
+                        this.scrollToSection("CI_id_NavConsultantInvoicePage", "CI_id_FirstSection");
+                    }catch (error) {
+                        sap.m.MessageToast.show(error.message || error.responseText);
+                    } finally {
+                        this.closeBusyDialog(); // Close after async call finishes
                     }
-                    this._fetchCommonData("EmailContent", "CCMailModel", {Type: "ConsultantInvoice"  });
-                    this.CI_CommonID();
-                    this.getView().byId("CI_id_ColumnGST").setVisible(false);
-                    this.getView().byId("CI_id_GSTCalc").setVisible(false);
-                    var sPath = oEvent.getParameter("arguments").sPath;
-                    var oPath = oEvent.getParameter("arguments").oPath;
-                    this.decodedPath = decodeURIComponent(decodeURIComponent(sPath));
-                    this.decodedEmployeeID = decodeURIComponent(oPath);
-                    this.Discount = true;
-                    this.UnitAmount = true;
-
-                    var oInvoiceModel = new JSONModel({
-                    EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",
-                    InvoiceNo: "", InvoiceDate: "", ConsultantAddress: "", GSTNO: "",
-                    CompanyGSTNO: "", MobileNo: "", CGST: false, SGST: false, IGST: false,
-                    BankName: "", AccountName: "", AccountNo: "", IFSCCode: "", PayBy: "",
-                    GSTValid: false, CGSTSelected: false, IGSTSelected: false, Percentage: "",
-                    Currency: "INR", STDCode: "+91"});
-                    this.getView().setModel(oInvoiceModel, "ConsultantInvoiceModel");
-           
-                    var oInvoiceItemModel = new JSONModel({
-                        SlNo: "", EmployeeID: "", Item: "", Days: "", SAC: "", UnitPrice: "",
-                        Total: "", SubTotal: "", TotalSum: "", Currency: "INR"});
-                    this.getView().setModel(oInvoiceItemModel, "oModelDataPro");
-           
-                    var visibilityPlay = new JSONModel({
-                        createVisi: true, editVisi: false, editable: true,
-                        invBtn: true, pasteBtn: true, merge: false });
-                    this.getView().setModel(visibilityPlay, "visiablityPlay");
-
-                    var sUserType = this.getView().getModel("LoginModel").getProperty("/Role");
-                    var oComboBox = this.getView().byId("CI_id_Cont");
-                    var isEditMode = sPath !== "X" && oPath !== "Y";
-
-                    if (sUserType === "Admin" && !isEditMode) {
-                        oComboBox.setVisible(true);
-                    } else {
-                        oComboBox.setVisible(false);
-                    }
-
-                    if (sPath === "X" && oPath === "Y") {
-                        this.readFunction("ConsultantInvoice", "ConsultantInvoiceModel", true);
-                        this.readFunction("ConsultantInvoiceItem", "oModelDataPro", true);
-                        this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("Delete");
-                    } else {
-                        this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID);
-                        this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID);
-                        this.setVisibilityForEdit();
-                    }
-                    oComboBox.setSelectedKey("");
                 },
 
                 CI_CommonID: function() {
                 const ids = ["CI_id_InDate", "CI_id_PaybyInv", "CI_id_InputInvoiceTo", "CI_id_InputInvoiceAddress", "CI_id_InputCompGSTNO",  "CI_id_ConsultantName", "CI_id_codeModel", "CI_id_InputMobile", "CI_id_InputConsultantAddress", "CI_id_InputGSTNO", "CI_id_InputBankName", "CI_id_InputAccountName", "CI_id_InputAccountNo", "CI_id_InputIFSCCode"]
                 ids.forEach((id) => {
                     this.byId(id).setValueState("None");
-               });
+                });
                 },
 
                 onFetchContractDetails: async function() {
                     try {
-                        // Contract list
-                        this.getBusyDialog(); // <-- Open custom BusyDialog
                         const contractData = await this.ajaxReadWithJQuery("EmployeeContract", {
                             Type: "Contract"
                         });
@@ -93,7 +110,6 @@ sap.ui.define(
                             contractDetails: contractData.data
                         });
                         this.getView().setModel(jsonModel, "contractModel");
-                         this.closeBusyDialog(); // <-- Close custom BusyDialog
                     } catch (error) {
                          this.closeBusyDialog(); // <-- Close custom BusyDialog
                          MessageToast.show(error.message || error.responseText);
@@ -101,10 +117,9 @@ sap.ui.define(
                 },
 
                 // Common function to fetch invoice data
-                commonFetchInvoiceData: function(invoiceNo, userId) {
+                commonFetchInvoiceData: async function(invoiceNo, userId) {
                     const requestData = {InvoiceNo: invoiceNo, EmployeeID: userId};
-                     this.getBusyDialog(); // <-- Open custom BusyDialog
-                    this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
+                    await this.ajaxReadWithJQuery("ConsultantInvoice", requestData).then(function(oData) {
                             this.InvoiceNo = oData.data;
                             this.EmployeeID = oData.data;
                             if (oData.data.length > 0) {
@@ -131,7 +146,6 @@ sap.ui.define(
                                 this.getView().setModel(oNavigationModel, "ConsultantInvoiceModel");
                                 this.getView().byId("CI_id_InputGSTNO").setEnabled(invoiceData.Currency === "INR");
                             }
-                             this.closeBusyDialog(); // <-- Close custom BusyDialog
                         }.bind(this))
                         .catch(function(error) {
                              this.closeBusyDialog(); // <-- Close custom BusyDialog
@@ -139,22 +153,12 @@ sap.ui.define(
                         });
                 },
 
-                 // Common function to fetch invoice items
-                commonFetchInvoiceItems: function(invoiceNo, userId) {
-                     this.getBusyDialog(); // <-- Open custom BusyDialog
+                commonFetchInvoiceItems: async function(invoiceNo, userId) {
                     const requestData = { InvoiceNo: invoiceNo, EmployeeID: userId };
-                    this.ajaxReadWithJQuery("ConsultantInvoiceItem", requestData)
-                        .then(function(oData) {
-                            this.processInvoiceItems(oData.data);
-                        }.bind(this))
-                        .catch(function(error) {
-                             this.closeBusyDialog(); // <-- Close custom BusyDialog
-                            MessageToast.show(error.message || error.responseText);
-                        });
-                },
-
-               processInvoiceItems: function(items) {
                     try {
+                        const oData = await this.ajaxReadWithJQuery("ConsultantInvoiceItem", requestData);
+                        if(oData && oData.data){
+                            var items = Array.isArray(oData.data) ? oData.data : [oData.data];
                         // Sort items
                         items.sort((a, b) => {
                             const valueA = a.Item || '';
@@ -178,67 +182,84 @@ sap.ui.define(
                             item.IndexNo = index + 1;
                         });
 
-                        var oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
-                        oInvoiceModel.setProperty("/ConsultantInvoiceItem", items);
-                        this.byId("CI_id_ConsultantInvoiceDeatailTable").getBinding("items").refresh(true);
+                        //  Set ConsultantInvoiceItem in model
+                        const oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
+                        oInvoiceModel.setProperty("/ConsultantInvoiceItem", items || []);
+                        oInvoiceModel.refresh(true);
+                        
+                        const invoiceItemData = oData.data[0];
+                        const oModelDataPro = this.getView().getModel("oModelDataPro");
+                        oModelDataPro.setProperty("/CGST", parseFloat(invoiceItemData.CGST) || 0);
+                        oModelDataPro.setProperty("/SGST", parseFloat(invoiceItemData.SGST) || 0);
+                        oModelDataPro.setProperty("/IGST", parseFloat(invoiceItemData.IGST) || 0);
 
-                    // Set GST values in oModelDataPro
-                    var oModelDataPro = this.getView().getModel("oModelDataPro");
-                    var cgst = parseFloat(items[0]?.CGST) || 0;
-                    var sgst = parseFloat(items[0]?.SGST) || 0;
-                    var igst = parseFloat(items[0]?.IGST) || 0;
+                        // Set visibility for CGST/SGST or IGST
+                        oModelDataPro.setProperty("/CGSTVisible", invoiceItemData.CGST && invoiceItemData.SGST ? true : false);
+                        oModelDataPro.setProperty("/SGSTVisible", invoiceItemData.SGST ? true : false);
+                        oModelDataPro.setProperty("/IGSTVisible", invoiceItemData.IGST && (!invoiceItemData.CGST || !invoiceItemData.SGST) ? true : false);
 
-                    oModelDataPro.setProperty("/CGST", cgst);
-                    oModelDataPro.setProperty("/SGST", sgst);
-                    oModelDataPro.setProperty("/IGST", igst);
+                        // Update total amount
+                       this.CI_updateTotalAmount();
 
-                    oModelDataPro.setProperty("/CGSTVisible", cgst && sgst);
-                    oModelDataPro.setProperty("/SGSTVisible", !!sgst);
-                    oModelDataPro.setProperty("/IGSTVisible", igst && (!cgst || !sgst));
+                        var gstNo = oInvoiceModel.getProperty("/GSTNO");
+                        var isGSTNOVisible = !!gstNo; // Check if GSTNO exists 
+                        this.byId("CI_id_ConsultantInvoiceDeatailTable").getColumns()[2].setVisible(isGSTNOVisible);
 
-                    // Update total amount
-                    this.CI_updateTotalAmount();
+                        var gstCalculation = items.every(function (item) {
+                        return !item.GSTCalculation || item.GSTCalculation.trim() === "";
+                        });
 
-                    // Control column visibility based on GSTNO
-                    var gstNo = oInvoiceModel.getProperty("/GSTNO");
-                    var isGSTNOVisible = !!gstNo;
-                    this.byId("CI_id_ConsultantInvoiceDeatailTable").getColumns()[2].setVisible(isGSTNOVisible);
-
-                    // Show/hide GSTCalculation column
-                    var allEmptyGST = items.every(item => !item.GSTCalculation || item.GSTCalculation.trim() === "");
-                    this.byId("CI_id_GSTCalc").setVisible(!allEmptyGST);
+                        var gstColumn = this.byId("CI_id_GSTCalc");
+                        if (gstCalculation) {
+                        gstColumn.setVisible(false);
+                        } else {
+                        gstColumn.setVisible(true);
+                        }
+                        }
                     } catch (error) {
-                       MessageToast.show(error.message || error.responseText);
+                        MessageToast.show(error.message || error.responseText);
                     } finally {
-                        // Always close BusyDialog
-                        this.closeBusyDialog();
+                        this.closeBusyDialog(); // Always close BusyDialog
                     }
                 },
 
-                CI_onChangeContractDetails: function(oEvent) {
-                    let sValue = oEvent.getSource().getValue().split(' - ');
-                    var contractID = sValue[0];
-                    var contractName = sValue[1];
-                    var oMsgText = this.i18nModel.getText("selectContractNo");
+                CI_onChangeContractDetails: function (oEvent) {
+                    let sValue = oEvent.getSource().getValue().split(' - ');   // Extract contract ID and name
+                    let contractID = sValue[0];
+                    let contractName = sValue[1];
+                    let oMsgText = this.i18nModel.getText("selectContractNo"); // Confirmation message
 
-                    // Use MessageBox to ask for confirmation
-                    sap.m.MessageBox.confirm(oMsgText, {
-                        actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
-                        onClose: function(sAction) {
-                            if (sAction === sap.m.MessageBox.Action.OK) {
-                                // User clicked OK, proceed with the contract change
-                                this.selectedContractID = contractID;
-                                this.Copy = true;
-                                this.readFunction("/ConsultantInvoice", "ConsultantInvoiceModel", true, contractID, contractName);
-                                MessageToast.show(this.i18nModel.getText("datadestroy"));
-                            }
-                        }.bind(this)
-                    });
+                    let oModelData = this.getView().getModel("contractModel").getData(); // Get contract model data
+                    let aContractData = Array.isArray(oModelData.contractDetails) ? oModelData.contractDetails : [];
+
+                    // Find the matching contract
+                    let oSelectedContract = aContractData.find(contract => contract.ContractNo === contractID);
+                    if (!oSelectedContract) {
+                        sap.m.MessageToast.show("Selected contract not found.");
+                        return;
+                    }
+
+                    let sMobileNo = oSelectedContract.MobileNo || "";  // Get required fields
+                    let sConsultantAddress = oSelectedContract.ConsultantAddress || "";  // Get required fields
+
+                    // Show confirmation dialog
+                    this.showConfirmationDialog(
+                        this.i18nModel.getText("confirmTitle"),
+                        oMsgText,
+                        function () {
+                            this.selectedContractID = contractID;
+                            this.Copy = true;
+                            this.readFunction("/ConsultantInvoice", "ConsultantInvoiceModel", true, contractID, contractName, sMobileNo, sConsultantAddress);
+                            sap.m.MessageToast.show(this.i18nModel.getText("datadestroy"));
+                        }.bind(this),
+                        function () {}, // Cancel
+                        this.i18nModel.getText("OkButton"),
+                        this.i18nModel.getText("CancelButton")
+                    );
                 },
 
-                readFunction: function(entitySet, modelName, isCreate, contractID, contractName) {
-                    this.onFetchContractDetails();
-                    this.ajaxReadWithJQuery(entitySet, {}).then(function(oData) {
+                readFunction: function (entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress) {
+                        this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
                         var oJSONModel = new sap.ui.model.json.JSONModel(oData);
                         this.getView().setModel(oJSONModel, modelName);
 
@@ -251,7 +272,7 @@ sap.ui.define(
                             var loginData = this.getOwnerComponent().getModel("LoginModel").getData();
 
                             if (this.Copy !== true) {
-                                filters.push(new sap.ui.model.Filter("EmployeeID", sap.ui.model.FilterOperator.EQ, loginData.userIds));
+                                filters.push(new sap.ui.model.Filter("EmployeeID", sap.ui.model.FilterOperator.EQ, loginData.EmployeeID));
                                 this.Copy = true;
                             } else if (this.selectedContractID) {
                                 filters.push(new sap.ui.model.Filter("EmployeeID", sap.ui.model.FilterOperator.EQ, this.selectedContractID));
@@ -260,8 +281,7 @@ sap.ui.define(
                                 this.Copy = false;
                             }
 
-                            var oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
-
+                            var oInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");                        
                             if (this.Copy === false && this.Copy !== undefined) {
                                 oInvoiceModel.setProperty("/EmployeeID", this.EmployeeID);
                                 oInvoiceModel.setProperty("/ConsultantName", this.ConsultantName);
@@ -274,16 +294,27 @@ sap.ui.define(
                             }
 
                             var oToday = new Date();
-                            oToday.setHours(0, 0, 0, 0); // Normalize
+                            oToday.setHours(0, 0, 0, 0);
 
                             var oValidUntil = new Date(oToday);
                             oValidUntil.setDate(oValidUntil.getDate() + 30);
 
+                            var sPath = "/0";
+                            var oCompanyDetails = this.getView().getModel("CompanyCodeDetailsModel").getProperty(sPath);
+
+                            var InvoiceTo = oCompanyDetails.companyName;
+                            var InvoiceAddress = oCompanyDetails.longAddress;
+                            var CompanyGSTNO = oCompanyDetails.gstin;
+
+                            oInvoiceModel.setProperty("/InvoiceTo", InvoiceTo);
+                            oInvoiceModel.setProperty("/InvoiceAddress", InvoiceAddress);
+                            oInvoiceModel.setProperty("/CompanyGSTNO", CompanyGSTNO);
                             oInvoiceModel.setProperty("/InvoiceDate", oToday);
                             oInvoiceModel.setProperty("/PayBy", oValidUntil);
                             oInvoiceModel.setProperty("/GSTValid", false);
                             oInvoiceModel.setProperty("/Currency", "INR");
                             oInvoiceModel.setProperty("/STDCode", "+91");
+
                             this.getView().byId("CI_id_ColumnGST").setVisible(false);
                             this.getView().byId("CI_id_GSTCalc").setVisible(false);
                             this.getView().getModel("visiablityPlay").setProperty("/copyBtn", false);
@@ -292,11 +323,32 @@ sap.ui.define(
                             var currency = oInvoiceModel.getProperty("/Currency");
                             this.getView().byId("CI_id_InputGSTNO").setEnabled(currency === "INR");
 
+                             const contData = this.getView().getModel("contractModel").getData();
+                            if (loginData.Role === "Contractor" && contData) {
+                              const contData = this.getView().getModel("contractModel").getData();
+                                const aCData = Array.isArray(contData.contractDetails) ? contData.contractDetails : [];
+
+                                const oSelectedContract = aCData.find(contract => contract.ContractNo === loginData.EmployeeID);
+                                if (!oSelectedContract) {
+                                    sap.m.MessageToast.show("Selected contract not found.");
+                                    return;
+                                }
+
+                                // Set from contract details
+                                oInvoiceModel.setProperty("/MobileNo", oSelectedContract.MobileNo || "");
+                                oInvoiceModel.setProperty("/ConsultantAddress", oSelectedContract.ConsultantAddress || "");
+                            } else {
+                                // For Admin/Manager, use passed values or fallback
+                                oInvoiceModel.setProperty("/MobileNo", MobileNo || "");
+                                oInvoiceModel.setProperty("/ConsultantAddress", ConsultantAddress || "");
+                            }
+
                             this.CI_onPressPasteBtn();
                         }
-                    }.bind(this)).catch(function(error) {
-                       MessageToast.show(error.message || error.responseText);
-                    });
+                    }.bind(this)).catch(function (error) {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.message || error.responseText);
+                    }.bind(this));
                 },
 
                 setVisibilityForEdit: function() {
@@ -334,8 +386,7 @@ sap.ui.define(
                         oData.ConsultantInvoiceItem = [];
                     }
 
-                    var gstInput = this.byId("CI_id_InputGSTNO").getValue();
-                    var GSTCalculationValue = gstInput ? "YES" : "NO";
+                  const currency = this.byId("CI_id_Currency").getSelectedKey()
 
                     var loginData = this.getOwnerComponent().getModel("LoginModel").getData();
                     var employeeID = loginData.EmployeeID;
@@ -347,13 +398,13 @@ sap.ui.define(
                         IndexNo: oData.ConsultantInvoiceItem.length > 0
                             ? oData.ConsultantInvoiceItem[oData.ConsultantInvoiceItem.length - 1].IndexNo + 1
                             : 1,
-                        SlNo: globalThis.crypto.randomUUID(),
                         EmployeeID: employeeID,
                         Item: "",
                         SAC: "",
-                        GSTCalculation: GSTCalculationValue,
+                        GSTCalculation: (currency === "INR") ? "YES" : "",
                         Days: "",
                         UnitPrice: "",
+                        Discount: "",
                         Total: "",
                         Currency: "INR"
                     };
@@ -404,7 +455,7 @@ sap.ui.define(
                     this.CI_updateTotalAmount();
                 },
 
-                CI_updateTotalAmount: function() {
+                CI_updateTotalAmount:function () {
                     var oModel = this.getView().getModel("oModelDataPro");
                     var oConsultantInvoiceModel = this.getView().getModel("ConsultantInvoiceModel");
                     var aItems = oConsultantInvoiceModel.getProperty("/ConsultantInvoiceItem") || [];
@@ -416,24 +467,29 @@ sap.ui.define(
                         igst = 0,
                         totalSum = 0;
 
-                    aItems.forEach(function(oItem) {
-                        var iItemTotal = oItem.Days ?
-                            parseFloat(oItem.Days) * parseFloat(oItem.UnitPrice || 0) :
-                            parseFloat(oItem.UnitPrice || 0);
+                    aItems.forEach(function (oItem) {
+                        var unit = parseFloat(oItem.Days) || 0;
+                        var rate = parseFloat(oItem.UnitPrice || 0);
+                        const baseAmount = unit ? unit * rate : rate;
 
-                        var iDiscount = oItem.Discount ? parseFloat(oItem.Discount) || 0 : 0;
-
-                        if (typeof oItem.Discount === 'string' && oItem.Discount.trim().endsWith('%')) {
-                            var percentage = iDiscount / 100;
-                            var iUpdatedTotal = iItemTotal - (iItemTotal * percentage);
-                            oItem.Total = iUpdatedTotal.toFixed(2);
-                            oItem.Discount = (iItemTotal * percentage).toFixed(2); // Separate field for discount value
+                        let discountAmount = 0;
+                        if (typeof oItem.Discount === "string" && oItem.Discount.trim().endsWith("%")) {
+                        const percent = parseFloat(oItem.Discount) / 100;
+                        discountAmount = baseAmount * percent;
+                        oItem.Discount = discountAmount.toFixed(2);
                         } else {
-                            var iUpdatedTotal = iItemTotal - iDiscount;
-                            oItem.Total = iUpdatedTotal.toFixed(2);
+                        discountAmount = parseFloat(oItem.Discount) || 0;
                         }
 
-                        // Update subtotals
+                        const finalAmount = baseAmount - discountAmount;
+                        if(finalAmount < 0){
+                        oItem.Total = '0.00';
+                        oItem.Discount = unit * rate;
+                        }else{
+                        oItem.Total = finalAmount.toFixed(2);
+                        }
+
+                        // GST-related subtotal
                         if (oItem.GSTCalculation === "YES") {
                             subTotalTaxable += parseFloat(oItem.Total);
                             oItem.SAC = "998314";
@@ -481,7 +537,7 @@ sap.ui.define(
                     oModel.refresh();
                 },
 
-                CI_onchangeDiscount: function(oEvent) {
+                 CI_onchangeDiscount: function(oEvent) {
                     var sValue = oEvent.getParameter("value").trim();
                     var regex = /^[0-9]+(\.[0-9]{1,2})?%?$/;
                     var oInput = oEvent.getSource();
@@ -544,6 +600,7 @@ sap.ui.define(
                     oModel.setProperty("/CGSTVisible", true);
                     oModel.setProperty("/SGSTVisible", true);
                     oModel.setProperty("/IGSTVisible", false);
+                    oModel.setProperty("/IGST", 0);
 
                     oConsultantInvoiceModel.setProperty("/CGSTVisible", true);
                     oConsultantInvoiceModel.setProperty("/SGSTVisible", true);
@@ -567,6 +624,8 @@ sap.ui.define(
                     oModel.setProperty("/CGSTVisible", false);
                     oModel.setProperty("/SGSTVisible", false);
                     oModel.setProperty("/IGSTVisible", true);
+                    oModel.setProperty("/CGST", 0);
+                    oModel.setProperty("/SGST", 0);
 
                     oConsultantInvoiceModel.setProperty("/CGSTVisible", false);
                     oConsultantInvoiceModel.setProperty("/SGSTVisible", false);
@@ -601,22 +660,18 @@ sap.ui.define(
 
                     if (!confirmed) return;
 
-                    this.getBusyDialog();
-
                     try {
                         const updatedItems = aItems.filter(item => item.IndexNo !== oItemData.IndexNo);
 
-                        // Reindex the remaining items
                         updatedItems.forEach((item, idx) => {
                             item.IndexNo = idx + 1;
                         });
 
                         oModel.setProperty("/ConsultantInvoiceItem", updatedItems);
-
-                        // Check if the item is already saved (existing in DB)
                         const isSavedItem = oItemData.InvoiceNo && oItemData.SlNo;
 
-                       if (isSavedItem) {
+                        if (isSavedItem) {
+                             this.getBusyDialog();
                             const sUrl = "/ConsultantInvoiceItem";
                             const oPayload = {
                                 filters: {
@@ -628,7 +683,7 @@ sap.ui.define(
                             await this.ajaxDeleteWithJQuery(sUrl, oPayload);
                             sap.m.MessageToast.show("Invoice item deleted successfully.");
                         } else {
-                            sap.m.MessageToast.show("Draft invoice item removed.");
+                            sap.m.MessageToast.show("Invoice item deleted successfully.");
                         }
 
                         this.CI_updateTotalAmount();
@@ -740,6 +795,13 @@ sap.ui.define(
                         getSource: () => gstInputField
                     });
                     oConsultantModel.setProperty("/GSTValid", isGSTValid && gstInputField !== "");
+                    var gstValue = gstInputField.getValue().trim();
+
+                     // Handle GST empty case
+                    if (gstValue === "") {
+                        gstInputField.setValueState("None");
+                        oConsultantModel.setProperty("/GSTValid", false);
+                    }
 
                     var oGSTColumn = this.byId("CI_id_ColumnGST");
                     var oGSTCalColumn = this.byId("CI_id_GSTCalc");
@@ -773,6 +835,7 @@ sap.ui.define(
                         oConsultantModel.setProperty("/GSTValid", false);
                         this.getView().byId("CI_id_InputGSTNO").setEnabled(false);
                     } else {
+                        gstInputField.setValueState("None");
                         this.getView().byId("CI_id_InputGSTNO").setEnabled(true);
                     }
                 },
@@ -816,6 +879,14 @@ sap.ui.define(
                         getSource: () => gstInputField
                     });
 
+                    if (gstInput === "") {
+                        gstInputField.setValueState("None"); 
+                    }
+
+                    if(isGSTValid){
+                        this.CI_onSelectCGST();
+                    }
+
                     var oConsultantModel = this.getView().getModel("ConsultantInvoiceModel");
                     oConsultantModel.setProperty("/GSTValid", isGSTValid && gstInput !== "");
 
@@ -834,7 +905,7 @@ sap.ui.define(
                     if (gstInput === "") {
                         var updatedTotalSum = totalSum;
                         var oData = oConsultantModel.getData();
-
+                       
                         if (oData.CGSTSelected) {
                             updatedTotalSum -= (cgst + sgst);
                         } else if (oData.IGSTSelected) {
@@ -870,6 +941,12 @@ sap.ui.define(
                       if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
                 },
 
+                CID_ValidateName: function(oEvent) {
+                   var oInput = oEvent.getSource();
+                    utils._LCvalidateName(oEvent);
+                      if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+                },
+
                 CID_ValidateMobileNo: function(oEvent) {
                    var oInput = oEvent.getSource();
                     utils._LCvalidateMobileNumber(oEvent);
@@ -894,53 +971,97 @@ sap.ui.define(
                         if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
                 },
 
-                CI_onPressback: function() {
-                    this.getRouter().navTo("RouteConsultantInvoiceApplication");
+                CID_onItemDescriptionLiveChange: function (oEvent) {
+                    utils._LCvalidateMandatoryField(oEvent);
+                },
+
+               CI_onPressback: function () {
+                    var isEditMode = this.getView().getModel("visiablityPlay").getProperty("/editable");
+                    if (isEditMode) {
+                        this.showConfirmationDialog(
+                            this.i18nModel.getText("ConfirmActionTitle"),
+                            this.i18nModel.getText("backConfirmation"),
+                            function () {
+                                // Reset edit-related flags
+                                this.getView().getModel("visiablityPlay").setProperty("/editable", false);
+                                this.getView().getModel("visiablityPlay").setProperty("/invBtn", false);
+                                this.getView().getModel("visiablityPlay").setProperty("/copyBtn", true);
+                                this.getView().getModel("visiablityPlay").setProperty("/merge", true);
+                                
+                                // Set table mode back to default (e.g., "None")
+                                this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("None");
+
+                                // Navigate back
+                                this.getRouter().navTo("RouteConsultantInvoiceApplication");
+                            }.bind(this)
+                        );
+                    } else {
+                        this.getRouter().navTo("RouteConsultantInvoiceApplication");
+                    }
                 },
 
                CI_onPressSubmit: async function () {
                     try {
                         const that = this;
-                        // Validate all required fields
-                        if (
+                         var isMandatoryValid = (
                             utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
                             utils._LCvalidateDate(this.byId("CI_id_PaybyInv"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceTo"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceAddress"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_ConsultantName"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.byId("CI_id_codeModel"), "ID") &&
                             utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
-                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputAccountName"), "ID") &&
+                            utils._LCvalidateName(this.byId("CI_id_InputAccountName"), "ID") &&
                             utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
-                            utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID")
-                        ) {
+                            utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID"));
+                            if (!isMandatoryValid) {
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                                return;
+                            }
+                        {
                             const invoiceModel = that.getView().getModel("ConsultantInvoiceModel");
                             const invoiceData = invoiceModel.getData();
 
                             const itemModel = that.getView().getModel("oModelDataPro");
                             const itemData = itemModel.getData();
 
-                            if (!itemData.TotalSum || itemData.TotalSum <= 0) {
-                                MessageBox.error("Please ensure that at least one item is filled!");
+                            var isValid = true;
+                            if (invoiceData.GSTNO && !utils._LCvalidateGstNumber(this.byId("CI_id_InputGSTNO"), "ID")) 
+                                isValid = false;
+                            if (invoiceData.CompanyGSTNO && !utils._LCvalidateGstNumber(this.byId("CI_id_InputCompGSTNO"), "ID")) 
+                                isValid = false;
+                            if (!isValid) {
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                                 return;
                             }
 
-                            if (invoiceData.GSTNO && invoiceData.Percentage && invoiceData.CGSTSelected &&
-                                invoiceData.IGSTVisible
-                            ) {
-                                MessageBox.error("Checkbox and the percentage field are filled in before Submit");
+                            // Validate all item descriptions and unit prices are filled and valid
+                            const aItemArray1 = invoiceModel.getProperty("/ConsultantInvoiceItem") || [];
+                            const bAllItemsValid = aItemArray1.every(item =>
+                                item.Item && item.Item.trim().length > 0 &&
+                                item.UnitPrice && parseFloat(item.UnitPrice) > 0
+                            );
+
+                            if (!bAllItemsValid) {
+                                MessageToast.show(this.i18nModel.getText("quotaionMsgDes"));
+                                return;
+                            }
+
+                            if (!itemData.TotalSum || itemData.TotalSum <= 0) {
+                                MessageToast.show("Please ensure that at least one item is filled!");
+                                return;
+                            }
+
+                            if (invoiceData.GSTNO && invoiceData.Percentage && invoiceData.CGSTSelected && invoiceData.IGSTVisible) {
+                                MessageToast.show("Checkbox and the percentage field are filled in before Submit");
                                 return;
                             }
 
                             if (!this.Discount) {
-                            sap.m.MessageBox.error(that.i18nModelMess.getText("mandetoryFields"));
-                            return; // Prevent further processing
-                            }
-
-                            if (!this.UnitAmount) {
-                            sap.m.MessageBox.error(that.i18nModelMess.getText("mandetoryFields"));
-                            return; // Prevent further processing
+                                MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+                                return;
                             }
 
                             // Clean up unnecessary fields
@@ -948,12 +1069,11 @@ sap.ui.define(
                             delete invoiceData.GSTValid;
                             delete invoiceData.CGSTSelected;
                             delete invoiceData.IGSTSelected;
-                            delete invoiceData.InvoiceItems;
 
                             const invoiceItemData = this.byId("CI_id_ConsultantInvoiceDeatailTable").getModel("ConsultantInvoiceModel")
-                             .getData().ConsultantInvoiceItem;
+                            .getData().ConsultantInvoiceItem;
 
-                              // Format dates
+                            // Format dates
                             const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
                             const sInvoiceDate = oDateFormat.format(this.byId("CI_id_InDate").getDateValue());
                             const sPayByDate = oDateFormat.format(this.byId("CI_id_PaybyInv").getDateValue());
@@ -974,8 +1094,7 @@ sap.ui.define(
                                         Total: parseFloat(cleanItem.Total),
                                         Currency: invoiceData.Currency,
                                     };
-                                })
-                                : [];
+                                }) : [];
 
                             const consultantInvoicePayload = {
                                 EmployeeID: invoiceData.EmployeeID,
@@ -1008,24 +1127,61 @@ sap.ui.define(
                                 Items: cleanedInvoiceItems
                             };
 
+                            // Submit invoice
+                            this.getBusyDialog();
                             try {
-                                this.getBusyDialog(); // <-- Open custom BusyDialog
                                 const response = await that.ajaxCreateWithJQuery("ConsultantInvoice", combinedPayload);
+                                this.closeBusyDialog();
+
                                 if (response.success === true) {
-                                     this.closeBusyDialog(); // <-- Close custom BusyDialog
-                                    that.getRouter().navTo("RouteConsultantInvoiceApplication");
+                                    invoiceModel.setProperty("/CGST", consultantInvoicePayload.CGST);
+                                    invoiceModel.setProperty("/SGST", consultantInvoicePayload.SGST);
+                                    invoiceModel.setProperty("/IGST", consultantInvoicePayload.IGST);
+                                    invoiceModel.setProperty("/SubTotal", consultantInvoicePayload.SubTotal);
+                                    invoiceModel.setProperty("/SubTotalNotGST", consultantInvoicePayload.SubTotalNotGST);
+                                    invoiceModel.setProperty("/TotalSum", consultantInvoicePayload.TotalSum);
+                                    invoiceData.InvoiceNo = response.InvoiceNo;
+                                    var oDialog = new sap.m.Dialog({
+                                        title: this.i18nModel.getText("success"),
+                                        type: sap.m.DialogType.Message,
+                                        state: sap.ui.core.ValueState.Success,
+                                        content: new sap.m.Text({
+                                            text: this.i18nModel.getText("invoiceCreatemsg")
+                                        }),
+                                        beginButton: new sap.m.Button({
+                                            text: "OK",
+                                            type: "Accept",
+                                            press: function () {
+                                                oDialog.close();
+                                                that.getRouter().navTo("RouteConsultantInvoiceApplication");
+                                            }
+                                        }),
+                                        endButton: new sap.m.Button({
+                                            text: "Generate PDF",
+                                            type: "Attention",
+                                            press: function () {
+                                                oDialog.close();
+                                                that.CI_onPressGeneratePdf();
+                                                that.getRouter().navTo("RouteConsultantInvoiceApplication");
+                                            }
+                                        }),
+                                        afterClose: function () {
+                                            oDialog.destroy();
+                                        }
+                                    });
+
+                                    oDialog.open();
                                 } else {
-                                    MessageToast.show("Failed to create invoice.");
+                                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                                 }
-                            } catch (createError) {
-                                MessageToast.show("Error while creating invoice: " + createError.statusText);
+                            } catch (error) {
+                                this.closeBusyDialog();
+                               MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                             }
-                        } else {
-                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        }
+                        } 
                     } catch (error) {
-                         this.closeBusyDialog(); // <-- Close custom BusyDialog
-                        MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                        this.closeBusyDialog();
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     }
                 },
 
@@ -1040,24 +1196,26 @@ sap.ui.define(
                         const sInvoiceDate = oDateFormat.format(this.byId("CI_id_InDate").getDateValue());
                         const sPayByDate = oDateFormat.format(this.byId("CI_id_PaybyInv").getDateValue());
 
-                      // Perform validations
-                      if (
-                          utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
-                          utils._LCvalidateDate(this.byId("CI_id_PaybyInv"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceTo"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceAddress"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_ConsultantName"), "ID") &&
-                          utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
-                          utils._LCvalidateMandatoryField(this.byId("CI_id_InputAccountName"), "ID") &&
-                          utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
-                          utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID")
-                      ) {
+                        var isMandatoryValid = (
+                            utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
+                            utils._LCvalidateDate(this.byId("CI_id_PaybyInv"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceTo"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceAddress"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_ConsultantName"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.byId("CI_id_codeModel"), "ID") &&
+                            utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
+                            utils._LCvalidateName(this.byId("CI_id_InputAccountName"), "ID") &&
+                            utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
+                            utils._LCvalidateIfcCode(this.byId("CI_id_InputIFSCCode"), "ID"));
+                            if (!isMandatoryValid) {
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                                return;
+                            }{
                           // TotalSum check
                           if (!oModelDataPro.TotalSum || oModelDataPro.TotalSum <= 0) {
-                            this.closeBusyDialog(); // <-- Close custom BusyDialog
-                              sap.m.MessageBox.error("Please ensure that at least one item is filled!");
+                              MessageToast.show("Please ensure that at least one item is filled!");
                               return;
                           }
 
@@ -1065,25 +1223,30 @@ sap.ui.define(
                           if (oConsultantInvoiceModel.GSTNO && oConsultantInvoiceModel.GSTNO !== "") {
                               if (oConsultantInvoiceModel.Percentage && oConsultantInvoiceModel.Percentage !== "") {
                                   if (oConsultantInvoiceModel.CGSTSelected && oConsultantInvoiceModel.IGSTVisible) {
-                                       this.closeBusyDialog(); // <-- Close custom BusyDialog
-                                      sap.m.MessageBox.error("Both CGST and IGST are selected. Please review your GST setup.");
+                                      MessageToast.show("Both CGST and IGST are selected. Please review your GST setup.");
                                       return;
                                   }
                               } else {
-                                   this.closeBusyDialog(); // <-- Close custom BusyDialog
-                                  sap.m.MessageBox.error("GST percentage is required when GST No is provided.");
+                                  MessageToast.show("GST percentage is required when GST No is provided.");
                                   return;
                               }
                           }
 
                            if (!this.Discount) {
-                            sap.m.MessageBox.error(that.i18nModelMess.getText("mandetoryFields"));
-                            return; // Prevent further processing
+                                MessageToast.show(that.i18nModel.getText("mandetoryFields"));
+                                return;
                             }
 
-                            if (!this.UnitAmount) {
-                            sap.m.MessageBox.error(that.i18nModelMess.getText("mandetoryFields"));
-                            return; // Prevent further processing
+                            var isValid = true;
+                            if (oConsultantInvoiceModel.GSTNO && !utils._LCvalidateGstNumber(this.byId("CI_id_InputGSTNO"), "ID")) 
+                                isValid = false;
+
+                            if (oConsultantInvoiceModel.CompanyGSTNO && !utils._LCvalidateGstNumber(this.byId("CI_id_InputCompGSTNO"), "ID")) 
+                                isValid = false;
+
+                            if (!isValid) {
+                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                                return;
                             }
 
                           // Prepare main invoice data payload
@@ -1118,6 +1281,17 @@ sap.ui.define(
                               InvoiceNo: oConsultantInvoiceModel.InvoiceNo,
                               EmployeeID: oConsultantInvoiceModel.EmployeeID
                             };
+
+                            const aItemArray2 = oView.getModel("ConsultantInvoiceModel").getProperty("/ConsultantInvoiceItem") || [];
+                            const bAllDescriptionsFilled1 = aItemArray2.every(item =>
+                                item.Item && item.Item.trim().length > 0 &&
+                                item.UnitPrice && parseFloat(item.UnitPrice) > 0
+                            );
+
+                            if (!bAllDescriptionsFilled1) {
+                                MessageToast.show("Each item must have a description.");
+                                return;
+                            }
 
                             const aItemArray = oView.getModel("ConsultantInvoiceModel").getProperty("/ConsultantInvoiceItem") || [];
 
@@ -1185,16 +1359,12 @@ sap.ui.define(
                               }
                           } catch (error) {
                                this.closeBusyDialog(); // <-- Close custom BusyDialog
-                              sap.m.MessageBox.error(error.message || error.responseText);
+                               MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                           }
                       }
                   },
 
-                 CI_onChangeGSTCalculation: function () {
-                    this.CI_updateTotalAmount();
-                  },
-
-                  CI_commonOpenDialog: function(fragmentName) {
+                CI_commonOpenDialog: function(fragmentName) {
                 if (!this.CI_oDialogMail) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
@@ -1274,7 +1444,7 @@ sap.ui.define(
                     "ConsultantName":oModel.ConsultantName,
                     "InvoiceNo":oModel.InvoiceNo,
                     "InvoiceDate":sFormattedDate,
-                    "TotalSum":oModel.TotalSum,
+                    "TotalSum": (`${Formatter.fromatNumber(oModel.TotalSum)} ${oModel.Currency}`),
                     "InvoiceTo":oModel.InvoiceTo,
                     "toEmailID": oModel.ContarctEmail,
                     "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
@@ -1291,7 +1461,316 @@ sap.ui.define(
                 this.closeBusyDialog();
                 this.Mail_onPressClose();
             },
+             
+            CD_onDiscountInfoPress: function (oEvent) {
+                if (!this._oPopover) {
+                    this._oPopover = new sap.m.Popover({
+                        contentWidth: "400px",
+                        contentHeight: "auto",
+                        showHeader: false,
+                        placement: sap.m.PlacementType.Bottom,
+                        content: [
+                            new sap.m.VBox({
+                                alignItems: "Center",
+                                justifyContent: "Center",
+                                width: "100%",
+                                items: [
+                                    new sap.m.Text({
+                                        text: this.i18nModel.getText("discountInfoText"),
+                                        wrapping: true
+                                    })
+                                ]
+                            }).addStyleClass("customPopoverContent")
+                        ]
+                    });
+                    this.getView().addDependent(this._oPopover);
+                }
+                this._oPopover.openBy(oEvent.getSource());
+            },
 
+          CI_onPressGeneratePdf: function () {
+            const { jsPDF } = window.jspdf;
+            const oView = this.getView();
+            const oModel = oView.getModel("ConsultantInvoiceModel").getData();
+            const oConsultantItemModel = oModel.ConsultantInvoiceItem || [];
+            
+            let currency = oModel.Currency === "INR" ? "Rupees" : oModel.Currency;
+            let totalInWords = this.convertNumberToWords(oModel.TotalSum, currency);
+            if (oModel.Currency !== "INR") {
+                totalInWords = totalInWords
+                    .replaceAll("Lakh", "Million")
+                    .replaceAll("Crore", "Billion")
+                    .replaceAll("Paise", "Cents")
+                    .replaceAll("Rupees", "Dollars");
+            }
+
+            const showSAC = oModel.GSTNO !== undefined && oModel.GSTNO !== "";
+
+            const margin = 15;
+            const doc = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4"
+            });
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const usableWidth = pageWidth - 2 * margin;
+            const headerMargin = 25.4;
+            let currentY = headerMargin;
+
+            doc.setFontSize(16);
+            doc.setFont("times", "bold");
+            let headerLabel = (oModel.GSTNO === undefined || oModel.GSTNO === "") ? "INVOICE" : "TAX-INVOICE";
+            doc.text(headerLabel, pageWidth - 18, currentY, { align: "right" });
+
+            currentY += 10;
+
+            const detailsStartY = currentY;
+            const rowHeight = 6.5;
+            const columnWidths = [30, 30];
+            doc.setFontSize(12);
+            doc.setFont("times", "normal");
+            const rightAlignX = pageWidth - 13.5 - columnWidths[0] - columnWidths[1];
+
+            const detailsTable = [
+                { label: 'Invoice No. :', value: oModel.InvoiceNo },
+                { label: 'Date :', value: Formatter.formatDate(oModel.InvoiceDate) },
+            ];
+
+            detailsTable.forEach(row => {
+                doc.setFont("times", "bold");
+                doc.text(row.label, rightAlignX + columnWidths[0] - doc.getTextWidth(row.label), currentY + 5);
+                doc.setFont("times", "normal");
+                doc.text(row.value, rightAlignX + columnWidths[0] + 2, currentY + 5);
+                currentY += rowHeight;
+            });
+
+            currentY = detailsStartY + 5;
+            doc.setFont("times", "bold");
+            doc.text("From,", margin, currentY);
+            currentY = detailsStartY + 10;
+            doc.setFontSize(12);
+            doc.text(oModel.ConsultantName, margin, currentY);
+            currentY += 5;
+
+            const ConsultantAddressLines = doc.splitTextToSize(oModel.ConsultantAddress, usableWidth / 2 - 10);
+            doc.setFont("times", "normal");
+            doc.text(ConsultantAddressLines, margin, currentY);
+            currentY += ConsultantAddressLines.length * 5;
+
+            if (oModel.GSTNO !== undefined && oModel.GSTNO !== "") {
+                doc.text(`GSTIN : ${oModel.GSTNO}`, margin, currentY);
+                currentY += 5;
+            }
+
+            currentY += 5;
+            doc.setFont("times", "bold");
+            doc.text("To,", margin, currentY);
+            currentY += 5;
+            doc.text(oModel.InvoiceTo, margin, currentY);
+            currentY += 5;
+
+            const InvoiceAddressLines = doc.splitTextToSize(oModel.InvoiceAddress, usableWidth / 2 - 10);
+            doc.setFont("times", "normal");
+            doc.text(InvoiceAddressLines, margin, currentY);
+            currentY += InvoiceAddressLines.length * 5;
+
+            if (oModel.CompanyGSTNO !== undefined && oModel.CompanyGSTNO !== "") {
+                doc.text(`GSTIN : ${oModel.CompanyGSTNO}`, margin, currentY);
+                currentY += 2;
+            }
+
+            currentY += 5; // always add a little space before the next section
+
+            const body = oConsultantItemModel.map((item, index) => {
+                const row = [
+                    index + 1,
+                    item.Item,
+                    item.Days || "-",
+                    Formatter.fromatNumber(item.UnitPrice) || "-",
+                    Formatter.fromatNumber(item.Discount) || "-",
+                    Formatter.fromatNumber(item.Total)
+                ];
+                if (showSAC) row.splice(2, 0, item.SAC); // Insert SAC as 4th column if required
+                return row;
+            });
+
+            const head = showSAC
+                ? [['Sl.No.', 'Item Description', 'SAC', 'Days/Unit', 'Unit Price', 'Discount', 'Total']]
+                : [['Sl.No.', 'Item Description', 'Days/Unit', 'Unit Price', 'Discount', 'Total']];
+
+            doc.autoTable({
+                startY: currentY,
+                head: head,
+                body: body,
+                theme: 'grid',
+                headStyles: { fillColor: [41, 128, 185] },
+                styles: {font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30],
+                halign: "center"},
+                columnStyles: {
+                    0: { halign: 'center' },
+                    1: { halign: 'left' },
+                    ...(showSAC ? { 
+                        2: { halign: 'center' }, 
+                        3: { halign: 'right' }, 
+                        4: { halign: 'right' }, 
+                        5: { halign: 'right' }, 
+                        6: { halign: 'right' } 
+                    } : { 
+                        2: { halign: 'center' }, 
+                        3: { halign: 'right' }, 
+                        4: { halign: 'right' }, 
+                        5: { halign: 'right' } 
+                    })
+                },
+            //      didParseCell: function (data) {
+            //     if (data.section === 'head') {
+            //     // Adjust header alignment for numeric columns
+            //     if (showSAC) {
+            //         if ([4, 5, 6].includes(data.column.index)) {
+            //         data.cell.styles.halign = 'right';
+            //         } else {
+            //         data.cell.styles.halign = 'center';
+            //         }
+            //     } else {
+            //         if ([3, 4, 5].includes(data.column.index)) {
+            //         data.cell.styles.halign = 'right';
+            //         } else {
+            //         data.cell.styles.halign = 'center';
+            //         }
+            //     }
+            //     }
+            // }
+            });
+    
+            currentY = doc.lastAutoTable.finalY + 10;
+
+            if (currentY + 40 > pageHeight) {
+                doc.addPage();
+                currentY = 20;
+            }
+
+            // Create summary table body
+            const summaryBody = [];
+
+            // SubTotal Without GST
+            if (oModel.SubTotalNotGST > 0) {
+                summaryBody.push([
+                    `Sub-Total ( Non-Taxable ) (${oModel.Currency})`,
+                    Formatter.fromatNumber(oModel.SubTotalNotGST)
+                ]);
+            }
+
+            // SubTotal With GST
+            if (oModel.SubTotal > 0) {
+                summaryBody.push([
+                    `Sub-Total ( Taxable ) (${oModel.Currency})`,
+                    Formatter.fromatNumber(oModel.SubTotal)
+                ]);
+            }
+
+            // GST Breakdown
+            if (oModel.Currency !== "USD") {
+                const cgstValue = parseFloat(oModel.CGST) || 0;
+                const sgstValue = parseFloat(oModel.SGST) || 0;
+                const igstValue = parseFloat(oModel.IGST) || 0;
+
+                if(oModel.Currency === "INR" && oModel.CGST && oModel.SGST && oModel.CGSTVisible === true) {
+                    summaryBody.push([
+                        `CGST (${oModel.Percentage}%)`,
+                        Formatter.fromatNumber(cgstValue.toFixed(2))
+                    ]);
+                    summaryBody.push([
+                        `SGST (${oModel.Percentage}%)`,
+                        Formatter.fromatNumber(sgstValue.toFixed(2))
+                    ]);
+                } else if (oModel.IGST && oModel.Currency === "INR"  && oModel.IGSTVisible === true) {
+                    summaryBody.push([
+                        `IGST (${oModel.Percentage}%)`,
+                        Formatter.fromatNumber(igstValue.toFixed(2))
+                    ]);
+                }
+            }
+
+            // Total row
+            const totalRowIndex = summaryBody.length;
+            summaryBody.push([
+                `Total (${oModel.Currency})`,
+                Formatter.fromatNumber(oModel.TotalSum)
+            ]);
+
+            doc.autoTable({
+                startY: currentY,
+                head: [],
+                body: summaryBody,
+                theme: 'plain',
+                styles: {
+                    font: "times",
+                    fontSize: 10,
+                    halign: "right",
+                    cellPadding: 2
+                },
+                columnStyles: {
+                    0: { halign: "right", cellWidth: 60 },
+                    1: { halign: "right", cellWidth: 40 }
+                },
+                margin: { left: 96 },
+                didParseCell: function (data) {
+                    if (data.row.index === totalRowIndex) {
+                        // Apply top border only for the total row (last row)
+                        data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
+                        data.cell.styles.lineColor = [0, 0, 0];
+                        data.cell.styles.fontStyle = 'bold';
+                    }
+                }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 10;
+
+            oModel.AmountInWords = totalInWords;
+            doc.setFont("times", "bold");
+            doc.text("Amount in Words:", 13, currentY);
+            currentY += 5;
+            doc.setFont("times", "normal");
+            const amountHeight = doc.getTextDimensions(oModel.AmountInWords || "").h;
+            doc.text(oModel.AmountInWords || "", 13, currentY, { maxWidth: 180 });
+            currentY += amountHeight + 10;
+
+            doc.setFont("times", "bold").setFontSize(11);
+            doc.text("PAYMENT METHOD :", margin - 2, currentY);
+            currentY += 5;
+
+            const paymentDetails = [
+                { label: "Bank Name", value: oModel.BankName },
+                { label: "Account Name", value: oModel.AccountName },
+                { label: "Account No", value: oModel.AccountNo },
+                { label: "IFSC Code", value: oModel.IFSCCode },
+                { label: "Pay By", value: Formatter.formatDate(oModel.PayBy) }
+            ];
+
+            paymentDetails.forEach(detail => {
+                doc.setFont("times", "bold");
+                const label = `${detail.label} :`;
+                const labelWidth = doc.getTextWidth(label);
+                doc.text(label, margin - 2, currentY);
+                doc.setFont("times", "normal");
+                doc.text(detail.value, margin + labelWidth, currentY);
+                currentY += 5;
+            });
+
+            currentY += 10;
+            doc.setFont("times", "bold").setFontSize(12);
+            const forLabelText = "For : " + oModel.ConsultantName;
+            const totalTextWidth = doc.getTextWidth(forLabelText);
+            doc.text(forLabelText, rightAlignX - totalTextWidth + 55, currentY);
+            currentY += 15;
+
+            doc.setFont("times", "normal").setFontSize(11);
+            doc.text("Thank you for your business!", margin - 2, currentY);
+
+            doc.save(`${oModel.ConsultantName}-${oModel.InvoiceNo}-Invoice.pdf`);
+        }
       }
     );
   }

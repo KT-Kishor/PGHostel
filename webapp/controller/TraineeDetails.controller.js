@@ -41,17 +41,17 @@ sap.ui.define([
                     "TraineeEmail": "",
                     "TrainingDuration": "6 Month",
                     "BaseLocation": "Kalaburagi",
-                    "Country":"India",
+                    "Country": "India",
                     "MobileNumber": "",
-                    "STDCode": "",
-                    "Gender":""
+                    "STDCode": "+91",
+                    "Gender": ""
                 };
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
                 this.getView().setModel(oViewModel, "viewModel");
                 this.viewModel = this.getView().getModel("viewModel");
-                ["TD_id_Name", "TD_id_ReportingManager", "TD_id_EmailID", "TD_id_TrainingType", "TD_id_JoiningDate", "TD_id_ReleaseDate", "TD_id_TrainingAmount",
-                    "TU_id_Name", "TU_id_Manager", "TU_id_TraineeMail", "TU_id_JoinDate", "TU_id_TrainingType", "TU_id_TrainingAmount"].forEach(function (ids) {
+                ["TD_id_Name", "TD_id_ReportingManager", "TD_id_EmailID", "TD_id_TrainingType", "TD_id_JoiningDate", "TD_id_ReleaseDate", "TD_id_TrainingAmount","TD_id_Location","TD_Id_Country","TD_id_STDCode","TD_id_Mobile",
+                    "TU_id_Name", "TU_id_Manager", "TU_id_TraineeMail", "TU_id_JoinDate", "TU_id_TrainingType", "TU_id_TrainingAmount","TU_Id_Country","TU_id_Location","TU_id_STDCode","TU_id_Mobile"].forEach(function (ids) {
                         this.getView().byId(ids).setValueState("None");
                     }.bind(this));
                 if (this.sArgPara === "CreateTraineeFlag") {
@@ -87,6 +87,12 @@ sap.ui.define([
                     } else if (traineeData.Status === "Saved") {
                         this.viewModel.setProperty("/isVisiable", true);
                         this.viewModel.setProperty("/editBut", true);
+                    }
+                    if (this.getView().getModel("oTraineeDetails").getProperty("/NameSalutation") === "Dr.") {
+                        this.getView().byId("TU_id_Gender").setEnabled(true);
+                    }
+                    else {
+                        this.getView().byId("TU_id_Gender").setEnabled(false);
                     }
                     this.closeBusyDialog();
                 } else {
@@ -140,6 +146,10 @@ sap.ui.define([
                 utils._LCvalidateJoiningBonus(oEvent);
                 this.TD_validateStep();
             },
+            TD_validateMobile: function (oEvent) {
+                utils._LCvalidateMobileNumber(oEvent);
+                this.TD_validateStep();
+            },
             //validate date function
             TD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent); // Base validation
@@ -166,12 +176,14 @@ sap.ui.define([
             TD_validateStep: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 oModel.Currency = this.getView().byId("TD_id_Currency").getSelectedKey();
+                oModel.Gender = this.getView().byId("TD_id_Gender").getSelectedKey();
                 oModel.BaseLocation = this.getView().byId("TD_id_Location").getSelectedKey();
                 oModel.TrainingDuration = this.getView().byId("TD_id_TDuration").getSelectedKey();
                 const bAllFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getSelectedKey() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_TrainingType").getSelectedKey() && this.getView().byId("TD_id_TrainingAmount").getValue() && this.getView().byId("TD_id_ReleaseDate").getValue() &&
-                    this.getView().byId("TD_id_JoiningDate").getValue() && this.getView().byId("TD_id_TDuration").getSelectedKey() && this.getView().byId("TD_id_Location").getSelectedKey();
+                    this.getView().byId("TD_id_JoiningDate").getValue() && this.getView().byId("TD_id_TDuration").getSelectedKey() && this.getView().byId("TD_Id_Country").getValue() && this.getView().byId("TD_id_Location").getSelectedKey() && this.getView().byId("TD_id_Mobile").getValue() && this.getView().byId("TD_id_STDCode").getValue();
                 if (bAllFieldsFilled) {
-                    let bValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_TrainingType"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("TD_id_TrainingAmount"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
+                    let bValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_TrainingType"), "ID") &&
+                        utils._LCvalidateJoiningBonus(this.getView().byId("TD_id_TrainingAmount"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_Location"), "ID") && utils._LCvalidateMobileNumber(this.getView().byId("TD_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_STDCode"), "ID");
                     this.getView().byId("TD_id_Wizard").getSteps()[0].setValidated(bValid);
                 } else {
                     this.getView().byId("TD_id_Wizard").getSteps()[0].setValidated(false);
@@ -191,7 +203,11 @@ sap.ui.define([
                         utils._LCstrictValidationComboBox(this.getView().byId("TD_id_TrainingType"), "ID") &&
                         utils._LCvalidateJoiningBonus(this.getView().byId("TD_id_TrainingAmount"), "ID") &&
                         utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") &&
-                        utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID");
+                        utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.getView().byId("TD_Id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.getView().byId("TD_id_Location"), "ID") &&
+                        utils._LCvalidateMobileNumber(this.getView().byId("TD_id_Mobile"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.getView().byId("TD_id_STDCode"), "ID");
                     if (!isValid) {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
@@ -282,7 +298,11 @@ sap.ui.define([
                             utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Manager"), "ID") &&
                             utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") &&
                             utils._LCstrictValidationComboBox(this.getView().byId("TU_id_TrainingType"), "ID") &&
-                            utils._LCvalidateJoiningBonus(this.getView().byId("TU_id_TrainingAmount"), "ID");
+                            utils._LCvalidateJoiningBonus(this.getView().byId("TU_id_TrainingAmount"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.getView().byId("TU_Id_Country"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Location"), "ID") &&
+                            utils._LCvalidateMobileNumber(this.getView().byId("TU_id_Mobile"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.getView().byId("TU_id_STDCode"), "ID");
                         if (isValid) {
                             this.updateCallForTrainee(this.viewModel, "traineeDataUpdated");
                         } else {
@@ -302,7 +322,10 @@ sap.ui.define([
                 try {
                     this.getBusyDialog();
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
-                    oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
+                    oModel.BaseLocation=this.byId("TU_id_Location").getSelectedKey()
+                    //  oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TU_id_Location").getSelectedKey();
+                     oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
+    
                     var sSelectedKey = this.byId("TU_id_Manager").getSelectedKey();
                     oModel.ManagerID = sSelectedKey ? sSelectedKey : oModel.ManagerID;
                     oModel.ReleaseDate = this.byId("TU_id_RelDate").getValue().split("/").reverse().join("-");
@@ -519,28 +542,28 @@ sap.ui.define([
                     oView.byId("TD_id_TrainingAmount").setValueState("None");
                 }
             },
-            
+
             TD_CreateSalutationChange: function (oEvent) {
                 this.onSalutationChangeCommon(
                     oEvent,
                     "oTraineeDetails",       // name of the model
                     "/Gender",           // path to gender property
-                    "TD_id_Genderr"        // ID of the gender control
+                    "TD_id_Gender"        // ID of the gender control
                 );
             },
-                TU_EditSalutationChange: function (oEvent) {
+            TU_EditSalutation: function (oEvent) {
                 this.onSalutationChangeCommon(
                     oEvent,
-                    "employeeModel",       // name of the model
+                    "oTraineeDetails",       // name of the model
                     "/Gender",           // path to gender property
                     "TU_id_Gender"        // ID of the gender control
                 );
             },
-             TD_onChangeCountry: function (oEvent) {
+            TD_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.onCountryChange(oEvent, { stdCodeCombo: "TD_id_STDCode", baseLocationCombo: "TD_id_Location", branchInput: "TD_id_BranchCode", mobileInput: "TD_id_Mobile" });
             },
-              TU_onChangeCountry: function (oEvent) {
+            TU_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.onCountryChange(oEvent, { stdCodeCombo: "TU_id_STDCode", baseLocationCombo: "TU_id_Location", branchInput: "TU_id_BranchCode", mobileInput: "TU_id_Mobile" });
             },

@@ -1,6 +1,6 @@
 sap.ui.define(
   [
-    "./BaseController", //import base controller
+    "./BaseController",  //import base controller
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "../model/formatter",
@@ -11,14 +11,8 @@ sap.ui.define(
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.RouteHrQuotationDetails", {
       Formatter: Formatter,
-
       onInit: function () {
-        var QuotaionModel = {
-        }
-        var oModel = new JSONModel(QuotaionModel);
-        this.getView().setModel(oModel, "quotation");
         var oQuotationModel = new JSONModel();
-
         this.getView().setModel(oQuotationModel, "QuotationModel");
         this.getRouter().getRoute("RouteHrQuotationDetails").attachMatched(this._onRouteMatched, this);
       },
@@ -28,106 +22,157 @@ sap.ui.define(
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
         this.getBusyDialog();
-        await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
-        this._fetchCommonData("Currency", "CurrencyModel");
-        this._fetchCommonData("Country", "CountryModel");
-        this._fetchCommonData("BaseLocation", "BrachModel");
-        this._fetchCommonData("CompanyInvoiceSAC", "SACModel", {});
-
+        this._ViewDatePickersReadOnly(["HQD_id_Quotation", "HQD_id_QuotationValid"], this.getView())
+        this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
+        // await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
+        if (!this.getView().getModel("QuotationPDFModel")) await this._fetchCommonData("Quotation", "QuotationPDFModel");
+        if (!this.getView().getModel("CompanyCodeDetailsModel")) await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+        // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-
         var oVisiModel = new JSONModel();
 
         if (sQuotationNo === "new") {
+          //  Set Busy true on dropdowns
+          this.byId("HQD_id_Country").setBusy(true);
+          this.byId("HQD_id_BranchCode").setBusy(true);
+
+          if (!this.getView().getModel("CountryModel")) await this._fetchCommonData("Country", "CountryModel");
+          if (!this.getView().getModel("BrachModel")) this._fetchCommonData("BaseLocation", "BrachModel");
+          if (!this.getView().getModel("SACModel")) this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
+
+          //  Set Busy false after data has loaded
+          this.byId("HQD_id_Country").setBusy(false);
+          this.byId("HQD_id_BranchCode").setBusy(false);
+
+          // ... continue with your model binding and setup
+          var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
           var oToday = new Date();
-          oToday.setHours(0, 0, 0, 0); // Normalize
+          oToday.setHours(0, 0, 0, 0);
+          var oMinDate = new Date(oToday);
+          oMinDate.setFullYear(oToday.getFullYear() - 100);
           var oValidUntil = new Date(oToday);
           oValidUntil.setDate(oValidUntil.getDate() + 30);
+
+          var sMobileNo = oRawData.mobileNo || "";
+          var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;
+
           var oBlankModel = new JSONModel({
             Date: oToday,
             ValidUntil: oValidUntil,
-            CompanyName: "",
-            CompanyAddress: "",
-            CompanyGSTNO: "",
-            CompanyEmailID: "",
-            CompanyMobileNo: "",
-            STDCode: "",
-            Country: "",
-            SelectedBranchCode: "",
-            Percentage: "",
-            Currency: "",
-            gstEditable: true
+            CompanyName: oRawData.companyName,
+            CompanyAddress: oRawData.longAddress,
+            CompanyGSTNO: oRawData.gstin,
+            CompanyEmailID: oRawData.carrerEmail,
+            CompanyMobileNo: sActualMobileNo,
+            STDCode: "+91",
+            CustomerSTDCode: "+91",
+            Country: "India",
+            Branch: "Kalaburagi",
+            Currency: "INR",
+            gstEditable: true,
+            IGSTSelected: false,
+            CGSTVisible: true,
+            Percentage: 9,
+            SGSTVisible: true,
+            IGSTVisible: false
           });
+          this.byId("HQD_id_CompGSTNO").setEditable(true);
           this.getView().setModel(oBlankModel, "SingleCompanyModel");
-          //  Set min date on Quotation Date
-          var oDatePicker = this.getView().byId("HQD_id_Quotation");
-          oDatePicker.setDateValue(oToday); // Ensure UI shows it
 
-          //  Set range on Valid Until Date
+          var oQuotationModel = new JSONModel({
+            QuotationItemModel: [],
+            CGSTSelected: true,
+            IGSTSelected: false,
+            CGSTVisible: true,
+            SGSTVisible: true,
+            IGSTVisible: false,
+            ShowGSTFields: true
+          });
+
+          this.getView().setModel(oQuotationModel, "QuotationModel");
+
+          this.updateTotalAmount();
+
+          var oDatePicker = this.getView().byId("HQD_id_Quotation");
+          oDatePicker.setDateValue(oToday);
+          oDatePicker.setMinDate(oMinDate);
+          oDatePicker.setMaxDate(oToday);
+
           var oValidPicker = this.getView().byId("HQD_id_QuotationValid");
           oValidPicker.setMaxDate(oValidUntil);
-          oValidPicker.setDateValue(oValidUntil); // Ensure UI shows it
+          oValidPicker.setDateValue(oValidUntil);
 
-          // Show input fields as editable
-          oVisiModel.setData({ editable: true, showBranch: false });
-
+          oVisiModel.setData({ editable: true });
           this.getView().setModel(oVisiModel, "visiablityPlay");
         }
+        // Inside the onRouteMatched function's else block (edit mode)
         else {
           // Edit Mode
-          this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
+          if (!this.getView().getModel("CCMailModel")) await this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
+          if (!this.getView().getModel("CountryModel")) await this._fetchCommonData("Country", "CountryModel");
+          if (!this.getView().getModel("SACModel")) await this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
           var oSelectedQuotation = aQuotations.find(item => item.QuotationNo === sQuotationNo);
           if (oSelectedQuotation) {
             var oSelectedModel = new JSONModel(oSelectedQuotation);
-
-            // Determine GST selection based on values from database
+            // Determine GST values
             var cgst = parseFloat(oSelectedQuotation.CGST || 0);
             var sgst = parseFloat(oSelectedQuotation.SGST || 0);
             var igst = parseFloat(oSelectedQuotation.IGST || 0);
 
-            if ((cgst > 0 || sgst > 0) && igst === 0) {
-              oSelectedModel.setProperty("/CGSTSelected", true);
-              oSelectedModel.setProperty("/IGSTSelected", false);
-              oSelectedModel.setProperty("/CGSTVisible", true);
-              oSelectedModel.setProperty("/SGSTVisible", true);
-              oSelectedModel.setProperty("/IGSTVisible", false);
-            } else if (igst > 0 && cgst === 0 && sgst === 0) {
-              oSelectedModel.setProperty("/CGSTSelected", false);
-              oSelectedModel.setProperty("/IGSTSelected", true);
-              oSelectedModel.setProperty("/CGSTVisible", false);
-              oSelectedModel.setProperty("/SGSTVisible", false);
-              oSelectedModel.setProperty("/IGSTVisible", true);
-            } else {
-              // Default/fallback
-              oSelectedModel.setProperty("/CGSTSelected", false);
-              oSelectedModel.setProperty("/IGSTSelected", false);
-              oSelectedModel.setProperty("/CGSTVisible", false);
-              oSelectedModel.setProperty("/SGSTVisible", false);
-              oSelectedModel.setProperty("/IGSTVisible", false);
-            }
-
+            // Calculate visibility and selection flags
+            var cgstVisible = (cgst > 0 || sgst > 0);
+            var sgstVisible = cgstVisible;
+            var igstVisible = (igst > 0);
+            var cgstSelected = (cgst > 0 || sgst > 0);
+            var igstSelected = (igst > 0);
             oSelectedModel.setProperty("/gstEditable", false); // Disable editing
-            this.getView().setModel(oSelectedModel, "SingleCompanyModel");
-          }
+            var sCurrency = oSelectedQuotation.Currency;
 
-          try {
-            const response = await this.ajaxReadWithJQuery("QuotationItem", { QuotationNo: sQuotationNo });
-            if (response && response.data) {
-              var aItems = Array.isArray(response.data) ? response.data : [response.data];
-              var oItemModel = new JSONModel({ QuotationItemModel: aItems });
-              this.getView().setModel(oItemModel, "QuotationModel");
-              this.updateTotalAmount();
+            // Convert Notes from HTML to plain text for display
+            var sNotes = oSelectedModel.getProperty("/Notes");
+            if (sNotes) {
+              var tmpDiv = document.createElement("div");
+              tmpDiv.innerHTML = sNotes;
+              oSelectedModel.setProperty("/Notes", tmpDiv.textContent || tmpDiv.innerText || "");
             }
-          } catch (e) {
-            console.error("Error loading items", e);
-          }
+            this.getView().setModel(oSelectedModel, "SingleCompanyModel");
+            const sCountry = oSelectedQuotation.Country;
+            if (sCountry === "India") {
+              await this._fetchCommonData("BaseLocation", "BrachModel");
+            } else {
 
+            }
+
+            setTimeout(() => {
+              const oEditor = this.byId("HQD_id_Notes");
+              if (oEditor && sNotes) {
+                oEditor._oEditor?.editorManager?.activeEditor?.setContent(sNotes);
+              }
+            }, 100)
+            // Set flags in QuotationModel after fetching items
+            try {
+              const response = await this.ajaxReadWithJQuery("QuotationItem", { QuotationNo: sQuotationNo });
+              if (response && response.data) {
+                var aItems = Array.isArray(response.data) ? response.data : [response.data];
+                var oQuotationModel = new JSONModel({
+                  QuotationItemModel: aItems,
+                  CGSTSelected: cgstSelected,
+                  IGSTSelected: igstSelected,
+                  CGSTVisible: cgstVisible,
+                  SGSTVisible: sgstVisible,
+                  IGSTVisible: igstVisible,
+
+                });
+                this.getView().setModel(oQuotationModel, "QuotationModel");
+                this.updateTotalAmount();
+              }
+            } catch (e) {
+              console.error("Error loading items", e);
+            }
+          }
           oVisiModel.setData({ editable: false });
         }
-
-
         if (sQuotationNo === "new") {
           oVisiModel.setData({
             editable: true,
@@ -143,53 +188,115 @@ sap.ui.define(
             merge: true
           });
         }
-
         this.getView().setModel(oVisiModel, "visiablityPlay");
-
         this.closeBusyDialog();
       },
 
       HQD_onCountryChange: function (oEvent) {
-        utils._LCstrictValidationComboBox(oEvent, "oEvent");
+        utils._LCstrictValidationComboBox(oEvent);
+        var sSelectedKey = oEvent.getSource().getSelectedKey(); // country name
+        var oCodeModel = this.getView().getModel("codeModel");
+        var aCodeData = oCodeModel.getProperty("/") || [];
 
-        var sSelectedKey = oEvent.getSource().getSelectedKey();
         var oSTDCodeField = this.byId("HQD_id_mobileNumber");
-        var oMobileNumberField = this.byId("HQD_id_InputCompanyMobileNo");
+        var oCustomerSTDCodeField = this.byId("HQD_id_CustomerNumberSTD");
         var oCurrencyCombo = this.byId("HQD_id_Curency");
-        var oQuotationModel = this.getView().getModel("QuotationModel");
         var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
+        var oQuotationModel = this.getView().getModel("QuotationModel");
         var oVisibilityModel = this.getView().getModel("visiablityPlay");
+        const oBranchComboBox = this.byId("HQD_id_BranchCode");
 
-        if (sSelectedKey === "India") {
-          oSTDCodeField.setValue("+91");
-          oCurrencyCombo.setSelectedKey("INR");
-          oSingleCompanyModel.setProperty("/CGSTSelected", true);
-          oSingleCompanyModel.setProperty("/Percentage", 9);
+        oBranchComboBox.setBusy(true);
 
-          oQuotationModel.setProperty("/ShowGSTFields", true);
-          oSingleCompanyModel.setProperty("/STDCode", "+91");
-          oSingleCompanyModel.setProperty("/Currency", "INR");
-          oVisibilityModel.setProperty("/showBranch", true);
-          oQuotationModel.setProperty("/CGSTVisible", true);
-          oQuotationModel.setProperty("/SGSTVisible", true);
-        } else {
-          oSTDCodeField.setValue("");
-          oMobileNumberField.setValue("");
-          oQuotationModel.setProperty("/ShowGSTFields", false);
-          oVisibilityModel.setProperty("/showBranch", false);
-          // Clear other dependent fields if needed
-          oSingleCompanyModel.setProperty("/STDCode", "");
-          oSingleCompanyModel.setProperty("/Currency", "");
-          oSingleCompanyModel.setProperty("/SelectedBranchCode", "");
+        // Find matching entry from codeModel based on country
+        var oCountryData = aCodeData.find(function (item) {
+          return item.country === sSelectedKey;
+        });
+
+        if (oCountryData) {
+          // Set STD code and Currency
+          var sSTDCode = oCountryData.calling_code;
+          var sCurrency = oCountryData.currency_code;
+
+          oSTDCodeField.setValue(sSTDCode);
+          oCustomerSTDCodeField.setValue(sSTDCode);
+          oCurrencyCombo.setSelectedKey(sCurrency);
+          oSingleCompanyModel.setProperty("/STDCode", sSTDCode);
+          oSingleCompanyModel.setProperty("/Currency", sCurrency);
+          oSingleCompanyModel.setProperty("/CustomerSTDCode", sSTDCode);
         }
 
-        // Reset value state if no value
+        if (sSelectedKey === "India") {
+          var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+          oSingleCompanyModel.setProperty("/Branch", "Kalaburagi");
+          this._fetchCommonData("BaseLocation", "BrachModel");
+          oVisibilityModel.setProperty("/showBranch", true);
+          oQuotationModel.setProperty("/ShowGSTFields", true);
+          oQuotationModel.setProperty("/CGSTSelected", true);
+          oQuotationModel.setProperty("/IGSTSelected", false);
+          oQuotationModel.setProperty("/CGSTVisible", true);
+          oQuotationModel.setProperty("/SGSTVisible", true);
+          oQuotationModel.setProperty("/IGSTVisible", false);
+          oSingleCompanyModel.setProperty("/Percentage", 9);
+          oSingleCompanyModel.setProperty("/gstEditable", true);
+
+          // Set Mobile number
+          var sMobileNo = oRawData.mobileNo || "";
+          var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;
+          oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
+        } else {
+          this.CountryAndCity(); // fetch cities for other countries
+          var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+          oSingleCompanyModel.setProperty("/Branch", " ");
+          oSingleCompanyModel.setProperty("/gstEditable", true);
+          oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName);
+          oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin);
+          oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail);
+          oSingleCompanyModel.setProperty("/CompanyAddress", oRawData.longAddress);
+          oSingleCompanyModel.setProperty("/CompanyMobileNo", "");
+          // oSingleCompanyModel.setProperty("/CustomerSTDCode", "");
+
+          // Hide GST fields and update percentage
+          oQuotationModel.setProperty("/ShowGSTFields", false);
+          oQuotationModel.setProperty("/CGSTSelected", false);
+          oQuotationModel.setProperty("/IGSTSelected", true);
+          oQuotationModel.setProperty("/CGSTVisible", false);
+          oQuotationModel.setProperty("/SGSTVisible", false);
+          oQuotationModel.setProperty("/IGSTVisible", false);
+          oSingleCompanyModel.setProperty("/Percentage", 18);
+        }
+
+        // Reset tax-related values
+        oQuotationModel.setProperty("/CGST", 0);
+        oQuotationModel.setProperty("/SGST", 0);
+        oQuotationModel.setProperty("/IGST", 0);
+        oQuotationModel.setProperty("/SubTotal", 0);
+
+        // Update GSTCalculation field in each item
+        var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
+        aItems.forEach(function (item) {
+          item.GSTCalculation = (sSelectedKey === "India") ? "Yes" : "No";
+        });
+        oQuotationModel.setProperty("/QuotationItemModel", aItems);
+
+        this.updateTotalAmount();
+
+        // Clear value state if blank
         if (oEvent.getSource().getValue() === '') {
           oEvent.getSource().setValueState("None");
         }
+
+        oBranchComboBox.setBusy(false);
+      },
+
+      CountryAndCity: function () {
+        var Code = this.getView().getModel("CountryModel").getData().filter((item) => item.countryName === this.byId("HQD_id_Country").getValue());
+        var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, Code[0].code);
+        this.byId("HQD_id_BranchCode").getBinding("items").filter(oFilter);
       },
 
       HQD_onBrachChange: function (oEvent) {
+        utils._LCstrictValidationComboBox(oEvent);
         var sSelectedBranchCode = oEvent.getSource().getSelectedKey();
         var aCompanyDetails = this.getView().getModel("CompanyCodeDetailsModel").getData();
 
@@ -200,15 +307,37 @@ sap.ui.define(
         if (oMatchedBranch) {
           var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
 
+          // Get mobile number and extract STD code and number
+          var sMobileNo = oMatchedBranch.mobileNo || "";
+          var sSTDCode = "";
+          var sActualMobileNo = sMobileNo;
+
+          if (sMobileNo.startsWith("+91")) {
+            sSTDCode = "+91";
+            sActualMobileNo = sMobileNo.slice(3); // remove +91
+          }
           oSingleCompanyModel.setProperty("/CompanyName", oMatchedBranch.companyName || "");
           oSingleCompanyModel.setProperty("/CompanyAddress", oMatchedBranch.longAddress || "");
           oSingleCompanyModel.setProperty("/CompanyGSTNO", oMatchedBranch.gstin || "");
           oSingleCompanyModel.setProperty("/CompanyEmailID", oMatchedBranch.carrerEmail || "");
-          oSingleCompanyModel.setProperty("/CompanyMobileNo", oMatchedBranch.mobileNo || "");
-          oSingleCompanyModel.setProperty("/STDCode", "+91");
+          oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
+          oSingleCompanyModel.setProperty("/STDCode", sSTDCode);
         }
       },
+      // _setSACBasedOnGST: function (sGSTCalc) {
+      //   var oSACModel = this.getView().getModel("SACModel");
+      //   var oQuotationModel = this.getView().getModel("QuotationModel");
+      //   var oSACCombo = this.byId("HQD_id_SACCombo");
+      //   var aSACItems = oSACModel.getProperty("/") || [];
 
+      //   if (aSACItems.length >= 2) {
+      //     var sSelectedKey = sGSTCalc === "Yes" ? aSACItems[0].id : aSACItems[1].id;
+
+      //     // Update UI and Model
+      //     oSACCombo.setSelectedKey(sSelectedKey);
+      //     oQuotationModel.setProperty("/SAC", sSelectedKey);
+      //   }
+      // },
       HQD_onComGSTLiveChange: function (oEvent) {
         utils._LCvalidateGstNumber(oEvent);
         var oInput = oEvent.getSource();
@@ -222,7 +351,6 @@ sap.ui.define(
         var oCGSTPercent = oView.byId("HQD_id_Percentage");
 
         var oModel = oView.getModel("QuotationModel");
-        var oSelected = oView.getModel("SingleCompanyModel");
 
         // If GST is valid (valueState is "None") and not empty
         if (sValueState === "None" && sGST) {
@@ -246,8 +374,8 @@ sap.ui.define(
           oIGSTRadio.setEditable(false);
           oCGSTPercent.setEditable(false);
           oModel.setProperty("/ShowSACAndGSTCalculation", false);
-          oSelected.setProperty("/CGSTSelected", false);
-          oSelected.setProperty("/IGSTSelected", false);
+          oModel.setProperty("/CGSTSelected", false);
+          oModel.setProperty("/IGSTSelected", false);
           oModel.setProperty("/CGSTPercent", "");
           oCGSTPercent.setValue("");
         }
@@ -256,12 +384,29 @@ sap.ui.define(
         var oView = this.getView();
         var oQuotationModel = oView.getModel("QuotationModel");
         var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
-        var subTotalTaxable = 0, subTotalNonTaxable = 0;
-        var cgst = 0, sgst = 0, igst = 0, totalSum = 0;
+        var sCurrency = this.getView().getModel("SingleCompanyModel").getProperty("/Currency");
+        var bIsINR = sCurrency === "INR";
+
+        // Declare required variables
+        var subTotalTaxable = 0;
+        var subTotalNonTaxable = 0;
+        var cgst = 0;
+        var sgst = 0;
+        var igst = 0;
+        var totalSum = 0;
+
         aItems.forEach(function (oItem) {
-          var iItemTotal = oItem.Days
-            ? parseFloat(oItem.Days) * parseFloat(oItem.UnitPrice || 0)
-            : parseFloat(oItem.UnitPrice || 0);
+          // Enforce GSTCalculation flag based on currency
+          if (!bIsINR && oItem.GSTCalculation !== "No") {
+            // Your existing code
+          }
+
+          // Fix: Handle cases where Days is 0 or undefined
+          var iDays = parseFloat(oItem.Days) || 0;
+          var iUnitPrice = parseFloat(oItem.UnitPrice) || 0;
+
+          // Calculate item total - if Days is 0, just use UnitPrice
+          var iItemTotal = iDays ? iDays * iUnitPrice : iUnitPrice;
 
           var iDiscount = 0;
           if (oItem.IsDiscountPercentage) {
@@ -278,7 +423,6 @@ sap.ui.define(
           var finalItemTotal = iItemTotal - iDiscount;
           oItem.Total = parseFloat(finalItemTotal.toFixed(2));
 
-          // Corrected GST check using oItem
           if (oItem.GSTCalculation === "Yes") {
             subTotalTaxable += oItem.Total;
           } else {
@@ -286,13 +430,13 @@ sap.ui.define(
           }
         });
 
+        // Rest of your existing code remains the same...
         // Update items back into model
         oQuotationModel.setProperty("/QuotationItemModel", aItems);
-
         oQuotationModel.setProperty("/SubTotal", parseFloat(subTotalTaxable.toFixed(2)));
         oQuotationModel.setProperty("/SubTotalNotGST", parseFloat(subTotalNonTaxable.toFixed(2)));
 
-        // Tax calculations remain unchanged
+        // Tax calculations
         var oSingleCompanyModel = oView.getModel("SingleCompanyModel");
 
         var cgstPerc = oQuotationModel.getProperty("/CGSTSelected")
@@ -304,7 +448,6 @@ sap.ui.define(
         var igstPerc = oQuotationModel.getProperty("/IGSTSelected")
           ? parseFloat(oSingleCompanyModel.getProperty("/Percentage") || 18)
           : 0;
-
 
         oQuotationModel.setProperty("/CGST", 0);
         oQuotationModel.setProperty("/SGST", 0);
@@ -327,6 +470,10 @@ sap.ui.define(
         oQuotationModel.setProperty("/TotalSum", parseFloat(totalSum.toFixed(2)));
         oQuotationModel.refresh();
       },
+
+      HQD_onPercentageChange: function () {
+        this.updateTotalAmount()
+      },
       onSelectCGST: function (oEvent) {
         // Uncheck IGST checkbox and ensure only CGST is selected
         this.getView().byId("HQD_id_CheckboxIGS").setSelected(false);
@@ -338,14 +485,9 @@ sap.ui.define(
         oModel.setProperty("/IGSTSelected", false); // Unselect IGST
 
         // Update visibility for CGST/SGST and hide IGST
-        oModel.setProperty("/CGSTVisible", true);
-        oModel.setProperty("/SGSTVisible", true);
-        oModel.setProperty("/IGSTVisible", false);
-
-        oQuotationModel.setProperty("/CGSTVisible", true);
-        oQuotationModel.setProperty("/SGSTVisible", true);
+        oModel.setProperty("/CGSTVisible", true); oModel.setProperty("/SGSTVisible", true);
+        oModel.setProperty("/IGSTVisible", false); oQuotationModel.setProperty("/CGSTVisible", true); oQuotationModel.setProperty("/SGSTVisible", true);
         oQuotationModel.setProperty("/IGSTVisible", false);
-
         // Set default percentage to 9% for CGST/SGST
         oModel.setProperty("/Percentage", 9);
         oQuotationModel.setProperty("/CGSTSelected", true);
@@ -364,30 +506,39 @@ sap.ui.define(
         // Access both models
         var oCompanyModel = oView.getModel("SingleCompanyModel");
         var oQuotationModel = oView.getModel("QuotationModel");
-
         // Update flags in QuotationModel instead of SingleCompanyModel
         oQuotationModel.setProperty("/CGSTSelected", false);
         oQuotationModel.setProperty("/IGSTSelected", true);
-
         // Update visibility
         oQuotationModel.setProperty("/CGSTVisible", false);
         oQuotationModel.setProperty("/SGSTVisible", false);
         oQuotationModel.setProperty("/IGSTVisible", true);
-
         // Set percentage for IGST in QuotationModel
-        oQuotationModel.setProperty("/Percentage", 18);
+        // oQuotationModel.setProperty("/Percentage", 18);
         oCompanyModel.setProperty("/Percentage", 18);
-
         // Recalculate
         this.updateTotalAmount();
       },
-
-
       HQD_onBack: function () {
-        this.getRouter().navTo("RouteHrQuotation");
-        this.resetHQDForm()
+        var isEditMode = this.getView().getModel("visiablityPlay").getProperty("/editable");
+        if (isEditMode) {
+          this.showConfirmationDialog(
+            this.i18nModel.getText("ConfirmActionTitle"),
+            this.i18nModel.getText("backConfirmation"),
+            function () {
+              // Reset edit-related flags
+              this.getView().getModel("visiablityPlay").setProperty("/editable", false);
+              this.getView().getModel("visiablityPlay").setProperty("/merge", true);
+              this.resetHQDForm()
+              // Navigate back
+              this.getRouter().navTo("RouteHrQuotation");
+            }.bind(this)
+          );
+        } else {
+          this.resetHQDForm()
+          this.getRouter().navTo("RouteHrQuotation");
+        }
       },
-
       HQD_DateValidate: function (oEvent) {
         var oView = this.getView();
         var oDatePicker = oEvent.getSource();
@@ -398,11 +549,9 @@ sap.ui.define(
 
           var oMaxDate = new Date(oDate);
           oMaxDate.setDate(oMaxDate.getDate() + 30);
-
           var oValidUntil = oView.byId("HQD_id_QuotationValid");
           oValidUntil.setMinDate(oDate);
           oValidUntil.setMaxDate(oMaxDate);
-
           var oCurrentValidUntil = oValidUntil.getDateValue();
           if (!oCurrentValidUntil || oCurrentValidUntil < oDate || oCurrentValidUntil > oMaxDate) {
             oValidUntil.setDateValue(oMaxDate); // Reset to max if invalid
@@ -424,26 +573,26 @@ sap.ui.define(
 
       HQD_EmailIDLiveChange: function (oEvent) {
         utils._LCvalidateEmail(oEvent);
-
       },
 
       HQD_onAddressLiveChange: function (oEvent) {
         utils._LCvalidateMandatoryField(oEvent)
       },
-
-
+      HQD_onItemDescriptionLiveChange: function (oEvent) {
+        utils._LCvalidateMandatoryField(oEvent);
+      },
+      HQD_STDCode: function (oEvent) {
+        utils._LCstrictValidationComboBox(oEvent);
+      },
       HQD_onCurrencyChange: function (oEvent) {
         utils._LCstrictValidationComboBox(oEvent);
 
         var sSelectedCurrency = oEvent.getSource().getSelectedKey();
-
         var oQuotationModel = this.getView().getModel("QuotationModel");
         var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
-
         // GST-relevant fields and values
         var oView = this.getView();
         var oModelDataPro = this.getView().getModel("QuotationModel");
-
         var fTotal = parseFloat(oModelDataPro.getProperty("/TotalSum")) || 0;
         var fCGST = parseFloat(oModelDataPro.getProperty("/CGST")) || 0;
         var fSGST = parseFloat(oModelDataPro.getProperty("/SGST")) || 0;
@@ -451,47 +600,59 @@ sap.ui.define(
 
         if (sSelectedCurrency === "INR") {
           // Currency is INR — enable GST
-          oQuotationModel.setProperty("/CGSTVisible", false);
-          oQuotationModel.setProperty("/SGSTVisible", false);
-          oQuotationModel.setProperty("/IGSTVisible", false);
+          oQuotationModel.setProperty("/CGSTVisible", false); oQuotationModel.setProperty("/SGSTVisible", false); oQuotationModel.setProperty("/IGSTVisible", false);
           oQuotationModel.setProperty("/ShowGSTFields", true);
-
           oSingleCompanyModel.setProperty("/gstEditable", true);
-          oView.byId("HQD_id_CompGSTNO")?.setEnabled(true);
-          oModelDataPro.setProperty("/ShowSACAndGSTCalculation", true);;
+          oQuotationModel.setProperty("/CGSTSelected", true);
+          oQuotationModel.setProperty("/IGSTSelected", false);
+          oQuotationModel.setProperty("/CGSTVisible", true);
+          oQuotationModel.setProperty("/SGSTVisible", true);
+          oQuotationModel.setProperty("/IGSTVisible", false);
+
+          oSingleCompanyModel.setProperty("/Percentage", 9);
           // GST-related logic (optional if not already in another function)
           // Calculate Total with GST
           var fNewTotal = fTotal + fCGST + fSGST + fIGST;
           oModelDataPro.setProperty("/TotalSum", fNewTotal.toFixed(2));
+
+          var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
+          aItems.forEach(function (item) {
+            item.GSTCalculation = "Yes"; // Enforce GST
+          });
+
+          // Force update to model to reflect change
+          oQuotationModel.setProperty("/QuotationItemModel", JSON.parse(JSON.stringify(aItems)));
+          this.updateTotalAmount();
+
         } else {
           // Currency is NOT INR — disable GST
-
           oQuotationModel.setProperty("/CGSTVisible", false);
           oQuotationModel.setProperty("/SGSTVisible", false);
           oQuotationModel.setProperty("/IGSTVisible", false);
           oQuotationModel.setProperty("/ShowGSTFields", false);
+          oQuotationModel.setProperty("/CGSTSelected", false);
+          oQuotationModel.setProperty("/IGSTSelected", true);
 
-          oSingleCompanyModel.setProperty("/Percentage", "");
-          oSingleCompanyModel.setProperty("/CGSTSelected", false);
-          oSingleCompanyModel.setProperty("/IGSTSelected", false);
-          oSingleCompanyModel.setProperty("/CompanyGSTNO", "");
-          oSingleCompanyModel.setProperty("/gstEditable", false);
-          oView.byId("HQD_id_CompGSTNO")?.setEnabled(false);
+          oSingleCompanyModel.setProperty("/Percentage", 18);
 
-          // Recalculate Total without GST
-          var updatedTotal = fTotal - (fCGST + fSGST + fIGST);
-          oModelDataPro.setProperty("/SubTotalNotGST", updatedTotal.toFixed(2));
-          oModelDataPro.setProperty("/TotalSum", updatedTotal.toFixed(2));
-          oModelDataPro.setProperty("/SubTotal", "");
-          oModelDataPro.setProperty("/ShowSACAndGSTCalculation", false);;
+          //  Mark all items as non-taxable (GSTCalculation = "No")
+          var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
+          aItems.forEach(function (item) {
+            item.GSTCalculation = "No"; //  This affects the ComboBox
+          });
 
-          // Clear GST values
-          oModelDataPro.setProperty("/CGST", "0");
-          oModelDataPro.setProperty("/SGST", "0");
-          oModelDataPro.setProperty("/IGST", "0");
+          oQuotationModel.setProperty("/QuotationItemModel", aItems);
+
+          // Clear tax values
+          oQuotationModel.setProperty("/CGST", 0);
+          oQuotationModel.setProperty("/SGST", 0);
+          oQuotationModel.setProperty("/IGST", 0);
+          oQuotationModel.setProperty("/SubTotal", 0);
+
+          //  Recalculate totals
+          this.updateTotalAmount();
         }
       },
-
 
       HQD_onCustomerNameLiveChange: function (oEvent) {
         utils._LCvalidateName(oEvent);
@@ -510,17 +671,49 @@ sap.ui.define(
       },
 
       HQD_onCustomerGSTLiveChange: function (oEvent) {
-        utils._LCvalidateGstNumber(oEvent)
-      },
-      // HQD_onNotesChange: function (oEvent) {
-      //   utils._LCvalidateMandatoryField(oEvent)
-      // },
+        const sGSTIN = oEvent.getSource().getValue();
+        const oInput = oEvent.getSource();
+        const regexGSTIN = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
+        if (sGSTIN && !regexGSTIN.test(sGSTIN)) {
+          oInput.setValueState(sap.ui.core.ValueState.Error);
+          oInput.setValueStateText("GST number should be in proper format (Eg:22AAAAA0000A1Z5)");
+        } else {
+          oInput.setValueState(sap.ui.core.ValueState.None);
+        }
+      },
+      HQD_onDiscountInfoPress: function (oEvent) {
+        if (!this._oPopover) {
+          this._oPopover = new sap.m.Popover({
+            contentWidth: "400px",
+            contentHeight: "auto",
+            showHeader: false,
+            placement: sap.m.PlacementType.Bottom,
+            content: [
+              new sap.m.VBox({
+                alignItems: "Center",
+                justifyContent: "Center",
+                width: "100%",
+                items: [
+                  new sap.m.Text({
+                    text: this.i18nModel.getText("discountInfoText"),
+                    wrapping: true
+                  })
+                ]
+              }).addStyleClass("customPopoverContent")
+            ]
+          });
+          this.getView().addDependent(this._oPopover);
+        }
+        this._oPopover.openBy(oEvent.getSource());
+      },
       HQD_onPressSubmit: async function () {
         const oView = this.getView();
+        var that = this
         // Validate RichTextEditor content
         const oRichTextEditor = this.byId("HQD_id_Notes");
-        const oNotesText = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'text' }) || "";
+        const oNotesHTML = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'html' }) || "";
+
         const oCurrency1 = this.byId("HQD_id_Curency").getSelectedKey();
 
         const isINR = oCurrency1 === "INR";
@@ -529,17 +722,16 @@ sap.ui.define(
         const bIsValid =
           utils._LCvalidateDate(this.byId("HQD_id_Quotation"), "ID") &&
           utils._LCvalidateDate(this.byId("HQD_id_QuotationValid"), "ID") &&
+          utils._LCstrictValidationComboBox(this.byId("HQD_id_Country"), "ID") &&
           utils._LCvalidateName(this.byId("HQD_id_InputCompanyName"), "ID") &&
-          utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyName"), "ID") &&
           utils._LCvalidateMobileNumber(this.byId("HQD_id_InputCompanyMobileNo"), "ID") &&
           utils._LCvalidateEmail(this.byId("HQD_id_CompanyEmailID"), "ID") &&
-          utils._LCstrictValidationComboBox(this.byId("HQD_id_Country"), "ID") &&
-          utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyAddress"), "ID") &&
           (!isINR || utils._LCvalidateGstNumber(this.byId("HQD_id_CompGSTNO"), "ID")) &&
           utils._LCstrictValidationComboBox(this.byId("HQD_id_Curency"), "ID") &&
+          utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyAddress"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_CustomerName"), "ID") &&
           utils._LCvalidateEmail(this.byId("HQD_id_CustomerEmailID"), "ID") &&
-          utils._LCvalidateMobileNumber(this.byId("HQD_id_InputCustomerMobileNo"), "ID") &&
+          utils._LCvalidateMobileNumber(this.byId("HQD_id_InputCustomerMobileNo"), "ID") && utils._LCstrictValidationComboBox(this.byId("HQD_id_CustomerNumberSTD"), "ID") && utils._LCstrictValidationComboBox(this.byId("HQD_id_mobileNumber"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCustomerAddress"), "ID") &&
           (!isINR || utils._LCvalidateMandatoryField(this.byId("HQD_id_Percentage"), "ID"));
 
@@ -547,21 +739,50 @@ sap.ui.define(
           MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           return;
         }
-        if (!oNotesText.trim()) {
-          MessageToast.show("Notes field is required.");
+        // Additional Customer GST validation based on valueState
+        const oCustomerGSTInput = this.byId("HQD_id_InputCustomerGSTNO");
+        if (oCustomerGSTInput.getValue() && oCustomerGSTInput.getValueState() !== sap.ui.core.ValueState.None) {
+          MessageToast.show("Please fix the Customer GST number format before submitting.");
           return;
         }
 
+
+        // Get values from QuotationModel
+        const oQuotationModel = oView.getModel("QuotationModel");
+        const oQuotationData = oQuotationModel.getData();
+        const oData = oView.getModel("SingleCompanyModel");
+        const ovalaue = oData.getData();
+        // Validate all item descriptions are filled
+        const aItemArray1 = oQuotationModel.getProperty("/QuotationItemModel") || [];
+        const bAllDescriptionsFilled = aItemArray1.every(item =>
+          item.Description && item.Description.trim().length > 0
+        );
+
+        if (!bAllDescriptionsFilled) {
+          MessageToast.show(this.i18nModel.getText("quotaionMsgDes"));
+          return;
+        }
+        const fTotalSum = parseFloat(oQuotationData.TotalSum || "0");
+        if (isNaN(fTotalSum) || fTotalSum <= 0) {
+          MessageToast.show(this.i18nModel.getText("quotaionTotalmsg"));
+          return;
+        }
+        const tmpDiv = document.createElement("div");
+        tmpDiv.innerHTML = oNotesHTML;
+        if (!tmpDiv.textContent.trim()) {
+          MessageToast.show(this.i18nModel.getText("quotaionNotemsg"));
+          return;
+        }
         // Format dates
         const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
         const sQuotationDate = oDateFormat.format(this.byId("HQD_id_Quotation").getDateValue());
         const sValidUntilDate = oDateFormat.format(this.byId("HQD_id_QuotationValid").getDateValue());
-
         // Gather all values
         const oCompanyName = this.byId("HQD_id_InputCompanyName").getValue();
         const omobilenumber = this.byId("HQD_id_InputCompanyMobileNo").getValue();
         const oCompanyEmail = this.byId("HQD_id_CompanyEmailID").getValue();
         const oCompanyStdCode = this.byId("HQD_id_mobileNumber").getValue();
+        const oCustomerStdcode = this.byId("HQD_id_CustomerNumberSTD").getValue();
         const oCountry = this.byId("HQD_id_Country").getSelectedKey();
         const oBranch = this.byId("HQD_id_BranchCode").getSelectedKey();
         const oAddress = this.byId("HQD_id_InputCompanyAddress").getValue();
@@ -573,20 +794,7 @@ sap.ui.define(
         const oCustomerMobile = this.byId("HQD_id_InputCustomerMobileNo").getValue();
         const oCustomerAddress = this.byId("HQD_id_InputCustomerAddress").getValue();
         const oCustomerGST = this.byId("HQD_id_InputCustomerGSTNO").getValue();
-
-        const oNotes = oNotesText; // Already extracted
-
-
-
-        // Get values from QuotationModel
-        const oQuotationModel = oView.getModel("QuotationModel");
-        const oQuotationData = oQuotationModel.getData();
-
-        const fTotalSum = parseFloat(oQuotationData.TotalSum || "0");
-        if (isNaN(fTotalSum) || fTotalSum <= 0) {
-          MessageToast.show("Total amount must be greater than 0.");
-          return;
-        }
+        const oNotes = oNotesHTML; // Already extracted
 
         const data = {
           Date: sQuotationDate,
@@ -596,6 +804,7 @@ sap.ui.define(
           CompanyEmailID: oCompanyEmail,
           Country: oCountry,
           Branch: oBranch,
+          CustomerSTDCode: oCustomerStdcode,
           CompanyAddress: oAddress,
           CompanyGSTNO: oCompanyGST,
           Percentage: oPercentage,
@@ -615,8 +824,6 @@ sap.ui.define(
           IGST: oQuotationData.IGST || "0.00",
           TotalSum: oQuotationData.TotalSum || "0.00"
         };
-
-
         // Extract table items
         const oModel = oView.getModel("QuotationModel");
         const aItemArray = oModel.getProperty("/QuotationItemModel") || [];
@@ -644,9 +851,50 @@ sap.ui.define(
           this.closeBusyDialog();
 
           if (response.success === true) {
-            MessageToast.show(`Quotation No ${response.QuotationNo} Created successfully!`);
-            this.resetHQDForm(); // <-- Make sure this resets the RichTextEditor too
-            this.getRouter().navTo("RouteHrQuotation");
+            oView.getModel("SingleCompanyModel").setProperty("/QuotationNo", response.QuotationNo);
+            oView.getModel("SingleCompanyModel").setProperty("/TotalSum", data.TotalSum);
+
+
+            // Force model updates before generating PDF
+            oView.getModel("SingleCompanyModel").updateBindings(true);
+            oView.getModel("QuotationModel").updateBindings(true);
+
+            var oDialog = new sap.m.Dialog({
+              title: this.i18nModel.getText("success"),
+              type: sap.m.DialogType.Message,
+              state: sap.ui.core.ValueState.Success,
+              content: new sap.m.Text({
+                text: this.i18nModel.getText("quotaionmsg")
+              }),
+              beginButton: new sap.m.Button({
+                text: "OK",
+                type: "Accept",
+                press: function () {
+                  oDialog.close();
+                  that.resetHQDForm();
+                  that.getRouter().navTo("RouteHrQuotation");
+                }
+              }),
+              endButton: new sap.m.Button({
+                text: "Generate PDF",
+                type: "Attention",
+                press: function () {
+                  oDialog.close();
+                  // Use setTimeout to ensure UI updates complete
+                  setTimeout(function () {
+                    that.HQD_onPressMerge().then(function () {
+                      that.resetHQDForm();
+                      that.getRouter().navTo("RouteHrQuotation");
+                    });
+                  }, 100);
+                }
+              }),
+              afterClose: function () {
+                oDialog.destroy();
+              }
+            });
+            oDialog.open();
+
           } else {
             MessageToast.show("Failed to create quotation.");
           }
@@ -674,27 +922,44 @@ sap.ui.define(
           return inWords(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + inWords(n % 10000000) : "");
         }
 
-        if (!num || isNaN(num)) return "Zero";
+        if (num === undefined || isNaN(num)) return "Zero";
 
-        const word = inWords(Math.floor(num));
-        let currencyText = "";
+        num = parseFloat(num).toFixed(2); // Keep 2 decimal places
+        const parts = num.toString().split(".");
+        const integerPart = parseInt(parts[0]);
+        const decimalPart = parseInt(parts[1]);
 
-        if (currency === "INR") {
-          currencyText = "Rupees";
-        } else if (currency === "USD") {
-          currencyText = "Dollars";
-        } else {
-          currencyText = "Currency";
+        const currencyText = currency === "INR" ? "Rupees" : currency === "USD" ? "Dollars" : "Currency";
+        const subCurrencyText = currency === "INR" ? "Paise" : currency === "USD" ? "Cents" : "Subunits";
+
+        let words = "";
+
+        if (integerPart > 0) {
+          words += inWords(integerPart) + " " + currencyText;
         }
 
-        return word + " " + currencyText + " Only";
+        if (decimalPart > 0) {
+          if (words) words += " and ";
+          words += inWords(decimalPart) + " " + subCurrencyText;
+        }
+        if (!words) {
+          words = "Zero " + currencyText;
+        }
+        return words + " Only";
       },
 
+
       HQD_onPressMerge: async function () {
-        const oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-        const oData = this.getView().getModel("SingleCompanyModel").getData();
-        const oQuotaionItem = this.getView().getModel("QuotationModel").getData();
-        const aItems = this.getView().getModel("QuotationModel")?.getProperty("/QuotationItemModel") || [];
+        const oView = this.getView();
+        // Force model bindings to upda te so latest data is reflected
+        oView.getModel("SingleCompanyModel").updateBindings(true);
+        oView.getModel("QuotationModel").updateBindings(true);
+
+        // Now safely read the latest data
+        const oCompanyDetailsModel = oView.getModel("CompanyCodeDetailsModel").getProperty("/0");
+        const oData = oView.getModel("SingleCompanyModel").getData();
+        const oQuotaionItem = oView.getModel("QuotationModel").getData();
+        const aItems = oView.getModel("QuotationModel").getProperty("/QuotationItemModel") || [];
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
@@ -703,188 +968,248 @@ sap.ui.define(
           orientation: "portrait"
         });
 
-        let y = 20; // Starting Y position
+        let y = 10; // Starting Y position
         const pageHeight = doc.internal.pageSize.getHeight();
-
         // Logo
         const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
         const img = await this._convertBLOBToImage(imgblob);
-        doc.addImage(img, "PNG", 13, y, 50, 50);
-        y += 60;
+        doc.addImage(img, "PNG", 13, y, 45, 45);
+        y += 50;
 
         // Header Title
         doc.setFontSize(25);
-        doc.setFont("helvetica", "bold");
-        doc.text(this.i18nModel.getText("quotation"), 135, 40);
+        doc.setFont("times", "bold");
+        doc.text(this.i18nModel.getText("quotation"), 158, 40);
 
         // Company Info
         doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
+        doc.setFont("times", "bold");
         doc.text(oData.CompanyName, 13, y);
         y += 5;
-        doc.setFont("helvetica", "normal");
-        const companyAddrHeight = doc.getTextDimensions(oData.CompanyAddress).h;
-        doc.text(oData.CompanyAddress, 13, y, { maxWidth: 60 });
-        y += companyAddrHeight + 20;
-
+        doc.setFont("times", "normal");
+        const splitAddress1 = doc.splitTextToSize(oData.CompanyAddress || "", 80);
+        doc.text(splitAddress1, 13, y);
+        y += splitAddress1.length * 5; // estimate 5mm per line        //  Adjust Y for mobile number
         doc.text(this.i18nModel.getText("pdfmobile") + oData.STDCode + " " + oData.CompanyMobileNo, 13, y);
         y += 5;
-        doc.text(this.i18nModel.getText("pdfemail") + oData.CompanyEmailID, 13, y);
+        doc.text(this.i18nModel.getText("pdfemail") + " " + oData.CompanyEmailID, 13, y);
+        y += 5;
+        if (oData.CompanyGSTNO) {
+          const oCompanygst = this.i18nModel.getText("pdfCustomerGst") + " " + oData.CompanyGSTNO;
+          doc.text(oCompanygst, 13, y);
+        }
         y += 10;
 
-        // Quotation Meta
-        doc.setFont("helvetica", "bold");
-        doc.text(this.i18nModel.getText("pdfquotationNo"), 168, y - 45, { align: "right" });
-        doc.text(this.i18nModel.getText("pdfDate"), 168, y - 40, { align: "right" });
-        doc.text(this.i18nModel.getText("pdfValiduntil"), 168, y - 35, { align: "right" });
+        // Quotation Metas
+        doc.setFont("times", "bold");
+        doc.text(this.i18nModel.getText("pdfquotationNo"), 168, y - 36, { align: "right" });
+        doc.text(this.i18nModel.getText("pdfDate"), 168, y - 31, { align: "right" });
+        doc.text(this.i18nModel.getText("pdfValiduntil"), 168, y - 26, { align: "right" });
 
-        doc.setFont("helvetica", "normal");
-        doc.text(oData.QuotationNo, 172, y - 45);
-        doc.text(Formatter.formatDate(oData.Date), 172, y - 40);
-        doc.text(Formatter.formatDate(oData.ValidUntil), 172, y - 35);
+        doc.setFont("times", "normal");
+        doc.text(oData.QuotationNo, 169, y - 36);
+        doc.text(Formatter.formatDate(oData.Date), 169, y - 31);
+        doc.text(Formatter.formatDate(oData.ValidUntil), 169, y - 26);
 
         // Customer Info
-
-        doc.setFont("helvetica", "bold");
+        doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("pdfto"), 13, y);
         y += 5;
-
         doc.text(oData.CustomerName, 13, y);
         y += 5;
-
-        doc.setFont("helvetica", "normal");
+        doc.setFont("times", "normal");
 
         //  Properly wrap address and calculate height
         const splitAddress = doc.splitTextToSize(oData.CustomerAddress || "", 80);
         doc.text(splitAddress, 13, y);
         y += splitAddress.length * 5; // estimate 5mm per line        //  Adjust Y for mobile number
-        const customerMobileText = this.i18nModel.getText("pdfmobile") + oData.STDCode + "" + oData.CustomerMobileNo;
+        const customerMobileText = this.i18nModel.getText("pdfmobile") + oData.STDCode + " " + oData.CustomerMobileNo;
         doc.text(customerMobileText, 13, y);
         y += 5;
         //  Adjust Y for email
-        const customerEmailText = this.i18nModel.getText("pdfemail") + oData.CustomerEmailID;
+        const customerEmailText = this.i18nModel.getText("pdfemail") + " " + oData.CustomerEmailID;
         doc.text(customerEmailText, 13, y);
-        y += 10; // add some space before next section
-
+        y += 5;
+        if (oData.CustomerGSTNO) {
+          const customerGSTNo = this.i18nModel.getText("pdfCustomerGst") + oData.CustomerGSTNO;
+          doc.text(customerGSTNo, 13, y);
+          y += 5; // only add space if GSTIN exists
+        }
+        y += 5; // always add a little space before the next section
 
         const isINR = oData.Currency === "INR";
 
         // Build table body dynamically
         const body = aItems.map((item, index) => {
-          const row = [
+          const formattedDiscount = item.Discount
+            ? Formatter.fromatNumber(item.Discount)
+            : "0.00";
+
+          return [
             index + 1,
             item.Description,
             item.Days,
             Formatter.fromatNumber(item.UnitPrice),
-            Formatter.fromatNumber(item.Discount),
+            formattedDiscount,
+            item.GSTCalculation,
             Formatter.fromatNumber(item.Total)
-          ];
+          ]
 
-          // Insert GST Calculation as 2nd column if INR
-          if (isINR) {
-            row.splice(1, 0, item.GSTCalculation);
-          }
-          return row;
         });
 
         // Build table head dynamically
-        const head = isINR
-          ? [['Sl.No.', 'GST Calculation', 'Description', 'Days', 'Unit Price', 'Discount', 'Total']]
-          : [['Sl.No.', 'Description', 'Days', 'Unit Price', 'Discount', 'Total']];
 
-        // AutoTable
+        const head = [['Sl.No.', 'Description', 'Days', 'Unit Price', 'Discount', 'Tax', 'Total']]
         doc.autoTable({
           startY: y,
           head: head,
           body: body,
           theme: 'grid',
-          headStyles: { fillColor: [41, 128, 185] },
-          styles: {
-            font: "helvetica",
-            fontSize: 10,
-            cellPadding: 3
+          headStyles: {
+            fillColor: [41, 128, 185],
+            font: "times",
+            fontSize: 10
           },
-          columnStyles: isINR
-            ? {
-              0: { halign: 'center' }, // Sl.No.
-              1: { halign: 'center' }, // GST Calculation
-              2: { halign: 'center' }, // Description
-              3: { halign: 'center' }, // Days
-              4: { halign: 'right' },  // Unit Price
-              5: { halign: 'right' },  // Discount
-              6: { halign: 'right' }   // Total
-            }
-            : {
-              0: { halign: 'center' }, // Sl.No.
-              1: { halign: 'center' }, // Description
-              2: { halign: 'center' }, // Days
-              3: { halign: 'right' },  // Unit Price
-              4: { halign: 'right' },  // Discount
-              5: { halign: 'right' }   // Total
-            }
+          styles: {
+            font: "times",
+            fontSize: 10,
+            cellPadding: 3,
+            lineWidth: 0.5,
+            lineColor: [30, 30, 30],
+            halign: "center"
+          },
+          columnStyles:
+          {
+            0: { halign: 'center' }, // Sl.No.
+            1: { halign: 'left' }, //Description
+            2: { halign: 'center' }, //Days
+            3: { halign: 'right' }, //Unit Price
+            4: { halign: 'right' }, //Discount
+            5: { halign: 'cenetr' }, //Tax
+            6: { halign: 'right' }  //Total
+          },
+         
         });
 
-
-        y = doc.lastAutoTable.finalY + 10;
-
+        y = doc.lastAutoTable.finalY;
         // Check for page overflow
         if (y + 40 > pageHeight) {
           doc.addPage();
           y = 20;
         }
 
+        doc.setFont("times", "bold");
+        doc.setFontSize(10);
+
+        const summaryBody = [];
+
         // SubTotal Without GST
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(12);
-        doc.text(`${this.i18nModel.getText("subTotalNotGST")} (${oData.Currency}): ${Formatter.fromatNumber(oData.SubTotalNotGST)}`, 190, y, { align: "right" });
-        y += 8;
+        summaryBody.push([
+          `${this.i18nModel.getText("subTotalNotGST")} (${oData.Currency})`,
+          Formatter.fromatNumber(oQuotaionItem.SubTotalNotGST)
+        ]);
 
-        // Subtotal and Tax
-        doc.text(`${this.i18nModel.getText("subTotalInGST")} (${oData.Currency}): ${Formatter.fromatNumber(oData.SubTotal)}`, 190, y, { align: "right" });
-        y += 8;
+        // SubTotal With GST
+        summaryBody.push([
+          `${this.i18nModel.getText("subTotalInGST")} (${oData.Currency})`,
+          Formatter.fromatNumber(oQuotaionItem.SubTotal)
+        ]);
 
+        // GST Breakdown
         if (oData.Currency !== "USD") {
-          const cgstValue = parseFloat(oData.CGST) || 0;
-          const sgstValue = parseFloat(oData.SGST) || 0;
+          const cgstValue = parseFloat(oQuotaionItem.CGST) || 0;
+          const sgstValue = parseFloat(oQuotaionItem.SGST) || 0;
+          const igstValue = parseFloat(oQuotaionItem.IGST) || 0;
           const percentage = oData.Percentage || 0;
 
-          const cgst = Formatter.fromatNumber(cgstValue.toFixed(2));
-          const sgst = Formatter.fromatNumber(sgstValue.toFixed(2));
-
-          doc.text(`CGST (${percentage}%): ${cgst}`, 190, y, { align: "right" });
-          y += 8;
-          doc.text(`SGST (${percentage}%): ${sgst}`, 190, y, { align: "right" });
-          y += 10;
+          if (cgstValue > 0 || sgstValue > 0) {
+            summaryBody.push([
+              `CGST (${percentage}%)`,
+              Formatter.fromatNumber(cgstValue.toFixed(2))
+            ]);
+            summaryBody.push([
+              `SGST (${percentage}%)`,
+              Formatter.fromatNumber(sgstValue.toFixed(2))
+            ]);
+          } else if (igstValue > 0 && oData.Currency === "INR") {
+            summaryBody.push([
+              `IGST (${percentage}%)`,
+              Formatter.fromatNumber(igstValue.toFixed(2))
+            ]);
+          }
         }
-        // Total
-        doc.setDrawColor(0);
-        doc.setLineWidth(0.5);
-        doc.line(105, y, 196, y);
-        y += 5;
-        doc.text(`${this.i18nModel.getText("pdfTotal")} (${oData.Currency}): ${Formatter.fromatNumber(oData.TotalSum)}`, 190, y, { align: "right" });
-        y += 5;
 
+
+        const totalRowIndex = summaryBody.length; // This is after pushing total row
+        summaryBody.push([
+          `${this.i18nModel.getText("pdfTotal")} (${oData.Currency})`,
+          Formatter.fromatNumber(oQuotaionItem.TotalSum)
+        ]);
+        // Add ":" to labels
+        summaryBody.forEach(row => row[0] = `${row[0]} :`);
+        doc.autoTable({
+          startY: y,
+          head: [],
+          body: summaryBody,
+          theme: 'plain',
+          styles: {
+            font: "times",
+            fontSize: 10,
+            halign: "right",
+            cellPadding: { top: 1, right: 3, bottom: 1, left: 3 }
+          },
+          columnStyles: {
+            0: { halign: "right", cellWidth: 60 },
+            1: { halign: "right", cellWidth: 40 }
+          },
+          margin: { left: 96 },
+          didParseCell: function (data) {
+            const lastRowIndex = summaryBody.length - 1;
+
+            if (data.row.index === lastRowIndex) {
+              data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
+              data.cell.styles.lineColor = [0, 0, 0];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        });
+
+
+        // Update Y position
+        y = doc.lastAutoTable.finalY + 5;
         // Amount in Words
-        oData.AmountInWords = this.numberToWords(oData.TotalSum, oData.Currency, { maxWidth: 80 });
-        doc.setFont("helvetica", "bold");
+        oData.AmountInWords = this.numberToWords(parseFloat(oQuotaionItem.TotalSum || 0), oData.Currency);
+
+        doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("pdfaAmount"), 13, y);
         y += 5;
-        doc.setFont("helvetica", "normal");
+        doc.setFont("times", "normal");
         const amountHeight = doc.getTextDimensions(oData.AmountInWords || "").h;
         doc.text(oData.AmountInWords || "", 13, y, { maxWidth: 180 });
         y += amountHeight + 10;
-
         // Terms & Conditions with page break support
-        doc.setFont("helvetica", "bold");
+        doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("pdftermconditaion"), 13, y);
         y += 5;
+        doc.setFont("times", "normal");
+        const convertHtmlToTextLines = (html, maxWidth) => {
+          const div = document.createElement("div");
+          div.innerHTML = html;
 
-        doc.setFont("helvetica", "normal");
+          div.querySelectorAll("br").forEach(br => br.replaceWith("\n"));
+          div.querySelectorAll("p").forEach(p => p.appendChild(document.createTextNode("\n")));
+          div.querySelectorAll("li").forEach(li => {
+            const bullet = document.createTextNode(`• ${li.textContent}\n`);
+            li.replaceWith(bullet);
+          });
+
+          const text = div.innerText || div.textContent || "";
+          return doc.splitTextToSize(text.trim(), maxWidth);
+        };
+
         const htmlNotes = oData.Notes || "";
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = htmlNotes;
-        const plainText = tempDiv.innerText || tempDiv.textContent || "";
-        const noteLines = doc.splitTextToSize(plainText, 180);
+        const noteLines = convertHtmlToTextLines(htmlNotes, 180);
+
 
         const lineHeight = 5;
         const availableHeight = pageHeight - y;
@@ -908,33 +1233,43 @@ sap.ui.define(
         }
 
         // Save PDF
-        doc.save("Quotation.pdf");
+        doc.save(`${oData.CustomerName}_Quotation.pdf`);
+
       },
       HQD_onPressAddQuotationItem: function () {
-        var oModel = this.getView().getModel("QuotationModel");
-        var oVisibilityModel = this.getView().getModel("visiablityPlay");
-        var aItems = oModel.getProperty("/QuotationItemModel") || [];
+        var oView = this.getView();
+        var oQuotationModel = oView.getModel("QuotationModel");
+        var oVisibilityModel = oView.getModel("visiablityPlay");
+        // var oSingleCompanyModel = oView.getModel("SingleCompanyModel");
 
+        var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
         var bEditMode = oVisibilityModel.getProperty("/editable");
+
+        // Get selected currency
+        // var sSelectedCurrency = oSingleCompanyModel.getProperty("/Currency");
+
+        // Determine GST applicability
+        // var bIsINRCurrency = sSelectedCurrency === "INR";
 
         var oNewItem = {
           Description: "",
           SAC: "",
-          GSTCalculation: "Yes",
+          GSTCalculation: "Yes", // 🛠️ Fix: Set properly
           Days: "",
           UnitPrice: "",
           Discount: "",
           Total: "0.00"
         };
 
-        // If in edit mode, add flag
         if (bEditMode) {
           oNewItem.flag = "create";
         }
 
         aItems.push(oNewItem);
-        oModel.setProperty("/QuotationItemModel", aItems);
+        oQuotationModel.setProperty("/QuotationItemModel", aItems);
+        this.updateTotalAmount(); // Optional: recalculate totals immediately
       },
+
 
 
       HQD_onInputChange: function (oEvent) {
@@ -976,23 +1311,29 @@ sap.ui.define(
         var oInput = oEvent.getSource();
         var sUserInput = oEvent.getParameter("value").trim();
 
-        // Check if input includes %
+        // Get binding context
+        var oContext = oInput.getBindingContext("QuotationModel");
+        if (!oContext) return;
+
+        var oModel = oContext.getModel();
+        var sPath = oContext.getPath();
+        var oItem = oModel.getProperty(sPath);
+
+        // Get UnitPrice and Days
+        var unitPrice = parseFloat(oItem.UnitPrice || 0);
+        var days = parseFloat(oItem.Days || 0);
+        var itemTotal = days > 0 ? unitPrice * days : unitPrice;
+
+        // Initialize discount
+        var finalDiscount = 0;
+
+        // Check if % entered
         var isPercentage = sUserInput.includes("%");
 
-        // Remove % symbol and non-numeric chars except dot
+        // Extract number
         var sCleanValue = sUserInput.replace(/[^0-9.]/g, "");
 
-        // Limit to 2 decimal places
-        var parts = sCleanValue.split(".");
-        if (parts.length > 1) {
-          parts[1] = parts[1].substring(0, 2);
-          sCleanValue = parts.join(".");
-        }
-
-        // Update input value with cleaned number (no % shown)
-        oInput.setValue(sCleanValue);
-
-        // Validate cleaned input
+        // Validate input
         var regex = /^[0-9]+(\.[0-9]{1,2})?$/;
         if (!sCleanValue || !regex.test(sCleanValue)) {
           oInput.setValueState("Error");
@@ -1001,28 +1342,36 @@ sap.ui.define(
           return;
         }
 
+        // Parse cleaned value
+        var parsedDiscount = parseFloat(sCleanValue);
+
+        if (isPercentage) {
+          finalDiscount = (parsedDiscount / 100) * itemTotal;
+        } else {
+          finalDiscount = parsedDiscount;
+        }
+
+        // Prevent over-discount
+        if (finalDiscount > itemTotal) {
+          finalDiscount = itemTotal;
+        }
+
+        // Set final values to model
+        oModel.setProperty(sPath + "/Discount", finalDiscount);
+        oModel.setProperty(sPath + "/IsDiscountPercentage", false); // Already converted to absolute value
+
+        // Update input with actual discount value (not percentage)
+        oInput.setValue(finalDiscount);
         oInput.setValueState("None");
         oInput.setValueStateText("");
         this.Discount = true;
 
-        // Get QuotationModel context
-        var oContext = oInput.getBindingContext("QuotationModel");
-        if (!oContext) return;
-
-        var oModel = oContext.getModel();
-        var sPath = oContext.getPath();
-
-        // Update model with cleaned value and percentage flag
-        oModel.setProperty(sPath + "/Discount", sCleanValue);
-        oModel.setProperty(sPath + "/IsDiscountPercentage", isPercentage);
-
-        // Recalculate all totals
+        // Recalculate totals
         this.updateTotalAmount();
       },
 
+
       HQD_onPressDelete: async function (oEvent) {
-        // this.byId("HQD_id_SmartTableQuotationItem").getBusyDialog();
-        // this.getBusyDialog();
         const that = this;
 
         try {
@@ -1157,6 +1506,7 @@ sap.ui.define(
       Mail_onSendEmail: function () {
         try {
           var oModel = this.getView().getModel("SingleCompanyModel").getData();
+          var oquotationitem = this.getView().getModel("QuotationModel").getData();
 
           // Format date to DD/MM/YYYY
           var oDate = new Date(oModel.Date); // Ensure it's a Date object
@@ -1171,7 +1521,7 @@ sap.ui.define(
             "CustomerEmailID": oModel.CustomerEmailID,
             "QuotationNo": oModel.QuotationNo,
             "Date": sFormattedDate,
-            "TotalSum": (`${oModel.TotalSum} ${oModel.Currency}`),
+            "TotalSum": (`${Formatter.fromatNumber(oquotationitem.TotalSum)} ${oModel.Currency}`),
             "CC": sap.ui.getCore().byId("CCMail_TextArea").getValue(),
             "attachments": this.getView().getModel("UploaderData").getProperty("/attachments")
           };
@@ -1190,12 +1540,13 @@ sap.ui.define(
           MessageToast.show(error.responseText);
         }
       },
+
       resetHQDForm: function () {
         const fields = [
           "HQD_id_QuotationValid", "HQD_id_InputCompanyName", "HQD_id_InputCompanyMobileNo",
           "HQD_id_CompanyEmailID", "HQD_id_Country", "HQD_id_InputCompanyAddress", "HQD_id_CompGSTNO",
           "HQD_id_Percentage", "HQD_id_Curency", "HQD_id_CustomerName", "HQD_id_CustomerEmailID",
-          "HQD_id_InputCustomerMobileNo", "HQD_id_InputCustomerAddress", "HQD_id_InputCustomerGSTNO"
+          "HQD_id_InputCustomerMobileNo", "HQD_id_InputCustomerAddress", "HQD_id_InputCustomerGSTNO", "HQD_id_mobileNumber", "HQD_id_CustomerNumberSTD"
         ];
 
         fields.forEach(id => {
@@ -1203,6 +1554,10 @@ sap.ui.define(
           if (oControl?.setValue) oControl.setValue("");
           if (oControl?.setSelectedKey) oControl.setSelectedKey("");
           if (oControl?.setDateValue) oControl.setDateValue(null);
+
+          if (oControl.setValueState) oControl.setValueState("None");
+          if (oControl.setValueStateText) oControl.setValueStateText("");
+
         });
         // Clear rich text editor
         this.byId("HQD_id_Notes")._oEditor?.editorManager?.activeEditor.setContent("");
@@ -1269,16 +1624,41 @@ sap.ui.define(
       HQD_onPressEdit: async function () {
         const oView = this.getView();
         const oModel = oView.getModel("visiablityPlay");
+        const oRadiobtn = oView.getModel("SingleCompanyModel");
+        const oQuotationModel = oView.getModel("QuotationModel");
+        const oQuotationData = oQuotationModel.getData();
+
         const bEditable = oModel.getProperty("/editable");
 
         if (!bEditable) {
           oModel.setProperty("/editable", true);
-          oModel.setProperty("/gstEditable", true);
+          oModel.setProperty("/merge", false);
+          oRadiobtn.setProperty("/gstEditable", true);
+          const oCurrency = this.byId("HQD_id_Curency").getSelectedKey();
+          const isINR = oCurrency === "INR";
+          if (!isINR) {
+            // Disable Company GST NO, Radio Buttons and Percentage Field
+            oRadiobtn.setProperty("/gstEditable", false);
+
+            // Disable Percentage field manually if needed
+            this.byId("HQD_id_Percentage").setEditable(false);
+            // this.byId("HQD_id_CompGSTNO").setEditable(false);
+
+            // Optionally hide/show tax fields as needed
+            const oQuotationModel = oView.getModel("QuotationModel");
+            oQuotationModel.setProperty("/CGSTVisible", false);
+            oQuotationModel.setProperty("/SGSTVisible", false);
+            oQuotationModel.setProperty("/IGSTVisible", false);
+          } else {
+            // Re-enable Percentage field for INR case
+            this.byId("HQD_id_Percentage").setEditable(true);
+
+          }
 
         } else {
           // Already in edit mode => perform Save logic
           const oRichTextEditor = this.byId("HQD_id_Notes");
-          const oNotesText = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'text' }) || "";
+          const oNotesHTML = oRichTextEditor?._oEditor?.editorManager?.activeEditor?.getContent({ format: 'html' }) || "";
 
           const oCurrency1 = this.byId("HQD_id_Curency").getSelectedKey();
           const isINR = oCurrency1 === "INR";
@@ -1294,7 +1674,7 @@ sap.ui.define(
             utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyAddress"), "ID") &&
             (!isINR || utils._LCvalidateGstNumber(this.byId("HQD_id_CompGSTNO"), "ID")) &&
             utils._LCstrictValidationComboBox(this.byId("HQD_id_Curency"), "ID") &&
-            utils._LCvalidateMandatoryField(this.byId("HQD_id_CustomerName"), "ID") &&
+            utils._LCvalidateMandatoryField(this.byId("HQD_id_CustomerName"), "ID") && utils._LCstrictValidationComboBox(this.byId("HQD_id_CustomerNumberSTD"), "ID") &&
             utils._LCvalidateEmail(this.byId("HQD_id_CustomerEmailID"), "ID") &&
             utils._LCvalidateMobileNumber(this.byId("HQD_id_InputCustomerMobileNo"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCustomerAddress"), "ID") &&
@@ -1304,12 +1684,18 @@ sap.ui.define(
             return;
           }
 
-          if (!oNotesText.trim()) {
-            MessageToast.show("Notes field is required.");
+          const fTotalSum = parseFloat(oQuotationData.TotalSum || "0");
+          if (isNaN(fTotalSum) || fTotalSum <= 0) {
+            MessageToast.show(this.i18nModel.getText("quotaionTotalmsg"));
             return;
           }
 
-          this.getBusyDialog();
+          const tmpDiv = document.createElement("div");
+          tmpDiv.innerHTML = oNotesHTML;
+          if (!tmpDiv.textContent.trim()) {
+            MessageToast.show("Notes field is required.");
+            return;
+          }
 
           const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
           const sQuotationDate = oDateFormat.format(this.byId("HQD_id_Quotation").getDateValue());
@@ -1324,8 +1710,11 @@ sap.ui.define(
             CompanyAddress: this.byId("HQD_id_InputCompanyAddress").getValue(),
             Date: sQuotationDate,
             ValidUntil: sValidUntilDate,
+            Country: this.byId("HQD_id_Country").getSelectedKey(),
+            Branch: this.byId("HQD_id_BranchCode").getSelectedKey(),
             CompanyGSTNO: this.byId("HQD_id_CompGSTNO").getValue(),
             CompanyMobileNo: this.byId("HQD_id_InputCompanyMobileNo").getValue(),
+            CustomerSTDCode: this.byId("HQD_id_CustomerNumberSTD").getValue(),
             CompanyEmailID: this.byId("HQD_id_CompanyEmailID").getValue(),
             CustomerName: this.byId("HQD_id_CustomerName").getValue(),
             CustomerAddress: this.byId("HQD_id_InputCustomerAddress").getValue(),
@@ -1334,7 +1723,7 @@ sap.ui.define(
             CustomerEmailID: this.byId("HQD_id_CustomerEmailID").getValue(),
             Currency: this.byId("HQD_id_Curency").getSelectedKey(),
             Percentage: this.byId("HQD_id_Percentage").getValue(),
-            Notes: oNotesText,
+            Notes: oNotesHTML,
             CGST: oQuotationItem.getProperty("/CGST"),
             SGST: oQuotationItem.getProperty("/SGST"),
             IGST: oQuotationItem.getProperty("/IGST"),
@@ -1347,9 +1736,17 @@ sap.ui.define(
             QuotationNo: sQuotationNo
           };
 
-          const aItemArray = oView.getModel("QuotationModel").getProperty("/QuotationItemModel") || [];
+          const aItemArray2 = oView.getModel("QuotationModel").getProperty("/QuotationItemModel") || [];
+          const bAllDescriptionsFilled1 = aItemArray2.every(item =>
+            item.Description && item.Description.trim().length > 0
+          );
 
-          const Items = aItemArray.map((item) => {
+          if (!bAllDescriptionsFilled1) {
+            MessageToast.show("Each item must have a description.");
+            return;
+          }
+
+          const Items = aItemArray2.map((item) => {
             const oFilters = {
               QuotationNo: sQuotationNo,
               SlNo: item.SlNo || ""
@@ -1375,20 +1772,20 @@ sap.ui.define(
               filters: oFilters
             };
           });
-
           const payload = {
             data,
             filtres,
             Items
           };
-
+          this.getBusyDialog();
           try {
             const response = await this.ajaxUpdateWithJQuery("Quotation", payload);
             this.closeBusyDialog();
             if (response.success === true) {
               MessageToast.show(`Quotation updated successfully!`);
               oModel.setProperty("/editable", false); // Exit edit mode
-              // this.getRouter().navTo("RouteHrQuotation");
+              oModel.setProperty("/merge", true); // Exit edit mode
+              oRadiobtn.setProperty("/gstEditable", false);
             } else {
               MessageToast.show("Failed to update quotation.");
             }

@@ -51,6 +51,23 @@
 
 					required="true"
 				/>
+				<Label text="{i18n>branch}" required="true" />
+                <ComboBox
+                    id="FCIA_id_trashbranch"
+                    placeholder="Select Branch"
+                    change="FCIA_onInputLiveChange"
+                    valueStateText="Select Branch"
+                    value="{CreateIncomeAssetModel>/TrashBranch}"
+                    selectedKey="{CreateIncomeAssetModel>/TrashBranch}"
+                    showSecondaryValues="true"
+                    items="{branchModel>/}"
+                >
+                    <core:ListItem
+                        key="{branchModel>city}" 
+                        text="{branchModel>city}"
+                        additionalText="{branchModel>branchCode}"
+                    />
+                </ComboBox>
 				<Label text="{i18n>Comments}"/>
 				    <TextArea id="FTIA_id_Comments" 
 					required="true"

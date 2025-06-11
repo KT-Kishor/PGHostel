@@ -14,9 +14,10 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="InvoiceNo" label="{i18n>invoiceNo}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_InvoiceNo" items="{path:'ConsultantModel>/', length:1000}"
-                			showSecondaryValues="true" showClearIcon="true">
-								<core:ListItem key="{ConsultantModel>InvoiceNo}" text="{ConsultantModel>InvoiceNo}" additionalText="{ConsultantModel>EmployeeID}"/>
+							<ComboBox id="CI_id_InvoiceNo" items="{path:'InvoiceModel>/', length:1000}"
+							showSecondaryValues="true" showClearIcon="true">
+							<core:ListItem key="{= ${InvoiceModel>InvoiceNo} + '|' + ${InvoiceModel>EmployeeID} }"
+							    text="{InvoiceModel>InvoiceNo}" additionalText="{InvoiceModel>EmployeeID}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -25,6 +26,11 @@
 							<ComboBox id="CI_id_EmployeeID" items="{path:'EmpModel>/', length:1000}" showSecondaryValues="true" showClearIcon="true">
 								<core:ListItem key="{EmpModel>EmployeeID}" text="{EmpModel>EmployeeID}" additionalText="{EmpModel>EmployeeName}" />
 							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="InvoiceDate" label="{i18n>invoiceDate}" groupName="ConsultantInvoice" visibleInFilterBar="true">
+						<fb:control>
+							<DateRangeSelection id="CI_id_DatePicker" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
 						</fb:control>
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
@@ -38,29 +44,26 @@
 					</Toolbar>
 				</headerToolbar>
 				<columns>
-					<Column>
+					<Column  demandPopin="true">
 						<Text text="{i18n>consultantName}" />
 					</Column>
-					<Column>
+					<Column  demandPopin="true">
 						<Text text="{i18n>invoiceNo}" />
 					</Column>
-					<Column>
+					<Column  demandPopin="true">
 						<Text text="{i18n>invoiceTo}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>invoiceDate}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>payBy}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>GSTNO}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>totalAmount}" />
-					</Column>
-					<Column>
-						<Text text="{i18n>currency}" />
 					</Column>
 				</columns>
 				<items>
@@ -72,8 +75,7 @@
 							<Text text="{path:'ConsultantModel>InvoiceDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{path:'ConsultantModel>PayBy' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{ConsultantModel>GSTNO}" />
-							<Text text="{ConsultantModel>TotalSum}" />
-							<Text text="{ConsultantModel>Currency}" />
+						<Text text="{ConsultantModel>Currency} {path:'ConsultantModel>TotalSum',formatter: '.Formatter.fromatNumber'}" />
 						</cells>
 					</ColumnListItem>
 				</items>

@@ -62,7 +62,7 @@ sap.ui.define(
                         if (that.Type !== "Trainee") {
                             return that.EmployeeDetReadCall("EmployeeDetails", { "EmployeeID": that.userId });
                         } else {
-                            return that.EmployeeDetReadCall("Trainee", { "TraineeID": that.userId });
+                            return that.EmployeeDetReadCall("EmployeeDetails", { "EmployeeID": that.userId });
                         }
                     }).then(() => {
                         this.closeBusyDialog(); //  Close  BusyDialog
@@ -113,7 +113,7 @@ sap.ui.define(
                     let rules = [
                         {
                             dataContext: { LeaveType: "Submitted" },
-                            properties: { color: "#fc7b03" },
+                            properties: { color: "#FFB347" },
                             displayName: "Submitted"
                         },
                         {
@@ -163,7 +163,7 @@ sap.ui.define(
                     let rules = [
                         {
                             dataContext: { LeaveType: "Submitted" },
-                            properties: { color: "#fc7b03" },
+                            properties: { color: "#FFB347" },
                             displayName: "Submitted"
                         },
                         {
@@ -427,7 +427,7 @@ sap.ui.define(
 
                     // Process leave records
                     leaveRecords.forEach(function (record) {
-                        if (record["Status"] !== "Rejected") {
+                        if (record["status"] !== "Rejected") {
                             var fromDate = that.onFormatDate(that.Formatter.formatDate(record.fromDate));
                             var toDate = that.onFormatDate(that.Formatter.formatDate(record.toDate));
                             if (fromDate && toDate) {
@@ -475,18 +475,25 @@ sap.ui.define(
 
                 // Initialize calendar legend
                 onInitializeLegend: function (oEvent) {
-                    this.oDatePicker = oEvent.getSource();
-                    if (this.oDatePicker) {
-                        var oLegend = new sap.ui.unified.CalendarLegend({
-                            items: [
-                                new sap.ui.unified.CalendarLegendItem({ type: "Type04", text: "Holiday" }),
-                                new sap.ui.unified.CalendarLegendItem({ type: "Type09", text: "Weekend" }),
-                                new sap.ui.unified.CalendarLegendItem({ type: "Type06", text: "Working Day" }),
-                                new sap.ui.unified.CalendarLegendItem({ type: "Type05", text: "Applied Leaves" })
-                            ]
-                        });
-                        this.oDatePicker.setLegend(oLegend);
-                        this.onMarkCalendarDatesAndLeaves();
+                    try {
+                        sap.ui.core.BusyIndicator.show(0);
+                        this.oDatePicker = oEvent.getSource();
+                        if (this.oDatePicker) {
+                            var oLegend = new sap.ui.unified.CalendarLegend({
+                                items: [
+                                    new sap.ui.unified.CalendarLegendItem({ type: "Type04", text: "Holiday" }),
+                                    new sap.ui.unified.CalendarLegendItem({ type: "Type09", text: "Weekend" }),
+                                    new sap.ui.unified.CalendarLegendItem({ type: "Type06", text: "Working Day" }),
+                                    new sap.ui.unified.CalendarLegendItem({ type: "Type05", text: "Applied Leaves" })
+                                ]
+                            });
+                            this.oDatePicker.setLegend(oLegend);
+                            this.onMarkCalendarDatesAndLeaves();
+                        }
+                    } catch (error) {
+                        MessageToast.show(error.message || error.responseText);
+                    } finally {
+                       sap.ui.core.BusyIndicator.hide();
                     }
                 },
 
@@ -494,6 +501,25 @@ sap.ui.define(
                 AL_onPressApplyLeave: function () {
                     var oView = this.getView();
                     var loginData = this.getOwnerComponent().getModel("LoginModel").getData();
+                    
+                    if (!this.JoiningDate || this.JoiningDate.length < 3) {
+                        sap.m.MessageToast.show("Joining date is not available or invalid.");
+                        return;
+                    }
+
+                    // Parse joining date
+                    var joiningDay = parseInt(this.JoiningDate[0]);
+                    var joiningMonth = parseInt(this.JoiningDate[1]) - 1; // JS months are 0-based
+                    var joiningYear = parseInt(this.JoiningDate[2]);
+
+                    var currentYear = new Date().getFullYear();
+
+                    // Check if joining year is in the future
+                    if (joiningYear > currentYear) {
+                        sap.m.MessageToast.show("Joining year is in the future. You cannot apply leave for future year.");
+                        return;
+                    }
+
                     // Create leave JSON model
                     var leaveJson = {
                         employeeID: loginData.EmployeeID,
@@ -509,22 +535,31 @@ sap.ui.define(
                         halfDay: false,
                         MinToDate: null,
                         managerRemark: "",
-                        maxDate: new Date(this.currentYear, 11, 31),
-                        minDate: new Date(this.JoiningDate[2], this.JoiningDate[1] - 1, this.JoiningDate[0]),
+                        maxDate: new Date(currentYear, 11, 31),
+                        minDate: new Date(joiningYear, joiningMonth, joiningDay),
                         isUpdate: false,
                     };
+
                     var oLeaveTempModel = new JSONModel(leaveJson);
                     oView.setModel(oLeaveTempModel, "LeaveTempModel");
                     this.openLeaveDialog(oView);
                 },
 
-                // Update leave button handler
+               // Update leave button handler
                 AL_onPressUpdate: function () {
                     var oView = this.getView();
                     var oTable = this.byId("AL_id_LeaveTableStandard").getSelectedItem();
-                    var oModelData = oTable.getBindingContext("LeaveModel").getObject();
+                    var oModelData = JSON.parse(JSON.stringify(oTable.getBindingContext("LeaveModel").getObject()));
+                    this._originalLeaveData = JSON.parse(JSON.stringify(oModelData));
                     this.UpdateNoofDays = oModelData.NoofDays;
-                    // Create leave JSON model with existing data
+                    this.previousLeaveDates = [];
+                    let prevFrom = this.onFormatDate(this.Formatter.formatDate(oModelData.fromDate));
+                    let prevTo = this.onFormatDate(this.Formatter.formatDate(oModelData.toDate));
+                    for (let d = new Date(prevFrom); d <= prevTo; d.setDate(d.getDate() + 1)) {
+                        this.previousLeaveDates.push(d.toDateString());
+                    }
+
+                    // Prepare leave data for dialog model
                     var leaveJson = {
                         ID: oModelData.ID,
                         employeeID: oModelData.employeeID,
@@ -537,12 +572,13 @@ sap.ui.define(
                         comments: oModelData.comments[0].Comment,
                         Submit: false,
                         Save: true,
-                        halfDay: oModelData.halfDay === "false" ? false : true,
+                        halfDay: oModelData.halfDay === 'false' ? false : true,
                         managerRemark: oModelData.ManagerRemark,
                         maxDate: new Date(this.currentYear, 11, 31),
                         minDate: new Date(this.JoiningDate[2], this.JoiningDate[1] - 1, this.JoiningDate[0]),
-                        isUpdate: true,
+                        isUpdate: true
                     };
+                    // Set data into LeaveTempModel
                     var oLeaveTempModel = new JSONModel(leaveJson);
                     oView.setModel(oLeaveTempModel, "LeaveTempModel");
                     this.openLeaveDialog(oView);
@@ -574,11 +610,21 @@ sap.ui.define(
                     sap.ui.getCore().byId("AL_id_LeaveComments").setValueState("None");
                 },
 
-                // Close the leave dialog fragment
+               // Close the leave dialog fragment
                 AL_onPressClose: function () {
                     this.oLeaveDialog.close();
                     this.byId("AL_id_LeaveTableStandard").removeSelections(true); // Clear table selection
                     this.byId("AL_id_Updatebtn").setVisible(false);
+                    this.byId("AL_id_Deletebtn").setVisible(false);
+                    if (this._originalLeaveData) {
+                        var aLeaveData = this.getView().getModel("LeaveModel").getProperty("/");
+                        var iIndex = aLeaveData.findIndex(item => item.ID === this._originalLeaveData.ID);
+                        if (iIndex > -1) {
+                            aLeaveData[iIndex] = JSON.parse(JSON.stringify(this._originalLeaveData));
+                            this.getView().getModel("LeaveModel").setProperty("/", aLeaveData);
+                        }
+                        this._originalLeaveData = null;
+                    }
                 },
 
                 // Format date string to Date object
@@ -649,18 +695,18 @@ sap.ui.define(
                 },
 
                 // Check if leave is already applied for given dates
-                isLeaveAlreadyApplied: function (fromDate, toDate) {
-                    var from = this.onFormatDate(fromDate);
-                    var to = this.onFormatDate(toDate);
+               isLeaveAlreadyApplied: function (fromDate, toDate, previousDates = []) {
+                    let from = this.onFormatDate(fromDate);
+                    let to = this.onFormatDate(toDate);
 
-                    for (var d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
-                        if (this.appliedLeavesSet.has(d.toDateString())) {
-                            return true;
+                    for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+                        let dateStr = d.toDateString();
+                        if (this.appliedLeavesSet.has(dateStr) && !previousDates.includes(dateStr)) {
+                            return true; // Date already applied by someone else and not in original
                         }
                     }
                     return false;
                 },
-
 
                 // Validation when from date changes
                 onValidation: function () {
@@ -894,6 +940,11 @@ sap.ui.define(
                                 }
                             }
 
+                            if (this.isLeaveAlreadyApplied(oData.fromDate, oData.toDate, this.previousLeaveDates)) {
+                                    return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
+                                }
+
+
                             // Leave model filtering
                             var LeaveModel = this.getView().getModel("LeaveModel").getData();
 
@@ -976,6 +1027,7 @@ sap.ui.define(
                         this.oLeaveDialog.close();
                         this.byId("AL_id_LeaveTableStandard").removeSelections(true); // Clear table selection
                         this.byId("AL_id_Updatebtn").setVisible(false);
+                        this.byId("AL_id_Deletebtn").setVisible(false);
                         // Refresh leave data
                         await this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
                     } else {
@@ -983,14 +1035,59 @@ sap.ui.define(
                     }
                 },
 
+                AL_onPressDelete: async function () {
+                        try {
+                            var oTable = this.byId("AL_id_LeaveTableStandard").getSelectedItem();
+                            if (!oTable) {
+                                MessageToast.show(this.i18nModel.getText("selectLeaveToDelete"));
+                                return;
+                            }
+
+                            var oModelData = oTable.getBindingContext("LeaveModel").getObject();
+                            var requestData = { filters: { ID: oModelData.ID } };
+
+                            // Show confirmation dialog before delete
+                            this.showConfirmationDialog(
+                                this.i18nModel.getText("confirmDeleteTitle"),   
+                                this.i18nModel.getText("confirmDeleteMessage"),
+                                async function () {
+                                    this.getBusyDialog(); // Show busy dialog
+
+                                    try {
+                                        const response = await this.ajaxDeleteWithJQuery("Leaves", requestData);
+                                        this.closeBusyDialog();
+
+                                        if (response.success === true) {
+                                            MessageToast.show(this.i18nModel.getText("leaveDeletedSuccess"));
+                                            this.byId("AL_id_LeaveTableStandard").removeSelections(true);
+                                            this.byId("AL_id_Updatebtn").setVisible(false);
+                                            this.byId("AL_id_Deletebtn").setVisible(false);
+                                            this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
+                                        } else {
+                                            MessageToast.show(response.message || response.responseText);
+                                        }
+                                    } catch (error) {
+                                        this.closeBusyDialog();
+                                        MessageToast.show(error.message || error.responseText);
+                                    }
+                                }.bind(this), // fnOnConfirm
+                            );
+                        } catch (error) {
+                            this.closeBusyDialog();
+                            MessageToast.show(error.message || error.responseText);
+                        }
+                    },
+
                 // Selection change handler for leave table
                 onSelectionChange: function (oEvent) {
                     var oSelectedItem = oEvent.getParameter("listItem");
                     var oContext = oSelectedItem.getBindingContext("LeaveModel");
                     var sStatus = oContext.getProperty("status");
                     var oUpdateButton = this.byId("AL_id_Updatebtn");
+                    var oDeleteButton = this.byId("AL_id_Deletebtn");
                     var bVisible = sStatus === "Submitted";
                     oUpdateButton.setVisible(bVisible);
+                    oDeleteButton.setVisible(bVisible);
                 },
 
                 AL_onSearch: async function () {

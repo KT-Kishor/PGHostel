@@ -518,10 +518,15 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 
 .custom-flexbox {
   margin: 10px 0;
+  margin-right: 10px;
 }
 
 .custom-vbox {
-  align-items: flex-end;
+  align-items:flex-end;
+  width: 100%;
+}
+.rich-vbox{
+align-items:flex-start;
   width: 100%;
 }
 
@@ -533,6 +538,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .amountText {
   text-align: end;
   min-width: 100px;
+  margin-right: 20px;
 }
 
 .customFormSpacing {
@@ -673,3 +679,11 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     }
 }
 
+.tokenStyle .sapMTokenText {
+    max-width: 100px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+}

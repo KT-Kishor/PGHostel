@@ -1,0 +1,12 @@
+{
+  "ContractPeriod": [
+    { "No": 1, "Months": "3 Months" },
+    { "No": 2, "Months": "6 Months" },
+    { "No": 3, "Months": "9 Months" },
+    { "No": 4, "Months": "12 Months" },
+    { "No": 5, "Months": "15 Months" },
+    { "No": 6, "Months": "18 Months" },
+    { "No": 7, "Months": "21 Months" },
+    { "No": 8, "Months": "24 Months" }
+  ]
+}

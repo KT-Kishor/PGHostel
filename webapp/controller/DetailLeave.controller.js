@@ -25,12 +25,17 @@ sap.ui.define([
         that.byId("AL_id_LeaveYear").setValue(that.currentYear);
         var barDataModel = new JSONModel({ Name: 'line', type: 'column', AllStatus: 'column' });
         that.getView().setModel(barDataModel, "MonthlyBar");
-         if (that.userId.includes("KT")) {
+        this.getBusyDialog();
+        if (that.userId.includes("KT-T")) {
             that.EmployeeDetReadCall("Trainee", { "TraineeID": that.userId });
+            that.getView().byId("AL_id_YearlyChart").setVisible(false);
+            that.getView().byId("AL_id_MonthlyChart").setVisible(false);
         } else {
             that.EmployeeDetReadCall("EmployeeDetails", { "EmployeeID": that.userId });
+            that.getView().byId("AL_id_YearlyChart").setVisible(true);
+            that.getView().byId("AL_id_MonthlyChart").setVisible(true);
         }                       
-        that.EmployeeDetReadCall("EmployeeDetails", { "EmployeeID": that.userId })
+        //that.EmployeeDetReadCall("EmployeeDetails", { "EmployeeID": that.userId })
         var oType;
         var oJson = new JSONModel({ selectedType: 1 })
         this.getView().setModel(oJson, "selectedModel");
@@ -42,11 +47,11 @@ sap.ui.define([
         } else {
             oType = "All In One Leave"
         }
-
+        
         this.BarDisplayFunction(oType, year, that.userId);
         this.YearlyBarDisplayFunction(that.userId);
         this.MonthBarDisplayFunction(oType, year, that.userId);
-     },
+    },
     DL_onBack:function () {
       this.getRouter().navTo("RouteMyInbox",{sMyInBox: "DetailLeave"});
     },

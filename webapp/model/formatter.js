@@ -1,10 +1,12 @@
-sap.ui.define([], function () {
+sap.ui.define([
+    "sap/ui/core/format/DateFormat"
+], function (DateFormat) {
     "use strict";
     return {
         formatDate: function (sDate) {
 
             if (sDate) {
-                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" });
+                var oDateFormat = DateFormat.getDateInstance({ pattern: "dd/MM/yyyy" });
                 return oDateFormat.format(new Date(sDate));
             }
             return sDate;
@@ -97,6 +99,20 @@ sap.ui.define([], function () {
             }
         },
 
+        visibilityFormatter: function (selfServiceBtn, role, type) {
+            var isAllowedRole = (role === 'Admin' || role === 'HR Manager' || role === 'HR');
+            var isSaveOrSubmit = (type === 'Save' || type === 'Submit');
+            // Self Service: show only if type is 'Save'
+            if (selfServiceBtn) {
+                return type === 'Save';
+            }
+            return isAllowedRole && isSaveOrSubmit;
+        },
+        resignationEndDateVisible: function (resignationEndDate, role) {
+            var isAllowedRole = (role === 'Admin' || role === 'HR Manager' || role === 'HR');
+            return !!resignationEndDate && isAllowedRole;
+        },
+        
         formatGrade: function (value) {
             if (!value) {
                 return "";
@@ -122,7 +138,7 @@ sap.ui.define([], function () {
             var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
             if (status === "Submitted") {
-                return "Indication17";
+                return "Indication07";
             } else if (status === "Payment Received") {
                 return "Success";
             } else if (status === "Invoice Sent" && daysDiff >= 0) {
@@ -148,6 +164,18 @@ sap.ui.define([], function () {
                 return new Date(oDate.getFullYear(), oDate.getMonth(), oDate.getDate());
             }
             return null;
+        },
+
+        formatCompanyAndDescription: function (companyName, description, startDate, EndDate) {
+            if (companyName && description) {
+                return companyName + " - " + description + " " + "(" + startDate + " - " + EndDate + ")";
+            } else if (companyName) {
+                return companyName;
+            } else if (description) {
+                return description;
+            } else {
+                return "";
+            }
         },
 
         fromatNumber: function (avalue) {
@@ -250,6 +278,13 @@ sap.ui.define([], function () {
             }
         },
 
+        formatCustomerTypeValue: function (sType, sValue) {
+            if (sValue && sValue !== "") {
+                return `${sType} (${sValue}%)`;
+            }
+            return sType;
+        },
+
         formatId: function (status, pickId, assigneId) {
             if (status === "Assigned" && assigneId) {
                 return assigneId;
@@ -259,7 +294,7 @@ sap.ui.define([], function () {
                 return " ";
             }
         },
-        
+
         formatName: function (status, pickName, assigneByName, assigneName) {
             if (status === "Assigned" && assigneByName) {
                 return assigneByName;
