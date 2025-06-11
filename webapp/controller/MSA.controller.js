@@ -11,6 +11,7 @@ sap.ui.define([
                 try {
                     var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
                     if (!LoginFUnction) return;
+                    this.closeBusyDialog();
                     this._fetchCommonData("ManageCustomer", "CompanyNameModel");
                     await this.MSA_onSearch();
                     this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");
