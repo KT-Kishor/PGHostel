@@ -39,6 +39,13 @@ sap.ui.define([
             return "";
         },
 
+        formatCurrencyInINR: function (sValue) {
+            if (sValue || sValue === 0) {
+                return  parseFloat(sValue).toLocaleString('en-IN');
+            }
+            return "";
+        },
+
         formatObjectStatus: function (sStatus) {
             switch (sStatus) {
                 case "New":
