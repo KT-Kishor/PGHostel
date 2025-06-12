@@ -173,6 +173,8 @@ sap.ui.define([
                 this.SelectedCustomerModel.setProperty("/SubTotalNotGST", "0.00");
                 this.SelectedCustomerModel.setProperty("/SubTotalInGST", "0.00");
                 this.SelectedCustomerModel.setProperty("/gstAmount", "0.00");
+                this.SelectedCustomerModel.setProperty("/PayByDate", "");
+                this.SelectedCustomerModel.setProperty("/InvoiceDate", "");
                 this.getView().getModel("FilteredSOWModel").setProperty("/TotalAmount", "0.00");
                 this.SelectedCustomerModel.setProperty("/AllDueAmount", "0.00");
                 this.SelectedCustomerModel.setProperty("/AllReceivedAmount", "0.00");
@@ -251,7 +253,7 @@ sap.ui.define([
                     const oData = await this.ajaxReadWithJQuery("SowDetails", { MsaID: msaID, SowID: sowID, Status: "Active" });
 
                     if (!oData.success) return;
-
+                    
                     const unitMultiplier = { Day: 20, Month: 1, Hour: 168, Bid: 1 };
                     let aFilteredSOWDetails = [];
                     this.itemIDCounter = 1;
@@ -295,10 +297,15 @@ sap.ui.define([
                     this.visiablityPlay.setProperty("/IncomeTax", isINR);
                     this.visiablityPlay.setProperty("/GST", isINR);
                     oSelectedCustomerModel.setProperty("/type", isINR ? this.Type : "");
-
                     if (!oSelectedCustomerModel.getProperty("/GST")) {
                         this.visiablityPlay.setProperty("/GST", false);
                     }
+                    if(isINR && !oSelectedCustomerModel.getProperty("/GST")) {
+                        oSelectedCustomerModel.setProperty("/Value", '9');
+                        oSelectedCustomerModel.setProperty("/Type", 'CGST/SGST');
+                        this.visiablityPlay.setProperty("/GST", true);
+                    }
+
                     await this.totalAmountCalculation();
                     if (isINR) {
                         const oModel = oSelectedCustomerModel;
@@ -569,12 +576,12 @@ sap.ui.define([
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
 
-                if (FilterModel.Currency === "INR") {
-                    if (!oSelectedCustomerModel.GST || oSelectedCustomerModel.GST.trim() === "") {
-                        sap.m.MessageBox.error(this.i18nModel.getText("gstMessage"));
-                        return false;
-                    }
-                }
+                // if (FilterModel.Currency === "INR") {
+                //     if (!oSelectedCustomerModel.GST || oSelectedCustomerModel.GST.trim() === "") {
+                //         sap.m.MessageBox.error(this.i18nModel.getText("gstMessage"));
+                //         return false;
+                //     }
+                // }
 
                 const oPayload = {
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
@@ -675,7 +682,6 @@ sap.ui.define([
                         utils._LCvalidateDate(this.byId("CID_id_Payby"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowPO"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CID_id_SowDetails"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_CurrencySelect"), "ID");
                     const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"), "ID") : true;
                     const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;
@@ -1283,9 +1289,9 @@ sap.ui.define([
                 const img = await this._convertBLOBToImage(imgblob);
                 const signature = await this._convertBLOBToImage(signBlob);
 
-                let currency = oModel.Currency === "INR" ? "Rupees" : oModel.Currency;
+                let currency = data.Currency === "INR" ? "Rupees" : data.Currency;
                 let totalInWords = this.convertNumberToWords(oModel.TotalAmount, currency);
-                if (oModel.Currency !== "INR") {
+                if (data.Currency !== "INR") {
                     totalInWords = totalInWords
                         .replaceAll("Lakh", "Million")
                         .replaceAll("Crore", "Billion")
@@ -1328,8 +1334,8 @@ sap.ui.define([
 
                 const detailsTable = [
                     { label: 'Invoice No. :', value: oModel.InvNo },
+                    {label: 'Date :',value: typeof(oModel.InvoiceDate) === 'string' ? oModel.InvoiceDate : Formatter.formatDate(oModel.InvoiceDate)},
                     { label: 'PO/SOW :', value: oModel.POSOW.toString() },
-                    {label: 'Date:',value: typeof(oModel.InvoiceDate) === 'string' ? oModel.InvoiceDate : Formatter.formatDate(oModel.InvoiceDate)}
                 ];
 
                 currentY = detailsStartY;
@@ -1386,7 +1392,7 @@ sap.ui.define([
                     headStyles: { fillColor: [41, 128, 185] },
                     styles: {
                         font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30],
-                        halign: "center"
+                        halign: "center", overflow: "ellipsize"
                     },
                     columnStyles: {
                         0: { halign: 'center' },
@@ -1413,14 +1419,14 @@ sap.ui.define([
 
                 if (oModel.SubTotalNotGST > 0) {
                     summaryBody.push([
-                        `Sub-Total ( Non-Taxable ) (${data.Currency})`,
+                        `Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
                         Formatter.fromatNumber(oModel.SubTotalNotGST)
                     ]);
                 }
 
                 if (oModel.SubTotalInGST > 0) {
                     summaryBody.push([
-                        `Sub-Total ( Taxable ) (${data.Currency})`,
+                        `Sub-Total ( Taxable ) (${data.Currency}) :`,
                         Formatter.fromatNumber(oModel.SubTotalInGST)
                     ]);
                 }
@@ -1430,25 +1436,25 @@ sap.ui.define([
                 const sgstPercentage = percentageText;
                 const igstPercentage = percentageText;
 
-                if (oModel.Currency !== "USD") {
+                if (data.Currency !== "USD") {
                     const cgstValue = parseFloat(oModel.CGST) || 0;
                     const sgstValue = parseFloat(oModel.SGST) || 0;
                     const igstValue = parseFloat(oModel.IGST) || 0;
 
-                    if (oModel.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && (oModel.CGST > 0)) {
-                        summaryBody.push([`CGST ${cgstPercentage}`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
-                        summaryBody.push([`SGST ${sgstPercentage}`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-                    } else if (oModel.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST")  && (oModel.IGST > 0)) {
-                        summaryBody.push([`IGST ${igstPercentage}`, Formatter.fromatNumber(igstValue.toFixed(2))]);
+                    if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && (oModel.CGST > 0)) {
+                        summaryBody.push([`CGST ${cgstPercentage} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
+                        summaryBody.push([`SGST ${sgstPercentage} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
+                    } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST")  && (oModel.IGST > 0)) {
+                        summaryBody.push([`IGST ${igstPercentage} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                     }
                 }
 
                 if (data.RoundOf && data.RoundOf > 0) {
-                    summaryBody.push([`Round Of (${data.Currency})`,(data.RoundOf)]);
+                    summaryBody.push([`Round Off (${data.Currency}) :`,(data.RoundOf)]);
                 }
 
                 const totalRowIndex = summaryBody.length;
-                summaryBody.push([`Total (${data.Currency})`, Formatter.fromatNumber(oModel.TotalAmount)]);
+                summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(oModel.TotalAmount)]);
 
                 doc.autoTable({
                     startY: currentY,
@@ -1459,13 +1465,14 @@ sap.ui.define([
                         font: "times",
                         fontSize: 10,
                         halign: "right",
-                        cellPadding: 2
+                        cellPadding: 2,
+                        overflow: "ellipsize"
                     },
                     columnStyles: {
                         0: { halign: "right", cellWidth: 60 },
                         1: { halign: "right", cellWidth: 40 }
                     },
-                    margin: { left: 96 },
+                    margin: { left: 95 },
                     didParseCell: function (data) {
                         if (data.row.index === totalRowIndex) {
                             data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };

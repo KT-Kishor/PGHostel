@@ -7,7 +7,7 @@
     xmlns:core="sap.ui.core"
     xmlns:f="sap.ui.layout.form">
 
-    <Page showNavButton="true" navButtonPress="TSD_onPressBack" title="{i18n>createTimeEntry}">
+    <Page showNavButton="true" navButtonPress="TSD_onPressBack" title="{viewModel>/pageTitle}">
         <content>
             <!-- Calendar with legend -->
             <u:CalendarDateInterval
@@ -19,17 +19,17 @@
                 startDateChange="onInitializeLegend"
                 days="7"
                 showDayNamesLine="true"  
-                intervalSelection="false" />
+                intervalSelection="false"
+                enabled="{viewModel>/isCalendarEnabled}" />
 
             <!-- Form for timesheet entry -->
             <f:SimpleForm  
                 id="SimpleFormToolbar"
-                editable="{viewModel>/isEditing}" 
                 layout="ResponsiveGridLayout"
                 labelSpanXL="4"
                 labelSpanL="3"
                 labelSpanM="4"
-                title="Create entry for {viewModel>/selectedEntryDate}"
+                title="{viewModel>/formTitle}"
                 labelSpanS="12"
                 adjustLabelSpan="false"
                 emptySpanXL="0"
@@ -53,7 +53,7 @@
                         showValueHelp="true"  
                         valueHelpRequest="onValueHelpRequest"
                         valueStateText="{i18n>selectAssignment}"
-                        editable="{viewModel>/isEditing}" />
+                        editable="{= ${viewModel>/isCreate} }" /> <!-- Only editable in create mode -->
 
                     <!-- Hours Worked -->
                     <Label text="{i18n>hoursWorked}" />
@@ -65,7 +65,8 @@
                         visible="{visiblePlay>/isAssignmentMode}"
                         change="TD_ValidateTime"
                         valueStateText="{i18n>hoursValueState}"
-                        editable="{viewModel>/isEditing}" />
+                        editable="{= ${viewModel>/isCreate} }" /> <!-- Only editable in create mode -->
+
                     <Text id="idTextActHour" text="Actual Hours: {/newModel/ActualHours}" />
                     <!-- Employee Comment -->
                     <Label text="{i18n>employeeComment}" />
@@ -74,7 +75,7 @@
                         liveChange="TD_ValidateCommonFields"  
                         maxLength="1000"  
                         valueStateText="{i18n>commentsValueState}"
-                        editable="{viewModel>/isEditing}" />
+                        editable="{viewModel>/isEditing}" /> <!-- Editable in create mode or when editing in edit mode -->
                 </f:content>
             </f:SimpleForm>
         </content>
@@ -86,12 +87,12 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
                 <contentRight>
-                     <Button 
-    text="{= ${viewModel>/isEditing} ? 'Save' : 'Edit' }"
-    type="{= ${viewModel>/isEditing} ? 'Accept' : 'Emphasized' }"
-    press="TSD_onToggleEdit"
-    id="TSD_id_EditDetail"
-    visible="{= ${viewModel>/isUpdate} }" />
+                    <Button 
+                        text="{= ${viewModel>/isEditing} ? 'Save' : 'Edit' }"
+                        type="{= ${viewModel>/isEditing} ? 'Accept' : 'Emphasized' }"
+                        press="TSD_onToggleEdit"
+                        id="TSD_id_EditDetail"
+                        visible="{= ${viewModel>/isUpdate} }" />
                     <Button text="{i18n>save}"
                         press="TSD_onSubmit"
                         type="Emphasized"

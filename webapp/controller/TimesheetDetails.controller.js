@@ -22,27 +22,55 @@ sap.ui.define([
             await this._fetchCommonData("AssignedTask", "AssignModel", { EmployeeID: this.EmployeeID });
             await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
             await this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: this.branch });
-            const oViewModel = new JSONModel({ isUpdate: false, isCreate: true, isSubmitted: false, isEditing: false, calendarStartDate: this._getStartOfWeek(new Date()) });
+            const oViewModel = new JSONModel({isUpdate: false,isCreate: true,isSubmitted: false,isEditing: true,calendarStartDate: this._getStartOfWeek(new Date()),isCalendarEnabled: true,formTitle: "",pageTitle: ""});
             this.getView().setModel(oViewModel, "viewModel");
             this.byId("TSD_id_Assignment").setValueState("None");
             this.byId("TSD_id_TimeHours").setValueState("None");
             this.byId("TSD_id_EmpComment").setValueState("None");
             this._makeDatePickersReadOnly(["TSD_id_Assignment", "TSD_id_TimeHours"]);
+            // Set current date as selected in the calendar
+            var oCalendar = this.byId("calendar");
+            if (oCalendar) {
+                var oToday = new Date();
+                var oDateRange = new sap.ui.unified.DateRange({ startDate: oToday });
+                oCalendar.removeAllSelectedDates();
+                oCalendar.addSelectedDate(oDateRange);
+                this.onInitializeLegend({ getSource: () => oCalendar });
+                this.onDateSelect({ getSource: () => oCalendar });
+            }
 
             // Handle Edit and Create cases
             this.sArg = oEvent.getParameter("arguments").sPath;
 
             if (this.sArg !== "Timesheet") {
                 await this.readCallTimesheet();
-                // Edit Case
                 oViewModel.setProperty("/isUpdate", true);
                 oViewModel.setProperty("/isCreate", false);
-                oViewModel.setProperty("/isEditing", false);
+                oViewModel.setProperty("/isEditing", false); // Start in view mode for edit
+                oViewModel.setProperty("/isCalendarEnabled", false);
+                oViewModel.setProperty("/pageTitle", "Edit Timesheet Entry");
+                var editDate = this.getView().getModel("newModel").getProperty("/Date");
+                if (editDate) {
+                    if (editDate.includes("T")) {
+                        editDate = editDate.split("T")[0];
+                    }
+                    var parts = editDate.split("-");
+                    if (parts.length === 3) {
+                        editDate = parts[2] + "/" + parts[1] + "/" + parts[0];
+                    }
+                }
+                oViewModel.setProperty("/formTitle", "Edit data for " + editDate);
             } else {
-                // Create Case
                 oViewModel.setProperty("/isUpdate", false);
                 oViewModel.setProperty("/isCreate", true);
                 oViewModel.setProperty("/isEditing", true);
+                oViewModel.setProperty("/isCalendarEnabled", true);
+                oViewModel.setProperty("/pageTitle", "Create Timesheet Entry");
+                var today = new Date();
+                var todayStr = String(today.getDate()).padStart(2, '0') + "/" +
+                    String(today.getMonth() + 1).padStart(2, '0') + "/" +
+                    today.getFullYear();
+                oViewModel.setProperty("/formTitle", "Create entry for " + todayStr);
                 // Set empty newModel for create
                 const emptyData = {
                     TaskID: "",
@@ -61,19 +89,8 @@ sap.ui.define([
                     this.getView().getModel("editModel").setProperty("/editableBut", true);
                 }
             }
-            // Set current date as selected in the calendar
-            var oCalendar = this.byId("calendar");
-            if (oCalendar) {
-                var oToday = new Date();
-                var oDateRange = new sap.ui.unified.DateRange({ startDate: oToday });
-                oCalendar.removeAllSelectedDates();
-                oCalendar.addSelectedDate(oDateRange);
-                this.onInitializeLegend({ getSource: () => oCalendar });
-                this.onDateSelect({ getSource: () => oCalendar });
-            }
             this.closeBusyDialog();
         },
-
         readCallTimesheet: async function () {
             try {
                 this.getBusyDialog();
@@ -170,55 +187,34 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("hoursExceedError") || "Entered hours cannot exceed actual assignment hours.");
                     return;
                 }
+                // Step 4: Prepare payload (use local date parts, not toISOString)
+                const localDateStr = [selectedDateObj.getFullYear(),
+                    String(selectedDateObj.getMonth() + 1).padStart(2, '0'),
+                    String(selectedDateObj.getDate()).padStart(2, '0')].join('-');
+                const oPayload = {
+                    TaskID: oData.TaskID,
+                    TaskName: oData.TaskName,
+                    EmployeeID: oData.EmployeeID,
+                    EmployeeName: oData.EmployeeName,
+                    ManagerName: oData.ManagerName || "Unknown",
+                    ManagerID: oData.ManagerID || "Unknown",
+                    HoursWorked: sEnteredHours.toString(),
+                    EmployeeComments: this.byId("TSD_id_EmpComment").getValue(),
+                    Date: localDateStr,
+                    Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
+                    Year: selectedDateObj.getFullYear(),
+                    Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
+                    Status: "Saved",
+                    ManagerComments: oData.ManagerComments || ""
+                };
 
-                // Step 4: Duplicate check (backend)
-                const selectedDateStr = selectedDateObj.toISOString().split("T")[0];
-                const taskId = oData.TaskID;
-                const employeeId = oData.EmployeeID;
-
+                // Step 5: Submit to backend
                 this.getBusyDialog();
                 try {
-                    // Make a backend call to check for duplicate
-                    const duplicate = await this.ajaxReadWithJQuery("Timesheet", {
-                        EmployeeID: employeeId,
-                        TaskID: taskId,
-                        Date: selectedDateStr
-                    });
-
-                    // If backend returns any data, it's a duplicate
-                    if (duplicate.data && (
-                        (Array.isArray(duplicate.data) && duplicate.data.length > 0) ||
-                        (!Array.isArray(duplicate.data) && Object.keys(duplicate.data).length > 0)
-                    )) {
-                        this.closeBusyDialog();
-                        MessageToast.show("You have already filled this assignment for the selected date.");
-                        return;
-                    }
-
-                    // Step 5: Prepare payload
-                    const oPayload = {
-                        TaskID: oData.TaskID,
-                        TaskName: oData.TaskName,
-                        EmployeeID: oData.EmployeeID,
-                        EmployeeName: oData.EmployeeName,
-                        ManagerName: oData.ManagerName || "Unknown",
-                        ManagerID: oData.ManagerID || "Unknown",
-                        HoursWorked: sEnteredHours.toString(),
-                        EmployeeComments: this.byId("TSD_id_EmpComment").getValue(),
-                        Date: selectedDateStr,
-                        Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
-                        Year: selectedDateObj.getFullYear(),
-                        Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
-                        Status: "Saved",
-                        ManagerComments: oData.ManagerComments || ""
-                    };
-
-                    // Step 6: Submit to backend
                     await this.ajaxCreateWithJQuery("Timesheet", { data: oPayload });
                     MessageToast.show(this.i18nModel.getText("timesheetSuccess"));
                     this.clearTimesheetForm();
                 } catch (backendErr) {
-                    this.closeBusyDialog();
                     MessageToast.show(backendErr.message || backendErr.responseText);
                 } finally {
                     this.closeBusyDialog();
@@ -284,6 +280,10 @@ sap.ui.define([
 
         onDateSelect: function (oEvent) {
             var that = this;
+            var oViewModel = this.getView().getModel("viewModel");
+            if (!oViewModel.getProperty("/isCalendarEnabled")) {
+                return;
+            }
             var selectedDates = oEvent.getSource().getSelectedDates();
             this.byId("TSD_id_Assignment").setValue("");
             this.byId("TSD_id_TimeHours").setValue("");
@@ -371,11 +371,13 @@ sap.ui.define([
             var oViewModel = this.getView().getModel("viewModel");
             var isEditing = oViewModel.getProperty("/isEditing");
             if (isEditing) {
-                // Save action (handle update logic)
+                // Save action
                 this.TSD_onUpdate();
+                oViewModel.setProperty("/isEditing", false);
+            } else {
+                // Switch to edit mode
+                oViewModel.setProperty("/isEditing", true);
             }
-            // Toggle editing mode
-            oViewModel.setProperty("/isEditing", !isEditing);
         },
         TSD_onUpdate: async function () {
             try {

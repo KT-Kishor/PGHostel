@@ -17,43 +17,90 @@ sap.ui.define(
       _onRouteMatched: async function () {
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
-        this.getBusyDialog()
-        this._ViewDatePickersReadOnly(["HQ_id_Quotaiondate"],this.getView())
-        // this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
+        this.getBusyDialog();
+
+        // Set financial year dates in the date range picker
+        var fyDates = this._getFinancialYearDates();
+        this.byId("HQ_id_Quotaiondate").setDateValue(fyDates.start);
+        this.byId("HQ_id_Quotaiondate").setSecondDateValue(fyDates.end);
+
+        this._ViewDatePickersReadOnly(["HQ_id_Quotaiondate"], this.getView());
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-        await this._fetchCommonData("Quotation", "CompanyQuotationModel", {});
+        // Fetch data with financial year filter initially
+        await this._fetchCommonData("Quotation", "CompanyQuotationModel", {
+          DateFrom: this._formatDateForBackend(fyDates.start),
+          DateTo: this._formatDateForBackend(fyDates.end)
+        });
         this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
 
         if (this.oValue === "HrQuotation") {
-
           this.HQ_onClearFilters();
-        } else {
-
         }
+        await this.HQ_onSearch()
         this.closeBusyDialog();
+
+      },
+      _getFinancialYearDates: function () {
+        var today = new Date();
+        var currentMonth = today.getMonth() + 1; // JavaScript months are 0-11
+        var currentYear = today.getFullYear();
+
+        // Assuming financial year runs from April to March
+        var fyStart, fyEnd;
+
+        if (currentMonth >= 4) {
+          // Current financial year is current year April to next year March
+          fyStart = new Date(currentYear, 3, 1); // April 1 (month is 0-based)
+          fyEnd = new Date(currentYear + 1, 2, 31); // March 31 of next year
+        } else {
+          // Current financial year is previous year April to current year March
+          fyStart = new Date(currentYear - 1, 3, 1);
+          fyEnd = new Date(currentYear, 2, 31);
+        }
+
+        return {
+          start: fyStart,
+          end: fyEnd
+        };
+      },
+      // Helper function to format date for backend
+      _formatDateForBackend: function (date) {
+        if (!date) return null;
+        var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+        return oDateFormat.format(date);
       },
       HQ_onSearch: async function () {
-        await this._fetchCommonData("Quotation", "CompanyQuotationModel", {});
+        this.getBusyDialog();
+
         var oFilterBar = this.byId("HQ_id_QuotationFilterBar");
         var aFilterItems = oFilterBar.getFilterGroupItems();
         var aFilters = [];
+        var oDateRange = this.byId("HQ_id_Quotaiondate");
+        var dateFrom = oDateRange.getDateValue();
+        var dateTo = oDateRange.getSecondDateValue();
 
+        // Create date filters if dates are selected
+        if (dateFrom && dateTo) {
+          var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+          var sDateFrom = oDateFormat.format(dateFrom);
+          var sDateTo = oDateFormat.format(dateTo);
+
+          // Create filter for date range
+          aFilters.push(new sap.ui.model.Filter("Date", sap.ui.model.FilterOperator.BT, sDateFrom, sDateTo));
+        }
+
+        // Handle other filters
         aFilterItems.forEach(function (oItem) {
+          if (oItem.getName() === "Date") return; // Skip date as we already handled it
+
           var sName = oItem.getName();
-          var oControl = oFilterBar.determineControlByFilterItem(oItem); //  Get actual control
+          var oControl = oFilterBar.determineControlByFilterItem(oItem);
           var sValue;
 
           if (oControl.isA("sap.m.ComboBox")) {
-            sValue = oControl.getSelectedKey(); //  Use selectedKey for ComboBox
-          } else if (oControl.isA("sap.m.DatePicker")) {
-            sValue = oControl.getDateValue(); //  Use getDateValue for DatePicker
-            if (sValue) {
-              // Format to your model's format, 'yyyy-MM-dd' or 'dd/MM/yyyy'
-              var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
-              sValue = oDateFormat.format(sValue);
-            }
+            sValue = oControl.getSelectedKey();
           } else if (oControl.getValue) {
-            sValue = oControl.getValue(); // fallback
+            sValue = oControl.getValue();
           }
 
           if (sValue) {
@@ -61,30 +108,35 @@ sap.ui.define(
           }
         });
 
+        // Apply filters to table
         var oTable = this.byId("HQ_id_QuotationItemTable");
         var oBinding = oTable.getBinding("items");
 
         if (oBinding) {
-          this.getBusyDialog(); // Show BusyDialog
           oBinding.filter(aFilters);
-
           oTable.attachEventOnce("updateFinished", function () {
             this.closeBusyDialog();
           }.bind(this));
+        } else {
+          this.closeBusyDialog();
         }
+      },
+      onDateRangeChange: function (oEvent) {
+        this.HQ_onSearch();
       },
 
 
       HQ_onClearFilters: function () {
-        var oFilterBar = this.getView().byId("HQ_id_QuotationFilterBar");
-        oFilterBar.getFilterGroupItems().forEach(function (oItem) {
-          var oControl = oItem.getControl();
-          if (oControl.setSelectedKey) {
-            oControl.setSelectedKey("");
-          } else if (oControl.setValue) {
-            oControl.setValue("");
-          }
-        });
+        // Clear all filters except the date range
+        this.byId("HQ_id_quotationNo").setSelectedKey("");
+        this.byId("HQ_id_CustomerName").setSelectedKey("");
+        // this.byId("HQ_id_Quotaiondate").setValue("");
+
+        // Reset date range to financial year
+        var fyDates = this._getFinancialYearDates();
+        this.byId("HQ_id_Quotaiondate").setDateValue(fyDates.start);
+        this.byId("HQ_id_Quotaiondate").setSecondDateValue(fyDates.end);
+        this.HQ_onSearch();
       },
 
       HQ_onPressAddQuotation: function () {
@@ -93,7 +145,7 @@ sap.ui.define(
 
       // Function to navigate back to the TileAdminView route
       onPressback: function () {
-        this.getRouter().navTo("RouteTilePage"); 
+        this.getRouter().navTo("RouteTilePage");
       },
 
       onLogout: function () {
@@ -101,7 +153,7 @@ sap.ui.define(
       },
 
       HQ_onPressBack: function () {
-        this.navigateToRouteView1(); 
+        this.navigateToRouteView1();
       },
 
       HQ_onPressQuotation: function (oEvent) {

@@ -446,7 +446,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitle,
 h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   font-size: 1.5rem !important;
 }
-
 .sapUiSizeCompact .sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMSB.sapMSBTransparent .sapMBtnContent,
 .sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMSB.sapMSBTransparent .sapMBtnContent,
 .sapUiSizeCompact .sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMBtnInner .sapMBtnContent,
@@ -681,4 +680,15 @@ align-items:flex-start;
 
 .PayByDateClass {
   white-space: nowrap !important;
+}
+.sapUiCompFilterBarNonPhone {
+    padding-top: 1rem;    
+    padding-bottom: 1rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
+   background-image: linear-gradient(to bottom right, rgb(170, 212, 237), rgb(173, 166, 249));
+    /* background-image: url("../image/Filter.jpg") !important; 
+     background-size: cover; 
+     background-position: center;
+     background-repeat: no-repeat; */
 }

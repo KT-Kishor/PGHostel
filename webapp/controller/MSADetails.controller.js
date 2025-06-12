@@ -48,7 +48,8 @@ sap.ui.define([
                     ReplacementMonth: "2 Months",
                     ReplacementRefund: "",
                     Country: "",
-                    City: ""
+                    City: "",
+                    GST:""
                 });
                 this.getView().setModel(oModelMSA, "msaModelWizart");
 
@@ -56,6 +57,7 @@ sap.ui.define([
                 this.getView().setModel(oModel, "VisibleModel")
                 this.AdvanceBalance = true;
                 this.byId("MsaD_id_Type").setSelectedIndex(0);
+                this.GST = true;
             },
 
             onRadioButtonGroupSelect: function (oEvent) {
@@ -154,6 +156,14 @@ sap.ui.define([
                 this.validateStep();
             },
 
+            MsaD_validateGST: function (oEvent) {
+                this.GST = utils._LCvalidateGstNumber(oEvent);
+                if(oEvent.getSource().getValue() === ""){
+                    this.GST = true; // If GST field is empty, consider it valid
+                    this.byId("MsaD_id_GST").setValueState("None");
+                }
+                this.validateStep();
+            },
             MSACountryComboBox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 this.validateStep();
@@ -184,7 +194,7 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_Address"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_Branch"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_Country"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_City"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_City"), "ID") && this.GST &&
                         (
                             !isRecruitment || (
                                 utils._LCvalidateTraineeAmount(this.byId("Msa_Id_RateCharge"), "ID") &&

@@ -49,7 +49,7 @@
 						<ToolbarSeparator />
 						<Button text="{i18n>InvoiceAddBtn}" type="Accept" tooltip="{i18n>addInvoice}" press="CI_onPressAddInvoice" />
 						<ToolbarSeparator />
-						<Button text="{i18n>InvoiceDeleteBtn}" id="CI_InvoiceDelete" type="Reject" press="CI_OnPressDeleteInvoice" enabled="false" />
+						<Button text="{i18n>InvoiceDeleteBtn}" id="CI_InvoiceDelete" visible="false" type="Reject" press="CI_OnPressDeleteInvoice" enabled="false" />
 						<ToolbarSeparator />
 						<Button text="{i18n>msasow}" type="Ghost" tooltip="{i18n>addInvoice}" press="CI_onPressMSASOW"/>
 					</Toolbar>

@@ -31,7 +31,8 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="MSA_id_Table" class="sapUiTinyMargin" items="{MSADisplayModel>/}" busyIndicatorDelay="0" width="auto" growingScrollToLoad="true" growing="true" growingThreshold="50" alternateRowColors="true">
+			<Table id="MSA_id_Table" class="sapUiTinyMargin" items="{
+                path: 'MSADisplayModel>/', sorter: {path: 'CreateMSADate',descending: false,group: true}}" busyIndicatorDelay="0" width="auto" growingScrollToLoad="true" growing="true" growingThreshold="50" alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar >
 						<Title id="MSA_id_Title" text="{i18n>msaDetails} ({= ${MSADisplayModel>/}.length })"/>
@@ -44,19 +45,18 @@
 					<Column demandPopin="true">
 						<Text text="{i18n>companyName}"/>
 					</Column>
-					<Column demandPopin="true">
-						<Text text="{i18n>panCardCommon}" />
-					</Column>
-
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>companyHeadName}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>companyHeadPosition}" />
 					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>createMSADate}" />
+					<Column demandPopin="true">
+						<Text text="{i18n>paymentterms}" />
 					</Column>
+					<!-- <Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>createMSADate}" />
+					</Column> -->
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>type}" />
 					</Column>
@@ -65,10 +65,10 @@
 					<ColumnListItem type="Navigation" press="OnPressNavigationMsaDet">
 						<cells>
 							<Text text="{MSADisplayModel>CompanyName}"/>
-							<Text text="{MSADisplayModel>PanCard}"/>
 							<Text text="{MSADisplayModel>CompanyHeadName}"/>
 							<Text text="{MSADisplayModel>CompanyHeadPosition}"/>
-							<Text text="{path:'MSADisplayModel>CreateMSADate',formatter: '.Formatter.formatDate'}"/>
+							<Text text="{MSADisplayModel>PaymentTerms}"/>
+							<!-- <Text text="{path:'MSADisplayModel>CreateMSADate',formatter: '.Formatter.formatDate'}"/> -->
 							<Text text="{MSADisplayModel>Type}"/>
 						</cells>
 					</ColumnListItem>

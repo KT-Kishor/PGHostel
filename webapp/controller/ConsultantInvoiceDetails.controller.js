@@ -1613,7 +1613,7 @@ sap.ui.define(
                 theme: 'grid',
                 headStyles: { fillColor: [41, 128, 185] },
                 styles: {font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30],
-                halign: "center"},
+                halign: "center", overflow: "ellipsize"},
                 columnStyles: {
                     0: { halign: 'center' },
                     1: { halign: 'left' },
@@ -1632,7 +1632,7 @@ sap.ui.define(
                 },
             });
     
-            currentY = doc.lastAutoTable.finalY + 10;
+            currentY = doc.lastAutoTable.finalY + 5;
 
             if (currentY + 40 > pageHeight) {
                 doc.addPage();
@@ -1645,7 +1645,7 @@ sap.ui.define(
             // SubTotal Without GST
             if (oModel.SubTotalNotGST > 0) {
                 summaryBody.push([
-                    `Sub-Total ( Non-Taxable ) (${oModel.Currency})`,
+                    `Sub-Total ( Non-Taxable ) (${oModel.Currency}) :`,
                     Formatter.fromatNumber(oModel.SubTotalNotGST)
                 ]);
             }
@@ -1653,7 +1653,7 @@ sap.ui.define(
             // SubTotal With GST
             if (oModel.SubTotal > 0) {
                 summaryBody.push([
-                    `Sub-Total ( Taxable ) (${oModel.Currency})`,
+                    `Sub-Total ( Taxable ) : (${oModel.Currency}) :`,
                     Formatter.fromatNumber(oModel.SubTotal)
                 ]);
             }
@@ -1666,16 +1666,16 @@ sap.ui.define(
 
                 if(oModel.Currency === "INR" && oModel.CGST && oModel.SGST && oModel.CGSTVisible === true) {
                     summaryBody.push([
-                        `CGST (${oModel.Percentage}%)`,
+                        `CGST (${oModel.Percentage}%) :`,
                         Formatter.fromatNumber(cgstValue.toFixed(2))
                     ]);
                     summaryBody.push([
-                        `SGST (${oModel.Percentage}%)`,
+                        `SGST (${oModel.Percentage}%) :`,
                         Formatter.fromatNumber(sgstValue.toFixed(2))
                     ]);
                 } else if (oModel.IGST && oModel.Currency === "INR"  && oModel.IGSTVisible === true) {
                     summaryBody.push([
-                        `IGST (${oModel.Percentage}%)`,
+                        `IGST (${oModel.Percentage}%) :`,
                         Formatter.fromatNumber(igstValue.toFixed(2))
                     ]);
                 }
@@ -1684,41 +1684,41 @@ sap.ui.define(
             // Total row
             const totalRowIndex = summaryBody.length;
             summaryBody.push([
-                `Total (${oModel.Currency})`,
+                `Total (${oModel.Currency}) :`,
                 Formatter.fromatNumber(oModel.TotalSum)
             ]);
 
             doc.autoTable({
-                startY: currentY,
-                head: [],
-                body: summaryBody,
-                theme: 'plain',
-                styles: {
-                    font: "times",
-                    fontSize: 10,
-                    halign: "right",
-                    cellPadding: 2
-                },
-                columnStyles: {
-                    0: { halign: "right", cellWidth: 60 },
-                    1: { halign: "right", cellWidth: 40 }
-                },
-                margin: { left: 96 },
-                didParseCell: function (data) {
-                    if (data.row.index === totalRowIndex) {
-                        // Apply top border only for the total row (last row)
-                        data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
-                        data.cell.styles.lineColor = [0, 0, 0];
-                        data.cell.styles.fontStyle = 'bold';
+                    startY: currentY,
+                    head: [],
+                    body: summaryBody,
+                    theme: 'plain',
+                    styles: {
+                        font: "times",
+                        fontSize: 10,
+                        halign: "right",
+                        cellPadding: 2,
+                        overflow: "ellipsize"
+                    },
+                    columnStyles: {
+                        0: { halign: "right", cellWidth: 60 },
+                        1: { halign: "right", cellWidth: 40 }
+                    },
+                    margin: { left: 95 },
+                    didParseCell: function (data) {
+                        if (data.row.index === totalRowIndex) {
+                            data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
+                            data.cell.styles.lineColor = [0, 0, 0];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
                     }
-                }
-            });
+                });
 
             currentY = doc.lastAutoTable.finalY + 10;
 
             oModel.AmountInWords = totalInWords;
             doc.setFont("times", "bold");
-            doc.text("Amount in Words:", 13, currentY);
+            doc.text("Amount in Words :", 13, currentY);
             currentY += 5;
             doc.setFont("times", "normal");
             const amountHeight = doc.getTextDimensions(oModel.AmountInWords || "").h;
