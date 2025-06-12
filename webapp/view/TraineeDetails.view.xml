@@ -94,7 +94,6 @@
 						    <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 							</items>
 				            </ComboBox>
-								<!-- <Label text="{i18n>branchCode}" />
 										<Input id="TD_id_BranchCode" value="{oTraineeDetails>BranchCode}"  editable="false" /> -->
                           <Label text="{i18n>mobileNo}" required="true" />
 							<HBox width="100%" justifyContent="Start" alignItems="Center">

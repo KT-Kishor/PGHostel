@@ -122,6 +122,7 @@ sap.ui.define([
                 this.getOwnerComponent().setModel(oModel, modelName);
               }
               resolve(data);
+              this.closeBusyDialog();
             }.bind(this),
             error: function (err) {
               reject(err);

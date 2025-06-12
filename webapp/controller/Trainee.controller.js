@@ -18,11 +18,6 @@ sap.ui.define([
                 this.getBusyDialog();
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this._fetchCommonData("Designation", "DesignationModel");
-                this._fetchCommonData("Department", "Departmentmodel");
-                this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeCertificate" });
-                await this._fetchCommonData("EmployeeDetailsData", "empModel");
-
                 // common company emails read call
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
@@ -46,7 +41,7 @@ sap.ui.define([
             //read call for trainee
             readCallForTrainee: async function (filter) {
                 try {
-                    this.getBusyDialog();
+                   // this.getBusyDialog();
                     await this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
                         var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                         this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
@@ -204,7 +199,6 @@ sap.ui.define([
                 this.byId("T_id_RejectBtn").setEnabled(false);
                 this.byId("T_id_TraineeTable").removeSelections(true);
             },
-
             //Reject trainee function
             _handleReject: async function (oContext) {
                 this.getBusyDialog();
@@ -287,7 +281,6 @@ sap.ui.define([
                     this.TCF_onPressPreview();
                 }
             },
-
             //download certificate
             TCF_onPressPreview: function () {
                 if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("TCF_id_ProjectName"), "ID")) {
@@ -433,8 +426,10 @@ sap.ui.define([
                 });
             },
             //Traniee certificate mail function
-            T_onCerMail: function () {
+            T_onCerMail:async function () {
                 try {
+                    sap.ui.core.BusyIndicator.show(0);
+                    await  this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeCertificate" });
                     var oTraineeEmail = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject().TraineeEmail;
                     if (!oTraineeEmail || oTraineeEmail.length === 0) {
                         MessageBox.error("To Email is missing");
@@ -453,6 +448,7 @@ sap.ui.define([
                     this.getView().setModel(oUploaderDataModel, "UploaderData");
                     this.T_commonOpenDialog("T_MailDialog", "sap.kt.com.minihrsolution.fragment.CommonMail");
                     this.validateSendButton();
+                    sap.ui.core.BusyIndicator.hide();
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("technicalError"));
                 }

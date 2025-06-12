@@ -219,11 +219,13 @@ sap.ui.define([
         "Paid": "errorPaidMessage"
       };
 
-      if (this.MIF_liveChangeForMangerComments()) {
+      if (this.MIF_liveChangeForMangerComments() && sap.ui.getCore().byId("MIF_id_remark").getValue().trim() !== "") {
         const statusValue = mapStatus[btnText];
+        sap.ui.getCore().byId("MIF_id_remark").setValueState("None");
         this.updateCallForMyInboxFunction(this.oModelData, statusValue, successKey[btnText], errorKey[btnText]);
       } else {
         sap.m.MessageToast.show(i18n.getText("enterComments"));
+        sap.ui.getCore().byId("MIF_id_remark").setValueState("Error");
       }
     },
 
