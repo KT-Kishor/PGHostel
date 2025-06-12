@@ -69,11 +69,18 @@
                         </fb:control>
                        
                     </fb:FilterGroupItem>
-                    <fb:FilterGroupItem name="Date" label="{i18n>quotaiodate}" groupName="Group1" visibleInFilterBar="true">
-						<fb:control>
-							<DateRangeSelection id="HQ_id_Quotaiondate" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" />
-						</fb:control>
-					</fb:FilterGroupItem>
+                     <fb:FilterGroupItem
+                        name="Date"
+                        label="{i18n>quotaiodate}"
+                        groupName="Group1"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                           <DatePicker id="HQ_id_Quotaiondate" displayFormat="dd/MM/yyyy"/>
+                        </fb:control>
+                       
+                    </fb:FilterGroupItem>
+
                 </fb:filterGroupItems>
             </fb:FilterBar>
                 <Table
