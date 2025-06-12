@@ -1560,6 +1560,11 @@ sap.ui.define(
             doc.text(ConsultantAddressLines, margin, currentY);
             currentY += ConsultantAddressLines.length * 5;
 
+            if (oModel.MobileNo) {
+                doc.text(`Mobile No : ${oModel.MobileNo}`, margin, currentY);
+                currentY += 5;
+            }
+
             if (oModel.GSTNO !== undefined && oModel.GSTNO !== "") {
                 doc.text(`GSTIN : ${oModel.GSTNO}`, margin, currentY);
                 currentY += 5;
@@ -1625,24 +1630,6 @@ sap.ui.define(
                         5: { halign: 'right' } 
                     })
                 },
-            //      didParseCell: function (data) {
-            //     if (data.section === 'head') {
-            //     // Adjust header alignment for numeric columns
-            //     if (showSAC) {
-            //         if ([4, 5, 6].includes(data.column.index)) {
-            //         data.cell.styles.halign = 'right';
-            //         } else {
-            //         data.cell.styles.halign = 'center';
-            //         }
-            //     } else {
-            //         if ([3, 4, 5].includes(data.column.index)) {
-            //         data.cell.styles.halign = 'right';
-            //         } else {
-            //         data.cell.styles.halign = 'center';
-            //         }
-            //     }
-            //     }
-            // }
             });
     
             currentY = doc.lastAutoTable.finalY + 10;
