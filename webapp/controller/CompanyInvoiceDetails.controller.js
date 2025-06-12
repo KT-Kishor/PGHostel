@@ -1329,7 +1329,7 @@ sap.ui.define([
                 const detailsTable = [
                     { label: 'Invoice No. :', value: oModel.InvNo },
                     { label: 'PO/SOW :', value: oModel.POSOW.toString() },
-                    { label: 'Date :', value: Formatter.formatDate(oModel.InvoiceDate) }
+                    {label: 'Date:',value: typeof(oModel.InvoiceDate) === 'string' ? oModel.InvoiceDate : Formatter.formatDate(oModel.InvoiceDate)}
                 ];
 
                 currentY = detailsStartY;
