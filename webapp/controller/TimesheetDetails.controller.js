@@ -22,7 +22,7 @@ sap.ui.define([
             await this._fetchCommonData("AssignedTask", "AssignModel", { EmployeeID: this.EmployeeID });
             await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
             await this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: this.branch });
-            const oViewModel = new JSONModel({ isUpdate: false, isCreate: true, isSubmitted: false, isEditing: false, calendarStartDate: this._getStartOfWeek(new Date()) });
+            const oViewModel = new JSONModel({isUpdate: false,isCreate: true,isSubmitted: false,isEditing: true,calendarStartDate: this._getStartOfWeek(new Date()),isCalendarEnabled: true,formTitle: "",pageTitle: ""});
             this.getView().setModel(oViewModel, "viewModel");
             this.byId("TSD_id_Assignment").setValueState("None");
             this.byId("TSD_id_TimeHours").setValueState("None");
@@ -44,15 +44,33 @@ sap.ui.define([
 
             if (this.sArg !== "Timesheet") {
                 await this.readCallTimesheet();
-                // Edit Case
                 oViewModel.setProperty("/isUpdate", true);
                 oViewModel.setProperty("/isCreate", false);
-                oViewModel.setProperty("/isEditing", false);
+                oViewModel.setProperty("/isEditing", false); // Start in view mode for edit
+                oViewModel.setProperty("/isCalendarEnabled", false);
+                oViewModel.setProperty("/pageTitle", "Edit Timesheet Entry");
+                var editDate = this.getView().getModel("newModel").getProperty("/Date");
+                if (editDate) {
+                    if (editDate.includes("T")) {
+                        editDate = editDate.split("T")[0];
+                    }
+                    var parts = editDate.split("-");
+                    if (parts.length === 3) {
+                        editDate = parts[2] + "/" + parts[1] + "/" + parts[0];
+                    }
+                }
+                oViewModel.setProperty("/formTitle", "Edit data for " + editDate);
             } else {
-                // Create Case
                 oViewModel.setProperty("/isUpdate", false);
                 oViewModel.setProperty("/isCreate", true);
                 oViewModel.setProperty("/isEditing", true);
+                oViewModel.setProperty("/isCalendarEnabled", true);
+                oViewModel.setProperty("/pageTitle", "Create Timesheet Entry");
+                var today = new Date();
+                var todayStr = String(today.getDate()).padStart(2, '0') + "/" +
+                    String(today.getMonth() + 1).padStart(2, '0') + "/" +
+                    today.getFullYear();
+                oViewModel.setProperty("/formTitle", "Create entry for " + todayStr);
                 // Set empty newModel for create
                 const emptyData = {
                     TaskID: "",
@@ -73,7 +91,6 @@ sap.ui.define([
             }
             this.closeBusyDialog();
         },
-
         readCallTimesheet: async function () {
             try {
                 this.getBusyDialog();
@@ -170,7 +187,10 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("hoursExceedError") || "Entered hours cannot exceed actual assignment hours.");
                     return;
                 }
-                // Step 4: Prepare payload
+                // Step 4: Prepare payload (use local date parts, not toISOString)
+                const localDateStr = [selectedDateObj.getFullYear(),
+                    String(selectedDateObj.getMonth() + 1).padStart(2, '0'),
+                    String(selectedDateObj.getDate()).padStart(2, '0')].join('-');
                 const oPayload = {
                     TaskID: oData.TaskID,
                     TaskName: oData.TaskName,
@@ -180,7 +200,7 @@ sap.ui.define([
                     ManagerID: oData.ManagerID || "Unknown",
                     HoursWorked: sEnteredHours.toString(),
                     EmployeeComments: this.byId("TSD_id_EmpComment").getValue(),
-                    Date: selectedDateObj.toISOString().split("T")[0],
+                    Date: localDateStr,
                     Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
                     Year: selectedDateObj.getFullYear(),
                     Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
@@ -189,7 +209,8 @@ sap.ui.define([
                 };
 
                 // Step 5: Submit to backend
-                this.getBusyDialog(); try {
+                this.getBusyDialog();
+                try {
                     await this.ajaxCreateWithJQuery("Timesheet", { data: oPayload });
                     MessageToast.show(this.i18nModel.getText("timesheetSuccess"));
                     this.clearTimesheetForm();
@@ -259,6 +280,10 @@ sap.ui.define([
 
         onDateSelect: function (oEvent) {
             var that = this;
+            var oViewModel = this.getView().getModel("viewModel");
+            if (!oViewModel.getProperty("/isCalendarEnabled")) {
+                return;
+            }
             var selectedDates = oEvent.getSource().getSelectedDates();
             this.byId("TSD_id_Assignment").setValue("");
             this.byId("TSD_id_TimeHours").setValue("");
@@ -346,11 +371,13 @@ sap.ui.define([
             var oViewModel = this.getView().getModel("viewModel");
             var isEditing = oViewModel.getProperty("/isEditing");
             if (isEditing) {
-                // Save action (handle update logic)
+                // Save action
                 this.TSD_onUpdate();
+                oViewModel.setProperty("/isEditing", false);
+            } else {
+                // Switch to edit mode
+                oViewModel.setProperty("/isEditing", true);
             }
-            // Toggle editing mode
-            oViewModel.setProperty("/isEditing", !isEditing);
         },
         TSD_onUpdate: async function () {
             try {
