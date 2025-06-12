@@ -1435,7 +1435,7 @@ sap.ui.define([
                     const sgstValue = parseFloat(oModel.SGST) || 0;
                     const igstValue = parseFloat(oModel.IGST) || 0;
 
-                    if (oModel.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && (oModel.CCEmailGST > 0)) {
+                    if (oModel.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && (oModel.CGST > 0)) {
                         summaryBody.push([`CGST ${cgstPercentage}`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
                         summaryBody.push([`SGST ${sgstPercentage}`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
                     } else if (oModel.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST")  && (oModel.IGST > 0)) {
