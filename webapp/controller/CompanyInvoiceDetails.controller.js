@@ -1413,14 +1413,14 @@ sap.ui.define([
 
                 if (oModel.SubTotalNotGST > 0) {
                     summaryBody.push([
-                        `Sub-Total ( Non-Taxable ) (${oModel.Currency})`,
+                        `Sub-Total ( Non-Taxable ) (${data.Currency})`,
                         Formatter.fromatNumber(oModel.SubTotalNotGST)
                     ]);
                 }
 
                 if (oModel.SubTotalInGST > 0) {
                     summaryBody.push([
-                        `Sub-Total ( Taxable ) (${oModel.Currency})`,
+                        `Sub-Total ( Taxable ) (${data.Currency})`,
                         Formatter.fromatNumber(oModel.SubTotalInGST)
                     ]);
                 }
@@ -1435,10 +1435,10 @@ sap.ui.define([
                     const sgstValue = parseFloat(oModel.SGST) || 0;
                     const igstValue = parseFloat(oModel.IGST) || 0;
 
-                    if (oModel.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST")) {
+                    if (oModel.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && (oModel.CCEmailGST > 0)) {
                         summaryBody.push([`CGST ${cgstPercentage}`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
                         summaryBody.push([`SGST ${sgstPercentage}`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-                    } else if ((oModel.Type === "IGST" && oModel.Currency === "INR") || type.split(" ")[0] === "IGST") {
+                    } else if (oModel.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST")  && (oModel.IGST > 0)) {
                         summaryBody.push([`IGST ${igstPercentage}`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                     }
                 }
@@ -1448,7 +1448,7 @@ sap.ui.define([
                 }
 
                 const totalRowIndex = summaryBody.length;
-                summaryBody.push([`Total (${oModel.Currency})`, Formatter.fromatNumber(oModel.TotalAmount)]);
+                summaryBody.push([`Total (${data.Currency})`, Formatter.fromatNumber(oModel.TotalAmount)]);
 
                 doc.autoTable({
                     startY: currentY,
