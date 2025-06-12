@@ -103,6 +103,14 @@
 
         <!-- Address -->
         <layout:VerticalLayout class="sapUiTinyMarginBottom sapUiSmallMarginBegin ">
+		<layout:HorizontalLayout>
+                <m:Label showColon="true" text="{i18n>type}" />
+                <m:Text
+                    text="{FilteredMsaModel>/0/Type}"
+					class="sapUiTinyMarginBegin"
+                />
+				
+            </layout:HorizontalLayout>
             <layout:HorizontalLayout>
                 <m:Label showColon="true" text="{i18n>Address}" />
                 <m:Text
@@ -110,14 +118,6 @@
                     width="300px"
                     wrapping="true"
                     wrappingType="Normal"
-					class="sapUiTinyMarginBegin"
-                />
-				
-            </layout:HorizontalLayout>
-			<layout:HorizontalLayout>
-                <m:Label showColon="true" text="{i18n>type}" />
-                <m:Text
-                    text="{FilteredMsaModel>/0/Type}"
 					class="sapUiTinyMarginBegin"
                 />
 				

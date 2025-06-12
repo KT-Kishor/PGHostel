@@ -19,6 +19,8 @@ sap.ui.define(
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 // Set header name in LoginModel
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("consultantInvoice"));
+                this._makeDatePickersReadOnly(["CI_id_DatePicker"]);
+                this.onClearAndSearch("CI_id_ConsultantInvoiceFilterBar");// Clear and search function
                 this.ContractReadCall();
             },
 
@@ -96,7 +98,7 @@ sap.ui.define(
                 }
             },
 
-           _createGroupHeader: function (oGroup) {
+            _createGroupHeader: function (oGroup) {
                 let sKey = oGroup.key;
                 const userData = this.getView().getModel("LoginModel").getData();
 
@@ -169,10 +171,12 @@ sap.ui.define(
 
             CI_OnSearch: async function () {
                 try {
-                    this.getBusyDialog();
                     const oFilterBar = this.byId("CI_id_ConsultantInvoiceFilterBar");
                     const aFilterItems = oFilterBar.getFilterGroupItems();
                     const params = {};
+
+                    // Get user data
+                    const userData = this.getOwnerComponent().getModel("LoginModel").getData();
 
                     // Get current financial year range
                     const { fyStart, fyEnd, financialYearLabel } = this._getFinancialYearRange();
@@ -213,6 +217,14 @@ sap.ui.define(
                         }
                     });
 
+                    // Contractor-specific validation
+                    if (userData.Role === "Contractor") {
+                        if (!params.InvoiceNo || !params.EmployeeID) {
+                            sap.m.MessageBox.warning(this.i18nModel.getText("mandatoryInvoiceNoEmpID"));
+                            return;
+                        }
+                    }
+
                     // Set default financial year dates if none provided
                     if (!invoiceDateProvided) {
                         params.InvoiceStartDate = formatDate(fyStart);
@@ -226,7 +238,7 @@ sap.ui.define(
                             dateRangeControl.setSecondDateValue(fyEnd);
                         }
                     } else {
-                        // Check if selected dates match financial year exactly
+                        // If selected dates exactly match financial year
                         const startDate = new Date(params.InvoiceStartDate);
                         const endDate = new Date(params.InvoiceEndDate);
 
@@ -237,6 +249,7 @@ sap.ui.define(
                     }
 
                     // Fetch data
+                    this.getBusyDialog();
                     const oData = await this.ajaxReadWithJQuery("ConsultantInvoice", params);
                     if (oData && Array.isArray(oData.data)) {
                         const oModel = new sap.ui.model.json.JSONModel(oData.data);
@@ -244,7 +257,6 @@ sap.ui.define(
                     }
                 } catch (error) {
                     sap.m.MessageToast.show(error.message || error.responseText || this.i18nModel.getText("technicalError"));
-                   
                 } finally {
                     this.closeBusyDialog();
                 }

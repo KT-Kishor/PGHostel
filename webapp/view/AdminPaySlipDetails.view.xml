@@ -450,7 +450,7 @@
                                     width="100%"
                                 >
                                     <m:Text
-                                        text="Net Pay ( INR ) : {path: 'PaySlip>/EmpData/NetPay', formatter: '.Formatter.formatCurrencyInINRText'} ({PaySlip>/EmpData/NetPayText})"
+                                        text="Net Pay ( INR ) : {path: 'PaySlip>/EmpData/NetPay', formatter: '.Formatter.CurrencyInINRText'} ({PaySlip>/EmpData/NetPayText})"
                                         class="boldBlackText"
                                         width="100%"
                                     />

@@ -80,7 +80,7 @@
 							<Text text="{EmployeeOfferModel>BaseLocation}"/>
 							<Text text="{path:'EmployeeOfferModel>JoiningDate',formatter: '.Formatter.formatDate'}"/>
 							<Text text="{EmployeeOfferModel>EmployeeEmail}"/>
-							<Text text="{path: 'EmployeeOfferModel>CTC' ,formatter: '.Formatter.formatCurrencyInINRText'}"/>
+							<Text text="{path: 'EmployeeOfferModel>CTC' ,formatter: '.Formatter.CurrencyInINRText'}"/>
 
 						</cells>
 					</ColumnListItem>

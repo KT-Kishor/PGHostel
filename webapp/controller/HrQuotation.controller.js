@@ -23,7 +23,6 @@ sap.ui.define(
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         await this._fetchCommonData("Quotation", "CompanyQuotationModel", {});
         this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
-        // this.getView().setModel(new JSONModel({ filteredLength: 0 }), "ViewModel");
 
         if (this.oValue === "HrQuotation") {
 
@@ -49,7 +48,7 @@ sap.ui.define(
           } else if (oControl.isA("sap.m.DatePicker")) {
             sValue = oControl.getDateValue(); //  Use getDateValue for DatePicker
             if (sValue) {
-              // Format to your model's format, e.g., 'yyyy-MM-dd' or 'dd/MM/yyyy'
+              // Format to your model's format, 'yyyy-MM-dd' or 'dd/MM/yyyy'
               var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
               sValue = oDateFormat.format(sValue);
             }
@@ -94,7 +93,7 @@ sap.ui.define(
 
       // Function to navigate back to the TileAdminView route
       onPressback: function () {
-        this.getRouter().navTo("RouteTilePage"); // Navigate to RouteTileAdminView
+        this.getRouter().navTo("RouteTilePage"); 
       },
 
       onLogout: function () {
@@ -102,12 +101,9 @@ sap.ui.define(
       },
 
       HQ_onPressBack: function () {
-        this.navigateToRouteView1(); // Navigate to RouteView1 and clear user ID and Name
+        this.navigateToRouteView1(); 
       },
 
-      // CommonReadcall: function (sPath, oModel, oParameters) {
-
-      // },
       HQ_onPressQuotation: function (oEvent) {
         var oContext = oEvent.getSource().getBindingContext("CompanyQuotationModel");
         var oData = oContext.getObject(); // get full object

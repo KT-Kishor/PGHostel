@@ -28,7 +28,7 @@ sap.ui.define([
                 this.MSAID = oEvent.getParameter("arguments").sPath;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
-                var editable = new JSONModel({ editable: false, isEnabled: true, Mode: "Delete", save: false, submitBtn: false, ExpendBtn: false, RelesedBtn: false, Recruitment: true, BtnEnable: false, addSowBtn: false, ExpendBtn: false, minDate: new Date(),secondMinDate: new Date() });
+                var editable = new JSONModel({ editable: false, isEnabled: true, Mode: "Delete", save: false, submitBtn: false, ExpendBtn: false, RelesedBtn: false, Recruitment: true, BtnEnable: false, addSowBtn: false, ExpendBtn: false, minDate: new Date(), secondMinDate: new Date() });
                 this.getView().setModel(editable, "simpleForm");
 
                 this.SimpleFormModel = this.getView().getModel("simpleForm");
@@ -296,6 +296,8 @@ sap.ui.define([
                 if (selectedKey !== "All") oFilter.Status = selectedKey;
 
                 await this._fetchCommonData("SowDetails", "SowReadModel", oFilter);
+                var SowModel = new JSONModel(this.getView().getModel("SowReadModel").getData());
+                this.getView().setModel(SowModel, "SowAllDataModel");
                 this.closeBusyDialog();
             },
 
@@ -500,7 +502,7 @@ sap.ui.define([
                         return;
                     }
                 }
-                if(this.ConsultantName === false || this.Desiganation === false || this.Rate === false) {
+                if (this.ConsultantName === false || this.Desiganation === false || this.Rate === false) {
                     return MessageToast.show(this.i18nModel.getText("mandatoryFieldsSow"));
                 }
                 this.getBusyDialog();
@@ -522,21 +524,31 @@ sap.ui.define([
             },
 
             TableGetData: function (value) {
-                var SowReadModel = this.getView().getModel("SowReadModel").getData();
-                var FilterData = SowReadModel.filter((item) => item.SowID === this.Selected.SowID);
+                // Get full data from model
+                var SowReadModel = this.getView().getModel("SowAllDataModel").getData();
+
+                // Filter and deep copy to avoid mutating original model
+                var FilterData = JSON.parse(JSON.stringify(
+                    SowReadModel.filter((item) => item.SowID === this.Selected.SowID)
+                ));
+
                 var sowCreateModel = this.getView().getModel("sowCreateModel");
+
                 if (value === 'Expend') {
                     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                    var result = ""
+                    var result = "";
                     for (var i = 0; i < 10; i++) {
                         result += characters.charAt(Math.floor(Math.random() * characters.length));
                     }
+
                     var StartDate = new Date(FilterData[0].EndDate);
                     StartDate.setDate(StartDate.getDate() + 1);
 
                     var EndDate = new Date(StartDate);
                     EndDate.setMonth(EndDate.getMonth() + 3);
                 }
+
+                // Set properties for sowCreateModel
                 sowCreateModel.setProperty("/SowID", value !== "Expend" ? FilterData[0].SowID : result);
                 sowCreateModel.setProperty("/EndDate", this.Formatter.formatDate(value !== "Expend" ? FilterData[0].EndDate : EndDate));
                 sowCreateModel.setProperty("/StartDate", this.Formatter.formatDate(value !== "Expend" ? FilterData[0].StartDate : StartDate));
@@ -545,7 +557,7 @@ sap.ui.define([
 
                 this.SimpleFormModel.setProperty("/secondMinDate", new Date(FilterData[0].StartDate));
 
-
+                // Modify local copy safely
                 var oFilteredData = FilterData;
                 oFilteredData.forEach((selectedData, index) => {
                     var rateString = selectedData.Rate;
@@ -565,10 +577,14 @@ sap.ui.define([
                         selectedData.PerDay = rateType;
                     }
                 });
+
+                // Optionally filter based on status
                 if (value === "Relesed") {
                     oFilteredData = oFilteredData.filter((item) => item.Status !== "Inactive");
                 }
-                this.getView().getModel("oModelDataPro").setData(oFilteredData)
+
+                // Update display model with filtered and formatted data
+                this.getView().getModel("oModelDataPro").setData(oFilteredData);
             },
 
             MsaE_onPressRelesedSow: function () {
@@ -728,7 +744,7 @@ sap.ui.define([
                 this.Desiganation = utils._LCvalidateMandatoryField(oEvent);
             },
 
-            onRateChange:function(oEvent) {
+            onRateChange: function (oEvent) {
                 this.Rate = utils._LCvalidateAmount(oEvent);
             },
 
@@ -829,6 +845,7 @@ sap.ui.define([
                     this.ajaxCreateWithJQuery(this.Type === 'MSA' ? "MSAEmail" : "SOWEmail", oPayload).then((oData) => {
                         MessageToast.show(this.i18nModel.getText("emailSuccess"));
                         this.byId("Sow_Id_ReadTable").removeSelections();
+                        this.SimpleFormModel.setProperty("/BtnEnable", false);
                         this.closeBusyDialog();
                     }).catch((error) => {
                         this.closeBusyDialog();
