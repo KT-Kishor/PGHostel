@@ -173,6 +173,8 @@ sap.ui.define([
                 this.SelectedCustomerModel.setProperty("/SubTotalNotGST", "0.00");
                 this.SelectedCustomerModel.setProperty("/SubTotalInGST", "0.00");
                 this.SelectedCustomerModel.setProperty("/gstAmount", "0.00");
+                this.SelectedCustomerModel.setProperty("/PayByDate", "");
+                this.SelectedCustomerModel.setProperty("/InvoiceDate", "");
                 this.getView().getModel("FilteredSOWModel").setProperty("/TotalAmount", "0.00");
                 this.SelectedCustomerModel.setProperty("/AllDueAmount", "0.00");
                 this.SelectedCustomerModel.setProperty("/AllReceivedAmount", "0.00");
@@ -251,7 +253,7 @@ sap.ui.define([
                     const oData = await this.ajaxReadWithJQuery("SowDetails", { MsaID: msaID, SowID: sowID, Status: "Active" });
 
                     if (!oData.success) return;
-
+                    
                     const unitMultiplier = { Day: 20, Month: 1, Hour: 168, Bid: 1 };
                     let aFilteredSOWDetails = [];
                     this.itemIDCounter = 1;
@@ -295,10 +297,15 @@ sap.ui.define([
                     this.visiablityPlay.setProperty("/IncomeTax", isINR);
                     this.visiablityPlay.setProperty("/GST", isINR);
                     oSelectedCustomerModel.setProperty("/type", isINR ? this.Type : "");
-
                     if (!oSelectedCustomerModel.getProperty("/GST")) {
                         this.visiablityPlay.setProperty("/GST", false);
                     }
+                    if(isINR && !oSelectedCustomerModel.getProperty("/GST")) {
+                        oSelectedCustomerModel.setProperty("/Value", '9');
+                        oSelectedCustomerModel.setProperty("/Type", 'CGST/SGST');
+                        this.visiablityPlay.setProperty("/GST", true);
+                    }
+
                     await this.totalAmountCalculation();
                     if (isINR) {
                         const oModel = oSelectedCustomerModel;
@@ -569,12 +576,12 @@ sap.ui.define([
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
 
-                if (FilterModel.Currency === "INR") {
-                    if (!oSelectedCustomerModel.GST || oSelectedCustomerModel.GST.trim() === "") {
-                        sap.m.MessageBox.error(this.i18nModel.getText("gstMessage"));
-                        return false;
-                    }
-                }
+                // if (FilterModel.Currency === "INR") {
+                //     if (!oSelectedCustomerModel.GST || oSelectedCustomerModel.GST.trim() === "") {
+                //         sap.m.MessageBox.error(this.i18nModel.getText("gstMessage"));
+                //         return false;
+                //     }
+                // }
 
                 const oPayload = {
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
@@ -675,7 +682,6 @@ sap.ui.define([
                         utils._LCvalidateDate(this.byId("CID_id_Payby"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowPO"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CID_id_SowDetails"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_CurrencySelect"), "ID");
                     const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"), "ID") : true;
                     const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;

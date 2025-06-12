@@ -55,8 +55,8 @@ sap.ui.define([
                         var sValue = oItem.getName();
                         if (oControl && oControl.getValue()) {
                             if (sValue === "CreateMSADate") {
-                                params["StartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
-                                params["EndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
+                                params["StartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0].trim().split('/').reverse().join('-')));
+                                params["EndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1].trim().split('/').reverse().join('-')));
                             } else {
                                 params[sValue] = oControl.getValue();
                             }
@@ -65,7 +65,23 @@ sap.ui.define([
                     if (params && Object.keys(params).length > 0) {
                         this.Filter = false;
                     }
+                    // Fetch the data
                     await this._fetchCommonData("MSADetails", "MSADisplayModel", params);
+
+                    // Get the loaded data from the model
+                    var oModel = this.getView().getModel("MSADisplayModel");
+                    var aData = oModel.getData();
+
+                    // Loop and format each CreateMSADate
+                    aData.forEach(item => {
+                        if (item.CreateMSADate) {
+                            item.CreateMSADate = this.Formatter.formatDate(item.CreateMSADate);
+                        }
+                    });
+
+                    // Update model with new formatted field
+                    oModel.setData(aData);
+
                     this.closeBusyDialog();
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));

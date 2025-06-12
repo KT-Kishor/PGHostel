@@ -63,7 +63,7 @@
     <items>
         <ColumnListItem>
             <cells>
-                <Input value="{oModelDataPro>IndexNo}" maxLength="10" width="100%" />
+                <Input value="{oModelDataPro>IndexNo}" editable="false"/>
             </cells>
             <cells>
                 <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center">

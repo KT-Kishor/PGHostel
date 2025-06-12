@@ -20,7 +20,7 @@
 					</VBox>
 				</HBox>
 
-				<Label text="{i18n>panCardCommon}"/>
+				<Label text="{i18n>placePanCardReg}"/>
 				<Input value="{CustomerModel>/PAN}" placeholder="{i18n>panCardPlaceholder}" maxLength="10" id="MC_id_CustomPan" liveChange="MC_ValidatePanCard" valueStateText="{i18n>panCardValueState}" />
 
 				<Label text="{i18n>gstNo}"/>

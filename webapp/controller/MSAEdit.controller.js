@@ -45,6 +45,7 @@ sap.ui.define([
                 this.Rate = true;
                 this.Desiganation = true;
                 this.ConsultantName = true;
+                this.GST = true;
             },
 
             onRadioButtonGroupSelect: function (oEvent) {
@@ -124,6 +125,13 @@ sap.ui.define([
 
             Msa_onComboBoxChange: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
+            },
+            Msa_LC_GSTNO: function (oEvent) {
+                this.GST = utils._LCvalidateGstNumber(oEvent);
+                if(oEvent.getSource().getValue() === ""){
+                    this.GST = true;
+                    sap.ui.getCore().byId("MsaE_id_MSA_GSTNO").setValueState("None");
+                }
             },
 
             Msa_ChangeMsaDate: function (oEvent) {
@@ -249,7 +257,7 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(get("MsaE_id_MsaAddress"), "ID") &&
                     utils._LCvalidateMandatoryField(get("MSA_Nav_Id_Country"), "ID") &&
                     utils._LCvalidateMandatoryField(get("MSA_Nav_Id_City"), "ID") &&
-                    utils._LCvalidateMandatoryField(get("MsaE_Id_Branch"), "ID") &&
+                    utils._LCvalidateMandatoryField(get("MsaE_Id_Branch"), "ID") && this.GST &&
                     (!isRecruitment || (
                         utils._LCvalidateTraineeAmount(get("Msa_Id_RateCharge"), "ID") &&
                         utils._LCvalidateTraineeAmount(get("Msa_Id_Refund"), "ID") &&

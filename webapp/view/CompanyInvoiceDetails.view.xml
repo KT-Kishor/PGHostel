@@ -84,7 +84,7 @@
 										<m:Input visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/IncomePerc}" id="CID_id_IncomeTaxPercentage" editable="{visiablityPlay>/editable}" maxLength="2" valueStateText="{i18n>incomeTaxValue}" liveChange="onIncomeTaxPercentageInputLiveChange"/>
 										<m:Input visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/IncomeTax}" id="CID_id_TDS" editable="false" />
 
-										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>selectSOW}" required="true"/>
+										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>selectSOW}"/>
 										<m:ComboBox visible="{visiablityPlay>/createVisi}" showClearIcon="true" items="{CombinedData>/items}" value="{SelectedCustomerModel>/SOWDetails}" change="OnChangeSowDetails" valueStateText="{i18n>selectSOW}" id="CID_id_SowDetails">
 											<core:Item key="{CombinedData>MsaID} - {CombinedData>SowID}" text="{parts:[{path:'CombinedData>CompanyName'},{path:'CombinedData>Description'},{path:'CombinedData>StartDate'},{path:'CombinedData>EndDate'}],formatter: '.Formatter.formatCompanyAndDescription'}"/>
 										</m:ComboBox>
