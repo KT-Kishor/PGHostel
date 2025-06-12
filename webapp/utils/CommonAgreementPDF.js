@@ -726,7 +726,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.text(oCompanyModel.longAddress, pageWidth - margin, coAddressY, coAlignment)
                 let coGSTINY = doc.getTextDimensions(oCompanyModel.longAddress, coAlignment).h + coAddressY + 3;
 
-                doc.text("GSTIN: " + oCompanyModel.GSTIN, pageWidth - margin, coGSTINY, coAlignment);
+                doc.text("GSTIN: " + oCompanyModel.gstin, pageWidth - margin, coGSTINY, coAlignment);
                 // currentY = doc.getTextDimensions("GSTIN: " + oCompanyModel.gstin, coAlignment).h; (NOT REQURIED AS OF NOW)
 
                 let titleY = topMargin + 50;
@@ -768,8 +768,8 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                 doc.autoTable({
                     startY: tableY,
-                    head: [["Description", "Unit/Quantity", "Amount", "Currency"]],
-                    body: oModel.POItems.map(item => [item.Description, item.Qty, item.Amount, item.Currency]),
+                    head: [["Sl. No", "Consultant Name", "Description", "Unit", "Amount", "Currency", "Peroid"]],
+                    body: oModel.POItems.map(item => [item.SerialNo, item.ConsultantName, item.Description, item.Unit, item.Amount, item.Currency, item.Peroid]),
 
                     styles: {
                         font: "times",
@@ -791,12 +791,12 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                         cellPadding: 1
                     },
 
-                    columnStyles: {
-                        0: { cellWidth: maxWidth * 0.4 },
-                        1: { cellWidth: maxWidth * 0.2 },
-                        2: { cellWidth: maxWidth * 0.2 },
-                        3: { cellWidth: maxWidth * 0.2 }
-                    },
+                    // columnStyles: {
+                    //     0: { cellWidth: maxWidth * 0.4 },
+                    //     1: { cellWidth: maxWidth * 0.2 },
+                    //     2: { cellWidth: maxWidth * 0.2 },
+                    //     3: { cellWidth: maxWidth * 0.2 }
+                    // },
 
                     tableWidth: maxWidth,
                     margin: { left: margin, right: margin }
