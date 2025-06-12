@@ -28,6 +28,16 @@ sap.ui.define([
             this.byId("TSD_id_TimeHours").setValueState("None");
             this.byId("TSD_id_EmpComment").setValueState("None");
             this._makeDatePickersReadOnly(["TSD_id_Assignment", "TSD_id_TimeHours"]);
+            // Set current date as selected in the calendar
+            var oCalendar = this.byId("calendar");
+            if (oCalendar) {
+                var oToday = new Date();
+                var oDateRange = new sap.ui.unified.DateRange({ startDate: oToday });
+                oCalendar.removeAllSelectedDates();
+                oCalendar.addSelectedDate(oDateRange);
+                this.onInitializeLegend({ getSource: () => oCalendar });
+                this.onDateSelect({ getSource: () => oCalendar });
+            }
 
             // Handle Edit and Create cases
             this.sArg = oEvent.getParameter("arguments").sPath;
@@ -60,16 +70,6 @@ sap.ui.define([
                 if (this.getView().getModel("editModel")) {
                     this.getView().getModel("editModel").setProperty("/editableBut", true);
                 }
-            }
-            // Set current date as selected in the calendar
-            var oCalendar = this.byId("calendar");
-            if (oCalendar) {
-                var oToday = new Date();
-                var oDateRange = new sap.ui.unified.DateRange({ startDate: oToday });
-                oCalendar.removeAllSelectedDates();
-                oCalendar.addSelectedDate(oDateRange);
-                this.onInitializeLegend({ getSource: () => oCalendar });
-                this.onDateSelect({ getSource: () => oCalendar });
             }
             this.closeBusyDialog();
         },
@@ -170,55 +170,30 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("hoursExceedError") || "Entered hours cannot exceed actual assignment hours.");
                     return;
                 }
+                // Step 4: Prepare payload
+                const oPayload = {
+                    TaskID: oData.TaskID,
+                    TaskName: oData.TaskName,
+                    EmployeeID: oData.EmployeeID,
+                    EmployeeName: oData.EmployeeName,
+                    ManagerName: oData.ManagerName || "Unknown",
+                    ManagerID: oData.ManagerID || "Unknown",
+                    HoursWorked: sEnteredHours.toString(),
+                    EmployeeComments: this.byId("TSD_id_EmpComment").getValue(),
+                    Date: selectedDateObj.toISOString().split("T")[0],
+                    Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
+                    Year: selectedDateObj.getFullYear(),
+                    Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
+                    Status: "Saved",
+                    ManagerComments: oData.ManagerComments || ""
+                };
 
-                // Step 4: Duplicate check (backend)
-                const selectedDateStr = selectedDateObj.toISOString().split("T")[0];
-                const taskId = oData.TaskID;
-                const employeeId = oData.EmployeeID;
-
-                this.getBusyDialog();
-                try {
-                    // Make a backend call to check for duplicate
-                    const duplicate = await this.ajaxReadWithJQuery("Timesheet", {
-                        EmployeeID: employeeId,
-                        TaskID: taskId,
-                        Date: selectedDateStr
-                    });
-
-                    // If backend returns any data, it's a duplicate
-                    if (duplicate.data && (
-                        (Array.isArray(duplicate.data) && duplicate.data.length > 0) ||
-                        (!Array.isArray(duplicate.data) && Object.keys(duplicate.data).length > 0)
-                    )) {
-                        this.closeBusyDialog();
-                        MessageToast.show("You have already filled this assignment for the selected date.");
-                        return;
-                    }
-
-                    // Step 5: Prepare payload
-                    const oPayload = {
-                        TaskID: oData.TaskID,
-                        TaskName: oData.TaskName,
-                        EmployeeID: oData.EmployeeID,
-                        EmployeeName: oData.EmployeeName,
-                        ManagerName: oData.ManagerName || "Unknown",
-                        ManagerID: oData.ManagerID || "Unknown",
-                        HoursWorked: sEnteredHours.toString(),
-                        EmployeeComments: this.byId("TSD_id_EmpComment").getValue(),
-                        Date: selectedDateStr,
-                        Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
-                        Year: selectedDateObj.getFullYear(),
-                        Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
-                        Status: "Saved",
-                        ManagerComments: oData.ManagerComments || ""
-                    };
-
-                    // Step 6: Submit to backend
+                // Step 5: Submit to backend
+                this.getBusyDialog(); try {
                     await this.ajaxCreateWithJQuery("Timesheet", { data: oPayload });
                     MessageToast.show(this.i18nModel.getText("timesheetSuccess"));
                     this.clearTimesheetForm();
                 } catch (backendErr) {
-                    this.closeBusyDialog();
                     MessageToast.show(backendErr.message || backendErr.responseText);
                 } finally {
                     this.closeBusyDialog();
