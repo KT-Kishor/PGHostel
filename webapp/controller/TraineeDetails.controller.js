@@ -132,10 +132,10 @@ sap.ui.define([
                 utils._LCvalidateName(oEvent);
                 this.TD_validateStep();
             },
-            TD_validateCombo: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
-                this.TD_validateStep();
-            },
+            // TD_validateCombo: function (oEvent) {
+            //     utils._LCstrictValidationComboBox(oEvent);
+            //     this.TD_validateStep();
+            // },
             //validate email function
             TD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
@@ -527,10 +527,13 @@ sap.ui.define([
                 }
             },
             onTrainingTypeChange: function (oEvent) {
-                const oComboBox = oEvent.getSource();
-                const sSelectedKey = oComboBox.getSelectedKey();
+                utils._LCstrictValidationComboBox(oEvent);
+                this.TD_validateStep();
+                var oComboBox = oEvent.getSource();
+                var sSelectedKey = oComboBox.getSelectedKey();
+                sSelectedKey = sSelectedKey ? sSelectedKey.trim() : oComboBox.getValue().trim();
                 const oView = this.getView();
-                if (sSelectedKey) {
+                if (sSelectedKey && oComboBox.getValueState() !== "Error") {
                     oView.byId("TD_id_TrainingAmountLabel").setVisible(true);
                     oView.byId("TD_id_TrainingDetailsBox").setVisible(true);
                     oView.byId("TD_id_TrainingAmount").setValue("");

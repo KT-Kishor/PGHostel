@@ -133,23 +133,46 @@
 							<blocks>
 								<m:Table items="{path:'SowReadModel>/',sorter: {path: 'SowID',descending: false,group: true}}" busyIndicatorDelay="0" id="Sow_Id_ReadTable" mode="SingleSelectLeft" selectionChange="onPressChangeSow">
 									<m:headerToolbar>
-										<m:OverflowToolbar>
-											<m:Title text="{i18n>sowTitle} ({= ${SowReadModel>/}.length })"/>
-											<m:ToolbarSpacer />
-											<m:ComboBox id="MsaE_id_SowStatus" items="{SowStatusModel>/SowStatus}" width="10%" change="MsaE_onChangeSowStatus">
-												<core:Item key="{SowStatusModel>ID}" text="{SowStatusModel>Status}" />
-											</m:ComboBox>
-											<m:ToolbarSeparator />
-											<m:Button text="{i18n>addSOW}" type="Accept" press="MsaE_onPressCreateSow" />
-											<m:ToolbarSeparator />
-											<m:Button icon="sap-icon://action" text="Actions" press="onOpenActionSheet"/>
-										</m:OverflowToolbar>
-									</m:headerToolbar>
+    <m:OverflowToolbar>
+        <m:Title text="{i18n>sowTitle} ({= ${SowReadModel>/}.length })">
+           
+        </m:Title>
+
+        <m:ToolbarSpacer />
+
+        <m:ComboBox 
+            id="MsaE_id_SowStatus" 
+            items="{SowStatusModel>/SowStatus}" 
+            width="10%" 
+            change="MsaE_onChangeSowStatus">
+            
+            <core:Item key="{SowStatusModel>ID}" text="{SowStatusModel>Status}" />
+        </m:ComboBox>
+
+        <m:ToolbarSeparator />
+
+        <m:Button 
+            text="{i18n>addSOW}" 
+            type="Accept" 
+            press="MsaE_onPressCreateSow">
+           
+        </m:Button>
+
+        <m:ToolbarSeparator />
+
+        <m:Button 
+            icon="sap-icon://action" 
+            text="Actions" 
+            press="onOpenActionSheet">
+        </m:Button>
+    </m:OverflowToolbar>
+</m:headerToolbar>
+
 									<m:columns>
 										<m:Column demandPopin="true">
 											<m:Text text="{i18n>consultantName}" />
 										</m:Column>
-										<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Column demandPopin="true">
 											<m:Text text="{i18n>desc}" />
 										</m:Column>
 										<m:Column minScreenWidth="Desktop" demandPopin="true">

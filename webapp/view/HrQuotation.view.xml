@@ -80,6 +80,7 @@
                         </fb:control>
                        
                     </fb:FilterGroupItem>
+
                 </fb:filterGroupItems>
             </fb:FilterBar>
                 <Table

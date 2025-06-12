@@ -687,3 +687,7 @@ align-items:flex-start;
     display: inline-block !important;
     vertical-align: middle !important;
 }
+
+.PayByDateClass {
+  white-space: nowrap !important;
+}

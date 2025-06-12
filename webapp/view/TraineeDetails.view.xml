@@ -50,7 +50,7 @@
 							<Label text="{i18n>emailId}" required="true" />
 							<Input value="{oTraineeDetails>/TraineeEmail}" maxLength="50" id="TD_id_EmailID" placeholder="{i18n>placeEmailId}" liveChange="TD_validateEmail" valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>trainingType}" required="true" />
-							<ComboBox  id="TD_id_TrainingType" placeholder="{i18n>selectTType}"  value="{oTraineeDetails>/Type}"   selectionChange="onTrainingTypeChange" 	change="TD_validateCombo"  width="100%" items="{TypeModel>/}" valueStateText="{i18n>selectTType}">
+							<ComboBox  id="TD_id_TrainingType" placeholder="{i18n>selectTType}"  value="{oTraineeDetails>/Type}"   change="onTrainingTypeChange"  width="100%" items="{TypeModel>/}" valueStateText="{i18n>selectTType}">
 								<core:ListItem key="{TypeModel>ID}" text="{TypeModel>Type}" />
 							</ComboBox>
 							<Label ></Label>
@@ -141,7 +141,7 @@
 							<Text  text="{oTraineeDetails>/Type}"/>
 							<!-- Stipend Amount -->
                             <Label text="{i18n>amount}" />
-                            <Text text="{path:'oTraineeDetails>/Amount', formatter: '.Formatter.CurrencyInINR'} {oTraineeDetails>/Currency}"/>	 
+                            <Text text="{oTraineeDetails>/Currency} {path:'oTraineeDetails>/Amount', formatter: '.Formatter.CurrencyInINR'}"/>	 
 							<Label text="{i18n>releaseDateT}" />
 							<Text text="{oTraineeDetails>/ReleaseDate}"/>
 							<Label text="{i18n>joiningDate}" />

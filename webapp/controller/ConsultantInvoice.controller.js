@@ -217,12 +217,8 @@ sap.ui.define(
                         }
                     });
 
-                    // Contractor-specific validation
                     if (userData.Role === "Contractor") {
-                        if (!params.InvoiceNo || !params.EmployeeID) {
-                            sap.m.MessageBox.warning(this.i18nModel.getText("mandatoryInvoiceNoEmpID"));
-                            return;
-                        }
+                        params.EmployeeID = userData.EmployeeID;
                     }
 
                     // Set default financial year dates if none provided
