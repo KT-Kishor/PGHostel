@@ -1632,7 +1632,7 @@ sap.ui.define(
                 },
             });
     
-            currentY = doc.lastAutoTable.finalY + 10;
+            currentY = doc.lastAutoTable.finalY + 5;
 
             if (currentY + 40 > pageHeight) {
                 doc.addPage();
@@ -1645,7 +1645,7 @@ sap.ui.define(
             // SubTotal Without GST
             if (oModel.SubTotalNotGST > 0) {
                 summaryBody.push([
-                    `Sub-Total ( Non-Taxable ) : (${oModel.Currency})`,
+                    `Sub-Total ( Non-Taxable ) (${oModel.Currency}) :`,
                     Formatter.fromatNumber(oModel.SubTotalNotGST)
                 ]);
             }
@@ -1653,7 +1653,7 @@ sap.ui.define(
             // SubTotal With GST
             if (oModel.SubTotal > 0) {
                 summaryBody.push([
-                    `Sub-Total ( Taxable ) : (${oModel.Currency})`,
+                    `Sub-Total ( Taxable ) : (${oModel.Currency}) :`,
                     Formatter.fromatNumber(oModel.SubTotal)
                 ]);
             }
@@ -1684,36 +1684,35 @@ sap.ui.define(
             // Total row
             const totalRowIndex = summaryBody.length;
             summaryBody.push([
-                `Total (${oModel.Currency})` :,
+                `Total (${oModel.Currency}) :`,
                 Formatter.fromatNumber(oModel.TotalSum)
             ]);
 
             doc.autoTable({
-                startY: currentY,
-                head: [],
-                body: summaryBody,
-                theme: 'plain',
-                styles: {
-                    font: "times",
-                    fontSize: 10,
-                    halign: "right",
-                    cellPadding: 2,
-                    overflow: "ellipsize"
-                },
-                columnStyles: {
-                    0: { halign: "right", cellWidth: 60 },
-                    1: { halign: "right", cellWidth: 40 }
-                },
-                margin: { left: 96 },
-                didParseCell: function (data) {
-                    if (data.row.index === totalRowIndex) {
-                        // Apply top border only for the total row (last row)
-                        data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
-                        data.cell.styles.lineColor = [0, 0, 0];
-                        data.cell.styles.fontStyle = 'bold';
+                    startY: currentY,
+                    head: [],
+                    body: summaryBody,
+                    theme: 'plain',
+                    styles: {
+                        font: "times",
+                        fontSize: 10,
+                        halign: "right",
+                        cellPadding: 2,
+                        overflow: "ellipsize"
+                    },
+                    columnStyles: {
+                        0: { halign: "right", cellWidth: 60 },
+                        1: { halign: "right", cellWidth: 40 }
+                    },
+                    margin: { left: 95 },
+                    didParseCell: function (data) {
+                        if (data.row.index === totalRowIndex) {
+                            data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
+                            data.cell.styles.lineColor = [0, 0, 0];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
                     }
-                }
-            });
+                });
 
             currentY = doc.lastAutoTable.finalY + 10;
 
