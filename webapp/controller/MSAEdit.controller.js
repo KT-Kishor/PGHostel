@@ -944,7 +944,7 @@ sap.ui.define([
             async MsaE_onPressMergeSow() {
                 this.getBusyDialog();
                 var oPDFModel = this.getView().getModel("PDFData");
-                oPDFModel.setProperty("/TableData", this.getView().getModel("SowReadModel").getData().filter((item) => item.SowID === this.Selected.SowID));
+                oPDFModel.setProperty("/TableData", this.getView().getModel("SowReadModel").getData().filter((item) => item.SowID === this.Selected.SowID && item.Status !== "Inactive"));
                 var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
                 await this._fetchCommonData("PDFCondition", "PDFSOWModel", { Type: "SOW" });
