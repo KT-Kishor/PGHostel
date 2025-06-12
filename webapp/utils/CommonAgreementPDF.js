@@ -682,7 +682,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.text(oModel.ClientRole, pageMiddle + 10, headofCoRoleY);
                 doc.text(oModel.SOWCreateDate, pageMiddle + 10, headofCoRoleY + 5);
 
-                doc.save("SOW.pdf");
+                doc.save(oModel.SOWDescription + " SOW.pdf");
                 that2.closeBusyDialog();
             }, 1000);
         },

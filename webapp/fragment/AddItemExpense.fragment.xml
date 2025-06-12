@@ -2,7 +2,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:u="sap.ui.unified"
 	xmlns:core="sap.ui.core">
-	<Dialog title="{i18n>addItemExpense}">
+	<Dialog title="{i18n>addItemExpense}" contentWidth="40%">
 		<VBox>
 			<f:SimpleForm id="Exp_id_SimpleFromtwo" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" emptySpanXL="0" emptySpanL="4" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1">
 				<f:content>
@@ -44,19 +44,20 @@
 							<Input value="{ExpenseCreateModel>/TotalAmount}" visible="{= ${ExpenseCreateModel>/Currency} !== 'INR' }" editable="false"></Input>
 						</VBox>
 					</HBox>
-					<HBox alignItems="Center" width="100%" renderType="Bare" class="sapUiSmallMarginBottom">
-						<VBox width="50%">
-							<u:FileUploader id="fileUploader" fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png,doc,docx" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true" iconFirst="true" buttonText="Attachment" class="sapUiSmallMarginBeginEnd" />
+				
+					<Label text="{i18n>comments}" required="true"></Label>
+					<TextArea id="ExpDet_id_Comments" valueStateText="{i18n>enterComments}" liveChange="LC_ExpComments" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
+
+					<HBox alignItems="Center" width="100%" renderType="Bare" class="sapUiSmallMarginTop">
+						<VBox width="20%">
+							<u:FileUploader id="fileUploader" fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,jpg,jpeg,png,doc,docx" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true" iconFirst="true" buttonText="Attachment" />
 						</VBox>
-						<VBox width="50%">
-							<Tokenizer id="tokenizer" width="100%" class="tokenStyle" tokenDelete="onTokenDelete" tokens="{tokenModel>/tokens}">
+						<VBox width="80%">
+							<Tokenizer id="tokenizer" width="100%" tokenDelete="onTokenDelete" tokens="{tokenModel>/tokens}">
 								<Token key="{tokenModel>key}" text="{tokenModel>text}" />
 							</Tokenizer>
 						</VBox>
 					</HBox>
-
-					<Label text="{i18n>comments}" required="true"></Label>
-					<TextArea id="ExpDet_id_Comments" valueStateText="{i18n>enterComments}" liveChange="LC_ExpComments" value="{ExpenseCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
 				</f:content>
 			</f:SimpleForm>
 		</VBox>
