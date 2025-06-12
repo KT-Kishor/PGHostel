@@ -376,11 +376,6 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
                 doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
-                doc.setFont("helvetica", "bold").setFontSize(9);
-                let subtitletextWidth = doc.getTextWidth("Master Service Agreement");
-                let subtitleX = (pageWidth - subtitletextWidth) / 2;
-                doc.text("Master Service Agreement", subtitleX, topMargin - 8);
-                doc.line(subtitleX, topMargin - 7, subtitleX + subtitletextWidth + 1, topMargin - 7);
                 let titleY = topMargin;
                 let titleText = content[0].Title;
                 doc.setFont("helvetica", "bold").setFontSize(12);
@@ -391,7 +386,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.setFont("helvetica", "normal").setFontSize(11);
 
                 let titleContent1Y = titleY + 10; // Initial Y position after titleY
-                const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
+                const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientName} - ${oModel.ClientRole}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
                 const boldWordList = boldWords.join(" ").split(" ");
 
                 function titleContent(i, titleContentY) {
