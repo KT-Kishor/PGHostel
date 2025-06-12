@@ -75,7 +75,7 @@ sap.ui.define(
           this.getView().setModel(oBlankModel, "SingleCompanyModel");
 
           var oQuotationModel = new JSONModel({
-            QuotationItemModel: [], CGSTSelected: true, IGSTSelected: false,SGSTVisible: true,
+            QuotationItemModel: [], CGSTSelected: true, IGSTSelected: false,SGSTVisible: true,CGSTVisible: true,
            IGSTVisible: false,ShowGSTFields: true
           });
 
@@ -980,7 +980,7 @@ sap.ui.define(
             2: { halign: 'center' }, //Days
             3: { halign: 'right' }, //Unit Price
             4: { halign: 'right' }, //Discount
-            5: { halign: 'cenetr' }, //Tax
+            5: { halign: 'center' }, //Tax
             6: { halign: 'right' }  //Total
           },
 
@@ -993,7 +993,7 @@ sap.ui.define(
         }
 
         doc.setFont("times", "bold");
-        doc.setFontSize(10);
+        doc.setFontSize(12);
 
         const summaryBody = [];
 
