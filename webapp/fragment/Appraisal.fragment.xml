@@ -36,7 +36,7 @@
                                      valueHelpIconSrc="sap-icon://message-information"
 									maxLength="5" valueStateText="{i18n>variabelPayValueStae}" />
 								<!-- Effective Date -->
-								<Label text="{i18n>EffectiveDate}" required="true" />
+								<Label text="{i18n>salaryEffectiveDate}" required="true" />
 								<DatePicker minDate="{controller>/nextMonthMinDate}"
 									value="{path: 'AppraisalModel>/EffectiveDate', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'MM-yyyy' }, constraints: { displayFormat: 'MM-yyyy' }}"
 									change="onChangeEffectiveDate"
