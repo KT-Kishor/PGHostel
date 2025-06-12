@@ -202,17 +202,17 @@
 												<m:Text class="amountText" text="{path:'SelectedCustomerModel>/SubTotalInGST',formatter: '.Formatter.fromatNumber'}" textAlign="End" />
 											</m:HBox>
 											<!-- CGST -->
-											<m:HBox justifyContent="SpaceBetween" visible="{= ${SelectedCustomerModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST' }">
+											<m:HBox justifyContent="SpaceBetween" visible="{= ${FilteredSOWModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST' }">
 												<m:Label text="{i18n>CGST} ({SelectedCustomerModel>/Value}%) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{path:'FilteredSOWModel>/gstAmount',formatter: '.Formatter.fromatNumber'}" textAlign="End" />
 											</m:HBox>
 											<!-- SGST -->
-											<m:HBox justifyContent="SpaceBetween" visible="{= ${SelectedCustomerModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST' }">
+											<m:HBox justifyContent="SpaceBetween" visible="{= ${FilteredSOWModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST' }">
 												<m:Label text="{i18n>SGST} ({SelectedCustomerModel>/Value}%) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{path:'FilteredSOWModel>/gstAmount',formatter: '.Formatter.fromatNumber'}" textAlign="End" />
 											</m:HBox>
 											<!-- IGST -->
-											<m:HBox justifyContent="SpaceBetween" visible="{= ${SelectedCustomerModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST' }">
+											<m:HBox justifyContent="SpaceBetween" visible="{= ${FilteredSOWModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'IGST' }">
 												<m:Label text="{i18n>IGST} ({SelectedCustomerModel>/Value}%) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{path: 'FilteredSOWModel>/gstAmount', formatter: '.Formatter.fromatNumber'}" textAlign="End" />
 											</m:HBox>
