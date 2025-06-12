@@ -24,7 +24,7 @@ sap.ui.define([
       this.oLoginModel = oLoginData;
       const oComponent = this.getOwnerComponent();
       const isAccountMgr = oLoginData.Role === "Account Manager" || oLoginData.Role === "Account Consultant";
-
+      this.getBusyDialog();
       this.sParams = sParams;
       oView.setModel(new JSONModel([{ type: "Leave" }, { type: "Expense" }, { type: "Resignation" }]), "oTypeModel");
       oLoginModel.setProperty("/HeaderName", "Inbox Details");
@@ -55,6 +55,7 @@ sap.ui.define([
         const empData = [...new Map(response.data.filter(item => item.EmpID?.trim()).map(item => [item.EmpID.trim(), item])).values()];
         oView.setModel(new JSONModel(empData), "oModelEmp");
       }
+      this.closeBusyDialog();
     },
 
     MI_onPressLOPData: function () {
@@ -231,10 +232,8 @@ sap.ui.define([
 
     MIF_liveChangeForMangerComments() {
       const input = sap.ui.getCore().byId("MIF_id_remark");
-      const regex = /^[^\\'"]*$/;
-
-      if (!regex.test(input.getValue())) {
-        input.setValueStateText(this.getView().getModel('i18n').getResourceBundle().getText("commentsValidation"));
+      if (input.getValue()) {
+        input.setValueStateText(this.getView().getModel('i18n').getResourceBundle().getText("commentsValueState"));
         input.setValueState("Error");
         return false;
       }

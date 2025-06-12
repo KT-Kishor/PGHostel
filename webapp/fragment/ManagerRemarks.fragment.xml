@@ -21,7 +21,7 @@
             columnsM="1"
             singleContainerFullSize="false">
 			<f:content>
-				<Label id="MIF_id_RemarkLabel"></Label>
+				<Label id="MIF_id_RemarkLabel" required="true"></Label>
                 <TextArea value="" liveChange="MIF_liveChangeForMangerComments"  rows="4" id="MIF_id_remark" placeholder="{i18n>remarks}" maxLength="2000"/>
 			</f:content>
 		</f:SimpleForm>
