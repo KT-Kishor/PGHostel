@@ -164,6 +164,7 @@ sap.ui.define([
       sap.ui.getCore().byId("MIF_id_RemarkLabel").setText(oValue);
       sap.ui.getCore().byId("MIF_id_remark").setValue("");
       sap.ui.getCore().byId("MIF_id_DialogManRemark").setTitle(oDialogTitle);
+      sap.ui.getCore().byId("MIF_id_remark").setValueState("None");
     },
 
     onSelectionChangeStatus() {
@@ -223,13 +224,14 @@ sap.ui.define([
       if (this.MIF_liveChangeForMangerComments() && sap.ui.getCore().byId("MIF_id_remark").getValue().trim() !== "") {
         const statusValue = mapStatus[btnText];
         sap.ui.getCore().byId("MIF_id_remark").setValueState("None");
+        sap.ui.getCore().byId("MIF_id_remark").setValueStateText("");
         this.updateCallForMyInboxFunction(this.oModelData, statusValue, successKey[btnText], errorKey[btnText]);
       } else {
         sap.m.MessageToast.show(i18n.getText("enterComments"));
         sap.ui.getCore().byId("MIF_id_remark").setValueState("Error");
+        sap.ui.getCore().byId("MIF_id_remark").setValueStateText(this.getView().getModel('i18n').getResourceBundle().getText("commentsValueState"));
       }
     },
-
     MIF_liveChangeForMangerComments() {
       const input = sap.ui.getCore().byId("MIF_id_remark");
       if (input.getValue()) {
