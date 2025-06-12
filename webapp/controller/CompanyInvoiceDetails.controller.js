@@ -42,6 +42,7 @@ sap.ui.define([
                 this.byId("CID_id_InputMailID").setValueState("None");
                 this.byId("CID_id_IncomeTaxPercentage").setValueState("None");
                 this.byId("CID_id_SowDetails").setValueState("None");
+                this.byId("CID_id_CurrencySelect").setEditable(true);
                 const oView = this.getView();
                 if (this.getView().getModel("CompanyInvoiceModel").getData().length === 0) {
                     var LastInvoiceDate = new Date()
@@ -67,6 +68,8 @@ sap.ui.define([
                     Form: true, Table: false, MultiEmail: true, Edit: true, IncomeTax: true, minDate: LastInvoiceDate
                 }), "visiablityPlay");
 
+                var SowDataModel = new JSONModel({items : []});
+                this.getView().setModel(SowDataModel, "CombinedData");
                 this.visiablityPlay = oView.getModel("visiablityPlay");
                 this.visiablityPlay.setProperty("/Edit", false);
                 this.visiablityPlay.setProperty("/MultiEmail", false);
@@ -187,8 +190,7 @@ sap.ui.define([
                 this.SelectedCustomerModel.refresh(true)
                 await this.ajaxCreateWithJQuery("combineSowMsa", { MsaID: this.SelectKey }).then((oData) => {
                     if (oData.success) {
-                        var oJson = new JSONModel({ items: oData.combinedData });
-                        this.getView().setModel(oJson, "CombinedData");
+                        this.getView().getModel("CombinedData").setProperty("/items", oData.combinedData);    
                         this.closeBusyDialog();
                         this.onChangeInvoiceDate();
                     }
@@ -575,7 +577,7 @@ sap.ui.define([
                 }
 
                 const oPayload = {
-                    InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : oSelectedCustomerModel.InvoiceDate?.toISOString().split('T')[0] || "",
+                    InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
                     CustomerName: (sMode === 'update') ? oSelectedCustomerModel.CustomerName : oSelectedCustomerModel.Customer,
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
                     Address: String(oSelectedCustomerModel.Address),

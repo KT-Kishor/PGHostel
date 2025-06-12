@@ -9,21 +9,19 @@
 				<WizardStep id="MsaD_id_WizardO" complete="MsaD_onComplete" title="{i18n>msaDetails}" validated="true">
 					<f:SimpleForm 
             editable="true"
-			layout="ResponsiveGridLayout"
-			labelSpanXL="4"
-			labelSpanL="3"
-			labelSpanM="4"
-			labelSpanS="12"
-			adjustLabelSpan="false"
-			emptySpanXL="0"
-			emptySpanL="4"
-			emptySpanM="0"
-			emptySpanS="0"
-			columnsXL="2"
-			columnsL="1"
-			columnsM="1"
-			singleContainerFullSize="false"
-			ariaLabelledBy="Title1">
+                                    layout="ColumnLayout"
+                                    labelSpanXL="12"
+                                    labelSpanL="12"
+                                    labelSpanM="12"
+                                    labelSpanS="12"
+                                    adjustLabelSpan="false"
+                                    emptySpanXL="0"
+                                    emptySpanL="0"
+                                    emptySpanM="0"
+                                    emptySpanS="0"
+                                    columnsXL="2"
+                                    columnsL="2"
+                                    columnsM="1">
 						<f:content>
 						<Label text="{i18n>type}" required="true" />
 							<RadioButtonGroup id="MsaD_id_Type" columns="5" selectedIndex="0"  valueState="None" select="onRadioButtonGroupSelect">
@@ -34,18 +32,18 @@
 							<Input value="{msaModelWizart>/CompanyName}" maxLength="50" placeholder="{i18n>placeCompany}" id="MsaD_id_CompanyName" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeCompany}" />
 
 							<Label text="{i18n>companyHeadName}" required="true" />
-							<HBox width="100%" justifyContent="Start" alignItems="Center">
-								<VBox width="20%">
+							<!-- <HBox width="100%" justifyContent="Start" alignItems="Center">
+								<VBox width="20%"> -->
 									<Select id="MsaD_id_HeadSal" selectedKey="{msaModelWizart>/Salutation}"
                                     items="{Salutation>/salutation}" width="100%">
                                             <core:Item key="{Salutation>text}" text="{Salutation>text}" />
                                     </Select>
-								</VBox>
-								<VBox width="78%">
+								<!-- </VBox>
+								<VBox width="78%"> -->
 									<Input value="{msaModelWizart>/CompanyHeadName}" maxLength="50" class="sapUiTinyMarginBegin"
 										placeholder="{i18n>placeHeadName}" id="MsaD_id_HeadName" width="100%" liveChange="MsaD_validateName" valueStateText="{i18n>placeHeadName}" />
-								</VBox>
-							</HBox>
+								<!-- </VBox>
+							</HBox> -->
 
 							<Label text="{i18n>companyHeadPosition}" required="true" />
 							<Input value="{msaModelWizart>/CompanyHeadPosition}" placeholder="{i18n>placeHedaPosition}" maxLength="50" id="MsaD_id_HeadPosition" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeHedaPosition}" />
@@ -56,48 +54,48 @@
 
 							<!-- Payment Section -->
 							<Label text="{i18n>paymentLabel}" required="true" visible="{VisibleModel>/Recruitment}" />
-							<HBox width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{VisibleModel>/Recruitment}">
-								<VBox width="49%">
-									<Input 
+							<!-- <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{VisibleModel>/Recruitment}">
+								<VBox width="49%"> -->
+									<Input visible="{VisibleModel>/Recruitment}"
 										value="{msaModelWizart>/PaymentAdvance}" 
 										maxLength="5" 
 										placeholder="{i18n>advancePlaceholder}" 
 										id="Msa_Id_PayAdvance" 
 										liveChange="onPaymentAdvanceInputChange" 
 										valueStateText="{i18n>msaAmountMess}" />
-								</VBox>
-								<VBox width="49%">
-									<Input 
+								<!-- </VBox>
+								<VBox width="49%"> -->
+									<Input visible="{VisibleModel>/Recruitment}"
 										value="{msaModelWizart>/PaymentBalance}" 
 										maxLength="5" 
 										placeholder="{i18n>balancePlaceholder}" 
 										id="Msa_Id_PayBalance" 
 										liveChange="onPaymentAdvanceInputChange" 
 										valueStateText="{i18n>msaAmountMess}" />
-								</VBox>
-							</HBox>
+								<!-- </VBox>
+							</HBox> -->
 
 							<!-- Replacement Gratuity Section -->
 							<Label text="{i18n>replacementGratuityLabel}" required="true" visible="{VisibleModel>/Recruitment}" />
-							<HBox width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{VisibleModel>/Recruitment}">
-								<VBox width="49%">
-									<Select 
+							<!-- <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center" visible="{VisibleModel>/Recruitment}">
+								<VBox width="49%"> -->
+									<Select visible="{VisibleModel>/Recruitment}"
 										items="{ContractPeriod>/ContractPeriod}" 
 										selectedKey="{msaModelWizart>/ReplacementMonth}" 
 										width="100%">
 										<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 									</Select>
-								</VBox>
-								<VBox width="49%">
-									<Input 
+								<!-- </VBox>
+								<VBox width="49%"> -->
+									<Input visible="{VisibleModel>/Recruitment}"
 										value="{msaModelWizart>/ReplacementRefund}" 
 										maxLength="5" 
 										placeholder="{i18n>refundPlaceholder}" 
 										id="Msa_Id_Refund" 
 										liveChange="LC_MSA_RateCharge" 
 										valueStateText="{i18n>msaAmountMess}" />
-								</VBox>
-							</HBox>
+								<!-- </VBox>
+							</HBox> -->
 
 							<Label text="{i18n>contractPeriod}" required="true" />
 							<Select id="MsaD_id_ContractPeriod" items="{ContractPeriodThree>/ContractPeriod}" selectedKey="{msaModelWizart>/ContractPeriod}">
@@ -140,22 +138,20 @@
 				</WizardStep>
 				<WizardStep id="MasD_id_ThirdStep" title="{i18n>review}" validated="true">
 					<f:SimpleForm 
-                                editable="true"
-			layout="ResponsiveGridLayout"
-			labelSpanXL="4"
-			labelSpanL="3"
-			labelSpanM="4"
-			labelSpanS="12"
-			adjustLabelSpan="false"
-			emptySpanXL="0"
-			emptySpanL="4"
-			emptySpanM="0"
-			emptySpanS="0"
-			columnsXL="2"
-			columnsL="1"
-			columnsM="1"
-			singleContainerFullSize="false"
-			ariaLabelledBy="Title1">
+                                 editable="true"
+                                    layout="ColumnLayout"
+                                    labelSpanXL="12"
+                                    labelSpanL="12"
+                                    labelSpanM="12"
+                                    labelSpanS="12"
+                                    adjustLabelSpan="false"
+                                    emptySpanXL="0"
+                                    emptySpanL="0"
+                                    emptySpanM="0"
+                                    emptySpanS="0"
+                                    columnsXL="2"
+                                    columnsL="2"
+                                    columnsM="1">
 						<f:content>
 							<Label text="{i18n>type}" />
 							<Text id="reviewPageType" />
@@ -168,13 +164,13 @@
 
 							<Label text="{i18n>msaRateCharge}" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/RateCharge} %" visible="{VisibleModel>/Recruitment}"/>
-							<Label text="Payment Advance" visible="{VisibleModel>/Recruitment}"/>
+							<Label text="{i18n>paymentLabel}" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/PaymentAdvance} %" visible="{VisibleModel>/Recruitment}"/>
-							<Label text="Payment Balance" visible="{VisibleModel>/Recruitment}"/>
+							<Label text="{i18n>paymentBalanceLabel}" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/PaymentBalance} %" visible="{VisibleModel>/Recruitment}"/>
-							<Label text="Replacement Gratuity Month" visible="{VisibleModel>/Recruitment}"/>
+							<Label text="{i18n>ReplacementGratuityMonth}" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/ReplacementMonth}" visible="{VisibleModel>/Recruitment}"/>
-							<Label text="Replacement Gratuity Refund" visible="{VisibleModel>/Recruitment}"/>
+							<Label text="{i18n>ReplacementGratuityRefund}" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/ReplacementRefund} %" visible="{VisibleModel>/Recruitment}"/>
 
 							<Label text="{i18n>contractPeriod}" />

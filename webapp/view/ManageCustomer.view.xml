@@ -34,6 +34,8 @@
 						<Button text="{i18n>custEditButToolTip}" type="Emphasized" tooltip="{i18n>custEditButToolTip}" press="MC_onEditCustomerDetails" id="MC_id_EditCustomer"/>
 						<ToolbarSeparator />
 						<Button type="Reject" text="{i18n>custDeleteToolTip}" tooltip="{i18n>custDeleteToolTip}" press="MC_onDeleteAddCustomer" id="MC_id_DeleteCustomer" />
+						<ToolbarSeparator />
+						<Button type="Attention" text="{i18n>msasow}" press="MC_OnPressMSASOW" />
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>

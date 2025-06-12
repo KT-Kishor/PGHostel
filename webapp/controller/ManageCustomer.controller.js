@@ -275,6 +275,10 @@ sap.ui.define([
         }
       },
 
+      MC_OnPressMSASOW:function () {
+        this.getRouter().navTo("RouteMSA"); // Navigate to MSASOW page
+      },
+
       // Submit Customer Data
       MC_onPressSubmit: async function () {
         var that = this;
