@@ -16,7 +16,7 @@
 						</Select>
 					</VBox>
 					<VBox width="78%">
-						<Input id="MC_id_CustCustomerName" value="{CustomerModel>/name}" maxLength="20" placeholder="{i18n>placeholderCustName}" change="MC_LCvalidateName" valueStateText="{i18n>placeholderCustName}" />
+						<Input id="MC_id_CustCustomerName" value="{CustomerModel>/name}" maxLength="20" placeholder="{i18n>placeholderCustName}" liveChange="MC_LCvalidateName" valueStateText="{i18n>placeholderCustName}" />
 					</VBox>
 				</HBox>
 

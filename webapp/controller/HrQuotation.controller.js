@@ -42,14 +42,12 @@ sap.ui.define(
       },
       _getFinancialYearDates: function () {
         var today = new Date();
-        var currentMonth = today.getMonth() + 1; // JavaScript months are 0-11
+        var currentMonth = today.getMonth() + 1; 
         var currentYear = today.getFullYear();
 
         // Assuming financial year runs from April to March
         var fyStart, fyEnd;
-
         if (currentMonth >= 4) {
-          // Current financial year is current year April to next year March
           fyStart = new Date(currentYear, 3, 1); // April 1 (month is 0-based)
           fyEnd = new Date(currentYear + 1, 2, 31); // March 31 of next year
         } else {
@@ -57,7 +55,6 @@ sap.ui.define(
           fyStart = new Date(currentYear - 1, 3, 1);
           fyEnd = new Date(currentYear, 2, 31);
         }
-
         return {
           start: fyStart,
           end: fyEnd

@@ -45,7 +45,6 @@ sap.ui.define([], function () {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
       if (!oField) return false;
       var oValue = oField.getValue().trim();
-      oField.setValue(oValue);
       if (oValue === "") {
         oField.setValueState("Error");
         return false;

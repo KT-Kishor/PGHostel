@@ -111,7 +111,7 @@
                                         <m:Input
                                             value="{SingleCompanyModel>/CompanyName}"
                                             id="HQD_id_InputCompanyName"
-                                            change="HQD_onNameLiveChange"
+                                            liveChange="HQD_onNameLiveChange"
                                             valueStateText="{i18n>placeName}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="50"
@@ -273,7 +273,7 @@
                                         <m:Input
                                             value="{SingleCompanyModel>/CustomerName}"
                                             id="HQD_id_CustomerName"
-                                            change="HQD_onCustomerNameLiveChange"
+                                            liveChange="HQD_onCustomerNameLiveChange"
                                             valueStateText="{i18n>placeName}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="100"

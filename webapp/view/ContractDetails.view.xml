@@ -15,7 +15,7 @@
 							<Select id=""  selectedKey="{ContractModelWizart>/Salutation}" items="{Salutation>/salutation}" width="100%">
 								<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 							</Select>
-							<Input value="{ContractModelWizart>/ConsultantName}" placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" change="CD_ValidateConsultantName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
+							<Input value="{ContractModelWizart>/ConsultantName}" placeholder="{i18n>placeConsultantName}"  id="CD_id_CName" liveChange="CD_ValidateConsultantName" maxLength="50" class="ClientCompanyInput" valueStateText="{i18n>nameConsultantValueState}"/>
 							<Label text="{i18n>address}" required="true"/>
 							<TextArea value="{ContractModelWizart>/ConsultantAddress}"  maxLength="120" rows="2" id="CD_id_Address" placeholder="{i18n>placeAddress}" change="onAddress" valueStateText="{i18n>addressValueState}"
 									liveChange="CD_ValidateCommonFields"/>

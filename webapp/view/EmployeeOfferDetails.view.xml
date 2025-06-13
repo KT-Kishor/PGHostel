@@ -37,7 +37,7 @@
                                              required="true"
                                              editable="true"
                                              id="EOD_id_Name"
-                                             change="EOD_validateName"
+                                             liveChange="EOD_validateName"
                                              maxLength="50"
                                              valueStateText="{i18n>placeEmpName}">
 												<layoutData>
