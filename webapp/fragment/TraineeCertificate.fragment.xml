@@ -39,13 +39,13 @@
                 />
                 <Select
                     id="TCF_id_Department"
-                    items="{Departmentmodel>/}"
+                    items="{DepartmentModel>/}"
                     selectedKey="{traineeModel>Department}"
 					editable="{= !${PDFData>/PreviewFlag} }"
                 >
                     <core:Item
-                        key="{Departmentmodel>departmentName}"
-                        text="{Departmentmodel>departmentName}"
+                        key="{DepartmentModel>departmentName}"
+                        text="{DepartmentModel>departmentName}"
                     />
                 </Select>
                 <Label text="{i18n>joiningDate}" />

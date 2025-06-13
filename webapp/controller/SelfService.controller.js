@@ -1441,7 +1441,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
             // Function to display salary data in UI panels
             displaySalaryPanels: function (salaryDetailsArray) {
-                var nextMonthDate = this.getView().getModel("controller").getProperty("/nextMonthMinDate"); // Fetch the pre-set next month's date
+                var nextMonthDate = this.getView().getModel("controller").getProperty("/nextMonthMinDate");
                 var AppraisalModel = new JSONModel({
                     CtcPercentage: "",
                     VariablePay: "0",
@@ -1455,19 +1455,20 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 var oToday = new Date();
                 salaryDetailsArray.forEach((offerData, index) => {
                     var oEffectiveDate = new Date(offerData.EffectiveDate);
-                    var isLastRecord = index === salaryDetailsArray.length - 1; // Check if it's the latest record
+                    var isLastRecord = index === salaryDetailsArray.length - 1;
                     var sTitleText = isLastRecord
-                        ? `Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`
-                        : `Appraisal Date: ${this.Formatter.formatDate(offerData.AppraisalDate)}, Effective Date: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, Yearly Gross: INR ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
+                        ? `${this.i18nModel.getText("salaryEffectiveDate")}: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, ${this.i18nModel.getText("salaryYearlyGross")}: ${this.i18nModel.getText("salaryINR")} ${this.Formatter.fromatNumber(offerData.GrossPay)}`
+                        : `${this.i18nModel.getText("salaryAppraisalDate")}: ${this.Formatter.formatDate(offerData.AppraisalDate)}, ${this.i18nModel.getText("salaryEffectiveDate")}: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, ${this.i18nModel.getText("salaryYearlyGross")}: ${this.i18nModel.getText("salaryINR")} ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
                     var oTitleText = new sap.m.Text({
                         text: sTitleText,
                         wrapping: true
-                    });
+                    }).addStyleClass("sapUiTinyMarginBottom");
+
                     var aButtonContent = [];
                     // Delete button
                     if (salaryDetailsArray.length > 1 && oEffectiveDate > oToday && this.getView().getModel("LoginModel").getProperty("/Role") === "Admin") {
                         var oDeleteButton = new sap.m.Button({
-                            text: "Delete",
+                            text: this.i18nModel.getText("delete"),
                             type: "Reject",
                             press: function () {
                                 this.onDeleteSalary(offerData);
@@ -1478,7 +1479,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     // Appraisal button
                     if (index === 0 && oEffectiveDate < oToday) {
                         var oAppraisalButton = new sap.m.Button({
-                            text: "Appraisal",
+                            text: this.i18nModel.getText("appraisal"),
                             type: "Emphasized",
                             visible: this.ViewModel.getProperty("/RelievingLetter"),
                             press: function () {
@@ -1491,7 +1492,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         }).addStyleClass("sapUiTinyMarginBegin");
                         aButtonContent.push(oAppraisalButton);
                     }
-                    var oButtonBox = new sap.m.HBox({
+                     var oButtonBox = new sap.m.HBox({
                         items: aButtonContent,
                         alignItems: "Center",
                         justifyContent: "End",

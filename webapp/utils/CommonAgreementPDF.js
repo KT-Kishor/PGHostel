@@ -31,7 +31,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             let titleContentY = titleY + 10; // Initial Y position after titleY
             const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
             const trimmedBoldWords = boldWords.map(word => word.trim());
-            const boldWordList = trimmedBoldWords.join(" ").split(" ");
+            const boldWordList = trimmedBoldWords.join(" ").split(" ").filter(item => item !== "");
 
             for (let i = 0; i < 10; i++) {
                 if (!content[i]?.TitleContent) break;
@@ -376,11 +376,6 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
                 doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
-                doc.setFont("helvetica", "bold").setFontSize(9);
-                let subtitletextWidth = doc.getTextWidth("Master Service Agreement");
-                let subtitleX = (pageWidth - subtitletextWidth) / 2;
-                doc.text("Master Service Agreement", subtitleX, topMargin - 8);
-                doc.line(subtitleX, topMargin - 7, subtitleX + subtitletextWidth + 1, topMargin - 7);
                 let titleY = topMargin;
                 let titleText = content[0].Title;
                 doc.setFont("helvetica", "bold").setFontSize(12);
@@ -391,8 +386,9 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.setFont("helvetica", "normal").setFontSize(11);
 
                 let titleContent1Y = titleY + 10; // Initial Y position after titleY
-                const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
-                const boldWordList = boldWords.join(" ").split(" ");
+                const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientName} - ${oModel.ClientRole}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
+                const trimmedBoldWords = boldWords.map(word => word.trim());
+                const boldWordList = trimmedBoldWords.join(" ").split(" ").filter(item => item !== "");
 
                 function titleContent(i, titleContentY) {
                     let titleContent = new Function("oCompanyModel", "oModel", `return ${content[i].TitleContent};`)(oCompanyModel, oModel);
@@ -726,7 +722,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.text(oCompanyModel.longAddress, pageWidth - margin, coAddressY, coAlignment)
                 let coGSTINY = doc.getTextDimensions(oCompanyModel.longAddress, coAlignment).h + coAddressY + 3;
 
-                doc.text("GSTIN: " + oCompanyModel.GSTIN, pageWidth - margin, coGSTINY, coAlignment);
+                doc.text("GSTIN: " + oCompanyModel.gstin, pageWidth - margin, coGSTINY, coAlignment);
                 // currentY = doc.getTextDimensions("GSTIN: " + oCompanyModel.gstin, coAlignment).h; (NOT REQURIED AS OF NOW)
 
                 let titleY = topMargin + 50;
@@ -768,8 +764,8 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                 doc.autoTable({
                     startY: tableY,
-                    head: [["Description", "Unit/Quantity", "Amount", "Currency"]],
-                    body: oModel.POItems.map(item => [item.Description, item.Qty, item.Amount, item.Currency]),
+                    head: [["Sl. No", "Consultant Name", "Description", "Unit", "Amount", "Currency", "Peroid"]],
+                    body: oModel.POItems.map(item => [item.SerialNo, item.ConsultantName, item.Description, item.Unit, item.Amount, item.Currency, item.Peroid]),
 
                     styles: {
                         font: "times",
@@ -791,12 +787,12 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                         cellPadding: 1
                     },
 
-                    columnStyles: {
-                        0: { cellWidth: maxWidth * 0.4 },
-                        1: { cellWidth: maxWidth * 0.2 },
-                        2: { cellWidth: maxWidth * 0.2 },
-                        3: { cellWidth: maxWidth * 0.2 }
-                    },
+                    // columnStyles: {
+                    //     0: { cellWidth: maxWidth * 0.4 },
+                    //     1: { cellWidth: maxWidth * 0.2 },
+                    //     2: { cellWidth: maxWidth * 0.2 },
+                    //     3: { cellWidth: maxWidth * 0.2 }
+                    // },
 
                     tableWidth: maxWidth,
                     margin: { left: margin, right: margin }

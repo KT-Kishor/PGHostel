@@ -1449,7 +1449,7 @@ sap.ui.define([
                     }
                 }
 
-                if (data.RoundOf && data.RoundOf > 0) {
+                if (data.RoundOf) {
                     summaryBody.push([`Round Off (${data.Currency}) :`,(data.RoundOf)]);
                 }
 

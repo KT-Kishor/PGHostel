@@ -17,18 +17,11 @@ sap.ui.define([
                 if (!LoginFunction) return;
                 this.getBusyDialog();
                 this.byId("TD_id_JoiningDate").setMinDate(new Date());
-                this._fetchCommonData("Currency", "CurrencyModel");
-                this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeOffer" });
-                this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                await this._fetchCommonData("EmployeeDetailsData", "empModel");
-                this._fetchCommonData("Country", "CountryModel");
-
                 this.sArgPara = oEvent.getParameter("arguments").sParTrainee;
                 this.byId("TD_id_Wizard").getSteps()[0].setValidated(false);
                 this.byId("TD_id_TrainingDetailsBox").setVisible(false);
                 this.byId("TD_id_TrainingAmountLabel").setVisible(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this.T_onResetWizard();
                 var jsonData = {
                     "NameSalutation": "Mr.",
                     "TraineeName": "",
@@ -46,6 +39,7 @@ sap.ui.define([
                     "STDCode": "+91",
                     "Gender": ""
                 };
+                await this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag", { Type: "TraineeOffer"});
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
                 this.getView().setModel(oViewModel, "viewModel");
@@ -54,18 +48,18 @@ sap.ui.define([
                     "TU_id_Name", "TU_id_Manager", "TU_id_TraineeMail", "TU_id_JoinDate", "TU_id_TrainingType", "TU_id_TrainingAmount","TU_Id_Country","TU_id_Location","TU_id_STDCode","TU_id_Mobile"].forEach(function (ids) {
                         this.getView().byId(ids).setValueState("None");
                     }.bind(this));
-                if (this.sArgPara === "CreateTraineeFlag") {
-                    this.getView().byId("TD_id_PageCreate").setVisible(true);
-                    this.getView().byId("TUF_id_pageTrainee").setVisible(false);
-                    this.T_onResetWizard();
-                } else {
+                    if (this.sArgPara === "CreateTraineeFlag") {
+                        this.getView().byId("TD_id_PageCreate").setVisible(true);
+                        this.getView().byId("TUF_id_pageTrainee").setVisible(false);
+                        this.T_onResetWizard();
+                    } else {
                     this.getView().byId("TD_id_PageCreate").setVisible(false);
                     this.getView().byId("TUF_id_pageTrainee").setVisible(true);
-
                     this.getModelData(this.sArgPara);
                 }
                 this._makeDatePickersReadOnly(["TD_id_JoiningDate", "TD_id_ReleaseDate", "TU_id_JoinDate", "TU_id_RelDate"]); //make date pickers read only
                 this.getView().byId("TD_id_Submit").setEnabled(false);
+                // this.closeBusyDialog();
             },
             //for edit case reading data from model
             getModelData: function (sArgPara) {
@@ -132,10 +126,6 @@ sap.ui.define([
                 utils._LCvalidateName(oEvent);
                 this.TD_validateStep();
             },
-            // TD_validateCombo: function (oEvent) {
-            //     utils._LCstrictValidationComboBox(oEvent);
-            //     this.TD_validateStep();
-            // },
             //validate email function
             TD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
