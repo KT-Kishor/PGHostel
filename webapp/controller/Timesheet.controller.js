@@ -7,7 +7,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                 this.getRouter().getRoute("RouteTimesheet").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched:async function () {
+            _onRouteMatched: async function () {
                 var LoginFunction = await this.commonLoginFunction("Timesheet");
                 if (!LoginFunction) return;
                 this.getBusyDialog();
@@ -15,6 +15,11 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                 const oViewModel = new JSONModel();
                 oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
                 this.getView().setModel(oViewModel, "viewModel");
+
+                // Add initial button states
+                oViewModel.setProperty("/canSubmit", false);
+                oViewModel.setProperty("/canDelete", false);
+
                 var loginModel = this.getOwnerComponent().getModel("LoginModel");
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
                 this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
@@ -33,7 +38,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                     sPath: sPath
                 });
             },
-              TSD_ReadTimesheetEntries: async function (filter) {
+            TSD_ReadTimesheetEntries: async function (filter) {
                 try {
                     this.getBusyDialog();
                     const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: filter },);
@@ -110,8 +115,8 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                 }
                 var aIdsToDelete = oSelectedItems.map(item => item.getBindingContext("FilteredTimesheetModel").getProperty("SrNo"));
                 this.showConfirmationDialog(
-                    this.i18nModel.getText("msgBoxConfirm"),
-                    this.i18nModel.getText("Confirmation"),
+                    this.i18nModel.getText("confirmTitle"),
+                    this.i18nModel.getText("deleteConfirm"),
                     function () {
                         that.getBusyDialog();
                         that.ajaxDeleteWithJQuery("/Timesheet", {
@@ -130,6 +135,66 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                         that.byId("TD_id_Table").removeSelections(true);
                     }
                 );
+            },
+            TS_onSubmitTimesheet: async function () {
+                var that = this;
+                var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
+                if (!oSelectedItems.length) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("selctRowtoSubmit"));
+                    return;
+                }
+                // Build array of update objects as required by backend
+                var aPayload = oSelectedItems.map(item => {
+                    var srNo = item.getBindingContext("FilteredTimesheetModel").getProperty("SrNo");
+                    return {
+                        filters: { SrNo: srNo },
+                        data: { Status: "Submitted" }
+                    };
+                });
+
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("confirmTitle"),
+                    this.i18nModel.getText("submitConfirm"),
+                    function () {
+                        that.getBusyDialog();
+                        that.ajaxUpdateWithJQuery("/Timesheet", aPayload)
+                            .then(() => {
+                                sap.m.MessageToast.show(that.i18nModel.getText("SubmitSuucess"));
+                                that._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: that.EmployeeID });
+                                that.closeBusyDialog();
+                            })
+                            .catch((error) => {
+                                that.closeBusyDialog();
+                                sap.m.MessageToast.show(error.responseText);
+                            });
+                    },
+                    function () { // On Cancel
+                        that.closeBusyDialog();
+                        that.byId("TD_id_Table").removeSelections(true);
+                    }
+                );
+            },
+            T_TableSelectionChange: function () {
+                var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
+                this.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                this.getView().getModel("viewModel").setProperty("/canDelete", false);
+                if (oSelectedItems.length === 0) {
+                    return;
+                }
+                // Check status of all selected rows
+                var allSaved = true;
+                var anySubmitted = false;
+                oSelectedItems.forEach(function (item) {
+                    var status = item.getBindingContext("FilteredTimesheetModel").getProperty("Status");
+                    if (status !== "Saved") {
+                        allSaved = false;
+                    }
+                    if (status === "Submitted") {
+                        anySubmitted = true;
+                    }
+                });
+                this.getView().getModel("viewModel").setProperty("/canSubmit", allSaved);
+                this.getView().getModel("viewModel").setProperty("/canDelete", !anySubmitted);
             }
         });
     });

@@ -47,7 +47,8 @@
                 growingScrollToLoad="true"
                 width="auto"
                 id="TD_id_Table"
-                mode="SingleSelectLeft"
+                mode="MultiSelect"
+                selectionChange="T_TableSelectionChange"
                 alternateRowColors="true"
                 items="{FilteredTimesheetModel>/}"
                 growingThreshold="50">
@@ -97,8 +98,8 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
                 <contentRight>
-                    <Button text="{i18n>submit}" press="TS_onSubmitTimesheet" type="Success"  id="TS_id_Submited"/>
-                    <Button text="{i18n>delete}" press="TS_onDeleteTimesheet" type="Negative"  id="TS_id_Delete"/>
+                    <Button text="{i18n>submit}" press="TS_onSubmitTimesheet" type="Accept"  id="TS_id_Submited" enabled="{viewModel>/canSubmit}"/>
+                    <Button text="{i18n>delete}" press="TS_onDeleteTimesheet" type="Reject"  id="TS_id_Delete" enabled="{viewModel>/canDelete}"/>
                 </contentRight>
             </Bar>
         </footer>
