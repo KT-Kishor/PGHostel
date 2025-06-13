@@ -38,43 +38,16 @@
 			<NavContainer id="pageContainer">
 				<pages>
 					<ScrollContainer id="idHome" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background sapUiTinyMargin">
-					<l:Grid defaultSpan="XL6 L6 M12 S12" class="grid-container">
-        
-                  <VBox class="sapUiLargeMarginTop ">
-                <Text class="custom-welcome sapUiTinyMarginTopBottom" textAlign="Center" text="{i18n>welcometoKT}" />
-                <Text class="custom-welcome sapUiTinyMarginTopBottom" text="{i18n>companynameKT}" />
-                <Text text="{i18n>afutureoftomorrow}" class="custom-tagline sapUiTinyMarginTop sapUiLargeMarginEnd" />
-                <Text class="custom-welcome-desc sapUiMediumMarginTop" textAlign="Left" text="{i18n>homepagecoute}" />
-            </VBox>	
-                <VBox class="sapUiLargeMarginTop Home-box">
-                <Text class="custom-welcome2 sapUiTinyMarginTopBottom" textAlign="Center" text="{i18n>welcometoKT}" />
-                <Text class="custom-welcome2 sapUiTinyMarginTopBottom" text="{i18n>secondCompanyName}" />
-                <Text text="{i18n>afutureoftomorrow}" class="custom-tagline sapUiTinyMarginTop sapUiLargeMarginEnd" />
-                <Text class="custom-welcome-desc sapUiMediumMarginTop" textAlign="Left" text="{i18n>homepagecoute}" />
-            </VBox>
-             </l:Grid>
-    <!-- <l:Grid defaultSpan="XL12 L12 M12 S12" width="100%" class="sapUiSmallMargin">
-       
-        <l:Grid defaultSpan="XL6 L6 M6 S12" class="position-welcome">
-            <VBox class="sapUiLargeMarginTop">
-                <Text class="custom-welcome sapUiTinyMarginTopBottom" textAlign="Center" text="{i18n>welcometoKT}" />
-                <Text class="custom-welcome sapUiTinyMarginTopBottom" text="{i18n>companynameKT}" />
-                <Text text="{i18n>afutureoftomorrow}" class="custom-tagline sapUiTinyMarginTop sapUiLargeMarginEnd" />
-                <Text class="custom-welcome-desc sapUiMediumMarginTop" textAlign="Left" text="{i18n>homepagecoute}" />
-            </VBox>
-        </l:Grid>
+											<l:Grid defaultSpan="XL12 L12 M12 S12" width="100%" class="position-welcome">
+							<VBox class="sapUiLargeMarginTop">
+								<Text class="custom-welcome sapUiTinyMarginTopBottom" textAlign="Center" text="{i18n>welcometoKT}"/>
+								<Text class="custom-welcome sapUiTinyMarginTopBottom" text="{i18n>companynameKT}"/>
+								<Text text="{i18n>afutureoftomorrow}" class="custom-tagline sapUiTinyMarginTop sapUiLargeMarginEnd"/>
+								<Text class="custom-welcome-desc sapUiMediumMarginTop" textAlign="Left" text="{i18n>homepagecoute}"/>
+							</VBox>
+						</l:Grid>
+					</ScrollContainer>
 
-      
-        <l:Grid defaultSpan="XL6 L6 M6 S12" class="position-welcome">
-            <VBox class="sapUiLargeMarginTop">
-                <Text class="custom-welcome sapUiTinyMarginTopBottom" textAlign="Center" text="{i18n>welcometoKT}" />
-                <Text class="custom-welcome sapUiTinyMarginTopBottom" text="{i18n>companynameKT}" />
-                <Text text="{i18n>afutureoftomorrow}" class="custom-tagline sapUiTinyMarginTop sapUiLargeMarginEnd" />
-                <Text class="custom-welcome-desc sapUiMediumMarginTop" textAlign="Left" text="{i18n>homepagecoute}" />
-            </VBox>
-        </l:Grid>
-    </l:Grid> -->
-</ScrollContainer>
 
 					<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Aboutus" type="XML"/>

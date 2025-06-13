@@ -124,7 +124,6 @@
   font-family: League spartan !important;
   font-weight: bolder !important;
 }
-
 .custom-welcome {
   line-height: 1;
   color: #161515;
@@ -135,7 +134,7 @@
 }
 
 .position-welcome {
-  position: relative;
+  position: absolute;
   top: 27%;
 }
 
