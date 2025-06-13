@@ -15,26 +15,44 @@ sap.ui.define(["./BaseController",
                 this.getRouter().getRoute("RouteTimesheet").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: async function () {
-                var LoginFunction = await this.commonLoginFunction("Timesheet");
+            _onRouteMatched: async function (oEvent) {
+            var LoginFunction = await this.commonLoginFunction("Timesheet");
                 if (!LoginFunction) return;
-                this.getBusyDialog();
-                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                const oViewModel = new JSONModel();
-                oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
-                this.getView().setModel(oViewModel, "viewModel");
+            // Set correct header
+            this.getView().getModel("LoginModel").setProperty("/HeaderName", "Timesheet");
 
-                // Add initial button states
+            var oArgs = oEvent.getParameter("arguments") || {};
+            var isManagerView = oArgs.managerView === "true" || oArgs.managerView === true;
+            var employeeID = oArgs.EmployeeID || this.EmployeeID;
+
+            this.getBusyDialog();
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            const oViewModel = new JSONModel();
+            oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
+            this.getView().setModel(oViewModel, "viewModel");
+            oViewModel.setProperty("/canSubmit", false);
+            oViewModel.setProperty("/canDelete", false);
+
+            await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: employeeID });
+            await this.TSD_ReadTimesheetEntries(employeeID);
+
+            if (isManagerView) {
+                // Filter only "Submitted" records
+                var oModel = this.getOwnerComponent().getModel("FilteredTimesheetModel");
+                var aAll = oModel.getData();
+                var aSubmitted = aAll.filter(function(entry) {
+                    return entry.Status === "Submitted";
+                });
+                oModel.setData(aSubmitted);
+
+                // Hide submit/delete for manager
                 oViewModel.setProperty("/canSubmit", false);
                 oViewModel.setProperty("/canDelete", false);
+            }
 
-                var loginModel = this.getOwnerComponent().getModel("LoginModel");
-                this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
-                this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
-
-                this.branch = loginModel.getProperty("/BranchCode");
-                this.TSD_ReadTimesheetEntries(this.EmployeeID);
-            },
+            this.branch = this.getOwnerComponent().getModel("LoginModel").getProperty("/BranchCode");
+            this.closeBusyDialog();
+        },
 
             TS_onFillDetails: function () {
                 this.getRouter().navTo("RouteTimesheetDetails", { sPath: "Timesheet" });

@@ -125,8 +125,10 @@ sap.ui.define([
         },
 
         TSD_onPressBack: function () {
-            this.getRouter().navTo("RouteTimesheet");
-        },
+         this.getRouter().navTo("RouteTimesheet", {
+            EmployeeID: "X",
+            managerView: true,
+          });        },
         TD_ValidateTime: function (oEvent) {
             utils._LCvalidateTimeLimit(oEvent);
         },

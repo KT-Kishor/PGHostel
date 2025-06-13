@@ -1,103 +1,104 @@
 <mvc:View
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"
-	xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
     controllerName="sap.kt.com.minihrsolution.controller.TimesheetApproval"
-	xmlns:fb="sap.ui.comp.filterbar"	
     displayBlock="true"
-    xmlns:u="sap.ui.unified">
-	<Page id="TSA_id_Page" >
-		<headerContent>
-		 <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
-
-		</headerContent>
-		<content>
-		  <u:CalendarDateInterval
- id="TSA_id_calendar"
- width="100%"
- startDateChange="TSA_onSelect"/>
-			<fb:FilterBar  class="sapUiTinyMargin" id="TSA_id_Filter" persistencyKey="myPersKey" useToolbar="false" clear="onPressClear" showClearOnFB="true" search=".onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" >
-				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="Employee ID" label="{i18n>employeeId}" groupName="Group1" visibleInFilterBar="true">
-					<fb:control>
-						<ComboBox   showClearIcon="true" items="" >
-							<core:Item key="" text=""/>
-						</ComboBox>
-					</fb:control>
-				</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Month" label="{i18n>month}" groupName="Group1" visibleInFilterBar="true">
-					<fb:control>
-						<ComboBox  showClearIcon="true" items="" >
-							<core:Item key="" text=""/>
-						</ComboBox>
-					</fb:control>
-				</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
-						<fb:control>
-                   		<ComboBox showClearIcon="true" items="" >
-							<core:Item key="" text=""/>
-						</ComboBox>	
-					</fb:control>
-						</fb:FilterGroupItem>
-				</fb:filterGroupItems>
-			</fb:FilterBar>
-			<Table class="sapUiTinyMargin" growingScrollToLoad="true" width="auto"   items="" growing="true"  growingThreshold="50"  alternateRowColors="true">
-				<columns>
-					<Column demandPopin="true">
-						<Text text="{i18n>employeeID}"/>
-					</Column>
-					<Column demandPopin="true">
-						<Text text="{i18n>taskName}"/>
-					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>date}" />
-					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>day}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>hoursWorked}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>manager}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>status}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>employeeComment}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>managerComment}" />
-					</Column>
-				</columns>
-				<items>
-					<ColumnListItem >
-						<cells>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-							<Text text=""/>
-						</cells>
-					</ColumnListItem>
-				</items>
-			</Table>
-		</content>
-		<footer>
-			<Bar>
-				 <contentLeft>
+    xmlns:u="sap.ui.unified"
+    xmlns:fb="sap.ui.comp.filterbar">
+    <Page id="TSA_id_Page">
+        <headerContent>
+            <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+        </headerContent>
+        <content>
+            <u:CalendarDateInterval
+                id="TSA_id_calendar"
+                width="100%"
+                startDateChange="onCalendarDateChange" />
+            <fb:FilterBar
+                class="sapUiTinyMargin"
+                id="TSA_id_Filter"
+                persistencyKey="myPersKey"
+                useToolbar="false"
+                clear="onPressClear"
+                showClearOnFB="true"
+                search="onSearch"
+                filterChange="onFilterChange"
+                afterVariantLoad="onAfterVariantLoad">
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeId}" groupName="Group1" visibleInFilterBar="true">
+                        <fb:control>
+                            <Input id="employeeIdInput"/>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <!-- Add more filters as needed -->
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+            <Table
+                id="TSA_id_Table"
+                mode="MultiSelect"
+                items="{ApprovalTimesheetModel>/}"
+                growing="true"
+                growingScrollToLoad="true"
+                growingThreshold="50"
+                alternateRowColors="true"
+                class="sapUiTinyMargin">
+                <columns>
+                    <Column demandPopin="true">
+                        <Text text="{i18n>employeeID}"/>
+                    </Column>
+                    <Column demandPopin="true">
+                        <Text text="{i18n>taskName}"/>
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>date}" />
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>day}" />
+                    </Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true">
+                        <Text text="{i18n>hoursWorked}" />
+                    </Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true">
+                        <Text text="{i18n>manager}" />
+                    </Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true">
+                        <Text text="{i18n>status}" />
+                    </Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true">
+                        <Text text="{i18n>employeeComment}" />
+                    </Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true">
+                        <Text text="{i18n>managerComment}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{ApprovalTimesheetModel>EmployeeID}"/>
+                            <Text text="{ApprovalTimesheetModel>TaskName}"/>
+                            <Text text="{ApprovalTimesheetModel>Date}"/>
+                            <Text text="{ApprovalTimesheetModel>Day}"/>
+                            <Text text="{ApprovalTimesheetModel>HoursWorked}"/>
+                            <Text text="{ApprovalTimesheetModel>ManagerName}"/>
+                            <Text text="{ApprovalTimesheetModel>Status}"/>
+                            <Text text="{ApprovalTimesheetModel>EmployeeComments}"/>
+                            <Text text="{ApprovalTimesheetModel>ManagerComments}"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <Bar>
+                <contentLeft>
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
-				<contentRight>
-					<Button text="{i18n>approve}" press="TSA_onApprove" type="Success"  id="TSA_id_Approve"/>
-                <Button text="{i18n>reject}" press="TSA_onReject" type="Negative"  id="TSA_id_Reject"/>
-				</contentRight>
-			</Bar>
-		</footer>
-	</Page>
+                <contentRight>
+                    <Button text="{i18n>approve}" press="TSA_onApprove" type="Accept" id="TSA_id_Approve"/>
+                    <Button text="{i18n>reject}" press="TSA_onReject" type="Reject" id="TSA_id_Reject"/>
+                </contentRight>
+            </Bar>
+        </footer>
+    </Page>
 </mvc:View>
