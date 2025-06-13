@@ -108,7 +108,8 @@
 							<Text text="{path:'ContractModel>AssignmentEndDate' ,formatter:'.Formatter.formatDate'}" />
 							<Text text="{ContractModel>ConsultantRate}"/>
 							<Text text="{ContractModel>PaymentTerms}"/>
-							<Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" />
+							<Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore"
+    						visible="{=${ContractModel>Comments}.length > 0 }"/>
 						</cells>
 					</ColumnListItem>
 				</items>

@@ -5,8 +5,10 @@ sap.ui.define(
         "sap/ui/model/json/JSONModel", //json model
         "../utils/validation", // Import validation functions
         "sap/m/MessageToast", // Import MessageToast for displaying messages
+         "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
+        "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
     ],
-    function(BaseController, Formatter, JSONModel, utils, MessageToast) {
+    function(BaseController, Formatter, JSONModel, utils, MessageToast,Timeline, TimelineItem) {
         "use strict";
         return BaseController.extend(
             "sap.kt.com.minihrsolution.controller.Contract", {
@@ -182,31 +184,45 @@ sap.ui.define(
                     return `${year}-${month}-${day}`; // YYYY-MM-DD
                 },
 
-                onShowMore: function(oEvent) {
-                    var oBindingContext = oEvent.getSource().getBindingContext("ContractModel");
-                    var sFullText = oBindingContext.getProperty("Comments");
+                onShowMore: function (oEvent) {
+                    var oContext = oEvent.getSource().getBindingContext("ContractModel");
+                    var oData = oContext.getObject();
+                    var oComment = oData.Comments || {}; 
 
-                    var formattedReferenceData = `
-                    <div style="padding: 15px; word-wrap: break-word; max-width: 100%; overflow-wrap: anywhere;">
-                        <p>${sFullText}</p>
-                    </div>`;
+                var oTimelineItem = new sap.suite.ui.commons.TimelineItem({
+                    dateTime: this.Formatter.formatDate(oData.AssignmentStartDate),
+                    text: oComment || "No comment provided",
+                    userNameClickable: false,
+                    icon: "sap-icon://comment"
+                });
 
-                    var oDialog = new sap.m.Dialog({
-                        title: this.getView().getModel("i18n").getProperty("comments"),
-                        draggable: true,
-                        resizable: true,
-                        contentWidth: "500px",
-                        contentHeight: "auto",
-                        content: new sap.ui.core.HTML({
-                            content: formattedReferenceData
-                        }),
-                        beginButton: new sap.m.Button({
-                            text: this.getView().getModel("i18n").getProperty("close"),
-                            press: function() {
-                                oDialog.close();
-                            }
-                        })
-                    });
+                var oTimeline = new sap.suite.ui.commons.Timeline({
+                    showHeader: false,
+                    enableBusyIndicator: false,
+                    width: "100%",
+                    sortOldestFirst: true,
+                    enableDoubleSided: false,
+                    content: [oTimelineItem],
+                    showHeaderBar: false
+                });
+
+                var oDialog = new sap.m.Dialog({
+                    title: this.getView().getModel("i18n").getProperty("comments"),
+                    contentWidth: "15rem",
+                    contentHeight: "5rem",
+                    draggable: true,
+                    resizable: true,
+                    content: [oTimeline],
+                    endButton: new sap.m.Button({
+                        text: "Close",
+                        type: "Reject",
+                        press: function () {
+                            oDialog.close();
+                            oDialog.destroy();
+                        }
+                    })
+                });
+
                     oDialog.open();
                 },
 

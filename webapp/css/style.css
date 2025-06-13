@@ -133,14 +133,6 @@
   font-family: League spartan !important;
 
 }
-.custom-welcome2 {
-  line-height: 1;
-  color: #13ffff;
-  font-size: 48px;
-  font-weight: bold;
-  font-family: League spartan !important;
-
-}
 
 .position-welcome {
   position: relative;
@@ -368,12 +360,7 @@ border-radius: 0.60rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 1);
     text-align: left;
   }
-  .Home-box{
-     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 1);
-    text-align: left;
-  }
+  
   .custom-trainee-title{
     font-size: 30px;
     font-family: Helvetica, sans-serif;
