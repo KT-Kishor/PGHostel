@@ -18,8 +18,8 @@ sap.ui.define([
                 this._makeDatePickersReadOnly(["CU_id_AgreementDate", "CU_id_AssignmentStartDate", "CU_id_AssignmentEndDate"]);
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
-                this._fetchCommonData("Country", "CountryModel");
-                this._fetchCommonData("Currency", "CurrencyModel");
+                // this._fetchCommonData("Country", "CountryModel");
+                // this._fetchCommonData("Currency", "CurrencyModel");
                 this._fetchCommonData("EmailContent", "CCMailModel", {
                     Type: "ContractActive"
                 });

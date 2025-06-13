@@ -67,11 +67,11 @@
 				<ComboBox value="{oEmpolyeeDetailsModel>/ManagerName}"
 				showSecondaryValues= "true"
 				id="OEF_id_Manager"
-				items="{EmployeeModel>/}"
+				items="{empModel>/}"
 				filterSecondaryValues="true"
 				change="validateCombo"
 				valueStateText="{i18n>combovalueState}">
-					<core:ListItem key="{EmployeeModel>EmployeeID}" text="{EmployeeModel>EmployeeName}" additionalText="{EmployeeModel>EmployeeID}"/>
+					<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}"/>
 				</ComboBox>
 			</f:content>
 		</f:SimpleForm>

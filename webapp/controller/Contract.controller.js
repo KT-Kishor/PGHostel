@@ -27,7 +27,7 @@ sap.ui.define(
                     try {
                         if(!this.getView().getModel("CreateCustomerModel")){
                             this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
-                            this._fetchCommonData("Currency", "CurrencyModel");
+                           // this._fetchCommonData("Currency", "CurrencyModel");
                             this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
                         }
                     this.readCallForContract("Initial");
