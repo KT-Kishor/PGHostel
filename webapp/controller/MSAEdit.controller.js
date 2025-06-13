@@ -19,11 +19,11 @@ sap.ui.define([
                 if (!LoginFUnction) return;
                 this.getBusyDialog();
                 this.scrollToSection("MsaE_id_ObjectPageLayout", "MsaE_id_SowDetailsSection");
-                if (!this.getView().getModel("ContractpaymentModel")) this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
-                if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
+                // if (!this.getView().getModel("ContractpaymentModel")) this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+                // if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                // if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
                 if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "MSA" });
-                if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
+                // if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
 
                 this.MSAID = oEvent.getParameter("arguments").sPath;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();

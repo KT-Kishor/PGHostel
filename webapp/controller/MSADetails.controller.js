@@ -17,9 +17,9 @@ sap.ui.define([
             _onRouteMatched: async function () {
                 var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
                 if (!LoginFUnction) return;
-                if (!this.getView().getModel("ContractpaymentModel")) this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
-                if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
+                // if (!this.getView().getModel("ContractpaymentModel")) this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+                // if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                // if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(false);
