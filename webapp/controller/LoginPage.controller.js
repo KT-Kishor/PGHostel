@@ -80,9 +80,7 @@ sap.ui.define(
         LP_onpresPassword(oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
-        // FSM_setUsername: function (oEvent) {
-        //   utils._LCvalidateName(oEvent);
-        // },
+       
         //for OTPsend
         LP_onOtppress: async function () {
           const oModel = this.getView().getModel("LoginViewModel");
@@ -311,9 +309,7 @@ sap.ui.define(
         LP_onTogglePasswordVisibility: function (oEvent) {
           this.SM_onTogglePasswordVisibility(oEvent)
         },
-        // FSM_username: function (oEvent) {
-        //   utils._LCvalidateName(oEvent);
-        // },
+        
         FSM_userID: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },

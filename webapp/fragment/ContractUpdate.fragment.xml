@@ -53,9 +53,9 @@
 												<!-- Binding the key and text of the Select control to the NameSalutation model -->
 												<core:Item key="{Salutation>text}" text="{Salutation>text}"/>
 												</m:Select>
-										<m:Input value="{oFilteredContractModel>/ConsultantName}" liveChange="CD_ValidateConsultantName" maxLength="50" id="CU_id_ConsultantName" valueStateText="{i18n>nameConsultantValueState}" editable="{simpleForm>/editable}"  />
+										<m:Input value="{oFilteredContractModel>/ConsultantName}" change="CD_ValidateConsultantName" maxLength="50" id="CU_id_ConsultantName" valueStateText="{i18n>nameConsultantValueState}" editable="{simpleForm>/editable}"  />
 										<m:Label text="{i18n>consultingService}" required="true"/>
-                                        <m:Input value="{oFilteredContractModel>/ConsultingService}" valueStateText="{i18n>placeConsultingService}" placeholder="{i18n>placeConsultingService}" id="CU_id_Role" change="onRole" liveChange="CD_ValidateConsultantName"  maxLength="50"  editable="{simpleForm>/editable}" />
+                                        <m:Input value="{oFilteredContractModel>/ConsultingService}" valueStateText="{i18n>placeConsultingService}" placeholder="{i18n>placeConsultingService}" id="CU_id_Role" change="CD_ValidateConsultantName"  maxLength="50"  editable="{simpleForm>/editable}" />
 										<!-- Consultant Email -->
 										<m:Label text="{i18n>consultantEmailID}" required="true"/>
 										<m:Input value="{oFilteredContractModel>/ContarctEmail}" liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}" id="CU_id_ContractEmailID" editable="{simpleForm>/editable}" maxLength="100" />
@@ -87,7 +87,7 @@
 												<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 												</m:Select>		
 										<!-- Client Report Contact Name -->
-										<m:Input value="{oFilteredContractModel>/ClientReportContact}" id="CU_id_ClientReportContact" editable="{simpleForm>/editable}" maxLength="50" liveChange="CD_validateName"  valueStateText="{i18n>commonNameValueState}"/>
+										<m:Input value="{oFilteredContractModel>/ClientReportContact}" id="CU_id_ClientReportContact" editable="{simpleForm>/editable}" maxLength="50" change="CD_validateName"  valueStateText="{i18n>commonNameValueState}"/>
 										<!-- Location where services are provided -->
 										<m:Label text="{i18n>locationswhereServices}" ></m:Label>
 										<m:Select selectedKey="{oFilteredContractModel>/LocationService}" id="CD_id_contractLocation" items="{WorkingMode>/location}" editable="{simpleForm>/editable}">

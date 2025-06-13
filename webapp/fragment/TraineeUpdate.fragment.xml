@@ -62,7 +62,7 @@
 												</m:Select>
 											</m:VBox>
 											<m:VBox width="75%">
-												<m:Input id="TU_id_Name" value="{oTraineeDetails>/TraineeName}" editable="{viewModel>/editable}" maxLength="50" liveChange="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>placeTraineeName}"/>
+												<m:Input id="TU_id_Name" value="{oTraineeDetails>/TraineeName}" editable="{viewModel>/editable}" maxLength="50" change="TD_validateName" class="sapUiTinyMarginBegin" valueStateText="{i18n>placeTraineeName}"/>
 											</m:VBox>
 										</m:HBox>
 										<m:Label text="{i18n>gender}" required="true"/>
