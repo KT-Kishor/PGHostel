@@ -28,15 +28,15 @@
 						   valueStateText="{i18n>companyNameValueState}" />
 
 					<Label text="{i18n>designation}" required="true" />
-					<ComboBox items="{path:'sDesignationModel>/'}"
+					<ComboBox items="{path:'DesignationModel>/'}"
 							  id="AddEmp_id_Desig"
 							  change="Emp_onDesignationChange"
 							  valueStateText="{i18n>designationValueState}"
 							  value="{employmentModel>/Designation}"
 							  showSecondaryValues="true"
 							  placeholder="{i18n>plaseDesignation}">
-						<core:Item key="{sDesignationModel>designationName}" 
-								   text="{sDesignationModel>designationName}" />
+						<core:Item key="{DesignationModel>designationName}" 
+								   text="{DesignationModel>designationName}" />
 					</ComboBox>
 
 					<Label text="{i18n>companyAddress}" required="true" />
