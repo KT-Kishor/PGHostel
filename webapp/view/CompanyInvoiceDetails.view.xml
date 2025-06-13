@@ -4,15 +4,15 @@
 	xmlns:m="sap.m"
 	xmlns="sap.uxap"
 	xmlns:f="sap.ui.layout.form">
-	<m:Page title="{i18n>invoiceDetails}"  showNavButton="true" navButtonPress="CID_onPressback" id="CID_id_MyPageId">
+	<m:Page title="{i18n>invoiceDetails}" showNavButton="true" navButtonPress="CID_onPressback" id="CID_id_MyPageId">
 		<!-- <m:ScrollContainer > -->
-		<ObjectPageLayout  id="CID_id_CmpInvObjectPageLayout"  useIconTabBar="false" class="sapUiSmallmarginResponsive" >
+		<ObjectPageLayout id="CID_id_CmpInvObjectPageLayout" useIconTabBar="false" class="sapUiSmallmarginResponsive">
 			<!-- Sections in the ObjectPage -->
 			<sections>
 				<!-- First section containing MSA details -->
-				<ObjectPageSection id="CID_id_CmpInvGoals" showTitle = "false" >
+				<ObjectPageSection id="CID_id_CmpInvGoals" showTitle = "false">
 					<subSections >
-						<ObjectPageSubSection id="CID_id_CmpInvGoalsSS1" title="{i18n>invoiceBasicDetails}" >
+						<ObjectPageSubSection id="CID_id_CmpInvGoalsSS1" title="{i18n>invoiceBasicDetails}">
 							<blocks>
 								<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 									<f:content>
@@ -112,7 +112,7 @@
 									<m:Table id="CID_id_TableInvoiceItem" items="{CompanyInvoiceItemModel>/CompanyInvoiceItem}" mode="Delete" delete="CID_onPressDelete">
 										<m:headerToolbar>
 											<m:Toolbar>
-											<m:Title text="{i18n>InvoiceItemDetails} ({= ${CompanyInvoiceItemModel>/CompanyInvoiceItem}.length })"></m:Title>
+												<m:Title text="{i18n>InvoiceItemDetails} ({= ${CompanyInvoiceItemModel>/CompanyInvoiceItem}.length })"></m:Title>
 												<m:ToolbarSpacer />
 												<m:Button type="Attention" text="{i18n>btnTransaction}" press="CID_onPressDisplayPaymentDetail" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
 												<m:Button visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Accept" press="CID_onPressAddInvoiceItems" />
@@ -139,7 +139,7 @@
 												<m:Text text="{i18n>rate}" />
 											</m:Column>
 											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
-												<m:Text text="{i18n>discount}"  />
+												<m:Text text="{i18n>discount}" />
 											</m:Column>
 											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
 												<m:Text text="{i18n>total}" />
@@ -232,7 +232,11 @@
 												<m:Text class="amountText" text="{path:'InvoicePayment>/AllReceivedAmount',formatter: '.Formatter.fromatNumber'}" textAlign="End" />
 											</m:HBox>
 											<!-- Received TDS -->
-											<m:HBox justifyContent="SpaceBetween" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }">
+											<m:HBox justifyContent="SpaceBetween" visible="{= 
+        (${SelectedCustomerModel>/Status} === 'Payment Received' || 
+         ${SelectedCustomerModel>/Status} === 'Payment Partially') &amp;&amp;
+         ${FilteredSOWModel>/Currency} === 'INR'
+    }">
 												<m:Label text="{i18n>invoiceReceivedIncomeTax} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{path:'InvoicePayment>/AllReceivedTDS',formatter: '.Formatter.fromatNumber'}" textAlign="End" />
 											</m:HBox>

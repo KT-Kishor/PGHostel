@@ -99,11 +99,11 @@
 							<Text text="{msaModelWizart>/Country}" />
 							<Label text="{i18n>city}"/>
 							<Text text="{msaModelWizart>/City}" />
-							
-							<Label text="{i18n>emailId}" />
+
+							<Label text="{i18n>emailId}" visible="{= !${msaModelWizart>/MsaEmail} ? false : true}" />
 							<Text text="{msaModelWizart>/MsaEmail}" />
-							<Label text="{i18n>GSTNO}" />
-							<Text text="{msaModelWizart>/GST}" />
+							<Label text="{i18n>GSTNO}" visible="{= !!${msaModelWizart>/GST} }"/>
+							<Text text="{msaModelWizart>/GST}" visible="{= !!${msaModelWizart>/GST} }"/>
 							<Label text="{i18n>msaRateCharge}" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/RateCharge} %" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="{i18n>paymentLabel}" visible="{VisibleModel>/Recruitment}"/>

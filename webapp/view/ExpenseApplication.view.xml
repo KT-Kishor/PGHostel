@@ -61,12 +61,16 @@
        alternateRowColors="true"
        growingScrollToLoad="true"
        width="auto"
+	   mode="SingleSelectLeft"
+	   selectionChange="onTableSelectionChange"
        busyIndicatorDelay="0">			 <headerToolbar>
                 <OverflowToolbar >
                     <Title id="title" text="Expense Details ({= ${ExpenseModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
+                    <ToolbarSpacer/>
 					<Button  type="Ghost" text="{i18n>download}" press="Exp_onPressExpenseDownload" />
+					<Button  type="Reject" enabled="false" id="Exp_id_DeleteBtn" text="{i18n>deleteExpense}" press="Exp_onPressDeleteExpense" />
                    <Button  type="Accept" text="{i18n>expAddBtn}" tooltip="{i18n>expenseAddTooltip}" press="Exp_onPressAddExpense" />
                 </OverflowToolbar>
             </headerToolbar>
@@ -92,9 +96,9 @@
 					<Column  minScreenWidth="Desktop" demandPopin="true">
 						<Label text="{i18n>expReimbursementAmountExp}"  tooltip="{i18n>expReimbursementAmount}"/>
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
+					<!-- <Column minScreenWidth="Desktop" demandPopin="true">
 						<Label text="" />
-					</Column>
+					</Column> -->
 				</columns>
 				<items>
 					<ColumnListItem type="Navigation" press="Exp_onCheckExpenseDetails">
@@ -106,7 +110,7 @@
 							<Text text="{ExpenseModel>Destination}" />
 							<Text text="INR {path:'ExpenseModel>TotalAmount', formatter: '.Formatter.fromatNumber'}" />
 							<Text text="INR {path:'ExpenseModel>ReimbursementAmount',formatter: '.Formatter.fromatNumber'}" />						
-							<Button icon="sap-icon://delete" visible="{= ${ExpenseModel>Status} === 'Draft' }" press="Exp_onPressDeleteExpense" />
+							<!-- <Button icon="sap-icon://delete" visible="{= ${ExpenseModel>Status} === 'Draft' }" press="Exp_onPressDeleteExpense" /> -->
 						</cells>
 					</ColumnListItem>
 				</items>
