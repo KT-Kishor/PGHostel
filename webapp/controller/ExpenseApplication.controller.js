@@ -59,6 +59,16 @@ sap.ui.define([
             }
         },
 
+        onTableSelectionChange: function (oEvent) {
+            var Status = oEvent.getSource().getSelectedItem().getBindingContext("ExpenseModel").getObject().Status;
+            this.DeleteExpID = oEvent.getSource().getSelectedItem().getBindingContext("ExpenseModel").getObject().ExpenseID;
+            if (Status === "Draft") {
+                this.byId("Exp_id_DeleteBtn").setEnabled(true);
+            }else{
+                this.byId("Exp_id_DeleteBtn").setEnabled(false);
+            }
+        },
+
         onChangeEmployeeID: async function () {
             var selectedItem = this.byId("Exp_id_EmployeeName").getSelectedItem();
             var EmployeeID = selectedItem
@@ -240,12 +250,13 @@ sap.ui.define([
                 this.i18nModel.getText("commonMesBoxConfirmDelete"),
                 async function () {
                     that.byId("exp_Id_ExpenseTable").setBusy(true);
-                    const expenseID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
+                    // const expenseID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
                     try {
-                        await that.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: expenseID } });
+                        await that.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: that.DeleteExpID } });
                         MessageToast.show(that.i18nModel.getText("expenseDeleteMess")); // <== use 'that' instead of 'this'
                         that.onChangeEmployeeID();
                         that.Exp_onSearch();
+                        that.byId("Exp_id_DeleteBtn").setEnabled(false);
                     } catch (error) {
                         MessageToast.show(error.responseText || "Error deleting expense");
                     } finally {

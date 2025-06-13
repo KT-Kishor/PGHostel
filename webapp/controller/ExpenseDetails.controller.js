@@ -196,6 +196,11 @@ sap.ui.define([
                 this.ViewModel.setProperty("/SubmitBtn", false);
                 this.ViewModel.setProperty("/SaveBtn", true);
                 this.openFragment();
+                if(this.SelectedData.ItemType === "Peridiem Declaration"){
+                    this.ViewModel.setProperty("/enable", false);
+                }else{
+                    this.ViewModel.setProperty("/enableDelete", true);
+                }
                 var jsonExpense = {
                     IndexNo: this.SelectedData.IndexNo,
                     ItemID: this.SelectedData.ItemID,
@@ -231,6 +236,7 @@ sap.ui.define([
                 sap.ui.getCore().byId("ExpDet_id_Comments").setValueState("None");
                 sap.ui.getCore().byId("ExpDet_id_ItemType").setValueState("None");
                 this.byId("exp_Id_ExpenseTable").removeSelections();
+                this.ViewModel.setProperty("/enable", true);
                 this.ExpenseItem.close();
             },
 
@@ -587,6 +593,7 @@ sap.ui.define([
                                 this.IndexNoIncreent();
                                 this.ExpenseTotalCalculation();
                                 this.ExpenseItem.close();
+                                this.ViewModel.setProperty("/enable", true);
                                 MessageToast.show(this.i18nModel.getText("expenseUpdateMess"));
                                 this.closeBusyDialog();
                             } else {
@@ -734,7 +741,7 @@ sap.ui.define([
                                 that.getBusyDialog();
                                 that.ajaxUpdateWithJQuery("Expense", inboxData).then((oData) => {
                                     if (oData) {
-                                        that._fetchCommonData("Expense", "FilteredExpenseModel", { ExpenseID: this.ExpenseID, });
+                                        that._fetchCommonData("Expense", "FilteredExpenseModel", { ExpenseID: that.ExpenseID, });
                                         that.ViewModel.setProperty("/status", false);
                                         that.byId("exp_Id_ExpenseTable").setMode(sap.m.ListMode.None);
                                         dialog.close();

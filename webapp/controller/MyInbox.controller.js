@@ -234,7 +234,7 @@ sap.ui.define([
     },
     MIF_liveChangeForMangerComments() {
       const input = sap.ui.getCore().byId("MIF_id_remark");
-      if (input.getValue()) {
+      if (!input.getValue()) {
         input.setValueStateText(this.getView().getModel('i18n').getResourceBundle().getText("commentsValueState"));
         input.setValueState("Error");
         return false;

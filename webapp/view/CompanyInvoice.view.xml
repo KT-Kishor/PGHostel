@@ -40,7 +40,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table mode="SingleSelectLeft" selectionChange="onSelectionChange" id="CI_id_InvoiceTable" items="{
+			<Table id="CI_id_InvoiceTable" items="{
                 path: 'CompanyInvoiceModel>/', sorter: {path: 'CustomerName',descending: false,group: true}}">
 				<headerToolbar>
 					<Toolbar>
