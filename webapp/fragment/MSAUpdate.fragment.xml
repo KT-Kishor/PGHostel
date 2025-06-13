@@ -9,7 +9,7 @@
 				<DatePicker displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="Msa_ChangeMsaDate" value="{path:'FilteredMsaModel>/0/CreateMSADate',formatter: '.Formatter.formatDate'}" valueStateText="{i18n>CreateMSADateVST}" id="MsaE_id_CreateMSADate"/>
 
 				<Label text="{i18n>companyName}" required="true"/>
-				<Input liveChange="Msa_LC_CompanyName" id="MsaE_id_CompanyName" maxLength="50" value="{FilteredMsaModel>/0/CompanyName}" valueStateText="{i18n>placeCompany}"/>
+				<Input liveChange="Msa_LC_CompanyName" editable="false" id="MsaE_id_CompanyName" maxLength="50" value="{FilteredMsaModel>/0/CompanyName}" valueStateText="{i18n>placeCompany}"/>
 				<Label text="{i18n>type}" required="true" />
 				<RadioButtonGroup editable="false" id="MsaE_id_Type" columns="5" valueState="Warning" select="onRadioButtonGroupSelect">
 					<RadioButton id="RB3-2" text="Service"/>
@@ -55,7 +55,7 @@
 				<Label text="{i18n>emailId}" required="true"/>
 				<TextArea liveChange="Msa_LC_EmailID" maxLength="500" id="MsaE_id_MSAEmail" valueStateText="{i18n>emailValueState}" value="{FilteredMsaModel>/0/MsaEmail}" />
 				<Label text="{i18n>GSTNO}"/>
-				<Input liveChange="Msa_LC_GSTNO" maxLength="20" id="MsaE_id_MSA_GSTNO" valueStateText="{i18n>gstNoValueState}" value="{FilteredMsaModel>/0/GST}" />
+				<Input liveChange="Msa_LC_GSTNO" maxLength="15" id="MsaE_id_MSA_GSTNO" valueStateText="{i18n>gstNoValueState}" value="{FilteredMsaModel>/0/GST}" />
 
 				<Label text="{i18n>msaRateCharge}" required="true" visible="{simpleForm>/Recruitment}"></Label>
 				<Input value="{FilteredMsaModel>/0/RateCharge}" visible="{simpleForm>/Recruitment}" maxLength="5" placeholder="Enter rate charge" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}"/>

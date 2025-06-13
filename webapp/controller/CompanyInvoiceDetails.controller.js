@@ -23,9 +23,9 @@ sap.ui.define([
                 var sArg = oEvent.getParameter("arguments").sPath;
                 if (!(await this.commonLoginFunction("CompanyInvoice"))) return;
                 this.scrollToSection("CID_id_CmpInvObjectPageLayout", "CID_id_CmpInvGoals");
-               // if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
+                // if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
                 if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "CompanyInvoice" });
-               // if (!this.getView().getModel("CompanyCodeDetailsModel")) this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
+                // if (!this.getView().getModel("CompanyCodeDetailsModel")) this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
                 this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status", "CID_id_CurrencySelect"]);
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -68,7 +68,7 @@ sap.ui.define([
                     Form: true, Table: false, MultiEmail: true, Edit: true, IncomeTax: true, minDate: LastInvoiceDate
                 }), "visiablityPlay");
 
-                var SowDataModel = new JSONModel({items : []});
+                var SowDataModel = new JSONModel({ items: [] });
                 this.getView().setModel(SowDataModel, "CombinedData");
                 this.visiablityPlay = oView.getModel("visiablityPlay");
                 this.visiablityPlay.setProperty("/Edit", false);
@@ -192,7 +192,7 @@ sap.ui.define([
                 this.SelectedCustomerModel.refresh(true)
                 await this.ajaxCreateWithJQuery("combineSowMsa", { MsaID: this.SelectKey }).then((oData) => {
                     if (oData.success) {
-                        this.getView().getModel("CombinedData").setProperty("/items", oData.combinedData);    
+                        this.getView().getModel("CombinedData").setProperty("/items", oData.combinedData);
                         this.closeBusyDialog();
                         this.onChangeInvoiceDate();
                     }
@@ -230,6 +230,7 @@ sap.ui.define([
                 if (oEvent) {
                     utils._LCvalidationComboBox(oEvent);
                 }
+                this.byId("CID_id_SowPO").setValueState("None");
                 const sSelectedKey = oEvent.getSource().getSelectedKey();
                 const oView = this.getView();
                 const oSelectedCustomerModel = oView.getModel("SelectedCustomerModel");
@@ -253,7 +254,7 @@ sap.ui.define([
                     const oData = await this.ajaxReadWithJQuery("SowDetails", { MsaID: msaID, SowID: sowID, Status: "Active" });
 
                     if (!oData.success) return;
-                    
+
                     const unitMultiplier = { Day: 20, Month: 1, Hour: 168, Bid: 1 };
                     let aFilteredSOWDetails = [];
                     this.itemIDCounter = 1;
@@ -300,7 +301,7 @@ sap.ui.define([
                     if (!oSelectedCustomerModel.getProperty("/GST")) {
                         this.visiablityPlay.setProperty("/GST", false);
                     }
-                    if(isINR && !oSelectedCustomerModel.getProperty("/GST")) {
+                    if (isINR && !oSelectedCustomerModel.getProperty("/GST")) {
                         oSelectedCustomerModel.setProperty("/Value", '9');
                         oSelectedCustomerModel.setProperty("/Type", 'CGST/SGST');
                         this.visiablityPlay.setProperty("/GST", true);
@@ -350,6 +351,30 @@ sap.ui.define([
                 // Add and update model
                 oData.push(newItem);
                 oItemModel.setProperty("/CompanyInvoiceItem", oData);
+            },
+
+            CI_On_ChangeRateType: function (oEvent) {
+                var data = oEvent.getSource().getSelectedItem().getBindingContext("CompanyInvoiceItemModel").getObject();
+
+                switch (data.UnitText) {
+                    case 'Per Day':
+                        data.Unit = 20;
+                        break;
+                    case 'Per Month':
+                        data.Unit = 1;
+                        break;
+                    case 'Per Hour':
+                        data.Unit = 168;
+                        break;
+                    case 'Fixed Bid':
+                        data.Unit = 1;
+                        break;
+                    default:
+                        data.Unit = 1;
+                }
+                // Optionally update the model (if using two-way binding or need manual update)
+                this.getView().getModel("CompanyInvoiceItemModel").refresh(true);
+                this.totalAmountCalculation();
             },
 
             totalAmountCalculation: function () {
@@ -1235,6 +1260,10 @@ sap.ui.define([
             Mail_onSendEmail: function () {
                 try {
                     var oModel = this.getView().getModel("UploaderData").getData();
+                    if (!oModel.attachments || oModel.attachments.length === 0) {
+                        MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
+                        return;
+                    }
                     var oPayload = {
                         "toEmailID": [oModel.ToEmail],
                         "toName": oModel.ToName,
@@ -1336,7 +1365,7 @@ sap.ui.define([
 
                 const detailsTable = [
                     { label: 'Invoice No. :', value: oModel.InvNo },
-                    {label: 'Date :',value: typeof(oModel.InvoiceDate) === 'string' ? oModel.InvoiceDate : Formatter.formatDate(oModel.InvoiceDate)},
+                    { label: 'Date :', value: typeof (oModel.InvoiceDate) === 'string' ? oModel.InvoiceDate : Formatter.formatDate(oModel.InvoiceDate) },
                     { label: 'PO/SOW :', value: oModel.POSOW.toString() },
                 ];
 
@@ -1414,7 +1443,7 @@ sap.ui.define([
                     },
                 });
 
-                currentY = doc.lastAutoTable.finalY ;
+                currentY = doc.lastAutoTable.finalY;
                 checkPageSpace(50);
 
                 const summaryBody = [];
@@ -1446,13 +1475,13 @@ sap.ui.define([
                     if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && (oModel.CGST > 0)) {
                         summaryBody.push([`CGST ${cgstPercentage} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
                         summaryBody.push([`SGST ${sgstPercentage} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-                    } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST")  && (oModel.IGST > 0)) {
+                    } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST") && (oModel.IGST > 0)) {
                         summaryBody.push([`IGST ${igstPercentage} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                     }
                 }
 
                 if (data.RoundOf) {
-                    summaryBody.push([`Round Off (${data.Currency}) :`,(data.RoundOf)]);
+                    summaryBody.push([`Round Off (${data.Currency}) :`, (data.RoundOf)]);
                 }
 
                 const totalRowIndex = summaryBody.length;

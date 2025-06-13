@@ -185,6 +185,13 @@ sap.ui.define([
             }
         },
 
+        GSTChecking:function(aValue){
+            if(aValue) {
+                return true;
+            }
+            return false;
+        },
+
         fromatNumber: function (avalue) {
             if (avalue === "0" || avalue === 0) {
                 return "0.00";
