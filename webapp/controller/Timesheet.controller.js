@@ -1,6 +1,14 @@
-sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/MessageToast", "sap/ui/unified/CalendarLegend",
-    "sap/ui/unified/CalendarLegendItem", "sap/ui/unified/DateTypeRange", "sap/ui/unified/CalendarDayType", "sap/ui/core/BusyIndicator", "sap/m/MessageBox"],
-    function (BaseController, JSONModel, MessageToast, CalendarLegend, CalendarLegendItem, DateTypeRange, CalendarDayType, BusyIndicator, MessageBox) {
+sap.ui.define(["./BaseController",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageToast",
+    "sap/ui/unified/CalendarLegend",
+    "sap/ui/unified/CalendarLegendItem",
+    "sap/ui/unified/DateTypeRange",
+    "sap/ui/unified/CalendarDayType",
+    "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
+    "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
+],
+    function (BaseController, JSONModel, MessageToast, CalendarLegend, CalendarLegendItem, DateTypeRange, CalendarDayType,Timeline,TimelineItem) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Timesheet", {
             onInit: function () {
@@ -110,7 +118,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                 var that = this;
                 var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
                 if (!oSelectedItems.length) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("selctRowtoDelete"));
+                    MessageToast.show(this.i18nModel.getText("selctRowtoDelete"));
                     return;
                 }
                 var aIdsToDelete = oSelectedItems.map(item => item.getBindingContext("FilteredTimesheetModel").getProperty("SrNo"));
@@ -122,12 +130,12 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                         that.ajaxDeleteWithJQuery("/Timesheet", {
                             filters: { SrNo: aIdsToDelete } // Send array of IDs
                         }).then(() => {
-                            sap.m.MessageToast.show(that.i18nModel.getText("DeletSuucess"));
+                            MessageToast.show(that.i18nModel.getText("DeletSuucess"));
                             that._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: that.EmployeeID });
                             that.closeBusyDialog();
                         }).catch((error) => {
                             that.closeBusyDialog();
-                            sap.m.MessageToast.show(error.responseText);
+                            MessageToast.show(error.responseText);
                         });
                     },
                     function () { // On Cancel
@@ -140,7 +148,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                 var that = this;
                 var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
                 if (!oSelectedItems.length) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("selctRowtoSubmit"));
+                    MessageToast.show(this.i18nModel.getText("selctRowtoSubmit"));
                     return;
                 }
                 // Build array of update objects as required by backend
@@ -159,13 +167,13 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                         that.getBusyDialog();
                         that.ajaxUpdateWithJQuery("/Timesheet", aPayload)
                             .then(() => {
-                                sap.m.MessageToast.show(that.i18nModel.getText("SubmitSuucess"));
+                                MessageToast.show(that.i18nModel.getText("SubmitSuucess"));
                                 that._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: that.EmployeeID });
                                 that.closeBusyDialog();
                             })
                             .catch((error) => {
                                 that.closeBusyDialog();
-                                sap.m.MessageToast.show(error.responseText);
+                                MessageToast.show(error.responseText);
                             });
                     },
                     function () { // On Cancel
@@ -195,6 +203,47 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/m/Message
                 });
                 this.getView().getModel("viewModel").setProperty("/canSubmit", allSaved);
                 this.getView().getModel("viewModel").setProperty("/canDelete", !anySubmitted);
-            }
+            },
+
+            TS_onShowComments: function (oEvent) {
+                var oContext = oEvent.getSource().getBindingContext("FilteredTimesheetModel");
+                var oData = oContext.getObject();
+                var aComments = oData.comments || [];
+                var aTimelineItems = aComments.map(function (oComment) {
+                    return new TimelineItem({
+                        dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
+                        title: oComment.CommentedBy || "Anonymous",
+                        text: oComment.Comment || "No comment provided",
+                        userNameClickable: false,
+                        icon: "sap-icon://comment"
+                    });
+                });
+                var oTimeline = new Timeline({
+                    showHeader: false,
+                    enableBusyIndicator: false,
+                    width: "100%",
+                    sortOldestFirst: true,
+                    enableDoubleSided: false,
+                    content: aTimelineItems,
+                    showHeaderBar: false
+                });
+                var oDialog = new sap.m.Dialog({
+                    title: this.i18nModel.getText("tCommentsTitle"),
+                    contentWidth: "25rem",
+                    contentHeight: "15rem",
+                    draggable: true,
+                    resizable: true,
+                    content: [oTimeline],
+                    endButton: new sap.m.Button({
+                        text: this.i18nModel.getText("close"),
+                        type: "Reject",
+                        press: function () {
+                            oDialog.close();
+                            oDialog.destroy();
+                        }
+                    })
+                });
+                oDialog.open();
+            },
         });
     });

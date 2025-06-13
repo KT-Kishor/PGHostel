@@ -50,7 +50,7 @@
                 mode="MultiSelect"
                 selectionChange="T_TableSelectionChange"
                 alternateRowColors="true"
-                items="{FilteredTimesheetModel>/}"
+                items="{path: 'FilteredTimesheetModel>/', sorter: {path: 'Status',descending: false,group: true}}" 
                 growingThreshold="50">
             
                 <headerToolbar>
@@ -68,8 +68,7 @@
                   <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>hoursWorked}" /></Column>
                   <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>manager}" /></Column>
                   <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>status}" /></Column>
-                  <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>employeeComment}" /></Column>
-                  <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>managerComment}" /></Column>
+                  <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>comments}" /></Column>
                 </columns>
               
                 <items>
@@ -80,11 +79,10 @@
                         <Text text="{FilteredTimesheetModel>Day}" />
                         <Text text="{FilteredTimesheetModel>HoursWorked}" />
                         <Text text="{EmployeeModel>/0/ManagerName}" />
-                        <!-- <Text text="{FilteredTimesheetModel>Status}" /> -->
-                            <ObjectStatus text="{FilteredTimesheetModel>Status}" inverted="true"
+                            <ObjectStatus text="{FilteredTimesheetModel>Status}" inverted="false"
                                 state="{path:'FilteredTimesheetModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
-                        <Text text="{FilteredTimesheetModel>EmployeeComments}" />
-                        <Text text="{FilteredTimesheetModel>ManagerComments}" />
+                        <Button icon="sap-icon://display-more" text="{i18n>View}" press="TS_onShowComments" />
+
                       </cells>
                     </ColumnListItem>
                   </items>
