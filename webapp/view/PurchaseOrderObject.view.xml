@@ -195,6 +195,16 @@
                                                 additionalText="{ManageCustomerModel>name}"
                                             />
                                         </m:ComboBox>
+
+                                         <m:Label
+                                            text="Customer Name"
+                                            class="oSowFragLabel"
+                                        />
+                                        <m:Input
+                                            id="FPO_id_CustName"
+                                            value="{PurchaseOrderModel>/CustomerHeadName}"
+                                            editable="false"
+                                        />
                                         <m:Label
                                             text="Mobile No"
                                             class="oSowFragLabel"
@@ -249,6 +259,16 @@
                                             value="{PurchaseOrderModel>/Tax}"
                                             editable="false"
                                         />
+                                         <m:Label
+                                            text="PAN No"
+                                            class="oSowFragLabel"
+                                        />
+                                        <m:Input
+                                            value="{PurchaseOrderModel>/PAN}"
+                                            id="FPO_id_PanNo"
+                                            maxLength="15"
+                                            editable="false"
+                                        />
                                         <m:Label
                                             text="Address"
                                             class="oSowFragLabel"
@@ -257,16 +277,6 @@
                                             id="FPO_id_Address"
                                             value="{PurchaseOrderModel>/Address}"
                                             maxLength="250"
-                                            editable="false"
-                                        />
-                                        <m:Label
-                                            text="PAN No"
-                                            class="oSowFragLabel"
-                                        />
-                                        <m:Input
-                                            value="{PurchaseOrderModel>/PAN}"
-                                            id="FPO_id_PanNo"
-                                            maxLength="15"
                                             editable="false"
                                         />
                                         <m:Label
@@ -300,6 +310,25 @@
                                                 text="Service"
                                             />
                                         </m:Select>
+
+                                         <m:Label
+                                            text="Paymant Terms"
+                                            class="oSowFragLabel"
+                                            required="true"
+                                        />
+                                        <m:Select
+                                            id="PO_id_PaymantTerms"
+                                            selectedKey="{PurchaseOrderModel>/PaymentTerms}"
+                                            width="100%"
+                                            items="{ContractpaymentModel>/}"
+                                        
+                                        >
+                                            <c:Item
+                                                key="{ContractpaymentModel>days}"
+                                                text="{ContractpaymentModel>days}"
+                                            />
+                                        </m:Select>
+
                                         <m:Label
                                             text="Start Date"
                                             class="oSowFragLabel"
@@ -345,16 +374,29 @@
                                             required="true"
                                         />
                                         <m:Select
+                                            id="FPO_id_Currency"
                                             selectedKey="{PurchaseOrderModel>/Currency}"
-                                            width="100%"
-                                            editable="{PurchaseOrderModel>/Editable}"
                                             items="{CurrencyModel>/}"
+                                            width="100%"
                                         >
                                             <c:Item
                                                 key="{CurrencyModel>currency}"
                                                 text="{CurrencyModel>currency}"
                                             />
                                         </m:Select>
+                                         <m:Label
+                                            text="Description"
+                                            class="oSowFragLabel"
+                                            required="true"
+                                        />
+                                        <m:TextArea
+                                            id="FPO_id_CustDescription"
+                                            placeholder="Enter Description"
+                                            valueStateText="Enter Description"
+                                            liveChange="POO_onCustDescriptionLiveChange"
+                                            value="{PurchaseOrderModel>/CustDescription}"
+                                            maxLength="300"
+                                        />
                                     </f:content>
                                 </f:SimpleForm>
                             </blocks>
@@ -414,10 +456,10 @@
                                             <m:ColumnListItem>
                                                 <m:cells>
                                                     <m:Input
-                                                        editable="{PurchaseOrderModel>/Editable}"
                                                         value="{PurchaseOrderModel>SerialNo}"
                                                         maxLength="10"
                                                         width="100%"
+                                                        editable="false"
                                                     />
 
                                                     <m:Input
@@ -468,7 +510,7 @@
                                                     </m:Select>
                                                     <m:Input
                                                         id="PO_id_TotalAmount"
-                                                        value="{PurchaseOrderModel>/TotalAmount}"
+                                                        value="{PurchaseOrderModel>TotalAmount}"
                                                         width="100%"
                                                         editable="false"
                                                     />
@@ -480,35 +522,38 @@
                                         <m:HBox
                                             justifyContent="End"
                                             alignItems="Center"
+
                                         >
                                             <m:Label
                                                 text="Sub Total :"
-                                                class="boldBlackText sapUiLargeMarginEnd"
+                                                class="boldBlackText sapUiLargeMarginEnd sapUiTinyMarginBottom"
                                                 wrapping="false"
                                             />
                                             <m:Text
-                                                text="{PurchaseOrderModel>/SubTotal}"
-                                                class="sapUiSmallMarginBegin "
+                                                text="{
+                                                path:'PurchaseOrderModel>/SubTotal',
+                                                formatter: '.Formatter.formatCurrency'}"
+                                                class="sapUiSmallMarginBegin sapUiTinyMarginBottom"
                                                 wrapping="false"
                                             />
                                         </m:HBox>
                                         <m:HBox
                                             justifyContent="End"
                                             alignItems="Center"
-
                                         >
                                             <m:Label
                                                 visible="{= ${PurchaseOrderModel>/GSTType} === 'IGST' }"
                                                 text="IGST ({PurchaseOrderModel>/Tax}%) :"
-                                                class="boldBlackText sapUiLargeMarginEnd"
+                                                class="boldBlackText sapUiLargeMarginEnd sapUiTinyMarginBottom"
                                                 wrapping="false"
                                                 
                                             />
                                             <m:Text
-                                                id="POO_idIGSTText"
-                                             
-                                               text="{PurchaseOrderModel>/IGST}"
-                                                class="sapUiSmallMarginBegin"
+                                              id="POO_idIGSTText"
+                                               text="{
+                                               path:'PurchaseOrderModel>/IGST',
+                                                formatter: '.Formatter.formatCurrency'}"
+                                                class="sapUiSmallMarginBegin sapUiTinyMarginBottom"
                                                 wrapping="false"
                                                 visible="{= ${PurchaseOrderModel>/GSTType} === 'IGST' }"  
                                                                                         
@@ -523,14 +568,16 @@
                                                 visible="{= ${PurchaseOrderModel>/GSTType} === 'CGST/SGST' }"  
 
                                                 text="CGST ({PurchaseOrderModel>/Tax}%) :"
-                                                class="boldBlackText sapUiLargeMarginEnd"
+                                                class="boldBlackText sapUiLargeMarginEnd sapUiTinyMarginBottom"
                                                 wrapping="false"
                                             />
                                             <m:Text
                                                 visible="{= ${PurchaseOrderModel>/GSTType} === 'CGST/SGST' }"  
 
-                                                text="{PurchaseOrderModel>/CGST}"
-                                                class="sapUiSmallMarginBegin"
+                                                text="{
+                                                path:'PurchaseOrderModel>/CGST',
+                                                 formatter: '.Formatter.formatCurrency'}"
+                                                class="sapUiSmallMarginBegin sapUiTinyMarginBottom"
                                                 wrapping="false"
                                             />
                                         </m:HBox>
@@ -543,14 +590,16 @@
                                                 visible="{= ${PurchaseOrderModel>/GSTType} === 'CGST/SGST' }"  
 
                                                 text="SGST ({PurchaseOrderModel>/Tax}%) :"
-                                                class="boldBlackText sapUiLargeMarginEnd"
+                                                class="boldBlackText sapUiLargeMarginEnd sapUiTinyMarginBottom"
                                                 wrapping="false"
                                             />
                                             <m:Text
                                                 visible="{= ${PurchaseOrderModel>/GSTType} === 'CGST/SGST' }"  
 
-                                                text="{PurchaseOrderModel>/SGST}"
-                                                class="sapUiSmallMarginBegin"
+                                                text="{
+                                                path:'PurchaseOrderModel>/SGST',
+                                                 formatter: '.Formatter.formatCurrency'}"
+                                                class="sapUiSmallMarginBegin sapUiTinyMarginBottom"
                                                 wrapping="false"
                                             />
                                         </m:HBox>
@@ -561,11 +610,13 @@
                                         >
                                             <m:Label
                                                 text="Total :"
-                                                class="boldBlackText sapUiLargeMarginEnd"
+                                                class="boldBlackText sapUiLargeMarginEnd  sapUiTinyMarginBottom"
                                                 wrapping="false"
                                             />
                                             <m:Text
-                                                text="{PurchaseOrderModel>/GrantTotal}"
+                                                text="{
+                                                path:'PurchaseOrderModel>/GrantTotal',
+                                                 formatter: '.Formatter.formatCurrency'}"
                                                 class="sapUiSmallMarginBegin"
                                                 wrapping="false"
                                             />

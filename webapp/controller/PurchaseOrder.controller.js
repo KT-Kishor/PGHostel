@@ -287,7 +287,7 @@ sap.ui.define([
                     console.error(e);
             }
         },
-        PO_ReadCall: async function () {
+          PO_ReadCall: async function () {
             this.getBusyDialog()
             await this.ajaxReadWithJQuery("PurchaseOrder").then((oData) => {
                 var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -351,7 +351,7 @@ sap.ui.define([
             this.ajaxReadWithJQuery("PurchaseOrder", filters).then((oData) => {
                 var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 this.getOwnerComponent().setModel(new JSONModel(PoData), "POModel");
-                      this.closeBusyDialog()
+                 this.closeBusyDialog()
             });
         },
         PO_onPressClear: function () {

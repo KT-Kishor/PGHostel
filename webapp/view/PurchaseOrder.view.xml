@@ -30,8 +30,8 @@
         >
             <fb:filterGroupItems>
                 <fb:FilterGroupItem
-                    name="Customer Name"
-                    label="Customer Name"
+                    name="Company Name"
+                    label="Company Name"
                     groupName="Group"
                     visibleInFilterBar="true"
                 >
@@ -43,8 +43,8 @@
 
                                >
                   <core:Item
-                   key="{ManageCustomerModel>name}"
-                   text="{ManageCustomerModel>name}"
+                   key="{ManageCustomerModel>companyName}"
+                   text="{ManageCustomerModel>companyName}"
                   />         
            </ComboBox>
                     </fb:control>
@@ -95,9 +95,15 @@
 
         </fb:FilterBar>
     <Table
-    id="PO_id_Table" 
+    id="idPOTable" 
     mode="SingleSelectLeft"
-    items="{POModel>/}">
+    items="{
+        path: 'POModel>/',
+        sorter: {
+            path: 'PoNumber',
+            descending: true
+        }
+    }">
         <headerToolbar>
             <Toolbar>
                 <Title text="Purchase Order List ({=${POModel>/}.length})" />
@@ -121,8 +127,8 @@
                 tooltip="{i18n>ponumber}"/>
             </Column>
             <Column>
-                <Text text="{i18n>companyname}" 
-                tooltip="{i18n>companyname}"/>
+                <Text text="{i18n>companyName}" 
+                tooltip="{i18n>companyName}"/>
             </Column>
             <Column>
                 <Text text="{i18n>customerAddress}" 
