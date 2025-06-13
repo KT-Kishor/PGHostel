@@ -24,20 +24,13 @@ sap.ui.define([
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
-                await this._fetchCommonData("BaseLocation", "BaseLocationModel"); //base location get call
                 let oModel = this.getView().getModel("BaseLocationModel");
                 let aData = oModel.getData();
                 // Sort by city name
                 aData.sort((a, b) => a.city.localeCompare(b.city));
-
                 // Update the model with sorted data
                 oModel.setData(aData);
-                 
-                    if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel"); // currency get call
-                    if (!this.getView().getModel("RoleModel")) this._fetchCommonData("AppVisibility", "RoleModel") // role get call
-                    if (!this.getView().getModel("DesignationModel")) this._fetchCommonData("Designation", "DesignationModel");//designation get call
-                    if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
-                    if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "EmployeeOffer" }); //CC mail id get call
+                this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag", { Type: "EmployeeOffer" }); //CC mail id get call
                 
                 var jsonData = {
                     "Salutation": "Mr.",
@@ -95,6 +88,7 @@ sap.ui.define([
                     this.getView().byId("EODF_id_ObjectPageLayoutEmp").setSelectedSection(oBasicDetailsSection);
                     this.readCallForEmployeeOffer(this.sArgPara);
                 }
+                this.closeBusyDialog();
                 this.getView().byId("EOD_id_PageCrate").setVisible(createPage); // create page visibility
                 this.getView().byId("EODF_id_PageUpdate").setVisible(updatePage); // update page visibilty
                 this.getView().byId("EOD_id_Submit").setEnabled(false);

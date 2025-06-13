@@ -23,22 +23,9 @@ sap.ui.define([
                 var LoginFunction = await this.commonLoginFunction("EmployeeOffer");
                 if (!LoginFunction) return;
                 this.getBusyDialog();
-                this._fetchCommonData("Designation", "DesignationModel"); // common designation read call
-                this._fetchCommonData("AppVisibility", "RoleModel"); // common role get call
-                var oRoleModel = this.getView().getModel("RoleModel");
-                if (oRoleModel) {
-                    var aRoles = oRoleModel.getData();
-                    aRoles.unshift({
-                        Role: ""
-                    });
-                    oRoleModel.setData(aRoles);
-                }
-                this._fetchCommonData("EmployeeDetailsData", "EmployeeModel"); // employee read get call
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
                 this.byId("EO_id_RejectBtn").setEnabled(false);
-                this._fetchCommonData("BaseLocation", "BaseLocationModel"); // base location read call
-                this._fetchCommonData("Country", "CountryModel");
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 this.Filter = true;
@@ -50,6 +37,14 @@ sap.ui.define([
                     this.EO_onSearch();
                 }
                 this._makeDatePickersReadOnly(["EO_id_JoiningDate"]);
+                var oRoleModel = this.getView().getModel("RoleModel");
+                if (oRoleModel) {
+                    var aRoles = oRoleModel.getData();
+                   if (!aRoles.length || aRoles[0].Role !== "") {
+                        aRoles.unshift({ Role: "" });
+                        oRoleModel.setData(aRoles);
+                    }
+                }  
             },
             // Read call for employee offer data
             readCallForEmployeeOffer: async function (filter) {
@@ -85,6 +80,7 @@ sap.ui.define([
             },
             //Navigation function
             EO_onPressEmployee: function (oEvent) {
+                this.closeBusyDialog();
                 var oParValue, value;
                 if (oEvent.getSource().getId().lastIndexOf("EO_id_AddEOffBut") !== -1) {
                     oParValue = "CreateOfferFlag"

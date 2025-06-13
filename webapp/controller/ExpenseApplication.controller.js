@@ -19,8 +19,8 @@ sap.ui.define([
             try {
                 this.LoginModel = this.getView().getModel("LoginModel");
 
-                if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
+               // if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
+               // if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
                 if (!this.getView().getModel("ExpenseTypeModel")) this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
                 if (!this.getView().getModel("ManagerModel")) this._fetchCommonData("ManagerFunction", "ManagerModel", { ManagerID: this.LoginModel.getProperty("/EmployeeID") });
 
