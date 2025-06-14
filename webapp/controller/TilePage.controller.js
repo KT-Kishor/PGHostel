@@ -312,7 +312,10 @@ sap.ui.define(
           this.getRouter().navTo("RouteManageAssignment");
         },
         TileV_onpresstimesheet: function () {
-          this.getRouter().navTo("RouteTimesheet");
+          this.getRouter().navTo("RouteTimesheet", {
+            EmployeeID: "X",
+            managerView: true,
+          });
         },
         TileV_onPressTimesheetApp: function () {
           this.getRouter().navTo("RouteTimesheetApproval");
@@ -363,7 +366,7 @@ sap.ui.define(
           this.getRouter().navTo("MyAsset");
 
         },
-         TileV_onpressPoApp:function(){
+        TileV_onpressPoApp:function(){
           this.getRouter().navTo("PurchaseOrder");
         }
         

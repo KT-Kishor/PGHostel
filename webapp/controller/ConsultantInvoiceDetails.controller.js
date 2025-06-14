@@ -1382,7 +1382,7 @@ sap.ui.define(
             CI_onSendEmail: function() {
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
-                    ToEmail: "",
+                    ToEmail: this.getView().getModel("CCMailModel").getData()[0].ToEmailID,
                     CCEmail: this.getView().getModel("CCMailModel").getData()[0].CCEmailId,
                     name: "",
                     mimeType: "",

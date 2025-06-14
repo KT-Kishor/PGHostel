@@ -277,8 +277,8 @@
                                             id="SS_id_lbase"
                                         />
 
-                                         <m:ComboBox items="{sBaseLocationModel>/}"  showSecondaryValues="true" value="{sEmployeeModel>/0/BaseLocation}" change="SS_onBaseLocationChange" id="SS_id_BaseL" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectBase}">
-						                       <core:ListItem key="{sBaseLocationModel>city}" text="{sBaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+                                         <m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{sEmployeeModel>/0/BaseLocation}" change="SS_onBaseLocationChange" id="SS_id_BaseL" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectBase}">
+						                       <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 				                        </m:ComboBox>
 									
 										<m:Label text="{i18n>branchCode}" />
@@ -292,16 +292,16 @@
                                             id="SS_id_lds"
                                         />
 										<m:Select
-                                            items="{sDesignationModel>/}"
+                                            items="{DesignationModel>/}"
                                             id="SS_id_Desi"
                                             showSecondaryValues="true"
                                             selectedKey="{sEmployeeModel>/0/Designation}"
                                             editable="{viewModel>/AdminRole}"
                                         >
 											<core:ListItem
-                                                key="{sDesignationModel>designationName}"
-                                                text="{sDesignationModel>designationName}"
-                                                additionalText="{sDesignationModel>department}"
+                                                key="{DesignationModel>designationName}"
+                                                text="{DesignationModel>designationName}"
+                                                additionalText="{DesignationModel>department}"
                                             />
 										</m:Select>
 										<m:Label
@@ -314,15 +314,15 @@
                                             showSecondaryValues="true"
                                             id="SS_id_Manager"
                                             editable="{viewModel>/AdminRole}"
-                                            items="{EmployeeModel>/}"
+                                            items="{empModel>/}"
                                             filterSecondaryValues="true"
                                             change="onManagerChange"
                                             valueStateText="{i18n>selectManager}"
                                         >
 											<core:ListItem
-                                                key="{EmployeeModel>EmployeeID}"
-                                                text="{EmployeeModel>EmployeeName}"
-                                                additionalText="{EmployeeModel>EmployeeID}"
+                                                key="{empModel>EmployeeID}"
+                                                text="{empModel>EmployeeName}"
+                                                additionalText="{empModel>EmployeeID}"
                                             />
 										</m:ComboBox>
 										<m:Label

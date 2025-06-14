@@ -170,7 +170,7 @@
 															<m:Input value="{CompanyInvoiceItemModel>Unit}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="20" valueStateText="{i18n>UnitValueText}" />
 														</m:VBox>
 														<m:VBox width="49%">
-															<m:ComboBox items="{RateType>/}" selectedKey="Per Day" value="{CompanyInvoiceItemModel>UnitText}" editable="{visiablityPlay>/editable}" width="100%">
+															<m:ComboBox items="{RateType>/}" selectedKey="Per Day" value="{CompanyInvoiceItemModel>UnitText}" change="CI_On_ChangeRateType" editable="{visiablityPlay>/editable}" width="100%">
 																<core:Item key="{RateType>ID}" text="{RateType>RateType}" />
 															</m:ComboBox>
 															<!-- <m:Input value="{CompanyInvoiceItemModel>UnitText}" editable="{visiablityPlay>/editable}" maxLength="20" /> -->

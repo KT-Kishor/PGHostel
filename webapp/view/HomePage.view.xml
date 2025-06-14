@@ -38,7 +38,7 @@
 			<NavContainer id="pageContainer">
 				<pages>
 					<ScrollContainer id="idHome" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background sapUiTinyMargin">
-						<l:Grid defaultSpan="XL12 L12 M12 S12" width="100%" class="position-welcome">
+											<l:Grid defaultSpan="XL12 L12 M12 S12" width="100%" class="position-welcome">
 							<VBox class="sapUiLargeMarginTop">
 								<Text class="custom-welcome sapUiTinyMarginTopBottom" textAlign="Center" text="{i18n>welcometoKT}"/>
 								<Text class="custom-welcome sapUiTinyMarginTopBottom" text="{i18n>companynameKT}"/>
@@ -47,6 +47,8 @@
 							</VBox>
 						</l:Grid>
 					</ScrollContainer>
+
+
 					<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Aboutus" type="XML"/>
 					</ScrollContainer>

@@ -58,7 +58,7 @@
 											<core:Item key="{Salutation>text}" text="{Salutation>text}" />
 										</m:Select>
 										<m:Label text="{i18n>employeeName}" required="true" />
-										<m:Input id="EOUF_id_Name" value="{employeeModel>/ConsultantName}" editable="{viewModel>/editable}" maxLength="50" liveChange="EOD_validateName" valueStateText="{i18n>placeEmpName}" placeholder="{i18n>placeEmpName}"/>
+										<m:Input id="EOUF_id_Name" value="{employeeModel>/ConsultantName}" editable="{viewModel>/editable}" maxLength="50" liveChange="OD_validateName" valueStateText="{i18n>placeEmpName}" placeholder="{i18n>placeEmpName}"/>
 										<m:Label text="{i18n>gender}" required="true" />
 										<m:Select items="{GenderModel>/}" id="EOU_id_Gender" selectedKey="{employeeModel>/Gender}" enabled="false"  editable="{viewModel>/editable}" >
 											<core:Item key="{GenderModel>Value}" text="{GenderModel>Value}" />

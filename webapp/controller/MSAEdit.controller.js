@@ -128,7 +128,7 @@ sap.ui.define([
             },
             Msa_LC_GSTNO: function (oEvent) {
                 this.GST = utils._LCvalidateGstNumber(oEvent);
-                if(oEvent.getSource().getValue() === ""){
+                if (oEvent.getSource().getValue() === "") {
                     this.GST = true;
                     sap.ui.getCore().byId("MsaE_id_MSA_GSTNO").setValueState("None");
                 }
@@ -227,14 +227,14 @@ sap.ui.define([
                         this.getView().addDependent(this.MSA_oDialog);
                         this.MSA_oDialog.open();
                         type !== "Recruitment"
-                            ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
-                            : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0);
+                            ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0)
+                            : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1);
                     }.bind(this));
                 } else {
                     this.MSA_oDialog.open();
                     type !== "Recruitment"
-                        ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
-                        : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0);
+                        ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0)
+                        : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
                 }
             },
 
@@ -469,6 +469,7 @@ sap.ui.define([
                     Currency: "INR"
                 };
                 this.getView().getModel("sowCreateModel").setData(jsonSow);
+                sap.ui.getCore().byId("SOW_id_oTableCreateSow").setMode("None");
             },
 
             onPressChangeSow: function (oEvent) {
@@ -838,9 +839,19 @@ sap.ui.define([
             Mail_onEmailChange: function () {
                 this.validateSendButton();
             },
+
+            // onCommonTokenDelete:function(){
+            //     this.getView().getModel("UploaderData").setProperty("/attachments",[]);
+            // },
             //Send mail
             Mail_onSendEmail: function () {
                 try {
+                    var aAttachments = this.getView().getModel("UploaderData").getProperty("/attachments");
+
+                    if (!aAttachments || aAttachments.length === 0) {
+                        MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
+                        return;
+                    }
                     var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
 
                     var oPayload = {

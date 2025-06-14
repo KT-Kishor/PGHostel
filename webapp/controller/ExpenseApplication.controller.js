@@ -243,13 +243,13 @@ sap.ui.define([
 
         // Delete the Expenase and Expense Item
         Exp_onPressDeleteExpense: async function (oEvent) {
-            this.byId("exp_Id_ExpenseTable").setBusy(true);
+            // this.byId("exp_Id_ExpenseTable").setBusy(true);
             var that = this;
             this.showConfirmationDialog(
                 this.i18nModel.getText("msgBoxConfirm"),
                 this.i18nModel.getText("commonMesBoxConfirmDelete"),
                 async function () {
-                    that.byId("exp_Id_ExpenseTable").setBusy(true);
+                   this.getBusyDialog();
                     // const expenseID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
                     try {
                         await that.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: that.DeleteExpID } });
@@ -260,10 +260,11 @@ sap.ui.define([
                     } catch (error) {
                         MessageToast.show(error.responseText || "Error deleting expense");
                     } finally {
-                        that.byId("exp_Id_ExpenseTable").setBusy(false);
+                        this.closeBusyDialog();
+                        // that.byId("exp_Id_ExpenseTable").setBusy(false);
                     }
                 },
-                function () { that.byId("exp_Id_ExpenseTable").setBusy(false); })
+                function () {  })
         },
         //Filter Function
         Exp_onSearch: async function () {

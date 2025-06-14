@@ -21,13 +21,13 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     const oView = this.getView();
                     this.i18nModel = oView.getModel("i18n").getResourceBundle();
                     this.companyName = "Kalpavriksha Technologies";
-                    if (!oView.getModel("sDesignationModel")) {
-                        this._fetchCommonData("Designation", "sDesignationModel");
-                        this._fetchCommonData("BaseLocation", "sBaseLocationModel");
-                        this._fetchCommonData("EmployeeDetailsData", "EmployeeModel");
-                        this._fetchCommonData("AppVisibility", "RoleModel");
-                        this._fetchCommonData("Country", "CountryModel");
-                    }
+                    // if (!oView.getModel("DesignationModel")) {
+                    //     this._fetchCommonData("Designation", "DesignationModel");
+                    //     this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                    //     this._fetchCommonData("EmployeeDetailsData", "EmployeeModel");
+                    //     this._fetchCommonData("AppVisibility", "RoleModel");
+                    //     this._fetchCommonData("Country", "CountryModel");
+                    // }
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
                         fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false,
@@ -1694,7 +1694,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.handleBaseLocationChange(
                     oEvent,
-                    "sBaseLocationModel",         // Source model
+                    "BaseLocationModel",         // Source model
                     "sEmployeeModel",     // Target model
                     "/0/BranchCode"                // Path in target model
                 );

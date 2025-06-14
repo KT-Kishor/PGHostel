@@ -124,7 +124,6 @@
   font-family: League spartan !important;
   font-weight: bolder !important;
 }
-
 .custom-welcome {
   line-height: 1;
   color: #161515;
@@ -360,6 +359,7 @@ border-radius: 0.60rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 1);
     text-align: left;
   }
+  
   .custom-trainee-title{
     font-size: 30px;
     font-family: Helvetica, sans-serif;

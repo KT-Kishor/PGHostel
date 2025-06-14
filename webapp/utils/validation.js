@@ -46,28 +46,28 @@ sap.ui.define([], function () {
       if (!oField) return false;
       var oValue = oField.getValue().trim();
       if (oValue === "") {
-          oField.setValueState("Error");
-          return false;
+        oField.setValueState("Error");
+        return false;
       }
       // Allow only letters, spaces, and dots
       var sanitizedValue = oValue.replace(/[^a-zA-Z\s.]/g, "");
       if (oValue !== sanitizedValue) oField.setValue(sanitizedValue);
       var regex = /^[a-zA-Z\s.]+$/;
       if (!regex.test(sanitizedValue)) {
-          oField.setValueState("Error");
-          return false;
+        oField.setValueState("Error");
+        return false;
       }
       var letterCount = (sanitizedValue.match(/[a-zA-Z]/g) || []).length;
       if (letterCount < 2) {
-          oField.setValueState("Error");
-          return false;
+        oField.setValueState("Error");
+        return false;
       }
-        oField.setValueState("None");
+      oField.setValueState("None");
       return true;
-  },
-  
-  
-        // Amount validation function
+    },
+
+
+    // Amount validation function
     _LCvalidateAmount: function (oEvent, type) {
       var oInput = type === "ID" ? (oInput = oEvent) : (oInput = oEvent.getSource());
       var value = oInput.getValue();
@@ -258,9 +258,9 @@ sap.ui.define([], function () {
     // Mandatory Field Validation
     _LCvalidateMandatoryField: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
-      if (!oField) return false; 
-      var oValue = oField.getValue().trim(); 
-      if (!oValue) { 
+      if (!oField) return false;
+      var oValue = oField.getValue().trim();
+      if (!oValue) {
         oField.setValueState("Error");
         return false;
       } else {
@@ -270,8 +270,8 @@ sap.ui.define([], function () {
     },
     _LCvalidateCTC: function (oEvent, type) {
       var oInput = type === "ID" ? oEvent : oEvent.getSource();
-      var value = oInput.getValue().replace(/[^0-9.]/g, ""); 
-        var parts = value.split(".");
+      var value = oInput.getValue().replace(/[^0-9.]/g, "");
+      var parts = value.split(".");
       if (parts.length === 2) {
         value = parts[0] + "." + parts[1].slice(0, 2);
       }
@@ -284,8 +284,8 @@ sap.ui.define([], function () {
       oInput.setValueState("None");
       return true;
     },
-    
-    
+
+
     // Pin Code Validation (NEW FUNCTION ADDED)
     _LCvalidatePinCode: function (oEvent, type) {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
@@ -339,16 +339,16 @@ sap.ui.define([], function () {
 
     _LCvalidateVariablePay: function (oEvent, type) {
       var oInput = type === "ID" ? oEvent : oEvent.getSource();
-      var value = oInput.getValue(); 
+      var value = oInput.getValue();
       var cleanedValue = value.replace(/[^0-9.]/g, "");
       var parts = cleanedValue.split(".");
       if (parts.length === 2) {
         cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
-      } 
-      oInput.setValue(cleanedValue); 
+      }
+      oInput.setValue(cleanedValue);
       var isValidFormat = /^\d+(\.\d{1,2})?$/.test(cleanedValue);
       var numValue = parseFloat(cleanedValue);
-        if (!isValidFormat || isNaN(numValue) || numValue < 0 || numValue > 20) {
+      if (!isValidFormat || isNaN(numValue) || numValue < 0 || numValue > 20) {
         oInput.setValueState("Error");
         return false;
       } else {
@@ -356,7 +356,7 @@ sap.ui.define([], function () {
         return true;
       }
     },
-    
+
     _LCvalidationComboBox: function (oEvent, type) {
       var aSelectedKeys =
         type === "ID"
@@ -433,16 +433,16 @@ sap.ui.define([], function () {
     _LCvalidateTraineeAmount: function (oEvent, type) {
       var oInput = type === "ID" ? oEvent : oEvent.getSource();
       var value = oInput.getValue().trim();
-    
+
       // Remove invalid characters
       var cleanedValue = value.replace(/[^0-9.]/g, "");
-    
+
       // Set cleaned value back to input
       oInput.setValue(cleanedValue);
-    
+
       // Regex: Up to 2 digits before decimal, optional decimal, up to 2 digits after decimal
       var validFormat = /^(?:\d{1,2})(?:\.\d{1,2})?$/;
-    
+
       // Check for value within 0-99.99 range and match regex
       if (!validFormat.test(cleanedValue) || parseFloat(cleanedValue) > 99.99) {
         oInput.setValueState("Error");
@@ -456,7 +456,7 @@ sap.ui.define([], function () {
     _LCstrictValidationComboBox: function (oEvent, type) {
       var oComboBox = type === "ID" ? oEvent : oEvent.getSource();
       var sValue = oComboBox.getValue();
-      if(!sValue){
+      if (!sValue) {
         oComboBox.setValueState("Error");
         return false;
       }

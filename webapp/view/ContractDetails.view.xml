@@ -22,7 +22,7 @@
 							<Label text="{i18n>consultantEmailID}" required="true"/>
 							<Input value="{ContractModelWizart>/ContarctEmail}"  maxLength="50" placeholder="{i18n>placeConsultantEmail}" id="CD_id_Email"  liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}"/>
 							<Label text="{i18n>consultingService}" required="true"/>
-							<Input value="{ContractModelWizart>/ConsultingService}"  valueStateText="{i18n>placeConsultingService}" placeholder="{i18n>placeConsultingService}" id="CD_id_ConsultingService" change="onRole" liveChange="CD_ValidateConsultantName"  maxLength="50"/>
+							<Input value="{ContractModelWizart>/ConsultingService}"  valueStateText="{i18n>placeConsultingService}" placeholder="{i18n>placeConsultingService}" id="CD_id_ConsultingService"  change="CD_ValidateConsultantName"  maxLength="50"/>
 							<Label text="{i18n>rate}" required="true" />
 							<RadioButtonGroup id="rbg3" columns="5" selectedIndex="{= ${ContractModelWizart>/Rate} === 'Hour' ? 0 : (${ContractModelWizart>/Rate} === 'Day' ? 1 : 2)}" select="RadioButtonSelect">
 								<RadioButton text="{i18n>rateHour}" />
