@@ -23,28 +23,27 @@
             singleContainerFullSize="false"
         >
             <f:content>
-                <Label text="{i18n>name}" required="true" />
-                <Input
-                    id="FSA_id_name"
-                    valueStateText="Enter Name"
-                    liveChange="FSA_onInputLiveChange"
-                    maxLength="25"
+                <Label
+                    text="{i18n>nominatedBy}"
+                    required="true"
                 />
-
-                <Label text="{i18n>nominatedBy}" required="true"/>
                 <Input
                     id="FSA_id_nominatedName"
                     valueStateText="Enter Name"
                     liveChange="FSA_onNomineNameLiveChange"
                     maxLength="25"
-                    />
-            	<Label text="{i18n>assignedDate}" required="true"/>
+                />
+
+                <Label
+                    text="{i18n>date}"
+                    required="true"
+                />
                 <DatePicker
                     id="FSA_id_Date"
                     change="FAA_onDateChange"
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
-                    />
+                />
             </f:content>
         </f:SimpleForm>
 

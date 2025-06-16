@@ -50,7 +50,6 @@ sap.ui.define([
                 this.onClearAndSearch("AA_id_FilterBarAsset");// Clear and search function
                 this._FragmentDatePickersReadOnly(["FAA_id_AssignedDate", "FAU_id_unassignDate", "FAA_id_Model"]);
                 this.getView().setModel(form, "myform");
-                await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 if (!this.getView().getModel("incomeModel")) {
                     this._fetchCommonData("IncomeAsset", "incomeModel");
                     this._fetchCommonData("AssetType", "assetType");
@@ -407,9 +406,9 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            FAA_onBranchChange: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
-            },
+            // FAA_onBranchChange: function (oEvent) {
+            //     utils._LCstrictValidationComboBox(oEvent);
+            // },
 
             FAA_onChangeAssignedBy: function (oEvent) {
                 if (utils._LCstrictValidationComboBox(oEvent)) {
