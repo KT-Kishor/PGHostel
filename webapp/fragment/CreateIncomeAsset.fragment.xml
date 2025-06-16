@@ -51,12 +51,12 @@
                     value="{CreateIncomeAssetModel>/PickedBranch}"
                     selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
                     showSecondaryValues="true"
-                    items="{branchModel>/}"
+                    items="{BaseLocationModel>/}"
                 >
                     <core:ListItem
-                        key="{branchModel>city}" 
-                        text="{branchModel>city}"
-                        additionalText="{branchModel>branchCode}"
+                        key="{BaseLocationModel>city}" 
+                        text="{BaseLocationModel>city}"
+                        additionalText="{BaseLocationModel>branchCode}"
                     />
                 </ComboBox>
                 <Label text="{i18n>vehicleModel}" required="true" />
@@ -106,26 +106,6 @@
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
                 />
-                
-
-                <!-- <Label text="{i18n>branch}" required="true" />
-                <ComboBox
-                    id="FCIA_id_branch"
-                    placeholder="Select Branch"
-                    change="FCIA_onbranchchange"
-                    selectionChange="FCIA_onselectionchange"
-                    valueStateText="Select Branch"
-                    value="{CreateIncomeAssetModel>/PickedBranch}"
-                    selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
-                    showSecondaryValues="true"
-                    items="{branchModel>/}"
-                >
-                    <core:ListItem
-                        key="{branchModel>city}" 
-                        text="{branchModel>city}"
-                        additionalText="{branchModel>branchCode}"
-                    />
-                </ComboBox> -->
                 <Label text="{i18n>pickedbranch}" required="true" />
                 <ComboBox
                     id="FCIA_id_pickbranch"
@@ -135,12 +115,12 @@
                     valueStateText="Select Branch"
                     selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
                     showSecondaryValues="true"
-                    items="{branchModel>/}"
+                    items="{BaseLocationModel>/}"
                 >
                     <core:ListItem
-                        key="{branchModel>city}" 
-                        text="{branchModel>city}"
-                        additionalText="{branchModel>branchCode}"
+                        key="{BaseLocationModel>city}" 
+                        text="{BaseLocationModel>city}"
+                        additionalText="{BaseLocationModel>branchCode}"
                     />
                 </ComboBox>
 
@@ -158,11 +138,11 @@
                 <Select
                     id="FCIA_id_currency"
                     selectedKey="{CreateIncomeAssetModel>/Currency}"
-                    items="{oCurrencyModel>/}"
+                    items="{CurrencyModel>/}"
                 >
                     <core:Item
-                        text="{oCurrencyModel>currency}"
-                        key="{oCurrencyModel>currency}"
+                        text="{CurrencyModel>currency}"
+                        key="{CurrencyModel>currency}"
                     />
                 </Select>
                 <Label text="{i18n>transferby}"/>
@@ -200,12 +180,12 @@
                     value="{CreateIncomeAssetModel>/TransferBranch}"
                     selectedKey="{CreateIncomeAssetModel>/TransferBranch}"
                     showSecondaryValues="true"
-                    items="{branchModel>/}"
+                    items="{BaseLocationModel>/}"
                 >
                     <core:ListItem
-                        key="{branchModel>city}" 
-                        text="{branchModel>city}"
-                        additionalText="{branchModel>branchCode}"
+                        key="{BaseLocationModel>city}" 
+                        text="{BaseLocationModel>city}"
+                        additionalText="{BaseLocationModel>branchCode}"
                     />
                 </ComboBox>
                  <Label text="{i18n>refrenceNo}" required="true" />

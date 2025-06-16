@@ -25,12 +25,12 @@
 											icon="sap-icon://copy" 
 											text="{i18n>copy}" press="CI_onPressCopyBtn" />
 											<!-- Paste Button -->
-											<m:Button 
+											<!-- <m:Button 
 											visible="{visiablityPlay>/pasteBtn}" 
 											type="Emphasized" 
 											icon="sap-icon://paste" 
 											text="{i18n>paste}" 
-											press="CI_onPressPasteBtn" />
+											press="CI_onPressPasteBtn" /> -->
 											<!-- ComboBox -->
 											<m:ComboBox 
 											id="CI_id_Cont" 
@@ -195,14 +195,14 @@
 											growingThreshold="50" busyIndicatorDelay="0"
 											growingScrollToLoad="true" width="auto" class="sapUiResponsiveMargin">
 										<m:columns>
-											<m:Column width="100px" >
+											<m:Column width="3rem" minScreenWidth="Tablet" >
 												<m:customData>
 													<core:CustomData key="p13nData" 
                                                             value='{"columnKey": "SNo", "leadingProperty": "SNo", "sortProperty": "SNo", "filterProperty": "SNo", "columnIndex": 1}' />
 												</m:customData>
 												<m:Text text="{i18n>invoiiceitemsiNo}" />
 											</m:Column>
-											<m:Column width="300px"  hAlign="Left" demandPopin="true">
+											<m:Column width="7rem"  hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
 												<m:customData>
 													<core:CustomData key="p13nData" 
                                                             value='{"columnKey": "Item", "leadingProperty": "Item", "sortProperty": "Item", "filterProperty": "Item", "columnIndex": 2}' />
@@ -210,7 +210,7 @@
 												<m:Text text="{i18n>item}" />
 											</m:Column>
 											<!-- SAC Column -->
-											<m:Column id="CI_id_ColumnGST" hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
+											<m:Column width="7rem" id="CI_id_ColumnGST" hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
 												<m:customData >
 													<core:CustomData key="p13nData"
 														value='{"columnKey": "SAC", "leadingProperty": "SAC", "sortProperty": "SAC", "filterProperty": "SAC", "columnIndex": 3 }' />
@@ -218,7 +218,7 @@
 												<m:Text text="{i18n>SAC}" />
 											</m:Column>
 											<!-- GSTCalculation Column -->
-											<m:Column id="CI_id_GSTCalc" hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
+											<m:Column  width="7rem" id="CI_id_GSTCalc" hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
 												<m:customData>
 													<core:CustomData key="p13nData"
 														value='\{"columnKey": "GSTCalculation", "leadingProperty": "GSTCalculation", "sortProperty": "GSTCalculation", "filterProperty": "GSTCalculation", "columnIndex": 4}' />
@@ -226,7 +226,7 @@
 												<m:Text text="{i18n>GSTCalculation}" />
 											</m:Column>
 											<!-- Days -->
-											<m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
+											<m:Column width="7rem" hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
 												<m:customData>
 													<core:CustomData key="p13nData" 
                                                             value='{"columnKey": "Days", "leadingProperty": "Days", "sortProperty": "Days", "filterProperty": "Days", "columnIndex": 5}' />
@@ -234,7 +234,7 @@
 												<m:Text text="{i18n>days}" />
 											</m:Column>
 											<!-- Unit Price -->
-											<m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
+											<m:Column width="7rem" hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
 												<m:customData>
 													<core:CustomData key="p13nData" 
                                                             value='{"columnKey": "UnitPrice", "leadingProperty": "UnitPrice", "sortProperty": "UnitPrice", "filterProperty": "UnitPrice", "columnIndex": 6}' />
@@ -242,7 +242,7 @@
 												<m:Text text="{i18n>unitPrice}" />
 											</m:Column>
 											<!-- Discount Column -->
-											<m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
+											<m:Column width="7rem" hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
 												<m:customData>
 													<core:CustomData key="p13nData"
 														value='\{"columnKey": "Discount", "leadingProperty": "Discount", "sortProperty": "Discount", "filterProperty": "Discount", "columnIndex": 7}' />
@@ -250,7 +250,7 @@
 												<m:Text text="{i18n>discount}" />
 											</m:Column>
 											<!-- Total Column -->
-											<m:Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
+											<m:Column width="7rem" hAlign="Left" minScreenWidth="Desktop" demandPopin="true">
 												<m:customData>
 													<core:CustomData key="p13nData" 
                                                             value='{"columnKey": "Total", "leadingProperty": "Total", "sortProperty": "Total", "filterProperty": "Total", "columnIndex": 8}' />
@@ -262,12 +262,11 @@
 											<m:ColumnListItem >
 												<m:cells>
 												<!-- SNo (Column 1) -->
-												<m:Text text="{ConsultantInvoiceModel>IndexNo}" ></m:Text>
-
+												<m:Input value="{ConsultantInvoiceModel>IndexNo}" editable="false" />
 												<!-- Item (Column 2) -->
 													<m:VBox>
 														<m:items>
-															<m:TextArea rows="2" value="{ConsultantInvoiceModel>Item}"  editable="{visiablityPlay>/editable}" placeholder="{i18n>itemDescription}" maxLength="200"
+															<m:Input value="{ConsultantInvoiceModel>Item}"  editable="{visiablityPlay>/editable}" placeholder="{i18n>itemDescription}" maxLength="200"
          													 liveChange="CID_onItemDescriptionLiveChange" width="100%" valueStateText="{i18n>itemplaceholder}"/>
 														</m:items>
 													</m:VBox>

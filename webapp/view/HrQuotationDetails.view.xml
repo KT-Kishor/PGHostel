@@ -92,7 +92,7 @@
                                         <m:Label text="{i18n>branch}" />
 <m:ComboBox
     id="HQD_id_BranchCode"
-    items="{BrachModel>/}" 
+    items="{BaseLocationModel>/}" 
     selectedKey="{SingleCompanyModel>/Branch}"
     value="{SingleCompanyModel>/Branch}"
     change="HQD_onBrachChange"
@@ -101,7 +101,7 @@
      valueStateText="Enter Branch"
      showSecondaryValues="true"
 >
-    <core:ListItem key="{BrachModel>branchCode}" text="{BrachModel>city}" additionalText="{BrachModel>branchCode}" />
+    <core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 </m:ComboBox>
 
                                         <m:Label
@@ -495,7 +495,7 @@
     <!-- SAC (Column 3) -->
     <m:ComboBox
       showSecondaryValues="true"
-      items="{path:'SACModel>/'}"
+      items="{path:'InvoiceSAC>/'}"
       value="{QuotationModel>SAC}"
       editable="{visiablityPlay>/editable}"
       selectedKey="1"
@@ -503,9 +503,9 @@
       visible="{QuotationModel>/ShowSACAndGSTCalculation}"
     >
       <core:ListItem
-        key="{SACModel>id}"
-        additionalText="{SACModel>description}"
-        text="{SACModel>sac}"
+        key="{InvoiceSAC>ID}"
+        additionalText="{InvoiceSAC>Description}"
+        text="{InvoiceSAC>SAC}"
       />
     </m:ComboBox>
     <!-- GSTCalculation (Column 4) -->

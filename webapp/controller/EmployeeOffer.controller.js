@@ -14,7 +14,7 @@ sap.ui.define([
                 var today = new Date();
                 var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
                 var oDateModel = new sap.ui.model.json.JSONModel();
-                oDateModel.setData({maxDate: maxDate,focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1) });
+                oDateModel.setData({ maxDate: maxDate, focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1) });
                 this.getView().setModel(oDateModel, "controller");
                 this.getRouter().getRoute("RouteEmployeeOffer").attachMatched(this._onRouteMatched, this);
             },
@@ -40,11 +40,16 @@ sap.ui.define([
                 var oRoleModel = this.getView().getModel("RoleModel");
                 if (oRoleModel) {
                     var aRoles = oRoleModel.getData();
-                   if (!aRoles.length || aRoles[0].Role !== "") {
+                    // Filter out "Contractor" and "Trainee" roles
+                    aRoles = aRoles.filter(function (role) {
+                        return role.Role !== "Contractor" && role.Role !== "Trainee";
+                    });
+                    // Add empty role at the top if not present
+                    if (!aRoles.length || aRoles[0].Role !== "") {
                         aRoles.unshift({ Role: "" });
-                        oRoleModel.setData(aRoles);
                     }
-                }  
+                    oRoleModel.setData(aRoles);
+                }
             },
             // Read call for employee offer data
             readCallForEmployeeOffer: async function (filter) {
@@ -202,7 +207,7 @@ sap.ui.define([
                                 BloodGroup: "",
                                 EmployeeStatus: "Active",
                                 CTC: oSelectedData.CTC,
-                                Currency:"INR",
+                                Currency: "INR",
                                 JoiningBonus: oSelectedData.JoiningBonus,
                                 BasicSalary: oSelectedData.BasicSalary,
                                 HRA: oSelectedData.HRA,
@@ -300,6 +305,8 @@ sap.ui.define([
                                 this.EO_onSearch();
                                 this.oDialog.close();
                                 MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
+                                this._fetchCommonData("EmployeeDetailsData", "empModel");
+                                this.getView().getModel("empModel").refresh(true);
 
                             } else {
                                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));

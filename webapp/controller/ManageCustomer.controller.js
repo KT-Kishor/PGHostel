@@ -16,8 +16,8 @@ sap.ui.define([
         var LoginFUnction = await this.commonLoginFunction("Customer");
         if (!LoginFUnction) return;
         this.getBusyDialog(); // Show busy dialog
-        await this._fetchCommonData("Country", "CountryModel");
-        await this._fetchCommonData("BaseLocation", "BaseLocationModel");
+        // await this._fetchCommonData("Country", "CountryModel");
+        // await this._fetchCommonData("BaseLocation", "BaseLocationModel");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
         this.byId("MC_id_CustTable").removeSelections(true); // Clear table selection
         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerCustomer")); // Set header name

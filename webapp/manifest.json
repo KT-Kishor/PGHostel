@@ -183,6 +183,11 @@
                 "uri": "model/EmployeeType.json",
                 "preload": true
             },
+              "ContractpaymentModel": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/PaymentTerms.json",
+                "preload": true
+            },
             "SowModel": {
                 "type":"sap.ui.model.json.JSONModel",
                 "uri":"model/SowStatus.json",

@@ -25,20 +25,11 @@ sap.ui.define(
         this._ViewDatePickersReadOnly(["HQD_id_Quotation", "HQD_id_QuotationValid"], this.getView())
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+        // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         var oVisiModel = new JSONModel();
 
         if (sQuotationNo === "new") {
-          //  Set Busy true on dropdowns
-          this.byId("HQD_id_Country").setBusy(true);
-          this.byId("HQD_id_BranchCode").setBusy(true);
-          await this._fetchCommonData("Country", "CountryModel");
-          this._fetchCommonData("BaseLocation", "BrachModel");
-          this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
-          this.byId("HQD_id_Country").setBusy(false);
-          this.byId("HQD_id_BranchCode").setBusy(false);
-
           //continue with model binding 
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
           var oToday = new Date();
@@ -75,8 +66,8 @@ sap.ui.define(
           this.getView().setModel(oBlankModel, "SingleCompanyModel");
 
           var oQuotationModel = new JSONModel({
-            QuotationItemModel: [], CGSTSelected: true, IGSTSelected: false,SGSTVisible: true,CGSTVisible: true,
-           IGSTVisible: false,ShowGSTFields: true
+            QuotationItemModel: [], CGSTSelected: true, IGSTSelected: false, SGSTVisible: true, CGSTVisible: true,
+            IGSTVisible: false, ShowGSTFields: true
           });
 
           this.getView().setModel(oQuotationModel, "QuotationModel");
@@ -98,9 +89,7 @@ sap.ui.define(
         // Inside the onRouteMatched function's else block (edit mode)
         else {
           // Edit Mode
-           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
-           this._fetchCommonData("Country", "CountryModel");
-           this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
+          this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation", Action: "CC" });
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
           var oSelectedQuotation = aQuotations.find(item => item.QuotationNo === sQuotationNo);
           if (oSelectedQuotation) {
@@ -127,12 +116,6 @@ sap.ui.define(
               oSelectedModel.setProperty("/Notes", tmpDiv.textContent || tmpDiv.innerText || "");
             }
             this.getView().setModel(oSelectedModel, "SingleCompanyModel");
-            const sCountry = oSelectedQuotation.Country;
-            if (sCountry === "India") {
-              await this._fetchCommonData("BaseLocation", "BrachModel");
-            } else {
-
-            }
 
             setTimeout(() => {
               const oEditor = this.byId("HQD_id_Notes");
@@ -146,8 +129,8 @@ sap.ui.define(
               if (response && response.data) {
                 var aItems = Array.isArray(response.data) ? response.data : [response.data];
                 var oQuotationModel = new JSONModel({
-                  QuotationItemModel: aItems,CGSTSelected: cgstSelected, IGSTSelected: igstSelected,
-                  CGSTVisible: cgstVisible,SGSTVisible: sgstVisible,IGSTVisible: igstVisible,
+                  QuotationItemModel: aItems, CGSTSelected: cgstSelected, IGSTSelected: igstSelected,
+                  CGSTVisible: cgstVisible, SGSTVisible: sgstVisible, IGSTVisible: igstVisible,
                 });
                 this.getView().setModel(oQuotationModel, "QuotationModel");
                 this.updateTotalAmount();
@@ -160,11 +143,11 @@ sap.ui.define(
         }
         if (sQuotationNo === "new") {
           oVisiModel.setData({
-            editable: true,createVisi: true,editVisi: false,  merge: false
+            editable: true, createVisi: true, editVisi: false, merge: false
           });
         } else {
           oVisiModel.setData({
-            editable: false,createVisi: false, editVisi: true, merge: true
+            editable: false, createVisi: false, editVisi: true, merge: true
           });
         }
         this.getView().setModel(oVisiModel, "visiablityPlay");
@@ -207,9 +190,9 @@ sap.ui.define(
         if (sSelectedKey === "India") {
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
           oSingleCompanyModel.setProperty("/Branch", "Kalaburagi");
-          this._fetchCommonData("BaseLocation", "BrachModel");
-          oVisibilityModel.setProperty("/showBranch", true);oQuotationModel.setProperty("/ShowGSTFields", true);oQuotationModel.setProperty("/CGSTSelected", true);oQuotationModel.setProperty("/IGSTSelected", false);oQuotationModel.setProperty("/CGSTVisible", true);
-          oQuotationModel.setProperty("/SGSTVisible", true);oQuotationModel.setProperty("/IGSTVisible", false);oSingleCompanyModel.setProperty("/Percentage", 9);oSingleCompanyModel.setProperty("/gstEditable", true);
+          this._fetchCommonData("BaseLocation", "BaseLocationModel");
+          oVisibilityModel.setProperty("/showBranch", true); oQuotationModel.setProperty("/ShowGSTFields", true); oQuotationModel.setProperty("/CGSTSelected", true); oQuotationModel.setProperty("/IGSTSelected", false); oQuotationModel.setProperty("/CGSTVisible", true);
+          oQuotationModel.setProperty("/SGSTVisible", true); oQuotationModel.setProperty("/IGSTVisible", false); oSingleCompanyModel.setProperty("/Percentage", 9); oSingleCompanyModel.setProperty("/gstEditable", true);
           // Setting Mobile number
           var sMobileNo = oRawData.mobileNo || "";
           var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;
@@ -218,16 +201,16 @@ sap.ui.define(
           this.CountryAndCity(); // fetch cities for other countries
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
           oSingleCompanyModel.setProperty("/Branch", " ");
-          oSingleCompanyModel.setProperty("/gstEditable", true);oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName);oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin);oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail);
+          oSingleCompanyModel.setProperty("/gstEditable", true); oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName); oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin); oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail);
           oSingleCompanyModel.setProperty("/CompanyAddress", oRawData.longAddress);
-          oSingleCompanyModel.setProperty("/CompanyMobileNo", "");oSingleCompanyModel.setProperty("/CustomerMobileNo", "");
+          oSingleCompanyModel.setProperty("/CompanyMobileNo", ""); oSingleCompanyModel.setProperty("/CustomerMobileNo", "");
           // Hide GST fields and update percentage
-          oQuotationModel.setProperty("/ShowGSTFields", false); oQuotationModel.setProperty("/CGSTSelected", false);oQuotationModel.setProperty("/IGSTSelected", true);
-         oQuotationModel.setProperty("/CGSTVisible", false);oQuotationModel.setProperty("/SGSTVisible", false);oQuotationModel.setProperty("/IGSTVisible", false);
-         oSingleCompanyModel.setProperty("/Percentage", 18);
+          oQuotationModel.setProperty("/ShowGSTFields", false); oQuotationModel.setProperty("/CGSTSelected", false); oQuotationModel.setProperty("/IGSTSelected", true);
+          oQuotationModel.setProperty("/CGSTVisible", false); oQuotationModel.setProperty("/SGSTVisible", false); oQuotationModel.setProperty("/IGSTVisible", false);
+          oSingleCompanyModel.setProperty("/Percentage", 18);
         }
         // Reset tax-related values
-        oQuotationModel.setProperty("/CGST", 0);oQuotationModel.setProperty("/SGST", 0);
+        oQuotationModel.setProperty("/CGST", 0); oQuotationModel.setProperty("/SGST", 0);
         oQuotationModel.setProperty("/IGST", 0); oQuotationModel.setProperty("/SubTotal", 0);
 
         // Update GSTCalculation field in each item
@@ -282,12 +265,12 @@ sap.ui.define(
           oSingleCompanyModel.setProperty("/STDCode", sSTDCode);
         }
       },
-     
+
       HQD_onComGSTLiveChange: function (oEvent) {
         utils._LCvalidateGstNumber(oEvent);
         var oInput = oEvent.getSource();
-        var sValueState = oInput.getValueState(); 
-        var sGST = oInput.getValue(); 
+        var sValueState = oInput.getValueState();
+        var sGST = oInput.getValue();
         // Get references to UI elements
         var oView = this.getView();
         var oCGSTRadio = oView.byId("HQD_id_CheckboxCGS");
@@ -312,8 +295,8 @@ sap.ui.define(
 
         } else {
           //  disable fields and clear values
-          oCGSTRadio.setEditable(false);oIGSTRadio.setEditable(false);oCGSTPercent.setEditable(false);
-          oModel.setProperty("/ShowSACAndGSTCalculation", false);oModel.setProperty("/CGSTSelected", false);oModel.setProperty("/IGSTSelected", false);oModel.setProperty("/CGSTPercent", "");
+          oCGSTRadio.setEditable(false); oIGSTRadio.setEditable(false); oCGSTPercent.setEditable(false);
+          oModel.setProperty("/ShowSACAndGSTCalculation", false); oModel.setProperty("/CGSTSelected", false); oModel.setProperty("/IGSTSelected", false); oModel.setProperty("/CGSTPercent", "");
           oCGSTPercent.setValue("");
         }
       },
@@ -353,14 +336,18 @@ sap.ui.define(
             iDiscount = iItemTotal;
           }
 
+
           var finalItemTotal = iItemTotal - iDiscount;
           oItem.Total = parseFloat(finalItemTotal.toFixed(2));
 
           if (oItem.GSTCalculation === "Yes") {
             subTotalTaxable += oItem.Total;
+            oItem.SAC = "998314";
           } else {
             subTotalNonTaxable += oItem.Total;
+            oItem.SAC = "-";
           }
+
         });
 
         // Update items back into model
@@ -380,7 +367,7 @@ sap.ui.define(
           ? parseFloat(oSingleCompanyModel.getProperty("/Percentage") || 18)
           : 0;
 
-        oQuotationModel.setProperty("/CGST", 0);oQuotationModel.setProperty("/SGST", 0);
+        oQuotationModel.setProperty("/CGST", 0); oQuotationModel.setProperty("/SGST", 0);
         oQuotationModel.setProperty("/IGST", 0);
 
         if (oQuotationModel.getProperty("/CGSTSelected")) {
@@ -411,11 +398,11 @@ sap.ui.define(
         var oModel = this.getView().getModel("SingleCompanyModel");
         var oQuotationModel = this.getView().getModel("QuotationModel");
 
-        oModel.setProperty("/CGSTSelected", true); 
-        oModel.setProperty("/IGSTSelected", false); 
+        oModel.setProperty("/CGSTSelected", true);
+        oModel.setProperty("/IGSTSelected", false);
         // Update visibility for CGST/SGST and hide IGST
         oModel.setProperty("/CGSTVisible", true); oModel.setProperty("/SGSTVisible", true);
-        oModel.setProperty("/IGSTVisible", false); oQuotationModel.setProperty("/CGSTVisible", true); oQuotationModel.setProperty("/SGSTVisible", true);oQuotationModel.setProperty("/IGSTVisible", false);oModel.setProperty("/Percentage", 9);oQuotationModel.setProperty("/CGSTSelected", true);
+        oModel.setProperty("/IGSTVisible", false); oQuotationModel.setProperty("/CGSTVisible", true); oQuotationModel.setProperty("/SGSTVisible", true); oQuotationModel.setProperty("/IGSTVisible", false); oModel.setProperty("/Percentage", 9); oQuotationModel.setProperty("/CGSTSelected", true);
         this.updateTotalAmount();
       },
 
@@ -427,7 +414,7 @@ sap.ui.define(
         // Access both models
         var oCompanyModel = oView.getModel("SingleCompanyModel");
         var oQuotationModel = oView.getModel("QuotationModel");
-       
+
         oQuotationModel.setProperty("/CGSTSelected", false);
         oQuotationModel.setProperty("/IGSTSelected", true);
         // Update visibility
@@ -519,8 +506,8 @@ sap.ui.define(
         if (sSelectedCurrency === "INR") {
           // Currency is INR — enable GST
           oQuotationModel.setProperty("/CGSTVisible", false); oQuotationModel.setProperty("/SGSTVisible", false); oQuotationModel.setProperty("/IGSTVisible", false);
-          oQuotationModel.setProperty("/ShowGSTFields", true);oSingleCompanyModel.setProperty("/gstEditable", true); oQuotationModel.setProperty("/CGSTSelected", true);
-          oQuotationModel.setProperty("/IGSTSelected", false);oQuotationModel.setProperty("/CGSTVisible", true);oQuotationModel.setProperty("/SGSTVisible", true);
+          oQuotationModel.setProperty("/ShowGSTFields", true); oSingleCompanyModel.setProperty("/gstEditable", true); oQuotationModel.setProperty("/CGSTSelected", true);
+          oQuotationModel.setProperty("/IGSTSelected", false); oQuotationModel.setProperty("/CGSTVisible", true); oQuotationModel.setProperty("/SGSTVisible", true);
           oQuotationModel.setProperty("/IGSTVisible", false);
           oSingleCompanyModel.setProperty("/Percentage", 9);
           // Calculate Total with GST
@@ -538,14 +525,14 @@ sap.ui.define(
 
         } else {
           // Currency is NOT INR — disable GST
-          oQuotationModel.setProperty("/CGSTVisible", false);oQuotationModel.setProperty("/SGSTVisible", false);oQuotationModel.setProperty("/IGSTVisible", false);
-          oQuotationModel.setProperty("/ShowGSTFields", false);oQuotationModel.setProperty("/CGSTSelected", false);oQuotationModel.setProperty("/IGSTSelected", true);
+          oQuotationModel.setProperty("/CGSTVisible", false); oQuotationModel.setProperty("/SGSTVisible", false); oQuotationModel.setProperty("/IGSTVisible", false);
+          oQuotationModel.setProperty("/ShowGSTFields", false); oQuotationModel.setProperty("/CGSTSelected", false); oQuotationModel.setProperty("/IGSTSelected", true);
           oSingleCompanyModel.setProperty("/Percentage", 18);
 
           //  Mark all items as non-taxable (GSTCalculation = "No")
           var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
           aItems.forEach(function (item) {
-            item.GSTCalculation = "No"; 
+            item.GSTCalculation = "No";
           });
 
           oQuotationModel.setProperty("/QuotationItemModel", aItems);
@@ -1133,7 +1120,7 @@ sap.ui.define(
         var oNewItem = {
           Description: "",
           SAC: "",
-          GSTCalculation: "Yes", 
+          GSTCalculation: "Yes",
           Days: "",
           UnitPrice: "",
           Discount: "",
@@ -1146,7 +1133,7 @@ sap.ui.define(
 
         aItems.push(oNewItem);
         oQuotationModel.setProperty("/QuotationItemModel", aItems);
-        this.updateTotalAmount(); 
+        this.updateTotalAmount();
       },
       HQD_onInputChange: function (oEvent) {
         var oInput = oEvent.getSource();
@@ -1444,7 +1431,7 @@ sap.ui.define(
       HQD_onChangeGSTCalculation: function (oEvent) {
         var oSource = oEvent.getSource(); // The ComboBox that was changed
         var sSelectedKey = oSource.getSelectedKey();
-        var oContext = oSource.getBindingContext("QuotationModel"); 
+        var oContext = oSource.getBindingContext("QuotationModel");
 
         if (!oContext) return;
 
@@ -1455,30 +1442,33 @@ sap.ui.define(
         oQuotationModel.setProperty(sPath + "/GSTCalculation", sSelectedKey);
 
         // Get SACModel data
-        var oSACModel = this.getView().getModel("SACModel");
+        var oSACModel = this.getView().getModel("InvoiceSAC");
         var aSACList = oSACModel ? oSACModel.getData() : [];
 
         // Apply logic based on selection
         if (sSelectedKey === "Yes") {
-          // Set SAC to first ID's sac
-          if (aSACList.length > 0) {
-            oQuotationModel.setProperty(sPath + "/SAC", aSACList[0].sac);
+          // Set SAC to first ID's sac (ensure it exists)
+          if (aSACList && aSACList.length > 1 && aSACList[1].SAC) {
+            oQuotationModel.setProperty(sPath + "/SAC", aSACList[1].SAC);
+          } else {
+            oQuotationModel.setProperty(sPath + "/SAC", "-");
           }
         } else {
-          // Set SAC to second ID's sac
-          if (aSACList.length > 1) {
-            oQuotationModel.setProperty(sPath + "/SAC", aSACList[1].sac);
+          // Set SAC to second ID's sac (ensure it exists)
+          if (aSACList && aSACList.length > 2 && aSACList[2].SAC) {
+            oQuotationModel.setProperty(sPath + "/SAC", aSACList[2].SAC);
           } else {
             oQuotationModel.setProperty(sPath + "/SAC", "-");
           }
         }
+
         // Optionally update global GSTCalculation
         oQuotationModel.setProperty("/GSTCalculation", sSelectedKey);
         this.updateTotalAmount();
       },
 
       onPercentageChange: function (oEvent) {
-        var sPercentage = oEvent.getParameter("value"); 
+        var sPercentage = oEvent.getParameter("value");
         var oModel = this.getView().getModel("SingleCompanyModel");
 
         // Update the entered percentage in the model
@@ -1651,7 +1641,7 @@ sap.ui.define(
           } catch (error) {
             this.closeBusyDialog();
             MessageToast.show(this.i18nModel.getText("quotaionUpdateErroeCatch"));
-           
+
           }
         }
       }

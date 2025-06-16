@@ -17,11 +17,11 @@ sap.ui.define([
                 this._makeDatePickersReadOnly(["CD_id_AgreeDate", "CD_id_Datestart", "CD_id_DateEnd"]);
                 this._makeDatePickersReadOnly(["CU_id_AgreementDate", "CU_id_AssignmentStartDate", "CU_id_AssignmentEndDate"]);
                 await this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+                // this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
                 // this._fetchCommonData("Country", "CountryModel");
                 // this._fetchCommonData("Currency", "CurrencyModel");
                 this._fetchCommonData("EmailContent", "CCMailModel", {
-                    Type: "ContractActive"
+                    Type: "ContractActive", Action: "CC"
                 });
                 this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
 
@@ -1010,9 +1010,9 @@ sap.ui.define([
 
             contractPDFgenerate: async function(oEmpModel) {
                 this.getBusyDialog();
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-                    branchCode: oEmpModel.BranchCode
-                });
+                // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+                //     branchCode: oEmpModel.BranchCode
+                // });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", {
                     Type: "Contract"
                 });

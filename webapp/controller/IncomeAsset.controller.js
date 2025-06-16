@@ -25,8 +25,8 @@ sap.ui.define([
                 this.commonLoginFunction("IncomeAsset");
                 let loginModel = this.getView().getModel("LoginModel").getData();
                 if (loginModel.Role === "IT Consultant") {
-                    await this._fetchCommonData("BaseLocation", "branchModel")
-                    let branchData = await this.getOwnerComponent().getModel("branchModel").getData() || [];
+                    // await this._fetchCommonData("BaseLocation", "branchModel")
+                    let branchData = await this.getOwnerComponent().getModel("BaseLocationModel").getData() || [];
                     let branch = branchData.find(item => item.branchCode == loginModel.BranchCode);
                     if (branch) {
                         loginModel.BranchName = branch.city;
@@ -45,42 +45,6 @@ sap.ui.define([
 
                 var oModel = new JSONModel(filteredEmp);
                 this.getView().setModel(oModel, "pickedByModel");
-
-                //             var aIncomeData = this.getView().getModel("incomeModel").getData();
-                // var oButton = this.getView().byId("IA_pickButton");
-
-                // var bVisible = false; // default false
-
-                // for (var i = 0; i < aIncomeData.length; i++) {
-                //     if (aIncomeData[i].Status === "Transferred") {
-                //         this.getView().byId("IA_pickButton").setVisible(true);
-                //     }
-                // }
-
-
-                //  this.getView().getModel("incomeModel").getData().forEach(item => {
-                //     if (item.Status === "Transferred") {   
-                //         this.getView().byId("IA_pickButton").setVisible(true);
-                //     }} )        
-
-                //                 await this._fetchCommonData("BaseLocation", "branchModel");
-
-                //                 let branchData = await this.getOwnerComponent().getModel("branchModel").getData();
-                //                 let incomeArray = this.getView().getModel("incomeModel").getData();
-
-                //                 let branch = branchData.find(item => item.branchCode === loginModel.BranchCode);
-                //                 if (branch) {
-                //                     loginModel.BranchName = branch.city?.trim();
-                //                 }
-
-                //                if (loginModel.Role === "IT Consultant") {
-                //     const shouldShowPickButton = incomeArray.some(item => item.Status === "Transferred");
-                //     this.byId("IA_pickButton").setVisible(shouldShowPickButton);
-                // } else {
-                //     this.byId("IA_pickButton").setVisible(false); // Fallback safety
-                // }
-
-
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 var model = new JSONModel({
                     "Type": "",
@@ -119,8 +83,8 @@ sap.ui.define([
                 this.Visible = this.getView().getModel("VisiableModel");
                 this.IA_CommonReadCall("");
                 this._fetchCommonData("AssetType", "oAssetTypeModel");
-                this._fetchCommonData("Currency", "oCurrencyModel");
-                this._fetchCommonData("BaseLocation", "branchModel")
+                // this._fetchCommonData("Currency", "oCurrencyModel");
+                // this._fetchCommonData("BaseLocation", "branchModel")
 
 
 
@@ -215,7 +179,7 @@ sap.ui.define([
             },
             Branchname: function () {
                 const loginBranchCode = this.getView().getModel("LoginModel").getProperty("/BranchCode");
-                const baseData = this.getView().getModel("branchModel").getData();
+                const baseData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
 
                 const matchedBranch = baseData.find(branch => branch.branchCode === loginBranchCode);
 
@@ -244,7 +208,7 @@ sap.ui.define([
                 let loginModel = this.getView().getModel("LoginModel").getData();
 
                 var empData = this.getView().getModel("EmpModel").getData();
-                var branchData = this.getView().getModel("branchModel").getData();
+                var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
 
                 // var matchedBranch = branchData.find(branch => branch.city === data.PickedBranch);
                 // var branchCode = matchedBranch ? matchedBranch.branchCode : null;
@@ -588,7 +552,7 @@ sap.ui.define([
             },
             IA_onUpadateButtonPress: async function () {
                 var empData = this.getView().getModel("EmpModel").getData();
-                var branchData = this.getView().getModel("branchModel").getData();
+                var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
                 let loginModel = this.getView().getModel("LoginModel").getData();
 
                 var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode && (emp.Role.includes("Admin") ||
@@ -740,7 +704,7 @@ sap.ui.define([
                 let loginModel = this.getView().getModel("LoginModel").getData();
 
                 var empData = this.getView().getModel("EmpModel").getData();
-                var branchData = this.getView().getModel("branchModel").getData();
+                var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
 
 
 
@@ -876,7 +840,7 @@ sap.ui.define([
 
 
                 var empData = this.getView().getModel("EmpModel").getData();
-                var branchData = this.getView().getModel("branchModel").getData();
+                var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
                 var matchedBranch = branchData.find(branch => branch.city === pickedBranchName);
 
                 var branchCode = matchedBranch ? matchedBranch.branchCode : null;
@@ -956,18 +920,6 @@ sap.ui.define([
                 }
             },
             IA_onTransferButtonPress: function () {
-                //     var loginRole = this.getView().getModel("LoginModel").getProperty("/Role");
-
-                //   const loginBranchCode = this.getView().getModel("LoginModel").getProperty("/BranchCode");
-                //     const baseData = this.getView().getModel("branchModel").getData();
-
-                //     const matchedBranch = baseData.find(branch => branch.branchCode === loginBranchCode);
-                //                         const branchName = matchedBranch.city;
-
-
-                // var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.Role === loginRole && item.BranchCode === loginBranchCode));
-                // this.getView().setModel(oModel, "AdminModel"); 
-
                 var table = this.byId("IA_id_OdataTable");
                 var selected = table.getSelectedItem();
 
@@ -986,7 +938,7 @@ sap.ui.define([
 
                 let loginModel = this.getView().getModel("LoginModel").getData();
                 var empData = this.getView().getModel("EmpModel").getData();
-                var branchData = this.getView().getModel("branchModel").getData();
+                var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
                 if (data.Status === "Available") {
                     var matchedBranch = branchData.find(branch => branch.city === pickedBranchName);
                 } else if (data.Status === "Returned") {
