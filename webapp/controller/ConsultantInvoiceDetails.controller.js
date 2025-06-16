@@ -57,7 +57,7 @@ sap.ui.define(
 
                         var visibilityPlay = new JSONModel({
                             createVisi: true, editVisi: false, editable: true,
-                            invBtn: true, pasteBtn: true, merge: false
+                            invBtn: true,  merge: false
                         });
                         this.getView().setModel(visibilityPlay, "visiablityPlay");
 
@@ -318,7 +318,7 @@ sap.ui.define(
                             this.getView().byId("CI_id_ColumnGST").setVisible(false);
                             this.getView().byId("CI_id_GSTCalc").setVisible(false);
                             this.getView().getModel("visiablityPlay").setProperty("/copyBtn", false);
-                            this.getView().getModel("visiablityPlay").setProperty("/pasteBtn", false);
+                            // this.getView().getModel("visiablityPlay").setProperty("/pasteBtn", false);
 
                             var currency = oInvoiceModel.getProperty("/Currency");
                             this.getView().byId("CI_id_InputGSTNO").setEnabled(currency === "INR");
@@ -358,7 +358,7 @@ sap.ui.define(
                     this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("None");
                     this.getView().getModel("visiablityPlay").setProperty("/invBtn", false);
                     this.getView().getModel("visiablityPlay").setProperty("/copyBtn", true);
-                    this.getView().getModel("visiablityPlay").setProperty("/pasteBtn", false);
+                    // this.getView().getModel("visiablityPlay").setProperty("/pasteBtn", false);
                     this.getView().getModel("visiablityPlay").setProperty("/merge", true);
                 },
 
@@ -696,7 +696,7 @@ sap.ui.define(
                 },
 
                 CI_onChangeGstNo: function(oEvent) {
-                    this.getView().getModel("visiablityPlay").setProperty("/pasteBtn", false);
+                    // this.getView().getModel("visiablityPlay").setProperty("/pasteBtn", false);
                     this.copiedData = {}; // Reset copied data
                     var gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{3}$/;
                     var data = gstRegex.test(this.byId("CI_id_InputGSTNO").getValue());
@@ -707,6 +707,7 @@ sap.ui.define(
 
                 CI_onPressCopyBtn: function() {
                     this.Copy = true;
+                    this.getBusyDialog(); // Show custom BusyDialog
                     var oModel = this.getView().getModel("ConsultantInvoiceModel");
                     var oData = oModel.getProperty("/");
 
@@ -740,44 +741,47 @@ sap.ui.define(
                     }
                 },
 
-                CI_onPressPasteBtn: function() {
-                    this.Copy = false
-                    var oModel = this.getView().getModel("ConsultantInvoiceModel");
+               CI_onPressPasteBtn: function () {
+                    try {
+                        this.Copy = false;
+                        var oModel = this.getView().getModel("ConsultantInvoiceModel");
 
-                    if (this.copiedData && Object.keys(this.copiedData).length > 0) {
-                        if (oModel) {
-                            // Paste copied data
-                            Object.keys(this.copiedData).forEach(key => {
-                                oModel.setProperty("/" + key, this.copiedData[key]);
-                            });
+                        if (this.copiedData && Object.keys(this.copiedData).length > 0) {
+                            if (oModel) {
+                                // Paste copied data
+                                Object.keys(this.copiedData).forEach(key => {
+                                    oModel.setProperty("/" + key, this.copiedData[key]);
+                                });
 
-                            // Validate GST Number and set column visibility
-                            var gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{3}$/;
-                            var isGSTValid = gstRegex.test(this.copiedData.GSTNO);
+                                // Validate GST Number and set column visibility
+                                var gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{3}$/;
+                                var isGSTValid = gstRegex.test(this.copiedData.GSTNO);
 
-                            oModel.setProperty("/GSTValid", isGSTValid && this.copiedData.GSTNO.trim() !== "");
+                                oModel.setProperty("/GSTValid", isGSTValid && this.copiedData.GSTNO.trim() !== "");
 
-                            var oGSTColumn = this.byId("CI_id_ColumnGST");
-                            oGSTColumn.setVisible(isGSTValid);
+                                var oGSTColumn = this.byId("CI_id_ColumnGST");
+                                oGSTColumn.setVisible(isGSTValid);
 
-                            var oGSTCalColumn = this.byId("CI_id_GSTCalc");
-                            oGSTCalColumn.setVisible(isGSTValid);
+                                var oGSTCalColumn = this.byId("CI_id_GSTCalc");
+                                oGSTCalColumn.setVisible(isGSTValid);
 
-                            // Trigger currency validation
-                            if (this.copiedData.Currency !== "INR") {
-                                this.CI_onCurrencyChange(); // Trigger for non-INR currencies
-                            } else {
-                                this.CI_onChangeGstNo(); // Trigger GST validation for INR currency
+                                // Trigger currency validation
+                                if (this.copiedData.Currency !== "INR") {
+                                    this.CI_onCurrencyChange(); // Trigger for non-INR currencies
+                                } else {
+                                    this.CI_onChangeGstNo(); // Trigger GST validation for INR currency
+                                }
+
+                                // Show success message and hide the paste button
+                                sap.m.MessageToast.show("Data pasted successfully!");
+
+                                // Clear copied data
+                                this.copiedData = {}; // Reset copied data
                             }
-
-                            // Show success message and hide the paste button
-                            sap.m.MessageToast.show("Data pasted successfully!");
-
-                            // Clear copied data
-                            this.copiedData = {}; // Reset copied data
-
-                            this.getView().getModel("visiablityPlay").setProperty("/pasteBtn", false);
                         }
+                    } catch (error) {
+                        this.closeBusyDialog();
+                        sap.m.MessageToast.show(error.message || error.responseText);
                     }
                 },
 
