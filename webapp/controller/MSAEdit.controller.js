@@ -264,13 +264,15 @@ sap.ui.define([
 
                 if (validationsPassed) {
                     const oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
+                    this.getView().getModel("FilteredMsaModel").getData()[0].CreateMSADate = sap.ui.getCore().byId("MsaE_id_CreateMSADate").getValue().split('/').reverse().join('-');
+
                     const oPayload = {
                         data: oModel,
                         filters: {
                             MsaID: oModel.MsaID
                         }
                     };
-
+                    this.getView().getModel("FilteredMsaModel").refresh(true);
                     this.getBusyDialog();
 
                     try {
