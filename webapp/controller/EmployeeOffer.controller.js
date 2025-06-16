@@ -40,11 +40,16 @@ sap.ui.define([
                 var oRoleModel = this.getView().getModel("RoleModel");
                 if (oRoleModel) {
                     var aRoles = oRoleModel.getData();
-                   if (!aRoles.length || aRoles[0].Role !== "") {
+                    // Filter out "Contractor" and "Trainee" roles
+                    aRoles = aRoles.filter(function(role) {
+                        return role.Role !== "Contractor" && role.Role !== "Trainee";
+                    });
+                    // Add empty role at the top if not present
+                    if (!aRoles.length || aRoles[0].Role !== "") {
                         aRoles.unshift({ Role: "" });
-                        oRoleModel.setData(aRoles);
                     }
-                }  
+                    oRoleModel.setData(aRoles);
+                }
             },
             // Read call for employee offer data
             readCallForEmployeeOffer: async function (filter) {

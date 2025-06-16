@@ -51,7 +51,7 @@ sap.ui.define(
             const firstEntry = Array.isArray(oData.data)
               ? oData.data[0]
               : oData.data;
-            this.getView().setModel(
+            this.getOwnerComponent().setModel(
               new JSONModel(firstEntry),
               "AppVisibilityModel"
             );

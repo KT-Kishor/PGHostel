@@ -49,7 +49,7 @@ sap.ui.define([
              this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
              this._fetchCommonData("Currency", "CurrencyModel");
             //  this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
-             this._fetchCommonData("PaymentTerms", "ContractpaymentModel")
+            //  this._fetchCommonData("PaymentTerms", "ContractpaymentModel")
              this._fetchCommonData("EmailContent", "CCMailModel",{Type:"PurchaseOrder", Action: "CC"})
 
             this.getView().byId("FPO_id_StartDate").setMinDate(null)

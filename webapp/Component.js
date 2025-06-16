@@ -29,7 +29,7 @@ sap.ui.define([
             this._fetchCommonData("EmployeeDetailsData", "empModel");
             this._fetchCommonData("Country", "CountryModel");
             this._fetchCommonData("AppVisibility", "RoleModel");
-            this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+            // this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
             this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
 
 

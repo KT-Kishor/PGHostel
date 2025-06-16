@@ -30,7 +30,7 @@ sap.ui.define(
                         if(!this.getView().getModel("CreateCustomerModel")){
                             this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
                            // this._fetchCommonData("Currency", "CurrencyModel");
-                            this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
+                            // this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
                         }
                     this.readCallForContract("Initial");
                     } catch (error) {
