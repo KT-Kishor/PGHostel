@@ -20,7 +20,6 @@ sap.ui.define([
             this.branch = this.getOwnerComponent().getModel("LoginModel").getProperty("/BranchCode");
             this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
             await this._fetchCommonData("AssignedTask", "AssignModel", { EmployeeID: this.EmployeeID });
-            await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
             await this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: this.branch });
             const oViewModel = new JSONModel({isUpdate: false,isCreate: true,isSubmitted: false,isEditing: true,calendarStartDate: this._getStartOfWeek(new Date()),isCalendarEnabled: true,formTitle: "",pageTitle: ""});
             this.getView().setModel(oViewModel, "viewModel");
@@ -158,6 +157,7 @@ sap.ui.define([
         },
         TSD_onSubmit: async function () {
             try {
+                await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
                 // Step 1: Validate mandatory fields
                 const isValid = (
                     utils._LCvalidateMandatoryField(this.byId("TSD_id_Assignment"), "ID") &&
@@ -197,8 +197,8 @@ sap.ui.define([
                     TaskName: oData.TaskName,
                     EmployeeID: oData.EmployeeID,
                     EmployeeName: oData.EmployeeName,
-                    ManagerName: oData.ManagerName || "Unknown",
-                    ManagerID: oData.ManagerID || "Unknown",
+                    ManagerName: this.getView().getModel("EmployeeModel").getData()[0].ManagerName,
+                    ManagerID: this.getView().getModel("EmployeeModel").getData()[0].ManagerID,
                     HoursWorked: sEnteredHours.toString(),
                     Date: localDateStr,
                     Month: selectedDateObj.toLocaleString('default', { month: 'long' }),

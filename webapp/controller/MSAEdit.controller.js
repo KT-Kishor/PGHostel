@@ -264,13 +264,15 @@ sap.ui.define([
 
                 if (validationsPassed) {
                     const oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
+                    this.getView().getModel("FilteredMsaModel").getData()[0].CreateMSADate = sap.ui.getCore().byId("MsaE_id_CreateMSADate").getValue().split('/').reverse().join('-');
+
                     const oPayload = {
                         data: oModel,
                         filters: {
                             MsaID: oModel.MsaID
                         }
                     };
-
+                    this.getView().getModel("FilteredMsaModel").refresh(true);
                     this.getBusyDialog();
 
                     try {
@@ -957,9 +959,13 @@ sap.ui.define([
             },
 
             async MsaE_onPressMergeSow() {
+                var tableData = this.getView().getModel("SowReadModel").getData().filter((item) => item.SowID === this.Selected.SowID && item.Status !== "Inactive");
+                if (tableData.length === 0) {
+                    return sap.m.MessageBox.error("PDF Cannot be generated as all contractors are inactive");
+                }
                 this.getBusyDialog();
                 var oPDFModel = this.getView().getModel("PDFData");
-                oPDFModel.setProperty("/TableData", this.getView().getModel("SowReadModel").getData().filter((item) => item.SowID === this.Selected.SowID && item.Status !== "Inactive"));
+                oPDFModel.setProperty("/TableData", tableData);
                 var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
                 await this._fetchCommonData("PDFCondition", "PDFSOWModel", { Type: "SOW" });

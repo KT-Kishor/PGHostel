@@ -23,6 +23,7 @@ sap.ui.define(
           await this.CompanyInvoice_onSearch();
           this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
           this._fetchCommonData("CompanyInvoice", "CompanyInvoiceFilterModel");
+          this.getView().getModel("LoginModel").setProperty("/RichText",false);
         },
 
         CompanyInvoice_onSearch: async function () {

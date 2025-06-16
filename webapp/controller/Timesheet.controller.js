@@ -23,7 +23,7 @@ sap.ui.define(["./BaseController",
 
             var oArgs = oEvent.getParameter("arguments") || {};
             var isManagerView = oArgs.managerView === "true" || oArgs.managerView === true;
-            var employeeID = oArgs.EmployeeID || this.EmployeeID;
+            var employeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
 
             this.getBusyDialog();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -33,7 +33,6 @@ sap.ui.define(["./BaseController",
             oViewModel.setProperty("/canSubmit", false);
             oViewModel.setProperty("/canDelete", false);
 
-            await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: employeeID });
             await this.TSD_ReadTimesheetEntries(employeeID);
 
             if (isManagerView) {

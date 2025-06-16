@@ -561,9 +561,13 @@ sap.ui.define([
                     oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
                 }
             },
-            CID_onPressAddCustomer: function () { this.getRouter().navTo("RouteManageCustomer", { value: "Data" }); },
+            CID_onPressAddCustomer: function () {
+                this.getView().getModel("LoginModel").setProperty("/RichText", false);
+                this.getRouter().navTo("RouteManageCustomer", { value: "Data" });
+            },
 
             CID_onPressMSAandSOW: function () {
+                this.getView().getModel("LoginModel").setProperty("/RichText", false);
                 if (this.SelectKey) {
                     this.getRouter().navTo("RouteMSAEdit", { sPath: this.SelectKey });
                 } else {
@@ -571,7 +575,10 @@ sap.ui.define([
                 }
             },
 
-            CID_onPressback: function () { this.getRouter().navTo("RouteCompanyInvoice") },
+            CID_onPressback: function () {
+                this.getView().getModel("LoginModel").setProperty("/RichText", false);
+                this.getRouter().navTo("RouteCompanyInvoice")
+            },
 
             CID_ValidateDate: function (oEvent) { utils._LCvalidateDate(oEvent) },
 
@@ -989,6 +996,8 @@ sap.ui.define([
                 sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
                 sap.ui.getCore().byId("idFrgConvertionRate").setValueState("None");
                 this.oDialog.close()
+                this._oDialog.destroy(true);  // Destroy the dialog and cleanup
+                this._oDialog = null;
             },
             onLiveTransactionID: function (oEvent) { utils._LCvalidateMandatoryField(oEvent) },
             onReceivedDateDatePickerChange: function (oEvent) { utils._LCvalidateDate(oEvent); },
@@ -1034,6 +1043,8 @@ sap.ui.define([
 
                     if (oData && oData.success) {
                         this.oDialog.close();
+                        this._oDialog.destroy(true);  
+                        this._oDialog = null;
                         this.Readcall("InvoicePaymentDetail", { InvNo: this.decodedPath });
                         this.Readcall("CompanyInvoice", { InvNo: this.decodedPath });
 
@@ -1205,6 +1216,8 @@ sap.ui.define([
                 this.loginModel.setProperty("/RichText", false);
                 this.loginModel.setProperty("/SimpleForm", true);
                 this.EOU_oDialogMail.close();
+                this.EOU_oDialogMail.destroy(true);
+                this.EOU_oDialogMail = null
             },
 
             EOD_commonOpenDialog: async function (fragmentName, value) {
@@ -1278,6 +1291,8 @@ sap.ui.define([
                         this.closeBusyDialog();
                         this.loginModel.setProperty("/RichText", false);
                         this.loginModel.setProperty("/SimpleForm", true);
+                        this.EOU_oDialogMail.destroy(true);
+                        this.EOU_oDialogMail = null;
                     }).catch((error) => {
                         this.closeBusyDialog();
                         MessageToast.show(error.responseText);

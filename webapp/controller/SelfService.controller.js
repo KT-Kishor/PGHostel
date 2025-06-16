@@ -1707,6 +1707,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
             SS_onDownloadExperienceLetter: function () {
+                this.getView().getModel("PDFData").setProperty("/OnlyRTEFlag", true);
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var today = new Date();
                 var date = Formatter.formatDate(today);
@@ -1729,6 +1730,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             SS_onDownloadTerminateLetter: function () {
+                this.getView().getModel("PDFData").setProperty("/OnlyRTEFlag", true);
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var date = Formatter.formatDate(new Date());
                 var empName = oEmpModel.Salutation + " " + oEmpModel.EmployeeName;
@@ -1748,6 +1750,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             SS_onDownloadWorkLetter: function () {
+                this.getView().getModel("PDFData").setProperty("/OnlyRTEFlag", true);
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var today = new Date();
                 var date = Formatter.formatDate(today);
@@ -1769,6 +1772,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             SS_onDownloadSalLetter: function () {
+                this.getView().getModel("PDFData").setProperty("/OnlyRTEFlag", false);
                 var oEmpModel = this.getView().getModel("sEmployeeModel").getData()[0];
                 var today = new Date();
                 var date = Formatter.formatDate(today);
@@ -1789,62 +1793,67 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             FCR_onDownloadPDF: async function () {
-                try {
-                    const empID = this.getView().getModel("sEmployeeModel").getData()[0].EmployeeID;
-                    const empData = this.getView().getModel("sEmployeeModel").getData()[0];
-                    const salaryResponse = await this.ajaxReadWithJQuery("SalaryDetails", { EmployeeID: empID });
-                    let latestSalary;
-                    if (Array.isArray(salaryResponse.data)) {
-                        const sortedSalaries = salaryResponse.data.sort((a, b) => new Date(a.EffectiveDate) - new Date(b.EffectiveDate));
-                        latestSalary = sortedSalaries[sortedSalaries.length - 1];
-                    } else {
-                        latestSalary = salaryResponse.data;
-                    }
-                    var oPDFModel = this.getView().getModel("PDFData");
-                    oPDFModel.setProperty("/YearlyComponents/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.Total));
-                    oPDFModel.setProperty("/YearlyComponents/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.BasicSalary));
-                    oPDFModel.setProperty("/YearlyComponents/2/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.HRA));
-                    oPDFModel.setProperty("/YearlyComponents/3/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.EmployerPF));
-                    oPDFModel.setProperty("/YearlyComponents/4/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.MedicalInsurance));
-                    oPDFModel.setProperty("/YearlyComponents/5/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.Gratuity));
-                    oPDFModel.setProperty("/Deductions/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.TotalDeduction));
-                    oPDFModel.setProperty("/Deductions/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.IncomeTax));
-                    oPDFModel.setProperty("/Deductions/2/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.EmployeePF));
-                    oPDFModel.setProperty("/Deductions/3/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.PT));
-                    oPDFModel.setProperty("/VariableComponents/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.VariablePay));
-                    oPDFModel.setProperty("/GrossPay/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.GrossPay));
-                    oPDFModel.setProperty("/GrossPay/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.GrossPayMontly));
-                    oPDFModel.setProperty("/EmpCTC", empData.Currency + " " + Formatter.fromatNumber(latestSalary.CostofCompany));
-                } catch (error) {
-                    MessageToast.show("Failed to fetch salary data.");
+                const empData = this.getView().getModel("sEmployeeModel").getData()[0];
+                if (this.getView().getModel("PDFData").getProperty("/OnlyRTEFlag")) {
+                    this.generateCertificatePDF(this.getView().getModel("PDFData").getProperty("/RTEText"), empData.BranchCode);
                 }
-                this.SSRTE_oDialog.close();
-                var oModel = this.getView().getModel("PDFData").getData();
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: this.getView().getModel("sEmployeeModel").getData()[0].BranchCode });
-                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-                if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64) {
+                else {
                     try {
-                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
-                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
-                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
-
-                        const [logoBase64, signBase64, backgroundBase64] = await Promise.all([
-                            this._convertBLOBToImage(logoBlob),
-                            this._convertBLOBToImage(signBlob),
-                            this._convertBLOBToImage(backgroundBlob)
-                        ]);
-
-                        oCompanyDetailsModel.companylogo64 = logoBase64;
-                        oCompanyDetailsModel.signature64 = signBase64;
-                        oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
-                    } catch (err) {
-                        console.error("Image compression failed:", err);
-                        this.closeBusyDialog();
+                        const empID = this.getView().getModel("sEmployeeModel").getData()[0].EmployeeID;
+                        const salaryResponse = await this.ajaxReadWithJQuery("SalaryDetails", { EmployeeID: empID });
+                        let latestSalary;
+                        if (Array.isArray(salaryResponse.data)) {
+                            const sortedSalaries = salaryResponse.data.sort((a, b) => new Date(a.EffectiveDate) - new Date(b.EffectiveDate));
+                            latestSalary = sortedSalaries[sortedSalaries.length - 1];
+                        } else {
+                            latestSalary = salaryResponse.data;
+                        }
+                        var oPDFModel = this.getView().getModel("PDFData");
+                        oPDFModel.setProperty("/YearlyComponents/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.Total));
+                        oPDFModel.setProperty("/YearlyComponents/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.BasicSalary));
+                        oPDFModel.setProperty("/YearlyComponents/2/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.HRA));
+                        oPDFModel.setProperty("/YearlyComponents/3/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.EmployerPF));
+                        oPDFModel.setProperty("/YearlyComponents/4/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.MedicalInsurance));
+                        oPDFModel.setProperty("/YearlyComponents/5/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.Gratuity));
+                        oPDFModel.setProperty("/Deductions/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.TotalDeduction));
+                        oPDFModel.setProperty("/Deductions/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.IncomeTax));
+                        oPDFModel.setProperty("/Deductions/2/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.EmployeePF));
+                        oPDFModel.setProperty("/Deductions/3/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.PT));
+                        oPDFModel.setProperty("/VariableComponents/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.VariablePay));
+                        oPDFModel.setProperty("/GrossPay/0/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.GrossPay));
+                        oPDFModel.setProperty("/GrossPay/1/Text", empData.Currency + " " + Formatter.fromatNumber(latestSalary.GrossPayMontly));
+                        oPDFModel.setProperty("/EmpCTC", empData.Currency + " " + Formatter.fromatNumber(latestSalary.CostofCompany));
+                    } catch (error) {
+                        MessageToast.show("Failed to fetch salary data.");
                     }
-                }
-                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
-                    if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
-                        jsPDF._GeneratePDF(this, sap.ui.getCore().byId("FCR_id_RTE").getValue(), oCompanyDetailsModel, oModel);
+                    this.SSRTE_oDialog.close();
+                    var oModel = this.getView().getModel("PDFData").getData();
+                    await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: this.getView().getModel("sEmployeeModel").getData()[0].BranchCode });
+                    var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                    if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64) {
+                        try {
+                            const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                            const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+                            const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
+
+                            const [logoBase64, signBase64, backgroundBase64] = await Promise.all([
+                                this._convertBLOBToImage(logoBlob),
+                                this._convertBLOBToImage(signBlob),
+                                this._convertBLOBToImage(backgroundBlob)
+                            ]);
+
+                            oCompanyDetailsModel.companylogo64 = logoBase64;
+                            oCompanyDetailsModel.signature64 = signBase64;
+                            oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+                        } catch (err) {
+                            console.error("Image compression failed:", err);
+                            this.closeBusyDialog();
+                        }
+                    }
+                    if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                        if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                            jsPDF._GeneratePDF(this, sap.ui.getCore().byId("FCR_id_RTE").getValue(), oCompanyDetailsModel, oModel);
+                        }
                     }
                 }
             },

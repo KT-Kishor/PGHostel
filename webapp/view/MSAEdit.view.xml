@@ -170,7 +170,7 @@
 
 									<m:columns>
 										<m:Column demandPopin="true">
-											<m:Text text="{i18n>consultantName}" />
+											<m:Text text="{i18n>POConsultantname}" />
 										</m:Column>
 										<m:Column demandPopin="true">
 											<m:Text text="{i18n>desc}" />

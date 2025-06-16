@@ -33,7 +33,7 @@
             <DatePicker  id="SOW_id_StartDate" minDate="{simpleForm>/minDate}" value="{sowCreateModel>/StartDate}" visible="{VisibleUpdateModel>/VisibleUpdate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="MsaE_validateDate" valueStateText="{i18n>dateValueState}"/>
            
              <Label text="{i18n>currency}" class="oSowFragLabel" required="true"/>
-             <ComboBox items="{CurrencyModel>/}" editable="{path:'FilteredMsaModel>/0/GST' , formatter: '.Formatter.GSTChecking'}"  value="{sowCreateModel>/Currency}">
+             <ComboBox items="{CurrencyModel>/}"  value="{sowCreateModel>/Currency}">
                 <core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
             </ComboBox>
             

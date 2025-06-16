@@ -6,7 +6,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
         _checkPageBreak: function (currentYPosition, bottomLimit, doc, topMargin, backImgX, backImgY, oCompanyModel) {
             if (currentYPosition >= bottomLimit) {
                 doc.addPage(); // Add a new page if the current position exceeds the limit
-                doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+                doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 127, 8, 63, 14.5);
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
                 doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
@@ -16,7 +16,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
         },
 
         _pdfContent: function (that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content, type) {
-            doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+            doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 127, 8, 63, 14.5);
             doc.setGState(new doc.GState({ opacity: 0.1 }));
             doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
             doc.setGState(new doc.GState({ opacity: 1 }));
@@ -261,7 +261,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
 
                 that._pdfContent(that, doc, pageWidth, pageHeight, margin, paraMargin, topMargin, maxWidth, pageMiddle, bottomLimit, currentY, backImgX, backImgY, oModel, oCompanyModel, content, "Contract");
                 doc.addPage();
-                doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+                doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 127, 8, 63, 14.5);
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
                 doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
@@ -372,7 +372,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 const backImgX = (pageWidth - 100) / 2; // Center horizontally
                 const backImgY = (pageHeight - 100) / 2; // Center vertically
 
-                doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+                doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 127, 8, 63, 14.5);
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
                 doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                 doc.setGState(new doc.GState({ opacity: 1 }));
@@ -857,7 +857,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     y: rteY,
                     html2canvas: { scale: 0.5 },
                     callback: function (doc) {
-                        if (isNextPage) doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 125, 8, 65, 14.5);
+                        if (isNextPage) doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 127, 8, 63, 14.5);
                         doc.setGState(new doc.GState({ opacity: 0.1 }));
                         doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                         doc.setGState(new doc.GState({ opacity: 1 }));
