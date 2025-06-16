@@ -71,7 +71,7 @@
                     <!-- Employee Comment -->
                     <Label text="{i18n>employeeComment}" />
                     <TextArea id="TSD_id_EmpComment"
-                        value="{newModel>/EmployeeComments}"  
+                        value="{newModel>/Comments}"  
                         liveChange="TD_ValidateCommonFields"  
                         maxLength="1000"  
                         valueStateText="{i18n>commentsValueState}"

@@ -76,13 +76,12 @@ sap.ui.define([
                     TaskID: "",
                     TaskName: "",
                     HoursWorked: "",
-                    EmployeeComments: "",
                     ActualHours: "",
                     EmployeeID: this.EmployeeID,
                     EmployeeName: "",
                     ManagerName: "",
                     ManagerID: "",
-                    ManagerComments: ""
+                    Comments:""
                 };
                 this.getView().setModel(new sap.ui.model.json.JSONModel(emptyData), "newModel");
                 if (this.getView().getModel("editModel")) {
@@ -201,13 +200,12 @@ sap.ui.define([
                     ManagerName: oData.ManagerName || "Unknown",
                     ManagerID: oData.ManagerID || "Unknown",
                     HoursWorked: sEnteredHours.toString(),
-                    EmployeeComments: this.byId("TSD_id_EmpComment").getValue(),
                     Date: localDateStr,
                     Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
                     Year: selectedDateObj.getFullYear(),
                     Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
                     Status: "Saved",
-                    ManagerComments: oData.ManagerComments || ""
+                    comments: oData.comments || this.byId("TSD_id_EmpComment").getValue(),
                 };
 
                 // Step 5: Submit to backend
@@ -359,7 +357,6 @@ sap.ui.define([
                     oNewModelData.EmployeeName = AllData.EmployeeName;
                     oNewModelData.ManagerName = AllData.ManagerName;
                     oNewModelData.ManagerID = AllData.ManagerID;
-                    oNewModelData.ManagerComments = AllData.ManagerComments || "";
 
                     this.getView().getModel("newModel").setData(oNewModelData);
                 } else {
