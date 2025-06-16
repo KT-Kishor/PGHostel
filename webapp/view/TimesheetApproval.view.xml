@@ -60,17 +60,12 @@
                         <Text text="{i18n>hoursWorked}" />
                     </Column>
                     <Column minScreenWidth="Desktop" demandPopin="true">
-                        <Text text="{i18n>manager}" />
-                    </Column>
-                    <Column minScreenWidth="Desktop" demandPopin="true">
                         <Text text="{i18n>status}" />
                     </Column>
                     <Column minScreenWidth="Desktop" demandPopin="true">
-                        <Text text="{i18n>employeeComment}" />
+                        <Text text="{i18n>comment}" />
                     </Column>
-                    <Column minScreenWidth="Desktop" demandPopin="true">
-                        <Text text="{i18n>managerComment}" />
-                    </Column>
+                   
                 </columns>
                 <items>
                     <ColumnListItem>
@@ -80,10 +75,8 @@
                             <Text text="{ApprovalTimesheetModel>Date}"/>
                             <Text text="{ApprovalTimesheetModel>Day}"/>
                             <Text text="{ApprovalTimesheetModel>HoursWorked}"/>
-                            <Text text="{ApprovalTimesheetModel>ManagerName}"/>
-                            <Text text="{ApprovalTimesheetModel>Status}"/>
-                            <Text text="{ApprovalTimesheetModel>EmployeeComments}"/>
-                            <Text text="{ApprovalTimesheetModel>ManagerComments}"/>
+                             <Text text="{ApprovalTimesheetModel>Status}"/>
+                            <Button icon="sap-icon://display-more" text="{i18n>View}" press="TSA_onShowComments" />
                         </cells>
                     </ColumnListItem>
                 </items>

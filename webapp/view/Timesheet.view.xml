@@ -78,7 +78,7 @@
                         <Text text="{path:'FilteredTimesheetModel>Date',formatter:'.Formatter.formatDate'}" />
                         <Text text="{FilteredTimesheetModel>Day}" />
                         <Text text="{FilteredTimesheetModel>HoursWorked}" />
-                        <Text text="{EmployeeModel>/0/ManagerName}" />
+                        <Text text="{FilteredTimesheetModel>ManagerName}" />
                             <ObjectStatus text="{FilteredTimesheetModel>Status}" inverted="false"
                                 state="{path:'FilteredTimesheetModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
                         <Button icon="sap-icon://display-more" text="{i18n>View}" press="TS_onShowComments" />
