@@ -48,7 +48,7 @@
                 <ObjectPageSection
                     titleUppercase="false"
                     id="purchaseOrderHeaderSection1"
-                    title="Company Details"
+                    title="{i18n>from}"
                 >
                     <subSections>
                         <ObjectPageSubSection id="dsd1">
@@ -74,7 +74,7 @@
                                 >
                                     <f:content>
                                         <m:Label
-                                            text="Branch Code"
+                                            text="{i18n>branchCode}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
@@ -95,7 +95,7 @@
                                             />
                                         </m:ComboBox>
                                         <m:Label
-                                            text="Company Name"
+                                            text="{i18n>companyName}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -104,7 +104,7 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="Address"
+                                            text="{i18n>address}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -113,7 +113,7 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="Email"
+                                            text="{i18n>email}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -122,7 +122,7 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="GSTIN"
+                                            text="{i18n>gstNo}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -131,7 +131,7 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="PAN"
+                                            text="{i18n>popan}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -175,7 +175,7 @@
                                 >
                                     <f:content>
                                         <m:Label
-                                            text="Company Name"
+                                            text="{i18n>companyName}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
@@ -197,7 +197,7 @@
                                         </m:ComboBox>
 
                                          <m:Label
-                                            text="Customer Name"
+                                            text="{i18n>customername}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -206,7 +206,7 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="Mobile No"
+                                            text="{i18n>mobileNo}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Select
@@ -227,7 +227,7 @@
                                             placeholder="Phone Number"
                                         />
                                         <m:Label
-                                            text="Email"
+                                            text="{i18n>email}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -236,7 +236,7 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="GSTIN"
+                                            text="{i18n>gstNo}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -246,7 +246,7 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="Tax Percentage"
+                                            text="{i18n>pdftax}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -260,7 +260,7 @@
                                             editable="false"
                                         />
                                          <m:Label
-                                            text="PAN No"
+                                            text="{i18n>popan}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -270,7 +270,7 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="Address"
+                                            text="{i18n>address}"
                                             class="oSowFragLabel"
                                         />
                                         <m:TextArea
@@ -280,7 +280,7 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="LUT"
+                                            text="{i18n>custLutVa}"
                                             class="oSowFragLabel"
                                         />
                                         <m:Input
@@ -289,7 +289,7 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="Type"
+                                            text="{i18n>type}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
@@ -312,7 +312,7 @@
                                         </m:Select>
 
                                          <m:Label
-                                            text="Paymant Terms"
+                                            text="{i18n>Paymant Terms}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
@@ -330,7 +330,7 @@
                                         </m:Select>
 
                                         <m:Label
-                                            text="Start Date"
+                                            text="{i18n>sdate}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
@@ -343,7 +343,7 @@
                                             displayFormat="dd/MM/yyyy"
                                         />
                                         <m:Label
-                                            text="End Date"
+                                            text="{i18n>edate}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
@@ -356,7 +356,7 @@
                                             displayFormat="dd/MM/yyyy"
                                         />
                                         <m:Label
-                                            text="Creation Date"
+                                            text="{i18n>podate}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
@@ -369,7 +369,7 @@
                                             displayFormat="dd/MM/yyyy"
                                         />
                                         <m:Label
-                                            text="Currency"
+                                            text="{i18n>currency}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
@@ -385,7 +385,7 @@
                                             />
                                         </m:Select>
                                          <m:Label
-                                            text="Description"
+                                            text="{i18n>description}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
@@ -395,7 +395,7 @@
                                             valueStateText="Enter Description"
                                             liveChange="POO_onCustDescriptionLiveChange"
                                             value="{PurchaseOrderModel>/CustDescription}"
-                                            maxLength="300"
+                                            maxLength="120"
                                         />
                                     </f:content>
                                 </f:SimpleForm>
@@ -407,7 +407,7 @@
                 <ObjectPageSection
                     titleUppercase="false"
                     id="purchaseOrderSection"
-                    title="Purchase Order Items"
+                    title="{i18n>Purchaseorderitems}"
                 >
                     <subSections>
                         <ObjectPageSubSection id="POO_Purchaseordersection">
@@ -424,7 +424,7 @@
                                                 <m:ToolbarSpacer />
                                                 <m:Button
                                                     id="POO_idAddItemButton"
-                                                    text="Add Item"
+                                                    text="{i18n>createitem}"
                                                     press="onAddItemButtonPress"
                                                 />
                                             </m:Toolbar>
@@ -435,21 +435,21 @@
                                             </m:Column>
                                             <m:Column>
                                                 <m:Text
-                                                    text="Consultant Name"
+                                                    text="{i18n>POConsultantname}"
                                                 />
                                             </m:Column>
                                             <m:Column>
-                                                <m:Text text="Description" />
+                                                <m:Text text="{i18n>description}" />
                                             </m:Column>
                                             <m:Column>
-                                                <m:Text text="Unit" />
+                                                <m:Text text="{i18n>unit}" />
                                             </m:Column>
                                             <m:Column>
-                                                <m:Text text="Amount" />
+                                                <m:Text text="{i18n>amount}" />
                                             </m:Column>
                                             <m:Column width="130px" />
                                             <m:Column>
-                                                <m:Text text="Total Amount" />
+                                                <m:Text text="{i18n>totalAmount}" />
                                             </m:Column>
                                         </m:columns>
                                         <m:items>
@@ -467,7 +467,7 @@
                                                         value="{PurchaseOrderModel>ConsultantName}"
                                                         liveChange="PO_onConsultantnameLiveChange"
                                                         valueStateText="Please Enter a Valid Name"
-                                                        maxLength="30"
+                                                        maxLength="50"
                                                         width="100%"
                                                         editable="{PurchaseOrderModel>/Editable}"
                                                     />
@@ -476,7 +476,7 @@
                                                         value="{PurchaseOrderModel>Description}"
                                                         liveChange="onDescriptionInputLiveChange"
                                                         valueStateText="Please enter a valid description"
-                                                        maxLength="250"
+                                                        maxLength="120"
                                                         editable="{PurchaseOrderModel>/Editable}"
                                                     />
                                                     <m:Input
@@ -484,7 +484,7 @@
                                                         liveChange="PO_onAmountInputChange"
                                                         valueStateText="Please enter a valid unit"
                                                         value="{PurchaseOrderModel>Unit}"
-                                                        maxLength="10"
+                                                        maxLength="15"
                                                         width="100%"
                                                         editable="{PurchaseOrderModel>/Editable}"
                                                     />
@@ -493,7 +493,7 @@
                                                         liveChange="PO_onAmountInputChange"
                                                         valueStateText="Please enter a valid amount"
                                                         value="{PurchaseOrderModel>Amount}"
-                                                        maxLength="10"
+                                                        maxLength="15"
                                                         width="100%"
                                                         editable="{PurchaseOrderModel>/Editable}"
                                                     />
@@ -631,8 +631,8 @@
                 <ObjectPageSection
                     titleUppercase="false"
                     id="POO_idSectionNotes"
-                    title="Notes"
-                    tooltip="Notes"
+                    title="{i18n>notes}"
+                    tooltip="{i18n>notes}"
                 >
                     <subSections>
                         <ObjectPageSubSection titleUppercase="false">
@@ -644,7 +644,7 @@
                                             id="POO_idClearButton"
                                             text="Clear"
                                             press="onClearNotesPress"
-                                        />
+                                            />
                                     </m:Toolbar>
                                     <richtexteditor:RichTextEditor
                                         id="FPO_idRichTextEditor"
@@ -664,32 +664,32 @@
                 <m:contentRight>
                     <m:Button
                         id="POO_idSubmitButton"
-                        text="Submit"
+                        text="{i18n>submit}"
                         type="Emphasized"
                         press="POO_onSubmitButtonPress"
                     />
                     <m:Button
                         id="POO_idmailButton"
-                        text="Send Mail"
+                        text="{i18n>tileFooter}"
                         type="Ghost"
                         press="POO_onmailButtonPress"
                     />
                     <m:Button
                         id="POO_ideditButton"
                         visible="{=${PurchaseOrderModel>/Editable}===false}"
-                        text="Edit"
+                        text="{i18n>edit}"
                         type="Emphasized"
                         press="POO_onEditButtonPress"
                     />
                     <m:Button
                         id="POO_idSaveButton"
-                        text="Save"
+                        text="{i18n>save}"
                         type="Accept"
                         press="POO_onSaveButtonPress"
                     />
                     <m:Button
                         id="POO_idPDFButton"
-                        text="Genarate PDF"
+                        text="{i18n>genaratepdf}"
                         type="Attention"
                         press="POO_onPDFButtonPress"
                     />

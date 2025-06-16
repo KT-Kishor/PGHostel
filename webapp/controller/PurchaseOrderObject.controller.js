@@ -46,11 +46,10 @@ sap.ui.define([
             var Layout = this.byId("ObjectPageLayout");
             Layout.setSelectedSection(this.byId("purchaseOrderHeaderSection1"));
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-             this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
-             this._fetchCommonData("Currency", "CurrencyModel");
-            //  this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+            //  this._fetchCommonData("Currency", "CurrencyModel");
+            // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
             //  this._fetchCommonData("PaymentTerms", "ContractpaymentModel")
-             this._fetchCommonData("EmailContent", "CCMailModel",{Type:"PurchaseOrder", Action: "CC"})
+             this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag",{Type:"PurchaseOrder", Action: "CC"})
 
             this.getView().byId("FPO_id_StartDate").setMinDate(null)
             var sdate = this.getView().byId("FPO_id_StartDate") 
@@ -164,7 +163,6 @@ sap.ui.define([
                     this.byId("FPO_idRichTextEditor").setEditable(false)
                     this.byId("POO_idAddItemButton").setVisible(false)
                     this.getView().byId("POO_idSaveButton").setVisible(false)
-                    this.getView().byId("POO_idClearButton").setVisible(false)
                     this.getView().byId("FPO_id_CustDescription").setEditable(false)
                     this.getView().byId("PO_id_PaymantTerms").setEditable(false)
                     purchaseOrderModel.setProperty("/Editable", false);
@@ -326,8 +324,8 @@ sap.ui.define([
 
             var oModel = this.getView().getModel("PurchaseOrderModel").getData()
             try {
-                if (utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_BranchCode"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustomerName"), "ID")
+                if (utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_BranchCode"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_CustomerName"), "ID")
                     && utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID")
                     &&
@@ -335,11 +333,12 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                     this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
                 ) {
-                    var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item) {
+                    var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item,index) {
                         if (!item.Description || !item.Unit || !item.Amount || !item.ConsultantName) {
-                            sap.m.MessageBox.error("Please complete all fields for each item row.")
-                            return false;
-                        }
+
+                            sap.m.MessageBox.error("Please complete all the fields in row " + (index + 1))           
+                                             return false;
+                           }
                         return true;
                     });
                     if (!isValid) {
@@ -355,7 +354,7 @@ sap.ui.define([
                         "Address": oModel.Address,
                         "StartDate": oModel.StartDate.split('/').reverse().join('-'),
                         "EndDate": oModel.EndDate.split('/').reverse().join('-'),
-                        "PAN": oModel.PAN,
+                        "PAN": oModel.PAN || "",
                         "PaymentTerms": oModel.PaymentTerms,
                         "CurrentDate": oModel.CurrentDate.split('/').reverse().join('-'),
                         "Type": oModel.Type || "internal",
@@ -377,7 +376,7 @@ sap.ui.define([
                         "CGST": oModel.CGST,
                         "SGST": oModel.SGST,
                         "GrantTotal": oModel.GrantTotal,
-                        "GSTType": oModel.GSTType,
+                        "GSTType": oModel.GSTType || "",
                         "Description": oModel.CustDescription,
                         "CustomerHeadName": oModel.CustomerHeadName
                     };
@@ -427,9 +426,17 @@ sap.ui.define([
                     type: "Message",
                     state: "Success",
                     content: new sap.m.Text({
-                        text: "Purchase Order Created Successfully"
+                        text: "Purchase order created successfully"
                     }),
-                    endButton: new sap.m.Button({
+                    endButton: new sap.m.Button({                       
+                         text: "Ganarate PDF",
+                        type: "Attention",
+                        press: function () {
+                           this.POO_onPDFButtonPress()
+                            this._oDialog.close();
+                      }.bind(this)
+                    }),
+                    beginButton: new sap.m.Button({
                         text: "OK",
                         type: "Accept",
                         press: function () {
@@ -451,17 +458,17 @@ sap.ui.define([
             var oModel = this.getView().getModel("PurchaseOrderModel").getData()
 
 
-            if (utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_BranchCode"), "ID") &&
-                utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustomerName"), "ID")
+            if (utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_BranchCode"), "ID") &&
+                utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_CustomerName"), "ID")
                 && utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
                 utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID") &&
                 utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
                 utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                 this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
             ) {
-                var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item) {
+                var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item ,index) {
                     if (!item.Description || !item.Unit || !item.Amount || !item.ConsultantName) {
-                        sap.m.MessageBox.error("Please fill in all required fields for each row.")
+                        sap.m.MessageBox.error("Please fill in all required fields for each row " + (index+1))
                         return false;
                     }
                     return true;
@@ -481,7 +488,7 @@ sap.ui.define([
                     "Address": oModel.Address,
                     "StartDate": oModel.StartDate.split('/').reverse().join('-'),
                     "EndDate": oModel.EndDate.split('/').reverse().join('-'),
-                    "PAN": oModel.PAN,
+                    "PAN": oModel.PAN || "",
                     "PaymentTerms": oModel.PaymentTerms || "10 Days",
                     "CurrentDate": oModel.CurrentDate.split('/').reverse().join('-'),
                     "Type": oModel.Type || "internal",
@@ -503,7 +510,7 @@ sap.ui.define([
                     "CGST": oModel.CGST,
                     "SGST": oModel.SGST,
                     "GrantTotal": oModel.GrantTotal,
-                    "GSTType": oModel.GSTType,
+                    "GSTType": oModel.GSTType || "",
                     "Description": oModel.CustDescription,
                     "CustomerHeadName": oModel.CustomerHeadName
                 };
@@ -555,11 +562,12 @@ sap.ui.define([
                 this.byId("PO_id_Type").setEditable(false)
                 this.byId("FPO_idRichTextEditor").setEditable(false)
                 this.byId("POO_idAddItemButton").setVisible(false)
-                this.byId("POO_idClearButton").setVisible(false)
                 this.byId("FPO_id_BranchCode").setEditable(false)
                 this.byId("FPO_id_CustDescription").setEditable(false)
                 this.byId("PO_id_PaymantTerms").setEditable(false)
                 this.byId("FPO_id_Currency").setEditable(false)
+                this.byId("POO_idmailButton").setVisible(true)
+                this.byId("POO_idPDFButton").setVisible(true)
 
                 purchaseOrderModel.setProperty("/Editable", false);
             } else {
@@ -581,13 +589,12 @@ sap.ui.define([
             this.byId("PO_id_Type").setEditable(true)
             this.byId("FPO_idRichTextEditor").setEditable(true)
             this.byId("POO_idAddItemButton").setVisible(true)
-            this.byId("POO_idClearButton").setVisible(true)
             this.byId("FPO_id_BranchCode").setEditable(true)
             this.byId("FPO_id_CustDescription").setEditable(true)
             this.byId("PO_id_PaymantTerms").setEditable(true)
             this.byId("FPO_id_Currency").setEditable(true)
-            // this.byId("POO_idmailButton").setVisible(false)
-            // this.byId("POO_idPDFButton").setVisible(false)
+            this.byId("POO_idmailButton").setVisible(false)
+            this.byId("POO_idPDFButton").setVisible(false)
 
 
 
@@ -771,24 +778,23 @@ sap.ui.define([
             this.EOU_oDialogMail = null;
         },
         //File upload function calling from base controller
-        Mail_onUpload: function (oEvent) {
-            this.handleFileUpload(
-                oEvent,
-                this,                      // context
-                "UploaderData",            // model name
-                "/attachments",            // path to attachment array
-                "/name",                   // path to comma-separated file names
-                "/isFileUploaded",         // boolean flag path
-                "uploadSuccessfull",       // i18n success key
-                "fileAlreadyUploaded",     // i18n duplicate key
-                "noFileSelected",          // i18n no file selected
-                "fileReadError",           // i18n file read error
-                () => this.validateSendButton()
-            );
-        },
+         Mail_onUpload: function(oEvent) {
+                this.handleFileUpload(
+                    oEvent,
+                    this, // context
+                    "UploaderData", // model name
+                    "/attachments", // path to attachment array
+                    "/name", // path to comma-separated file names
+                    "/isFileUploaded", // boolean flag path
+                    "uploadSuccessfull", // i18n success key
+                    "fileAlreadyUploaded", // i18n duplicate key
+                    "noFileSelected", // i18n no file selected
+                    "fileReadError", // i18n file read error
+                    () => this.validateSendButton()
+                );
+            },
         //Mail dialog button visibility
-        validateSendButton: function () {
-            try {
+        validateSendButton: function() {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                 const emailField = sap.ui.getCore().byId("CCMail_TextArea");
                 const uploaderModel = this.getView().getModel("UploaderData");
@@ -797,31 +803,30 @@ sap.ui.define([
                 }
                 const isEmailValid = utils._LCvalidateEmail(emailField, "ID") === true;
                 const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
-                sendBtn.setEnabled(isEmailValid && isFileUploaded);
-            } catch (error) {
-                MessageToast.show(this.i18nModel.getText("technicalError"));
-            }
-        },
 
-        //If mail changing then check validation
-        Mail_onEmailChange: function () {
-            this.validateSendButton();
-        },
+                sendBtn.setEnabled(isEmailValid && isFileUploaded);
+            },
+
+            Mail_onEmailChange: function() {
+                this.validateSendButton(); // Reuse from BaseController
+            },
         //Send mail
         Mail_onSendEmail: function () {
             try {
                 var oModel = this.getView().getModel("PurchaseOrderModel").getData();
                 var oPayload = {
-                    "toEmailID": oModel.customerEmail,
+                    "toEmailID":"nareshtelkar2674@gmail.com",
                     "CustomerHeadName": oModel.CustomerHeadName,
                     "PoNumber": this.PoNumber,
                     "CompanyName": oModel.CompanyName,
                     "StartDate": oModel.StartDate,
                     "EndDate": oModel.EndDate,
-                    "Description": oModel.CustDescription,
-                    "PaymentTerms": oModel.PaymentTerms,
-                    "GrantTotal": oModel.GrantTotal
-                };
+                    "Description": oModel.CustDescription ,
+                    "PaymentTerms": oModel.PaymentTerms || "10 Days",
+                    "GrantTotal": oModel.GrantTotal,
+                    "CC":this.getView().getModel("UploaderData").getProperty("/CCEmail"),
+                    "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
+                                };
                 this.getBusyDialog();
                 this.ajaxCreateWithJQuery("PurchaseOrderEmail", oPayload).then((oData) => {
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
