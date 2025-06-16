@@ -29,13 +29,13 @@ sap.ui.define([
                     this.ExpenseID = oEvent.getParameter("arguments").sPath;
 
                     if (this.ExpenseID.includes("MyInbox")) {
-                       // await this._fetchCommonData("Country", "CountryModel");
-                      //  await this._fetchCommonData("BaseLocation", "BaseLocationModel");
+                        // await this._fetchCommonData("Country", "CountryModel");
+                        //  await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                         this.ExpenseID = this.ExpenseID.split("|")[0];
                         this.MyInBox = true;
                     }
 
-                   // if (!this.getView().getModel("CurrencyModel")) await this._fetchCommonData("Currency", "CurrencyModel");
+                    // if (!this.getView().getModel("CurrencyModel")) await this._fetchCommonData("Currency", "CurrencyModel");
                     await this._fetchCommonData("Expense", "FilteredExpenseModel", {
                         ExpenseID: this.ExpenseID,
                     });
@@ -196,9 +196,9 @@ sap.ui.define([
                 this.ViewModel.setProperty("/SubmitBtn", false);
                 this.ViewModel.setProperty("/SaveBtn", true);
                 this.openFragment();
-                if(this.SelectedData.ItemType === "Peridiem Declaration"){
+                if (this.SelectedData.ItemType === "Peridiem Declaration") {
                     this.ViewModel.setProperty("/enable", false);
-                }else{
+                } else {
                     this.ViewModel.setProperty("/enableDelete", true);
                 }
                 var jsonExpense = {
@@ -375,6 +375,7 @@ sap.ui.define([
                         content: [],
                         endButton: new sap.m.Button({
                             text: "Close",
+                            type: "Reject",
                             press: function () {
                                 if (this._pdfBlobUrl) {
                                     URL.revokeObjectURL(this._pdfBlobUrl);
@@ -841,7 +842,8 @@ sap.ui.define([
                 var oData = Array.isArray(aData) && aData.length > 0 ? aData[0] : {};
                 var aComments = oData.comments || [];
 
-                var aTimelineItems = aComments.map(function (oComment) {
+                // ✅ Reverse the array to show latest comments first
+                var aTimelineItems = aComments.slice().reverse().map(function (oComment) {
                     return new sap.suite.ui.commons.TimelineItem({
                         dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
                         title: oComment.CommentedBy || "Anonymous",
@@ -855,16 +857,16 @@ sap.ui.define([
                     showHeader: false,
                     enableBusyIndicator: false,
                     width: "100%",
-                    sortOldestFirst: true,
+                    sortOldestFirst: true, // Can remain true since items are reversed manually
                     enableDoubleSided: false,
                     content: aTimelineItems,
                     showHeaderBar: false
                 });
 
-                // Inject into VBox in the ObjectPageSubSection
                 var oVBox = oView.byId("timelineContainer");
-                oVBox.removeAllItems(); // Clear previous content if any
+                oVBox.removeAllItems();
                 oVBox.addItem(oTimeline);
             }
+
         });
     });
