@@ -30,15 +30,6 @@ sap.ui.define(
         var oVisiModel = new JSONModel();
 
         if (sQuotationNo === "new") {
-          //  Set Busy true on dropdowns
-          this.byId("HQD_id_Country").setBusy(true);
-          this.byId("HQD_id_BranchCode").setBusy(true);
-          await this._fetchCommonData("Country", "CountryModel");
-          this._fetchCommonData("BaseLocation", "BrachModel");
-          // this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
-          this.byId("HQD_id_Country").setBusy(false);
-          this.byId("HQD_id_BranchCode").setBusy(false);
-
           //continue with model binding 
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
           var oToday = new Date();
@@ -99,8 +90,6 @@ sap.ui.define(
         else {
           // Edit Mode
           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation", Action: "CC" });
-          this._fetchCommonData("Country", "CountryModel");
-          //  this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
           var oSelectedQuotation = aQuotations.find(item => item.QuotationNo === sQuotationNo);
           if (oSelectedQuotation) {
@@ -127,12 +116,6 @@ sap.ui.define(
               oSelectedModel.setProperty("/Notes", tmpDiv.textContent || tmpDiv.innerText || "");
             }
             this.getView().setModel(oSelectedModel, "SingleCompanyModel");
-            const sCountry = oSelectedQuotation.Country;
-            if (sCountry === "India") {
-              await this._fetchCommonData("BaseLocation", "BrachModel");
-            } else {
-
-            }
 
             setTimeout(() => {
               const oEditor = this.byId("HQD_id_Notes");
@@ -207,7 +190,7 @@ sap.ui.define(
         if (sSelectedKey === "India") {
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
           oSingleCompanyModel.setProperty("/Branch", "Kalaburagi");
-          this._fetchCommonData("BaseLocation", "BrachModel");
+          this._fetchCommonData("BaseLocation", "BaseLocationModel");
           oVisibilityModel.setProperty("/showBranch", true); oQuotationModel.setProperty("/ShowGSTFields", true); oQuotationModel.setProperty("/CGSTSelected", true); oQuotationModel.setProperty("/IGSTSelected", false); oQuotationModel.setProperty("/CGSTVisible", true);
           oQuotationModel.setProperty("/SGSTVisible", true); oQuotationModel.setProperty("/IGSTVisible", false); oSingleCompanyModel.setProperty("/Percentage", 9); oSingleCompanyModel.setProperty("/gstEditable", true);
           // Setting Mobile number

@@ -13,70 +13,68 @@
             />
         </headerContent>
         <content>
-                <fb:FilterBar
-                    id="HQ_id_QuotationFilterBar"
-                    persistencyKey="myPersKey"
-                    filterChange="HQ_onFilterChange"
-                    afterVariantLoad=".onAfterVariantLoad"
-                    clear="HQ_onClearFilters"
-                    showClearOnFB="true"
-                    showFilterConfiguration="false"
-                    useToolbar="false"
-                    search="HQ_onSearch"
-                >
-                    <fb:filterGroupItems>
-                        <fb:FilterGroupItem
-                            name="QuotationNo"
-                            label="{i18n>quotationNo}"
-                            groupName="Group1"
-                            visibleInFilterBar="true"
-                        >
-                            <fb:control>
-                                <ComboBox
-                                    showSecondaryValues="true"
-                                    items="{path: 'CompanyQuotationModel>/'}"
-                                    showClearIcon="true"
-                                    id="HQ_id_quotationNo"
-                                >
-                                    <core:ListItem
-                                        key="{CompanyQuotationModel>QuotationNo}"
-                                        text="{CompanyQuotationModel>QuotationNo}"
-                                        additionalText="{CompanyQuotationModel>CompanyName}"
-                                    />
-                                </ComboBox>
-                            </fb:control>
-                        
-                        </fb:FilterGroupItem>
-                        <fb:FilterGroupItem
-                            name="CustomerName"
-                            label="{i18n>customerName}"
-                            groupName="Group1"
-                            visibleInFilterBar="true"
-                        >
-                            <fb:control>
-                                <ComboBox
-                                    showSecondaryValues="true"
-                                    items="{path: 'CompanyQuotationModel>/'}"
-                                    showClearIcon="true"
-                                    id="HQ_id_CustomerName"
-                                >
-                                    <core:ListItem
-                                        key="{CompanyQuotationModel>CustomerName}"
-                                        text="{CompanyQuotationModel>CustomerName}"
-                                        additionalText="{CompanyQuotationModel>QuotationNo}"
-                                    />
-                                </ComboBox>
-                            </fb:control>
-                        
-                        </fb:FilterGroupItem>
-                        <fb:FilterGroupItem name="Date" label="{i18n>quotaiodate}" groupName="Group1" visibleInFilterBar="true">
-                            <fb:control>
-                                <DateRangeSelection id="HQ_id_Quotaiondate" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
-                            </fb:control>
-                        </fb:FilterGroupItem>
-
-                    </fb:filterGroupItems>
-                </fb:FilterBar>
+         <fb:FilterBar
+    id="HQ_id_QuotationFilterBar"
+    persistencyKey="myPersKey"
+    filterChange="HQ_onFilterChange"
+    afterVariantLoad=".onAfterVariantLoad"
+    clear="HQ_onClearFilters"
+    showClearOnFB="true"
+    showFilterConfiguration="false"
+    useToolbar="false"
+    search="HQ_onSearch">
+    <fb:filterGroupItems>
+        <fb:FilterGroupItem
+            name="QuotationNo"
+            label="{i18n>quotationNo}"
+            groupName="Group1"
+            visibleInFilterBar="true">
+            <fb:control>
+                <ComboBox
+                    showSecondaryValues="true"
+                    items="{path: 'FilteredQuotations>/'}"
+                    showClearIcon="true"
+                    id="HQ_id_quotationNo"
+                    selectedKey="{/filters/QuotationNo}">
+                    <core:ListItem
+                        key="{FilteredQuotations>QuotationNo}"
+                        text="{FilteredQuotations>QuotationNo}"
+                        additionalText="{FilteredQuotations>CompanyName}"/>
+                </ComboBox>
+            </fb:control>
+        </fb:FilterGroupItem>
+        <fb:FilterGroupItem
+            name="CustomerName"
+            label="{i18n>customerName}"
+            groupName="Group1"
+            visibleInFilterBar="true">
+            <fb:control>
+                <ComboBox
+                    showSecondaryValues="true"
+                    items="{path: 'FilteredCustomers>/'}"
+                    showClearIcon="true"
+                    id="HQ_id_CustomerName"
+                    selectedKey="{/filters/CustomerName}">
+                    <core:ListItem
+                        key="{FilteredCustomers>CustomerName}"
+                        text="{FilteredCustomers>CustomerName}"
+                        additionalText="{FilteredCustomers>QuotationNo}"/>
+                </ComboBox>
+            </fb:control>
+        </fb:FilterGroupItem>
+        <fb:FilterGroupItem name="Date" label="{i18n>quotaiodate}" groupName="Group1" visibleInFilterBar="true">
+            <fb:control>
+                <DateRangeSelection 
+                    id="HQ_id_Quotaiondate" 
+                    valueFormat="yyyy-MM-dd" 
+                    displayFormat="dd/MM/yyyy" 
+                    change="onDateRangeChange"
+                    dateValue="{/filters/DateFrom}"
+                    secondDateValue="{/filters/DateTo}"/>
+            </fb:control>
+        </fb:FilterGroupItem>
+    </fb:filterGroupItems>
+</fb:FilterBar>
                 <Table
                 items="{path: 'CompanyQuotationModel>/'}"
                 alternateRowColors="true"

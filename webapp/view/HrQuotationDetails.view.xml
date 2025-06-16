@@ -92,7 +92,7 @@
                                         <m:Label text="{i18n>branch}" />
 <m:ComboBox
     id="HQD_id_BranchCode"
-    items="{BrachModel>/}" 
+    items="{BaseLocationModel>/}" 
     selectedKey="{SingleCompanyModel>/Branch}"
     value="{SingleCompanyModel>/Branch}"
     change="HQD_onBrachChange"
@@ -101,7 +101,7 @@
      valueStateText="Enter Branch"
      showSecondaryValues="true"
 >
-    <core:ListItem key="{BrachModel>branchCode}" text="{BrachModel>city}" additionalText="{BrachModel>branchCode}" />
+    <core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 </m:ComboBox>
 
                                         <m:Label
