@@ -48,9 +48,9 @@ sap.ui.define([
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
              this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
              this._fetchCommonData("Currency", "CurrencyModel");
-             this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+            //  this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
              this._fetchCommonData("PaymentTerms", "ContractpaymentModel")
-             this._fetchCommonData("EmailContent", "CCMailModel",{Type:"PurchaseOrder"})
+             this._fetchCommonData("EmailContent", "CCMailModel",{Type:"PurchaseOrder", Action: "CC"})
 
             this.getView().byId("FPO_id_StartDate").setMinDate(null)
             var sdate = this.getView().byId("FPO_id_StartDate") 

@@ -21,7 +21,7 @@ sap.ui.define([
                 // this._fetchCommonData("Country", "CountryModel");
                 // this._fetchCommonData("Currency", "CurrencyModel");
                 this._fetchCommonData("EmailContent", "CCMailModel", {
-                    Type: "ContractActive"
+                    Type: "ContractActive", Action: "CC"
                 });
                 this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
 
@@ -1010,9 +1010,9 @@ sap.ui.define([
 
             contractPDFgenerate: async function(oEmpModel) {
                 this.getBusyDialog();
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-                    branchCode: oEmpModel.BranchCode
-                });
+                // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+                //     branchCode: oEmpModel.BranchCode
+                // });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", {
                     Type: "Contract"
                 });

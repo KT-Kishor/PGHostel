@@ -429,7 +429,7 @@ sap.ui.define([
             T_onCerMail:async function () {
                 try {
                     sap.ui.core.BusyIndicator.show(0);
-                    await  this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeCertificate" });
+                    await  this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeCertificate", Action: "CC" });
                     var oTraineeEmail = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject().TraineeEmail;
                     if (!oTraineeEmail || oTraineeEmail.length === 0) {
                         MessageBox.error("To Email is missing");

@@ -39,7 +39,7 @@ sap.ui.define([
                     "STDCode": "+91",
                     "Gender": ""
                 };
-                await this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag", { Type: "TraineeOffer"});
+                await this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag", { Type: "TraineeOffer", Action: "CC"});
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
                 this.getView().setModel(oViewModel, "viewModel");

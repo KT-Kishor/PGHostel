@@ -30,7 +30,7 @@ sap.ui.define([
                 aData.sort((a, b) => a.city.localeCompare(b.city));
                 // Update the model with sorted data
                 oModel.setData(aData);
-                this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag", { Type: "EmployeeOffer" }); //CC mail id get call
+                this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag", { Type: "EmployeeOffer", Action: "CC" }); //CC mail id get call
                 
                 var jsonData = {
                     "Salutation": "Mr.",

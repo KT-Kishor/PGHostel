@@ -25,7 +25,7 @@ sap.ui.define(
         this._ViewDatePickersReadOnly(["HQD_id_Quotation", "HQD_id_QuotationValid"], this.getView())
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+        // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         var oVisiModel = new JSONModel();
 
@@ -98,7 +98,7 @@ sap.ui.define(
         // Inside the onRouteMatched function's else block (edit mode)
         else {
           // Edit Mode
-          this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation" });
+          this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation", Action: "CC" });
           this._fetchCommonData("Country", "CountryModel");
           //  this._fetchCommonData("CompanyInvoiceSAC", "SACModel");
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
