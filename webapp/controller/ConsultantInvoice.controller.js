@@ -192,12 +192,24 @@ sap.ui.define(
                         if (oControl) {
                             if (oControl.isA("sap.m.ComboBox")) {
                                 const selectedKey = oControl.getSelectedKey();
-                                if (selectedKey && sParamKey === "InvoiceNo") {
-                                    const [invoiceNo, employeeId] = selectedKey.split("|");
-                                    if (invoiceNo) params["InvoiceNo"] = invoiceNo;
-                                    if (employeeId) params["EmployeeID"] = employeeId;
-                                } else if (selectedKey) {
-                                    params[sParamKey] = selectedKey;
+                                const inputValue = oControl.getValue(); // Get the manually entered value
+                                
+                                if (sParamKey === "InvoiceNo") {
+                                    if (selectedKey) {
+                                        const [invoiceNo, employeeId] = selectedKey.split("|");
+                                        if (invoiceNo) params["InvoiceNo"] = invoiceNo;
+                                        if (employeeId) params["EmployeeID"] = employeeId;
+                                    } else if (inputValue) {
+                                        // Use the manually entered value
+                                        params["InvoiceNo"] = inputValue;
+                                    }
+                                } else {
+                                    // For other comboboxes (like EmployeeID)
+                                    if (selectedKey) {
+                                        params[sParamKey] = selectedKey;
+                                    } else if (inputValue) {
+                                        params[sParamKey] = inputValue;
+                                    }
                                 }
                             }
                             else if (oControl.isA("sap.m.DateRangeSelection")) {

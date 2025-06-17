@@ -133,14 +133,14 @@ sap.ui.define([
             Msa_ChangeMsaDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
                 const oModelData = this.getView().getModel("FilteredMsaModel").getData()[0];
-                const [day, month, year] = this.byId("MsaE_id_CreateMSADate").getValue().split('/');
+                const [day, month, year] = sap.ui.getCore().byId("MsaE_id_CreateMSADate").getValue().split('/');
                 const assignmentEndDate = new Date(year, month - 1, day);
 
                 const contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]);
                 assignmentEndDate.setMonth(assignmentEndDate.getMonth() + contractPeriod);
 
                 oModelData.MsaContractPeriodEndDate = assignmentEndDate.toISOString().split('T')[0];
-                oModelData.CreateMSADate = this.byId("MsaE_id_CreateMSADate").getValue().split("/").reverse().join("-");
+                oModelData.CreateMSADate = sap.ui.getCore().byId("MsaE_id_CreateMSADate").getValue().split("/").reverse().join("-");
             },
 
             Msa_LC_PanCard: function (oEvent) {

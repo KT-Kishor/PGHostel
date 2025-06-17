@@ -1,8 +1,10 @@
 sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast"
-], function (BaseController, JSONModel, MessageToast) {
+    "sap/m/MessageToast",
+     "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
+    "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
+], function (BaseController, JSONModel, MessageToast, Timeline, TimelineItem) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetApproval", {
         onInit: function () {
@@ -13,15 +15,21 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-             var LoginFunction = await this.commonLoginFunction("TimesheetApproval");
+            var LoginFunction = await this.commonLoginFunction("TimesheetApproval");
             if (!LoginFunction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Timesheet Approval");
 
             // Get ManagerID from LoginModel
             const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
-            this.getBusyDialog();
 
+            await this.readSubmittedTimesheetsForManager(ManagerID);
+
+            // Disable buttons initially
+            this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
+        },
+        readSubmittedTimesheetsForManager: async function (ManagerID) {
+            this.getBusyDialog();
             try {
                 // Read all timesheet entries for employees under this manager
                 const oData = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID });
@@ -31,15 +39,12 @@ sap.ui.define([
                 timesheetData = timesheetData.filter(entry => entry.Status === "Submitted");
 
                 // Set filtered data to ApprovalTimesheetModel
-                this.getView().setModel(new JSONModel(timesheetData), "ApprovalTimesheetModel");
+                this.getView().setModel(new sap.ui.model.json.JSONModel(timesheetData), "ApprovalTimesheetModel");
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
             } finally {
                 this.closeBusyDialog();
             }
-
-            // Disable buttons initially
-            this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
         },
 
         TSA_onSelect: function () {
@@ -172,6 +177,87 @@ sap.ui.define([
 
         onLogout: function () {
             this.getRouter().navTo("RouteLoginPage");
-        }
+        },
+        TSA_onSearch: async function () {
+            try {
+                this.getBusyDialog();
+                var aFilterItems = this.byId("TSA_id_Filter").getFilterGroupItems();
+                var params = {};
+                aFilterItems.forEach(function (oItem) {
+                    var oControl = oItem.getControl();
+                    var sValue = oItem.getName();
+                    if (oControl && oControl.getValue && oControl.getValue()) {
+                        params[sValue] = oControl.getValue();
+                    }
+                });
+
+                // Always fetch only submitted timesheets for this manager
+                const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
+                await this.readSubmittedTimesheetsForManager(ManagerID);
+
+                // Apply client-side filters
+                var aAllData = this.getView().getModel("ApprovalTimesheetModel").getData();
+                var aFiltered = aAllData;
+
+                // Example: filter by EmployeeID if present
+                if (params.EmployeeID) {
+                    aFiltered = aFiltered.filter(function (entry) {
+                        return entry.EmployeeID && entry.EmployeeID.toString().includes(params.EmployeeID);
+                    });
+                }
+                // Update the model with filtered data
+                this.getView().getModel("ApprovalTimesheetModel").setData(aFiltered);
+
+            } catch (error) {
+                MessageToast.show(this.i18nModel.getText("technicalError"));
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        TSA_onClear: function () {
+            this.byId("TSA_id_Name").setValue("");
+        },
+         TSA_onShowComments: function (oEvent) {
+                var oContext = oEvent.getSource().getBindingContext("ApprovalTimesheetModel");
+                var oData = oContext.getObject();
+                var aComments = oData.comments || [];
+                var aTimelineItems = aComments.map(function (oComment) {
+                    return new TimelineItem({
+                        dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
+                        title: oComment.CommentedBy || "Anonymous",
+                        text: oComment.Comment || "No comment provided",
+                        userNameClickable: false,
+                        icon: "sap-icon://comment"
+                    });
+                });
+                var oTimeline = new Timeline({
+                    showHeader: false,
+                    enableBusyIndicator: false,
+                    width: "100%",
+                    sortOldestFirst: true,
+                    enableDoubleSided: false,
+                    content: aTimelineItems,
+                    showHeaderBar: false
+                });
+                var oDialog = new sap.m.Dialog({
+                    title: this.i18nModel.getText("tCommentsTitle"),
+                    contentWidth: "25rem",
+                    contentHeight: "15rem",
+                    draggable: true,
+                    resizable: true,
+                    content: [oTimeline],
+                    endButton: new sap.m.Button({
+                        text: this.i18nModel.getText("close"),
+                        type: "Reject",
+                        press: function () {
+                            oDialog.close();
+                            oDialog.destroy();
+                        }
+                    })
+                });
+                oDialog.open();
+            },
+
     });
 });

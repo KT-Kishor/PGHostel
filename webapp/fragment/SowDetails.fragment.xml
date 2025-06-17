@@ -55,7 +55,7 @@
     </headerToolbar>
     <columns>
         <Column minScreenWidth="Tablet" width="8%"><Text text="{i18n>sNo}" /></Column>
-        <Column minScreenWidth="Tablet" demandPopin="true" width="30%"><Text text="{i18n>consultantName}" /></Column>
+        <Column minScreenWidth="Tablet" demandPopin="true" width="30%"><Text text="{i18n>POConsultantname}" /></Column>
         <Column minScreenWidth="Tablet" demandPopin="true" width="22%"><Text text="{i18n>designation}" /></Column>
         <Column visible="{VisibleUpdateModel>/VisibleUpdateStatus}" minScreenWidth="Tablet" demandPopin="true" width="25%"><Text text="{i18n>status}" /></Column>
         <Column minScreenWidth="Tablet" demandPopin="true" width="40%"><Text text="{i18n>rate}" /></Column>
@@ -82,7 +82,7 @@
                 </HBox>
             </cells>
             <cells>
-                <Input value="{oModelDataPro>Designation}" liveChange="onLiveChangeDesiganation" valueStateText="{i18n>designationValueState}" maxLength="15" width="100%" />
+                <Input value="{oModelDataPro>Designation}" liveChange="onLiveChangeDesiganation" valueStateText="{i18n>designationValueState}" maxLength="50" width="100%" />
             </cells>
             <cells >
                <ComboBox items="{SowModel>/SowStatus}" value="{oModelDataPro>Status}" width="100%">

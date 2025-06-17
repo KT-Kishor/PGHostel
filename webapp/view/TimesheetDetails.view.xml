@@ -65,7 +65,7 @@
                         visible="{visiblePlay>/isAssignmentMode}"
                         change="TD_ValidateTime"
                         valueStateText="{i18n>hoursValueState}"
-                        editable="{= ${viewModel>/isCreate} }" /> <!-- Only editable in create mode -->
+                        editable="{= ${viewModel>/isEditing} }" /> 
 
                     <Text id="idTextActHour" text="Actual Hours: {/newModel/ActualHours}" />
                     <!-- Employee Comment -->
@@ -75,7 +75,7 @@
                         liveChange="TD_ValidateCommonFields"  
                         maxLength="1000"  
                         valueStateText="{i18n>commentsValueState}"
-                        editable="{viewModel>/isEditing}" /> <!-- Editable in create mode or when editing in edit mode -->
+                        editable="{viewModel>/isEditing}" /> 
                 </f:content>
             </f:SimpleForm>
         </content>
