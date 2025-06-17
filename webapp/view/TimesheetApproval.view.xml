@@ -39,6 +39,7 @@
                 mode="MultiSelect"
                 items="{ApprovalTimesheetModel>/}"
                 growing="true"
+                selectionChange="TSA_onSelect"
                 growingScrollToLoad="true"
                 growingThreshold="50"
                 alternateRowColors="true"
@@ -72,7 +73,7 @@
                         <cells>
                             <Text text="{ApprovalTimesheetModel>EmployeeID}"/>
                             <Text text="{ApprovalTimesheetModel>TaskName}"/>
-                            <Text text="{ApprovalTimesheetModel>Date}"/>
+                            <Text text="{path:'ApprovalTimesheetModel>Date',formatter:'.Formatter.formatDate'}"/>
                             <Text text="{ApprovalTimesheetModel>Day}"/>
                             <Text text="{ApprovalTimesheetModel>HoursWorked}"/>
                              <Text text="{ApprovalTimesheetModel>Status}"/>
@@ -88,8 +89,10 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
                 <contentRight>
-                    <Button text="{i18n>approve}" press="TSA_onApprove" type="Accept" id="TSA_id_Approve"/>
-                    <Button text="{i18n>reject}" press="TSA_onReject" type="Reject" id="TSA_id_Reject"/>
+                    <Button text="{i18n>approve}" press="TSA_onApprove" type="Accept" id="TSA_id_Approve"
+                     enabled="{approvalViewModel>/canApproveReject}"/>
+                    <Button text="{i18n>reject}" press="TSA_onReject" type="Reject" id="TSA_id_Reject"
+                     enabled="{approvalViewModel>/canApproveReject}"/>
                 </contentRight>
             </Bar>
         </footer>
