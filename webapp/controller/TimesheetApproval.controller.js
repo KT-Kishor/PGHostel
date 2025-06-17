@@ -1,8 +1,10 @@
 sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast"
-], function (BaseController, JSONModel, MessageToast) {
+    "sap/m/MessageToast",
+     "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
+    "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
+], function (BaseController, JSONModel, MessageToast, Timeline, TimelineItem) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetApproval", {
         onInit: function () {
@@ -215,7 +217,47 @@ sap.ui.define([
 
         TSA_onClear: function () {
             this.byId("TSA_id_Name").setValue("");
-        }
+        },
+         TSA_onShowComments: function (oEvent) {
+                var oContext = oEvent.getSource().getBindingContext("ApprovalTimesheetModel");
+                var oData = oContext.getObject();
+                var aComments = oData.comments || [];
+                var aTimelineItems = aComments.map(function (oComment) {
+                    return new TimelineItem({
+                        dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
+                        title: oComment.CommentedBy || "Anonymous",
+                        text: oComment.Comment || "No comment provided",
+                        userNameClickable: false,
+                        icon: "sap-icon://comment"
+                    });
+                });
+                var oTimeline = new Timeline({
+                    showHeader: false,
+                    enableBusyIndicator: false,
+                    width: "100%",
+                    sortOldestFirst: true,
+                    enableDoubleSided: false,
+                    content: aTimelineItems,
+                    showHeaderBar: false
+                });
+                var oDialog = new sap.m.Dialog({
+                    title: this.i18nModel.getText("tCommentsTitle"),
+                    contentWidth: "25rem",
+                    contentHeight: "15rem",
+                    draggable: true,
+                    resizable: true,
+                    content: [oTimeline],
+                    endButton: new sap.m.Button({
+                        text: this.i18nModel.getText("close"),
+                        type: "Reject",
+                        press: function () {
+                            oDialog.close();
+                            oDialog.destroy();
+                        }
+                    })
+                });
+                oDialog.open();
+            },
 
     });
 });

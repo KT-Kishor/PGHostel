@@ -222,5 +222,9 @@ sap.ui.define(["./BaseController",
                     MessageToast.show(this.i18nModel.getText("technicalError"));
                 }
             },
+            TS_onClear: function () {
+                this.byId("TS_monthComboBox").setValue("");
+                this.byId("TS_id_Status").setValue("");
+            }
         });
     });

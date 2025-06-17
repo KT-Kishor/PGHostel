@@ -25,7 +25,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem name="Month" label="{i18n>month}" groupName="Group1" visibleInFilterBar="true">
     <fb:control>
-        <ComboBox id="monthComboBox"
+        <ComboBox id="TS_monthComboBox"
           showClearIcon="true"
           items="{Months>/month}">
             <core:Item key="{Months>ID}" text="{Months>Month}" />
