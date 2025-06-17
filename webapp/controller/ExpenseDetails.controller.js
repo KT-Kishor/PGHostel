@@ -93,6 +93,10 @@ sap.ui.define([
                 }
             },
 
+             onLogout: function () {
+                this.CommonLogoutFunction();
+            },
+
             // Expense Item Index increment and ItemExpense Read call
             IndexNoIncreent: function () {
                 var that = this;
