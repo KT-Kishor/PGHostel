@@ -788,6 +788,8 @@ sap.ui.define([
 
             Mail_onPressClose: function () {
                 this.EOU_oDialogMail.close();
+                this.EOU_oDialogMail.destroy(true);
+                this.EOU_oDialogMail = null;
             },
 
             EOD_commonOpenDialog: function (fragmentName) {
