@@ -7,105 +7,171 @@ sap.ui.define([
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetApproval", {
         onInit: function () {
             this.getRouter().getRoute("RouteTimesheetApproval").attachMatched(this._onRouteMatched, this);
+            // ViewModel for button enable/disable
+            const oViewModel = new JSONModel({ canApproveReject: false });
+            this.getView().setModel(oViewModel, "approvalViewModel");
         },
 
         _onRouteMatched: async function () {
+             var LoginFunction = await this.commonLoginFunction("TimesheetApproval");
+            if (!LoginFunction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Timesheet Approval");
 
-            // Get manager's ID (adjust property as per your LoginModel)
-            var sManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
-
+            // Get ManagerID from LoginModel
+            const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
             this.getBusyDialog();
+
             try {
-                // Fetch all submitted timesheets for employees under this manager
-                const oData = await this.ajaxReadWithJQuery("Timesheet", {
-                    Status: "Submitted"
-                    // ManagerID: sManagerID // Uncomment if backend supports filtering by manager
-                });
-                const aAll = Array.isArray(oData.data) ? oData.data : [oData.data];
-                // Frontend filter: only employees under this manager
-                const aFiltered = aAll.filter(entry => entry.ManagerID === sManagerID);
-                this.getView().setModel(new JSONModel(aFiltered), "ApprovalTimesheetModel");
+                // Read all timesheet entries for employees under this manager
+                const oData = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID });
+                let timesheetData = Array.isArray(oData.data) ? oData.data : [oData.data];
+
+                // Filter only "Submitted" status
+                timesheetData = timesheetData.filter(entry => entry.Status === "Submitted");
+
+                // Set filtered data to ApprovalTimesheetModel
+                this.getView().setModel(new JSONModel(timesheetData), "ApprovalTimesheetModel");
             } catch (error) {
-                MessageToast.show(error.message || error.responseText || "Error loading timesheets.");
+                MessageToast.show(error.message || error.responseText);
+            } finally {
+                this.closeBusyDialog();
             }
-            this.closeBusyDialog();
+
+            // Disable buttons initially
+            this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
         },
 
-        onCalendarDateChange: function(oEvent) {
-            var oCalendar = oEvent.getSource();
-            var oSelectedDate = oCalendar.getStartDate();
-            if (!oSelectedDate) return;
+        TSA_onSelect: function () {
+            const oTable = this.byId("TSA_id_Table");
+            const oSelectedItems = oTable.getSelectedItems();
+            let canApproveReject = false;
 
-            var sDay = String(oSelectedDate.getDate()).padStart(2, '0');
-            var sMonth = String(oSelectedDate.getMonth() + 1).padStart(2, '0');
-            var sYear = oSelectedDate.getFullYear();
-            var sFormattedDate = `${sDay}/${sMonth}/${sYear}`; // Adjust format as per your data
-
-            var aAll = this.getView().getModel("ApprovalTimesheetModel").getData();
-            var aFiltered = aAll.filter(function(entry) {
-                return entry.Date === sFormattedDate;
-            });
-            this.getView().getModel("ApprovalTimesheetModel").setData(aFiltered);
-        },
-
-        onSearch: function(oEvent) {
-            var sEmployeeID = this.byId("employeeIdInput")?.getValue();
-            var aAll = this.getView().getModel("ApprovalTimesheetModel").getData();
-            var aFiltered = aAll;
-            if (sEmployeeID) {
-                aFiltered = aFiltered.filter(function(entry) {
-                    return entry.EmployeeID === sEmployeeID;
-                });
+            if (oSelectedItems.length > 0) {
+                // Only enable if all selected items are "Submitted"
+                canApproveReject = oSelectedItems.every(item =>
+                    item.getBindingContext("ApprovalTimesheetModel").getProperty("Status") === "Submitted"
+                );
             }
-            this.getView().getModel("ApprovalTimesheetModel").setData(aFiltered);
+
+            this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", canApproveReject);
         },
 
         TSA_onApprove: function () {
-            this._updateSelectedStatus("Approved");
+            this._openManagerRemarkDialog("Approved");
         },
 
         TSA_onReject: function () {
-            this._updateSelectedStatus("Rejected");
+            this._openManagerRemarkDialog("Rejected");
         },
 
-        _updateSelectedStatus: function (sStatus) {
-            var oTable = this.byId("TSA_id_Table");
-            var oSelectedItems = oTable.getSelectedItems();
+        _openManagerRemarkDialog: function (status) {
+            this._approvalStatus = status; // Store for use on submit
+
+            const sTitle = status === "Approved"
+                ? this.i18nModel.getText("confirmApprove")
+                : this.i18nModel.getText("confirmRejectleave");
+
+            if (!this._oManagerRemarkDialog) {
+                sap.ui.core.Fragment.load({
+                    name: "sap.kt.com.minihrsolution.fragment.ManagerRemarks",
+                    controller: this
+                }).then(function (oDialog) {
+                    this._oManagerRemarkDialog = oDialog;
+                    this.getView().addDependent(oDialog);
+
+                    oDialog.setTitle(sTitle);
+                    sap.ui.getCore().byId("MIF_id_RemarkLabel").setText(
+                        status === "Approved"
+                            ? this.i18nModel.getText("approveRemark")
+                            : this.i18nModel.getText("rejectRemark")
+                    );
+                    sap.ui.getCore().byId("MIF_id_remark").setValue("");
+
+                    // Set button type and text
+                    var oOkBtn = sap.ui.getCore().byId("MIF_id_OkBtn");
+                    if (oOkBtn) {
+                        oOkBtn.setType(status === "Approved" ? "Accept" : "Reject");
+                        oOkBtn.setText(status === "Approved"
+                            ? this.i18nModel.getText("approve")
+                            : this.i18nModel.getText("reject"));
+                    }
+
+                    oDialog.open();
+                }.bind(this));
+            } else {
+                this._oManagerRemarkDialog.setTitle(sTitle);
+                sap.ui.getCore().byId("MIF_id_RemarkLabel").setText(
+                    status === "Approved"
+                        ? this.i18nModel.getText("approveRemark")
+                        : this.i18nModel.getText("rejectRemark")
+                );
+                sap.ui.getCore().byId("MIF_id_remark").setValue("");
+
+                // Set button type and text
+                var oOkBtn = sap.ui.getCore().byId("MIF_id_OkBtn");
+                if (oOkBtn) {
+                    oOkBtn.setType(status === "Approved" ? "Accept" : "Reject");
+                    oOkBtn.setText(status === "Approved"
+                        ? this.i18nModel.getText("approve")
+                        : this.i18nModel.getText("reject"));
+                }
+
+                this._oManagerRemarkDialog.open();
+            }
+        },
+
+        MTF_onPressOk: async function () {
+            const oTable = this.byId("TSA_id_Table");
+            const oSelectedItems = oTable.getSelectedItems();
+            const sRemark = sap.ui.getCore().byId("MIF_id_remark").getValue();
+
             if (!oSelectedItems.length) {
-                MessageToast.show(this.i18nModel.getText("selctRowtoApproveReject") || "Please select at least one row.");
+                MessageToast.show(this.i18nModel.getText("selctRowtoApprove"));
                 return;
             }
-            var aPayload = oSelectedItems.map(function (item) {
-                var srNo = item.getBindingContext("ApprovalTimesheetModel").getProperty("SrNo");
+            if (!sRemark) {
+                MessageToast.show(this.i18nModel.getText("remarkRequired"));
+                return;
+            }
+
+            const aPayload = oSelectedItems.map(item => {
+                const srNo = item.getBindingContext("ApprovalTimesheetModel").getProperty("SrNo");
                 return {
                     filters: { SrNo: srNo },
-                    data: { Status: sStatus }
+                    data: { Status: this._approvalStatus, ManagerRemark: sRemark }
                 };
             });
 
             this.getBusyDialog();
-            this.ajaxUpdateWithJQuery("/Timesheet", aPayload)
-                .then(() => {
-                    MessageToast.show(this.i18nModel.getText("statusUpdateSuccess") || "Status updated successfully.");
-                    this._onRouteMatched();
-                })
-                .catch((error) => {
-                    MessageToast.show(error.responseText || "Error updating status.");
-                })
-                .finally(() => {
-                    this.closeBusyDialog();
-                });
+            try {
+                await this.ajaxUpdateWithJQuery("Timesheet", aPayload);
+                MessageToast.show(
+                    this._approvalStatus === "Approved"
+                        ? this.i18nModel.getText("approvedSuccess")
+                        : this.i18nModel.getText("rejectedSuccess")
+                );
+                this._oManagerRemarkDialog.close();
+                this._onRouteMatched(); // Refresh data
+            } catch (error) {
+                MessageToast.show(error.message || error.responseText);
+            } finally {
+                this.closeBusyDialog();
+            }
         },
+
+        MIF_onPressClose: function () {
+            if (this._oManagerRemarkDialog) {
+                this._oManagerRemarkDialog.close();
+            }
+        },
+
         onPressback: function () {
             this.getRouter().navTo("RouteTilePage");
         },
+
         onLogout: function () {
             this.getRouter().navTo("RouteLoginPage");
-        },
-
-
-        
+        }
     });
 });

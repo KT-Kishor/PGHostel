@@ -477,7 +477,7 @@
                 },
                 {
                     "name": "RouteTimesheet",
-                     "pattern": "Timesheet/{EmployeeID}/{managerView}",
+                    "pattern": "Timesheet",
                     "target": [
                         "TargetTimesheet"
                     ]

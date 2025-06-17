@@ -91,6 +91,8 @@ sap.ui.define([
             "Leaves": "/Leaves",
             "ConsultantInvoice": "/ConsultantInvoice",
             "MyInbox": "/MyInbox",
+            "Timesheet": "/Timesheet",
+            "TimesheetApproval": "/TimesheetApproval",
 
           };
 

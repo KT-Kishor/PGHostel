@@ -21,7 +21,7 @@ sap.ui.define([
             this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
             await this._fetchCommonData("AssignedTask", "AssignModel", { EmployeeID: this.EmployeeID });
             await this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: this.branch });
-            const oViewModel = new JSONModel({isUpdate: false,isCreate: true,isSubmitted: false,isEditing: true,calendarStartDate: this._getStartOfWeek(new Date()),isCalendarEnabled: true,formTitle: "",pageTitle: ""});
+            const oViewModel = new JSONModel({ isUpdate: false, isCreate: true, isSubmitted: false, isEditing: true, calendarStartDate: this._getStartOfWeek(new Date()), isCalendarEnabled: true, formTitle: "", pageTitle: "" });
             this.getView().setModel(oViewModel, "viewModel");
             this.byId("TSD_id_Assignment").setValueState("None");
             this.byId("TSD_id_TimeHours").setValueState("None");
@@ -80,7 +80,7 @@ sap.ui.define([
                     EmployeeName: "",
                     ManagerName: "",
                     ManagerID: "",
-                    Comments:""
+                    Comments: ""
                 };
                 this.getView().setModel(new sap.ui.model.json.JSONModel(emptyData), "newModel");
                 if (this.getView().getModel("editModel")) {
@@ -123,10 +123,8 @@ sap.ui.define([
         },
 
         TSD_onPressBack: function () {
-         this.getRouter().navTo("RouteTimesheet", {
-            EmployeeID: "X",
-            managerView: true,
-          });        },
+            this.getRouter().navTo("RouteTimesheet");
+        },
         TD_ValidateTime: function (oEvent) {
             utils._LCvalidateTimeLimit(oEvent);
         },
@@ -190,8 +188,8 @@ sap.ui.define([
                 }
                 // Step 4: Prepare payload (use local date parts, not toISOString)
                 const localDateStr = [selectedDateObj.getFullYear(),
-                    String(selectedDateObj.getMonth() + 1).padStart(2, '0'),
-                    String(selectedDateObj.getDate()).padStart(2, '0')].join('-');
+                String(selectedDateObj.getMonth() + 1).padStart(2, '0'),
+                String(selectedDateObj.getDate()).padStart(2, '0')].join('-');
                 const oPayload = {
                     TaskID: oData.TaskID,
                     TaskName: oData.TaskName,
