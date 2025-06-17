@@ -8,9 +8,7 @@
 			<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 		</headerContent>
 		<content>
-			<fb:FilterBar id="CI_id_ConsultantInvoiceFilterBar" persistencyKey="consultantInvoicePersKey" 
-    useToolbar="false" clear="CI_onClearFilters" showClearOnFB="true" search="CI_OnSearch" 
-    filterChange=".onFilterChange"  showFilterConfiguration="false" class="sapUiTinyMargin">
+			<fb:FilterBar id="CI_id_ConsultantInvoiceFilterBar"  showFilterConfiguration="false" useToolbar="false" clear="CI_onClearFilters" showClearOnFB="true" search="CI_OnSearch" class="sapUiTinyMargin">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="InvoiceNo" label="{i18n>invoiceNo}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>

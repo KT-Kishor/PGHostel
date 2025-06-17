@@ -119,18 +119,18 @@
 							<Text text="{= ${ContractModelWizart>/Salutation} + ' ' + ${ContractModelWizart>/ConsultantName}}"/>
 							<Label text="{i18n>address}"/>
 							<Text text="{ContractModelWizart>/ConsultantAddress}"/>
-							<Label text="{i18n>consultingService}"/>
-							<Text text="{ContractModelWizart>/ConsultingService}"/>
 							<Label text="{i18n>consultantEmailID}"/>
 							<Text text="{ContractModelWizart>/ContarctEmail}"/>
+							<Label text="{i18n>consultingService}"/>
+							<Text text="{ContractModelWizart>/ConsultingService}"/>
 							<Label text="{i18n>amount}"/>
 							<Text text="{path:'ContractModelWizart>/Amount', formatter: '.Formatter.CurrencyInINR'} {ContractModelWizart>/Currency} Per {ContractModelWizart>/Rate}" />	
 							<Label text="{i18n>endClientHirer}"/>
 							<Text text="{ContractModelWizart>/EndClientHirer}"/>
+							<Label text="{i18n>hiringContactLabel}"/>
+							<Text text="{= ${ContractModelWizart>/Salutation2} + ' ' + ${ContractModelWizart>/ClientReportContact} }" />
 							<Label text="{i18n>locationswhereServices}"/>
 							<Text text="{ContractModelWizart>/Location}"/>
-							<Label text="{i18n>clienthiringcontact}"/>
-							<Text text="{= ${ContractModelWizart>/Salutation2} + ' ' + ${ContractModelWizart>/ClientReportContact} }" />
 							<Label text="{i18n>startDate}"/>
 							<Text text="{path : 'ContractModelWizart>/StartDate'}"/>
 							<Label text="{i18n>endDate}"/>
@@ -143,10 +143,10 @@
 							<Text text="{ContractModelWizart>/AdditionalRates}"/>
 							<Label text="{i18n>paymentterms}"/>
 							<Text text="{ContractModelWizart>/PaymentTerms}"/>
-							<Label text="{i18n>contractLocation}"/>
-							<Text  text="{ContractModelWizart>/contractLocation}" />
 							<Label text="{i18n>expCountry}"/>
 							<Text text="{ContractModelWizart>/Country}"/>
+							<Label text="{i18n>contractLocation}"/>
+							<Text  text="{ContractModelWizart>/contractLocation}" />	
 							<Label text="{i18n>mobileNo}"/>
 							<Text text="{= ${ContractModelWizart>/STDCode} + ' ' + ${ContractModelWizart>/MobileNo} }"/>
 						</f:content>
