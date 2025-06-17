@@ -173,11 +173,9 @@ sap.ui.define([
             return null;
         },
 
-        formatCompanyAndDescription: function (companyName, description, startDate, EndDate) {
-            if (companyName && description) {
-                return companyName + " - " + description + " " + "(" + startDate + " - " + EndDate + ")";
-            } else if (companyName) {
-                return companyName;
+        formatCompanyAndDescription: function (description, startDate, EndDate) {
+            if (description) {
+                return description + " " + "(" + startDate + " - " + EndDate + ")";
             } else if (description) {
                 return description;
             } else {

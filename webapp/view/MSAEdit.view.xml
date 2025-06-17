@@ -96,13 +96,17 @@
                 <m:Text text="{FilteredMsaModel>/0/PanCard}" class="sapUiTinyMarginBegin" />
             </layout:HorizontalLayout>
             <layout:HorizontalLayout>
-                <m:Label showColon="true" text="{i18n>emailId}" />
-                <m:Text text="{FilteredMsaModel>/0/MsaEmail}" class="sapUiTinyMarginBegin"/>
+                <m:Label showColon="true" text="{i18n>GSTNO}" />
+                <m:Text text="{FilteredMsaModel>/0/GST}" class="sapUiTinyMarginBegin"/>
             </layout:HorizontalLayout>
         </layout:VerticalLayout>
 
         <!-- Address -->
         <layout:VerticalLayout class="sapUiTinyMarginBottom sapUiSmallMarginBegin ">
+		<layout:HorizontalLayout>
+                <m:Label showColon="true" text="{i18n>emailId}" />
+                <m:Text text="{FilteredMsaModel>/0/MsaEmail} {}" class="sapUiTinyMarginBegin"/>
+            </layout:HorizontalLayout>
 		<layout:HorizontalLayout>
                 <m:Label showColon="true" text="{i18n>type}" />
                 <m:Text
@@ -185,6 +189,9 @@
 											<m:Text text="{i18n>designation}" />
 										</m:Column>
 										<m:Column minScreenWidth="Tablet" demandPopin="true">
+											<m:Text text="{i18n>rate}" />
+										</m:Column>
+										<m:Column minScreenWidth="Tablet" demandPopin="true">
 											<m:Text text="{i18n>status}" />
 										</m:Column>
 									</m:columns>
@@ -196,7 +203,8 @@
 												<m:Text text="{path:'SowReadModel>StartDate',formatter: '.Formatter.formatDate'}"/>
 												<m:Text text="{path:'SowReadModel>EndDate',formatter: '.Formatter.formatDate'}"/>
 												<m:Text text="{SowReadModel>Designation}"/>
-												<m:Text text="{SowReadModel>Status}"/>
+												<m:Text text="{SowReadModel>Rate}"/>
+												<m:ObjectStatus text="{SowReadModel>Status}" inverted="false" state="{path: 'SowReadModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
 											</m:cells>
 										</m:ColumnListItem>
 									</m:items>

@@ -9,14 +9,15 @@
 				<WizardStep id="MsaD_id_WizardO" complete="MsaD_onComplete" title="{i18n>msaDetails}" validated="true">
 					<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="12" labelSpanL="12" labelSpanM="12" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 						<f:content>
-							<Label text="{i18n>createMSADate}" required="true" />
-							<DatePicker valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" id="MsaD_id_CreateMSADate" value="{msaModelWizart>/CreateMSADate}" change="MsaD_validateDate" valueStateText="{i18n>dateValueState}" />
-
-							<Label text="{i18n>type}" required="true" />
+						<Label text="{i18n>type}" required="true" />
 							<RadioButtonGroup id="MsaD_id_Type" columns="5" selectedIndex="0" valueState="None" select="onRadioButtonGroupSelect">
 								<RadioButton id="RB3-1" text="{i18n>Service}"/>
 								<RadioButton id="RB3-2" text="{i18n>Recruitment}"/>
 							</RadioButtonGroup>
+
+							<Label text="{i18n>createMSADate}" required="true" />
+							<DatePicker valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" id="MsaD_id_CreateMSADate" value="{msaModelWizart>/CreateMSADate}" change="MsaD_validateDate" valueStateText="{i18n>dateValueState}" />
+
 							<Label text="{i18n>companyName}" required="true" />
 							<Input value="{msaModelWizart>/CompanyName}" maxLength="50" placeholder="{i18n>placeCompany}" id="MsaD_id_CompanyName" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeCompany}" />
 
