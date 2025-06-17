@@ -975,6 +975,8 @@ sap.ui.define([
                     if (invoiceData.Currency !== "INR") {
                         invoiceData.AmountInFCurrency = invoiceData.AmountInINR;
                     }
+                    invoiceData.InvoiceDate = this.Formatter.formatDate(invoiceData.InvoiceDate);
+                    invoiceData.PayByDate = this.Formatter.formatDate(invoiceData.PayByDate);
                     this.getView().setModel(new JSONModel(invoiceData), "SelectedCustomerModel");
                     this.Status = invoiceData.Status;
                     return;
@@ -1049,8 +1051,6 @@ sap.ui.define([
 
                     if (oData && oData.success) {
                         this.oDialog.close();
-                        this._oDialog.destroy(true);
-                        this._oDialog = null;
                         this.Readcall("InvoicePaymentDetail", { InvNo: this.decodedPath });
                         this.Readcall("CompanyInvoice", { InvNo: this.decodedPath });
 
