@@ -264,29 +264,33 @@ sap.ui.define(["./BaseController",
                 oDialog.open();
             },
 
-            T_onSearch: async function () {
-                try {
-                    this.getBusyDialog();
+             T_onSearch: async function () {
+                    this.getBusyDialog(); // Show busy dialog
                     var aFilterItems = this.byId("TS_id_FilterBar").getFilterGroupItems();
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                     var params = {};
                     aFilterItems.forEach(function (oItem) {
                         var oControl = oItem.getControl();
                         var sValue = oItem.getName();
                         if (oControl && oControl.getValue()) {
-                            params[sValue] = oControl.getValue();
+                            if (sValue === "Date") {
+                                var oFromDate = oControl.getDateValue();
+                                var oToDate = oControl.getSecondDateValue();
+                                params["StartDate"] = oDateFormat.format(oFromDate);
+                                params["EndDate"] = oDateFormat.format(oToDate);
+                            } else {
+                                params[sValue] = oControl.getValue();
+                            }
                         }
                     });
-
-                    // Always add EmployeeID to params
-                    params.EmployeeID = this.EmployeeID || this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
-
-                    await this.TSD_ReadTimesheetEntries(params);
-                } catch (error) {
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
-                } finally {
-                    this.closeBusyDialog();
-                }
-            },
+                    try {
+                        await this._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: this.EmployeeID, ...params });
+                    } catch (error) {
+                        sap.m.MessageToast.show(error.message || error.responseText);
+                    } finally {
+                        this.closeBusyDialog(); // Close after call finishes
+                    }
+                },
             TS_onClear: function () {
                 this.byId("TS_monthComboBox").setValue("");
                 this.byId("TS_id_Status").setValue("");

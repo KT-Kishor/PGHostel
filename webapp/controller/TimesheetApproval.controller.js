@@ -1,15 +1,16 @@
 sap.ui.define([
     "./BaseController",
+    "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
     "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
-], function (BaseController, JSONModel, MessageToast, Timeline, TimelineItem) {
+], function (BaseController, utils, JSONModel, MessageToast, Timeline, TimelineItem) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetApproval", {
         onInit: function () {
             this.getRouter().getRoute("RouteTimesheetApproval").attachMatched(this._onRouteMatched, this);
-           
+
         },
 
         _onRouteMatched: async function () {
@@ -22,7 +23,7 @@ sap.ui.define([
             const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
 
             await this.readSubmittedTimesheetsForManager(ManagerID);
-             // ViewModel for button enable/disable
+            // ViewModel for button enable/disable
             const oViewModel = new JSONModel({ canApproveReject: false });
             this.getView().setModel(oViewModel, "approvalViewModel");
 
@@ -130,17 +131,10 @@ sap.ui.define([
         MTF_onPressOk: async function () {
             const oTable = this.byId("TSA_id_Table");
             const oSelectedItems = oTable.getSelectedItems();
-            const sRemark = sap.ui.getCore().byId("MIF_id_remark").getValue();
-
-            if (!oSelectedItems.length) {
-                MessageToast.show(this.i18nModel.getText("selctRowtoApprove"));
+            if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MIF_id_remark"), "ID")) {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
-            if (!sRemark) {
-                MessageToast.show(this.i18nModel.getText("remarkRequired"));
-                return;
-            }
-
             const aPayload = oSelectedItems.map(item => {
                 const srNo = item.getBindingContext("ApprovalTimesheetModel").getProperty("SrNo");
                 return {
@@ -165,7 +159,7 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
-
+        
         MIF_onPressClose: function () {
             if (this._oManagerRemarkDialog) {
                 this._oManagerRemarkDialog.close();
