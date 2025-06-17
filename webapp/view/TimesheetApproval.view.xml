@@ -20,15 +20,17 @@
                 id="TSA_id_Filter"
                 persistencyKey="myPersKey"
                 useToolbar="false"
-                clear="onPressClear"
+                clear="TSA_onClear"
                 showClearOnFB="true"
-                search="onSearch"
+                search="TSA_onSearch"
                 filterChange="onFilterChange"
                 afterVariantLoad="onAfterVariantLoad">
                 <fb:filterGroupItems>
-                    <fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeId}" groupName="Group1" visibleInFilterBar="true">
+                    <fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true" >
                         <fb:control>
-                            <Input id="employeeIdInput"/>
+                    <ComboBox  showSecondaryValues= "true"  id="TSA_id_Name" showClearIcon="true" items="{path:'ApprovalTimesheetModel>/'}" >
+						<core:ListItem key="{ApprovalTimesheetModel>EmployeeID}" text="{ApprovalTimesheetModel>EmployeeID}" additionalText="{ApprovalTimesheetModel>EmployeeName}" />
+					</ComboBox>                        
                         </fb:control>
                     </fb:FilterGroupItem>
                     <!-- Add more filters as needed -->
@@ -49,7 +51,7 @@
                         <Text text="{i18n>employeeID}"/>
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="{i18n>taskName}"/>
+                        <Text text="{i18n>assignmentName}"/>
                     </Column>
                     <Column minScreenWidth="Tablet" demandPopin="true">
                         <Text text="{i18n>date}" />
@@ -64,7 +66,7 @@
                         <Text text="{i18n>status}" />
                     </Column>
                     <Column minScreenWidth="Desktop" demandPopin="true">
-                        <Text text="{i18n>comment}" />
+                        <Text text="{i18n>comments}" />
                     </Column>
                    
                 </columns>

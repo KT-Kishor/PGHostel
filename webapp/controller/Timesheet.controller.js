@@ -130,7 +130,7 @@ sap.ui.define(["./BaseController",
                         that.ajaxDeleteWithJQuery("/Timesheet", {
                             filters: { SrNo: aIdsToDelete } // Send array of IDs
                         }).then(() => {
-                            MessageToast.show(that.i18nModel.getText("DeletSuucess"));
+                            MessageToast.show(that.i18nModel.getText("deletTimesheetSuucess"));
                             that._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: that.EmployeeID });
                             that.closeBusyDialog();
                         }).catch((error) => {

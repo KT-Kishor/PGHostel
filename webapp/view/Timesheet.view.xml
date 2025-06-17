@@ -62,7 +62,7 @@
                 </headerToolbar>
               
                 <columns>
-                  <Column demandPopin="true"><Text text="{i18n>taskName}" /></Column>
+                  <Column demandPopin="true"><Text text="{i18n>assignmentName}" /></Column>
                   <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>date}" /></Column>
                   <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>day}" /></Column>
                   <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>hoursWorked}" /></Column>
