@@ -843,7 +843,7 @@ sap.ui.define([
                 var aComments = oData.comments || [];
 
                 // ✅ Reverse the array to show latest comments first
-                var aTimelineItems = aComments.slice().reverse().map(function (oComment) {
+                var aTimelineItems = aComments.reverse().map(function (oComment) {
                     return new sap.suite.ui.commons.TimelineItem({
                         dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
                         title: oComment.CommentedBy || "Anonymous",
@@ -857,7 +857,7 @@ sap.ui.define([
                     showHeader: false,
                     enableBusyIndicator: false,
                     width: "100%",
-                    sortOldestFirst: true, // Can remain true since items are reversed manually
+                    sortOldestFirst: false, // Can remain true since items are reversed manually
                     enableDoubleSided: false,
                     content: aTimelineItems,
                     showHeaderBar: false
