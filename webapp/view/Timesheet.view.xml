@@ -16,8 +16,8 @@
  width="100%"
  legend="calendarLegend"
  startDate="{viewModel>/calendarStartDate}" 
- select="onCalendarDateSelect" 
- startDateChange="onInitializeCalendarLegend"
+ select="TS_onCalendarDateSelect" 
+ startDateChange="filterTimesheetForCurrentWeek"
  days="7" 
  showDayNamesLine="true" 
  intervalSelection="false" />
