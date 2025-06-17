@@ -8,14 +8,14 @@ sap.ui.define(["./BaseController",
     "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
     "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
 ],
-    function (BaseController, JSONModel, MessageToast, CalendarLegend, CalendarLegendItem, DateTypeRange, CalendarDayType,Timeline,TimelineItem) {
+    function (BaseController, JSONModel, MessageToast, CalendarLegend, CalendarLegendItem, DateTypeRange, CalendarDayType, Timeline, TimelineItem) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Timesheet", {
             onInit: function () {
                 this.getRouter().getRoute("RouteTimesheet").attachMatched(this._onRouteMatched, this);
             },
 
-             _onRouteMatched: async function () {
+            _onRouteMatched: async function () {
                 var LoginFunction = await this.commonLoginFunction("Timesheet");
                 if (!LoginFunction) return;
                 this.getBusyDialog();
@@ -70,48 +70,6 @@ sap.ui.define(["./BaseController",
             },
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
-            },
-
-            onCalendarDateSelect: function (oEvent) {
-                const oCalendar = oEvent.getSource();
-                const aSelectedDates = oCalendar.getSelectedDates();
-                if (aSelectedDates.length > 0) {
-                    const oSelectedDate = aSelectedDates[0].getStartDate();
-                    // Format selected date to dd/mm/yyyy
-                    const sDay = oSelectedDate.getDate().toString().padStart(2, '0');
-                    const sMonth = (oSelectedDate.getMonth() + 1).toString().padStart(2, '0');
-                    const sYear = oSelectedDate.getFullYear().toString();
-                    const sFormattedDate = `${sDay}/${sMonth}/${sYear}`;
-                    // Get all timesheet data
-                    const oTimesheetModel = this.getView().getModel("TimesheetModel");
-                    const aTimesheetData = oTimesheetModel ? oTimesheetModel.getData() : [];
-                    const aFilteredData = aTimesheetData.filter(entry => entry.Date === sFormattedDate);
-                    // Set filtered data to a new model for display
-                    const oFilteredModel = new sap.ui.model.json.JSONModel(aFilteredData);
-                    this.getView().setModel(oFilteredModel, "FilteredTimesheetModel");
-
-                    if (aFilteredData.length === 0) {
-                        MessageToast.show("No timesheet entries for selected date.");
-                    }
-                }
-            },
-
-            onMonthChange: function (oEvent) {
-                const sMonth = oEvent.getSource().getSelectedKey(); // e.g., "01"
-                const iYear = new Date().getFullYear(); // or allow year selection separately
-                const oTimesheetModel = this.getView().getModel("TimesheetModel");
-                const aAllEntries = oTimesheetModel ? oTimesheetModel.getData() : [];
-                const aFilteredEntries = aAllEntries.filter(entry => {
-                    if (!entry.Date) return false;
-                    // Entry.Date expected as "dd/mm/yyyy"
-                    const parts = entry.Date.split("/");
-                    return parts.length === 3 && parts[1] === sMonth && parts[2] === iYear.toString();
-                });
-                const oFilteredModel = new sap.ui.model.json.JSONModel(aFilteredEntries);
-                this.getView().setModel(oFilteredModel, "FilteredTimesheetModel");
-                if (aFilteredEntries.length === 0) {
-                    MessageToast.show("No timesheet entries for selected month.");
-                }
             },
 
             TS_onDeleteTimesheet: async function () {
@@ -244,6 +202,25 @@ sap.ui.define(["./BaseController",
                     })
                 });
                 oDialog.open();
+            },
+
+            T_onSearch: async function () {
+                try {
+                    this.getBusyDialog();
+                    var aFilterItems = this.byId("TS_id_FilterBar").getFilterGroupItems();
+                    var params = {};
+                    aFilterItems.forEach(function (oItem) {
+                        var oControl = oItem.getControl();
+                        var sValue = oItem.getName();
+                        if (oControl && oControl.getValue()) {
+                            params[sValue] = oControl.getValue();
+                        }
+                    });
+
+                    await this.TSD_ReadTimesheetEntries(params);
+                } catch (error) {
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                }
             },
         });
     });

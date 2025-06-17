@@ -189,22 +189,33 @@ sap.ui.define([
                     }
                 });
 
-                // Always include ManagerID and filter for "Submitted" status
-                params.ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
-                params.Status = "Submitted";
+                // Always fetch only submitted timesheets for this manager
+                const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
+                await this.readSubmittedTimesheetsForManager(ManagerID);
 
-                // Call your backend to get filtered data
-                const oData = await this.ajaxReadWithJQuery("Timesheet", params);
-                let timesheetData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                // Apply client-side filters
+                var aAllData = this.getView().getModel("ApprovalTimesheetModel").getData();
+                var aFiltered = aAllData;
 
-                // Set filtered data to ApprovalTimesheetModel
-                this.getView().setModel(new sap.ui.model.json.JSONModel(timesheetData), "ApprovalTimesheetModel");
+                // Example: filter by EmployeeID if present
+                if (params.EmployeeID) {
+                    aFiltered = aFiltered.filter(function (entry) {
+                        return entry.EmployeeID && entry.EmployeeID.toString().includes(params.EmployeeID);
+                    });
+                }
+                // Update the model with filtered data
+                this.getView().getModel("ApprovalTimesheetModel").setData(aFiltered);
+
             } catch (error) {
                 MessageToast.show(this.i18nModel.getText("technicalError"));
             } finally {
                 this.closeBusyDialog();
             }
         },
+
+        TSA_onClear: function () {
+            this.byId("TSA_id_Name").setValue("");
+        }
 
     });
 });

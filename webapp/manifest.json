@@ -247,6 +247,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/PaySlip.json",
                 "preload": true
+            },
+             "TStatusModel": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/TimesheetStatus.json",
+                "preload": true
             }
         },
         "resources": {
