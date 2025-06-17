@@ -24,24 +24,27 @@ sap.ui.define([
             this.getBusyDialog()
             this.PoNumber = oEvent.getParameter("arguments").sPath;
 
-            this.byId("FPO_id_CustomerName").setEditable(true)
-            this.byId("FPO_id_CustDescription").setEditable(true)
+            this.byId("FPO_id_CustomerName").setEditable(true).setValueState("None")
+            this.byId("FPO_id_CustDescription").setEditable(true).setValueState("None")
             this.byId("FPO_id_Currency").setEditable(true)
             this.byId("PO_id_PaymantTerms").setEditable(true)
             this.byId("POO_idSubmitButton").setVisible(true)
-            this.byId("FPO_id_StartDate").setEditable(true)
-            this.byId("FPO_id_EndDate").setEditable(true)
-            this.byId("FPO_id_Date").setEditable(true)
+            this.byId("FPO_id_StartDate").setEditable(true).setValueState("None")
+            this.byId("FPO_id_EndDate").setEditable(true).setValueState("None")
+            this.byId("FPO_id_Date").setEditable(true).setValueState("None")
             this.byId("PO_id_Type").setEditable(true)
             this.byId("FPO_idRichTextEditor").setEditable(true)
             this.byId("POO_idAddItemButton").setVisible(true)
-            this.byId("FPO_id_BranchCode").setEditable(true)
+            this.byId("FPO_id_BranchCode").setEditable(true).setValueState("None")
 
+            this.byId("POO_idClearButton").setVisible(true)
             this.byId("POO_idSaveButton").setVisible(false)
             this.byId("POO_ideditButton").setVisible(false)
             this.byId("FPO_id_LUT").setVisible(false)
             this.byId("POO_idmailButton").setVisible(false)
             this.byId("POO_idPDFButton").setVisible(false)
+            this.byId("FPO_id_PoNumber").setVisible(false)
+
 
             var Layout = this.byId("ObjectPageLayout");
             Layout.setSelectedSection(this.byId("purchaseOrderHeaderSection1"));
@@ -62,6 +65,7 @@ sap.ui.define([
             });
             this.getView().byId("FPO_id_Date").setMinDate(new Date(new Date().setDate(new Date().getDate() - 30)));
             var model = new JSONModel({
+                "PoNumber": this.PoNumber,
                 "CustomerName": "",
                 "CustomerHeadName": "",
                 "Type": "",
@@ -117,6 +121,7 @@ sap.ui.define([
 
                     const purchaseOrderData = oFCIAerData[0];
                     const purchaseOrderModel = this.getView().getModel("PurchaseOrderModel");
+                    
 
                     purchaseOrderModel.setProperty("/CustomerName", purchaseOrderData.PurchaseOrder[0].CustomerName);
                     purchaseOrderModel.setProperty("/Type", purchaseOrderData.PurchaseOrder[0].Type);
@@ -146,6 +151,8 @@ sap.ui.define([
                     purchaseOrderModel.setProperty("/CGST", purchaseOrderData.PurchaseOrder[0].CGST);
                     purchaseOrderModel.setProperty("/SGST", purchaseOrderData.PurchaseOrder[0].SGST);
                     purchaseOrderModel.setProperty("/GrantTotal", purchaseOrderData.PurchaseOrder[0].GrantTotal);
+                    purchaseOrderModel.setProperty("/PaymentTerms", purchaseOrderData.PurchaseOrder[0].PaymentTerms);
+
 
                     const purchaseOrders = purchaseOrderData.PurchaseOrderItems;
                     purchaseOrders.forEach((item, index) => {
@@ -165,6 +172,10 @@ sap.ui.define([
                     this.getView().byId("POO_idSaveButton").setVisible(false)
                     this.getView().byId("FPO_id_CustDescription").setEditable(false)
                     this.getView().byId("PO_id_PaymantTerms").setEditable(false)
+                    this.getView().byId("POO_idClearButton").setVisible(false)
+                        this.byId("FPO_id_PoNumber").setVisible(true)
+
+
                     purchaseOrderModel.setProperty("/Editable", false);
 
                     this.getView().byId("POO_idmailButton").setVisible(true)
@@ -568,6 +579,10 @@ sap.ui.define([
                 this.byId("FPO_id_Currency").setEditable(false)
                 this.byId("POO_idmailButton").setVisible(true)
                 this.byId("POO_idPDFButton").setVisible(true)
+                this.byId("POO_idClearButton").setVisible(false)
+                this.byId("FPO_id_PoNumber").setVisible(true)
+
+
 
                 purchaseOrderModel.setProperty("/Editable", false);
             } else {
@@ -595,6 +610,9 @@ sap.ui.define([
             this.byId("FPO_id_Currency").setEditable(true)
             this.byId("POO_idmailButton").setVisible(false)
             this.byId("POO_idPDFButton").setVisible(false)
+            this.byId("POO_idClearButton").setVisible(true)
+            this.byId("FPO_id_PoNumber").setVisible(true)
+
 
 
 
@@ -633,7 +651,7 @@ sap.ui.define([
                 this.ajaxDeleteWithJQuery("PurchaseOrderItems", payload)
                 this.showConfirmationDialog(
                     "Delete Confirmation",
-                    "Are you sure you want to delete this Purchase Order?",
+                    "Are you sure you want to delete this Purchase order item?",
                     () => {
                         this.getBusyDialog()
                         this.ajaxDeleteWithJQuery("PurchaseOrderItems", payload).then(() => {
@@ -812,10 +830,14 @@ sap.ui.define([
             },
         //Send mail
         Mail_onSendEmail: function () {
-            try {
                 var oModel = this.getView().getModel("PurchaseOrderModel").getData();
+                 const uploaderModel = this.getView().getModel("UploaderData").getProperty("/attachments");
+                if (uploaderModel!=[]) {
+                    MessageToast.show(this.i18nModel.getText("attachmentRequired"))
+                    return;
+                }
                 var oPayload = {
-                    "toEmailID":"nareshtelkar2674@gmail.com",
+                    "toEmailID":oModel.customerEmail,
                     "CustomerHeadName": oModel.CustomerHeadName,
                     "PoNumber": this.PoNumber,
                     "CompanyName": oModel.CompanyName,
@@ -828,15 +850,14 @@ sap.ui.define([
                     "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                                 };
                 this.getBusyDialog();
+                
                 this.ajaxCreateWithJQuery("PurchaseOrderEmail", oPayload).then((oData) => {
                     MessageToast.show(this.i18nModel.getText("emailSuccess"));
                     this.closeBusyDialog();
                     this.EOU_oDialogMail.close()
                 })
-            } catch (error) {
-                this.closeBusyDialog();
-                MessageToast.show(error.responseText);
-            }
+               
+            
         },
     });
 });

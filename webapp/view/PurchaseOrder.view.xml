@@ -121,36 +121,53 @@
             </Toolbar>
         </headerToolbar>
         <columns>
-         <Column>
+         <Column
+          minScreenWidth="Tablet"
+                    demandPopin="true"
+         >
                 <Text 
                 text="{i18n>ponumber}" 
                 tooltip="{i18n>ponumber}"/>
             </Column>
-            <Column>
+            <Column
+             minScreenWidth="Tablet"
+                    demandPopin="true">
                 <Text text="{i18n>companyName}" 
                 tooltip="{i18n>companyName}"/>
             </Column>
-            <Column>
+            <Column
+             minScreenWidth="Tablet"
+                    demandPopin="true">
                 <Text text="{i18n>customerAddress}" 
                 tooltip="{i18n>customerAddress}"/>
             </Column>
-            <Column>
+            <Column
+             minScreenWidth="Tablet"
+                    demandPopin="true">
                 <Text text="{i18n>type}" 
                 tooltip="{i18n>type}"/>
             </Column>
-            <Column>
+            <Column
+             minScreenWidth="Tablet"
+                    demandPopin="true">
                 <Text text="{i18n>pan}" 
                 tooltip="{i18n>pan}"/>
             </Column>
-            <Column>
+            <Column
+             minScreenWidth="Tablet"
+                    demandPopin="true">
                 <Text text="{i18n>sdate}" 
                 tooltip="{i18n>sdate}"/>
             </Column>
-            <Column>
+            <Column
+             minScreenWidth="Tablet"
+                    demandPopin="true">
                 <Text text="{i18n>edate}" 
                 tooltip="{i18n>edate}"/>
             </Column>
-            <Column>
+            <Column
+             minScreenWidth="Tablet"
+                    demandPopin="true">
                 <Text text="{i18n>podate}" 
                 tooltip="{i18n>podate}"/>
             </Column>
