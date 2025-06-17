@@ -467,7 +467,7 @@ sap.ui.define([
                     Currency: "INR"
                 };
                 this.getView().getModel("sowCreateModel").setData(jsonSow);
-                sap.ui.getCore().byId("SOW_id_oTableCreateSow").setMode("None");
+                // sap.ui.getCore().byId("SOW_id_oTableCreateSow").setMode("None");
             },
 
             onPressChangeSow: function (oEvent) {
