@@ -135,7 +135,7 @@
 					<subSections>
 						<ObjectPageSubSection title=" " titleUppercase="false">
 							<blocks>
-								<m:Table items="{path:'SowReadModel>/',sorter: {path: 'SowID',descending: false,group: true}}" busyIndicatorDelay="0" id="Sow_Id_ReadTable" mode="SingleSelectLeft" selectionChange="onPressChangeSow">
+								<m:Table items="{path:'SowReadModel>/',sorter: {path: 'Description',descending: false,group: true}}" busyIndicatorDelay="0" id="Sow_Id_ReadTable" mode="SingleSelectLeft" selectionChange="onPressChangeSow">
 									<m:headerToolbar>
     <m:OverflowToolbar>
         <m:Title text="{i18n>sowTitle} ({= ${SowReadModel>/}.length })">
@@ -176,9 +176,9 @@
 										<m:Column demandPopin="true">
 											<m:Text text="{i18n>POConsultantname}" />
 										</m:Column>
-										<m:Column demandPopin="true">
+										<!-- <m:Column demandPopin="true">
 											<m:Text text="{i18n>desc}" />
-										</m:Column>
+										</m:Column> -->
 										<m:Column minScreenWidth="Desktop" demandPopin="true">
 											<m:Text text="{i18n>startDate}" />
 										</m:Column>
@@ -199,7 +199,7 @@
 										<m:ColumnListItem >
 											<m:cells>
 												<m:Text text="{SowReadModel>ConsultantName}"/>
-												<m:Text text="{SowReadModel>Description}"/>
+												<!-- <m:Text text="{SowReadModel>Description}"/> -->
 												<m:Text text="{path:'SowReadModel>StartDate',formatter: '.Formatter.formatDate'}"/>
 												<m:Text text="{path:'SowReadModel>EndDate',formatter: '.Formatter.formatDate'}"/>
 												<m:Text text="{SowReadModel>Designation}"/>

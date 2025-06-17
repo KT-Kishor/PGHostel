@@ -208,6 +208,7 @@ sap.ui.define([
                     this.byId("CID_id_Payby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
                     this.byId("CID_id_NavPayby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
                 }
+                this.getBusyDialog();
                 const oData = await this.ajaxReadWithJQuery("MSADetails", { MsaID: this.SelectKey });
                 const oSelectedCustomerModel = this.getView().getModel("SelectedCustomerModel");
                 if (oData.success) {
@@ -215,10 +216,12 @@ sap.ui.define([
                     var paymentDay = parseInt(oData.data[0].PaymentTerms);
                     paymentDateObj.setDate(paymentDateObj.getDate() + paymentDay);
                     oSelectedCustomerModel.setProperty("/PayByDate", paymentDateObj);
+                    this.closeBusyDialog();
                 } else {
                     var currentDate = new Date();
                     currentDate.setDate(currentDate.getDate() + 30);
                     oSelectedCustomerModel.setProperty("/PayByDate", currentDate);
+                    this.closeBusyDialog();
                 }
             },
 
@@ -415,7 +418,7 @@ sap.ui.define([
                     let finalAmount = baseAmount - discountAmount;
                     item.Total = finalAmount.toFixed(2);
 
-                    const isGSTApplicable = item.GSTCalculation === "YES" && oCustomerModel.getProperty("/Currency") === "INR";
+                    const isGSTApplicable = item.GSTCalculation === "YES" && oSOWModel.getProperty("/Currency") === "INR";
                     item.SAC = isGSTApplicable ? "998314" : "-";
 
                     if (isGSTApplicable) {
@@ -1075,7 +1078,11 @@ sap.ui.define([
                 if (oEvent.getSource().getValue() !== "INR") {
                     this.byId("idSAC").setVisible(false);
                     this.byId("idGSTCalculation").setVisible(false);
+                }else{
+                    this.byId("idSAC").setVisible(true);
+                    this.byId("idGSTCalculation").setVisible(true);
                 }
+                this.totalAmountCalculation();
             },
             CD_onDiscountInfoPress: function (oEvent) {
                 if (!this._oPopover) {

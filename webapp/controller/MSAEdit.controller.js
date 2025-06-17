@@ -505,7 +505,7 @@ sap.ui.define([
                 for (let i = 0; i < oModelDataPro.length; i++) {
                     let row = oModelDataPro[i];
                     if (!row.Salutation || !row.ConsultantName || !row.Designation || !row.Rate) {
-                        sap.m.MessageBox.error(`Please fill all mandatory fields in row ${i + 1}`);
+                        sap.m.MessageBox.error(`All  fields in Row  ${i + 1}  must be completed to continue`);
                         return;
                     }
                 }
