@@ -1225,7 +1225,7 @@
                     titleUppercase="false"
                     id="connections"
                     title="{i18n>paySlip}"
-                   visible="{= !${viewModel>/TraineeRole} }">
+                    visible="{viewModel>/ResignationVisible}">
 					<subSections>
 						<ObjectPageSubSection
                             id="connectionsSS"

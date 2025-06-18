@@ -14,8 +14,8 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox  showSecondaryValues= "true"  items="{FilterEmployeeDetails>/}" id="ED_id_EmpIDFilter" showClearIcon="true">
-								<core:ListItem key="{FilterEmployeeDetails>EmployeeID}" text="{FilterEmployeeDetails>EmployeeID}" additionalText="{FilterEmployeeDetails>EmployeeName}" />
+							<ComboBox  showSecondaryValues= "true"  items="{sEmployeeDetails>/}" id="ED_id_EmpIDFilter" showClearIcon="true">
+								<core:ListItem key="{sEmployeeDetails>EmployeeID}" text="{sEmployeeDetails>EmployeeID}" additionalText="{sEmployeeDetails>EmployeeName}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -28,8 +28,8 @@
 					</fb:FilterGroupItem> -->
 					<fb:FilterGroupItem name="ManagerName" label="{i18n>manager}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox showSecondaryValues= "true"  items="{EmployeeModel>/}" id="ED_id_ManagerFilter" showClearIcon="true">
-								<core:ListItem key="{EmployeeModel>EmployeeID}" text="{EmployeeModel>EmployeeName}" additionalText="{EmployeeModel>EmployeeID}"/>
+							<ComboBox showSecondaryValues= "true"  items="{empModel>/}" id="ED_id_ManagerFilter" showClearIcon="true">
+								<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>

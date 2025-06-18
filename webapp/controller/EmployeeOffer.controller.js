@@ -102,6 +102,8 @@ sap.ui.define([
             //Onboard call
             EO_onOnboardPress: async function () {
                 this.onHandleEmployeeAction("Onboarded", "onBoardEmployee");
+                this._fetchCommonData("EmployeeDetailsData", "empModel");
+
             },
             //reject call
             EO_onRejectPress: function () {
@@ -305,7 +307,6 @@ sap.ui.define([
                                 this.EO_onSearch();
                                 this.oDialog.close();
                                 MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
-                                this._fetchCommonData("EmployeeDetailsData", "empModel");
                                 this.getView().getModel("empModel").refresh(true);
 
                             } else {
