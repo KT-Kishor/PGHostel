@@ -163,6 +163,10 @@ sap.ui.define([
                 }
             },
 
+            onLogout: function () {
+                this.CommonLogoutFunction();
+            },
+
             onChangeAddCustomer: async function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 this.SelectKey = oEvent.getSource().getSelectedKey();
@@ -919,8 +923,8 @@ sap.ui.define([
                     totalReceivedAmount = this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount");
                 }
                 var totalAmount = parseFloat(paymentModel.getProperty("/TotalAmount")) || 0;
-                var receivedAmount = parseFloat(paymentModel.getProperty("/ReceivedAmount").replaceAll(',','')) || 0;
-                var receivedTDS = parseFloat(paymentModel.getProperty("/ReceivedTDS").replaceAll(',','')) || 0;
+                var receivedAmount = parseFloat(paymentModel.getProperty("/ReceivedAmount").replaceAll(',', '')) || 0;
+                var receivedTDS = parseFloat(paymentModel.getProperty("/ReceivedTDS").replaceAll(',', '')) || 0;
                 var AllreceivedTDS = parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedTDS")) || 0;
 
                 var dueAmount = totalAmount - totalReceivedAmount - receivedAmount - receivedTDS - AllreceivedTDS;
@@ -1078,7 +1082,7 @@ sap.ui.define([
                 if (oEvent.getSource().getValue() !== "INR") {
                     this.byId("idSAC").setVisible(false);
                     this.byId("idGSTCalculation").setVisible(false);
-                }else{
+                } else {
                     this.byId("idSAC").setVisible(true);
                     this.byId("idGSTCalculation").setVisible(true);
                 }
@@ -1293,7 +1297,7 @@ sap.ui.define([
                     }
                     var SelectedModel = this.getView().getModel("SelectedCustomerModel");
                     var oPayload = {
-                        "InvNo":SelectedModel.getData().InvNo,
+                        "InvNo": SelectedModel.getData().InvNo,
                         "toEmailID": oModel.ToEmail,
                         "toName": oModel.ToName,
                         "subject": oModel.Subject,
