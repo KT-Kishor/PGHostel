@@ -18,6 +18,14 @@
         showNavButton="true"
         title="Purchase Order Application"
     >
+        <m:headerContent>
+            <m:Button
+                press="onLogout"
+                icon="sap-icon://log"
+                tooltip="{i18n>logoutTooltip}"
+                type="Transparent"
+            />
+        </m:headerContent>
         <ObjectPageLayout id="ObjectPageLayout">
             <!-- <headerTitle>
                 <ObjectPageDynamicHeaderTitle>
@@ -527,7 +535,7 @@
                                                         editable="{PurchaseOrderModel>/Editable}"
                                                         textAlign="End"
                                                     />
-                                                     <m:Select
+                                                    <m:Select
                                                         id="PO_id_day"
                                                         selectedKey="{PurchaseOrderModel>Period}"
                                                         editable="{PurchaseOrderModel>/Editable}"
@@ -548,7 +556,7 @@
                                                         editable="{PurchaseOrderModel>/Editable}"
                                                         textAlign="End"
                                                     />
-                                                   
+
                                                     <m:Input
                                                         id="PO_id_TotalAmount"
                                                         value="{PurchaseOrderModel>TotalAmount}"
@@ -652,7 +660,6 @@
                                                 class="sapUiSmallMarginBegin"
                                                 wrapping="false"
                                                 visible="{= ${PurchaseOrderModel>/Currency} === 'INR'}"
-
                                             />
                                         </m:HBox>
                                     </m:VBox>
