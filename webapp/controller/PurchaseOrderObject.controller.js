@@ -197,11 +197,6 @@ sap.ui.define([
             }
             this.closeBusyDialog()
         },
-
-        onLogout: function () {
-            this.CommonLogoutFunction();
-        },
-
         PO_onButtonPress: function () {
             this.getRouter().navTo("PurchaseOrder");
 
@@ -711,27 +706,36 @@ sap.ui.define([
                         if (!isNaN(total)) fSubTotal += total;
                     });
                     oModel.setProperty("/SubTotal", fSubTotal.toFixed(2));
-                    this._calculateGSTandTotal();
+                    this._calculateGSTandTotal(); 
                 }
             }
         },
 
         POO_onPDFButtonPress: async function () {
+            this.getBusyDialog();
             var oPDFModel = this.getView().getModel("PDFData");
             var oPOModel = this.getView().getModel("PurchaseOrderModel").getData();
             oPDFModel.setProperty("/ClientCompanyName", oPOModel.CustomerName);
             oPDFModel.setProperty("/ClientCompanyAddress", oPOModel.Address);
             oPDFModel.setProperty("/ClientCompanyPAN", oPOModel.PAN);
-            oPDFModel.setProperty("/PONumber", oPOModel.PONumber || "12345");
+            oPDFModel.setProperty("/PONumber", oPOModel.PoNumber);
             oPDFModel.setProperty("/POType", oPOModel.Type);
             oPDFModel.setProperty("/POFrom", oPOModel.StartDate);
             oPDFModel.setProperty("/POTo", oPOModel.EndDate);
             oPDFModel.setProperty("/PODate", oPOModel.CurrentDate);
             oPDFModel.setProperty("/POItems", oPOModel.PurchaseOrders);
-            oPDFModel.setProperty("/TotalPOAmount", oPOModel.TotalAmount || "98765");
-            oPDFModel.setProperty("/POAmountInWords", oPOModel.AmountInWords || "Ninety eight thousand seven sixty five rupees only");
+            oPDFModel.setProperty("/Tax", oPOModel.Tax);
+            oPDFModel.setProperty("/SubTotal", oPOModel.SubTotal);
+            oPDFModel.setProperty("/IGST", oPOModel.IGST);
+            oPDFModel.setProperty("/CGST", oPOModel.CGST);
+            oPDFModel.setProperty("/SGST", oPOModel.SGST);
+            oPDFModel.setProperty("/GSTType", oPOModel.GSTType);
+            oPDFModel.setProperty("/GSTIN", oPOModel.GSTIN);
+            oPDFModel.setProperty("/TotalPOAmount", oPOModel.GrantTotal);
+            oPDFModel.setProperty("/Currency", oPOModel.Currency);
+            oPDFModel.setProperty("/POAmountInWords", oPOModel.AmountInWords || "Not Found");
             var htmlContent = oPOModel.Notes;
-            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
+            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oPOModel.BranchCode });
             var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
             if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                 try {
@@ -755,7 +759,7 @@ sap.ui.define([
                     console.error("Image compression failed:", err);
                     this.closeBusyDialog();
                 }
-
+                
             }
             if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                 if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePOPDF === "function") {
@@ -844,7 +848,7 @@ sap.ui.define([
         Mail_onSendEmail: function () {
             var oModel = this.getView().getModel("PurchaseOrderModel").getData();
             const uploaderModel = this.getView().getModel("UploaderData").getProperty("/attachments");
-            if (uploaderModel == false) {
+            if (uploaderModel==false) {
                 MessageToast.show(this.i18nModel.getText("attachmentRequired"))
                 return;
             }
