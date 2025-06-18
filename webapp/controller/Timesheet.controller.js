@@ -51,7 +51,7 @@ sap.ui.define(["./BaseController",
             TSD_ReadTimesheetEntries: async function (filter) {
                 try {
                     this.getBusyDialog();
-                    const oData = await this.ajaxReadWithJQuery("Timesheet", {EmployeeID: this.EmployeeID});
+                    const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID });
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
                     this.filterTimesheetForCurrentWeek(); // <-- Filter for current week
@@ -133,73 +133,112 @@ sap.ui.define(["./BaseController",
             },
 
             TS_onDeleteTimesheet: async function () {
-                var that = this;
-                var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
+                const that = this;
+                const oTable = this.byId("TD_id_Table");
+                const oSelectedItems = oTable.getSelectedItems();
                 if (!oSelectedItems.length) {
                     MessageToast.show(this.i18nModel.getText("selctRowtoDelete"));
                     return;
                 }
-                var aIdsToDelete = oSelectedItems.map(item => item.getBindingContext("FilteredTimesheetModel").getProperty("SrNo"));
+                const aIdsToDelete = oSelectedItems.map(item =>
+                    item.getBindingContext("FilteredTimesheetModel").getProperty("SrNo")
+                );
                 this.showConfirmationDialog(
                     this.i18nModel.getText("confirmTitle"),
                     this.i18nModel.getText("deleteConfirm"),
-                    function () {
-                        that.getBusyDialog();
-                        that.ajaxDeleteWithJQuery("/Timesheet", {
-                            filters: { SrNo: aIdsToDelete } // Send array of IDs
-                        }).then(() => {
+                    async function () {
+                        try {
+                            that.getBusyDialog();
+
+                            // Step 1: Delete the records
+                            await that.ajaxDeleteWithJQuery("/Timesheet", {
+                                filters: { SrNo: aIdsToDelete }
+                            });
                             MessageToast.show(that.i18nModel.getText("deletTimesheetSuucess"));
-                            that._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: that.EmployeeID });
+                            that.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                            that.getView().getModel("viewModel").setProperty("/canDelete", false);
+                            // Step 2: Refetch the data
+                            const refreshedData = await that.ajaxReadWithJQuery("Timesheet", {
+                                EmployeeID: that.EmployeeID
+                            });
+                            const parsedData = Array.isArray(refreshedData.data)
+                                ? refreshedData.data
+                                : [refreshedData.data];
+
+                            // Step 3: Update model manually
+                            const oNewModel = new sap.ui.model.json.JSONModel(parsedData);
+                            that.getView().setModel(oNewModel, "FilteredTimesheetModel");
+                            oNewModel.refresh(true); // Force UI refresh
+
+                            oTable.removeSelections(true);
+                        } catch (error) {
+                            that.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                            that.getView().getModel("viewModel").setProperty("/canDelete", false);
+                            MessageToast.show(error.message || error.responseText || "Error deleting record");
+                        } finally {
                             that.closeBusyDialog();
-                        }).catch((error) => {
-                            that.closeBusyDialog();
-                            MessageToast.show(error.responseText);
-                        });
+                        }
                     },
-                    function () { // On Cancel
-                        that.closeBusyDialog();
-                        that.byId("TD_id_Table").removeSelections(true);
+                    function () {
+                        oTable.removeSelections(true); // On cancel, still clear selection
                     }
                 );
             },
+
+
             TS_onSubmitTimesheet: async function () {
-                var that = this;
-                var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
+                const that = this;
+                const oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
+
                 if (!oSelectedItems.length) {
                     MessageToast.show(this.i18nModel.getText("selctRowtoSubmit"));
                     return;
                 }
-                // Build array of update objects as required by backend
-                var aPayload = oSelectedItems.map(item => {
-                    var srNo = item.getBindingContext("FilteredTimesheetModel").getProperty("SrNo");
+
+                // Prepare payload for each selected timesheet
+                const aPayload = oSelectedItems.map(item => {
+                    const oData = item.getBindingContext("FilteredTimesheetModel").getObject();
                     return {
-                        filters: { SrNo: srNo },
-                        data: { Status: "Submitted" }
+                        data: {
+                            Status: "Submitted",
+                        },
+                        filters: {
+                            SrNo: oData.SrNo
+                        }
                     };
                 });
 
                 this.showConfirmationDialog(
                     this.i18nModel.getText("confirmTitle"),
                     this.i18nModel.getText("submitConfirm"),
-                    function () {
-                        that.getBusyDialog();
-                        that.ajaxUpdateWithJQuery("/Timesheet", aPayload)
-                            .then(() => {
-                                MessageToast.show(that.i18nModel.getText("SubmitSuucess"));
-                                that._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: that.EmployeeID });
-                                that.closeBusyDialog();
-                            })
-                            .catch((error) => {
-                                that.closeBusyDialog();
-                                MessageToast.show(error.responseText);
-                            });
+                    async function () {
+                        try {
+                            that.getBusyDialog();
+
+                            // Send to backend
+                            await that.ajaxUpdateWithJQuery("/Timesheet", aPayload);
+
+                            MessageToast.show(that.i18nModel.getText("SubmitSuucess"));
+
+                            // Refresh and clean up
+                            that.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                            that.getView().getModel("viewModel").setProperty("/canDelete", false);
+                            that.byId("TD_id_Table").removeSelections(true);
+                            await that._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: that.EmployeeID });
+                        } catch (error) {
+                            that.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                            that.getView().getModel("viewModel").setProperty("/canDelete", false);
+                            MessageToast.show(error.message || error.responseText || "Update failed");
+                        } finally {
+                            that.closeBusyDialog();
+                        }
                     },
-                    function () { // On Cancel
-                        that.closeBusyDialog();
+                    function () {
                         that.byId("TD_id_Table").removeSelections(true);
                     }
                 );
             },
+
             T_TableSelectionChange: function () {
                 var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
                 this.getView().getModel("viewModel").setProperty("/canSubmit", false);
@@ -264,33 +303,33 @@ sap.ui.define(["./BaseController",
                 oDialog.open();
             },
 
-             T_onSearch: async function () {
-                    this.getBusyDialog(); // Show busy dialog
-                    var aFilterItems = this.byId("TS_id_FilterBar").getFilterGroupItems();
-                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
-                    var params = {};
-                    aFilterItems.forEach(function (oItem) {
-                        var oControl = oItem.getControl();
-                        var sValue = oItem.getName();
-                        if (oControl && oControl.getValue()) {
-                            if (sValue === "Date") {
-                                var oFromDate = oControl.getDateValue();
-                                var oToDate = oControl.getSecondDateValue();
-                                params["StartDate"] = oDateFormat.format(oFromDate);
-                                params["EndDate"] = oDateFormat.format(oToDate);
-                            } else {
-                                params[sValue] = oControl.getValue();
-                            }
+            T_onSearch: async function () {
+                this.getBusyDialog(); // Show busy dialog
+                var aFilterItems = this.byId("TS_id_FilterBar").getFilterGroupItems();
+                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
+                var params = {};
+                aFilterItems.forEach(function (oItem) {
+                    var oControl = oItem.getControl();
+                    var sValue = oItem.getName();
+                    if (oControl && oControl.getValue()) {
+                        if (sValue === "Date") {
+                            var oFromDate = oControl.getDateValue();
+                            var oToDate = oControl.getSecondDateValue();
+                            params["StartDate"] = oDateFormat.format(oFromDate);
+                            params["EndDate"] = oDateFormat.format(oToDate);
+                        } else {
+                            params[sValue] = oControl.getValue();
                         }
-                    });
-                    try {
-                        await this._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: this.EmployeeID, ...params });
-                    } catch (error) {
-                        sap.m.MessageToast.show(error.message || error.responseText);
-                    } finally {
-                        this.closeBusyDialog(); // Close after call finishes
                     }
-                },
+                });
+                try {
+                    await this._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: this.EmployeeID, ...params });
+                } catch (error) {
+                    sap.m.MessageToast.show(error.message || error.responseText);
+                } finally {
+                    this.closeBusyDialog(); // Close after call finishes
+                }
+            },
             TS_onClear: function () {
                 this.byId("TS_monthComboBox").setValue("");
                 this.byId("TS_id_Status").setValue("");
