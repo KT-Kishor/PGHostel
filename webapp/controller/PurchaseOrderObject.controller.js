@@ -156,6 +156,15 @@ sap.ui.define([
                     purchaseOrderModel.setProperty("/Currency", purchaseOrderData.PurchaseOrderItems[0].Currency);
 
 
+                    var length = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
+                    if (length == false) {
+                        var oModel = this.getView().getModel("PurchaseOrderModel")
+                        oModel.setProperty("/IGST", "");
+                        oModel.setProperty("/CGST", "");
+                        oModel.setProperty("/SGST", "");
+                        oModel.setProperty("/GrantTotal", "");
+                        oModel.setProperty("/SubTotal", "0.00");
+                    }
 
 
                     const purchaseOrders = purchaseOrderData.PurchaseOrderItems;
@@ -188,11 +197,6 @@ sap.ui.define([
             }
             this.closeBusyDialog()
         },
-
-        onLogout: function () {
-            this.CommonLogoutFunction();
-        },
-
         PO_onButtonPress: function () {
             this.getRouter().navTo("PurchaseOrder");
 
@@ -248,7 +252,6 @@ sap.ui.define([
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyPANNo", PoData.pan);
 
             this.byId("FPO_id_BranchCode").setValueState("None");
-
         },
         onAddItemButtonPress: function () {
             var oModel = this.getView().getModel("PurchaseOrderModel");
@@ -677,7 +680,7 @@ sap.ui.define([
                                     if (!isNaN(total)) fSubTotal += total;
                                 });
                                 oModel.setProperty("/SubTotal", fSubTotal.toFixed(2));
-                                this._updateGSTandGrantTotal(); // or inline GST logic
+                                this._calculateGSTandTotal()
                             }
                             this.closeBusyDialog()
                         });
@@ -703,7 +706,7 @@ sap.ui.define([
                         if (!isNaN(total)) fSubTotal += total;
                     });
                     oModel.setProperty("/SubTotal", fSubTotal.toFixed(2));
-                    this._updateGSTandGrantTotal(); // or inline GST logic
+                    this._calculateGSTandTotal(); 
                 }
             }
         },
@@ -747,6 +750,7 @@ sap.ui.define([
                     console.error("Image compression failed:", err);
                     this.closeBusyDialog();
                 }
+                
             }
             if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                 if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePOPDF === "function") {
@@ -835,7 +839,7 @@ sap.ui.define([
         Mail_onSendEmail: function () {
             var oModel = this.getView().getModel("PurchaseOrderModel").getData();
             const uploaderModel = this.getView().getModel("UploaderData").getProperty("/attachments");
-            if (uploaderModel != []) {
+            if (uploaderModel==false) {
                 MessageToast.show(this.i18nModel.getText("attachmentRequired"))
                 return;
             }
