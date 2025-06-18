@@ -6,6 +6,14 @@
 	xmlns:layout="sap.ui.layout"
 	xmlns:m="sap.m">
 	<m:Page id="MsaE_id_Page" title="{i18n>msaDetails}" navButtonPress="MsaE_onBack" showNavButton="true">
+	<m:headerContent>
+	<m:Button
+        press="onLogout"
+        icon="sap-icon://log"
+        tooltip="{i18n>logoutTooltip}"
+        type="Transparent"
+    />
+	</m:headerContent>
 		<ObjectPageLayout busyIndicatorDelay="0" enableLazyLoading="true" useIconTabBar="true" showTitleInHeaderContent="true" id="MsaE_id_ObjectPageLayout" upperCaseAnchorBar="false">
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>

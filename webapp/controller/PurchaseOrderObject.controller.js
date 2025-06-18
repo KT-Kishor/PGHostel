@@ -531,7 +531,7 @@ _calculateGSTandTotal: function () {
                             "Description": item.Description,
                             "Unit": item.Unit,
                             "Amount": item.Amount,
-                            "Currency": item.Currency || "INR",
+                            "Currency": oModel.Currency || "INR",
                             "Period": item.Period || "Per Day",
                             "TotalAmount": item.TotalAmount
 

@@ -44,6 +44,10 @@ sap.ui.define([
                 this.GST = true;
             },
 
+             onLogout: function () {
+                this.CommonLogoutFunction();
+            },
+
             onRadioButtonGroupSelect: function (oEvent) {
                 if (oEvent.getSource().getSelectedButton().getText() === 'Recruitment') {
                     this.SimpleFormModel.setProperty("/Recruitment", true);
