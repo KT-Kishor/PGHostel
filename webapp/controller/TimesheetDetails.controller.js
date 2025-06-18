@@ -43,7 +43,11 @@ sap.ui.define([
 
             if (this.sArg !== "Timesheet") {
                 await this.readCallTimesheet();
-                oViewModel.setProperty("/isUpdate", true);
+                const oData = this.getView().getModel("newModel").getData();
+
+                const isSubmitted = oData.Status === "Submitted";
+                oViewModel.setProperty("/isUpdate", !isSubmitted); // hide edit button if submitted
+                // oViewModel.setProperty("/isUpdate", true);
                 oViewModel.setProperty("/isCreate", false);
                 oViewModel.setProperty("/isEditing", false); // Start in view mode for edit
                 oViewModel.setProperty("/isCalendarEnabled", false);

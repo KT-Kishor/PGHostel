@@ -188,15 +188,22 @@ sap.ui.define(["./BaseController",
 
             TS_onSubmitTimesheet: async function () {
                 const that = this;
-                const oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
+                const oTable = this.byId("TD_id_Table");
+                const aSelectedItems = oTable.getSelectedItems();
 
-                if (!oSelectedItems.length) {
+                if (!aSelectedItems.length) {
                     MessageToast.show(this.i18nModel.getText("selctRowtoSubmit"));
                     return;
                 }
 
-                // Prepare payload for each selected timesheet
-                const aPayload = oSelectedItems.map(item => {
+                // Construct timesheet-level metadata (optional)
+                const oMetaData = {
+                    EmployeeID: this.EmployeeID,
+                    SubmittedAt: new Date().toISOString().split("T")[0]
+                };
+
+                // Construct item-level data (row updates)
+                const aItems = aSelectedItems.map(item => {
                     const oData = item.getBindingContext("FilteredTimesheetModel").getObject();
                     return {
                         data: {
@@ -208,6 +215,11 @@ sap.ui.define(["./BaseController",
                     };
                 });
 
+                const finalPayload = {
+                    data: oMetaData,   // optional
+                    items: aItems
+                };
+
                 this.showConfirmationDialog(
                     this.i18nModel.getText("confirmTitle"),
                     this.i18nModel.getText("submitConfirm"),
@@ -215,20 +227,18 @@ sap.ui.define(["./BaseController",
                         try {
                             that.getBusyDialog();
 
-                            // Send to backend
-                            await that.ajaxUpdateWithJQuery("/Timesheet", aPayload);
+                            // Backend endpoint should expect { data, items[] }
+                            await that.ajaxUpdateWithJQuery("Timesheet", finalPayload);
 
                             MessageToast.show(that.i18nModel.getText("SubmitSuucess"));
 
-                            // Refresh and clean up
                             that.getView().getModel("viewModel").setProperty("/canSubmit", false);
                             that.getView().getModel("viewModel").setProperty("/canDelete", false);
                             that.byId("TD_id_Table").removeSelections(true);
                             await that._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: that.EmployeeID });
+
                         } catch (error) {
-                            that.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                            that.getView().getModel("viewModel").setProperty("/canDelete", false);
-                            MessageToast.show(error.message || error.responseText || "Update failed");
+                            MessageToast.show(error.message || error.responseText);
                         } finally {
                             that.closeBusyDialog();
                         }
