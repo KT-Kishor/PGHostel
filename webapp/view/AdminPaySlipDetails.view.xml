@@ -15,6 +15,14 @@
         navButtonPress="APD_onPressBack"
         showNavButton="true"
     >
+        <m:headerContent>
+            <m:Button
+                press="onLogout"
+                icon="sap-icon://log"
+                tooltip="{i18n>logoutTooltip}"
+                type="Transparent"
+            />
+        </m:headerContent>
         <ObjectPageLayout
             id="APD_id_NavAdmin"
             enableLazyLoading="true"

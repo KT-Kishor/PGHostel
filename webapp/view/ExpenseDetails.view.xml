@@ -9,7 +9,6 @@
 
 <m:Page id="id_Expense_Details" title="{i18n>expDetails}" navButtonPress="Exp_Det_onPressBackBtn" showNavButton="true">
  <m:headerContent>
- <m:ToolbarSpacer ></m:ToolbarSpacer>
           <m:Button
         press="onLogout"
         icon="sap-icon://log"

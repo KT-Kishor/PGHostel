@@ -300,6 +300,10 @@ sap.ui.define([
                 }
             },
 
+            onLogout: function () {
+                this.CommonLogoutFunction();
+            },
+
             VSF_onCloseDialog: function () {
                 if (this.APD_oDialog) {
                     this.APD_oDialog.close();
