@@ -13,15 +13,12 @@
         title="{viewModel>/pageTitle}"
     >
     <headerContent>
-    <Toolbar >
-    <ToolbarSpacer ></ToolbarSpacer>
         <Button
             press="onLogout"
             icon="sap-icon://log"
             tooltip="{i18n>logoutTooltip}"
             type="Transparent"
         />
-        </Toolbar>
         </headerContent>
         <content>
             <!-- Calendar with legend -->

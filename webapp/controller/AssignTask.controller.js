@@ -27,6 +27,10 @@ sap.ui.define(
           this.CommonReadcall({ TaskID: sTaskID });
         },
 
+        onLogout: function () {
+          this.CommonLogoutFunction();
+        },
+
         _fetchTaskDetails: async function (sTaskID) {
           try {
             const response = await this.ajaxReadWithJQuery("NewTask", {
