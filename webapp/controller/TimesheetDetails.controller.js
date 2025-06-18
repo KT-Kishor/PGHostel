@@ -112,6 +112,11 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
+
+        onLogout: function () {
+            this.CommonLogoutFunction();
+        },
+
         _getStartOfWeek: function (date) {
             const day = date.getDay(); // Sunday = 0, Monday = 1, ...
             const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust if Sunday
