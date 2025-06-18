@@ -687,15 +687,16 @@ sap.ui.define(
                     return businessDays;
                 },
 
-                // Half day selection handler
-                onHalfDaySelect: function () {
-                    var oLeaveModel = this.getView().getModel("LeaveTempModel");
-                    oLeaveModel.setProperty("/halfDay", !!oLeaveModel.getProperty("/halfDay"));
-                    this.onLiveChange();
+
+                onHalfDaySelect: function (oEvent) {
+                        var bSelected = oEvent.getParameter("selected"); // Always reliable
+                        var oLeaveModel = this.getView().getModel("LeaveTempModel");
+                        oLeaveModel.setProperty("/halfDay", bSelected); // Set updated value explicitly
+                        this.onLiveChange(); // Recalculate
                 },
 
                 // Check if leave is already applied for given dates
-               isLeaveAlreadyApplied: function (fromDate, toDate, previousDates = []) {
+                isLeaveAlreadyApplied: function (fromDate, toDate, previousDates = []) {
                     let from = this.onFormatDate(fromDate);
                     let to = this.onFormatDate(toDate);
 
