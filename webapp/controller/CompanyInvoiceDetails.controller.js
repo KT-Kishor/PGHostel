@@ -1024,7 +1024,7 @@ sap.ui.define([
 
                 let isCurrencyValid = true;
                 if (paymentModel.Currency !== "INR") {
-                    isCurrencyValid = utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID");
+                    isCurrencyValid = utils._LCvalidateAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID");
                 } else {
                     await this.onChangeReceivedTDS(); // now returns boolean
                 }
