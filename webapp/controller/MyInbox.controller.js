@@ -15,7 +15,7 @@ sap.ui.define([
 
     _onRouteMatched: async function (OEvent) {
       var LoginFUnction = await this.commonLoginFunction("MyInbox");
-      if (!LoginFUnction) return; 
+      if (!LoginFUnction) return;
       this.getView().getModel("PaySlip").setProperty("/isRouteLOP", false);
       const sParams = OEvent.getParameter("arguments").sMyInBox;
       const oView = this.getView();
@@ -113,11 +113,22 @@ sap.ui.define([
 
         if (this.oLoginModel.Role !== "Account Manager" && this.oLoginModel.Role !== "Account Consultant") params["ManagerID"] = this.idEmp;
         else {
-          if (!params.hasOwnProperty("Status")) {
-            params["Status"] = "Send to account";
-          }
+          var status = !params.hasOwnProperty("Status");
+          // if (!params.hasOwnProperty("Status")) {
+          //   params["Status"] = "Send to account";
+          // }
         }
         await this._fetchCommonData("InboxDetails", "MyInboxModelData", params);
+        if (status && (this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant")) {
+          var aFilters = [
+            new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Paid"),
+            new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Send to account")
+          ];
+          var oCombinedFilter = new sap.ui.model.Filter(aFilters, false); // 'false' means OR logic
+          var oTable = this.byId("MI_id_MyInboxTable");
+          oTable.getBinding("items").filter(oCombinedFilter);
+
+        }
         this.onBeforeShow();
         this.closeBusyDialog();
       } catch (error) {
@@ -190,9 +201,9 @@ sap.ui.define([
           sPath: oData.ID + "|MyInbox"
         });
       } else if (oData.Type === "Leave") {
-        this.getRouter().navTo("RouteDetailLeave",{sLeaveID : oData.ID });
+        this.getRouter().navTo("RouteDetailLeave", { sLeaveID: oData.ID });
       } else {
-        this.getRouter().navTo("SelfService", { sPath: oData.EmpID,Role: "MyInboxResignation" });
+        this.getRouter().navTo("SelfService", { sPath: oData.EmpID, Role: "MyInboxResignation" });
       }
     },
 

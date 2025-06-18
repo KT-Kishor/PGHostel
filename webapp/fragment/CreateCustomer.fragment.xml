@@ -6,7 +6,7 @@
 		<f:SimpleForm id="MC_id_SimpleFormAddToolbar" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" emptySpanXL="0" emptySpanL="4" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1" width="100%" maxContainerCols="2">
 			<f:content>
 				<Label text="{i18n>companyName}" />
-				<Input id="MC_id_CustCompanyName" liveChange="MC_ValidateCommonFields" value="{CustomerModel>/companyName}" required="true" maxLength="200" placeholder="{i18n>companyNamePlace}" valueStateText="{i18n>placeCompany}"/>
+				<Input id="MC_id_CustCompanyName" liveChange="MC_ValidateCommonFields" value="{CustomerModel>/companyName}" editable="{ViewModel>/update}" required="true" maxLength="200" placeholder="{i18n>companyNamePlace}" valueStateText="{i18n>placeCompany}"/>
 
 				<Label text="{i18n>customerName}" required="true"/>
 				<HBox width="100%" justifyContent="Start" alignItems="Center">

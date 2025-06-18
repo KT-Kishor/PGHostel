@@ -20,6 +20,8 @@ sap.ui.define(["./BaseController",
                 if (!LoginFunction) return;
                 this.getBusyDialog();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Timesheet Details");
+
                 const oViewModel = new JSONModel();
                 oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
                 this.getView().setModel(oViewModel, "viewModel");
@@ -49,13 +51,71 @@ sap.ui.define(["./BaseController",
             TSD_ReadTimesheetEntries: async function (filter) {
                 try {
                     this.getBusyDialog();
-                    const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: filter },);
+                    const oData = await this.ajaxReadWithJQuery("Timesheet", {EmployeeID: this.EmployeeID});
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
+                    this.filterTimesheetForCurrentWeek(); // <-- Filter for current week
                     this.closeBusyDialog();
                 } catch (error) {
                     MessageToast.show(error.message || error.responseText);
                     this.closeBusyDialog();
+                }
+            },
+            filterTimesheetForCurrentWeek: function () {
+                // Get start date from view model
+                var oViewModel = this.getView().getModel("viewModel");
+                var oStartDate = new Date(oViewModel.getProperty("/calendarStartDate"));
+                oStartDate.setHours(0, 0, 0, 0);
+
+                // Get number of days in the interval (default 7)
+                var oCalendar = this.byId("TS_id_calendarTimesheet");
+                var iDays = oCalendar && oCalendar.getDays ? oCalendar.getDays() : 7;
+
+                // Calculate end date
+                var oEndDate = new Date(oStartDate);
+                oEndDate.setDate(oEndDate.getDate() + iDays - 1);
+                oEndDate.setHours(23, 59, 59, 999);
+
+                // Get all timesheet data
+                var oTimesheetModel = this.getOwnerComponent().getModel("FilteredTimesheetModel");
+                var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
+
+                // Filter entries for the current week
+                var aFiltered = aAllData.filter(function (entry) {
+                    if (!entry.Date) return false;
+                    var entryDate = new Date(entry.Date);
+                    entryDate.setHours(0, 0, 0, 0);
+                    return entryDate >= oStartDate && entryDate <= oEndDate;
+                });
+
+                // Update the model with filtered data
+                this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "FilteredTimesheetModel");
+            },
+
+            TS_onCalendarDateSelect: function (oEvent) {
+                // Get the selected date from the calendar
+                var oCalendar = oEvent.getSource();
+                var aSelectedDates = oCalendar.getSelectedDates();
+                if (aSelectedDates.length > 0) {
+                    var oSelectedDate = aSelectedDates[0].getStartDate();
+                    // Zero out time for comparison
+                    oSelectedDate.setHours(0, 0, 0, 0);
+
+                    // Get all timesheet data
+                    var oTimesheetModel = this.getOwnerComponent().getModel("FilteredTimesheetModel");
+                    var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
+
+                    // Filter for the selected date
+                    var aFiltered = aAllData.filter(function (entry) {
+                        if (!entry.Date) return false;
+                        // Parse the DB date string to a Date object
+                        var entryDate = new Date(entry.Date);
+                        entryDate.setHours(0, 0, 0, 0);
+                        return entryDate.getTime() === oSelectedDate.getTime();
+                    });
+
+                    // Update the model with filtered data
+                    this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "FilteredTimesheetModel");
                 }
             },
 
@@ -204,24 +264,33 @@ sap.ui.define(["./BaseController",
                 oDialog.open();
             },
 
-            T_onSearch: async function () {
-                try {
-                    this.getBusyDialog();
+             T_onSearch: async function () {
+                    this.getBusyDialog(); // Show busy dialog
                     var aFilterItems = this.byId("TS_id_FilterBar").getFilterGroupItems();
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
                     var params = {};
                     aFilterItems.forEach(function (oItem) {
                         var oControl = oItem.getControl();
                         var sValue = oItem.getName();
                         if (oControl && oControl.getValue()) {
-                            params[sValue] = oControl.getValue();
+                            if (sValue === "Date") {
+                                var oFromDate = oControl.getDateValue();
+                                var oToDate = oControl.getSecondDateValue();
+                                params["StartDate"] = oDateFormat.format(oFromDate);
+                                params["EndDate"] = oDateFormat.format(oToDate);
+                            } else {
+                                params[sValue] = oControl.getValue();
+                            }
                         }
                     });
-
-                    await this.TSD_ReadTimesheetEntries(params);
-                } catch (error) {
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
-                }
-            },
+                    try {
+                        await this._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: this.EmployeeID, ...params });
+                    } catch (error) {
+                        sap.m.MessageToast.show(error.message || error.responseText);
+                    } finally {
+                        this.closeBusyDialog(); // Close after call finishes
+                    }
+                },
             TS_onClear: function () {
                 this.byId("TS_monthComboBox").setValue("");
                 this.byId("TS_id_Status").setValue("");

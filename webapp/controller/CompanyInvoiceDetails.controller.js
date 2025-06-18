@@ -208,6 +208,7 @@ sap.ui.define([
                     this.byId("CID_id_Payby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
                     this.byId("CID_id_NavPayby").setMinDate(new Date(oEvent.getSource().getValue().split('/').reverse().join('-')));
                 }
+                this.getBusyDialog();
                 const oData = await this.ajaxReadWithJQuery("MSADetails", { MsaID: this.SelectKey });
                 const oSelectedCustomerModel = this.getView().getModel("SelectedCustomerModel");
                 if (oData.success) {
@@ -215,10 +216,12 @@ sap.ui.define([
                     var paymentDay = parseInt(oData.data[0].PaymentTerms);
                     paymentDateObj.setDate(paymentDateObj.getDate() + paymentDay);
                     oSelectedCustomerModel.setProperty("/PayByDate", paymentDateObj);
+                    this.closeBusyDialog();
                 } else {
                     var currentDate = new Date();
                     currentDate.setDate(currentDate.getDate() + 30);
                     oSelectedCustomerModel.setProperty("/PayByDate", currentDate);
+                    this.closeBusyDialog();
                 }
             },
 
@@ -232,6 +235,9 @@ sap.ui.define([
                 }
                 this.byId("CID_id_SowPO").setValueState("None");
                 const sSelectedKey = oEvent.getSource().getSelectedKey();
+                if (!sSelectedKey) {
+                    this.byId("CID_id_CurrencySelect").setEditable(true);
+                }
                 const oView = this.getView();
                 const oSelectedCustomerModel = oView.getModel("SelectedCustomerModel");
                 const oFilteredSOWModel = oView.getModel("FilteredSOWModel");
@@ -412,7 +418,7 @@ sap.ui.define([
                     let finalAmount = baseAmount - discountAmount;
                     item.Total = finalAmount.toFixed(2);
 
-                    const isGSTApplicable = item.GSTCalculation === "YES" && oCustomerModel.getProperty("/Currency") === "INR";
+                    const isGSTApplicable = item.GSTCalculation === "YES" && oSOWModel.getProperty("/Currency") === "INR";
                     item.SAC = isGSTApplicable ? "998314" : "-";
 
                     if (isGSTApplicable) {
@@ -969,6 +975,8 @@ sap.ui.define([
                     if (invoiceData.Currency !== "INR") {
                         invoiceData.AmountInFCurrency = invoiceData.AmountInINR;
                     }
+                    invoiceData.InvoiceDate = this.Formatter.formatDate(invoiceData.InvoiceDate);
+                    invoiceData.PayByDate = this.Formatter.formatDate(invoiceData.PayByDate);
                     this.getView().setModel(new JSONModel(invoiceData), "SelectedCustomerModel");
                     this.Status = invoiceData.Status;
                     return;
@@ -1043,8 +1051,6 @@ sap.ui.define([
 
                     if (oData && oData.success) {
                         this.oDialog.close();
-                        this._oDialog.destroy(true);  
-                        this._oDialog = null;
                         this.Readcall("InvoicePaymentDetail", { InvNo: this.decodedPath });
                         this.Readcall("CompanyInvoice", { InvNo: this.decodedPath });
 
@@ -1068,6 +1074,16 @@ sap.ui.define([
 
             CID_ValidateCommonFields: function (oEvent) { utils._LCvalidateMandatoryField(oEvent); },
 
+            CID_CurrencyChanges: function (oEvent) {
+                if (oEvent.getSource().getValue() !== "INR") {
+                    this.byId("idSAC").setVisible(false);
+                    this.byId("idGSTCalculation").setVisible(false);
+                }else{
+                    this.byId("idSAC").setVisible(true);
+                    this.byId("idGSTCalculation").setVisible(true);
+                }
+                this.totalAmountCalculation();
+            },
             CD_onDiscountInfoPress: function (oEvent) {
                 if (!this._oPopover) {
                     this._oPopover = new sap.m.Popover({
@@ -1273,12 +1289,14 @@ sap.ui.define([
             Mail_onSendEmail: function () {
                 try {
                     var oModel = this.getView().getModel("UploaderData").getData();
-                    if (!oModel.attachments || oModel.attachments.length === 0) {
-                        MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
-                        return;
+                    if (this.loginModel.getProperty("/SimpleForm")) {
+                        if (!oModel.attachments || oModel.attachments.length === 0) {
+                            MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
+                            return;
+                        }
                     }
                     var oPayload = {
-                        "toEmailID": [oModel.ToEmail],
+                        "toEmailID": oModel.ToEmail,
                         "toName": oModel.ToName,
                         "subject": oModel.Subject,
                         "body": oModel.htmlbody,
@@ -1291,8 +1309,6 @@ sap.ui.define([
                         this.closeBusyDialog();
                         this.loginModel.setProperty("/RichText", false);
                         this.loginModel.setProperty("/SimpleForm", true);
-                        this.EOU_oDialogMail.destroy(true);
-                        this.EOU_oDialogMail = null;
                     }).catch((error) => {
                         this.closeBusyDialog();
                         MessageToast.show(error.responseText);

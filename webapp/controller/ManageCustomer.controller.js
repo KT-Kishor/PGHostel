@@ -16,8 +16,8 @@ sap.ui.define([
         var LoginFUnction = await this.commonLoginFunction("Customer");
         if (!LoginFUnction) return;
         this.getBusyDialog(); // Show busy dialog
-        // await this._fetchCommonData("Country", "CountryModel");
-        // await this._fetchCommonData("BaseLocation", "BaseLocationModel");
+        var ViewModel = new JSONModel({update:true});
+        this.getView().setModel(ViewModel,"ViewModel")
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
         this.byId("MC_id_CustTable").removeSelections(true); // Clear table selection
         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerCustomer")); // Set header name
@@ -138,11 +138,13 @@ sap.ui.define([
 
       // Call the function for create new Customer
       MC_onAddCustomerDetails: function () {
+        this.getView().getModel("ViewModel").setProperty("/update", true);
         this.manageCustomerDetails(false);
       },
-
+      
       // Call the function for edit Customer
       MC_onEditCustomerDetails: function () {
+        this.getView().getModel("ViewModel").setProperty("/update", false);
         this.manageCustomerDetails(true);
       },
 

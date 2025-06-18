@@ -86,11 +86,11 @@
 
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>selectSOW}"/>
 										<m:ComboBox visible="{visiablityPlay>/createVisi}" showClearIcon="true" items="{CombinedData>/items}" value="{SelectedCustomerModel>/SOWDetails}" change="OnChangeSowDetails" valueStateText="{i18n>selectSOW}" id="CID_id_SowDetails">
-											<core:Item key="{CombinedData>MsaID} - {CombinedData>SowID}" text="{parts:[{path:'CombinedData>CompanyName'},{path:'CombinedData>Description'},{path:'CombinedData>StartDate'},{path:'CombinedData>EndDate'}],formatter: '.Formatter.formatCompanyAndDescription'}"/>
+											<core:Item key="{CombinedData>MsaID} - {CombinedData>SowID}" text="{parts:[{path:'CombinedData>Description'},{path:'CombinedData>StartDate'},{path:'CombinedData>EndDate'}],formatter: '.Formatter.formatCompanyAndDescription'}"/>
 										</m:ComboBox>
 
 										<m:Label text="{i18n>currency}" required="true"/>
-										<m:ComboBox items="{CurrencyModel>/}" value="{FilteredSOWModel>/Currency}" id="CID_id_CurrencySelect" change="CID_ValidateCommonFields" valueStateText="{i18n>selectCurrency}">
+										<m:ComboBox items="{CurrencyModel>/}" value="{FilteredSOWModel>/Currency}" id="CID_id_CurrencySelect" change="CID_CurrencyChanges" valueStateText="{i18n>selectCurrency}">
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:ComboBox>
 
