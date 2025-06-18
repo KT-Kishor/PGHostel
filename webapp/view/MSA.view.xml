@@ -54,9 +54,9 @@
 					<Column demandPopin="true">
 						<Text text="{i18n>paymentterms}" />
 					</Column>
-					<!-- <Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>createMSADate}" />
-					</Column> -->
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>msaEndDate}" />
+					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>type}" />
 					</Column>
@@ -68,7 +68,7 @@
 							<Text text="{MSADisplayModel>CompanyHeadName}"/>
 							<Text text="{MSADisplayModel>CompanyHeadPosition}"/>
 							<Text text="{MSADisplayModel>PaymentTerms}"/>
-							<!-- <Text text="{path:'MSADisplayModel>CreateMSADate',formatter: '.Formatter.formatDate'}"/> -->
+							<Text text="{path:'MSADisplayModel>MsaContractPeriodEndDate',formatter: '.Formatter.formatDate'}"/>
 							<Text text="{MSADisplayModel>Type}"/>
 						</cells>
 					</ColumnListItem>
