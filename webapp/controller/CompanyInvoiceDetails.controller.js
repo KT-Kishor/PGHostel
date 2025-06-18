@@ -919,8 +919,8 @@ sap.ui.define([
                     totalReceivedAmount = this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount");
                 }
                 var totalAmount = parseFloat(paymentModel.getProperty("/TotalAmount")) || 0;
-                var receivedAmount = parseFloat(paymentModel.getProperty("/ReceivedAmount")) || 0;
-                var receivedTDS = parseFloat(paymentModel.getProperty("/ReceivedTDS")) || 0;
+                var receivedAmount = parseFloat(paymentModel.getProperty("/ReceivedAmount").replaceAll(',','')) || 0;
+                var receivedTDS = parseFloat(paymentModel.getProperty("/ReceivedTDS").replaceAll(',','')) || 0;
                 var AllreceivedTDS = parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedTDS")) || 0;
 
                 var dueAmount = totalAmount - totalReceivedAmount - receivedAmount - receivedTDS - AllreceivedTDS;

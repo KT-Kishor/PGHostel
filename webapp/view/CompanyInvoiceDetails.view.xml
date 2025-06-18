@@ -116,7 +116,7 @@
 												<m:ToolbarSpacer />
 												<m:Button type="Attention" text="{i18n>btnTransaction}" press="CID_onPressDisplayPaymentDetail" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
 												<m:Button visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Accept" press="CID_onPressAddInvoiceItems" />
-												<m:ToolbarSeparator />
+												<!-- <m:ToolbarSeparator /> -->
 											</m:Toolbar>
 										</m:headerToolbar>
 										<m:columns>
