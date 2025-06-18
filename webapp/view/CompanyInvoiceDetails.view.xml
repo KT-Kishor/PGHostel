@@ -5,6 +5,14 @@
 	xmlns="sap.uxap"
 	xmlns:f="sap.ui.layout.form">
 	<m:Page title="{i18n>invoiceDetails}" showNavButton="true" navButtonPress="CID_onPressback" id="CID_id_MyPageId">
+	<m:headerContent>
+	<m:Button
+        press="onLogout"
+        icon="sap-icon://log"
+        tooltip="{i18n>logoutTooltip}"
+        type="Transparent"
+    />
+	</m:headerContent>
 		<!-- <m:ScrollContainer > -->
 		<ObjectPageLayout id="CID_id_CmpInvObjectPageLayout" useIconTabBar="false" class="sapUiSmallmarginResponsive">
 			<!-- Sections in the ObjectPage -->
@@ -116,7 +124,7 @@
 												<m:ToolbarSpacer />
 												<m:Button type="Attention" text="{i18n>btnTransaction}" press="CID_onPressDisplayPaymentDetail" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
 												<m:Button visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Accept" press="CID_onPressAddInvoiceItems" />
-												<m:ToolbarSeparator />
+												<!-- <m:ToolbarSeparator /> -->
 											</m:Toolbar>
 										</m:headerToolbar>
 										<m:columns>

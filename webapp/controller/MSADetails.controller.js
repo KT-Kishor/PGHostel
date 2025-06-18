@@ -49,7 +49,7 @@ sap.ui.define([
                     ReplacementRefund: "",
                     Country: "",
                     City: "",
-                    GST:""
+                    GST: ""
                 });
                 this.getView().setModel(oModelMSA, "msaModelWizart");
 
@@ -58,6 +58,10 @@ sap.ui.define([
                 this.AdvanceBalance = true;
                 this.byId("MsaD_id_Type").setSelectedIndex(0);
                 this.GST = true;
+            },
+
+            onLogout: function () {
+                this.CommonLogoutFunction();
             },
 
             onRadioButtonGroupSelect: function (oEvent) {
@@ -158,7 +162,7 @@ sap.ui.define([
 
             MsaD_validateGST: function (oEvent) {
                 this.GST = utils._LCvalidateGstNumber(oEvent);
-                if(oEvent.getSource().getValue() === ""){
+                if (oEvent.getSource().getValue() === "") {
                     this.GST = true; // If GST field is empty, consider it valid
                     this.byId("MsaD_id_GST").setValueState("None");
                 }

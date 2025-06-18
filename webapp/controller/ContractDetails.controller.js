@@ -1,14 +1,14 @@
 sap.ui.define([
-        "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "../utils/CommonAgreementPDF",
-        "../model/formatter", "sap/m/MessageToast",
-    ],
-    function(BaseController, utils, JSONModel, jsPDF, Formatter, MessageToast) {
+    "./BaseController", "../utils/validation", "sap/ui/model/json/JSONModel", "../utils/CommonAgreementPDF",
+    "../model/formatter", "sap/m/MessageToast",
+],
+    function (BaseController, utils, JSONModel, jsPDF, Formatter, MessageToast) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.ContractDetails", {
-            onInit: function() {
+            onInit: function () {
                 this.getRouter().getRoute("RouteContractDetails").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: async function(oEvent) {
+            _onRouteMatched: async function (oEvent) {
                 var LoginFunction = await this.commonLoginFunction("Contract");
                 if (!LoginFunction) return;
                 this.getBusyDialog();
@@ -161,30 +161,34 @@ sap.ui.define([
                 }
             },
 
-            CD_CommonID: function() {
-                const ids = ["CD_id_CName", "CD_id_Address", "CD_id_Email", "CD_id_Amount", "CD_id_EndClientHirer", "CD_id_Locationcomb", "CD_id_HiringContact", "CD_id_ConLocation", "CD_id_ConsultingService", "CD_id_codeModel", "CD_id_Mobile", "CD_id_DateEnd", "CD_id_Datestart" ]
+            onLogout: function () {
+                this.CommonLogoutFunction();
+            },
+
+            CD_CommonID: function () {
+                const ids = ["CD_id_CName", "CD_id_Address", "CD_id_Email", "CD_id_Amount", "CD_id_EndClientHirer", "CD_id_Locationcomb", "CD_id_HiringContact", "CD_id_ConLocation", "CD_id_ConsultingService", "CD_id_codeModel", "CD_id_Mobile", "CD_id_DateEnd", "CD_id_Datestart"]
                 ids.forEach((id) => {
                     this.byId(id).setValueState("None");
                 });
             },
 
-            CU_CommonID: function() {
-                const ids = ["CU_id_ConsultantName", "CU_id_Role", "CU_id_ContractEmailID",  "CU_id_ContractAddress", "CU_id_EndClient", "CU_id_ClientReportContact", "CU_id_EditAmountInput", "CU_id_Country", "CU_id_ContractCity", "CU_id_codeModel",
+            CU_CommonID: function () {
+                const ids = ["CU_id_ConsultantName", "CU_id_Role", "CU_id_ContractEmailID", "CU_id_ContractAddress", "CU_id_EndClient", "CU_id_ClientReportContact", "CU_id_EditAmountInput", "CU_id_Country", "CU_id_ContractCity", "CU_id_codeModel",
                     "CU_id_Mobile", "CU_id_Comments"]
                 ids.forEach((id) => {
                     this.byId(id).setValueState("None");
                 });
-            }, 
+            },
 
             // Reset wizard to initial state
-            CD_onResetWizard: function() {
+            CD_onResetWizard: function () {
                 var oWizard = this.getView().byId("CD_id_Wizard");
                 oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
                 oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
                 this.byId("CD_id_StepTwo").getParent().setShowNextButton(true);
             },
 
-           ChangeAggrementDate: function () {
+            ChangeAggrementDate: function () {
                 const oAgreementDatePicker = this.byId("CD_id_AgreeDate");
                 const oStartDatePicker = this.byId("CD_id_Datestart");
                 const oEndDatePicker = this.byId("CD_id_DateEnd");
@@ -224,7 +228,7 @@ sap.ui.define([
                 }
             },
 
-            _forceRevalidate: function(oDatePicker) {
+            _forceRevalidate: function (oDatePicker) {
                 const oDate = oDatePicker.getDateValue();
                 if (oDate) {
                     oDatePicker.setDateValue(null);       // Temporarily clear
@@ -232,7 +236,7 @@ sap.ui.define([
                 }
             },
 
-           validateDate: function(oEvent) {
+            validateDate: function (oEvent) {
                 let oStartDatePicker = this.byId("CD_id_Datestart");
                 let oEndDatePicker = this.byId("CD_id_DateEnd");
 
@@ -261,7 +265,7 @@ sap.ui.define([
                 }
             },
 
-           onChangeAggrementDate: function () {
+            onChangeAggrementDate: function () {
                 const oAgreementDatePicker = this.byId("CU_id_AgreementDate");
                 const oStartDatePicker = this.byId("CU_id_AssignmentStartDate");
                 const oEndDatePicker = this.byId("CU_id_AssignmentEndDate");
@@ -290,7 +294,7 @@ sap.ui.define([
                 }
             },
 
-             CD_validateDate: function(oEvent) {
+            CD_validateDate: function (oEvent) {
                 let oModel, oStartDatePicker, oEndDatePicker;
                 if (this.sArgPara === "CreateContractFlag") {
                     oModel = this.getView().getModel("ContractModelWizart");
@@ -320,12 +324,12 @@ sap.ui.define([
                 }
             },
 
-            CD_validateName: function(oEvent) {
+            CD_validateName: function (oEvent) {
                 const oSource = oEvent.getSource();
                 const selectedKey = oSource.getSelectedKey?.().trim();
                 const selectedItem = oSource.getSelectedItem();
                 const value = selectedItem ? selectedItem.getAdditionalText() : ""; // Check if selectedItem is not null
-                
+
                 let oModel, oInput;
                 if (this.sArgPara === "CreateContractFlag") {
                     oModel = this.getView().getModel("ContractModelWizart");
@@ -351,28 +355,28 @@ sap.ui.define([
                 }
             },
 
-            CD_validateEmail: function(oEvent) {
+            CD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
                 }
             },
 
-            CD_validateAmount: function(oEvent) {
+            CD_validateAmount: function (oEvent) {
                 utils._LCvalidateAmount(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
                 }
             },
 
-            CD_validateMobileNo: function(oEvent) {
+            CD_validateMobileNo: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
                 }
             },
 
-            CD_onChangeCountry: function(oEvent) {
+            CD_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSource = oEvent.getSource();
                 const selectedKey = oSource.getSelectedKey?.();
@@ -412,33 +416,33 @@ sap.ui.define([
             },
 
             // Format date string to Date object
-            onFormatDate: function(dateString) {
+            onFormatDate: function (dateString) {
                 var parts = dateString.split('/');
                 return new Date(parts[2], parts[1] - 1, parts[0]);
             },
 
-            CD_ValidateCommonFields: function(oEvent) {
+            CD_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
                 }
             },
 
-            CD_onBaseLocationChange: function(oEvent) {
+            CD_onBaseLocationChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
                 }
             },
 
-            CD_ValidateComboBox: function(oEvent) {
+            CD_ValidateComboBox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
                 }
             },
 
-            CD_ValidateConsultantName: function(oEvent) {
+            CD_ValidateConsultantName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
@@ -446,24 +450,24 @@ sap.ui.define([
             },
 
             //back function
-            CD_onPressback: function() {
+            CD_onPressback: function () {
                 this.showConfirmationDialog(
                     this.i18nModel.getText("ConfirmActionTitle"),
                     this.i18nModel.getText("backConfirmation"),
-                    function() {
+                    function () {
                         this.getRouter().navTo("RouteContract");
                     }.bind(this)
                 );
                 this.byId("CD_id_StepTwo").getParent().setShowNextButton(true);
             },
 
-            CU_onBack: function() {
+            CU_onBack: function () {
                 var isEditMode = this.getView().getModel("viewModel").getProperty("/isEditMode");
                 if (isEditMode) {
                     this.showConfirmationDialog(
                         this.i18nModel.getText("ConfirmActionTitle"),
                         this.i18nModel.getText("backConfirmation"),
-                        function() {
+                        function () {
                             this.getView().getModel("viewModel").setProperty("/isEditMode", false);
                             this.getView().getModel("simpleForm").setProperty("/editable", false);
                             this.getView().getModel("simpleForm").setProperty("/Status", false);
@@ -480,7 +484,7 @@ sap.ui.define([
                 }
             },
 
-            validateStep: function() {
+            validateStep: function () {
                 var oModel = this.getView().getModel("ContractModelWizart").getData();
 
                 oModel.AgreementDate = this.byId("CD_id_AgreeDate").getValue();
@@ -529,19 +533,19 @@ sap.ui.define([
             },
 
             //radio button select function
-            RadioButtonSelect: function(oEvent) {
+            RadioButtonSelect: function (oEvent) {
                 var oModel = this.getView().getModel("ContractModelWizart");
                 this.RadioButton = oEvent.getSource().getAggregation("buttons")[oEvent.getSource().mProperties.selectedIndex].getText()
                 oModel.setProperty("/Rate", this.RadioButton);
             },
 
             //third step validation function
-            CD_StepTwo: function() {
+            CD_StepTwo: function () {
                 this.getView().byId("CD_id_Submit").setEnabled(true);
                 this.byId("CD_id_StepTwo").getParent().setShowNextButton(false);
             },
 
-            CD_onSubmit: async function() {
+            CD_onSubmit: async function () {
                 try {
                     if (
                         utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") &&
@@ -625,7 +629,7 @@ sap.ui.define([
                                 beginButton: new sap.m.Button({
                                     text: "OK",
                                     type: "Accept",
-                                    press: function() {
+                                    press: function () {
                                         oDialog.close();
                                         this.getView().byId("CD_id_StepTwo").getParent().setShowNextButton(true);
                                         this.getRouter().navTo("RouteContract");
@@ -634,14 +638,14 @@ sap.ui.define([
                                 endButton: new sap.m.Button({
                                     text: "Generate PDF",
                                     type: "Attention",
-                                    press: function() {
+                                    press: function () {
                                         oDialog.close();
                                         this.getView().byId("CD_id_StepTwo").getParent().setShowNextButton(true);
                                         this.getRouter().navTo("RouteContract");
                                         this.contractPDFgenerate(data);
                                     }.bind(this)
                                 }),
-                                afterClose: function() {
+                                afterClose: function () {
                                     oDialog.destroy();
                                 }
                             });
@@ -657,7 +661,7 @@ sap.ui.define([
                 }
             },
 
-            onChangeContractStatus: function(oEvent) {
+            onChangeContractStatus: function (oEvent) {
                 var oSelectedItem = oEvent.getSource().getSelectedItem();
                 var oSelectedValue = oSelectedItem ? oSelectedItem.getText() : "";
                 if (oSelectedValue === "Renewed") {
@@ -682,15 +686,15 @@ sap.ui.define([
                     this.getView().getModel("simpleForm").setProperty("/Status", true);
                     this.getView().getModel("simpleForm").setProperty("/mobile", false);
                     MessageToast.show(this.i18nModel.getText("renewOperation"));
-                }else if(oSelectedValue === "New"){
+                } else if (oSelectedValue === "New") {
                     this.getView().getModel("simpleForm").setProperty("/renewStatus", true);
-                        this.getView().getModel("simpleForm").setProperty("/editable", true);
-                        this.getView().getModel("simpleForm").setProperty("/Status", true);  
-                        this.getView().getModel("simpleForm").setProperty("/mobile", true); 
+                    this.getView().getModel("simpleForm").setProperty("/editable", true);
+                    this.getView().getModel("simpleForm").setProperty("/Status", true);
+                    this.getView().getModel("simpleForm").setProperty("/mobile", true);
                 }
             },
 
-            onEditOrSavePress: function() {
+            onEditOrSavePress: function () {
                 var oView = this.getView();
                 var oViewModel = oView.getModel("viewModel");
                 var oSimpleFormModel = oView.getModel("simpleForm");
@@ -715,7 +719,7 @@ sap.ui.define([
                         oSimpleFormModel.setProperty("/Status", true);
                         oSimpleFormModel.setProperty("/mobile", true);
                     } else if (sStatus === "New") {
-                         oSimpleFormModel.setProperty("/renewStatus", true);
+                        oSimpleFormModel.setProperty("/renewStatus", true);
                         oSimpleFormModel.setProperty("/editable", true);
                         oSimpleFormModel.setProperty("/Status", true);
                         oSimpleFormModel.setProperty("/mobile", true);
@@ -727,7 +731,7 @@ sap.ui.define([
                 }
             },
 
-            formatDateToISO: function(dateObj) {
+            formatDateToISO: function (dateObj) {
                 if (!dateObj || !(dateObj instanceof Date)) return "";
                 const year = dateObj.getFullYear();
                 const month = (dateObj.getMonth() + 1).toString().padStart(2, "0");
@@ -735,7 +739,7 @@ sap.ui.define([
                 return `${year}-${month}-${day}`; // YYYY-MM-DD
             },
 
-            onPressSave: async function() {
+            onPressSave: async function () {
                 const oView = this.getView();
 
                 const oStartDatePicker = this.byId("CU_id_AssignmentStartDate");
@@ -781,8 +785,8 @@ sap.ui.define([
 
                 const oModel = oView.getModel("oFilteredContractModel").getData();
 
-                if (oModel.ContractStatus === "Renewed" || 
-                (this._previousContractStatus === "Active" && oModel.ContractStatus !== "Inactive")) {
+                if (oModel.ContractStatus === "Renewed" ||
+                    (this._previousContractStatus === "Active" && oModel.ContractStatus !== "Inactive")) {
                     const previousStatus = this._previousContractStatus;
                     this.getView().getModel("oFilteredContractModel").setProperty("/ContractStatus", previousStatus);
                     const oComboBox = this.byId("CD_id_contractStatus");
@@ -872,7 +876,7 @@ sap.ui.define([
                 }
             },
 
-            updateContractdata: async function(ContractNo, AgreementNo) {
+            updateContractdata: async function (ContractNo, AgreementNo) {
                 var response = await this.ajaxReadWithJQuery("Contract", {
                     ContractNo: ContractNo,
                     AgreementNo: AgreementNo
@@ -911,12 +915,12 @@ sap.ui.define([
                 this.CU_CommonID();
             },
 
-            CUD_commonOpenDialog: function(fragmentName) {
+            CUD_commonOpenDialog: function (fragmentName) {
                 if (!this.CUD_oDialogMail) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
                         controller: this,
-                    }).then(function(CUD_oDialogMail) {
+                    }).then(function (CUD_oDialogMail) {
                         this.CUD_oDialogMail = CUD_oDialogMail;
                         this.getView().addDependent(this.CUD_oDialogMail);
                         this.CUD_oDialogMail.open();
@@ -925,7 +929,7 @@ sap.ui.define([
                     this.CUD_oDialogMail.open();
                 }
             },
-            CUD_onSendEmail: function() {
+            CUD_onSendEmail: function () {
                 var oContractEmail = this.getView().getModel("oFilteredContractModel").getData().ContarctEmail;
                 if (!oContractEmail || oContractEmail.length === 0) {
                     MessageBox.error("To Email is missing");
@@ -945,12 +949,12 @@ sap.ui.define([
                 this.CUD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
             },
-            Mail_onPressClose: function() {
+            Mail_onPressClose: function () {
                 this.CUD_oDialogMail.destroy();
                 this.CUD_oDialogMail = null;
                 // this.CUD_oDialogMail.close();
             },
-            Mail_onUpload: function(oEvent) {
+            Mail_onUpload: function (oEvent) {
                 this.handleFileUpload(
                     oEvent,
                     this, // context
@@ -966,7 +970,7 @@ sap.ui.define([
                 );
             },
 
-            validateSendButton: function() {
+            validateSendButton: function () {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                 const emailField = sap.ui.getCore().byId("CCMail_TextArea");
                 const uploaderModel = this.getView().getModel("UploaderData");
@@ -979,15 +983,15 @@ sap.ui.define([
                 sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
 
-            Mail_onEmailChange: function() {
+            Mail_onEmailChange: function () {
                 this.validateSendButton(); // Reuse from BaseController
             },
-            Mail_onSendEmail: function() {
+            Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("oFilteredContractModel").getData();
-                 if (!oModel.attachments || oModel.attachments.length === 0) {
-                        MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
-                        return;
-                    }
+                if (!oModel.attachments || oModel.attachments.length === 0) {
+                    MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
+                    return;
+                }
                 var oPayload = {
                     "EmployeeName": oModel.ConsultantName,
                     "toEmailID": oModel.ContarctEmail,
@@ -1008,11 +1012,11 @@ sap.ui.define([
             },
 
             //PDF download function
-            onPressMerge: async function() {
+            onPressMerge: async function () {
                 this.contractPDFgenerate(this.pdfData);
             },
 
-            contractPDFgenerate: async function(oEmpModel) {
+            contractPDFgenerate: async function (oEmpModel) {
                 this.getBusyDialog();
                 // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
                 //     branchCode: oEmpModel.BranchCode

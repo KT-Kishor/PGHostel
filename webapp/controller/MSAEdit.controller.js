@@ -44,6 +44,10 @@ sap.ui.define([
                 this.GST = true;
             },
 
+            onLogout: function () {
+                this.CommonLogoutFunction();
+            },
+
             onRadioButtonGroupSelect: function (oEvent) {
                 if (oEvent.getSource().getSelectedButton().getText() === 'Recruitment') {
                     this.SimpleFormModel.setProperty("/Recruitment", true);
@@ -129,14 +133,16 @@ sap.ui.define([
                     sap.ui.getCore().byId("MsaE_id_MSA_GSTNO").setValueState("None");
                 }
             },
-
             Msa_ChangeMsaDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
+            },
+
+            onContractPeriodSelectChange: function (oEvent) {
                 const oModelData = this.getView().getModel("FilteredMsaModel").getData()[0];
                 const [day, month, year] = sap.ui.getCore().byId("MsaE_id_CreateMSADate").getValue().split('/');
                 const assignmentEndDate = new Date(year, month - 1, day);
 
-                const contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]);
+                const contractPeriod = parseInt(oModelData.ContractPeriod);
                 assignmentEndDate.setMonth(assignmentEndDate.getMonth() + contractPeriod);
 
                 oModelData.MsaContractPeriodEndDate = assignmentEndDate.toISOString().split('T')[0];
@@ -302,8 +308,8 @@ sap.ui.define([
                 if (selectedKey !== "All") oFilter.Status = selectedKey;
 
                 await this._fetchCommonData("SowDetails", "SowReadModel", oFilter);
-                var SowModel = new JSONModel(this.getView().getModel("SowReadModel").getData());
-                this.getView().setModel(SowModel, "SowAllDataModel");
+                // var SowModel = new JSONModel(this.getView().getModel("SowReadModel").getData());
+                // this.getView().setModel(SowModel, "SowAllDataModel");
                 this.closeBusyDialog();
             },
 
@@ -530,8 +536,12 @@ sap.ui.define([
                 }
             },
 
-            TableGetData: function (value) {
+            TableGetData: async function (value) {
                 // Get full data from model
+                this.getBusyDialog();
+                var SowID = this.byId("Sow_Id_ReadTable").getSelectedItem().getBindingContext("SowReadModel").getObject().SowID;
+                await this._fetchCommonData("SowDetails", "SowAllDataModel", { SowID: SowID });
+                this.closeBusyDialog();
                 var SowReadModel = this.getView().getModel("SowAllDataModel").getData();
 
                 // Filter and deep copy to avoid mutating original model
@@ -565,7 +575,17 @@ sap.ui.define([
                 this.SimpleFormModel.setProperty("/secondMinDate", new Date(FilterData[0].StartDate));
 
                 // Modify local copy safely
-                var oFilteredData = FilterData;
+                if (value === "Expend") {
+                    var oFilteredData = FilterData.filter((item) => item.Status === "Active");
+                    this.ExtendBtn = true;
+                    if (oFilteredData.length === 0) {
+                        this.ExtendBtn = false;
+                        this.byId("Sow_Id_ReadTable").removeSelections();
+                        return sap.m.MessageBox.error(this.i18nModel.getText("extendActiveMess"));
+                    }
+                } else {
+                    var oFilteredData = FilterData;
+                }
                 oFilteredData.forEach((selectedData, index) => {
                     var rateString = selectedData.Rate;
                     selectedData.IndexNo = index + 1;
@@ -587,26 +607,33 @@ sap.ui.define([
 
                 // Optionally filter based on status
                 if (value === "Relesed") {
-                    oFilteredData = oFilteredData.filter((item) => item.Status !== "Inactive");
+                    this.RelesedBtn = true;
+                    oFilteredData = oFilteredData.filter((item) => item.Status === "Active");
+                    if (oFilteredData.length === 0) {
+                        this.RelesedBtn = false;
+                        this.byId("Sow_Id_ReadTable").removeSelections();
+                        return sap.m.MessageBox.error(this.i18nModel.getText("relesedActiveMess"));
+                    }
                 }
-
-                // Update display model with filtered and formatted data
+                oFilteredData.forEach((item, index) => {
+                    item.IndexNo = (index + 1)
+                })
                 this.getView().getModel("oModelDataPro").setData(oFilteredData);
             },
 
-            MsaE_onPressRelesedSow: function () {
+            MsaE_onPressRelesedSow: async function () {
                 this.SimpleFormModel.setProperty("/addSowBtn", false);
-                this.TableGetData("Relesed");
+                await this.TableGetData("Relesed");
                 this.SimpleFormModel.setProperty("/ExpendBtn", false);
                 this.SimpleFormModel.setProperty("/save", false);
                 this.SimpleFormModel.setProperty("/Mode", "MultiSelect");
                 this.SimpleFormModel.setProperty("/submitBtn", false);
                 this.SimpleFormModel.setProperty("/ExpendBtn", false);
                 this.SimpleFormModel.setProperty("/RelesedBtn", true);
-                this.FragmentOpen();
+                if (this.RelesedBtn === true) this.FragmentOpen();
             },
 
-            MasE_onPressExpendSow: function () {
+            MasE_onPressExpendSow: async function () {
                 var endDateObj = new Date(this.Selected.EndDate);
                 var currentDate = new Date();
                 var timeDiff = endDateObj.getTime() - currentDate.getTime();
@@ -615,19 +642,19 @@ sap.ui.define([
                 if (daysDiff > 30) return sap.m.MessageBox.error(this.i18nModel.getText("sowExtend30Days"));
                 this.SimpleFormModel.setProperty("/ExpendBtn", true);
                 this.SimpleFormModel.setProperty("/addSowBtn", true);
-                this.TableGetData("Expend");
+                await this.TableGetData("Expend");
                 this.SimpleFormModel.setProperty("/save", false);
                 this.SimpleFormModel.setProperty("/Mode", "MultiSelect");
                 this.SimpleFormModel.setProperty("/submitBtn", false);
                 this.SimpleFormModel.setProperty("/ExpendBtn", true);
                 this.SimpleFormModel.setProperty("/RelesedBtn", false);
-                this.FragmentOpen();
+                if (this.ExtendBtn) this.FragmentOpen();
             },
 
-            MsaE_onPressUpdateSOW: function () {
+            MsaE_onPressUpdateSOW: async function () {
                 this.SimpleFormModel.setProperty("/ExpendBtn", false);
                 this.SimpleFormModel.setProperty("/addSowBtn", true);
-                this.TableGetData("Update");
+                await this.TableGetData("Update");
                 this.SimpleFormModel.setProperty("/save", false);
                 this.SimpleFormModel.setProperty("/Mode", "Delete");
                 this.SimpleFormModel.setProperty("/submitBtn", true);

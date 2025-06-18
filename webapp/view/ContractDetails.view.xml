@@ -4,6 +4,14 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core">
 	<Page id="C_id_PageCreate" title="{i18n>headerContractDetails}" showNavButton="true" navButtonPress="CD_onPressback" >
+	<headerContent>
+	<Button
+        press="onLogout"
+        icon="sap-icon://log"
+        tooltip="{i18n>logoutTooltip}"
+        type="Transparent"
+    />
+	</headerContent>
 		<content>
 			<Wizard id="CD_id_Wizard" showNextButton="true"  busyIndicatorDelay="0" >
 				<WizardStep id="CD_id_Firststep" title="{i18n>basicDetails}" validated="true" complete="CD_StepTwo" >

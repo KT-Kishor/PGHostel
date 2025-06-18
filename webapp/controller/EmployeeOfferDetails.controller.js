@@ -31,7 +31,7 @@ sap.ui.define([
                 // Update the model with sorted data
                 oModel.setData(aData);
                 this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag", { Type: "EmployeeOffer", Action: "CC" }); //CC mail id get call
-                
+
                 var jsonData = {
                     "Salutation": "Mr.",
                     "ConsultantName": "",
@@ -68,7 +68,7 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(jsonData), "employeeModel");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false, pfVisibility: false, });
                 this.getView().setModel(oViewModel, "viewModel");
-                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOD_id_Location", "EOD_Id_Country", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay", "EOUF_id_VariablePerc", "EOD_id_PinCode", "EOUF_id_PinCode", "EOUF_id_Location", "EUD_Id_Country","EOUF_id_Designation"].forEach(function (ids) {
+                ["EOD_id_Name", "EOD_id_Reldate", "EOUF_id_Reldate", "EOUF_id_Name", "EOD_id_mail", "EOD_id_Location", "EOD_Id_Country", "EOUF_id_mail", "EOUF_id_Address", "EOD_id_Address", "EOD_id_CTC", "EOUF_id_CTC", "EOUF_id_Bonus", "EOD_id_Bonus", "EOD_id_VariablePay", "EOUF_id_VariablePerc", "EOD_id_PinCode", "EOUF_id_PinCode", "EOUF_id_Location", "EUD_Id_Country", "EOUF_id_Designation"].forEach(function (ids) {
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 //create case
@@ -100,6 +100,11 @@ sap.ui.define([
                     this.getView().getModel("employeeModel").setProperty("/Gender", "Female");
                 }
             },
+
+            onLogout: function () {
+                this.CommonLogoutFunction();
+            },
+
             //Edit or save in update case
             EOUF_onEditOrSavePress: function () {
                 var oViewModel = this.getView().getModel("viewModel");

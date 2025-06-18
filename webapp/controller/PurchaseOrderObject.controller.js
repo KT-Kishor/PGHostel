@@ -19,6 +19,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("PurchaseOrderObject").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function (oEvent) {
+
             var LoginFunction = await this.commonLoginFunction("PurchaseOrder");
             if (!LoginFunction) return;
             this.getBusyDialog()
@@ -79,7 +80,7 @@ sap.ui.define([
                 "Description": "",
                 "Unit": "",
                 "Amount": "",
-                "Currency": "",
+                "Currency": "INR",
                 "Notes": "",
                 "GSTIN": "",
                 "customerEmail": "",
@@ -152,6 +153,9 @@ sap.ui.define([
                     purchaseOrderModel.setProperty("/SGST", purchaseOrderData.PurchaseOrder[0].SGST);
                     purchaseOrderModel.setProperty("/GrantTotal", purchaseOrderData.PurchaseOrder[0].GrantTotal);
                     purchaseOrderModel.setProperty("/PaymentTerms", purchaseOrderData.PurchaseOrder[0].PaymentTerms);
+                    purchaseOrderModel.setProperty("/Currency", purchaseOrderData.PurchaseOrderItems[0].Currency);
+
+
 
 
                     const purchaseOrders = purchaseOrderData.PurchaseOrderItems;
@@ -203,13 +207,6 @@ sap.ui.define([
             this.getView().getModel("PurchaseOrderModel").setProperty("/GSTType", Customer.type);
             this.getView().getModel("PurchaseOrderModel").setProperty("/CustomerHeadName", Customer.name);
 
-
-            var GST = this.byId("FPO_id_GSTIN").getValue()
-            if (GST != "") {
-                this.byId("FPO_id_Currency").setEditable(false)
-            } else {
-                this.byId("FPO_id_Currency").setEditable(true)
-            }
             if (Customer.LUT && Customer.LUT.trim() !== "") {
                 this.getView().byId("FPO_id_LUT").setVisible(true)
                 this.getView().getModel("PurchaseOrderModel").setProperty("/LUT", Customer.LUT);
@@ -226,22 +223,27 @@ sap.ui.define([
                 oModel.setProperty("/GrantTotal", "");
                 oModel.setProperty("/SubTotal", "0.00");
             }
-            this._updateGSTandGrantTotal()
+              this._calculateGSTandTotal();
 
             this.byId("FPO_id_CustomerName").setValueState("None");
         },
-        PO_onComboBoxBranchChange: function () {
+        PO_onComboBoxBranchChange:async function () {
             var selectedkey = this.byId("FPO_id_BranchCode").getSelectedKey();
-            var Customer = this.getView().getModel("CompanyCodeDetailsModel").getData().find(function (cust) {
-                return cust.branchCode === selectedkey
+            this.getBusyDialog()
+             var PoData= await this.ajaxReadWithJQuery("CompanyCodeDetails",{branchCode:selectedkey}).then((oData) => {
+                var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                 return PoData[0]
             });
-            this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyName", Customer.companyName);
-            this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyAddress", Customer.longAddress);
-            this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyGSTNo", Customer.gstin);
-            this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyEmail", Customer.carrerEmail);
-            this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyPANNo", Customer.pan);
-
+                 this.closeBusyDialog()
+         
+            this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyName", PoData.companyName);
+            this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyAddress", PoData.longAddress);
+            this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyGSTNo", PoData.gstin);
+            this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyEmail", PoData.carrerEmail);
+            this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyPANNo", PoData.pan);
+         
             this.byId("FPO_id_BranchCode").setValueState("None");
+            
         },
         onAddItemButtonPress: function () {
             var oModel = this.getView().getModel("PurchaseOrderModel");
@@ -260,75 +262,71 @@ sap.ui.define([
 
             oModel.setProperty("/PurchaseOrders", aData);
         },
-        PO_onAmountInputChange: function (oEvent) {
-            utils._LCvalidateAmount(oEvent);
-            var oInput = oEvent.getSource();
-            var oContext = oInput.getBindingContext("PurchaseOrderModel");
-            var sPath = oContext.getPath();
-            var model = this.getView().getModel("PurchaseOrderModel");
+       
+       onSelectCurrencyChange: function () {
+    this._calculateGSTandTotal();
+},
 
-            var oParent = oInput.getParent();
-            var aItems = oParent.getCells();
-            var sUnit = aItems[3].getValue();
-            var sAmount = aItems[4].getValue();
+PO_onAmountInputChange: function (oEvent) {
+    utils._LCvalidateAmount(oEvent);
 
-            var fUnit = parseFloat(sUnit);
-            var fAmount = parseFloat(sAmount);
+    var oInput = oEvent.getSource();
+    var oContext = oInput.getBindingContext("PurchaseOrderModel");
+    var sPath = oContext.getPath();
+    var model = this.getView().getModel("PurchaseOrderModel");
 
-            if (!isNaN(fUnit) && !isNaN(fAmount)) {
-                var fTotal = fUnit * fAmount;
-                model.setProperty(sPath + "/TotalAmount", fTotal.toFixed(2));
-            } else {
-                model.setProperty(sPath + "/TotalAmount", "");
-            }
-            var aPOs = model.getProperty("/PurchaseOrders");
-            var fSubTotal = 0;
+    var oParent = oInput.getParent();
+    var aItems = oParent.getCells();
+    var sUnit = aItems[3].getValue();
+    var sAmount = aItems[5].getValue();
 
-            aPOs.forEach(function (item) {
-                var fItemTotal = parseFloat(item.TotalAmount);
-                if (!isNaN(fItemTotal)) {
-                    fSubTotal += fItemTotal;
-                }
-            });
+    var fUnit = parseFloat(sUnit);
+    var fAmount = parseFloat(sAmount);
 
-            model.setProperty("/SubTotal", fSubTotal.toFixed(2));
+    if (!isNaN(fUnit) && !isNaN(fAmount)) {
+        var fTotal = fUnit * fAmount;
+        model.setProperty(sPath + "/TotalAmount", fTotal.toFixed(2));
+    } else {
+        model.setProperty(sPath + "/TotalAmount", "");
+    }
 
-            var tax = this.getView().byId("FPO_id_tax").getValue()
-            var GSTtype = this.getView().byId("FPO_id_type").getValue()
+    this._calculateGSTandTotal(); 
+},
 
-            if (GSTtype == "IGST") {
-                var GST = fSubTotal * tax / 100
-                model.setProperty("/IGST", GST.toFixed(2));
-            } else {
-                var GST = fSubTotal * tax / 100
-                model.setProperty("/CGST", GST.toFixed(2));
-                model.setProperty("/SGST", GST.toFixed(2));
-            }
-            var Total = GST + fSubTotal
-            model.setProperty("/GrantTotal", Total.toFixed(2));
+_calculateGSTandTotal: function () {
+    var model = this.getView().getModel("PurchaseOrderModel");
 
-            this._updateGSTandGrantTotal()
-        },
-        _updateGSTandGrantTotal: function () {
-            var model = this.getView().getModel("PurchaseOrderModel");
-            var fSubTotal = parseFloat(model.getProperty("/SubTotal"));
+    var aPOs = model.getProperty("/PurchaseOrders") || [];
+    var fSubTotal = 0;
+    aPOs.forEach(function (item) {
+        var fItemTotal = parseFloat(item.TotalAmount);
+        if (!isNaN(fItemTotal)) {
+            fSubTotal += fItemTotal;
+        }
+    });
+    model.setProperty("/SubTotal", fSubTotal.toFixed(2));
 
-            var tax = this.getView().byId("FPO_id_tax").getValue()
-            var GSTtype = this.getView().byId("FPO_id_type").getValue()
+    var tax = parseFloat(this.getView().byId("FPO_id_tax").getValue()) || 0;
+    var GSTtype = this.getView().byId("FPO_id_type").getValue();
+    var Currency = this.getView().byId("FPO_id_Currency").getSelectedKey();
 
-            var GST = fSubTotal * tax / 100
-            model.setProperty("/IGST", GST.toFixed(2));
-            model.setProperty("/CGST", GST.toFixed(2));
-            model.setProperty("/SGST", GST.toFixed(2));
+    var GST = fSubTotal * tax / 100;
 
-            if (GSTtype == "IGST") {
-                var Total = GST + fSubTotal
-                model.setProperty("/GrantTotal", Total.toFixed(2));
-            } else {
-                var Total = GST + GST + fSubTotal
-                model.setProperty("/GrantTotal", Total.toFixed(2));
-            }
-        },
+    model.setProperty("/IGST", "");
+    model.setProperty("/CGST", "");
+    model.setProperty("/SGST", "");
+
+    if (GSTtype === "IGST" && Currency === "INR") {
+        model.setProperty("/IGST", GST.toFixed(2));
+        model.setProperty("/GrantTotal", (fSubTotal + GST).toFixed(2));
+    } else if (GSTtype === "CGST/SGST" && Currency === "INR") {
+        model.setProperty("/CGST", GST.toFixed(2));
+        model.setProperty("/SGST", GST.toFixed(2));
+        model.setProperty("/GrantTotal", (fSubTotal + GST * 2).toFixed(2));
+    } else {
+        model.setProperty("/GrantTotal", fSubTotal.toFixed(2));
+    }
+},
         POO_onSubmitButtonPress: async function () {
 
             var purchaseOrders = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders");
@@ -399,7 +397,7 @@ sap.ui.define([
                                 "Description": item.Description,
                                 "Unit": item.Unit,
                                 "Amount": item.Amount,
-                                "Currency": item.Currency || "INR",
+                                "Currency": oModel.Currency || "INR",
                                 "Period": item.Period || "Per Day",
                                 "TotalAmount": item.TotalAmount
 
@@ -533,7 +531,7 @@ sap.ui.define([
                             "Description": item.Description,
                             "Unit": item.Unit,
                             "Amount": item.Amount,
-                            "Currency": item.Currency || "INR",
+                            "Currency": oModel.Currency || "INR",
                             "Period": item.Period || "Per Day",
                             "TotalAmount": item.TotalAmount
 

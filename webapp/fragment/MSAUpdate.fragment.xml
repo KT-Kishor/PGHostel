@@ -25,7 +25,7 @@
 				<Input liveChange="Msa_LC_HeadPosition" value="{FilteredMsaModel>/0/CompanyHeadPosition}" id="MsaE_id_HeadPosition" valueStateText="{i18n>placeHedaPosition}" maxLength="50" />
 
 				<Label text="{i18n>contractPeriod}" required="true"/>
-				<Select items="{ContractPeriodThree>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ContractPeriod}">
+				<Select items="{ContractPeriodThree>/ContractPeriod}" selectedKey="{FilteredMsaModel>/0/ContractPeriod}" change="onContractPeriodSelectChange">
 					<core:Item key="{ContractPeriodThree>Months}" text="{ContractPeriodThree>Months}" />
 				</Select>
 

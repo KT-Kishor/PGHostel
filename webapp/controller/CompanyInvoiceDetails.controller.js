@@ -163,6 +163,10 @@ sap.ui.define([
                 }
             },
 
+            onLogout: function () {
+                this.CommonLogoutFunction();
+            },
+
             onChangeAddCustomer: async function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 this.SelectKey = oEvent.getSource().getSelectedKey();
@@ -214,7 +218,7 @@ sap.ui.define([
                 if (oData.success) {
                     var paymentDateObj = new Date(oSelectedCustomerModel.getData().InvoiceDate);
                     var paymentDay = parseInt(oData.data[0].PaymentTerms);
-                    paymentDateObj.setDate(paymentDateObj.getDate() + paymentDay);
+                    paymentDateObj.setDate(paymentDateObj.getDate() + (paymentDay - 1));
                     oSelectedCustomerModel.setProperty("/PayByDate", paymentDateObj);
                     this.closeBusyDialog();
                 } else {
@@ -919,8 +923,8 @@ sap.ui.define([
                     totalReceivedAmount = this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount");
                 }
                 var totalAmount = parseFloat(paymentModel.getProperty("/TotalAmount")) || 0;
-                var receivedAmount = parseFloat(paymentModel.getProperty("/ReceivedAmount")) || 0;
-                var receivedTDS = parseFloat(paymentModel.getProperty("/ReceivedTDS")) || 0;
+                var receivedAmount = parseFloat(paymentModel.getProperty("/ReceivedAmount").replaceAll(',', '')) || 0;
+                var receivedTDS = parseFloat(paymentModel.getProperty("/ReceivedTDS").replaceAll(',', '')) || 0;
                 var AllreceivedTDS = parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedTDS")) || 0;
 
                 var dueAmount = totalAmount - totalReceivedAmount - receivedAmount - receivedTDS - AllreceivedTDS;
@@ -1078,7 +1082,7 @@ sap.ui.define([
                 if (oEvent.getSource().getValue() !== "INR") {
                     this.byId("idSAC").setVisible(false);
                     this.byId("idGSTCalculation").setVisible(false);
-                }else{
+                } else {
                     this.byId("idSAC").setVisible(true);
                     this.byId("idGSTCalculation").setVisible(true);
                 }
@@ -1179,11 +1183,9 @@ sap.ui.define([
                     <p>If you’ve already made the payment, kindly disregard this reminder. Otherwise, we would appreciate it if you could arrange payment as soon as possible.</p>
                     <p>If you have any questions or need further information, please don't hesitate to contact us.</p>
                     <p>Thank you for your attention to this matter.</p>
-                   <p style="margin: 0;">Best regards,</p>                   
+                   <p style="margin: 0;">Best Regards,</p>                   
                    <p style="margin: 0;">Finance Department</p>
-                    <p style="margin: 0; margin-bottom: 10px;">
-                        <a href="https://www.kalpavrikshatechnologies.com/">Kalpavriksha Technologies</a>
-                    </p>`
+                    `
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
                 this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail", true);
@@ -1216,12 +1218,10 @@ sap.ui.define([
                     <li><b>Description : ${modelData.InvoiceDescription}</b></li>
 
                     <p>If you have any questions or require further information, please do not hesitate to contact us.</p>
-                   <p style="margin: 0;">Best regards,</p>
+                   <p style="margin: 0;">Best Regards,</p>
                    <p style="margin: 0;">Nikhil Shah,</p>
                    <p style="margin: 0;">Accountant Manager</p>
-                    <p style="margin: 0; margin-bottom: 10px;">
-                        <a href="https://www.kalpavrikshatechnologies.com/">Kalpavriksha Technologies</a>
-                    </p>`
+                   `
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
                 this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail", false);
@@ -1295,18 +1295,22 @@ sap.ui.define([
                             return;
                         }
                     }
+                    var SelectedModel = this.getView().getModel("SelectedCustomerModel");
                     var oPayload = {
+                        "InvNo": SelectedModel.getData().InvNo,
                         "toEmailID": oModel.ToEmail,
                         "toName": oModel.ToName,
                         "subject": oModel.Subject,
                         "body": oModel.htmlbody,
                         "CCEmailId": oModel.CCEmail,
-                        "attachments": oModel.attachMatched
+                        "attachments": oModel.attachments
                     };
                     this.getBusyDialog();
                     this.ajaxCreateWithJQuery("CompanyInvoiceEmail", oPayload).then((oData) => {
                         MessageToast.show(this.i18nModel.getText("emailSuccess"));
                         this.closeBusyDialog();
+                        SelectedModel.setProperty("/Status", "Invoice Sent");
+                        SelectedModel.refresh(true);
                         this.loginModel.setProperty("/RichText", false);
                         this.loginModel.setProperty("/SimpleForm", true);
                     }).catch((error) => {
