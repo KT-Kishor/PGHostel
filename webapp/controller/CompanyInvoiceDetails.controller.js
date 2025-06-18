@@ -75,6 +75,8 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/MultiEmail", false);
                 this.visiablityPlay.setProperty("/merge", false);
                 oView.setModel(new JSONModel(), "CompanyInvoiceItemModel");
+                this.byId("CID_id_TableInvoiceItem").setMode("Delete");
+
                 this.Update = false;
                 if (sArg === "X") return;
                 this.visiablityPlay.setProperty("/Edit", true);

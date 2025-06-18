@@ -58,6 +58,9 @@
 						<Text text="{i18n>invoiceNo}" />
 					</Column>
 					<Column>
+						<Text text="{i18n>customerName}" />
+					</Column>
+					<Column>
 						<Text text="{i18n>invoiceDate}" />
 					</Column>
 					<Column>
@@ -77,6 +80,7 @@
 					<ColumnListItem type="Navigation" press="CI_onPressInvoiceRow">
 						<cells>
 							<Text text="{CompanyInvoiceModel>InvNo}" />
+							<Text text="{CompanyInvoiceModel>CustomerName}" />
 							<Text text="{path:'CompanyInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{CompanyInvoiceModel>InvoiceDescription}" />
 							<Text text="{path: 'CompanyInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'} {CompanyInvoiceModel>Currency}" textAlign="End" />
