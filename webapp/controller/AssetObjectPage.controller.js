@@ -17,12 +17,12 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("AssetObjectPage").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function (oEvent) {
-          
-            
+
+
             var LoginFunction = await this.commonLoginFunction("AssetAssignment");
             if (!LoginFunction) return;
             var Layout = this.byId("ObjectPageLayout");
-            Layout.setSelectedSection(this.byId("OB_Timeline")); 
+            Layout.setSelectedSection(this.byId("OB_Timeline"));
             this.getBusyDialog()
             this.Name = oEvent.getParameter("arguments").Name;
             this.Slno = oEvent.getParameter("arguments").sPath;
@@ -42,7 +42,7 @@ sap.ui.define([
                 this.getView().getModel("objectModel").setProperty("/Status", currentItem.Status);
             }
             data.forEach(function (item) {
-                 if (item.TransferDate && item.TransferDate !== "1899-11-30T00:00:00.000Z") {
+                if (item.TransferDate && item.TransferDate !== "1899-11-30T00:00:00.000Z") {
                     timelineData.push({
                         type: "Transfer",
                         // dateTime: item.TransferDate,
@@ -106,7 +106,7 @@ sap.ui.define([
                         // Status: "Trashed",
                         // Comments:item.Comments,
                         text: item.TrashComments ? "Comment: " + item.TrashComments : "",
-                        title: "The asset was Trashed by " + item.TrashByEmployeeName + " (" + item.TrashByEmployeeID + ") at " + item.TrashBranch  + " on "+
+                        title: "The asset was Trashed by " + item.TrashByEmployeeName + " (" + item.TrashByEmployeeID + ") at " + item.TrashBranch + " on " +
                             new Date(item.TrashDate).toLocaleDateString('en-GB')
                     });
                 }
@@ -129,6 +129,11 @@ sap.ui.define([
             this.getView().setModel(oModel, "Mymodel");
 
         },
+
+        onLogout: function () {
+            this.CommonLogoutFunction();
+        },
+
         getTimelineDate: function (assetDate, assignedDate, status) {
             if (status === "Available") {
                 return this.formatDate(assetDate);
