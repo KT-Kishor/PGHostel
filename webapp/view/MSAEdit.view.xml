@@ -112,6 +112,10 @@
         <!-- Address -->
         <layout:VerticalLayout class="sapUiTinyMarginBottom sapUiSmallMarginBegin ">
 		<layout:HorizontalLayout>
+                <m:Label showColon="true" text="{i18n>msaEndDate}" />
+                <m:Text text="{path:'FilteredMsaModel>/0/MsaContractPeriodEndDate',formatter: '.Formatter.formatDate'}" class="sapUiTinyMarginBegin"/>
+            </layout:HorizontalLayout>
+		<layout:HorizontalLayout>
                 <m:Label showColon="true" text="{i18n>emailId}" />
                 <m:Text text="{FilteredMsaModel>/0/MsaEmail}" class="sapUiTinyMarginBegin"/>
             </layout:HorizontalLayout>

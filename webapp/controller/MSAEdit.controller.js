@@ -44,7 +44,7 @@ sap.ui.define([
                 this.GST = true;
             },
 
-             onLogout: function () {
+            onLogout: function () {
                 this.CommonLogoutFunction();
             },
 
@@ -133,14 +133,16 @@ sap.ui.define([
                     sap.ui.getCore().byId("MsaE_id_MSA_GSTNO").setValueState("None");
                 }
             },
-
             Msa_ChangeMsaDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
+            },
+
+            onContractPeriodSelectChange: function (oEvent) {
                 const oModelData = this.getView().getModel("FilteredMsaModel").getData()[0];
                 const [day, month, year] = sap.ui.getCore().byId("MsaE_id_CreateMSADate").getValue().split('/');
                 const assignmentEndDate = new Date(year, month - 1, day);
 
-                const contractPeriod = parseInt(oModelData.ContractPeriod.split(" ")[0]);
+                const contractPeriod = parseInt(oModelData.ContractPeriod);
                 assignmentEndDate.setMonth(assignmentEndDate.getMonth() + contractPeriod);
 
                 oModelData.MsaContractPeriodEndDate = assignmentEndDate.toISOString().split('T')[0];
@@ -613,8 +615,9 @@ sap.ui.define([
                         return sap.m.MessageBox.error(this.i18nModel.getText("relesedActiveMess"));
                     }
                 }
-
-                // Update display model with filtered and formatted data
+                oFilteredData.forEach((item, index) => {
+                    item.IndexNo = (index + 1)
+                })
                 this.getView().getModel("oModelDataPro").setData(oFilteredData);
             },
 
