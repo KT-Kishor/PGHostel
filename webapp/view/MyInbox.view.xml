@@ -57,22 +57,22 @@
 					<Column demandPopin="true">
 						<Text text="{i18n>employeeName}" />
 					</Column>
-					<Column demandPopin="true">
+					<Column  minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>startDate}" />
 					</Column>
-					<Column demandPopin="true">
+					<Column  minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>endDate}" />
 					</Column>
-					<Column demandPopin="true">
+					<Column  minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>type}" />
 					</Column>
-					<Column demandPopin="true">
+					<Column  minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>subType}" />
 					</Column>
-					<Column demandPopin="true" >
+					<Column  minScreenWidth="Desktop" demandPopin="true" >
 						<Text text="{i18n>submittedDate}" />
 					</Column>
-					<Column demandPopin="true" >
+					<Column  minScreenWidth="Desktop" demandPopin="true" >
 						<Text text="{i18n>status}" />
 					</Column>
 				</columns>
