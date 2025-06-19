@@ -188,9 +188,6 @@
 										<m:Column demandPopin="true">
 											<m:Text text="{i18n>POConsultantname}" />
 										</m:Column>
-										<!-- <m:Column demandPopin="true">
-											<m:Text text="{i18n>desc}" />
-										</m:Column> -->
 										<m:Column minScreenWidth="Desktop" demandPopin="true">
 											<m:Text text="{i18n>startDate}" />
 										</m:Column>
@@ -211,7 +208,6 @@
 										<m:ColumnListItem >
 											<m:cells>
 												<m:Text text="{SowReadModel>ConsultantName}"/>
-												<!-- <m:Text text="{SowReadModel>Description}"/> -->
 												<m:Text text="{path:'SowReadModel>StartDate',formatter: '.Formatter.formatDate'}"/>
 												<m:Text text="{path:'SowReadModel>EndDate',formatter: '.Formatter.formatDate'}"/>
 												<m:Text text="{SowReadModel>Designation}"/>
@@ -225,15 +221,6 @@
 						</ObjectPageSubSection>
 					</subSections>
 				</ObjectPageSection>
-				<!-- <ObjectPageSection titleUppercase="false" title="PO">
-					<subSections>
-						<ObjectPageSubSection title=" " titleUppercase="false">
-							<blocks>
-								<m:Button text="Generate PDF" press="onPressOpenRTE"/>
-							</blocks>
-						</ObjectPageSubSection>
-					</subSections>
-				</ObjectPageSection> -->
 			</sections>
 		</ObjectPageLayout>
 	</m:Page>
