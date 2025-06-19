@@ -164,15 +164,61 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             onSectionChange: async function (oEvent) {
-                if (this.getView().getModel("viewModel").getProperty("/isEditMode")) {
-                    sap.m.MessageBox.warning(this.i18nModel.getText("sectionChangeConfirm"));
-                    // If in edit mode, revert to the previous section
-                    this.byId("ObjectPageLayout").setSelectedSection(this._currentSection);
+                const viewModel = this.getView().getModel("viewModel");
+                const oNewSection = oEvent.getParameter("section");
+                const oCurrentSection = this._currentSection;
+
+                // If in edit mode, show confirmation dialog
+                if (viewModel.getProperty("/isEditMode")) {
+                    this.showConfirmationDialog(
+                        this.i18nModel.getText("confirmNavigationTitle"),
+                        this.i18nModel.getText("sectionChangeConfirm"),
+                        async () => {
+                            this._currentSection = oNewSection;
+                            const sectionTitle = oNewSection.getTitle();
+
+                            switch (sectionTitle) {
+                                case "Basic Details":
+                                    await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
+                                    this.getView().getModel("sEmployeeModel").refresh(true);
+                                    break;
+
+                                case "Salary Details":
+                                    this.SS_readSalaryDetails(this.EmployeeID);
+                                    break;
+
+                                case "Payslip":
+                                    this.getView().byId("SS_id_PaySlipTable").setBusy(true);
+                                    await this._commonGETCall("AdminPaySlip", "EmpTable", { EmployeeID: this.EmployeeID });
+                                    this.getView().byId("SS_id_PaySlipTable").setBusy(false);
+                                    break;
+
+                                case "Document":
+                                    [
+                                        "SS_id_AcName", "SS_id_Acno", "SS_id_BankName", "SS_id_Branch",
+                                        "SS_id_IfcsCode", "SS_id_Address", "SS_id_Pan", "SS_idAdhar",
+                                        "SS_id_Passport", "SS_id_Voterid"
+                                    ].forEach(id => this.byId(id)?.setValueState("None"));
+                                    this.SS_readEducationalDetails(this.EmployeeID);
+                                    this.SS_readEmploymentDetails(this.EmployeeID);
+                                    break;
+
+                                case "Attachment":
+                                    this.byId("SS_id_DocType")?.setValueState("None");
+                                    this.ReadEmployeeDocument();
+                                    break;
+                            }
+                        },
+                        () => {
+                            this.byId("ObjectPageLayout").setSelectedSection(oCurrentSection);
+                        },
+                        this.i18nModel.getText("OkButton"),
+                        this.i18nModel.getText("CancelButton")
+                    );
                     return;
                 }
-                // If not in edit mode, accept and store new section
-                this._currentSection = oEvent.getParameter("section");
-                const sectionTitle = oEvent.getParameter("section").getTitle();
+                this._currentSection = oNewSection;
+                const sectionTitle = oNewSection.getTitle();
                 switch (sectionTitle) {
                     case "Basic Details":
                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
