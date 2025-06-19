@@ -174,6 +174,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.i18nModel.getText("confirmNavigationTitle"),
                         this.i18nModel.getText("sectionChangeConfirm"),
                         async () => {
+                             viewModel.setProperty("/isEditMode", false);
                             this._currentSection = oNewSection;
                             const sectionTitle = oNewSection.getTitle();
 
