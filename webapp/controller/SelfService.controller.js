@@ -2223,6 +2223,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.oModel.setProperty("/EmpData", {});
                 this.oModel.setProperty("/BackRoute", "SelfService");
                 this.oModel.setProperty("/BackPath", this.sPath);
+                this.oModel.setProperty("/BackPathRole", this.sNavigatedRole);
                 var month = this.oModel.getProperty(`${sPath}/YearMonth`).split("-")[1];
                 var filters = {
                     ID: this.oModel.getProperty(`${sPath}/ID`),

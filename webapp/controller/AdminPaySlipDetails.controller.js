@@ -11,6 +11,7 @@ sap.ui.define([
 
             _onRouteMatched: async function (oEvent) {
                 BusyIndicator.hide();
+                this.scrollToSection("APD_id_NavAdmin", "APD_id_First");
                 var LoginFunction = await this.commonLoginFunction("PaySlip");
                 if (!LoginFunction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -26,7 +27,7 @@ sap.ui.define([
             APD_onPressBack: function () {
                 var oRoutePath = this.oModel.getProperty("/BackRoute");
                 if (oRoutePath === "RouteAdminPaySlip") this.getRouter().navTo(oRoutePath);
-                else this.getRouter().navTo(oRoutePath, { sPath: this.oModel.getProperty("/BackPath") });
+                else this.getRouter().navTo(oRoutePath, { sPath: this.oModel.getProperty("/BackPath"), Role: this.oModel.getProperty("/BackPathRole") });
             },
 
             APD_onEmployeeIDChange: async function (oEvent) {
@@ -69,7 +70,7 @@ sap.ui.define([
                             oData.DeductionData = response.data.Deduction.filter(function (item) {
                                 return !(item.Amount == null && item.YearlyAmount == null);
                             });
-                            oData.ProfilePhoto = "data:image/png;base64," + (oData.ProfilePhoto || "");
+                            oData.ProfilePhoto = "data:image/png;base64," + (response.data.ProfilePhoto || "");
                             this.oModel.setProperty("/EmpData", oData);
                             this.totalCalculationAmount();
                         }
@@ -164,13 +165,20 @@ sap.ui.define([
             },
 
             APD_onPressSubmit: async function () {
-                this.getBusyDialog();
                 var data = this.oModel.getData().EmpData;
                 var month = data.Month.substring(0, 3);
                 var yearKey = month + "YearlyAmount";
                 var monthKey = month + "Amount";
                 var earnData = data.EarningData;
                 var dedData = data.DeductionData;
+                try {
+                    this.checkEmpty(earnData);
+                    this.checkEmpty(dedData);
+                } catch (err) {
+                    MessageBox.error(err.message);
+                    return;
+                };
+                this.getBusyDialog();
                 this.transformCompData(earnData, data, yearKey, monthKey);
                 this.transformCompData(dedData, data, yearKey, monthKey);
                 delete data.EarningData;
@@ -351,6 +359,14 @@ sap.ui.define([
                 else {
                     return sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(yearMonth);
                 }
+            },
+
+            checkEmpty: function (compData) {
+                compData.forEach(function (item) {
+                    if (!item.Description || !item.Amount || !item.YearlyAmount) {
+                        throw new Error("Fields cannot be Empty, please recheck the data.");
+                    }
+                });
             }
         });
     });
