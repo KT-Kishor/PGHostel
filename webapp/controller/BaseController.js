@@ -86,7 +86,7 @@ sap.ui.define([
             "Expense": "/ExpenseApp",
             "MSA&SOW": "/GenerateMsaNda",
             "HrQuotation": "/QuotationApp",
-            "PaySlip": "/PaySlip",
+            "PaySlip": "/AdminPaySlip",
             "CompanyInvoice": "/InvoiceApp",
             "Leaves": "/Leaves",
             "ConsultantInvoice": "/ConsultantInvoice",
