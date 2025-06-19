@@ -154,6 +154,10 @@ sap.ui.define(
         this.closeBusyDialog();
       },
 
+      onLogout: function () {
+        this.CommonLogoutFunction();
+      },
+
       HQD_onCountryChange: function (oEvent) {
         utils._LCstrictValidationComboBox(oEvent);
         var sSelectedKey = oEvent.getSource().getSelectedKey(); // country name

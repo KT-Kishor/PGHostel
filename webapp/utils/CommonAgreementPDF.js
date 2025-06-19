@@ -684,129 +684,147 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
         },
 
         _GeneratePOPDF: function (that, oModel, oCompanyModel, htmlContent) {
-            setTimeout(function () {
-                var { jsPDF } = window.jspdf;
-                var doc = new jsPDF({
-                    unit: "mm",
-                    format: "a4",
-                    margins: { left: 30, right: 30 },
-                    lineHeight: 1.5,
-                    orientation: "portrait",
-                });
+            var { jsPDF } = window.jspdf;
+            var doc = new jsPDF({
+                unit: "mm",
+                format: "a4",
+                margins: { left: 30, right: 30 },
+                lineHeight: 1.5,
+                orientation: "portrait",
+            });
 
-                var pageWidth = doc.internal.pageSize.getWidth();
-                var pageHeight = doc.internal.pageSize.getHeight();
-                var margin = 25; // left and right margin
-                var paraMargin = 6; // left margin for paragraphs
-                var topMargin = 25;
-                var footerHeight = 25; // reserve 25 units at the bottom for footer
-                var maxWidth = pageWidth - 2 * margin; // usable width
-                var pageMiddle = pageWidth / 2;
-                var bottomLimit = pageHeight - footerHeight;
-                let currentY;
+            var pageWidth = doc.internal.pageSize.getWidth();
+            var pageHeight = doc.internal.pageSize.getHeight();
+            var margin = 25; // left and right margin
+            var paraMargin = 6; // left margin for paragraphs
+            var topMargin = 25;
+            var footerHeight = 25; // reserve 25 units at the bottom for footer
+            var maxWidth = pageWidth - 2 * margin; // usable width
+            var pageMiddle = pageWidth / 2;
+            var bottomLimit = pageHeight - footerHeight;
+            let currentY;
 
-                doc.setFont("times", "bold").setFontSize(14);
+            doc.setFont("times", "bold").setFontSize(14);
 
-                const backImgX = (pageWidth - 100) / 2; // Center horizontally
-                const backImgY = (pageHeight - 100) / 2; // Center vertically
+            const backImgX = (pageWidth - 100) / 2; // Center horizontally
+            const backImgY = (pageHeight - 100) / 2; // Center vertically
 
-                doc.addImage(oCompanyModel.companylogo64, "PNG", margin, topMargin - 10, 45, 45);
+            doc.addImage(oCompanyModel.companylogo64, "PNG", margin, topMargin - 10, 45, 45);
 
-                let coAlignment = { maxWidth: 70, align: "right" };
-                let coNameY = topMargin;
+            let coAlignment = { maxWidth: 70, align: "right" };
+            let coNameY = topMargin;
 
-                doc.text(oCompanyModel.companyName, pageWidth - margin, coNameY, coAlignment)
-                let coAddressY = doc.getTextDimensions(oCompanyModel.companyName, coAlignment).h + coNameY + 3;
+            doc.text(oCompanyModel.companyName, pageWidth - margin, coNameY, coAlignment)
+            let coAddressY = doc.getTextDimensions(oCompanyModel.companyName, coAlignment).h + coNameY + 3;
 
-                doc.setFont("times", "normal").setFontSize(12);
-                doc.text(oCompanyModel.longAddress, pageWidth - margin, coAddressY, coAlignment)
-                let coGSTINY = doc.getTextDimensions(oCompanyModel.longAddress, coAlignment).h + coAddressY + 3;
+            doc.setFont("times", "normal").setFontSize(12);
+            doc.text(oCompanyModel.longAddress, pageWidth - margin, coAddressY, coAlignment)
+            let coGSTINY = doc.getTextDimensions(oCompanyModel.longAddress, coAlignment).h + coAddressY + 3;
 
-                doc.text("GSTIN: " + oCompanyModel.gstin, pageWidth - margin, coGSTINY, coAlignment);
-                // currentY = doc.getTextDimensions("GSTIN: " + oCompanyModel.gstin, coAlignment).h; (NOT REQURIED AS OF NOW)
+            doc.text("GSTIN: " + oCompanyModel.gstin, pageWidth - margin, coGSTINY, coAlignment);
+            // currentY = doc.getTextDimensions("GSTIN: " + oCompanyModel.gstin, coAlignment).h; (NOT REQURIED AS OF NOW)
 
-                let titleY = topMargin + 50;
-                doc.setTextColor(255, 0, 0);
-                doc.setFont("times", "bold").setFontSize(14);
-                let titleText = "PURCHASE ORDER";
-                let titletextWidth = doc.getTextWidth(titleText);
-                let titleX = (pageWidth - titletextWidth) / 2;
-                doc.text(titleText, titleX, titleY);
+            let titleY = topMargin + 50;
+            doc.setTextColor(255, 0, 0);
+            doc.setFont("times", "bold").setFontSize(14);
+            let titleText = "PURCHASE ORDER";
+            let titletextWidth = doc.getTextWidth(titleText);
+            let titleX = (pageWidth - titletextWidth) / 2;
+            doc.text(titleText, titleX, titleY);
 
-                doc.setTextColor(0, 0, 0);
-                doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
 
-                let clientAlignment = { maxWidth: 70, align: "left" };
-                let clientNameY = titleY + 15;
-                doc.text("To,", margin, clientNameY - 5, clientAlignment);
-                doc.text(oModel.ClientCompanyName, margin, clientNameY);
-                doc.setFont("times", "normal");
-                doc.text(oModel.ClientCompanyAddress, margin, clientNameY + 6, clientAlignment);
-                let clientPANY = doc.getTextDimensions(oModel.ClientCompanyAddress, clientAlignment).h + clientNameY + 8;
-                doc.text("PAN: " + oModel.ClientCompanyPAN, margin, clientPANY);
+            let clientAlignment = { maxWidth: 70, align: "left" };
+            let clientNameY = titleY + 15;
+            doc.text("To,", margin, clientNameY - 5, clientAlignment);
+            doc.text(oModel.ClientCompanyName, margin, clientNameY);
+            doc.setFont("times", "normal");
+            doc.text(oModel.ClientCompanyAddress, margin, clientNameY + 6, clientAlignment);
+            let clientPANY = doc.getTextDimensions(oModel.ClientCompanyAddress, clientAlignment).h + clientNameY + 8;
+            doc.text("PAN: " + oModel.ClientCompanyPAN, margin, clientPANY);
+            if(oModel.GSTIN !== "") doc.text("GSTIN: " + oModel.GSTIN, margin, clientPANY + 6);
 
-                doc.setFont("times", "bold");
-                let poDetaisX = pageWidth - margin - 50;
-                let poDetailsY = clientNameY - 4;
-                doc.text("PO Number", poDetaisX, poDetailsY);
-                doc.text("Type", poDetaisX, poDetailsY + 6);
-                doc.text("From", poDetaisX, poDetailsY + 12);
-                doc.text("To", poDetaisX, poDetailsY + 18);
-                doc.text("Date", poDetaisX, poDetailsY + 24);
-                doc.setFont("times", "normal");
-                doc.text(`: ${oModel.PONumber}`, poDetaisX + 22, poDetailsY);
-                doc.text(`: ${oModel.POType}`, poDetaisX + 22, poDetailsY + 6);
-                doc.text(`: ${oModel.POFrom}`, poDetaisX + 22, poDetailsY + 12);
-                doc.text(`: ${oModel.POTo}`, poDetaisX + 22, poDetailsY + 18);
-                doc.text(`: ${oModel.PODate}`, poDetaisX + 22, poDetailsY + 24);
+            doc.setFont("times", "bold");
+            let poDetaisX = pageWidth - margin - 50;
+            let poDetailsY = clientNameY - 4;
+            doc.text("PO Number", poDetaisX, poDetailsY);
+            doc.text("Type", poDetaisX, poDetailsY + 6);
+            doc.text("From", poDetaisX, poDetailsY + 12);
+            doc.text("To", poDetaisX, poDetailsY + 18);
+            doc.text("Date", poDetaisX, poDetailsY + 24);
+            doc.setFont("times", "normal");
+            doc.text(`: ${oModel.PONumber}`, poDetaisX + 22, poDetailsY);
+            doc.text(`: ${oModel.POType}`, poDetaisX + 22, poDetailsY + 6);
+            doc.text(`: ${oModel.POFrom}`, poDetaisX + 22, poDetailsY + 12);
+            doc.text(`: ${oModel.POTo}`, poDetaisX + 22, poDetailsY + 18);
+            doc.text(`: ${oModel.PODate}`, poDetaisX + 22, poDetailsY + 24);
 
-                let tableY = poDetailsY + 35;
+            let tableY = poDetailsY + 35;
 
-                doc.autoTable({
-                    startY: tableY,
-                    head: [["Sl. No", "Consultant Name", "Description", "Unit", "Amount", "Currency", "Peroid"]],
-                    body: oModel.POItems.map(item => [item.SerialNo, item.ConsultantName, item.Description, item.Unit, item.Amount, item.Currency, item.Peroid]),
+            doc.autoTable({
+                startY: tableY,
+                theme: 'grid',
+                head: [["Sl. No", "Description", "Consultant Name", "Unit", "Peroid", "Amount", "Total Amount", "Currency"]],
+                body: oModel.POItems.map(item => [item.SerialNo, item.Description, item.ConsultantName, item.Unit, item.Period, item.Amount, item.TotalAmount, item.Currency]),
 
-                    styles: {
-                        font: "times",
-                        fontSize: 10,
-                        cellPadding: 1,
-                        overflow: 'linebreak',
-                        halign: 'left',
-                        valign: 'middle',
-                        minCellHeight: 5,
-                        fillColor: [200, 200, 200],
-                        textColor: [0, 0, 0]
-                    },
+                styles: {
+                    font: "times",
+                    fontSize: 10,
+                    cellPadding: 1,
+                    overflow: 'linebreak',
+                    halign: 'left',
+                    valign: 'middle',
+                    minCellHeight: 5,
+                    textColor: [0, 0, 0],
+                    lineColor: [0, 0, 0]
+                },
 
-                    headStyles: {
-                        fillColor: [150, 150, 150],
-                        textColor: [0, 0, 0],
-                        fontStyle: "bold",
-                        valign: 'middle',
-                        cellPadding: 1
-                    },
+                headStyles: {
+                    fillColor: [96, 205, 255],
+                    textColor: [0, 0, 0],
+                    fontStyle: "bold",
+                    valign: 'middle',
+                    cellPadding: 1,
+                    lineWidth: 0.3,
+                    lineColor: [0, 0, 0]
+                },
 
-                    // columnStyles: {
-                    //     0: { cellWidth: maxWidth * 0.4 },
-                    //     1: { cellWidth: maxWidth * 0.2 },
-                    //     2: { cellWidth: maxWidth * 0.2 },
-                    //     3: { cellWidth: maxWidth * 0.2 }
-                    // },
+                bodyStyles: {
+                    lineWidth: 0.3
+                },
+                tableWidth: maxWidth,
+                margin: { left: margin, right: margin }
+            });
 
-                    tableWidth: maxWidth,
-                    margin: { left: margin, right: margin }
-                });
-
-                var totalAmountY = doc.lastAutoTable.finalY + 10;
-                doc.setFont("times", "bold").setFontSize(10);
-                doc.text("TOTAL AMOUNT:", margin, totalAmountY);
-                doc.setFont("times", "normal");
-                doc.text(`${oModel.TotalPOAmount} (${oModel.POAmountInWords})`, margin + 32, totalAmountY);
-
-                function prepareHtmlForPdf(htmlContent) {
-                    // Styles to inject
-                    const style = `
+            var totalAmountY = doc.lastAutoTable.finalY + 10;
+            var amountLabelX = pageWidth - margin - 25; // Align with PO details
+            doc.setFontSize(10);
+            doc.text("Sub Total :", amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
+            doc.text(oModel.SubTotal, pageWidth - margin, totalAmountY,  { maxWidth: 100, align: "right" });
+            if(oModel.GSTType === "IGST" && oModel.Currency === "INR") {
+                totalAmountY += 6;
+                doc.text(`IGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
+                doc.text(oModel.IGST, pageWidth - margin, totalAmountY, { maxWidth: 100, align: "right" });
+            }
+            if (oModel.GSTType === "CGST/SGST" && oModel.Currency === "INR") {
+                totalAmountY += 6;
+                doc.text(`CGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
+                doc.text(oModel.CGST, pageWidth - margin, totalAmountY, { maxWidth: 100, align: "right" });
+                totalAmountY += 6;
+                doc.text(`SGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
+                doc.text(oModel.SGST, pageWidth - margin, totalAmountY, { maxWidth: 100, align: "right" });
+            }
+            totalAmountY += 3;
+            doc.setLineWidth(0.3);
+            doc.line(amountLabelX - 30, totalAmountY, pageWidth - margin, totalAmountY); // Draw line for separation
+            totalAmountY += 6;
+            doc.setFont("times", "bold").setFontSize(10.5);
+            doc.text("Total Amount :", amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
+            doc.text(oModel.TotalPOAmount, pageWidth - margin, totalAmountY,  { maxWidth: 100, align: "right" });
+            function prepareHtmlForPdf(htmlContent) {
+                // Styles to inject
+                const style = `
                         <style>
                             body {
                             margin: 0;
@@ -828,47 +846,44 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                         </style>
                         `;
 
-                    return style + htmlContent;
-                }
+                return style + htmlContent;
+            }
 
-                let container = document.createElement("div");
-                container.innerHTML = prepareHtmlForPdf(htmlContent);
-                container.style.width = `${2 * maxWidth}px`;
-                container.style.fontFamily = "Times New Roman";
-                container.style.fontSize = "5.5pt";
-                container.style.lineHeight = "1.4";
-                container.style.position = "absolute";  // Prevent it from affecting layout
-                container.style.padding = "0";
-                document.body.appendChild(container);
+            let container = document.createElement("div");
+            container.innerHTML = prepareHtmlForPdf(htmlContent);
+            container.style.width = `${2 * maxWidth}px`;
+            container.style.fontFamily = "Times New Roman";
+            container.style.fontSize = "5.5pt";
+            container.style.lineHeight = "1.4";
+            container.style.position = "absolute";  // Prevent it from affecting layout
+            container.style.padding = "0";
+            document.body.appendChild(container);
 
-                let rteY;
-                let estRteY = 68;
-                let isNextPage = false;
-                if (bottomLimit - totalAmountY < estRteY) {
-                    rteY = pageHeight + margin;
-                    isNextPage = true;
+            let rteY;
+            let estRteY = 68;
+            let isNextPage = false;
+            if (bottomLimit - totalAmountY < estRteY) {
+                rteY = pageHeight + margin;
+                isNextPage = true;
+                doc.setGState(new doc.GState({ opacity: 0.1 }));
+                doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
+                doc.setGState(new doc.GState({ opacity: 1 }));
+            }
+            else rteY = totalAmountY + 3;
+            doc.html(container, {
+                x: margin,
+                y: rteY,
+                html2canvas: { scale: 0.5 },
+                callback: function (doc) {
+                    if (isNextPage) doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 127, 8, 63, 14.5);
                     doc.setGState(new doc.GState({ opacity: 0.1 }));
                     doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                     doc.setGState(new doc.GState({ opacity: 1 }));
+                    doc.save("PO.pdf");
+                    that.closeBusyDialog();
+                    document.body.removeChild(container);
                 }
-                else rteY = totalAmountY + 3;
-                doc.html(container, {
-                    x: margin,
-                    y: rteY,
-                    html2canvas: { scale: 0.5 },
-                    callback: function (doc) {
-                        if (isNextPage) doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 127, 8, 63, 14.5);
-                        doc.setGState(new doc.GState({ opacity: 0.1 }));
-                        doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
-                        doc.setGState(new doc.GState({ opacity: 1 }));
-                        doc.save("PO.pdf");
-                        that.closeBusyDialog();
-                        document.body.removeChild(container);
-                    }
-                });
-
-
-            }, 1000);
+            });
         }
     };
 });

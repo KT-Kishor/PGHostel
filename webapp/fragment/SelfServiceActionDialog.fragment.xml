@@ -10,7 +10,7 @@
     <Button
         text="{i18n>headerIdCard}"
         type="Ghost"
-        visible="{viewModel>/RelievingLetter}"
+        visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
         id="IC_id_Idcard"
         press="CC_onPressIdCardDetails"
         enabled="{= ${viewModel>/isEditMode} === true ? false : true}"

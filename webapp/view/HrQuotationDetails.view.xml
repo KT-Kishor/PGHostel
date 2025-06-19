@@ -12,6 +12,14 @@
         navButtonPress="HQD_onBack"
         showNavButton="true"
     >
+    <m:headerContent>
+    <m:Button
+        press="onLogout"
+        icon="sap-icon://log"
+        tooltip="{i18n>logoutTooltip}"
+        type="Transparent"
+    />
+    </m:headerContent>
         <ObjectPageLayout
             id="HQD_id_QuotationDetailsPage"
         >

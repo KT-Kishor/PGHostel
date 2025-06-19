@@ -163,25 +163,14 @@ sap.ui.define(
         },
         RP_onPressCanclePW: function () {
           sap.ui
-            .getCore()
-            .byId("RP_id_userid")
-            .setValue("")
-            .setSelectedKey("")
-            .setValueState("None");
+            .getCore().byId("RP_id_userid").setValue("").setSelectedKey("").setValueState("None");
+              sap.ui.getCore().byId("RP_id_userid").setSelectedKey(null);
           var oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
           // Reset all input fields
           oUserNameInput.setValue("");
           oUserNameInput.setValueState("None");
-          sap.ui
-            .getCore()
-            .byId("RP_id_NewPW")
-            .setValue("")
-            .setValueState("None");
-          sap.ui
-            .getCore()
-            .byId("RP_id_ConfirmPW")
-            .setValue("")
-            .setValueState("None");
+          sap.ui.getCore().byId("RP_id_NewPW").setValue("").setValueState("None");
+          sap.ui.getCore().byId("RP_id_ConfirmPW").setValue("").setValueState("None");
           // Close dialog
           if (this.oUpdatePass) {
             this.oUpdatePass.close();
@@ -206,10 +195,12 @@ sap.ui.define(
             return;
           }
           if (newPassword !== confirmPassword) {
+            sap.ui.getCore().byId("RP_id_ConfirmPW").setValueState("Error");
             MessageToast.show(this.i18nModel.getText("misPasswords"));
             return;
           }
           try {
+            this.getBusyDialog();
             const response = await this.ajaxUpdateWithJQuery("LoginDetails", {
               data: {
                 Password: btoa(newPassword),
@@ -219,6 +210,9 @@ sap.ui.define(
               },
             });
             if (response.success === true) {
+              this.closeBusyDialog();
+              sap.ui.getCore().byId("RP_id_userid").setSelectedKey(null);
+               sap.ui.getCore().byId("RP_id_ConfirmPW").setValueState("None");
               oUserIdInput.setValue("");
               oUserNameInput.setValue("");
               oNewPwInput.setValue("");

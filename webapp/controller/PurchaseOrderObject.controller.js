@@ -53,10 +53,10 @@ sap.ui.define([
             //  this._fetchCommonData("Currency", "CurrencyModel");
             // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
             //  this._fetchCommonData("PaymentTerms", "ContractpaymentModel")
-             this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag",{Type:"PurchaseOrder", Action: "CC"})
+            this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag", { Type: "PurchaseOrder", Action: "CC" })
 
             this.getView().byId("FPO_id_StartDate").setMinDate(null)
-            var sdate = this.getView().byId("FPO_id_StartDate") 
+            var sdate = this.getView().byId("FPO_id_StartDate")
             var enddate = this.getView().byId("FPO_id_EndDate");
 
             this.getView().byId("FPO_id_StartDate").attachChange(function (oEvent) {
@@ -122,7 +122,7 @@ sap.ui.define([
 
                     const purchaseOrderData = oFCIAerData[0];
                     const purchaseOrderModel = this.getView().getModel("PurchaseOrderModel");
-                    
+
 
                     purchaseOrderModel.setProperty("/CustomerName", purchaseOrderData.PurchaseOrder[0].CustomerName);
                     purchaseOrderModel.setProperty("/Type", purchaseOrderData.PurchaseOrder[0].Type);
@@ -156,6 +156,15 @@ sap.ui.define([
                     purchaseOrderModel.setProperty("/Currency", purchaseOrderData.PurchaseOrderItems[0].Currency);
 
 
+                    var length = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
+                    if (length == false) {
+                        var oModel = this.getView().getModel("PurchaseOrderModel")
+                        oModel.setProperty("/IGST", "");
+                        oModel.setProperty("/CGST", "");
+                        oModel.setProperty("/SGST", "");
+                        oModel.setProperty("/GrantTotal", "");
+                        oModel.setProperty("/SubTotal", "0.00");
+                    }
 
 
                     const purchaseOrders = purchaseOrderData.PurchaseOrderItems;
@@ -177,7 +186,7 @@ sap.ui.define([
                     this.getView().byId("FPO_id_CustDescription").setEditable(false)
                     this.getView().byId("PO_id_PaymantTerms").setEditable(false)
                     this.getView().byId("POO_idClearButton").setVisible(false)
-                        this.byId("FPO_id_PoNumber").setVisible(true)
+                    this.byId("FPO_id_PoNumber").setVisible(true)
 
 
                     purchaseOrderModel.setProperty("/Editable", false);
@@ -188,6 +197,11 @@ sap.ui.define([
             }
             this.closeBusyDialog()
         },
+
+        onLogout: function () {
+            this.CommonLogoutFunction();
+        },
+
         PO_onButtonPress: function () {
             this.getRouter().navTo("PurchaseOrder");
 
@@ -223,27 +237,26 @@ sap.ui.define([
                 oModel.setProperty("/GrantTotal", "");
                 oModel.setProperty("/SubTotal", "0.00");
             }
-              this._calculateGSTandTotal();
+            this._calculateGSTandTotal();
 
             this.byId("FPO_id_CustomerName").setValueState("None");
         },
-        PO_onComboBoxBranchChange:async function () {
+        PO_onComboBoxBranchChange: async function () {
             var selectedkey = this.byId("FPO_id_BranchCode").getSelectedKey();
             this.getBusyDialog()
-             var PoData= await this.ajaxReadWithJQuery("CompanyCodeDetails",{branchCode:selectedkey}).then((oData) => {
+            var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", { branchCode: selectedkey }).then((oData) => {
                 var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                 return PoData[0]
+                return PoData[0]
             });
-                 this.closeBusyDialog()
-         
+            this.closeBusyDialog()
+
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyName", PoData.companyName);
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyAddress", PoData.longAddress);
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyGSTNo", PoData.gstin);
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyEmail", PoData.carrerEmail);
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyPANNo", PoData.pan);
-         
+
             this.byId("FPO_id_BranchCode").setValueState("None");
-            
         },
         onAddItemButtonPress: function () {
             var oModel = this.getView().getModel("PurchaseOrderModel");
@@ -262,71 +275,71 @@ sap.ui.define([
 
             oModel.setProperty("/PurchaseOrders", aData);
         },
-       
-       onSelectCurrencyChange: function () {
-    this._calculateGSTandTotal();
-},
 
-PO_onAmountInputChange: function (oEvent) {
-    utils._LCvalidateAmount(oEvent);
+        onSelectCurrencyChange: function () {
+            this._calculateGSTandTotal();
+        },
 
-    var oInput = oEvent.getSource();
-    var oContext = oInput.getBindingContext("PurchaseOrderModel");
-    var sPath = oContext.getPath();
-    var model = this.getView().getModel("PurchaseOrderModel");
+        PO_onAmountInputChange: function (oEvent) {
+            utils._LCvalidateAmount(oEvent);
 
-    var oParent = oInput.getParent();
-    var aItems = oParent.getCells();
-    var sUnit = aItems[3].getValue();
-    var sAmount = aItems[5].getValue();
+            var oInput = oEvent.getSource();
+            var oContext = oInput.getBindingContext("PurchaseOrderModel");
+            var sPath = oContext.getPath();
+            var model = this.getView().getModel("PurchaseOrderModel");
 
-    var fUnit = parseFloat(sUnit);
-    var fAmount = parseFloat(sAmount);
+            var oParent = oInput.getParent();
+            var aItems = oParent.getCells();
+            var sUnit = aItems[3].getValue();
+            var sAmount = aItems[5].getValue();
 
-    if (!isNaN(fUnit) && !isNaN(fAmount)) {
-        var fTotal = fUnit * fAmount;
-        model.setProperty(sPath + "/TotalAmount", fTotal.toFixed(2));
-    } else {
-        model.setProperty(sPath + "/TotalAmount", "");
-    }
+            var fUnit = parseFloat(sUnit);
+            var fAmount = parseFloat(sAmount);
 
-    this._calculateGSTandTotal(); 
-},
+            if (!isNaN(fUnit) && !isNaN(fAmount)) {
+                var fTotal = fUnit * fAmount;
+                model.setProperty(sPath + "/TotalAmount", fTotal.toFixed(2));
+            } else {
+                model.setProperty(sPath + "/TotalAmount", "");
+            }
 
-_calculateGSTandTotal: function () {
-    var model = this.getView().getModel("PurchaseOrderModel");
+            this._calculateGSTandTotal();
+        },
 
-    var aPOs = model.getProperty("/PurchaseOrders") || [];
-    var fSubTotal = 0;
-    aPOs.forEach(function (item) {
-        var fItemTotal = parseFloat(item.TotalAmount);
-        if (!isNaN(fItemTotal)) {
-            fSubTotal += fItemTotal;
-        }
-    });
-    model.setProperty("/SubTotal", fSubTotal.toFixed(2));
+        _calculateGSTandTotal: function () {
+            var model = this.getView().getModel("PurchaseOrderModel");
 
-    var tax = parseFloat(this.getView().byId("FPO_id_tax").getValue()) || 0;
-    var GSTtype = this.getView().byId("FPO_id_type").getValue();
-    var Currency = this.getView().byId("FPO_id_Currency").getSelectedKey();
+            var aPOs = model.getProperty("/PurchaseOrders") || [];
+            var fSubTotal = 0;
+            aPOs.forEach(function (item) {
+                var fItemTotal = parseFloat(item.TotalAmount);
+                if (!isNaN(fItemTotal)) {
+                    fSubTotal += fItemTotal;
+                }
+            });
+            model.setProperty("/SubTotal", fSubTotal.toFixed(2));
 
-    var GST = fSubTotal * tax / 100;
+            var tax = parseFloat(this.getView().byId("FPO_id_tax").getValue()) || 0;
+            var GSTtype = this.getView().byId("FPO_id_type").getValue();
+            var Currency = this.getView().byId("FPO_id_Currency").getSelectedKey();
 
-    model.setProperty("/IGST", "");
-    model.setProperty("/CGST", "");
-    model.setProperty("/SGST", "");
+            var GST = fSubTotal * tax / 100;
 
-    if (GSTtype === "IGST" && Currency === "INR") {
-        model.setProperty("/IGST", GST.toFixed(2));
-        model.setProperty("/GrantTotal", (fSubTotal + GST).toFixed(2));
-    } else if (GSTtype === "CGST/SGST" && Currency === "INR") {
-        model.setProperty("/CGST", GST.toFixed(2));
-        model.setProperty("/SGST", GST.toFixed(2));
-        model.setProperty("/GrantTotal", (fSubTotal + GST * 2).toFixed(2));
-    } else {
-        model.setProperty("/GrantTotal", fSubTotal.toFixed(2));
-    }
-},
+            model.setProperty("/IGST", "");
+            model.setProperty("/CGST", "");
+            model.setProperty("/SGST", "");
+
+            if (GSTtype === "IGST" && Currency === "INR") {
+                model.setProperty("/IGST", GST.toFixed(2));
+                model.setProperty("/GrantTotal", (fSubTotal + GST).toFixed(2));
+            } else if (GSTtype === "CGST/SGST" && Currency === "INR") {
+                model.setProperty("/CGST", GST.toFixed(2));
+                model.setProperty("/SGST", GST.toFixed(2));
+                model.setProperty("/GrantTotal", (fSubTotal + GST * 2).toFixed(2));
+            } else {
+                model.setProperty("/GrantTotal", fSubTotal.toFixed(2));
+            }
+        },
         POO_onSubmitButtonPress: async function () {
 
             var purchaseOrders = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders");
@@ -342,12 +355,12 @@ _calculateGSTandTotal: function () {
                     utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                     this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
                 ) {
-                    var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item,index) {
+                    var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item, index) {
                         if (!item.Description || !item.Unit || !item.Amount || !item.ConsultantName) {
 
-                            sap.m.MessageBox.error("Please complete all the fields in row " + (index + 1))           
-                                             return false;
-                           }
+                            sap.m.MessageBox.error("Please complete all the fields in row " + (index + 1))
+                            return false;
+                        }
                         return true;
                     });
                     if (!isValid) {
@@ -437,13 +450,13 @@ _calculateGSTandTotal: function () {
                     content: new sap.m.Text({
                         text: "Purchase order created successfully"
                     }),
-                    endButton: new sap.m.Button({                       
-                         text: "Ganarate PDF",
+                    endButton: new sap.m.Button({
+                        text: "Ganarate PDF",
                         type: "Attention",
                         press: function () {
-                           this.POO_onPDFButtonPress()
+                            this.POO_onPDFButtonPress()
                             this._oDialog.close();
-                      }.bind(this)
+                        }.bind(this)
                     }),
                     beginButton: new sap.m.Button({
                         text: "OK",
@@ -475,9 +488,9 @@ _calculateGSTandTotal: function () {
                 utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                 this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
             ) {
-                var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item ,index) {
+                var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item, index) {
                     if (!item.Description || !item.Unit || !item.Amount || !item.ConsultantName) {
-                        sap.m.MessageBox.error("Please fill in all required fields for each row " + (index+1))
+                        sap.m.MessageBox.error("Please fill in all required fields for each row " + (index + 1))
                         return false;
                     }
                     return true;
@@ -672,7 +685,7 @@ _calculateGSTandTotal: function () {
                                     if (!isNaN(total)) fSubTotal += total;
                                 });
                                 oModel.setProperty("/SubTotal", fSubTotal.toFixed(2));
-                                this._updateGSTandGrantTotal(); // or inline GST logic
+                                this._calculateGSTandTotal()
                             }
                             this.closeBusyDialog()
                         });
@@ -698,27 +711,36 @@ _calculateGSTandTotal: function () {
                         if (!isNaN(total)) fSubTotal += total;
                     });
                     oModel.setProperty("/SubTotal", fSubTotal.toFixed(2));
-                    this._updateGSTandGrantTotal(); // or inline GST logic
+                    this._calculateGSTandTotal();
                 }
             }
         },
 
         POO_onPDFButtonPress: async function () {
+            this.getBusyDialog();
             var oPDFModel = this.getView().getModel("PDFData");
             var oPOModel = this.getView().getModel("PurchaseOrderModel").getData();
             oPDFModel.setProperty("/ClientCompanyName", oPOModel.CustomerName);
             oPDFModel.setProperty("/ClientCompanyAddress", oPOModel.Address);
             oPDFModel.setProperty("/ClientCompanyPAN", oPOModel.PAN);
-            oPDFModel.setProperty("/PONumber", oPOModel.PONumber || "12345");
+            oPDFModel.setProperty("/PONumber", oPOModel.PoNumber);
             oPDFModel.setProperty("/POType", oPOModel.Type);
             oPDFModel.setProperty("/POFrom", oPOModel.StartDate);
             oPDFModel.setProperty("/POTo", oPOModel.EndDate);
             oPDFModel.setProperty("/PODate", oPOModel.CurrentDate);
             oPDFModel.setProperty("/POItems", oPOModel.PurchaseOrders);
-            oPDFModel.setProperty("/TotalPOAmount", oPOModel.TotalAmount || "98765");
-            oPDFModel.setProperty("/POAmountInWords", oPOModel.AmountInWords || "Ninety eight thousand seven sixty five rupees only");
+            oPDFModel.setProperty("/Tax", oPOModel.Tax);
+            oPDFModel.setProperty("/SubTotal", oPOModel.SubTotal);
+            oPDFModel.setProperty("/IGST", oPOModel.IGST);
+            oPDFModel.setProperty("/CGST", oPOModel.CGST);
+            oPDFModel.setProperty("/SGST", oPOModel.SGST);
+            oPDFModel.setProperty("/GSTType", oPOModel.GSTType);
+            oPDFModel.setProperty("/GSTIN", oPOModel.GSTIN);
+            oPDFModel.setProperty("/TotalPOAmount", oPOModel.GrantTotal);
+            oPDFModel.setProperty("/Currency", oPOModel.Currency);
+            oPDFModel.setProperty("/POAmountInWords", oPOModel.AmountInWords || "Not Found");
             var htmlContent = oPOModel.Notes;
-            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
+            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oPOModel.BranchCode });
             var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
             if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                 try {
@@ -742,6 +764,7 @@ _calculateGSTandTotal: function () {
                     console.error("Image compression failed:", err);
                     this.closeBusyDialog();
                 }
+
             }
             if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                 if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePOPDF === "function") {
@@ -773,20 +796,20 @@ _calculateGSTandTotal: function () {
             this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
             this.validateSendButton();
         },
-         EOD_commonOpenDialog: function (fragmentName) {
-        if (!this.EOU_oDialogMail) {
-          sap.ui.core.Fragment.load({
-            name: fragmentName,
-            controller: this,
-          }).then(function (EOU_oDialogMail) {
-            this.EOU_oDialogMail = EOU_oDialogMail;
-            this.getView().addDependent(this.EOU_oDialogMail);
-            this.EOU_oDialogMail.open();
-          }.bind(this));
-        } else {
-          this.EOU_oDialogMail.open();
-        }
-      },
+        EOD_commonOpenDialog: function (fragmentName) {
+            if (!this.EOU_oDialogMail) {
+                sap.ui.core.Fragment.load({
+                    name: fragmentName,
+                    controller: this,
+                }).then(function (EOU_oDialogMail) {
+                    this.EOU_oDialogMail = EOU_oDialogMail;
+                    this.getView().addDependent(this.EOU_oDialogMail);
+                    this.EOU_oDialogMail.open();
+                }.bind(this));
+            } else {
+                this.EOU_oDialogMail.open();
+            }
+        },
 
         //close mail dialog
         Mail_onPressClose: function () {
@@ -794,68 +817,68 @@ _calculateGSTandTotal: function () {
             this.EOU_oDialogMail = null;
         },
         //File upload function calling from base controller
-         Mail_onUpload: function(oEvent) {
-                this.handleFileUpload(
-                    oEvent,
-                    this, // context
-                    "UploaderData", // model name
-                    "/attachments", // path to attachment array
-                    "/name", // path to comma-separated file names
-                    "/isFileUploaded", // boolean flag path
-                    "uploadSuccessfull", // i18n success key
-                    "fileAlreadyUploaded", // i18n duplicate key
-                    "noFileSelected", // i18n no file selected
-                    "fileReadError", // i18n file read error
-                    () => this.validateSendButton()
-                );
-            },
+        Mail_onUpload: function (oEvent) {
+            this.handleFileUpload(
+                oEvent,
+                this, // context
+                "UploaderData", // model name
+                "/attachments", // path to attachment array
+                "/name", // path to comma-separated file names
+                "/isFileUploaded", // boolean flag path
+                "uploadSuccessfull", // i18n success key
+                "fileAlreadyUploaded", // i18n duplicate key
+                "noFileSelected", // i18n no file selected
+                "fileReadError", // i18n file read error
+                () => this.validateSendButton()
+            );
+        },
         //Mail dialog button visibility
-        validateSendButton: function() {
-                const sendBtn = sap.ui.getCore().byId("SendMail_Button");
-                const emailField = sap.ui.getCore().byId("CCMail_TextArea");
-                const uploaderModel = this.getView().getModel("UploaderData");
-                if (!sendBtn || !emailField || !uploaderModel) {
-                    return;
-                }
-                const isEmailValid = utils._LCvalidateEmail(emailField, "ID") === true;
-                const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
+        validateSendButton: function () {
+            const sendBtn = sap.ui.getCore().byId("SendMail_Button");
+            const emailField = sap.ui.getCore().byId("CCMail_TextArea");
+            const uploaderModel = this.getView().getModel("UploaderData");
+            if (!sendBtn || !emailField || !uploaderModel) {
+                return;
+            }
+            const isEmailValid = utils._LCvalidateEmail(emailField, "ID") === true;
+            const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
 
-                sendBtn.setEnabled(isEmailValid && isFileUploaded);
-            },
+            sendBtn.setEnabled(isEmailValid && isFileUploaded);
+        },
 
-            Mail_onEmailChange: function() {
-                this.validateSendButton(); // Reuse from BaseController
-            },
+        Mail_onEmailChange: function () {
+            this.validateSendButton(); // Reuse from BaseController
+        },
         //Send mail
         Mail_onSendEmail: function () {
-                var oModel = this.getView().getModel("PurchaseOrderModel").getData();
-                 const uploaderModel = this.getView().getModel("UploaderData").getProperty("/attachments");
-                if (uploaderModel!=[]) {
-                    MessageToast.show(this.i18nModel.getText("attachmentRequired"))
-                    return;
-                }
-                var oPayload = {
-                    "toEmailID":oModel.customerEmail,
-                    "CustomerHeadName": oModel.CustomerHeadName,
-                    "PoNumber": this.PoNumber,
-                    "CompanyName": oModel.CompanyName,
-                    "StartDate": oModel.StartDate,
-                    "EndDate": oModel.EndDate,
-                    "Description": oModel.CustDescription ,
-                    "PaymentTerms": oModel.PaymentTerms || "10 Days",
-                    "GrantTotal": oModel.GrantTotal,
-                    "CC":this.getView().getModel("UploaderData").getProperty("/CCEmail"),
-                    "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
-                                };
-                this.getBusyDialog();
-                
-                this.ajaxCreateWithJQuery("PurchaseOrderEmail", oPayload).then((oData) => {
-                    MessageToast.show(this.i18nModel.getText("emailSuccess"));
-                    this.closeBusyDialog();
-                    this.EOU_oDialogMail.close()
-                })
-               
-            
+            var oModel = this.getView().getModel("PurchaseOrderModel").getData();
+            const uploaderModel = this.getView().getModel("UploaderData").getProperty("/attachments");
+            if (uploaderModel == false) {
+                MessageToast.show(this.i18nModel.getText("attachmentRequired"))
+                return;
+            }
+            var oPayload = {
+                "toEmailID": oModel.customerEmail,
+                "CustomerHeadName": oModel.CustomerHeadName,
+                "PoNumber": this.PoNumber,
+                "CompanyName": oModel.CompanyName,
+                "StartDate": oModel.StartDate,
+                "EndDate": oModel.EndDate,
+                "Description": oModel.CustDescription,
+                "PaymentTerms": oModel.PaymentTerms || "10 Days",
+                "GrantTotal": oModel.GrantTotal,
+                "CC": this.getView().getModel("UploaderData").getProperty("/CCEmail"),
+                "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
+            };
+            this.getBusyDialog();
+
+            this.ajaxCreateWithJQuery("PurchaseOrderEmail", oPayload).then((oData) => {
+                MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                this.closeBusyDialog();
+                this.EOU_oDialogMail.close()
+            })
+
+
         },
     });
 });

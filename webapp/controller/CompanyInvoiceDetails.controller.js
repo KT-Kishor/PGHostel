@@ -75,6 +75,8 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/MultiEmail", false);
                 this.visiablityPlay.setProperty("/merge", false);
                 oView.setModel(new JSONModel(), "CompanyInvoiceItemModel");
+                this.byId("CID_id_TableInvoiceItem").setMode("Delete");
+
                 this.Update = false;
                 if (sArg === "X") return;
                 this.visiablityPlay.setProperty("/Edit", true);
@@ -1022,7 +1024,7 @@ sap.ui.define([
 
                 let isCurrencyValid = true;
                 if (paymentModel.Currency !== "INR") {
-                    isCurrencyValid = utils._LCvalidateTraineeAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID");
+                    isCurrencyValid = utils._LCvalidateAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID");
                 } else {
                     await this.onChangeReceivedTDS(); // now returns boolean
                 }
