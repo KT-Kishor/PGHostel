@@ -30,12 +30,12 @@
 				</Select>
 
 				<Label text="{i18n>CompBranch}" required="true" />
-				<ComboBox id="MsaE_Id_Branch" filterSecondaryValues="true" change="Msa_onComboBoxChange" valueStateText="{i18n>expValStaSource}" items="{BaseLocationModel>/}" value="{FilteredMsaModel>/0/BranchCode}" showSecondaryValues="true">
+				<ComboBox id="MsaE_Id_Branch" filterSecondaryValues="true" change="Msa_onComboBoxChange" valueStateText="{i18n>selectBranch}" items="{BaseLocationModel>/}" value="{FilteredMsaModel>/0/BranchCode}" showSecondaryValues="true">
 					<core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>branchCode}" additionalText="{BaseLocationModel>city}" />
 				</ComboBox>
 
 				<Label text="{i18n>panCardReg}" required="true"/>
-				<Input id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/0/PanCard}" valueStateText="{i18n>panCardValueState}" liveChange="Msa_LC_PanCard"/>
+				<Input id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/0/PanCard}" valueStateText="{i18n>placePanCardReg}" liveChange="Msa_LC_PanCard"/>
 				<Label text="{i18n>paymentterms}" required="true"/>
 				<Select items="{ContractpaymentModel>/}" selectedKey="{FilteredMsaModel>/0/PaymentTerms}">
 					<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
