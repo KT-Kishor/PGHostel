@@ -106,9 +106,9 @@ sap.ui.define([
     },
 
     _fetchCommonData: async function (entityName, modelName, filter = "") {
-      if( modelName.split(" ")[1] === "TraineeFlag"){
-        var flag  =  modelName.split(" ")[1]
-        modelName =  modelName.split(" ")[0];
+      if (modelName.split(" ")[1] === "TraineeFlag") {
+        var flag = modelName.split(" ")[1]
+        modelName = modelName.split(" ")[0];
       }
       if (!this.getOwnerComponent().getModel("LoginModel")) {
         BusyIndicator.hide();
@@ -128,8 +128,8 @@ sap.ui.define([
                 this.getOwnerComponent().setModel(oModel, modelName);
               }
               resolve(data);
-              if(flag === "TraineeFlag"){
-              this.closeBusyDialog();
+              if (flag === "TraineeFlag") {
+                this.closeBusyDialog();
               }
             }.bind(this),
             error: function (err) {
@@ -358,29 +358,29 @@ sap.ui.define([
         }
       });
     },
-    _ViewDatePickersReadOnly:function(aIds,oView){
-    aIds.forEach(function (sId) {
-      var oDatePicker = oView.byId(sId);
-      if (oDatePicker) {
-        oDatePicker.addEventDelegate({
-          onAfterRendering: function () {
-            var oInputDom = oDatePicker.getDomRef("inner");
-            if (oInputDom) {
-              oInputDom.setAttribute("readonly", true); // Prevent typing
-              oInputDom.style.cursor = "pointer";
+    _ViewDatePickersReadOnly: function (aIds, oView) {
+      aIds.forEach(function (sId) {
+        var oDatePicker = oView.byId(sId);
+        if (oDatePicker) {
+          oDatePicker.addEventDelegate({
+            onAfterRendering: function () {
+              var oInputDom = oDatePicker.getDomRef("inner");
+              if (oInputDom) {
+                oInputDom.setAttribute("readonly", true); // Prevent typing
+                oInputDom.style.cursor = "pointer";
+              }
             }
-          }
-        }, oDatePicker);
-        // Open calendar on click
-        oDatePicker.attachBrowserEvent("click", function () {
-          var oIconDomRef = oDatePicker.getDomRef("icon");
-          if (oIconDomRef) {
-            oIconDomRef.click(); // simulate icon click to open calendar
-          }
-        });
-      }
-    });
-  },
+          }, oDatePicker);
+          // Open calendar on click
+          oDatePicker.attachBrowserEvent("click", function () {
+            var oIconDomRef = oDatePicker.getDomRef("icon");
+            if (oIconDomRef) {
+              oIconDomRef.click(); // simulate icon click to open calendar
+            }
+          });
+        }
+      });
+    },
 
     _convertBLOBtoBASE64: function (buffer) {
       if (!buffer || buffer.byteLength === 0) {
@@ -444,535 +444,532 @@ sap.ui.define([
       sErrorKey,
       fnValidateCallback
     ) {
-    var that = this;
-    const oFileUploader = oEvent.getSource();
-    const oFiles = oFileUploader.oFileUpload.files;
-    const oModel = oContext.getView().getModel(sModelName);
-    const MAX_TOTAL_SIZE = 20 * 1024 * 1024; // 20 MB
+      var that = this;
+      const oFileUploader = oEvent.getSource();
+      const oFiles = oFileUploader.oFileUpload.files;
+      const oModel = oContext.getView().getModel(sModelName);
+      const MAX_TOTAL_SIZE = 20 * 1024 * 1024; // 20 MB
 
-    // No file selected
-    if (!oFiles.length) {
-      sap.m.MessageToast.show(oContext.getI18nText(sNoFileKey));
-      return;
-    }
-
-    let attachments = oModel.getProperty(sAttachmentPath) || [];
-    let uploadedFileNames = oModel.getProperty(sNamePath)
-      ? oModel.getProperty(sNamePath).split(", ")
-      : [];
-    let currentTotalSize = attachments.reduce((sum, file) => sum + file.size, 0);
-
-    // Calculate total size including new files
-    let newFilesTotalSize = Array.from(oFiles).reduce((sum, file) => sum + file.size, 0);
-    let finalTotalSize = currentTotalSize + newFilesTotalSize;
-
-    // Check total size constraint
-    if (finalTotalSize > MAX_TOTAL_SIZE) {
-      sap.m.MessageToast.show("Total file size should not exceed 20 MB.");
-      return;
-    }
-
-    Array.from(oFiles).forEach((oFile) => {
-      if (uploadedFileNames.includes(oFile.name)) {
-        sap.m.MessageToast.show(oContext.getI18nText(sDuplicateTextKey, [oFile.name]));
+      // No file selected
+      if (!oFiles.length) {
+        sap.m.MessageToast.show(oContext.getI18nText(sNoFileKey));
         return;
       }
 
-      const oReader = new FileReader();
-      oReader.onload = (e) => {
-        const sFileBinary = e.target.result.split(",")[1];
+      let attachments = oModel.getProperty(sAttachmentPath) || [];
+      let uploadedFileNames = oModel.getProperty(sNamePath)
+        ? oModel.getProperty(sNamePath).split(", ")
+        : [];
+      let currentTotalSize = attachments.reduce((sum, file) => sum + file.size, 0);
 
-        attachments.push({
-          filename: oFile.name,
-          contentType: oFile.type,
-          content: sFileBinary,
-          encoding: "base64",
-          size: oFile.size // Store file size for future calculations
-        });
+      // Calculate total size including new files
+      let newFilesTotalSize = Array.from(oFiles).reduce((sum, file) => sum + file.size, 0);
+      let finalTotalSize = currentTotalSize + newFilesTotalSize;
 
-        oModel.setProperty(sAttachmentPath, attachments);
-        oModel.setProperty(sUploadFlagPath, true);
+      // Check total size constraint
+      if (finalTotalSize > MAX_TOTAL_SIZE) {
+        sap.m.MessageToast.show("Total file size should not exceed 20 MB.");
+        return;
+      }
 
-        uploadedFileNames.push(oFile.name);
-        oModel.setProperty(sNamePath, uploadedFileNames.join(", "));
-
-        sap.m.MessageToast.show(oContext.getI18nText(sSuccessTextKey, [oFile.name]));
-
-        // Re-validate button
-        if (typeof fnValidateCallback === "function") {
-          fnValidateCallback.call(oContext);
+      Array.from(oFiles).forEach((oFile) => {
+        if (uploadedFileNames.includes(oFile.name)) {
+          sap.m.MessageToast.show(oContext.getI18nText(sDuplicateTextKey, [oFile.name]));
+          return;
         }
-      };
 
-      oReader.onerror = () => {
-        sap.m.MessageToast.show(oContext.getI18nText(sErrorKey, [oFile.name]));
-      };
+        const oReader = new FileReader();
+        oReader.onload = (e) => {
+          const sFileBinary = e.target.result.split(",")[1];
 
-      oReader.readAsDataURL(oFile);
-    });
+          attachments.push({
+            filename: oFile.name,
+            contentType: oFile.type,
+            fileType: oFile.name.split(".")[(oFile.name.split(".").length - 1)],
+            content: sFileBinary,
+            encoding: "base64",
+            size: oFile.size // Store file size for future calculations
+          });
 
-    // Clear uploader for next selection
-    oFileUploader.setValue("");
-  },
-    onCommonTokenDelete: function (oEvent) {
-      // You may set these as data-* attributes on the Tokenizer or use fixed conventions
-      var sModelName = "UploaderData";
-      var sAttachmentPath = "/attachments";
-      var sNamePath = "/name";
-      var sUploadFlagPath = "/isFileUploaded";
-      var oModel = this.getView().getModel(sModelName);
-      var aAttachments = oModel.getProperty(sAttachmentPath) || [];
-      // Support both single and multiple token deletion
-      var oTokens = oEvent.getParameter("tokens") || [oEvent.getParameter("token")];
-      oTokens.forEach(function (oToken) {
-        var sFileName = oToken.getKey();
-        aAttachments = aAttachments.filter(function (file) {
-          return file.filename !== sFileName;
-        });
+          oModel.setProperty(sAttachmentPath, attachments);
+          oModel.setProperty(sUploadFlagPath, true);
+
+          uploadedFileNames.push(oFile.name);
+          oModel.setProperty(sNamePath, uploadedFileNames.join(", "));
+
+          sap.m.MessageToast.show(oContext.getI18nText(sSuccessTextKey, [oFile.name]));
+
+          // Re-validate button
+          if (typeof fnValidateCallback === "function") {
+            fnValidateCallback.call(oContext);
+          }
+        };
+
+        oReader.onerror = () => {
+          sap.m.MessageToast.show(oContext.getI18nText(sErrorKey, [oFile.name]));
+        };
+
+        oReader.readAsDataURL(oFile);
       });
-      oModel.setProperty(sAttachmentPath, aAttachments);
-      var aNames = aAttachments.map(function (file) { return file.filename; });
-      oModel.setProperty(sNamePath, aNames.join(", "));
-      oModel.setProperty(sUploadFlagPath, aAttachments.length > 0);
+
+      // Clear uploader for next selection
+      oFileUploader.setValue("");
     },
 
     async generateCertificatePDF(content, branchCode) {
-    this.getBusyDialog(); // open BusyDialog immediately
-    var oModel = this.getView().getModel("PDFData").getData();
-    await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: branchCode });
-    var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-    if(!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64) {
-    try {
-      const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
-      const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
-      const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
-
-      const [logoBase64, signBase64, backgroundBase64] = await Promise.all([
-        this._convertBLOBToImage(logoBlob),
-        this._convertBLOBToImage(signBlob),
-        this._convertBLOBToImage(backgroundBlob)
-      ]);
-
-      oCompanyDetailsModel.companylogo64 = logoBase64;
-      oCompanyDetailsModel.signature64 = signBase64;
-      oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
-    } catch (err) {
-      console.error("Image compression failed:", err);
-      this.closeBusyDialog();
-    }
-  }
-  if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
-    if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
-      jsPDF._GeneratePDF(this, content, oCompanyDetailsModel, oModel);
-    }
-  }
-},
-  //common confirmation dialog box
-  showConfirmationDialog: function (sTitle, sMessage, fnOnConfirm, fnOnCancel, sOkText, sCancelText) {
-    var oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-
-    var dialog = new sap.m.Dialog({
-      title: sTitle,
-      type: "Message",
-      icon: "sap-icon://question-mark",
-      content: new sap.m.Text({ text: sMessage }),
-      beginButton: new sap.m.Button({
-        text: sOkText || oResourceBundle.getText("OkButton"),
-        type: "Accept",
-        press: function () {
-          dialog.close();
-
-          // this.getBusyDialog(); // open BusyDialog immediately
-          Promise.resolve()
-            .then(function () {
-              if (typeof fnOnConfirm === "function") {
-                return fnOnConfirm();
-              }
-            }.bind(this))
-            .finally(function () {
-              // this.closeBusyDialog(); // Always close BusyDialog
-            }.bind(this));
-        }.bind(this)
-      }),
-      endButton: new sap.m.Button({
-        text: sCancelText || oResourceBundle.getText("CancelButton"),
-        type: "Reject",
-        press: function () {
-          dialog.close();
-
-          // this.getBusyDialog(); // open BusyDialog immediately
-          Promise.resolve()
-            .then(function () {
-              if (typeof fnOnCancel === "function") {
-                return fnOnCancel();
-              }
-            }.bind(this))
-            .finally(function () {
-              // this.closeBusyDialog(); // Always close BusyDialog
-            }.bind(this));
-        }.bind(this)
-      }),
-      afterClose: function () {
-        dialog.destroy();
-      }
-    });
-
-    dialog.open();
-  },
-
-  _initMessagePopover: function () {
-    var i18n = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-    this.oMessagePopover = new sap.m.MessagePopover({
-      items: [
-        new sap.m.MessageItem({ type: "Information", title: "P - Present", description: i18n.getText("forP") }),
-        new sap.m.MessageItem({ type: "Information", title: "A - Absent", description: i18n.getText("forA") }),
-        new sap.m.MessageItem({ type: "Information", title: "H - Half-Day", description: i18n.getText("forH") }),
-        new sap.m.MessageItem({ type: "Information", title: "LA - Late", description: i18n.getText("forLA") }),
-        new sap.m.MessageItem({ type: "Information", title: "L - Leave", description: i18n.getText("forL") }),
-        new sap.m.MessageItem({ type: "Information", title: "SP - Present on Sunday", description: i18n.getText("forSP") }),
-        new sap.m.MessageItem({ type: "Information", title: "SA - Absent on Sunday", description: i18n.getText("forSA") }),
-        new sap.m.MessageItem({ type: "Information", title: "SH - Half-Day on Sunday", description: i18n.getText("forSH") }),
-        new sap.m.MessageItem({ type: "Information", title: "SLA - Late on Sunday", description: i18n.getText("forSLA") }),
-        new sap.m.MessageItem({ type: "Information", title: "SL - Leave on Sunday", description: i18n.getText("forSL") })
-      ]
-    });
-    this.getView().addDependent(this.oMessagePopover);
-  },
-
-  FST_onEnableImport: function () {
-    var branch = this.byId("FST_id_FilterBranch");
-    var date = this.byId("FST_id_MonthYearPicker");
-    if (!branch.getValue() || !date.getValue()) {
-      this.byId("FST_id_ImportBtn").setEnabled(false);
-      this.byId("MP_id_GoBtn").setEnabled(false);
-    }
-    else {
-      this.byId("FST_id_ImportBtn").setEnabled(true);
-      this.byId("MP_id_GoBtn").setEnabled(true);
-    }
-  },
-
-  updateDaysInColumns: function (pickerYear, pickerMonth) {
-    var daysInMonth = new Date(pickerYear, pickerMonth, 0).getDate(); // Get number of days in the month
-    for (var day = 1; day <= daysInMonth; day++) {
-      var date = new Date(pickerYear, pickerMonth - 1, day); // JS months are 0-indexed
-      var weekday = date.toLocaleString('en-US', { weekday: 'short' }); // e.g., Sun, Mon
-      var text = day + "\n" + weekday;
-      var columnId = "idDay" + day;
-      var oColumnText = this.byId(columnId);
-      if (oColumnText) {
-        oColumnText.setText(text);
-      }
-    }
-  },
-
-  resetColumnHeaders: function () {
-    for (var i = 1; i <= 31; i++) {
-      var columnId = "idDay" + i;
-      var oColumnText = this.byId(columnId);
-      if (oColumnText) {
-        oColumnText.setText(i.toString());
-      }
-    }
-  },
-
-  _commonGETCall: async function (sEntity, sModelName, oFilter) {
-    try {
-      var response = await this.ajaxReadWithJQuery(sEntity, oFilter);
-      if (response.success) {
-        this.oModel.setProperty("/" + sModelName, response.data || response.results);
-      } else {
-        console.error(response);
-        sap.m.MessageToast.show(this.i18nModel.getText("msgFailedToFetch"));
-      }
-    }
-    catch (e) {
-      console.error(e);
-    }
-  },
-
-  checkLoginModel: function () {
-    if (!this.getView().getModel("LoginModel")) {
-      sap.ui.core.BusyIndicator.hide();
-      this.getRouter().navTo("RouteLoginPage");
-    }
-  },
-  onClearAndSearch: function (sFilterBarId) {
-    var oFilterBar = this.byId(sFilterBarId);
-    if (oFilterBar) {
-      oFilterBar.clear(); // Clear all filters in the FilterBar
-    }
-  },
-
-  getBusyDialog: function () {
-    if (!this._pBusyDialog) {
-      this._pBusyDialog = sap.ui.core.Fragment.load({
-        name: "sap.kt.com.minihrsolution.fragment.BusyIndicator",
-        controller: this
-      }).then(function (oBusyDialog) {
-        this.getView().addDependent(oBusyDialog);
-        return oBusyDialog;
-      }.bind(this));
-    }
-
-    this._pBusyDialog.then(function (oBusyDialog) {
-      this.oBusyDialog = oBusyDialog;
-      this.oBusyDialog.open();
-
-    }.bind(this));
-  },
-
-  closeBusyDialog: function () {
-    if (this.oBusyDialog) {
-      this.oBusyDialog.close();
-
-    }
-  },
-
-  CommonVisitingCard: async function (EmployeeName, MobileNo, Email, Designation, branchCode) {
-    const { jsPDF } = window.jspdf;
-    this.getBusyDialog(); // open BusyDialog immediately
-
-    try {
+      this.getBusyDialog(); // open BusyDialog immediately
+      var oModel = this.getView().getModel("PDFData").getData();
       await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: branchCode });
       var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+      if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64) {
+        try {
+          const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+          const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+          const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
 
-      const visitfrontBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.visitingCardFront?.data);
-      const visitbackBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.visitingCardBack?.data);
-      const address = oCompanyDetailsModel.shortAddress;
-      const companyurl = oCompanyDetailsModel.website;
+          const [logoBase64, signBase64, backgroundBase64] = await Promise.all([
+            this._convertBLOBToImage(logoBlob),
+            this._convertBLOBToImage(signBlob),
+            this._convertBLOBToImage(backgroundBlob)
+          ]);
 
-      const doc = new jsPDF({
-        orientation: "landscape",
-        unit: "mm",
-        format: [50.8, 88.9] // 3.5 x 2 inches
+          oCompanyDetailsModel.companylogo64 = logoBase64;
+          oCompanyDetailsModel.signature64 = signBase64;
+          oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+        } catch (err) {
+          console.error("Image compression failed:", err);
+          this.closeBusyDialog();
+        }
+      }
+      if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+        if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+          jsPDF._GeneratePDF(this, content, oCompanyDetailsModel, oModel);
+        }
+      }
+    },
+    //common confirmation dialog box
+    showConfirmationDialog: function (sTitle, sMessage, fnOnConfirm, fnOnCancel, sOkText, sCancelText) {
+      var oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+
+      var dialog = new sap.m.Dialog({
+        title: sTitle,
+        type: "Message",
+        icon: "sap-icon://question-mark",
+        content: new sap.m.Text({ text: sMessage }),
+        beginButton: new sap.m.Button({
+          text: sOkText || oResourceBundle.getText("OkButton"),
+          type: "Accept",
+          press: function () {
+            dialog.close();
+
+            // this.getBusyDialog(); // open BusyDialog immediately
+            Promise.resolve()
+              .then(function () {
+                if (typeof fnOnConfirm === "function") {
+                  return fnOnConfirm();
+                }
+              }.bind(this))
+              .finally(function () {
+                // this.closeBusyDialog(); // Always close BusyDialog
+              }.bind(this));
+          }.bind(this)
+        }),
+        endButton: new sap.m.Button({
+          text: sCancelText || oResourceBundle.getText("CancelButton"),
+          type: "Reject",
+          press: function () {
+            dialog.close();
+
+            // this.getBusyDialog(); // open BusyDialog immediately
+            Promise.resolve()
+              .then(function () {
+                if (typeof fnOnCancel === "function") {
+                  return fnOnCancel();
+                }
+              }.bind(this))
+              .finally(function () {
+                // this.closeBusyDialog(); // Always close BusyDialog
+              }.bind(this));
+          }.bind(this)
+        }),
+        afterClose: function () {
+          dialog.destroy();
+        }
       });
 
-      // Add Front Background
-      doc.addImage(visitfrontBase64, "JPEG", 0, 0, 88.9, 50.8);
+      dialog.open();
+    },
 
-      // Add Employee Info
-      doc.setFontSize(12);
-      doc.setTextColor("#FFFFFF");
-      doc.setFont("times", "bold");
-      doc.text(EmployeeName, 5, 8);
-
-      doc.setFontSize(8);
-      doc.setFont("times", "normal");
-      doc.text(Designation, 5, 12);
-
-      doc.setFontSize(6.5);
-      doc.text(`+91 ${MobileNo}`, 13, 23);
-
-      if (Email.length > 26) {
-        const emailLines = doc.splitTextToSize(Email, 33);
-        doc.text(emailLines, 13, 29.5);
-      }
-      else {
-        doc.text(Email, 13, 30.5);
-      }
-
-      doc.setTextColor("#FFFFFF");
-      doc.textWithLink(companyurl, 13, 38, { url: companyurl });
-
-      const addressLines = doc.splitTextToSize(address, 43.5);
-      doc.text(addressLines, 13, 44.5);
-
-      // Add Back Page
-      doc.addPage();
-      doc.addImage(visitbackBase64, "JPEG", 0, 0, 88.9, 50.8);
-
-      // Save PDF
-      doc.save(`${EmployeeName}_VisitingCard.pdf`);
-    } catch (error) {
-      sap.m.MessageToast.show(error.message || error.responseText);
-    } finally {
-      this.closeBusyDialog();
-    }
-  },
-  // Common salutaon and gender change code
-  onSalutationChangeCommon: function (oEvent, sModelName, sGenderPropertyPath, sGenderControlId) {
-    var selectedSalutation = oEvent.getSource().getSelectedKey();
-    var oView = this.getView();
-    var oModel = oView.getModel(sModelName);
-
-    if (selectedSalutation === "Ms." || selectedSalutation === "Mrs.") {
-      oModel.setProperty(sGenderPropertyPath, "Female");
-      oView.byId(sGenderControlId).setEnabled(false);
-    } else if (selectedSalutation === "Mr.") {
-      oModel.setProperty(sGenderPropertyPath, "Male");
-      oView.byId(sGenderControlId).setEnabled(false);
-    } else {
-      oView.byId(sGenderControlId).setEnabled(true);
-    }
-  },
-  onCountryChange: function (oEvent, oIds) {
-    const oSource = oEvent.getSource();
-    const oSelectedItem = oSource.getSelectedItem();
-
-    if (!oSelectedItem) {
-      oSource.setValueState("None");
-      return;
-    }
-
-    const sCountryCode = oSelectedItem.getAdditionalText();
-    const oView = this.getView() || oSource.getParent();
-
-    const getById = (sId) => oView.byId(sId) || sap.ui.getCore().byId(sId);
-
-    // STD Code Logic
-    const oSTDCombo = getById(oIds.stdCodeCombo);
-    if (oSTDCombo?.getBinding("items")) {
-      oSTDCombo.getBinding("items").filter([]);
-      oSTDCombo.setValue("");
-
-      setTimeout(() => {
-        const aFilteredItems = oSTDCombo.getItems();
-        const oMatch = aFilteredItems.find(item => item.getAdditionalText() === sCountryCode);
-        if (oMatch) {
-          oSTDCombo.setSelectedItem(oMatch);
-          oSTDCombo.setValue(oMatch.getText());
-          oSTDCombo.setValueState("None");
-        }
-      }, 100);
-    }
-
-    // Base Location Filtering
-    const oBaseCombo = getById(oIds.baseLocationCombo);
-    if (oBaseCombo?.getBinding("items")) {
-      const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, sCountryCode);
-      oBaseCombo.getBinding("items").filter([oFilter]);
-      oBaseCombo.setSelectedKey("");
-      oBaseCombo.setValue("");
-    }
-
-    // Branch Code Clear
-    const oBranchInput = getById(oIds.branchInput);
-    if (oBranchInput) {
-      oBranchInput.setValue("");
-    }
-
-    // Mobile Number Clear
-    const oMobileInput = getById(oIds.mobileInput);
-    if (oMobileInput) {
-      oMobileInput.setValue("");
-    }
-  },
-  handleBaseLocationChange: function (oEvent, sBaseLocationModelName, sTargetModelName, sTargetPath) {
-    const sSelectedKey = oEvent.getSource().getSelectedKey();
-    const oView = this.getView();
-    const oBaseLocationModel = oView.getModel(sBaseLocationModelName);
-    const aLocations = oBaseLocationModel.getData();
-
-    const oSelectedLocation = aLocations.find(loc => loc.city === sSelectedKey);
-
-    if (oSelectedLocation) {
-      const oTargetModel = oView.getModel(sTargetModelName);
-      oTargetModel.setProperty(sTargetPath, oSelectedLocation.branchCode);
-    }
-  },
-
-  getFirstDayOfMonth: function (monthName, year) {
-    // Define a lookup for month names
-    var monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-
-    // Get the index of the month (0-based)
-    var monthIndex = monthNames.indexOf(monthName);
-
-    // Validate input
-    if (monthIndex === -1 || typeof year !== 'number') {
-      console.error("Invalid month name or year");
-      return null;
-    }
-
-    // Return new Date for first day of that month
-    return new Date(year, monthIndex, 1);
-  },
-
-  //Common Convert number to words function
-  convertNumberToWords: function (num, currency) {
-    if (num === 0) return "Zero " + currency + " Only";
-
-    const belowTwenty = [
-      '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
-      'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen',
-      'Eighteen', 'Nineteen'
-    ];
-    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-    const thousands = ['', 'Thousand', 'Lakh', 'Crore'];
-
-    function helper(n) {
-      if (n === 0) return '';
-      else if (n < 20) return belowTwenty[n] + ' ';
-      else if (n < 100) return tens[Math.floor(n / 10)] + ' ' + helper(n % 10);
-      else return belowTwenty[Math.floor(n / 100)] + ' Hundred ' + helper(n % 100);
-    }
-
-    let result = '';
-    let i = 0;
-
-    let integerPart = Math.floor(num);
-    let fractionalPart = Math.round((num - integerPart) * 100);
-
-    while (integerPart > 0) {
-      let divisor = (i === 0) ? 1000 : 100;
-      const remainder = integerPart % divisor;
-
-      if (remainder !== 0) {
-        result = helper(remainder) + thousands[i] + ' ' + result;
-      }
-
-      integerPart = Math.floor(integerPart / divisor);
-      i++;
-    }
-
-    result = result.trim() + ` ${currency}`;
-
-    // Add fractional part (lowercase + correct suffix)
-    if (fractionalPart > 0) {
-      const fractionalWords = helper(fractionalPart).trim().toLowerCase();
-      const suffix = (currency === "Rupees") ? "paise" : "cents";
-      result += " and " + fractionalWords + ' ' + suffix;
-    }
-
-    return result + " Only";
-  },
-
-  scrollToSection: function (pageId, sectionId) {
-    var page = this.byId(pageId);
-    if (page && sectionId) {
-      page.scrollToSection(this.byId(sectionId).getId());
-    }
-  },
-  //Variable pay function
-  EOD_onVariablePayInfoPress: function (oEvent) {
-    if (!this._oPopover) {
-      this._oPopover = new sap.m.Popover({
-        contentWidth: "400px",
-        contentHeight: "auto",
-        showHeader: false,
-        placement: sap.m.PlacementType.Bottom,
-        content: [
-          new sap.m.VBox({
-            alignItems: "Center",
-            justifyContent: "Center",
-            width: "100%",
-            items: [
-              new sap.m.Text({
-                text: this.i18nModel.getText("variablePayMsg"),
-                wrapping: true
-              })
-            ]
-          }).addStyleClass("customPopoverContent")
+    _initMessagePopover: function () {
+      var i18n = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+      this.oMessagePopover = new sap.m.MessagePopover({
+        items: [
+          new sap.m.MessageItem({ type: "Information", title: "P - Present", description: i18n.getText("forP") }),
+          new sap.m.MessageItem({ type: "Information", title: "A - Absent", description: i18n.getText("forA") }),
+          new sap.m.MessageItem({ type: "Information", title: "H - Half-Day", description: i18n.getText("forH") }),
+          new sap.m.MessageItem({ type: "Information", title: "LA - Late", description: i18n.getText("forLA") }),
+          new sap.m.MessageItem({ type: "Information", title: "L - Leave", description: i18n.getText("forL") }),
+          new sap.m.MessageItem({ type: "Information", title: "SP - Present on Sunday", description: i18n.getText("forSP") }),
+          new sap.m.MessageItem({ type: "Information", title: "SA - Absent on Sunday", description: i18n.getText("forSA") }),
+          new sap.m.MessageItem({ type: "Information", title: "SH - Half-Day on Sunday", description: i18n.getText("forSH") }),
+          new sap.m.MessageItem({ type: "Information", title: "SLA - Late on Sunday", description: i18n.getText("forSLA") }),
+          new sap.m.MessageItem({ type: "Information", title: "SL - Leave on Sunday", description: i18n.getText("forSL") })
         ]
       });
-      this.getView().addDependent(this._oPopover);
-    }
-    this._oPopover.openBy(oEvent.getSource());
-  },
+      this.getView().addDependent(this.oMessagePopover);
+    },
+
+    FST_onEnableImport: function () {
+      var branch = this.byId("FST_id_FilterBranch");
+      var date = this.byId("FST_id_MonthYearPicker");
+      if (!branch.getValue() || !date.getValue()) {
+        this.byId("FST_id_ImportBtn").setEnabled(false);
+        this.byId("MP_id_GoBtn").setEnabled(false);
+      }
+      else {
+        this.byId("FST_id_ImportBtn").setEnabled(true);
+        this.byId("MP_id_GoBtn").setEnabled(true);
+      }
+    },
+
+    updateDaysInColumns: function (pickerYear, pickerMonth) {
+      var daysInMonth = new Date(pickerYear, pickerMonth, 0).getDate(); // Get number of days in the month
+      for (var day = 1; day <= daysInMonth; day++) {
+        var date = new Date(pickerYear, pickerMonth - 1, day); // JS months are 0-indexed
+        var weekday = date.toLocaleString('en-US', { weekday: 'short' }); // e.g., Sun, Mon
+        var text = day + "\n" + weekday;
+        var columnId = "idDay" + day;
+        var oColumnText = this.byId(columnId);
+        if (oColumnText) {
+          oColumnText.setText(text);
+        }
+      }
+    },
+
+    resetColumnHeaders: function () {
+      for (var i = 1; i <= 31; i++) {
+        var columnId = "idDay" + i;
+        var oColumnText = this.byId(columnId);
+        if (oColumnText) {
+          oColumnText.setText(i.toString());
+        }
+      }
+    },
+
+    _commonGETCall: async function (sEntity, sModelName, oFilter) {
+      try {
+        var response = await this.ajaxReadWithJQuery(sEntity, oFilter);
+        if (response.success) {
+          this.oModel.setProperty("/" + sModelName, response.data || response.results);
+        } else {
+          console.error(response);
+          sap.m.MessageToast.show(this.i18nModel.getText("msgFailedToFetch"));
+        }
+      }
+      catch (e) {
+        console.error(e);
+      }
+    },
+
+    checkLoginModel: function () {
+      if (!this.getView().getModel("LoginModel")) {
+        sap.ui.core.BusyIndicator.hide();
+        this.getRouter().navTo("RouteLoginPage");
+      }
+    },
+    onClearAndSearch: function (sFilterBarId) {
+      var oFilterBar = this.byId(sFilterBarId);
+      if (oFilterBar) {
+        oFilterBar.clear(); // Clear all filters in the FilterBar
+      }
+    },
+
+    getBusyDialog: function () {
+      if (!this._pBusyDialog) {
+        this._pBusyDialog = sap.ui.core.Fragment.load({
+          name: "sap.kt.com.minihrsolution.fragment.BusyIndicator",
+          controller: this
+        }).then(function (oBusyDialog) {
+          this.getView().addDependent(oBusyDialog);
+          return oBusyDialog;
+        }.bind(this));
+      }
+
+      this._pBusyDialog.then(function (oBusyDialog) {
+        this.oBusyDialog = oBusyDialog;
+        this.oBusyDialog.open();
+
+      }.bind(this));
+    },
+
+    closeBusyDialog: function () {
+      if (this.oBusyDialog) {
+        this.oBusyDialog.close();
+
+      }
+    },
+
+    CommonVisitingCard: async function (EmployeeName, MobileNo, Email, Designation, branchCode) {
+      const { jsPDF } = window.jspdf;
+      this.getBusyDialog(); // open BusyDialog immediately
+
+      try {
+        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: branchCode });
+        var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+
+        const visitfrontBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.visitingCardFront?.data);
+        const visitbackBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.visitingCardBack?.data);
+        const address = oCompanyDetailsModel.shortAddress;
+        const companyurl = oCompanyDetailsModel.website;
+
+        const doc = new jsPDF({
+          orientation: "landscape",
+          unit: "mm",
+          format: [50.8, 88.9] // 3.5 x 2 inches
+        });
+
+        // Add Front Background
+        doc.addImage(visitfrontBase64, "JPEG", 0, 0, 88.9, 50.8);
+
+        // Add Employee Info
+        doc.setFontSize(12);
+        doc.setTextColor("#FFFFFF");
+        doc.setFont("times", "bold");
+        doc.text(EmployeeName, 5, 8);
+
+        doc.setFontSize(8);
+        doc.setFont("times", "normal");
+        doc.text(Designation, 5, 12);
+
+        doc.setFontSize(6.5);
+        doc.text(`+91 ${MobileNo}`, 13, 23);
+
+        if (Email.length > 26) {
+          const emailLines = doc.splitTextToSize(Email, 33);
+          doc.text(emailLines, 13, 29.5);
+        }
+        else {
+          doc.text(Email, 13, 30.5);
+        }
+
+        doc.setTextColor("#FFFFFF");
+        doc.textWithLink(companyurl, 13, 38, { url: companyurl });
+
+        const addressLines = doc.splitTextToSize(address, 43.5);
+        doc.text(addressLines, 13, 44.5);
+
+        // Add Back Page
+        doc.addPage();
+        doc.addImage(visitbackBase64, "JPEG", 0, 0, 88.9, 50.8);
+
+        // Save PDF
+        doc.save(`${EmployeeName}_VisitingCard.pdf`);
+      } catch (error) {
+        sap.m.MessageToast.show(error.message || error.responseText);
+      } finally {
+        this.closeBusyDialog();
+      }
+    },
+    // Common salutaon and gender change code
+    onSalutationChangeCommon: function (oEvent, sModelName, sGenderPropertyPath, sGenderControlId) {
+      var selectedSalutation = oEvent.getSource().getSelectedKey();
+      var oView = this.getView();
+      var oModel = oView.getModel(sModelName);
+
+      if (selectedSalutation === "Ms." || selectedSalutation === "Mrs.") {
+        oModel.setProperty(sGenderPropertyPath, "Female");
+        oView.byId(sGenderControlId).setEnabled(false);
+      } else if (selectedSalutation === "Mr.") {
+        oModel.setProperty(sGenderPropertyPath, "Male");
+        oView.byId(sGenderControlId).setEnabled(false);
+      } else {
+        oView.byId(sGenderControlId).setEnabled(true);
+      }
+    },
+    onCountryChange: function (oEvent, oIds) {
+      const oSource = oEvent.getSource();
+      const oSelectedItem = oSource.getSelectedItem();
+
+      if (!oSelectedItem) {
+        oSource.setValueState("None");
+        return;
+      }
+
+      const sCountryCode = oSelectedItem.getAdditionalText();
+      const oView = this.getView() || oSource.getParent();
+
+      const getById = (sId) => oView.byId(sId) || sap.ui.getCore().byId(sId);
+
+      // STD Code Logic
+      const oSTDCombo = getById(oIds.stdCodeCombo);
+      if (oSTDCombo?.getBinding("items")) {
+        oSTDCombo.getBinding("items").filter([]);
+        oSTDCombo.setValue("");
+
+        setTimeout(() => {
+          const aFilteredItems = oSTDCombo.getItems();
+          const oMatch = aFilteredItems.find(item => item.getAdditionalText() === sCountryCode);
+          if (oMatch) {
+            oSTDCombo.setSelectedItem(oMatch);
+            oSTDCombo.setValue(oMatch.getText());
+            oSTDCombo.setValueState("None");
+          }
+        }, 100);
+      }
+
+      // Base Location Filtering
+      const oBaseCombo = getById(oIds.baseLocationCombo);
+      if (oBaseCombo?.getBinding("items")) {
+        const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, sCountryCode);
+        oBaseCombo.getBinding("items").filter([oFilter]);
+        oBaseCombo.setSelectedKey("");
+        oBaseCombo.setValue("");
+      }
+
+      // Branch Code Clear
+      const oBranchInput = getById(oIds.branchInput);
+      if (oBranchInput) {
+        oBranchInput.setValue("");
+      }
+
+      // Mobile Number Clear
+      const oMobileInput = getById(oIds.mobileInput);
+      if (oMobileInput) {
+        oMobileInput.setValue("");
+      }
+    },
+    handleBaseLocationChange: function (oEvent, sBaseLocationModelName, sTargetModelName, sTargetPath) {
+      const sSelectedKey = oEvent.getSource().getSelectedKey();
+      const oView = this.getView();
+      const oBaseLocationModel = oView.getModel(sBaseLocationModelName);
+      const aLocations = oBaseLocationModel.getData();
+
+      const oSelectedLocation = aLocations.find(loc => loc.city === sSelectedKey);
+
+      if (oSelectedLocation) {
+        const oTargetModel = oView.getModel(sTargetModelName);
+        oTargetModel.setProperty(sTargetPath, oSelectedLocation.branchCode);
+      }
+    },
+
+    getFirstDayOfMonth: function (monthName, year) {
+      // Define a lookup for month names
+      var monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      // Get the index of the month (0-based)
+      var monthIndex = monthNames.indexOf(monthName);
+
+      // Validate input
+      if (monthIndex === -1 || typeof year !== 'number') {
+        console.error("Invalid month name or year");
+        return null;
+      }
+
+      // Return new Date for first day of that month
+      return new Date(year, monthIndex, 1);
+    },
+
+    //Common Convert number to words function
+    convertNumberToWords: function (num, currency) {
+      if (num === 0) return "Zero " + currency + " Only";
+
+      const belowTwenty = [
+        '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+        'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen',
+        'Eighteen', 'Nineteen'
+      ];
+      const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+      const thousands = ['', 'Thousand', 'Lakh', 'Crore'];
+
+      function helper(n) {
+        if (n === 0) return '';
+        else if (n < 20) return belowTwenty[n] + ' ';
+        else if (n < 100) return tens[Math.floor(n / 10)] + ' ' + helper(n % 10);
+        else return belowTwenty[Math.floor(n / 100)] + ' Hundred ' + helper(n % 100);
+      }
+
+      let result = '';
+      let i = 0;
+
+      let integerPart = Math.floor(num);
+      let fractionalPart = Math.round((num - integerPart) * 100);
+
+      while (integerPart > 0) {
+        let divisor = (i === 0) ? 1000 : 100;
+        const remainder = integerPart % divisor;
+
+        if (remainder !== 0) {
+          result = helper(remainder) + thousands[i] + ' ' + result;
+        }
+
+        integerPart = Math.floor(integerPart / divisor);
+        i++;
+      }
+
+      result = result.trim() + ` ${currency}`;
+
+      // Add fractional part (lowercase + correct suffix)
+      if (fractionalPart > 0) {
+        const fractionalWords = helper(fractionalPart).trim().toLowerCase();
+        const suffix = (currency === "Rupees") ? "paise" : "cents";
+        result += " and " + fractionalWords + ' ' + suffix;
+      }
+
+      return result + " Only";
+    },
+
+    scrollToSection: function (pageId, sectionId) {
+      var page = this.byId(pageId);
+      if (page && sectionId) {
+        page.scrollToSection(this.byId(sectionId).getId());
+      }
+    },
+    //Variable pay function
+    EOD_onVariablePayInfoPress: function (oEvent) {
+      if (!this._oPopover) {
+        this._oPopover = new sap.m.Popover({
+          contentWidth: "400px",
+          contentHeight: "auto",
+          showHeader: false,
+          placement: sap.m.PlacementType.Bottom,
+          content: [
+            new sap.m.VBox({
+              alignItems: "Center",
+              justifyContent: "Center",
+              width: "100%",
+              items: [
+                new sap.m.Text({
+                  text: this.i18nModel.getText("variablePayMsg"),
+                  wrapping: true
+                })
+              ]
+            }).addStyleClass("customPopoverContent")
+          ]
+        });
+        this.getView().addDependent(this._oPopover);
+      }
+      this._oPopover.openBy(oEvent.getSource());
+    },
+
+     onAttachmentsTableDelete: function (oEvent) {
+      const oTableItem = oEvent.getParameter("listItem"); // the item being deleted
+      const oTable = oEvent.getSource(); // the table
+
+      // Get model
+      const oModel = this.getView().getModel("UploaderData");
+      const aItems = oModel.getProperty("/attachments");
+
+      // Find the index of the deleted item
+      const iIndex = oTable.indexOfItem(oTableItem);
+
+      if (iIndex > -1) {
+        aItems.splice(iIndex, 1); // remove 1 item at that index
+        oModel.setProperty("/attachments", aItems); // update the model
+      }
+    },
 
   })
 });
