@@ -28,7 +28,7 @@
 					<core:Item key="{YearModel>}" text="{YearModel>}" />
 				</Select>
 				<ToolbarSpacer/>
-				<Button id="AL_id_SmartTableCharBut" icon="sap-icon://table-view" tooltip="{i18n>gototable}" press="AL_onPressGoSmartTable" />
+				<Button id="AL_id_SmartTableCharBut" text="{i18n>tableView}" tooltip="{i18n>gototable}" press="AL_onPressGoSmartTable" />
 			</OverflowToolbar>
 		</Panel>
 		<g:GridContainer id="AL_id_DemoGrid" columnsChange=".onGridColumnsChange">

@@ -370,7 +370,7 @@ sap.ui.define(
                     var oContext = oEvent.getSource().getBindingContext("LeaveModel");
                     var oData = oContext.getObject();
                     var aComments = oData.comments || [];
-                    var aTimelineItems = aComments.map(function (oComment) {
+                    var aTimelineItems = aComments.reverse().map(function (oComment) {
                         return new TimelineItem({
                             dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
                             title: oComment.CommentedBy || "Anonymous",
@@ -383,7 +383,7 @@ sap.ui.define(
                         showHeader: false,
                         enableBusyIndicator: false,
                         width: "100%",
-                        sortOldestFirst: true,
+                        sortOldestFirst: false,
                         enableDoubleSided: false,
                         content: aTimelineItems,
                         showHeaderBar: false
@@ -726,6 +726,18 @@ sap.ui.define(
                     if (oDate) {
                         oEvent.getSource().setValueState("None"); // Clear error state
                     }
+                    const oFromDatePicker = sap.ui.getCore().byId("AL_id_FromDate");
+                    const oToDatePicker = sap.ui.getCore().byId("AL_id_ToDate");
+                    const oFromDate = oFromDatePicker.getDateValue(); // Date object
+                    const oToDate = oToDatePicker.getDateValue(); // Date object
+                    if (oFromDate && oToDate && oFromDate > oToDate) {
+                        oToDatePicker.setDateValue(null); // Clear the ToDate if FromDate is greater
+                        oToDatePicker.setValue("");
+                        oToDatePicker.setValueState("Error");
+                        oToDatePicker.setValueStateText("From Date cannot be greater than To Date");
+                        this.onValidation();
+                        return false;
+                    }
                     this.onValidation();
                     this.onLiveChange();
                     return !!this.getView().getModel("LeaveTempModel").getProperty("/fromDate");
@@ -733,11 +745,24 @@ sap.ui.define(
 
                 // Validate to date
                 AL_ValidateToDate: function (oEvent) {
-                    const oDate = oEvent.getSource().getDateValue();
-                    if (oDate) {
-                        oEvent.getSource().setValueState("None"); // Clear error state
+                    const oToDatePicker = oEvent.getSource(); // DatePicker control
+                    const oToDate = oToDatePicker.getDateValue(); // Date object
+
+                    if (oToDate) {
+                        oToDatePicker.setValueState("None"); // Clear error state
                     }
+
+                    const oFromDate = sap.ui.getCore().byId("AL_id_FromDate").getDateValue();
+                    if (!oFromDate) {
+                        oToDatePicker.setDateValue(null); // Clear the ToDate if FromDate is not selected
+                        oToDatePicker.setValue("");       // Also clear the text input
+                        oToDatePicker.setValueState("Error");
+                        oToDatePicker.setValueStateText("Please select From Date");
+                        return false;
+                    }
+
                     this.onLiveChange();
+
                     return !!this.getView().getModel("LeaveTempModel").getProperty("/toDate");
                 },
 
