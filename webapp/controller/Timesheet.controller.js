@@ -196,18 +196,26 @@ sap.ui.define(["./BaseController",
                     return;
                 }
 
-                // Construct timesheet-level metadata (optional)
-                const oMetaData = {
-                    EmployeeID: this.EmployeeID,
-                    SubmittedAt: new Date().toISOString().split("T")[0]
-                };
-
-                // Construct item-level data (row updates)
+                // data updates for selected rows
                 const aItems = aSelectedItems.map(item => {
                     const oData = item.getBindingContext("FilteredTimesheetModel").getObject();
                     return {
                         data: {
                             Status: "Submitted",
+                            EmployeeID: that.EmployeeID,
+                            EmployeeName: oData.EmployeeName,
+                            Hours: oData.Hours,
+                            Description: oData.Description,
+                            SrNo: oData.SrNo,
+                            TaskID: oData.TaskID,
+                            TaskName: oData.TaskName,
+                            Date: oData.Date,
+                            ManagerID: oData.ManagerID,
+                            ManagerName: oData.ManagerName,
+                            //Comments: oData.Comments || [],
+                            Comments: oData.comments[0].Comment
+,
+
                         },
                         filters: {
                             SrNo: oData.SrNo
@@ -216,8 +224,8 @@ sap.ui.define(["./BaseController",
                 });
 
                 const finalPayload = {
-                    data: oMetaData,   // optional
-                    items: aItems
+                    tableName: "Timesheet",
+                    data: aItems
                 };
 
                 this.showConfirmationDialog(
@@ -227,7 +235,6 @@ sap.ui.define(["./BaseController",
                         try {
                             that.getBusyDialog();
 
-                            // Backend endpoint should expect { data, items[] }
                             await that.ajaxUpdateWithJQuery("Timesheet", finalPayload);
 
                             MessageToast.show(that.i18nModel.getText("SubmitSuucess"));
@@ -235,7 +242,10 @@ sap.ui.define(["./BaseController",
                             that.getView().getModel("viewModel").setProperty("/canSubmit", false);
                             that.getView().getModel("viewModel").setProperty("/canDelete", false);
                             that.byId("TD_id_Table").removeSelections(true);
-                            await that._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: that.EmployeeID });
+
+                            await that._fetchCommonData("Timesheet", "FilteredTimesheetModel", {
+                                EmployeeID: that.EmployeeID
+                            });
 
                         } catch (error) {
                             MessageToast.show(error.message || error.responseText);
