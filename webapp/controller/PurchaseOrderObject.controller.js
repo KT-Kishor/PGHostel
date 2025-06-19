@@ -197,6 +197,11 @@ sap.ui.define([
             }
             this.closeBusyDialog()
         },
+
+        onLogout: function () {
+            this.CommonLogoutFunction();
+        },
+
         PO_onButtonPress: function () {
             this.getRouter().navTo("PurchaseOrder");
 
@@ -706,7 +711,7 @@ sap.ui.define([
                         if (!isNaN(total)) fSubTotal += total;
                     });
                     oModel.setProperty("/SubTotal", fSubTotal.toFixed(2));
-                    this._calculateGSTandTotal(); 
+                    this._calculateGSTandTotal();
                 }
             }
         },
@@ -759,7 +764,7 @@ sap.ui.define([
                     console.error("Image compression failed:", err);
                     this.closeBusyDialog();
                 }
-                
+
             }
             if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
                 if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePOPDF === "function") {
@@ -848,7 +853,7 @@ sap.ui.define([
         Mail_onSendEmail: function () {
             var oModel = this.getView().getModel("PurchaseOrderModel").getData();
             const uploaderModel = this.getView().getModel("UploaderData").getProperty("/attachments");
-            if (uploaderModel==false) {
+            if (uploaderModel == false) {
                 MessageToast.show(this.i18nModel.getText("attachmentRequired"))
                 return;
             }
