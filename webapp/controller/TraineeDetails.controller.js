@@ -464,7 +464,9 @@ sap.ui.define([
                     MessageToast.show(error.responseText);
                 }
             },
-
+             TD_validateCombo: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
+            },
             //PDF generation function
             TD_onPressMerge: async function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");
