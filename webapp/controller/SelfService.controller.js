@@ -30,13 +30,18 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     // }
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
-                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false,
+                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false ,
                         isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false, SelfServiceBtn: false
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
                     var sLoggedInRole = loginModel.getProperty("/Role");
+                    if (["Admin", "HR Manager", "HR"].includes(sLoggedInRole)) {
+                        this.ViewModel.setProperty("/ShowStatusControl", true);
+                    } else {
+                        this.ViewModel.setProperty("/ShowStatusControl", false);
+                    }
                     this.sNavigatedRole = oEvent.getParameter("arguments").Role; // Role from navigation
                     this.sPath = oEvent.getParameter('arguments').sPath;
                     // sections if role is "Trainee" from either login or navigation
@@ -100,28 +105,22 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && this.sNavigatedRole !== "Trainee") {
                             this.byId("SS_id_Action").setVisible(true);
                             this.ViewModel.setProperty("/TraineeRole", false);
+
                             if (oModelAllData.EmployeeStatus === "Inactive") {
                                 this.ViewModel.setProperty("/WorkCompletedVisible", true);
                                 this.ViewModel.setProperty("/Letter", false);
                                 this.ViewModel.setProperty("/isVisitMode", false);
-
-                                // Keep RelievingLetter visible for Admin/HR roles
-                                if (["Admin", "HR", "HR Manager"].includes(sLoggedInRole)) {
-                                    this.ViewModel.setProperty("/RelievingLetter", true);
-                                } else {
-                                    this.ViewModel.setProperty("/RelievingLetter", false);
-                                }
+                                this.ViewModel.setProperty("/RelievingLetter", false);
                             } else if (oModelAllData.EmployeeStatus === "Active") {
                                 this.ViewModel.setProperty("/WorkCompletedVisible", false);
                                 this.ViewModel.setProperty("/isVisitMode", true);
-                                this.ViewModel.setProperty("/Letter", true); // Show  buttons for active
-                                this.ViewModel.setProperty("/RelievingLetter", true);
+                                this.ViewModel.setProperty("/Letter", true);
                             }
-
                         } else {
                             this.ViewModel.setProperty("/WorkCompletedVisible", false);
-                            if (oModelAllData.EmployeeStatus === "Inactive")
+                            if (oModelAllData.EmployeeStatus === "Inactive") {
                                 this.byId("SS_id_Action").setVisible(false);
+                            }
                         }
                         const oObjectPage = this.byId("ObjectPageLayout");
                         const oSection = this.byId("basicDetailsSection");
@@ -2241,7 +2240,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation", ["RF_id_StartDate", "RF_id_EndDate"]);
                 let oModel = this.getView().getModel("sEmployeeModel");
                 let oData = oModel.getProperty("/0");
-                if (oData && !oData.ResignationStartDate && !oData.ResignationEndDate && !oData.ResignComment ) {
+                if (oData && !oData.ResignationStartDate && !oData.ResignationEndDate && !oData.ResignComment) {
                     // Data not loaded yet, fetch and retry
                     await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                     oData = oModel.getProperty("/0");

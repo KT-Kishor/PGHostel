@@ -379,15 +379,14 @@
                                             text="{i18n>employeeStatus}"
                                             id="SS_id_les"
                                             required="true"
-                                            visible="{viewModel>/RelievingLetter}"
+                                            visible="{viewModel>/ShowStatusControl}"
                                         />
 										<m:Select
                                             change="SS_onStatusChange"
                                             id="SS_id_StatusSelf"
-                                            editable="{viewModel>/AdminRole}"
                                             selectedKey="{sEmployeeModel>/0/EmployeeStatus}"
                                             items="{StatusEmp>/}"
-                                            visible="{viewModel>/RelievingLetter}"
+                                            visible="{viewModel>/ShowStatusControl}"
                                         >
 											<core:Item
                                                 key="{StatusEmp>Value}"

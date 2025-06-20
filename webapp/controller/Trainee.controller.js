@@ -428,7 +428,7 @@ sap.ui.define([
             //Traniee certificate mail function
             T_onCerMail:async function () {
                 try {
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog();
                     await  this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeCertificate", Action: "CC" });
                     var oTraineeEmail = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject().TraineeEmail;
                     if (!oTraineeEmail || oTraineeEmail.length === 0) {
@@ -448,7 +448,7 @@ sap.ui.define([
                     this.getView().setModel(oUploaderDataModel, "UploaderData");
                     this.T_commonOpenDialog("T_MailDialog", "sap.kt.com.minihrsolution.fragment.CommonMail");
                     this.validateSendButton();
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog();;
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("technicalError"));
                 }
