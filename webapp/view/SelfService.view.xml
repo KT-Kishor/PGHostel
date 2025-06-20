@@ -384,6 +384,7 @@
 										<m:Select
                                             change="SS_onStatusChange"
                                             id="SS_id_StatusSelf"
+                                            editable="{viewModel>/AdminRole}"
                                             selectedKey="{sEmployeeModel>/0/EmployeeStatus}"
                                             items="{StatusEmp>/}"
                                             visible="{viewModel>/ShowStatusControl}"
