@@ -1509,22 +1509,13 @@ sap.ui.define(
                     this._oPopover.openBy(oEvent.getSource());
                 },
 
-                CI_onPressGeneratePdf: function () {
+                CI_onPressGeneratePdf: async function () {
                     const { jsPDF } = window.jspdf;
                     const oView = this.getView();
                     const oModel = oView.getModel("ConsultantInvoiceModel").getData();
                     const oConsultantItemModel = oModel.ConsultantInvoiceItem || [];
 
-                    let currency = oModel.Currency === "INR" ? "Rupees" : oModel.Currency;
-                    let totalInWords = this.convertNumberToWords(oModel.TotalSum, currency);
-                    if (oModel.Currency !== "INR") {
-                        totalInWords = totalInWords
-                            .replaceAll("Lakh", "Million")
-                            .replaceAll("Crore", "Billion")
-                            .replaceAll("Paise", "Cents")
-                            .replaceAll("Rupees", "Dollars");
-                    }
-
+                    let totalInWords = await this.convertNumberToWords(oModel.TotalSum, oModel.Currency);
                     const showSAC = oModel.GSTNO !== undefined && oModel.GSTNO !== "";
 
                     const margin = 15;

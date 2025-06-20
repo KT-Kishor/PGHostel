@@ -1362,16 +1362,7 @@ sap.ui.define([
                 const img = await this._convertBLOBToImage(imgblob);
                 const signature = await this._convertBLOBToImage(signBlob);
 
-                let currency = data.Currency === "INR" ? "Rupees" : data.Currency;
-                let totalInWords = this.convertNumberToWords(oModel.TotalAmount, currency);
-                if (data.Currency !== "INR") {
-                    totalInWords = totalInWords
-                        .replaceAll("Lakh", "Million")
-                        .replaceAll("Crore", "Billion")
-                        .replaceAll("Paise", "Cents")
-                        .replaceAll("Rupees", "Dollars");
-                }
-
+                let totalInWords =  await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
                 const showSAC = oModel.GST !== undefined && oModel.GST !== "";
 
                 const margin = 15;
@@ -1420,14 +1411,26 @@ sap.ui.define([
                     doc.text(row.value, rightAlignX + columnWidths[0] + 5, currentY + 5);
                     currentY += rowHeight;
                 });
-
+                
                 currentY += 15;
                 doc.setFont("times", "bold").setFontSize(11);
                 doc.text("To,", margin, currentY);
                 currentY += 5;
+
                 doc.setFont("times", "normal").setFontSize(11);
-                doc.text(oModel.CustomerName, margin, currentY);
-                currentY += 5;
+                const maxLength = 30;
+                const customerName = oModel.CustomerName || "";
+                const lines = [];
+
+                for (let i = 0; i < customerName.length; i += maxLength) {
+                    lines.push(customerName.substring(i, i + maxLength));
+                }
+
+                lines.forEach(line => {
+                    doc.text(line, margin, currentY);
+                    currentY += 5; 
+                });
+
 
                 const customerAddressLines = doc.splitTextToSize(oModel.Address, usableWidth / 2 - 10);
                 doc.text(customerAddressLines, margin, currentY);
@@ -1485,86 +1488,79 @@ sap.ui.define([
                     },
                 });
 
-                currentY = doc.lastAutoTable.finalY;
+               // Get starting Y position
+                currentY = doc.lastAutoTable.finalY + 10;
                 checkPageSpace(50);
 
-                const summaryBody = [];
+                // Calculate positioning
+                const amountLabelX = pageWidth - margin - 30; // Right aligned for labels
+                doc.setFont("times", "normal").setFontSize(10);
 
+                // Subtotal (Non-Taxable)
                 if (oModel.SubTotalNotGST > 0) {
-                    summaryBody.push([
-                        `Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
-                        Formatter.fromatNumber(oModel.SubTotalNotGST)
-                    ]);
+                    doc.text(`Sub-Total (Non-Taxable) (${data.Currency}) :`, amountLabelX, currentY, { align: "right", maxWidth: 100 });
+                    doc.text(Formatter.fromatNumber(oModel.SubTotalNotGST), pageWidth - margin - 2, currentY, { align: "right", maxWidth: 100 });
+                    currentY += 6;
                 }
 
+                // Subtotal (Taxable)
                 if (oModel.SubTotalInGST > 0) {
-                    summaryBody.push([
-                        `Sub-Total ( Taxable ) (${data.Currency}) :`,
-                        Formatter.fromatNumber(oModel.SubTotalInGST)
-                    ]);
+                    doc.text(`Sub-Total (Taxable) (${data.Currency}) :`, amountLabelX, currentY, { align: "right", maxWidth: 100 });
+                    doc.text(Formatter.fromatNumber(oModel.SubTotalInGST), pageWidth - margin - 2, currentY, { align: "right", maxWidth: 100 });
+                    currentY += 6;
                 }
 
+                // Tax labels
                 const percentageText = oModel.Value !== undefined ? `(${oModel.Value}%)` : `(${type.split(" ")[1]})`;
                 const cgstPercentage = percentageText;
                 const sgstPercentage = percentageText;
                 const igstPercentage = percentageText;
 
-                if (data.Currency !== "USD") {
-                    const cgstValue = parseFloat(oModel.CGST) || 0;
-                    const sgstValue = parseFloat(oModel.SGST) || 0;
-                    const igstValue = parseFloat(oModel.IGST) || 0;
+                if (data.Currency === "INR") {
+                    if ((oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && (parseFloat(oModel.CGST) > 0)) {
+                        doc.text(`CGST ${cgstPercentage} :`, amountLabelX, currentY, { align: "right", maxWidth: 100 });
+                        doc.text(Formatter.fromatNumber(parseFloat(oModel.CGST).toFixed(2)), pageWidth - margin - 2, currentY, { align: "right", maxWidth: 100 });
+                        currentY += 6;
 
-                    if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && (oModel.CGST > 0)) {
-                        summaryBody.push([`CGST ${cgstPercentage} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
-                        summaryBody.push([`SGST ${sgstPercentage} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-                    } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST") && (oModel.IGST > 0)) {
-                        summaryBody.push([`IGST ${igstPercentage} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
+                        doc.text(`SGST ${sgstPercentage} :`, amountLabelX, currentY, { align: "right", maxWidth: 100 });
+                        doc.text(Formatter.fromatNumber(parseFloat(oModel.SGST).toFixed(2)), pageWidth - margin - 2, currentY, { align: "right", maxWidth: 100 });
+                        currentY += 6;
+                    } else if ((oModel.Type === "IGST" || type.split(" ")[0] === "IGST") && (parseFloat(oModel.IGST) > 0)) {
+                        doc.text(`IGST ${igstPercentage} :`, amountLabelX, currentY, { align: "right", maxWidth: 100 });
+                        doc.text(Formatter.fromatNumber(parseFloat(oModel.IGST).toFixed(2)), pageWidth - margin - 2, currentY, { align: "right", maxWidth: 100 });
+                        currentY += 6;
                     }
                 }
 
+               // Round Off
                 if (data.RoundOf) {
-                    summaryBody.push([`Round Off (${data.Currency}) :`, (data.RoundOf)]);
+                    doc.text(`Round Off (${data.Currency}) :`, amountLabelX, currentY, { align: "right", maxWidth: 100 });
+                    doc.text(data.RoundOf, pageWidth - margin - 2, currentY, { align: "right", maxWidth: 100 });
+                    currentY += 2;
                 }
 
-                const totalRowIndex = summaryBody.length;
-                summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(oModel.TotalAmount)]);
+                // Separator line
+                currentY += 3;
+                doc.setLineWidth(0.3);
+                doc.line(amountLabelX - 38, currentY, pageWidth - margin, currentY);
+                currentY += 6;
 
-                doc.autoTable({
-                    startY: currentY,
-                    head: [],
-                    body: summaryBody,
-                    theme: 'plain',
-                    styles: {
-                        font: "times",
-                        fontSize: 10,
-                        halign: "right",
-                        cellPadding: 2,
-                        overflow: "ellipsize"
-                    },
-                    columnStyles: {
-                        0: { halign: "right", cellWidth: 60 },
-                        1: { halign: "right", cellWidth: 40 }
-                    },
-                    margin: { left: 95 },
-                    didParseCell: function (data) {
-                        if (data.row.index === totalRowIndex) {
-                            data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
-                            data.cell.styles.lineColor = [0, 0, 0];
-                            data.cell.styles.fontStyle = 'bold';
-                        }
-                    }
-                });
+                // Total
+                doc.setFont("times", "bold").setFontSize(11);
+                doc.text(`Total (${data.Currency}) :`, amountLabelX, currentY, { align: "right", maxWidth: 100 });
+                doc.text(Formatter.fromatNumber(oModel.TotalAmount), pageWidth - margin - 2, currentY, { align: "right", maxWidth: 100 });
 
-                currentY = doc.lastAutoTable.finalY + 10;
+                currentY += 10;
                 checkPageSpace(25);
-
+                
+                // Amount in Words
                 oModel.AmountInWords = totalInWords;
-                doc.setFont("times", "bold");
-                doc.text("Amount in Words:", 13, currentY);
+                doc.setFont("times", "bold").setFontSize(10);
+                doc.text(`Amount in Words:`, margin, currentY);
                 currentY += 5;
                 doc.setFont("times", "normal");
                 const amountHeight = doc.getTextDimensions(oModel.AmountInWords || "").h;
-                doc.text(oModel.AmountInWords || "", 13, currentY, { maxWidth: 180 });
+                doc.text(oModel.AmountInWords || "", margin, currentY, { maxWidth: 180 });
                 currentY += amountHeight + 10;
 
                 checkPageSpace(40);
