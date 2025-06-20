@@ -29,7 +29,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.setFont("times", "normal").setFontSize(11);
 
             let titleContentY = titleY + 10; // Initial Y position after titleY
-            const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
+            const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)", "Parties"];
             const trimmedBoldWords = boldWords.map(word => word.trim());
             const boldWordList = trimmedBoldWords.join(" ").split(" ").filter(item => item !== "");
 
@@ -809,39 +809,40 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 tableWidth: maxWidth,
                 margin: { left: margin, right: margin }
             });
-
+            doc.setFont("times", "bold").setFontSize(11);
+            const options = { maxWidth: 100, align: "right" };
+            const dimensions = doc.getTextDimensions(Formatter.fromatNumber(oModel.TotalPOAmount), options);
             var totalAmountY = doc.lastAutoTable.finalY + 10;
-            var amountLabelX = pageWidth - margin - 30; // Align with PO details
-            doc.setFontSize(10);
-            doc.text(`Sub Total (${oModel.Currency}) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
-            doc.text(Formatter.fromatNumber(oModel.SubTotal), pageWidth - margin - 2, totalAmountY, { maxWidth: 100, align: "right" });
+            var amountLabelX = pageWidth - margin - dimensions.w - 2; // Align with PO details
+            doc.setFont("times", "normal").setFontSize(10);
+            doc.text(`Sub Total (${oModel.Currency}) :`, amountLabelX, totalAmountY, options);
+            doc.text(Formatter.fromatNumber(oModel.SubTotal), pageWidth - margin - 2, totalAmountY, options);
             if (oModel.GSTType === "IGST" && oModel.Currency === "INR") {
                 totalAmountY += 6;
-                doc.text(`IGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
-                doc.text(Formatter.fromatNumber(oModel.IGST), pageWidth - margin - 2, totalAmountY, { maxWidth: 100, align: "right" });
+                doc.text(`IGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, options);
+                doc.text(Formatter.fromatNumber(oModel.IGST), pageWidth - margin - 2, totalAmountY, options);
             }
             if (oModel.GSTType === "CGST/SGST" && oModel.Currency === "INR") {
                 totalAmountY += 6;
-                doc.text(`CGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
-                doc.text(Formatter.fromatNumber(oModel.CGST), pageWidth - margin - 2, totalAmountY, { maxWidth: 100, align: "right" });
+                doc.text(`CGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, options);
+                doc.text(Formatter.fromatNumber(oModel.CGST), pageWidth - margin - 2, totalAmountY, options);
                 totalAmountY += 6;
-                doc.text(`SGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
-                doc.text(Formatter.fromatNumber(oModel.SGST), pageWidth - margin - 2, totalAmountY, { maxWidth: 100, align: "right" });
+                doc.text(`SGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, options);
+                doc.text(Formatter.fromatNumber(oModel.SGST), pageWidth - margin - 2, totalAmountY, options);
             }
             totalAmountY += 3;
             doc.setLineWidth(0.3);
             doc.line(amountLabelX - 38, totalAmountY, pageWidth - margin, totalAmountY); // Draw line for separation
             totalAmountY += 6;
             doc.setFont("times", "bold").setFontSize(11);
-            doc.text(`Total Amount (${oModel.Currency}) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
-            doc.text(Formatter.fromatNumber(oModel.TotalPOAmount), pageWidth - margin - 2, totalAmountY, { maxWidth: 100, align: "right" });
+            doc.text(`Total Amount (${oModel.Currency}) :`, amountLabelX, totalAmountY, options);
+            doc.text(Formatter.fromatNumber(oModel.TotalPOAmount), pageWidth - margin - 2, totalAmountY, options);
             let amtWordY = totalAmountY + 7;
             doc.setFontSize(10);
             doc.text(`Total Amount in Words (${oModel.Currency}) :`, margin, amtWordY);
             doc.setFont("times", "normal");
-            doc.text(oModel.POAmountInWords, margin, amtWordY + 5)
+            doc.text(oModel.POAmountInWords, margin, amtWordY + 5, { maxWidth: maxWidth });
             doc.setFont("times", "bold").setFontSize(12);
-            let noteY = amtWordY + 20;
             function prepareHtmlForPdf(htmlContent) {
                 // Styles to inject
                 const style = `
@@ -884,7 +885,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             footerDesign();
             doc.addPage();
             doc.setFont("times", "bold").setFontSize(14);
-            noteY = topMargin + 6;
+            let noteY = topMargin + 6;
             let rteY = pageHeight + topMargin + 7;
             doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 127, 8, 63, 14.5);
 
