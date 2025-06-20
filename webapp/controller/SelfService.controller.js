@@ -2235,7 +2235,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation", ["RF_id_StartDate", "RF_id_EndDate"]);
                 let oModel = this.getView().getModel("sEmployeeModel");
                 let oData = oModel.getProperty("/0");
-                if (!oData) {
+                if (oData && !oData.ResignationStartDate && !oData.ResignationEndDate && !oData.ResignComment ) {
                     // Data not loaded yet, fetch and retry
                     await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                     oData = oModel.getProperty("/0");
