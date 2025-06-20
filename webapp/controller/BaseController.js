@@ -458,7 +458,7 @@ sap.ui.define([
 
       let attachments = oModel.getProperty(sAttachmentPath) || [];
       let uploadedFileNames = oModel.getProperty(sNamePath)
-        ? oModel.getProperty(sNamePath).split(", ")
+        ? oModel.getProperty("/attachments").map((item) => item.filename)
         : [];
       let currentTotalSize = attachments.reduce((sum, file) => sum + file.size, 0);
 
@@ -514,6 +514,23 @@ sap.ui.define([
 
       // Clear uploader for next selection
       oFileUploader.setValue("");
+    },
+
+    onAttachmentsTableDelete: function (oEvent) {
+      const oTableItem = oEvent.getParameter("listItem"); // the item being deleted
+      const oTable = oEvent.getSource(); // the table
+
+      // Get model
+      const oModel = this.getView().getModel("UploaderData");
+      const aItems = oModel.getProperty("/attachments");
+
+      // Find the index of the deleted item
+      const iIndex = oTable.indexOfItem(oTableItem);
+
+      if (iIndex > -1) {
+        aItems.splice(iIndex, 1); // remove 1 item at that index
+        oModel.setProperty("/attachments", aItems); // update the model
+      }
     },
 
     async generateCertificatePDF(content, branchCode) {
@@ -952,23 +969,6 @@ sap.ui.define([
         this.getView().addDependent(this._oPopover);
       }
       this._oPopover.openBy(oEvent.getSource());
-    },
-
-     onAttachmentsTableDelete: function (oEvent) {
-      const oTableItem = oEvent.getParameter("listItem"); // the item being deleted
-      const oTable = oEvent.getSource(); // the table
-
-      // Get model
-      const oModel = this.getView().getModel("UploaderData");
-      const aItems = oModel.getProperty("/attachments");
-
-      // Find the index of the deleted item
-      const iIndex = oTable.indexOfItem(oTableItem);
-
-      if (iIndex > -1) {
-        aItems.splice(iIndex, 1); // remove 1 item at that index
-        oModel.setProperty("/attachments", aItems); // update the model
-      }
     },
 
   })
