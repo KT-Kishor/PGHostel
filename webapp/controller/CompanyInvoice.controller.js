@@ -97,6 +97,7 @@ sap.ui.define(
               }
             }
             // Fetch data
+            this._fetchCommonData("CompanyInvoice", "CompanyInvoiceFilterModel", {InvoiceStartDate: params.InvoiceStartDate, InvoiceEndDate: params.InvoiceEndDate});
             await this._fetchCommonData("CompanyInvoice", "CompanyInvoiceModel", params);
             this.closeBusyDialog();
           } catch (error) {

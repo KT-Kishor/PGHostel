@@ -34,6 +34,7 @@ sap.ui.define([
                 this.Discount = true;
                 this.RateUnit = true;
                 this.Particulars = true;
+                this.mobileNo = true;
                 this.ResivedTDSFlag = true;
                 this.byId("CID_id_AddCustComboBox").setValueState("None");
                 this.byId("CID_id_InvoiceDesc").setValueState("None");
@@ -188,7 +189,7 @@ sap.ui.define([
                 this.SelectedCustomerModel.setProperty("/Name", SelectedData.name);
                 this.SelectedCustomerModel.setProperty("/PAN", SelectedData.PAN);
                 this.SelectedCustomerModel.setProperty("/GST", SelectedData.GST);
-                this.SelectedCustomerModel.setProperty("/Address", SelectedData.address);
+                this.SelectedCustomerModel.setProperty("/Address", SelectedData.address + " ," +SelectedData.baseLocation + " ," + SelectedData.country);
                 this.SelectedCustomerModel.setProperty("/MailID", SelectedData.mailID);
                 this.SelectedCustomerModel.setProperty("/MobileNo", SelectedData.mobileNo);
                 this.SelectedCustomerModel.setProperty("/Type", SelectedData.type);
@@ -549,7 +550,7 @@ sap.ui.define([
                 if (!sValue) {
                     oInput.setValueState("None");
                     oInput.setValueStateText("");
-                    this.CI_updateTotalAmount();
+                    // this.CI_updateTotalAmount();
                     this.Discount = true;
                 } else if (!regex.test(sValue)) {
                     oInput.setValueState("Error");
@@ -800,11 +801,15 @@ sap.ui.define([
             },
             CID_onPressLiveChangeEmail: function (oEvent) { utils._LCvalidateEmail(oEvent) },
 
+            CID_onPressLiveChangeMobileNo:function(oEvent){
+                this.mobileNo = utils._LCvalidateMobileNumber(oEvent);
+            },
+
             onPressUpdateInvoice: async function () {
                 try {
                     var oModel = this.getView().getModel("FilteredSOWModel").getData();
                     const bIsValid =
-                        utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") && this.mobileNo &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowPO"), "ID") &&
                         utils._LCvalidateEmail(this.byId("CID_id_InputMailID"), "ID") &&
                         (!!this.Discount && !!this.RateUnit && !!this.Particulars) &&

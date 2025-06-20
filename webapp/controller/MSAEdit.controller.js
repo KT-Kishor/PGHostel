@@ -20,7 +20,7 @@ sap.ui.define([
                 this.getBusyDialog();
                 this.scrollToSection("MsaE_id_ObjectPageLayout", "MsaE_id_SowDetailsSection");
                 this._fetchCommonData("EmailContent", "CCMailModel", { Type: "MSA", Action: "CC" });
-
+                
                 this.MSAID = oEvent.getParameter("arguments").sPath;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
@@ -34,8 +34,10 @@ sap.ui.define([
                 this.getView().setModel(oSowCreateModel, "sowCreateModel");
                 this._makeDatePickersReadOnly(["MsaE_id_SowStatus"]);
                 this.byId("MsaE_id_SowStatus").setValue("All");
+                this.BusyIndicater = false;
                 await this.MSADetailsReadCall();
                 await this.CommonReadCallForSow();
+                this.BusyIndicater = true;
                 this.closeBusyDialog();
                 this.AdvanceBalance = true;
                 this.Rate = true;
@@ -61,7 +63,7 @@ sap.ui.define([
             },
 
             MSADetailsReadCall: async function () {
-                this.getBusyDialog();
+                if(this.BusyIndicater) this.getBusyDialog();
                 try {
                     await this._fetchCommonData("MSADetails", "FilteredMsaModel", { MsaID: this.MSAID });
                     this.SimpleFormModel.setProperty("/minDate", new Date(this.getView().getModel("FilteredMsaModel").getData()[0].CreateMSADate));
@@ -91,6 +93,7 @@ sap.ui.define([
             },
             MSACountryComboBox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
+                sap.ui.getCore().byId("MSA_Nav_Id_City").setValue("");
                 var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
                 var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
                 sap.ui.getCore().byId("MSA_Nav_Id_Country").getBinding("items").filter(oFilter);
@@ -100,15 +103,6 @@ sap.ui.define([
             },
             MsaE_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
-            },
-
-            MsaE_onEditOrSavePress: function () {
-                if (this.SimpleFormModel.getProperty("/editable")) {
-                    this.onPressSave();
-                } else {
-                    this.SimpleFormModel.setProperty("/editable", true);
-                    this.SimpleFormModel.setProperty("/isEnabled", false);
-                }
             },
 
             Msa_LC_CompanyName: function (oEvent) {
@@ -231,13 +225,34 @@ sap.ui.define([
                         type !== "Recruitment"
                             ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0)
                             : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1);
-                    }.bind(this));
-                } else {
-                    this.MSA_oDialog.open();
-                    type !== "Recruitment"
+                            this.resetMsaDialogFields();
+                            this._FragmentDatePickersReadOnly(["MsaE_id_CreateMSADate"]);
+                        }.bind(this));
+                    } else {
+                        this.MSA_oDialog.open();
+                        type !== "Recruitment"
                         ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0)
                         : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
+                        this.resetMsaDialogFields();
+                        this._FragmentDatePickersReadOnly(["MsaE_id_CreateMSADate"]);
                 }
+            },
+
+            resetMsaDialogFields: function () {
+                var oView = sap.ui.getCore();
+
+                // Input Fields
+                oView.byId("MsaE_id_CompanyName")?.setValueState("None");
+                oView.byId("MsaE_id_CreateMSADate")?.setValueState("None");
+                oView.byId("MsaE_id_MsaHead")?.setValueState("None");
+                oView.byId("MsaE_id_HeadPosition")?.setValueState("None");
+                oView.byId("MsaE_id_MsaPanCard")?.setValueState("None");
+                oView.byId("MsaE_id_MSAEmail")?.setValueState("None");
+                oView.byId("MsaE_id_MSA_GSTNO")?.setValueState("None");
+                oView.byId("Msa_Id_RateCharge")?.setValueState("None");
+                oView.byId("Msa_Id_PayAdvance")?.setValueState("None");
+                oView.byId("Msa_Id_PayBalance")?.setValueState("None");
+                oView.byId("Msa_Id_Refund")?.setValueState("None");
             },
 
             MSA_Frg_Close: function () {
@@ -302,14 +317,12 @@ sap.ui.define([
             },
 
             CommonReadCallForSow: async function () {
-                this.getBusyDialog();
+               if(this.BusyIndicater) this.getBusyDialog();
                 const selectedKey = this.byId("MsaE_id_SowStatus").getValue();
                 let oFilter = { MsaID: this.MSAID };
                 if (selectedKey !== "All") oFilter.Status = selectedKey;
 
                 await this._fetchCommonData("SowDetails", "SowReadModel", oFilter);
-                // var SowModel = new JSONModel(this.getView().getModel("SowReadModel").getData());
-                // this.getView().setModel(SowModel, "SowAllDataModel");
                 this.closeBusyDialog();
             },
 
@@ -377,16 +390,14 @@ sap.ui.define([
                         this.getView().addDependent(this.SOW_oDialog);
                         this.SOW_oDialog.open();
                         var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
-                        if (oTable) {
-                            oTable.removeSelections(true); // true = clears selection without triggering events
-                        }
+                        if (oTable) oTable.removeSelections(true);
+                        this._FragmentDatePickersReadOnly(["SOW_id_EndDate","SOW_id_StartDate"]);
                     }.bind(this));
                 } else {
                     this.SOW_oDialog.open();
                     var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
-                    if (oTable) {
-                        oTable.removeSelections(true); // true = clears selection without triggering events
-                    }
+                    if (oTable) oTable.removeSelections(true);
+                    this._FragmentDatePickersReadOnly(["SOW_id_EndDate","SOW_id_StartDate"]);
                 }
             },
 

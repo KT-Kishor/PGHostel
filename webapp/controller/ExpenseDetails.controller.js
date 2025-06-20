@@ -580,10 +580,7 @@ sap.ui.define([
                                     oModel.Currency !== "INR"
                                         ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID")
                                         : true
-                                )
-                            )
-                    )
-                ) {
+                                )))) {
 
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var Attachment = this.getView().getModel("tokenModel").getData();

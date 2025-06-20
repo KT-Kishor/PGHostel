@@ -86,7 +86,7 @@
 										<m:Input value="{SelectedCustomerModel>/MailID}" id="CID_id_InputMailID" maxLength="500" liveChange="CID_onPressLiveChangeEmail" editable="{visiablityPlay>/CInvoice}" change="onchangeEmail" valueStateText="{i18n>emailValueState}"/>
 
 										<m:Label text="{i18n>mobileNo}" />
-										<m:Input value="{SelectedCustomerModel>/MobileNo}" id="CID_id_InputMobileNo" maxLength="10" liveChange="CID_onPressLiveChange" editable="{visiablityPlay>/CInvoice}" />
+										<m:Input value="{SelectedCustomerModel>/MobileNo}" id="CID_id_InputMobileNo" maxLength="10" liveChange="CID_onPressLiveChangeMobileNo" editable="{visiablityPlay>/CInvoice}" valueState="{i18n>mobileNoValueState}" />
 
 										<m:Label visible="{visiablityPlay>/TDS}" required="true" text="{i18n>TDS}" />
 										<m:Input visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/IncomePerc}" id="CID_id_IncomeTaxPercentage" editable="{visiablityPlay>/editable}" maxLength="2" valueStateText="{i18n>incomeTaxValue}" liveChange="onIncomeTaxPercentageInputLiveChange"/>
@@ -175,21 +175,20 @@
 												<m:cells>
 													<m:HBox width="100%" justifyContent="SpaceBetween">
 														<m:VBox width="49%">
-															<m:Input value="{CompanyInvoiceItemModel>Unit}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="20" valueStateText="{i18n>UnitValueText}" />
+															<m:Input value="{CompanyInvoiceItemModel>Unit}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="15" valueStateText="{i18n>UnitValueText}" />
 														</m:VBox>
 														<m:VBox width="49%">
 															<m:ComboBox items="{RateType>/}" selectedKey="Per Day" value="{CompanyInvoiceItemModel>UnitText}" change="CI_On_ChangeRateType" editable="{visiablityPlay>/editable}" width="100%">
 																<core:Item key="{RateType>ID}" text="{RateType>RateType}" />
 															</m:ComboBox>
-															<!-- <m:Input value="{CompanyInvoiceItemModel>UnitText}" editable="{visiablityPlay>/editable}" maxLength="20" /> -->
 														</m:VBox>
 													</m:HBox>
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Rate}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" valueStateText="{i18n>RateValueText}" textAlign="End" maxLength="20" />
+													<m:Input value="{CompanyInvoiceItemModel>Rate}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" valueStateText="{i18n>RateValueText}" textAlign="End" maxLength="15" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Discount}" showValueHelp="true" valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="20" valueStateText="{i18n>discountInfoText}" />
+													<m:Input value="{CompanyInvoiceItemModel>Discount}" showValueHelp="true" valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="15" valueStateText="{i18n>discountInfoText}" />
 												</m:cells>
 												<m:cells>
 													<m:Input value="{path:'CompanyInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />

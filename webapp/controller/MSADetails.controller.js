@@ -17,10 +17,7 @@ sap.ui.define([
             _onRouteMatched: async function () {
                 var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
                 if (!LoginFUnction) return;
-                // if (!this.getView().getModel("ContractpaymentModel")) this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
-                // if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                // if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
-
+                this._ViewDatePickersReadOnly(["MsaD_id_CreateMSADate"],this.getView());
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(false);
                 this.byId("MsaD_id_Submit").setEnabled(false);
@@ -171,6 +168,7 @@ sap.ui.define([
             MSACountryComboBox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 this.validateStep();
+                this.byId("MSA_Id_City").setValue("");
                 var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
                 var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
                 this.byId("MSA_Id_City").getBinding("items").filter(oFilter);
