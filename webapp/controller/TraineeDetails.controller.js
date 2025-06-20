@@ -435,8 +435,13 @@ sap.ui.define([
             //mail send function
             Mail_onSendEmail: function () {
                 try {
-                    this.getBusyDialog();
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
+                    var aAttachments = this.getView().getModel("UploaderData").getProperty("/attachments");
+                    if (!aAttachments || aAttachments.length === 0) {
+                        MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
+                        return;
+                    }
+                    this.getBusyDialog();
                     var oPayload = {
                         "TraineeName": oModel.TraineeName,
                         "toEmailID": oModel.TraineeEmail,

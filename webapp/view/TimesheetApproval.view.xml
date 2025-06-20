@@ -33,6 +33,20 @@
 					</ComboBox>                        
                         </fb:control>
                     </fb:FilterGroupItem>
+                    <fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true" >
+                        <fb:control>
+                    <ComboBox  showSecondaryValues= "true"  id="TSA_id_Status" showClearIcon="true" items="{path:'ApprovalTimesheetModel>/'}" >
+						<core:ListItem key="{ApprovalTimesheetModel>Status}" text="{ApprovalTimesheetModel>Status}" />
+					</ComboBox>                        
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                     <fb:FilterGroupItem name="Month" label="{i18n>month}" groupName="Group1" visibleInFilterBar="true" >
+                        <fb:control>
+                        <ComboBox  showSecondaryValues= "true"  id="TSA_id_Month" showClearIcon="true" items="{Months>/month}" >
+						<core:ListItem key="{Months>ID}" text="{Months>Month}" />
+					</ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
                     <!-- Add more filters as needed -->
                 </fb:filterGroupItems>
             </fb:FilterBar>
@@ -78,7 +92,8 @@
                             <Text text="{path:'ApprovalTimesheetModel>Date',formatter:'.Formatter.formatDate'}"/>
                             <Text text="{ApprovalTimesheetModel>Day}"/>
                             <Text text="{ApprovalTimesheetModel>HoursWorked}"/>
-                             <Text text="{ApprovalTimesheetModel>Status}"/>
+                            <ObjectStatus text="{ApprovalTimesheetModel>Status}" inverted="false"
+                                state="{path:'ApprovalTimesheetModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
                             <Button icon="sap-icon://display-more" text="{i18n>View}" press="TSA_onShowComments" />
                         </cells>
                     </ColumnListItem>

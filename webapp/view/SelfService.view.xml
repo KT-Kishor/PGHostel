@@ -823,6 +823,7 @@
 										<m:Label
                                             text="{i18n>adharCard}"
                                             required="true"
+                                            id="SS_id_LAdhar"
                                         />
 										<m:Input
                                             value="{sEmployeeModel>/0/AdharCard}"

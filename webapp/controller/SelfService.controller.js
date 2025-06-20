@@ -44,7 +44,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
 
                         var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lpa", "SS_id_lca", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
-                            "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan",];
+                            "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan","SS_id_LAdhar"];
                         if (this.sPath === "SelfService") {
                             this.ViewModel.setProperty("/SelfServiceBtn", true);
                             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileSelfSerciceFooter"));

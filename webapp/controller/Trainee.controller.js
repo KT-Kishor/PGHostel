@@ -41,7 +41,7 @@ sap.ui.define([
             //read call for trainee
             readCallForTrainee: async function (filter) {
                 try {
-                   // this.getBusyDialog();
+                    // this.getBusyDialog();
                     await this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
                         var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                         this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
@@ -499,6 +499,11 @@ sap.ui.define([
             Mail_onSendEmail: function () {
                 try {
                     var oModel = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject();
+                    var aAttachments = this.getView().getModel("UploaderData").getProperty("/attachments");
+                    if (!aAttachments || aAttachments.length === 0) {
+                        MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
+                        return;
+                    }
                     var oPayload = {
                         "TraineeName": oModel.TraineeName,
                         "toEmailID": oModel.TraineeEmail,

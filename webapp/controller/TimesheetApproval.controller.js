@@ -37,8 +37,8 @@ sap.ui.define([
                 const oData = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID });
                 let timesheetData = Array.isArray(oData.data) ? oData.data : [oData.data];
 
-                // Filter only "Submitted" status
-                timesheetData = timesheetData.filter(entry => entry.Status === "Submitted");
+                // Filter only "Submitted, approved, rejected" status
+                timesheetData = timesheetData.filter(entry => ["Submitted", "Approved", "Rejected"].includes(entry.Status));
 
                 // Set filtered data to ApprovalTimesheetModel
                 this.getView().setModel(new sap.ui.model.json.JSONModel(timesheetData), "ApprovalTimesheetModel");

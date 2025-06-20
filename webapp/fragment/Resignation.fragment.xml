@@ -5,11 +5,13 @@
     xmlns:rich="sap.ui.richtexteditor"
 >
     <Dialog
-        title="{i18n>applyResign}"
-        contentWidth="85%"
-        contentHeight="75%"
-        id="RF_dialog"
-    >
+    title="{i18n>applyResign}"
+    contentWidth="85%"
+    contentHeight="auto"
+    id="RF_dialog"
+    verticalScrolling="true"
+    horizontalScrolling="false"
+>
         <f:SimpleForm
             editable="true"
             layout="ColumnLayout"
@@ -99,7 +101,7 @@
         <rich:RichTextEditor
             id="RF_id_RTE"
             width="100%"
-            height="70vh"
+            height="60vh"
             showGroupFontStyle="true"
             showGroupTextAlign="true"
             showGroupStructure="true"

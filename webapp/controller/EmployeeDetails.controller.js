@@ -32,7 +32,8 @@ sap.ui.define([
                 try {
                       this.getBusyDialog();
                     const aFilterItems = this.byId("ED_id_FilterBar").getFilterGroupItems();
-                    if(this.getView().getModel("LoginModel").getProperty("/Role") === "Admin") {
+                    // Check if the user is an Admin ,HR,HR Manager
+                    if(this.getView().getModel("LoginModel").getProperty("/Role") === "Admin" || this.getView().getModel("LoginModel").getProperty("/Role") === "HR" || this.getView().getModel("LoginModel").getProperty("/Role") === "HR Manager") {
                         var params = {}; // Initialize with empty object for Admin
                     }else{
                         var params = {ManagerID: this.getView().getModel("LoginModel").getProperty("/EmployeeID")}; // Initialize with ManageID
