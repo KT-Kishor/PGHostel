@@ -86,7 +86,7 @@
 										<m:Input value="{SelectedCustomerModel>/MailID}" id="CID_id_InputMailID" maxLength="500" liveChange="CID_onPressLiveChangeEmail" editable="{visiablityPlay>/CInvoice}" change="onchangeEmail" valueStateText="{i18n>emailValueState}"/>
 
 										<m:Label text="{i18n>mobileNo}" />
-										<m:Input value="{SelectedCustomerModel>/MobileNo}" id="CID_id_InputMobileNo" maxLength="10" liveChange="CID_onPressLiveChangeMobileNo" editable="{visiablityPlay>/CInvoice}" valueState="{i18n>mobileNoValueState}" />
+										<m:Input value="{SelectedCustomerModel>/MobileNo}" id="CID_id_InputMobileNo" maxLength="10" liveChange="CID_onPressLiveChangeMobileNo" editable="{visiablityPlay>/CInvoice}" valueStateText="{i18n>mobileNoValueState}" />
 
 										<m:Label visible="{visiablityPlay>/TDS}" required="true" text="{i18n>TDS}" />
 										<m:Input visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/IncomePerc}" id="CID_id_IncomeTaxPercentage" editable="{visiablityPlay>/editable}" maxLength="2" valueStateText="{i18n>incomeTaxValue}" liveChange="onIncomeTaxPercentageInputLiveChange"/>
