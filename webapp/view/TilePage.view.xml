@@ -21,9 +21,10 @@
             />
         </headerContent>
 
-        <ux:ObjectPageLayout upperCaseAnchorBar="false" >
+        <ux:ObjectPageLayout upperCaseAnchorBar="false" id="id_ObjectPageLayoutTile">
             <ux:sections>
                 <ux:ObjectPageSection
+                    id="id_Sectiontile"
                     titleUppercase="false"
                     title="Home"
                     visible="{= ${TileAccessModel>/Home} === '1' ? true : false}"

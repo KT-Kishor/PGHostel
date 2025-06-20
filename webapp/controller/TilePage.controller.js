@@ -18,7 +18,7 @@ sap.ui.define(
         _onRouteMatched: async function () {
           var LoginFunction = await this.commonLoginFunction("TilePage");
           if (!LoginFunction) return;
-
+          this.scrollToSection("id_ObjectPageLayoutTile","id_Sectiontile");
           this.getBusyDialog();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.AppVisibilityReadCall();
