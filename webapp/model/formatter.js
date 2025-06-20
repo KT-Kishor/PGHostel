@@ -41,7 +41,7 @@ sap.ui.define([
 
         CurrencyInINR: function (sValue) {
             if (sValue || sValue === 0) {
-                return  parseFloat(sValue).toLocaleString('en-IN');
+                return parseFloat(sValue).toLocaleString('en-IN');
             }
             return "";
         },
@@ -119,7 +119,7 @@ sap.ui.define([
             var isAllowedRole = (role === 'Admin' || role === 'HR Manager' || role === 'HR');
             return !!resignationEndDate && isAllowedRole;
         },
-        
+
         formatGrade: function (value) {
             if (!value) {
                 return "";
@@ -203,12 +203,14 @@ sap.ui.define([
             var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
             return oFloatFormat.format(numericValue);
         },
-
-        fullNameFormatter: function (salutation, consultantName) {
-            if (salutation && consultantName) {
-                return salutation + " " + consultantName;
+        
+        bytesToMB: function (bytes) {
+            if (!bytes || isNaN(bytes)) {
+                return "0 MB";
             }
-            return consultantName || salutation;
+
+            const mb = bytes / (1024 * 1024);
+            return mb.toFixed(2) + " MB";
         },
 
         YearlyToMontlyConv: function (value) {

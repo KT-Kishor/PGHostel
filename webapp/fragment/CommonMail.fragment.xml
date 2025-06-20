@@ -34,7 +34,7 @@
                         <cells>
                             <Text text="{UploaderData>filename}" />
                             <Text text="{UploaderData>fileType}" />
-                            <Text text="{UploaderData>size}" />
+                            <Text text="{path:'UploaderData>size',formatter: '.Formatter.bytesToMB'}" />
                         </cells>
                     </ColumnListItem>
                 </items>
