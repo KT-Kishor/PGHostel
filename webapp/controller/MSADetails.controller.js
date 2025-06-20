@@ -129,6 +129,11 @@ sap.ui.define([
                 this.byId("MsaD_id_PanCard").setValueState("None");
                 this.byId("MSA_Id_Country").setValueState("None");
                 this.byId("MSA_Id_City").setValueState("None");
+                this.byId("Msa_Id_RateCharge").setValueState("None");
+                this.byId("MsaD_id_GST").setValueState("None");
+                this.byId("Msa_Id_PayAdvance").setValueState("None");
+                this.byId("Msa_Id_PayBalance").setValueState("None");
+                this.byId("Msa_Id_Refund").setValueState("None");
             },
             MsaD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);

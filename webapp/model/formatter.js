@@ -144,17 +144,20 @@ sap.ui.define([
             var timeDiff = dueDate - today;
             var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-            if (status === "Submitted") {
-                return "Indication07";
-            } else if (status === "Payment Received") {
-                return "Success";
-            } else if (status === "Invoice Sent" && daysDiff >= 0) {
+            // if (status === "Submitted") {
+            //     return "Indication07";
+            // } else 
+            // if (status === "Payment Received") {
+            //     return "Success";
+            // } else 
+            if (status === "Invoice Sent" && daysDiff >= 0) {
                 return "Warning";
             } else if (status === "Invoice Sent" && daysDiff < 0) {
                 return "Error";
-            } else {
-                return "Indication01";
-            }
+            } 
+            // else {
+            //     return "Indication01";
+            // }
         },
 
         formatMaxDate: function () {

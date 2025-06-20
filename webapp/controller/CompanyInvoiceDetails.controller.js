@@ -309,6 +309,7 @@ sap.ui.define([
                     this.byId("idSAC").setVisible(isINR);
                     this.byId("idGSTCalculation").setVisible(isINR);
                     this.visiablityPlay.setProperty("/IncomeTax", isINR);
+                    this.visiablityPlay.setProperty("/TDS", isINR);
                     this.visiablityPlay.setProperty("/GST", isINR);
                     oSelectedCustomerModel.setProperty("/type", isINR ? this.Type : "");
                     if (!oSelectedCustomerModel.getProperty("/GST")) {
@@ -333,6 +334,7 @@ sap.ui.define([
                         const tds = ((total * incomePerc) / 100).toFixed(2);
                         oModel.setProperty("/IncomeTax", Math.round(tds));
                     }
+                    this.visiablityPlay.refresh(true);
                 } catch (error) {
                     MessageToast.show(error.responseText);
                 } finally {
@@ -403,7 +405,7 @@ sap.ui.define([
                     const rate = (isNaN(parseFloat(item.Rate)) || parseFloat(item.Rate) === 0) ? 1 : parseFloat(item.Rate);
                     const unit = (isNaN(parseFloat(item.Unit)) || parseFloat(item.Unit) === 0) ? 1 : parseFloat(item.Unit);
                     const baseAmount = unit * rate;
-
+                    item.Unit = unit
                     let discountAmount = 0;
 
                     // Check if discount is in percentage format
@@ -621,13 +623,6 @@ sap.ui.define([
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
 
-                // if (FilterModel.Currency === "INR") {
-                //     if (!oSelectedCustomerModel.GST || oSelectedCustomerModel.GST.trim() === "") {
-                //         sap.m.MessageBox.error(this.i18nModel.getText("gstMessage"));
-                //         return false;
-                //     }
-                // }
-
                 const oPayload = {
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
                     CustomerName: (sMode === 'update') ? oSelectedCustomerModel.CustomerName : oSelectedCustomerModel.Customer,
@@ -649,7 +644,7 @@ sap.ui.define([
                     TotalAmount: parseFloat(oModel.TotalAmount) || 0,
                     Status: oSelectedCustomerModel.Status,
                     InvoiceDescription: oSelectedCustomerModel.InvoiceDescription || "",
-                    IncomeTax: oSelectedCustomerModel.IncomeTax,
+                    IncomeTax: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomeTax : "",
                     MailID: oSelectedCustomerModel.MailID,
                     Type: oSelectedCustomerModel.Type || "",
                     Value: (!oSelectedCustomerModel.Value || isNaN(oSelectedCustomerModel.Value)) ? "0" : oSelectedCustomerModel.Value,
@@ -658,7 +653,7 @@ sap.ui.define([
                     SubTotalNotGST: parseFloat(oSelectedCustomerModel.SubTotalNotGST) || 0,
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
                     LUT: String(oSelectedCustomerModel.LUT),
-                    IncomePerc: oSelectedCustomerModel.IncomePerc || "10",
+                    IncomePerc:(FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
                 };
                 const aItemsRaw = oCompanyInvoiceItemModel.CompanyInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -730,7 +725,7 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.byId("CID_id_CurrencySelect"), "ID");
                     const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"), "ID") : true;
                     const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;
-                    const bOptionalValid = !!this.Discount && !!this.RateUnit && !!this.Particulars;
+                    const bOptionalValid = this.Discount && this.RateUnit && this.Particulars;
                     const bIsValid = bMandatoryValid && bTDSValid && bOptionalValid && bConversionRateValid;
                     if (!bIsValid) {
                         return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));

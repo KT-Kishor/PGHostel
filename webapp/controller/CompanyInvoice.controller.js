@@ -19,7 +19,7 @@ sap.ui.define(
           var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
           if (!LoginFUnction) return;
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          this.getView().getModel("LoginModel").setProperty("/HeaderName", "Company Invoice Application");
+          this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceapp"));
           await this.CompanyInvoice_onSearch();
           this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
           this.getView().getModel("LoginModel").setProperty("/RichText",false);

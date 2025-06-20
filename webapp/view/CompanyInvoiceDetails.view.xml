@@ -167,10 +167,10 @@
 													</m:ComboBox>
 												</m:cells>
 												<m:cells>
-													<m:ComboBox editable="{visiablityPlay>/editable}" value="{CompanyInvoiceItemModel>GSTCalculation}" selectedKey="Yes" change="Comp_onChangeGSTCalculation">
+													<m:Select editable="{visiablityPlay>/editable}" selectedKey="{CompanyInvoiceItemModel>GSTCalculation}" change="Comp_onChangeGSTCalculation">
 														<core:Item key="{i18n>yes}" text="{i18n>yes}"/>
 														<core:Item key="{i18n>no}" text="{i18n>no}"/>
-													</m:ComboBox>
+													</m:Select>
 												</m:cells>
 												<m:cells>
 													<m:HBox width="100%" justifyContent="SpaceBetween">
