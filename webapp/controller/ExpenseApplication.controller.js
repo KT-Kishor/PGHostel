@@ -19,9 +19,7 @@ sap.ui.define([
             try {
                 this.LoginModel = this.getView().getModel("LoginModel");
 
-               // if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
-               // if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
-                if (!this.getView().getModel("ExpenseTypeModel")) this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
+               if (!this.getView().getModel("ExpenseTypeModel")) this._fetchCommonData("ExpenseItemType", "ExpenseTypeModel");
                 if (!this.getView().getModel("ManagerModel")) this._fetchCommonData("ManagerFunction", "ManagerModel", { ManagerID: this.LoginModel.getProperty("/EmployeeID") });
 
                 let today = new Date();
@@ -96,7 +94,7 @@ sap.ui.define([
                 ExpenseName: "",
                 ExpStartDate: "",
                 ExpEndDate: "",
-                TravelAllowance: "",
+                TravelAllowance: "NO",
                 Country: "",
                 Source: "",
                 Destination: "",
@@ -212,6 +210,9 @@ sap.ui.define([
             if (oEvent.getSource().getValue() === '') {
                 oEvent.getSource().setValueState("None")
             }
+            var oModel = this.getView().getModel("CreateExpenseModel");
+            oModel.setProperty("/Destination","");
+            oModel.setProperty("/Source","");
             var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
             var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
             sap.ui.getCore().byId("exp-Id-Source").getBinding("items").filter(oFilter);
@@ -243,14 +244,12 @@ sap.ui.define([
 
         // Delete the Expenase and Expense Item
         Exp_onPressDeleteExpense: async function (oEvent) {
-            // this.byId("exp_Id_ExpenseTable").setBusy(true);
             var that = this;
             this.showConfirmationDialog(
                 this.i18nModel.getText("msgBoxConfirm"),
                 this.i18nModel.getText("commonMesBoxConfirmDelete"),
                 async function () {
-                   this.getBusyDialog();
-                    // const expenseID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
+                   that.getBusyDialog();
                     try {
                         await that.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: that.DeleteExpID } });
                         MessageToast.show(that.i18nModel.getText("expenseDeleteMess")); // <== use 'that' instead of 'this'
@@ -260,11 +259,10 @@ sap.ui.define([
                     } catch (error) {
                         MessageToast.show(error.responseText || "Error deleting expense");
                     } finally {
-                        this.closeBusyDialog();
-                        // that.byId("exp_Id_ExpenseTable").setBusy(false);
+                        that.closeBusyDialog();
                     }
                 },
-                function () {  })
+                function () { that.closeBusyDialog(); })
         },
         //Filter Function
         Exp_onSearch: async function () {

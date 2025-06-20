@@ -315,6 +315,8 @@ sap.ui.define([
                 if (oEvent.getSource().getValue() === '') {
                     oEvent.getSource().setValueState("None")
                 }
+                this.byId("Exp_id_Source").setValue("");
+                this.byId("Exp_id_Destination").setValue("");
                 this.CountryAndCity();
             },
 
@@ -328,7 +330,7 @@ sap.ui.define([
             onPressSave: async function () {
                 if (
                     utils._LCvalidateMandatoryField(this.byId("Exp_id_Source"), "ID") &&
-                    (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"), "ID") : true) && utils._LCstrictValidationComboBox(this.byId("Exp_id_Country"), "ID") && utils._LCvalidateMandatoryField(this.byId("Exp_id_EmpRemark"), "ID")) {
+                    (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"), "ID") : true) && utils._LCstrictValidationComboBox(this.byId("Exp_id_Country"), "ID")) {
                     var oModel = this.getView().getModel("FilteredExpenseModel");
                     oModel.getData()[0].ExpStartDate = oModel.getData()[0].ExpStartDate.split("T")[0];
                     oModel.getData()[0].ExpEndDate = oModel.getData()[0].ExpEndDate.split("T")[0];
@@ -624,14 +626,11 @@ sap.ui.define([
                     return MessageToast.show(this.i18nModel.getText("expenseDeleteSelectRowMess"));
                 }
 
-                this.byId("exp_Id_ExpenseTable").setBusy(true);
-
                 this.showConfirmationDialog(
                     this.i18nModel.getText("msgBoxConfirm"),
                     this.i18nModel.getText("commonMesBoxConfirmDelete"),
                     async function () {
-                        that.byId("exp_Id_ExpenseTable").setBusy(true);
-
+                        that.getBusyDialog();
                         try {
                             const itemID = selectedItem.getBindingContext("ItemExpenseModel").getObject().ItemID;
                             await that.ajaxDeleteWithJQuery("/ItemExpense", {
@@ -647,11 +646,11 @@ sap.ui.define([
                         } catch (error) {
                             MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
                         } finally {
-                            that.byId("exp_Id_ExpenseTable").setBusy(false);
+                            that.closeBusyDialog();
                         }
                     },
                     function () {
-                        that.byId("exp_Id_ExpenseTable").setBusy(false);
+                        that.closeBusyDialog();
                     });
             },
 
