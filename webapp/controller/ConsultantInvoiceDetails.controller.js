@@ -430,7 +430,7 @@ sap.ui.define(
                 },
 
                 CI_onInputChange: async function (oEvent) {
-                    this.UnitAmount = utils._LCvalidateAmount(oEvent);
+                     this.UnitAmount = utils._LCvalidateAmount(oEvent);
 
                     const oInput = oEvent.getSource();
                     const oBindingContext = oInput.getBindingContext("ConsultantInvoiceModel");

@@ -913,9 +913,9 @@ sap.ui.define([
 
       // Add fractional part (lowercase + correct suffix)
       if (fractionalPart > 0) {
-        const fractionalWords = helper(fractionalPart).trim().toLowerCase();
-        const suffix = (currency === "Rupees") ? "paise" : "cents";
-        result += " and " + fractionalWords + ' ' + suffix;
+        const fractionalWords = helper(fractionalPart).trim();
+        const suffix = (currency === "Rupees") ? "Paise" : "Cents";
+        result += " And " + fractionalWords + ' ' + suffix;
       }
 
       return result + " Only";
