@@ -22,7 +22,6 @@ sap.ui.define(
           this.getView().getModel("LoginModel").setProperty("/HeaderName", "Company Invoice Application");
           await this.CompanyInvoice_onSearch();
           this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
-          this._fetchCommonData("CompanyInvoice", "CompanyInvoiceFilterModel");
           this.getView().getModel("LoginModel").setProperty("/RichText",false);
         },
 

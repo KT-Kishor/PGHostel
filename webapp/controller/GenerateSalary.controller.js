@@ -14,10 +14,10 @@ sap.ui.define(
       },
 
       _onRouteMatched: async function () {
-        BusyIndicator.hide();
-        this.getBusyDialog();
-        var LoginFunction = await this.commonLoginFunction("Payroll");
+        var LoginFunction = await this.commonLoginFunction("A_Payroll");
         if (!LoginFunction) return;
+       
+        this.getBusyDialog();
         this.checkLoginModel();
         this._makeDatePickersReadOnly(["FST_id_MonthYearPicker"]);
         this.oLoginModel = this.getView().getModel("LoginModel");

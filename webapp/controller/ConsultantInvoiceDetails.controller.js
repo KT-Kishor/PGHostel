@@ -36,9 +36,9 @@ sap.ui.define(
                         this.UnitAmount = true;
                         this.getBusyDialog()
                         // if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
+                         // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel")
                         if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice", Action: "CC" });
-                        // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel")
-
+                       
                         var oInvoiceModel = new JSONModel({
                             EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",
                             InvoiceNo: "", InvoiceDate: "", ConsultantAddress: "", GSTNO: "",
@@ -81,7 +81,7 @@ sap.ui.define(
                             this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("Delete");
                         } else {
                             await this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID),
-                                await this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
+                            await this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
                             await this.setVisibilityForEdit();
                             await this.onFetchContractDetails();
                         }
@@ -1455,7 +1455,8 @@ sap.ui.define(
                         ("0" + (oDate.getMonth() + 1)).slice(-2),
                         oDate.getFullYear()
                     ].join("/");
-                    if (!oModel.attachments || oModel.attachments.length === 0) {
+                    var aAttachments = this.getView().getModel("UploaderData").getData().attachments;
+                    if (!aAttachments || aAttachments.length === 0) {
                         MessageToast.show(this.i18nModel.getText("attachmentRequired"));
                         return;
                     }

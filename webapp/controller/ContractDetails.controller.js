@@ -988,10 +988,11 @@ sap.ui.define([
             },
             Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("oFilteredContractModel").getData();
-                if (!oModel.attachments || oModel.attachments.length === 0) {
-                    MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
-                    return;
-                }
+               var aAttachments = this.getView().getModel("UploaderData").getData().attachments;
+                    if (!aAttachments || aAttachments.length === 0) {
+                        MessageToast.show(this.i18nModel.getText("attachmentRequired"));
+                        return;
+                    }
                 var oPayload = {
                     "EmployeeName": oModel.ConsultantName,
                     "toEmailID": oModel.ContarctEmail,

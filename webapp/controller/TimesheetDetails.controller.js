@@ -45,7 +45,7 @@ sap.ui.define([
                 await this.readCallTimesheet();
                 const oData = this.getView().getModel("newModel").getData();
 
-                const isSubmitted = oData.Status === "Submitted";
+                const isSubmitted = oData.Status === "Submitted" || oData.Status === "Approved";
                 oViewModel.setProperty("/isUpdate", !isSubmitted); // hide edit button if submitted
                 // oViewModel.setProperty("/isUpdate", true);
                 oViewModel.setProperty("/isCreate", false);

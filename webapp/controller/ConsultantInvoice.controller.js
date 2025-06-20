@@ -3,16 +3,16 @@ sap.ui.define(
         "./BaseController", //call base controller
         "sap/ui/model/json/JSONModel",
         "sap/m/MessageToast",
-          "../model/formatter",
+        "../model/formatter",
     ],
-    function (
-        BaseController, JSONModel, MessageToast,Formatter) {
+    function(
+        BaseController, JSONModel, MessageToast, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.ConsultantInvoice", {
-            onInit: function () {
+            onInit: function() {
                 this.getRouter().getRoute("RouteConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: async function () {
+            _onRouteMatched: async function() {
                 var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
                 if (!LoginFUnction) return;
                 // Get i18n resource bundle
@@ -20,11 +20,13 @@ sap.ui.define(
                 // Set header name in LoginModel
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("consultantInvoice"));
                 this._makeDatePickersReadOnly(["CI_id_DatePicker"]);
-                this.onClearAndSearch("CI_id_ConsultantInvoiceFilterBar");// Clear and search function
+                this.onClearAndSearch("CI_id_ConsultantInvoiceFilterBar"); // Clear and search function
                 this.ContractReadCall();
+                this.bDateRangeTriggered = false;
+
             },
 
-            ContractReadCall: async function () {
+            ContractReadCall: async function() {
                 try {
                     const oView = this.getView();
                     const userData = this.getOwnerComponent().getModel("LoginModel").getData();
@@ -48,11 +50,11 @@ sap.ui.define(
                     const currentYear = new Date().getFullYear();
                     let fyStart, fyEnd;
                     if (new Date().getMonth() >= 3) { // April or later
-                        fyStart = new Date(currentYear, 3, 1);   // April 1st
+                        fyStart = new Date(currentYear, 3, 1); // April 1st
                         fyEnd = new Date(currentYear + 1, 2, 31); // March 31st next year
                     } else {
                         fyStart = new Date(currentYear - 1, 3, 1); // April 1st last year
-                        fyEnd = new Date(currentYear, 2, 31);      // March 31st this year
+                        fyEnd = new Date(currentYear, 2, 31); // March 31st this year
                     }
 
                     const formatDate = (date) => date.toISOString().split("T")[0];
@@ -98,7 +100,7 @@ sap.ui.define(
                 }
             },
 
-            _createGroupHeader: function (oGroup) {
+            _createGroupHeader: function(oGroup) {
                 let sKey = oGroup.key;
                 const userData = this.getView().getModel("LoginModel").getData();
 
@@ -113,7 +115,7 @@ sap.ui.define(
                 });
             },
 
-            logindata: async function () {
+            logindata: async function() {
                 try {
                     await this.ajaxReadWithJQuery("AllLoginDetails", "EmpModel").then((data) => {
                         if (data.success) {
@@ -130,14 +132,14 @@ sap.ui.define(
                 }
             },
 
-            CI_onPressAddInvoice: function () {
+            CI_onPressAddInvoice: function() {
                 this.getRouter().navTo("RouteNavConsultantInvoiceApplication", {
                     sPath: "X",
                     oPath: "Y",
                 });
             },
 
-            CI_onPressInvoice: function (oEvent) {
+            CI_onPressInvoice: function(oEvent) {
                 var oBindingContext = oEvent.getSource().getBindingContext("ConsultantModel");
                 var oInvoiceNo = oBindingContext.getProperty("InvoiceNo");
                 var oEmployeeID = oBindingContext.getProperty("EmployeeID");
@@ -147,15 +149,15 @@ sap.ui.define(
                 });
             },
 
-            onPressback: function () {
+            onPressback: function() {
                 this.getRouter().navTo("RouteTilePage");
             },
 
-            onLogout: function () {
+            onLogout: function() {
                 this.getRouter().navTo("RouteLoginPage");
             },
 
-            CI_onClearFilters: function () {
+            CI_onClearFilters: function() {
                 const oFilterBar = this.getView().byId("CI_id_ConsultantInvoiceFilterBar");
                 oFilterBar.getFilterGroupItems().forEach((oItem) => {
                     const oControl = oItem.getControl();
@@ -169,17 +171,25 @@ sap.ui.define(
                 });
             },
 
-            CI_OnSearch: async function () {
+            CI_OnSearch: async function() {
                 try {
                     const oFilterBar = this.byId("CI_id_ConsultantInvoiceFilterBar");
                     const aFilterItems = oFilterBar.getFilterGroupItems();
                     const params = {};
 
+                    if (params.InvoiceStartDate && params.InvoiceEndDate) {
+                        this._filterInvoiceModelByDateRange(params.InvoiceStartDate, params.InvoiceEndDate);
+                    }
+
                     // Get user data
                     const userData = this.getOwnerComponent().getModel("LoginModel").getData();
 
                     // Get current financial year range
-                    const { fyStart, fyEnd, financialYearLabel } = this._getFinancialYearRange();
+                    const {
+                        fyStart,
+                        fyEnd,
+                        financialYearLabel
+                    } = this._getFinancialYearRange();
                     const formatDate = (date) => date.toISOString().split("T")[0];
 
                     let invoiceDateProvided = false;
@@ -193,7 +203,7 @@ sap.ui.define(
                             if (oControl.isA("sap.m.ComboBox")) {
                                 const selectedKey = oControl.getSelectedKey();
                                 const inputValue = oControl.getValue(); // Get the manually entered value
-                                
+
                                 if (sParamKey === "InvoiceNo") {
                                     if (selectedKey) {
                                         const [invoiceNo, employeeId] = selectedKey.split("|");
@@ -211,8 +221,7 @@ sap.ui.define(
                                         params[sParamKey] = inputValue;
                                     }
                                 }
-                            }
-                            else if (oControl.isA("sap.m.DateRangeSelection")) {
+                            } else if (oControl.isA("sap.m.DateRangeSelection")) {
                                 const value = oControl.getValue();
                                 if (value && value.includes("-")) {
                                     const [start, end] = value.split("-").map(date =>
@@ -222,8 +231,7 @@ sap.ui.define(
                                     params["InvoiceEndDate"] = end;
                                     invoiceDateProvided = true;
                                 }
-                            }
-                            else if (oControl.getValue && oControl.getValue()) {
+                            } else if (oControl.getValue && oControl.getValue()) {
                                 params[sParamKey] = oControl.getValue();
                             }
                         }
@@ -262,7 +270,21 @@ sap.ui.define(
                     if (oData && Array.isArray(oData.data)) {
                         const oModel = new sap.ui.model.json.JSONModel(oData.data);
                         this.getView().setModel(oModel, "ConsultantModel");
+                        if (this.bDateRangeTriggered) {
+                            const filteredData = oData.data.filter(item => {
+                                const itemDate = new Date(item.InvoiceDate);
+                                const start = new Date(this.dateRangeStart);
+                                const end = new Date(this.dateRangeEnd);
+                                return itemDate >= start && itemDate <= end;
+                            });
+
+                            const oInvoiceModel = new sap.ui.model.json.JSONModel(filteredData);
+                            this.getView().setModel(oInvoiceModel, "InvoiceModel");
+                            oInvoiceModel.refresh(true);
+                            this.bDateRangeTriggered = false; // reset flag
+                        }
                     }
+                    this.closeBusyDialog();
                 } catch (error) {
                     sap.m.MessageToast.show(error.message || error.responseText || this.i18nModel.getText("technicalError"));
                 } finally {
@@ -271,7 +293,7 @@ sap.ui.define(
             },
 
             // Helper function to get financial year range
-            _getFinancialYearRange: function () {
+            _getFinancialYearRange: function() {
                 const today = new Date();
                 const currentYear = today.getFullYear();
                 const currentMonth = today.getMonth(); // 0 = Jan, 3 = April
@@ -288,9 +310,66 @@ sap.ui.define(
                     financialYearLabel = `${currentYear - 1}-${currentYear}`;
                 }
 
-                return { fyStart, fyEnd, financialYearLabel };
-            }
+                return {
+                    fyStart,
+                    fyEnd,
+                    financialYearLabel
+                };
+            },
+
+            onDateRangeChange: function(oEvent) {
+                try {
+                    const oDateRange = oEvent.getSource();
+                    const value = oDateRange.getValue();
+
+                    if (value && value.includes("-")) {
+                        const [start, end] = value.split("-").map(date =>
+                            date.trim().split("/").reverse().join("-")
+                        );
+
+                        this.dateRangeStart = start;
+                        this.dateRangeEnd = end;
+                        this.bDateRangeTriggered = true;
+
+                        const oComboBox = this.byId("CI_id_InvoiceNo");
+                        if (oComboBox) {
+                            oComboBox.setSelectedKey("");
+                            oComboBox.setValue("");
+                        }
+
+                        this.CI_OnSearch();
+                    }
+                } catch (error) {
+                    MessageToast.show(error.message || error.responseText);
+                }
+            },
+
+
+            _filterInvoiceModelByDateRange: function(startDate, endDate) {
+                const oConsultantModel = this.getView().getModel("ConsultantModel");
+                const oInvoiceModel = this.getView().getModel("InvoiceModel");
+
+                if (!oConsultantModel || !oInvoiceModel) return;
+
+                // Get all data from ConsultantModel
+                const aAllData = oConsultantModel.getData();
+
+                if (!Array.isArray(aAllData)) return;
+
+                // Filter data by date range
+                const aFilteredData = aAllData.filter(item => {
+                    const itemDate = new Date(item.InvoiceDate);
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+
+                    return itemDate >= start && itemDate <= end;
+                });
+
+                // Update InvoiceModel with filtered data
+                oInvoiceModel.setData(aFilteredData);
+                oInvoiceModel.refresh(true);
+            },
         })
     }
-    
+
 )

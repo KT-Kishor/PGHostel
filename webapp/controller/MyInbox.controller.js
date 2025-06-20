@@ -16,9 +16,12 @@ sap.ui.define([
     _onRouteMatched: async function (OEvent) {
       var LoginFUnction = await this.commonLoginFunction("MyInbox");
       if (!LoginFUnction) return;
+      const oView = this.getView();
+      ["MI_id_ButReSend", "MI_id_ButApprove", "MI_id_ButReject", "MI_id_ButPaid"].forEach(id => {
+        oView.byId(id).setVisible(false);
+      });
       this.getView().getModel("PaySlip").setProperty("/isRouteLOP", false);
       const sParams = OEvent.getParameter("arguments").sMyInBox;
-      const oView = this.getView();
       const oLoginModel = oView.getModel("LoginModel");
       const oLoginData = oLoginModel.getData();
       this.oLoginModel = oLoginData;
@@ -46,16 +49,18 @@ sap.ui.define([
       if (isAccountMgr) {
         oComponent.getModel("MyInbox").setData([
           { ID: 1, StatusName: "Send to account" },
-          { ID: 2, StatusName: "Paid" }
+          { ID: 2, StatusName: "Paid" },
+          { ID: 3, StatusName: "Submitted" },
         ]);
       }
 
-      const response = await this.ajaxReadWithJQuery("InboxDetails", isAccountMgr ? { Status: "Send to account" } : { ManagerID: this.idEmp });
+      const response = await this.ajaxReadWithJQuery("InboxDetails", isAccountMgr ? "" : { ManagerID: this.idEmp });
+      this.closeBusyDialog();
       if (response.data?.length) {
         const empData = [...new Map(response.data.filter(item => item.EmpID?.trim()).map(item => [item.EmpID.trim(), item])).values()];
         oView.setModel(new JSONModel(empData), "oModelEmp");
       }
-      this.closeBusyDialog();
+      if(isAccountMgr){ this.commonFilterFunction("MI_id_EmpIDFilter");}
     },
 
     MI_onPressLOPData: function () {
@@ -114,29 +119,51 @@ sap.ui.define([
         if (this.oLoginModel.Role !== "Account Manager" && this.oLoginModel.Role !== "Account Consultant") params["ManagerID"] = this.idEmp;
         else {
           var status = !params.hasOwnProperty("Status");
-          // if (!params.hasOwnProperty("Status")) {
-          //   params["Status"] = "Send to account";
-          // }
+          if (!status && params.Status === "Submitted") {
+            params["ManagerID"] = this.idEmp;
+          } 
         }
         await this._fetchCommonData("InboxDetails", "MyInboxModelData", params);
+        this.closeBusyDialog();
         if (status && (this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant")) {
-          var aFilters = [
-            new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Paid"),
-            new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Send to account")
-          ];
-          var oCombinedFilter = new sap.ui.model.Filter(aFilters, false); // 'false' means OR logic
-          var oTable = this.byId("MI_id_MyInboxTable");
-          oTable.getBinding("items").filter(oCombinedFilter);
-
+            this.commonFilterFunction("MI_id_MyInboxTable");  
         }
         this.onBeforeShow();
-        this.closeBusyDialog();
       } catch (error) {
         this.closeBusyDialog();
         sap.m.MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
       }
     },
+   commonFilterFunction(ID) {
+       // OR group: Status = 'Paid' OR Status = 'Send to account'
+        var oPaidOrSendFilter = new sap.ui.model.Filter({
+          filters: [
+            new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Paid"),
+            new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Send to account")
+          ],
+          and: false // OR logic
+        });
 
+        // AND group: Status = 'Submitted' AND ManagerID = this.idEmp
+        var oSubmittedAndManagerFilter = new sap.ui.model.Filter({
+          filters: [
+            new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, "Submitted"),
+            new sap.ui.model.Filter("ManagerID", sap.ui.model.FilterOperator.EQ, this.idEmp)
+          ],
+          and: true // AND logic
+        });
+
+        // Final OR: (Paid OR Send) OR (Submitted AND Manager)
+        var finalFilter = new sap.ui.model.Filter({
+          filters: [oPaidOrSendFilter, oSubmittedAndManagerFilter],
+          and: false // final OR logic
+        });
+
+
+        var oCombinedFilter = new sap.ui.model.Filter(finalFilter, false); // 'false' means OR logic
+        var oTable = this.byId(ID);
+        oTable.getBinding("items").filter(oCombinedFilter); 
+   },
     MI_onClearEmployeeDetails() {
       ["EmpID", "Type", "SubmittedDate", "Status"].forEach(id =>
         this.byId(`MI_id_${id}Filter`).setValue("")
@@ -187,9 +214,9 @@ sap.ui.define([
       const isAccountant = role === "Account Manager" || role === "Account Consultant";
       const isExpense = Type === "Expense";
 
-      this.byId("MI_id_ButApprove").setVisible(isSubmitted && !isAccountant);
-      this.byId("MI_id_ButReject").setVisible(isSubmitted && !isAccountant);
-      this.byId("MI_id_ButReSend").setVisible((isExpense && isSubmitted && !isAccountant) || (isAccountant && Status === "Send to account"));
+      this.byId("MI_id_ButApprove").setVisible(isSubmitted);
+      this.byId("MI_id_ButReject").setVisible(isSubmitted);
+      this.byId("MI_id_ButReSend").setVisible((isExpense && isSubmitted) || (isAccountant && Status === "Send to account"));
       this.byId("MI_id_ButPaid").setVisible(isAccountant && Status === "Send to account");
     },
 
@@ -259,7 +286,8 @@ sap.ui.define([
       oModelData.Status = statusValue;
       oModelData.NoofDays = String(oModelData.NoofDays);
       if (this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant") {
-        oModelData.AccountRemark = remark;
+        oModelData.AccountRemark = remark
+        if(statusValue !== "Send to account" || statusValue !== "Paid")oModelData.ManagerComment = remark;
         oModelData.AccountName = this.oLoginModel.EmployeeName;
       } else {
         oModelData.ManagerComment = remark;

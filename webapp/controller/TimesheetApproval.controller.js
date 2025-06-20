@@ -131,6 +131,7 @@ sap.ui.define([
         MTF_onPressOk: async function () {
             const oTable = this.byId("TSA_id_Table");
             const oSelectedItems = oTable.getSelectedItems();
+            const sRemark = sap.ui.getCore().byId("MIF_id_remark").getValue();
             if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MIF_id_remark"), "ID")) {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
@@ -139,27 +140,34 @@ sap.ui.define([
                 const srNo = item.getBindingContext("ApprovalTimesheetModel").getProperty("SrNo");
                 return {
                     filters: { SrNo: srNo },
-                    data: { Status: this._approvalStatus, ManagerRemark: sRemark }
+                    data: {
+                        Status: this._approvalStatus,
+                        // Comments: sRemark
+                    }
                 };
             });
+            const finalPayload = {
+                tableName: "Timesheet",
+                data: aPayload
+            };
 
             this.getBusyDialog();
             try {
-                await this.ajaxUpdateWithJQuery("Timesheet", aPayload);
+                await this.ajaxUpdateWithJQuery("Timesheet", finalPayload);
                 MessageToast.show(
                     this._approvalStatus === "Approved"
                         ? this.i18nModel.getText("approvedSuccess")
                         : this.i18nModel.getText("rejectedSuccess")
                 );
                 this._oManagerRemarkDialog.close();
-                this._onRouteMatched(); // Refresh data
+                this._onRouteMatched(); // Refresh table
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
             } finally {
                 this.closeBusyDialog();
             }
         },
-        
+
         MIF_onPressClose: function () {
             if (this._oManagerRemarkDialog) {
                 this._oManagerRemarkDialog.close();

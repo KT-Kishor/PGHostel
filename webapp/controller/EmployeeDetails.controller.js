@@ -13,11 +13,13 @@ sap.ui.define([
                     if (!LoginFunction) return;
 
                     this.getBusyDialog();
-                    if (oEvent.getParameter("arguments").sPath === 'EmployeeDetails') this.onClearEmployeeDetails();
+                    if (oEvent.getParameter("arguments").sPath === 'EmployeeDetails') {
+                        this.onClearEmployeeDetails(); // this will now work as expected
+                    }
                     this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                     this.getView().getModel("LoginModel").setProperty("/HeaderName", "Employee Details");
-                   // common role get call
-                   // this.CommonReadCall();
+                    // common role get call
+                    // this.CommonReadCall();
                     this.Emp_det_onSearch();
                     this.closeBusyDialog();
                 } catch (error) {
@@ -28,7 +30,7 @@ sap.ui.define([
 
             Emp_det_onSearch: async function () {
                 try {
-                    this.getBusyDialog();
+                      this.getBusyDialog();
                     const aFilterItems = this.byId("ED_id_FilterBar").getFilterGroupItems();
                     if(this.getView().getModel("LoginModel").getProperty("/Role") === "Admin") {
                         var params = {}; // Initialize with empty object for Admin
@@ -78,12 +80,21 @@ sap.ui.define([
             },
 
             onClearEmployeeDetails: function () {
-                this.byId("ED_id_EmpIDFilter").setValue("");
-                this.byId("ED_id_ManagerFilter").setValue("");
-                this.byId("ED_id_Status").setValue("");
-               // this.byId("ED_id_TypeFilter").setValue("");
-                this.byId("ED_id_RoleFilter").setValue("");
-                this.byId("ED_id_BaseLFilter").setValue("");
+                var aFilterItems = this.byId("ED_id_FilterBar").getFilterGroupItems();
+                aFilterItems.forEach(function (oItem) {
+                    var oControl = oItem.getControl(); // Get the associated control
+                    if (oControl) {
+                        if (oControl.setValue) {
+                            oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
+                        }
+                        if (oControl.setSelectedKey) {
+                            oControl.setSelectedKey(""); // Reset selection for dropdowns
+                        }
+                        if (oControl.setSelected) {
+                            oControl.setSelected(false); // Reset selection for Checkboxes
+                        }
+                    }
+                });
             },
 
             CommonReadCall: async function () {
@@ -102,9 +113,9 @@ sap.ui.define([
                 var EmployeeID = oEvent.getSource().getBindingContext("sEmployeeDetails").getProperty("EmployeeID");
                 var EmployeeRole = oEvent.getSource().getBindingContext("sEmployeeDetails").getProperty("Role");
                 this.getRouter().navTo("SelfService", {
-                     sPath: EmployeeID,
-                        Role: EmployeeRole
-                     });
+                    sPath: EmployeeID,
+                    Role: EmployeeRole
+                });
             }
 
 

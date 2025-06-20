@@ -26,7 +26,7 @@
 			</f:content>
 		</f:SimpleForm>
 		<beginButton>
-			<Button id="MIF_id_OkBtn" press="MTF_onPressOk" text=""/>
+			<Button type="Emphasized" id="MIF_id_OkBtn" press="MTF_onPressOk" text=""/>
 		</beginButton>
 		<endButton>
 			<Button text="{i18n>close}" type="Reject" press="MIF_onPressClose" />

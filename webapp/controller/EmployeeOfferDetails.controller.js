@@ -594,7 +594,8 @@ sap.ui.define([
                 }
                 else {
                     oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond year(s)");
-                    oPDFModel.setProperty("/BondCondition2", "any training costs and ");
+                    if(oEmpModel.EmploymentBond == "1") oPDFModel.setProperty("/BondCondition2", "any training costs and during 18 employment months, ");
+                    else oPDFModel.setProperty("/BondCondition2", "any training costs and ");
                 }
                 oPDFModel.setProperty("/YearlyComponents/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Total));
                 oPDFModel.setProperty("/YearlyComponents/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.BasicSalary));
