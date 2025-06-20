@@ -13,7 +13,7 @@ sap.ui.define([
       this.getRouter().getRoute("RouteMyInbox").attachMatched(this._onRouteMatched, this);
     },
 
-    _onRouteMatched: async function (OEvent) {
+  _onRouteMatched: async function (OEvent) {
       var LoginFUnction = await this.commonLoginFunction("MyInbox");
       if (!LoginFUnction) return;
       const oView = this.getView();
@@ -26,7 +26,7 @@ sap.ui.define([
       const oLoginData = oLoginModel.getData();
       this.oLoginModel = oLoginData;
       const oComponent = this.getOwnerComponent();
-      const isAccountMgr = oLoginData.Role === "Account Manager" || oLoginData.Role === "Account Consultant";
+      this._isAccountant = ["Account Manager", "Account Consultant"].includes(oLoginData.Role);
       this.getBusyDialog();
       this.sParams = sParams;
       oView.setModel(new JSONModel([{ type: "Leave" }, { type: "Expense" }, { type: "Resignation" }]), "oTypeModel");
@@ -34,8 +34,8 @@ sap.ui.define([
       this.i18nModel = oView.getModel("i18n").getResourceBundle;
       this.idEmp = oLoginData.EmployeeID;
 
-      const statusFilter = isAccountMgr ? "Send to account" : "Submitted";
-      const filter = isAccountMgr ? { Status: statusFilter } : { ManagerID: this.idEmp, Status: statusFilter };
+      const statusFilter = this._isAccountant ? "Send to account" : "Submitted";
+      const filter = this._isAccountant ? { Status: statusFilter } : { ManagerID: this.idEmp, Status: statusFilter };
 
       if (sParams === "MyInboxView") {
         this.MI_onClearEmployeeDetails();
@@ -45,8 +45,8 @@ sap.ui.define([
         this.MI_onSearch();
       }
 
-      oView.byId("MI_id_LOPDetBut").setVisible(isAccountMgr);
-      if (isAccountMgr) {
+      oView.byId("MI_id_LOPDetBut").setVisible(this._isAccountant);
+      if (this._isAccountant) {
         oComponent.getModel("MyInbox").setData([
           { ID: 1, StatusName: "Send to account" },
           { ID: 2, StatusName: "Paid" },
@@ -54,21 +54,25 @@ sap.ui.define([
         ]);
       }
 
-      const response = await this.ajaxReadWithJQuery("InboxDetails", isAccountMgr ? "" : { ManagerID: this.idEmp });
+      const response = await this.ajaxReadWithJQuery("InboxDetails", this._isAccountant ? "" : { ManagerID: this.idEmp });
       this.closeBusyDialog();
       if (response.data?.length) {
         const empData = [...new Map(response.data.filter(item => item.EmpID?.trim()).map(item => [item.EmpID.trim(), item])).values()];
         oView.setModel(new JSONModel(empData), "oModelEmp");
       }
-      if(isAccountMgr){ this.commonFilterFunction("MI_id_EmpIDFilter");}
+      if(this._isAccountant){ this.commonFilterFunction("MI_id_EmpIDFilter");}
     },
-
     MI_onPressLOPData: function () {
       //const oData = this.byId("MI_id_MyInboxTable").getSelectedItem().getBindingContext("MyInboxModelData").getObject();
       this.getRouter().navTo("RouteLOPDetails");
     },
     onPressback() {
       this.getRouter().navTo("RouteTilePage");
+      if( this.oDiaReg) {
+        this.oDiaReg.close();
+        this.oDiaReg.destroy();
+        this.oDiaReg = null;
+      }
     },
 
     onLogout() {
@@ -90,7 +94,7 @@ sap.ui.define([
       this.functionToOpenDialog(actionText, i18n.getText(dialogTexts[actionText]));
     },
 
-    MI_onSearch: async function () {
+     MI_onSearch: async function () {
       try {
         this.getBusyDialog();
         const filterItems = this.byId("MI_id_FilterBar").getFilterGroupItems();
@@ -109,14 +113,14 @@ sap.ui.define([
               params["SubStartDate"] = oDateFormat.format(startDate);
               params["SubEndDate"] = oDateFormat.format(endDate);
             } else if (sKey === "Type" && oControl.getSelectedKeys().length > 0) {
-              params[sKey] = oControl.getSelectedKeys()[0]; // assuming single selection
+              params[sKey] = oControl.getSelectedKeys()[0];
             } else if (sValue) {
               params[sKey] = sValue;
             }
           }
         });
 
-        if (this.oLoginModel.Role !== "Account Manager" && this.oLoginModel.Role !== "Account Consultant") params["ManagerID"] = this.idEmp;
+        if (!this._isAccountant) params["ManagerID"] = this.idEmp;
         else {
           var status = !params.hasOwnProperty("Status");
           if (!status && params.Status === "Submitted") {
@@ -125,7 +129,7 @@ sap.ui.define([
         }
         await this._fetchCommonData("InboxDetails", "MyInboxModelData", params);
         this.closeBusyDialog();
-        if (status && (this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant")) {
+        if (status && this._isAccountant) {
             this.commonFilterFunction("MI_id_MyInboxTable");  
         }
         this.onBeforeShow();
@@ -197,8 +201,7 @@ sap.ui.define([
     valueSetFunction(text, oDialogTitle) {
       sap.ui.getCore().byId("MIF_id_OkBtn").setText(text);
       const i18n = this.getView().getModel("i18n").getResourceBundle();
-      var isAccount = this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant"
-      var oValue = isAccount ? i18n.getText("accountRemarksLeave") : i18n.getText("managerRemarksLeave");
+      var oValue = this._isAccountant && this.oModelData.Status !== "Submitted" ? i18n.getText("accountRemarksLeave") : i18n.getText("managerRemarksLeave");
       sap.ui.getCore().byId("MIF_id_RemarkLabel").setText(oValue);
       sap.ui.getCore().byId("MIF_id_remark").setValue("");
       sap.ui.getCore().byId("MIF_id_DialogManRemark").setTitle(oDialogTitle);
@@ -207,22 +210,17 @@ sap.ui.define([
 
     onSelectionChangeStatus() {
       this.oModelData = this.byId("MI_id_MyInboxTable").getSelectedItem().getBindingContext("MyInboxModelData").getObject();
-      const role = this.oLoginModel.Role;
       const { Status, Type } = this.oModelData;
-
       const isSubmitted = Status === "Submitted";
-      const isAccountant = role === "Account Manager" || role === "Account Consultant";
       const isExpense = Type === "Expense";
-
       this.byId("MI_id_ButApprove").setVisible(isSubmitted);
       this.byId("MI_id_ButReject").setVisible(isSubmitted);
-      this.byId("MI_id_ButReSend").setVisible((isExpense && isSubmitted) || (isAccountant && Status === "Send to account"));
-      this.byId("MI_id_ButPaid").setVisible(isAccountant && Status === "Send to account");
+      this.byId("MI_id_ButReSend").setVisible((isExpense && isSubmitted) || (this._isAccountant && Status === "Send to account"));
+      this.byId("MI_id_ButPaid").setVisible(this._isAccountant && Status === "Send to account");
     },
 
-    MI_onPressColNavigation(oEvent) {
+    MI_onPressColNavigation:async function(oEvent) {
       const oData = oEvent.getSource().getBindingContext("MyInboxModelData").getObject();
-
       if (oData.Type === "Expense") {
         this.getRouter().navTo("RouteExpensDetails", {
           sPath: oData.ID + "|MyInbox"
@@ -230,10 +228,53 @@ sap.ui.define([
       } else if (oData.Type === "Leave") {
         this.getRouter().navTo("RouteDetailLeave", { sLeaveID: oData.ID });
       } else {
-        this.getRouter().navTo("SelfService", { sPath: oData.EmpID, Role: "MyInboxResignation" });
+        this.getBusyDialog();
+        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: oData.EmpID });
+        const oView = this.getView();
+        if (!this.oDiaReg) {
+        sap.ui.core.Fragment.load({
+          name: "sap.kt.com.minihrsolution.fragment.Resignation",
+          controller: this
+        }).then(oDiaReg => {
+          this.oDiaReg = oDiaReg;
+          oView.addDependent(oDiaReg);
+          oDiaReg.open();
+          this.functionToOpenResignationDialog();
+        });
+        } else {
+        this.oDiaReg.open();
+        this.functionToOpenResignationDialog();
+        }
       }
     },
-
+    functionToOpenResignationDialog:function() {
+     var oData = this.getView().getModel("sEmployeeModel").getData()[0];
+      var empName = oData.Salutation + " " + oData.EmployeeName;
+      var joinDate = Formatter.formatDate(oData.JoiningDate);
+      var startDate = Formatter.formatDate(oData.ResignationStartDate);
+      var endDate = Formatter.formatDate(oData.ResignationEndDate);
+      this.companyName = "Kalpavriksha Technologies";
+                var data = `
+                <div style="text-align: justify;">
+                    <p>Dear <b>${oData.ManagerName}</b>,</p>  
+                    <p>I hope this message finds you well.</p>
+                    <p>I <b>${empName}</b> writing to formally resign from my position as <b>${oData.Designation}</b> at <b>${this.companyName}</b>, effective <b>${startDate}</b>. My last working day will be <b>${endDate}</b>.</p>
+                    <p>I joined this organization on <b>${joinDate}</b>, and it has been an incredibly rewarding journey filled with learning, professional growth, and meaningful relationships. I want to sincerely thank you for your guidance and support throughout my tenure.</p>
+                    <p>The reason of resignation is as follows:</p>
+                    <p>${oData.ResignComment}</p>                   
+         <p>I will do my best during this transition period to ensure a smooth handover of my responsibilities. Please let me know how I can help during this time.</p>
+        <p>Thanks & Best Regards,<br/>
+        ${empName}<br/>
+        ${oData.Designation}<br/>
+        ${this.companyName}</p>
+    </div>`;
+      this.closeBusyDialog();
+      this.getView().setModel(new JSONModel({"RTEText":data}),"PDFData");
+      this.getView().setModel(new JSONModel({"CanWithdrawResignation":false,"editableResignatin":false,"BtnVisible":false}), "viewModel");
+    },
+    RF_onPressCloseDialog:function() {
+      this.oDiaReg.close(); 
+    },
     MTF_onPressOk() {
       const btnText = sap.ui.getCore().byId("MIF_id_OkBtn").getText();
       const i18n = this.getView().getModel("i18n").getResourceBundle();
@@ -241,7 +282,7 @@ sap.ui.define([
       const mapStatus = {
         "Approve": this.oModelData.Type === "Expense" ? "Send to account" : "Approved",
         "Reject": "Rejected",
-        "Send Back": this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant" ? "Send back by account" : "Send back by manager",
+        "Send Back": this._isAccountant && this.oModelData.Status !== "Submitted" ? "Send back by account" : "Send back by manager",
         "Paid": "Paid"
       };
 
@@ -285,7 +326,7 @@ sap.ui.define([
       const remark = sap.ui.getCore().byId("MIF_id_remark").getValue();
       oModelData.Status = statusValue;
       oModelData.NoofDays = String(oModelData.NoofDays);
-      if (this.oLoginModel.Role === "Account Manager" || this.oLoginModel.Role === "Account Consultant") {
+      if (this._isAccountant) {
         oModelData.AccountRemark = remark
         if(statusValue !== "Send to account" || statusValue !== "Paid")oModelData.ManagerComment = remark;
         oModelData.AccountName = this.oLoginModel.EmployeeName;

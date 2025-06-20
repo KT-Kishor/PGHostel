@@ -127,13 +127,6 @@
                 type="Reject"
                 class="submit"
             />
-            <Button
-                visible="{viewModel>/backButtonVisible}"
-                text="{i18n>back}"
-                press="RF_onPressbackButton"
-                type="Emphasized"
-                class="submit"
-            />
         </FlexBox>   
     </Dialog>
 </core:FragmentDefinition>

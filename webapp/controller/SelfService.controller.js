@@ -40,13 +40,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.sNavigatedRole = oEvent.getParameter("arguments").Role; // Role from navigation
                     this.sPath = oEvent.getParameter('arguments').sPath;
                     // sections if role is "Trainee" from either login or navigation
-                    if (this.sNavigatedRole === "MyInboxResignation") {
-                        this.sFlag = true
-                        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
-                            EmployeeID: this.sPath
-                        });
-                        this.onApplyResignation();
-                    } else {
                         var bHideSalarySection = sLoggedInRole === "Trainee" || this.sNavigatedRole === "Trainee";
                         this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
 
@@ -155,7 +148,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.byId("SS_id_STDCodeRII").setValueState("None");
                         this.byId("SS_id_FatherName").setValueState("None");
                         this.byId("SS_id_Compmail").setValueState("None");
-                    }
+
                 } catch (error) { } finally {
                     this.closeBusyDialog();
                 }
@@ -845,11 +838,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 } else {
                     if (this.sPath === "SelfService") {
                         this.getRouter().navTo("RouteTilePage");
-                    } else if (this.sFlag === true) {
-                        this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInbox" });
                     } else {
                         this.getRouter().navTo("RouteEmployeeDetails", { sPath: "SelfService" });
                     }
+                }
+                if (this["SSReg_oDialog"]) {
+                    this["SSReg_oDialog"].close();
+                    this["SSReg_oDialog"].destroy();
+                    this["SSReg_oDialog"] = null;
                 }
             },
             onLogout: function () {
@@ -2244,21 +2240,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                     oData = oModel.getProperty("/0");
                 }
-                if (oData.ResignationStartDate && oData.ResignationEndDate && oData.ResignComment) {
-                    if (this.sFlag) {
-                        this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
-                        this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
-                        this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
-                        this.getView().getModel("viewModel").setProperty("/closeButtonVisible", false)
-                        this.getView().getModel("viewModel").setProperty("/backButtonVisible", true)
-                    } else {
-                        this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
-                        this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
-                        this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
-                        this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
-                        this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
-                    }
-
+                if (oData && oData.ResignationStartDate && oData.ResignationEndDate && oData.ResignComment) {
+                    this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
+                    this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
+                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
+                    this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
+                    this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
                     this._onPressPreview("Initial");
                 } else {
                     this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
@@ -2266,11 +2253,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getView().getModel("viewModel").setProperty("/BtnVisible", true);
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
                     this.getView().getModel("viewModel").setProperty("/editableResignatin", true)
-                }
-            },
-            RF_onPressbackButton: function () {
-                if (this.sFlag) {
-                    this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInbox" });
                 }
             },
             RF_onPressCloseDialog: function () {
