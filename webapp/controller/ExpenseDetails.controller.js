@@ -93,7 +93,7 @@ sap.ui.define([
                 }
             },
 
-             onLogout: function () {
+            onLogout: function () {
                 this.CommonLogoutFunction();
             },
 
@@ -200,7 +200,7 @@ sap.ui.define([
                 this.ViewModel.setProperty("/SubmitBtn", false);
                 this.ViewModel.setProperty("/SaveBtn", true);
                 this.openFragment();
-                if (this.SelectedData.ItemType === "Peridiem Declaration") {
+                if (this.SelectedData.ItemType === "Perdiem Declaration") {
                     this.ViewModel.setProperty("/enable", false);
                 } else {
                     this.ViewModel.setProperty("/enableDelete", true);
@@ -432,7 +432,7 @@ sap.ui.define([
             Exp_Frg_onItemTypeChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 var oText = oEvent.getSource().getSelectedItem().getText();
-                if (oText === "Peridiem Declaration") {
+                if (oText === "Perdiem Declaration") {
                     this.ViewModel.setProperty("/enable", false);
                     this.getView().getModel("ExpenseCreateModel").getData().ExpenseAmount = 0;
                     this.getView().getModel("ExpenseCreateModel").getData().ModeOfPayment = "Company";
@@ -513,7 +513,7 @@ sap.ui.define([
             async Exp_Det_onPressSubmit() {
                 var oModel = this.getView().getModel("ExpenseCreateModel").getData();
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
-                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Peridiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
+                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
                     // ❗ Attachment validation
 
                     var Attachment = this.getView().getModel("tokenModel").getData();
@@ -567,7 +567,24 @@ sap.ui.define([
                 var oModel = this.getView().getModel("ExpenseCreateModel").getData();
                 var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
-                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
+                if (
+                    utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") &&
+                    (
+                        oModel.ItemType === "Perdiem Declaration"
+                            ? true
+                            : (
+                                utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") &&
+                                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") &&
+                                (
+                                    oModel.Currency !== "INR"
+                                        ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID")
+                                        : true
+                                )
+                            )
+                    )
+                ) {
+
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var Attachment = this.getView().getModel("tokenModel").getData();
                     if (!Attachment.tokens.length > 0) {
@@ -675,7 +692,7 @@ sap.ui.define([
 
                 if (oModelData.TravelAllowance === "YES") {
                     var hasPerDiemDeclaration = itemExpenses.some(function (item) {
-                        return item.ItemType === "Peridiem Declaration";
+                        return item.ItemType === "Perdiem Declaration";
                     });
 
                     if (!hasPerDiemDeclaration) {

@@ -102,7 +102,7 @@
 					<Button id="MI_id_ButApprove" text="{i18n>approve}" press="MI_onPressButtons" type="Accept" visible="false"/>
 					<Button id="MI_id_ButReject" text="{i18n>reject}" press="MI_onPressButtons" type="Reject" visible="false"/>
 					<Button id="MI_id_ButReSend" text="{i18n>resend}" press="MI_onPressButtons" type="Emphasized" visible="false"/>
-					<Button id="MI_id_ButPaid" text="{i18n>paid}" press="MI_onPressButtons" type="Success" visible="false"/>
+					<Button id="MI_id_ButPaid" text="{i18n>paid}" press="MI_onPressButtons" type="Accept" visible="false"/>
 				</contentRight>
 			</Bar>
 		</footer>
