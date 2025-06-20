@@ -2360,6 +2360,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 return;
                             }
                             var oEmployeeModel = that.getView().getModel("sEmployeeModel").getData()[0];
+                            oEmployeeModel.ResignationStartDate = sap.ui.getCore().byId("RF_id_StartDate").getValue()
+                            oEmployeeModel.ResignationEndDate = sap.ui.getCore().byId("RF_id_EndDate").getValue()
+                            oEmployeeModel.resignComment = sap.ui.getCore().byId("RF_id_ResignReason").getValue()
                             var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
                             var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue().split("/").reverse().join("-");
                             var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue().split("/").reverse().join("-");
