@@ -743,7 +743,10 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.text(oModel.ClientCompanyAddress, margin, clientNameY + 6, clientAlignment);
             let clientPANY = doc.getTextDimensions(oModel.ClientCompanyAddress, clientAlignment).h + clientNameY + 8;
             doc.text("PAN: " + oModel.ClientCompanyPAN, margin, clientPANY);
-            if (oModel.GSTIN !== "") doc.text("GSTIN: " + oModel.GSTIN, margin, clientPANY + 6);
+            if (oModel.GSTIN !== ""){
+                clientPANY += 6; // Add space for GSTIN if it exists
+                doc.text("GSTIN: " + oModel.GSTIN, margin, clientPANY);
+            } 
 
             doc.setFont("times", "bold");
             let poDetaisX = pageWidth - margin - 50;
@@ -760,7 +763,8 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.text(`: ${oModel.POTo}`, poDetaisX + 22, poDetailsY + 18);
             doc.text(`: ${oModel.PODate}`, poDetaisX + 22, poDetailsY + 24);
 
-            let tableY = poDetailsY + 40;
+            let tableY = poDetailsY + 33;
+            if(clientPANY > tableY - 5) tableY = clientPANY + 5; // Ensure table starts below client details
 
             doc.autoTable({
                 startY: tableY,
@@ -879,10 +883,9 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.setGState(new doc.GState({ opacity: 1 }));
             footerDesign();
             doc.addPage();
-            footerDesign();
-            doc.setFont("times", "bold").setFontSize(12);
-            noteY = topMargin + 5;
-            let rteY = pageHeight + topMargin + 8;
+            doc.setFont("times", "bold").setFontSize(14);
+            noteY = topMargin + 6;
+            let rteY = pageHeight + topMargin + 7;
             doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 127, 8, 63, 14.5);
 
             doc.text("Terms and Conditions", pageMiddle, noteY, { maxWidth: 100, align: "center" });
@@ -895,7 +898,8 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                     doc.setGState(new doc.GState({ opacity: 1 }));
                     doc.setFont("times", "bold").setFontSize(11);
-                    let forCoNameY = rteY - pageHeight + 60;
+                    const endYmm = findHtmlEndYmm(doc);
+                    let forCoNameY = rteY - pageHeight + 30 + (256 - endYmm);
                     doc.text(`For ${oCompanyModel.companyName}`, margin, forCoNameY);
                     doc.text("By:", margin, forCoNameY + 5);
 
@@ -905,15 +909,17 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     doc.setFont("times", "normal");
                     let headofCoRoleY = headofCoNameY + 5;
                     doc.text(oCompanyModel.designation, margin, headofCoRoleY);
-                    doc.text(oModel.AgreementDate, margin, headofCoRoleY + 5);
+                    doc.text(oModel.PODate, margin, headofCoRoleY + 5);
 
                     doc.setFont("times", "bold");
                     doc.text(`For ${oModel.ClientCompanyName}`, pageMiddle + 10, forCoNameY);
+                    doc.text("By:", pageMiddle + 10, forCoNameY + 5);
                     doc.text(oModel.ClientName, pageMiddle + 10, headofCoNameY);
 
                     doc.setFont("times", "normal");
                     doc.text(oModel.ClientRole, pageMiddle + 10, headofCoRoleY);
-                    doc.text(oModel.AgreementDate, pageMiddle + 10, headofCoRoleY + 5);
+                    doc.text(oModel.PODate, pageMiddle + 10, headofCoRoleY + 5);
+                    footerDesign();
                     doc.save("PO.pdf");
                     that.closeBusyDialog();
                     document.body.removeChild(container);
@@ -944,6 +950,38 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.text(lutNo, lutX, bottomLimit + 22);
                 doc.setTextColor(0, 0, 0);
             }
+
+            function findHtmlEndYmm(doc, pageNumber = 1) {
+                const pageCommands = doc.internal.pages[2];    
+                if (!Array.isArray(pageCommands)) {
+                    console.warn(`No page #${pageNumber} found.`);
+                    return 0;
+                }
+                // scaleFactor:  points per mm (≈ 72 pt/in ÷ 25.4 mm/in ≈ 2.8346)
+                const scaleFactor = doc.internal.scaleFactor;
+                // Regex to capture “<x> <y> Td”
+                const tdRegex = /(\d+(\.\d+)?)\s+(\d+(\.\d+)?)\s+Td/;
+                let minYpoints = Infinity;
+                for (let chunk of pageCommands) {
+                    // Each chunk is a string of PDF operators. We only care about lines containing “Td”.
+                    const match = tdRegex.exec(chunk);
+                    if (match) {
+                        // match[1] = the X (in points), match[3] = the Y (in points)
+                        const yPoints = parseFloat(match[3]);
+                        if (!isNaN(yPoints) && yPoints < minYpoints) {
+                            minYpoints = yPoints;
+                        }
+                    }
+                }
+                if (!isFinite(minYpoints)) {
+                    // No “Td” found → no text
+                    return 0;
+                }
+                // Convert points → mm:  y_mm = y_points ÷ scaleFactor
+                const yMm = minYpoints / scaleFactor;
+                return yMm;
+            }
+
         }
     };
 });

@@ -485,11 +485,12 @@ sap.ui.define([
                         text: "Purchase order created successfully"
                     }),
                     endButton: new sap.m.Button({
-                        text: "Ganarate PDF",
+                        text: "Generate PDF",
                         type: "Attention",
                         press: function () {
-                            this.POO_onPDFButtonPress()
+                            this.POO_onPDFButtonPress();
                             this._oDialog.close();
+                            this.getRouter().navTo("PurchaseOrder");
                         }.bind(this)
                     }),
                     beginButton: new sap.m.Button({
@@ -758,21 +759,32 @@ sap.ui.define([
         },
 
         POO_onPDFButtonPress: async function () {
+            this.getBusyDialog();
             var oPDFModel = this.getView().getModel("PDFData");
             var oPOModel = this.getView().getModel("PurchaseOrderModel").getData();
             oPDFModel.setProperty("/ClientCompanyName", oPOModel.CustomerName);
             oPDFModel.setProperty("/ClientCompanyAddress", oPOModel.Address);
+            oPDFModel.setProperty("/ClientName", oPOModel.CustomerHeadName);
             oPDFModel.setProperty("/ClientCompanyPAN", oPOModel.PAN);
-            oPDFModel.setProperty("/PONumber", oPOModel.PONumber || "12345");
+            oPDFModel.setProperty("/PONumber", oPOModel.PoNumber);
             oPDFModel.setProperty("/POType", oPOModel.Type);
             oPDFModel.setProperty("/POFrom", oPOModel.StartDate);
             oPDFModel.setProperty("/POTo", oPOModel.EndDate);
             oPDFModel.setProperty("/PODate", oPOModel.CurrentDate);
             oPDFModel.setProperty("/POItems", oPOModel.PurchaseOrders);
-            oPDFModel.setProperty("/TotalPOAmount", oPOModel.TotalAmount || "98765");
-            oPDFModel.setProperty("/POAmountInWords", oPOModel.AmountInWords || "Ninety eight thousand seven sixty five rupees only");
+            oPDFModel.setProperty("/Tax", oPOModel.Tax);
+            oPDFModel.setProperty("/SubTotal", oPOModel.SubTotal);
+            oPDFModel.setProperty("/IGST", oPOModel.IGST);
+            oPDFModel.setProperty("/CGST", oPOModel.CGST);
+            oPDFModel.setProperty("/SGST", oPOModel.SGST);
+            oPDFModel.setProperty("/GSTType", oPOModel.GSTType);
+            oPDFModel.setProperty("/GSTIN", oPOModel.GSTIN);
+            oPDFModel.setProperty("/TotalPOAmount", oPOModel.GrantTotal);
+            oPDFModel.setProperty("/Currency", oPOModel.Currency);
+            if (oPOModel.Currency === "INR") oPDFModel.setProperty("/POAmountInWords", this.convertNumberToWords(oPOModel.GrantTotal, "Rupees"));
+            else oPDFModel.setProperty("/POAmountInWords", this.convertNumberToWords(oPOModel.GrantTotal, oPOModel.Currency));
             var htmlContent = oPOModel.Notes;
-            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
+            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oPOModel.BranchCode });
             var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
             if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                 try {
