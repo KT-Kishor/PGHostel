@@ -353,7 +353,7 @@ sap.ui.define([
                     Particulars: "",
                     SAC: "998314",
                     GSTCalculation: (currency === "INR") ? "YES" : "",
-                    Unit: "",
+                    Unit: "1",
                     Rate: "",
                     UnitText: "Per Day",
                     Currency: currency,
@@ -950,7 +950,7 @@ sap.ui.define([
                     } else {
                         sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
                         this.ResivedAmount = true;
-                        utils._LCvalidateTraineeAmount(oEvent);
+                        utils._LCvalidateAmountZeroTaking(oEvent);
                     }
                 }
             },
