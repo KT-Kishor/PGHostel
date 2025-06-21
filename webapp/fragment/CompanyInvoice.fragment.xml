@@ -75,28 +75,28 @@
 		<VBox visible="{visiablityPlay>/Table}">
 			<Table items="{PaymentDetailModel>/InvoicePaymentDetail}">
 				<columns>
-					<Column>
+					<Column minScreenWidth="Tablet">
 						<Text text="{i18n>invoiceTransactionID}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Tablet">
 						<Text text="{i18n>invoiceReceivedDate}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>totalAmount}" />
 					</Column>
-                    <Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>invoiceReceivedAmount}" />
 					</Column>
-					<Column visible="{= ${PaymentModel>/Currency} === 'INR'}">
+					<Column visible="{= ${PaymentModel>/Currency} === 'INR'}" minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>invoiceReceivedTDS}" />
 					</Column>
-					<Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>invoiceDueAmount}" />
 					</Column>
-					<Column visible="{= ${PaymentModel>/Currency} !== 'INR'}">
+					<Column visible="{= ${PaymentModel>/Currency} !== 'INR'}" minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>expConversionRate}" />
 					</Column>
-					<Column visible="{= ${PaymentModel>/Currency} !== 'INR'}">
+					<Column visible="{= ${PaymentModel>/Currency} !== 'INR'}" minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>amountInINR}" />
 					</Column>
 				</columns>

@@ -150,7 +150,7 @@
 								<m:Table items="{path:'SowReadModel>/',sorter: {path: 'Description',descending: false,group: true}}" busyIndicatorDelay="0" id="Sow_Id_ReadTable" mode="SingleSelectLeft" selectionChange="onPressChangeSow">
 									<m:headerToolbar>
     <m:OverflowToolbar>
-        <m:Title text="{i18n>sowTitle} ({= ${SowReadModel>/}.length })">
+        <m:Title text="{i18n>sowTitle}">
            
         </m:Title>
 

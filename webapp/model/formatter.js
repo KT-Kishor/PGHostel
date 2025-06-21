@@ -132,33 +132,47 @@ sap.ui.define([
         },
 
         companyInvoicePayByDate: function (payByDate, status) {
-            if (!payByDate) return "None";
+            if (!payByDate || status !== "Invoice Sent") {
+                return "None";
+            }
 
             var dueDate = new Date(payByDate);
             var today = new Date();
 
-            // Reset time part for accurate comparison
+            // Normalize time to 00:00:00 to avoid partial-day issues
             dueDate.setHours(0, 0, 0, 0);
             today.setHours(0, 0, 0, 0);
 
-            var timeDiff = dueDate - today;
+            var timeDiff = dueDate.getTime() - today.getTime();
             var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-            // if (status === "Submitted") {
-            //     return "Indication07";
-            // } else 
-            // if (status === "Payment Received") {
-            //     return "Success";
-            // } else 
-            if (status === "Invoice Sent" && daysDiff >= 0) {
-                return "Warning";
-            } else if (status === "Invoice Sent" && daysDiff < 0) {
-                return "Error";
-            } 
-            // else {
-            //     return "Indication01";
-            // }
+            if (daysDiff < 0) {
+                return "Error"; // Overdue
+            } else if (daysDiff <= 10) {
+                return "Warning"; // Due soon
+            } else {
+                return "None"; // Not urgent
+            }
         },
+
+
+        // formatter.js
+        formatContractEndState: function (endDate) {
+            if (!endDate) return "None";
+
+            const contractEnd = new Date(endDate);
+            const today = new Date();
+
+            contractEnd.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+
+            const diffDays = Math.ceil((contractEnd - today) / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) return "Error";
+            if (diffDays <= 10) return "Warning";
+            return "None";
+        }
+        ,
 
         formatMaxDate: function () {
             var oDate = new Date()
@@ -206,7 +220,7 @@ sap.ui.define([
             var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
             return oFloatFormat.format(numericValue);
         },
-        
+
         bytesToMB: function (bytes) {
             if (!bytes || isNaN(bytes)) {
                 return "0 MB";

@@ -162,47 +162,46 @@ sap.ui.define([
             },
 
             onPaymentAdvanceInputChange: function (oEvent) {
-                var sAdvanceInput = this.byId("Msa_Id_PayAdvance");
-                var sBalanceInput = this.byId("Msa_Id_PayBalance");
+                var sAdvanceInput = sap.ui.getCore().byId("Msa_Id_PayAdvance");
+                var sBalanceInput = sap.ui.getCore().byId("Msa_Id_PayBalance");
 
                 var sAdvanceValue = sAdvanceInput.getValue();
                 var sBalanceValue = sBalanceInput.getValue();
 
-                // Regular expression: Up to 2 digits before decimal, optional 1 digit after
-                var regex = /^(?:\d{1,2})(?:\.\d{1})?$/;
+                // Allow up to 2 digits and optional 2 decimal places
+                var regex = /^(?:100(?:\.00?)?|[0-9]{1,2}(?:\.\d{1,2})?)$/;
 
                 var bAdvanceValid = regex.test(sAdvanceValue);
                 var bBalanceValid = regex.test(sBalanceValue);
 
                 if (!bAdvanceValid || !bBalanceValid) {
+                    var msg = "Enter up to 2 digits and 2 decimal places (e.g. 99.99)";
                     sAdvanceInput.setValueState("Error");
-                    sAdvanceInput.setValueStateText("Enter up to 2 digits and 1 decimal place (e.g. 99.9)");
+                    sAdvanceInput.setValueStateText(msg);
                     sBalanceInput.setValueState("Error");
-                    sBalanceInput.setValueStateText("Enter up to 2 digits and 1 decimal place (e.g. 99.9)");
+                    sBalanceInput.setValueStateText(msg);
                     this.AdvanceBalance = false;
-                    return;
                 }
 
-                var nAdvance = parseFloat(sAdvanceValue) || 0;
-                var nBalance = parseFloat(sBalanceValue) || 0;
+                var nAdvance = parseFloat(sAdvanceValue);
+                var nBalance = parseFloat(sBalanceValue);
                 var nTotal = nAdvance + nBalance;
 
-                if (nTotal > 100) {
-                    this.AdvanceBalance = false;
-                    var sMsg = "Total of Advance and Balance should not exceed 100%";
+                // Accept ONLY if total is exactly 100.00 (not 99.99 or 100.01)
+                if (nTotal.toFixed(2) !== "100.00") {
+                    var sMsg = "Total must be exactly 100%";
                     sAdvanceInput.setValueState("Error");
                     sAdvanceInput.setValueStateText(sMsg);
                     sBalanceInput.setValueState("Error");
                     sBalanceInput.setValueStateText(sMsg);
+                    this.AdvanceBalance = false;
                 } else {
-                    this.AdvanceBalance = true;
                     sAdvanceInput.setValueState("None");
                     sBalanceInput.setValueState("None");
+                    this.AdvanceBalance = true;
                 }
-                utils._LCvalidateTraineeAmount(oEvent);
                 this.validateStep();
             },
-
 
             LC_MSA_RateCharge: function (oEvent) {
                 utils._LCvalidateTraineeAmount(oEvent);
@@ -275,9 +274,7 @@ sap.ui.define([
                     (!isRecruitment || (
                         utils._LCvalidateTraineeAmount(get("Msa_Id_RateCharge"), "ID") &&
                         utils._LCvalidateTraineeAmount(get("Msa_Id_Refund"), "ID") &&
-                        this.AdvanceBalance &&
-                        utils._LCvalidateTraineeAmount(get("Msa_Id_PayAdvance"), "ID") &&
-                        utils._LCvalidateTraineeAmount(get("Msa_Id_PayBalance"), "ID")
+                        this.AdvanceBalance
                     ));
 
                 if (validationsPassed) {
