@@ -89,7 +89,7 @@ sap.ui.define([
                 }
             },
 
-            totalCalculationAmount: function () {
+            totalCalculationAmount: async function () {
                 const getTotal = (data, key) => data.reduce((total, item) => total + Number(item[key] || 0), 0);
                 const empData = this.oModel.getProperty("/EmpData");
                 const earnData = empData.EarningData || [];
@@ -105,7 +105,7 @@ sap.ui.define([
                 var totalNetPay = +((earningsTotalMonthly - deductionsTotalMonthly).toFixed(2));
                 if (totalNetPay < 0) totalNetPay = 0;
                 this.oModel.setProperty("/EmpData/NetPay", totalNetPay);
-                this.oModel.setProperty("/EmpData/NetPayText", this.convertNumberToWords(totalNetPay, "Rupees"));
+                this.oModel.setProperty("/EmpData/NetPayText", await this.convertNumberToWords(totalNetPay, "INR"));
             },
 
             APD_onPressSalAdd: function () {
