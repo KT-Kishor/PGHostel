@@ -16,6 +16,7 @@ sap.ui.define(
             .attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function () {
+          if(!this.that) this.that = this.getOwnerComponent().getModel("ThisModel")?.getData().that;
           var LoginFunction = await this.commonLoginFunction("TilePage");
           if (!LoginFunction) return;
           this.scrollToSection("id_ObjectPageLayoutTile","id_Sectiontile");
@@ -287,6 +288,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteContract", { valueEmp: "Contract" });
         },
         TileV_onPressAdminPaySlip: function () {
+          this.that.getBusyDialog();
           this.getRouter().navTo("RouteAdminPaySlip");
         },
         TileV_onpressSelfservice: function () {

@@ -10,6 +10,7 @@ sap.ui.define([
             },
 
             _onRouteMatched: async function () {
+                if(!this.that) this.that = this.getOwnerComponent().getModel("ThisModel")?.getData().that;
                 var LoginFunction = await this.commonLoginFunction("PaySlip");
                 if (!LoginFunction) return;
                 this.AP_onSearch();
@@ -17,6 +18,7 @@ sap.ui.define([
                 this.oModel = this.getView().getModel("PaySlip");
                 this.oModel.setProperty("/isRouteLOP", false);
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("paySlipTitle"));
+                this.that.closeBusyDialog();
             },
 
             AP_onPressAddPayslip: function () {
@@ -32,7 +34,7 @@ sap.ui.define([
             },
 
             AP_onSearch: async function () {
-                this.getBusyDialog();
+                this.that.getBusyDialog();
                 var aFilterItems = this.byId("AP_id_AdminPaySlip").getFilterGroupItems();
                 var params = {};
                 aFilterItems.forEach(function (oItem) {
@@ -48,7 +50,7 @@ sap.ui.define([
                     }
                 });
                 await this._commonGETCall("AdminPaySlip", "EmpTable", params);
-                this.closeBusyDialog();
+                this.that.closeBusyDialog();
             },
 
             AP_onClear: function () {
@@ -59,7 +61,7 @@ sap.ui.define([
             },
 
             AP_onPressAddPayslip: function () {
-                BusyIndicator.show(0);
+                this.that.getBusyDialog();
                 this.oModel.setProperty("/isCreate", true);
                 this.oModel.setProperty("/isIdSelected", false);
                 this.oModel.setProperty("/EmpData", {});
@@ -68,6 +70,7 @@ sap.ui.define([
             },
 
             AP_onPressPayslip: function (oEvent) {
+                this.that.getBusyDialog();
                 var sPath = oEvent.getSource().getBindingContext("PaySlip").getPath();
                 this.oModel.setProperty("/isCreate", false);
                 this.oModel.setProperty("/isIdSelected", true);

@@ -11,6 +11,7 @@ sap.ui.define(
       "sap.kt.com.minihrsolution.controller.LoginPage",
       {
         onInit: function () {
+          this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel({ that: this }), "ThisModel");
           this.getRouter().getRoute("RouteLoginPage").attachMatched(this._onRouteMatched, this);
           const model = new JSONModel({
             // for Database connection

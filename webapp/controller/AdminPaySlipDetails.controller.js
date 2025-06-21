@@ -10,7 +10,7 @@ sap.ui.define([
             },
 
             _onRouteMatched: async function (oEvent) {
-                BusyIndicator.hide();
+                if(!this.that) this.that = this.getOwnerComponent().getModel("ThisModel")?.getData().that;
                 this.scrollToSection("APD_id_NavAdmin", "APD_id_First");
                 var LoginFunction = await this.commonLoginFunction("PaySlip");
                 if (!LoginFunction) return;
@@ -22,6 +22,7 @@ sap.ui.define([
                     this.oModel.setProperty("/isRouteLOP", false);
                     this.flagID = false;
                 }
+                this.that.closeBusyDialog();
             },
 
             APD_onPressBack: function () {
@@ -363,7 +364,7 @@ sap.ui.define([
 
             checkEmpty: function (compData) {
                 compData.forEach(function (item) {
-                    if (!item.Description || !item.Amount || !item.YearlyAmount) {
+                    if (!item.Description || !item.YearlyAmount) {
                         throw new Error("Fields cannot be Empty, please recheck the data.");
                     }
                 });
