@@ -268,6 +268,7 @@ sap.ui.define([
 
             Exp_Det_onEditOrSavePress: function () {
                 var isEditMode = this.ViewModel.getProperty("/isEditMode");
+                this.byId("exp_Id_ExpenseTable").removeSelections();
                 if (isEditMode) {
                     this.onPressSave();
                 } else {

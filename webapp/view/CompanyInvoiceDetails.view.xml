@@ -167,7 +167,7 @@
 													</m:ComboBox>
 												</m:cells>
 												<m:cells>
-													<m:Select editable="{visiablityPlay>/editable}" selectedKey="{CompanyInvoiceItemModel>GSTCalculation}" change="Comp_onChangeGSTCalculation">
+													<m:Select width="100%" editable="{visiablityPlay>/editable}" selectedKey="{CompanyInvoiceItemModel>GSTCalculation}" change="Comp_onChangeGSTCalculation">
 														<core:Item key="{i18n>yes}" text="{i18n>yes}"/>
 														<core:Item key="{i18n>no}" text="{i18n>no}"/>
 													</m:Select>
