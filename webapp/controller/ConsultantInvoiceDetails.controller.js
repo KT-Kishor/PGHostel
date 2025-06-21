@@ -316,6 +316,8 @@ sap.ui.define(
                             oInvoiceModel.setProperty("/GSTValid", false);
                             oInvoiceModel.setProperty("/Currency", "INR");
                             oInvoiceModel.setProperty("/STDCode", "+91");
+                            oInvoiceModel.setProperty("/MobileNo", MobileNo || "");
+                            oInvoiceModel.setProperty("/ConsultantAddress", ConsultantAddress || "");
 
                             // Set visibility and enabled states
                             var oColumnGST = this.getView().byId("CI_id_ColumnGST");
@@ -347,9 +349,6 @@ sap.ui.define(
                                     oInvoiceModel.setProperty("/MobileNo", oSelectedContract.MobileNo || "");
                                     oInvoiceModel.setProperty("/ConsultantAddress", oSelectedContract.ConsultantAddress || "");
                                 }
-                            } else {
-                                oInvoiceModel.setProperty("/MobileNo", MobileNo || "");
-                                oInvoiceModel.setProperty("/ConsultantAddress", ConsultantAddress || "");
                             }
                             this.CI_onPressPasteBtn();
                             this.closeBusyDialog();
