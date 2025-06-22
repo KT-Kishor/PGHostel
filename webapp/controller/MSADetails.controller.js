@@ -17,10 +17,7 @@ sap.ui.define([
             _onRouteMatched: async function () {
                 var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
                 if (!LoginFUnction) return;
-                // if (!this.getView().getModel("ContractpaymentModel")) this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
-                // if (!this.getView().getModel("BaseLocationModel")) this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                // if (!this.getView().getModel("CountryModel")) this._fetchCommonData("Country", "CountryModel");
-
+                this._ViewDatePickersReadOnly(["MsaD_id_CreateMSADate"], this.getView());
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(false);
                 this.byId("MsaD_id_Submit").setEnabled(false);
@@ -86,38 +83,38 @@ sap.ui.define([
                 var sAdvanceValue = sAdvanceInput.getValue();
                 var sBalanceValue = sBalanceInput.getValue();
 
-                // Regular expression: Up to 2 digits before decimal, optional 1 digit after
-                var regex = /^(?:\d{1,2})(?:\.\d{2})?$/;
+                // Allow up to 2 digits and optional 2 decimal places
+                var regex = /^(?:100(?:\.00?)?|[0-9]{1,2}(?:\.\d{1,2})?)$/;
 
                 var bAdvanceValid = regex.test(sAdvanceValue);
                 var bBalanceValid = regex.test(sBalanceValue);
 
                 if (!bAdvanceValid || !bBalanceValid) {
+                    var msg = "Enter up to 2 digits and 2 decimal places (e.g. 99.99)";
                     sAdvanceInput.setValueState("Error");
-                    sAdvanceInput.setValueStateText("Enter up to 2 digits and 1 decimal place (e.g. 99.9)");
+                    sAdvanceInput.setValueStateText(msg);
                     sBalanceInput.setValueState("Error");
-                    sBalanceInput.setValueStateText("Enter up to 2 digits and 1 decimal place (e.g. 99.9)");
+                    sBalanceInput.setValueStateText(msg);
                     this.AdvanceBalance = false;
-                    return;
                 }
 
-                var nAdvance = parseFloat(sAdvanceValue) || 0;
-                var nBalance = parseFloat(sBalanceValue) || 0;
+                var nAdvance = parseFloat(sAdvanceValue);
+                var nBalance = parseFloat(sBalanceValue);
                 var nTotal = nAdvance + nBalance;
 
-                if (nTotal > 100) {
-                    this.AdvanceBalance = false;
-                    var sMsg = "Total of Advance and Balance should not exceed 100%";
+                // Accept ONLY if total is exactly 100.00 (not 99.99 or 100.01)
+                if (nTotal.toFixed(2) !== "100.00") {
+                    var sMsg = "Total must be exactly 100%";
                     sAdvanceInput.setValueState("Error");
                     sAdvanceInput.setValueStateText(sMsg);
                     sBalanceInput.setValueState("Error");
                     sBalanceInput.setValueStateText(sMsg);
+                    this.AdvanceBalance = false;
                 } else {
-                    this.AdvanceBalance = true;
                     sAdvanceInput.setValueState("None");
                     sBalanceInput.setValueState("None");
+                    this.AdvanceBalance = true;
                 }
-                utils._LCvalidateTraineeAmount(oEvent);
                 this.validateStep();
             },
 
@@ -132,6 +129,11 @@ sap.ui.define([
                 this.byId("MsaD_id_PanCard").setValueState("None");
                 this.byId("MSA_Id_Country").setValueState("None");
                 this.byId("MSA_Id_City").setValueState("None");
+                this.byId("Msa_Id_RateCharge").setValueState("None");
+                this.byId("MsaD_id_GST").setValueState("None");
+                this.byId("Msa_Id_PayAdvance").setValueState("None");
+                this.byId("Msa_Id_PayBalance").setValueState("None");
+                this.byId("Msa_Id_Refund").setValueState("None");
             },
             MsaD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
@@ -171,6 +173,7 @@ sap.ui.define([
             MSACountryComboBox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 this.validateStep();
+                this.byId("MSA_Id_City").setValue("");
                 var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
                 var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
                 this.byId("MSA_Id_City").getBinding("items").filter(oFilter);
@@ -202,8 +205,7 @@ sap.ui.define([
                         (
                             !isRecruitment || (
                                 utils._LCvalidateTraineeAmount(this.byId("Msa_Id_RateCharge"), "ID") &&
-                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_Refund"), "ID") && this.AdvanceBalance && utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayAdvance"), "ID") &&
-                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_PayBalance"), "ID")
+                                utils._LCvalidateTraineeAmount(this.byId("Msa_Id_Refund"), "ID") && this.AdvanceBalance
                             ));
 
                     this.byId("MsaD_id_Wizard").getSteps()[0].setValidated(isValid);

@@ -29,7 +29,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.setFont("times", "normal").setFontSize(11);
 
             let titleContentY = titleY + 10; // Initial Y position after titleY
-            const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)"];
+            const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)", "Parties"];
             const trimmedBoldWords = boldWords.map(word => word.trim());
             const boldWordList = trimmedBoldWords.join(" ").split(" ").filter(item => item !== "");
 
@@ -743,7 +743,10 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.text(oModel.ClientCompanyAddress, margin, clientNameY + 6, clientAlignment);
             let clientPANY = doc.getTextDimensions(oModel.ClientCompanyAddress, clientAlignment).h + clientNameY + 8;
             doc.text("PAN: " + oModel.ClientCompanyPAN, margin, clientPANY);
-            if (oModel.GSTIN !== "") doc.text("GSTIN: " + oModel.GSTIN, margin, clientPANY + 6);
+            if (oModel.GSTIN !== ""){
+                clientPANY += 6; // Add space for GSTIN if it exists
+                doc.text("GSTIN: " + oModel.GSTIN, margin, clientPANY);
+            } 
 
             doc.setFont("times", "bold");
             let poDetaisX = pageWidth - margin - 50;
@@ -760,7 +763,8 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.text(`: ${oModel.POTo}`, poDetaisX + 22, poDetailsY + 18);
             doc.text(`: ${oModel.PODate}`, poDetaisX + 22, poDetailsY + 24);
 
-            let tableY = poDetailsY + 40;
+            let tableY = poDetailsY + 33;
+            if(clientPANY > tableY - 5) tableY = clientPANY + 5; // Ensure table starts below client details
 
             doc.autoTable({
                 startY: tableY,
@@ -805,39 +809,40 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 tableWidth: maxWidth,
                 margin: { left: margin, right: margin }
             });
-
+            doc.setFont("times", "bold").setFontSize(11);
+            const options = { maxWidth: 100, align: "right" };
+            const dimensions = doc.getTextDimensions(Formatter.fromatNumber(oModel.TotalPOAmount), options);
             var totalAmountY = doc.lastAutoTable.finalY + 10;
-            var amountLabelX = pageWidth - margin - 30; // Align with PO details
-            doc.setFontSize(10);
-            doc.text(`Sub Total (${oModel.Currency}) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
-            doc.text(Formatter.fromatNumber(oModel.SubTotal), pageWidth - margin - 2, totalAmountY, { maxWidth: 100, align: "right" });
+            var amountLabelX = pageWidth - margin - dimensions.w - 2; // Align with PO details
+            doc.setFont("times", "normal").setFontSize(10);
+            doc.text(`Sub Total (${oModel.Currency}) :`, amountLabelX, totalAmountY, options);
+            doc.text(Formatter.fromatNumber(oModel.SubTotal), pageWidth - margin - 2, totalAmountY, options);
             if (oModel.GSTType === "IGST" && oModel.Currency === "INR") {
                 totalAmountY += 6;
-                doc.text(`IGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
-                doc.text(Formatter.fromatNumber(oModel.IGST), pageWidth - margin - 2, totalAmountY, { maxWidth: 100, align: "right" });
+                doc.text(`IGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, options);
+                doc.text(Formatter.fromatNumber(oModel.IGST), pageWidth - margin - 2, totalAmountY, options);
             }
             if (oModel.GSTType === "CGST/SGST" && oModel.Currency === "INR") {
                 totalAmountY += 6;
-                doc.text(`CGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
-                doc.text(Formatter.fromatNumber(oModel.CGST), pageWidth - margin - 2, totalAmountY, { maxWidth: 100, align: "right" });
+                doc.text(`CGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, options);
+                doc.text(Formatter.fromatNumber(oModel.CGST), pageWidth - margin - 2, totalAmountY, options);
                 totalAmountY += 6;
-                doc.text(`SGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
-                doc.text(Formatter.fromatNumber(oModel.SGST), pageWidth - margin - 2, totalAmountY, { maxWidth: 100, align: "right" });
+                doc.text(`SGST (${oModel.Tax}%) :`, amountLabelX, totalAmountY, options);
+                doc.text(Formatter.fromatNumber(oModel.SGST), pageWidth - margin - 2, totalAmountY, options);
             }
             totalAmountY += 3;
             doc.setLineWidth(0.3);
             doc.line(amountLabelX - 38, totalAmountY, pageWidth - margin, totalAmountY); // Draw line for separation
             totalAmountY += 6;
             doc.setFont("times", "bold").setFontSize(11);
-            doc.text(`Total Amount (${oModel.Currency}) :`, amountLabelX, totalAmountY, { maxWidth: 100, align: "right" });
-            doc.text(Formatter.fromatNumber(oModel.TotalPOAmount), pageWidth - margin - 2, totalAmountY, { maxWidth: 100, align: "right" });
+            doc.text(`Total Amount (${oModel.Currency}) :`, amountLabelX, totalAmountY, options);
+            doc.text(Formatter.fromatNumber(oModel.TotalPOAmount), pageWidth - margin - 2, totalAmountY, options);
             let amtWordY = totalAmountY + 7;
             doc.setFontSize(10);
             doc.text(`Total Amount in Words (${oModel.Currency}) :`, margin, amtWordY);
             doc.setFont("times", "normal");
-            doc.text(oModel.POAmountInWords, margin, amtWordY + 5)
+            doc.text(oModel.POAmountInWords, margin, amtWordY + 5, { maxWidth: maxWidth });
             doc.setFont("times", "bold").setFontSize(12);
-            let noteY = amtWordY + 20;
             function prepareHtmlForPdf(htmlContent) {
                 // Styles to inject
                 const style = `
@@ -879,10 +884,9 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.setGState(new doc.GState({ opacity: 1 }));
             footerDesign();
             doc.addPage();
-            footerDesign();
-            doc.setFont("times", "bold").setFontSize(12);
-            noteY = topMargin + 5;
-            let rteY = pageHeight + topMargin + 8;
+            doc.setFont("times", "bold").setFontSize(14);
+            let noteY = topMargin + 6;
+            let rteY = pageHeight + topMargin + 7;
             doc.addImage(oCompanyModel.emailLogoBase64, "PNG", 127, 8, 63, 14.5);
 
             doc.text("Terms and Conditions", pageMiddle, noteY, { maxWidth: 100, align: "center" });
@@ -895,7 +899,8 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     doc.addImage(oCompanyModel.backgroundLogoBase64, "PNG", backImgX, backImgY, 100, 100);
                     doc.setGState(new doc.GState({ opacity: 1 }));
                     doc.setFont("times", "bold").setFontSize(11);
-                    let forCoNameY = rteY - pageHeight + 60;
+                    const endYmm = findHtmlEndYmm(doc);
+                    let forCoNameY = rteY - pageHeight + 30 + (256 - endYmm);
                     doc.text(`For ${oCompanyModel.companyName}`, margin, forCoNameY);
                     doc.text("By:", margin, forCoNameY + 5);
 
@@ -905,15 +910,17 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                     doc.setFont("times", "normal");
                     let headofCoRoleY = headofCoNameY + 5;
                     doc.text(oCompanyModel.designation, margin, headofCoRoleY);
-                    doc.text(oModel.AgreementDate, margin, headofCoRoleY + 5);
+                    doc.text(oModel.PODate, margin, headofCoRoleY + 5);
 
                     doc.setFont("times", "bold");
                     doc.text(`For ${oModel.ClientCompanyName}`, pageMiddle + 10, forCoNameY);
+                    doc.text("By:", pageMiddle + 10, forCoNameY + 5);
                     doc.text(oModel.ClientName, pageMiddle + 10, headofCoNameY);
 
                     doc.setFont("times", "normal");
                     doc.text(oModel.ClientRole, pageMiddle + 10, headofCoRoleY);
-                    doc.text(oModel.AgreementDate, pageMiddle + 10, headofCoRoleY + 5);
+                    doc.text(oModel.PODate, pageMiddle + 10, headofCoRoleY + 5);
+                    footerDesign();
                     doc.save("PO.pdf");
                     that.closeBusyDialog();
                     document.body.removeChild(container);
@@ -944,6 +951,38 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.text(lutNo, lutX, bottomLimit + 22);
                 doc.setTextColor(0, 0, 0);
             }
+
+            function findHtmlEndYmm(doc, pageNumber = 1) {
+                const pageCommands = doc.internal.pages[2];    
+                if (!Array.isArray(pageCommands)) {
+                    console.warn(`No page #${pageNumber} found.`);
+                    return 0;
+                }
+                // scaleFactor:  points per mm (≈ 72 pt/in ÷ 25.4 mm/in ≈ 2.8346)
+                const scaleFactor = doc.internal.scaleFactor;
+                // Regex to capture “<x> <y> Td”
+                const tdRegex = /(\d+(\.\d+)?)\s+(\d+(\.\d+)?)\s+Td/;
+                let minYpoints = Infinity;
+                for (let chunk of pageCommands) {
+                    // Each chunk is a string of PDF operators. We only care about lines containing “Td”.
+                    const match = tdRegex.exec(chunk);
+                    if (match) {
+                        // match[1] = the X (in points), match[3] = the Y (in points)
+                        const yPoints = parseFloat(match[3]);
+                        if (!isNaN(yPoints) && yPoints < minYpoints) {
+                            minYpoints = yPoints;
+                        }
+                    }
+                }
+                if (!isFinite(minYpoints)) {
+                    // No “Td” found → no text
+                    return 0;
+                }
+                // Convert points → mm:  y_mm = y_points ÷ scaleFactor
+                const yMm = minYpoints / scaleFactor;
+                return yMm;
+            }
+
         }
     };
 });

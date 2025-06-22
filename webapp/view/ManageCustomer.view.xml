@@ -70,7 +70,7 @@
 							<Text text="{CreateCustomerModel>type}" />
 							<Text text="{CreateCustomerModel>value}" />
 							<Text text="{CreateCustomerModel>mailID}" />
-							<Text text="{CustomerModel>/stdCode} {CreateCustomerModel>mobileNo}" />
+							<Text text="{CreateCustomerModel>stdCode} {CreateCustomerModel>mobileNo}" />
 						</cells>
 					</ColumnListItem>
 				</items>

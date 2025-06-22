@@ -89,6 +89,26 @@ sap.ui.define([], function () {
         return true;
       }
     },
+
+    _LCvalidateAmountZeroTaking: function (oEvent, type) {
+      var oInput = type === "ID" ? (oInput = oEvent) : (oInput = oEvent.getSource());
+      var value = oInput.getValue();
+      var cleanedValue = value.replace(/[^0-9.]/g, "");
+      var parts = cleanedValue.split(".");
+      if (parts.length === 2) {
+        cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
+      }
+      oInput.setValue(cleanedValue);
+    
+      if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
+        oInput.setValueState("Error");
+        return false;
+      } else {
+        oInput.setValueState("None");
+        return true;
+      }
+    },
+
     _LCvalidateJoiningBonus: function (oEvent, type) {
       var oInput = type === "ID" ? oEvent : oEvent.getSource();
       var value = oInput.getValue();

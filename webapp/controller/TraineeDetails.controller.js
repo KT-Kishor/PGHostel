@@ -124,26 +124,26 @@ sap.ui.define([
             //validate name function
             TD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
-                this.TD_validateStep();
+               if(this.sArgPara === "CreateTraineeFlag") this.TD_validateStep();
             },
             //validate email function
             TD_validateEmail: function (oEvent) {
                 utils._LCvalidateEmail(oEvent);
-                this.TD_validateStep();
+                if(this.sArgPara === "CreateTraineeFlag")this.TD_validateStep();
             },
             //validate amount function
             TD_validateAmount: function (oEvent) {
                 utils._LCvalidateJoiningBonus(oEvent);
-                this.TD_validateStep();
+                if(this.sArgPara === "CreateTraineeFlag")this.TD_validateStep();
             },
             TD_validateMobile: function (oEvent) {
                 utils._LCvalidateMobileNumber(oEvent);
-                this.TD_validateStep();
+                if(this.sArgPara === "CreateTraineeFlag")this.TD_validateStep();
             },
             //validate date function
             TD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent); // Base validation
-                this.TD_validateStep(); // Step validation
+                if(this.sArgPara === "CreateTraineeFlag")this.TD_validateStep(); // Step validation
                 var oOfferDateId = oEvent.getSource().getId().split("--")[2];
                 var releaseDate, joinDateVa;
                 if (oOfferDateId === "TD_id_ReleaseDate" || oOfferDateId === "TU_id_RelDate") {
@@ -435,8 +435,13 @@ sap.ui.define([
             //mail send function
             Mail_onSendEmail: function () {
                 try {
-                    this.getBusyDialog();
                     var oModel = this.getView().getModel("oTraineeDetails").getData();
+                    var aAttachments = this.getView().getModel("UploaderData").getProperty("/attachments");
+                    if (!aAttachments || aAttachments.length === 0) {
+                        MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
+                        return;
+                    }
+                    this.getBusyDialog();
                     var oPayload = {
                         "TraineeName": oModel.TraineeName,
                         "toEmailID": oModel.TraineeEmail,
@@ -459,7 +464,9 @@ sap.ui.define([
                     MessageToast.show(error.responseText);
                 }
             },
-
+             TD_validateCombo: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
+            },
             //PDF generation function
             TD_onPressMerge: async function (value) {
                 var oModel = this.getView().getModel("oTraineeDetails");
@@ -523,7 +530,7 @@ sap.ui.define([
 
             onTrainingTypeChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
-                this.TD_validateStep();
+                if(this.sArgPara === "CreateTraineeFlag") this.TD_validateStep();
                 var oComboBox = oEvent.getSource();
                 var sSelectedKey = oComboBox.getSelectedKey();
                 sSelectedKey = sSelectedKey ? sSelectedKey.trim() : oComboBox.getValue().trim();

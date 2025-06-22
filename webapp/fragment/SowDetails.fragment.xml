@@ -49,7 +49,7 @@
             <Title text="{i18n>ConsultantHeaderDetails}" id="SOW_id_SowDetails" />
             <ToolbarSpacer />
         <Button text="{i18n>addConsultant}" type="Accept" visible="{simpleForm>/addSowBtn}" press="SOW_onAddConsultant" />
-           <ToolbarSeparator />
+           <!-- <ToolbarSeparator /> -->
             <Button icon="sap-icon://delete" press="SOW_onDeleteExtendItem" visible="{simpleForm>/ExpendBtn}" />
         </Toolbar>
     </headerToolbar>
@@ -85,9 +85,9 @@
                 <Input value="{oModelDataPro>Designation}" liveChange="onLiveChangeDesiganation" valueStateText="{i18n>designationValueState}" maxLength="50" width="100%" />
             </cells>
             <cells >
-               <ComboBox items="{SowModel>/SowStatus}" value="{oModelDataPro>Status}" width="100%">
-                    <core:Item key="{SowModel>ID}" text="{SowModel>Status}" />
-                </ComboBox>
+               <Select items="{SowModel>/SowStatus}" selectedKey="{oModelDataPro>Status}" width="100%">
+                    <core:Item key="{SowModel>Status}" text="{SowModel>Status}" />
+                </Select>
             </cells>
             <cells>
                 <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center">

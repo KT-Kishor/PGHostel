@@ -68,7 +68,11 @@
 							<Text text="{MSADisplayModel>CompanyHeadName}"/>
 							<Text text="{MSADisplayModel>CompanyHeadPosition}"/>
 							<Text text="{MSADisplayModel>PaymentTerms}"/>
-							<Text text="{path:'MSADisplayModel>MsaContractPeriodEndDate',formatter: '.Formatter.formatDate'}"/>
+							<ObjectStatus class="PayByDateClass"
+    text="{path: 'MSADisplayModel>MsaContractPeriodEndDate', formatter: '.Formatter.formatDate'}" inverted="false"
+    state="{path: 'MSADisplayModel>MsaContractPeriodEndDate', formatter: '.Formatter.formatContractEndState'}" />
+
+							<!-- <Text text="{path:'MSADisplayModel>MsaContractPeriodEndDate',formatter: '.Formatter.formatDate'}"/> -->
 							<Text text="{MSADisplayModel>Type}"/>
 						</cells>
 					</ColumnListItem>

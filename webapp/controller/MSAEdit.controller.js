@@ -34,8 +34,10 @@ sap.ui.define([
                 this.getView().setModel(oSowCreateModel, "sowCreateModel");
                 this._makeDatePickersReadOnly(["MsaE_id_SowStatus"]);
                 this.byId("MsaE_id_SowStatus").setValue("All");
+                this.BusyIndicater = false;
                 await this.MSADetailsReadCall();
                 await this.CommonReadCallForSow();
+                this.BusyIndicater = true;
                 this.closeBusyDialog();
                 this.AdvanceBalance = true;
                 this.Rate = true;
@@ -61,7 +63,7 @@ sap.ui.define([
             },
 
             MSADetailsReadCall: async function () {
-                this.getBusyDialog();
+                if (this.BusyIndicater) this.getBusyDialog();
                 try {
                     await this._fetchCommonData("MSADetails", "FilteredMsaModel", { MsaID: this.MSAID });
                     this.SimpleFormModel.setProperty("/minDate", new Date(this.getView().getModel("FilteredMsaModel").getData()[0].CreateMSADate));
@@ -87,10 +89,12 @@ sap.ui.define([
                 if (oEvent.getParameter('id').split('_').pop() === 'StartDate') {
                     sap.ui.getCore().byId("SOW_id_EndDate").setMinDate(new Date(oEvent.getParameter('value').split('/').reverse().join('-')));
                 }
+                sap.ui.getCore().byId("SOW_id_EndDate").getValue();
                 utils._LCvalidateDate(oEvent);
             },
             MSACountryComboBox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
+                sap.ui.getCore().byId("MSA_Nav_Id_City").setValue("");
                 var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
                 var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
                 sap.ui.getCore().byId("MSA_Nav_Id_Country").getBinding("items").filter(oFilter);
@@ -100,15 +104,6 @@ sap.ui.define([
             },
             MsaE_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
-            },
-
-            MsaE_onEditOrSavePress: function () {
-                if (this.SimpleFormModel.getProperty("/editable")) {
-                    this.onPressSave();
-                } else {
-                    this.SimpleFormModel.setProperty("/editable", true);
-                    this.SimpleFormModel.setProperty("/isEnabled", false);
-                }
             },
 
             Msa_LC_CompanyName: function (oEvent) {
@@ -161,57 +156,52 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            LC_MSA_RateCharge: function (oEvent) {
-                utils._LCvalidateTraineeAmount(oEvent);
-                this.validateStep();
-            },
 
             LC_MSA_RateCharge: function (oEvent) {
                 utils._LCvalidateTraineeAmount(oEvent);
             },
 
             onPaymentAdvanceInputChange: function (oEvent) {
-                var sAdvanceInput = this.byId("Msa_Id_PayAdvance");
-                var sBalanceInput = this.byId("Msa_Id_PayBalance");
+                var sAdvanceInput = sap.ui.getCore().byId("Msa_Id_PayAdvance");
+                var sBalanceInput = sap.ui.getCore().byId("Msa_Id_PayBalance");
 
                 var sAdvanceValue = sAdvanceInput.getValue();
                 var sBalanceValue = sBalanceInput.getValue();
 
-                // Regular expression: Up to 2 digits before decimal, optional 1 digit after
-                var regex = /^(?:\d{1,2})(?:\.\d{1})?$/;
+                // Allow up to 2 digits and optional 2 decimal places
+                var regex = /^(?:100(?:\.00?)?|[0-9]{1,2}(?:\.\d{1,2})?)$/;
 
                 var bAdvanceValid = regex.test(sAdvanceValue);
                 var bBalanceValid = regex.test(sBalanceValue);
 
                 if (!bAdvanceValid || !bBalanceValid) {
+                    var msg = "Enter up to 2 digits and 2 decimal places (e.g. 99.99)";
                     sAdvanceInput.setValueState("Error");
-                    sAdvanceInput.setValueStateText("Enter up to 2 digits and 1 decimal place (e.g. 99.9)");
+                    sAdvanceInput.setValueStateText(msg);
                     sBalanceInput.setValueState("Error");
-                    sBalanceInput.setValueStateText("Enter up to 2 digits and 1 decimal place (e.g. 99.9)");
+                    sBalanceInput.setValueStateText(msg);
                     this.AdvanceBalance = false;
-                    return;
                 }
 
-                var nAdvance = parseFloat(sAdvanceValue) || 0;
-                var nBalance = parseFloat(sBalanceValue) || 0;
+                var nAdvance = parseFloat(sAdvanceValue);
+                var nBalance = parseFloat(sBalanceValue);
                 var nTotal = nAdvance + nBalance;
 
-                if (nTotal > 100) {
-                    this.AdvanceBalance = false;
-                    var sMsg = "Total of Advance and Balance should not exceed 100%";
+                // Accept ONLY if total is exactly 100.00 (not 99.99 or 100.01)
+                if (nTotal.toFixed(2) !== "100.00") {
+                    var sMsg = "Total must be exactly 100%";
                     sAdvanceInput.setValueState("Error");
                     sAdvanceInput.setValueStateText(sMsg);
                     sBalanceInput.setValueState("Error");
                     sBalanceInput.setValueStateText(sMsg);
+                    this.AdvanceBalance = false;
                 } else {
-                    this.AdvanceBalance = true;
                     sAdvanceInput.setValueState("None");
                     sBalanceInput.setValueState("None");
+                    this.AdvanceBalance = true;
                 }
-                utils._LCvalidateTraineeAmount(oEvent);
                 this.validateStep();
             },
-
 
             LC_MSA_RateCharge: function (oEvent) {
                 utils._LCvalidateTraineeAmount(oEvent);
@@ -231,13 +221,34 @@ sap.ui.define([
                         type !== "Recruitment"
                             ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0)
                             : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1);
+                        this.resetMsaDialogFields();
+                        this._FragmentDatePickersReadOnly(["MsaE_id_CreateMSADate"]);
                     }.bind(this));
                 } else {
                     this.MSA_oDialog.open();
                     type !== "Recruitment"
                         ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0)
                         : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
+                    this.resetMsaDialogFields();
+                    this._FragmentDatePickersReadOnly(["MsaE_id_CreateMSADate"]);
                 }
+            },
+
+            resetMsaDialogFields: function () {
+                var oView = sap.ui.getCore();
+
+                // Input Fields
+                oView.byId("MsaE_id_CompanyName")?.setValueState("None");
+                oView.byId("MsaE_id_CreateMSADate")?.setValueState("None");
+                oView.byId("MsaE_id_MsaHead")?.setValueState("None");
+                oView.byId("MsaE_id_HeadPosition")?.setValueState("None");
+                oView.byId("MsaE_id_MsaPanCard")?.setValueState("None");
+                oView.byId("MsaE_id_MSAEmail")?.setValueState("None");
+                oView.byId("MsaE_id_MSA_GSTNO")?.setValueState("None");
+                oView.byId("Msa_Id_RateCharge")?.setValueState("None");
+                oView.byId("Msa_Id_PayAdvance")?.setValueState("None");
+                oView.byId("Msa_Id_PayBalance")?.setValueState("None");
+                oView.byId("Msa_Id_Refund")?.setValueState("None");
             },
 
             MSA_Frg_Close: function () {
@@ -245,7 +256,7 @@ sap.ui.define([
             },
 
             MSA_Frg_Update: async function () {
-                const isRecruitment = sap.ui.getCore().byId("MsaE_id_Type").getSelectedIndex() === 0;
+                const isRecruitment = sap.ui.getCore().byId("MsaE_id_Type").getSelectedIndex() === 1;
 
                 const get = sap.ui.getCore().byId.bind(sap.ui.getCore());
 
@@ -263,9 +274,7 @@ sap.ui.define([
                     (!isRecruitment || (
                         utils._LCvalidateTraineeAmount(get("Msa_Id_RateCharge"), "ID") &&
                         utils._LCvalidateTraineeAmount(get("Msa_Id_Refund"), "ID") &&
-                        this.AdvanceBalance &&
-                        utils._LCvalidateTraineeAmount(get("Msa_Id_PayAdvance"), "ID") &&
-                        utils._LCvalidateTraineeAmount(get("Msa_Id_PayBalance"), "ID")
+                        this.AdvanceBalance
                     ));
 
                 if (validationsPassed) {
@@ -302,14 +311,12 @@ sap.ui.define([
             },
 
             CommonReadCallForSow: async function () {
-                this.getBusyDialog();
+                if (this.BusyIndicater) this.getBusyDialog();
                 const selectedKey = this.byId("MsaE_id_SowStatus").getValue();
                 let oFilter = { MsaID: this.MSAID };
                 if (selectedKey !== "All") oFilter.Status = selectedKey;
 
                 await this._fetchCommonData("SowDetails", "SowReadModel", oFilter);
-                // var SowModel = new JSONModel(this.getView().getModel("SowReadModel").getData());
-                // this.getView().setModel(SowModel, "SowAllDataModel");
                 this.closeBusyDialog();
             },
 
@@ -377,16 +384,14 @@ sap.ui.define([
                         this.getView().addDependent(this.SOW_oDialog);
                         this.SOW_oDialog.open();
                         var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
-                        if (oTable) {
-                            oTable.removeSelections(true); // true = clears selection without triggering events
-                        }
+                        if (oTable) oTable.removeSelections(true);
+                        this._FragmentDatePickersReadOnly(["SOW_id_EndDate", "SOW_id_StartDate"]);
                     }.bind(this));
                 } else {
                     this.SOW_oDialog.open();
                     var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
-                    if (oTable) {
-                        oTable.removeSelections(true); // true = clears selection without triggering events
-                    }
+                    if (oTable) oTable.removeSelections(true);
+                    this._FragmentDatePickersReadOnly(["SOW_id_EndDate", "SOW_id_StartDate"]);
                 }
             },
 
@@ -473,7 +478,8 @@ sap.ui.define([
                     Currency: "INR"
                 };
                 this.getView().getModel("sowCreateModel").setData(jsonSow);
-                // sap.ui.getCore().byId("SOW_id_oTableCreateSow").setMode("None");
+                this.SimpleFormModel.setProperty("/Mode", "Delete");
+                // sap.ui.getCore().byId("SOW_id_oTableCreateSow").setMode("delete");
             },
 
             onPressChangeSow: function (oEvent) {
@@ -501,22 +507,24 @@ sap.ui.define([
                 };
                 this.byId("MsaE_id_SowStatus").setValue(Status);
                 var Message = (Status === "Inactive") ? this.i18nModel.getText("sowAllInactive") : this.i18nModel.getText("sowAllActive");
-                await this.CommonUpdateCall(oData, Message);
+                await this.CommonUpdateCall(oData, Message, "ActiveInactive");
                 this.SimpleFormModel.setProperty("/BtnEnable", false);
             },
 
-            CommonUpdateCall: async function (Data, Message) {
+            CommonUpdateCall: async function (Data, Message, type) {
                 var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
-                if (!oModelDataPro || oModelDataPro.length === 0) return MessageToast.show(this.i18nModel.getText("msaTableValidation"));
-                for (let i = 0; i < oModelDataPro.length; i++) {
-                    let row = oModelDataPro[i];
-                    if (!row.Salutation || !row.ConsultantName || !row.Designation || !row.Rate) {
-                        sap.m.MessageBox.error(`All  fields in Row  ${i + 1}  must be completed to continue`);
-                        return;
+                if (type !== "ActiveInactive") {
+                    if (!oModelDataPro || oModelDataPro.length === 0) return MessageToast.show(this.i18nModel.getText("msaTableValidation"));
+                    for (let i = 0; i < oModelDataPro.length; i++) {
+                        let row = oModelDataPro[i];
+                        if (!row.Salutation || !row.ConsultantName || !row.Designation || !row.Rate) {
+                            sap.m.MessageBox.error(`All  fields in Row  ${i + 1}  must be completed to continue`);
+                            return;
+                        }
                     }
-                }
-                if (this.ConsultantName === false || this.Desiganation === false || this.Rate === false) {
-                    return MessageToast.show(this.i18nModel.getText("mandatoryFieldsSow"));
+                    if (this.ConsultantName === false || this.Desiganation === false || this.Rate === false) {
+                        return MessageToast.show(this.i18nModel.getText("mandatoryFieldsSow"));
+                    }
                 }
                 this.getBusyDialog();
                 try {
@@ -581,7 +589,7 @@ sap.ui.define([
                     if (oFilteredData.length === 0) {
                         this.ExtendBtn = false;
                         this.byId("Sow_Id_ReadTable").removeSelections();
-                        return sap.m.MessageBox.error(this.i18nModel.getText("extendActiveMess"));
+                        return sap.m.MessageBox.error(this.i18nModel.getText("relesedActiveMess"));
                     }
                 } else {
                     var oFilteredData = FilterData;
@@ -733,7 +741,7 @@ sap.ui.define([
                     }))
                 };
                 this.byId("MsaE_id_SowStatus").setValue("Inactive");
-                await this.CommonUpdateCall(oJson, this.i18nModel.getText("sowAllRelesedUpdate"));
+                await this.CommonUpdateCall(oJson, this.i18nModel.getText("sowAllRelesedUpdate"),"");
                 // this.SOW_oDialog.close();
                 this.SimpleFormModel.setProperty("/BtnEnable", false);
             },
@@ -765,7 +773,7 @@ sap.ui.define([
                     }))
                 };
                 this.byId("MsaE_id_SowStatus").setValue("New");
-                await this.CommonUpdateCall(oData, this.i18nModel.getText("sowUpdate"));
+                await this.CommonUpdateCall(oData, this.i18nModel.getText("sowUpdate"),"");
                 // this.SOW_oDialog.close();
                 this.SimpleFormModel.setProperty("/BtnEnable", false);
             },

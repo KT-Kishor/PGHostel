@@ -399,7 +399,7 @@ sap.ui.define(
                                 this.getBusyDialog();
                                 var updateContract = await this.ajaxCreateWithJQuery("ContractStatusUpdate", jsonData);
                                 if (updateContract.success) {
-                                    MessageToast.show(this.i18nModel.getText("agreementUpdatedSuccess"));
+                                    MessageToast.show(this.i18nModel.getText("agreementRenewSuccess"));
                                     this.oContractDialog.close();
                                     this.byId("C_id_ActivateBtn").setEnabled(false);
                                     this.byId("C_id_Renewbtn").setEnabled(false);
@@ -475,7 +475,7 @@ sap.ui.define(
                             this.getBusyDialog();
                             var updateResponse = await this.ajaxUpdateWithJQuery("Contract", requestData);
                             if (updateResponse.success) {
-                                MessageToast.show(this.i18nModel.getText("agreementUpdatedSuccess"));
+                                MessageToast.show(this.i18nModel.getText("agreementActiveSuccess"));
                                 this.oContractDialog.close();
                                 this.byId("C_id_ActivateBtn").setEnabled(false);
                                 this.byId("C_id_Renewbtn").setEnabled(false);

@@ -23,7 +23,8 @@ sap.ui.define([
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
             if (!LoginFUnction) return;
-            await this.PO_ReadCall()
+            this.finacial()
+            await this.PO_onSearch()
 
             await this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
             // this._fetchCommonData("Currency", "CurrencyModel");
@@ -40,15 +41,32 @@ sap.ui.define([
                 "Unit": "",
                 "Amount": "",
                 "Currency": "",
-                "Notes":"",
+                "Notes": "",
                 "PurchaseOrders": [],
 
             })
             this.getView().setModel(model, "PurchaseOrderModel");
 
+
+            
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Purchase Order");
             this._ViewDatePickersReadOnly(["PO_idECreationDatePicker"], this.getView());
 
+        },
+        finacial: function () {
+            var oDateRange = this.byId("PO_idECreationDatePicker");
+            var today = new Date();
+            var currentYear = today.getFullYear();
+            var currentMonth = today.getMonth();
+
+            var startYear = currentMonth >= 3 ? currentYear : currentYear - 1;
+            var endYear = startYear + 1;
+
+            var oStartDate = new Date(startYear, 3, 1);
+            var oEndDate = new Date(endYear, 2, 31);
+
+            oDateRange.setDateValue(oStartDate);
+            oDateRange.setSecondDateValue(oEndDate)
         },
         onPressback: function () {
             this.getRouter().navTo("RouteTilePage");
@@ -57,12 +75,12 @@ sap.ui.define([
             this.CommonLogoutFunction()
         },
         PO_onCreatePurchaseOrder: function () {
-            
-            this.getRouter().navTo("PurchaseOrderObject",{sPath:"PurchaseOrder"});
+
+            this.getRouter().navTo("PurchaseOrderObject", { sPath: "PurchaseOrder" });
 
         },
-     
-       
+
+
         PO_onCloseFrag: function () {
             this.PO_oDialog.close();
             var oModel = this.getView().getModel("PurchaseOrderModel");
@@ -72,19 +90,19 @@ sap.ui.define([
 
 
         },
-       
+
         PO_onAmountInputChange: function (oEvent) {
             utils._LCvalidateAmount(oEvent);
         },
         onDescriptionInputLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent)
         },
-        FPO_onDateChange:function(oEvent){
-              utils._LCvalidateDate(oEvent)
+        FPO_onDateChange: function (oEvent) {
+            utils._LCvalidateDate(oEvent)
         },
 
-      
-          PO_ReadCall: async function () {
+
+        PO_ReadCall: async function () {
             this.getBusyDialog()
             await this.ajaxReadWithJQuery("PurchaseOrder").then((oData) => {
                 var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -107,12 +125,14 @@ sap.ui.define([
                 "Delete Confirmation",
                 "Are you sure you want to delete this Purchase Order?",
                 () => {
+                    this.getBusyDialog()
                     this.ajaxDeleteWithJQuery("PurchaseOrder", { filters: { PoNumber: PoNumber } }).then(() => {
                         MessageToast.show(this.i18nModel.getText("purchaseOrderDeleted"));
-                         this.PO_ReadCall();
+                        this.PO_ReadCall();
+                     
                     });
                 },
-                 function () { Table.removeSelections() }
+                function () { Table.removeSelections() }
             );
 
         },
@@ -126,9 +146,9 @@ sap.ui.define([
         },
         PO_onSearch: function () {
             var CustName1 = this.getView().byId("PO_id_CustomerName")
-            var CustName  = CustName1.getSelectedKey()  ? CustName1.getSelectedKey()  : CustName1.getValue()
+            var CustName = CustName1.getSelectedKey() ? CustName1.getSelectedKey() : CustName1.getValue()
 
-            var Po = this.getView().byId("PO_id_PoNumber").getSelectedKey() ? this.getView().byId("PO_id_PoNumber").getSelectedKey() :this.getView().byId("PO_id_PoNumber").getValue()
+            var Po = this.getView().byId("PO_id_PoNumber").getSelectedKey() ? this.getView().byId("PO_id_PoNumber").getSelectedKey() : this.getView().byId("PO_id_PoNumber").getValue()
             var oDateRange = this.getView().byId("PO_idECreationDatePicker")
             var odateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
             var oStartDate = oDateRange.getDateValue();
@@ -151,16 +171,21 @@ sap.ui.define([
             this.ajaxReadWithJQuery("PurchaseOrder", filters).then((oData) => {
                 var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 this.getOwnerComponent().setModel(new JSONModel(PoData), "POModel");
-                 this.closeBusyDialog()
+                 this.ajaxReadWithJQuery("PurchaseOrder").then((oData) => {
+                var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                this.getOwnerComponent().setModel(new JSONModel(PoData), "POModelfilter");
+                this.closeBusyDialog()
+            });
+                this.closeBusyDialog()
             });
         },
         PO_onPressClear: function () {
             this.getView().byId("PO_id_CustomerName").setSelectedKey("");
             this.getView().byId("PO_id_PoNumber").setSelectedKey("");
-            this.getView().byId("PO_idECreationDatePicker").setValue("");
+          this.finacial()
         },
-        onClearNotesPress:function(){
-            this.getView().getModel("PurchaseOrderModel").setProperty("/Notes","")
+        onClearNotesPress: function () {
+            this.getView().getModel("PurchaseOrderModel").setProperty("/Notes", "")
         }
 
     });

@@ -31,14 +31,14 @@
 					</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Source" label="{i18n>expSource}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Source" showClearIcon="true" showSecondaryValues="true" id="Exp_id_SourceFilter" items="{BaseLocationModel>/}">
+						<ComboBox name="Source" showClearIcon="true" showSecondaryValues="true" id="Exp_id_SourceFilter" items="{path: 'BaseLocationModel>/', sorter: {path: 'CountryCode',descending: false,group: true}}">
 							<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Destination" label="{i18n>expDestination}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Destination" id="Exp_id_DestinationFilter" showSecondaryValues="true" showClearIcon="true" items="{BaseLocationModel>/}">
+						<ComboBox name="Destination" id="Exp_id_DestinationFilter" showSecondaryValues="true" showClearIcon="true" items="{path: 'BaseLocationModel>/', sorter: {path: 'CountryCode',descending: false,group: true}}">
 							<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 						</ComboBox>
 					</fb:control>
@@ -65,12 +65,12 @@
 	   selectionChange="onTableSelectionChange"
        busyIndicatorDelay="0">			 <headerToolbar>
                 <OverflowToolbar >
-                    <Title id="title" text="Expense Details ({= ${ExpenseModel>/}.length })"/>
+                    <Title id="title" text="{i18n>expDetails} ({= ${ExpenseModel>/}.length })"/>
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
                     <ToolbarSpacer/>
-					<Button  type="Ghost" text="{i18n>download}" press="Exp_onPressExpenseDownload" />
-					<Button  type="Reject" enabled="false" id="Exp_id_DeleteBtn" text="{i18n>deleteExpense}" press="Exp_onPressDeleteExpense" />
+					<Button  type="Ghost" text="{i18n>download}" tooltip="{i18n>downloadPerdiem}" press="Exp_onPressExpenseDownload" />
+					<Button  type="Reject" tooltip="{i18n>deleteExpense}" enabled="false" id="Exp_id_DeleteBtn" text="{i18n>deleteExpense}" press="Exp_onPressDeleteExpense" />
                    <Button  type="Accept" text="{i18n>expAddBtn}" tooltip="{i18n>expenseAddTooltip}" press="Exp_onPressAddExpense" />
                 </OverflowToolbar>
             </headerToolbar>

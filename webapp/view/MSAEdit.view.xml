@@ -130,7 +130,7 @@
             <layout:HorizontalLayout>
                 <m:Label showColon="true" text="{i18n>Address}" />
                 <m:Text
-                    text="{FilteredMsaModel>/0/Address} {FilteredMsaModel>/0/Country}  {FilteredMsaModel>/0/City} "
+                    text="{FilteredMsaModel>/0/Address} {FilteredMsaModel>/0/City} {FilteredMsaModel>/0/Country}"
                     width="300px"
                     wrapping="true"
                     wrappingType="Normal"
@@ -150,7 +150,7 @@
 								<m:Table items="{path:'SowReadModel>/',sorter: {path: 'Description',descending: false,group: true}}" busyIndicatorDelay="0" id="Sow_Id_ReadTable" mode="SingleSelectLeft" selectionChange="onPressChangeSow">
 									<m:headerToolbar>
     <m:OverflowToolbar>
-        <m:Title text="{i18n>sowTitle} ({= ${SowReadModel>/}.length })">
+        <m:Title text="{i18n>sowTitle}">
            
         </m:Title>
 

@@ -93,7 +93,7 @@ sap.ui.define([
                 }
             },
 
-             onLogout: function () {
+            onLogout: function () {
                 this.CommonLogoutFunction();
             },
 
@@ -200,7 +200,7 @@ sap.ui.define([
                 this.ViewModel.setProperty("/SubmitBtn", false);
                 this.ViewModel.setProperty("/SaveBtn", true);
                 this.openFragment();
-                if (this.SelectedData.ItemType === "Peridiem Declaration") {
+                if (this.SelectedData.ItemType === "Perdiem Declaration") {
                     this.ViewModel.setProperty("/enable", false);
                 } else {
                     this.ViewModel.setProperty("/enableDelete", true);
@@ -268,6 +268,7 @@ sap.ui.define([
 
             Exp_Det_onEditOrSavePress: function () {
                 var isEditMode = this.ViewModel.getProperty("/isEditMode");
+                this.byId("exp_Id_ExpenseTable").removeSelections();
                 if (isEditMode) {
                     this.onPressSave();
                 } else {
@@ -315,6 +316,8 @@ sap.ui.define([
                 if (oEvent.getSource().getValue() === '') {
                     oEvent.getSource().setValueState("None")
                 }
+                this.byId("Exp_id_Source").setValue("");
+                this.byId("Exp_id_Destination").setValue("");
                 this.CountryAndCity();
             },
 
@@ -328,7 +331,7 @@ sap.ui.define([
             onPressSave: async function () {
                 if (
                     utils._LCvalidateMandatoryField(this.byId("Exp_id_Source"), "ID") &&
-                    (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"), "ID") : true) && utils._LCstrictValidationComboBox(this.byId("Exp_id_Country"), "ID") && utils._LCvalidateMandatoryField(this.byId("Exp_id_EmpRemark"), "ID")) {
+                    (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"), "ID") : true) && utils._LCstrictValidationComboBox(this.byId("Exp_id_Country"), "ID")) {
                     var oModel = this.getView().getModel("FilteredExpenseModel");
                     oModel.getData()[0].ExpStartDate = oModel.getData()[0].ExpStartDate.split("T")[0];
                     oModel.getData()[0].ExpEndDate = oModel.getData()[0].ExpEndDate.split("T")[0];
@@ -368,7 +371,8 @@ sap.ui.define([
                 const oData = oContext.getObject();
                 const sMimeType = oData.AttachmentType || "image/png";
                 const sBase64 = oData.Attachment;
-                const sFileName = "Document Preview";
+                const sFileName = oData.FileName || "Document Preview";
+
                 if (!this._oPreviewDialog) {
                     this._oPreviewDialog = new sap.m.Dialog({
                         title: sFileName,
@@ -391,7 +395,9 @@ sap.ui.define([
                     });
                     this.getView().addDependent(this._oPreviewDialog);
                 }
+
                 this._oPreviewDialog.removeAllContent();
+
                 if (sMimeType.startsWith("image/")) {
                     const sFileUri = `data:${sMimeType};base64,${sBase64}`;
                     const oImage = new sap.m.Image({
@@ -400,8 +406,8 @@ sap.ui.define([
                     });
                     oImage.addStyleClass("imagePreviewFit");
                     this._oPreviewDialog.addContent(oImage);
+                    this._oPreviewDialog.open();
                 } else if (sMimeType === "application/pdf") {
-                    // Convert base64 to Blob
                     const byteCharacters = atob(sBase64);
                     const byteArrays = [];
                     for (let offset = 0; offset < byteCharacters.length; offset += 512) {
@@ -416,21 +422,48 @@ sap.ui.define([
                     const blob = new Blob(byteArrays, { type: sMimeType });
                     const sBlobUrl = URL.createObjectURL(blob);
                     this._pdfBlobUrl = sBlobUrl;
+
                     this._oPreviewDialog.addContent(new sap.ui.core.HTML({
                         content: `<iframe src="${sBlobUrl}" width="100%" height="600px" style="border:none;"></iframe>`
                     }));
+                    this._oPreviewDialog.open();
                 } else {
-                    this._oPreviewDialog.addContent(new sap.m.Text({
-                        text: "Preview not supported."
-                    }));
+                    // Unsupported type: Trigger download
+                    try {
+                        const byteCharacters = atob(sBase64);
+                        const byteArrays = [];
+
+                        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                            const slice = byteCharacters.slice(offset, offset + 512);
+                            const byteNumbers = new Array(slice.length);
+                            for (let i = 0; i < slice.length; i++) {
+                                byteNumbers[i] = slice.charCodeAt(i);
+                            }
+                            const byteArray = new Uint8Array(byteNumbers);
+                            byteArrays.push(byteArray);
+                        }
+
+                        const blob = new Blob(byteArrays, { type: sMimeType });
+                        const sBlobUrl = URL.createObjectURL(blob);
+
+                        const link = document.createElement("a");
+                        link.href = sBlobUrl;
+                        link.download = oData.FileName || "attachment";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+
+                        URL.revokeObjectURL(sBlobUrl);
+                    } catch (e) {
+                        MessageToast.show("Attachment could not be downloaded.");
+                    }
                 }
-                this._oPreviewDialog.open();
             },
 
             Exp_Frg_onItemTypeChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 var oText = oEvent.getSource().getSelectedItem().getText();
-                if (oText === "Peridiem Declaration") {
+                if (oText === "Perdiem Declaration") {
                     this.ViewModel.setProperty("/enable", false);
                     this.getView().getModel("ExpenseCreateModel").getData().ExpenseAmount = 0;
                     this.getView().getModel("ExpenseCreateModel").getData().ModeOfPayment = "Company";
@@ -511,8 +544,7 @@ sap.ui.define([
             async Exp_Det_onPressSubmit() {
                 var oModel = this.getView().getModel("ExpenseCreateModel").getData();
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
-                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Peridiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
-                    // ❗ Attachment validation
+                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
 
                     var Attachment = this.getView().getModel("tokenModel").getData();
                     if (!Attachment.tokens || Attachment.tokens.length === 0) {
@@ -565,7 +597,21 @@ sap.ui.define([
                 var oModel = this.getView().getModel("ExpenseCreateModel").getData();
                 var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
-                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
+                if (
+                    utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") &&
+                    (
+                        oModel.ItemType === "Perdiem Declaration"
+                            ? true
+                            : (
+                                utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") &&
+                                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") &&
+                                (
+                                    oModel.Currency !== "INR"
+                                        ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID")
+                                        : true
+                                )))) {
+
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var Attachment = this.getView().getModel("tokenModel").getData();
                     if (!Attachment.tokens.length > 0) {
@@ -619,19 +665,14 @@ sap.ui.define([
             Exp_Det_onPressExpenseItemDelete: async function () {
                 const that = this;
                 const selectedItem = this.byId("exp_Id_ExpenseTable").getSelectedItem();
-
                 if (!selectedItem) {
                     return MessageToast.show(this.i18nModel.getText("expenseDeleteSelectRowMess"));
                 }
-
-                this.byId("exp_Id_ExpenseTable").setBusy(true);
-
                 this.showConfirmationDialog(
                     this.i18nModel.getText("msgBoxConfirm"),
                     this.i18nModel.getText("commonMesBoxConfirmDelete"),
                     async function () {
-                        that.byId("exp_Id_ExpenseTable").setBusy(true);
-
+                        that.getBusyDialog();
                         try {
                             const itemID = selectedItem.getBindingContext("ItemExpenseModel").getObject().ItemID;
                             await that.ajaxDeleteWithJQuery("/ItemExpense", {
@@ -647,11 +688,11 @@ sap.ui.define([
                         } catch (error) {
                             MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
                         } finally {
-                            that.byId("exp_Id_ExpenseTable").setBusy(false);
+                            that.closeBusyDialog();
                         }
                     },
                     function () {
-                        that.byId("exp_Id_ExpenseTable").setBusy(false);
+                        that.closeBusyDialog();
                     });
             },
 
@@ -676,7 +717,7 @@ sap.ui.define([
 
                 if (oModelData.TravelAllowance === "YES") {
                     var hasPerDiemDeclaration = itemExpenses.some(function (item) {
-                        return item.ItemType === "Peridiem Declaration";
+                        return item.ItemType === "Perdiem Declaration";
                     });
 
                     if (!hasPerDiemDeclaration) {
@@ -684,13 +725,11 @@ sap.ui.define([
                     }
                 }
 
-                // Checkbox for confirmation
                 var checkbox = new sap.m.CheckBox({
                     text: that.i18nModel.getText("expenseSubmittedMess"),
                     selected: false
                 });
 
-                // TextArea for comments (visible only when status !== "Draft")
                 var commentTextArea = new sap.m.TextArea({
                     placeholder: that.i18nModel.getText("enterComments"),
                     rows: 3,
@@ -829,7 +868,6 @@ sap.ui.define([
                         }
                     })
                 });
-
                 oDialog.open();
             },
 
@@ -846,7 +884,6 @@ sap.ui.define([
                 var oData = Array.isArray(aData) && aData.length > 0 ? aData[0] : {};
                 var aComments = oData.comments || [];
 
-                // ✅ Reverse the array to show latest comments first
                 var aTimelineItems = aComments.reverse().map(function (oComment) {
                     return new sap.suite.ui.commons.TimelineItem({
                         dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
@@ -856,17 +893,15 @@ sap.ui.define([
                         icon: "sap-icon://comment"
                     });
                 });
-
                 var oTimeline = new sap.suite.ui.commons.Timeline({
                     showHeader: false,
                     enableBusyIndicator: false,
                     width: "100%",
-                    sortOldestFirst: false, // Can remain true since items are reversed manually
+                    sortOldestFirst: false,
                     enableDoubleSided: false,
                     content: aTimelineItems,
                     showHeaderBar: false
                 });
-
                 var oVBox = oView.byId("timelineContainer");
                 oVBox.removeAllItems();
                 oVBox.addItem(oTimeline);

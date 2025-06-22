@@ -34,6 +34,7 @@ sap.ui.define([
                 this.Discount = true;
                 this.RateUnit = true;
                 this.Particulars = true;
+                this.mobileNo = true;
                 this.ResivedTDSFlag = true;
                 this.byId("CID_id_AddCustComboBox").setValueState("None");
                 this.byId("CID_id_InvoiceDesc").setValueState("None");
@@ -188,7 +189,7 @@ sap.ui.define([
                 this.SelectedCustomerModel.setProperty("/Name", SelectedData.name);
                 this.SelectedCustomerModel.setProperty("/PAN", SelectedData.PAN);
                 this.SelectedCustomerModel.setProperty("/GST", SelectedData.GST);
-                this.SelectedCustomerModel.setProperty("/Address", SelectedData.address);
+                this.SelectedCustomerModel.setProperty("/Address", SelectedData.address + " ," + SelectedData.baseLocation + " ," + SelectedData.country);
                 this.SelectedCustomerModel.setProperty("/MailID", SelectedData.mailID);
                 this.SelectedCustomerModel.setProperty("/MobileNo", SelectedData.mobileNo);
                 this.SelectedCustomerModel.setProperty("/Type", SelectedData.type);
@@ -217,7 +218,7 @@ sap.ui.define([
                 this.getBusyDialog();
                 const oData = await this.ajaxReadWithJQuery("MSADetails", { MsaID: this.SelectKey });
                 const oSelectedCustomerModel = this.getView().getModel("SelectedCustomerModel");
-                if (oData.success) {
+                if (oData.success && oData.data.length !== 0) {
                     var paymentDateObj = new Date(oSelectedCustomerModel.getData().InvoiceDate);
                     var paymentDay = parseInt(oData.data[0].PaymentTerms);
                     paymentDateObj.setDate(paymentDateObj.getDate() + (paymentDay - 1));
@@ -308,6 +309,7 @@ sap.ui.define([
                     this.byId("idSAC").setVisible(isINR);
                     this.byId("idGSTCalculation").setVisible(isINR);
                     this.visiablityPlay.setProperty("/IncomeTax", isINR);
+                    this.visiablityPlay.setProperty("/TDS", isINR);
                     this.visiablityPlay.setProperty("/GST", isINR);
                     oSelectedCustomerModel.setProperty("/type", isINR ? this.Type : "");
                     if (!oSelectedCustomerModel.getProperty("/GST")) {
@@ -332,6 +334,7 @@ sap.ui.define([
                         const tds = ((total * incomePerc) / 100).toFixed(2);
                         oModel.setProperty("/IncomeTax", Math.round(tds));
                     }
+                    this.visiablityPlay.refresh(true);
                 } catch (error) {
                     MessageToast.show(error.responseText);
                 } finally {
@@ -350,7 +353,7 @@ sap.ui.define([
                     Particulars: "",
                     SAC: "998314",
                     GSTCalculation: (currency === "INR") ? "YES" : "",
-                    Unit: "",
+                    Unit: "1",
                     Rate: "",
                     UnitText: "Per Day",
                     Currency: currency,
@@ -399,10 +402,15 @@ sap.ui.define([
                 let totalWithoutGST = 0;
 
                 aSOWDetails.forEach((item) => {
+                    if (oSOWModel.getProperty("/Currency") === "INR" && !oCustomerModel.getProperty("/GST")) {
+                        oCustomerModel.setProperty("/Value", '9');
+                        oCustomerModel.setProperty("/Type", 'CGST/SGST');
+                        this.visiablityPlay.setProperty("/GST", true);
+                    }
                     const rate = (isNaN(parseFloat(item.Rate)) || parseFloat(item.Rate) === 0) ? 1 : parseFloat(item.Rate);
                     const unit = (isNaN(parseFloat(item.Unit)) || parseFloat(item.Unit) === 0) ? 1 : parseFloat(item.Unit);
                     const baseAmount = unit * rate;
-
+                    item.Unit = unit
                     let discountAmount = 0;
 
                     // Check if discount is in percentage format
@@ -549,7 +557,7 @@ sap.ui.define([
                 if (!sValue) {
                     oInput.setValueState("None");
                     oInput.setValueStateText("");
-                    this.CI_updateTotalAmount();
+                    // this.CI_updateTotalAmount();
                     this.Discount = true;
                 } else if (!regex.test(sValue)) {
                     oInput.setValueState("Error");
@@ -620,13 +628,6 @@ sap.ui.define([
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
 
-                // if (FilterModel.Currency === "INR") {
-                //     if (!oSelectedCustomerModel.GST || oSelectedCustomerModel.GST.trim() === "") {
-                //         sap.m.MessageBox.error(this.i18nModel.getText("gstMessage"));
-                //         return false;
-                //     }
-                // }
-
                 const oPayload = {
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
                     CustomerName: (sMode === 'update') ? oSelectedCustomerModel.CustomerName : oSelectedCustomerModel.Customer,
@@ -648,7 +649,7 @@ sap.ui.define([
                     TotalAmount: parseFloat(oModel.TotalAmount) || 0,
                     Status: oSelectedCustomerModel.Status,
                     InvoiceDescription: oSelectedCustomerModel.InvoiceDescription || "",
-                    IncomeTax: oSelectedCustomerModel.IncomeTax,
+                    IncomeTax: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomeTax : "",
                     MailID: oSelectedCustomerModel.MailID,
                     Type: oSelectedCustomerModel.Type || "",
                     Value: (!oSelectedCustomerModel.Value || isNaN(oSelectedCustomerModel.Value)) ? "0" : oSelectedCustomerModel.Value,
@@ -657,7 +658,7 @@ sap.ui.define([
                     SubTotalNotGST: parseFloat(oSelectedCustomerModel.SubTotalNotGST) || 0,
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
                     LUT: String(oSelectedCustomerModel.LUT),
-                    IncomePerc: oSelectedCustomerModel.IncomePerc || "10",
+                    IncomePerc: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
                 };
                 const aItemsRaw = oCompanyInvoiceItemModel.CompanyInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -729,7 +730,7 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.byId("CID_id_CurrencySelect"), "ID");
                     const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"), "ID") : true;
                     const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;
-                    const bOptionalValid = !!this.Discount && !!this.RateUnit && !!this.Particulars;
+                    const bOptionalValid = this.Discount && this.RateUnit && this.Particulars;
                     const bIsValid = bMandatoryValid && bTDSValid && bOptionalValid && bConversionRateValid;
                     if (!bIsValid) {
                         return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
@@ -800,11 +801,15 @@ sap.ui.define([
             },
             CID_onPressLiveChangeEmail: function (oEvent) { utils._LCvalidateEmail(oEvent) },
 
+            CID_onPressLiveChangeMobileNo: function (oEvent) {
+                this.mobileNo = utils._LCvalidateMobileNumber(oEvent);
+            },
+
             onPressUpdateInvoice: async function () {
                 try {
                     var oModel = this.getView().getModel("FilteredSOWModel").getData();
                     const bIsValid =
-                        utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") && this.mobileNo &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_SowPO"), "ID") &&
                         utils._LCvalidateEmail(this.byId("CID_id_InputMailID"), "ID") &&
                         (!!this.Discount && !!this.RateUnit && !!this.Particulars) &&
@@ -897,7 +902,7 @@ sap.ui.define([
                     DueAmount: (
                         this.getView().getModel("InvoicePayment").getData().length !== 0
                             ? parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount")) - parseFloat(ResivedTDSData || 0)
-                            : parseFloat(oNavigationModel.TotalAmount) - parseFloat(oNavigationModel.IncomeTax)
+                            : parseFloat(oNavigationModel.TotalAmount || 0) - parseFloat(oNavigationModel.IncomeTax || 0)
                     ).toFixed(2),
                     Currency: oNavigationModel.Currency,
                     ReceivedTDS: ResivedTDSData,
@@ -945,7 +950,7 @@ sap.ui.define([
                     } else {
                         sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
                         this.ResivedAmount = true;
-                        utils._LCvalidateAmount(oEvent);
+                        utils._LCvalidateAmountZeroTaking(oEvent);
                     }
                 }
             },
@@ -1010,17 +1015,16 @@ sap.ui.define([
                 sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
                 sap.ui.getCore().byId("idFrgConvertionRate").setValueState("None");
                 this.oDialog.close()
-                this._oDialog.destroy(true);  // Destroy the dialog and cleanup
+                this._oDialog.destroy(true); 
                 this._oDialog = null;
             },
             onLiveTransactionID: function (oEvent) { utils._LCvalidateMandatoryField(oEvent) },
             onReceivedDateDatePickerChange: function (oEvent) { utils._LCvalidateDate(oEvent); },
             onChangePaymentRecived: async function () {
                 var paymentModel = this.getView().getModel("PaymentModel").getData();
-
                 const isMandatoryValid =
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idTransactionID"), "ID") &&
-                    utils._LCvalidateAmount(sap.ui.getCore().byId("idReceivedAmount"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("idReceivedDate"), "ID");
+                    utils._LCvalidateDate(sap.ui.getCore().byId("idReceivedDate"), "ID");
 
                 let isCurrencyValid = true;
                 if (paymentModel.Currency !== "INR") {
@@ -1028,7 +1032,6 @@ sap.ui.define([
                 } else {
                     await this.onChangeReceivedTDS(); // now returns boolean
                 }
-
                 const isValid = isMandatoryValid && isCurrencyValid && this.ResivedAmount && this.ResivedTDSFlag;
                 if (!this.ResivedAmount) sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
 
@@ -1036,9 +1039,12 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
+                if (Number(paymentModel.DueAmount) < 0) {
+                    sap.m.MessageBox.show(this.i18nModel.getText("dueAmountZeroOrNegative"));
+                    return;
+                }
 
                 this.getBusyDialog();
-
                 const jsonData = {
                     InvNo: String(paymentModel.InvNo),
                     TransactionId: String(paymentModel.TransactionId),
@@ -1084,10 +1090,13 @@ sap.ui.define([
                 if (oEvent.getSource().getValue() !== "INR") {
                     this.byId("idSAC").setVisible(false);
                     this.byId("idGSTCalculation").setVisible(false);
+                    this.visiablityPlay.setProperty("/TDS", false);
                 } else {
                     this.byId("idSAC").setVisible(true);
                     this.byId("idGSTCalculation").setVisible(true);
+                    this.visiablityPlay.setProperty("/TDS", true);
                 }
+                this.visiablityPlay.refresh(true);
                 this.totalAmountCalculation();
             },
             CD_onDiscountInfoPress: function (oEvent) {
@@ -1357,16 +1366,7 @@ sap.ui.define([
                 const img = await this._convertBLOBToImage(imgblob);
                 const signature = await this._convertBLOBToImage(signBlob);
 
-                let currency = data.Currency === "INR" ? "Rupees" : data.Currency;
-                let totalInWords = this.convertNumberToWords(oModel.TotalAmount, currency);
-                if (data.Currency !== "INR") {
-                    totalInWords = totalInWords
-                        .replaceAll("Lakh", "Million")
-                        .replaceAll("Crore", "Billion")
-                        .replaceAll("Paise", "Cents")
-                        .replaceAll("Rupees", "Dollars");
-                }
-
+                let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
                 const showSAC = oModel.GST !== undefined && oModel.GST !== "";
 
                 const margin = 15;
@@ -1420,9 +1420,21 @@ sap.ui.define([
                 doc.setFont("times", "bold").setFontSize(11);
                 doc.text("To,", margin, currentY);
                 currentY += 5;
+
                 doc.setFont("times", "normal").setFontSize(11);
-                doc.text(oModel.CustomerName, margin, currentY);
-                currentY += 5;
+                const maxLength = 30;
+                const customerName = oModel.CustomerName || "";
+                const lines = [];
+
+                for (let i = 0; i < customerName.length; i += maxLength) {
+                    lines.push(customerName.substring(i, i + maxLength));
+                }
+
+                lines.forEach(line => {
+                    doc.text(line, margin, currentY);
+                    currentY += 5;
+                });
+
 
                 const customerAddressLines = doc.splitTextToSize(oModel.Address, usableWidth / 2 - 10);
                 doc.text(customerAddressLines, margin, currentY);

@@ -30,132 +30,130 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     // }
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
-                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false,
+                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false ,
                         isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false, SelfServiceBtn: false
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
                     var sLoggedInRole = loginModel.getProperty("/Role");
+                    if (["Admin", "HR Manager", "HR"].includes(sLoggedInRole)) {
+                        this.ViewModel.setProperty("/ShowStatusControl", true);
+                    } else {
+                        this.ViewModel.setProperty("/ShowStatusControl", false);
+                    }
                     this.sNavigatedRole = oEvent.getParameter("arguments").Role; // Role from navigation
                     this.sPath = oEvent.getParameter('arguments').sPath;
                     // sections if role is "Trainee" from either login or navigation
-                    if (this.sNavigatedRole === "MyInboxResignation") {
-                        this.sFlag = true
-                        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
-                            EmployeeID: this.sPath
-                        });
-                        this.onApplyResignation();
-                    } else {
-                        var bHideSalarySection = sLoggedInRole === "Trainee" || this.sNavigatedRole === "Trainee";
-                        this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
+                    var bHideSalarySection = sLoggedInRole === "Trainee" || this.sNavigatedRole === "Trainee";
+                    this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
 
-                        var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lpa", "SS_id_lca", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
-                            "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan",];
-                        if (this.sPath === "SelfService") {
-                            this.ViewModel.setProperty("/SelfServiceBtn", true);
-                            this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileSelfSerciceFooter"));
-                            this.ViewModel.setProperty("/SetProfile", true);
-                            if (loginModel) this.EmployeeID = loginModel.getProperty("/EmployeeID");
-                            aIds.forEach(function (sId) {
-                                this.getView().byId(sId).setRequired(true);
-                            }.bind(this));
-                            this.byId("SS_id_lc").setRequired(false)
-                            this.byId("SS_id_lbase").setRequired(false)
-                            this.byId("SS_id_lds").setRequired(false)
-                            this.byId("SS_id_Lmg").setRequired(false)
-                        }
-                        else {
-                            this.ViewModel.setProperty("/SelfServiceBtn", false);
-                            this.EmployeeID = this.sPath;
-                            this.byId("SS_id_lc").setRequired(true)
-                            this.byId("SS_id_lbase").setRequired(true)
-                            this.byId("SS_id_Lmg").setRequired(true)
-
-                            this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
-                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee") {
-                                this.ViewModel.setProperty("/Letter", true);
-                            } else {
-                                this.ViewModel.setProperty("/Letter", false);
-                            }
-                            if (["Admin", "HR Manager", "HR"].includes(loginModel.getProperty("/Role"))) {
-                                this.ViewModel.setProperty("/RelievingLetter", true);
-                            }
-                            aIds.forEach(function (sId) {
-                                this.getView().byId(sId).setRequired(false);
-                            }.bind(this));
-                        }
-                        if (this.sPath === "SelfService" && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee") {
-                            this.ViewModel.setProperty("/ResignationVisible", true);
-                        } else {
-                            this.ViewModel.setProperty("/ResignationVisible", false);
-                        }
-                        var employeeModel = new JSONModel();
-                        this.getOwnerComponent().setModel(employeeModel, "employeeModel");
-                        if (this.EmployeeID) {
-                            await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
-                                EmployeeID: this.EmployeeID
-                            });
-                            oView.getModel("sEmployeeModel").refresh(true);
-                            var oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
-                            if (this.sPath === "SelfService" && oModelAllData.Type !== "Submit") this.ViewModel.setProperty("/SelfService", true);
-
-                            if (!oModelAllData.EContactIStdCode) oModelAllData.EContactIStdCode = "+91";
-                            if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
-
-                            // --- Releving letter Button Visibility Logic ---
-                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && this.sNavigatedRole !== "Trainee") {
-                                this.byId("SS_id_Action").setVisible(true);
-                                this.ViewModel.setProperty("/TraineeRole", false);
-                                if (oModelAllData.EmployeeStatus === "Inactive") {
-                                    this.ViewModel.setProperty("/WorkCompletedVisible", true);
-                                    this.ViewModel.setProperty("/Letter", false); // Hide other letter buttons
-                                    this.ViewModel.setProperty("/RelievingLetter", false);
-                                    this.ViewModel.setProperty("/isVisitMode", false);
-                                } else if (oModelAllData.EmployeeStatus === "Active") {
-                                    this.ViewModel.setProperty("/WorkCompletedVisible", false);
-                                    this.ViewModel.setProperty("/isVisitMode", true);
-                                    this.ViewModel.setProperty("/Letter", true); // Show  buttons for active
-                                    this.ViewModel.setProperty("/RelievingLetter", true);
-                                }
-
-                            } else {
-                                this.ViewModel.setProperty("/WorkCompletedVisible", false);
-                                if (oModelAllData.EmployeeStatus === "Inactive")
-                                    this.byId("SS_id_Action").setVisible(false);
-                            }
-                            const oObjectPage = this.byId("ObjectPageLayout");
-                            const oSection = this.byId("basicDetailsSection");
-                            if (oObjectPage && oSection) {
-                                oObjectPage.setSelectedSection(oSection);
-                            }
-                        }
-                        this.managerID = this.getView().getModel("sEmployeeModel").getProperty("/0/ManagerID");
-                        var oTextModel = new JSONModel({ name: "" });
-                        this.getView().setModel(oTextModel, "TextDisplay");
-                        var oIdCardModel = this.getView().getModel("IdCardModel");
-                        if (oIdCardModel) {
-                            oIdCardModel.attachPropertyChange(this.IC_onPressDisplayImageOnCanvas.bind(this));
-                        }
-                        this.byId("SS_id_EmeNameF").setValueState("None");
-                        this.byId("SS_idRelF").setValueState("None");
-                        this.byId("SS_id_EmpMoF").setValueState("None");
-                        this.byId("SS_id_AddF").setValueState("None");
-                        this.byId("SS_id_NameS").setValueState("None");
-                        this.byId("SS_idRelS").setValueState("None");
-                        this.byId("SS_id_EmpMoS").setValueState("None");
-                        this.byId("SS_id_PAddress").setValueState("None");
-                        this.byId("SS_id_Manager").setValueState("None");
-                        this.byId("SS_id_BloodGroup").setValueState("None");
-                        this.byId("SS_id_CAdress").setValueState("None");
-                        this.byId("SS_id_EmpAddS").setValueState("None");
-                        this.byId("SS_id_MobileNo").setValueState("None");
-                        this.byId("SS_id_STDCode").setValueState("None");
-                        this.byId("SS_id_STDCodeRI").setValueState("None");
-                        this.byId("SS_id_STDCodeRII").setValueState("None");
-                        this.byId("SS_id_FatherName").setValueState("None");
-                        this.byId("SS_id_Compmail").setValueState("None");
+                    var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lpa", "SS_id_lca", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
+                        "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan", "SS_id_LAdhar"];
+                    if (this.sPath === "SelfService") {
+                        this.ViewModel.setProperty("/SelfServiceBtn", true);
+                        this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileSelfSerciceFooter"));
+                        this.ViewModel.setProperty("/SetProfile", true);
+                        if (loginModel) this.EmployeeID = loginModel.getProperty("/EmployeeID");
+                        aIds.forEach(function (sId) {
+                            this.getView().byId(sId).setRequired(true);
+                        }.bind(this));
+                        this.byId("SS_id_lc").setRequired(false)
+                        this.byId("SS_id_lbase").setRequired(false)
+                        this.byId("SS_id_lds").setRequired(false)
+                        this.byId("SS_id_Lmg").setRequired(false)
                     }
+                    else {
+                        this.ViewModel.setProperty("/SelfServiceBtn", false);
+                        this.EmployeeID = this.sPath;
+                        this.byId("SS_id_lc").setRequired(true)
+                        this.byId("SS_id_lbase").setRequired(true)
+                        this.byId("SS_id_Lmg").setRequired(true)
+
+                        this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
+                        if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee") {
+                            this.ViewModel.setProperty("/Letter", true);
+                        } else {
+                            this.ViewModel.setProperty("/Letter", false);
+                        }
+                        if (["Admin", "HR Manager", "HR"].includes(loginModel.getProperty("/Role"))) {
+                            this.ViewModel.setProperty("/RelievingLetter", true);
+                        }
+                        aIds.forEach(function (sId) {
+                            this.getView().byId(sId).setRequired(false);
+                        }.bind(this));
+                    }
+                    if (this.sPath === "SelfService" && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee") {
+                        this.ViewModel.setProperty("/ResignationVisible", true);
+                    } else {
+                        this.ViewModel.setProperty("/ResignationVisible", false);
+                    }
+                    var employeeModel = new JSONModel();
+                    this.getOwnerComponent().setModel(employeeModel, "employeeModel");
+                    if (this.EmployeeID) {
+                        await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
+                            EmployeeID: this.EmployeeID
+                        });
+                        oView.getModel("sEmployeeModel").refresh(true);
+                        var oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
+                        if (this.sPath === "SelfService" && oModelAllData.Type !== "Submit") this.ViewModel.setProperty("/SelfService", true);
+
+                        if (!oModelAllData.EContactIStdCode) oModelAllData.EContactIStdCode = "+91";
+                        if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
+
+                        // --- Releving letter Button Visibility Logic ---
+                        if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && this.sNavigatedRole !== "Trainee") {
+                            this.byId("SS_id_Action").setVisible(true);
+                            this.ViewModel.setProperty("/TraineeRole", false);
+
+                            if (oModelAllData.EmployeeStatus === "Inactive") {
+                                this.ViewModel.setProperty("/WorkCompletedVisible", true);
+                                this.ViewModel.setProperty("/Letter", false);
+                                this.ViewModel.setProperty("/isVisitMode", false);
+                                this.ViewModel.setProperty("/RelievingLetter", false);
+                            } else if (oModelAllData.EmployeeStatus === "Active") {
+                                this.ViewModel.setProperty("/WorkCompletedVisible", false);
+                                this.ViewModel.setProperty("/isVisitMode", true);
+                                this.ViewModel.setProperty("/Letter", true);
+                            }
+                        } else {
+                            this.ViewModel.setProperty("/WorkCompletedVisible", false);
+                            if (oModelAllData.EmployeeStatus === "Inactive") {
+                                this.byId("SS_id_Action").setVisible(false);
+                            }
+                        }
+                        const oObjectPage = this.byId("ObjectPageLayout");
+                        const oSection = this.byId("basicDetailsSection");
+                        if (oObjectPage && oSection) {
+                            oObjectPage.setSelectedSection(oSection);
+                        }
+                    }
+                    this.managerID = this.getView().getModel("sEmployeeModel").getProperty("/0/ManagerID");
+                    var oTextModel = new JSONModel({ name: "" });
+                    this.getView().setModel(oTextModel, "TextDisplay");
+                    var oIdCardModel = this.getView().getModel("IdCardModel");
+                    if (oIdCardModel) {
+                        oIdCardModel.attachPropertyChange(this.IC_onPressDisplayImageOnCanvas.bind(this));
+                    }
+                    this.byId("SS_id_EmeNameF").setValueState("None");
+                    this.byId("SS_idRelF").setValueState("None");
+                    this.byId("SS_id_EmpMoF").setValueState("None");
+                    this.byId("SS_id_AddF").setValueState("None");
+                    this.byId("SS_id_NameS").setValueState("None");
+                    this.byId("SS_idRelS").setValueState("None");
+                    this.byId("SS_id_EmpMoS").setValueState("None");
+                    this.byId("SS_id_PAddress").setValueState("None");
+                    this.byId("SS_id_Manager").setValueState("None");
+                    this.byId("SS_id_BloodGroup").setValueState("None");
+                    this.byId("SS_id_CAdress").setValueState("None");
+                    this.byId("SS_id_EmpAddS").setValueState("None");
+                    this.byId("SS_id_MobileNo").setValueState("None");
+                    this.byId("SS_id_STDCode").setValueState("None");
+                    this.byId("SS_id_STDCodeRI").setValueState("None");
+                    this.byId("SS_id_STDCodeRII").setValueState("None");
+                    this.byId("SS_id_FatherName").setValueState("None");
+                    this.byId("SS_id_Compmail").setValueState("None");
+
                 } catch (error) { } finally {
                     this.closeBusyDialog();
                 }
@@ -174,7 +172,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.i18nModel.getText("confirmNavigationTitle"),
                         this.i18nModel.getText("sectionChangeConfirm"),
                         async () => {
-                             viewModel.setProperty("/isEditMode", false);
+                            viewModel.setProperty("/isEditMode", false);
                             this._currentSection = oNewSection;
                             const sectionTitle = oNewSection.getTitle();
 
@@ -845,11 +843,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 } else {
                     if (this.sPath === "SelfService") {
                         this.getRouter().navTo("RouteTilePage");
-                    } else if (this.sFlag === true) {
-                        this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInbox" });
                     } else {
                         this.getRouter().navTo("RouteEmployeeDetails", { sPath: "SelfService" });
                     }
+                }
+                if (this["SSReg_oDialog"]) {
+                    this["SSReg_oDialog"].close();
+                    this["SSReg_oDialog"].destroy();
+                    this["SSReg_oDialog"] = null;
                 }
             },
             onLogout: function () {
@@ -2239,26 +2240,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation", ["RF_id_StartDate", "RF_id_EndDate"]);
                 let oModel = this.getView().getModel("sEmployeeModel");
                 let oData = oModel.getProperty("/0");
-                if (!oData) {
+                if (oData && !oData.ResignationStartDate && !oData.ResignationEndDate && !oData.ResignComment) {
                     // Data not loaded yet, fetch and retry
                     await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                     oData = oModel.getProperty("/0");
                 }
-                if (oData.ResignationStartDate && oData.ResignationEndDate && oData.ResignComment) {
-                    if (this.sFlag) {
-                        this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
-                        this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
-                        this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
-                        this.getView().getModel("viewModel").setProperty("/closeButtonVisible", false)
-                        this.getView().getModel("viewModel").setProperty("/backButtonVisible", true)
-                    } else {
-                        this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
-                        this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
-                        this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
-                        this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
-                        this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
-                    }
-
+                if (oData && oData.ResignationStartDate && oData.ResignationEndDate && oData.ResignComment) {
+                    this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
+                    this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
+                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
+                    this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
+                    this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
                     this._onPressPreview("Initial");
                 } else {
                     this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
@@ -2266,11 +2258,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getView().getModel("viewModel").setProperty("/BtnVisible", true);
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
                     this.getView().getModel("viewModel").setProperty("/editableResignatin", true)
-                }
-            },
-            RF_onPressbackButton: function () {
-                if (this.sFlag) {
-                    this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInbox" });
                 }
             },
             RF_onPressCloseDialog: function () {
@@ -2372,6 +2359,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 return;
                             }
                             var oEmployeeModel = that.getView().getModel("sEmployeeModel").getData()[0];
+                            oEmployeeModel.ResignationStartDate = sap.ui.getCore().byId("RF_id_StartDate").getValue()
+                            oEmployeeModel.ResignationEndDate = sap.ui.getCore().byId("RF_id_EndDate").getValue()
+                            oEmployeeModel.resignComment = sap.ui.getCore().byId("RF_id_ResignReason").getValue()
                             var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
                             var startDate = sap.ui.getCore().byId("RF_id_StartDate").getValue().split("/").reverse().join("-");
                             var endDate = sap.ui.getCore().byId("RF_id_EndDate").getValue().split("/").reverse().join("-");

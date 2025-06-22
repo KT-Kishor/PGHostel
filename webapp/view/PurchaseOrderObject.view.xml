@@ -16,7 +16,7 @@
     <m:Page
         navButtonPress="PO_onButtonPress"
         showNavButton="true"
-        title="Purchase Order Application"
+        title="Purchase Order Details"
     >
         <m:headerContent>
             <m:Button
@@ -222,6 +222,24 @@
                                             value="{PurchaseOrderModel>/CustomerHeadName}"
                                             editable="false"
                                         />
+                                          <m:Label
+                                            text="{i18n>country}"
+                                            class="oSowFragLabel"
+                                        />
+                                        <m:Input
+                                            id="FPO_id_country"
+                                            value="{PurchaseOrderModel>/Country}"
+                                            editable="false"
+                                        />
+                                         <m:Label
+                                            text="{i18n>city}"
+                                            class="oSowFragLabel"
+                                        />
+                                        <m:Input
+                                            id="FPO_id_city"
+                                            value="{PurchaseOrderModel>/City}"
+                                            editable="false"
+                                        />
                                         <m:Label
                                             text="{i18n>mobileNo}"
                                             class="oSowFragLabel"
@@ -252,6 +270,7 @@
                                             value="{PurchaseOrderModel>/customerEmail}"
                                             editable="false"
                                         />
+                                       
                                         <m:Label
                                             text="{i18n>gstNo}"
                                             class="oSowFragLabel"
@@ -277,16 +296,6 @@
                                             editable="false"
                                         />
                                         <m:Label
-                                            text="{i18n>popan}"
-                                            class="oSowFragLabel"
-                                        />
-                                        <m:Input
-                                            value="{= ${PurchaseOrderModel>/PAN} === 0 ? '' : ${PurchaseOrderModel>/PAN}}"
-                                            id="FPO_id_PanNo"
-                                            maxLength="15"
-                                            editable="false"
-                                        />
-                                        <m:Label
                                             text="{i18n>address}"
                                             class="oSowFragLabel"
                                         />
@@ -294,6 +303,16 @@
                                             id="FPO_id_Address"
                                             value="{PurchaseOrderModel>/Address}"
                                             maxLength="250"
+                                            editable="false"
+                                        />
+                                        <m:Label
+                                            text="{i18n>popan}"
+                                            class="oSowFragLabel"
+                                        />
+                                        <m:Input
+                                            value="{= ${PurchaseOrderModel>/PAN} === 0 ? '' : ${PurchaseOrderModel>/PAN}}"
+                                            id="FPO_id_PanNo"
+                                            maxLength="15"
                                             editable="false"
                                         />
                                         <m:Label
@@ -413,6 +432,7 @@
                                             liveChange="POO_onCustDescriptionLiveChange"
                                             value="{PurchaseOrderModel>/CustDescription}"
                                             maxLength="120"
+                                            
                                         />
                                     </f:content>
                                 </f:SimpleForm>
@@ -534,6 +554,7 @@
                                                         width="100%"
                                                         editable="{PurchaseOrderModel>/Editable}"
                                                         textAlign="End"
+                                                        
                                                     />
                                                     <m:Select
                                                         id="PO_id_day"
@@ -555,6 +576,7 @@
                                                         width="100%"
                                                         editable="{PurchaseOrderModel>/Editable}"
                                                         textAlign="End"
+                                                        
                                                     />
 
                                                     <m:Input

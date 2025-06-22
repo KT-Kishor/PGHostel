@@ -61,13 +61,13 @@
                     <fb:control>
                        <ComboBox 
                          id="PO_id_PoNumber"
-                         items="{POModel>/}"
+                         items="{POModelfilter>/}"
                             showClearIcon="true"
 
                                >
                   <core:Item
-                   key="{POModel>PoNumber}"
-                   text="{POModel>PoNumber}"
+                   key="{POModelfilter>PoNumber}"
+                   text="{POModelfilter>PoNumber}"
                   />         
            </ComboBox>
                     </fb:control>
