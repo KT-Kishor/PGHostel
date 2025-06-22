@@ -78,6 +78,7 @@ sap.ui.define([
             stdCode: "+91",
             country: "India",
             baseLocation: "",
+            HeadPosition:""
           };
           oModel = new JSONModel(oData);
         }
@@ -110,6 +111,7 @@ sap.ui.define([
         sap.ui.getCore().byId("MC_id_Country").setValueState("None");
         sap.ui.getCore().byId("MC_id_codeModel").setValueState("None");
         sap.ui.getCore().byId("MC_id_CustAddress").setValueState("None");
+        sap.ui.getCore().byId("MC_id_HeadPosition").setValueState("None");
         if (bIsEdit && this._originalCustomerData) {
           this._originalCustomerData.stdCode !== "" ? this._originalCustomerData.stdCode : "+91"; 
           this._originalCustomerData.GST !== null ? this._originalCustomerData.GST : ""; 
@@ -289,6 +291,7 @@ sap.ui.define([
           var isMandatoryValid = (
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCompanyName"), "ID") &&
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCustomerName"), "ID") &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_HeadPosition"), "ID") &&
             utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
             utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
             utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_Country"), "ID") &&
@@ -341,11 +344,12 @@ sap.ui.define([
           var isMandatoryValid = (
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCompanyName"), "ID") &&
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCustomerName"), "ID") &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_HeadPosition"), "ID") &&
             utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
             utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
             utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_Country"), "ID") &&
             utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_BaseCity"), "ID") &&
-            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID") 
           );
           if (!isMandatoryValid) {
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -367,6 +371,7 @@ sap.ui.define([
           if (oUpdatedData.GST && !utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID")) isValid = false;
           if (oUpdatedData.mobileNo && !utils._LCvalidateMobileNumber(sap.ui.getCore().byId("MC_id_CustMob"), "ID")) isValid = false;
           if (oUpdatedData.LUT && !utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID")) isValid = false;
+          // Check if any mandatory fields are invalid
           if (!isValid) {
             MessageToast.show(this.i18nModel.getText("mandetoryChecks"));
             return;
