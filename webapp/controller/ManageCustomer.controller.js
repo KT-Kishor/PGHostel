@@ -23,7 +23,7 @@ sap.ui.define([
         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerCustomer")); // Set header name
         this.oValue = oEvent.getParameter("arguments").value;
         try {
-          if (this.oValue === "ManageCustomer") {
+          if (this.oValue === "ManageCustomer" || this.oValue === "MSA") {
             await this.readCallForManageCustomer("Initial");
             this.MC_onClear(); // Clear the filter bar
           } else {
