@@ -7,7 +7,7 @@
     displayBlock="true">
 	<Page id="Lp_id_Loginpage" class="login-background">
 		<headerContent>
-			<Avatar src="./image/logo.jpg" displaySize="XS" press="onAvatarPressed" tooltip="Company Logo"/>
+			<Avatar src="./image/logo.jpeg" displaySize="XS" press="onAvatarPressed" tooltip="Company Logo"/>
 			<Title level="H1" text="{i18n>companynameKT}" class="custom-text" wrapping="false"/>
 			<ToolbarSpacer/>
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>

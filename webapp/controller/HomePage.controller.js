@@ -97,7 +97,7 @@ sap.ui.define(
                 header: "Company info",
                 title: "Kvriksha Technologies",
                 titleUrl: "",
-                icon: "./image/KvrikshaLogo.jpeg",
+                icon: "./image/logo.jpeg",
                 displayShape: "Circle",
                 description: "Cell Phone : +91 9686145959",
                 groups: [
