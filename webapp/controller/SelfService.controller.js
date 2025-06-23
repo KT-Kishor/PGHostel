@@ -20,7 +20,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getBusyDialog();
                     const oView = this.getView();
                     this.i18nModel = oView.getModel("i18n").getResourceBundle();
-                    this.companyName = "Kalpavriksha Technologies";
+                    this.companyName = "Kvriksha Technologies Private Limited";
                     this._fetchCommonData("EmployeeDetailsData", "empModel");
                     // if (!oView.getModel("DesignationModel")) {
                     //     this._fetchCommonData("Designation", "DesignationModel");

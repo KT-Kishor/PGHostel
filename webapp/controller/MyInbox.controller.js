@@ -253,7 +253,7 @@ sap.ui.define([
       var joinDate = Formatter.formatDate(oData.JoiningDate);
       var startDate = Formatter.formatDate(oData.ResignationStartDate);
       var endDate = Formatter.formatDate(oData.ResignationEndDate);
-      this.companyName = "Kalpavriksha Technologies";
+      this.companyName = "Kvriksha Technologies Private Limited";
                 var data = `
                 <div style="text-align: justify;">
                     <p>Dear <b>${oData.ManagerName}</b>,</p>  

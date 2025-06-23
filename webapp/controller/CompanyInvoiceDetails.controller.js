@@ -1181,7 +1181,7 @@ sap.ui.define([
                     content: "",
                     isFileUploaded: false,
                     button: true,
-                    Subject: "KALPAVRIKSHA TECHNOLOGIES - INVOICE PAYMENT REMINDER",
+                    Subject: "Kvriksha Technologies Private Limited - INVOICE PAYMENT REMINDER",
                     htmlbody: `<p>Dear Finance Team,</p>
                     <p>I hope you're doing well. This is a friendly reminder that payment for invoice ${modelData.InvNo}, issued on  ${modelData.InvoiceDate}, is still outstanding.</p>
                     <li><b>Invoice No : ${modelData.InvNo}</b></li>
@@ -1581,7 +1581,7 @@ sap.ui.define([
 
                 const paymentDetails = [
                     { label: "Bank Name", value: "Kotak Mahindra Bank Limited" },
-                    { label: "Account Name", value: "Kalpavriksha Technologies" },
+                    { label: "Account Name", value: "Kvriksha Technologies Private Limited" },
                     { label: "Account No", value: "0648506056" },
                     { label: "IFSC Code", value: "KKBK0008249" },
                     { label: "Swift Code", value: "KKBKINBBCPC" },

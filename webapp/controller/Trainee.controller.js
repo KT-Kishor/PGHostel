@@ -16,7 +16,7 @@ sap.ui.define([
                 var LoginFunction = await this.commonLoginFunction("Trainee");
                 if (!LoginFunction) return;
                 this.getBusyDialog();
-                this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
+                this.companyName = "Kvriksha Technologies Private Limited"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 // common company emails read call
                 this.byId("T_id_OnboardBtn").setEnabled(false);
