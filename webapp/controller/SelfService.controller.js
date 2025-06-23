@@ -160,6 +160,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
                 this.oModel = this.getView().getModel("PaySlip");
                 this._currentSection = this.byId("ObjectPageLayout").getSelectedSection();
+                this.initAddressToggleModel();
             },
 
             onSectionChange: async function (oEvent) {
@@ -1513,7 +1514,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
                     var aButtonContent = [];
                     // Delete button
-                    if (salaryDetailsArray.length > 1 && oEffectiveDate > oToday) {
+                    if (salaryDetailsArray.length > 1 && oEffectiveDate > oToday && this.getView().getModel("LoginModel").getProperty("/Role") === "Admin") {
                         var oDeleteButton = new sap.m.Button({
                             text: this.i18nModel.getText("delete"),
                             type: "Reject",
@@ -1528,7 +1529,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         var oAppraisalButton = new sap.m.Button({
                             text: this.i18nModel.getText("appraisal"),
                             type: "Emphasized",
-                           // visible: this.ViewModel.getProperty("/RelievingLetter"),
+                            visible: this.ViewModel.getProperty("/RelievingLetter"),
                             press: function () {
                                 this._fetchCommonData("TaxCalculation", "TDSModel", { Country: this.getView().getModel("sEmployeeModel").getData()[0].CountryCode });
                                 this.SS_commonOpenDialog("Appraisal", "sap.kt.com.minihrsolution.fragment.Appraisal", ["SS_id_Joinn"]);
@@ -2468,6 +2469,58 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             SS_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
+            },
+             initAddressToggleModel: function () {
+            const fullPerm = this.getView().getModel("sEmployeeModel").getProperty("/0/PermanentAddress") || "";
+            const fullCorr = this.getView().getModel("sEmployeeModel").getProperty("/0/CorrespondenceAddress") || "";
+
+            const addressModel = new sap.ui.model.json.JSONModel({
+                // Permanent
+                permFull: fullPerm,
+                permTruncated: fullPerm.length > 60 ? fullPerm.slice(0, 60) + "..." : fullPerm,
+                permToggleText: fullPerm.length > 60 ? "Show More" : "",
+                permIsTruncated: true,
+                permShowToggle: fullPerm.length > 60,
+
+                // Correspondence
+                corrFull: fullCorr,
+                corrTruncated: fullCorr.length > 60 ? fullCorr.slice(0, 60) + "..." : fullCorr,
+                corrToggleText: fullCorr.length > 60 ? "Show More" : "",
+                corrIsTruncated: true,
+                corrShowToggle: fullCorr.length > 60
+            });
+
+            this.getView().setModel(addressModel, "addressModel");
+        },
+        onTogglePermanentAddress: function () {
+            const oModel = this.getView().getModel("addressModel");
+            const isTruncated = oModel.getProperty("/permIsTruncated");
+
+            if (isTruncated) {
+                oModel.setProperty("/permTruncated", oModel.getProperty("/permFull"));
+                oModel.setProperty("/permToggleText", "Show Less");
+            } else {
+                oModel.setProperty("/permTruncated", oModel.getProperty("/permFull").slice(0, 60) + "...");
+                oModel.setProperty("/permToggleText", "Show More");
             }
+
+            oModel.setProperty("/permIsTruncated", !isTruncated);
+        },
+
+        onToggleCorrespondenceAddress: function () {
+            const oModel = this.getView().getModel("addressModel");
+            const isTruncated = oModel.getProperty("/corrIsTruncated");
+
+            if (isTruncated) {
+                oModel.setProperty("/corrTruncated", oModel.getProperty("/corrFull"));
+                oModel.setProperty("/corrToggleText", "Show Less");
+            } else {
+                oModel.setProperty("/corrTruncated", oModel.getProperty("/corrFull").slice(0, 60) + "...");
+                oModel.setProperty("/corrToggleText", "Show More");
+            }
+
+            oModel.setProperty("/corrIsTruncated", !isTruncated);
+        },
+        
         });
     });
