@@ -506,7 +506,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                             return;
                         }
-
+                        
                         // Update some fields before sending
                         oDataModel.DateOfBirth = oView.byId("SS_id_Dob").getValue().split("/").reverse().join("-");
                         oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
@@ -544,6 +544,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
             updateFunctionForSelf: function (oPayload, ID) {
                 var oView = this.getView();
+                var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
                 this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload)
                     .then((oData) => {
                         if (oData.success) {
@@ -553,6 +554,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             MessageToast.show(this.i18nModel.getText("dataSaved"));
                             oView.getModel("viewModel").setProperty("/isEditMode", false);
                             oView.getModel("viewModel").setProperty("/AdminRole", false);
+                            this._updateAddressModel(oDataModel);
                             this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
                                 EmployeeID: this.EmployeeID
                             });
@@ -596,7 +598,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                 actions: [sap.m.MessageBox.Action.OK, "Cancle"],
                                 onClose: async function (sAction) {
                                     if (sAction === "OK") {
-                                       this.getBusyDialog();
+                                        this.getBusyDialog();
                                         // oData.ManagerID = managerId;
                                         await this.updateFunctionForSelf(oPayload, "");
                                         var flag = false;
@@ -637,7 +639,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                             that.getView().byId("SS_id_Manager").setSelectedKey(oPayload.data.ManagerID);
                                             //await that.updateFunctionForSelf(oPayload, "");
                                         });
-                                      this.closeBusyDialog();
+                                        this.closeBusyDialog();
                                     }
                                 }.bind(this)
                             });
@@ -1525,7 +1527,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         aButtonContent.push(oDeleteButton);
                     }
                     // Appraisal button
-                    if (index === 0 && oEffectiveDate < oToday &&this.sPath !== "SelfService") {
+                    if (index === 0 && oEffectiveDate < oToday && this.sPath !== "SelfService") {
                         var oAppraisalButton = new sap.m.Button({
                             text: this.i18nModel.getText("appraisal"),
                             type: "Emphasized",
@@ -2470,57 +2472,75 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
             },
-             initAddressToggleModel: function () {
-            const fullPerm = this.getView().getModel("sEmployeeModel").getProperty("/0/PermanentAddress") || "";
-            const fullCorr = this.getView().getModel("sEmployeeModel").getProperty("/0/CorrespondenceAddress") || "";
+            initAddressToggleModel: function () {
+                const fullPerm = this.getView().getModel("sEmployeeModel").getProperty("/0/PermanentAddress") || "";
+                const fullCorr = this.getView().getModel("sEmployeeModel").getProperty("/0/CorrespondenceAddress") || "";
 
-            const addressModel = new sap.ui.model.json.JSONModel({
-                // Permanent
-                permFull: fullPerm,
-                permTruncated: fullPerm.length > 60 ? fullPerm.slice(0, 60) + "..." : fullPerm,
-                permToggleText: fullPerm.length > 60 ? "Show More" : "",
-                permIsTruncated: true,
-                permShowToggle: fullPerm.length > 60,
+                const addressModel = new sap.ui.model.json.JSONModel({
+                    // Permanent
+                    permFull: fullPerm,
+                    permTruncated: fullPerm.length > 60 ? fullPerm.slice(0, 60) + "..." : fullPerm,
+                    permToggleText: fullPerm.length > 60 ? "Show More" : "",
+                    permIsTruncated: true,
+                    permShowToggle: fullPerm.length > 60,
 
-                // Correspondence
-                corrFull: fullCorr,
-                corrTruncated: fullCorr.length > 60 ? fullCorr.slice(0, 60) + "..." : fullCorr,
-                corrToggleText: fullCorr.length > 60 ? "Show More" : "",
-                corrIsTruncated: true,
-                corrShowToggle: fullCorr.length > 60
-            });
+                    // Correspondence
+                    corrFull: fullCorr,
+                    corrTruncated: fullCorr.length > 60 ? fullCorr.slice(0, 60) + "..." : fullCorr,
+                    corrToggleText: fullCorr.length > 60 ? "Show More" : "",
+                    corrIsTruncated: true,
+                    corrShowToggle: fullCorr.length > 60
+                });
 
-            this.getView().setModel(addressModel, "addressModel");
-        },
-        onTogglePermanentAddress: function () {
-            const oModel = this.getView().getModel("addressModel");
-            const isTruncated = oModel.getProperty("/permIsTruncated");
+                this.getView().setModel(addressModel, "addressModel");
+            },
+            onTogglePermanentAddress: function () {
+                const oModel = this.getView().getModel("addressModel");
+                const isTruncated = oModel.getProperty("/permIsTruncated");
 
-            if (isTruncated) {
-                oModel.setProperty("/permTruncated", oModel.getProperty("/permFull"));
-                oModel.setProperty("/permToggleText", "Show Less");
-            } else {
-                oModel.setProperty("/permTruncated", oModel.getProperty("/permFull").slice(0, 60) + "...");
-                oModel.setProperty("/permToggleText", "Show More");
-            }
+                if (isTruncated) {
+                    oModel.setProperty("/permTruncated", oModel.getProperty("/permFull"));
+                    oModel.setProperty("/permToggleText", "Show Less");
+                } else {
+                    oModel.setProperty("/permTruncated", oModel.getProperty("/permFull").slice(0, 60) + "...");
+                    oModel.setProperty("/permToggleText", "Show More");
+                }
 
-            oModel.setProperty("/permIsTruncated", !isTruncated);
-        },
+                oModel.setProperty("/permIsTruncated", !isTruncated);
+            },
 
-        onToggleCorrespondenceAddress: function () {
-            const oModel = this.getView().getModel("addressModel");
-            const isTruncated = oModel.getProperty("/corrIsTruncated");
+            onToggleCorrespondenceAddress: function () {
+                const oModel = this.getView().getModel("addressModel");
+                const isTruncated = oModel.getProperty("/corrIsTruncated");
 
-            if (isTruncated) {
-                oModel.setProperty("/corrTruncated", oModel.getProperty("/corrFull"));
-                oModel.setProperty("/corrToggleText", "Show Less");
-            } else {
-                oModel.setProperty("/corrTruncated", oModel.getProperty("/corrFull").slice(0, 60) + "...");
-                oModel.setProperty("/corrToggleText", "Show More");
-            }
+                if (isTruncated) {
+                    oModel.setProperty("/corrTruncated", oModel.getProperty("/corrFull"));
+                    oModel.setProperty("/corrToggleText", "Show Less");
+                } else {
+                    oModel.setProperty("/corrTruncated", oModel.getProperty("/corrFull").slice(0, 60) + "...");
+                    oModel.setProperty("/corrToggleText", "Show More");
+                }
 
-            oModel.setProperty("/corrIsTruncated", !isTruncated);
-        },
-        
+                oModel.setProperty("/corrIsTruncated", !isTruncated);
+            },
+            _updateAddressModel: function (oData) {
+                const oAddressModel = this.getView().getModel("addressModel");
+                const permanent = oData.PermanentAddress || "";
+                const corr = oData.CorrespondenceAddress || "";
+                oAddressModel.setData({
+                    permFull: permanent,
+                    permTruncated: permanent.length > 60 ? permanent.slice(0, 60) + "..." : permanent,
+                    permToggleText: permanent.length > 60 ? "Show More" : "",
+                    permShowToggle: permanent.length > 60,
+                    permExpanded: false,
+                    corrFull: corr,
+                    corrTruncated: corr.length > 60 ? corr.slice(0, 60) + "..." : corr,
+                    corrToggleText: corr.length > 60 ? "Show More" : "",
+                    corrShowToggle: corr.length > 60,
+                    corrExpanded: false,
+                });
+            },
+
+
         });
     });
