@@ -1040,7 +1040,7 @@ sap.ui.define([
                     return;
                 }
                 if (Number(paymentModel.DueAmount) < 0) {
-                    sap.m.MessageBox.show(this.i18nModel.getText("dueAmountZeroOrNegative"));
+                    sap.m.MessageBox.error(this.i18nModel.getText("dueAmountZeroOrNegative"));
                     return;
                 }
 
@@ -1188,7 +1188,7 @@ sap.ui.define([
                     <li><b>Due Date : ${modelData.PayByDate}</b></li>
                     <li><b>Invoice Amount : ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</b></li>
                     <li><b>Received Amount : ${this.Formatter.fromatNumber(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount"))} ${modelData.Currency}</b></li>                   
-                    <li><b>Due Amount : ${this.Formatter.fromatNumber(parseFloat(modelData.TotalAmount) - parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount")))} ${modelData.Currency}</b></li>                   
+                    <li><b>Due Amount : ${this.Formatter.fromatNumber(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount"))}</b></li>                   
                     <li><b>Description : ${modelData.InvoiceDescription}</b></li>
 
                     <p>If you’ve already made the payment, kindly disregard this reminder. Otherwise, we would appreciate it if you could arrange payment as soon as possible.</p>
