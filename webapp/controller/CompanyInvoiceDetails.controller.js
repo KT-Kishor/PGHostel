@@ -1601,7 +1601,7 @@ sap.ui.define([
                 checkPageSpace(35);
                 const forLabelY = currentY + 5;
                 doc.setFont("helvetica", "bold").setFontSize(11);
-                doc.text("For: " + oCompanyDetailsModel.companyName, rightAlignX + 2, forLabelY);
+                doc.text("For: " + oCompanyDetailsModel.companyName, rightAlignX - 15, forLabelY);
 
                 const logoXPosition = rightAlignX + 20;
                 const logoYPosition = forLabelY + 2;
@@ -1609,8 +1609,8 @@ sap.ui.define([
 
                 const partnersYPosition = logoYPosition + 18;
                 doc.setFont("helvetica", "bold").setFontSize(11);
-                doc.text(oCompanyDetailsModel.headOfCompany, rightAlignX + 30, partnersYPosition);
-                doc.text(oCompanyDetailsModel.designation, rightAlignX + 28, partnersYPosition + 5);
+                doc.text(oCompanyDetailsModel.headOfCompany, rightAlignX + 32, partnersYPosition);
+                doc.text(oCompanyDetailsModel.designation, rightAlignX + 30, partnersYPosition + 5);
 
                 doc.setFont("times", "normal").setFontSize(11);
                 doc.text("Thank you for your business!", margin - 2, partnersYPosition + 10);
