@@ -79,10 +79,13 @@
                             class="TextColor"
                             wrapping="true"
                         />
-						<m:Text
-                            text="{sEmployeeModel>/0/PermanentAddress}"
+
+						<m:Text id="permAddressText"
+                            text="{addressModel>/permTruncated}"
                             wrapping="true"
                         />
+                          <m:Link id="permToggleLink" text="{addressModel>/permToggleText}" press="onTogglePermanentAddress" visible="{= ${addressModel>/permShowToggle} }" />
+
 					</m:VBox>
 					<!-- Correspondence Address -->
 					<m:VBox
@@ -95,10 +98,12 @@
                             class="TextColor"
                             wrapping="true"
                         />
-						<m:Text
-                            text="{sEmployeeModel>/0/CorrespondenceAddress}"
+
+						<m:Text id="corrAddressText" 
+                            text="{addressModel>/corrTruncated}"
                             wrapping="true"
                         />
+                          <m:Link id="corrToggleLink" text="{addressModel>/corrToggleText}" press="onToggleCorrespondenceAddress" visible="{= ${addressModel>/corrShowToggle} }" />
 					</m:VBox>
 				</m:FlexBox>
 			</headerContent>
