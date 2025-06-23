@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
     <HBox class="sapUiTinyMarginTop">
         <Image
-            src="../image/logo.jpg"
+            src="../image/logo.jpeg"
             width="30px"
             height="30px"
             class="companylogo"

@@ -38,7 +38,7 @@
             </headerTitle>
             <headerContent>
                 <m:FlexBox wrap="Wrap" fitContainer="true">
-                    <m:Avatar class="sapUiSmallMarginEnd" src="../image/logo.jpg" displaySize="L" />
+                    <m:Avatar class="sapUiSmallMarginEnd" src="../image/logo.jpeg" displaySize="L" />
                     <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
                         <m:ObjectIdentifier title="Customer Address" text="{objectModel>/0/PurchaseOrder/0/Address}" tooltip="Customer Address" />
                     </layout:VerticalLayout>
