@@ -40,6 +40,7 @@ sap.ui.define([
                     "Gender": ""
                 };
                 await this._fetchCommonData("EmailContent", "CCMailModel TraineeFlag", { Type: "TraineeOffer", Action: "CC" });
+                this._fetchCommonData("EmployeeDetailsData", "empModel");
                 this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
                 var oViewModel = new JSONModel({ isEditMode: true, isVisiable: true, editable: false });
                 this.getView().setModel(oViewModel, "viewModel");
@@ -466,6 +467,7 @@ sap.ui.define([
             },
              TD_validateCombo: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
+                if(this.sArgPara === "CreateTraineeFlag") this.TD_validateStep();
             },
             //PDF generation function
             TD_onPressMerge: async function (value) {
@@ -567,6 +569,7 @@ sap.ui.define([
             TD_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.onCountryChange(oEvent, { stdCodeCombo: "TD_id_STDCode", baseLocationCombo: "TD_id_Location", branchInput: "TD_id_BranchCode", mobileInput: "TD_id_Mobile" });
+                if(this.sArgPara === "CreateTraineeFlag") this.TD_validateStep();
             },
             TU_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");

@@ -28,6 +28,7 @@ sap.ui.define([
                     this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                     this.ExpenseID = oEvent.getParameter("arguments").sPath;
 
+                    this.MyInBox = false;
                     if (this.ExpenseID.includes("MyInbox")) {
                         // await this._fetchCommonData("Country", "CountryModel");
                         //  await this._fetchCommonData("BaseLocation", "BaseLocationModel");
