@@ -1513,7 +1513,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
                     var aButtonContent = [];
                     // Delete button
-                    if (salaryDetailsArray.length > 1 && oEffectiveDate > oToday && this.getView().getModel("LoginModel").getProperty("/Role") === "Admin") {
+                    if (salaryDetailsArray.length > 1 && oEffectiveDate > oToday) {
                         var oDeleteButton = new sap.m.Button({
                             text: this.i18nModel.getText("delete"),
                             type: "Reject",
@@ -1528,7 +1528,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         var oAppraisalButton = new sap.m.Button({
                             text: this.i18nModel.getText("appraisal"),
                             type: "Emphasized",
-                            visible: this.ViewModel.getProperty("/RelievingLetter"),
+                           // visible: this.ViewModel.getProperty("/RelievingLetter"),
                             press: function () {
                                 this._fetchCommonData("TaxCalculation", "TDSModel", { Country: this.getView().getModel("sEmployeeModel").getData()[0].CountryCode });
                                 this.SS_commonOpenDialog("Appraisal", "sap.kt.com.minihrsolution.fragment.Appraisal", ["SS_id_Joinn"]);

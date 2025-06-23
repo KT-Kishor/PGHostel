@@ -212,9 +212,7 @@ sap.ui.define(["./BaseController",
                             Date: oData.Date,
                             ManagerID: oData.ManagerID,
                             ManagerName: oData.ManagerName,
-                            //Comments: oData.Comments || [],
-                            Comments: oData.comments[0].Comment
-,
+                            Comments: oData.Comments || "",
 
                         },
                         filters: {
