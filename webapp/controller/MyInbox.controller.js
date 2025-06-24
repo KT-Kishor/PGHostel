@@ -239,20 +239,26 @@ sap.ui.define([
           this.oDiaReg = oDiaReg;
           oView.addDependent(oDiaReg);
           oDiaReg.open();
-          this.functionToOpenResignationDialog();
+          this.functionToOpenResignationDialog(oData);
         });
         } else {
         this.oDiaReg.open();
-        this.functionToOpenResignationDialog();
+        this.functionToOpenResignationDialog(oData);
         }
       }
     },
-    functionToOpenResignationDialog:function() {
-     var oData = this.getView().getModel("sEmployeeModel").getData()[0];
+    functionToOpenResignationDialog:function(oModel) {
+      var oEmpModel = this.getView().getModel("sEmployeeModel");
+     var oData = oEmpModel.getData()[0];
       var empName = oData.Salutation + " " + oData.EmployeeName;
       var joinDate = Formatter.formatDate(oData.JoiningDate);
-      var startDate = Formatter.formatDate(oData.ResignationStartDate);
-      var endDate = Formatter.formatDate(oData.ResignationEndDate);
+      var startDate = Formatter.formatDate(oModel.StartDate);
+      var endDate = Formatter.formatDate(oModel.EndDate);
+      if(oModel.Status === "Rejected"){
+     oEmpModel.setProperty("/0/ResignationStartDate", oModel.StartDate);
+     oEmpModel.setProperty("/0/ResignationEndDate", oModel.EndDate);
+     oEmpModel.setProperty("/0/ResignComment", oModel.EmpComment);
+      }
       this.companyName = "Kalpavriksha Technologies";
                 var data = `
                 <div style="text-align: justify;">
@@ -261,7 +267,7 @@ sap.ui.define([
                     <p>I <b>${empName}</b> writing to formally resign from my position as <b>${oData.Designation}</b> at <b>${this.companyName}</b>, effective <b>${startDate}</b>. My last working day will be <b>${endDate}</b>.</p>
                     <p>I joined this organization on <b>${joinDate}</b>, and it has been an incredibly rewarding journey filled with learning, professional growth, and meaningful relationships. I want to sincerely thank you for your guidance and support throughout my tenure.</p>
                     <p>The reason of resignation is as follows:</p>
-                    <p>${oData.ResignComment}</p>                   
+                    <p>${oModel.EmpComment}</p>                   
          <p>I will do my best during this transition period to ensure a smooth handover of my responsibilities. Please let me know how I can help during this time.</p>
         <p>Thanks & Best Regards,<br/>
         ${empName}<br/>

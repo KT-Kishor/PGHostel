@@ -2262,6 +2262,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getView().getModel("viewModel").setProperty("/BtnVisible", true);
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
                     this.getView().getModel("viewModel").setProperty("/editableResignatin", true)
+                    this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+                    this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                 }
             },
             RF_onPressCloseDialog: function () {
