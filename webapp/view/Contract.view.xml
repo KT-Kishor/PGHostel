@@ -33,8 +33,8 @@
 						<ComboBox
 							id="C_id_EndClient"
 							showClearIcon="true"
-							items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" >
-							<core:Item key="{CreateCustomerModel>companyName}" text="{CreateCustomerModel>companyName}" />
+							items="{path:'ContractModelInitial>/', sorter: {path:'EndClient', descending:false }}" >
+							<core:Item key="{ContractModelInitial>EndClient}" text="{ContractModelInitial>EndClient}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>

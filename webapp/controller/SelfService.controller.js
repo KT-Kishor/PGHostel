@@ -189,9 +189,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                     break;
 
                                 case "Payslip":
-                                    this.getView().byId("SS_id_PaySlipTable").setBusy(true);
                                     await this._commonGETCall("AdminPaySlip", "EmpTable", { EmployeeID: this.EmployeeID });
-                                    this.getView().byId("SS_id_PaySlipTable").setBusy(false);
                                     break;
 
                                 case "Document":
@@ -229,9 +227,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.SS_readSalaryDetails(this.EmployeeID);
                         break;
                     case "Payslip":
-                        this.getView().byId("SS_id_PaySlipTable").setBusy(true);
+                        this.getBusyDialog();
                         await this._commonGETCall("AdminPaySlip", "EmpTable", { EmployeeID: this.EmployeeID });
-                        this.getView().byId("SS_id_PaySlipTable").setBusy(false);
+                         this.closeBusyDialog();
                         break;
                     case "Document":
                         this.byId("SS_id_AcName").setValueState("None");
