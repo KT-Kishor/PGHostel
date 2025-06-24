@@ -300,9 +300,12 @@ sap.ui.define([
                 var selectedDate = selectedDates[0].getStartDate();
                 var formattedDate = that.Formatter.formatDate(selectedDate);
                 var today = new Date();
+                // Store raw selected date for use in assignment duplicate check
+                this.getView().getModel("AssignModel").setProperty("/selectedDate", selectedDate);
                 // Get holiday data
                 var holidays = that.getView().getModel("HolidayModel").getData();
-                var holidayMap = new Map(holidays.map(holiday => [new Date(holiday.Date).toDateString(), holiday.Name])); var day = selectedDate.getDay();
+                var holidayMap = new Map(holidays.map(holiday => [new Date(holiday.Date).toDateString(), holiday.Name]));
+                var day = selectedDate.getDay();
                 var isWeekend = (day === 0 || day === 6);
                 var isHoliday = holidayMap.has(selectedDate.toDateString());
                 // Prevent future date selection
@@ -344,33 +347,64 @@ sap.ui.define([
         },
 
 
-        onValueHelpDialogClose: function (oEvent) {
+        onValueHelpDialogClose: async function (oEvent) {
             const oSelectedItem = oEvent.getParameter("selectedItem");
-            if (oSelectedItem) {
-                const AllData = oSelectedItem.getBindingContext("AssignModel").getObject();
-                if (AllData) {
-                    // Show actual hours in the UI
-                    this.getView().getModel("AssignModel").setProperty("/selectedAssignment", AllData.TaskName);
-                    this.getView().getModel("AssignModel").setProperty("/HoursWorked", AllData.HoursWorked);
-                    this.getView().byId("idTextActHour").setText("Actual Hours: " + (AllData.HoursWorked || "0"));
-
-                    // Merge with existing newModel data (preserve comments, etc.)
-                    var oNewModelData = this.getView().getModel("newModel")?.getData() || {};
-                    oNewModelData.TaskID = AllData.TaskID;
-                    oNewModelData.TaskName = AllData.TaskName;
-                    oNewModelData.HoursWorked = AllData.HoursWorked;
-                    oNewModelData.ActualHours = AllData.HoursWorked;
-                    oNewModelData.EmployeeID = this.EmployeeID;
-                    oNewModelData.EmployeeName = AllData.EmployeeName;
-                    oNewModelData.ManagerName = AllData.ManagerName;
-                    oNewModelData.ManagerID = AllData.ManagerID;
-
-                    this.getView().getModel("newModel").setData(oNewModelData);
-                } else {
-                    console.warn("No data found for selected item.");
-                }
-            } else {
+            if (!oSelectedItem) {
                 console.warn("No selected item.");
+                return;
+            }
+            const AllData = oSelectedItem.getBindingContext("AssignModel").getObject();
+            if (!AllData) {
+                console.warn("No data found for selected item.");
+                return;
+            }
+            const selectedDate = this.getView().getModel("AssignModel").getProperty("/selectedDate");
+            if (!selectedDate) {
+                MessageToast.show("Please select a date before choosing an assignment.");
+                return;
+            }
+            // Format selected date to 'YYYY-MM-DD'
+            const formattedDate = [selectedDate.getFullYear(),String(selectedDate.getMonth() + 1).padStart(2, '0'),String(selectedDate.getDate()).padStart(2, '0')].join('-');
+            this.getBusyDialog();
+            try {
+                // Fetch all timesheet entries for this employee
+                const checkDup = await this.ajaxReadWithJQuery("Timesheet", {
+                    EmployeeID: this.EmployeeID
+                });
+                // Check if any entry matches the selected TaskID AND the selected Date
+                const isDuplicate = Array.isArray(checkDup.data) && checkDup.data.some(entry => {
+                    if (!entry.Date || !entry.TaskID) return false;
+                    const entryDateObj = new Date(entry.Date);
+                    const entryDateOnly = [ entryDateObj.getFullYear(), String(entryDateObj.getMonth() + 1).padStart(2, '0'), String(entryDateObj.getDate()).padStart(2, '0')].join('-');
+                    return entry.TaskID === AllData.TaskID && entryDateOnly === formattedDate;
+                });
+                if (isDuplicate) {
+                    MessageToast.show("This assignment already exists for the selected date.");
+                    this.closeBusyDialog();
+                    return;
+                }
+                // Show actual hours in the UI
+                this.getView().getModel("AssignModel").setProperty("/selectedAssignment", AllData.TaskName);
+                this.getView().getModel("AssignModel").setProperty("/HoursWorked", AllData.HoursWorked);
+                this.getView().byId("idTextActHour").setText("Actual Hours: " + (AllData.HoursWorked || "0"));
+
+                // Merge with existing newModel data
+                const oNewModelData = this.getView().getModel("newModel")?.getData() || {};
+                oNewModelData.TaskID = AllData.TaskID;
+                oNewModelData.TaskName = AllData.TaskName;
+                oNewModelData.HoursWorked = AllData.HoursWorked;
+                oNewModelData.ActualHours = AllData.HoursWorked;
+                oNewModelData.EmployeeID = this.EmployeeID;
+                oNewModelData.EmployeeName = AllData.EmployeeName;
+                oNewModelData.ManagerName = AllData.ManagerName;
+                oNewModelData.ManagerID = AllData.ManagerID;
+                oNewModelData.Date = formattedDate;
+                this.getView().getModel("newModel").setData(oNewModelData);
+
+            } catch (err) {
+                MessageToast.show(err.message || "Error checking assignment.");
+            } finally {
+                this.closeBusyDialog();
             }
         },
         TSD_onToggleEdit: function () {
