@@ -25,7 +25,6 @@ sap.ui.define(
         this._ViewDatePickersReadOnly(["HQD_id_Quotation", "HQD_id_QuotationValid"], this.getView())
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
-        // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         var oVisiModel = new JSONModel();
 
@@ -82,7 +81,6 @@ sap.ui.define(
           var oValidPicker = this.getView().byId("HQD_id_QuotationValid");
           oValidPicker.setMaxDate(oValidUntil);
           oValidPicker.setDateValue(oValidUntil);
-
           oVisiModel.setData({ editable: true });
           this.getView().setModel(oVisiModel, "visiablityPlay");
         }
@@ -106,7 +104,6 @@ sap.ui.define(
             var cgstSelected = (cgst > 0 || sgst > 0);
             var igstSelected = (igst > 0);
             oSelectedModel.setProperty("/gstEditable", false); // Disable editing
-            var sCurrency = oSelectedQuotation.Currency;
 
             // Convert Notes from HTML to plain text for display
             var sNotes = oSelectedModel.getProperty("/Notes");
@@ -170,9 +167,7 @@ sap.ui.define(
         var oQuotationModel = this.getView().getModel("QuotationModel");
         var oVisibilityModel = this.getView().getModel("visiablityPlay");
         const oBranchComboBox = this.byId("HQD_id_BranchCode");
-
         oBranchComboBox.setBusy(true);
-
         // Find matching entry from codeModel based on country
         var oCountryData = aCodeData.find(function (item) {
           return item.country === sSelectedKey;
@@ -201,6 +196,7 @@ sap.ui.define(
           var sMobileNo = oRawData.mobileNo || "";
           var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;
           oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
+          
         } else {
           this.CountryAndCity(); // fetch cities for other countries
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
@@ -241,10 +237,9 @@ sap.ui.define(
       },
 
       HQD_onBrachChange: function (oEvent) {
-        utils._LCstrictValidationComboBox(oEvent);
+        utils._LCvalidationComboBox(oEvent);
         var sSelectedBranchCode = oEvent.getSource().getSelectedKey();
         var aCompanyDetails = this.getView().getModel("CompanyCodeDetailsModel").getData();
-
         var oMatchedBranch = aCompanyDetails.find(function (entry) {
           return entry.branchCode === sSelectedBranchCode;
         });
@@ -392,9 +387,11 @@ sap.ui.define(
         oQuotationModel.refresh();
       },
 
-      HQD_onPercentageChange: function () {
+      HQD_onPercentageChange: function (oEvent) {
+        utils._LCvalidateAmount(oEvent)
         this.updateTotalAmount()
       },
+    
       onSelectCGST: function (oEvent) {
         // Uncheck IGST checkbox and ensure only CGST is selected
         this.getView().byId("HQD_id_CheckboxIGS").setSelected(false);
@@ -448,25 +445,37 @@ sap.ui.define(
           this.getRouter().navTo("RouteHrQuotation");
         }
       },
-      HQD_DateValidate: function (oEvent) {
-        var oView = this.getView();
-        var oDatePicker = oEvent.getSource();
-        var oDate = oDatePicker.getDateValue();
+  HQD_DateValidate: function (oEvent) {
+    var oView = this.getView();
+    var oDatePicker = oEvent.getSource();
+    var oDate = oDatePicker.getDateValue();
 
-        if (oDate) {
-          oDate.setHours(0, 0, 0, 0);
+    if (oDate) {
+        // Normalize current date
+        oDate.setHours(0, 0, 0, 0);
 
-          var oMaxDate = new Date(oDate);
-          oMaxDate.setDate(oMaxDate.getDate() + 30);
-          var oValidUntil = oView.byId("HQD_id_QuotationValid");
-          oValidUntil.setMinDate(oDate);
-          oValidUntil.setMaxDate(oMaxDate);
-          var oCurrentValidUntil = oValidUntil.getDateValue();
-          if (!oCurrentValidUntil || oCurrentValidUntil < oDate || oCurrentValidUntil > oMaxDate) {
-            oValidUntil.setDateValue(oMaxDate); // Reset to max if invalid
-          }
+        // Create fresh max date each time
+        var oMaxDate = new Date(oDate.getTime());
+        oMaxDate.setDate(oMaxDate.getDate() + 30);
+
+        var oValidUntil = oView.byId("HQD_id_QuotationValid");
+        oValidUntil.setMinDate(new Date(oDate.getTime()));
+        oValidUntil.setMaxDate(new Date(oMaxDate.getTime()));
+
+        var oCurrentValidUntil = oValidUntil.getDateValue();
+
+        // Compare with fresh values
+        if (!oCurrentValidUntil || oCurrentValidUntil < oDate || oCurrentValidUntil > oMaxDate) {
+            //  Use a NEW Date object to trigger change
+            var oNewValidDate = new Date(oMaxDate.getTime());
+            oValidUntil.setDateValue(oNewValidDate);
+
+            //  Update model with a fresh date
+            var oModel = oView.getModel("SingleCompanyModel");
+            oModel.setProperty("/ValidUntil", new Date(oNewValidDate.getTime()));
         }
-      },
+    }
+},
 
       HQD_LastDate: function (oEvent) {
         utils._LCvalidateDate(oEvent)
@@ -644,8 +653,7 @@ sap.ui.define(
         // Get values from QuotationModel
         const oQuotationModel = oView.getModel("QuotationModel");
         const oQuotationData = oQuotationModel.getData();
-        const oData = oView.getModel("SingleCompanyModel");
-        const ovalaue = oData.getData();
+       
         // Validate all item descriptions are filled
         const aItemArray1 = oQuotationModel.getProperty("/QuotationItemModel") || [];
         const bAllDescriptionsFilled = aItemArray1.every(item =>
@@ -669,47 +677,28 @@ sap.ui.define(
         }
         // Format dates
         const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
-        const sQuotationDate = oDateFormat.format(this.byId("HQD_id_Quotation").getDateValue());
-        const sValidUntilDate = oDateFormat.format(this.byId("HQD_id_QuotationValid").getDateValue());
-        // Gather all values
-        const oCompanyName = this.byId("HQD_id_InputCompanyName").getValue();
-        const omobilenumber = this.byId("HQD_id_InputCompanyMobileNo").getValue();
-        const oCompanyEmail = this.byId("HQD_id_CompanyEmailID").getValue();
-        const oCompanyStdCode = this.byId("HQD_id_mobileNumber").getValue();
-        const oCustomerStdcode = this.byId("HQD_id_CustomerNumberSTD").getValue();
-        const oCountry = this.byId("HQD_id_Country").getSelectedKey();
-        const oBranch = this.byId("HQD_id_BranchCode").getSelectedKey();
-        const oAddress = this.byId("HQD_id_InputCompanyAddress").getValue();
-        const oCompanyGST = this.byId("HQD_id_CompGSTNO").getValue();
-        const oPercentage = this.byId("HQD_id_Percentage").getValue();
         const oCurrency = this.byId("HQD_id_Curency").getSelectedKey();
-        const oCustomerName = this.byId("HQD_id_CustomerName").getValue();
-        const oCustomerEmail = this.byId("HQD_id_CustomerEmailID").getValue();
-        const oCustomerMobile = this.byId("HQD_id_InputCustomerMobileNo").getValue();
-        const oCustomerAddress = this.byId("HQD_id_InputCustomerAddress").getValue();
-        const oCustomerGST = this.byId("HQD_id_InputCustomerGSTNO").getValue();
-        const oNotes = oNotesHTML; // Already extracted
 
         const data = {
-          Date: sQuotationDate,
-          ValidUntil: sValidUntilDate,
-          CompanyName: oCompanyName,
-          CompanyMobileNo: omobilenumber,
-          CompanyEmailID: oCompanyEmail,
-          Country: oCountry,
-          Branch: oBranch,
-          CustomerSTDCode: oCustomerStdcode,
-          CompanyAddress: oAddress,
-          CompanyGSTNO: oCompanyGST,
-          Percentage: oPercentage,
+          Date: oDateFormat.format(this.byId("HQD_id_Quotation").getDateValue()),
+          ValidUntil: oDateFormat.format(this.byId("HQD_id_QuotationValid").getDateValue()),
+          CompanyName: this.byId("HQD_id_InputCompanyName").getValue(),
+          CompanyMobileNo: this.byId("HQD_id_InputCompanyMobileNo").getValue(),
+          CompanyEmailID: this.byId("HQD_id_CompanyEmailID").getValue(),
+          Country: this.byId("HQD_id_Country").getSelectedKey(),
+          Branch: this.byId("HQD_id_BranchCode").getSelectedKey(),
+          CustomerSTDCode: this.byId("HQD_id_CustomerNumberSTD").getValue(),
+          CompanyAddress: this.byId("HQD_id_InputCompanyAddress").getValue(),
+          CompanyGSTNO: this.byId("HQD_id_CompGSTNO").getValue(),
+          Percentage: this.byId("HQD_id_Percentage").getValue(),
           Currency: oCurrency,
-          CustomerName: oCustomerName,
-          CustomerEmailID: oCustomerEmail,
-          CustomerMobileNo: oCustomerMobile,
-          CustomerAddress: oCustomerAddress,
-          CustomerGSTNO: oCustomerGST,
-          Notes: oNotes,
-          STDCode: oCompanyStdCode,
+          CustomerName: this.byId("HQD_id_CustomerName").getValue(),
+          CustomerEmailID: this.byId("HQD_id_CustomerEmailID").getValue(),
+          CustomerMobileNo: this.byId("HQD_id_InputCustomerMobileNo").getValue(),
+          CustomerAddress: this.byId("HQD_id_InputCustomerAddress").getValue(),
+          CustomerGSTNO: this.byId("HQD_id_InputCustomerGSTNO").getValue(),
+          Notes: oNotesHTML,
+          STDCode: this.byId("HQD_id_mobileNumber").getValue(),
 
           SubTotalNotGST: oQuotationData.SubTotalNotGST || "0.00",
           SubTotal: oQuotationData.SubTotal || "0.00",
@@ -723,10 +712,9 @@ sap.ui.define(
         const aItemArray = oModel.getProperty("/QuotationItemModel") || [];
 
         const Items = aItemArray.map((item) => ({
-
           SAC: item.SAC || "",
           Days: item.Days || "",
-          UnitPrice: item.UnitPrice || "",
+          UnitPrice: item.UnitPrice || "",  
           Total: item.Total || "0.00",
           Currency: item.Currency || oCurrency,
           Description: item.Description || "",
@@ -795,50 +783,6 @@ sap.ui.define(
           MessageToast.show(this.i18nModel.getText("quotaioncreateError2"));
         }
       },
-      //for converting number to words
-      numberToWords: function (num, currency) {
-        const a = [
-          "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
-          "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
-          "Eighteen", "Nineteen"
-        ];
-        const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
-
-        function inWords(n) {
-          if (n < 20) return a[n];
-          if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
-          if (n < 1000) return a[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " and " + inWords(n % 100) : "");
-          if (n < 100000) return inWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + inWords(n % 1000) : "");
-          if (n < 10000000) return inWords(Math.floor(n / 100000)) + " Lakh" + (n % 100000 ? " " + inWords(n % 100000) : "");
-          return inWords(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + inWords(n % 10000000) : "");
-        }
-
-        if (num === undefined || isNaN(num)) return "Zero";
-
-        num = parseFloat(num).toFixed(2); // Keep 2 decimal places
-        const parts = num.toString().split(".");
-        const integerPart = parseInt(parts[0]);
-        const decimalPart = parseInt(parts[1]);
-
-        const currencyText = currency === "INR" ? "Rupees" : currency === "USD" ? "Dollars" : "Currency";
-        const subCurrencyText = currency === "INR" ? "Paise" : currency === "USD" ? "Cents" : "Subunits";
-
-        let words = "";
-
-        if (integerPart > 0) {
-          words += inWords(integerPart) + " " + currencyText;
-        }
-
-        if (decimalPart > 0) {
-          if (words) words += " and ";
-          words += inWords(decimalPart) + " " + subCurrencyText;
-        }
-        if (!words) {
-          words = "Zero " + currencyText;
-        }
-        return words + " Only";
-      },
-
       HQD_onPressMerge: async function () {
         const oView = this.getView();
         // Force model bindings to update so latest data is reflected
@@ -1044,7 +988,7 @@ sap.ui.define(
           columnStyles: {
             0: { halign: "right", cellWidth: 60 },
             1: { halign: "right", cellWidth: 40 }
-          },
+          },  
           margin: { left: 96 },
           didParseCell: function (data) {
             const lastRowIndex = summaryBody.length - 1;
@@ -1060,7 +1004,7 @@ sap.ui.define(
         // Update Y position
         y = doc.lastAutoTable.finalY + 5;
         // Amount in Words
-        oData.AmountInWords = this.numberToWords(parseFloat(oQuotaionItem.TotalSum || 0), oData.Currency);
+        oData.AmountInWords = await this.convertNumberToWords(parseFloat(oQuotaionItem.TotalSum || 0), oData.Currency);
         doc.setFont("times", "bold");
         doc.text(this.i18nModel.getText("pdfaAmount"), 13, y);
         y += 5;
@@ -1140,26 +1084,8 @@ sap.ui.define(
         this.updateTotalAmount();
       },
       HQD_onInputChange: function (oEvent) {
-        var oInput = oEvent.getSource();
-        var sValue = oInput.getValue().trim();
-        var regex = /^[0-9]{1,10}(\.[0-9]{1,2})?$/;
-
-        if (sValue !== "") {
-          if (sValue.length > 10 || !regex.test(sValue)) {
-            oInput.setValueState("Error");
-            oInput.setValueStateText("Value must be up to 10 characters, with a maximum of 2 decimals.");
-            this.UnitAmount = false;
-          } else {
-            oInput.setValueState("None");
-            oInput.setValueStateText("");
-            this.UnitAmount = true;
-          }
-        } else {
-          oInput.setValueState("None");
-          oInput.setValueStateText("");
-          this.UnitAmount = true;
-        }
-
+       
+        utils._LCvalidateAmount(oEvent);
         var oBindingContext = oEvent.getSource().getBindingContext("QuotationModel");
         var oItemContext = oBindingContext.getObject();
 
@@ -1407,7 +1333,7 @@ sap.ui.define(
           "HQD_id_QuotationValid", "HQD_id_InputCompanyName", "HQD_id_InputCompanyMobileNo",
           "HQD_id_CompanyEmailID", "HQD_id_Country", "HQD_id_InputCompanyAddress", "HQD_id_CompGSTNO",
           "HQD_id_Percentage", "HQD_id_Curency", "HQD_id_CustomerName", "HQD_id_CustomerEmailID",
-          "HQD_id_InputCustomerMobileNo", "HQD_id_InputCustomerAddress", "HQD_id_InputCustomerGSTNO", "HQD_id_mobileNumber", "HQD_id_CustomerNumberSTD"
+          "HQD_id_InputCustomerMobileNo", "HQD_id_InputCustomerAddress", "HQD_id_InputCustomerGSTNO", "HQD_id_mobileNumber", "HQD_id_CustomerNumberSTD", "HQD_id_BranchCode"
         ];
 
         fields.forEach(id => {

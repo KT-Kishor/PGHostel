@@ -17,7 +17,7 @@ sap.ui.define(
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
         this.getBusyDialog();
-
+        this._ViewDatePickersReadOnly(["HQ_id_quotationNo", "HQ_id_CustomerName","HQ_id_Quotaiondate"], this.getView())
         // Initialize filters model if it doesn't exist
         if (!this.getView().getModel("/filters")) {
           this.getView().setModel(new JSONModel({
@@ -61,7 +61,7 @@ sap.ui.define(
         this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
 
         if (this.oValue === "HrQuotation") {
-          this.HQ_onClearFilters();
+          await this.HQ_onSearch();
         } else {
           // Ensure search is called even if not HrQuotation
           await this.HQ_onSearch();
@@ -104,7 +104,11 @@ sap.ui.define(
       },
       HQ_onSearch: async function () {
         this.getBusyDialog();
-
+        await this._fetchCommonData("Quotation", "CompanyQuotationModel", {
+          DateFrom: sDateFrom,
+          DateTo: sDateTo
+        });
+        this.closeBusyDialog();
         // Get current values from controls
         var sQuotationNo = this.byId("HQ_id_quotationNo").getSelectedKey();
         var sCustomerName = this.byId("HQ_id_CustomerName").getSelectedKey();
@@ -212,11 +216,6 @@ sap.ui.define(
         // Clear selections
         this.byId("HQ_id_quotationNo").setSelectedKey("");
         this.byId("HQ_id_CustomerName").setSelectedKey("");
-
-        // Reset to financial year dates
-        var fyDates = this._getFinancialYearDates();
-        this.byId("HQ_id_Quotaiondate").setDateValue(fyDates.start);
-        this.byId("HQ_id_Quotaiondate").setSecondDateValue(fyDates.end);
 
         // Update filters model
         var sDateFrom = this._formatDateForBackend(fyDates.start);

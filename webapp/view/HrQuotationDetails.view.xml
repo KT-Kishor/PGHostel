@@ -47,9 +47,9 @@
                                 >
                                     <f:content>
                                      <m:Label text="{i18n>quotaionNo}" visible="{visiablityPlay>/editVisi}" />
-<m:Input value="{SingleCompanyModel>/QuotationNo}"
-         editable="false"
-         visible="{visiablityPlay>/editVisi}" />
+                                     <m:Input value="{SingleCompanyModel>/QuotationNo}"
+                                       editable="false"
+                                       visible="{visiablityPlay>/editVisi}" />
 
                                         <m:Label
                                             text="{i18n>quotaiodate}"
@@ -206,7 +206,8 @@
     value="{SingleCompanyModel>/Percentage}"
     change="HQD_onPercentageChange"
     editable="{SingleCompanyModel>/gstEditable}"
-    type="Number"
+    maxLength="3"
+  
     valueStateText="{i18n>msaAmountMess}"
     id="HQD_id_Percentage"
    
@@ -326,7 +327,7 @@
                                             valueStateText="{i18n>mobileNoValueState}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
-                                             placeholder="{i18n>mobileNo}"
+                                            placeholder="{i18n>mobileNo}"
                                             
                                         />
                                         <m:Label text="{i18n>customerGSTNO}" />
@@ -384,7 +385,7 @@
                                                 />
                                                 <m:ToolbarSpacer />
                                                 <m:Button
-                                                text="{i18n>quotaionitembutton}"
+                                                    text="{i18n>quotaionitembutton}"
                                                     visible="{visiablityPlay>/editable}"
                                                     tooltip="{i18n>addItem}"
                                                     press="HQD_onPressAddQuotationItem"
@@ -492,7 +493,7 @@
           placeholder="{i18n>itemDescription}"
           editable="{visiablityPlay>/editable}"
           maxLength="200"
-        liveChange="HQD_onItemDescriptionLiveChange"
+          liveChange="HQD_onItemDescriptionLiveChange"
           id="HQD_id_ItemDescription"
           width="100%"
           valueStateText="{i18n>itemplaceholder}"
@@ -532,8 +533,7 @@
       value="{QuotationModel>Days}"
       editable="{visiablityPlay>/editable}"
       change="HQD_onInputChange"
-      type="Number"
-      maxLength="20"
+      maxLength="18"
       textAlign="End"
     />
 
@@ -542,8 +542,7 @@
       value="{QuotationModel>UnitPrice}"
       editable="{visiablityPlay>/editable}"
       change="HQD_onInputChange"
-      type="Number"
-      maxLength="20"
+      maxLength="18"
       textAlign="End"
     />
 
@@ -556,8 +555,8 @@
       textAlign="End"
       type="Text"
       showValueHelp="true"
-	valueHelpRequest="HQD_onDiscountInfoPress" 
-    valueHelpIconSrc="sap-icon://message-information" 
+	  valueHelpRequest="HQD_onDiscountInfoPress" 
+      valueHelpIconSrc="sap-icon://message-information" 
     />
 
     <!-- Total (Column 8) -->
