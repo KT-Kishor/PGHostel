@@ -64,6 +64,12 @@ sap.ui.define([
                 if (this.oLoginModel.getProperty("/Role") === "IT Consultant") {
                     var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.BranchCode === this.oLoginModel.getProperty("/BranchCode")));
                     this.getView().setModel(oModel, "AdminModel");
+                } else {
+                    var filteredEmp = empData.filter(emp => (emp.Role.includes("Admin") ||
+                        emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
+
+                    var oModel = new JSONModel(filteredEmp);
+                    this.getView().setModel(oModel, "AdminModel");
                 }
             },
             getModelData: function () {
@@ -191,8 +197,16 @@ sap.ui.define([
             AA_onPressAssign: async function () {
                 this.getBusyDialog();
                 this.oLoginModel = this.getView().getModel("LoginModel")
+                let loginModel = this.getView().getModel("LoginModel").getData();
+                var empData = this.getView().getModel("EmpModel").getData();
                 if (this.oLoginModel.getProperty("/Role") === "IT Consultant") {
                     var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.BranchCode === this.oLoginModel.getProperty("/BranchCode")));
+                    this.getView().setModel(oModel, "EmpModel");
+                } else {
+                    var filteredEmp = empData.filter(emp => (emp.Role.includes("Admin") ||
+                        emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
+
+                    var oModel = new JSONModel(filteredEmp);
                     this.getView().setModel(oModel, "AdminModel");
                 }
                 this._dialogMode = "Assign";
@@ -507,13 +521,13 @@ sap.ui.define([
                     var oControl = oItem.getControl();
                     if (oControl) {
                         if (oControl.setValue) {
-                            oControl.setValue(""); 
+                            oControl.setValue("");
                         }
                         if (oControl.setSelectedKey) {
-                            oControl.setSelectedKey(""); 
+                            oControl.setSelectedKey("");
                         }
                         if (oControl.setSelected) {
-                            oControl.setSelected(false); 
+                            oControl.setSelected(false);
                         }
                     }
                 });
@@ -575,7 +589,15 @@ sap.ui.define([
                         oFormModel.setProperty("/formData/data/ReturnEmpID", this.oLoginModel.getProperty("/EmployeeID"));
                         oFormModel.setProperty("/formData/data/ReturnEmpName", this.oLoginModel.getProperty("/EmployeeName"));
                         oFormModel.setProperty("/formData/data/ReturnBranch", oSelectedData.AssignBranch);
-                        var role = this.oLoginModel.getProperty("/Role");
+                        // var role = this.oLoginModel.getProperty("/Role");               
+                        var empData = this.getView().getModel("EmpModel").getData();
+                        let loginModel = this.getView().getModel("LoginModel").getData();
+                        var filteredEmp = empData.filter(emp =>(emp.Role.includes("Admin") ||
+                            emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
+
+                        var oModel = new JSONModel(filteredEmp);
+                        this.getView().setModel(oModel, "AdminModel");
+
                         if (!this._unassignDialog) {
                             this._unassignDialog = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.AssetUnassignDialog", this);
                             this.getView().addDependent(this._unassignDialog);

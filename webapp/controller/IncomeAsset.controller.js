@@ -1116,7 +1116,6 @@ sap.ui.define([
                     var context = selected.getBindingContext("incomeModel");
                     var selectedData = context.getObject();
                     if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FTIA_id_Date"), "ID") &&
-                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FCIA_id_trashbranch"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FTIA_id_Comments"), "ID")) {
                     //         var selectedBranch = sap.ui.getCore().byId("FCIA_id_trashbranch").getSelectedItem();
 
