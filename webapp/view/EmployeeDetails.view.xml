@@ -12,7 +12,7 @@
 		<content>
 			<fb:FilterBar  class="sapUiTinyMargin" id="ED_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" showClearOnFB="true" search="Emp_det_onSearch" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" clear="onClearEmployeeDetails" showFilterConfiguration="false" >	
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true"  visible="{= ${LoginModel>/Role} === 'Admin' }">
 						<fb:control>
 							<ComboBox  showSecondaryValues= "true"  items="{sEmployeeDetails>/}" id="ED_id_EmpIDFilter" showClearIcon="true">
 								<core:ListItem key="{sEmployeeDetails>EmployeeID}" text="{sEmployeeDetails>EmployeeID}" additionalText="{sEmployeeDetails>EmployeeName}" />
