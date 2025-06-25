@@ -107,7 +107,6 @@ sap.ui.define(
         },
 
         CI_onPressMSASOW: function () { this.getRouter().navTo("RouteMSA"); },
-
         onPressClear: function () {
           this.byId("CI_id_InvNo").setValue("");
           this.byId("CI_id_InvoiceDatePicker").setValue("");

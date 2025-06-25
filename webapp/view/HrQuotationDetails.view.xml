@@ -86,7 +86,7 @@
                                             selectedKey="{SingleCompanyModel>/Country}"
                                             width="100%"
                                             showSecondaryValues="true"
-                                            valueStateText="{i18n>countryValueState}"
+                                             valueStateText="{i18n>countryValueState}"
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_Country"
                                             change="HQD_onCountryChange"
@@ -120,7 +120,7 @@
                                             value="{SingleCompanyModel>/CompanyName}"
                                             id="HQD_id_InputCompanyName"
                                             liveChange="HQD_onNameLiveChange"
-                                            valueStateText="{i18n>placeName}"
+                                            valueStateText="{i18n>customerComanyname}"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="50"
                                         />
@@ -167,7 +167,6 @@
                                             valueStateText="{i18n>emailValueState}"
                                             maxLength="100"
                                         />
-                                       
                                         <m:Label text="{i18n>companyGSTNO}"  required="{QuotationModel>/ShowGSTFields}"/>
                                         <m:Input
                                             value="{SingleCompanyModel>/CompanyGSTNO}"
@@ -542,6 +541,7 @@
       value="{QuotationModel>UnitPrice}"
       editable="{visiablityPlay>/editable}"
       change="HQD_onInputChange"
+      valueStateText="{i18n>enterUnitPrice}"
       maxLength="18"
       textAlign="End"
     />

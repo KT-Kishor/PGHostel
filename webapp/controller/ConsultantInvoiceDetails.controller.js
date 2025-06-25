@@ -894,16 +894,6 @@ sap.ui.define(
                     // Apply changes back to the model
                     oConsultantModel.setData(oData);
                     oConsultantModel.refresh(true);
-
-                    // Extract first 2 digits (state code)
-                    const stateCode = gstInput.substring(0, 2);
-
-                    if (isGSTValid && stateCode === "29") {
-                        this.CI_onSelectCGST();
-                    } else if (isGSTValid && stateCode !== "29") {
-                        this.CI_onSelectIGST();
-                    }
-
                     oConsultantModel.setProperty("/GSTValid", isGSTValid && gstInput !== "");
                     var oGSTColumn = this.byId("CI_id_ColumnGST");
                     var oGSTCalColumn = this.byId("CI_id_GSTCalc");
