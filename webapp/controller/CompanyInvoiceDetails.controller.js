@@ -1014,9 +1014,12 @@ sap.ui.define([
                 sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
                 sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
                 sap.ui.getCore().byId("idFrgConvertionRate").setValueState("None");
-                this.oDialog.close()
-                this._oDialog.destroy(true); 
-                this._oDialog = null;
+
+                if (this._oDialog) {
+                    this._oDialog.close();
+                    this._oDialog.destroy(true);
+                    this._oDialog = null;
+                }
             },
             onLiveTransactionID: function (oEvent) { utils._LCvalidateMandatoryField(oEvent) },
             onReceivedDateDatePickerChange: function (oEvent) { utils._LCvalidateDate(oEvent); },

@@ -22,16 +22,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.i18nModel = oView.getModel("i18n").getResourceBundle();
                     this.companyName = "Kalpavriksha Technologies";
                     this._fetchCommonData("EmployeeDetailsData", "empModel");
-                    // if (!oView.getModel("DesignationModel")) {
-                    //     this._fetchCommonData("Designation", "DesignationModel");
-                    //     this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                    //     this._fetchCommonData("EmployeeDetailsData", "EmployeeModel");
-                    //     this._fetchCommonData("AppVisibility", "RoleModel");
-                    //     this._fetchCommonData("Country", "CountryModel");
-                    // }
+
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
-                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false ,
+                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false,
                         isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false, SelfServiceBtn: false
                     });
                     oView.setModel(viewModel, "viewModel");
@@ -229,7 +223,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     case "Payslip":
                         this.getBusyDialog();
                         await this._commonGETCall("AdminPaySlip", "EmpTable", { EmployeeID: this.EmployeeID });
-                         this.closeBusyDialog();
+                        this.closeBusyDialog();
                         break;
                     case "Document":
                         this.byId("SS_id_AcName").setValueState("None");
@@ -504,7 +498,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                             return;
                         }
-                        
+
                         // Update some fields before sending
                         oDataModel.DateOfBirth = oView.byId("SS_id_Dob").getValue().split("/").reverse().join("-");
                         oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
@@ -1647,9 +1641,18 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     return new Date(currentEntry.EffectiveDate) > new Date(latestEntry.EffectiveDate) ? currentEntry : latestEntry;
                 });
 
-                var ctcPercentage = parseFloat(AppraisalModel.getProperty("/CtcPercentage"));
-                var CtcCalculate = (parseFloat(this.latest.CTC.replaceAll(",", "")) || 0) * ctcPercentage / 100;
-                var NewCTC = (CTCType === "Percentage") ? parseFloat(this.latest.CTC) + CtcCalculate : parseFloat(this.latest.CTC.replaceAll(",", "")) + ctcPercentage;
+                var ctcPercentage = parseFloat(AppraisalModel.getProperty("/CtcPercentage")) || 0;
+
+                // Safely remove commas and parse CTC
+                var baseCTC = parseFloat((this.latest.CTC || "0").toString().replace(/,/g, "")) || 0;
+
+                // Calculate the increment amount
+                var CtcCalculate = baseCTC * ctcPercentage / 100;
+
+                // Calculate the new CTC based on the CTCType
+                var NewCTC = (CTCType === "Percentage")
+                    ? baseCTC + CtcCalculate
+                    : baseCTC + ctcPercentage;
 
                 this.getView().getModel("employeeModel").setProperty("/CTC", this.Formatter.fromatNumber(NewCTC));
                 this.getView().getModel("employeeModel").setProperty("/JoiningBonus", this.Formatter.fromatNumber(0));
