@@ -1647,9 +1647,13 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     return new Date(currentEntry.EffectiveDate) > new Date(latestEntry.EffectiveDate) ? currentEntry : latestEntry;
                 });
 
-                var ctcPercentage = parseFloat(AppraisalModel.getProperty("/CtcPercentage"));
-                var CtcCalculate = (parseFloat(this.latest.CTC.replaceAll(",", "")) || 0) * ctcPercentage / 100;
-                var NewCTC = (CTCType === "Percentage") ? parseFloat(this.latest.CTC) + CtcCalculate : parseFloat(this.latest.CTC.replaceAll(",", "")) + ctcPercentage;
+                var ctcPercentage = parseFloat(AppraisalModel.getProperty("/CtcPercentage")) || 0;
+
+                var baseCTC = parseFloat((this.latest.CTC || "0").toString().replace(/,/g, "")) || 0;
+
+                var CtcCalculate = baseCTC * ctcPercentage / 100;
+
+                var NewCTC = (CTCType === "Percentage") ? baseCTC + CtcCalculate : baseCTC + ctcPercentage;
 
                 this.getView().getModel("employeeModel").setProperty("/CTC", this.Formatter.fromatNumber(NewCTC));
                 this.getView().getModel("employeeModel").setProperty("/JoiningBonus", this.Formatter.fromatNumber(0));
