@@ -92,7 +92,7 @@
                     <Label text="{i18n>employeeComment}" />
                     <TextArea
                         id="TSD_id_EmpComment"
-                        value="{newModel>/Comments}"
+                        value="{newModel>/Comment}"
                         liveChange="TD_ValidateCommonFields"
                         maxLength="1000"
                         valueStateText="{i18n>commentsValueState}"

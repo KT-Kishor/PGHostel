@@ -44,6 +44,7 @@ sap.ui.define([
             if (this.sArg !== "Timesheet") {
                 await this.readCallTimesheet();
                 const oData = this.getView().getModel("newModel").getData();
+                this.getView().getModel("newModel").setProperty("/Comment", oData.comments[0].Comment);
 
                 const isSubmitted = oData.Status === "Submitted" || oData.Status === "Approved";
                 oViewModel.setProperty("/isUpdate", !isSubmitted); // hide edit button if submitted
@@ -84,7 +85,7 @@ sap.ui.define([
                     EmployeeName: "",
                     ManagerName: "",
                     ManagerID: "",
-                    Comments: ""
+                    Comment: ""
                 };
                 this.getView().setModel(new sap.ui.model.json.JSONModel(emptyData), "newModel");
                 if (this.getView().getModel("editModel")) {
@@ -212,7 +213,7 @@ sap.ui.define([
                     Year: selectedDateObj.getFullYear(),
                     Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
                     Status: "Saved",
-                    comments: oData.comments || this.byId("TSD_id_EmpComment").getValue(),
+                    comments: oData.Comment
                 };
 
                 // Step 5: Submit to backend
