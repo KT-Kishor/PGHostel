@@ -140,7 +140,6 @@ sap.ui.define([
         },
 
         onValueHelpRequest: function () {
-            // Validate that a date is selected before opening the dialog
             const oCalendar = this.getView().byId("calendar");
             const selectedDates = oCalendar ? oCalendar.getSelectedDates() : [];
             const selectedDateObj = selectedDates[0]?.getStartDate();
@@ -150,12 +149,41 @@ sap.ui.define([
                 return;
             }
 
+            // Normalize selected date
+            const selectedDate = new Date(
+                selectedDateObj.getFullYear(),
+                selectedDateObj.getMonth(),
+                selectedDateObj.getDate()
+            );
+
+            // Get full assignment data
+            const oAssignModel = this.getView().getModel("AssignModel");
+            const aAllAssignments = oAssignModel?.getData() || [];
+
+            // Filter based on selected date falling within start and end date
+            const aFilteredAssignments = aAllAssignments.filter(oItem => {
+                if (!oItem.StartDate || !oItem.EndDate) return false;
+
+                const startDate = new Date(oItem.StartDate);
+                const endDate = new Date(oItem.EndDate);
+
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(0, 0, 0, 0);
+
+                return selectedDate >= startDate && selectedDate <= endDate;
+            });
+
+            // Set filtered data into a dedicated model
+            const oFilteredModel = new sap.ui.model.json.JSONModel(aFilteredAssignments);
+            this.getView().setModel(oFilteredModel, "FilteredAssignModel");
+
+            // Open dialog
             if (!this.TSD_oDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.kt.com.minihrsolution.fragment.TimesheetTask",
-                    controller: this,
-                }).then(function (TSD_oDialog) {
-                    this.TSD_oDialog = TSD_oDialog;
+                    controller: this
+                }).then(function (oDialog) {
+                    this.TSD_oDialog = oDialog;
                     this.getView().addDependent(this.TSD_oDialog);
                     this.TSD_oDialog.open();
                 }.bind(this));
@@ -163,6 +191,17 @@ sap.ui.define([
                 this.TSD_oDialog.open();
             }
         },
+        onAssignmentLiveChange: function (oEvent) {
+            const sQuery = oEvent.getParameter("value").toLowerCase(); // get input string
+            const oBinding = oEvent.getSource().getBinding("items");
+
+            const oFilter1 = new sap.ui.model.Filter("TaskName", sap.ui.model.FilterOperator.Contains, sQuery);
+            const oFilter2 = new sap.ui.model.Filter("TaskID", sap.ui.model.FilterOperator.Contains, sQuery);
+
+            const oCombinedFilter = new sap.ui.model.Filter([oFilter1, oFilter2], false); // OR logic
+            oBinding.filter(oCombinedFilter);
+        },
+
         TSD_onSubmit: async function () {
             try {
                 await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
@@ -365,7 +404,7 @@ sap.ui.define([
                 return;
             }
             // Format selected date to 'YYYY-MM-DD'
-            const formattedDate = [selectedDate.getFullYear(),String(selectedDate.getMonth() + 1).padStart(2, '0'),String(selectedDate.getDate()).padStart(2, '0')].join('-');
+            const formattedDate = [selectedDate.getFullYear(), String(selectedDate.getMonth() + 1).padStart(2, '0'), String(selectedDate.getDate()).padStart(2, '0')].join('-');
             this.getBusyDialog();
             try {
                 // Fetch all timesheet entries for this employee
@@ -376,7 +415,7 @@ sap.ui.define([
                 const isDuplicate = Array.isArray(checkDup.data) && checkDup.data.some(entry => {
                     if (!entry.Date || !entry.TaskID) return false;
                     const entryDateObj = new Date(entry.Date);
-                    const entryDateOnly = [ entryDateObj.getFullYear(), String(entryDateObj.getMonth() + 1).padStart(2, '0'), String(entryDateObj.getDate()).padStart(2, '0')].join('-');
+                    const entryDateOnly = [entryDateObj.getFullYear(), String(entryDateObj.getMonth() + 1).padStart(2, '0'), String(entryDateObj.getDate()).padStart(2, '0')].join('-');
                     return entry.TaskID === AllData.TaskID && entryDateOnly === formattedDate;
                 });
                 if (isDuplicate) {
