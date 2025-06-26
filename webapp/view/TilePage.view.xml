@@ -542,6 +542,19 @@
                                             />
                                         </TileContent>
                                     </GenericTile>
+
+                                     <GenericTile
+                                        visible="{= ${AppVisibilityModel>/MyAsset} === '1' ? true : false}"
+                                        class="sapUiMediumMargin"
+                                        header="{i18n>recruitment}"
+                                        press="TileV_Recruitment"
+                                        >
+                                        <TileContent unit="{i18n>assetFooter}">
+                                        <ImageContent
+                                        src="sap-icon://add-employee"
+                                        />
+                                        </TileContent>
+                                        </GenericTile>
                                 </layout:HorizontalLayout>
                             </ux:blocks>
                         </ux:ObjectPageSubSection>

@@ -93,6 +93,7 @@ sap.ui.define([
             "MyInbox": "/MyInbox",
             "Timesheet": "/Timesheet",
             "TimesheetApproval": "/TimesheetApproval",
+            "Recruitment":"/Recruitment"
 
           };
 

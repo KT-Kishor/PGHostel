@@ -28,7 +28,7 @@ sap.ui.define([
             this.Slno = oEvent.getParameter("arguments").sPath;
             await this._fetchCommonData("IncomeAsset", "objectModel", {
                 SerialNumber: this.Slno,
-            })
+            });
 
 
             this.closeBusyDialog()

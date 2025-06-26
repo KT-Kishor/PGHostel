@@ -252,6 +252,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TimesheetStatus.json",
                 "preload": true
+            },
+             "ExpectedCTC": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/ExpectedctcRange.json",
+                "preload": true
             }
         },
         "resources": {
@@ -630,6 +635,13 @@
                     "target":[
                         "TargetPurchaseOrderObject"
                     ]
+                },
+                {
+                    "name":"Recruitment",
+                    "pattern": "Recruitment",
+                    "target":[
+                        "TargetRecruitment"
+                    ]
                 }
 
             ],
@@ -964,6 +976,13 @@
                     "clearControlAggregation": false,
                     "viewId": "HrQuotationDetails",
                     "viewName": "HrQuotationDetails"
+                },
+                "TargetRecruitment":{
+                    "viewType": "XML",
+                    "transition":"slide",
+                    "clearControlAggregation": false,
+                    "viewId": "Recruitment",
+                    "viewName": "Recruitment"
                 }
 
             }

@@ -360,6 +360,9 @@ sap.ui.define(
         },
         TileV_onpressPoApp:function(){
           this.getRouter().navTo("PurchaseOrder");
+        },
+        TileV_Recruitment:function(){
+          this.getRouter().navTo("Recruitment");
         }
         
       }
