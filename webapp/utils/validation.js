@@ -50,9 +50,9 @@ sap.ui.define([], function () {
         return false;
       }
       // Allow only letters, spaces, and dots
-      var sanitizedValue = oValue.replace(/[^a-zA-Z\s.]/g, "");
+      var sanitizedValue = oValue.replace(/[^a-zA-Z\s./]/g, "");
       if (oValue !== sanitizedValue) oField.setValue(sanitizedValue);
-      var regex = /^[a-zA-Z\s.]+$/;
+      var regex = /^[a-zA-Z\s./]+$/;
       if (!regex.test(sanitizedValue)) {
         oField.setValueState("Error");
         return false;
