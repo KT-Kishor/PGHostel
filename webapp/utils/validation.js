@@ -332,7 +332,7 @@ sap.ui.define([], function () {
       if (!oField) return false;
 
       var oValue = oField.getValue();
-      var regex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/;
+      var regex = /^(?=.*[A-Z])(?=.*[!@#$%^&*+-])[A-Za-z\d!+-@#$%^&*()_=]{6,}$/;
 
       if (!regex.test(oValue)) {
         oField.setValueState("Error");
