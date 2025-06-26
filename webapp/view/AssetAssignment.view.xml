@@ -35,14 +35,14 @@
                             name="AssignEmployeeName"
                             showClearIcon="true"
                             id="AA_id_EmployeeName"
-                            items="{AdminModel>/}"
+                            items="{EmpModel>/}"
                             showSecondaryValues="true"
                         >
                             <items>
                                 <core:ListItem
-                                    key="{AdminModel>EmployeeName}"
-                                    text="{AdminModel>EmployeeName}"
-                                    additionalText="{AdminModel>EmployeeID}"
+                                    key="{EmpModel>EmployeeName}"
+                                    text="{EmpModel>EmployeeName}"
+                                    additionalText="{EmpModel>EmployeeID}"
                                 />
                             </items>
                         </ComboBox>
