@@ -142,11 +142,7 @@ sap.ui.define([
                         this._populateUniqueFilterValues(oFCIAerData);
 
                     }
-
-
-
-
-                    this.closeBusyDialog()
+                  this.closeBusyDialog()
                 }).catch((error) => {
                     this.closeBusyDialog()
 
@@ -284,6 +280,7 @@ sap.ui.define([
                 } else {
                     this.FCIA_Dialog.open();
 
+
                     var oModel = this.getView().getModel("CreateIncomeAssetModel")
                     var oSimpleForm = sap.ui.getCore().byId("FCIA_id_SimpleFormChange354wide");
                     if (oSimpleForm) {
@@ -308,7 +305,7 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_ID_DescriptionTextArea").setValue("").setValueState("None").setEditable(true).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_eqno").setValue("").setValueState("None").setEditable(true).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_slno").setValue("").setValueState("None").setEditable(true).setVisible(true)
-                    sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEnabled(true)
+                    sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(loginModel.EmployeeName).setVisible(true).setEnabled(true)
                     sap.ui.getCore().byId("FCIA_id_Date").setValue("").setValueState("None").setVisible(true).setEditable(true)
                     sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey(oModel.getProperty("/PickedBranch")).setValueState("None");
                     sap.ui.getCore().byId("FCIA_id_branch").setVisible(true).setEditable(true)
@@ -582,7 +579,6 @@ sap.ui.define([
             return;
         }
                 await this.ajaxReadWithJQuery("IncomeAsset").then((oData) => {
-                    let loginModel = this.getView().getModel("LoginModel").getData();
                     var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "EditModel");
                 })
@@ -704,7 +700,7 @@ sap.ui.define([
                 let loginModel = this.getView().getModel("LoginModel").getData();
 
                 var empData = this.getView().getModel("EmpModel").getData();
-                var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
+                // var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
 
 
 
@@ -795,7 +791,7 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_ID_DescriptionTextArea").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_eqno").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_slno").setVisible(false)
-                    // sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(true)
+                    // sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(loginModel.EmployeeName)
                     sap.ui.getCore().byId("FCIA_id_Date").setVisible(true).setValue("").setValueState("None").setEditable(true)
                     sap.ui.getCore().byId("FCIA_id_branch").setVisible(false).setSelectedKey("")
                     sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(true).setSelectedKey(oRowData.TransferBranch).setValueState("None").setEditable(false)
@@ -816,7 +812,7 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(true)
 
                     }
-                          this.getView().getModel("CreateIncomeAssetModel").setProperty("/PickedBranch", oRowData.TransferBranch);
+                     this.getView().getModel("CreateIncomeAssetModel").setProperty("/PickedBranch", oRowData.TransferBranch);
 
 
                     this._FragmentDatePickersReadOnly(["FCIA_id_Date"])
@@ -1152,16 +1148,16 @@ sap.ui.define([
 
             IA_onSearch: function () {
 
-                var sEqNo = this.getView().byId("IA_id_EqNo").getSelectedKey();
-                var sPickedBy = this.getView().byId("IA_id_PickedBy").getSelectedKey();
+                var sEqNo = this.getView().byId("IA_id_EqNo").getSelectedKey() ?  this.getView().byId("IA_id_EqNo").getSelectedKey() : this.getView().byId("IA_id_EqNo").getValue();
+                var sPickedBy = this.getView().byId("IA_id_PickedBy").getSelectedKey() ? this.getView().byId("IA_id_PickedBy").getSelectedKey() : this.getView().byId("IA_id_PickedBy").getValue();
 
                 var oDateRange = this.getView().byId("idOdataDateComboBox");
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
                 var oStartDate = oDateRange.getDateValue();
                 var oEndDate = oDateRange.getSecondDateValue();
-                var slNo = this.getView().byId("IA_id_SlNo").getSelectedKey();
-                var status = this.getView().byId("IA_id_Status").getSelectedKey();
-                var sBranch = this.getView().byId("IA_id_branch").getSelectedKey();
+                var slNo = this.getView().byId("IA_id_SlNo").getSelectedKey()? this.getView().byId("IA_id_SlNo").getSelectedKey() : this.getView().byId("IA_id_SlNo").getValue();
+                var status = this.getView().byId("IA_id_Status").getSelectedKey() ? this.getView().byId("IA_id_Status").getSelectedKey() :this.getView().byId("IA_id_Status").getValue();
+                var sBranch = this.getView().byId("IA_id_branch").getSelectedKey() ? this.getView().byId("IA_id_branch").getSelectedKey():this.getView().byId("IA_id_branch").getValue();
 
 
                 var filters = {
@@ -1231,7 +1227,8 @@ sap.ui.define([
                         this.ajaxReadWithJQuery("IncomeAsset", "IsCurrent=1").then((oData) => {
                             var oFCIAerData1 = Array.isArray(oData.data) ? oData.data : [oData.data];
                             let loginModel = this.getView().getModel("LoginModel").getData();
-                            const filteredData = oFCIAerData1.filter(item => item.PickedBranch === loginModel.BranchName);
+                            const filteredData = oFCIAerData1.filter(item => item.PickedBranch === loginModel.BranchName ||  
+                                item.TransferBranch === loginModel.BranchName);
                             this._populateUniqueFilterValues(filteredData);
                         })
                     } else {
@@ -1318,8 +1315,6 @@ sap.ui.define([
                     { label: "Trash Date", property: "TrashDate", type: "Date", formatter: ".formatDate" },
                     { label: "Trash Comments", property: "TrashComments", type: "string" },
                     { label: "Trash Branch", property: "TrashBranch", type: "string" },
-
-
                     { label: "ReturnEmpName", property: "ReturnEmpName", type: "string" },
                     { label: "ReturnEmpID", property: "ReturnEmpID", type: "string" },
                     { label: "ReturnDate", property: "ReturnDate", type: "Date", formatter: ".formatDate" },

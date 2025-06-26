@@ -75,7 +75,7 @@
                   liveChange="FCIA_onDescriptionTextAreaChange"
                   value="{CreateIncomeAssetModel>/Description}"
                   placeholder="Enter Description" 
-                  maxLength="60" width="100%" />
+                  maxLength="250" width="100%" />
                     <Label text="{i18n>slNo}" required="true" />
                 <Input
                     id="FCIA_id_slno"

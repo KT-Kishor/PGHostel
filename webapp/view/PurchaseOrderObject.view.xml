@@ -212,7 +212,15 @@
                                                 additionalText="{ManageCustomerModel>name}"
                                             />
                                         </m:ComboBox>
-
+                                        <m:Label
+                                            text="{i18n>designation}"
+                                            class="oSowFragLabel"
+                                        />
+                                        <m:Input
+                                            id="FPO_id_designation"
+                                            value="{PurchaseOrderModel>/CustomerDesignation}"
+                                            editable="false"
+                                        />
                                         <m:Label
                                             text="{i18n>customername}"
                                             class="oSowFragLabel"
