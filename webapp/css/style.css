@@ -692,3 +692,22 @@ align-items:flex-start;
      background-position: center;
      background-repeat: no-repeat; */
 }
+.sapFDynamicPageTitle {
+    z-index: 4;
+    position: relative;
+    min-height: 3rem;
+    padding: 0.5rem 2rem 0.5rem 3rem;
+    display: flex
+;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    box-sizing: border-box;
+    background-image: linear-gradient(to bottom right, rgb(170, 212, 237), rgb(173, 166, 249)) !important;
+   
+}
+.sapMGHLI {
+    background-image: linear-gradient(to bottom right, rgb(170, 212, 237), rgb(173, 166, 249)) !important;
+    font-weight: bold;
+    color: #006064;
+}
