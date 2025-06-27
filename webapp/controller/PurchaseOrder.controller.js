@@ -21,7 +21,7 @@ sap.ui.define([
         _onRouteMatched: async function () {
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
+            var LoginFUnction = await this.commonLoginFunction("PurchaseOrder");
             if (!LoginFUnction) return;
             this.finacial()
             await this.PO_onSearch()

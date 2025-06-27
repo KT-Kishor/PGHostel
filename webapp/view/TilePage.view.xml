@@ -490,11 +490,7 @@
                     </ux:subSections>
                 </ux:ObjectPageSection>
 
-                <ux:ObjectPageSection
-                    titleUppercase="false"
-                    title="Asset"
-                    visible="{= ${TileAccessModel>/ManageAsset} === '1' ? true : false}"
-                >
+                <ux:ObjectPageSection titleUppercase="false" title="Asset" visible="{= ${TileAccessModel>/ManageAsset} === '1' ? true : false}">
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
                             <ux:blocks>
@@ -549,10 +545,7 @@
                     </ux:subSections>
                 </ux:ObjectPageSection>
 
-                <ux:ObjectPageSection
-                    titleUppercase="false"
-                    title="Recruitment"
-                >
+                <ux:ObjectPageSection titleUppercase="false" title="{i18n>recruitment}" visible="{= ${TileAccessModel>/Recruitment} === '1' ? true : false}">
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
                             <ux:blocks>

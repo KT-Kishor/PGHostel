@@ -17,8 +17,6 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("AssetObjectPage").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function (oEvent) {
-
-
             var LoginFunction = await this.commonLoginFunction("AssetAssignment");
             if (!LoginFunction) return;
             var Layout = this.byId("ObjectPageLayout");
@@ -125,7 +123,7 @@ sap.ui.define([
                 //     });
                 // }
             });
-            var oModel = new sap.ui.model.json.JSONModel(timelineData);
+            var oModel = new JSONModel(timelineData);
             this.getView().setModel(oModel, "Mymodel");
 
         },

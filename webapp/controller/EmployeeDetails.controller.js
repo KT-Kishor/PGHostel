@@ -1,6 +1,6 @@
 sap.ui.define([
-    "./BaseController", "sap/ui/model/json/JSONModel", "sap/m/MessageToast", "../model/formatter"],
-    function (BaseController, JSONModel, MessageToast, Formatter) {
+    "./BaseController", "sap/m/MessageToast", "../model/formatter"],
+    function (BaseController, MessageToast, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeDetails", {
             Formatter: Formatter,

@@ -17,10 +17,10 @@ sap.ui.define(
         this.getRouter().getRoute("RouteHrQuotationDetails").attachMatched(this._onRouteMatched, this);
       },
       _onRouteMatched: async function (oEvent) {
-        var oArgs = oEvent.getParameter("arguments");
-        var sQuotationNo = decodeURIComponent(oArgs.sQuotationNo);
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
+        var oArgs = oEvent.getParameter("arguments");
+        var sQuotationNo = decodeURIComponent(oArgs.sQuotationNo);
         this.getBusyDialog();
         this._ViewDatePickersReadOnly(["HQD_id_Quotation", "HQD_id_QuotationValid"], this.getView())
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");

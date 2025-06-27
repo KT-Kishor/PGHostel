@@ -1,7 +1,7 @@
 sap.ui.define([
-    "./BaseController", "sap/ui/core/BusyIndicator", "../model/formatter", "sap/m/MessageBox", "../utils/PaySlipPDF"
+    "./BaseController", "../model/formatter", "sap/m/MessageBox", "../utils/PaySlipPDF"
 ],
-    function (BaseController, BusyIndicator, Formatter, MessageBox, jsPDF) {
+    function (BaseController, Formatter, MessageBox, jsPDF) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.AdminPaySlipDetails", {
             Formatter: Formatter,

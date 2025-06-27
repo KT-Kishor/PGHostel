@@ -1,10 +1,9 @@
 sap.ui.define([
   "./BaseController",
   "sap/ui/model/json/JSONModel",
-  "../utils/validation",
   "../model/formatter",
   "sap/m/MessageToast",
-], (BaseController, JSONModel, utils, Formatter,MessageToast) => {
+], (BaseController, JSONModel, Formatter,MessageToast) => {
   "use strict";
 
   return BaseController.extend("sap.kt.com.minihrsolution.controller.DetailLeave", {

@@ -1,13 +1,12 @@
 sap.ui.define(
   [
     "./BaseController",
-    "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     'sap/ui/export/Spreadsheet',
     "../model/formatter",
 
   ],
-  function (BaseController, JSONModel, MessageToast, Spreadsheet, Formatter) {
+  function (BaseController, MessageToast, Spreadsheet, Formatter) {
 
     "use strict";
     return BaseController.extend(

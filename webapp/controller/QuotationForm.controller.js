@@ -17,6 +17,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            var LoginFunction = await this.commonLoginFunction("A_Quotations");
+            if (!LoginFunction) return;
             BusyIndicator.hide();
             this.getBusyDialog();
             var oView = this.getView();
@@ -46,7 +48,7 @@ sap.ui.define([
             if (this.oModel.getProperty("/MasterEdit")) {
                 this.showConfirmationDialog(this.i18nModel.getText("ConfirmActionTitle"), this.i18nModel.getText("backConfirmation"), function () { BusyIndicator.show(0); this.getRouter().navTo("RouteQuotation"); }.bind(this))
             } else {
-                BusyIndicator.show(0); 
+                BusyIndicator.show(0);
                 this.getRouter().navTo("RouteQuotation");
             }
         },
