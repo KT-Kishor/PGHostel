@@ -99,6 +99,7 @@ sap.ui.define(
             var cgst = parseFloat(oSelectedQuotation.CGST || 0);
             var sgst = parseFloat(oSelectedQuotation.SGST || 0);
             var igst = parseFloat(oSelectedQuotation.IGST || 0);
+            var Percentage = parseFloat(oSelectedQuotation.Percentage || 0);
 
             // Calculate visibility and selection flags
             var cgstVisible = (cgst > 0 || sgst > 0);
@@ -106,11 +107,21 @@ sap.ui.define(
             var igstVisible = (igst > 0);
             var cgstSelected = (cgst > 0 || sgst > 0);
             var igstSelected = (igst > 0);
-            if(!cgstSelected){
-               oSelectedModel.setProperty("/Percentage", " ")
-            }else{
-                oSelectedModel.setProperty("/Percentage", " ")
+            // Determine which GST radio is selected
+            var percentageToShow = "";
+
+            // If CGST/SGST is selected, use Percentage
+            if (cgstSelected && !igstSelected) {
+              percentageToShow = Percentage;
+            }else if (igstSelected && !cgstSelected) {
+              percentageToShow = Percentage;
             }
+            else if (cgstSelected && igstSelected) {
+              percentageToShow = Percentage;
+            }
+            oSelectedModel.setProperty("/Percentage", percentageToShow);
+
+
             oSelectedModel.setProperty("/gstEditable", false); // Disable editing
 
             // Check currency and set visibility accordingly
@@ -293,7 +304,7 @@ sap.ui.define(
         var sValueState = oInput.getValueState();
         var sGST = oInput.getValue().trim();
 
-        if(oInput.getValue() === '') {
+        if (oInput.getValue() === '') {
           oInput.setValueState("None");
           return;
         }
