@@ -25,16 +25,18 @@ sap.ui.define(["./BaseController",
                 const oViewModel = new JSONModel();
                 oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
                 this.getView().setModel(oViewModel, "viewModel");
-
+                
                 // Add initial button states
                 oViewModel.setProperty("/canSubmit", false);
                 oViewModel.setProperty("/canDelete", false);
-
+                
                 var loginModel = this.getOwnerComponent().getModel("LoginModel");
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
-
+                
                 this.branch = loginModel.getProperty("/BranchCode");
                 this.TSD_ReadTimesheetEntries(this.EmployeeID);
+                this.TS_onSearch();
+                this.TS_onClear();
             },
 
 
@@ -53,7 +55,7 @@ sap.ui.define(["./BaseController",
                     this.getBusyDialog();
                     const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID });
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getView().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
+                    this.getOwnerComponent().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
                     this.filterTimesheetForCurrentWeek(); // <-- Filter for current week
                     this.closeBusyDialog();
                 } catch (error) {
@@ -77,7 +79,7 @@ sap.ui.define(["./BaseController",
                 oEndDate.setHours(23, 59, 59, 999);
 
                 // Get all timesheet data
-                var oTimesheetModel = this.getView().getModel("FilteredTimesheetModel");
+                var oTimesheetModel = this.getOwnerComponent().getModel("FilteredTimesheetModel");
                 var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
 
                 // Filter entries for the current week
@@ -102,7 +104,7 @@ sap.ui.define(["./BaseController",
                     oSelectedDate.setHours(0, 0, 0, 0);
 
                     // Get all timesheet data
-                    var oTimesheetModel = this.getView().getModel("FilteredTimesheetModel");
+                    var oTimesheetModel = this.getOwnerComponent().getModel("FilteredTimesheetModel");
                     var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
 
                     // Filter for the selected date
@@ -169,7 +171,7 @@ sap.ui.define(["./BaseController",
                             const oNewModel = new sap.ui.model.json.JSONModel(parsedData);
                             that.getView().setModel(oNewModel, "FilteredTimesheetModel");
                             oNewModel.refresh(true); // Force UI refresh
-
+                            that.filterTimesheetForCurrentWeek();
                             oTable.removeSelections(true);
                         } catch (error) {
                             that.getView().getModel("viewModel").setProperty("/canSubmit", false);
@@ -239,9 +241,11 @@ sap.ui.define(["./BaseController",
                             that.getView().getModel("viewModel").setProperty("/canDelete", false);
                             that.byId("TD_id_Table").removeSelections(true);
 
-                    const oData = await that.ajaxReadWithJQuery("Timesheet", { EmployeeID: that.EmployeeID });
-                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    that.getView().getModel("FilteredTimesheetModel").setData(offerData);
+                            const oData = await that.ajaxReadWithJQuery("Timesheet", { EmployeeID: that.EmployeeID });
+                            const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                            that.getView().getModel("FilteredTimesheetModel").setData(offerData);
+                            that.filterTimesheetForCurrentWeek();
+                            that.byId("TD_id_Table").removeSelections(true)
 
                         } catch (error) {
                             MessageToast.show(error.message || error.responseText);
@@ -257,26 +261,34 @@ sap.ui.define(["./BaseController",
 
             T_TableSelectionChange: function () {
                 var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
-                this.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                this.getView().getModel("viewModel").setProperty("/canDelete", false);
+                var oViewModel = this.getView().getModel("viewModel");
+
+                // Default to false
+                oViewModel.setProperty("/canSubmit", false);
+                oViewModel.setProperty("/canDelete", false);
+
                 if (oSelectedItems.length === 0) {
                     return;
                 }
-                // Check status of all selected rows
-                var allSaved = true;
-                var anySubmitted = false;
+
+                var allValidForSubmitOrDelete = true;
+
                 oSelectedItems.forEach(function (item) {
                     var status = item.getBindingContext("FilteredTimesheetModel").getProperty("Status");
-                    if (status !== "Saved") {
-                        allSaved = false;
-                    }
-                    if (status === "Submitted") {
-                        anySubmitted = true;
+
+                    // If any status is Submitted or Approved, disable buttons
+                    if (status === "Submitted" || status === "Approved") {
+                        allValidForSubmitOrDelete = false;
                     }
                 });
-                this.getView().getModel("viewModel").setProperty("/canSubmit", allSaved);
-                this.getView().getModel("viewModel").setProperty("/canDelete", !anySubmitted);
+
+                if (allValidForSubmitOrDelete) {
+                    // All statuses are either Saved or Rejected
+                    oViewModel.setProperty("/canSubmit", true);
+                    oViewModel.setProperty("/canDelete", true);
+                }
             },
+
 
             TS_onShowComments: function (oEvent) {
                 var oContext = oEvent.getSource().getBindingContext("FilteredTimesheetModel");
@@ -347,8 +359,24 @@ sap.ui.define(["./BaseController",
                 }
             },
             TS_onClear: function () {
-                this.byId("TS_monthComboBox").setValue("");
-                this.byId("TS_id_Status").setValue("");
-            }
+                var aFilterItems = this.byId("TS_id_FilterBar").getFilterGroupItems();
+                aFilterItems.forEach(function (oItem) {
+                    var oControl = oItem.getControl(); // Get the associated control
+                    if (oControl) {
+                        if (oControl.setValue) {
+                            oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
+                        }
+                        if (oControl.setSelectedKey) {
+                            oControl.setSelectedKey(""); // Reset selection for dropdowns
+                        }
+                        if (oControl.setSelected) {
+                            oControl.setSelected(false); // Reset selection for Checkboxes
+                        }
+                    }
+                });
+            },
+
+
+
         });
     });
