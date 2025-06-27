@@ -1,14 +1,19 @@
 sap.ui.define(
   [
     "./BaseController",
-    "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
+    'sap/ui/export/Spreadsheet',
+    "../model/formatter",
+
   ],
-  function (BaseController, JSONModel, MessageToast) {
+  function (BaseController, MessageToast, Spreadsheet, Formatter) {
+
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.CompanyInvoice",
       {
+        Formatter: Formatter,
+
         onInit: function () {
           this.getRouter()
             .getRoute("RouteCompanyInvoice")
@@ -22,7 +27,7 @@ sap.ui.define(
           this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceapp"));
           await this.CompanyInvoice_onSearch();
           this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
-          this.getView().getModel("LoginModel").setProperty("/RichText",false);
+          this.getView().getModel("LoginModel").setProperty("/RichText", false);
         },
 
         CompanyInvoice_onSearch: async function () {
@@ -97,7 +102,7 @@ sap.ui.define(
               }
             }
             // Fetch data
-            this._fetchCommonData("CompanyInvoice", "CompanyInvoiceFilterModel", {InvoiceStartDate: params.InvoiceStartDate, InvoiceEndDate: params.InvoiceEndDate});
+            this._fetchCommonData("CompanyInvoice", "CompanyInvoiceFilterModel", { InvoiceStartDate: params.InvoiceStartDate, InvoiceEndDate: params.InvoiceEndDate });
             await this._fetchCommonData("CompanyInvoice", "CompanyInvoiceModel", params);
             this.closeBusyDialog();
           } catch (error) {
@@ -107,7 +112,6 @@ sap.ui.define(
         },
 
         CI_onPressMSASOW: function () { this.getRouter().navTo("RouteMSA"); },
-
         onPressClear: function () {
           this.byId("CI_id_InvNo").setValue("");
           this.byId("CI_id_InvoiceDatePicker").setValue("");
@@ -115,33 +119,33 @@ sap.ui.define(
           this.byId("CI_id_StatusComboBox").setValue("");
         },
 
-        onSelectionChange:function (oEvent) {
+        onSelectionChange: function (oEvent) {
           this.data = oEvent.getSource().getSelectedItem().getBindingContext("CompanyInvoiceModel").getObject();
-          if(this.data.Status === "Submitted"){
+          if (this.data.Status === "Submitted") {
             this.byId("CI_InvoiceDelete").setEnabled(true);
-          }else{
+          } else {
             this.byId("CI_InvoiceDelete").setEnabled(false);
           }
         },
 
-        CI_OnPressDeleteInvoice:function () {
-           var that = this;
-            this.showConfirmationDialog(
-                that.i18nModel.getText("msgBoxConfirm"),
-                that.i18nModel.getText("msgBoxConfirmDelete"),
-                async function () {
-                   that.getBusyDialog();
-                    try {
-                        await that.ajaxDeleteWithJQuery("/CompanyInvoice", { filters: { InvNo: that.data.InvNo } });
-                        MessageToast.show(that.i18nModel.getText("CompanyDeleteMess"));
-                        that.CompanyInvoice_onSearch();
-                    } catch (error) {
-                        MessageToast.show(error.responseText || "Error deleting expense");
-                    } finally {
-                        that.closeBusyDialog();
-                    }
-                },
-                function () { that.closeBusyDialog(); })
+        CI_OnPressDeleteInvoice: function () {
+          var that = this;
+          this.showConfirmationDialog(
+            that.i18nModel.getText("msgBoxConfirm"),
+            that.i18nModel.getText("msgBoxConfirmDelete"),
+            async function () {
+              that.getBusyDialog();
+              try {
+                await that.ajaxDeleteWithJQuery("/CompanyInvoice", { filters: { InvNo: that.data.InvNo } });
+                MessageToast.show(that.i18nModel.getText("CompanyDeleteMess"));
+                that.CompanyInvoice_onSearch();
+              } catch (error) {
+                MessageToast.show(error.responseText || "Error deleting expense");
+              } finally {
+                that.closeBusyDialog();
+              }
+            },
+            function () { that.closeBusyDialog(); })
         },
 
         CI_onPressAddInvoice: function () {
@@ -159,6 +163,44 @@ sap.ui.define(
         onLogout: function () {
           this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
         },
+        CI_onPressDownload: function () {
+          var table = this.byId("CI_id_InvoiceTable");
+          const oModelData = table.getModel("CompanyInvoiceModel").getData();
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,
+              InvoiceDate: Formatter.formatDate(item.InvoiceDate),
+              PayByDate: Formatter.formatDate(item.PayByDate)
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("invoiceNo"), property: "InvNo", type: "string" },
+            { label: this.i18nModel.getText("customerName"), property: "CustomerName", type: "string" },
+            { label: this.i18nModel.getText("invoiceDate"), property: "InvoiceDate", type: "string" },
+            { label: this.i18nModel.getText("invoiceDescription"), property: "InvoiceDescription", type: "string" },
+            { label: this.i18nModel.getText("totalAmount"), property: "TotalAmount", type: "number" },
+            { label: this.i18nModel.getText("PayByDate"), property: "PayByDate", type: "string " },
+            { label: this.i18nModel.getText("status"), property: "Status", type: "string" },
+          ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("invoiceapp")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "CompanyInvoice.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("exportSuccessful"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
+
+        }
       }
     );
   }

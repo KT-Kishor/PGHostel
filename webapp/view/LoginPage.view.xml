@@ -37,7 +37,7 @@
 						<!-- Password Input Field (Initially Hidden) -->
 						<Label text="{i18n>btnpass}" id="Lp_id_PasswordLabel" visible="{LoginViewModel>/isPasswordVisible}"  required="true" />
 						<Input id="Lp_id_PasswordInput" liveChange="LP_onpresPassword"  type="Password" placeholder="{i18n>placepass}" valueStateText="{i18n>placepass}"  visible="{LoginViewModel>/isPasswordVisible}" valueState="{LoginViewModel>/passwordValueState}" valueHelpIconSrc="sap-icon://show" valueHelpRequest="LP_onTogglePasswordVisibility" 
-						value="{LoginViewModel>/password}" submit="LP_onpasswordchange" showValueHelp="true"  maxLength="20"/>
+						value="{LoginViewModel>/password}" submit="LP_onpasswordchange" showValueHelp="true"  maxLength="50"/>
 						<!-- Forgot Password Link  -->
 						<Link text="{i18n>forgotPass}" press="LP_onForgotPassword" id="Lp_id_ForgotPasswordLink" visible="{LoginViewModel>/isForgotPasswordVisible}"  />
 						

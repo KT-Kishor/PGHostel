@@ -1,0 +1,249 @@
+<mvc:View
+    controllerName="sap.kt.com.minihrsolution.controller.Recruitment"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    height="100%"
+    xmlns:fb="sap.ui.comp.filterbar"
+>
+    <Page>
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.kt.com.minihrsolution.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+        <fb:FilterBar
+            id="RE_Id_filterBar"
+            persistencyKey="myPersKey"
+            useToolbar="false"
+            search=".RE_FilterBaronSearch"
+            clear=".RE_RemoveValueFilterBar"
+            showClearOnFB="true"
+            showFilterConfiguration="false"
+        >
+            <fb:filterGroupItems>
+                <fb:FilterGroupItem
+                    name="name"
+                    label="{i18n>name}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            name="Name"
+                            items="{path: 'myModel>/'}"
+                            id="RE_Id_ComboBoxFilterField1"
+                            showClearIcon="true"
+                        >
+                            <core:Item
+                                key="{myModel>Name}"
+                                text="{myModel>Name}"
+                            />
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+
+                <fb:FilterGroupItem
+                    name="SupplierName"
+                    label="{i18n>TableColNoticePeriod}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            name="SupplierName"
+                            selectionChange=".onSelectionChange"
+                            items="{
+												path: 'ExpectedCTC>/data',
+												templateShareable: true
+											}"
+                            id="RE_Id_ComboBoxFilterField3"
+                            showClearIcon="true"
+                        >
+                            <core:Item
+                                key="{ExpectedCTC>key}"
+                                text="{ExpectedCTC>value}"
+                            />
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+
+                <fb:FilterGroupItem
+                    name="skills"
+                    label="{i18n>TableColSkills}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <SearchField
+                            id="RE_Id_ComboBoxFilterField4"
+                        />
+                          
+                    </fb:control>
+                </fb:FilterGroupItem>
+            </fb:filterGroupItems>
+        </fb:FilterBar>
+
+        <Table
+            id="RE_Id_MainTable"
+            items="{myModel>/}"
+            mode="SingleSelectLeft"
+        >
+            <headerToolbar>
+                <OverflowToolbar>
+                    <content>
+                        <Title
+                            text="{i18n>TableHeader}"
+                            level="H2"
+                        />
+
+                        <ToolbarSpacer />
+
+                        <Button
+                            text="{i18n>create}"
+                            press="RE_AddNewStudentData"
+                            type="Accept"
+                            tooltip="{i18n>tooltipAdduser}"
+                        />
+
+                        <Button
+                            text="{i18n>edit}"
+                            type="Emphasized"
+                            press="FRE_ColumnClickFragmentOpenForUpdate"
+                            tooltip="{i18n>tooltipEditUser}"
+                        />
+
+                        <Button
+                            text="{i18n>delete}"
+                            press="RE_DeleteUser"
+                            type="Reject"
+                            tooltip="{i18n>tooltipDeleteStudent}"
+                            
+                        />
+<!-- class="sapUiSmallMarginEnd" -->
+                        <Button
+                            text="Export"
+                            type="Ghost"
+                            press="ExportTableData"
+                            class="sapUiSmallMarginEnd"
+                        />
+                    </content>
+                </OverflowToolbar>
+            </headerToolbar>
+            <infoToolbar />
+            <columns>
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>compName}" />
+                </Column>
+
+                <!-- <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColInterview}" />
+                </Column> -->
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColCurrentPackage}" />
+                </Column>
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColExpectedPackage}" />
+                </Column>
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColNoticePeriod}" />
+                </Column>
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>mobilenumber}" />
+                </Column>
+
+                <!-- <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColTime}" />
+                </Column> -->
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>emailId}" />
+                </Column>
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColExperience}" />
+                </Column>
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColSkills}" />
+                </Column>
+
+                <!-- <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColRemark}" />
+                </Column> -->
+            </columns>
+
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Text text="{myModel>Name}" />
+                        <Text text="{myModel>CurrentCTC} LPA" />
+
+                        <Text text="{myModel>ExpectedCTC} LPA" />
+                        <!-- <Text text="{myModel>NoticePeriod} Days" /> -->
+                        <Text
+                            text="{= ${myModel>NoticePeriod} === '0' ? 'Immediate' : ${myModel>NoticePeriod}} Days"
+                        />
+
+                        <Text text="{myModel>STDCode}-{myModel>MobileNumber}" />
+
+                        <Text text="{myModel>EmailID}" />
+                        <Text text="{myModel>Experience} Years" />
+                        <Text text="{myModel>Skills}" />
+                        <Text text="{myModel>Date}" />
+                        <Text text="{myModel>AvailableForInterview}" />
+                        <Text text="{myModel>Remark}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <footer>
+            <Bar id="MI_id_FooterBar">
+                <contentLeft>
+                    <core:Fragment
+                        fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
+                        type="XML"
+                    />
+                </contentLeft>
+            </Bar>
+        </footer>
+    </Page>
+</mvc:View>

@@ -53,7 +53,7 @@ sap.ui.define(["./BaseController",
                     this.getBusyDialog();
                     const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID });
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getOwnerComponent().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
+                    this.getView().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
                     this.filterTimesheetForCurrentWeek(); // <-- Filter for current week
                     this.closeBusyDialog();
                 } catch (error) {
@@ -77,7 +77,7 @@ sap.ui.define(["./BaseController",
                 oEndDate.setHours(23, 59, 59, 999);
 
                 // Get all timesheet data
-                var oTimesheetModel = this.getOwnerComponent().getModel("FilteredTimesheetModel");
+                var oTimesheetModel = this.getView().getModel("FilteredTimesheetModel");
                 var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
 
                 // Filter entries for the current week
@@ -102,7 +102,7 @@ sap.ui.define(["./BaseController",
                     oSelectedDate.setHours(0, 0, 0, 0);
 
                     // Get all timesheet data
-                    var oTimesheetModel = this.getOwnerComponent().getModel("FilteredTimesheetModel");
+                    var oTimesheetModel = this.getView().getModel("FilteredTimesheetModel");
                     var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
 
                     // Filter for the selected date
@@ -151,7 +151,7 @@ sap.ui.define(["./BaseController",
                             that.getBusyDialog();
 
                             // Step 1: Delete the records
-                            await that.ajaxDeleteWithJQuery("/Timesheet", {
+                            await that.ajaxDeleteWithJQuery("Timesheet", {
                                 filters: { SrNo: aIdsToDelete }
                             });
                             MessageToast.show(that.i18nModel.getText("deletTimesheetSuucess"));
@@ -211,9 +211,7 @@ sap.ui.define(["./BaseController",
                             TaskName: oData.TaskName,
                             Date: oData.Date,
                             ManagerID: oData.ManagerID,
-                            ManagerName: oData.ManagerName,
-                            Comments: oData.Comments || "",
-
+                            ManagerName: oData.ManagerName
                         },
                         filters: {
                             SrNo: oData.SrNo
@@ -241,9 +239,9 @@ sap.ui.define(["./BaseController",
                             that.getView().getModel("viewModel").setProperty("/canDelete", false);
                             that.byId("TD_id_Table").removeSelections(true);
 
-                            await that._fetchCommonData("Timesheet", "FilteredTimesheetModel", {
-                                EmployeeID: that.EmployeeID
-                            });
+                    const oData = await that.ajaxReadWithJQuery("Timesheet", { EmployeeID: that.EmployeeID });
+                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    that.getView().getModel("FilteredTimesheetModel").setData(offerData);
 
                         } catch (error) {
                             MessageToast.show(error.message || error.responseText);

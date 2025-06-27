@@ -55,7 +55,7 @@
 										<m:Label text="{i18n>consultantName}" required="true"/>
                                          <m:Select
                                                editable="{simpleForm>/editable}" 
-                                               selectedKey="{oFilteredContractModel>/Salutation}"
+                                               selectedKey="{oFilteredContractModel>/ConsultantNameSalutation}"
                                                items="{Salutation>/salutation}"
                                                width="100%">
 												<!-- Binding the key and text of the Select control to the NameSalutation model -->

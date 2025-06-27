@@ -93,7 +93,9 @@ sap.ui.define([
             "MyInbox": "/MyInbox",
             "Timesheet": "/Timesheet",
             "TimesheetApproval": "/TimesheetApproval",
-
+            "Recruitment":"/Recruitment",
+            "PurchaseOrder": "/PurchaseOrder",
+            "A_Quotations":"/A_Quotations",
           };
 
           const modelPath = tileMap[value];

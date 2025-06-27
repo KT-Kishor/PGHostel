@@ -337,6 +337,7 @@ sap.ui.define([
                     oModel.getData()[0].ExpStartDate = oModel.getData()[0].ExpStartDate.split("T")[0];
                     oModel.getData()[0].ExpEndDate = oModel.getData()[0].ExpEndDate.split("T")[0];
                     delete oModel.getData()[0].Comments;
+                    oModel.getData()[0].Visible = false;
                     var oData = {
                         data: oModel.getData()[0],
                         filters: {

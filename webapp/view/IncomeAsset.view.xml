@@ -23,6 +23,7 @@
             filterChange="IA_.onFilterChange"
             afterVariantLoad="IA_.onAfterVariantLoad"
             showFilterConfiguration="false"
+            filterContainerWidth="auto"
         >
             <fb:filterGroupItems>
                 <fb:FilterGroupItem
@@ -151,14 +152,14 @@
                          <ComboBox
                     id="IA_id_branch"
                     showSecondaryValues="true"
-                    items="{branchModel>/}"
+                    items="{BaseLocationModel>/}"
                     showClearIcon="true"
 
                 >
                     <core:ListItem
-                        key="{branchModel>city}" 
-                        text="{branchModel>city}"
-                        additionalText="{branchModel>branchCode}"
+                        key="{BaseLocationModel>city}" 
+                        text="{BaseLocationModel>city}"
+                        additionalText="{BaseLocationModel>branchCode}"
                     />
                 </ComboBox>
                     </fb:control>

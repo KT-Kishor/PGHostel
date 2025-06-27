@@ -21,7 +21,9 @@ sap.ui.define([
       }
     },
 
-    _onRouteMatched(oEvent) {
+    async _onRouteMatched(oEvent) {
+       var LoginFunction = await this.commonLoginFunction("MyInbox");
+          if (!LoginFunction) return;
       const currentDate = new Date();
       // Get first day of the month
       const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);

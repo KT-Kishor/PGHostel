@@ -20,7 +20,7 @@
 								<!-- CTC Entry -->
 								<Label text="{i18n>ctcValue}" required="true" />
 								<Input value="{AppraisalModel>/CtcPercentage}" id="AF_id_CTC"
-									placeholder="{i18n>placeCtc}" liveChange="EOD_validateAmount"
+									placeholder="{i18n>placeCtc}" change="EOD_validateAmount"
 									maxLength="15" valueStateText="{i18n>ctcAndVariblePay}" />
 								<!-- Type Selection -->
 								<Select forceSelection="false" selectedKey="1" id="ED_Frg_idAppraisalType" change="onSelectChange">
@@ -30,7 +30,7 @@
 								<!-- Variable Pay -->
 								<Label text="{i18n>EmpOfferVariablePay}" required="true" />
 								<Input id="AF_id_VariablePay" value="{AppraisalModel>/VariablePay}"
-									placeholder="{i18n>variablePayPer}" liveChange="EOD_validatevariable"
+									placeholder="{i18n>variablePayPer}" change="EOD_validatevariable"
                                     showValueHelp="true"
                                     valueHelpRequest="EOD_onVariablePayInfoPress"
                                      valueHelpIconSrc="sap-icon://message-information"

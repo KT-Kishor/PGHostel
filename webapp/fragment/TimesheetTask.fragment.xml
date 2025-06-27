@@ -4,7 +4,8 @@
         title="{i18n>selectAss}"
         items="{AssignModel>/}"
         confirm=".onValueHelpDialogClose"
-        cancel=".onValueHelpCancel">
+        cancel=".onValueHelpCancel"
+        liveChange=".onAssignmentLiveChange">
         <StandardListItem
             iconDensityAware="false"
             iconInset="false"

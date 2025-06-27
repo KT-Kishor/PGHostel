@@ -11,9 +11,9 @@ sap.ui.define([
 
     _onRouteMatched: async function () {
       BusyIndicator.hide();
-      this.getBusyDialog();
-      var LoginFunction = await this.commonLoginFunction("Quotation");
+      var LoginFunction = await this.commonLoginFunction("A_Quotations");
       if (!LoginFunction) return;
+      this.getBusyDialog();
       this.checkLoginModel();
       var oView = this.getView();
       this.oCore = sap.ui.getCore();

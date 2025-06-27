@@ -198,5 +198,6 @@
 
     "TotalPOAmount": "3,09,000 INR",
     "POAmountInWords": "Three Lakh Nine Thousand Only",
-    "isTypeTrainee": true
+    "isTypeTrainee": true,
+    "DemoBase64": "../image/SpotAward.png"
 }

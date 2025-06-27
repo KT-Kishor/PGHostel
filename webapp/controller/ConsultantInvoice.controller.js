@@ -64,10 +64,10 @@ sap.ui.define(
                     this.getBusyDialog();
 
                     const oData = await this.ajaxReadWithJQuery("ConsultantInvoice", filterObj);
-                    const oConsultantModel = new sap.ui.model.json.JSONModel(oData.data);
+                    const oConsultantModel = new JSONModel(oData.data);
                     this.getView().setModel(oConsultantModel, "ConsultantModel");
 
-                    const oInvoiceModel = new sap.ui.model.json.JSONModel(oData.data);
+                    const oInvoiceModel = new JSONModel(oData.data);
                     this.getView().setModel(oInvoiceModel, "InvoiceModel");
 
                     // Set default range in date picker control
@@ -120,7 +120,7 @@ sap.ui.define(
                     await this.ajaxReadWithJQuery("AllLoginDetails", "EmpModel").then((data) => {
                         if (data.success) {
                             const filteredData = data.data.filter(emp => emp.Role !== 'Trainee');
-                            var oModel = new sap.ui.model.json.JSONModel();
+                            var oModel = new JSONModel();
                             oModel.setData(filteredData);
                             this.getView().setModel(oModel, "EmpModel");
                         }
@@ -268,7 +268,7 @@ sap.ui.define(
                     this.getBusyDialog();
                     const oData = await this.ajaxReadWithJQuery("ConsultantInvoice", params);
                     if (oData && Array.isArray(oData.data)) {
-                        const oModel = new sap.ui.model.json.JSONModel(oData.data);
+                        const oModel = new JSONModel(oData.data);
                         this.getView().setModel(oModel, "ConsultantModel");
                         if (this.bDateRangeTriggered) {
                             const filteredData = oData.data.filter(item => {
@@ -278,7 +278,7 @@ sap.ui.define(
                                 return itemDate >= start && itemDate <= end;
                             });
 
-                            const oInvoiceModel = new sap.ui.model.json.JSONModel(filteredData);
+                            const oInvoiceModel = new JSONModel(filteredData);
                             this.getView().setModel(oInvoiceModel, "InvoiceModel");
                             oInvoiceModel.refresh(true);
                             this.bDateRangeTriggered = false; // reset flag

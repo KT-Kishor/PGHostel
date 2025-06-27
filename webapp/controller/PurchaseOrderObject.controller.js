@@ -19,15 +19,15 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("PurchaseOrderObject").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function (oEvent) {
-        //   await   this._fetchCommonData("BaseLocation", "BaseLocationModel");
+            //   await   this._fetchCommonData("BaseLocation", "BaseLocationModel");
 
 
             var LoginFunction = await this.commonLoginFunction("PurchaseOrder");
             if (!LoginFunction) return;
             this.getBusyDialog()
-             this.unit=true
+            this.unit = true
             this.PoNumber = oEvent.getParameter("arguments").sPath;
-            
+
             this.byId("FPO_id_CustomerName").setEditable(true).setValueState("None")
             this.byId("FPO_id_CustDescription").setEditable(true).setValueState("None")
             this.byId("FPO_id_Currency").setEditable(true)
@@ -71,10 +71,11 @@ sap.ui.define([
             var model = new JSONModel({
                 "PoNumber": this.PoNumber,
                 "CustomerName": "",
+                "CustomerDesignation": "",
                 "CustomerHeadName": "",
                 "City": "",
                 "Country": "",
-                "Type": "",
+                "Type": "Internal",
                 "PaymentTerms": "",
                 "Address": "",
                 "CustDescription": "",
@@ -111,8 +112,8 @@ sap.ui.define([
                 "PurchaseOrders": [],
             })
             this.getView().setModel(model, "PurchaseOrderModel");
-            
-                var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", { branchCode: "KLB01" }).then((oData) => {
+
+            var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", { branchCode: "KLB01" }).then((oData) => {
                 var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 return PoData[0]
             });
@@ -144,7 +145,7 @@ sap.ui.define([
                     purchaseOrderModel.setProperty("/CustomerName", purchaseOrderData.PurchaseOrder[0].CustomerName);
                     purchaseOrderModel.setProperty("/Type", purchaseOrderData.PurchaseOrder[0].Type);
                     purchaseOrderModel.setProperty("/Address", purchaseOrderData.PurchaseOrder[0].Address);
-                    purchaseOrderModel.setProperty("/StartDate", new Date(purchaseOrderData.PurchaseOrder[0].StartDate).toLocaleDateString('en-GB')); 
+                    purchaseOrderModel.setProperty("/StartDate", new Date(purchaseOrderData.PurchaseOrder[0].StartDate).toLocaleDateString('en-GB'));
                     purchaseOrderModel.setProperty("/EndDate", purchaseOrderData.PurchaseOrder[0].EndDate);
                     purchaseOrderModel.setProperty("/PAN", purchaseOrderData.PurchaseOrder[0].PAN);
                     purchaseOrderModel.setProperty("/CurrentDate", new Date(purchaseOrderData.PurchaseOrder[0].CurrentDate).toLocaleDateString('en-GB'));
@@ -173,8 +174,9 @@ sap.ui.define([
                     purchaseOrderModel.setProperty("/PaymentTerms", purchaseOrderData.PurchaseOrder[0].PaymentTerms);
                     purchaseOrderModel.setProperty("/Currency", purchaseOrderData.PurchaseOrderItems[0].Currency);
                     purchaseOrderModel.setProperty("/Country", purchaseOrderData.PurchaseOrder[0].Country);
-
                     purchaseOrderModel.setProperty("/City", purchaseOrderData.PurchaseOrder[0].City);
+                    purchaseOrderModel.setProperty("/CustomerDesignation", purchaseOrderData.PurchaseOrder[0].CustomerDesignation);
+
 
 
 
@@ -188,10 +190,10 @@ sap.ui.define([
                         oModel.setProperty("/SubTotal", "0.00");
                     }
 
-                      const purchaseOrders = purchaseOrderData.PurchaseOrderItems;
-                      purchaseOrders.forEach((item, index) => {
-                          item.SerialNo = (index + 1).toString();
-                      });
+                    const purchaseOrders = purchaseOrderData.PurchaseOrderItems;
+                    purchaseOrders.forEach((item, index) => {
+                        item.SerialNo = (index + 1).toString();
+                    });
                     purchaseOrderModel.setProperty("/PurchaseOrders", purchaseOrders);
 
                     this.byId("FPO_id_CustomerName").setEditable(false)
@@ -210,7 +212,7 @@ sap.ui.define([
                     this.byId("FPO_id_PoNumber").setVisible(true)
 
 
-                     purchaseOrderModel.setProperty("/Editable", false);
+                    purchaseOrderModel.setProperty("/Editable", false);
 
                     this.getView().byId("POO_idmailButton").setVisible(true)
                     this.getView().byId("POO_idPDFButton").setVisible(true)
@@ -237,6 +239,8 @@ sap.ui.define([
             this.getView().getModel("PurchaseOrderModel").setProperty("/GSTType", Customer.type);
             this.getView().getModel("PurchaseOrderModel").setProperty("/Country", Customer.country);
             this.getView().getModel("PurchaseOrderModel").setProperty("/City", Customer.baseLocation);
+            this.getView().getModel("PurchaseOrderModel").setProperty("/CustomerDesignation", Customer.HeadPosition);
+
 
             this.getView().getModel("PurchaseOrderModel").setProperty("/CustomerHeadName", Customer.name);
 
@@ -276,6 +280,7 @@ sap.ui.define([
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyEmail", PoData.carrerEmail);
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyPANNo", PoData.pan);
 
+
             this.byId("FPO_id_BranchCode").setValueState("None");
         },
         onAddItemButtonPress: function () {
@@ -301,7 +306,7 @@ sap.ui.define([
         },
 
         PO_onAmountInputChange: function (oEvent) {
-           this.unit= utils._LCvalidateAmount(oEvent);
+            this.unit = utils._LCvalidateAmount(oEvent);
 
             var oInput = oEvent.getSource();
             var oContext = oInput.getBindingContext("PurchaseOrderModel");
@@ -368,15 +373,15 @@ sap.ui.define([
             try {
                 if (utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_BranchCode"), "ID") &&
                     utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_CustomerName"), "ID") &&
-                     utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
-                     utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
+                    utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
+                    utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID")
                     && utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
-                    this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0 
+                    this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
 
-                    
-                  ) {
-                   
+
+                ) {
+
                     var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item, index) {
                         if (!item.Description || !item.Unit || !item.Amount || !item.ConsultantName) {
 
@@ -388,24 +393,24 @@ sap.ui.define([
                     if (!isValid) {
                         return;
                     }
-                   const valid = !!this.unit;
-                     if(!valid){
-                    return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
-                      }
+                    const valid = !!this.unit;
+                    if (!valid) {
+                        return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                    }
                     var notes = this.getView().getModel("PurchaseOrderModel").getProperty("/Notes")
                     if (!notes) {
                         MessageToast.show(this.i18nModel.getText("quotaionNotemsg"));
                         return;
                     }
-                    
-                    var data = 
-                     {
+
+                    var data =
+                    {
                         "CustomerName": oModel.CustomerName,
                         "Address": oModel.Address,
                         "StartDate": oModel.StartDate.split('/').reverse().join('-'),
                         "EndDate": oModel.EndDate.split('/').reverse().join('-'),
                         "PAN": oModel.PAN || "",
-                        "PaymentTerms": oModel.PaymentTerms,
+                        "PaymentTerms": oModel.PaymentTerms || "10 Days",
                         "CurrentDate": oModel.CurrentDate.split('/').reverse().join('-'),
                         "Type": oModel.Type || "internal",
                         "Notes": oModel.Notes,
@@ -431,6 +436,8 @@ sap.ui.define([
                         "CustomerHeadName": oModel.CustomerHeadName,
                         "Country": oModel.Country,
                         "City": oModel.City,
+                        "CustomerDesignation": oModel.CustomerDesignation,
+
 
 
                     };
@@ -457,13 +464,14 @@ sap.ui.define([
                         Items
                     }
                     this.getBusyDialog();
-                    await this.ajaxCreateWithJQuery("PurchaseOrder", oPayLoad);
+                    var response = await this.ajaxCreateWithJQuery("PurchaseOrder", oPayLoad);
+                    this.PoNumber = response.PoNumber;
                     await this.onSuccessDialog();
                     this.closeBusyDialog();
 
-                
-                } 
-                
+
+                }
+
                 else {
                     MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
 
@@ -488,8 +496,10 @@ sap.ui.define([
                         text: "Generate PDF",
                         type: "Attention",
                         press: function () {
+                            this.PoNumber
                             this.POO_onPDFButtonPress();
                             this._oDialog.close();
+
                             this.getRouter().navTo("PurchaseOrder");
                         }.bind(this)
                     }),
@@ -520,7 +530,7 @@ sap.ui.define([
                 utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
                 utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
                 utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID") &&
-           
+
                 utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                 this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
             ) {
@@ -534,10 +544,10 @@ sap.ui.define([
                 if (!isValid) {
                     return;
                 }
-                   const valid = !!this.unit;
-                     if(!valid){
+                const valid = !!this.unit;
+                if (!valid) {
                     return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
-                      }
+                }
                 var notes = this.getView().getModel("PurchaseOrderModel").getProperty("/Notes")
                 if (!notes) {
                     MessageToast.show(this.i18nModel.getText("quotaionNotemsg"));
@@ -577,6 +587,8 @@ sap.ui.define([
                     "CustomerHeadName": oModel.CustomerHeadName,
                     "Country": oModel.Country,
                     "City": oModel.City,
+                    "CustomerDesignation": oModel.CustomerDesignation,
+
                 };
                 var Items = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").map(function (item, index) {
 
@@ -759,6 +771,7 @@ sap.ui.define([
         },
 
         POO_onPDFButtonPress: async function () {
+            this.getRouter().navTo("PurchaseOrder");
             this.getBusyDialog();
             var oPDFModel = this.getView().getModel("PDFData");
             var oPOModel = this.getView().getModel("PurchaseOrderModel").getData();
@@ -766,7 +779,7 @@ sap.ui.define([
             oPDFModel.setProperty("/ClientCompanyAddress", oPOModel.Address);
             oPDFModel.setProperty("/ClientName", oPOModel.CustomerHeadName);
             oPDFModel.setProperty("/ClientCompanyPAN", oPOModel.PAN);
-            oPDFModel.setProperty("/PONumber", oPOModel.PoNumber);
+            oPDFModel.setProperty("/PONumber", this.PoNumber);
             oPDFModel.setProperty("/POType", oPOModel.Type);
             oPDFModel.setProperty("/POFrom", oPOModel.StartDate);
             oPDFModel.setProperty("/POTo", oPOModel.EndDate);
@@ -781,8 +794,8 @@ sap.ui.define([
             oPDFModel.setProperty("/GSTIN", oPOModel.GSTIN);
             oPDFModel.setProperty("/TotalPOAmount", oPOModel.GrantTotal);
             oPDFModel.setProperty("/Currency", oPOModel.Currency);
-            if (oPOModel.Currency === "INR") oPDFModel.setProperty("/POAmountInWords", this.convertNumberToWords(oPOModel.GrantTotal, "Rupees"));
-            else oPDFModel.setProperty("/POAmountInWords", this.convertNumberToWords(oPOModel.GrantTotal, oPOModel.Currency));
+            var amountInWords = await this.convertNumberToWords(oPOModel.GrantTotal, oPOModel.Currency);
+            oPDFModel.setProperty("/POAmountInWords", amountInWords);
             var htmlContent = oPOModel.Notes;
             await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oPOModel.BranchCode });
             var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");

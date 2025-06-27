@@ -27,6 +27,7 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("traineeEdit"));
                 this.oValue = oEvent.getParameter("arguments").value;
                 this.Filter = true;
+                this._fetchCommonData("EmployeeDetailsData", "empModel");
                 if (this.oValue === "Trainee") {
                     await this.T_onPressClear();// clear the filter bar
                     await this.readCallForTrainee("");

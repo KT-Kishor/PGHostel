@@ -41,14 +41,14 @@
 
                 <ObjectAttribute
                     title="{i18n>startDate}"
-                    text="{TaskDetailsModel>StartDate}"
+                    text="{path:'TaskDetailsModel>StartDate', formatter:'.Formatter.formatDate'}"
                     class="sapUiSmallMarginEnd taskNameColor"
                     textDirection="LTR"
                 />
 
                 <ObjectAttribute
                     title="{i18n>endDate}"
-                    text="{TaskDetailsModel>EndDate}"
+                    text="{path:'TaskDetailsModel>EndDate', formatter:'.Formatter.formatDate'}"
                     class="sapUiSmallMarginEnd taskNameColor"
                     textDirection="LTR"
                 />
@@ -161,8 +161,9 @@
                         <cells>
                             <Text text="{AssignModel>EmployeeID}" />
                             <Text text="{AssignModel>EmployeeName}" />
-                            <Text text="{AssignModel>StartDate}" />
-                            <Text text="{AssignModel>EndDate}" />
+
+                            <Text text="{path:'AssignModel>StartDate',formatter:'.Formatter.formatDate'}" />
+                            <Text text="{path:'AssignModel>EndDate',formatter:'.Formatter.formatDate'}" />
                             <Text text="{AssignModel>HoursWorked}" />
                         </cells>
                     </ColumnListItem>

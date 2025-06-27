@@ -6,12 +6,7 @@ sap.ui.define([
     "sap/ui/model/odata/type/Currency",
     "../model/formatter",
 ],
-    function (BaseController,
-        JSONModel,
-        MessageToast,
-        utils,
-        Currency,
-        Formatter) {
+    function (BaseController,JSONModel,MessageToast,utils,Currency,Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.CompanyInvoiceDetails", {
             Formatter: Formatter,
@@ -20,12 +15,12 @@ sap.ui.define([
             },
 
             _onRouteMatched: async function (oEvent) {
+                var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
+                if (!LoginFUnction) return;
                 var sArg = oEvent.getParameter("arguments").sPath;
                 if (!(await this.commonLoginFunction("CompanyInvoice"))) return;
                 this.scrollToSection("CID_id_CmpInvObjectPageLayout", "CID_id_CmpInvGoals");
-                // if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
                 if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "CompanyInvoice", Action: "CC" });
-                // if (!this.getView().getModel("CompanyCodeDetailsModel")) this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
                 this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status", "CID_id_CurrencySelect"]);
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -1014,6 +1009,7 @@ sap.ui.define([
                 sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
                 sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
                 sap.ui.getCore().byId("idFrgConvertionRate").setValueState("None");
+
                 if (this._oDialog) {
                     this._oDialog.close();
                     this._oDialog.destroy(true);

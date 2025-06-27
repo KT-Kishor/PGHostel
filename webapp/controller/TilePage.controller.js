@@ -57,7 +57,7 @@ sap.ui.define(
               "AppVisibilityModel"
             );
 
-            const tileNames = ["Home", "Timesheet", "Payslip", "OfferGeneration", "Invoice", "Quotation", "Expense", "ManageAsset",];
+            const tileNames = ["Home", "Timesheet", "Payslip", "OfferGeneration", "Invoice", "Quotation", "Expense", "ManageAsset","Recruitment"];
 
             const tileKeys = firstEntry.TileKey?.split(",") || [];
             const tileMapping = tileNames.reduce((map, name, i) => {
@@ -360,6 +360,9 @@ sap.ui.define(
         },
         TileV_onpressPoApp:function(){
           this.getRouter().navTo("PurchaseOrder");
+        },
+        TileV_Recruitment:function(){
+          this.getRouter().navTo("Recruitment");
         }
         
       }

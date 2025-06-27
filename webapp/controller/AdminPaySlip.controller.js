@@ -1,7 +1,8 @@
 sap.ui.define([
-    "./BaseController", "../model/formatter", "sap/ui/core/BusyIndicator"
+    "./BaseController", 
+    "../model/formatter"
 ],
-    function (BaseController, Formatter, BusyIndicator) {
+    function (BaseController, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.AdminPaySlip", {
             Formatter: Formatter,

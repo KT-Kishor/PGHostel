@@ -173,7 +173,7 @@ sap.ui.define(
             MessageToast.show("Task updated successfully!");
             this.oTaskDialog.close();
             this._fetchCommonData("NewTask", "TaskModel", {});
-            this.CommonReadcall()
+            //this.CommonReadcall()
           } else {
             this.closeBusyDialog();
             MessageToast.show("Failed to update task.");

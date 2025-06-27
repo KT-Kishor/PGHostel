@@ -44,6 +44,7 @@ sap.ui.define([
             if (this.sArg !== "Timesheet") {
                 await this.readCallTimesheet();
                 const oData = this.getView().getModel("newModel").getData();
+                this.getView().getModel("newModel").setProperty("/Comment", oData.comments[oData.comments.length-1].Comment);
 
                 const isSubmitted = oData.Status === "Submitted" || oData.Status === "Approved";
                 oViewModel.setProperty("/isUpdate", !isSubmitted); // hide edit button if submitted
@@ -84,7 +85,7 @@ sap.ui.define([
                     EmployeeName: "",
                     ManagerName: "",
                     ManagerID: "",
-                    Comments: ""
+                    Comment: ""
                 };
                 this.getView().setModel(new sap.ui.model.json.JSONModel(emptyData), "newModel");
                 if (this.getView().getModel("editModel")) {
@@ -139,7 +140,6 @@ sap.ui.define([
         },
 
         onValueHelpRequest: function () {
-            // Validate that a date is selected before opening the dialog
             const oCalendar = this.getView().byId("calendar");
             const selectedDates = oCalendar ? oCalendar.getSelectedDates() : [];
             const selectedDateObj = selectedDates[0]?.getStartDate();
@@ -149,12 +149,41 @@ sap.ui.define([
                 return;
             }
 
+            // Normalize selected date
+            const selectedDate = new Date(
+                selectedDateObj.getFullYear(),
+                selectedDateObj.getMonth(),
+                selectedDateObj.getDate()
+            );
+
+            // Get full assignment data
+            const oAssignModel = this.getView().getModel("AssignModel");
+            const aAllAssignments = oAssignModel?.getData() || [];
+
+            // Filter based on selected date falling within start and end date
+            const aFilteredAssignments = aAllAssignments.filter(oItem => {
+                if (!oItem.StartDate || !oItem.EndDate) return false;
+
+                const startDate = new Date(oItem.StartDate);
+                const endDate = new Date(oItem.EndDate);
+
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(0, 0, 0, 0);
+
+                return selectedDate >= startDate && selectedDate <= endDate;
+            });
+
+            // Set filtered data into a dedicated model
+            const oFilteredModel = new sap.ui.model.json.JSONModel(aFilteredAssignments);
+            this.getView().setModel(oFilteredModel, "FilteredAssignModel");
+
+            // Open dialog
             if (!this.TSD_oDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.kt.com.minihrsolution.fragment.TimesheetTask",
-                    controller: this,
-                }).then(function (TSD_oDialog) {
-                    this.TSD_oDialog = TSD_oDialog;
+                    controller: this
+                }).then(function (oDialog) {
+                    this.TSD_oDialog = oDialog;
                     this.getView().addDependent(this.TSD_oDialog);
                     this.TSD_oDialog.open();
                 }.bind(this));
@@ -162,6 +191,17 @@ sap.ui.define([
                 this.TSD_oDialog.open();
             }
         },
+        onAssignmentLiveChange: function (oEvent) {
+            const sQuery = oEvent.getParameter("value").toLowerCase(); // get input string
+            const oBinding = oEvent.getSource().getBinding("items");
+
+            const oFilter1 = new sap.ui.model.Filter("TaskName", sap.ui.model.FilterOperator.Contains, sQuery);
+            const oFilter2 = new sap.ui.model.Filter("TaskID", sap.ui.model.FilterOperator.Contains, sQuery);
+
+            const oCombinedFilter = new sap.ui.model.Filter([oFilter1, oFilter2], false); // OR logic
+            oBinding.filter(oCombinedFilter);
+        },
+
         TSD_onSubmit: async function () {
             try {
                 await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
@@ -212,7 +252,7 @@ sap.ui.define([
                     Year: selectedDateObj.getFullYear(),
                     Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
                     Status: "Saved",
-                    comments: oData.comments || this.byId("TSD_id_EmpComment").getValue(),
+                    comments: oData.Comment
                 };
 
                 // Step 5: Submit to backend
@@ -300,9 +340,12 @@ sap.ui.define([
                 var selectedDate = selectedDates[0].getStartDate();
                 var formattedDate = that.Formatter.formatDate(selectedDate);
                 var today = new Date();
+                // Store raw selected date for use in assignment duplicate check
+                this.getView().getModel("AssignModel").setProperty("/selectedDate", selectedDate);
                 // Get holiday data
                 var holidays = that.getView().getModel("HolidayModel").getData();
-                var holidayMap = new Map(holidays.map(holiday => [new Date(holiday.Date).toDateString(), holiday.Name])); var day = selectedDate.getDay();
+                var holidayMap = new Map(holidays.map(holiday => [new Date(holiday.Date).toDateString(), holiday.Name]));
+                var day = selectedDate.getDay();
                 var isWeekend = (day === 0 || day === 6);
                 var isHoliday = holidayMap.has(selectedDate.toDateString());
                 // Prevent future date selection
@@ -344,33 +387,64 @@ sap.ui.define([
         },
 
 
-        onValueHelpDialogClose: function (oEvent) {
+        onValueHelpDialogClose: async function (oEvent) {
             const oSelectedItem = oEvent.getParameter("selectedItem");
-            if (oSelectedItem) {
-                const AllData = oSelectedItem.getBindingContext("AssignModel").getObject();
-                if (AllData) {
-                    // Show actual hours in the UI
-                    this.getView().getModel("AssignModel").setProperty("/selectedAssignment", AllData.TaskName);
-                    this.getView().getModel("AssignModel").setProperty("/HoursWorked", AllData.HoursWorked);
-                    this.getView().byId("idTextActHour").setText("Actual Hours: " + (AllData.HoursWorked || "0"));
-
-                    // Merge with existing newModel data (preserve comments, etc.)
-                    var oNewModelData = this.getView().getModel("newModel")?.getData() || {};
-                    oNewModelData.TaskID = AllData.TaskID;
-                    oNewModelData.TaskName = AllData.TaskName;
-                    oNewModelData.HoursWorked = AllData.HoursWorked;
-                    oNewModelData.ActualHours = AllData.HoursWorked;
-                    oNewModelData.EmployeeID = this.EmployeeID;
-                    oNewModelData.EmployeeName = AllData.EmployeeName;
-                    oNewModelData.ManagerName = AllData.ManagerName;
-                    oNewModelData.ManagerID = AllData.ManagerID;
-
-                    this.getView().getModel("newModel").setData(oNewModelData);
-                } else {
-                    console.warn("No data found for selected item.");
-                }
-            } else {
+            if (!oSelectedItem) {
                 console.warn("No selected item.");
+                return;
+            }
+            const AllData = oSelectedItem.getBindingContext("AssignModel").getObject();
+            if (!AllData) {
+                console.warn("No data found for selected item.");
+                return;
+            }
+            const selectedDate = this.getView().getModel("AssignModel").getProperty("/selectedDate");
+            if (!selectedDate) {
+                MessageToast.show("Please select a date before choosing an assignment.");
+                return;
+            }
+            // Format selected date to 'YYYY-MM-DD'
+            const formattedDate = [selectedDate.getFullYear(), String(selectedDate.getMonth() + 1).padStart(2, '0'), String(selectedDate.getDate()).padStart(2, '0')].join('-');
+            this.getBusyDialog();
+            try {
+                // Fetch all timesheet entries for this employee
+                const checkDup = await this.ajaxReadWithJQuery("Timesheet", {
+                    EmployeeID: this.EmployeeID
+                });
+                // Check if any entry matches the selected TaskID AND the selected Date
+                const isDuplicate = Array.isArray(checkDup.data) && checkDup.data.some(entry => {
+                    if (!entry.Date || !entry.TaskID) return false;
+                    const entryDateObj = new Date(entry.Date);
+                    const entryDateOnly = [entryDateObj.getFullYear(), String(entryDateObj.getMonth() + 1).padStart(2, '0'), String(entryDateObj.getDate()).padStart(2, '0')].join('-');
+                    return entry.TaskID === AllData.TaskID && entryDateOnly === formattedDate;
+                });
+                if (isDuplicate) {
+                    MessageToast.show("This assignment already exists for the selected date.");
+                    this.closeBusyDialog();
+                    return;
+                }
+                // Show actual hours in the UI
+                this.getView().getModel("AssignModel").setProperty("/selectedAssignment", AllData.TaskName);
+                this.getView().getModel("AssignModel").setProperty("/HoursWorked", AllData.HoursWorked);
+                this.getView().byId("idTextActHour").setText("Actual Hours: " + (AllData.HoursWorked || "0"));
+
+                // Merge with existing newModel data
+                const oNewModelData = this.getView().getModel("newModel")?.getData() || {};
+                oNewModelData.TaskID = AllData.TaskID;
+                oNewModelData.TaskName = AllData.TaskName;
+                oNewModelData.HoursWorked = AllData.HoursWorked;
+                oNewModelData.ActualHours = AllData.HoursWorked;
+                oNewModelData.EmployeeID = this.EmployeeID;
+                oNewModelData.EmployeeName = AllData.EmployeeName;
+                oNewModelData.ManagerName = AllData.ManagerName;
+                oNewModelData.ManagerID = AllData.ManagerID;
+                oNewModelData.Date = formattedDate;
+                this.getView().getModel("newModel").setData(oNewModelData);
+
+            } catch (err) {
+                MessageToast.show(err.message || "Error checking assignment.");
+            } finally {
+                this.closeBusyDialog();
             }
         },
         TSD_onToggleEdit: function () {
@@ -390,6 +464,7 @@ sap.ui.define([
                 this.getBusyDialog();
                 var oViewModel = this.getView().getModel("viewModel");
                 var oModel = this.getView().getModel("newModel").getData();
+                delete oModel.comments;
                 oModel = {
                     "data": oModel,
                     "filters": {

@@ -48,22 +48,17 @@ sap.ui.define(
 
               // Set this as the current task ID for reuse
               this._currentTaskID = oTaskDetails.TaskID;
+              // Set task details model
+              this.getView().setModel(new JSONModel(oTaskDetails), "TaskDetailsModel");
+              this._currentTaskID = oTaskDetails.TaskID;
 
-              // OPTIONAL: Parse date from dd/MM/yyyy (if needed)
-              const fnParseDate = (sDate) => {
-                const [dd, mm, yyyy] = sDate.split("/");
-                return new Date(`${yyyy}-${mm}-${dd}`);
-              };
-
-              const oStartDate = fnParseDate(oTaskDetails.StartDate);
-              const oEndDate = fnParseDate(oTaskDetails.EndDate);
-
-              // Create a new model to store min/max dates
+              // Prepare newTaskModel with minDate and maxDate
               const oNewTaskModel = new JSONModel({
-                minDate: oStartDate,
-                maxDate: oEndDate
+                minDate: new Date(oTaskDetails.StartDate),
+                maxDate: new Date(oTaskDetails.EndDate)
               });
 
+              // Set this model at view level so fragment can access it
               this.getView().setModel(oNewTaskModel, "newTaskModel");
             }
           } catch (error) {
@@ -303,8 +298,9 @@ sap.ui.define(
               EmployeeID: empID,
               EmployeeName: oEmployee ? oEmployee.EmployeeName : "",
               HoursWorked: sHoursWorked,
-              StartDate: sStartDate,
-              EndDate: sEndDate
+              StartDate: sStartDate.split("/").reverse().join('-'),
+              EndDate: sEndDate.split("/").reverse().join('-')
+
             };
           });
 
@@ -335,10 +331,21 @@ sap.ui.define(
             return;
           }
           const oEditModel = this.getView().getModel("EditTaskModel");
-          const oData = { ...oEditModel.getData() }; // Clone data to avoid reference issues
+          const oRawData = { ...oEditModel.getData() }; // Clone data to avoid mutation
           const oEmpId = oSelectedItem.getBindingContext("AssignModel").getProperty("EmployeeID");
 
-          // Construct both EmployeeID and TaskID filters
+          const fnFormatDateForBackend = (sDate) => {
+            if (!sDate || !sDate.includes("/")) return null;
+            const [dd, mm, yyyy] = sDate.split("/");
+            return `${yyyy}-${mm}-${dd}`;
+          };
+
+          const oData = {
+            ...oRawData,
+            StartDate: fnFormatDateForBackend(oRawData.StartDate),
+            EndDate: fnFormatDateForBackend(oRawData.EndDate)
+          };
+
           const filters = {
             EmployeeID: oEmpId,
             TaskID: this._currentTaskID
@@ -358,7 +365,6 @@ sap.ui.define(
               // Refresh data and UI
               this._fetchCommonData("AssignedTask", "AssignModel");
               this.FAT_onSearch();
-              // this.CommonReadcall();
               oTable.removeSelections();
               this.oTaskDialog.close();
             } else {
