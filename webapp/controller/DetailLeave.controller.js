@@ -14,6 +14,8 @@ sap.ui.define([
       this.getRouter().getRoute("RouteDetailLeave").attachMatched(this._onRouteMatched, this);
     },
     _onRouteMatched: async function (oEvent) {
+        var LoginFUnction = await this.commonLoginFunction("MyInbox");
+        if (!LoginFUnction) return;
         const sParams = oEvent.getParameter("arguments").sLeaveID;
         const response = await this.ajaxReadWithJQuery("InboxDetails", { ID : sParams });
         response.data[0].StartDate = this.Formatter.formatDate(response.data[0].StartDate);
@@ -22,8 +24,9 @@ sap.ui.define([
         this.getOwnerComponent().setModel(new JSONModel(response.data[0]), "oNavLeaveModel");
         this.modelData = this.getOwnerComponent().getModel("oNavLeaveModel").getData();
         var that = this;
-       // that.currentYear = new Date().getFullYear();
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+        this.getView().getModel("LoginModel").setProperty("/HeaderName",this.i18nModel.getText("titleInBox") );
+       // that.currentYear = new Date().getFullYear();
         that.userId = this.modelData.EmpID;
       
         //that.byId("AL_id_LeaveBarChart").setVisible(false);
@@ -62,7 +65,10 @@ sap.ui.define([
     DL_onBack:function () {
       this.getRouter().navTo("RouteMyInbox",{sMyInBox: "DetailLeave"});
     },
-      BarDisplayFunction: async function (leaveType, selectedYear, userId) {
+    onLogout:function () {  
+        this.getRouter().navTo("RouteLoginPage");   
+    },
+    BarDisplayFunction: async function (leaveType, selectedYear, userId) {
                     let jsonData = {
                         "data": { "EmployeeID": userId, "selectYear": selectedYear, "LeaveType": leaveType }
                     };

@@ -44,7 +44,7 @@ sap.ui.define([
             if (this.sArg !== "Timesheet") {
                 await this.readCallTimesheet();
                 const oData = this.getView().getModel("newModel").getData();
-                this.getView().getModel("newModel").setProperty("/Comment", oData.comments[0].Comment);
+                this.getView().getModel("newModel").setProperty("/Comment", oData.comments[oData.comments.length-1].Comment);
 
                 const isSubmitted = oData.Status === "Submitted" || oData.Status === "Approved";
                 oViewModel.setProperty("/isUpdate", !isSubmitted); // hide edit button if submitted
@@ -464,6 +464,7 @@ sap.ui.define([
                 this.getBusyDialog();
                 var oViewModel = this.getView().getModel("viewModel");
                 var oModel = this.getView().getModel("newModel").getData();
+                delete oModel.comments;
                 oModel = {
                     "data": oModel,
                     "filters": {

@@ -241,6 +241,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         break;
                     case "Attachment":
                         this.byId("SS_id_DocType").setValueState("None");
+                        this.byId("SS_id_DocType").setValue("");
                         this.ReadEmployeeDocument();
                         break;
                 }
@@ -998,6 +999,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         content: [],
                         endButton: new sap.m.Button({
                             text: "Close",
+                            type :"Reject",
                             press: function () {
                                 if (this._pdfBlobUrl) {
                                     URL.revokeObjectURL(this._pdfBlobUrl);

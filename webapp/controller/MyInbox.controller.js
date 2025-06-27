@@ -30,8 +30,8 @@ sap.ui.define([
       this.getBusyDialog();
       this.sParams = sParams;
       oView.setModel(new JSONModel([{ type: "Leave" }, { type: "Expense" }, { type: "Resignation" }]), "oTypeModel");
-      oLoginModel.setProperty("/HeaderName", "Inbox Details");
-      this.i18nModel = oView.getModel("i18n").getResourceBundle;
+      this.i18nModel = oView.getModel("i18n").getResourceBundle();
+      oLoginModel.setProperty("/HeaderName",this.i18nModel.getText("inboxDetails"));
       this.idEmp = oLoginData.EmployeeID;
 
       const statusFilter = this._isAccountant ? "Send to account" : "Submitted";
