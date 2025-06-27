@@ -106,12 +106,17 @@ sap.ui.define(
             var igstVisible = (igst > 0);
             var cgstSelected = (cgst > 0 || sgst > 0);
             var igstSelected = (igst > 0);
+            if(!cgstSelected){
+               oSelectedModel.setProperty("/Percentage", " ")
+            }else{
+                oSelectedModel.setProperty("/Percentage", " ")
+            }
             oSelectedModel.setProperty("/gstEditable", false); // Disable editing
 
             // Check currency and set visibility accordingly
             var sCurrency = oSelectedQuotation.Currency || "INR";
             var bShowGSTFields = sCurrency === "INR";
-            oSelectedModel.setProperty("/Percentage", " ")
+            // oSelectedModel.setProperty("/Percentage", " ")
             // Convert Notes from HTML to plain text for display
             var sNotes = oSelectedModel.getProperty("/Notes");
             if (sNotes) {
