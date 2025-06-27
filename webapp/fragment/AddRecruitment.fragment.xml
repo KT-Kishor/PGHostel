@@ -246,7 +246,7 @@
               <Button
                     id="FM_Id_SubmitBTN"
                     text="{i18n>submit}"
-                    type="Emphasized"
+                    type="Accept"
                     class="btn1"
                     press="RE_StudentDataSave"
                 />

@@ -103,13 +103,13 @@
                         <Button
                             text="{i18n>create}"
                             press="RE_AddNewStudentData"
-                            type="Emphasized"
+                            type="Accept"
                             tooltip="{i18n>tooltipAdduser}"
                         />
 
                         <Button
                             text="{i18n>edit}"
-                            type="Attention"
+                            type="Emphasized"
                             press="FRE_ColumnClickFragmentOpenForUpdate"
                             tooltip="{i18n>tooltipEditUser}"
                         />

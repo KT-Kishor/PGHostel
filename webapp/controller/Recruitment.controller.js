@@ -289,26 +289,24 @@ sap.ui.define(
                 RE_FilterBaronSearch: async function (oEvent) {
                     let a = this.byId("RE_Id_ComboBoxFilterField1").getValue();
                     let b = this.byId("RE_Id_ComboBoxFilterField3").getValue();
-                    let c = this.byId("RE_Id_ComboBoxFilterField4").getValue();
+                    // let c = this.byId("RE_Id_ComboBoxFilterField4").getValue();
+
                     if (!b) {
                         this.Data = ""
                     } else {
                         this.Data = "1-" + b;
                     }
 
-
                     var filter = {
                         "Name": a,
                         "NoticePeriod": this.Data,
-                        "Skill": c
+                        // "Skill": c
                     }
 
                     this.getBusyDialog();
                     await this._fetchCommonData("CandidateProfile", "myModel", filter)
                         .then((response) => {
-                            // console.log(response);
                             this.closeBusyDialog();
-                            // this.getView().getModel("myModel").setData(response);
                         })
                 },
 
@@ -390,33 +388,50 @@ sap.ui.define(
                 },
 
                 RE_DeleteUser: function (oEvent) {
-
                     var oTable = this.getView().byId("RE_Id_MainTable");
                     var oSelectedItem = oTable.getSelectedItem();
 
                     if (!oSelectedItem) {
-                        let rowselect = this.i18na.getText("MessageNoRowSelected")
+                        let rowselect = this.i18na.getText("MessageNoRowSelected");
                         MessageToast.show(rowselect);
                         return;
                     }
+
                     let oContext = oSelectedItem.getBindingContext("myModel");
                     this.id = oContext.getObject().ID;
 
-                    const payLoad = {
-                        filters: {
-                            ID: this.id,
-                        },
-                    };
-                    this.getBusyDialog();
-                    this.ajaxDeleteWithJQuery("CandidateProfile", payLoad).then((response) => {
-                        this.closeBusyDialog();
-                        let dataDeleteSuccess = this.i18na.getText("dataDelteSucces");
-                        MessageToast.show(dataDeleteSuccess);
-                        this.RE_ReadUpdatedDataFromBakend();
-                    })
+                    // Get localized confirmation message
+                    let sTitle = this.i18na.getText("confirmTitle"); 
+                    let sMessage = this.i18na.getText("ConfirmRecruitmentDeleteMessage");
+                    let sOkText = this.i18na.getText("OkButton");               
+                    let sCancelText = this.i18na.getText("CancelButton");          
 
-                    this.getView().byId("RE_Id_MainTable").removeSelections();
+                    // Show confirmation dialog
+                    this.showConfirmationDialog(sTitle, sMessage,
+                        function () {
+                            // On Confirm
+                            const payLoad = {
+                                filters: {
+                                    ID: this.id,
+                                },
+                            };
+                            this.getBusyDialog();
+                            this.ajaxDeleteWithJQuery("CandidateProfile", payLoad).then((response) => {
+                                this.closeBusyDialog();
+                                let dataDeleteSuccess = this.i18na.getText("dataDelteSucces");
+                                MessageToast.show(dataDeleteSuccess);
+                                this.RE_ReadUpdatedDataFromBakend();
+                            });
+                            oTable.removeSelections();
+                        }.bind(this),
+
+                        function () {
+                        }.bind(this),
+                        sOkText,
+                        sCancelText
+                    );
                 },
+
                 RE_RemoveValueState: function () {
                     const valueState = new JSONModel({
                         NameState: "None",
@@ -541,22 +556,10 @@ sap.ui.define(
                     // console.log(aData);
 
                     // Step 2: Define the columns for export
-                    let updatedData = a.map((elem) => {
-                        let date = elem.Date
-                        // console.log("first date :",date);
-                        
-                        let date2 = new Date(date);
-                        // console.log("updated date",date2);
-                        
-                        let fromatedDate = date2.getDate().toString().padStart(2, '0') + "/" +
-                            (date2.getMonth() + 1).toString().padStart(2, '0') + "/" +
-                            date2.getFullYear();
-                            // console.log("final date :",fromatedDate);
-                            
+                    let updatedData = a.map((elem) => { 
                         return {
                             ...elem, // keep other properties
-
-                            Date: elem.Date === "1899-11-30T00:00:00.000Z" ? "" : fromatedDate
+                            Date: elem.Date === "1899-11-30T00:00:00.000Z" ? "" : formatter.formatDate(elem.Date),
                         };
                     });
                     // console.log(updatedData);
@@ -565,14 +568,14 @@ sap.ui.define(
                         { label: "Name", property: "Name" },
                         { label: "Country", property: "Country" },
                         { label: "City", property: "City" },
-                        { label: "AvaForInterview", property: "AvailableForInterview" },
-                        { label: "CurrentCTC", property: "CurrentCTC" },
-                        { label: "ExpectedCTC", property: "ExpectedCTC" },
+                        { label: "Available for interview", property: "AvailableForInterview" },
+                        { label: "Current CTC", property: "CurrentCTC" },
+                        { label: "Expected CTC", property: "ExpectedCTC" },
                         { label: "Experience", property: "Experience" },
-                        { label: "Date", property: "Date" },
+                        { label: "Date", property: "Date",type:"string" },
                         { label: "STDCode", property: "STDCode" },
-                        { label: "MobileNumber", property: "MobileNumber" },
-                        { label: "NoticePeriod", property: "NoticePeriod" },
+                        { label: "Mobile Number", property: "MobileNumber" },
+                        { label: "Notice Period", property: "NoticePeriod" },
                         { label: "Remark", property: "Remark" },
                         { label: "Skills", property: "Skills" },
                     ];
@@ -596,3 +599,4 @@ sap.ui.define(
         );
     }
 );
+
