@@ -1285,7 +1285,14 @@ sap.ui.define([
                         item.TransferDate = '';
                         item.ReturnDate = '';
                     }
-                    return item;
+                    return{ 
+                        ...item,
+                        AssetCreationDate: Formatter.formatDate(item.AssetCreationDate),
+                        TransferDate: Formatter.formatDate(item.TransferDate),
+                        ReturnDate: Formatter.formatDate(item.ReturnDate),
+                        TrashDate: Formatter.formatDate(item.TrashDate)
+
+                    };
                 });
 
                 if (!oModelData || oModelData.length === 0) {
@@ -1301,23 +1308,23 @@ sap.ui.define([
                     { label: "Serial No", property: "SerialNumber", type: "string" },
                     { label: "Picked By", property: "PickedEmployeeName", type: "string" },
                     { label: "Pickedby ID", property: "PickedEmployeeID", type: "string" },
-                    { label: "Asset Creation Date", property: "AssetCreationDate", type: "Date", format: "yyyy-MM-dd" },
+                    { label: "Asset Creation Date", property: "AssetCreationDate", type: "string" },
                     { label: "Branch", property: "PickedBranch", type: "string" },
                     { label: "Transfer By", property: "TransferByName", type: "string" },
                     { label: "TransferBy ID", property: "TransferByID", type: "string" },
                     { label: "TransferBranch", property: "TransferBranch", type: "string" },
-                    { label: "TransferDate", property: "TransferDate", type: "Date", formatter: ".formatDate" },
+                    { label: "TransferDate", property: "TransferDate", type: "string"},
                     { label: "Asset Value", property: "AssetValue", type: "number" },
                     { label: "Currency", property: "Currency", type: "string" },
                     { label: "Status", property: "Status", type: "string" },
                     { label: "TrashByEmployeeName", property: "TrashByEmployeeName", type: "string" },
                     { label: "TrashByEmployeeID", property: "TrashByEmployeeID", type: "string" },
-                    { label: "Trash Date", property: "TrashDate", type: "Date", formatter: ".formatDate" },
+                    { label: "Trash Date", property: "TrashDate", type: "string" },
                     { label: "Trash Comments", property: "TrashComments", type: "string" },
                     { label: "Trash Branch", property: "TrashBranch", type: "string" },
                     { label: "ReturnEmpName", property: "ReturnEmpName", type: "string" },
                     { label: "ReturnEmpID", property: "ReturnEmpID", type: "string" },
-                    { label: "ReturnDate", property: "ReturnDate", type: "Date", formatter: ".formatDate" },
+                    { label: "ReturnDate", property: "ReturnDate", type: "string",  },
                     { label: "Return Comments", property: "Comments", type: "string" }
                 ];
 
@@ -1325,11 +1332,11 @@ sap.ui.define([
                     workbook: {
                         columns: aCols,
                         context: {
-                            sheetName: "Income Asset"
+                            sheetName: "Company Asset"
                         }
                     },
                     dataSource: oModelData,
-                    fileName: "IncomeAsset.xlsx"
+                    fileName: "CompanyAsset.xlsx"
                 };
 
                 const oSheet = new Spreadsheet(oSettings);
