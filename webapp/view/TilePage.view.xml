@@ -7,7 +7,10 @@
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout"
 >
-    <Page id="idPageTile" class="service-background">
+    <Page
+        id="idPageTile"
+        class="service-background"
+    >
         <headerContent>
             <Text
                 text="{= 'Welcome ' + ${LoginModel>/EmployeeName} }"
@@ -21,7 +24,10 @@
             />
         </headerContent>
 
-        <ux:ObjectPageLayout upperCaseAnchorBar="false" id="id_ObjectPageLayoutTile">
+        <ux:ObjectPageLayout
+            upperCaseAnchorBar="false"
+            id="id_ObjectPageLayoutTile"
+        >
             <ux:sections>
                 <ux:ObjectPageSection
                     id="id_Sectiontile"
@@ -34,9 +40,9 @@
                             <ux:blocks>
                                 <layout:HorizontalLayout
                                     allowWrapping="true"
-                                    class="sapUiTinyMargin"  
+                                    class="sapUiTinyMargin"
                                 >
-                                 <GenericTile
+                                    <GenericTile
                                         visible="{= ${AppVisibilityModel>/MyInbox} === '1' ? true : false}"
                                         class="sapUiMediumMargin"
                                         header="{i18n>headerInbox}"
@@ -111,7 +117,6 @@
                                             />
                                         </TileContent>
                                     </GenericTile>
-
                                 </layout:HorizontalLayout>
                             </ux:blocks>
                         </ux:ObjectPageSubSection>
@@ -121,7 +126,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Timesheet"
-                     visible="{= ${TileAccessModel>/Timesheet} === '1' ? true : false}"
+                    visible="{= ${TileAccessModel>/Timesheet} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -146,7 +151,7 @@
                                         </TileContent>
                                     </GenericTile>
 
-									<GenericTile
+                                    <GenericTile
                                         visible="{= ${AppVisibilityModel>/AssignmentTask} === '1' ? true : false}"
                                         class="sapUiMediumMargin"
                                         header="{i18n>headerAssignTask}"
@@ -176,7 +181,6 @@
                                             />
                                         </TileContent>
                                     </GenericTile>
-
                                 </layout:HorizontalLayout>
                             </ux:blocks>
                         </ux:ObjectPageSubSection>
@@ -186,7 +190,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Payslip"
-                     visible="{= ${TileAccessModel>/Payslip} === '1' ? true : false}"
+                    visible="{= ${TileAccessModel>/Payslip} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -248,7 +252,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Offer Generation"
-                     visible="{= ${TileAccessModel>/OfferGeneration} === '1' ? true : false}"
+                    visible="{= ${TileAccessModel>/OfferGeneration} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -307,7 +311,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Invoice"
-                     visible="{= ${TileAccessModel>/Invoice} === '1' ? true : false}"
+                    visible="{= ${TileAccessModel>/Invoice} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -316,8 +320,7 @@
                                     allowWrapping="true"
                                     class="sapUiTinyMargin"
                                 >
-
-                                <GenericTile
+                                    <GenericTile
                                         visible="{= ${AppVisibilityModel>/GenerateMsaNda} === '1' ? true : false}"
                                         class="sapUiMediumMargin"
                                         header="{i18n>headerMSA}"
@@ -380,14 +383,12 @@
                                         </TileContent>
                                     </GenericTile>
                                     <GenericTile
-                                    visible="{= ${AppVisibilityModel>/PurchaseOrder} === '1' ? true : false}"
+                                        visible="{= ${AppVisibilityModel>/PurchaseOrder} === '1' ? true : false}"
                                         class="sapUiMediumMargin"
                                         header="{i18n>headerPoGenarate}"
                                         press="TileV_onpressPoApp"
                                     >
-                                        <TileContent
-                                            unit="{i18n>tilePotitle}"
-                                        >
+                                        <TileContent unit="{i18n>tilePotitle}">
                                             <ImageContent
                                                 src="sap-icon://my-sales-order"
                                             />
@@ -402,7 +403,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Quotation"
-                     visible="{= ${TileAccessModel>/Quotation} === '1' ? true : false}"
+                    visible="{= ${TileAccessModel>/Quotation} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -425,7 +426,7 @@
                                     </GenericTile>
 
                                     <GenericTile
-                                    visible="{= ${AppVisibilityModel>/QuotationApp} === '1' ? true : false}"
+                                        visible="{= ${AppVisibilityModel>/QuotationApp} === '1' ? true : false}"
                                         class="sapUiMediumMargin"
                                         header="{i18n>hrQuotation}"
                                         press="TileV_onPressHrQuotation"
@@ -462,7 +463,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Expense"
-                     visible="{= ${TileAccessModel>/Expense} === '1' ? true : false}"
+                    visible="{= ${TileAccessModel>/Expense} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -492,7 +493,7 @@
                 <ux:ObjectPageSection
                     titleUppercase="false"
                     title="Asset"
-                     visible="{= ${TileAccessModel>/ManageAsset} === '1' ? true : false}"
+                    visible="{= ${TileAccessModel>/ManageAsset} === '1' ? true : false}"
                 >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
@@ -501,18 +502,18 @@
                                     allowWrapping="true"
                                     class="sapUiTinyMargin"
                                 >
-                                <GenericTile
+                                    <GenericTile
                                         visible="{= ${AppVisibilityModel>/MyAsset} === '1' ? true : false}"
                                         class="sapUiMediumMargin"
                                         header="{i18n>MyAssetTitle}"
                                         press="TileV_MyAsset"
-                                        >
+                                    >
                                         <TileContent unit="{i18n>assetFooter}">
-                                        <ImageContent
-                                        src="sap-icon://my-view"
-                                        />
+                                            <ImageContent
+                                                src="sap-icon://my-view"
+                                            />
                                         </TileContent>
-                                        </GenericTile>
+                                    </GenericTile>
                                     <GenericTile
                                         visible="{= ${AppVisibilityModel>/IncomeAsset} === '1' ? true : false}"
                                         class="sapUiMediumMargin"
@@ -542,20 +543,31 @@
                                             />
                                         </TileContent>
                                     </GenericTile>
-
-                                     <GenericTile
-                                        visible="{= ${AppVisibilityModel>/MyAsset} === '1' ? true : false}"
-                                        class="sapUiMediumMargin"
-                                        header="{i18n>recruitment}"
-                                        press="TileV_Recruitment"
-                                        >
-                                        <TileContent unit="{i18n>assetFooter}">
-                                        <ImageContent
-                                        src="sap-icon://add-employee"
-                                        />
-                                        </TileContent>
-                                        </GenericTile>
                                 </layout:HorizontalLayout>
+                            </ux:blocks>
+                        </ux:ObjectPageSubSection>
+                    </ux:subSections>
+                </ux:ObjectPageSection>
+
+                <ux:ObjectPageSection
+                    titleUppercase="false"
+                    title="Recruitment"
+                >
+                    <ux:subSections>
+                        <ux:ObjectPageSubSection titleUppercase="false">
+                            <ux:blocks>
+                                <GenericTile
+                                    visible="{= ${AppVisibilityModel>/RecruitmentApp} === '1' ? true : false}"
+                                    class="sapUiMediumMargin"
+                                    header="{i18n>recruitment}"
+                                    press="TileV_Recruitment"
+                                >
+                                    <TileContent unit="{i18n>assetFooter}">
+                                        <ImageContent
+                                            src="sap-icon://add-employee"
+                                        />
+                                    </TileContent>
+                                </GenericTile>
                             </ux:blocks>
                         </ux:ObjectPageSubSection>
                     </ux:subSections>
@@ -572,10 +584,10 @@
                 </contentLeft>
                 <contentRight>
                     <Button
-    text="{i18n>updatepassword2}"
-    press="TP_onupdatepress"
-    visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Consultant' || ${LoginModel>/Role} === 'IT Manager' }"
-/>
+                        text="{i18n>updatepassword2}"
+                        press="TP_onupdatepress"
+                        visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Consultant' || ${LoginModel>/Role} === 'IT Manager' }"
+                    />
                 </contentRight>
             </Bar>
         </footer>

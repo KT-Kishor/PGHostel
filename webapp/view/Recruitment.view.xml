@@ -68,6 +68,20 @@
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
+
+                <fb:FilterGroupItem
+                    name="skills"
+                    label="{i18n>TableColSkills}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <SearchField
+                            id="RE_Id_ComboBoxFilterField4"
+                        />
+                          
+                    </fb:control>
+                </fb:FilterGroupItem>
             </fb:filterGroupItems>
         </fb:FilterBar>
 
@@ -95,7 +109,7 @@
 
                         <Button
                             text="{i18n>edit}"
-                            type="Emphasized"
+                            type="Attention"
                             press="FRE_ColumnClickFragmentOpenForUpdate"
                             tooltip="{i18n>tooltipEditUser}"
                         />
@@ -105,14 +119,15 @@
                             press="RE_DeleteUser"
                             type="Reject"
                             tooltip="{i18n>tooltipDeleteStudent}"
+                            
+                        />
+<!-- class="sapUiSmallMarginEnd" -->
+                        <Button
+                            text="Export"
+                            type="Ghost"
+                            press="ExportTableData"
                             class="sapUiSmallMarginEnd"
                         />
-
-                        <!-- <Button
-                            text="Show Data"
-                            type="Accept"
-                            press="NewPage"
-                        /> -->
                     </content>
                 </OverflowToolbar>
             </headerToolbar>
@@ -208,7 +223,7 @@
                             text="{= ${myModel>NoticePeriod} === '0' ? 'Immediate' : ${myModel>NoticePeriod}} Days"
                         />
 
-                        <Text text="{myModel>MobileNumber}" />
+                        <Text text="{myModel>STDCode}-{myModel>MobileNumber}" />
 
                         <Text text="{myModel>EmailID}" />
                         <Text text="{myModel>Experience} Years" />
@@ -221,11 +236,14 @@
             </items>
         </Table>
         <footer>
-			<Bar id="MI_id_FooterBar">
-			    <contentLeft>
-                    <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+            <Bar id="MI_id_FooterBar">
+                <contentLeft>
+                    <core:Fragment
+                        fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
+                        type="XML"
+                    />
                 </contentLeft>
-			</Bar>
-		</footer>
+            </Bar>
+        </footer>
     </Page>
 </mvc:View>

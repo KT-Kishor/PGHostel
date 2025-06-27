@@ -4,14 +4,16 @@ sap.ui.define(
         "sap/m/MessageToast",
         "../model/formatter",
         "sap/ui/model/json/JSONModel",
-        "../utils/validation"
+        "../utils/validation",
+        "sap/ui/export/Spreadsheet",
     ],
     (
         BaseController,
         MessageToast,
         formatter,
         JSONModel,
-        utils
+        utils,
+        Spreadsheet
     ) => {
         "use strict";
 
@@ -25,7 +27,7 @@ sap.ui.define(
                         .getRoute("Recruitment")
                         .attachPatternMatched(this._onObjectMatched, this);
                 },
-                _onObjectMatched:async function () {
+                _onObjectMatched: async function () {
                     var LoginFUnction = await this.commonLoginFunction("Recruitment");
                     if (!LoginFUnction) return;
                     this.i18na = this.getOwnerComponent()
@@ -61,10 +63,10 @@ sap.ui.define(
                     const EditableModel = new JSONModel({
                         Editable: true,
                     });
-                      const InterviewYesNo = new JSONModel({
+                    const InterviewYesNo = new JSONModel({
                         results: [
-                            { key: 1, text: "YES" },
-                            { key: 2, text: "NO" },
+                            { key: "YES", text: "YES" },
+                            { key: "NO", text: "NO" },
                         ],
                     });
                     this.getView().setModel(InterviewYesNo, "setInterviewYesNo");
@@ -72,7 +74,6 @@ sap.ui.define(
                     this.RE_ReadUpdatedDataFromBakend();
                     this.RE_RemoveValueState();
                     this.getView().getModel("LoginModel").setProperty("/HeaderName", "Recruitment Details");
-
                 },
 
                 //Add student function all data
@@ -109,7 +110,7 @@ sap.ui.define(
                 },
 
                 FRE_UpDateTimeFragmentFieldEditable: function () {
-                   
+
                     let ButtonText = sap.ui.getCore().byId("FM_Id_EditBTN").getText();
                     if (ButtonText === "Edit") {
                         this.getView()
@@ -130,7 +131,7 @@ sap.ui.define(
                         .getSelectedKey()
                         ? sap.ui.getCore().byId("FM_Id_Country").getSelectedKey()
                         : sap.ui.getCore().byId("FM_Id_Country").getValue();
-                
+
                     var oFilter = new sap.ui.model.Filter(
                         "CountryCode",
                         sap.ui.model.FilterOperator.EQ,
@@ -138,7 +139,7 @@ sap.ui.define(
                     );
                     sap.ui.getCore().byId("FM_Id_City").getBinding("items").filter(oFilter);
                     this.getView().getModel("stuDataModel").setProperty("/City", "");
-                   
+
                 },
 
                 RE_StudentDataSave: async function () {
@@ -211,7 +212,7 @@ sap.ui.define(
                             this.oDialog = oDialog;
                             oView.addDependent(this.oDialog);
                             this.oDialog.open();
-                        
+
                             this.FRE_CommonFuncPassingValuesInFragment(
                                 flag,
                                 value1,
@@ -257,7 +258,7 @@ sap.ui.define(
                     if (!this.FRE_ValidateAllFields()) {
                         return;
                     }
-                        sap.ui.getCore().byId("FM_Id_EditBTN").setText("Edit")
+                    sap.ui.getCore().byId("FM_Id_EditBTN").setText("Edit")
 
                     let noticeperiod = sap.ui.getCore().byId("FM_RE_NoticePeriod").getValue();
                     getDataStudentmodel.NoticePeriod = noticeperiod;
@@ -285,36 +286,36 @@ sap.ui.define(
                     this.getView().byId("RE_Id_MainTable").removeSelections();
                 },
 
-                RE_FilterBaronSearch: function (oEvent) {
+                RE_FilterBaronSearch: async function (oEvent) {
                     let a = this.byId("RE_Id_ComboBoxFilterField1").getValue();
-                    let c = this.byId("RE_Id_ComboBoxFilterField3").getValue();
-
-                    let oTable = this.byId("RE_Id_MainTable");
-                    let oBinding = oTable.getBinding("items");
-
-                    let aFilters = [];
-
-                    if (a) {
-                        aFilters.push(
-                            new sap.ui.model.Filter("Name", sap.ui.model.FilterOperator.EQ, a)
-                        );
+                    let b = this.byId("RE_Id_ComboBoxFilterField3").getValue();
+                    let c = this.byId("RE_Id_ComboBoxFilterField4").getValue();
+                    if (!b) {
+                        this.Data = ""
+                    } else {
+                        this.Data = "1-" + b;
                     }
-                    if (c) {
-                        aFilters.push(
-                            new sap.ui.model.Filter(
-                                "NoticePeriod",
-                                sap.ui.model.FilterOperator.EQ,
-                                c
-                            )
-                        );
+
+
+                    var filter = {
+                        "Name": a,
+                        "NoticePeriod": this.Data,
+                        "Skill": c
                     }
-                    oBinding.filter(aFilters);
-                    // this.RE_ReadUpdatedDataFromBakend();
+
+                    this.getBusyDialog();
+                    await this._fetchCommonData("CandidateProfile", "myModel", filter)
+                        .then((response) => {
+                            // console.log(response);
+                            this.closeBusyDialog();
+                            // this.getView().getModel("myModel").setData(response);
+                        })
                 },
 
                 RE_RemoveValueFilterBar: function () {
                     this.byId("RE_Id_ComboBoxFilterField1").setValue("");
                     this.byId("RE_Id_ComboBoxFilterField3").setValue("");
+                    this.byId("RE_Id_ComboBoxFilterField4").setValue("");
                     this.getView().byId("RE_Id_MainTable").removeSelections();
                 },
 
@@ -407,13 +408,13 @@ sap.ui.define(
                         },
                     };
                     this.getBusyDialog();
-                      this.ajaxDeleteWithJQuery("CandidateProfile",payLoad).then((response)=>{
+                    this.ajaxDeleteWithJQuery("CandidateProfile", payLoad).then((response) => {
                         this.closeBusyDialog();
                         let dataDeleteSuccess = this.i18na.getText("dataDelteSucces");
-                            MessageToast.show(dataDeleteSuccess);
-                            this.RE_ReadUpdatedDataFromBakend();
-                      })
-                   
+                        MessageToast.show(dataDeleteSuccess);
+                        this.RE_ReadUpdatedDataFromBakend();
+                    })
+
                     this.getView().byId("RE_Id_MainTable").removeSelections();
                 },
                 RE_RemoveValueState: function () {
@@ -491,7 +492,7 @@ sap.ui.define(
                 FRE_ValidateAvlForIntervewField: function (oEvent) {
                     let modelValuState = this.getView().getModel("modelValuStateError");
                     var val = sap.ui.getCore().byId("FM_RE_AvlInterview").getValue();
-    
+
                     if (val === "") {
                         modelValuState.setProperty("/AvailableForInterviewState", "Error");
                     } else {
@@ -502,7 +503,7 @@ sap.ui.define(
                     utils._LCvalidateMobileNumber(oEvent);
                 },
                 RE_VAlidateEmailField: function (oEvent) {
-                    
+
                     utils._LCvalidateEmail(oEvent);
                 },
                 RE_ValidateRemarkField: function (oEvent) {
@@ -517,7 +518,7 @@ sap.ui.define(
                         }
                     }
                 },
-               
+
                 RE_ValidateCityField: function (oEvent) {
                     let modelValuState = this.getView().getModel("modelValuStateError");
                     let sValue = oEvent.getSource().getSelectedKey();
@@ -533,6 +534,64 @@ sap.ui.define(
                 onLogout: function () {
                     this.CommonLogoutFunction(); // Navigate to login page
                 },
+
+                ExportTableData: function () {
+                    let aData = this.getView().getModel("myModel")
+                    let a = aData.getData()
+                    // console.log(aData);
+
+                    // Step 2: Define the columns for export
+                    let updatedData = a.map((elem) => {
+                        let date = elem.Date
+                        // console.log("first date :",date);
+                        
+                        let date2 = new Date(date);
+                        // console.log("updated date",date2);
+                        
+                        let fromatedDate = date2.getDate().toString().padStart(2, '0') + "/" +
+                            (date2.getMonth() + 1).toString().padStart(2, '0') + "/" +
+                            date2.getFullYear();
+                            // console.log("final date :",fromatedDate);
+                            
+                        return {
+                            ...elem, // keep other properties
+
+                            Date: elem.Date === "1899-11-30T00:00:00.000Z" ? "" : fromatedDate
+                        };
+                    });
+                    // console.log(updatedData);
+
+                    var aCols = [
+                        { label: "Name", property: "Name" },
+                        { label: "Country", property: "Country" },
+                        { label: "City", property: "City" },
+                        { label: "AvaForInterview", property: "AvailableForInterview" },
+                        { label: "CurrentCTC", property: "CurrentCTC" },
+                        { label: "ExpectedCTC", property: "ExpectedCTC" },
+                        { label: "Experience", property: "Experience" },
+                        { label: "Date", property: "Date" },
+                        { label: "STDCode", property: "STDCode" },
+                        { label: "MobileNumber", property: "MobileNumber" },
+                        { label: "NoticePeriod", property: "NoticePeriod" },
+                        { label: "Remark", property: "Remark" },
+                        { label: "Skills", property: "Skills" },
+                    ];
+
+                    // Step 3: Create Spreadsheet instance
+                    var oSettings = {
+                        workbook: {
+                            columns: aCols
+                        },
+                        dataSource: updatedData,
+                        fileName: "ExportedData.xlsx",
+                        worker: true
+                    };
+
+                    var oSheet = new Spreadsheet(oSettings);
+                    oSheet.build().finally(function () {
+                        oSheet.destroy();
+                    });
+                }
             }
         );
     }
