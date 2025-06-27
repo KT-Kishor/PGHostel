@@ -37,7 +37,7 @@ sap.ui.define(
                     that.byId("AL_id_LeaveBarChart").setVisible(false);
                     that.byId("AL_id_LeaveTableStandard").setVisible(true);
                     that.byId("AL_id_leavefilterbar").setVisible(true);
-                    that.byId("AL_id_LeaveYear").setValue(that.currentYear);
+                    that.byId("AL_id_LeaveYear").setSelectedKey(that.currentYear);
 
                     // Start chained async calls
                     that._fetchCommonData("Leaves", "LeaveModel", { employeeID: that.userId }).then(() => {
@@ -259,25 +259,21 @@ sap.ui.define(
                 },
 
                 // Function to fetch employee details
-                EmployeeDetReadCall: async function (entity, value) {
+                 EmployeeDetReadCall: async function (entity, value) {
                     try {
                         let data = await this.ajaxReadWithJQuery(entity, value);
                         if (data && data.data && data.data.length > 0) {
                             let joiningDateField = (entity === "Trainee") ? "JoiningDate" : "JoiningDate";
                             this.JoiningDate = this.Formatter.formatDate(data.data[0][joiningDateField]).split("/").map(Number);
-                            let joinYear = this.JoiningDate[2];
-                            let currentYear = new Date().getFullYear();
-
                             let addYears = [];
-                            for (let i = joinYear; i <= currentYear; i++) {
-                                addYears.push({ year: i });
+                            let length = new Date().getFullYear() - this.JoiningDate[2];
+                            for (let i = 0; i <= length; i++) {
+                                addYears.push({ key: this.JoiningDate[2] + i, text: this.JoiningDate[2] + i })
+                                // addYears.push(this.JoiningDate[2] + i);
                             }
-
                             let yearModel = new JSONModel({ items: addYears });
                             this.getView().setModel(yearModel, "YearModel");
-
-                            // Set default selected year as current year
-                            this.getView().byId("AL_id_LeaveYear").setSelectedKey(currentYear.toString());
+                            
                         } else {
                             MessageToast.show(this.i18nModel.getText("joiningDateMissing"));
                         }
@@ -323,6 +319,7 @@ sap.ui.define(
                     this.byId("AL_id_LeaveBarChart").setVisible(true);
                     this.byId("AL_id_LeaveTableStandard").setVisible(false);
                     this.byId("AL_id_leavefilterbar").setVisible(false);
+                    this.getView().byId("AL_id_LeaveYear").setSelectedKey(this.currentYear);
                     if (this.Type === "Trainee") {
                         this.byId("AL_id_MonthlyChart").setVisible(false);
                         this.byId("AL_id_YearlyChart").setVisible(false);

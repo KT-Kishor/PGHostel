@@ -31,7 +31,7 @@ sap.ui.define([
         //that.byId("AL_id_LeaveBarChart").setVisible(false);
         that.byId("AL_id_SmartTableCharBut").setVisible(false);
         //that.byId("AL_id_leavefilterbar").setVisible(true);
-        that.byId("AL_id_LeaveYear").setValue(that.currentYear);
+        //that.byId("AL_id_LeaveYear").setValue(that.currentYear);
         var barDataModel = new JSONModel({ Name: 'line', type: 'column', AllStatus: 'column' });
         that.getView().setModel(barDataModel, "MonthlyBar");
         this.getBusyDialog();
@@ -48,8 +48,8 @@ sap.ui.define([
         var oType;
         var oJson = new JSONModel({ selectedType: 1 })
         this.getView().setModel(oJson, "selectedModel");
-        var year = this.modelData.StartDate.split("/").map(Number)[2];
-        this.getView().byId("AL_id_LeaveYear").setSelectedKey(year);
+        this.year = this.modelData.StartDate.split("/").map(Number)[2];
+        this.getView().byId("AL_id_LeaveYear").setSelectedKey(this.year);
         if (this.modelData.SubType === "LOP") {
             oType = "LOP"
             this.getView().getModel("selectedModel").setProperty("/selectedType", 2);
@@ -57,9 +57,9 @@ sap.ui.define([
             oType = "All In One Leave"
         }
         
-        this.BarDisplayFunction(oType, year, that.userId);
+        this.BarDisplayFunction(oType, this.year, that.userId);
         this.YearlyBarDisplayFunction(that.userId);
-        this.MonthBarDisplayFunction(oType, year, that.userId);
+        this.MonthBarDisplayFunction(oType, this.year, that.userId);
     },
     DL_onBack:function () {
       this.getRouter().navTo("RouteMyInbox",{sMyInBox: "DetailLeave"});
@@ -146,25 +146,21 @@ sap.ui.define([
                         oPopOver.connect(oVizFrame.getVizUid());
                     }
                 },
-                  EmployeeDetReadCall: async function (entity, value) {
+                 EmployeeDetReadCall: async function (entity, value) {
                     try {
                         let data = await this.ajaxReadWithJQuery(entity, value);
                         if (data && data.data && data.data.length > 0) {
                             let joiningDateField = (entity === "Trainee") ? "JoiningDate" : "AppraisalDate";
                             this.JoiningDate = this.Formatter.formatDate(data.data[0][joiningDateField]).split("/").map(Number);
-                            let joinYear = this.JoiningDate[2];
-                            let currentYear = new Date().getFullYear();
-
                             let addYears = [];
-                            for (let i = joinYear; i <= currentYear; i++) {
-                                addYears.push({ year: i });
+                            let length = new Date().getFullYear() - this.JoiningDate[2];
+                            for (let i = 0; i <= length; i++) {
+                                addYears.push({ key: this.JoiningDate[2] + i, text: this.JoiningDate[2] + i })
+                                // addYears.push(this.JoiningDate[2] + i);
                             }
-
                             let yearModel = new JSONModel({ items: addYears });
                             this.getView().setModel(yearModel, "YearModel");
-
-                            // Set default selected year as current year
-                            this.getView().byId("AL_id_LeaveYear").setSelectedKey(currentYear.toString());
+                            this.getView().byId("AL_id_LeaveYear").setSelectedKey(this.year);
                         } else {
                             MessageToast.show(this.i18nModel.getText("joiningDateMissing"));
                         }

@@ -22,11 +22,11 @@
 				<ToolbarSeparator />
 				<Label text="Year" id="AL_id_YearLabel" />
 				<Select id="AL_id_LeaveYear"
-						change="AL_onChangeYears"
-						width="100px"
-						items="{YearModel>/items}">
-					<core:Item key="{YearModel>year}" text="{YearModel>year}" />
-				</Select>
+					change="AL_onChangeYears"
+					width="100px"
+					items="{YearModel>/items}">
+				<core:Item key="{YearModel>key}" text="{YearModel>text}" />
+			    </Select>
 				<ToolbarSpacer/>
 				<Button id="AL_id_SmartTableCharBut" text="{i18n>tableView}" tooltip="{i18n>gototable}" press="AL_onPressGoSmartTable" />
 			</OverflowToolbar>
