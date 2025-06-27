@@ -152,13 +152,19 @@ sap.ui.define([
                         if (data && data.data && data.data.length > 0) {
                             let joiningDateField = (entity === "Trainee") ? "JoiningDate" : "AppraisalDate";
                             this.JoiningDate = this.Formatter.formatDate(data.data[0][joiningDateField]).split("/").map(Number);
+                            let joinYear = this.JoiningDate[2];
+                            let currentYear = new Date().getFullYear();
+
                             let addYears = [];
-                            let length = new Date().getFullYear() - this.JoiningDate[2];
-                            for (let i = 0; i <= length; i++) {
-                                addYears.push(this.JoiningDate[2] + i);
+                            for (let i = joinYear; i <= currentYear; i++) {
+                                addYears.push({ year: i });
                             }
+
                             let yearModel = new JSONModel({ items: addYears });
                             this.getView().setModel(yearModel, "YearModel");
+
+                            // Set default selected year as current year
+                            this.getView().byId("AL_id_LeaveYear").setSelectedKey(currentYear.toString());
                         } else {
                             MessageToast.show(this.i18nModel.getText("joiningDateMissing"));
                         }
