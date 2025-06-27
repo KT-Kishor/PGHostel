@@ -25,7 +25,7 @@
 						change="AL_onChangeYears"
 						width="100px"
 						items="{YearModel>/items}">
-					<core:Item key="{YearModel>}" text="{YearModel>}" />
+					<core:Item key="{YearModel>year}" text="{YearModel>year}" />
 				</Select>
 				<ToolbarSpacer/>
 				<Button id="AL_id_SmartTableCharBut" text="{i18n>tableView}" tooltip="{i18n>gototable}" press="AL_onPressGoSmartTable" />
