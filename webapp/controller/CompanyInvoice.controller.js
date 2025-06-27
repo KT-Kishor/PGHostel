@@ -170,7 +170,9 @@ sap.ui.define(
             return {
               ...item,
               InvoiceDate: Formatter.formatDate(item.InvoiceDate),
-              PayByDate: Formatter.formatDate(item.PayByDate)
+              PayByDate: Formatter.formatDate(item.PayByDate),
+              TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
+              
             };
           });
           const aCols = [
@@ -178,7 +180,7 @@ sap.ui.define(
             { label: this.i18nModel.getText("customerName"), property: "CustomerName", type: "string" },
             { label: this.i18nModel.getText("invoiceDate"), property: "InvoiceDate", type: "string" },
             { label: this.i18nModel.getText("invoiceDescription"), property: "InvoiceDescription", type: "string" },
-            { label: this.i18nModel.getText("totalAmount"), property: "TotalAmount", type: "number" },
+            { label: this.i18nModel.getText("totalAmount"), property: "TotalAmountCurrency", type: "string" },
             { label: this.i18nModel.getText("PayByDate"), property: "PayByDate", type: "string " },
             { label: this.i18nModel.getText("status"), property: "Status", type: "string" },
           ];
@@ -194,7 +196,7 @@ sap.ui.define(
           };
           const oSheet = new Spreadsheet(oSettings);
           oSheet.build().then(function () {
-            MessageToast.show(this.i18nModel.getText("exportSuccessful"));
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
           }.bind(this))
             .finally(function () {
               oSheet.destroy();

@@ -130,6 +130,7 @@ sap.ui.define([
             },
             Msa_ChangeMsaDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent);
+                this.onContractPeriodSelectChange();
             },
 
             onContractPeriodSelectChange: function (oEvent) {

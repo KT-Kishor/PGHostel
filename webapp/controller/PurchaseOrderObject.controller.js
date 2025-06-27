@@ -142,6 +142,7 @@ sap.ui.define([
                     const purchaseOrderData = oFCIAerData[0];
                     const purchaseOrderModel = this.getView().getModel("PurchaseOrderModel");
 
+
                     purchaseOrderModel.setProperty("/CustomerName", purchaseOrderData.PurchaseOrder[0].CustomerName);
                     purchaseOrderModel.setProperty("/Type", purchaseOrderData.PurchaseOrder[0].Type);
                     purchaseOrderModel.setProperty("/Address", purchaseOrderData.PurchaseOrder[0].Address);
@@ -204,24 +205,31 @@ sap.ui.define([
                     this.byId("FPO_id_Currency").setEditable(false)
                     this.byId("FPO_id_BranchCode").setEditable(false)
                     this.byId("FPO_idRichTextEditor").setEditable(false)
-                    this.byId("POO_idAddItemButton").setVisible(false)
-                    this.getView().byId("POO_idSaveButton").setVisible(false)
                     this.getView().byId("FPO_id_CustDescription").setEditable(false)
                     this.getView().byId("PO_id_PaymantTerms").setEditable(false)
+                    this.byId("POO_idAddItemButton").setVisible(false)
+                    this.getView().byId("POO_idSaveButton").setVisible(false)
                     this.getView().byId("POO_idClearButton").setVisible(false)
                     this.byId("FPO_id_PoNumber").setVisible(true)
-
-
-                    purchaseOrderModel.setProperty("/Editable", false);
-
                     this.getView().byId("POO_idmailButton").setVisible(true)
                     this.getView().byId("POO_idPDFButton").setVisible(true)
+
+                    
+                  
+                    purchaseOrderModel.setProperty("/Editable", false);
+
                 });
             }
             this.closeBusyDialog()
         },
         PO_onButtonPress: function () {
-            this.getRouter().navTo("PurchaseOrder");
+            this.showConfirmationDialog(
+           "Confirm Action",
+           "Are you sure you want to go back?",
+           ()=>{
+               this.getRouter().navTo("PurchaseOrder");
+             }
+            )
 
         },
         PO_onComboBoxChange: function () {

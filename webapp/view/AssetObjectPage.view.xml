@@ -38,14 +38,24 @@
                             wrapping="true"
                         />
                     </expandedHeading>
-                    <snappedHeading />
+                    <snappedHeading>
+                        <m:Title
+                            text="{objectModel>/0/Type}"
+                            wrapping="true"
+                        />
+                    </snappedHeading>
                     <expandedContent>
                         <m:ObjectIdentifier
                             title="{objectModel>/0/Model}"
                             text="{objectModel>/0/Description}"
-                            
                         />
                     </expandedContent>
+                    <snappedContent>
+                        <m:ObjectIdentifier
+                            title="{objectModel>/0/Model}"
+                            text="{objectModel>/0/Description}"
+                        />
+                    </snappedContent>
                 </ObjectPageDynamicHeaderTitle>
             </headerTitle>
             <headerContent>
@@ -174,32 +184,16 @@
                                     }"
                                 >
                                     <m:columns>
-                                        <m:Column>
+                                        <m:Column
+                                          minScreenWidth="Tablet"
+                                          demandPopin="true">
                                             <m:Text text="{i18n>Assetdate}"
                                             tooltip="{i18n>Assetdate}" />
                                         </m:Column>
-                                        <!-- <m:Column>
-                                            <m:Text
-                                                text="{i18n>Pickeddetails}"
-                                            />
-                                        </m:Column> -->
-                                        <!-- <m:Column>
-                                            <m:Text text="{i18n>Assetdate}" />
-                                        </m:Column> -->
-                                        <!-- <m:Column>
-                                            <m:Text text="Asset Creation Branch " />
-                                        </m:Column> -->
-                                        <!-- <m:Column>
-                                            <m:Text text="{i18n>status}" 
-                                            tooltip="{i18n>status}"/>
-                                        </m:Column> -->
-                                        <!-- <m:Column>
-                                            <m:Text text="{i18n>trashDate}" />
-                                        </m:Column> -->
-                                        <!-- <m:Column>
-                                            <m:Text text="{i18n>transferby}" />
-                                        </m:Column> -->
-                                        <m:Column>
+                                       
+                                        <m:Column
+                                          minScreenWidth="Tablet"
+                                          demandPopin="true">
                                             <m:Text
                                                 text="{i18n>transferdetails}"
                                                 tooltip="{i18n>transferdetails}"
@@ -214,7 +208,9 @@
                                         <!-- <m:Column>
                                             <m:Text text="{i18n>returnDate}" />
                                         </m:Column> -->
-                                        <m:Column>
+                                        <m:Column
+                                          minScreenWidth="Tablet"
+                    demandPopin="true">
                                             <m:Text
                                                 text="{i18n>assignedName}"
                                                 tooltip="{i18n>assignedName}"
@@ -232,14 +228,18 @@
                                         <!-- <m:Column>
                                             <m:Text text="{i18n>transferby}" />
                                         </m:Column> -->
-                                        <m:Column>
+                                        <m:Column
+                                          minScreenWidth="Tablet"
+                    demandPopin="true">
                                             <m:Text text="{i18n>return}" 
                                             tooltip="{i18n>return}"/>
                                         </m:Column>
                                         <!-- <m:Column>
                                             <m:Text text="{i18n>returnDate}" />
                                         </m:Column> -->
-                                        <m:Column>
+                                        <m:Column
+                                          minScreenWidth="Tablet"
+                    demandPopin="true">
                                             <m:Text text="{i18n>trashby}" 
                                             tooltip="{i18n>trashby}"/>
                                         </m:Column>

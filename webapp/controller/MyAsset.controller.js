@@ -24,7 +24,9 @@ sap.ui.define([
       _onRouteMatched:async function(){
           var LoginFunction = await this.commonLoginFunction("MyAsset");
                 if (!LoginFunction) return;
-           this.getBusyDialog()
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Asset Details");
+
+                  this.getBusyDialog()
                    this.ajaxReadWithJQuery("IncomeAsset", "Status=Assigned").then((oData) => {
                     let loginModel = this.getView().getModel("LoginModel").getData();
 
