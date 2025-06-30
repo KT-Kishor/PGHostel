@@ -426,6 +426,10 @@ sap.ui.define([
             const oViewModel = this.getView().getModel("viewModel");
 
             if (oViewModel.getProperty("/isEditing")) {
+                // Don't proceed with update if validation fails
+                if (!this._validateTimesheetFields(false)) {
+                    return;
+                }
                 await this.TSD_onUpdate();
                 oViewModel.setProperty("/isEditing", false);
             } else {
@@ -438,17 +442,20 @@ sap.ui.define([
                 const hrs = match?.HoursWorked;
 
                 this.getView().getModel("newModel").setProperty("/ActualHours", hrs || 0);
-                this.byId("idTextActHour").setText("Actual Hours: " + (hrs ?? "Not available"));
+                const hoursText = hrs ? `${hrs} hours` : "Not available";
+                this.byId("idTextActHour").setText(`Actual Hours: ${hoursText}`);
+
+                // Focus on the hours input field for quick editing
+                this.byId("TSD_id_TimeHours").focus();
             }
         },
         TSD_onUpdate: async function () {
             try {
+                this.getBusyDialog();
                 if (!this._validateTimesheetFields(false)) {
                     this.closeBusyDialog();
                     return;
                 }
-
-                this.getBusyDialog();
                 let oData = this.getView().getModel("newModel").getData();
                 delete oData.comments;
 
@@ -502,12 +509,14 @@ sap.ui.define([
             }
 
             if (sEnteredHours > sActualHours) {
-                MessageToast.show(this.i18nModel.getText("hoursExceedError") || "Entered hours cannot exceed assigned hours.");
+                const errorMsg = this.i18nModel.getText("hoursExceedError") || `Entered hours (${sEnteredHours}) cannot exceed assigned hours (${sActualHours}).`;
+                MessageToast.show(errorMsg);
+                oHours.setValueState("Error");
+                oHours.setValueStateText(errorMsg);
                 return false;
             }
-
+            oHours.setValueState("None");
             return true;
         }
-
     });
 });
