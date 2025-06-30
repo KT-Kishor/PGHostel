@@ -32,19 +32,18 @@
                 minDate="{newTaskModel>/minDate}"
                 maxDate="{newTaskModel>/maxDate}"
                     change="AT_onstartDatevalidateDate"
-                    value="{EditTaskModel>/StartDate}"
+                    value="{path:'EditTaskModel>/StartDate', formatter:'.Formatter.formatDate'}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     id="FAT_id_StartDate"
                     valueStateText="{i18n>dateValueState}"/>
-                    
                 <Label text="{i18n>endDate}" required="true"/>
                 <DatePicker
                 minDate="{newTaskModel>/minDate}"
                      maxDate="{newTaskModel>/maxDate}"
                     change="AT_validateDate"
-                    value="{EditTaskModel>/EndDate}"
-                    displayFormat="dd/MM/yyyy" 
+                    value="{path:'EditTaskModel>/EndDate', formatter:'.Formatter.formatDate'}"
+                    displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     id="FAT_id_EndDate"
                     valueStateText="{i18n>dateValueState}"/>
