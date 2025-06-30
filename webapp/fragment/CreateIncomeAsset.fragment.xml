@@ -212,12 +212,12 @@
              id="FCIA_id_saveButton"
              class="marginRight"
              />
-               <!-- <Button text="Submit" 
+               <Button text="Submit" 
              press="FCIA_onsavebuttonpress"
              type="Accept"
              id="FCIA_id_submitButton"
              class="marginRight"
-             /> -->
+             />
             <Button
                 text="{i18n>Transfer}"
                 press="FCIA_onTransferbuttonpress"

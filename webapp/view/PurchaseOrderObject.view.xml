@@ -608,7 +608,7 @@
                                                 wrapping="false"
                                             />
                                             <m:Text
-                                                text="{
+                                                text="{=${PurchaseOrderModel>/SubTotal}===''? '' : ${PurchaseOrderModel>/Currency}} {
                                                 path:'PurchaseOrderModel>/SubTotal',
                                                 formatter: '.Formatter.formatCurrency'}"
                                                 class="sapUiSmallMarginBegin sapUiTinyMarginBottom"
@@ -684,7 +684,7 @@
                                                 visible="{= ${PurchaseOrderModel>/Currency} === 'INR'}"
                                             />
                                             <m:Text
-                                                text="{
+                                                text="{=${PurchaseOrderModel>/GrantTotal}===''? '' : ${PurchaseOrderModel>/Currency}} {
                                                 path:'PurchaseOrderModel>/GrantTotal',
                                                  formatter: '.Formatter.formatCurrency'}"
                                                 class="sapUiSmallMarginBegin"

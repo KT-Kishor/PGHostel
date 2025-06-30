@@ -779,8 +779,7 @@ sap.ui.define([
         },
 
         POO_onPDFButtonPress: async function () {
-            this.getRouter().navTo("PurchaseOrder");
-            this.getBusyDialog();
+         
             var oPDFModel = this.getView().getModel("PDFData");
             var oPOModel = this.getView().getModel("PurchaseOrderModel").getData();
             oPDFModel.setProperty("/ClientCompanyName", oPOModel.CustomerName);
@@ -805,6 +804,7 @@ sap.ui.define([
             var amountInWords = await this.convertNumberToWords(oPOModel.GrantTotal, oPOModel.Currency);
             oPDFModel.setProperty("/POAmountInWords", amountInWords);
             var htmlContent = oPOModel.Notes;
+               this.getBusyDialog();
             await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oPOModel.BranchCode });
             var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
             if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {

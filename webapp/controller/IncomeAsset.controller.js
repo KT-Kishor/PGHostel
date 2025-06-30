@@ -235,13 +235,7 @@ sap.ui.define([
                         oDatePicker.setMaxDate(maxdate)
                     }
 
-                    //  var oAssignedDate = oRowData.TransferDate
-                    //     if (oAssignedDate) {
-                    //         var oMinDate = new Date(oAssignedDate);
-                    //         var oMaxDate = new Date(oAssignedDate);
-                    //         oMaxDate.setDate(oMaxDate.getDate() +365);
-                    //         sap.ui.getCore().byId("FCIA_id_Date").setMinDate(oMinDate).setMaxDate(oMaxDate);
-                    //     }
+                  
 
                     sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_transferbranch").setVisible(false)
@@ -253,23 +247,18 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_type").setEnabled(true).setVisible(true)
-
-
-
-                    // sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey(oModel.getProperty("/PickedBranch")).setValueState("None");
-                    // sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(true)
+                    sap.ui.getCore().byId("FCIA_id_submitButton").setVisible(true)
+                    sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(false)
 
 
                     if (loginRole === "IT Consultant") {
                         sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
                         sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
-                        // sap.ui.getCore().byId("FCIA_id_pickedby").setEnabled(false);
 
 
                     } else {
                         sap.ui.getCore().byId("FCIA_id_branch").setEditable(true);
                         sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);
-                        // sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);  
 
                     }
 
@@ -323,11 +312,14 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_transferbranch").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
+                    sap.ui.getCore().byId("FCIA_id_submitButton").setVisible(true)
+                    sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(false)
+
+
 
 
                     sap.ui.getCore().byId("FCIA_id_pickButton").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_transferButton").setVisible(false)
-                    sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(true)
 
                     if (loginRole === "IT Consultant") {
                         sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
@@ -395,7 +387,7 @@ sap.ui.define([
                             MessageToast.show(this.i18nModel.getText("branchmessage"));
                             return;
                         }
-
+                        this.getBusyDialog();
                         var oPayLoad = {
                             "Type": type,
                             "Model": oModel.Model,
@@ -412,7 +404,6 @@ sap.ui.define([
                             "IsCurrent": "1",
                             "Status": "Available",
                             "TrashDate": null
-                            // "PickedEmployeeID": sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText()
 
 
                         };
@@ -420,11 +411,8 @@ sap.ui.define([
 
                         if (!selected) {
                             var pickedEmployeeId = sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText();
-
-                            await this.ajaxCreateWithJQuery("IncomeAsset", { data: { ...oPayLoad, PickedEmployeeID: pickedEmployeeId } }); MessageToast.show(this.i18nModel.getText("assetcreate"));
-
-
-
+                            await this.ajaxCreateWithJQuery("IncomeAsset", { data: { ...oPayLoad, PickedEmployeeID: pickedEmployeeId } });
+                             MessageToast.show(this.i18nModel.getText("assetcreate"));
                         } else {
                             var selectedData = selected.getBindingContext("incomeModel").getObject();
                             await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oPayLoad, filters: { ID: selectedData.ID } });
@@ -468,6 +456,8 @@ sap.ui.define([
                         MessageToast.show(this.i18nModel.getText("branchmessage"));
                         return;
                     }
+                    this.getBusyDialog();
+
                     var oPayLoad = {
                         "Type": data.Type,
                         "Model": data.Model,
@@ -514,6 +504,8 @@ sap.ui.define([
                         MessageToast.show(this.i18nModel.getText("branchmessage"));
                         return;
                     }
+                        this.getBusyDialog();
+
                     var oPayLoad = {
                         "Type": type,
                         "Model": oModel.Model,
@@ -635,6 +627,8 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_transferbranch").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
+                        sap.ui.getCore().byId("FCIA_id_submitButton").setVisible(false)
+                         sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(true)
 
                         if (loginRole === "IT Consultant") {
                             sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
@@ -684,6 +678,8 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
+                    sap.ui.getCore().byId("FCIA_id_submitButton").setVisible(false)
+                    sap.ui.getCore().byId("FCIA_id_saveButton").setVisible(true)
 
                     if (loginRole === "IT Consultant") {
                         sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
@@ -761,6 +757,7 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_transferbranch").setVisible(false)
                         sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
+                         sap.ui.getCore().byId("FCIA_id_submitButton").setVisible(false)
 
                         if (loginModel.Role === "IT Consultant") {
                             sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEnabled(false)
@@ -810,6 +807,8 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_transferButton").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(false)
+                    sap.ui.getCore().byId("FCIA_id_submitButton").setVisible(false)
+
 
                     if (loginModel.Role === "IT Consultant") {
                         sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(true).setEditable(false)
@@ -993,6 +992,8 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_pickButton").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_transferButton").setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(true)
+                    sap.ui.getCore().byId("FCIA_id_submitButton").setVisible(false)
+
 
 
                     sap.ui.getCore().byId("FCIA_id_CancelButton").setVisible(true)
@@ -1080,6 +1081,8 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_transferButton").setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_refrenceNo").setVisible(true)
+                    sap.ui.getCore().byId("FCIA_id_submitButton").setVisible(false)
+
 
 
                     if (data.IsCurrent == 1 && data.Status == "Returned") {
@@ -1126,6 +1129,7 @@ sap.ui.define([
                         // }
                         selectedData.TrashDate = Date;
                         selectedData.Status = "Trashed";
+                        this.getBusyDialog()
                         var oPayLoad = {
                             "Status": "Trashed",
                             "TrashDate": Date,
