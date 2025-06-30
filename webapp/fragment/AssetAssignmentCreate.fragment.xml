@@ -137,7 +137,7 @@
 		</f:SimpleForm>
 		<beginButton>
 			<Button
-                text="{i18n>save}"
+                text="{i18n>assetAssignmentSave}"
                 press="FAA_onPressSave"
                 type="Accept"
             />

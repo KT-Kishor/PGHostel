@@ -178,6 +178,7 @@ sap.ui.define([
                     </div>`;
                 var oDialog = new sap.m.Dialog({
                     title: this.getView().getModel("i18n").getProperty("comments"),
+                    type :  sap.m.DialogType.Message,
                     draggable: true,
                     resizable: true,
                     contentWidth: "500px",
@@ -187,6 +188,7 @@ sap.ui.define([
                     }),
                     beginButton: new sap.m.Button({
                         text: this.getView().getModel("i18n").getProperty("close"),
+                        type : "Reject",
                         press: function () {
                             oDialog.close();
                         }
@@ -490,6 +492,7 @@ sap.ui.define([
                         this.AA_onSearch();
                         this.FAA_Dialog.close();
                         this.byId("AA_id_AssestTable").removeSelections(true);
+                        MessageToast.show(this.i18nModel.getText("assetAssigned"))
                     } catch (e) {
                         this.closeBusyDialog();
                         MessageToast.show(this.i18nModel.getText("technicalError"));
