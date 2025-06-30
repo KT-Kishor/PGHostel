@@ -21,6 +21,7 @@ sap.ui.define(
                     try {
                         var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
                         if (!LoginFUnction) return;
+                        this.selectedContractID = null;
                         this._makeDatePickersReadOnly(["CI_id_InDate", "CI_id_PaybyInv"]);
                         this.i18nModel = this.getView().getModel('i18n').getResourceBundle();
                         this.CI_CommonID();
