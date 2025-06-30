@@ -145,37 +145,40 @@ sap.ui.define([
             const selectedDateObj = selectedDates[0]?.getStartDate();
 
             if (!selectedDateObj) {
-                MessageToast.show(this.i18nModel.getText("selectDateT") || "Please select a date first.");
+                MessageToast.show("Please select a date first.");
                 return;
             }
 
-            // Normalize selected date
-            const selectedDate = new Date(
+            // Format selected date as YYYY-MM-DD for comparison
+            const selectedDateStr = [
                 selectedDateObj.getFullYear(),
-                selectedDateObj.getMonth(),
-                selectedDateObj.getDate()
-            );
+                String(selectedDateObj.getMonth() + 1).padStart(2, '0'),
+                String(selectedDateObj.getDate()).padStart(2, '0')
+            ].join('-');
 
-            // Get full assignment data
-            const oAssignModel = this.getView().getModel("AssignModel");
-            const aAllAssignments = oAssignModel?.getData() || [];
+            // Get assignment data
+            const aAllAssignments = this.getView().getModel("AssignModel").getData() || [];
 
-            // Filter based on selected date falling within start and end date
+            // Filter assignments where selected date is between start and end dates
             const aFilteredAssignments = aAllAssignments.filter(oItem => {
                 if (!oItem.StartDate || !oItem.EndDate) return false;
 
-                const startDate = new Date(oItem.StartDate);
-                const endDate = new Date(oItem.EndDate);
+                // Convert assignment dates to YYYY-MM-DD format
+                const startDateStr = oItem.StartDate.split('T')[0];
+                const endDateStr = oItem.EndDate.split('T')[0];
 
-                startDate.setHours(0, 0, 0, 0);
-                endDate.setHours(0, 0, 0, 0);
-
-                return selectedDate >= startDate && selectedDate <= endDate;
+                // Compare date strings directly
+                return selectedDateStr >= startDateStr &&
+                    selectedDateStr <= endDateStr;
             });
 
-            // Set filtered data into a dedicated model
-            const oFilteredModel = new sap.ui.model.json.JSONModel(aFilteredAssignments);
-            this.getView().setModel(oFilteredModel, "FilteredAssignModel");
+            if (aFilteredAssignments.length === 0) {
+                MessageToast.show("No valid assignments found for the selected date");
+                return;
+            }
+
+            // Set filtered data
+            this.getView().setModel(new JSONModel(aFilteredAssignments), "FilteredAssignModel");
 
             // Open dialog
             if (!this.TSD_oDialog) {
