@@ -35,7 +35,7 @@ sap.ui.define(["./BaseController",
                 
                 this.branch = loginModel.getProperty("/BranchCode");
                 this.TSD_ReadTimesheetEntries(this.EmployeeID);
-                this.TS_onSearch();
+                this.T_onSearch();
                 this.TS_onClear();
             },
 
@@ -351,7 +351,9 @@ sap.ui.define(["./BaseController",
                     }
                 });
                 try {
-                    await this._fetchCommonData("Timesheet", "FilteredTimesheetModel", { EmployeeID: this.EmployeeID, ...params });
+                   var data =  await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID, ...params });
+                   var oModelData  = new JSONModel(data.data);
+                   this.getView().setModel(oModelData, "FilteredTimesheetModel");
                 } catch (error) {
                     sap.m.MessageToast.show(error.message || error.responseText);
                 } finally {
