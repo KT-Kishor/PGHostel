@@ -552,7 +552,7 @@
                                 <GenericTile
                                     visible="{= ${AppVisibilityModel>/RecruitmentApp} === '1' ? true : false}"
                                     class="sapUiMediumMargin"
-                                    header="{i18n>recruitment}"
+                                    header="{i18n>headerrecruitment}"
                                     press="TileV_Recruitment"
                                 >
                                     <TileContent unit="{i18n>assetFooter}">

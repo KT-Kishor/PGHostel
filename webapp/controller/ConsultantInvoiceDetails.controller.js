@@ -838,25 +838,32 @@ sap.ui.define(
                 },
 
                 CID_DateValidate: function (oEvent) {
+                    var oStartDate = oEvent.getSource().getDateValue(); // Get selected Start Date
                     var oView = this.getView();
-                    var oDatePicker = oEvent.getSource();
-                    var oDate = oDatePicker.getDateValue();
+                    var oEndDatePicker = oView.byId("CI_id_PaybyInv");
 
-                    if (oDate) {
-                        oDate.setHours(0, 0, 0, 0);
+                    if (oStartDate) {
+                        oEndDatePicker.setMinDate(oStartDate);  // Set min date for end date picker
+                        var oEndDate = new Date(oStartDate); // Calculate end date = start date + 30 days
+                        oEndDate.setDate(oEndDate.getDate() + 30);
 
-                        var oMaxDate = new Date(oDate);
-                        oMaxDate.setDate(oMaxDate.getDate() + 30);
+                        // Format for display in DatePicker
+                        var oLocale = sap.ui.getCore().getConfiguration().getFormatSettings().getFormatLocale();
+                        var oDateFormatDisplay = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd/MM/yyyy", locale: oLocale });
 
-                        var oValidUntil = oView.byId("CI_id_PaybyInv");
-                        oValidUntil.setMinDate(oDate);
-                        oValidUntil.setMaxDate(oMaxDate);
+                        // Format for model
+                        var oDateFormatModel = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+                        var sStartDateFormatted = oDateFormatModel.format(oStartDate);
+                        var sEndDateFormatted = oDateFormatModel.format(oEndDate);
+                        oEndDatePicker.setValue(oDateFormatDisplay.format(oEndDate));  // Set EndDate in the UI
 
-                        var oCurrentValidUntil = oValidUntil.getDateValue();
-                        if (!oCurrentValidUntil || oCurrentValidUntil < oDate || oCurrentValidUntil > oMaxDate) {
-                            oValidUntil.setDateValue(oMaxDate); // Reset to max if invalid
-                        }
+                        var oModel = oView.getModel("ConsultantInvoiceModel");
+                        oModel.setProperty("/InvoiceDate", sStartDateFormatted);
+                        oModel.setProperty("/PayBy", sEndDateFormatted);
                     }
+
+                    // Validate the start date field
+                    utils._LCvalidateDate(oEvent.getSource(), "ID");
                 },
 
                 CID_LastDate: function (oEvent) {
@@ -1145,6 +1152,8 @@ sap.ui.define(
                                     invoiceModel.setProperty("/SubTotal", consultantInvoicePayload.SubTotal);
                                     invoiceModel.setProperty("/SubTotalNotGST", consultantInvoicePayload.SubTotalNotGST);
                                     invoiceModel.setProperty("/TotalSum", consultantInvoicePayload.TotalSum);
+                                    invoiceModel.setProperty("/InvoiceDate", sInvoiceDate);
+                                    invoiceModel.setProperty("/PayBy", sPayByDate);
                                     invoiceData.InvoiceNo = response.InvoiceNo;
                                     var oDialog = new sap.m.Dialog({
                                         title: this.i18nModel.getText("success"),
@@ -1352,6 +1361,9 @@ sap.ui.define(
                                 oModel.setProperty("/GSTValid", false);
                                 oModel.setProperty("/CGSTSelected", oConsultantInvoiceModel.CGSTSelected);
                                 oModel.setProperty("/IGSTSelected", oConsultantInvoiceModel.IGSTSelected);
+                                oModel.setProperty("/InvoiceDate", sInvoiceDate);
+                                oModel.setProperty("/PayBy", sPayByDate);
+
 
                                 // Set view visibility and table mode
                                 var oVisiModel = this.getView().getModel("visiablityPlay");
