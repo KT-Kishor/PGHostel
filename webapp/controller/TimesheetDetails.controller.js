@@ -44,7 +44,7 @@ sap.ui.define([
             if (this.sArg !== "Timesheet") {
                 await this.readCallTimesheet();
                 const oData = this.getView().getModel("newModel").getData();
-                this.getView().getModel("newModel").setProperty("/Comment", oData.comments[oData.comments.length-1].Comment);
+                this.getView().getModel("newModel").setProperty("/Comment", oData.comments[oData.comments.length - 1].Comment);
 
                 const isSubmitted = oData.Status === "Submitted" || oData.Status === "Approved";
                 oViewModel.setProperty("/isUpdate", !isSubmitted); // hide edit button if submitted
@@ -204,50 +204,31 @@ sap.ui.define([
 
         TSD_onSubmit: async function () {
             try {
-                await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
-                // Step 1: Validate mandatory fields
-                const isValid = (
-                    utils._LCvalidateMandatoryField(this.byId("TSD_id_Assignment"), "ID") &&
-                    utils._LCvalidateTimeLimit(this.byId("TSD_id_TimeHours"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.byId("TSD_id_EmpComment"), "ID")
-                );
-                if (!isValid) {
-                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                if (!this._validateTimesheetFields(true)) return;
+
+                const oCalendar = this.byId("calendar").getSelectedDates();
+                const selectedDateObj = oCalendar[0]?.getStartDate();
+                if (!selectedDateObj) {
+                    MessageToast.show("Please select a date.");
                     return;
                 }
 
-                // Step 2: Validate date selected
-                const oCalendar = this.getView().byId("calendar").getSelectedDates();
-                const selectedDateObj = oCalendar[0]?.getStartDate();
-                if (!selectedDateObj) {
-                    MessageToast.show(this.i18nModel.getText("selectDateT"));
-                    return;
-                }
-                // Step 3: Get entered and actual hours
-                const sEnteredHours = Number(this.byId("TSD_id_TimeHours").getValue());
+                const formattedDate = [
+                    selectedDateObj.getFullYear(),
+                    String(selectedDateObj.getMonth() + 1).padStart(2, '0'),
+                    String(selectedDateObj.getDate()).padStart(2, '0')
+                ].join('-');
+
                 const oData = this.getView().getModel("newModel")?.getData() || {};
-                const sActualHours = Number(oData?.ActualHours);
-                if (isNaN(sEnteredHours) || isNaN(sActualHours)) {
-                    MessageToast.show("Invalid hour value.");
-                    return;
-                }
-                if (sEnteredHours > sActualHours) {
-                    MessageToast.show(this.i18nModel.getText("hoursExceedError") || "Entered hours cannot exceed actual assignment hours.");
-                    return;
-                }
-                // Step 4: Prepare payload (use local date parts, not toISOString)
-                const localDateStr = [selectedDateObj.getFullYear(),
-                String(selectedDateObj.getMonth() + 1).padStart(2, '0'),
-                String(selectedDateObj.getDate()).padStart(2, '0')].join('-');
                 const oPayload = {
                     TaskID: oData.TaskID,
                     TaskName: oData.TaskName,
                     EmployeeID: oData.EmployeeID,
                     EmployeeName: oData.EmployeeName,
-                    ManagerName: this.getView().getModel("EmployeeModel").getData()[0].ManagerName,
-                    ManagerID: this.getView().getModel("EmployeeModel").getData()[0].ManagerID,
-                    HoursWorked: sEnteredHours.toString(),
-                    Date: localDateStr,
+                    ManagerName: oData.ManagerName,
+                    ManagerID: oData.ManagerID,
+                    HoursWorked: Number(this.byId("TSD_id_TimeHours").getValue()).toString(),
+                    Date: formattedDate,
                     Month: selectedDateObj.toLocaleString('default', { month: 'long' }),
                     Year: selectedDateObj.getFullYear(),
                     Day: selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' }),
@@ -255,20 +236,14 @@ sap.ui.define([
                     comments: oData.Comment
                 };
 
-                // Step 5: Submit to backend
                 this.getBusyDialog();
-                try {
-                    await this.ajaxCreateWithJQuery("Timesheet", { data: oPayload });
-                    MessageToast.show(this.i18nModel.getText("timesheetSuccess"));
-                    this.clearTimesheetForm();
-                } catch (backendErr) {
-                    MessageToast.show(backendErr.message || backendErr.responseText);
-                } finally {
-                    this.closeBusyDialog();
-                }
+                await this.ajaxCreateWithJQuery("Timesheet", { data: oPayload });
+                MessageToast.show(this.i18nModel.getText("timesheetSuccess") || "Timesheet submitted!");
+                this.clearTimesheetForm();
             } catch (err) {
+                MessageToast.show(err.message || "Submission error.");
+            } finally {
                 this.closeBusyDialog();
-                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             }
         },
         // Initialize calendar legend
@@ -447,50 +422,92 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
-        TSD_onToggleEdit: function () {
-            var oViewModel = this.getView().getModel("viewModel");
-            var isEditing = oViewModel.getProperty("/isEditing");
-            if (isEditing) {
-                // Save action
-                this.TSD_onUpdate();
+        TSD_onToggleEdit: async function () {
+            const oViewModel = this.getView().getModel("viewModel");
+
+            if (oViewModel.getProperty("/isEditing")) {
+                await this.TSD_onUpdate();
                 oViewModel.setProperty("/isEditing", false);
             } else {
-                // Switch to edit mode
                 oViewModel.setProperty("/isEditing", true);
+
+                // Get ActualHours from AssignModel
+                const oAssignData = this.getView().getModel("AssignModel")?.getData() || [];
+                const oModelData = this.getView().getModel("newModel")?.getData() || {};
+                const match = oAssignData.find(a => a.TaskID === oModelData.TaskID);
+                const hrs = match?.HoursWorked;
+
+                this.getView().getModel("newModel").setProperty("/ActualHours", hrs || 0);
+                this.byId("idTextActHour").setText("Actual Hours: " + (hrs ?? "Not available"));
             }
         },
         TSD_onUpdate: async function () {
             try {
-                this.getBusyDialog();
-                var oViewModel = this.getView().getModel("viewModel");
-                var oModel = this.getView().getModel("newModel").getData();
-                delete oModel.comments;
-                oModel = {
-                    "data": oModel,
-                    "filters": {
-                        "SrNo": this.sArg
-                    }
-                };
-                // AJAX call for updating the data
-                await this.ajaxUpdateWithJQuery("Timesheet", oModel).then((oData) => {
-                    if (oData.success) {
-                        this.closeBusyDialog();
-                        oViewModel.setProperty("/editable", false);
-                        oViewModel.setProperty("/isEditMode", true);
-                        oViewModel.setProperty("/isVisiable", true);
-                        oViewModel.setProperty("editBut", true);
-                        this.getView().getModel("newModel").refresh(true);
-                    }
-                }).catch((error) => {
+                if (!this._validateTimesheetFields(false)) {
                     this.closeBusyDialog();
-                    MessageToast.show(error.message || error.responseText);
-                });
-            } catch (error) {
+                    return;
+                }
+
+                this.getBusyDialog();
+                let oData = this.getView().getModel("newModel").getData();
+                delete oData.comments;
+
+                const oPayload = {
+                    data: oData,
+                    filters: { SrNo: this.sArg }
+                };
+
+                await this.ajaxUpdateWithJQuery("Timesheet", oPayload);
+                MessageToast.show(this.i18nModel.getText("updateSuccess") || "Update successful.");
+
+                const oViewModel = this.getView().getModel("viewModel");
+                oViewModel.setProperty("/isEditing", false);
+                oViewModel.setProperty("/isEditMode", true);
+                oViewModel.setProperty("/editable", false);
+                oViewModel.setProperty("/isVisiable", true);
+                oViewModel.setProperty("/editBut", true);
+                this.getView().getModel("newModel").refresh(true);
+
+            } catch (err) {
+                MessageToast.show(err.message || this.i18nModel.getText("technicalError") || "Update failed.");
+            } finally {
                 this.closeBusyDialog();
-                MessageToast.show(this.i18nModel.getText("technicalError"));
             }
         },
+        _validateTimesheetFields: function (isCreateMode = true) {
+            const oComment = this.byId("TSD_id_EmpComment");
+            const oHours = this.byId("TSD_id_TimeHours");
+            const oAssignment = this.byId("TSD_id_Assignment");
+            const oData = this.getView().getModel("newModel")?.getData() || {};
+            const aAssigns = this.getView().getModel("AssignModel")?.getData() || [];
 
+            // Basic field validation
+            if (!utils._LCvalidateMandatoryField(oAssignment, "ID")) return false;
+            if (!utils._LCvalidateTimeLimit(oHours, "ID")) return false;
+            if (!utils._LCvalidateMandatoryField(oComment, "ID")) return false;
+
+            const sEnteredHours = Number(oHours.getValue());
+            let sActualHours = Number(oData.ActualHours);
+
+            // Fallback if ActualHours not populated
+            if (!sActualHours || sActualHours === 0) {
+                const match = aAssigns.find(a => a.TaskID === oData.TaskID);
+                sActualHours = Number(match?.HoursWorked || 0);
+                this.getView().getModel("newModel").setProperty("/ActualHours", sActualHours);
+            }
+
+            if (isNaN(sEnteredHours) || isNaN(sActualHours)) {
+                MessageToast.show("Invalid hour value.");
+                return false;
+            }
+
+            if (sEnteredHours > sActualHours) {
+                MessageToast.show(this.i18nModel.getText("hoursExceedError") || "Entered hours cannot exceed assigned hours.");
+                return false;
+            }
+
+            return true;
+        }
 
     });
 });

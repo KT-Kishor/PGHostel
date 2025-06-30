@@ -25,17 +25,16 @@ sap.ui.define(["./BaseController",
                 const oViewModel = new JSONModel();
                 oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
                 this.getView().setModel(oViewModel, "viewModel");
-                
+
                 // Add initial button states
                 oViewModel.setProperty("/canSubmit", false);
                 oViewModel.setProperty("/canDelete", false);
-                
+
                 var loginModel = this.getOwnerComponent().getModel("LoginModel");
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
-                
+
                 this.branch = loginModel.getProperty("/BranchCode");
                 this.TSD_ReadTimesheetEntries(this.EmployeeID);
-                this.T_onSearch();
                 this.TS_onClear();
             },
 
@@ -351,9 +350,9 @@ sap.ui.define(["./BaseController",
                     }
                 });
                 try {
-                   var data =  await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID, ...params });
+                    var data =  await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID, ...params });
                    var oModelData  = new JSONModel(data.data);
-                   this.getView().setModel(oModelData, "FilteredTimesheetModel");
+                    this.getView().setModel(oModelData, "FilteredTimesheetModel");
                 } catch (error) {
                     sap.m.MessageToast.show(error.message || error.responseText);
                 } finally {
