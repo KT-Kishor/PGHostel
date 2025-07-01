@@ -17,7 +17,6 @@ sap.ui.define(
         var LoginFunction = await this.commonLoginFunction("HrQuotation");
         if (!LoginFunction) return;
         this.getBusyDialog();
-        this._ViewDatePickersReadOnly(["HQ_id_Quotaiondate"], this.getView())
         // Initialize filters model if it doesn't exist
         if (!this.getView().getModel("/filters")) {
           this.getView().setModel(new JSONModel({
@@ -40,8 +39,6 @@ sap.ui.define(
         // Update filters model
         this.getView().getModel("filters").setProperty("/DateFrom", sDateFrom);
         this.getView().getModel("filters").setProperty("/DateTo", sDateTo);
-
-        this._ViewDatePickersReadOnly(["HQ_id_Quotaiondate"], this.getView());
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
         // FIRST: Fetch data with financial year filter
@@ -115,15 +112,6 @@ sap.ui.define(
           // Format dates for filtering
           var sDateFrom = dateFrom ? this._formatDateForBackend(dateFrom) : null;
           var sDateTo = dateTo ? this._formatDateForBackend(dateTo) : null;
-
-          // If no date range is selected, use financial year as default
-          // if (!sDateFrom || !sDateTo) {
-          //   var fyDates = this._getFinancialYearDates();
-          //   sDateFrom = this._formatDateForBackend(fyDates.start);
-          //   sDateTo = this._formatDateForBackend(fyDates.end);
-          //   oDateRange.setDateValue(fyDates.start);
-          //   oDateRange.setSecondDateValue(fyDates.end);
-          // }
 
           // Update filters model
           var oFiltersModel = this.getView().getModel("filters");

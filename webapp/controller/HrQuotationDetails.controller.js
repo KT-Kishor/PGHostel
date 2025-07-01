@@ -17,10 +17,10 @@ sap.ui.define(
         this.getRouter().getRoute("RouteHrQuotationDetails").attachMatched(this._onRouteMatched, this);
       },
       _onRouteMatched: async function (oEvent) {
-        var LoginFunction = await this.commonLoginFunction("HrQuotation");
-        if (!LoginFunction) return;
         var oArgs = oEvent.getParameter("arguments");
         var sQuotationNo = decodeURIComponent(oArgs.sQuotationNo);
+        var LoginFunction = await this.commonLoginFunction("HrQuotation");
+        if (!LoginFunction) return;
         this.getBusyDialog();
         this._ViewDatePickersReadOnly(["HQD_id_Quotation", "HQD_id_QuotationValid"], this.getView())
         this.scrollToSection("HQD_id_QuotationDetailsPage", "HQD_id_Section");
@@ -113,7 +113,7 @@ sap.ui.define(
             // If CGST/SGST is selected, use Percentage
             if (cgstSelected && !igstSelected) {
               percentageToShow = Percentage;
-            }else if (igstSelected && !cgstSelected) {
+            } else if (igstSelected && !cgstSelected) {
               percentageToShow = Percentage;
             }
             else if (cgstSelected && igstSelected) {
@@ -391,6 +391,7 @@ sap.ui.define(
           var finalItemTotal = iItemTotal - iDiscount;
           oItem.Total = parseFloat(finalItemTotal.toFixed(2));
 
+
           if (oItem.GSTCalculation === "Yes" && bIsINR) {
             subTotalTaxable += oItem.Total;
             oItem.SAC = "998314";
@@ -454,7 +455,7 @@ sap.ui.define(
 
         var oModel = this.getView().getModel("SingleCompanyModel");
         var oQuotationModel = this.getView().getModel("QuotationModel");
-
+        this.getView().byId("HQD_id_Percentage").setValueState(sap.ui.core.ValueState.None);
         oModel.setProperty("/CGSTSelected", true);
         oModel.setProperty("/IGSTSelected", false);
         // Update visibility for CGST/SGST and hide IGST
@@ -465,12 +466,14 @@ sap.ui.define(
 
       onSelectIGST: function () {
         var oView = this.getView();
+
         // Uncheck CGST/SGST 
         oView.byId("HQD_id_CheckboxCGS").setSelected(false);
 
         // Access both models
         var oCompanyModel = oView.getModel("SingleCompanyModel");
         var oQuotationModel = oView.getModel("QuotationModel");
+        oView.byId("HQD_id_Percentage").setValueState(sap.ui.core.ValueState.None);
 
         oQuotationModel.setProperty("/CGSTSelected", false);
         oQuotationModel.setProperty("/IGSTSelected", true);
@@ -531,10 +534,6 @@ sap.ui.define(
             oModel.setProperty("/ValidUntil", new Date(oNewValidDate.getTime()));
           }
         }
-      },
-
-      HQD_LastDate: function (oEvent) {
-        utils._LCvalidateDate(oEvent)
       },
 
       HQD_onNameLiveChange: function (oEvent) {
@@ -681,6 +680,7 @@ sap.ui.define(
 
         const isINR = oCurrency1 === "INR";
         oView.getModel("QuotationModel").getData()
+        const MainModel = that.getView().getModel("SingleCompanyModel");
         // Perform other validations
         const bIsValid =
           utils._LCvalidateDate(this.byId("HQD_id_Quotation"), "ID") &&
@@ -714,19 +714,18 @@ sap.ui.define(
 
         // Validate all item descriptions are filled
         const aItemArray1 = oQuotationModel.getProperty("/QuotationItemModel") || [];
-        const bAllDescriptionsFilled = aItemArray1.every(item =>
-          item.Description && item.Description.trim().length > 0 && item.UnitPrice && parseFloat(item.UnitPrice) > 0
-        );
+        if (aItemArray1.length === 0) {
+          MessageToast.show(this.i18nModel.getText("companyTableValidation"));
+          return false;
+        }
+        for (let i = 0; i < aItemArray1.length; i++) {
+          const item = aItemArray1[i];
+          if (!item.Description || !item.UnitPrice) {
+            sap.m.MessageBox.error(`Please fill all mandatory fields (Description, UnitPrice) in item row ${i + 1}`);
+            return false;
+          }
+        }
 
-        if (!bAllDescriptionsFilled) {
-          MessageToast.show(this.i18nModel.getText("quotaionMsgDes"));
-          return;
-        }
-        const fTotalSum = parseFloat(oQuotationData.TotalSum || "0");
-        if (isNaN(fTotalSum) || fTotalSum <= 0) {
-          MessageToast.show(this.i18nModel.getText("quotaionTotalmsg"));
-          return;
-        }
         const tmpDiv = document.createElement("div");
         tmpDiv.innerHTML = oNotesHTML;
         if (!tmpDiv.textContent.trim()) {
@@ -735,11 +734,14 @@ sap.ui.define(
         }
         // Format dates
         const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+        const sQuotationDate = oDateFormat.format(this.byId("HQD_id_Quotation").getDateValue());
+        const sValidUntilDate = oDateFormat.format(this.byId("HQD_id_QuotationValid").getDateValue());
+
         const oCurrency = this.byId("HQD_id_Curency").getSelectedKey();
 
         const data = {
-          Date: oDateFormat.format(this.byId("HQD_id_Quotation").getDateValue()),
-          ValidUntil: oDateFormat.format(this.byId("HQD_id_QuotationValid").getDateValue()),
+          Date: sQuotationDate,
+          ValidUntil: sValidUntilDate,
           CompanyName: this.byId("HQD_id_InputCompanyName").getValue(),
           CompanyMobileNo: this.byId("HQD_id_InputCompanyMobileNo").getValue(),
           CompanyEmailID: this.byId("HQD_id_CompanyEmailID").getValue(),
@@ -793,6 +795,8 @@ sap.ui.define(
           if (response.success === true) {
             oView.getModel("SingleCompanyModel").setProperty("/QuotationNo", response.QuotationNo);
             oView.getModel("SingleCompanyModel").setProperty("/TotalSum", data.TotalSum);
+             MainModel.setProperty("/Date", sQuotationDate);
+             MainModel.setProperty("/ValidUntil", sValidUntilDate);
             // Force model updates before generating PDF
             oView.getModel("SingleCompanyModel").updateBindings(true);
             oView.getModel("QuotationModel").updateBindings(true);
@@ -1215,9 +1219,14 @@ sap.ui.define(
         if (finalDiscount > itemTotal) {
           finalDiscount = itemTotal;
         }
-        // Set final values to model
-        oModel.setProperty(sPath + "/Discount", finalDiscount);
+        // Set final values to model  
+        oModel.setProperty(sPath + "/Discount", finalDiscount); // Store as absolute value
         oModel.setProperty(sPath + "/IsDiscountPercentage", false); // Already converted to absolute value
+        if (isPercentage) {
+          oInput.setValue(parsedDiscount.toFixed(2) + "%");
+        } else {
+          oInput.setValue(finalDiscount.toFixed(2));
+        }
 
         // Update input with actual discount value (not percentage)
         oInput.setValue(finalDiscount);
@@ -1250,7 +1259,6 @@ sap.ui.define(
             aItems.splice(iIndex, 1);
             oModel.setProperty("/QuotationItemModel", aItems);
             that.updateTotalAmount();
-            MessageToast.show(that.i18nModel.getText("msgQuotationitemdelete"));
             return;
           }
 
@@ -1413,7 +1421,7 @@ sap.ui.define(
           "HQD_id_QuotationValid", "HQD_id_InputCompanyName", "HQD_id_InputCompanyMobileNo",
           "HQD_id_CompanyEmailID", "HQD_id_Country", "HQD_id_InputCompanyAddress", "HQD_id_CompGSTNO",
           "HQD_id_Percentage", "HQD_id_Curency", "HQD_id_CustomerName", "HQD_id_CustomerEmailID",
-          "HQD_id_InputCustomerMobileNo", "HQD_id_InputCustomerAddress", "HQD_id_InputCustomerGSTNO", "HQD_id_mobileNumber", "HQD_id_CustomerNumberSTD", "HQD_id_BranchCode"
+          "HQD_id_InputCustomerMobileNo", "HQD_id_InputCustomerAddress", "HQD_id_InputCustomerGSTNO", "HQD_id_mobileNumber", "HQD_id_CustomerNumberSTD", "HQD_id_BranchCode", "HQD_id_UnitPriceInput", "HQD_id_DiscountInput", "HQD_id_DaysInput"
         ];
 
         fields.forEach(id => {
@@ -1594,15 +1602,17 @@ sap.ui.define(
           const filtres = {
             QuotationNo: sQuotationNo
           };
-
           const aItemArray2 = oView.getModel("QuotationModel").getProperty("/QuotationItemModel") || [];
-          const bAllDescriptionsFilled1 = aItemArray2.every(item =>
-            item.Description && item.Description.trim().length > 0 && item.UnitPrice && parseFloat(item.UnitPrice) > 0
-          );
-
-          if (!bAllDescriptionsFilled1) {
-            MessageToast.show("Each item must have a description.");
-            return;
+          if (aItemArray2.length === 0) {
+            MessageToast.show(this.i18nModel.getText("companyTableValidation"));
+            return false;
+          }
+          for (let i = 0; i < aItemArray2.length; i++) {
+            const item = aItemArray2[i];
+            if (!item.Description || !item.UnitPrice) {
+              sap.m.MessageBox.error(`Please fill all mandatory fields (Description, UnitPrice) in item row ${i + 1}`);
+              return false;
+            }
           }
           const Items = aItemArray2.map((item) => {
             const oFilters = {
@@ -1639,7 +1649,10 @@ sap.ui.define(
           try {
             const response = await this.ajaxUpdateWithJQuery("Quotation", payload);
             this.closeBusyDialog();
-            if (response.success === true) {
+            if (response.success === true) {  
+              oView.byId("HQD_id_DaysInput").setValueState(sap.ui.core.ValueState.None);
+              oView.byId("HQD_id_UnitPriceInput").setValueState(sap.ui.core.ValueState.None);
+              oView.byId("HQD_id_DiscountInput").setValueState(sap.ui.core.ValueState.None);
               MessageToast.show(`Quotation updated successfully!`);
               oModel.setProperty("/editable", false); // Exit edit mode
               oModel.setProperty("/merge", true); // Exit edit mode

@@ -71,7 +71,6 @@
                                         <m:DatePicker
                                             displayFormat="dd/MM/yyyy"
                                             valueFormat="dd/MM/yyyy"
-                                            change="HQD_LastDate"
                                             valueStateText="{i18n>invalidDate}"
                                             value="{path:'SingleCompanyModel>/ValidUntil' ,formatter:'.Formatter.formatDate'}"
                                             editable="{visiablityPlay>/editable}"
@@ -205,7 +204,7 @@
     value="{SingleCompanyModel>/Percentage}"
     change="HQD_onPercentageChange"
     editable="{SingleCompanyModel>/gstEditable}"
-    maxLength="3"
+    maxLength="5"
   
     valueStateText="{i18n>msaAmountMess}"
     id="HQD_id_Percentage"
@@ -526,14 +525,16 @@
       <core:Item key="Yes" text="{i18n>quotaionyes}" />
       <core:Item key="No" text="{i18n>quotaionno}" />
     </m:ComboBox>
+   
 
     <!-- Days (Column 5) -->
      <m:Input
       value="{QuotationModel>Days}"
       editable="{visiablityPlay>/editable}"
       change="HQD_onInputChange"
-      maxLength="18"
+      maxLength="15"
       textAlign="End"
+      id="HQD_id_DaysInput"
     />
 
     <!-- UnitPrice (Column 6) -->
@@ -542,8 +543,9 @@
       editable="{visiablityPlay>/editable}"
       change="HQD_onInputChange"
       valueStateText="{i18n>enterUnitPrice}"
-      maxLength="18"
+      maxLength="15"
       textAlign="End"
+      id="HQD_id_UnitPriceInput"
     />
 
     <!-- Discount (Column 7) -->
@@ -557,6 +559,7 @@
       showValueHelp="true"
 	  valueHelpRequest="HQD_onDiscountInfoPress" 
       valueHelpIconSrc="sap-icon://message-information" 
+      id="HQD_id_DiscountInput"
     />
 
     <!-- Total (Column 8) -->
