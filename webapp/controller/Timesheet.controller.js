@@ -54,7 +54,7 @@ sap.ui.define(["./BaseController",
                     this.getBusyDialog();
                     const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID });
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getOwnerComponent().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
+                    this.getView().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
                     this.filterTimesheetForCurrentWeek(); // <-- Filter for current week
                     this.closeBusyDialog();
                 } catch (error) {
@@ -78,7 +78,7 @@ sap.ui.define(["./BaseController",
                 oEndDate.setHours(23, 59, 59, 999);
 
                 // Get all timesheet data
-                var oTimesheetModel = this.getOwnerComponent().getModel("FilteredTimesheetModel");
+                var oTimesheetModel = this.getView().getModel("FilteredTimesheetModel");
                 var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
 
                 // Filter entries for the current week
@@ -103,7 +103,7 @@ sap.ui.define(["./BaseController",
                     oSelectedDate.setHours(0, 0, 0, 0);
 
                     // Get all timesheet data
-                    var oTimesheetModel = this.getOwnerComponent().getModel("FilteredTimesheetModel");
+                    var oTimesheetModel = this.getView().getModel("FilteredTimesheetModel");
                     var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
 
                     // Filter for the selected date

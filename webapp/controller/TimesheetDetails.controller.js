@@ -149,38 +149,26 @@ sap.ui.define([
                 return;
             }
 
-            // Format selected date as YYYY-MM-DD for comparison
+            // Format selected date as YYYY-MM-DD (inline formatting)
             const selectedDateStr = [
                 selectedDateObj.getFullYear(),
                 String(selectedDateObj.getMonth() + 1).padStart(2, '0'),
                 String(selectedDateObj.getDate()).padStart(2, '0')
             ].join('-');
-
             // Get assignment data
-            const aAllAssignments = this.getView().getModel("AssignModel").getData() || [];
-
-            // Filter assignments where selected date is between start and end dates
+            const aAllAssignments = this.getView().getModel("AssignModel")?.getData() || [];
+            // Filter assignments where selected date is between StartDate and EndDate (inclusive)
             const aFilteredAssignments = aAllAssignments.filter(oItem => {
                 if (!oItem.StartDate || !oItem.EndDate) return false;
-
-                // Convert assignment dates to YYYY-MM-DD format
-                const startDateStr = oItem.StartDate.split('T')[0];
-                const endDateStr = oItem.EndDate.split('T')[0];
-
-                // Compare date strings directly
-                return selectedDateStr >= startDateStr &&
-                    selectedDateStr <= endDateStr;
+                const startDateStr = oItem.StartDate.split("T")[0];
+                const endDateStr = oItem.EndDate.split("T")[0];
+                return selectedDateStr >= startDateStr && selectedDateStr <= endDateStr;
             });
-
             if (aFilteredAssignments.length === 0) {
-                MessageToast.show("No valid assignments found for the selected date");
+                MessageToast.show("No valid assignments found for the selected date.");
                 return;
             }
-
-            // Set filtered data
-            this.getView().setModel(new JSONModel(aFilteredAssignments), "FilteredAssignModel");
-
-            // Open dialog
+            // Load the fragment and assign the filtered model
             if (!this.TSD_oDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.kt.com.minihrsolution.fragment.TimesheetTask",
@@ -188,9 +176,12 @@ sap.ui.define([
                 }).then(function (oDialog) {
                     this.TSD_oDialog = oDialog;
                     this.getView().addDependent(this.TSD_oDialog);
+                    // Set model after fragment loads
+                    this.TSD_oDialog.setModel(new sap.ui.model.json.JSONModel(aFilteredAssignments), "AssignModel");
                     this.TSD_oDialog.open();
                 }.bind(this));
             } else {
+                this.TSD_oDialog.setModel(new sap.ui.model.json.JSONModel(aFilteredAssignments), "AssignModel");
                 this.TSD_oDialog.open();
             }
         },
