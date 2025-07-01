@@ -156,7 +156,9 @@ sap.ui.define([
             const oTable = this.byId("TSA_id_Table");
             const oSelectedItems = oTable.getSelectedItems();
             const sRemark = sap.ui.getCore().byId("MIF_id_remark").getValue();
-            if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MIF_id_remark"), "ID")) {
+
+            // Call live change function first
+            if (!this.MIF_liveChangeForMangerComments()) {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
@@ -171,7 +173,6 @@ sap.ui.define([
                     }
                 };
             });
-            //aPayload.comments = sRemark ;
             const finalPayload = {
                 comments: sRemark,
                 data: aPayload
@@ -193,11 +194,23 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
+        MIF_liveChangeForMangerComments() {
+            const input = sap.ui.getCore().byId("MIF_id_remark");
+            if (!input.getValue()) {
+                input.setValueStateText(this.getView().getModel('i18n').getResourceBundle().getText("commentsValueState"));
+                input.setValueState("Error");
+                return false;
+            }
+            input.setValueState("None");
+            return true;
+        },
 
         MIF_onPressClose: function () {
             if (this._oManagerRemarkDialog) {
                 this._oManagerRemarkDialog.close();
             }
+            //removal table selection
+            this.byId("TSA_id_Table").removeSelections(true); // true to suppress selection change event
         },
 
         onPressback: function () {
