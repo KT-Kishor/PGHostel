@@ -133,10 +133,10 @@ sap.ui.define([
                     { label: "Assigned By Name", property: "AssignedByEmployeeName", type: "string" },
                     { label: "Assigned By ID", property: "AssignedByEmployeeID", type: "string" },
                     { label: "Assign Branch", property: "AssignBranch", type: "string" },
-                    { label: "Assigned Date", property: "AssignedDate", type: "Date" },
+                    { label: "Assigned Date", property: "AssignedDate", type: "string" },
                     { label: "Asset Value", property: "AssetValue", type: "Number" },
                     { label: "Status", property: "Status", type: "string" },
-                    { label: "Return Date", property: "ReturnDate", type: "Date" },
+                    { label: "Return Date", property: "ReturnDate", type: "string" },
                     { label: "Return Branch", property: "ReturnBranch", type: "string" },
                     { label: "Returned Employee ID", property: "ReturnEmpID", type: "string" },
                     { label: "Returned Employee Name", property: "ReturnEmpName", type: "string" },
@@ -145,15 +145,15 @@ sap.ui.define([
             },
 
             AA_onDownload: function () {
-                const oModel = this.byId("AA_id_AssestTable")
-                    .getModel("assetModel")
-                    .getData();
+                const oModel = this.byId("AA_id_AssestTable").getModel("assetModel").getData();
                 if (!oModel || oModel.length === 0) {
                     MessageToast.show(this.i18nModel.getText("noData"));
                     return;
                 }
                 const adjustedData = oModel.map((item => ({
-                    ...item, ReturnDate: (item.Status === "Assigned" || item.ReturnDate === "00-01-1900" || item.ReturnDate === "1900-01-01") ? "" : item.ReturnDate
+                    ...item,
+                    AssignedDate: Formatter.formatDate(item.AssignedDate),
+                    ReturnDate: (item.Status === "Assigned") ? "" : Formatter.formatDate(item.ReturnDate)
                 })));
                 const aCols = this.createTableSheet();
                 const oSettings = {
@@ -178,7 +178,7 @@ sap.ui.define([
                     </div>`;
                 var oDialog = new sap.m.Dialog({
                     title: this.getView().getModel("i18n").getProperty("comments"),
-                    type :  sap.m.DialogType.Message,
+                    type: sap.m.DialogType.Message,
                     draggable: true,
                     resizable: true,
                     contentWidth: "500px",
@@ -188,7 +188,7 @@ sap.ui.define([
                     }),
                     beginButton: new sap.m.Button({
                         text: this.getView().getModel("i18n").getProperty("close"),
-                        type : "Reject",
+                        type: "Reject",
                         press: function () {
                             oDialog.close();
                         }
@@ -596,7 +596,7 @@ sap.ui.define([
                         // var role = this.oLoginModel.getProperty("/Role");               
                         var empData = this.getView().getModel("EmpModel").getData();
                         let loginModel = this.getView().getModel("LoginModel").getData();
-                        var filteredEmp = empData.filter(emp =>(emp.Role.includes("Admin") ||
+                        var filteredEmp = empData.filter(emp => (emp.Role.includes("Admin") ||
                             emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
 
                         var oModel = new JSONModel(filteredEmp);
