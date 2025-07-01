@@ -47,35 +47,44 @@ sap.ui.define([
                 this.getView().getModel("newModel").setProperty("/Comment", oData.comments[oData.comments.length - 1].Comment);
 
                 const isSubmitted = oData.Status === "Submitted" || oData.Status === "Approved";
-                oViewModel.setProperty("/isUpdate", !isSubmitted); // hide edit button if submitted
-                // oViewModel.setProperty("/isUpdate", true);
+                oViewModel.setProperty("/isUpdate", !isSubmitted);
                 oViewModel.setProperty("/isCreate", false);
-                oViewModel.setProperty("/isEditing", false); // Start in view mode for edit
+                oViewModel.setProperty("/isEditing", false);
                 oViewModel.setProperty("/isCalendarEnabled", false);
-                oViewModel.setProperty("/pageTitle", "Edit Timesheet Entry");
+
+                // i18n page title
+                oViewModel.setProperty("/pageTitle", this.i18nModel.getText("pageTitleEdit"));
+
+                // format date
                 var editDate = this.getView().getModel("newModel").getProperty("/Date");
-                if (editDate) {
-                    if (editDate.includes("T")) {
-                        editDate = editDate.split("T")[0];
-                    }
-                    var parts = editDate.split("-");
-                    if (parts.length === 3) {
-                        editDate = parts[2] + "/" + parts[1] + "/" + parts[0];
-                    }
+                if (editDate && editDate.includes("T")) {
+                    editDate = editDate.split("T")[0];
                 }
-                oViewModel.setProperty("/formTitle", "Edit data for " + editDate);
+                var parts = editDate.split("-");
+                if (parts.length === 3) {
+                    editDate = parts[2] + "/" + parts[1] + "/" + parts[0];
+                }
+
+                // i18n form title
+                oViewModel.setProperty("/formTitle", this.i18nModel.getText("formTitleEdit", [editDate]));
+
             } else {
                 oViewModel.setProperty("/isUpdate", false);
                 oViewModel.setProperty("/isCreate", true);
                 oViewModel.setProperty("/isEditing", true);
                 oViewModel.setProperty("/isCalendarEnabled", true);
-                oViewModel.setProperty("/pageTitle", "Create Timesheet Entry");
+
+                // i18n page title
+                oViewModel.setProperty("/pageTitle", this.i18nModel.getText("pageTitleCreate"));
+
                 var today = new Date();
                 var todayStr = String(today.getDate()).padStart(2, '0') + "/" +
                     String(today.getMonth() + 1).padStart(2, '0') + "/" +
                     today.getFullYear();
-                oViewModel.setProperty("/formTitle", "Create entry for " + todayStr);
-                // Set empty newModel for create
+
+                // i18n form title
+                oViewModel.setProperty("/formTitle", this.i18nModel.getText("formTitleCreate", [todayStr]));
+
                 const emptyData = {
                     TaskID: "",
                     TaskName: "",
@@ -145,7 +154,7 @@ sap.ui.define([
             const selectedDateObj = selectedDates[0]?.getStartDate();
 
             if (!selectedDateObj) {
-                MessageToast.show("Please select a date first.");
+                MessageToast.show(this.i18nModel.getText("selectDateT"));
                 return;
             }
 
@@ -165,7 +174,7 @@ sap.ui.define([
                 return selectedDateStr >= startDateStr && selectedDateStr <= endDateStr;
             });
             if (aFilteredAssignments.length === 0) {
-                MessageToast.show("No valid assignments found for the selected date.");
+                MessageToast.show(this.i18nModel.getText("noAssignment"));
                 return;
             }
             // Load the fragment and assign the filtered model
@@ -204,7 +213,7 @@ sap.ui.define([
                 const oCalendar = this.byId("calendar").getSelectedDates();
                 const selectedDateObj = oCalendar[0]?.getStartDate();
                 if (!selectedDateObj) {
-                    MessageToast.show("Please select a date.");
+                    MessageToast.show(this.i18nModel.getText("selectDateT"));
                     return;
                 }
 
@@ -243,38 +252,50 @@ sap.ui.define([
         },
         // Initialize calendar legend
         onMarkCalendarDates: function () {
-            var that = this;
-            this.oDatePicker.removeAllSpecialDates();
-            var holidays = that.getView().getModel("HolidayModel").getData();
-            var holidayMap = new Map(holidays.map(function (holiday) {
-                return [new Date(holiday.Date).toDateString(), holiday.Name];
-            }));
-            var yearStart = new Date(new Date().getFullYear(), 0, 1);
-            var yearEnd = new Date(new Date().getFullYear(), 11, 31);
-            var today = new Date();
-            for (var d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
-                var day = d.getDay();
-                var isWeekend = (day === 0 || day === 6);
-                var holidayName = holidayMap.get(d.toDateString());
-                var isFutureDate = d > today;
-                var dateRange = new sap.ui.unified.DateTypeRange({
+            const that = this;
+            const oCalendar = this.oDatePicker;
+            if (!oCalendar) return;
+
+            oCalendar.removeAllSpecialDates();
+
+            const holidays = this.getView().getModel("HolidayModel").getData();
+            const holidayMap = new Map(holidays.map(holiday => [
+                new Date(holiday.Date).toDateString(),
+                holiday.Name
+            ]));
+
+            const yearStart = new Date(new Date().getFullYear(), 0, 1);
+            const yearEnd = new Date(new Date().getFullYear(), 11, 31);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
+                d.setHours(0, 0, 0, 0);
+                const day = d.getDay();
+                const isWeekend = (day === 0 || day === 6);
+                const holidayName = holidayMap.get(d.toDateString());
+                const isFutureDate = d > today;
+
+                const oDateRange = new sap.ui.unified.DateTypeRange({
                     startDate: new Date(d),
                     endDate: new Date(d)
                 });
+
                 if (holidayName) {
-                    dateRange.setType("Type04");
-                    dateRange.setTooltip("Holiday : " + holidayName);
+                    oDateRange.setType("Type04");
+                    oDateRange.setTooltip(this.i18nModel.getText("calendarHoliday") + " : " + holidayName);
                 } else if (isWeekend) {
-                    dateRange.setType("Type09");
-                    dateRange.setTooltip("Weekend");
+                    oDateRange.setType("Type09");
+                    oDateRange.setTooltip(this.i18nModel.getText("calendarWeekend"));
                 } else if (isFutureDate) {
-                    dateRange.setType("Type07");
-                    dateRange.setTooltip("Future Date");
+                    oDateRange.setType("Type07");
+                    oDateRange.setTooltip(this.i18nModel.getText("calendarFutureDate"));
                 } else {
-                    dateRange.setType("Type06");
-                    dateRange.setTooltip("Working Day");
+                    oDateRange.setType("Type06");
+                    oDateRange.setTooltip(this.i18nModel.getText("calendarWorkingDay"));
                 }
-                this.oDatePicker.addSpecialDate(dateRange);
+
+                oCalendar.addSpecialDate(oDateRange);
             }
         },
 
@@ -282,12 +303,12 @@ sap.ui.define([
         onInitializeLegend: function (oEvent) {
             this.oDatePicker = oEvent.getSource();
             if (this.oDatePicker) {
-                var oLegend = new sap.ui.unified.CalendarLegend({
+                const oLegend = new sap.ui.unified.CalendarLegend({
                     items: [
-                        new sap.ui.unified.CalendarLegendItem({ type: "Type04", text: "Holiday" }),
-                        new sap.ui.unified.CalendarLegendItem({ type: "Type09", text: "Weekend" }),
-                        new sap.ui.unified.CalendarLegendItem({ type: "Type06", text: "Working Day" }),
-                        new sap.ui.unified.CalendarLegendItem({ type: "Type07", text: "Future Date" })
+                        new sap.ui.unified.CalendarLegendItem({ type: "Type04", text: this.i18nModel.getText("calendarHoliday") }),
+                        new sap.ui.unified.CalendarLegendItem({ type: "Type09", text: this.i18nModel.getText("calendarWeekend") }),
+                        new sap.ui.unified.CalendarLegendItem({ type: "Type06", text: this.i18nModel.getText("calendarWorkingDay") }),
+                        new sap.ui.unified.CalendarLegendItem({ type: "Type07", text: this.i18nModel.getText("calendarFutureDate") })
                     ]
                 });
                 this.oDatePicker.setLegend(oLegend);
@@ -320,17 +341,17 @@ sap.ui.define([
                 var isHoliday = holidayMap.has(selectedDate.toDateString());
                 // Prevent future date selection
                 if (selectedDate > today) {
-                    sap.m.MessageBox.error("You cannot fill a timesheet for a future date.");
+                    sap.m.MessageBox.error("futureDateT");
                     return;
                 }
                 // Show warning for holiday or weekend
                 if (isWeekend || isHoliday) {
-                    sap.m.MessageBox.warning("Are you sure you want to fill a timesheet on a non-working day?");
+                    sap.m.MessageBox.warning(this.i18nModel.getText("holidayWarning"));
                 }
                 // Update the SimpleForm title
                 var oSimpleForm = that.getView().byId("SimpleFormToolbar");
                 if (oSimpleForm) {
-                    oSimpleForm.setTitle("Create entry for " + formattedDate);
+                    oSimpleForm.setTitle(this.i18nModel.getText("formTitleCreate", [formattedDate]));
                 }
                 // Update view model
                 var oViewModel = that.getView().getModel("viewModel");
@@ -370,7 +391,7 @@ sap.ui.define([
             }
             const selectedDate = this.getView().getModel("AssignModel").getProperty("/selectedDate");
             if (!selectedDate) {
-                MessageToast.show("Please select a date before choosing an assignment.");
+                MessageToast.show(this.i18nModel.getText("selectDateT"));
                 return;
             }
             // Format selected date to 'YYYY-MM-DD'
@@ -389,7 +410,7 @@ sap.ui.define([
                     return entry.TaskID === AllData.TaskID && entryDateOnly === formattedDate;
                 });
                 if (isDuplicate) {
-                    MessageToast.show("This assignment already exists for the selected date.");
+                    MessageToast.show(this.i18nModel.getText("duplicateEntry"));
                     this.closeBusyDialog();
                     return;
                 }
@@ -453,7 +474,7 @@ sap.ui.define([
                 }
                 let oData = this.getView().getModel("newModel").getData();
                 delete oData.comments;
-                 delete oData.ActualHours; 
+                delete oData.ActualHours;
 
                 const oPayload = {
                     data: oData,

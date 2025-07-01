@@ -20,7 +20,8 @@ sap.ui.define(["./BaseController",
                 if (!LoginFunction) return;
                 this.getBusyDialog();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Timesheet Details");
+                const sTitle = this.i18nModel.getText("tileTimesheetFooter");
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", sTitle);
 
                 const oViewModel = new JSONModel();
                 oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
@@ -353,8 +354,8 @@ sap.ui.define(["./BaseController",
                     }
                 });
                 try {
-                    var data =  await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID, ...params });
-                   var oModelData  = new JSONModel(data.data);
+                    var data = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID, ...params });
+                    var oModelData = new JSONModel(data.data);
                     this.getView().setModel(oModelData, "FilteredTimesheetModel");
                 } catch (error) {
                     sap.m.MessageToast.show(error.message || error.responseText);

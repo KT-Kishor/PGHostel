@@ -66,7 +66,7 @@
                   <OverflowToolbar>
                     <Title text="{i18n>tileTimesheetFooter}" />
                     <ToolbarSpacer />
-                    <Button text="{i18n>fillTimesheet}" press="TS_onFillDetails" type="Accept"  />
+                    <Button text="{i18n>fillTimesheet}" press="TS_onFillDetails" type="Accept" tooltip="{i18n>fillTimesheet}" />
                   </OverflowToolbar>
                 </headerToolbar>
               

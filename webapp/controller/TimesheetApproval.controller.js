@@ -17,7 +17,8 @@ sap.ui.define([
             var LoginFunction = await this.commonLoginFunction("TimesheetApproval");
             if (!LoginFunction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this.getView().getModel("LoginModel").setProperty("/HeaderName", "Timesheet Approval");
+            const sTitle = this.i18nModel.getText("headerTimesheetApproval");
+            this.getView().getModel("LoginModel").setProperty("/HeaderName", sTitle);
 
             // Get ManagerID from LoginModel
             const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
@@ -210,7 +211,7 @@ sap.ui.define([
                 this._oManagerRemarkDialog.close();
             }
             //removal table selection
-            this.byId("TSA_id_Table").removeSelections(true); // true to suppress selection change event
+            this.byId("TSA_id_Table").removeSelections(true); 
         },
 
         onPressback: function () {
