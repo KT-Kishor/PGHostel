@@ -453,6 +453,7 @@ sap.ui.define([
                 }
                 let oData = this.getView().getModel("newModel").getData();
                 delete oData.comments;
+                 delete oData.ActualHours; 
 
                 const oPayload = {
                     data: oData,
