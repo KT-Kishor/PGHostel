@@ -341,7 +341,7 @@ sap.ui.define([
                 var isHoliday = holidayMap.has(selectedDate.toDateString());
                 // Prevent future date selection
                 if (selectedDate > today) {
-                    sap.m.MessageBox.error("futureDateT");
+                    sap.m.MessageBox.error(this.i18nModel.getText("futureDateT"));
                     return;
                 }
                 // Show warning for holiday or weekend
