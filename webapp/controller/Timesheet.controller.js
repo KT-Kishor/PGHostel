@@ -54,6 +54,7 @@ sap.ui.define(["./BaseController",
                     this.getBusyDialog();
                     const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID });
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    this.timesheetData = offerData; // Store the data for later use
                     this.getView().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
                     this.filterTimesheetForCurrentWeek(); // <-- Filter for current week
                     this.closeBusyDialog();
@@ -78,11 +79,11 @@ sap.ui.define(["./BaseController",
                 oEndDate.setHours(23, 59, 59, 999);
 
                 // Get all timesheet data
-                var oTimesheetModel = this.getView().getModel("FilteredTimesheetModel");
-                var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
+                // var oTimesheetModel = this.getView().getModel("FilteredTimesheetModel");
+                // var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
 
                 // Filter entries for the current week
-                var aFiltered = aAllData.filter(function (entry) {
+                var aFiltered = this.timesheetData.filter(function (entry) {
                     if (!entry.Date) return false;
                     var entryDate = new Date(entry.Date);
                     entryDate.setHours(0, 0, 0, 0);
@@ -170,6 +171,7 @@ sap.ui.define(["./BaseController",
                             const oNewModel = new sap.ui.model.json.JSONModel(parsedData);
                             that.getView().setModel(oNewModel, "FilteredTimesheetModel");
                             oNewModel.refresh(true); // Force UI refresh
+                            that.timesheetData = parsedData; // Update the stored data
                             that.filterTimesheetForCurrentWeek();
                             oTable.removeSelections(true);
                         } catch (error) {
@@ -243,6 +245,7 @@ sap.ui.define(["./BaseController",
                             const oData = await that.ajaxReadWithJQuery("Timesheet", { EmployeeID: that.EmployeeID });
                             const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                             that.getView().getModel("FilteredTimesheetModel").setData(offerData);
+                            that.timesheetData = offerData; // Update the stored data
                             that.filterTimesheetForCurrentWeek();
                             that.byId("TD_id_Table").removeSelections(true)
 
@@ -376,8 +379,5 @@ sap.ui.define(["./BaseController",
                     }
                 });
             },
-
-
-
         });
     });

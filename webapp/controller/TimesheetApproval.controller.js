@@ -138,16 +138,18 @@ sap.ui.define([
             }
             const aPayload = oSelectedItems.map(item => {
                 const srNo = item.getBindingContext("ApprovalTimesheetModel").getProperty("SrNo");
+                const managerName = item.getBindingContext("ApprovalTimesheetModel").getProperty("ManagerName");
                 return {
                     filters: { SrNo: srNo },
                     data: {
                         Status: this._approvalStatus,
-                        // Comments: sRemark
+                        ManagerName :managerName
                     }
                 };
             });
+            //aPayload.comments = sRemark ;
             const finalPayload = {
-                tableName: "Timesheet",
+                comments : sRemark,
                 data: aPayload
             };
 
