@@ -28,15 +28,15 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true" >
                         <fb:control>
-                    <ComboBox  showSecondaryValues= "true"  id="TSA_id_Name" showClearIcon="true" items="{path:'ApprovalTimesheetModel>/'}" >
-						<core:ListItem key="{ApprovalTimesheetModel>EmployeeID}" text="{ApprovalTimesheetModel>EmployeeID}" additionalText="{ApprovalTimesheetModel>EmployeeName}" />
+                    <ComboBox  showSecondaryValues= "true"  id="TSA_id_Name" showClearIcon="true" items="{path:'EmployeeFilterModel>/'}" >
+						<core:ListItem key="{EmployeeFilterModel>EmployeeID}" text="{EmployeeFilterModel>EmployeeID}" additionalText="{EmployeeFilterModel>EmployeeName}" />
 					</ComboBox>                        
                         </fb:control>
                     </fb:FilterGroupItem>
                     <fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true" >
                         <fb:control>
-                    <ComboBox  showSecondaryValues= "true"  id="TSA_id_Status" showClearIcon="true" items="{path:'ApprovalTimesheetModel>/'}" >
-						<core:ListItem key="{ApprovalTimesheetModel>Status}" text="{ApprovalTimesheetModel>Status}" />
+                    <ComboBox  showSecondaryValues= "true"  id="TSA_id_Status" showClearIcon="true" items="{path:'TApprovalModel>/'}" selectedKey="Submitted" >
+						<core:ListItem key="{TApprovalModel>ID}" text="{TApprovalModel>StatusName}" />
 					</ComboBox>                        
                         </fb:control>
                     </fb:FilterGroupItem>

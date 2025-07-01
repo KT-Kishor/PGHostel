@@ -29,25 +29,49 @@ sap.ui.define([
 
             // Disable buttons initially
             this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
+            this.TSA_onClear(); // Clear any existing filters
         },
         readSubmittedTimesheetsForManager: async function (ManagerID) {
             this.getBusyDialog();
             try {
-                // Read all timesheet entries for employees under this manager
                 const oData = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID });
                 let timesheetData = Array.isArray(oData.data) ? oData.data : [oData.data];
 
-                // Filter only "Submitted, approved, rejected" status
-                timesheetData = timesheetData.filter(entry => ["Submitted", "Approved", "Rejected"].includes(entry.Status));
+                // Filter only specific statuses
+                timesheetData = timesheetData.filter(entry =>
+                    ["Submitted", "Approved", "Rejected"].includes(entry?.Status)
+                );
 
-                // Set filtered data to ApprovalTimesheetModel
-                this.getView().setModel(new sap.ui.model.json.JSONModel(timesheetData), "ApprovalTimesheetModel");
+                // Set main timesheet model
+                this.getView().setModel(new JSONModel(timesheetData), "ApprovalTimesheetModel");
+
+                // === Unique Employee ID List ===
+                const uniqueEmployees = [];
+                const employeeMap = new Set();
+
+                timesheetData.forEach(entry => {
+                    if (!employeeMap.has(entry.EmployeeID)) {
+                        employeeMap.add(entry.EmployeeID);
+                        uniqueEmployees.push({
+                            EmployeeID: entry.EmployeeID,
+                            EmployeeName: entry.EmployeeName
+                        });
+                    }
+                });
+
+                this.getView().setModel(new JSONModel(uniqueEmployees), "EmployeeFilterModel");
+                const oStatusComboBox = this.byId("TSA_id_Status");
+                if (oStatusComboBox) {
+                    oStatusComboBox.setSelectedKey("Submitted");
+                }
+                this.TSA_onSearch();
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
             } finally {
                 this.closeBusyDialog();
             }
         },
+
 
         TSA_onSelect: function () {
             const oTable = this.byId("TSA_id_Table");
@@ -143,13 +167,13 @@ sap.ui.define([
                     filters: { SrNo: srNo },
                     data: {
                         Status: this._approvalStatus,
-                        ManagerName :managerName
+                        ManagerName: managerName
                     }
                 };
             });
             //aPayload.comments = sRemark ;
             const finalPayload = {
-                comments : sRemark,
+                comments: sRemark,
                 data: aPayload
             };
 
@@ -196,23 +220,11 @@ sap.ui.define([
                     }
                 });
 
-                // Always fetch only submitted timesheets for this manager
                 const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
-                await this.readSubmittedTimesheetsForManager(ManagerID);
-
-                // Apply client-side filters
-                var aAllData = this.getView().getModel("ApprovalTimesheetModel").getData();
-                var aFiltered = aAllData;
-
-                // Example: filter by EmployeeID if present
-                if (params.EmployeeID) {
-                    aFiltered = aFiltered.filter(function (entry) {
-                        return entry.EmployeeID && entry.EmployeeID.toString().includes(params.EmployeeID);
-                    });
-                }
-                // Update the model with filtered data
-                this.getView().getModel("ApprovalTimesheetModel").setData(aFiltered);
-
+                //await this.readSubmittedTimesheetsForManager(ManagerID);
+                var data = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID, ...params });
+                var oModelData = new JSONModel(data.data);
+                this.getView().setModel(oModelData, "ApprovalTimesheetModel");
             } catch (error) {
                 MessageToast.show(this.i18nModel.getText("technicalError"));
             } finally {
@@ -221,7 +233,21 @@ sap.ui.define([
         },
 
         TSA_onClear: function () {
-            this.byId("TSA_id_Name").setValue("");
+            var aFilterItems = this.byId("TSA_id_Filter").getFilterGroupItems();
+            aFilterItems.forEach(function (oItem) {
+                var oControl = oItem.getControl(); // Get the associated control
+                if (oControl) {
+                    if (oControl.setValue) {
+                        oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
+                    }
+                    if (oControl.setSelectedKey) {
+                        oControl.setSelectedKey(""); // Reset selection for dropdowns
+                    }
+                    if (oControl.setSelected) {
+                        oControl.setSelected(false); // Reset selection for Checkboxes
+                    }
+                }
+            });
         },
         TSA_onShowComments: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("ApprovalTimesheetModel");

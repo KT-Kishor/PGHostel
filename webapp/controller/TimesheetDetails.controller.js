@@ -198,6 +198,7 @@ sap.ui.define([
 
         TSD_onSubmit: async function () {
             try {
+                await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
                 if (!this._validateTimesheetFields(true)) return;
 
                 const oCalendar = this.byId("calendar").getSelectedDates();
@@ -219,8 +220,8 @@ sap.ui.define([
                     TaskName: oData.TaskName,
                     EmployeeID: oData.EmployeeID,
                     EmployeeName: oData.EmployeeName,
-                    ManagerName: oData.ManagerName,
-                    ManagerID: oData.ManagerID,
+                    ManagerName: this.getView().getModel("EmployeeModel").getData()[0].ManagerName,
+                    ManagerID: this.getView().getModel("EmployeeModel").getData()[0].ManagerID,
                     HoursWorked: Number(this.byId("TSD_id_TimeHours").getValue()).toString(),
                     Date: formattedDate,
                     Month: selectedDateObj.toLocaleString('default', { month: 'long' }),

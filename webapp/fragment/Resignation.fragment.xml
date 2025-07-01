@@ -92,7 +92,7 @@
                     editable="{viewModel>/editableResignatin}"
                     liveChange="onDocumentTypeChange"
                     value="{sEmployeeModel>/0/ResignComment}"
-                    maxLength="60"
+                    maxLength="1000"
                     valueStateText="{i18n>commentsValueState}"
                     placeholder="{i18n>resignComment}"
                 />

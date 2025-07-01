@@ -253,6 +253,11 @@
                 "uri": "model/TimesheetStatus.json",
                 "preload": true
             },
+               "TApprovalModel": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/TimesheetApprovalStatus.json",
+                "preload": true
+            },
              "ExpectedCTC": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/ExpectedctcRange.json",

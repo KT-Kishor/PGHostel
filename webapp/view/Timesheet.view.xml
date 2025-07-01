@@ -41,13 +41,6 @@
                         </fb:control>
                     </fb:FilterGroupItem>
 
-                    <fb:FilterGroupItem name="Date" label="{i18n>date}" groupName="Group1" visibleInFilterBar="true">
-                        <fb:control>
-                            <ComboBox id="TS_id_Date" showClearIcon="true" items="{TDateModel>/}">
-                                <core:Item key="{TDateModel>ID}" text="{TDateModel>Date}"/>
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
             
 
                 </fb:filterGroupItems>
