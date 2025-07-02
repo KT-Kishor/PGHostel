@@ -44,8 +44,18 @@ sap.ui.define([
             if (this.sArg !== "Timesheet") {
                 await this.readCallTimesheet();
                 const oData = this.getView().getModel("newModel").getData();
-                this.getView().getModel("newModel").setProperty("/Comment", oData.comments[oData.comments.length - 1].Comment);
-
+                // this.getView().getModel("newModel").setProperty("/Comment", oData.comments[oData.comments.length - 1].Comment);
+                let empComments = [];
+                if (Array.isArray(oData.comments)) {
+                    empComments = oData.comments.filter(
+                        (comment) => comment.CommentedBy === oData.EmployeeName
+                    );
+                }
+                if (empComments.length > 0) {
+                    this.getView().getModel("newModel").setProperty("/Comment", empComments[empComments.length - 1].Comment);
+                } else {
+                    this.getView().getModel("newModel").setProperty("/Comment", "");
+                }
                 const isSubmitted = oData.Status === "Submitted" || oData.Status === "Approved";
                 oViewModel.setProperty("/isUpdate", !isSubmitted);
                 oViewModel.setProperty("/isCreate", false);
@@ -510,8 +520,7 @@ sap.ui.define([
             const aAssigns = this.getView().getModel("AssignModel")?.getData() || [];
 
             // Basic field validation
-            if (!utils._LCvalidateMandatoryField(oAssignment, "ID") || !utils._LCvalidateTimeLimit(oHours, "ID") || !utils._LCvalidateMandatoryField(oComment, "ID"))
-            {
+            if (!utils._LCvalidateMandatoryField(oAssignment, "ID") || !utils._LCvalidateTimeLimit(oHours, "ID") || !utils._LCvalidateMandatoryField(oComment, "ID")) {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return false;
             }
