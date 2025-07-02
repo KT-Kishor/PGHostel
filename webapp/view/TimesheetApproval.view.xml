@@ -35,7 +35,7 @@
                     </fb:FilterGroupItem>
                     <fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true" >
                         <fb:control>
-                    <ComboBox  showSecondaryValues= "true"  id="TSA_id_Status" showClearIcon="true" items="{path:'TApprovalModel>/'}" selectedKey="Submitted" >
+                    <ComboBox  showSecondaryValues= "true"  id="TSA_id_Status" showClearIcon="true" items="{path:'TApprovalModel>/'}"  >
 						<core:ListItem key="{TApprovalModel>ID}" text="{TApprovalModel>StatusName}" />
 					</ComboBox>                        
                         </fb:control>

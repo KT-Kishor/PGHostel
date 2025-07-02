@@ -22,6 +22,9 @@ sap.ui.define([
 
             // Get ManagerID from LoginModel
             const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
+            this.TSA_onClear(); // Clear any existing filters
+            //Initially Status filter set the value Submitted
+            this.byId("TSA_id_Status").setValue("Submitted");
 
             await this.readSubmittedTimesheetsForManager(ManagerID);
             // ViewModel for button enable/disable
@@ -30,7 +33,6 @@ sap.ui.define([
 
             // Disable buttons initially
             this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
-            this.TSA_onClear(); // Clear any existing filters
         },
         readSubmittedTimesheetsForManager: async function (ManagerID) {
             this.getBusyDialog();
@@ -61,10 +63,7 @@ sap.ui.define([
                 });
 
                 this.getView().setModel(new JSONModel(uniqueEmployees), "EmployeeFilterModel");
-                const oStatusComboBox = this.byId("TSA_id_Status");
-                if (oStatusComboBox) {
-                    oStatusComboBox.setSelectedKey("Submitted");
-                }
+                this.byId("TSA_id_Status").setValue("Submitted");
                 this.TSA_onSearch();
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
@@ -211,8 +210,8 @@ sap.ui.define([
                 this._oManagerRemarkDialog.close();
             }
             //removal table selection
-            this.byId("TSA_id_Table").removeSelections(true); 
-            sap.ui.getCore().byId("MIF_id_remark").setValue(""); 
+            this.byId("TSA_id_Table").removeSelections(true);
+            sap.ui.getCore().byId("MIF_id_remark").setValue("");
             sap.ui.getCore().byId("MIF_id_remark").setValueState("None"); // Reset value state
             //disable buttons
             this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
