@@ -16,6 +16,7 @@
                 width="100%"
                 startDate="{viewModel>/calendarStartDate}" 
                 days="7"
+                select="TSA_onCalendarDateSelect" 
                 startDateChange="onCalendarDateChange" />
             <fb:FilterBar
                 class="sapUiTinyMargin"

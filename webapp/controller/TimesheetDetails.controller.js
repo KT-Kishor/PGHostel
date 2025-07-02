@@ -452,7 +452,7 @@ sap.ui.define([
                 this.getView().getModel("newModel").setProperty("/ActualHours", hrs || 0);
                 const hoursText = hrs ? `${hrs} hours` : "Not available";
                 this.byId("idTextActHour").setText(`Actual Hours: ${hoursText}`);
-                this.byId("TSD_id_TimeHours").focus();
+                //this.byId("TSD_id_TimeHours").focus();
             }
         },
         //Update the data

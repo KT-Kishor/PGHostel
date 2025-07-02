@@ -54,6 +54,7 @@ sap.ui.define([
                 timesheetData = timesheetData.filter(entry =>
                     ["Submitted", "Approved", "Rejected"].includes(entry?.Status)
                 );
+                this._fullApprovalData = timesheetData;
                 // Set main timesheet model
                 this.getView().setModel(new JSONModel(timesheetData), "ApprovalTimesheetModel");
 
@@ -86,6 +87,35 @@ sap.ui.define([
                     item.getBindingContext("ApprovalTimesheetModel").getProperty("Status") === "Submitted");
             }
             this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", canApproveReject);
+        },
+        //Calendar date selection with filtering from full dataset
+        TSA_onCalendarDateSelect: function (oEvent) {
+            var aSelectedDates =  oEvent.getSource().getSelectedDates();
+            if (aSelectedDates.length > 0) {
+                var oSelectedDate = aSelectedDates[0].getStartDate();
+                oSelectedDate.setHours(0, 0, 0, 0);
+
+                // Filter from the full dataset
+                if (this._fullApprovalData) {
+                    var aFiltered = this._fullApprovalData.filter(function (entry) {
+                        if (!entry.Date) return false;
+                        var entryDate = new Date(entry.Date);
+                        entryDate.setHours(0, 0, 0, 0);
+                        return entryDate.getTime() === oSelectedDate.getTime();
+                    });
+                    this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "ApprovalTimesheetModel");
+                } else {
+                    // If somehow _fullApprovalData isn't set yet, fallback to current model data
+                    const currentData = this.getView().getModel("ApprovalTimesheetModel").getData() || [];
+                    var aFilteredFallback = currentData.filter(function (entry) {
+                        if (!entry.Date) return false;
+                        var entryDate = new Date(entry.Date);
+                        entryDate.setHours(0, 0, 0, 0);
+                        return entryDate.getTime() === oSelectedDate.getTime();
+                    });
+                    this.getView().setModel(new sap.ui.model.json.JSONModel(aFilteredFallback), "ApprovalTimesheetModel");
+                }
+            }
         },
         //Approve Timesheet
         TSA_onApprove: function () {

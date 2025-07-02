@@ -32,10 +32,12 @@ sap.ui.define(["./BaseController",
                 oViewModel.setProperty("/canDelete", false);
 
                 var loginModel = this.getOwnerComponent().getModel("LoginModel");
-                this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
+                this.EmployeeID = loginModel.getProperty("/EmployeeID");
                 this.branch = loginModel.getProperty("/BranchCode");
-                this.TSD_ReadTimesheetEntries(this.EmployeeID);
+                await this.TSD_ReadTimesheetEntries(this.EmployeeID); // Wait for data load
                 this.TS_onClear();
+
+                this.closeBusyDialog();
             },
             //Fill the timesheet
             TS_onFillDetails: function () {
@@ -54,12 +56,14 @@ sap.ui.define(["./BaseController",
                     this.getBusyDialog();
                     const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID });
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.timesheetData = offerData; // Store the data for later use
+                    this.timesheetData = offerData;
                     this.getView().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
-                    this.filterTimesheetForCurrentWeek(); // <-- Filter for current week
-                    this.closeBusyDialog();
+                    // Set initial filtered data (e.g., current week)
+                    this.filterTimesheetForCurrentWeek();
+
                 } catch (error) {
                     MessageToast.show(error.message || error.responseText);
+                } finally {
                     this.closeBusyDialog();
                 }
             },
@@ -91,17 +95,14 @@ sap.ui.define(["./BaseController",
             },
             //On date selection filter data 
             TS_onCalendarDateSelect: function (oEvent) {
-                var oCalendar = oEvent.getSource();
-                var aSelectedDates = oCalendar.getSelectedDates();
+                var aSelectedDates = oEvent.getSource().getSelectedDates();
                 if (aSelectedDates.length > 0) {
                     var oSelectedDate = aSelectedDates[0].getStartDate();
                     oSelectedDate.setHours(0, 0, 0, 0);
 
-                    // Get all timesheet data
-                    var oTimesheetModel = this.getView().getModel("FilteredTimesheetModel");
-                    var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
+                    // Use the master data store for filtering
+                    var aAllData = this.timesheetData || [];
 
-                    // Filter for the selected date
                     var aFiltered = aAllData.filter(function (entry) {
                         if (!entry.Date) return false;
                         var entryDate = new Date(entry.Date);
@@ -111,7 +112,7 @@ sap.ui.define(["./BaseController",
                     this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "FilteredTimesheetModel");
                 }
             },
-
+            
             //Get start week day
             _getStartOfWeek: function (date) {
                 const day = date.getDay(); // Sunday = 0, Monday = 1, ...
