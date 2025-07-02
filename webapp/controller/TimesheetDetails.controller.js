@@ -432,6 +432,10 @@ sap.ui.define([
                 oNewModelData.Date = formattedDate;
                 this.getView().getModel("newModel").setData(oNewModelData);
 
+                const oInput = this.byId("TSD_id_Assignment");
+                oInput.setValue(AllData.TaskName);
+                oInput.setValueState("None");
+                oInput.setValueStateText("");
             } catch (err) {
                 MessageToast.show(err.message || "Error checking assignment.");
             } finally {
@@ -506,10 +510,11 @@ sap.ui.define([
             const aAssigns = this.getView().getModel("AssignModel")?.getData() || [];
 
             // Basic field validation
-            if (!utils._LCvalidateMandatoryField(oAssignment, "ID")) return false;
-            if (!utils._LCvalidateTimeLimit(oHours, "ID")) return false;
-            if (!utils._LCvalidateMandatoryField(oComment, "ID")) return false;
-
+            if (!utils._LCvalidateMandatoryField(oAssignment, "ID") || !utils._LCvalidateTimeLimit(oHours, "ID") || !utils._LCvalidateMandatoryField(oComment, "ID"))
+            {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return false;
+            }
             const sEnteredHours = Number(oHours.getValue());
             let sActualHours = Number(oData.ActualHours);
 

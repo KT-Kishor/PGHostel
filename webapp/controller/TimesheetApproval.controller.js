@@ -212,6 +212,11 @@ sap.ui.define([
             }
             //removal table selection
             this.byId("TSA_id_Table").removeSelections(true); 
+            sap.ui.getCore().byId("MIF_id_remark").setValue(""); 
+            sap.ui.getCore().byId("MIF_id_remark").setValueState("None"); // Reset value state
+            //disable buttons
+            this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
+            this._approvalStatus = null; // Reset approval status
         },
 
         onPressback: function () {
