@@ -271,6 +271,11 @@ sap.ui.define([
             var oContext = oEvent.getSource().getBindingContext("ApprovalTimesheetModel");
             var oData = oContext.getObject();
             var aComments = oData.comments || [];
+            aComments.sort(function (a, b) {
+                var dateA = new Date(a.CommentDateTime);
+                var dateB = new Date(b.CommentDateTime);
+                return dateB - dateA;
+            });
             var aTimelineItems = aComments.map(function (oComment) {
                 return new TimelineItem({
                     dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
@@ -284,7 +289,7 @@ sap.ui.define([
                 showHeader: false,
                 enableBusyIndicator: false,
                 width: "100%",
-                sortOldestFirst: true,
+                sortOldestFirst: false,
                 enableDoubleSided: false,
                 content: aTimelineItems,
                 showHeaderBar: false

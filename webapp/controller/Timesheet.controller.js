@@ -310,7 +310,7 @@ sap.ui.define(["./BaseController",
                     showHeader: false,
                     enableBusyIndicator: false,
                     width: "100%",
-                    sortOldestFirst: true,
+                    sortOldestFirst: false,
                     enableDoubleSided: false,
                     content: aTimelineItems,
                     showHeaderBar: false
