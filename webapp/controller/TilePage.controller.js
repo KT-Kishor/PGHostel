@@ -16,14 +16,22 @@ sap.ui.define(
             .attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function () {
-          if(!this.that) this.that = this.getOwnerComponent().getModel("ThisModel")?.getData().that;
+          if (!this.that) this.that = this.getOwnerComponent().getModel("ThisModel")?.getData().that;
           var LoginFunction = await this.commonLoginFunction("TilePage");
           if (!LoginFunction) return;
-          this.scrollToSection("id_ObjectPageLayoutTile","id_Sectiontile");
+          this.scrollToSection("id_ObjectPageLayoutTile", "id_Sectiontile");
           this.getBusyDialog();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.AppVisibilityReadCall();
           await this._fetchCommonData("AllLoginDetails", "EmpModel");
+          await this._fetchCommonData("EmployeeDetails", "EmpDetails");
+          var oChatModel = new JSONModel({
+            messages: [],
+            messageText: "",
+            selectedEmployee: null
+          });
+          this.getView().setModel(oChatModel);
+
           this.CreateEmployeeModel();
         },
 
@@ -57,7 +65,7 @@ sap.ui.define(
               "AppVisibilityModel"
             );
 
-            const tileNames = ["Home", "Timesheet", "Payslip", "OfferGeneration", "Invoice", "Quotation", "Expense", "ManageAsset","Recruitment"];
+            const tileNames = ["Home", "Timesheet", "Payslip", "OfferGeneration", "Invoice", "Quotation", "Expense", "ManageAsset", "Recruitment"];
 
             const tileKeys = firstEntry.TileKey?.split(",") || [];
             const tileMapping = tileNames.reduce((map, name, i) => {
@@ -165,7 +173,7 @@ sap.ui.define(
         RP_onPressCanclePW: function () {
           sap.ui
             .getCore().byId("RP_id_userid").setValue("").setSelectedKey("").setValueState("None");
-              sap.ui.getCore().byId("RP_id_userid").setSelectedKey(null);
+          sap.ui.getCore().byId("RP_id_userid").setSelectedKey(null);
           var oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
           // Reset all input fields
           oUserNameInput.setValue("");
@@ -213,7 +221,7 @@ sap.ui.define(
             if (response.success === true) {
               this.closeBusyDialog();
               sap.ui.getCore().byId("RP_id_userid").setSelectedKey(null);
-               sap.ui.getCore().byId("RP_id_ConfirmPW").setValueState("None");
+              sap.ui.getCore().byId("RP_id_ConfirmPW").setValueState("None");
               oUserIdInput.setValue("");
               oUserNameInput.setValue("");
               oNewPwInput.setValue("");
@@ -292,7 +300,7 @@ sap.ui.define(
           this.getRouter().navTo("RouteAdminPaySlip");
         },
         TileV_onpressSelfservice: function () {
-          this.getRouter().navTo("SelfService", { sPath: "SelfService",Role: "Role" });
+          this.getRouter().navTo("SelfService", { sPath: "SelfService", Role: "Role" });
         },
         TileV_onpressInbox: function () {
           this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInboxView" });
@@ -313,11 +321,11 @@ sap.ui.define(
           this.getRouter().navTo("RouteTimesheetApproval");
         },
         TileV_onPressGenerateSalary: function () {
-     
+
           this.getRouter().navTo("RouteGenerateSalary");
         },
         TileV_onPressManagePayroll: function () {
-        
+
           this.getRouter().navTo("RouteManagePayroll");
         },
         TileV_onpressEmployeeDetails: function () {
@@ -358,13 +366,103 @@ sap.ui.define(
           this.getRouter().navTo("MyAsset");
 
         },
-        TileV_onpressPoApp:function(){
+        TileV_onpressPoApp: function () {
           this.getRouter().navTo("PurchaseOrder");
         },
-        TileV_Recruitment:function(){
+        TileV_Recruitment: function () {
           this.getRouter().navTo("Recruitment");
-        }
-        
+        },
+        Tile_ChatApp: function () {
+          var oView = this.getView();
+          // Ensure user selection is reset before opening
+          if (!this.Chatapp) {
+            sap.ui.core.Fragment.load({
+              name: "sap.kt.com.minihrsolution.fragment.KTChatApp",
+              controller: this,
+            }).then(
+              function (Chatapp) {
+                this.Chatapp = Chatapp;
+                oView.addDependent(this.Chatapp);
+                this.Chatapp.open();
+              }.bind(this)
+            );
+          } else {
+            this.Chatapp.open();
+          }
+        },
+        onCloseDialog: function () {
+          if (this.Chatapp) {
+            this.Chatapp.close();
+          }
+        },
+        // onEmployeeSelect: function (oEvent) {
+        //   var oSelected = oEvent.getParameter("listItem");
+        //   var oEmployee = oSelected.getBindingContext("EmpDetails").getObject();
+
+        //   // Update selected employee in model
+        //   this.getView().getModel("EmpDetails").setProperty("/selectedEmployee", oEmployee);
+
+        //   // Load chat history for selected employee
+        //   this._loadChatHistory(oEmployee.EmployeeID);
+        // },
+
+        // onMessageInputChange: function (oEvent) {
+        //   var sValue = oEvent.getParameter("value");
+        //   this.getView().getModel("EmpDetails").setProperty("/messageText", sValue);
+        // },
+
+        onSendMessage: function () {
+          var oModel = this.getView().getModel(); // unnamed model
+
+          if (!oModel) {
+            console.error("Model not found.");
+            return;
+          }
+
+          var sMessage = oModel.getProperty("/messageText");
+          if (!sMessage?.trim()) return;
+
+          var aMessages = oModel.getProperty("/messages") || [];
+
+          aMessages.push({
+            sender: "You",
+            time: new Date().toLocaleTimeString(),
+            content: sMessage
+          });
+
+          oModel.setProperty("/messages", aMessages);
+          oModel.setProperty("/messageText", ""); // clear input
+        },
+
+
+
+
+        // _loadChatHistory: function (sEmployeeId) {
+        //   // Mock data - replace with actual data loading
+        //   var aMockMessages = [
+        //     {
+        //       sender: "Employee",
+        //       time: new Date().toLocaleTimeString(),
+        //       content: "Hello! How can I help you today?",
+        //       isSent: false
+        //     }
+        //   ];
+        //   this.getView().getModel("EmpDetails").setProperty("/messages", aMockMessages);
+        //   this._scrollToBottom();
+        // },
+
+        // _scrollToBottom: function () {
+        //   var oList = this.byId("messageList");
+        //   if (oList) {
+        //     setTimeout(function () {
+        //       var iLastIndex = oList.getItems().length - 1;
+        //       if (iLastIndex >= 0) {
+        //         oList.scrollToIndex(iLastIndex);
+        //       }
+        //     }, 0);
+        //   }
+        // }
+
       }
     );
   }

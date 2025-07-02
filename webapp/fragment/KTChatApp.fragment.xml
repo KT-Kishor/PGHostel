@@ -1,0 +1,82 @@
+<core:FragmentDefinition
+
+    xmlns:m="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:html="http://www.w3.org/1999/xhtml">
+    
+    <m:Dialog title="KVriksha Chat"
+            contentWidth="600px"
+            contentHeight="600px"
+            stretch="true">
+        
+        <m:customHeader>
+            <m:Bar>
+                <m:contentMiddle>
+                    <m:Title text="KVriksha Chat"/>
+                </m:contentMiddle>
+                <m:contentRight>
+                    <m:Button 
+                        icon="sap-icon://decline"
+                        press=".onCloseDialog"
+                        tooltip="Close"/>
+                </m:contentRight>
+            </m:Bar>
+        </m:customHeader>
+        
+        <m:content>
+            <l:Splitter height="600px"  class="chatSplitter">
+              
+
+                <!-- Left Pane - Employee List -->
+                <m:List id="employeeList"
+                      mode="SingleSelectMaster"
+                      selectionChange=".onEmployeeSelect"
+                      items="{EmpDetails>/}">
+                       <!-- <m:Input placeholder="Search or start a new chat"/> -->
+                    <m:layoutData>
+                        <l:SplitterLayoutData size="300px" resizable="true"/>
+                    </m:layoutData>
+                    
+                    <!-- <m:StandardListItem
+                        title="{EmpModel>EmployeeName}"
+                        icon="{photo}"
+                        type="Active"/> -->
+                        	<m:StandardListItem title="{EmpDetails>EmployeeName}"  icon="{path:'EmpDetails>ProfilePhoto',formatter: '.Formatter.getImageSrc'}" type="Navigation" press=".onPressGoToMaster" />
+                </m:List>
+
+                <!-- Right Pane - Chat Area -->
+                <m:VBox class="chatAreaContainer"  >
+                
+                    <m:List id="messageList"
+                          items="{/messages}">
+                        <m:CustomListItem>
+                            <m:HBox>
+                                <m:VBox class="sapUiSmallMarginBegin">
+                                    <m:Text text="{sender} ({time})" class="senderText"/>
+                                    <m:Text text="{content}" class="messageText"/>
+                                </m:VBox>
+                            </m:HBox>
+                        </m:CustomListItem>
+                    </m:List>
+                </m:VBox>
+            </l:Splitter>
+        </m:content>
+        <m:footer>
+            <m:Toolbar>
+                <m:Input id="messageInput"
+                      class="classmessageInput"
+                      width="100%"
+                      placeholder="Type your message..."
+                      enabled="{= !!${/selectedEmployee}}"
+                      liveChange=".onMessageInputChange" submit=""/>
+                <m:ToolbarSpacer/>
+                <m:Button id="sendButton"
+                      icon="sap-icon://paper-plane"
+                      type="Emphasized"
+                      enabled="{= !!${/selectedEmployee} &amp;&amp; !!${/messageText}}"
+                       press="onSendMessage"/>
+            </m:Toolbar>
+        </m:footer>
+    </m:Dialog>
+</core:FragmentDefinition>

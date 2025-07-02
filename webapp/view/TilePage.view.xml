@@ -561,6 +561,16 @@
                                         />
                                     </TileContent>
                                 </GenericTile>
+                                 <GenericTile
+                                    header="Chat App"
+                                    press="Tile_ChatApp"
+                                >
+                                    <TileContent unit="{i18n>assetFooter}">
+                                        <ImageContent
+                                            src="sap-icon://add-employee"
+                                        />
+                                    </TileContent>
+                                </GenericTile>
                             </ux:blocks>
                         </ux:ObjectPageSubSection>
                     </ux:subSections>

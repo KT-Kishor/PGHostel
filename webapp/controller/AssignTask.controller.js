@@ -334,16 +334,19 @@ sap.ui.define(
           const oRawData = { ...oEditModel.getData() }; // Clone data to avoid mutation
           const oEmpId = oSelectedItem.getBindingContext("AssignModel").getProperty("EmployeeID");
 
-          const fnFormatDateForBackend = (sDate) => {
-            if (!sDate || !sDate.includes("/")) return null;
-            const [dd, mm, yyyy] = sDate.split("/");
-            return `${yyyy}-${mm}-${dd}`;
-          };
+          // const fnFormatDateForBackend = (sDate) => {
+          //   if (!sDate || !sDate.includes("/")) return null;
+          //   const [dd, mm, yyyy] = sDate.split("/");
+          //   return `${yyyy}-${mm}-${dd}`;
+          // };
+          const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+        const sQuotationDate = oDateFormat.format(sap.ui.getCore().byId("FAT_id_StartDate").getDateValue());
+        const sValidUntilDate = oDateFormat.format(sap.ui.getCore().byId("FAT_id_EndDate").getDateValue());
 
           const oData = {
             ...oRawData,
-            StartDate: fnFormatDateForBackend(oRawData.StartDate),
-            EndDate: fnFormatDateForBackend(oRawData.EndDate)
+            StartDate: sQuotationDate,
+            EndDate: sValidUntilDate
           };
 
           const filters = {
