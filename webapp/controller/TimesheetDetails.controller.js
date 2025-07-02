@@ -37,10 +37,8 @@ sap.ui.define([
                 this.onInitializeLegend({ getSource: () => oCalendar });
                 this.onDateSelect({ getSource: () => oCalendar });
             }
-
             // Handle Edit and Create cases
             this.sArg = oEvent.getParameter("arguments").sPath;
-
             if (this.sArg !== "Timesheet") {
                 await this.readCallTimesheet();
                 const oData = this.getView().getModel("newModel").getData();
@@ -61,10 +59,7 @@ sap.ui.define([
                 oViewModel.setProperty("/isCreate", false);
                 oViewModel.setProperty("/isEditing", false);
                 oViewModel.setProperty("/isCalendarEnabled", false);
-
-                // i18n page title
                 oViewModel.setProperty("/pageTitle", this.i18nModel.getText("pageTitleEdit"));
-
                 // format date
                 var editDate = this.getView().getModel("newModel").getProperty("/Date");
                 if (editDate && editDate.includes("T")) {
@@ -74,27 +69,18 @@ sap.ui.define([
                 if (parts.length === 3) {
                     editDate = parts[2] + "/" + parts[1] + "/" + parts[0];
                 }
-
-                // i18n form title
                 oViewModel.setProperty("/formTitle", this.i18nModel.getText("formTitleEdit", [editDate]));
-
             } else {
                 oViewModel.setProperty("/isUpdate", false);
                 oViewModel.setProperty("/isCreate", true);
                 oViewModel.setProperty("/isEditing", true);
                 oViewModel.setProperty("/isCalendarEnabled", true);
-
-                // i18n page title
                 oViewModel.setProperty("/pageTitle", this.i18nModel.getText("pageTitleCreate"));
-
                 var today = new Date();
                 var todayStr = String(today.getDate()).padStart(2, '0') + "/" +
                     String(today.getMonth() + 1).padStart(2, '0') + "/" +
                     today.getFullYear();
-
-                // i18n form title
                 oViewModel.setProperty("/formTitle", this.i18nModel.getText("formTitleCreate", [todayStr]));
-
                 const emptyData = {
                     TaskID: "",
                     TaskName: "",
@@ -113,6 +99,8 @@ sap.ui.define([
             }
             this.closeBusyDialog();
         },
+
+        //read Timesheet
         readCallTimesheet: async function () {
             try {
                 this.getBusyDialog();
@@ -129,46 +117,44 @@ sap.ui.define([
                 }).catch((error) => {
                     MessageToast.show(error.message || error.responseText);
                     this.closeBusyDialog();
-
                 });
             } catch (error) {
                 MessageToast.show(this.i18nModel.getText("technicalError"));
                 this.closeBusyDialog();
             }
         },
-
+        //logout function
         onLogout: function () {
             this.CommonLogoutFunction();
         },
-
+        //Start week day
         _getStartOfWeek: function (date) {
             const day = date.getDay(); // Sunday = 0, Monday = 1, ...
             const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust if Sunday
             return new Date(date.setDate(diff));
         },
-
+        //validation function
         TD_ValidateCommonFields: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
-
+        //back function
         TSD_onPressBack: function () {
             this.getRouter().navTo("RouteTimesheet");
         },
+        //validate time
         TD_ValidateTime: function (oEvent) {
             utils._LCvalidateTimeLimit(oEvent);
         },
-
+        //open the value help to selct assignment
         onValueHelpRequest: function () {
             const oCalendar = this.getView().byId("calendar");
             const selectedDates = oCalendar ? oCalendar.getSelectedDates() : [];
             const selectedDateObj = selectedDates[0]?.getStartDate();
-
             if (!selectedDateObj) {
                 MessageToast.show(this.i18nModel.getText("selectDateT"));
                 return;
             }
-
-            // Format selected date as YYYY-MM-DD (inline formatting)
+            // Format selected date as YYYY-MM-DD
             const selectedDateStr = [
                 selectedDateObj.getFullYear(),
                 String(selectedDateObj.getMonth() + 1).padStart(2, '0'),
@@ -176,7 +162,7 @@ sap.ui.define([
             ].join('-');
             // Get assignment data
             const aAllAssignments = this.getView().getModel("AssignModel")?.getData() || [];
-            // Filter assignments where selected date is between StartDate and EndDate (inclusive)
+            // Filter assignments where selected date is between StartDate and EndDate
             const aFilteredAssignments = aAllAssignments.filter(oItem => {
                 if (!oItem.StartDate || !oItem.EndDate) return false;
                 const startDateStr = oItem.StartDate.split("T")[0];
@@ -187,7 +173,7 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("noAssignment"));
                 return;
             }
-            // Load the fragment and assign the filtered model
+            // Load the fragment 
             if (!this.TSD_oDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.kt.com.minihrsolution.fragment.TimesheetTask",
@@ -204,6 +190,8 @@ sap.ui.define([
                 this.TSD_oDialog.open();
             }
         },
+
+        //Assignment live change
         onAssignmentLiveChange: function (oEvent) {
             const sQuery = oEvent.getParameter("value").toLowerCase(); // get input string
             const oBinding = oEvent.getSource().getBinding("items");
@@ -214,7 +202,7 @@ sap.ui.define([
             const oCombinedFilter = new sap.ui.model.Filter([oFilter1, oFilter2], false); // OR logic
             oBinding.filter(oCombinedFilter);
         },
-
+        //Submit the timesheet data
         TSD_onSubmit: async function () {
             try {
                 await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
@@ -226,13 +214,11 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("selectDateT"));
                     return;
                 }
-
                 const formattedDate = [
                     selectedDateObj.getFullYear(),
                     String(selectedDateObj.getMonth() + 1).padStart(2, '0'),
                     String(selectedDateObj.getDate()).padStart(2, '0')
                 ].join('-');
-
                 const oData = this.getView().getModel("newModel")?.getData() || {};
                 const oPayload = {
                     TaskID: oData.TaskID,
@@ -249,7 +235,6 @@ sap.ui.define([
                     Status: "Saved",
                     comments: oData.Comment
                 };
-
                 this.getBusyDialog();
                 await this.ajaxCreateWithJQuery("Timesheet", { data: oPayload });
                 MessageToast.show(this.i18nModel.getText("timesheetSuccess") || "Timesheet submitted!");
@@ -265,32 +250,26 @@ sap.ui.define([
             const that = this;
             const oCalendar = this.oDatePicker;
             if (!oCalendar) return;
-
             oCalendar.removeAllSpecialDates();
-
             const holidays = this.getView().getModel("HolidayModel").getData();
             const holidayMap = new Map(holidays.map(holiday => [
                 new Date(holiday.Date).toDateString(),
                 holiday.Name
             ]));
-
             const yearStart = new Date(new Date().getFullYear(), 0, 1);
             const yearEnd = new Date(new Date().getFullYear(), 11, 31);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-
             for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
                 d.setHours(0, 0, 0, 0);
                 const day = d.getDay();
                 const isWeekend = (day === 0 || day === 6);
                 const holidayName = holidayMap.get(d.toDateString());
                 const isFutureDate = d > today;
-
                 const oDateRange = new sap.ui.unified.DateTypeRange({
                     startDate: new Date(d),
                     endDate: new Date(d)
                 });
-
                 if (holidayName) {
                     oDateRange.setType("Type04");
                     oDateRange.setTooltip(this.i18nModel.getText("calendarHoliday") + " : " + holidayName);
@@ -304,7 +283,6 @@ sap.ui.define([
                     oDateRange.setType("Type06");
                     oDateRange.setTooltip(this.i18nModel.getText("calendarWorkingDay"));
                 }
-
                 oCalendar.addSpecialDate(oDateRange);
             }
         },
@@ -325,7 +303,7 @@ sap.ui.define([
                 this.onMarkCalendarDates();
             }
         },
-
+        //Date selection for fill timesheet
         onDateSelect: function (oEvent) {
             var that = this;
             var oViewModel = this.getView().getModel("viewModel");
@@ -368,7 +346,7 @@ sap.ui.define([
                 oViewModel.setProperty("/selectedEntryDate", formattedDate);
             }
         },
-
+        //Clear the data
         clearTimesheetForm: function () {
             const oAssignModel = this.getView().getModel("AssignModel");
             // Clear input values
@@ -386,8 +364,7 @@ sap.ui.define([
             this.byId("TSD_id_EmpComment").setValueState("None");
             this.getView().setModel(new JSONModel({}), "newModel");
         },
-
-
+        //Close the value help after selecting assignment
         onValueHelpDialogClose: async function (oEvent) {
             const oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) {
@@ -452,6 +429,7 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
+        //Edit the timesheet data
         TSD_onToggleEdit: async function () {
             const oViewModel = this.getView().getModel("viewModel");
 
@@ -474,11 +452,10 @@ sap.ui.define([
                 this.getView().getModel("newModel").setProperty("/ActualHours", hrs || 0);
                 const hoursText = hrs ? `${hrs} hours` : "Not available";
                 this.byId("idTextActHour").setText(`Actual Hours: ${hoursText}`);
-
-                // Focus on the hours input field for quick editing
                 this.byId("TSD_id_TimeHours").focus();
             }
         },
+        //Update the data
         TSD_onUpdate: async function () {
             try {
                 this.getBusyDialog();
@@ -489,12 +466,10 @@ sap.ui.define([
                 let oData = this.getView().getModel("newModel").getData();
                 delete oData.comments;
                 delete oData.ActualHours;
-
                 const oPayload = {
                     data: oData,
                     filters: { SrNo: this.sArg }
                 };
-
                 await this.ajaxUpdateWithJQuery("Timesheet", oPayload);
                 MessageToast.show(this.i18nModel.getText("updateSuccess") || "Update successful.");
 
@@ -505,13 +480,13 @@ sap.ui.define([
                 oViewModel.setProperty("/isVisiable", true);
                 oViewModel.setProperty("/editBut", true);
                 this.getView().getModel("newModel").refresh(true);
-
             } catch (err) {
                 MessageToast.show(err.message || this.i18nModel.getText("technicalError") || "Update failed.");
             } finally {
                 this.closeBusyDialog();
             }
         },
+        //common validation for edit and create timesheet data
         _validateTimesheetFields: function (isCreateMode = true) {
             const oComment = this.byId("TSD_id_EmpComment");
             const oHours = this.byId("TSD_id_TimeHours");
@@ -526,19 +501,16 @@ sap.ui.define([
             }
             const sEnteredHours = Number(oHours.getValue());
             let sActualHours = Number(oData.ActualHours);
-
             // Fallback if ActualHours not populated
             if (!sActualHours || sActualHours === 0) {
                 const match = aAssigns.find(a => a.TaskID === oData.TaskID);
                 sActualHours = Number(match?.HoursWorked || 0);
                 this.getView().getModel("newModel").setProperty("/ActualHours", sActualHours);
             }
-
             if (isNaN(sEnteredHours) || isNaN(sActualHours)) {
                 MessageToast.show("Invalid hour value.");
                 return false;
             }
-
             if (sEnteredHours > sActualHours) {
                 const errorMsg = this.i18nModel.getText("hoursExceedError") || `Entered hours (${sEnteredHours}) cannot exceed assigned hours (${sActualHours}).`;
                 MessageToast.show(errorMsg);

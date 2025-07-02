@@ -10,7 +10,6 @@ sap.ui.define([
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetApproval", {
         onInit: function () {
             this.getRouter().getRoute("RouteTimesheetApproval").attachMatched(this._onRouteMatched, this);
-
         },
 
         _onRouteMatched: async function () {
@@ -22,11 +21,15 @@ sap.ui.define([
 
             // Get ManagerID from LoginModel
             const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
+            const oModel = new JSONModel();
+            oModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
+            this.getView().setModel(oModel, "viewModel");
             this.TSA_onClear(); // Clear any existing filters
-            //Initially Status filter set the value Submitted
-            this.byId("TSA_id_Status").setValue("Submitted");
+
+            this.byId("TSA_id_Status").setValue("Submitted"); //initially set Submitted
 
             await this.readSubmittedTimesheetsForManager(ManagerID);
+
             // ViewModel for button enable/disable
             const oViewModel = new JSONModel({ canApproveReject: false });
             this.getView().setModel(oViewModel, "approvalViewModel");
@@ -34,34 +37,35 @@ sap.ui.define([
             // Disable buttons initially
             this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
         },
+        //Get week satrt day
+        _getStartOfWeek: function (date) {
+            const day = date.getDay(); // Sunday = 0, Monday = 1, ...
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust if Sunday
+            return new Date(date.setDate(diff));
+        },
+
+        //Read Timesheet for logged in manager
         readSubmittedTimesheetsForManager: async function (ManagerID) {
             this.getBusyDialog();
             try {
                 const oData = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID });
                 let timesheetData = Array.isArray(oData.data) ? oData.data : [oData.data];
-
                 // Filter only specific statuses
                 timesheetData = timesheetData.filter(entry =>
                     ["Submitted", "Approved", "Rejected"].includes(entry?.Status)
                 );
-
                 // Set main timesheet model
                 this.getView().setModel(new JSONModel(timesheetData), "ApprovalTimesheetModel");
 
-                // === Unique Employee ID List ===
+                // Unique Employee ID List 
                 const uniqueEmployees = [];
                 const employeeMap = new Set();
-
                 timesheetData.forEach(entry => {
                     if (!employeeMap.has(entry.EmployeeID)) {
                         employeeMap.add(entry.EmployeeID);
-                        uniqueEmployees.push({
-                            EmployeeID: entry.EmployeeID,
-                            EmployeeName: entry.EmployeeName
-                        });
+                        uniqueEmployees.push({ EmployeeID: entry.EmployeeID, EmployeeName: entry.EmployeeName });
                     }
                 });
-
                 this.getView().setModel(new JSONModel(uniqueEmployees), "EmployeeFilterModel");
                 this.byId("TSA_id_Status").setValue("Submitted");
                 this.TSA_onSearch();
@@ -71,34 +75,29 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
-
-
+        //Table selection
         TSA_onSelect: function () {
             const oTable = this.byId("TSA_id_Table");
             const oSelectedItems = oTable.getSelectedItems();
             let canApproveReject = false;
-
             if (oSelectedItems.length > 0) {
                 // Only enable if all selected items are "Submitted"
                 canApproveReject = oSelectedItems.every(item =>
-                    item.getBindingContext("ApprovalTimesheetModel").getProperty("Status") === "Submitted"
-                );
+                    item.getBindingContext("ApprovalTimesheetModel").getProperty("Status") === "Submitted");
             }
-
             this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", canApproveReject);
         },
-
+        //Approve Timesheet
         TSA_onApprove: function () {
             this._openManagerRemarkDialog("Approved");
         },
-
+        //Reject timesheet
         TSA_onReject: function () {
             this._openManagerRemarkDialog("Rejected");
         },
-
+        //Open manager remark dialog
         _openManagerRemarkDialog: function (status) {
             this._approvalStatus = status; // Store for use on submit
-
             const sTitle = status === "Approved"
                 ? this.i18nModel.getText("confirmApprove")
                 : this.i18nModel.getText("confirmRejectleave");
@@ -127,7 +126,6 @@ sap.ui.define([
                             ? this.i18nModel.getText("approve")
                             : this.i18nModel.getText("reject"));
                     }
-
                     oDialog.open();
                 }.bind(this));
             } else {
@@ -147,7 +145,6 @@ sap.ui.define([
                         ? this.i18nModel.getText("approve")
                         : this.i18nModel.getText("reject"));
                 }
-
                 this._oManagerRemarkDialog.open();
             }
         },
@@ -177,7 +174,6 @@ sap.ui.define([
                 comments: sRemark,
                 data: aPayload
             };
-
             this.getBusyDialog();
             try {
                 await this.ajaxUpdateWithJQuery("Timesheet", finalPayload);
@@ -217,14 +213,15 @@ sap.ui.define([
             this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
             this._approvalStatus = null; // Reset approval status
         },
-
+        //Back function
         onPressback: function () {
             this.getRouter().navTo("RouteTilePage");
         },
-
+        //logout function
         onLogout: function () {
             this.getRouter().navTo("RouteLoginPage");
         },
+        //Search call for filter values
         TSA_onSearch: async function () {
             try {
                 this.getBusyDialog();
@@ -237,7 +234,6 @@ sap.ui.define([
                         params[sValue] = oControl.getValue();
                     }
                 });
-
                 const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
                 //await this.readSubmittedTimesheetsForManager(ManagerID);
                 var data = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID, ...params });
@@ -250,6 +246,7 @@ sap.ui.define([
             }
         },
 
+        //Clear filterbar
         TSA_onClear: function () {
             var aFilterItems = this.byId("TSA_id_Filter").getFilterGroupItems();
             aFilterItems.forEach(function (oItem) {
@@ -267,6 +264,7 @@ sap.ui.define([
                 }
             });
         },
+        //Show comments
         TSA_onShowComments: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("ApprovalTimesheetModel");
             var oData = oContext.getObject();
@@ -312,6 +310,5 @@ sap.ui.define([
             });
             oDialog.open();
         },
-
     });
 });

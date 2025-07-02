@@ -33,23 +33,22 @@ sap.ui.define(["./BaseController",
 
                 var loginModel = this.getOwnerComponent().getModel("LoginModel");
                 this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
-
                 this.branch = loginModel.getProperty("/BranchCode");
                 this.TSD_ReadTimesheetEntries(this.EmployeeID);
                 this.TS_onClear();
             },
-
-
+            //Fill the timesheet
             TS_onFillDetails: function () {
                 this.getRouter().navTo("RouteTimesheetDetails", { sPath: "Timesheet" });
             },
-
+            //Navigate to edit data
             TS_onPressData: function (oEvent) {
                 var sPath = oEvent.getSource().getBindingContext("FilteredTimesheetModel").getProperty("SrNo");
                 this.getRouter().navTo("RouteTimesheetDetails", {
                     sPath: sPath
                 });
             },
+            //Read Timesheet
             TSD_ReadTimesheetEntries: async function (filter) {
                 try {
                     this.getBusyDialog();
@@ -79,10 +78,6 @@ sap.ui.define(["./BaseController",
                 oEndDate.setDate(oEndDate.getDate() + iDays - 1);
                 oEndDate.setHours(23, 59, 59, 999);
 
-                // Get all timesheet data
-                // var oTimesheetModel = this.getView().getModel("FilteredTimesheetModel");
-                // var aAllData = oTimesheetModel ? oTimesheetModel.getData() : [];
-
                 // Filter entries for the current week
                 var aFiltered = this.timesheetData.filter(function (entry) {
                     if (!entry.Date) return false;
@@ -94,14 +89,12 @@ sap.ui.define(["./BaseController",
                 // Update the model with filtered data
                 this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "FilteredTimesheetModel");
             },
-
+            //On date selection filter data 
             TS_onCalendarDateSelect: function (oEvent) {
-                // Get the selected date from the calendar
                 var oCalendar = oEvent.getSource();
                 var aSelectedDates = oCalendar.getSelectedDates();
                 if (aSelectedDates.length > 0) {
                     var oSelectedDate = aSelectedDates[0].getStartDate();
-                    // Zero out time for comparison
                     oSelectedDate.setHours(0, 0, 0, 0);
 
                     // Get all timesheet data
@@ -111,30 +104,29 @@ sap.ui.define(["./BaseController",
                     // Filter for the selected date
                     var aFiltered = aAllData.filter(function (entry) {
                         if (!entry.Date) return false;
-                        // Parse the DB date string to a Date object
                         var entryDate = new Date(entry.Date);
                         entryDate.setHours(0, 0, 0, 0);
                         return entryDate.getTime() === oSelectedDate.getTime();
                     });
-
-                    // Update the model with filtered data
                     this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "FilteredTimesheetModel");
                 }
             },
 
+            //Get start week day
             _getStartOfWeek: function (date) {
                 const day = date.getDay(); // Sunday = 0, Monday = 1, ...
                 const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust if Sunday
                 return new Date(date.setDate(diff));
             },
-
+            //back function
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
+            //logout
             onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
-
+            //Delete the Timesheet data
             TS_onDeleteTimesheet: async function () {
                 const that = this;
                 const oTable = this.byId("TD_id_Table");
@@ -152,7 +144,6 @@ sap.ui.define(["./BaseController",
                     async function () {
                         try {
                             that.getBusyDialog();
-
                             // Step 1: Delete the records
                             await that.ajaxDeleteWithJQuery("Timesheet", {
                                 filters: { SrNo: aIdsToDelete }
@@ -188,8 +179,7 @@ sap.ui.define(["./BaseController",
                     }
                 );
             },
-
-
+            //Submit the timesheet
             TS_onSubmitTimesheet: async function () {
                 const that = this;
                 const oTable = this.byId("TD_id_Table");
@@ -199,7 +189,6 @@ sap.ui.define(["./BaseController",
                     MessageToast.show(this.i18nModel.getText("selctRowtoSubmit"));
                     return;
                 }
-
                 // data updates for selected rows
                 const aItems = aSelectedItems.map(item => {
                     const oData = item.getBindingContext("FilteredTimesheetModel").getObject();
@@ -222,12 +211,10 @@ sap.ui.define(["./BaseController",
                         }
                     };
                 });
-
                 const finalPayload = {
                     tableName: "Timesheet",
                     data: aItems
                 };
-
                 this.showConfirmationDialog(
                     this.i18nModel.getText("confirmTitle"),
                     this.i18nModel.getText("submitConfirm"),
@@ -236,7 +223,6 @@ sap.ui.define(["./BaseController",
                             that.getBusyDialog();
 
                             await that.ajaxUpdateWithJQuery("Timesheet", finalPayload);
-
                             MessageToast.show(that.i18nModel.getText("SubmitSuucess"));
 
                             that.getView().getModel("viewModel").setProperty("/canSubmit", false);
@@ -261,38 +247,31 @@ sap.ui.define(["./BaseController",
                     }
                 );
             },
-
+            //Table selection change
             T_TableSelectionChange: function () {
                 var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
                 var oViewModel = this.getView().getModel("viewModel");
-
                 // Default to false
                 oViewModel.setProperty("/canSubmit", false);
                 oViewModel.setProperty("/canDelete", false);
-
                 if (oSelectedItems.length === 0) {
                     return;
                 }
-
                 var allValidForSubmitOrDelete = true;
-
                 oSelectedItems.forEach(function (item) {
                     var status = item.getBindingContext("FilteredTimesheetModel").getProperty("Status");
-
                     // If any status is Submitted or Approved, disable buttons
                     if (status === "Submitted" || status === "Approved") {
                         allValidForSubmitOrDelete = false;
                     }
                 });
-
                 if (allValidForSubmitOrDelete) {
                     // All statuses are either Saved or Rejected
                     oViewModel.setProperty("/canSubmit", true);
                     oViewModel.setProperty("/canDelete", true);
                 }
             },
-
-
+            //Comment open dialog
             TS_onShowComments: function (oEvent) {
                 var oContext = oEvent.getSource().getBindingContext("FilteredTimesheetModel");
                 var oData = oContext.getObject();
@@ -333,7 +312,7 @@ sap.ui.define(["./BaseController",
                 });
                 oDialog.open();
             },
-
+            //Searh data on filtering
             T_onSearch: async function () {
                 this.getBusyDialog(); // Show busy dialog
                 var aFilterItems = this.byId("TS_id_FilterBar").getFilterGroupItems();
@@ -363,6 +342,8 @@ sap.ui.define(["./BaseController",
                     this.closeBusyDialog(); // Close after call finishes
                 }
             },
+
+            //Clear the filter
             TS_onClear: function () {
                 var aFilterItems = this.byId("TS_id_FilterBar").getFilterGroupItems();
                 aFilterItems.forEach(function (oItem) {
