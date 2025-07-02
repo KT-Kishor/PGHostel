@@ -493,8 +493,8 @@ sap.ui.define([
                 oPDFModel.setProperty("/TrainingStartDate", Formatter.formatDate(oEmpModel.JoiningDate));
                 oPDFModel.setProperty("/ReportingManager", oEmpModel.ReportingManager);
                 oPDFModel.setProperty("/StipendOrFees", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Amount));
-                oPDFModel.setProperty("/StipendSkipLine", (oEmpModel.Type === "Paid" || oEmpModel.Amount == "0") ? 5 : null);
-                oPDFModel.setProperty("/TrainingFeesSkipLine", (oEmpModel.Type === "Stipend" || oEmpModel.Amount == "0") ? 6 : null);
+                oPDFModel.setProperty("/StipendSkipLine", (oEmpModel.Type === "Paid" || parseInt(oEmpModel.Amount) === 0) ? 5 : null);
+                oPDFModel.setProperty("/TrainingFeesSkipLine", (oEmpModel.Type === "Stipend" || parseInt(oEmpModel.Amount) === 0) ? 6 : null);
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
