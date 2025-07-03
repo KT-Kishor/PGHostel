@@ -3,8 +3,9 @@ sap.ui.define([
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
+     "sap/ui/unified/DateRange",
     "sap/ui/unified/CalendarLegendItem",
-], function (BaseController, utils, JSONModel, MessageToast, CalendarLegendItem) {
+], function (BaseController, utils, JSONModel, MessageToast, DateRange) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetDetails", {
         onInit: function () {
@@ -25,16 +26,7 @@ sap.ui.define([
             this.byId("TSD_id_TimeHours").setValueState("None");
             this.byId("TSD_id_EmpComment").setValueState("None");
             this._makeDatePickersReadOnly(["TSD_id_Assignment", "TSD_id_TimeHours"]);
-            // Set current date as selected in the calendar
-            var oCalendar = this.byId("calendar");
-            if (oCalendar) {
-                var oToday = new Date();
-                var oDateRange = new sap.ui.unified.DateRange({ startDate: oToday });
-                oCalendar.removeAllSelectedDates();
-                oCalendar.addSelectedDate(oDateRange);
-                this.onInitializeLegend({ getSource: () => oCalendar });
-                this.onDateSelect({ getSource: () => oCalendar });
-            }
+            await this._initializeCalendarAndLegend();
             // Handle Edit and Create cases
             this.sArg = oEvent.getParameter("arguments").sPath;
             if (this.sArg !== "Timesheet") {
@@ -97,7 +89,17 @@ sap.ui.define([
             }
             this.closeBusyDialog();
         },
-
+        _initializeCalendarAndLegend: async function () {
+            const oCalendar = this.byId("calendar");
+            if (oCalendar) {
+                // Set the default selected date
+                const oToday = new Date();
+                oCalendar.removeAllSelectedDates();
+                oCalendar.addSelectedDate(new DateRange({ startDate: oToday }));
+                // Call the common function from the BaseController
+                await this.initCalendarLegend(oCalendar, this.branch);
+            }
+        },
         //read Timesheet
         readCallTimesheet: async function () {
             try {
@@ -242,64 +244,6 @@ sap.ui.define([
                 MessageToast.show(err.message || "Submission error.");
             } finally {
                 this.closeBusyDialog();
-            }
-        },
-        // Initialize calendar legend
-        onMarkCalendarDates: function () {
-            const that = this;
-            const oCalendar = this.oDatePicker;
-            if (!oCalendar) return;
-            oCalendar.removeAllSpecialDates();
-            const holidays = this.getView().getModel("HolidayModel").getData();
-            const holidayMap = new Map(holidays.map(holiday => [
-                new Date(holiday.Date).toDateString(),
-                holiday.Name
-            ]));
-            const yearStart = new Date(new Date().getFullYear(), 0, 1);
-            const yearEnd = new Date(new Date().getFullYear(), 11, 31);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
-                d.setHours(0, 0, 0, 0);
-                const day = d.getDay();
-                const isWeekend = (day === 0 || day === 6);
-                const holidayName = holidayMap.get(d.toDateString());
-                const isFutureDate = d > today;
-                const oDateRange = new sap.ui.unified.DateTypeRange({
-                    startDate: new Date(d),
-                    endDate: new Date(d)
-                });
-                if (holidayName) {
-                    oDateRange.setType("Type04");
-                    oDateRange.setTooltip(this.i18nModel.getText("calendarHoliday") + " : " + holidayName);
-                } else if (isWeekend) {
-                    oDateRange.setType("Type09");
-                    oDateRange.setTooltip(this.i18nModel.getText("calendarWeekend"));
-                } else if (isFutureDate) {
-                    oDateRange.setType("Type07");
-                    oDateRange.setTooltip(this.i18nModel.getText("calendarFutureDate"));
-                } else {
-                    oDateRange.setType("Type06");
-                    oDateRange.setTooltip(this.i18nModel.getText("calendarWorkingDay"));
-                }
-                oCalendar.addSpecialDate(oDateRange);
-            }
-        },
-
-        // Initialize calendar legend with new "Future Date" type
-        onInitializeLegend: function (oEvent) {
-            this.oDatePicker = oEvent.getSource();
-            if (this.oDatePicker) {
-                const oLegend = new sap.ui.unified.CalendarLegend({
-                    items: [
-                        new CalendarLegendItem({ type: "Type04", text: this.i18nModel.getText("calendarHoliday") }),
-                        new CalendarLegendItem({ type: "Type09", text: this.i18nModel.getText("calendarWeekend") }),
-                        new CalendarLegendItem({ type: "Type06", text: this.i18nModel.getText("calendarWorkingDay") }),
-                        new CalendarLegendItem({ type: "Type07", text: this.i18nModel.getText("calendarFutureDate") })
-                    ]
-                });
-                this.oDatePicker.setLegend(oLegend);
-                this.onMarkCalendarDates();
             }
         },
         //Date selection for fill timesheet
