@@ -3,10 +3,8 @@ sap.ui.define([
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "sap/ui/unified/DateTypeRange",
-    "sap/ui/unified/CalendarDayType",
     "sap/ui/unified/CalendarLegendItem",
-], function (BaseController, utils, JSONModel, MessageToast, DateTypeRange, CalendarDayType, CalendarLegendItem) {
+], function (BaseController, utils, JSONModel, MessageToast,CalendarLegendItem) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetDetails", {
         onInit: function () {
@@ -293,10 +291,10 @@ sap.ui.define([
             if (this.oDatePicker) {
                 const oLegend = new sap.ui.unified.CalendarLegend({
                     items: [
-                        new sap.ui.unified.CalendarLegendItem({ type: "Type04", text: this.i18nModel.getText("calendarHoliday") }),
-                        new sap.ui.unified.CalendarLegendItem({ type: "Type09", text: this.i18nModel.getText("calendarWeekend") }),
-                        new sap.ui.unified.CalendarLegendItem({ type: "Type06", text: this.i18nModel.getText("calendarWorkingDay") }),
-                        new sap.ui.unified.CalendarLegendItem({ type: "Type07", text: this.i18nModel.getText("calendarFutureDate") })
+                        new CalendarLegendItem({ type: "Type04", text: this.i18nModel.getText("calendarHoliday") }),
+                        new CalendarLegendItem({ type: "Type09", text: this.i18nModel.getText("calendarWeekend") }),
+                        new CalendarLegendItem({ type: "Type06", text: this.i18nModel.getText("calendarWorkingDay") }),
+                        new CalendarLegendItem({ type: "Type07", text: this.i18nModel.getText("calendarFutureDate") })
                     ]
                 });
                 this.oDatePicker.setLegend(oLegend);
