@@ -15,6 +15,35 @@ sap.ui.define(
             .getRoute("RouteTilePage")
             .attachMatched(this._onRouteMatched, this);
         },
+        onAfterRendering: function () {
+          var oCarousel = this.byId("carouselSample");
+          var iInterval = 3000; // in milliseconds
+
+          // Ensure there is more than one page before starting the timer
+          if (oCarousel.getPages().length > 1) {
+            this._autoScrollTimer = setInterval(function () {
+              oCarousel.next();
+            }, iInterval);
+          }
+        },
+
+        onExit: function () {
+          // Clear the timer when the view is destroyed
+          if (this._autoScrollTimer) {
+            clearInterval(this._autoScrollTimer);
+          }
+        },
+
+        onSendWishesPress: function (oEvent) {
+          // Get the context of the person whose card was clicked
+          const oContext = oEvent.getSource().getBindingContext("PDFData");
+          const sName = oContext.getProperty("Name");
+
+          // Example: Show a toast message
+          sap.m.MessageToast.show("Your wishes have been sent to " + sName + "!");
+
+          // You can add more complex logic here, like opening an email client
+        },
         _onRouteMatched: async function () {
           if (!this.that) this.that = this.getOwnerComponent().getModel("ThisModel")?.getData().that;
           var LoginFunction = await this.commonLoginFunction("TilePage");

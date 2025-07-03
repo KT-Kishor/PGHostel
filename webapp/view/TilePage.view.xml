@@ -5,7 +5,9 @@
     xmlns:ux="sap.uxap"
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout"
-    xmlns:l="sap.ui.layout">
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.f"
+    xmlns:card="sap.f.cards">
     <App>
         <l:Splitter orientation="Horizontal" height="100%">
             <Page id="idPageTile" class="service-background">
@@ -291,12 +293,43 @@
                     <l:SplitterLayoutData size="40%" />
 
                 </layoutData>
-                <GenericTile header="Analytics" class="sapUiTinyMargin">
-                    <TileContent>
-                    </TileContent>
-                </GenericTile>
+                <Carousel
+                    id="carouselSample"
+                    height="auto"
+                    width="auto"
+                    loop="true"
+                    showPageIndicator="false"
+                    pages="{path: 'PDFData>/TableData'}">
+                    <pages>
+                        <f:Card class="sapUiSmallMargin" width="auto">
+                            <f:header>
+                                <card:Header
+                                    title="{PDFData>Name}"
+                                    subtitle="{PDFData>Role}"
+                                    iconSrc="{PDFData>/KTLogo}"
+                                    iconDisplayShape="Circle"
+                                    iconFitType="Cover">
+                                </card:Header>
+                            </f:header>
+                            <f:content>
+                                <VBox class="sapUiContentPadding sapUiMediumMarginBeginEnd" width="auto" renderType="Bare">
+                                    <Title
+                                        level="H3"
+                                        text="Happy Birthday!! 🎉"
+                                        titleStyle="H3"
+                                        class="sapUiSmallMarginBottom" />
 
-
+                                    <Text
+                                        text="Wishing you a day filled with happiness and a year filled with joy. We hope you have a wonderful birthday and a great year ahead."
+                                        class="sapUiSmallMarginBottom" />
+                                        <HBox justifyContent="End" class="sapUiSmallMarginBottom">
+                                    <Button text="Send Wishes" type="Emphasized" press=".onPauseCarousel" />
+                                    </HBox>
+                                </VBox> 
+                            </f:content>
+                        </f:Card>
+                    </pages>
+                </Carousel>
                 <Table items="{MSASOWModel>/}" >
                     <columns>
                         <Column demandPopin="true">
