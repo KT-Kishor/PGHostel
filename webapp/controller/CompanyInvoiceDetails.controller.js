@@ -98,13 +98,15 @@ sap.ui.define([
                     this.byId("CID_id_Payby").setMinDate(new Date(oHeader.InvoiceDate));
                     this.byId("CID_id_NavPayby").setMinDate(new Date(oHeader.InvoiceDate));
                     oHeader.InvoiceDate = this.Formatter.formatDate(oHeader.InvoiceDate);
+                    var PayByDate = oHeader.PayByDate;
+                    oHeader.PayByDate = this.Formatter.formatDate(oHeader.PayByDate);
 
                     this.SelectedCustomerModel.setData(oHeader);
 
                     const aItems = oData.data.CompanyInvoiceItem.map((item, index) => ({ ...item, IndexNo: index + 1 }));
                     oView.setModel(new JSONModel({ CompanyInvoiceItem: aItems }), "CompanyInvoiceItemModel");
 
-                    const { IGST = "0", SGST = "0", CGST = "0", Value, Currency, PayByDate, Status, InvNo } = oHeader;
+                    const { IGST = "0", SGST = "0", CGST = "0", Value, Currency, Status, InvNo } = oHeader;
                     this.getView().getModel("FilteredSOWModel").setProperty("/Currency", Currency);
                     if (IGST === "0") {
                         this.visiablityPlay.setProperty("/igstVisi", false);
