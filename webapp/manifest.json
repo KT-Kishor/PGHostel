@@ -659,6 +659,13 @@
                     "target":[
                         "TargetAppliedCandidates"
                     ]
+                },
+                 {
+                    "name": "RouteKTChat",
+                    "pattern": "KTChat",
+                    "target": [
+                        "TargetChat"
+                    ]
                 }
 
             ],
@@ -1007,6 +1014,13 @@
                     "clearControlAggregation": false,
                     "viewId": "AppliedCandidates",
                     "viewName": "AppliedCandidates"
+                },
+                 "TargetChat":{
+                    "viewType": "XML",
+                    "transition":"slide",
+                    "clearControlAggregation": false,
+                    "viewId": "KTChat",
+                    "viewName": "KTChat"
                 }
 
             }

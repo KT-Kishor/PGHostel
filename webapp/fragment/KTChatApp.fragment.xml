@@ -49,12 +49,12 @@
                 <m:VBox class="chatAreaContainer"  >
                 
                     <m:List id="messageList"
-                          items="{/messages}">
+                          items="">
                         <m:CustomListItem>
                             <m:HBox>
-                                <m:VBox class="sapUiSmallMarginBegin">
-                                    <m:Text text="{sender} ({time})" class="senderText"/>
-                                    <m:Text text="{content}" class="messageText"/>
+                                <m:VBox class="sapUiSmallMarginBegin chatAreaContainer">
+                                    <m:Text text="Sai" class="senderText"/>
+                                    <m:Text text="Sai_send" class="messageText"/>
                                 </m:VBox>
                             </m:HBox>
                         </m:CustomListItem>

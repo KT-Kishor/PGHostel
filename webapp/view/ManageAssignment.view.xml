@@ -15,9 +15,9 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="TaskName" label="{i18n>assignmentid}" groupName="Group1" visibleInFilterBar="true" >
 					<fb:control>
-						<ComboBox showClearIcon="true" items="{TaskModel>/}"  showSecondaryValues="true" >
-							<core:ListItem key="{TaskModel>TaskID}" text="{TaskModel>TaskName}" additionalText="{TaskModel>TaskID}"/>
-						</ComboBox>
+						<ComboBox showClearIcon="true" items="{TaskListModel>/}" showSecondaryValues="true">
+    <core:ListItem key="{TaskListModel>TaskID}" text="{TaskListModel>TaskName}" />
+</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="StartDate" label="{i18n>startDate}" groupName="Group1" visibleInFilterBar="true">
@@ -25,11 +25,11 @@
 							 <DateRangeSelection id="MA_id_StartDate" valueFormat="MM/dd/yyyy"  displayFormat="MM/dd/yyyy"  />	
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="EndDate" label="{i18n>endDate}" groupName="Group1" visibleInFilterBar="true">
+					<!-- <fb:FilterGroupItem name="EndDate" label="{i18n>endDate}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
                     <DateRangeSelection id="MA_id_EndDate" valueFormat="MM/dd/yyyy"  displayFormat="MM/dd/yyyy"  />						
 					</fb:control>
-						</fb:FilterGroupItem>
+						</fb:FilterGroupItem> -->
 	
 				</fb:filterGroupItems>
 			</fb:FilterBar>

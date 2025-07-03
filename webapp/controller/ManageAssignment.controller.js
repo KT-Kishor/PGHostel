@@ -97,10 +97,12 @@ sap.ui.define(
                 this.oTaskDialog = oDialog;
                 oView.addDependent(oDialog);
                 oDialog.open();
+                this._FragmentDatePickersReadOnly(["NAF_id_StartDate", "NAF_id_EndDate"]);
               }.bind(this)
             );
           } else {
             this.oTaskDialog.open();
+            this._FragmentDatePickersReadOnly(["NAF_id_StartDate", "NAF_id_EndDate"]);
           }
         },
         MA_onPressClear: function () {
@@ -145,6 +147,7 @@ sap.ui.define(
           });
           if (response.success === true) {
             this.closeBusyDialog();
+            this.byId("MA_id_TaskTable").removeSelections(true)
             MessageToast.show("Task created successfully!");
             this.oTaskDialog.close();
             this._fetchCommonData("NewTask", "TaskModel", {});
@@ -183,6 +186,7 @@ sap.ui.define(
           );
           if (response.success === true) {
             this.closeBusyDialog();
+            this.byId("MA_id_TaskTable").removeSelections(true)
             MessageToast.show("Task updated successfully!");
             this.oTaskDialog.close();
             this._fetchCommonData("NewTask", "TaskModel", {});
@@ -236,18 +240,24 @@ sap.ui.define(
             const response = await this.ajaxReadWithJQuery("NewTask", params);
             if (response.success === true) {
               this.closeBusyDialog();
-              // Ensure data is an array
-              const taskData = Array.isArray(response.data)
-                ? response.data
-                : [response.data];
-              const oModel = new JSONModel(taskData);
-              this.getView().setModel(oModel, "TaskModel");
+              const taskData = Array.isArray(response.data) ? response.data : [response.data];
+
+              // Filtered result  for table
+              const oTableModel = new JSONModel(taskData);
+              this.getView().setModel(oTableModel, "TaskModel");
+
+              // Original full list for ComboBox 
+              if (!this.getView().getModel("TaskListModel")) {
+                const oFullListModel = new JSONModel(taskData);
+                this.getView().setModel(oFullListModel, "TaskListModel");
+              }
             }
           } catch (error) {
             this.closeBusyDialog();
             MessageToast.show("Request failed");
           }
         },
+
 
         MA_onItemPress: function (oEvent) {
           const oSelectedItem = oEvent.getSource().getBindingContext("TaskModel").getObject();

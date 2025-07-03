@@ -375,22 +375,23 @@ sap.ui.define(
           this.getRouter().navTo("Recruitment");
         },
         Tile_ChatApp: function () {
-          var oView = this.getView();
-          // Ensure user selection is reset before opening
-          if (!this.Chatapp) {
-            sap.ui.core.Fragment.load({
-              name: "sap.kt.com.minihrsolution.fragment.KTChatApp",
-              controller: this,
-            }).then(
-              function (Chatapp) {
-                this.Chatapp = Chatapp;
-                oView.addDependent(this.Chatapp);
-                this.Chatapp.open();
-              }.bind(this)
-            );
-          } else {
-            this.Chatapp.open();
-          }
+            this.getRouter().navTo("RouteKTChat");
+          // var oView = this.getView();
+          // // Ensure user selection is reset before opening
+          // if (!this.Chatapp) {
+          //   sap.ui.core.Fragment.load({
+          //     name: "sap.kt.com.minihrsolution.fragment.KTChatApp",
+          //     controller: this,
+          //   }).then(
+          //     function (Chatapp) {
+          //       this.Chatapp = Chatapp;
+          //       oView.addDependent(this.Chatapp);
+          //       this.Chatapp.open();
+          //     }.bind(this)
+          //   );
+          // } else {
+          //   this.Chatapp.open();
+          // }
         },
         onCloseDialog: function () {
           if (this.Chatapp) {

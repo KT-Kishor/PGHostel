@@ -186,6 +186,11 @@ sap.ui.define(
 
         FAT_onTaskClose: function () {
           if (this.oTaskDialog) {
+            this.byId("AT_id_TaskTable").removeSelections(true);
+            sap.ui.getCore().byId("FAT_id_EmployeeID").setValueState(sap.ui.core.ValueState.None);
+            sap.ui.getCore().byId("FAT_id_StartDate").setValueState(sap.ui.core.ValueState.None);
+            sap.ui.getCore().byId("FAT_id_EndDate").setValueState(sap.ui.core.ValueState.None);
+            sap.ui.getCore().byId("FAT_id_HoursWorked").setValueState(sap.ui.core.ValueState.None);
             this.oTaskDialog.close();
           }
         },
@@ -314,7 +319,7 @@ sap.ui.define(
             this.getView().setModel(null, "EditTaskModel");
 
             this.oTaskDialog.close();
-            MessageToast.show("Employee(s) assigned successfully!");
+            MessageToast.show("Employees assigned successfully");
           }
           else {
             MessageToast.show(this.i18nModel.getText("smgFailtoassign"));
@@ -333,12 +338,16 @@ sap.ui.define(
           const oEditModel = this.getView().getModel("EditTaskModel");
           const oRawData = { ...oEditModel.getData() }; // Clone data to avoid mutation
           const oEmpId = oSelectedItem.getBindingContext("AssignModel").getProperty("EmployeeID");
+           if (
+            !utils._LCvalidationComboBox(sap.ui.getCore().byId("FAT_id_EmployeeID"), "ID") ||
+            !utils._LCvalidateDate(sap.ui.getCore().byId("FAT_id_EndDate"), "ID") ||
+            !utils._LCvalidateTimeLimit(sap.ui.getCore().byId("FAT_id_HoursWorked"), "ID")
+          ) {
+            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+            return;
+          }
 
-          // const fnFormatDateForBackend = (sDate) => {
-          //   if (!sDate || !sDate.includes("/")) return null;
-          //   const [dd, mm, yyyy] = sDate.split("/");
-          //   return `${yyyy}-${mm}-${dd}`;
-          // };
+          
           const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
         const sQuotationDate = oDateFormat.format(sap.ui.getCore().byId("FAT_id_StartDate").getDateValue());
         const sValidUntilDate = oDateFormat.format(sap.ui.getCore().byId("FAT_id_EndDate").getDateValue());
@@ -363,6 +372,7 @@ sap.ui.define(
 
             if (response.success) {
               this.closeBusyDialog();
+             
               MessageToast.show(this.i18nModel.getText("smgUpdatetask"));
 
               // Refresh data and UI
