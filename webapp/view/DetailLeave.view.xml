@@ -1,42 +1,145 @@
 <mvc:View controllerName="sap.kt.com.minihrsolution.controller.DetailLeave"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
+    xmlns:m="sap.m"
+	xmlns="sap.uxap"
+	xmlns:layout="sap.ui.layout"
     xmlns:f="sap.ui.layout.form"
-    xmlns:core="sap.ui.core"
-    xmlns:l="sap.ui.layout">
-    <Page id="idDetailLeavePage" title="{i18n>titleInBox}" navButtonPress="DL_onBack" showNavButton="true">
-	   <headerContent>
-		<ToolbarSpacer />
-       <Button
+    xmlns:core="sap.ui.core">
+	<m:Page id="idDetailLeavePage" title="{i18n>titleInBox}" navButtonPress="DL_onBack" showNavButton="true">
+	<m:headerContent>
+		<m:ToolbarSpacer />
+       <m:Button
         press="onLogout"
         icon="sap-icon://log"
         tooltip="{i18n>logoutTooltip}"
         type="Transparent"
        />
-		</headerContent>
-        <content>
-		<ObjectHeader
-		iconAlt="{oNavLeaveModel>/EmpName}"
-		responsive="true"
-		title="{oNavLeaveModel>/EmpName}"
-		intro="{oNavLeaveModel>/EmpID}"
-		backgroundDesign="Translucent"
-		class="sapUiResponsivePadding--header" >
-			<ObjectAttribute title=""  
-            text="{= ${oNavLeaveModel>/StartDate} + ' to ' + ${oNavLeaveModel>/EndDate} + ' (' + ${oNavLeaveModel>/NoofDays} + ' ' + (${oNavLeaveModel>/NoofDays} === 1 ? 'day' : 'days') + ')' }"/>         
-			<ObjectAttribute  title="{i18n>submittedDate}" text="{oNavLeaveModel>/SubmittedDate}" />
-			<statuses>
-			<ObjectStatus
-				title="{i18n>status}"
-				text="{oNavLeaveModel>/Status}"
-				  state="{= ${oNavLeaveModel>/Status} === 'Approved' ? 'Success' : 
-                  ${oNavLeaveModel>/Status} === 'Rejected' ? 'Error' : 
-                  ${oNavLeaveModel>/Status} === 'Submitted' ? 'Warning' : 'None'}"/>
-		    </statuses>
-			<ObjectAttribute title="{i18n>employeeComment}" text="{oNavLeaveModel>/EmpComment}" tooltip="{oNavLeaveModel>/EmpComment}" />
-			<ObjectAttribute class="customTitleStyle" title="{i18n>managerComment}" text="{oNavLeaveModel>/ManagerComment}"  tooltip="{oNavLeaveModel>/ManagerComment}"  />
-	    </ObjectHeader>
-		<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.LeaveBarChart" type="XML"/>	
-        </content>
-    </Page>
+	</m:headerContent>
+   	<ObjectPageLayout id="ObjectPageLayout"
+		enableLazyLoading="true"
+		beforeNavigate="onBeforeNavigate"
+		useIconTabBar="true"
+		showTitleInHeaderContent="true"
+		upperCaseAnchorBar="false">
+		<headerTitle>
+			<ObjectPageDynamicHeaderTitle>
+				<expandedHeading>
+					<m:Title text="{oNavLeaveModel>/EmpName}" wrapping="true"/>
+				</expandedHeading>
+
+				<snappedHeading>
+					<m:FlexBox fitContainer="true" alignItems="Center">
+						<m:Title text="{oNavLeaveModel>/EmpName}" wrapping="true" />
+					</m:FlexBox>
+				</snappedHeading>
+
+				<expandedContent>
+					<m:Text text="{oNavLeaveModel>/EmpID}"/>
+				</expandedContent>
+
+				<snappedContent>
+					<m:Text text="{oNavLeaveModel>/EmpID}"/>
+				</snappedContent>
+			</ObjectPageDynamicHeaderTitle>
+		</headerTitle>
+
+ <headerContent>
+    <m:FlexBox
+        id="QF_id_HeaderContent"
+        wrap="Wrap"
+        fitContainer="true"
+        class="sapUiMediumMargin headerContentBox"
+        justifyContent="Start"
+        alignItems="Start"
+        busyIndicatorDelay="0">
+
+        <!-- 🔹 Row 1: Leave Period, Submitted Date, Branch, Status -->
+        <layout:VerticalLayout class="sapUiSmallMarginBottom" width="100%" wrap="Wrap">
+        <layout:HorizontalLayout class="sapUiSmallMarginBottom" width="100%" wrap="Wrap">
+            
+            <!-- Leave Period -->
+            <layout:VerticalLayout class="sapUiSmallMarginEnd">
+                <m:Text
+                    text="{= ${oNavLeaveModel>/StartDate} + ' to ' + ${oNavLeaveModel>/EndDate} + 
+                            ' (' + ${oNavLeaveModel>/NoofDays} + ' ' + (${oNavLeaveModel>/NoofDays} === 1 ? 'day' : 'days') + ')' }"
+                    wrapping="false"/>
+            </layout:VerticalLayout>
+
+            <!-- Submitted Date -->
+            <layout:VerticalLayout class="sapUiSmallMarginEnd">
+			<layout:HorizontalLayout>
+			    <m:Label text="{i18n>submittedDate} : " design="Bold"/>
+                <m:Text text="{oNavLeaveModel>/SubmittedDate}" wrapping="false"/>
+			</layout:HorizontalLayout>
+            </layout:VerticalLayout>
+
+            <!-- Status -->
+            <layout:VerticalLayout>
+			    <layout:HorizontalLayout>
+				<m:Label text="{i18n>status} : " design="Bold"/>							
+                <m:ObjectStatus 
+                    text="{oNavLeaveModel>/Status}"
+                    state="{= ${oNavLeaveModel>/Status} === 'Approved' ? 'Success' :
+                             ${oNavLeaveModel>/Status} === 'Rejected' ? 'Error' :
+                             ${oNavLeaveModel>/Status} === 'Submitted' ? 'Warning' : 'None'}"/>
+				</layout:HorizontalLayout>
+            </layout:VerticalLayout>
+        </layout:HorizontalLayout>
+
+		<layout:HorizontalLayout class="sapUiSmallMarginBottom" width="100%" wrap="Wrap">
+
+		  <layout:VerticalLayout class="sapUiSmallMarginEnd">
+			<layout:HorizontalLayout>
+			    <m:Label text="{i18n>employeeComment}" design="Bold"/>
+                <m:ExpandableText
+                    text="{oNavLeaveModel>/EmpComment}"
+                    overflowMode="Button"
+                    maxCharacters="100"
+                    wrapping="true"
+                    class="sapUiTinyMarginTop"/>
+			</layout:HorizontalLayout>
+            </layout:VerticalLayout>
+
+			<layout:VerticalLayout width="45%">
+			   <layout:HorizontalLayout>
+                <m:Label text="{i18n>managerComment}" design="Bold"/>
+                <m:ExpandableText
+                    text="{oNavLeaveModel>/ManagerComment}"
+                    overflowMode="Button"
+                    maxCharacters="100"
+                    wrapping="true"
+                    class="sapUiTinyMarginTop"/>
+                </layout:HorizontalLayout>
+            </layout:VerticalLayout>
+
+		</layout:HorizontalLayout>
+
+        </layout:VerticalLayout>
+
+    </m:FlexBox>
+</headerContent>
+
+		<sections>
+			<ObjectPageSection titleUppercase="false">
+			<subSections>
+				<ObjectPageSubSection id="goalsSS1" titleUppercase="false">
+					<blocks>
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.LeaveBarChart" type="XML"/>
+					</blocks>
+				</ObjectPageSubSection>
+			</subSections>
+			</ObjectPageSection>
+			</sections>
+	</ObjectPageLayout>
+	<m:footer>
+			<m:Bar>
+				<m:contentLeft>
+					<core:Fragment
+                        fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
+                        type="XML"
+                    />
+				</m:contentLeft>
+			</m:Bar>
+		</m:footer>
+	</m:Page>
 </mvc:View>
