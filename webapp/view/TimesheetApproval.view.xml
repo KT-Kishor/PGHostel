@@ -17,7 +17,8 @@
                 startDate="{viewModel>/calendarStartDate}" 
                 days="7"
                 select="TSA_onCalendarDateSelect" 
-                startDateChange="onCalendarDateChange" />
+                startDateChange="filterTimesheetForCurrentWeek"
+ />
             <fb:FilterBar
                 class="sapUiTinyMargin"
                 id="TSA_id_Filter"

@@ -343,6 +343,8 @@ sap.ui.define(["./BaseController",
                     var data = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID, ...params });
                     var oModelData = new JSONModel(data.data);
                     this.getView().setModel(oModelData, "FilteredTimesheetModel");
+                     that.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                     that.getView().getModel("viewModel").setProperty("/canDelete", false);
                 } catch (error) {
                     sap.m.MessageToast.show(error.message || error.responseText);
                 } finally {

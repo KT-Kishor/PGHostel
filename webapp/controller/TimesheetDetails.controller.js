@@ -4,7 +4,7 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/ui/unified/CalendarLegendItem",
-], function (BaseController, utils, JSONModel, MessageToast,CalendarLegendItem) {
+], function (BaseController, utils, JSONModel, MessageToast, CalendarLegendItem) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetDetails", {
         onInit: function () {
@@ -203,6 +203,7 @@ sap.ui.define([
         //Submit the timesheet data
         TSD_onSubmit: async function () {
             try {
+                this.getBusyDialog();
                 await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
                 if (!this._validateTimesheetFields(true)) return;
 
@@ -210,6 +211,7 @@ sap.ui.define([
                 const selectedDateObj = oCalendar[0]?.getStartDate();
                 if (!selectedDateObj) {
                     MessageToast.show(this.i18nModel.getText("selectDateT"));
+                    this.closeBusyDialog();
                     return;
                 }
                 const formattedDate = [
@@ -233,7 +235,6 @@ sap.ui.define([
                     Status: "Saved",
                     comments: oData.Comment
                 };
-                this.getBusyDialog();
                 await this.ajaxCreateWithJQuery("Timesheet", { data: oPayload });
                 MessageToast.show(this.i18nModel.getText("timesheetSuccess") || "Timesheet submitted!");
                 this.clearTimesheetForm();
