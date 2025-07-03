@@ -42,18 +42,6 @@
                     editable="{EditableModeltruefalse>/Editable}"
                 />
 
-                <Label text="{i18n>TableColExpectedPackage}" />
-                <Input
-                    value="{stuDataModel>/ExpectedCTC}"
-                    liveChange="RE_ValidateNameExpectedCTC"
-                    required="true"
-                    id="FM_RE_ExpectedCTC"
-                    valueState="{modelValuStateError>/ExpectedCTCState}"
-                    valueStateText="{i18n>ExpectedCTC}"
-                    editable="{EditableModeltruefalse>/Editable}"
-                    maxLength="10"
-                />
-
                 <Label text="{i18n>TableColCurrentPackage}" />
                 <Input
                     value="{stuDataModel>/CurrentCTC}"
@@ -62,6 +50,18 @@
                     id="FM_RE_CurrentCTC"
                     valueState="{modelValuStateError>/CurrentCTCState}"
                     valueStateText="{i18n>CurrentCTC}"
+                    editable="{EditableModeltruefalse>/Editable}"
+                    maxLength="10"
+                />
+
+                <Label text="{i18n>TableColExpectedPackage}" />
+                <Input
+                    value="{stuDataModel>/ExpectedCTC}"
+                    liveChange="RE_ValidateNameExpectedCTC"
+                    required="true"
+                    id="FM_RE_ExpectedCTC"
+                    valueState="{modelValuStateError>/ExpectedCTCState}"
+                    valueStateText="{i18n>ExpectedCTC}"
                     editable="{EditableModeltruefalse>/Editable}"
                     maxLength="10"
                 />
@@ -241,9 +241,9 @@
         </layout:SimpleForm>
 
         <footer>
-          <OverflowToolbar id="otbFooter">
-             <ToolbarSpacer/>
-              <Button
+            <OverflowToolbar id="otbFooter">
+                <ToolbarSpacer />
+                <Button
                     id="FM_Id_SubmitBTN"
                     text="{i18n>submit}"
                     type="Accept"
@@ -270,7 +270,7 @@
                     press="FRE_CloseFragment"
                     type="Reject"
                 />
-          </OverflowToolbar>
+            </OverflowToolbar>
         </footer>
     </Dialog>
 </core:FragmentDefinition>

@@ -76,10 +76,39 @@
                     visibleInFilterBar="true"
                 >
                     <fb:control>
-                        <SearchField
+                        <Input
                             id="RE_Id_ComboBoxFilterField4"
-                        />
-                          
+                            placeholder="Type skill..."
+                            showSuggestion="true"
+                            suggest="onSuggestSkills"
+                            suggestionItems="{path: 'skillModel>/skills'}"
+                        >
+                            <core:Item text="{skillModel>skill}" />
+                        </Input>
+                    </fb:control>
+                </fb:FilterGroupItem>
+
+                <fb:FilterGroupItem
+                    name="Experince"
+                    label="{i18n>TableColExperience}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            name="Experince"
+                            selectionChange=".onSelectionChange"
+                            items="{path: 'Experience>/data',
+									templateShareable: true
+											}"
+                            id="RE_ID_Experince"
+                            showClearIcon="true"
+                        >
+                            <core:Item
+                                key="{Experience>key}"
+                                text="{Experience>value}"
+                            />
+                        </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
             </fb:filterGroupItems>
@@ -119,9 +148,8 @@
                             press="RE_DeleteUser"
                             type="Reject"
                             tooltip="{i18n>tooltipDeleteStudent}"
-                            
                         />
-<!-- class="sapUiSmallMarginEnd" -->
+                        <!-- class="sapUiSmallMarginEnd" -->
                         <Button
                             text="Export"
                             type="Ghost"

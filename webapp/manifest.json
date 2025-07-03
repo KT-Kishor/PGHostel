@@ -262,6 +262,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/ExpectedctcRange.json",
                 "preload": true
+            },
+             "Experience": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Experience.json",
+                "preload": true
             }
         },
         "resources": {

@@ -74,6 +74,7 @@ sap.ui.define(
                     this.RE_ReadUpdatedDataFromBakend();
                     this.RE_RemoveValueState();
                     this.getView().getModel("LoginModel").setProperty("/HeaderName", "Recruitment Details");
+
                 },
 
                 //Add student function all data
@@ -289,7 +290,8 @@ sap.ui.define(
                 RE_FilterBaronSearch: async function (oEvent) {
                     let a = this.byId("RE_Id_ComboBoxFilterField1").getValue();
                     let b = this.byId("RE_Id_ComboBoxFilterField3").getValue();
-                    // let c = this.byId("RE_Id_ComboBoxFilterField4").getValue();
+                    let c = this.byId("RE_Id_ComboBoxFilterField4").getValue();
+                    let d = this.byId("RE_ID_Experince").getValue();
 
                     if (!b) {
                         this.Data = ""
@@ -300,7 +302,8 @@ sap.ui.define(
                     var filter = {
                         "Name": a,
                         "NoticePeriod": this.Data,
-                        // "Skill": c
+                        "Skills": c,
+                        "Experience":d
                     }
 
                     this.getBusyDialog();
@@ -314,6 +317,7 @@ sap.ui.define(
                     this.byId("RE_Id_ComboBoxFilterField1").setValue("");
                     this.byId("RE_Id_ComboBoxFilterField3").setValue("");
                     this.byId("RE_Id_ComboBoxFilterField4").setValue("");
+                    this.byId("RE_ID_Experince").setValue("");
                     this.getView().byId("RE_Id_MainTable").removeSelections();
                 },
 
@@ -401,10 +405,10 @@ sap.ui.define(
                     this.id = oContext.getObject().ID;
 
                     // Get localized confirmation message
-                    let sTitle = this.i18na.getText("confirmTitle"); 
+                    let sTitle = this.i18na.getText("confirmTitle");
                     let sMessage = this.i18na.getText("ConfirmRecruitmentDeleteMessage");
-                    let sOkText = this.i18na.getText("OkButton");               
-                    let sCancelText = this.i18na.getText("CancelButton");          
+                    let sOkText = this.i18na.getText("OkButton");
+                    let sCancelText = this.i18na.getText("CancelButton");
 
                     // Show confirmation dialog
                     this.showConfirmationDialog(sTitle, sMessage,
@@ -556,7 +560,7 @@ sap.ui.define(
                     // console.log(aData);
 
                     // Step 2: Define the columns for export
-                    let updatedData = a.map((elem) => { 
+                    let updatedData = a.map((elem) => {
                         return {
                             ...elem, // keep other properties
                             Date: elem.Date === "1899-11-30T00:00:00.000Z" ? "" : formatter.formatDate(elem.Date),
@@ -572,7 +576,7 @@ sap.ui.define(
                         { label: "Current CTC", property: "CurrentCTC" },
                         { label: "Expected CTC", property: "ExpectedCTC" },
                         { label: "Experience", property: "Experience" },
-                        { label: "Date", property: "Date",type:"string" },
+                        { label: "Date", property: "Date", type: "string" },
                         { label: "STDCode", property: "STDCode" },
                         { label: "Mobile Number", property: "MobileNumber" },
                         { label: "Notice Period", property: "NoticePeriod" },
@@ -594,6 +598,40 @@ sap.ui.define(
                     oSheet.build().finally(function () {
                         oSheet.destroy();
                     });
+                },
+                // Utility function to extract unique skills and set to model
+                onSuggestSkills: function (oEvent) {
+                    let sValue = oEvent.getParameter("suggestValue")?.toLowerCase() || "";
+
+                    let aTableData = this.getView().getModel("myModel").getData();
+
+                    // --- Suggest skill strings ---
+                    let aMatchingSkillStrings = aTableData
+                        .map(item => item.Skills?.trim())
+                        .filter(skillStr => {
+                            if (!skillStr) return false;
+                            return skillStr
+                                .split(",")
+                                .some(skill => skill.trim().toLowerCase().includes(sValue));
+                        });
+
+                    let aUniqueSkillStrings = [...new Set(aMatchingSkillStrings)];
+                    let aSuggestionItems = aUniqueSkillStrings.map(skill => ({ skill }));
+
+                    let oSuggestModel = new sap.ui.model.json.JSONModel({ skills: aSuggestionItems });
+                    this.getView().setModel(oSuggestModel, "skillModel");
+
+                    // --- Filter candidate data based on skill match ---
+                    let aFilteredCandidates = aTableData.filter(item => {
+                        if (!item.Skills) return false;
+                        return item.Skills
+                            .split(",")
+                            .some(skill => skill.trim().toLowerCase().includes(sValue));
+                    });
+
+                    // Set the filtered data to a model bound to your table
+                    let oFilteredModel = new sap.ui.model.json.JSONModel(aFilteredCandidates);
+                    this.getView().setModel(oFilteredModel, "filteredModel");
                 }
             }
         );
