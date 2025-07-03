@@ -25,6 +25,8 @@ sap.ui.define(
           this.AppVisibilityReadCall();
           await this._fetchCommonData("AllLoginDetails", "EmpModel");
           await this._fetchCommonData("EmployeeDetails", "EmpDetails");
+          await this._fetchCommonData("getCompanyInvoice", "CompanyInvoiceModel");
+          await this._fetchCommonData("getMSAEndingSoon", "MSASOWModel");
           var oChatModel = new JSONModel({
             messages: [],
             messageText: "",
@@ -434,9 +436,8 @@ sap.ui.define(
           oModel.setProperty("/messageText", ""); // clear input
         },
 
-        TileV_RecruitementDashbord: function () {
-          this.getRouter().navTo("AppliedCandidates");
-        },
+
+
 
         // _loadChatHistory: function (sEmployeeId) {
         //   // Mock data - replace with actual data loading
@@ -468,3 +469,8 @@ sap.ui.define(
     );
   }
 );
+
+
+
+
+
