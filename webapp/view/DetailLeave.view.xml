@@ -50,17 +50,15 @@
                     <m:HBox wrap="Wrap" justifyContent="Start" fitContainer="true">
                         
                         <!-- Leave Period -->
-                        <m:VBox class="sapUiSmallMarginEnd">
+                        <m:VBox class="sapUiMediumMarginEnd">
                             <m:Label text="{i18n>leavePeriod}" design="Bold"/>
-                            <m:Text
-                                text="{= ${oNavLeaveModel>/StartDate} + ' to ' + ${oNavLeaveModel>/EndDate} + ' (' + ${oNavLeaveModel>/NoofDays} + ' ' + (${oNavLeaveModel>/NoofDays} === 1 ? 'day' : 'days') + ')' }"
-                                wrapping="false"/>
+                            <m:Text text="{= ${oNavLeaveModel>/StartDate} + ' to ' + ${oNavLeaveModel>/EndDate} + ' (' + ${oNavLeaveModel>/NoofDays} + ' ' + (${oNavLeaveModel>/NoofDays} === 1 ? 'day' : 'days') + ')' }"  class="TextColor"/>
                         </m:VBox>
 
                         <!-- Submitted Date -->
-                        <m:VBox class="sapUiSmallMarginEnd">
+                        <m:VBox class="sapUiMediumMarginEnd">
                             <m:Label text="{i18n>submittedDate}" design="Bold"/>
-                            <m:Text text="{oNavLeaveModel>/SubmittedDate}" wrapping="false"/>
+                            <m:Text text="{oNavLeaveModel>/SubmittedDate}" />
                         </m:VBox>
 
                         <!-- Status -->
@@ -78,22 +76,22 @@
                     <m:HBox fitContainer="true" alignItems="Start" class="sapUiSmallMarginTop" wrap="NoWrap">
 
                         <!-- Employee Comment -->
-                        <m:VBox width="50%" class="sapUiSmallMarginEnd">
+                        <m:VBox  class="sapUiSmallMarginEnd">
                             <m:Label text="{i18n>employeeComment}" design="Bold"/>
                             <m:ExpandableText
                                 text="{oNavLeaveModel>/EmpComment}"
                                 wrapping="true"
-                                maxCharacters="100"
+                                maxCharacters="60"
                                 overflowMode="Button"/>
                         </m:VBox>
 
                         <!-- Manager Comment -->
-                        <m:VBox width="50%">
+                        <m:VBox >
                             <m:Label text="{i18n>managerComment}" design="Bold"/>
                             <m:ExpandableText
                                 text="{oNavLeaveModel>/ManagerComment}"
                                 wrapping="true"
-                                maxCharacters="100"
+                                maxCharacters="60"
                                 overflowMode="Button"/>
                         </m:VBox>
                     </m:HBox>

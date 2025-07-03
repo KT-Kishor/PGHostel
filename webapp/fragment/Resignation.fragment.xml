@@ -123,7 +123,6 @@
             />
         
             <Button
-                visible="{viewModel>/closeButtonVisible}"
                 text="{i18n>close}"
                 press="RF_onPressCloseDialog"
                 type="Reject"

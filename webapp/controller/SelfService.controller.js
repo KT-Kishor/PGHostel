@@ -2247,9 +2247,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 await this.SS_commonOpenDialog("SSReg_oDialog", "sap.kt.com.minihrsolution.fragment.Resignation", ["RF_id_StartDate", "RF_id_EndDate"]);
                 let oModel = this.getView().getModel("sEmployeeModel");
                 let oData = oModel.getProperty("/0");
-                if (oData && !oData.ResignationStartDate && !oData.ResignationEndDate && !oData.ResignComment) {
+                if (oData && (!oData.ResignationStartDate || !oData.ResignationEndDate || !oData.ResignComment)) {
                     // Data not loaded yet, fetch and retry
                     await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
+                    oModel = this.getView().getModel("sEmployeeModel")
                     oData = oModel.getProperty("/0");
                 }
                 if (oData && oData.ResignationStartDate && oData.ResignationEndDate && oData.ResignComment) {
@@ -2257,11 +2258,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
                     this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
-                    this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
+                   // this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
                     this._onPressPreview("Initial");
                 } else {
                     this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
-                    this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
+                  //  this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
                     this.getView().getModel("viewModel").setProperty("/BtnVisible", true);
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
                     this.getView().getModel("viewModel").setProperty("/editableResignatin", true)
@@ -2330,9 +2331,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         ${designation}<br/>
         ${this.companyName}</p>
     </div>
-`;
+`;                 
                 this.getView().getModel("PDFData").setProperty("/RTEText", data);
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
+                if(flag !== "Preview"){
+                    if(new Date(oEmployeeModel.ResignationEndDate) < new Date()){
+                    this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
+                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
+                    }else{
+                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
+                    }
+                }
             },
             SS_ResignStartDateChange: function (oEvent) {
                 var oStartDate = oEvent.getSource().getDateValue(); // Get selected Start Date
