@@ -434,8 +434,9 @@ sap.ui.define(
           oModel.setProperty("/messageText", ""); // clear input
         },
 
-
-
+        TileV_RecruitementDashbord: function () {
+          this.getRouter().navTo("AppliedCandidates");
+        },
 
         // _loadChatHistory: function (sEmployeeId) {
         //   // Mock data - replace with actual data loading

@@ -255,6 +255,7 @@
                     id="FM_Id_EditBTN"
                     text="{i18n>edit}"
                     class="btn122"
+                    type="Emphasized"
                     press="FRE_UpDateTimeFragmentFieldEditable"
                 />
                 <!-- <Button

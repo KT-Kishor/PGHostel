@@ -118,6 +118,7 @@ sap.ui.define(
                             .getModel("EditableModeltruefalse")
                             .setProperty("/Editable", true);
                         sap.ui.getCore().byId("FM_Id_EditBTN").setText("Save")
+                        sap.ui.getCore().byId("FM_Id_EditBTN").setType("Accept")
                     } else {
                         if (!this.RE_UpdateStudent()) {
                             return;
@@ -198,6 +199,7 @@ sap.ui.define(
                     this.getView().setModel(studentData, "stuDataModel");
                     this.FRE_CommonDialogFunction(true, false, flag, true);
                     this.getView().byId("RE_Id_MainTable").removeSelections();
+
                     this.getView()
                         .getModel("EditableModeltruefalse")
                         .setProperty("/Editable", false);
@@ -220,6 +222,7 @@ sap.ui.define(
                                 value2,
                                 value3
                             );
+                            this._FragmentDatePickersReadOnly(["FM_Id_DateAvlForInterview"]);
                         });
                     } else {
                         this.oDialog.open();
@@ -229,6 +232,7 @@ sap.ui.define(
                             value2,
                             value3
                         );
+                        this._FragmentDatePickersReadOnly(["FM_Id_DateAvlForInterview"]);
                     }
                 },
                 FRE_CommonFuncPassingValuesInFragment: function (
@@ -243,7 +247,7 @@ sap.ui.define(
                     sap.ui.getCore().byId("FM_Id_SubmitBTN").setVisible(value2);
                     sap.ui.getCore().byId("FM_Id_EditBTN").setVisible(value3);
                     sap.ui.getCore().byId("FM_Id_EditBTN").setText("Edit")
-                    sap.ui.getCore().byId("FM_Id_EditBTN").setType("Accept")
+                    sap.ui.getCore().byId("FM_Id_EditBTN").setType("Emphasized")
 
                     if (flag === "Create Candidate") {
                         oStuDataModel.setProperty("/STDCode", "+91");
@@ -260,6 +264,7 @@ sap.ui.define(
                         return;
                     }
                     sap.ui.getCore().byId("FM_Id_EditBTN").setText("Edit")
+                    // sap.ui.getCore().byId("FM_Id_EditBTN").setType("Emphasized")
 
                     let noticeperiod = sap.ui.getCore().byId("FM_RE_NoticePeriod").getValue();
                     getDataStudentmodel.NoticePeriod = noticeperiod;
@@ -303,7 +308,7 @@ sap.ui.define(
                         "Name": a,
                         "NoticePeriod": this.Data,
                         "Skills": c,
-                        "Experience":d
+                        "Experience": d
                     }
 
                     this.getBusyDialog();
@@ -311,12 +316,13 @@ sap.ui.define(
                         .then((response) => {
                             this.closeBusyDialog();
                         })
+                    this.byId("RE_Id_ComboBoxFilterField1").setValue("");
                 },
 
                 RE_RemoveValueFilterBar: function () {
                     this.byId("RE_Id_ComboBoxFilterField1").setValue("");
                     this.byId("RE_Id_ComboBoxFilterField3").setValue("");
-                    this.byId("RE_Id_ComboBoxFilterField4").setValue("");
+                    this.byId("RE_Id_ComboBoxFilterField1").setSelectedKey("")
                     this.byId("RE_ID_Experince").setValue("");
                     this.getView().byId("RE_Id_MainTable").removeSelections();
                 },
@@ -432,7 +438,8 @@ sap.ui.define(
                         function () {
                         }.bind(this),
                         sOkText,
-                        sCancelText
+                        sCancelText,
+                        oTable.removeSelections()
                     );
                 },
 
@@ -549,6 +556,10 @@ sap.ui.define(
                 },
                 onPressback: function () {
                     this.getOwnerComponent().getRouter().navTo("RouteTilePage"); // Navigate to tile page
+                    this.byId("RE_Id_ComboBoxFilterField1").setValue("");
+                    this.byId("RE_Id_ComboBoxFilterField3").setValue("");
+                    this.byId("RE_Id_ComboBoxFilterField1").setSelectedKey("")
+                    this.byId("RE_ID_Experince").setValue("");
                 },
                 onLogout: function () {
                     this.CommonLogoutFunction(); // Navigate to login page

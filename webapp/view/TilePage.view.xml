@@ -490,7 +490,11 @@
                     </ux:subSections>
                 </ux:ObjectPageSection>
 
-                <ux:ObjectPageSection titleUppercase="false" title="Asset" visible="{= ${TileAccessModel>/ManageAsset} === '1' ? true : false}">
+                <ux:ObjectPageSection
+                    titleUppercase="false"
+                    title="Asset"
+                    visible="{= ${TileAccessModel>/ManageAsset} === '1' ? true : false}"
+                >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
                             <ux:blocks>
@@ -545,7 +549,11 @@
                     </ux:subSections>
                 </ux:ObjectPageSection>
 
-                <ux:ObjectPageSection titleUppercase="false" title="{i18n>recruitment}" visible="{= ${TileAccessModel>/Recruitment} === '1' ? true : false}">
+                <ux:ObjectPageSection
+                    titleUppercase="false"
+                    title="{i18n>recruitment}"
+                    visible="{= ${TileAccessModel>/Recruitment} === '1' ? true : false}"
+                >
                     <ux:subSections>
                         <ux:ObjectPageSubSection titleUppercase="false">
                             <ux:blocks>
@@ -561,7 +569,21 @@
                                         />
                                     </TileContent>
                                 </GenericTile>
-                                 <GenericTile
+
+                                <GenericTile
+                                    visible="{= ${AppVisibilityModel>/RecruitmentApp} === '1' ? true : false}"
+                                    class="sapUiMediumMargin"
+                                    header="{i18n>RecruitementDashbord}"
+                                    press="TileV_RecruitementDashbord"
+                                >
+                                    <TileContent unit="{i18n>assetFooter}">
+                                        <ImageContent
+                                            src="sap-icon://add-employee"
+                                        />
+                                    </TileContent>
+                                </GenericTile>
+
+                                <GenericTile
                                     header="Chat App"
                                     press="Tile_ChatApp"
                                 >

@@ -1,0 +1,33 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+   controllerName="sap.kt.com.minihrsolution.controller.AppliedCandidates">
+
+    <Page
+        title="Job Applications Overview"
+        showNavButton="true"
+        navButtonPress="onNavBack">
+
+        <content>
+            <Table id="jobTable" items="{jobModel>/}">
+                <columns>
+                    <Column>
+                        <Text text="Job Title" />
+                    </Column>
+                    <Column>
+                        <Text text="Total Applicants" />
+                    </Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{jobModel>jobTitle}" />
+                            <Text text="{jobModel>applicantCount}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

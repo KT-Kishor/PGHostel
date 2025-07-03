@@ -652,6 +652,13 @@
                     "target":[
                         "TargetRecruitment"
                     ]
+                },
+                {
+                    "name":"AppliedCandidates",
+                    "pattern": "AppliedCandidates",
+                    "target":[
+                        "TargetAppliedCandidates"
+                    ]
                 }
 
             ],
@@ -993,6 +1000,13 @@
                     "clearControlAggregation": false,
                     "viewId": "Recruitment",
                     "viewName": "Recruitment"
+                },
+                 "TargetAppliedCandidates":{
+                    "viewType": "XML",
+                    "transition":"slide",
+                    "clearControlAggregation": false,
+                    "viewId": "AppliedCandidates",
+                    "viewName": "AppliedCandidates"
                 }
 
             }
