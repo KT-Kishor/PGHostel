@@ -1,11 +1,11 @@
 sap.ui.define(["./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "sap/ui/unified/CalendarLegendItem",
+    "sap/ui/unified/DateRange",
     "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
     "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
 ],
-    function (BaseController, JSONModel, MessageToast, CalendarLegendItem, Timeline, TimelineItem) {
+    function (BaseController, JSONModel, MessageToast, DateRange, Timeline, TimelineItem) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Timesheet", {
             onInit: function () {
@@ -34,14 +34,7 @@ sap.ui.define(["./BaseController",
                 await this.TSD_ReadTimesheetEntries(this.EmployeeID); // Wait for data load
                 this.TS_onClear();
                 this.closeBusyDialog();
-                var oCalendar = this.byId("TS_id_calendarTimesheet");
-                if (oCalendar) {
-                    var oToday = new Date();
-                    var oDateRange = new sap.ui.unified.DateRange({ startDate: oToday });
-                    oCalendar.removeAllSelectedDates();
-                    oCalendar.addSelectedDate(oDateRange);
-                    this.onInitializeLegend({ getSource: () => oCalendar });
-                }
+                await this._initializeCalendarAndLegend();
             },
             //Fill the timesheet
             TS_onFillDetails: function () {
@@ -343,8 +336,8 @@ sap.ui.define(["./BaseController",
                     var data = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID, ...params });
                     var oModelData = new JSONModel(data.data);
                     this.getView().setModel(oModelData, "FilteredTimesheetModel");
-                     that.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                     that.getView().getModel("viewModel").setProperty("/canDelete", false);
+                    that.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                    that.getView().getModel("viewModel").setProperty("/canDelete", false);
                 } catch (error) {
                     sap.m.MessageToast.show(error.message || error.responseText);
                 } finally {
@@ -370,61 +363,18 @@ sap.ui.define(["./BaseController",
                     }
                 });
             },
-            onInitializeLegend: function (oEvent) {
-                this.oDatePicker = oEvent.getSource();
-                if (this.oDatePicker) {
-                    const oLegend = new sap.ui.unified.CalendarLegend({
-                        items: [
-                            new CalendarLegendItem({ type: "Type04", text: this.i18nModel.getText("calendarHoliday") }),
-                            new CalendarLegendItem({ type: "Type09", text: this.i18nModel.getText("calendarWeekend") }),
-                            new CalendarLegendItem({ type: "Type06", text: this.i18nModel.getText("calendarWorkingDay") }),
-                            new CalendarLegendItem({ type: "Type07", text: this.i18nModel.getText("calendarFutureDate") })
-                        ]
-                    });
-                    this.oDatePicker.setLegend(oLegend);
-                    this.onMarkCalendarDates();
+            _initializeCalendarAndLegend: async function () {
+                const oCalendar = this.byId("TS_id_calendarTimesheet");
+                if (oCalendar) {
+                    // Set the default selected date
+                    const oToday = new Date();
+                    oCalendar.removeAllSelectedDates();
+                    oCalendar.addSelectedDate(new DateRange({ startDate: oToday }));
+
+                    // Call the common function from the BaseController
+                    // It's async, so we use await
+                    await this.initCalendarLegend(oCalendar, this.branch);
                 }
             },
-            onMarkCalendarDates: function () {
-                const that = this;
-                this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: this.branch });
-                const oCalendar = this.oDatePicker;
-                if (!oCalendar) return;
-                oCalendar.removeAllSpecialDates();
-                const holidays = this.getView().getModel("HolidayModel").getData();
-                const holidayMap = new Map(holidays.map(holiday => [
-                    new Date(holiday.Date).toDateString(),
-                    holiday.Name
-                ]));
-                const yearStart = new Date(new Date().getFullYear(), 0, 1);
-                const yearEnd = new Date(new Date().getFullYear(), 11, 31);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
-                    d.setHours(0, 0, 0, 0);
-                    const day = d.getDay();
-                    const isWeekend = (day === 0 || day === 6);
-                    const holidayName = holidayMap.get(d.toDateString());
-                    const isFutureDate = d > today;
-                    const oDateRange = new sap.ui.unified.DateTypeRange({
-                        startDate: new Date(d),
-                        endDate: new Date(d)
-                    });
-                    if (holidayName) {
-                        oDateRange.setType("Type04");
-                        oDateRange.setTooltip(this.i18nModel.getText("calendarHoliday") + " : " + holidayName);
-                    } else if (isWeekend) {
-                        oDateRange.setType("Type09");
-                        oDateRange.setTooltip(this.i18nModel.getText("calendarWeekend"));
-                    } else if (isFutureDate) {
-                        oDateRange.setType("Type07");
-                        oDateRange.setTooltip(this.i18nModel.getText("calendarFutureDate"));
-                    } else {
-                        oDateRange.setType("Type06");
-                        oDateRange.setTooltip(this.i18nModel.getText("calendarWorkingDay"));
-                    }
-                    oCalendar.addSpecialDate(oDateRange);
-                }
-            }
         });
     });

@@ -16,6 +16,7 @@
                 width="100%"
                 startDate="{viewModel>/calendarStartDate}" 
                 days="7"
+                 legend="calendarLegend"
                 select="TSA_onCalendarDateSelect" 
                 startDateChange="filterTimesheetForCurrentWeek"
  />

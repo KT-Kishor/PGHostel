@@ -3,8 +3,11 @@ sap.ui.define([
   "sap/ui/model/json/JSONModel",
   "../utils/TraineeCertificatePDF",
   "../model/formatter",
-  "sap/ui/core/BusyIndicator"
-], function (Controller, JSONModel, jsPDF, Formatter, BusyIndicator) {
+  "sap/ui/core/BusyIndicator",
+    "sap/ui/unified/CalendarLegend",
+    "sap/ui/unified/CalendarLegendItem",
+    "sap/ui/unified/DateTypeRange"
+], function (Controller, JSONModel, jsPDF, Formatter, BusyIndicator,CalendarLegend,CalendarLegendItem,DateTypeRange) {
   "use strict";
 
   return Controller.extend("sap.kt.ktofferletter.products.controller.BaseController", {
@@ -1095,6 +1098,63 @@ sap.ui.define([
 
         resolve(finalResult.trim());
       });
-    }
+    },
+     initCalendarLegend: async function (oCalendar, sBranchCode) {
+            if (!oCalendar || !sBranchCode) {
+                console.error("BaseController.initCalendarLegend: Calendar control and branch code are required.");
+                return;
+            }
+            const oI18nBundle = this.getView().getModel("i18n").getResourceBundle();
+            const oLegend = new CalendarLegend({
+                items: [
+                    new CalendarLegendItem({ type: "Type04", text: oI18nBundle.getText("calendarHoliday") }),
+                    new CalendarLegendItem({ type: "Type09", text: oI18nBundle.getText("calendarWeekend") }),
+                    new CalendarLegendItem({ type: "Type06", text: oI18nBundle.getText("calendarWorkingDay") }),
+                    new CalendarLegendItem({ type: "Type07", text: oI18nBundle.getText("calendarFutureDate") })
+                ]
+            });
+            oCalendar.setLegend(oLegend);
+            try {
+                await this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: sBranchCode });  
+                const aHolidays = this.getView().getModel("HolidayModel").getData() || [];
+                const holidayMap = new Map(aHolidays.map(holiday => [
+                    new Date(holiday.Date).toDateString(),
+                    holiday.Name
+                ]));
+                oCalendar.removeAllSpecialDates();
+                const currentYear = new Date().getFullYear();
+                const yearStart = new Date(currentYear, 0, 1);
+                const yearEnd = new Date(currentYear, 11, 31);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
+                    const currentDate = new Date(d);
+                    currentDate.setHours(0, 0, 0, 0);
+                    
+                    const day = currentDate.getDay();
+                    const isWeekend = (day === 0 || day === 6);
+                    const holidayName = holidayMap.get(currentDate.toDateString());
+                    const isFutureDate = currentDate > today;
+
+                    const oDateRange = new DateTypeRange({ startDate: currentDate });
+                    
+                    if (holidayName) {
+                        oDateRange.setType("Type04").setTooltip(`${oI18nBundle.getText("calendarHoliday")}: ${holidayName}`);
+                    } else if (isWeekend) {
+                        oDateRange.setType("Type09").setTooltip(oI18nBundle.getText("calendarWeekend"));
+                    } else if (isFutureDate) {
+                        oDateRange.setType("Type07").setTooltip(oI18nBundle.getText("calendarFutureDate"));
+                    } else {
+                        oDateRange.setType("Type06").setTooltip(oI18nBundle.getText("calendarWorkingDay"));
+                    }
+                    oCalendar.addSpecialDate(oDateRange);
+                }
+
+            } catch (error) {
+                console.error("Failed to fetch holidays or mark calendar dates.", error);
+                MessageToast.show(oI18nBundle.getText("errorFetchingHolidays")); // Add this text to i18n
+            }
+        },
   })
 });

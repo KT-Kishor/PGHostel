@@ -3,9 +3,10 @@ sap.ui.define([
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
+    "sap/ui/unified/DateRange",
     "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
     "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
-], function (BaseController, utils, JSONModel, MessageToast, Timeline, TimelineItem) {
+], function (BaseController, utils, JSONModel, MessageToast, DateRange, Timeline, TimelineItem) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetApproval", {
         onInit: function () {
@@ -36,6 +37,8 @@ sap.ui.define([
 
             // Disable buttons initially
             this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
+            this.branch = this.getView().getModel("LoginModel").getProperty("/BranchCode");
+            await this._initializeCalendarAndLegend();
         },
         //Get week satrt day
         _getStartOfWeek: function (date) {
@@ -366,6 +369,19 @@ sap.ui.define([
                 })
             });
             oDialog.open();
+        },
+        _initializeCalendarAndLegend: async function () {
+            const oCalendar = this.byId("TSA_id_calendar");
+            if (oCalendar) {
+                // Set the default selected date
+                const oToday = new Date();
+                oCalendar.removeAllSelectedDates();
+                oCalendar.addSelectedDate(new DateRange({ startDate: oToday }));
+
+                // Call the common function from the BaseController
+                // It's async, so we use await
+                await this.initCalendarLegend(oCalendar, this.branch);
+            }
         },
     });
 });
