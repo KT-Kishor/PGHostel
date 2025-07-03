@@ -67,7 +67,7 @@
                     <Column demandPopin="true">
                         <Text text="{i18n>employeeID}"/>
                     </Column>
-                    <Column demandPopin="true">
+                    <Column minScreenWidth="Tablet" demandPopin="true">
                         <Text text="{i18n>assignmentName}"/>
                     </Column>
                     <Column minScreenWidth="Tablet" demandPopin="true">
@@ -79,10 +79,10 @@
                     <Column minScreenWidth="Desktop" demandPopin="true">
                         <Text text="{i18n>hoursWorked}" />
                     </Column>
-                    <Column minScreenWidth="Desktop" demandPopin="true">
+                    <Column  demandPopin="true">
                         <Text text="{i18n>status}" />
                     </Column>
-                    <Column minScreenWidth="Desktop" demandPopin="true">
+                    <Column  demandPopin="true">
                         <Text text="{i18n>comments}" />
                     </Column>
                    

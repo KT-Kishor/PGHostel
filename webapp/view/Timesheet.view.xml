@@ -76,8 +76,8 @@
                   <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>day}" /></Column>
                   <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>hoursWorked}" /></Column>
                   <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>manager}" /></Column>
-                  <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>status}" /></Column>
-                  <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>comments}" /></Column>
+                  <Column  demandPopin="true"><Text text="{i18n>status}" /></Column>
+                  <Column  demandPopin="true"><Text text="{i18n>comments}" /></Column>
                 </columns>
               
                 <items>
