@@ -151,7 +151,7 @@ sap.ui.define([
                     // Set button type and text
                     var oOkBtn = sap.ui.getCore().byId("MIF_id_OkBtn");
                     if (oOkBtn) {
-                        oOkBtn.setType(status === "Approved" ? "Accept" : "Reject");
+                        oOkBtn.setType(status === "Approved" ? "Emphasized" : "Emphasized");
                         oOkBtn.setText(status === "Approved"
                             ? this.i18nModel.getText("approve")
                             : this.i18nModel.getText("reject"));
@@ -170,7 +170,7 @@ sap.ui.define([
                 // Set button type and text
                 var oOkBtn = sap.ui.getCore().byId("MIF_id_OkBtn");
                 if (oOkBtn) {
-                    oOkBtn.setType(status === "Approved" ? "Accept" : "Reject");
+                    oOkBtn.setType(status === "Approved" ? "Emphasized" : "Emphasized");
                     oOkBtn.setText(status === "Approved"
                         ? this.i18nModel.getText("approve")
                         : this.i18nModel.getText("reject"));

@@ -180,6 +180,8 @@ sap.ui.define(["./BaseController",
                         }
                     },
                     function () {
+                        that.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                        that.getView().getModel("viewModel").setProperty("/canDelete", false);
                         oTable.removeSelections(true); // On cancel, still clear selection
                     }
                 );

@@ -59,7 +59,7 @@
             >
                 <f:content>
                     <!-- Assignment Selection -->
-                    <Label text="{i18n>selectAssignment}" />
+                    <Label text="{i18n>selectAssignment}"  required="true"/>
                     <Input
                         id="TSD_id_Assignment"
                         showSuggestion="true"
@@ -73,7 +73,7 @@
                     <!-- Only editable in create mode -->
 
                     <!-- Hours Worked -->
-                    <Label text="{i18n>hoursWorked}" />
+                    <Label text="{i18n>hoursWorked}" required="true" />
                     <TimePicker
                         value="{newModel>/HoursWorked}"
                         id="TSD_id_TimeHours"
@@ -90,7 +90,7 @@
                         text="Actual Hours: {/newModel/ActualHours}"
                     />
                     <!-- Employee Comment -->
-                    <Label text="{i18n>employeeComment}" />
+                    <Label text="{i18n>employeeComment}"  required="true"/>
                     <TextArea
                         id="TSD_id_EmpComment"
                         value="{newModel>/Comment}"

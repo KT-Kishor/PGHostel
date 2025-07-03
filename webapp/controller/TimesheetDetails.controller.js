@@ -313,6 +313,11 @@ sap.ui.define([
             this.byId("TSD_id_TimeHours").setValue("");
             this.byId("TSD_id_EmpComment").setValue("");
             this.byId("idTextActHour").setText("");
+            //set value state none
+            this.byId("TSD_id_Assignment").setValueState("None");
+            this.byId("TSD_id_TimeHours").setValueState("None");
+            this.byId("TSD_id_EmpComment").setValueState("None");
+
             if (selectedDates.length > 0) {
                 var selectedDate = selectedDates[0].getStartDate();
                 var formattedDate = that.Formatter.formatDate(selectedDate);
