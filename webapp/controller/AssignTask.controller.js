@@ -327,6 +327,7 @@ sap.ui.define(
             sap.ui.getCore().byId("FAT_id_StartDate").setDateValue(null)
             await this._fetchCommonData("AssignedTask", "AssignModel", { TaskID: sTaskID });
             await this.CommonReadcall({ TaskID: sTaskID });
+            this.FAT_onPressClear()
             //  Reset EditTaskModel to clear previous values
             this.getView().setModel(null, "EditTaskModel");
             MessageToast.show("Employee assigned successfully");
