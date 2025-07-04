@@ -732,6 +732,31 @@ sap.ui.define(
           MessageToast.show(this.i18nModel.getText("quotaionNotemsg"));
           return;
         }
+        // Validate ValueState of Days, UnitPrice, and Discount fields in table
+        // const oTable = this.byId("HQD_id_SmartTableQuotationItem"); // Replace with your actual table ID
+        // const aItems = oTable.getItems();
+
+        // for (let i = 0; i < aItems.length; i++) {
+        //   const oItem = aItems[i];
+        //   const aCells = oItem.getCells();
+
+        //   // Access actual input controls (even if wrapped inside layout containers)
+        //   const oDaysInput = aCells[1].getContent ? aCells[1].getContent()[0] : aCells[1];
+        //   const oUnitPriceInput = aCells[2].getContent ? aCells[2].getContent()[0] : aCells[2];
+        //   const oDiscountInput = aCells[3].getContent ? aCells[3].getContent()[0] : aCells[3];
+
+        //   // Check if inputs are valid UI5 Input fields and check value state
+        //   if (
+        //     oDaysInput instanceof sap.m.Input && oDaysInput.getValueState() !== sap.ui.core.ValueState.None ||
+        //     oUnitPriceInput instanceof sap.m.Input && oUnitPriceInput.getValueState() !== sap.ui.core.ValueState.None ||
+        //     oDiscountInput instanceof sap.m.Input && oDiscountInput.getValueState() !== sap.ui.core.ValueState.None
+        //   ) {
+        //     MessageToast.show(`Please correct errors in item row ${i + 1} before submission.`);
+        //     return;
+        //   }
+        // }
+
+
         // Format dates
         const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
         const sQuotationDate = oDateFormat.format(this.byId("HQD_id_Quotation").getDateValue());
@@ -795,8 +820,8 @@ sap.ui.define(
           if (response.success === true) {
             oView.getModel("SingleCompanyModel").setProperty("/QuotationNo", response.QuotationNo);
             oView.getModel("SingleCompanyModel").setProperty("/TotalSum", data.TotalSum);
-             MainModel.setProperty("/Date", sQuotationDate);
-             MainModel.setProperty("/ValidUntil", sValidUntilDate);
+            MainModel.setProperty("/Date", sQuotationDate);
+            MainModel.setProperty("/ValidUntil", sValidUntilDate);
             // Force model updates before generating PDF
             oView.getModel("SingleCompanyModel").updateBindings(true);
             oView.getModel("QuotationModel").updateBindings(true);
@@ -1649,7 +1674,7 @@ sap.ui.define(
           try {
             const response = await this.ajaxUpdateWithJQuery("Quotation", payload);
             this.closeBusyDialog();
-            if (response.success === true) {  
+            if (response.success === true) {
               oView.byId("HQD_id_DaysInput").setValueState(sap.ui.core.ValueState.None);
               oView.byId("HQD_id_UnitPriceInput").setValueState(sap.ui.core.ValueState.None);
               oView.byId("HQD_id_DiscountInput").setValueState(sap.ui.core.ValueState.None);

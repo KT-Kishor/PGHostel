@@ -16,7 +16,7 @@
                     <core:Item key="{TaskType>Task}" text="{TaskType>Task}"/>
                 </Select>
                 <Label text="{i18n>description}" required="true" id="FNA_id_Ldesc" visible="{= !${visiblePlay>/isAssignmentMode} }"/>
-                <Input value="{EditTaskModel>/TaskTypeDescription}" id="NAF_id_Description" liveChange="AT_ValidateCommonFields"  maxLength="50" valueStateText="{i18n>taskDescription}"/>
+                <Input value="{EditTaskModel>/TaskTypeDescription}" id="NAF_id_Description" liveChange="AT_ValidateCommonFields"  maxLength="120" valueStateText="{i18n>taskDescription}"/>
                 <Label text="{i18n>startDate}" required="true"/>
                 <DatePicker minDate="{newTaskModel>/minDate}"
                     maxDate="{newTaskModel>/maxDate}"

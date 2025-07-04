@@ -177,10 +177,12 @@ sap.ui.define(
                 this.oTaskDialog = oDialog;
                 oView.addDependent(oDialog);
                 oDialog.open();
+                this._FragmentDatePickersReadOnly(["FAT_id_StartDate", "FAT_id_EndDate"]);
               }.bind(this)
             );
           } else {
             this.oTaskDialog.open();
+            this._FragmentDatePickersReadOnly(["FAT_id_StartDate", "FAT_id_EndDate"]);
           }
         },
 
@@ -317,9 +319,9 @@ sap.ui.define(
             await this.CommonReadcall({ TaskID: sTaskID });
             //  Reset EditTaskModel to clear previous values
             this.getView().setModel(null, "EditTaskModel");
-
+            MessageToast.show("Employee assigned successfully");
             this.oTaskDialog.close();
-            MessageToast.show("Employees assigned successfully");
+            
           }
           else {
             MessageToast.show(this.i18nModel.getText("smgFailtoassign"));
@@ -372,14 +374,12 @@ sap.ui.define(
 
             if (response.success) {
               this.closeBusyDialog();
-             
-              MessageToast.show(this.i18nModel.getText("smgUpdatetask"));
-
               // Refresh data and UI
               this._fetchCommonData("AssignedTask", "AssignModel");
               this.FAT_onSearch();
               oTable.removeSelections();
               this.oTaskDialog.close();
+              MessageToast.show(this.i18nModel.getText("smgUpdatetask"));
             } else {
               this.closeBusyDialog();
               MessageToast.show("Update failed: " + (response.message || ""));

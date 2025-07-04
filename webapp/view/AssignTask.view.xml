@@ -20,13 +20,13 @@
         </headerContent>
         <content>
             <ObjectHeader
+              
                 responsive="true"
                 backgroundDesign="Translucent"
                 class="sapUiResponsivePadding--header"
                 binding="{TaskDetailsModel>/}"
+             
             >
-                <!-- Bind to task details model -->
-
                 <ObjectAttribute
                     title="{i18n>taskName}"
                     text="{TaskDetailsModel>TaskName}"

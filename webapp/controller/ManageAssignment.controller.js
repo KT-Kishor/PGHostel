@@ -151,7 +151,7 @@ sap.ui.define(
             MessageToast.show("Task created successfully!");
             this.oTaskDialog.close();
             this._fetchCommonData("NewTask", "TaskModel", {});
-            this.CommonReadcall()
+            await this.CommonReadcall()
           } else {
             this.closeBusyDialog();
             MessageToast.show("Failed to create task.");
@@ -189,8 +189,9 @@ sap.ui.define(
             this.byId("MA_id_TaskTable").removeSelections(true)
             MessageToast.show("Task updated successfully!");
             this.oTaskDialog.close();
-            this._fetchCommonData("NewTask", "TaskModel", {});
+            // this._fetchCommonData("NewTask", "TaskModel", {});
             //this.CommonReadcall()
+            await this.MA_onSearch()
           } else {
             this.closeBusyDialog();
             MessageToast.show("Failed to update task.");
@@ -209,7 +210,6 @@ sap.ui.define(
           // Close the dialog if it exists
           if (this.oTaskDialog) {
             // Reset form binding 
-            this.CommonReadcall();
             this.oTaskDialog.close();
           }
 
@@ -233,7 +233,6 @@ sap.ui.define(
           });
           await this.CommonReadcall(params);// read call for trainee after filter
         },
-
         CommonReadcall: async function (params) {
           try {
             this.getBusyDialog();
@@ -242,12 +241,12 @@ sap.ui.define(
               this.closeBusyDialog();
               const taskData = Array.isArray(response.data) ? response.data : [response.data];
 
-              // Filtered result  for table
+              // Filtered result for table 
               const oTableModel = new JSONModel(taskData);
               this.getView().setModel(oTableModel, "TaskModel");
 
-              // Original full list for ComboBox 
-              if (!this.getView().getModel("TaskListModel")) {
+              // Only update TaskListModel if we're doing a full refresh (no params)
+              if (!params || Object.keys(params).length === 0) {
                 const oFullListModel = new JSONModel(taskData);
                 this.getView().setModel(oFullListModel, "TaskListModel");
               }
