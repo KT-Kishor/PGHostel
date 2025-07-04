@@ -150,6 +150,7 @@ sap.ui.define(
             this.byId("MA_id_TaskTable").removeSelections(true)
             MessageToast.show("Task created successfully!");
             this.oTaskDialog.close();
+            this.MA_onPressClear()
             this._fetchCommonData("NewTask", "TaskModel", {});
             await this.CommonReadcall()
           } else {
@@ -191,6 +192,7 @@ sap.ui.define(
             this.oTaskDialog.close();
             // this._fetchCommonData("NewTask", "TaskModel", {});
             //this.CommonReadcall()
+              this.MA_onPressClear()
             await this.MA_onSearch()
           } else {
             this.closeBusyDialog();

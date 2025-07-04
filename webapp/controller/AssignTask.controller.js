@@ -21,6 +21,7 @@ sap.ui.define(
           const sTaskID = oEvent.getParameter("arguments").taskID;
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           // Save the taskID to the controller
+          this.FAT_onPressClear()
           this._currentTaskID = sTaskID;
           this._fetchTaskDetails(sTaskID);
           this.readCallForAllLoginDetails();
@@ -144,9 +145,14 @@ sap.ui.define(
             }
 
             const oData = oSelectedItem.getBindingContext("AssignModel").getObject();
-            this._originalTaskData = JSON.parse(JSON.stringify(oData));
-            oModel = new JSONModel(oData);
-          } else {
+
+            // Deep clone to avoid mutation of original model data
+            const oClonedData = JSON.parse(JSON.stringify(oData));
+
+            this._originalTaskData = oClonedData; // Store the clean original data
+            oModel = new JSONModel(oClonedData);
+          }
+          else {
             this._originalTaskData = null;
 
             //  Get StartDate from the view model
@@ -189,10 +195,12 @@ sap.ui.define(
         FAT_onTaskClose: function () {
           if (this.oTaskDialog) {
             this.byId("AT_id_TaskTable").removeSelections(true);
+
             sap.ui.getCore().byId("FAT_id_EmployeeID").setValueState(sap.ui.core.ValueState.None);
             sap.ui.getCore().byId("FAT_id_StartDate").setValueState(sap.ui.core.ValueState.None);
             sap.ui.getCore().byId("FAT_id_EndDate").setValueState(sap.ui.core.ValueState.None);
             sap.ui.getCore().byId("FAT_id_HoursWorked").setValueState(sap.ui.core.ValueState.None);
+
             this.oTaskDialog.close();
           }
         },
@@ -315,13 +323,15 @@ sap.ui.define(
           const response = await this.ajaxCreateWithJQuery("AssignedTask", { data: aPayloadData });
           if (response.success) {
             this.closeBusyDialog();
+            sap.ui.getCore().byId("FAT_id_EmployeeID").setSelectedKeys([]);
+            sap.ui.getCore().byId("FAT_id_StartDate").setDateValue(null)
             await this._fetchCommonData("AssignedTask", "AssignModel", { TaskID: sTaskID });
             await this.CommonReadcall({ TaskID: sTaskID });
             //  Reset EditTaskModel to clear previous values
             this.getView().setModel(null, "EditTaskModel");
             MessageToast.show("Employee assigned successfully");
             this.oTaskDialog.close();
-            
+
           }
           else {
             MessageToast.show(this.i18nModel.getText("smgFailtoassign"));
@@ -340,7 +350,7 @@ sap.ui.define(
           const oEditModel = this.getView().getModel("EditTaskModel");
           const oRawData = { ...oEditModel.getData() }; // Clone data to avoid mutation
           const oEmpId = oSelectedItem.getBindingContext("AssignModel").getProperty("EmployeeID");
-           if (
+          if (
             !utils._LCvalidationComboBox(sap.ui.getCore().byId("FAT_id_EmployeeID"), "ID") ||
             !utils._LCvalidateDate(sap.ui.getCore().byId("FAT_id_EndDate"), "ID") ||
             !utils._LCvalidateTimeLimit(sap.ui.getCore().byId("FAT_id_HoursWorked"), "ID")
@@ -349,10 +359,10 @@ sap.ui.define(
             return;
           }
 
-          
+
           const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
-        const sQuotationDate = oDateFormat.format(sap.ui.getCore().byId("FAT_id_StartDate").getDateValue());
-        const sValidUntilDate = oDateFormat.format(sap.ui.getCore().byId("FAT_id_EndDate").getDateValue());
+          const sQuotationDate = oDateFormat.format(sap.ui.getCore().byId("FAT_id_StartDate").getDateValue());
+          const sValidUntilDate = oDateFormat.format(sap.ui.getCore().byId("FAT_id_EndDate").getDateValue());
 
           const oData = {
             ...oRawData,
@@ -376,6 +386,7 @@ sap.ui.define(
               this.closeBusyDialog();
               // Refresh data and UI
               this._fetchCommonData("AssignedTask", "AssignModel");
+              this.FAT_onPressClear()
               this.FAT_onSearch();
               oTable.removeSelections();
               this.oTaskDialog.close();
