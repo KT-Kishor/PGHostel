@@ -88,9 +88,11 @@ sap.ui.define(
           oValidPicker.setDateValue(oValidUntil);
           oVisiModel.setData({ editable: true });
           this.getView().setModel(oVisiModel, "visiablityPlay");
+          this.UnitAmount = true;
         } else {
           // Edit Mode
           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation", Action: "CC" });
+          this.UnitAmount = true;
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
           var oSelectedQuotation = aQuotations.find(item => item.QuotationNo === sQuotationNo);
           if (oSelectedQuotation) {
@@ -726,12 +728,18 @@ sap.ui.define(
           }
         }
 
+        const bOptionalValid = !!this.UnitAmount;
+        if (!bOptionalValid) {
+                return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+        }
+
         const tmpDiv = document.createElement("div");
         tmpDiv.innerHTML = oNotesHTML;
         if (!tmpDiv.textContent.trim()) {
           MessageToast.show(this.i18nModel.getText("quotaionNotemsg"));
           return;
         }
+
         // Validate ValueState of Days, UnitPrice, and Discount fields in table
         // const oTable = this.byId("HQD_id_SmartTableQuotationItem"); // Replace with your actual table ID
         // const aItems = oTable.getItems();
@@ -1182,7 +1190,7 @@ sap.ui.define(
       },
       HQD_onInputChange: function (oEvent) {
 
-        utils._LCvalidateAmount(oEvent);
+        this.UnitAmount = utils._LCvalidateAmount(oEvent);
         var oBindingContext = oEvent.getSource().getBindingContext("QuotationModel");
         var oItemContext = oBindingContext.getObject();
 
@@ -1580,6 +1588,11 @@ sap.ui.define(
           if (isNaN(fTotalSum) || fTotalSum <= 0) {
             MessageToast.show(this.i18nModel.getText("quotaionTotalmsg"));
             return;
+          }
+
+          const bOptionalValid = !!this.UnitAmount;
+          if (!bOptionalValid) {
+                return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
           }
 
           const tmpDiv = document.createElement("div");
