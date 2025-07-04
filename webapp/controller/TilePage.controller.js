@@ -4,8 +4,13 @@ sap.ui.define(
     "sap/m/MessageToast",
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
+	"sap/gantt/shape/Path",
   ],
-  function (BaseController, MessageToast, utils, JSONModel) {
+  function (BaseController,
+	MessageToast,
+	validation,
+	JSONModel,
+	Path) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.TilePage",
@@ -51,11 +56,11 @@ sap.ui.define(
           this.scrollToSection("id_ObjectPageLayoutTile", "id_Sectiontile");
           this.getBusyDialog();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          this.AppVisibilityReadCall();
           await this._fetchCommonData("AllLoginDetails", "EmpModel");
           await this._fetchCommonData("EmployeeDetails", "EmpDetails");
-          await this._fetchCommonData("getCompanyInvoice", "CompanyInvoiceModel");
+          await this._fetchCommonData("getCompanyInvoice", "CompanyInvoiceModelData");
           await this._fetchCommonData("getMSAEndingSoon", "MSASOWModel");
+          this.AppVisibilityReadCall();
           var oChatModel = new JSONModel({
             messages: [],
             messageText: "",
@@ -466,8 +471,15 @@ sap.ui.define(
           oModel.setProperty("/messageText", ""); // clear input
         },
 
+        OnPressNavigationMsaDet: function (oEvent) {
+           var MsaID = oEvent.getSource().getBindingContext("MSASOWModel").getProperty("MsaID");
+            this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID })
+        },
 
-
+        CI_onPressInvoiceRow: function (oEvent) {
+          var Path=encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModelData").getObject().InvNo);
+          this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
+        },
 
         // _loadChatHistory: function (sEmployeeId) {
         //   // Mock data - replace with actual data loading

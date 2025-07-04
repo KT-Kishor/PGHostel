@@ -6,7 +6,7 @@ sap.ui.define([
     "sap/ui/model/odata/type/Currency",
     "../model/formatter",
 ],
-    function (BaseController,JSONModel,MessageToast,utils,Currency,Formatter) {
+    function (BaseController, JSONModel, MessageToast, utils, Currency, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.CompanyInvoiceDetails", {
             Formatter: Formatter,
@@ -40,10 +40,12 @@ sap.ui.define([
                 this.byId("CID_id_SowDetails").setValueState("None");
                 this.byId("CID_id_CurrencySelect").setEditable(true);
                 const oView = this.getView();
-                if (this.getView().getModel("CompanyInvoiceModel").getData().length === 0) {
-                    var LastInvoiceDate = new Date()
-                } else {
-                    var LastInvoiceDate = new Date(this.getView().getModel("CompanyInvoiceModel").getData()[0].InvoiceDate)
+                if (this.getView().getModel("CompanyInvoiceModel")) {
+                    if (this.getView().getModel("CompanyInvoiceModel").getData().length === 0) {
+                        var LastInvoiceDate = new Date()
+                    } else {
+                        var LastInvoiceDate = new Date(this.getView().getModel("CompanyInvoiceModel").getData()[0].InvoiceDate)
+                    }
                 }
                 oView.setModel(new JSONModel({
                     CustomerName: "", InvNo: "", InvoiceDate: "", Name: "", PAN: "", GST: "", Address: "", MailID: "", MobileNo: "",
