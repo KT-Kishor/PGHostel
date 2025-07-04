@@ -53,7 +53,7 @@ sap.ui.define([
             }
         },
 
-        _applyAllFilters: function () {
+       _applyAllFilters: function () {
             if (!this.timesheetData) { return; }
 
             const oViewModel = this.getView().getModel("viewModel");
@@ -66,10 +66,7 @@ sap.ui.define([
 
             if (sMonthKey) {
                 oViewModel.setProperty("/isCalendarEnabled", false);
-                aFilteredData = aFilteredData.filter(entry => {
-                    if (!entry.Date) return false;
-                    return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey;
-                });
+                aFilteredData = aFilteredData.filter(entry => { if (!entry.Date) return false; return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey; });
             } else {
                 oViewModel.setProperty("/isCalendarEnabled", true);
                 const oCalendar = this.byId("TS_id_calendarTimesheet");
@@ -78,30 +75,25 @@ sap.ui.define([
                 const oEndDate = new Date(oStartDate);
                 oEndDate.setDate(oEndDate.getDate() + oCalendar.getDays() - 1);
                 oEndDate.setHours(23, 59, 59, 999);
-
-                aFilteredData = aFilteredData.filter(entry => {
-                    if (!entry.Date) return false;
-                    const entryDate = new Date(entry.Date);
-                    return entryDate >= oStartDate && entryDate <= oEndDate;
-                });
+                aFilteredData = aFilteredData.filter(entry => { if (!entry.Date) return false; return new Date(entry.Date) >= oStartDate && new Date(entry.Date) <= oEndDate; });
             }
+            if (sStatusValue) { aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue); }
 
-            if (sStatusValue) {
-                aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue);
-            }
+            const oModel = this.getView().getModel("FilteredTimesheetModel");
+            oModel.setData(aFilteredData);
+            oModel.refresh(true);
 
-            this.getView().getModel("FilteredTimesheetModel").setData(aFilteredData);
             this.byId("TD_id_Table").removeSelections(true);
             this.T_TableSelectionChange();
         },
 
-        onMonthSelectionChange: function () {
-            this._applyAllFilters();
-        },
+        // onMonthSelectionChange: function () {
+        //     this._applyAllFilters();
+        // },
 
-        onStatusSelectionChange: function () {
-            this._applyAllFilters();
-        },
+        // onStatusSelectionChange: function () {
+        //     this._applyAllFilters();
+        // },
 
         filterTimesheetForCurrentWeek: function () {
             this._applyAllFilters();
