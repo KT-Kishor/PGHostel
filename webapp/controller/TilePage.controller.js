@@ -8,7 +8,7 @@ sap.ui.define(
   ],
   function (BaseController,
 	MessageToast,
-	validation,
+	utils,
 	JSONModel,
 	Path) {
     "use strict";
