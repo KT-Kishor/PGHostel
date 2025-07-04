@@ -41,11 +41,11 @@ sap.ui.define([
             await this._initializeCalendarAndLegend();
         },
         //Get week satrt day
-        _getStartOfWeek: function (date) {
-            const day = date.getDay(); // Sunday = 0, Monday = 1, ...
-            const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust if Sunday
-            return new Date(date.setDate(diff));
-        },
+          _getStartOfWeek: function (date) {
+                const day = date.getDay(); // Sunday = 0, Monday = 1, ...
+                const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust if Sunday
+                return new Date(date.setDate(diff));
+            },
 
         //Read Timesheet for logged in manager
         readSubmittedTimesheetsForManager: async function (ManagerID) {
@@ -72,7 +72,6 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(uniqueEmployees), "EmployeeFilterModel");
                 this.byId("TSA_id_Status").setValue("Submitted");
                 this.TSA_onSearch();
-                this.filterTimesheetForCurrentWeek();
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
             } finally {
@@ -92,31 +91,31 @@ sap.ui.define([
             this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", canApproveReject);
         },
         filterTimesheetForCurrentWeek: function () {
-            // Get start date from view model
-            var oViewModel = this.getView().getModel("viewModel");
-            var oStartDate = new Date(oViewModel.getProperty("/calendarStartDate"));
-            oStartDate.setHours(0, 0, 0, 0);
+                // Get start date from view model
+                var oViewModel = this.getView().getModel("viewModel");
+                var oStartDate = new Date(oViewModel.getProperty("/calendarStartDate"));
+                oStartDate.setHours(0, 0, 0, 0);
 
-            // Get number of days in the interval (default 7)
-            var oCalendar = this.byId("TSA_id_calendar");
-            var iDays = oCalendar && oCalendar.getDays ? oCalendar.getDays() : 7;
+                // Get number of days in the interval (default 7)
+                var oCalendar = this.byId("TSA_id_calendar");
+                var iDays = oCalendar && oCalendar.getDays ? oCalendar.getDays() : 7;
 
-            // Calculate end date
-            var oEndDate = new Date(oStartDate);
-            oEndDate.setDate(oEndDate.getDate() + iDays - 1);
-            oEndDate.setHours(23, 59, 59, 999);
+                // Calculate end date
+                var oEndDate = new Date(oStartDate);
+                oEndDate.setDate(oEndDate.getDate() + iDays - 1);
+                oEndDate.setHours(23, 59, 59, 999);
 
-            // Filter entries for the current week
-            var aFiltered = this._fullApprovalData.filter(function (entry) {
-                if (!entry.Date) return false;
-                var entryDate = new Date(entry.Date);
-                entryDate.setHours(0, 0, 0, 0);
-                return entryDate >= oStartDate && entryDate <= oEndDate;
-            });
+                // Filter entries for the current week
+                var aFiltered = this._fullApprovalData.filter(function (entry) {
+                    if (!entry.Date) return false;
+                    var entryDate = new Date(entry.Date);
+                    entryDate.setHours(0, 0, 0, 0);
+                    return entryDate >= oStartDate && entryDate <= oEndDate;
+                });
 
-            // Update the model with filtered data
-            this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "ApprovalTimesheetModel");
-        },
+                // Update the model with filtered data
+                this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "ApprovalTimesheetModel");
+            },
         //Calendar date selection with filtering from full dataset
         TSA_onCalendarDateSelect: function (oEvent) {
             var aSelectedDates = oEvent.getSource().getSelectedDates();
@@ -298,6 +297,7 @@ sap.ui.define([
                 var data = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID, ...params });
                 var oModelData = new JSONModel(data.data);
                 this.getView().setModel(oModelData, "ApprovalTimesheetModel");
+                this.filterTimesheetForCurrentWeek();
                 this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
             } catch (error) {
                 MessageToast.show(this.i18nModel.getText("technicalError"));

@@ -336,8 +336,8 @@ sap.ui.define(["./BaseController",
                     var data = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID, ...params });
                     var oModelData = new JSONModel(data.data);
                     this.getView().setModel(oModelData, "FilteredTimesheetModel");
-                    that.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                    that.getView().getModel("viewModel").setProperty("/canDelete", false);
+                    this.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                    this.getView().getModel("viewModel").setProperty("/canDelete", false);
                 } catch (error) {
                     sap.m.MessageToast.show(error.message || error.responseText);
                 } finally {
@@ -370,9 +370,7 @@ sap.ui.define(["./BaseController",
                     const oToday = new Date();
                     oCalendar.removeAllSelectedDates();
                     oCalendar.addSelectedDate(new DateRange({ startDate: oToday }));
-
                     // Call the common function from the BaseController
-                    // It's async, so we use await
                     await this.initCalendarLegend(oCalendar, this.branch);
                 }
             },
