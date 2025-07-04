@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
     <SelectDialog
         id="TSF_id_Dialog"
-        title="{i18n>selectAss}"
+        title="{i18n>selectAssignment}"
         items="{AssignModel>/}"
         confirm=".onValueHelpDialogClose"
         cancel=".onValueHelpCancel"

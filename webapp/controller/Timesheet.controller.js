@@ -237,12 +237,16 @@ sap.ui.define(["./BaseController",
                             that.byId("TD_id_Table").removeSelections(true)
 
                         } catch (error) {
+                            that.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                            that.getView().getModel("viewModel").setProperty("/canDelete", false);
                             MessageToast.show(error.message || error.responseText);
                         } finally {
                             that.closeBusyDialog();
                         }
                     },
                     function () {
+                        that.getView().getModel("viewModel").setProperty("/canSubmit", false);
+                        that.getView().getModel("viewModel").setProperty("/canDelete", false);
                         that.byId("TD_id_Table").removeSelections(true);
                     }
                 );
