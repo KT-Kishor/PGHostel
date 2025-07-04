@@ -1,33 +1,184 @@
 <mvc:View
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
-   controllerName="sap.kt.com.minihrsolution.controller.AppliedCandidates">
+    controllerName="sap.kt.com.minihrsolution.controller.AppliedCandidates"
+    xmlns:core="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar"
+>
+    <Page>
+    <headerContent>
+            <core:Fragment
+                fragmentName="sap.kt.com.minihrsolution.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+        <fb:FilterBar
+            persistencyKey="myPersKey"
+            useToolbar="false"
+            search=".RE_FilterBaronSearch"
+            clear=".RE_RemoveValueFilterBar"
+            showClearOnFB="true"
+            showFilterConfiguration="false"
+        >
+            <fb:filterGroupItems>
+                <fb:FilterGroupItem
+                    name="name"
+                    label="{i18n>TableColSkills}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            name="Name"
+                            items="{path: 'myModel>/'}"
+                            showClearIcon="true"
+                        >
+                            <core:Item
+                                key=""
+                                text=""
+                            />
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
 
-    <Page
-        title="Job Applications Overview"
-        showNavButton="true"
-        navButtonPress="onNavBack">
+                <fb:FilterGroupItem
+                    name="SupplierName"
+                    label="{i18n>TableColExperience}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            name="SupplierName"
+                            selectionChange=".onSelectionChange"
+                            items="{
+												path: 'ExpectedCTC>/data',
+												templateShareable: true
+											}"
+                            showClearIcon="true"
+                        >
+                            <core:Item
+                                key=""
+                                text=""
+                            />
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
 
-        <content>
-            <Table id="jobTable" items="{jobModel>/}">
-                <columns>
-                    <Column>
-                        <Text text="Job Title" />
-                    </Column>
-                    <Column>
-                        <Text text="Total Applicants" />
-                    </Column>
-                </columns>
+                <fb:FilterGroupItem
+                    name="skills"
+                    label="{i18n>Jobtitle}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <Input
+                            placeholder="Type skill..."
+                            showSuggestion="true"
+                            suggest="onSuggestSkills"
+                            suggestionItems="{path: 'skillModel>/skills'}"
+                        >
+                            <core:Item text="{skillModel>skill}" />
+                        </Input>
+                    </fb:control>
+                </fb:FilterGroupItem>
 
-                <items>
-                    <ColumnListItem>
-                        <cells>
-                            <Text text="{jobModel>jobTitle}" />
-                            <Text text="{jobModel>applicantCount}" />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
+                <fb:FilterGroupItem
+                    name="notice period"
+                    label="{i18n>TableColNoticePeriod}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <ComboBox
+                            name="notice period"
+                            selectionChange=".onSelectionChange"
+                            items="{path: 'Experience>/data',
+									templateShareable: true
+											}"
+                         
+                            showClearIcon="true"
+                        >
+                            <core:Item
+                                key=""
+                                text=""
+                            />
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+            </fb:filterGroupItems>
+        </fb:FilterBar>
+
+        <Table
+            id=""
+            items="{DataTableModel>/}"
+            mode="SingleSelectLeft"
+        > 
+            <columns>
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>compName}" />
+                </Column>
+
+                <!-- <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColInterview}" />
+                </Column> -->
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColNameHeistQualification}" />
+                </Column>
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColSkills}" />
+                </Column>
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColNoticePeriod}" />
+                </Column>
+
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="{i18n>TableColNameJob}" />
+                </Column>
+            </columns>
+
+            <items>
+                <ColumnListItem type="Navigation" press="ColumnPress"> 
+                    <cells>
+                        <Text text="{DataTableModel>FullName}" />
+                        <Text text="{DataTableModel>HighestQualifaction}" />
+                        <Text text="{DataTableModel>Skills}"/>
+                        <Text text="{DataTableModel>NoticePeriod}" />
+                        <Text text="{DataTableModel>JobTitle}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <footer>
+            <Bar id="RE_id_FooterBar">
+                <contentLeft>
+                    <core:Fragment
+                        fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
+                        type="XML"
+                    />
+                </contentLeft>
+            </Bar>
+        </footer>
     </Page>
 </mvc:View>

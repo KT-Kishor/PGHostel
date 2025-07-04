@@ -408,6 +408,9 @@ sap.ui.define(
         TileV_Recruitment: function () {
           this.getRouter().navTo("Recruitment");
         },
+        TileV_RecruitementDashbord: function () {
+          this.getRouter().navTo("AppliedCandidates");
+        },
         Tile_ChatApp: function () {
             this.getRouter().navTo("RouteKTChat");
           // var oView = this.getView();

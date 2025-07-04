@@ -737,3 +737,7 @@ align-items:flex-start;
     font-weight: bold;
     color: #006064;
 }
+
+.rightMarginCustom {
+    margin-right: 40px;
+}

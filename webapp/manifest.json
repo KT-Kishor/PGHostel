@@ -666,7 +666,12 @@
                     "target": [
                         "TargetChat"
                     ]
-                }
+                },
+                 {
+          "name": "AppliedCanDetail",
+          "pattern": "AppliedCanDetail/{id}",
+          "target": ["TargetAppliedCanDetail"]
+        }
 
             ],
             "targets": {
@@ -1021,7 +1026,14 @@
                     "clearControlAggregation": false,
                     "viewId": "KTChat",
                     "viewName": "KTChat"
-                }
+                },
+                "TargetAppliedCanDetail": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "AppliedCanDetail",
+          "viewName": "AppliedCanDetail"
+        }
 
             }
         },

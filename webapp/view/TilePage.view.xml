@@ -259,6 +259,19 @@
                                                     <ImageContent src="sap-icon://message-popup" />
                                                 </TileContent>
                                             </GenericTile>
+
+                                             <GenericTile
+                                    visible="{= ${AppVisibilityModel>/RecruitmentApp} === '1' ? true : false}"
+                                    class="sapUiMediumMargin"
+                                    header="{i18n>RecruitementDashbord}"
+                                    press="TileV_RecruitementDashbord"
+                                >
+                                    <TileContent unit="{i18n>assetFooter}">
+                                        <ImageContent
+                                            src="sap-icon://add-employee"
+                                        />
+                                    </TileContent>
+                                </GenericTile>
                                         </layout:HorizontalLayout>
                                     </ux:blocks>
                                 </ux:ObjectPageSubSection>
