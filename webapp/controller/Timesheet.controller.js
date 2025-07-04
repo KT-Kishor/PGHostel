@@ -1,382 +1,262 @@
-sap.ui.define(["./BaseController",
+sap.ui.define([
+    "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/ui/unified/DateRange",
-    "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
-    "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
-],
-    function (BaseController, JSONModel, MessageToast, DateRange, Timeline, TimelineItem) {
-        "use strict";
-        return BaseController.extend("sap.kt.com.minihrsolution.controller.Timesheet", {
-            onInit: function () {
-                this.getRouter().getRoute("RouteTimesheet").attachMatched(this._onRouteMatched, this);
-            },
+    "sap/suite/ui/commons/Timeline",
+    "sap/suite/ui/commons/TimelineItem"
+], function (BaseController, JSONModel, MessageToast, DateRange, Timeline, TimelineItem) {
+    "use strict";
+    return BaseController.extend("sap.kt.com.minihrsolution.controller.Timesheet", {
 
-            _onRouteMatched: async function () {
-                var LoginFunction = await this.commonLoginFunction("Timesheet");
-                if (!LoginFunction) return;
+        onInit: function () {
+            this.getRouter().getRoute("RouteTimesheet").attachMatched(this._onRouteMatched, this);
+        },
+
+        _onRouteMatched: async function () {
+            var LoginFunction = await this.commonLoginFunction("Timesheet");
+            if (!LoginFunction) return;
+
+            this.getBusyDialog();
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileTimesheetFooter"));
+
+            const oViewModel = new JSONModel({
+                calendarStartDate: this._getStartOfWeek(new Date()),
+                isCalendarEnabled: true,
+                canSubmit: false,
+                canDelete: false
+            });
+            this.getView().setModel(oViewModel, "viewModel");
+            this.getView().setModel(new JSONModel([]), "FilteredTimesheetModel");
+
+            const loginModel = this.getOwnerComponent().getModel("LoginModel");
+            this.EmployeeID = loginModel.getProperty("/EmployeeID");
+            this.branch = loginModel.getProperty("/BranchCode");
+
+            await this.TSD_ReadTimesheetEntries();
+            await this._initializeCalendarAndLegend();
+            this.TS_onClear();
+            this.closeBusyDialog();
+        },
+
+        TSD_ReadTimesheetEntries: async function () {
+            try {
                 this.getBusyDialog();
-                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                const sTitle = this.i18nModel.getText("tileTimesheetFooter");
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", sTitle);
-
-                const oViewModel = new JSONModel();
-                oViewModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
-                this.getView().setModel(oViewModel, "viewModel");
-
-                // Add initial button states
-                oViewModel.setProperty("/canSubmit", false);
-                oViewModel.setProperty("/canDelete", false);
-
-                var loginModel = this.getOwnerComponent().getModel("LoginModel");
-                this.EmployeeID = loginModel.getProperty("/EmployeeID");
-                this.branch = loginModel.getProperty("/BranchCode");
-                await this.TSD_ReadTimesheetEntries(this.EmployeeID); // Wait for data load
-                this.TS_onClear();
+                const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID });
+                this.timesheetData = Array.isArray(oData.data) ? oData.data : [oData.data];
+            } catch (error) {
+                this.timesheetData = [];
+                MessageToast.show(error.message || error.responseText);
+            } finally {
                 this.closeBusyDialog();
-                await this._initializeCalendarAndLegend();
-            },
-            //Fill the timesheet
-            TS_onFillDetails: function () {
-                this.getRouter().navTo("RouteTimesheetDetails", { sPath: "Timesheet" });
-            },
-            //Navigate to edit data
-            TS_onPressData: function (oEvent) {
-                var sPath = oEvent.getSource().getBindingContext("FilteredTimesheetModel").getProperty("SrNo");
-                this.getRouter().navTo("RouteTimesheetDetails", {
-                    sPath: sPath
+            }
+        },
+
+        _applyAllFilters: function () {
+            if (!this.timesheetData) { return; }
+
+            const oViewModel = this.getView().getModel("viewModel");
+            const oMonthFilter = this.byId("TS_monthComboBox");
+            const oStatusFilter = this.byId("TS_id_Status");
+            const sMonthKey = oMonthFilter.getSelectedKey();
+            const sStatusValue = oStatusFilter.getValue();
+
+            let aFilteredData = this.timesheetData;
+
+            if (sMonthKey) {
+                oViewModel.setProperty("/isCalendarEnabled", false);
+                aFilteredData = aFilteredData.filter(entry => {
+                    if (!entry.Date) return false;
+                    return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey;
                 });
-            },
-            //Read Timesheet
-            TSD_ReadTimesheetEntries: async function (filter) {
-                try {
-                    this.getBusyDialog();
-                    const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID });
-                    const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.timesheetData = offerData;
-                    this.getView().setModel(new JSONModel(offerData), "FilteredTimesheetModel");
-                    // Set initial filtered data (e.g., current week)
-                    this.filterTimesheetForCurrentWeek();
-
-                } catch (error) {
-                    MessageToast.show(error.message || error.responseText);
-                } finally {
-                    this.closeBusyDialog();
-                }
-            },
-            filterTimesheetForCurrentWeek: function () {
-                // Get start date from view model
-                var oViewModel = this.getView().getModel("viewModel");
-                var oStartDate = new Date(oViewModel.getProperty("/calendarStartDate"));
+            } else {
+                oViewModel.setProperty("/isCalendarEnabled", true);
+                const oCalendar = this.byId("TS_id_calendarTimesheet");
+                const oStartDate = new Date(oCalendar.getStartDate());
                 oStartDate.setHours(0, 0, 0, 0);
-
-                // Get number of days in the interval (default 7)
-                var oCalendar = this.byId("TS_id_calendarTimesheet");
-                var iDays = oCalendar && oCalendar.getDays ? oCalendar.getDays() : 7;
-
-                // Calculate end date
-                var oEndDate = new Date(oStartDate);
-                oEndDate.setDate(oEndDate.getDate() + iDays - 1);
+                const oEndDate = new Date(oStartDate);
+                oEndDate.setDate(oEndDate.getDate() + oCalendar.getDays() - 1);
                 oEndDate.setHours(23, 59, 59, 999);
 
-                // Filter entries for the current week
-                var aFiltered = this.timesheetData.filter(function (entry) {
+                aFilteredData = aFilteredData.filter(entry => {
                     if (!entry.Date) return false;
-                    var entryDate = new Date(entry.Date);
-                    entryDate.setHours(0, 0, 0, 0);
+                    const entryDate = new Date(entry.Date);
                     return entryDate >= oStartDate && entryDate <= oEndDate;
                 });
+            }
 
-                // Update the model with filtered data
-                this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "FilteredTimesheetModel");
-            },
-            //On date selection filter data 
-            TS_onCalendarDateSelect: function (oEvent) {
-                var aSelectedDates = oEvent.getSource().getSelectedDates();
-                if (aSelectedDates.length > 0) {
-                    var oSelectedDate = aSelectedDates[0].getStartDate();
-                    oSelectedDate.setHours(0, 0, 0, 0);
+            if (sStatusValue) {
+                aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue);
+            }
 
-                    // Use the master data store for filtering
-                    var aAllData = this.timesheetData || [];
+            this.getView().getModel("FilteredTimesheetModel").setData(aFilteredData);
+            this.byId("TD_id_Table").removeSelections(true);
+            this.T_TableSelectionChange();
+        },
 
-                    var aFiltered = aAllData.filter(function (entry) {
-                        if (!entry.Date) return false;
-                        var entryDate = new Date(entry.Date);
-                        entryDate.setHours(0, 0, 0, 0);
-                        return entryDate.getTime() === oSelectedDate.getTime();
-                    });
-                    this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "FilteredTimesheetModel");
-                }
-            },
+        onMonthSelectionChange: function () {
+            this._applyAllFilters();
+        },
 
-            //Get start week day
-            _getStartOfWeek: function (date) {
-                const day = date.getDay(); // Sunday = 0, Monday = 1, ...
-                const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust if Sunday
-                return new Date(date.setDate(diff));
-            },
-            //back function
-            onPressback: function () {
-                this.getRouter().navTo("RouteTilePage");
-            },
-            //logout
-            onLogout: function () {
-                this.getRouter().navTo("RouteLoginPage");
-            },
-            //Delete the Timesheet data
-            TS_onDeleteTimesheet: async function () {
-                const that = this;
-                const oTable = this.byId("TD_id_Table");
-                const oSelectedItems = oTable.getSelectedItems();
-                if (!oSelectedItems.length) {
-                    MessageToast.show(this.i18nModel.getText("selctRowtoDelete"));
-                    return;
-                }
-                const aIdsToDelete = oSelectedItems.map(item =>
-                    item.getBindingContext("FilteredTimesheetModel").getProperty("SrNo")
-                );
-                this.showConfirmationDialog(
-                    this.i18nModel.getText("confirmTitle"),
-                    this.i18nModel.getText("deleteConfirm"),
-                    async function () {
-                        try {
-                            that.getBusyDialog();
-                            // Step 1: Delete the records
-                            await that.ajaxDeleteWithJQuery("Timesheet", {
-                                filters: { SrNo: aIdsToDelete }
-                            });
-                            MessageToast.show(that.i18nModel.getText("deletTimesheetSuucess"));
-                            that.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                            that.getView().getModel("viewModel").setProperty("/canDelete", false);
-                            // Step 2: Refetch the data
-                            const refreshedData = await that.ajaxReadWithJQuery("Timesheet", {
-                                EmployeeID: that.EmployeeID
-                            });
-                            const parsedData = Array.isArray(refreshedData.data)
-                                ? refreshedData.data
-                                : [refreshedData.data];
+        onStatusSelectionChange: function () {
+            this._applyAllFilters();
+        },
 
-                            // Step 3: Update model manually
-                            const oNewModel = new sap.ui.model.json.JSONModel(parsedData);
-                            that.getView().setModel(oNewModel, "FilteredTimesheetModel");
-                            oNewModel.refresh(true); // Force UI refresh
-                            that.timesheetData = parsedData; // Update the stored data
-                            that.filterTimesheetForCurrentWeek();
-                            oTable.removeSelections(true);
-                        } catch (error) {
-                            that.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                            that.getView().getModel("viewModel").setProperty("/canDelete", false);
-                            MessageToast.show(error.message || error.responseText || "Error deleting record");
-                        } finally {
-                            that.closeBusyDialog();
-                        }
-                    },
-                    function () {
-                        that.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                        that.getView().getModel("viewModel").setProperty("/canDelete", false);
-                        oTable.removeSelections(true); // On cancel, still clear selection
-                    }
-                );
-            },
-            //Submit the timesheet
-            TS_onSubmitTimesheet: async function () {
-                const that = this;
-                const oTable = this.byId("TD_id_Table");
-                const aSelectedItems = oTable.getSelectedItems();
+        filterTimesheetForCurrentWeek: function () {
+            this._applyAllFilters();
+        },
 
-                if (!aSelectedItems.length) {
-                    MessageToast.show(this.i18nModel.getText("selctRowtoSubmit"));
-                    return;
-                }
-                // data updates for selected rows
-                const aItems = aSelectedItems.map(item => {
-                    const oData = item.getBindingContext("FilteredTimesheetModel").getObject();
-                    return {
-                        data: {
-                            Status: "Submitted",
-                            EmployeeID: that.EmployeeID,
-                            EmployeeName: oData.EmployeeName,
-                            Hours: oData.Hours,
-                            Description: oData.Description,
-                            SrNo: oData.SrNo,
-                            TaskID: oData.TaskID,
-                            TaskName: oData.TaskName,
-                            Date: oData.Date,
-                            ManagerID: oData.ManagerID,
-                            ManagerName: oData.ManagerName
-                        },
-                        filters: {
-                            SrNo: oData.SrNo
-                        }
-                    };
+        TS_onCalendarDateSelect: function (oEvent) {
+            if (!this.getView().getModel("viewModel").getProperty("/isCalendarEnabled")) { return; }
+            const aSelectedDates = oEvent.getSource().getSelectedDates();
+            if (aSelectedDates.length > 0) {
+                const oSelectedDate = aSelectedDates[0].getStartDate();
+                oSelectedDate.setHours(0, 0, 0, 0);
+                const aFilteredData = this.timesheetData.filter(entry => {
+                    if (!entry.Date) return false;
+                    const entryDate = new Date(entry.Date);
+                    entryDate.setHours(0, 0, 0, 0);
+                    return entryDate.getTime() === oSelectedDate.getTime();
                 });
-                const finalPayload = {
-                    tableName: "Timesheet",
-                    data: aItems
+                this.getView().getModel("FilteredTimesheetModel").setData(aFilteredData);
+            } else {
+                this._applyAllFilters();
+            }
+            this.byId("TD_id_Table").removeSelections(true);
+            this.T_TableSelectionChange();
+        },
+
+        T_onSearch: function () {
+            this._applyAllFilters();
+        },
+
+        TS_onClear: function () {
+            this.byId("TS_monthComboBox").setSelectedKey("");
+            this.byId("TS_id_Status").setValue("");
+            this.byId("TS_id_Status").setSelectedKey("");
+            this._applyAllFilters();
+        },
+
+        TS_onFillDetails: function () {
+            this.getRouter().navTo("RouteTimesheetDetails", { sPath: "Timesheet" });
+        },
+
+        TS_onPressData: function (oEvent) {
+            const sPath = oEvent.getSource().getBindingContext("FilteredTimesheetModel").getProperty("SrNo");
+            this.getRouter().navTo("RouteTimesheetDetails", { sPath: sPath });
+        },
+
+        _getStartOfWeek: function (date) {
+            const day = date.getDay(); const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(date.setDate(diff));
+        },
+
+        onPressback: function () {
+            this.getRouter().navTo("RouteTilePage");
+        },
+        onLogout: function () {
+            this.getRouter().navTo("RouteLoginPage");
+        },
+        _initializeCalendarAndLegend: async function () {
+            const oCalendar = this.byId("TS_id_calendarTimesheet");
+            if (oCalendar) {
+                const oToday = new Date(); oCalendar.removeAllSelectedDates();
+                oCalendar.addSelectedDate(new DateRange({ startDate: oToday }));
+                await this.initCalendarLegend(oCalendar, this.branch);
+            }
+        },
+
+        TS_onDeleteTimesheet: async function () {
+            const oTable = this.byId("TD_id_Table");
+            const oSelectedItems = oTable.getSelectedItems();
+            if (!oSelectedItems.length) {
+                MessageToast.show(this.i18nModel.getText("selctRowtoDelete"));
+                return;
+            }
+            const aIdsToDelete = oSelectedItems.map(item => item.getBindingContext("FilteredTimesheetModel").getProperty("SrNo"));
+            this.showConfirmationDialog(this.i18nModel.getText("confirmTitle"), this.i18nModel.getText("deleteConfirm"),
+                async () => {
+                    try {
+                        this.getBusyDialog();
+                        await this.ajaxDeleteWithJQuery("Timesheet", { filters: { SrNo: aIdsToDelete } });
+                        MessageToast.show(this.i18nModel.getText("deletTimesheetSuucess"));
+                        await this.TSD_ReadTimesheetEntries();
+                        this._applyAllFilters();
+                    } catch (error) {
+                        MessageToast.show(error.message || error.responseText || "Error deleting record");
+                    } finally { this.closeBusyDialog(); }
+                },
+                () => { oTable.removeSelections(true); this.T_TableSelectionChange(); }
+            );
+        },
+
+        TS_onSubmitTimesheet: async function () {
+            const oTable = this.byId("TD_id_Table");
+            const aSelectedItems = oTable.getSelectedItems();
+            if (!aSelectedItems.length) {
+                MessageToast.show(this.i18nModel.getText("selctRowtoSubmit"));
+                return;
+            }
+            const aItems = aSelectedItems.map(item => {
+                const oData = item.getBindingContext("FilteredTimesheetModel").getObject();
+                return {
+                    data: {
+                        Status: "Submitted",
+                        EmployeeID: oData.EmployeeID,
+                        EmployeeName: oData.EmployeeName,
+                        Hours: oData.Hours,
+                        Description: oData.Description,
+                        SrNo: oData.SrNo,
+                        TaskID: oData.TaskID,
+                        TaskName: oData.TaskName,
+                        Date: oData.Date,
+                        ManagerID: oData.ManagerID,
+                        ManagerName: oData.ManagerName
+                    },
+                    filters: { SrNo: oData.SrNo }
                 };
-                this.showConfirmationDialog(
-                    this.i18nModel.getText("confirmTitle"),
-                    this.i18nModel.getText("submitConfirm"),
-                    async function () {
-                        try {
-                            that.getBusyDialog();
+            });
+            const finalPayload = { tableName: "Timesheet", data: aItems };
+            this.showConfirmationDialog(this.i18nModel.getText("confirmTitle"), this.i18nModel.getText("submitConfirm"),
+                async () => {
+                    try {
+                        this.getBusyDialog();
+                        await this.ajaxUpdateWithJQuery("Timesheet", finalPayload);
+                        MessageToast.show(this.i18nModel.getText("SubmitSuucess"));
+                        await this.TSD_ReadTimesheetEntries();
+                        this._applyAllFilters();
+                    } catch (error) {
+                        MessageToast.show(error.message || error.responseText);
+                    } finally { this.closeBusyDialog(); }
+                },
+                () => { oTable.removeSelections(true); this.T_TableSelectionChange(); }
+            );
+        },
 
-                            await that.ajaxUpdateWithJQuery("Timesheet", finalPayload);
-                            MessageToast.show(that.i18nModel.getText("SubmitSuucess"));
+        T_TableSelectionChange: function () {
+            const oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
+            const oViewModel = this.getView().getModel("viewModel");
+            let bCanSubmit = false, bCanDelete = false;
+            if (oSelectedItems.length > 0) {
+                const bAllItemsAreModifiable = oSelectedItems.every(item => {
+                    const sStatus = item.getBindingContext("FilteredTimesheetModel").getProperty("Status");
+                    return sStatus !== "Submitted" && sStatus !== "Approved";
+                });
+                if (bAllItemsAreModifiable) { bCanSubmit = true; bCanDelete = true; }
+            }
+            oViewModel.setProperty("/canSubmit", bCanSubmit);
+            oViewModel.setProperty("/canDelete", bCanDelete);
+        },
 
-                            that.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                            that.getView().getModel("viewModel").setProperty("/canDelete", false);
-                            that.byId("TD_id_Table").removeSelections(true);
-
-                            const oData = await that.ajaxReadWithJQuery("Timesheet", { EmployeeID: that.EmployeeID });
-                            const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                            that.getView().getModel("FilteredTimesheetModel").setData(offerData);
-                            that.timesheetData = offerData; // Update the stored data
-                            that.filterTimesheetForCurrentWeek();
-                            that.byId("TD_id_Table").removeSelections(true)
-
-                        } catch (error) {
-                            that.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                            that.getView().getModel("viewModel").setProperty("/canDelete", false);
-                            MessageToast.show(error.message || error.responseText);
-                        } finally {
-                            that.closeBusyDialog();
-                        }
-                    },
-                    function () {
-                        that.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                        that.getView().getModel("viewModel").setProperty("/canDelete", false);
-                        that.byId("TD_id_Table").removeSelections(true);
-                    }
-                );
-            },
-            //Table selection change
-            T_TableSelectionChange: function () {
-                var oSelectedItems = this.byId("TD_id_Table").getSelectedItems();
-                var oViewModel = this.getView().getModel("viewModel");
-                // Default to false
-                oViewModel.setProperty("/canSubmit", false);
-                oViewModel.setProperty("/canDelete", false);
-                if (oSelectedItems.length === 0) {
-                    return;
-                }
-                var allValidForSubmitOrDelete = true;
-                oSelectedItems.forEach(function (item) {
-                    var status = item.getBindingContext("FilteredTimesheetModel").getProperty("Status");
-                    // If any status is Submitted or Approved, disable buttons
-                    if (status === "Submitted" || status === "Approved") {
-                        allValidForSubmitOrDelete = false;
-                    }
-                });
-                if (allValidForSubmitOrDelete) {
-                    // All statuses are either Saved or Rejected
-                    oViewModel.setProperty("/canSubmit", true);
-                    oViewModel.setProperty("/canDelete", true);
-                }
-            },
-            //Comment open dialog
-            TS_onShowComments: function (oEvent) {
-                var oContext = oEvent.getSource().getBindingContext("FilteredTimesheetModel");
-                var oData = oContext.getObject();
-                var aComments = oData.comments || [];
-                var aTimelineItems = aComments.map(function (oComment) {
-                    return new TimelineItem({
-                        dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
-                        title: oComment.CommentedBy || "Anonymous",
-                        text: oComment.Comment || "No comment provided",
-                        userNameClickable: false,
-                        icon: "sap-icon://comment"
-                    });
-                });
-                var oTimeline = new Timeline({
-                    showHeader: false,
-                    enableBusyIndicator: false,
-                    width: "100%",
-                    sortOldestFirst: false,
-                    enableDoubleSided: false,
-                    content: aTimelineItems,
-                    showHeaderBar: false
-                });
-                var oDialog = new sap.m.Dialog({
-                    title: this.i18nModel.getText("tCommentsTitle"),
-                    contentWidth: "25rem",
-                    contentHeight: "15rem",
-                    draggable: true,
-                    resizable: true,
-                    content: [oTimeline],
-                    endButton: new sap.m.Button({
-                        text: this.i18nModel.getText("close"),
-                        type: "Reject",
-                        press: function () {
-                            oDialog.close();
-                            oDialog.destroy();
-                        }
-                    })
-                });
-                oDialog.open();
-            },
-            //Searh data on filtering
-            T_onSearch: async function () {
-                this.getBusyDialog(); // Show busy dialog
-                var aFilterItems = this.byId("TS_id_FilterBar").getFilterGroupItems();
-                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
-                var params = {};
-                aFilterItems.forEach(function (oItem) {
-                    var oControl = oItem.getControl();
-                    var sValue = oItem.getName();
-                    if (oControl && oControl.getValue()) {
-                        if (sValue === "Date") {
-                            var oFromDate = oControl.getDateValue();
-                            var oToDate = oControl.getSecondDateValue();
-                            params["StartDate"] = oDateFormat.format(oFromDate);
-                            params["EndDate"] = oDateFormat.format(oToDate);
-                        } else {
-                            params[sValue] = oControl.getValue();
-                        }
-                    }
-                });
-                try {
-                    var data = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID, ...params });
-                    var oModelData = new JSONModel(data.data);
-                    this.getView().setModel(oModelData, "FilteredTimesheetModel");
-                    this.getView().getModel("viewModel").setProperty("/canSubmit", false);
-                    this.getView().getModel("viewModel").setProperty("/canDelete", false);
-                } catch (error) {
-                    sap.m.MessageToast.show(error.message || error.responseText);
-                } finally {
-                    this.closeBusyDialog(); // Close after call finishes
-                }
-            },
-
-            //Clear the filter
-            TS_onClear: function () {
-                var aFilterItems = this.byId("TS_id_FilterBar").getFilterGroupItems();
-                aFilterItems.forEach(function (oItem) {
-                    var oControl = oItem.getControl(); // Get the associated control
-                    if (oControl) {
-                        if (oControl.setValue) {
-                            oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
-                        }
-                        if (oControl.setSelectedKey) {
-                            oControl.setSelectedKey(""); // Reset selection for dropdowns
-                        }
-                        if (oControl.setSelected) {
-                            oControl.setSelected(false); // Reset selection for Checkboxes
-                        }
-                    }
-                });
-            },
-            _initializeCalendarAndLegend: async function () {
-                const oCalendar = this.byId("TS_id_calendarTimesheet");
-                if (oCalendar) {
-                    // Set the default selected date
-                    const oToday = new Date();
-                    oCalendar.removeAllSelectedDates();
-                    oCalendar.addSelectedDate(new DateRange({ startDate: oToday }));
-                    // Call the common function from the BaseController
-                    await this.initCalendarLegend(oCalendar, this.branch);
-                }
-            },
-        });
+        TS_onShowComments: function (oEvent) {
+            const oContext = oEvent.getSource().getBindingContext("FilteredTimesheetModel");
+            const oData = oContext.getObject();
+            const aComments = oData.comments || [];
+            const aTimelineItems = aComments.map(function (oComment) { return new TimelineItem({ dateTime: new Date(oComment.CommentDateTime).toLocaleString(), title: oComment.CommentedBy || "Anonymous", text: oComment.Comment || "No comment provided", userNameClickable: false, icon: "sap-icon://comment" }); });
+            const oTimeline = new Timeline({ showHeader: false, content: aTimelineItems });
+            const oDialog = new sap.m.Dialog({ title: this.i18nModel.getText("tCommentsTitle"), contentWidth: "25rem", content: [oTimeline], endButton: new sap.m.Button({ text: this.i18nModel.getText("close"), press: function () { oDialog.close(); } }), afterClose: function () { oDialog.destroy(); } });
+            oDialog.open();
+        }
     });
+});

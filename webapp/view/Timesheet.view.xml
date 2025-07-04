@@ -22,28 +22,30 @@
  showDayNamesLine="true" 
  intervalSelection="false" />
             <fb:FilterBar  class="sapUiTinyMargin" id="TS_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="TS_onClear" showClearOnFB="true" search="T_onSearch" filterChange=".onFilterChange" showFilterConfiguration="false" afterVariantLoad=".onAfterVariantLoad" >
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem name="Month" label="{i18n>month}" groupName="Group1" visibleInFilterBar="true">
-    <fb:control>
-        <ComboBox id="TS_monthComboBox"
-          showClearIcon="true"
-          items="{Months>/month}">
-            <core:Item key="{Months>ID}" text="{Months>Month}" />
-        </ComboBox>
-    </fb:control>
-</fb:FilterGroupItem>
-                
-                    <fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
-                        <fb:control>
-                            <ComboBox id="TS_id_Status" showClearIcon="true" items="{TStatusModel>/}">
-                                <core:Item key="{TStatusModel>ID}" text="{TStatusModel>Type}"/>
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
+               <fb:filterGroupItems>
+    <fb:FilterGroupItem name="Month" label="{i18n>month}" groupName="Group1" visibleInFilterBar="true">
+        <fb:control>
+            <ComboBox id="TS_monthComboBox"
+              showClearIcon="true"
+              change="onMonthSelectionChange"
+              items="{Months>/month}">
+                <core:Item key="{Months>ID}" text="{Months>Month}" />
+            </ComboBox>
+        </fb:control>
+    </fb:FilterGroupItem>
 
-            
-
-                </fb:filterGroupItems>
+    <fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
+        <fb:control>
+            <!-- THIS IS THE FIX: Add the change event handler -->
+            <ComboBox id="TS_id_Status"
+              showClearIcon="true"
+              change="onStatusSelectionChange" 
+              items="{TStatusModel>/}">
+                <core:Item key="{TStatusModel>ID}" text="{TStatusModel>Type}"/>
+            </ComboBox>
+        </fb:control>
+    </fb:FilterGroupItem>
+</fb:filterGroupItems>
             </fb:FilterBar>
             <MessageStrip
                 text="{i18n>notification}"
