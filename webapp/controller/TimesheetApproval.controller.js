@@ -105,15 +105,18 @@ sap.ui.define([
             oEndDate.setDate(oEndDate.getDate() + iDays - 1);
             oEndDate.setHours(23, 59, 59, 999);
 
-            // Filter entries for the current week
+            const sStatus = this.byId("TSA_id_Status").getValue();
+
             var aFiltered = this._fullApprovalData.filter(function (entry) {
                 if (!entry.Date) return false;
                 var entryDate = new Date(entry.Date);
                 entryDate.setHours(0, 0, 0, 0);
-                return entryDate >= oStartDate && entryDate <= oEndDate;
+                const isInWeek = entryDate >= oStartDate && entryDate <= oEndDate;
+                if (sStatus === "Submitted") {
+                    return isInWeek && entry.Status === "Submitted";
+                }
+                return isInWeek;
             });
-
-            // Update the model with filtered data
             this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "ApprovalTimesheetModel");
         },
         //Calendar date selection with filtering from full dataset
