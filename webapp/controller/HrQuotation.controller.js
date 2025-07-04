@@ -102,8 +102,9 @@ sap.ui.define(
       HQ_onSearch: async function () {
         try {
           this.getBusyDialog();
+
           // Get current values from controls
-          var sQuotationNo = this.byId("HQ_id_quotationNo").getValue().trim();
+          var sQuotationNo = this.byId("HQ_id_quotationNo").getSelectedKey().trim();
           var sCustomerName = this.byId("HQ_id_CustomerName").getValue().trim();
           var oDateRange = this.byId("HQ_id_Quotaiondate");
           var dateFrom = oDateRange.getDateValue();
@@ -122,7 +123,15 @@ sap.ui.define(
             oFiltersModel.setProperty("/DateTo", sDateTo);
           }
 
-          // First fetch data from backend with the current filters
+          //  Fetch the full unfiltered quotation list for ComboBox
+          await this._fetchCommonData("Quotation", "AllQuotationsModel", {});
+          const aAllQuotations = this.getView().getModel("AllQuotationsModel").getData();
+          const aUniqueQuotations = Array.from(
+            new Map(aAllQuotations.map(item => [item.QuotationNo, item])).values()
+          );
+          this.getView().setModel(new JSONModel(aUniqueQuotations), "AllQuotationsModel");
+
+          // 2. Fetch filtered data for table
           await this._fetchCommonData("Quotation", "CompanyQuotationModel", {
             QuotationNo: sQuotationNo || null,
             CustomerName: sCustomerName || null,
@@ -130,32 +139,32 @@ sap.ui.define(
             DateTo: sDateTo
           });
 
-          // Then apply client-side filtering on the table
+          // 3. Apply client-side filter to table
           var oTable = this.byId("HQ_id_QuotationItemTable");
           var oBinding = oTable.getBinding("items");
 
           if (oBinding) {
-            // Build filters array for client-side filtering
             var aFilters = [];
 
             // Always filter by date range
-            aFilters.push(new sap.ui.model.Filter("Date", "BT", sDateFrom, sDateTo));
+            if (sDateFrom && sDateTo) {
+              aFilters.push(new sap.ui.model.Filter("Date", "BT", sDateFrom, sDateTo));
+            }
 
-            // Add text filters only if values are provided
             if (sQuotationNo) {
               aFilters.push(new sap.ui.model.Filter("QuotationNo", "Contains", sQuotationNo));
             }
+
             if (sCustomerName) {
               aFilters.push(new sap.ui.model.Filter("CustomerName", "Contains", sCustomerName));
             }
 
-            // Combine all filters with AND condition
             var oCombinedFilter = aFilters.length > 0 ? new sap.ui.model.Filter(aFilters, true) : null;
-            // Apply the filter
             oBinding.filter(oCombinedFilter);
+
             this.onTableUpdateFinished();
 
-            // Wait for the table to update
+            // Wait for updateFinished event to ensure UI refresh
             await new Promise(resolve => {
               oTable.attachEventOnce("updateFinished", function () {
                 this._refreshFilterBarDropdowns();
@@ -167,10 +176,10 @@ sap.ui.define(
           console.error("Search error:", error);
           sap.m.MessageToast.show("An error occurred during search");
         } finally {
-          // Ensure busy dialog is always closed
           this.closeBusyDialog();
         }
       },
+
       _refreshFilterBarDropdowns: function () {
         var oFiltersModel = this.getView().getModel("filters");
         var filterData = oFiltersModel.getData();

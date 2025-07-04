@@ -32,14 +32,14 @@
             <fb:control>
                 <ComboBox
                     showSecondaryValues="true"
-                    items="{path: 'FilteredQuotations>/'}"
+                    items="{path: 'AllQuotationsModel>/'}"
                     showClearIcon="true"
                     id="HQ_id_quotationNo"
                     selectedKey="{/filters/QuotationNo}">
                     <core:ListItem
-                        key="{FilteredQuotations>QuotationNo}"
-                        text="{FilteredQuotations>QuotationNo}"
-                        additionalText="{FilteredQuotations>CompanyName}"/>
+                        key="{AllQuotationsModel>QuotationNo}"
+                        text="{AllQuotationsModel>QuotationNo}"
+                        additionalText="{AllQuotationsModel>CompanyName}"/>
                 </ComboBox>
             </fb:control>
         </fb:FilterGroupItem>
@@ -51,14 +51,14 @@
             <fb:control>
                 <ComboBox
                     showSecondaryValues="true"
-                    items="{path: 'FilteredCustomers>/'}"
+                    items="{path: 'AllQuotationsModel>/'}"
                     showClearIcon="true"
                     id="HQ_id_CustomerName"
                     selectedKey="{/filters/CustomerName}">
                     <core:ListItem
-                        key="{FilteredCustomers>CustomerName}"
-                        text="{FilteredCustomers>CustomerName}"
-                        additionalText="{FilteredCustomers>QuotationNo}"/>
+                        key="{AllQuotationsModel>CustomerName}"
+                        text="{AllQuotationsModel>CustomerName}"
+                        additionalText="{AllQuotationsModel>QuotationNo}"/>
                 </ComboBox>
             </fb:control>
         </fb:FilterGroupItem>
