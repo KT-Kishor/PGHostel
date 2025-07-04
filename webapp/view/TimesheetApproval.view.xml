@@ -33,7 +33,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="true" >
                         <fb:control>
-                    <ComboBox  showSecondaryValues= "true"  id="TSA_id_Name" showClearIcon="true" items="{path:'EmployeeFilterModel>/'}" >
+                    <ComboBox  showSecondaryValues= "true"  id="TSA_id_Employee" showClearIcon="true" items="{path:'EmployeeFilterModel>/'}" >
 						<core:ListItem key="{EmployeeFilterModel>EmployeeID}" text="{EmployeeFilterModel>EmployeeID}" additionalText="{EmployeeFilterModel>EmployeeName}" />
 					</ComboBox>                        
                         </fb:control>
@@ -111,10 +111,8 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
                 <contentRight>
-                    <Button text="{i18n>approve}" press="TSA_onApprove" type="Accept" id="TSA_id_Approve"
-                     enabled="{approvalViewModel>/canApproveReject}"/>
-                    <Button text="{i18n>reject}" press="TSA_onReject" type="Reject" id="TSA_id_Reject"
-                     enabled="{approvalViewModel>/canApproveReject}"/>
+                   <Button text="Approve" press="TSA_onApprove" type="Accept" enabled="{viewModel>/canApproveReject}"/>
+                   <Button text="Reject" press="TSA_onReject" type="Reject" enabled="{viewModel>/canApproveReject}"/>
                 </contentRight>
             </Bar>
         </footer>

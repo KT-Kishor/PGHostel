@@ -1,14 +1,15 @@
 sap.ui.define([
     "./BaseController",
-    "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/ui/unified/DateRange",
-    "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
-    "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
-], function (BaseController, utils, JSONModel, MessageToast, DateRange, Timeline, TimelineItem) {
+    "sap/suite/ui/commons/Timeline",
+    "sap/suite/ui/commons/TimelineItem",
+    "sap/ui/core/Fragment"
+], function (BaseController, JSONModel, MessageToast, DateRange, Timeline, TimelineItem, Fragment) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.TimesheetApproval", {
+
         onInit: function () {
             this.getRouter().getRoute("RouteTimesheetApproval").attachMatched(this._onRouteMatched, this);
         },
@@ -16,138 +17,156 @@ sap.ui.define([
         _onRouteMatched: async function () {
             var LoginFunction = await this.commonLoginFunction("TimesheetApproval");
             if (!LoginFunction) return;
+
+            this.getBusyDialog();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            const sTitle = this.i18nModel.getText("headerTimesheetApproval");
-            this.getView().getModel("LoginModel").setProperty("/HeaderName", sTitle);
+            this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerTimesheetApproval"));
 
-            // Get ManagerID from LoginModel
+            const oViewModel = new JSONModel({
+                calendarStartDate: this._getStartOfWeek(new Date()),
+                isCalendarEnabled: true,
+                canApproveReject: false
+            });
+            this.getView().setModel(oViewModel, "viewModel");
+
+            this.getView().setModel(new JSONModel([]), "ApprovalTimesheetModel");
+            this.getView().setModel(new JSONModel([]), "EmployeeFilterModel");
+
             const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
-            const oModel = new JSONModel();
-            oModel.setData({ calendarStartDate: this._getStartOfWeek(new Date()) });
-            this.getView().setModel(oModel, "viewModel");
-            this.TSA_onClear(); // Clear any existing filters
-
-            this.byId("TSA_id_Status").setValue("Submitted"); //initially set Submitted
-
-            await this.readSubmittedTimesheetsForManager(ManagerID);
-
-            // ViewModel for button enable/disable
-            const oViewModel = new JSONModel({ canApproveReject: false });
-            this.getView().setModel(oViewModel, "approvalViewModel");
-
-            // Disable buttons initially
-            this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
             this.branch = this.getView().getModel("LoginModel").getProperty("/BranchCode");
+
+            await this.readTimesheetsForManager(ManagerID);
             await this._initializeCalendarAndLegend();
+
+            this.TSA_onClear();
+            this.byId("TSA_id_Status").setValue("Submitted");
+            this._applyAllFilters();
+            this.closeBusyDialog();
         },
-        //Get week satrt day
+
         _getStartOfWeek: function (date) {
-            const day = date.getDay(); // Sunday = 0, Monday = 1, ...
-            const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust if Sunday
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
             return new Date(date.setDate(diff));
         },
 
-        //Read Timesheet for logged in manager
-        readSubmittedTimesheetsForManager: async function (ManagerID) {
+        readTimesheetsForManager: async function (ManagerID) {
             this.getBusyDialog();
             try {
                 const oData = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID });
                 let timesheetData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                // Filter only specific statuses
-                timesheetData = timesheetData.filter(entry =>
-                    ["Submitted", "Approved", "Rejected"].includes(entry?.Status)
+
+                const aAllowedStatuses = ["Submitted", "Approved", "Rejected"];
+                const aFilteredManagerData = timesheetData.filter(entry =>
+                    entry && entry.Status && aAllowedStatuses.includes(entry.Status)
                 );
-                this._fullApprovalData = timesheetData;
-                // Set main timesheet model
-                this.getView().setModel(new JSONModel(timesheetData), "ApprovalTimesheetModel");
-                // Unique Employee ID List 
+                this._fullApprovalData = aFilteredManagerData;
+
                 const uniqueEmployees = [];
                 const employeeMap = new Set();
-                timesheetData.forEach(entry => {
-                    if (!employeeMap.has(entry.EmployeeID)) {
+                this._fullApprovalData.forEach(entry => {
+                    if (entry.EmployeeID && !employeeMap.has(entry.EmployeeID)) {
                         employeeMap.add(entry.EmployeeID);
                         uniqueEmployees.push({ EmployeeID: entry.EmployeeID, EmployeeName: entry.EmployeeName });
                     }
                 });
-                this.getView().setModel(new JSONModel(uniqueEmployees), "EmployeeFilterModel");
-               // this.byId("TSA_id_Status").setValue("Submitted");
-                this.TSA_onSearch();
+                this.getView().getModel("EmployeeFilterModel").setData(uniqueEmployees);
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
+                this._fullApprovalData = [];
             } finally {
                 this.closeBusyDialog();
             }
         },
-        //Table selection
+
+        _applyAllFilters: function () {
+            if (!this._fullApprovalData) { return; }
+
+            const oViewModel = this.getView().getModel("viewModel");
+            const oEmployeeFilter = this.byId("TSA_id_Employee");
+            const oMonthFilter = this.byId("TSA_id_Month");
+            const oStatusFilter = this.byId("TSA_id_Status");
+            const sEmployeeID = oEmployeeFilter.getSelectedKey();
+            const sMonthKey = oMonthFilter.getSelectedKey();
+            const sStatusValue = oStatusFilter.getValue();
+
+            let aFilteredData = this._fullApprovalData;
+
+            if (sEmployeeID) { aFilteredData = aFilteredData.filter(entry => entry.EmployeeID === sEmployeeID); }
+            if (sMonthKey) {
+                oViewModel.setProperty("/isCalendarEnabled", false);
+                aFilteredData = aFilteredData.filter(entry => { if (!entry.Date) return false; return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey; });
+            } else {
+                oViewModel.setProperty("/isCalendarEnabled", true);
+                const oCalendar = this.byId("TSA_id_calendar");
+                const oStartDate = new Date(oCalendar.getStartDate());
+                oStartDate.setHours(0, 0, 0, 0);
+                const oEndDate = new Date(oStartDate);
+                oEndDate.setDate(oEndDate.getDate() + oCalendar.getDays() - 1);
+                oEndDate.setHours(23, 59, 59, 999);
+                aFilteredData = aFilteredData.filter(entry => { if (!entry.Date) return false; return new Date(entry.Date) >= oStartDate && new Date(entry.Date) <= oEndDate; });
+            }
+            if (sStatusValue) { aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue); }
+            const oModel = this.getView().getModel("ApprovalTimesheetModel");
+            oModel.setData(aFilteredData);
+            oModel.refresh(true);
+            this.byId("TSA_id_Table").removeSelections(true);
+            this.TSA_onSelect();
+        },
+
+        onFilterChange: function () {
+            this._applyAllFilters();
+        },
+        filterTimesheetForCurrentWeek: function () {
+            this._applyAllFilters();
+        },
+        TSA_onCalendarDateSelect: function (oEvent) {
+            if (!this.getView().getModel("viewModel").getProperty("/isCalendarEnabled")) { return; }
+            const aSelectedDates = oEvent.getSource().getSelectedDates();
+            if (aSelectedDates.length > 0) {
+                const oSelectedDate = aSelectedDates[0].getStartDate();
+                oSelectedDate.setHours(0, 0, 0, 0);
+                const sEmployeeID = this.byId("TSA_id_Employee").getSelectedKey();
+                const sStatusValue = this.byId("TSA_id_Status").getValue();
+                let aFilteredData = this._fullApprovalData.filter(entry => {
+                    if (!entry.Date) return false;
+                    const entryDate = new Date(entry.Date);
+                    entryDate.setHours(0, 0, 0, 0);
+                    const isCorrectDate = entryDate.getTime() === oSelectedDate.getTime();
+                    const isCorrectEmployee = !sEmployeeID || entry.EmployeeID === sEmployeeID;
+                    const isCorrectStatus = !sStatusValue || entry.Status === sStatusValue;
+                    return isCorrectDate && isCorrectEmployee && isCorrectStatus;
+                });
+                this.getView().getModel("ApprovalTimesheetModel").setData(aFilteredData);
+            } else {
+                this._applyAllFilters();
+            }
+            this.byId("TSA_id_Table").removeSelections(true);
+            this.TSA_onSelect();
+        },
+
+        TSA_onSearch: function () {
+            this._applyAllFilters();
+        },
+
+        TSA_onClear: function () {
+            this.byId("TSA_id_Employee").setSelectedKey("");
+            this.byId("TSA_id_Month").setSelectedKey("");
+            this.byId("TSA_id_Status").setValue("");
+            this.byId("TSA_id_Status").setSelectedKey("");
+            //this._applyAllFilters();
+        },
+
         TSA_onSelect: function () {
             const oTable = this.byId("TSA_id_Table");
             const oSelectedItems = oTable.getSelectedItems();
             let canApproveReject = false;
             if (oSelectedItems.length > 0) {
-                // Only enable if all selected items are "Submitted"
-                canApproveReject = oSelectedItems.every(item =>
-                    item.getBindingContext("ApprovalTimesheetModel").getProperty("Status") === "Submitted");
+                canApproveReject = oSelectedItems.every(item => item.getBindingContext("ApprovalTimesheetModel").getProperty("Status") === "Submitted");
             }
-            this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", canApproveReject);
+            this.getView().getModel("viewModel").setProperty("/canApproveReject", canApproveReject);
         },
-        filterTimesheetForCurrentWeek: function () {
-            // Get start date from view model
-            var oViewModel = this.getView().getModel("viewModel");
-            var oStartDate = new Date(oViewModel.getProperty("/calendarStartDate"));
-            oStartDate.setHours(0, 0, 0, 0);
 
-            // Get number of days in the interval (default 7)
-            var oCalendar = this.byId("TSA_id_calendar");
-            var iDays = oCalendar && oCalendar.getDays ? oCalendar.getDays() : 7;
-
-            // Calculate end date
-            var oEndDate = new Date(oStartDate);
-            oEndDate.setDate(oEndDate.getDate() + iDays - 1);
-            oEndDate.setHours(23, 59, 59, 999);
-
-            const sStatus = this.byId("TSA_id_Status").getValue();
-
-            var aFiltered = this._fullApprovalData.filter(function (entry) {
-                if (!entry.Date) return false;
-                var entryDate = new Date(entry.Date);
-                entryDate.setHours(0, 0, 0, 0);
-                const isInWeek = entryDate >= oStartDate && entryDate <= oEndDate;
-                if (sStatus === "Submitted") {
-                    return isInWeek && entry.Status === "Submitted";
-                }
-                return isInWeek;
-            });
-            this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "ApprovalTimesheetModel");
-        },
-        //Calendar date selection with filtering from full dataset
-        TSA_onCalendarDateSelect: function (oEvent) {
-            var aSelectedDates = oEvent.getSource().getSelectedDates();
-            if (aSelectedDates.length > 0) {
-                var oSelectedDate = aSelectedDates[0].getStartDate();
-                oSelectedDate.setHours(0, 0, 0, 0);
-
-                // Filter from the full dataset
-                if (this._fullApprovalData) {
-                    var aFiltered = this._fullApprovalData.filter(function (entry) {
-                        if (!entry.Date) return false;
-                        var entryDate = new Date(entry.Date);
-                        entryDate.setHours(0, 0, 0, 0);
-                        return entryDate.getTime() === oSelectedDate.getTime();
-                    });
-                    this.getView().setModel(new sap.ui.model.json.JSONModel(aFiltered), "ApprovalTimesheetModel");
-                } else {
-                    // If somehow _fullApprovalData isn't set yet, fallback to current model data
-                    const currentData = this.getView().getModel("ApprovalTimesheetModel").getData() || [];
-                    var aFilteredFallback = currentData.filter(function (entry) {
-                        if (!entry.Date) return false;
-                        var entryDate = new Date(entry.Date);
-                        entryDate.setHours(0, 0, 0, 0);
-                        return entryDate.getTime() === oSelectedDate.getTime();
-                    });
-                    this.getView().setModel(new sap.ui.model.json.JSONModel(aFilteredFallback), "ApprovalTimesheetModel");
-                }
-            }
-        },
         //Approve Timesheet
         TSA_onApprove: function () {
             this._openManagerRemarkDialog("Approved");
@@ -216,8 +235,6 @@ sap.ui.define([
             const sRemark = sap.ui.getCore().byId("MIF_id_remark").getValue();
             const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
 
-
-            // Call live change function first
             if (!this.MIF_liveChangeForMangerComments()) {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
@@ -246,9 +263,10 @@ sap.ui.define([
                         : this.i18nModel.getText("rejectedSuccess")
                 );
                 this._oManagerRemarkDialog.close();
-                this.readSubmittedTimesheetsForManager(ManagerID)
+                await this.readTimesheetsForManager(ManagerID)
+                this._applyAllFilters();
+                this.getView().getModel("viewModel").setProperty("/canApproveReject", false);
 
-                //this._onRouteMatched(); // Refresh table
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
             } finally {
@@ -275,7 +293,7 @@ sap.ui.define([
             sap.ui.getCore().byId("MIF_id_remark").setValue("");
             sap.ui.getCore().byId("MIF_id_remark").setValueState("None"); // Reset value state
             //disable buttons
-            this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
+            this.getView().getModel("viewModel").setProperty("/canApproveReject", false);
             this._approvalStatus = null; // Reset approval status
         },
         //Back function
@@ -287,56 +305,6 @@ sap.ui.define([
                 this._oManagerRemarkDialog = null;
             }
         },
-        //logout function
-        onLogout: function () {
-            this.getRouter().navTo("RouteLoginPage");
-        },
-        //Search call for filter values
-        TSA_onSearch: async function () {
-            try {
-                this.getBusyDialog();
-                var aFilterItems = this.byId("TSA_id_Filter").getFilterGroupItems();
-                var params = {};
-                aFilterItems.forEach(function (oItem) {
-                    var oControl = oItem.getControl();
-                    var sValue = oItem.getName();
-                    if (oControl && oControl.getValue && oControl.getValue()) {
-                        params[sValue] = oControl.getValue();
-                    }
-                });
-                const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
-                //await this.readSubmittedTimesheetsForManager(ManagerID);
-                var data = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID, ...params });
-                var oModelData = new JSONModel(data.data);
-                this.getView().setModel(oModelData, "ApprovalTimesheetModel");
-                this.filterTimesheetForCurrentWeek();
-                this.getView().getModel("approvalViewModel").setProperty("/canApproveReject", false);
-            } catch (error) {
-                MessageToast.show(this.i18nModel.getText("technicalError"));
-            } finally {
-                this.closeBusyDialog();
-            }
-        },
-
-        //Clear filterbar
-        TSA_onClear: function () {
-            var aFilterItems = this.byId("TSA_id_Filter").getFilterGroupItems();
-            aFilterItems.forEach(function (oItem) {
-                var oControl = oItem.getControl(); // Get the associated control
-                if (oControl) {
-                    if (oControl.setValue) {
-                        oControl.setValue(""); // Clear value for ComboBox, Input, DatePicker, etc.
-                    }
-                    if (oControl.setSelectedKey) {
-                        oControl.setSelectedKey(""); // Reset selection for dropdowns
-                    }
-                    if (oControl.setSelected) {
-                        oControl.setSelected(false); // Reset selection for Checkboxes
-                    }
-                }
-            });
-        },
-        //Show comments
         TSA_onShowComments: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("ApprovalTimesheetModel");
             var oData = oContext.getObject();
@@ -389,11 +357,12 @@ sap.ui.define([
                 const oToday = new Date();
                 oCalendar.removeAllSelectedDates();
                 oCalendar.addSelectedDate(new DateRange({ startDate: oToday }));
-
-                // Call the common function from the BaseController
-                // It's async, so we use await
                 await this.initCalendarLegend(oCalendar, this.branch);
             }
+        },
+        //logout function
+        onLogout: function () {
+            this.getRouter().navTo("RouteLoginPage");
         },
     });
 });
