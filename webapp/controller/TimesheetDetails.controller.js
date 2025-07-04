@@ -468,6 +468,10 @@ sap.ui.define([
                     return;
                 }
                 let oData = this.getView().getModel("newModel").getData();
+                // Change status from "Rejected" to "Saved" on update
+                if (oData.Status === "Rejected") {
+                    oData.Status = "Saved";
+                }
                 delete oData.comments;
                 delete oData.ActualHours;
                 const oPayload = {
@@ -490,6 +494,7 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
+
         //common validation for edit and create timesheet data
         _validateTimesheetFields: function (isCreateMode = true) {
             const oComment = this.byId("TSD_id_EmpComment");
