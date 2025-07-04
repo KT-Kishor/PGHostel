@@ -70,7 +70,7 @@ sap.ui.define([
                     }
                 });
                 this.getView().setModel(new JSONModel(uniqueEmployees), "EmployeeFilterModel");
-                this.byId("TSA_id_Status").setValue("Submitted");
+               // this.byId("TSA_id_Status").setValue("Submitted");
                 this.TSA_onSearch();
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
@@ -214,6 +214,8 @@ sap.ui.define([
             const oTable = this.byId("TSA_id_Table");
             const oSelectedItems = oTable.getSelectedItems();
             const sRemark = sap.ui.getCore().byId("MIF_id_remark").getValue();
+            const ManagerID = this.getView().getModel("LoginModel").getProperty("/EmployeeID");
+
 
             // Call live change function first
             if (!this.MIF_liveChangeForMangerComments()) {
@@ -244,7 +246,9 @@ sap.ui.define([
                         : this.i18nModel.getText("rejectedSuccess")
                 );
                 this._oManagerRemarkDialog.close();
-                this._onRouteMatched(); // Refresh table
+                this.readSubmittedTimesheetsForManager(ManagerID)
+
+                //this._onRouteMatched(); // Refresh table
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
             } finally {
