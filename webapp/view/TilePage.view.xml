@@ -285,11 +285,11 @@
 						<l:SplitterLayoutData size="50%" />
 					</l:layoutData>
                     <VBox>
-                        <Carousel id="carouselSample" backgroundDesign="Transparent" height="auto" width="auto" loop="true" showPageIndicator="false" pages="{path: 'PDFData>/TableData'}">
+                        <Carousel visible="{= ${BirthdayModel>/}.length > 0 }" id="carouselSample" backgroundDesign="Transparent" height="auto" width="auto" loop="true" showPageIndicator="false" pages="{path: 'BirthdayModel>/'}">
                         <pages>
-                            <f:Card class="sapUiSmallMargin" width="auto">
+                            <f:Card class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" width="auto">
                                 <f:header>
-                                    <card:Header title="{PDFData>Name}" subtitle="{PDFData>Role}" iconSrc="{PDFData>/KTLogo}" iconDisplayShape="Circle" iconFitType="Cover">
+                                    <card:Header title="{BirthdayModel>EmployeeName}" subtitle="{BirthdayModel>Role}" iconSrc="data:image/png;base64,{BirthdayModel>ProfilePhoto}" iconDisplayShape="Circle" iconFitType="Cover">
                                     </card:Header>
                                 </f:header>
                                 <f:content>
@@ -297,7 +297,7 @@
                                         <Title level="H3" text="Happy Birthday!! 🎉" titleStyle="H3" class="sapUiSmallMarginBottom" />
                                         <Text text="Wishing you a day filled with happiness and a year filled with joy. We hope you have a wonderful birthday and a great year ahead." class="sapUiSmallMarginBottom" />
                                         <HBox justifyContent="End" class="sapUiSmallMarginBottom">
-                                            <Button text="Send Wishes" type="Emphasized" press=".onPauseCarousel" />
+                                            <Button text="Send Wishes" type="Emphasized" press="onPressCC" />
                                         </HBox>
                                     </VBox>
                                 </f:content>
@@ -305,7 +305,7 @@
                         </pages>
                     </Carousel>
 
-                    <Panel headerText="{i18n>msaDetails}" width="auto" class="sapUiSmallMarginBeginEnd" visible="{= ${MSASOWModel>/length} > 0 }">
+                    <Panel headerText="{i18n>msaDetails}" width="auto" class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" visible="{= ${MSASOWModel>/length} > 0 }">
                         <VBox>
                             <Table items="{MSASOWModel>/}">
                                 <columns>

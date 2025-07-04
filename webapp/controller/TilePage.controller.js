@@ -20,17 +20,6 @@ sap.ui.define(
             .getRoute("RouteTilePage")
             .attachMatched(this._onRouteMatched, this);
         },
-        onAfterRendering: function () {
-          var oCarousel = this.byId("carouselSample");
-          var iInterval = 3000; // in milliseconds
-
-          // Ensure there is more than one page before starting the timer
-          if (oCarousel.getPages().length > 1) {
-            this._autoScrollTimer = setInterval(function () {
-              oCarousel.next();
-            }, iInterval);
-          }
-        },
 
         onExit: function () {
           // Clear the timer when the view is destroyed
@@ -69,6 +58,29 @@ sap.ui.define(
           this.getView().setModel(oChatModel);
 
           this.CreateEmployeeModel();
+          this.initializeBirthdayCarousel();
+        },
+
+        initializeBirthdayCarousel: function () {
+          var filteredModel = this.getView().getModel("EmpDetails").getData().filter(function (item) {
+            return new Date(item.DateOfBirth).getDate() === new Date().getDate() &&
+              new Date(item.DateOfBirth).getMonth() === new Date().getMonth();
+          });
+          var oBirthdayModel = new JSONModel(filteredModel);
+          this.getView().setModel(oBirthdayModel, "BirthdayModel");
+          var oCarousel = this.byId("carouselSample");
+          var iInterval = 3000; // in milliseconds
+
+          // Ensure there is more than one page before starting the timer
+          if (oCarousel.getPages().length > 1) {
+            this._autoScrollTimer = setInterval(function () {
+              oCarousel.next();
+            }, iInterval);
+          }
+        },
+
+        onPressCC: function() {
+          MessageToast.show("Implementation in progress");
         },
 
         CreateEmployeeModel: function () {
