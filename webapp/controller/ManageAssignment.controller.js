@@ -73,7 +73,7 @@ sap.ui.define(
             const oData = oSelectedItem.getBindingContext("TaskModel").getObject();
             this._originalTaskData = JSON.parse(JSON.stringify(oData)); // deep copy
 
-            oModel = new JSONModel(oData);
+            oModel = new JSONModel(this._originalTaskData); // Always use original data
           } else {
             this._originalTaskData = null;
             const newTaskData = {
@@ -90,21 +90,32 @@ sap.ui.define(
 
           if (!this.oTaskDialog) {
             sap.ui.core.Fragment.load({
-              name: "sap.kt.com.minihrsolution.fragment.NewAssignment", // your fragment path
+              name: "sap.kt.com.minihrsolution.fragment.NewAssignment",
               controller: this,
-            }).then(
-              function (oDialog) {
-                this.oTaskDialog = oDialog;
-                oView.addDependent(oDialog);
-                oDialog.open();
-                this._FragmentDatePickersReadOnly(["NAF_id_StartDate", "NAF_id_EndDate"]);
-              }.bind(this)
-            );
+            }).then(function (oDialog) {
+              this.oTaskDialog = oDialog;
+              oView.addDependent(oDialog);
+              oDialog.open();
+              this._FragmentDatePickersReadOnly(["NAF_id_StartDate", "NAF_id_EndDate"]);
+            }.bind(this));
           } else {
+            // Reset model when reopening 
+            if (bIsEdit && this._originalTaskData) {
+              oView.getModel("EditTaskModel").setData(JSON.parse(JSON.stringify(this._originalTaskData)));
+            } else if (!bIsEdit) {
+              oView.getModel("EditTaskModel").setData({
+                TaskName: "",
+                TaskType: "",
+                TaskTypeDescription: "",
+                StartDate: "",
+                EndDate: "",
+              });
+            }
             this.oTaskDialog.open();
             this._FragmentDatePickersReadOnly(["NAF_id_StartDate", "NAF_id_EndDate"]);
           }
         },
+
         MA_onPressClear: function () {
           var oFilterBar = this.getView().byId("MA_id_FilterBar");
           oFilterBar.getFilterGroupItems().forEach(function (oItem) {
@@ -192,7 +203,7 @@ sap.ui.define(
             this.oTaskDialog.close();
             // this._fetchCommonData("NewTask", "TaskModel", {});
             //this.CommonReadcall()
-              this.MA_onPressClear()
+            this.MA_onPressClear()
             await this.MA_onSearch()
           } else {
             this.closeBusyDialog();
