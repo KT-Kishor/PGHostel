@@ -21,7 +21,7 @@ sap.ui.define([
             this.getBusyDialog();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerTimesheetApproval"));
-
+            this._makeDatePickersReadOnly(["TSA_id_Employee", "TSA_id_Month","TSA_id_Status"]);
             const oViewModel = new JSONModel({
                 calendarStartDate: this._getStartOfWeek(new Date()),
                 isCalendarEnabled: true,
@@ -144,17 +144,24 @@ sap.ui.define([
             this.byId("TSA_id_Table").removeSelections(true);
             this.TSA_onSelect();
         },
-
         TSA_onSearch: function () {
-            this._applyAllFilters();
+            this.getBusyDialog();
+            setTimeout(() => {
+                this._applyAllFilters();
+                this.closeBusyDialog();
+            }, 100);
         },
 
         TSA_onClear: function () {
+            this.getBusyDialog();
             this.byId("TSA_id_Employee").setSelectedKey("");
             this.byId("TSA_id_Month").setSelectedKey("");
             this.byId("TSA_id_Status").setValue("");
             this.byId("TSA_id_Status").setSelectedKey("");
-            //this._applyAllFilters();
+            setTimeout(() => {
+                // this._applyAllFilters();
+                this.closeBusyDialog();
+            }, 100);
         },
 
         TSA_onSelect: function () {
