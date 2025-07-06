@@ -20,7 +20,7 @@ sap.ui.define([
             this.getBusyDialog();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileTimesheetFooter"));
-
+            this._makeDatePickersReadOnly(["TS_monthComboBox","TS_id_Status"]);
             const oViewModel = new JSONModel({
                 calendarStartDate: this._getStartOfWeek(new Date()),
                 isCalendarEnabled: true,
@@ -29,7 +29,7 @@ sap.ui.define([
             });
             this.getView().setModel(oViewModel, "viewModel");
             this.getView().setModel(new JSONModel([]), "FilteredTimesheetModel");
-
+            
             const loginModel = this.getOwnerComponent().getModel("LoginModel");
             this.EmployeeID = loginModel.getProperty("/EmployeeID");
             this.branch = loginModel.getProperty("/BranchCode");
