@@ -53,7 +53,7 @@ sap.ui.define([
             }
         },
 
-       _applyAllFilters: function () {
+        _applyAllFilters: function () {
             if (!this.timesheetData) { return; }
 
             const oViewModel = this.getView().getModel("viewModel");
@@ -96,8 +96,14 @@ sap.ui.define([
         // },
 
         filterTimesheetForCurrentWeek: function () {
-            this._applyAllFilters();
+            this.getBusyDialog();
+
+            setTimeout(() => {
+                this._applyAllFilters();
+                this.closeBusyDialog();
+            }, 100);
         },
+
 
         TS_onCalendarDateSelect: function (oEvent) {
             if (!this.getView().getModel("viewModel").getProperty("/isCalendarEnabled")) { return; }
@@ -120,15 +126,25 @@ sap.ui.define([
         },
 
         T_onSearch: function () {
-            this._applyAllFilters();
+            this.getBusyDialog();
+            setTimeout(() => {
+                this._applyAllFilters();
+                this.closeBusyDialog();
+            }, 100);
         },
 
         TS_onClear: function () {
+            this.getBusyDialog();
             this.byId("TS_monthComboBox").setSelectedKey("");
             this.byId("TS_id_Status").setValue("");
             this.byId("TS_id_Status").setSelectedKey("");
-            this._applyAllFilters();
+
+            setTimeout(() => {
+                this._applyAllFilters();
+                this.closeBusyDialog();
+            }, 100);
         },
+
 
         TS_onFillDetails: function () {
             this.getRouter().navTo("RouteTimesheetDetails", { sPath: "Timesheet" });
@@ -242,44 +258,44 @@ sap.ui.define([
         },
 
         TS_onShowComments: function (oEvent) {
-                var oContext = oEvent.getSource().getBindingContext("FilteredTimesheetModel");
-                var oData = oContext.getObject();
-                var aComments = oData.comments || [];
-                var aTimelineItems = aComments.map(function (oComment) {
-                    return new TimelineItem({
-                        dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
-                        title: oComment.CommentedBy || "Anonymous",
-                        text: oComment.Comment || "No comment provided",
-                        userNameClickable: false,
-                        icon: "sap-icon://comment"
-                    });
+            var oContext = oEvent.getSource().getBindingContext("FilteredTimesheetModel");
+            var oData = oContext.getObject();
+            var aComments = oData.comments || [];
+            var aTimelineItems = aComments.map(function (oComment) {
+                return new TimelineItem({
+                    dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
+                    title: oComment.CommentedBy || "Anonymous",
+                    text: oComment.Comment || "No comment provided",
+                    userNameClickable: false,
+                    icon: "sap-icon://comment"
                 });
-                var oTimeline = new Timeline({
-                    showHeader: false,
-                    enableBusyIndicator: false,
-                    width: "100%",
-                    sortOldestFirst: false,
-                    enableDoubleSided: false,
-                    content: aTimelineItems,
-                    showHeaderBar: false
-                });
-                var oDialog = new sap.m.Dialog({
-                    title: this.i18nModel.getText("tCommentsTitle"),
-                    contentWidth: "25rem",
-                    contentHeight: "15rem",
-                    draggable: true,
-                    resizable: true,
-                    content: [oTimeline],
-                    endButton: new sap.m.Button({
-                        text: this.i18nModel.getText("close"),
-                        type: "Reject",
-                        press: function () {
-                            oDialog.close();
-                            oDialog.destroy();
-                        }
-                    })
-                });
-                oDialog.open();
-            },
+            });
+            var oTimeline = new Timeline({
+                showHeader: false,
+                enableBusyIndicator: false,
+                width: "100%",
+                sortOldestFirst: false,
+                enableDoubleSided: false,
+                content: aTimelineItems,
+                showHeaderBar: false
+            });
+            var oDialog = new sap.m.Dialog({
+                title: this.i18nModel.getText("tCommentsTitle"),
+                contentWidth: "25rem",
+                contentHeight: "15rem",
+                draggable: true,
+                resizable: true,
+                content: [oTimeline],
+                endButton: new sap.m.Button({
+                    text: this.i18nModel.getText("close"),
+                    type: "Reject",
+                    press: function () {
+                        oDialog.close();
+                        oDialog.destroy();
+                    }
+                })
+            });
+            oDialog.open();
+        },
     });
 });
