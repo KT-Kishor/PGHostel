@@ -33,14 +33,12 @@ sap.ui.define([
                 oCalendar.removeAllSelectedDates();
                 oCalendar.addSelectedDate(oDateRange);
                 this.onInitializeLegend({ getSource: () => oCalendar });
-                this.onDateSelect({ getSource: () => oCalendar });
             }
             // Handle Edit and Create cases
             this.sArg = oEvent.getParameter("arguments").sPath;
             if (this.sArg !== "Timesheet") {
                 await this.readCallTimesheet();
                 const oData = this.getView().getModel("newModel").getData();
-                // this.getView().getModel("newModel").setProperty("/Comment", oData.comments[oData.comments.length - 1].Comment);
                 let empComments = [];
                 if (Array.isArray(oData.comments)) {
                     empComments = oData.comments.filter(
@@ -91,6 +89,10 @@ sap.ui.define([
                     Comment: ""
                 };
                 this.getView().setModel(new sap.ui.model.json.JSONModel(emptyData), "newModel");
+                // Call onDateSelect only in create mode after all flags are set correctly.
+                if (oCalendar) {
+                    this.onDateSelect({ getSource: () => oCalendar });
+                }
                 if (this.getView().getModel("editModel")) {
                     this.getView().getModel("editModel").setProperty("/editableBut", true);
                 }
