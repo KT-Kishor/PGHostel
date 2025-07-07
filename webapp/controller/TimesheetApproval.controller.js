@@ -86,24 +86,35 @@ sap.ui.define([
             const oEmployeeFilter = this.byId("TSA_id_Employee");
             const oMonthFilter = this.byId("TSA_id_Month");
             const oStatusFilter = this.byId("TSA_id_Status");
+            const oYearPicker = this.byId("TSA_id_Year"); 
             const sEmployeeValue = oEmployeeFilter.getValue();
             const sMonthValue = oMonthFilter.getValue();
             const sStatusValue = oStatusFilter.getValue();
-
+            const sYearValue = oYearPicker.getValue(); 
             let aFilteredData = this._fullApprovalData;
-
             if (sEmployeeValue) { aFilteredData = aFilteredData.filter(entry => entry.EmployeeID === sEmployeeValue); }
-            if (sMonthValue) {
-                oViewModel.setProperty("/isCalendarEnabled", false);
-                let sMonthKey = "-1";// Default to a key that will never match
-                const oSelectedItem = oMonthFilter.getItems().find(item => item.getText() === sMonthValue);
-                if (oSelectedItem) {
-                    sMonthKey = oSelectedItem.getKey();
-                }
+            if (sStatusValue) { aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue); }
+            if (sYearValue) {
                 aFilteredData = aFilteredData.filter(entry => {
                     if (!entry.Date) return false;
-                    return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey;
+                    // The year from the data is compared with the string value from the picker
+                    return (new Date(entry.Date).getFullYear()).toString() === sYearValue;
                 });
+            }
+            // Handle Month vs. Weekly Calendar logic
+            if (sMonthValue || sYearValue) {
+                oViewModel.setProperty("/isCalendarEnabled", false);
+
+                if (sMonthValue) {
+                    let sMonthKey = "-1";
+                    const oSelectedItem = oMonthFilter.getItems().find(item => item.getText() === sMonthValue);
+                    if (oSelectedItem) { sMonthKey = oSelectedItem.getKey(); }
+
+                    aFilteredData = aFilteredData.filter(entry => {
+                        if (!entry.Date) return false;
+                        return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey;
+                    });
+                }
             } else {
                 oViewModel.setProperty("/isCalendarEnabled", true);
                 const oCalendar = this.byId("TSA_id_calendar");
@@ -117,10 +128,7 @@ sap.ui.define([
                     return new Date(entry.Date) >= oStartDate && new Date(entry.Date) <= oEndDate;
                 });
             }
-            // Filter by Status
-            if (sStatusValue) {
-                aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue);
-            }
+
             const oModel = this.getView().getModel("ApprovalTimesheetModel");
             oModel.setData(aFilteredData);
             oModel.refresh(true);
@@ -140,8 +148,9 @@ sap.ui.define([
             if (aSelectedDates.length > 0) {
                 const oSelectedDate = aSelectedDates[0].getStartDate();
                 oSelectedDate.setHours(0, 0, 0, 0);
-                const sEmployeeID = this.byId("TSA_id_Employee").getSelectedKey();
+                const sEmployeeID = this.byId("TSA_id_Employee").getValue();
                 const sStatusValue = this.byId("TSA_id_Status").getValue();
+                const sYearValue = this.byId("TSA_id_Year").getValue(); 
                 let aFilteredData = this._fullApprovalData.filter(entry => {
                     if (!entry.Date) return false;
                     const entryDate = new Date(entry.Date);
@@ -149,7 +158,8 @@ sap.ui.define([
                     const isCorrectDate = entryDate.getTime() === oSelectedDate.getTime();
                     const isCorrectEmployee = !sEmployeeID || entry.EmployeeID === sEmployeeID;
                     const isCorrectStatus = !sStatusValue || entry.Status === sStatusValue;
-                    return isCorrectDate && isCorrectEmployee && isCorrectStatus;
+                    const isCorrectYear = !sYearValue || (new Date(entry.Date).getFullYear()).toString() === sYearValue;
+                    return isCorrectDate && isCorrectEmployee && isCorrectStatus && isCorrectYear;
                 });
                 this.getView().getModel("ApprovalTimesheetModel").setData(aFilteredData);
             } else {
@@ -172,6 +182,7 @@ sap.ui.define([
             this.byId("TSA_id_Month").setSelectedKey("");
             this.byId("TSA_id_Status").setValue("");
             this.byId("TSA_id_Status").setSelectedKey("");
+            this.byId("TSA_id_Year").setValue(""); // This correctly clears the DatePicker
             setTimeout(() => {
                 // this._applyAllFilters();
                 this.closeBusyDialog();

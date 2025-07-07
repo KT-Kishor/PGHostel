@@ -52,7 +52,15 @@
 					</ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
-                    <!-- Add more filters as needed -->
+                    <fb:FilterGroupItem name="Year" label="{i18n>year}" groupName="Group1" visibleInFilterBar="true">
+                        <fb:control>
+                            <DatePicker 
+                                id="TSA_id_Year"
+                                displayFormat="yyyy"
+                                valueFormat="yyyy"
+                                placeholder="{i18n>year}" />
+                        </fb:control>
+                    </fb:FilterGroupItem>
                 </fb:filterGroupItems>
             </fb:FilterBar>
             <Table
