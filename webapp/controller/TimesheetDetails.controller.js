@@ -205,9 +205,9 @@ sap.ui.define([
         //Submit the timesheet data
         TSD_onSubmit: async function () {
             try {
-                this.getBusyDialog();
                 await this._fetchCommonData("EmployeeDetails", "EmployeeModel", { EmployeeID: this.EmployeeID });
                 if (!this._validateTimesheetFields(true)) return;
+                this.getBusyDialog();
 
                 const oCalendar = this.byId("calendar").getSelectedDates();
                 const selectedDateObj = oCalendar[0]?.getStartDate();
@@ -509,6 +509,12 @@ sap.ui.define([
             if (!utils._LCvalidateMandatoryField(oAssignment, "ID") || !utils._LCvalidateTimeLimit(oHours, "ID") || !utils._LCvalidateMandatoryField(oComment, "ID")) {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return false;
+            }
+             if (!oAssignment.getValue()) {
+                oAssignment.setValueState("Error");
+                oAssignment.setValueStateText(this.i18nModel.getText("selectAssignment"));
+            } else {
+                oAssignment.setValueState("None");
             }
             const sEnteredHours = Number(oHours.getValue());
             let sActualHours = Number(oData.ActualHours);
