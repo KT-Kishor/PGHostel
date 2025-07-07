@@ -32,19 +32,16 @@
                 <core:Item key="{Months>ID}" text="{Months>Month}" />
             </ComboBox>
         </fb:control>
-    </fb:FilterGroupItem>
-
-    <fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
-        <fb:control>
-            <!-- THIS IS THE FIX: Add the change event handler -->
-            <ComboBox id="TS_id_Status"
-              showClearIcon="true"
-              change="onStatusSelectionChange" 
-              items="{TStatusModel>/}">
-                <core:Item key="{TStatusModel>ID}" text="{TStatusModel>Type}"/>
-            </ComboBox>
-        </fb:control>
-    </fb:FilterGroupItem>
+    </fb:FilterGroupItem>    
+    <fb:FilterGroupItem name="Year" label="{i18n>year}" groupName="Group1" visibleInFilterBar="true">
+    <fb:control>
+        <DatePicker 
+            id="TS_id_Year"
+            displayFormat="yyyy"
+            valueFormat="yyyy"
+            placeholder="{i18n>year}" />
+    </fb:control>
+</fb:FilterGroupItem>
 </fb:filterGroupItems>
             </fb:FilterBar>
             <MessageStrip

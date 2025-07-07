@@ -13,14 +13,13 @@ sap.ui.define([
             this.getRouter().getRoute("RouteTimesheet").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function () {
+       _onRouteMatched: async function () {
             var LoginFunction = await this.commonLoginFunction("Timesheet");
             if (!LoginFunction) return;
 
             this.getBusyDialog();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileTimesheetFooter"));
-            this._makeDatePickersReadOnly(["TS_monthComboBox","TS_id_Status"]);
             const oViewModel = new JSONModel({
                 calendarStartDate: this._getStartOfWeek(new Date()),
                 isCalendarEnabled: true,
@@ -29,7 +28,7 @@ sap.ui.define([
             });
             this.getView().setModel(oViewModel, "viewModel");
             this.getView().setModel(new JSONModel([]), "FilteredTimesheetModel");
-            
+
             const loginModel = this.getOwnerComponent().getModel("LoginModel");
             this.EmployeeID = loginModel.getProperty("/EmployeeID");
             this.branch = loginModel.getProperty("/BranchCode");
@@ -58,15 +57,27 @@ sap.ui.define([
 
             const oViewModel = this.getView().getModel("viewModel");
             const oMonthFilter = this.byId("TS_monthComboBox");
-            const oStatusFilter = this.byId("TS_id_Status");
+            const oYearPicker = this.byId("TS_id_Year");
             const sMonthKey = oMonthFilter.getSelectedKey();
-            const sStatusValue = oStatusFilter.getValue();
+            const sYearValue = oYearPicker.getValue();
 
             let aFilteredData = this.timesheetData;
-
-            if (sMonthKey) {
-                oViewModel.setProperty("/isCalendarEnabled", false);
-                aFilteredData = aFilteredData.filter(entry => { if (!entry.Date) return false; return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey; });
+            if (sYearValue) {
+                aFilteredData = aFilteredData.filter(entry => {
+                    if (!entry.Date) return false;
+                    return (new Date(entry.Date).getFullYear()).toString() === sYearValue;
+                });
+            }
+            // Logic for Month vs. Weekly Calendar
+            if (sMonthKey || sYearValue) { // Calendar is disabled if EITHER month or year is selected
+                oViewModel.setProperty("/isCalendarEnabled", false);       
+                // Apply month filter only if a month is selected
+                if(sMonthKey) {
+                    aFilteredData = aFilteredData.filter(entry => {
+                        if (!entry.Date) return false;
+                        return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey;
+                    });
+                }
             } else {
                 oViewModel.setProperty("/isCalendarEnabled", true);
                 const oCalendar = this.byId("TS_id_calendarTimesheet");
@@ -75,9 +86,11 @@ sap.ui.define([
                 const oEndDate = new Date(oStartDate);
                 oEndDate.setDate(oEndDate.getDate() + oCalendar.getDays() - 1);
                 oEndDate.setHours(23, 59, 59, 999);
-                aFilteredData = aFilteredData.filter(entry => { if (!entry.Date) return false; return new Date(entry.Date) >= oStartDate && new Date(entry.Date) <= oEndDate; });
+                aFilteredData = aFilteredData.filter(entry => {
+                    if (!entry.Date) return false;
+                    return new Date(entry.Date) >= oStartDate && new Date(entry.Date) <= oEndDate;
+                });
             }
-            if (sStatusValue) { aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue); }
 
             const oModel = this.getView().getModel("FilteredTimesheetModel");
             oModel.setData(aFilteredData);
@@ -87,13 +100,6 @@ sap.ui.define([
             this.T_TableSelectionChange();
         },
 
-        // onMonthSelectionChange: function () {
-        //     this._applyAllFilters();
-        // },
-
-        // onStatusSelectionChange: function () {
-        //     this._applyAllFilters();
-        // },
 
         filterTimesheetForCurrentWeek: function () {
             this.getBusyDialog();
@@ -105,7 +111,7 @@ sap.ui.define([
         },
 
 
-        TS_onCalendarDateSelect: function (oEvent) {
+         TS_onCalendarDateSelect: function (oEvent) {
             if (!this.getView().getModel("viewModel").getProperty("/isCalendarEnabled")) { return; }
             const aSelectedDates = oEvent.getSource().getSelectedDates();
             if (aSelectedDates.length > 0) {
@@ -136,9 +142,7 @@ sap.ui.define([
         TS_onClear: function () {
             this.getBusyDialog();
             this.byId("TS_monthComboBox").setSelectedKey("");
-            this.byId("TS_id_Status").setValue("");
-            this.byId("TS_id_Status").setSelectedKey("");
-
+            this.byId("TS_id_Year").setValue("");
             setTimeout(() => {
                 this._applyAllFilters();
                 this.closeBusyDialog();
