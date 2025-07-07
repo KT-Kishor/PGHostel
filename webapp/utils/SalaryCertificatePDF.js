@@ -72,7 +72,7 @@ sap.ui.define([], function () {
                     doc.setGState(new doc.GState({ opacity: 1 }));
                     footerContent();
                     doc.setLineWidth(0.6);
-                    let headerY = rteY + 40 + (193.34 - endYmm);
+                    let headerY = pageHeight - endYmm + 10;
                     if (headerY > 180) {
                         doc.addPage();
                         doc.setGState(new doc.GState({ opacity: 0.1 }));

@@ -325,19 +325,15 @@ sap.ui.define([
                     var charCount = plainText.length;
                     var lines = plainText.split(/\r\n|\r|\n/);
                     var lineCount = lines.length;
-                    console.log("Characters:", charCount, "Lines:", lineCount);
                 } else {
-                    console.warn("Editor not ready yet.");
-                    this.closeBusyDialog();
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
                     return;
                 }
                 if (charCount > 1000 || lineCount > 21) {
-                    this.closeBusyDialog();
                     MessageBox.error("Certificate content exceeds the limit of 1000 characters or 21 lines.");
                     return;
                 }
                 try {
-                    this.getBusyDialog();
                     // Get selected trainee's data from the table
                     let oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                     let oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
@@ -353,17 +349,17 @@ sap.ui.define([
                         Role: "Trainee",
                         Status: "Training Completed",
                     };
-                    await this.updateCallForTrainee(oUpdatedData, "downloadSucess");
-                    this.T_onSearch();
+                    await this.updateCallForTrainee(oUpdatedData, "pdfDownloading");
+                    await this.T_onSearch();
                     this.byId("T_id_TraineeTable").removeSelections(true);
                     this.byId("T_id_Download").setVisible(false);
                     this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                     let htmlContent = sap.ui.getCore().byId("myRTE").getValue();
-                    this.generateCertificatePDF(htmlContent, oTraineeModel.BranchCode);
                     this.TC_oDialog.close();
                     this.T_ButtonVisibility();
                     this.closeBusyDialog();
                     this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview</b> to Preview the Certificate</p>");
+                    this.generateCertificatePDF(htmlContent, oTraineeModel.BranchCode);
                 } catch (error) {
                     this.closeBusyDialog();
                     MessageToast.show(error.message || error.responseText);
