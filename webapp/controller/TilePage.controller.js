@@ -36,11 +36,11 @@ sap.ui.define(
           this.scrollToSection("id_ObjectPageLayoutTile", "id_Sectiontile");
           this.getBusyDialog();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          await this._fetchCommonData("AllLoginDetails", "EmpModel");
-          await this._fetchCommonData("EmployeeDetails", "EmpDetails");
           await this._fetchCommonData("getCompanyInvoice", "CompanyInvoiceModelData");
           await this._fetchCommonData("getMSAEndingSoon", "MSASOWModel");
           this.AppVisibilityReadCall();
+          await this._fetchCommonData("AllLoginDetails", "EmpModel");
+          await this._fetchCommonData("EmployeeDetails", "EmpDetails");
           var oChatModel = new JSONModel({
             messages: [],
             messageText: "",

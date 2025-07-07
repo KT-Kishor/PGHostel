@@ -304,10 +304,17 @@
                             </f:Card>
                         </pages>
                     </Carousel>
-
-                    <Panel headerText="{i18n>msaDetails}" width="auto" class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" visible="{= ${MSASOWModel>/length} > 0 }">
-                        <VBox>
-                            <Table items="{MSASOWModel>/}">
+                    <f:Card width="auto" class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" visible="{= ${MSASOWModel>/length} > 0 }">
+                    <f:content>
+                        <Table items="{MSASOWModel>/}">
+                        <headerToolbar>
+                                    <OverflowToolbar>
+                                        <Title
+                                            text="{i18n>msaDetails}"
+                                            level="H1"
+                                        />
+                                    </OverflowToolbar>
+                                </headerToolbar>
                                 <columns>
                                     <Column minScreenWidth="Tablet" demandPopin="true">
                                         <Text text="{i18n>companyName}"/>
@@ -333,13 +340,20 @@
                                     </ColumnListItem>
                                 </items>
                             </Table>
-                        </VBox>
-                    </Panel>
-
-                    <Panel headerText="{i18n>invoiceDetails}" width="auto" class="sapUiSmallMargin" visible="{= ${CompanyInvoiceModelData>/length} > 0 }">
-                        <VBox>
-                            <!-- Corrected model path to CompanyInvoiceModelData -->
-                            <Table items="{CompanyInvoiceModelData>/}">
+                    </f:content>
+                    </f:Card>
+                    
+                    <f:Card width="auto" class="sapUiSmallMargin" visible="{= ${CompanyInvoiceModelData>/length} > 0 }">
+                    <f:content>
+                        <Table items="{CompanyInvoiceModelData>/}">
+                        <headerToolbar>
+                                    <OverflowToolbar>
+                                        <Title
+                                            text="{i18n>invoiceDetails}"
+                                            level="H1"
+                                        />
+                                    </OverflowToolbar>
+                                </headerToolbar>
                                 <columns>
                                     <Column minScreenWidth="Tablet" demandPopin="true">
                                         <Text text="{i18n>invoiceNo}" />
@@ -365,8 +379,8 @@
                                     </ColumnListItem>
                                 </items>
                             </Table>
-                        </VBox>
-                    </Panel>
+                    </f:content>
+                    </f:Card>
                 </VBox>
 				</l:SplitPane>
             </l:PaneContainer>
