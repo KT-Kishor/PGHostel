@@ -37,7 +37,9 @@ sap.ui.define(
           this.getBusyDialog();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           await this._fetchCommonData("getCompanyInvoice", "CompanyInvoiceModelData");
+          this.getView().getModel("CompanyInvoiceModelData").setProperty("/length", this.getView().getModel("CompanyInvoiceModelData").getData().length);
           await this._fetchCommonData("getMSAEndingSoon", "MSASOWModel");
+          this.getView().getModel("MSASOWModel").setProperty("/length", this.getView().getModel("MSASOWModel").getData().length);
           this.AppVisibilityReadCall();
           await this._fetchCommonData("AllLoginDetails", "EmpModel");
           await this._fetchCommonData("EmployeeDetails", "EmpDetails");

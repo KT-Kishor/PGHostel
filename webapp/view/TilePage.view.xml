@@ -304,7 +304,13 @@
                             </f:Card>
                         </pages>
                     </Carousel>
-                    <f:Card width="auto" class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" visible="{= ${MSASOWModel>/length} > 0 }">
+                    <f:Card width="auto" class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" visible="{= ${MSASOWModel>/length} > 0
+      &amp;&amp; (
+        ${LoginModel>/Role} === 'Admin' ||
+        ${LoginModel>/Role} === 'Demo' ||
+        ${LoginModel>/Role} === 'AccountManage' ||
+        ${LoginModel>/Role} === 'HR Manager'
+      )}">
                     <f:content>
                         <Table items="{MSASOWModel>/}">
                         <headerToolbar>
@@ -343,7 +349,13 @@
                     </f:content>
                     </f:Card>
                     
-                    <f:Card width="auto" class="sapUiSmallMargin" visible="{= ${CompanyInvoiceModelData>/length} > 0 }">
+                    <f:Card width="auto" class="sapUiSmallMargin" visible="{= ${CompanyInvoiceModelData>/length} > 0
+      &amp;&amp; (
+        ${LoginModel>/Role} === 'Admin' ||
+        ${LoginModel>/Role} === 'Demo' ||
+        ${LoginModel>/Role} === 'AccountManage' ||
+        ${LoginModel>/Role} === 'HR Manager'
+      )}">
                     <f:content>
                         <Table items="{CompanyInvoiceModelData>/}">
                         <headerToolbar>
