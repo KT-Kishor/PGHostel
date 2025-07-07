@@ -21,7 +21,7 @@
  days="7" 
  showDayNamesLine="true" 
  intervalSelection="false" />
-            <fb:FilterBar  class="sapUiTinyMargin" id="TS_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="TS_onClear" showClearOnFB="true" search="T_onSearch" filterChange=".onFilterChange" showFilterConfiguration="false" afterVariantLoad=".onAfterVariantLoad" >
+            <fb:FilterBar  class="sapUiTinyMargin"  id="TS_id_FilterBar" persistencyKey="myPersKey" useToolbar="false" clear="TS_onClear" showClearOnFB="true" search="T_onSearch" filterChange=".onFilterChange" showFilterConfiguration="false" afterVariantLoad=".onAfterVariantLoad" >
                <fb:filterGroupItems>
     <fb:FilterGroupItem name="Month" label="{i18n>month}" groupName="Group1" visibleInFilterBar="true">
         <fb:control>

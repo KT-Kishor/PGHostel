@@ -21,14 +21,13 @@ sap.ui.define([
             this.getBusyDialog();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerTimesheetApproval"));
-            //this._makeDatePickersReadOnly(["TSA_id_Employee", "TSA_id_Month", "TSA_id_Status"]);
+
             const oViewModel = new JSONModel({
                 calendarStartDate: this._getStartOfWeek(new Date()),
                 isCalendarEnabled: true,
                 canApproveReject: false
             });
             this.getView().setModel(oViewModel, "viewModel");
-
             this.getView().setModel(new JSONModel([]), "ApprovalTimesheetModel");
             this.getView().setModel(new JSONModel([]), "EmployeeFilterModel");
 
@@ -38,9 +37,9 @@ sap.ui.define([
             await this.readTimesheetsForManager(ManagerID);
             await this._initializeCalendarAndLegend();
 
-            this.TSA_onClear();
-            this.byId("TSA_id_Status").setValue("Submitted");
-            this._applyAllFilters();
+            this.TSA_onClear(true); // Call clear but mark it as initial load
+            this.byId("TSA_id_Status").setValue("Submitted"); // Set default status
+            this._applyAllFilters(); // Apply the default filter
             this.closeBusyDialog();
         },
 
@@ -55,12 +54,8 @@ sap.ui.define([
             try {
                 const oData = await this.ajaxReadWithJQuery("Timesheet", { ManagerID: ManagerID });
                 let timesheetData = Array.isArray(oData.data) ? oData.data : [oData.data];
-
                 const aAllowedStatuses = ["Submitted", "Approved", "Rejected"];
-                const aFilteredManagerData = timesheetData.filter(entry =>
-                    entry && entry.Status && aAllowedStatuses.includes(entry.Status)
-                );
-                this._fullApprovalData = aFilteredManagerData;
+                this._fullApprovalData = timesheetData.filter(entry => entry && entry.Status && aAllowedStatuses.includes(entry.Status));
 
                 const uniqueEmployees = [];
                 const employeeMap = new Set();
@@ -86,25 +81,27 @@ sap.ui.define([
             const oEmployeeFilter = this.byId("TSA_id_Employee");
             const oMonthFilter = this.byId("TSA_id_Month");
             const oStatusFilter = this.byId("TSA_id_Status");
-            const oYearPicker = this.byId("TSA_id_Year"); 
+            const oYearPicker = this.byId("TSA_id_Year");
             const sEmployeeValue = oEmployeeFilter.getValue();
             const sMonthValue = oMonthFilter.getValue();
             const sStatusValue = oStatusFilter.getValue();
-            const sYearValue = oYearPicker.getValue(); 
+            const sYearValue = oYearPicker.getValue();
             let aFilteredData = this._fullApprovalData;
-            if (sEmployeeValue) { aFilteredData = aFilteredData.filter(entry => entry.EmployeeID === sEmployeeValue); }
-            if (sStatusValue) { aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue); }
-            if (sYearValue) {
-                aFilteredData = aFilteredData.filter(entry => {
-                    if (!entry.Date) return false;
-                    // The year from the data is compared with the string value from the picker
-                    return (new Date(entry.Date).getFullYear()).toString() === sYearValue;
-                });
-            }
-            // Handle Month vs. Weekly Calendar logic
-            if (sMonthValue || sYearValue) {
-                oViewModel.setProperty("/isCalendarEnabled", false);
+            // Check if any filter in the filter bar is active
+            const bIsFilterBarActive = sEmployeeValue || sMonthValue || sStatusValue || sYearValue;
+            if (bIsFilterBarActive) {
+                //  Filter bar has values. Filter by them. ---    
+                // The calendar is secondary. Disable it if Month or Year is used.
+                oViewModel.setProperty("/isCalendarEnabled", !(sMonthValue || sYearValue));
 
+                if (sEmployeeValue) { aFilteredData = aFilteredData.filter(entry => entry.EmployeeID === sEmployeeValue); }
+                if (sStatusValue) { aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue); }
+                if (sYearValue) {
+                    aFilteredData = aFilteredData.filter(entry => {
+                        if (!entry.Date) return false;
+                        return (new Date(entry.Date).getFullYear()).toString() === sYearValue;
+                    });
+                }
                 if (sMonthValue) {
                     let sMonthKey = "-1";
                     const oSelectedItem = oMonthFilter.getItems().find(item => item.getText() === sMonthValue);
@@ -136,7 +133,7 @@ sap.ui.define([
             this.TSA_onSelect();
         },
 
-        onFilterChange: function () {
+           onFilterChange: function () {
             this._applyAllFilters();
         },
         filterTimesheetForCurrentWeek: function () {
@@ -148,18 +145,20 @@ sap.ui.define([
             if (aSelectedDates.length > 0) {
                 const oSelectedDate = aSelectedDates[0].getStartDate();
                 oSelectedDate.setHours(0, 0, 0, 0);
-                const sEmployeeID = this.byId("TSA_id_Employee").getValue();
+                // When clicking a single day, respect the other filters
+                const sEmployeeValue = this.byId("TSA_id_Employee").getValue();
                 const sStatusValue = this.byId("TSA_id_Status").getValue();
-                const sYearValue = this.byId("TSA_id_Year").getValue(); 
-                let aFilteredData = this._fullApprovalData.filter(entry => {
+                const sYearValue = this.byId("TSA_id_Year").getValue();
+                const sMonthValue = this.byId("TSA_id_Month").getValue();
+                let aFilteredData = this._fullApprovalData;
+                if (sEmployeeValue) { aFilteredData = aFilteredData.filter(e => e.EmployeeID === sEmployeeValue); }
+                if (sStatusValue) { aFilteredData = aFilteredData.filter(e => e.Status === sStatusValue); }
+                // The primary filter here is the single selected date
+                 aFilteredData = aFilteredData.filter(entry => {
                     if (!entry.Date) return false;
                     const entryDate = new Date(entry.Date);
                     entryDate.setHours(0, 0, 0, 0);
-                    const isCorrectDate = entryDate.getTime() === oSelectedDate.getTime();
-                    const isCorrectEmployee = !sEmployeeID || entry.EmployeeID === sEmployeeID;
-                    const isCorrectStatus = !sStatusValue || entry.Status === sStatusValue;
-                    const isCorrectYear = !sYearValue || (new Date(entry.Date).getFullYear()).toString() === sYearValue;
-                    return isCorrectDate && isCorrectEmployee && isCorrectStatus && isCorrectYear;
+                    return entryDate.getTime() === oSelectedDate.getTime();
                 });
                 this.getView().getModel("ApprovalTimesheetModel").setData(aFilteredData);
             } else {
@@ -168,7 +167,7 @@ sap.ui.define([
             this.byId("TSA_id_Table").removeSelections(true);
             this.TSA_onSelect();
         },
-        TSA_onSearch: function () {
+           TSA_onSearch: function () {
             this.getBusyDialog();
             setTimeout(() => {
                 this._applyAllFilters();
@@ -176,17 +175,15 @@ sap.ui.define([
             }, 100);
         },
 
-        TSA_onClear: function () {
-            this.getBusyDialog();
-            this.byId("TSA_id_Employee").setSelectedKey("");
-            this.byId("TSA_id_Month").setSelectedKey("");
+        TSA_onClear: function (bIsInitialLoad) {
+            this.byId("TSA_id_Employee").setValue("");
+            this.byId("TSA_id_Month").setValue("");
             this.byId("TSA_id_Status").setValue("");
-            this.byId("TSA_id_Status").setSelectedKey("");
-            this.byId("TSA_id_Year").setValue(""); // This correctly clears the DatePicker
-            setTimeout(() => {
-                // this._applyAllFilters();
-                this.closeBusyDialog();
-            }, 100);
+            this.byId("TSA_id_Year").setValue("");     
+            // Only apply filters immediately if it's a user action, not on initial load
+            if (!bIsInitialLoad) {
+                this._applyAllFilters();
+            }
         },
 
         TSA_onSelect: function () {
