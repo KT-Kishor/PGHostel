@@ -21,7 +21,7 @@ sap.ui.define([
             this.getBusyDialog();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerTimesheetApproval"));
-            this._makeDatePickersReadOnly(["TSA_id_Employee", "TSA_id_Month","TSA_id_Status"]);
+            //this._makeDatePickersReadOnly(["TSA_id_Employee", "TSA_id_Month", "TSA_id_Status"]);
             const oViewModel = new JSONModel({
                 calendarStartDate: this._getStartOfWeek(new Date()),
                 isCalendarEnabled: true,
@@ -86,16 +86,24 @@ sap.ui.define([
             const oEmployeeFilter = this.byId("TSA_id_Employee");
             const oMonthFilter = this.byId("TSA_id_Month");
             const oStatusFilter = this.byId("TSA_id_Status");
-            const sEmployeeID = oEmployeeFilter.getSelectedKey();
-            const sMonthKey = oMonthFilter.getSelectedKey();
+            const sEmployeeValue = oEmployeeFilter.getValue();
+            const sMonthValue = oMonthFilter.getValue();
             const sStatusValue = oStatusFilter.getValue();
 
             let aFilteredData = this._fullApprovalData;
 
-            if (sEmployeeID) { aFilteredData = aFilteredData.filter(entry => entry.EmployeeID === sEmployeeID); }
-            if (sMonthKey) {
+            if (sEmployeeValue) { aFilteredData = aFilteredData.filter(entry => entry.EmployeeID === sEmployeeValue); }
+            if (sMonthValue) {
                 oViewModel.setProperty("/isCalendarEnabled", false);
-                aFilteredData = aFilteredData.filter(entry => { if (!entry.Date) return false; return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey; });
+                let sMonthKey = "-1";// Default to a key that will never match
+                const oSelectedItem = oMonthFilter.getItems().find(item => item.getText() === sMonthValue);
+                if (oSelectedItem) {
+                    sMonthKey = oSelectedItem.getKey();
+                }
+                aFilteredData = aFilteredData.filter(entry => {
+                    if (!entry.Date) return false;
+                    return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey;
+                });
             } else {
                 oViewModel.setProperty("/isCalendarEnabled", true);
                 const oCalendar = this.byId("TSA_id_calendar");
@@ -104,9 +112,15 @@ sap.ui.define([
                 const oEndDate = new Date(oStartDate);
                 oEndDate.setDate(oEndDate.getDate() + oCalendar.getDays() - 1);
                 oEndDate.setHours(23, 59, 59, 999);
-                aFilteredData = aFilteredData.filter(entry => { if (!entry.Date) return false; return new Date(entry.Date) >= oStartDate && new Date(entry.Date) <= oEndDate; });
+                aFilteredData = aFilteredData.filter(entry => {
+                    if (!entry.Date) return false;
+                    return new Date(entry.Date) >= oStartDate && new Date(entry.Date) <= oEndDate;
+                });
             }
-            if (sStatusValue) { aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue); }
+            // Filter by Status
+            if (sStatusValue) {
+                aFilteredData = aFilteredData.filter(entry => entry.Status === sStatusValue);
+            }
             const oModel = this.getView().getModel("ApprovalTimesheetModel");
             oModel.setData(aFilteredData);
             oModel.refresh(true);
