@@ -173,7 +173,7 @@ sap.ui.define([
                 return sel >= start && sel <= end;
             });
             if (isLeave) {
-                MessageToast.show(this.i18nModel.getText("leaveDateT") || "You cannot fill timesheet on leave.");
+                sap.m.MessageBox.error(this.i18nModel.getText("leaveDateT") || "You cannot fill timesheet on leave.");
                 return;
             }
             // Format selected date as YYYY-MM-DD
