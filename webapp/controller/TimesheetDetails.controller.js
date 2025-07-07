@@ -19,6 +19,8 @@ sap.ui.define([
             this.EmployeeID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
             await this._fetchCommonData("AssignedTask", "AssignModel", { EmployeeID: this.EmployeeID });
             await this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: this.branch });
+            //leave data with approved status
+            await this._fetchCommonData("Leaves", "LeaveModel", { EmployeeID: this.EmployeeID , status: "Approved" });
             const oViewModel = new JSONModel({ isUpdate: false, isCreate: true, isSubmitted: false, isEditing: true, calendarStartDate: this._getStartOfWeek(new Date()), isCalendarEnabled: true, formTitle: "", pageTitle: "" });
             this.getView().setModel(oViewModel, "viewModel");
             this.byId("TSD_id_Assignment").setValueState("None");
@@ -250,8 +252,37 @@ sap.ui.define([
         onMarkCalendarDates: function () {
             const that = this;
             const oCalendar = this.oDatePicker;
-            if (!oCalendar) return;
+            if (!oCalendar) {
+                console.log("Calendar instance not set!");
+                return;
+            }
             oCalendar.removeAllSpecialDates();
+            // Get all leaves and filter for current user
+            let leaves = this.getView().getModel("LeaveModel")?.getData() || [];
+            if (!Array.isArray(leaves) && leaves.results) {
+                leaves = leaves.results;
+            }
+            // Filter for logged-in user
+            leaves = leaves.filter(leave => leave.employeeID === this.EmployeeID);
+            leaves.forEach(function (leave) {
+                if (!leave.fromDate || !leave.toDate) return;
+                let start = new Date(leave.fromDate);
+                let end = new Date(leave.toDate);
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
+                start.setHours(0, 0, 0, 0);
+                end.setHours(0, 0, 0, 0);
+                for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                    d.setHours(0, 0, 0, 0);
+                    const oDateRange = new sap.ui.unified.DateTypeRange({
+                        startDate: new Date(d),
+                        endDate: new Date(d),
+                        type: "Type01", // Pink for leave
+                        tooltip: that.i18nModel.getText("calendarLeave") || "Leave"
+                    });
+                    oCalendar.addSpecialDate(oDateRange);
+                }
+            });
+            // Mark holidays, weekends, working days, future dates
             const holidays = this.getView().getModel("HolidayModel").getData();
             const holidayMap = new Map(holidays.map(holiday => [
                 new Date(holiday.Date).toDateString(),
@@ -297,11 +328,12 @@ sap.ui.define([
                         new CalendarLegendItem({ type: "Type04", text: this.i18nModel.getText("calendarHoliday") }),
                         new CalendarLegendItem({ type: "Type09", text: this.i18nModel.getText("calendarWeekend") }),
                         new CalendarLegendItem({ type: "Type06", text: this.i18nModel.getText("calendarWorkingDay") }),
-                        new CalendarLegendItem({ type: "Type07", text: this.i18nModel.getText("calendarFutureDate") })
+                        new CalendarLegendItem({ type: "Type07", text: this.i18nModel.getText("calendarFutureDate") }),
+                        new CalendarLegendItem({ type: "Type01", text: this.i18nModel.getText("calendarLeave") })
                     ]
                 });
                 this.oDatePicker.setLegend(oLegend);
-                this.onMarkCalendarDates();
+                this.onMarkCalendarDates(); 
             }
         },
         //Date selection for fill timesheet
@@ -510,7 +542,7 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return false;
             }
-             if (!oAssignment.getValue()) {
+            if (!oAssignment.getValue()) {
                 oAssignment.setValueState("Error");
                 oAssignment.setValueStateText(this.i18nModel.getText("selectAssignment"));
             } else {
