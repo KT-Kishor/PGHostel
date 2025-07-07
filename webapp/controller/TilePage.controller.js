@@ -16,28 +16,19 @@ sap.ui.define(
       "sap.kt.com.minihrsolution.controller.TilePage",
       {
         onInit: function () {
+          this._autoScrollTimer = null;
           this.getRouter()
             .getRoute("RouteTilePage")
             .attachMatched(this._onRouteMatched, this);
         },
 
         onExit: function () {
-          // Clear the timer when the view is destroyed
+          // 3. Final, essential cleanup
           if (this._autoScrollTimer) {
             clearInterval(this._autoScrollTimer);
           }
         },
 
-        onSendWishesPress: function (oEvent) {
-          // Get the context of the person whose card was clicked
-          const oContext = oEvent.getSource().getBindingContext("PDFData");
-          const sName = oContext.getProperty("Name");
-
-          // Example: Show a toast message
-          sap.m.MessageToast.show("Your wishes have been sent to " + sName + "!");
-
-          // You can add more complex logic here, like opening an email client
-        },
         _onRouteMatched: async function () {
           if (!this.that) this.that = this.getOwnerComponent().getModel("ThisModel")?.getData().that;
           var LoginFunction = await this.commonLoginFunction("TilePage");
@@ -62,6 +53,9 @@ sap.ui.define(
         },
 
         initializeBirthdayCarousel: function () {
+          if (this._autoScrollTimer) {
+            clearInterval(this._autoScrollTimer);
+          }
           var filteredModel = this.getView().getModel("EmpDetails").getData().filter(function (item) {
             return new Date(item.DateOfBirth).getDate() === new Date().getDate() &&
               new Date(item.DateOfBirth).getMonth() === new Date().getMonth();
@@ -72,10 +66,18 @@ sap.ui.define(
           var iInterval = 3000; // in milliseconds
 
           // Ensure there is more than one page before starting the timer
-          if (oCarousel.getPages().length > 1) {
+          if (oCarousel && oCarousel.getPages().length > 1) {
             this._autoScrollTimer = setInterval(function () {
-              oCarousel.next();
-            }, iInterval);
+              var oCarouselInstance = this.byId("carouselSample");
+
+              // 2. THE BULLETPROOF CHECK:
+              // Check if the control object exists AND if its DOM element is still rendered.
+              // getDomRef() will be null if the control is not on the screen.
+              if (oCarouselInstance && oCarouselInstance.getDomRef()) {
+                oCarouselInstance.next();
+              }
+
+            }.bind(this), iInterval);
           }
         },
 
