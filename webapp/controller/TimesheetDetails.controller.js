@@ -20,7 +20,7 @@ sap.ui.define([
             await this._fetchCommonData("AssignedTask", "AssignModel", { EmployeeID: this.EmployeeID });
             await this._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: this.branch });
             //leave data with approved status
-            await this._fetchCommonData("Leaves", "LeaveModel", { EmployeeID: this.EmployeeID , status: "Approved" });
+            await this._fetchCommonData("Leaves", "LeaveModel", { EmployeeID: this.EmployeeID, status: "Approved" });
             const oViewModel = new JSONModel({ isUpdate: false, isCreate: true, isSubmitted: false, isEditing: true, calendarStartDate: this._getStartOfWeek(new Date()), isCalendarEnabled: true, formTitle: "", pageTitle: "" });
             this.getView().setModel(oViewModel, "viewModel");
             this.byId("TSD_id_Assignment").setValueState("None");
@@ -156,6 +156,26 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("selectDateT"));
                 return;
             }
+            // --- Leave check: block assignment value help if leave is applied (Approved) on selected date ---
+            let leaves = this.getView().getModel("LeaveModel")?.getData() || [];
+            if (!Array.isArray(leaves) && leaves.results) {
+                leaves = leaves.results;
+            }
+            leaves = leaves.filter(leave => leave.employeeID === this.EmployeeID && leave.status === "Approved");
+            var isLeave = leaves.some(function (leave) {
+                if (!leave.fromDate || !leave.toDate) return false;
+                let start = new Date(leave.fromDate);
+                let end = new Date(leave.toDate);
+                start.setHours(0, 0, 0, 0);
+                end.setHours(0, 0, 0, 0);
+                let sel = new Date(selectedDateObj);
+                sel.setHours(0, 0, 0, 0);
+                return sel >= start && sel <= end;
+            });
+            if (isLeave) {
+                MessageToast.show(this.i18nModel.getText("leaveDateT") || "You cannot fill timesheet on leave.");
+                return;
+            }
             // Format selected date as YYYY-MM-DD
             const selectedDateStr = [
                 selectedDateObj.getFullYear(),
@@ -257,13 +277,13 @@ sap.ui.define([
                 return;
             }
             oCalendar.removeAllSpecialDates();
-            // Get all leaves and filter for current user
+            // Get all leaves and filter for current user with status Approved
             let leaves = this.getView().getModel("LeaveModel")?.getData() || [];
             if (!Array.isArray(leaves) && leaves.results) {
                 leaves = leaves.results;
             }
-            // Filter for logged-in user
-            leaves = leaves.filter(leave => leave.employeeID === this.EmployeeID);
+            // Filter for logged-in user and only approved leaves
+            leaves = leaves.filter(leave => leave.employeeID === this.EmployeeID && leave.status === "Approved");
             leaves.forEach(function (leave) {
                 if (!leave.fromDate || !leave.toDate) return;
                 let start = new Date(leave.fromDate);
@@ -333,7 +353,7 @@ sap.ui.define([
                     ]
                 });
                 this.oDatePicker.setLegend(oLegend);
-                this.onMarkCalendarDates(); 
+                this.onMarkCalendarDates();
             }
         },
         //Date selection for fill timesheet
