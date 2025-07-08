@@ -20,6 +20,7 @@ sap.ui.define([
             this.AC_ReadCall();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Recruitment Dashboard");
             this._makeDatePickersReadOnly(["filterExperience"]);
+            this.onFilterBarClear();    
         },
 
         AC_ReadCall: async function () {
@@ -73,38 +74,50 @@ sap.ui.define([
         },
 
         onFilterBarSearch: async function () {
-            await this.getBusyDialog();
-            try {
-                const sName = this.byId("filterEmployeeName").getValue();
-                const sNoticePeriod = this.byId("filterNoticePeriod").getValue();   // Allow typed input
-                const sSkills = this.byId("filterSkills").getValue();
-                const experienceText = this.byId("filterExperience").getValue();     // Allow typed input
-                const aFilters = [];
+            this.getBusyDialog();
+            const minDelayPromise = new Promise(resolve => setTimeout(resolve, 300));
+            const filterPromise = new Promise((resolve, reject) => {
+                try {
+                    const sName = this.byId("filterEmployeeName").getValue();
+                    const sNoticePeriod = this.byId("filterNoticePeriod").getValue();
+                    const sSkills = this.byId("filterSkills").getValue();
+                    const experienceText = this.byId("filterExperience").getValue();
+                    const aFilters = [];
 
-                if (sName) {
-                    aFilters.push(new Filter("FullName", FilterOperator.Contains, sName));
-                }
-                if (sNoticePeriod) {
-                    aFilters.push(new Filter("NoticePeriod", FilterOperator.EQ, sNoticePeriod));
-                }
-                if (sSkills) {
-                    aFilters.push(new Filter("Skills", FilterOperator.Contains, sSkills));
-                }
-                if (experienceText) {
-                    const [min, max] = experienceText.split("-").map(Number);
-                    if (!isNaN(min) && !isNaN(max)) {
-                        aFilters.push(new Filter({
-                            filters: [
-                                new Filter("Experience", FilterOperator.GE, min),
-                                new Filter("Experience", FilterOperator.LE, max)
-                            ],
-                            and: true
-                        }));
+                    if (sName) {
+                        aFilters.push(new Filter("FullName", FilterOperator.Contains, sName));
                     }
+                    if (sNoticePeriod) {
+                        const noticePeriodNum = parseInt(sNoticePeriod, 10);
+                        if (!isNaN(noticePeriodNum)) {
+                            aFilters.push(new Filter("NoticePeriod", FilterOperator.EQ, noticePeriodNum));
+                        }
+                    }
+                    if (sSkills) {
+                        aFilters.push(new Filter("Skills", FilterOperator.Contains, sSkills));
+                    }
+                    if (experienceText) {
+                        const [min, max] = experienceText.split("-").map(val => parseInt(val.trim(), 10));
+                        if (!isNaN(min) && !isNaN(max)) {
+                            aFilters.push(new Filter({
+                                filters: [
+                                    new Filter("Experience", FilterOperator.GE, min),
+                                    new Filter("Experience", FilterOperator.LE, max)
+                                ],
+                                and: true
+                            }));
+                        }
+                    }
+                    const oTable = this.byId("appliedCandidatesTable");
+                    const oBinding = oTable.getBinding("items");
+                    oBinding.filter(aFilters);
+                    resolve();
+                } catch (error) {
+                    reject(error);
                 }
-                const oTable = this.byId("appliedCandidatesTable");
-                const oBinding = oTable.getBinding("items");
-                oBinding.filter(aFilters);
+            });
+            try {
+                await Promise.all([minDelayPromise, filterPromise]);
             } catch (error) {
                 MessageToast.show("Error during filtering.");
             } finally {
