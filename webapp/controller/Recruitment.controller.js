@@ -291,38 +291,68 @@ sap.ui.define(
                     this.oDialog.close();
                     this.getView().byId("RE_Id_MainTable").removeSelections();
                 },
+                //  RE_FilterBaronSearch: async function (oEvent) {
+                //     let a = this.byId("RE_Id_ComboBoxFilterField1").getValue();
+                //     let b = this.byId("RE_Id_ComboBoxFilterField3").getValue();
+                //     let c = this.byId("RE_Id_ComboBoxFilterField4").getValue();
+                //     let d = this.byId("RE_ID_Experince").getValue();
 
-                RE_FilterBaronSearch: async function (oEvent) {
-                    let a = this.byId("RE_Id_ComboBoxFilterField1").getValue();
-                    let b = this.byId("RE_Id_ComboBoxFilterField3").getValue();
-                    let c = this.byId("RE_Id_ComboBoxFilterField4").getValue();
-                    let d = this.byId("RE_ID_Experince").getValue();
+                //     if (!b) {
+                //         this.Data = ""
+                //     } else {
+                //         this.Data = "1-" + b;
+                //     }
 
-                    if (!b) {
-                        this.Data = ""
-                    } else {
-                        this.Data = "1-" + b;
+                //     var filter = {
+                //         "Name": a,
+                //         "NoticePeriod": this.Data,
+                //         "Skills": c,
+                //         "Experience": d
+                //     }
+
+                //     this.getBusyDialog();
+                //     await this._fetchCommonData("CandidateProfile", "myModel", filter)
+                //         .then((response) => {
+                //             this.closeBusyDialog();
+                //         })
+                //     this.byId("RE_Id_ComboBoxFilterField1").setValue("");
+                // },
+
+                RE_FilterBaronSearch: function () {
+                    const oFilterBar = this.byId("RE_Id_filterBar");
+                    const aFilters = [];
+
+                    // Get filter values
+                    const nameValue = this.byId("RE_Id_ComboBoxFilterField1").getValue();
+                    const noticePeriodValue = this.byId("RE_Id_ComboBoxFilterField3").getValue();
+                    const skillsValue = this.byId("RE_Id_ComboBoxFilterField4").getValue();
+                    const experienceValue = this.byId("RE_ID_Experince").getValue();
+
+                    // Build filters based on current input
+                    if (nameValue) {
+                        aFilters.push(new sap.ui.model.Filter("Name", sap.ui.model.FilterOperator.Contains, nameValue));
+                    }
+                    if (noticePeriodValue) {
+                        aFilters.push(new sap.ui.model.Filter("NoticePeriod", sap.ui.model.FilterOperator.Contains, noticePeriodValue));
+                    }
+                    if (skillsValue) {
+                        aFilters.push(new sap.ui.model.Filter("Skills", sap.ui.model.FilterOperator.Contains, skillsValue));
+                    }
+                    if (experienceValue) {
+                        aFilters.push(new sap.ui.model.Filter("Experience", sap.ui.model.FilterOperator.EQ, experienceValue));
                     }
 
-                    var filter = {
-                        "Name": a,
-                        "NoticePeriod": this.Data,
-                        "Skills": c,
-                        "Experience": d
-                    }
-
-                    this.getBusyDialog();
-                    await this._fetchCommonData("CandidateProfile", "myModel", filter)
-                        .then((response) => {
-                            this.closeBusyDialog();
-                        })
-                    this.byId("RE_Id_ComboBoxFilterField1").setValue("");
+                    // Apply filters to table binding
+                    const oTable = this.byId("RE_Id_MainTable");
+                    const oBinding = oTable.getBinding("items");
+                    oBinding.filter(aFilters);
                 },
-
+                
                 RE_RemoveValueFilterBar: function () {
                     this.byId("RE_Id_ComboBoxFilterField1").setValue("");
                     this.byId("RE_Id_ComboBoxFilterField3").setValue("");
                     this.byId("RE_Id_ComboBoxFilterField1").setSelectedKey("")
+                    this.byId("RE_Id_ComboBoxFilterField4").setValue("");
                     this.byId("RE_ID_Experince").setValue("");
                     this.getView().byId("RE_Id_MainTable").removeSelections();
                 },
