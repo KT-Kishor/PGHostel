@@ -2,31 +2,50 @@ sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
-], function (BaseController, JSONModel, Filter, FilterOperator) {
+    "sap/ui/model/FilterOperator",
+    "sap/m/MessageToast"
+], function (BaseController, JSONModel, Filter, FilterOperator, MessageToast) {
     "use strict";
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.AppliedCandidates", {
 
         onInit: function () {
             const router = this.getOwnerComponent().getRouter();
-            router
-                .getRoute("AppliedCandidates")
-                .attachPatternMatched(this._onObjectMatched, this);
+            router.getRoute("AppliedCandidates").attachPatternMatched(this._onObjectMatched, this);
         },
+
         _onObjectMatched: async function () {
             var LoginFUnction = await this.commonLoginFunction("AppliedCandidates");
             if (!LoginFUnction) return;
             this.AC_ReadCall();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Recruitment Dashboard");
+            this._makeDatePickersReadOnly(["filterExperience"]);
         },
 
         AC_ReadCall: async function () {
             this.getBusyDialog();
-            var data = await this.ajaxReadWithJQuery("JobApplications");
-            let tableModel = new JSONModel(data.data);
-            this.getOwnerComponent().setModel(tableModel, "DataTableModel");
-            this.closeBusyDialog();
+            try {
+                const data = await this.ajaxReadWithJQuery("JobApplications");
+                const aCandidates = data.data || [];
+                // Set table data
+                const tableModel = new JSONModel(aCandidates);
+                this.getOwnerComponent().setModel(tableModel, "DataTableModel");
+                // Prepare unique names
+                const aUniqueNames = [];
+                const nameSet = new Set();
+                aCandidates.forEach(candidate => {
+                    if (candidate.FullName && !nameSet.has(candidate.FullName)) {
+                        nameSet.add(candidate.FullName);
+                        aUniqueNames.push({ FullName: candidate.FullName });
+                    }
+                });
+                const nameModel = new JSONModel(aUniqueNames);
+                this.getView().setModel(nameModel, "UniqueNamesModel");
+            } catch (err) {
+                MessageToast.show("Failed to load candidate data.");
+            } finally {
+                this.closeBusyDialog();
+            }
         },
         onPressback: function () {
             this.getOwnerComponent().getRouter().navTo("RouteTilePage");
@@ -35,61 +54,88 @@ sap.ui.define([
         onLogout: function () {
             this.CommonLogoutFunction();
         },
+
         onCandidatePress: function (oEvent) {
-            let data = oEvent.getSource().getBindingContext("DataTableModel");
-            let id = data.getObject().ID;
-            // Navigate to the detail view of the selected candidate
+            const data = oEvent.getSource().getBindingContext("DataTableModel");
+            const id = data.getObject().ID;
             this.getOwnerComponent().getRouter().navTo("AppliedCanDetail", { id: id });
         },
+
         onFilterBarClear: function () {
             this.byId("filterEmployeeName").setSelectedKey("");
-            this.byId("filterNoticePeriod").setSelectedKey("");
+            this.byId("filterNoticePeriod").setValue("");
             this.byId("filterSkills").setValue("");
-            this.byId("filterExperience").setSelectedKey("");
+            this.byId("filterExperience").setValue("");
 
             // const oTable = this.byId("appliedCandidatesTable");
             // const oBinding = oTable.getBinding("items");
             // oBinding.filter([]);
         },
-        onFilterBarSearch: function () {
-            // Get all the filter values from the UI
-            const sName = this.byId("filterEmployeeName").getValue().toLowerCase();
-            const sNoticePeriod = this.byId("filterNoticePeriod").getValue().toLowerCase();
-            const sSkills = this.byId("filterSkills").getValue().toLowerCase();
-            const sExperienceRange = this.byId("filterExperience").getValue(); // e.g., "2-4"
 
-            const oTable = this.byId("appliedCandidatesTable");
-            const oBinding = oTable.getBinding("items");
-            const oCustomFilter = new sap.ui.model.Filter({
-                test: function (oCandidate) {
-                    let bNameMatch = true;
-                    let bNoticePeriodMatch = true;
-                    let bSkillsMatch = true;
-                    let bExperienceMatch = true;
-                    if (sName) {
-                        bNameMatch = oCandidate.Name?.toLowerCase().includes(sName);
-                    }
-                    if (sNoticePeriod) {
-                        bNoticePeriodMatch = oCandidate.NoticePeriod?.toLowerCase() === sNoticePeriod;
-                    }
-                    if (sSkills) {
-                        bSkillsMatch = oCandidate.Skills?.toLowerCase().includes(sSkills);
-                    }
-                    if (sExperienceRange) {
-                        const candidateExp = parseFloat(oCandidate.Experience);
-                        if (isNaN(candidateExp)) {
-                            bExperienceMatch = false;
-                        } else {
-                            const aRange = sExperienceRange.split('-').map(Number);
-                            const minExp = aRange[0];
-                            const maxExp = aRange[1];
-                            bExperienceMatch = (candidateExp >= minExp && candidateExp <= maxExp);
-                        }
-                    }
-                    return bNameMatch && bNoticePeriodMatch && bSkillsMatch && bExperienceMatch;
+        onFilterBarSearch: async function () {
+            await this.getBusyDialog();
+            try {
+                const sName = this.byId("filterEmployeeName").getValue();
+                const sNoticePeriod = this.byId("filterNoticePeriod").getValue();   // Allow typed input
+                const sSkills = this.byId("filterSkills").getValue();
+                const experienceText = this.byId("filterExperience").getValue();     // Allow typed input
+                const aFilters = [];
+
+                if (sName) {
+                    aFilters.push(new Filter("FullName", FilterOperator.Contains, sName));
                 }
-            });
-            oBinding.filter([oCustomFilter]);
+                if (sNoticePeriod) {
+                    aFilters.push(new Filter("NoticePeriod", FilterOperator.EQ, sNoticePeriod));
+                }
+                if (sSkills) {
+                    aFilters.push(new Filter("Skills", FilterOperator.Contains, sSkills));
+                }
+                if (experienceText) {
+                    const [min, max] = experienceText.split("-").map(Number);
+                    if (!isNaN(min) && !isNaN(max)) {
+                        aFilters.push(new Filter({
+                            filters: [
+                                new Filter("Experience", FilterOperator.GE, min),
+                                new Filter("Experience", FilterOperator.LE, max)
+                            ],
+                            and: true
+                        }));
+                    }
+                }
+                const oTable = this.byId("appliedCandidatesTable");
+                const oBinding = oTable.getBinding("items");
+                oBinding.filter(aFilters);
+            } catch (error) {
+                MessageToast.show("Error during filtering.");
+            } finally {
+                this.closeBusyDialog();
+            }
         },
+        // Utility function to extract unique skills and set to model
+        onSuggestSkills: function (oEvent) {
+            let sValue = oEvent.getParameter("suggestValue")?.toLowerCase() || "";
+            let aTableData = this.getView().getModel("DataTableModel").getData();
+            // --- Suggest skill strings ---
+            let aMatchingSkillStrings = aTableData
+                .map(item => item.Skills?.trim())
+                .filter(skillStr => {
+                    if (!skillStr) return false;
+                    return skillStr
+                        .split(",")
+                        .some(skill => skill.trim().toLowerCase().includes(sValue));
+                });
+            let aUniqueSkillStrings = [...new Set(aMatchingSkillStrings)];
+            let aSuggestionItems = aUniqueSkillStrings.map(skill => ({ skill }));
+            let oSuggestModel = new sap.ui.model.json.JSONModel({ skills: aSuggestionItems });
+            this.getView().setModel(oSuggestModel, "skillModel");
+            let aFilteredCandidates = aTableData.filter(item => {
+                if (!item.Skills) return false;
+                return item.Skills
+                    .split(",")
+                    .some(skill => skill.trim().toLowerCase().includes(sValue));
+            });
+            let oFilteredModel = new sap.ui.model.json.JSONModel(aFilteredCandidates);
+            this.getView().setModel(oFilteredModel, "filteredModel");
+        }
     });
 });

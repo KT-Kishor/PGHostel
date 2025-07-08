@@ -34,13 +34,13 @@
                     <fb:control>
                              <ComboBox
                             name="Name"
-                            items="{path: 'DataTableModel>/'}"
+                            items="{path: 'UniqueNamesModel>/'}"
                             id="filterEmployeeName"
                             showClearIcon="true"
                         >
                             <core:Item
-                                key="{DataTableModel>FullName}"
-                                text="{DataTableModel>FullName}"
+                                key="{UniqueNamesModel>FullName}"
+                                text="{UniqueNamesModel>FullName}"
                             />
                         </ComboBox>
                     </fb:control>
@@ -55,15 +55,12 @@
                 >
                     <fb:control>
                         <ComboBox
-                            id="filterNoticePeriod"
-                            items="{path: 'ExpectedCTC>/data'}"
-                            showClearIcon="true"
-                        >
-                            <core:Item
-                                key="{ExpectedCTC>key}"
-                                text="{ExpectedCTC>value}"
-                            />
-                        </ComboBox>
+    id="filterNoticePeriod"
+    items="{path: 'ExpectedCTC>/data'}"
+    showClearIcon="true"
+    selectedKey="">
+    <core:Item key="{ExpectedCTC>value}" text="{ExpectedCTC>value}" />
+</ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
 
