@@ -319,42 +319,55 @@ sap.ui.define(
                 // },
 
                 RE_FilterBaronSearch: function () {
-                    const oFilterBar = this.byId("RE_Id_filterBar");
-                    const aFilters = [];
+                    // Get all the filter values from the UI
+                    const sName = this.byId("RE_Id_ComboBoxFilterField1").getValue().toLowerCase();
+                    const sNoticePeriod = this.byId("RE_Id_ComboBoxFilterField3").getValue().toLowerCase();
+                    const sSkills = this.byId("RE_Id_ComboBoxFilterField4").getValue().toLowerCase();
+                    const sExperienceRange = this.byId("RE_ID_Experince").getValue(); // e.g., "2-4"
 
-                    // Get filter values
-                    const nameValue = this.byId("RE_Id_ComboBoxFilterField1").getValue();
-                    const noticePeriodValue = this.byId("RE_Id_ComboBoxFilterField3").getValue();
-                    const skillsValue = this.byId("RE_Id_ComboBoxFilterField4").getValue();
-                    const experienceValue = this.byId("RE_ID_Experince").getValue();
-
-                    // Build filters based on current input
-                    if (nameValue) {
-                        aFilters.push(new sap.ui.model.Filter("Name", sap.ui.model.FilterOperator.Contains, nameValue));
-                    }
-                    if (noticePeriodValue) {
-                        aFilters.push(new sap.ui.model.Filter("NoticePeriod", sap.ui.model.FilterOperator.Contains, noticePeriodValue));
-                    }
-                    if (skillsValue) {
-                        aFilters.push(new sap.ui.model.Filter("Skills", sap.ui.model.FilterOperator.Contains, skillsValue));
-                    }
-                    if (experienceValue) {
-                        aFilters.push(new sap.ui.model.Filter("Experience", sap.ui.model.FilterOperator.EQ, experienceValue));
-                    }
-
-                    // Apply filters to table binding
                     const oTable = this.byId("RE_Id_MainTable");
                     const oBinding = oTable.getBinding("items");
-                    oBinding.filter(aFilters);
+                    const oCustomFilter = new sap.ui.model.Filter({
+                        test: function (oCandidate) {
+                            let bNameMatch = true;
+                            let bNoticePeriodMatch = true;
+                            let bSkillsMatch = true;
+                            let bExperienceMatch = true;
+                            if (sName) {
+                                bNameMatch = oCandidate.Name?.toLowerCase().includes(sName);
+                            }
+                            if (sNoticePeriod) {
+                                bNoticePeriodMatch = oCandidate.NoticePeriod?.toLowerCase() === sNoticePeriod;
+                            }
+                            if (sSkills) {
+                                bSkillsMatch = oCandidate.Skills?.toLowerCase().includes(sSkills);
+                            }
+                            if (sExperienceRange) {
+                                const candidateExp = parseFloat(oCandidate.Experience);
+                                if (isNaN(candidateExp)) {
+                                    bExperienceMatch = false;
+                                } else {
+                                    const aRange = sExperienceRange.split('-').map(Number);
+                                    const minExp = aRange[0];
+                                    const maxExp = aRange[1];
+                                    bExperienceMatch = (candidateExp >= minExp && candidateExp <= maxExp);
+                                }
+                            }
+                            return bNameMatch && bNoticePeriodMatch && bSkillsMatch && bExperienceMatch;
+                        }
+                    });
+                    oBinding.filter([oCustomFilter]);
                 },
-                
+
                 RE_RemoveValueFilterBar: function () {
                     this.byId("RE_Id_ComboBoxFilterField1").setValue("");
                     this.byId("RE_Id_ComboBoxFilterField3").setValue("");
-                    this.byId("RE_Id_ComboBoxFilterField1").setSelectedKey("")
                     this.byId("RE_Id_ComboBoxFilterField4").setValue("");
                     this.byId("RE_ID_Experince").setValue("");
                     this.getView().byId("RE_Id_MainTable").removeSelections();
+                    const oTable = this.byId("RE_Id_MainTable");
+                    const oBinding = oTable.getBinding("items");
+                    oBinding.filter([]);
                 },
 
                 RE_ReadUpdatedDataFromBakend: async function () {
