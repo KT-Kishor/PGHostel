@@ -111,8 +111,6 @@
         <Table
             id="appliedCandidatesTable"
             items="{DataTableModel>/}"
-            mode="SingleSelectLeft"
-            noDataText="{i18n>noDataText}"
         >
             <columns>
                 <Column><Text text="{i18n>compName}" /></Column>

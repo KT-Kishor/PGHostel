@@ -5,7 +5,7 @@
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout.form"
 >
-    <Page  title="Recruitement Dashbord" navButtonPress="onPageNavButtonPress" showNavButton="true" icon="sap-icon://log">
+    <Page  title="Recruitment Dashbord" navButtonPress="onPageNavButtonPress" showNavButton="true">
      <headerContent>
           <Button
         press="onLogout"
