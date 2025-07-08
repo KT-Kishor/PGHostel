@@ -75,7 +75,7 @@
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headerListOfHolidays}"
                                 >
-                                    <m:TileContent unit="{i18n>PublicHolidays}">
+                                    <m:TileContent unit="{i18n>headerListOfHolidays}">
                                         <m:ImageContent
                                             src="sap-icon://general-leave-request"
                                         />
@@ -86,7 +86,7 @@
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>headerLeave}"
                                 >
-                                    <m:TileContent unit="{i18n>CreateLeave}">
+                                    <m:TileContent unit="{i18n>headerLeave}">
                                         <m:ImageContent
                                             src="sap-icon://time-off"
                                         />
@@ -279,7 +279,7 @@
                                    class="sapUiTinyMarginBegin sapUiTinyMarginTop sapUiMediumMargin"
                                     header="{i18n>invoiceapp}"
                                 >
-                                    <m:TileContent unit="{i18n>createinvoice}">
+                                    <m:TileContent unit="{i18n>tileInvoiceFooter}">
                                         <m:ImageContent
                                             src="sap-icon://my-sales-order"
                                         />
@@ -290,7 +290,7 @@
                                     header="{i18n>headerContractorInvoice}"
                                 >
                                     <m:TileContent
-                                        unit="{i18n>createinvoice}"
+                                        unit="{i18n>tileInvoiceFooter}"
                                     >
                                         <m:ImageContent
                                             src="sap-icon://monitor-payments"
