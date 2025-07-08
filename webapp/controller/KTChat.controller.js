@@ -20,18 +20,36 @@ sap.ui.define([
 
 		onInit: function () {
 			this.getRouter().getRoute("RouteKTChat").attachMatched(this._onRouteMatched, this);
-
+			// Initialize chat model
 			var oData = {
-				current_room: "",
+				messages: [],         // For the input box chat bubbles
 				current_chat: [],
-				subscribed_channels: [],
-				username: ""
+				current_room: "",     // ReceiverID
+				username: "",
+				filteredEmployees: []
 			};
-			var oModelCh = new JSONModel(oData);
-			sap.ui.getCore().setModel(oModelCh, "chat");
 
-			var oModel = new JSONModel();
-			sap.ui.getCore().setModel(oModel, "table");
+			var oModel = new JSONModel(oData);
+			this.getView().setModel(oModel, "chat");
+			sap.ui.getCore().setModel(oModel, "chat");
+			
+		},
+		_onRouteMatched: function (oEvent) {
+			// Get logged-in user ID
+			const oLoginModel = this.getView().getModel("LoginModel");
+			const sCurrentUserID = oLoginModel.getProperty("/EmployeeID");
+
+			// Get original employee data
+			const oEmpModel = this.getView().getModel("EmpDetails");
+			const aAllEmployees = oEmpModel.getData();
+
+			// Filter out current user
+			const aFilteredEmployees = aAllEmployees.filter(function (oEmployee) {
+				return oEmployee.EmployeeID !== sCurrentUserID;
+			});
+
+			// Update model with filtered list
+			this.getView().getModel("chat").setProperty("/filteredEmployees", aFilteredEmployees);
 		},
 
 		changeName: function (oEvent) {
@@ -46,66 +64,93 @@ sap.ui.define([
 			MessageToast.show("Name set to: " + sName);
 		},
 
-		sendMessage: function (oEvt) {
-			var sValue = oEvt.getSource().getValue().trim();
-			if (!sValue) return;
+		sendMessage: function () {
+			const oInput = this.byId("messageInput1");
+			const sText = oInput.getValue().trim();
+			if (!sText) return;
 
-			var oChatModel = sap.ui.getCore().getModel("chat");
-			var oChatData = oChatModel.getData();
-			var sUsername = oChatData.username || "Anonymous";
-			var sTimestamp = new Date().toLocaleString();
+			const oChatModel = this.getView().getModel("chat");
+			const oLoginModel = this.getView().getModel("LoginModel");
 
-			// Push new message to model
-			oChatData.current_chat.push({
-				message: sValue,
-				username: sUsername,
-				timestamp: sTimestamp
-			});
-			oChatModel.refresh();
-			var oScroll = this.byId("chatScrollContainer");
+			const sSenderID = oLoginModel.getProperty("/EmployeeID");
+			const sSenderName = oLoginModel.getProperty("/EmployeeName");
+			const sReceiverID = oChatModel.getProperty("/current_room");
 
-			// Get or create Timeline only ONCE
-			var oTimeline = sap.ui.getCore().byId("dynamicTimeline");
-			if (!oTimeline) {
-				oTimeline = new sap.suite.ui.commons.Timeline("dynamicTimeline", {
-					width: "100%",
-					height: "100%",
-					enableScroll: false,
-					enableDoubleSided:true,
-					showSearch: false,
-					showHeaderBar: false, 
-
-				});
-				oScroll.addContent(oTimeline);
+			if (!sSenderID || !sReceiverID) {
+				MessageToast.show("Please select a recipient first.");
+				return;
 			}
 
-			// Create new message item
-			var oItem = new sap.suite.ui.commons.TimelineItem({
-				dateTime: sTimestamp,
-				text: sValue,
-				userName: sUsername,
-				icon: "sap-icon://person-placeholder"
-			});
+			const oPayload = {
+				data: {
+					SenderID: sSenderID,
+					ReceiverID: sReceiverID,
+					MessageText: btoa(sText)// Proper encoding
+				}
+			};
 
-			// Add message to timeline
-			oTimeline.addContent(oItem);
+			this.ajaxCreateWithJQuery("ChatApplication", oPayload)
+				.then(() => {
+					// Update List model for chat bubble display
+					const aMsgList = oChatModel.getProperty("/messages") || [];
+					aMsgList.push({
+						text: sText, // Store original text (not encoded) in local model
+						sender: "me",
+						time: new Date().toLocaleTimeString()
+					});
+					oChatModel.setProperty("/messages", aMsgList);
+					oInput.setValue("");
 
-			// Scroll to bottom after short delay
-			setTimeout(function () {
-				oScroll.scrollTo(0, oScroll.getScrollHeight(), 300);
-			}, 100);
-
-			// Clear input field
-			oEvt.getSource().setValue("");
+				
+				})
+				.catch(function (err) {
+					MessageToast.show("Failed to send message.");
+					console.error(err);
+				});
 		},
 
-
 		onPressGoToMaster: function (oEvent) {
-			var oSelected = oEvent.getSource().getBindingContext("EmpDetails").getObject();
-			var oChatModel = sap.ui.getCore().getModel("chat");
-			oChatModel.setProperty("/current_room", oSelected.EmployeeName);
-			oChatModel.setProperty("/current_chat", []);
-			MessageToast.show("Switched to: " + oSelected.EmployeeName);
+			const oSelected = oEvent.getSource().getBindingContext("chat").getObject();
+			const sReceiverID = oSelected.EmployeeID;
+			const sReceiverName = oSelected.EmployeeName;
+
+			const oChatModel = this.getView().getModel("chat");
+			const oLoginModel = this.getView().getModel("LoginModel");
+
+			const sSenderID = oLoginModel.getProperty("/EmployeeID");
+			const sSenderName = oLoginModel.getProperty("/EmployeeName");
+
+			oChatModel.setProperty("/current_room", sReceiverID);
+			oChatModel.setProperty("/currentReceiverName", sReceiverName);
+			oChatModel.setProperty("/username", sSenderName);
+			oChatModel.setProperty("/messages", []); // Clear previous
+
+			this.ajaxReadWithJQuery("getMessagesBetweenUsers", {
+				SenderID: sSenderID,
+				ReceiverID: sReceiverID
+			}).then((response) => {
+				const aServerMessages = response.results || [];
+
+				const aMessages = aServerMessages.map((msg) => {
+					// Decode the message
+					let messageText = msg.MessageText;
+					let decode = atob(messageText);
+					return {
+						text: decode,
+						sender: msg.SenderID === sSenderID ? "me" : "them",
+						time: new Date(msg.Timestamp).toLocaleTimeString()
+					};
+					
+				});
+                
+				this.byId("headerTitle").setText(`Chat with ${sReceiverName}`);
+				// Update chat model
+				oChatModel.setProperty("/messages", aMessages);
+							
+			}).catch((err) => {
+				MessageToast.show("Failed to load messages");
+				console.error(err);
+			});
 		},
 
 		onPressback: function () {
@@ -113,6 +158,7 @@ sap.ui.define([
 		},
 
 		onLogout: function () {
+			localStorage.removeItem("chatMessages");
 			this.CommonLogoutFunction();
 		}
 

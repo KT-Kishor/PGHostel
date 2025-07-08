@@ -62,9 +62,8 @@ sap.ui.define(
           });
           this.getView().setModel(oLoginModel, "LoginViewModel");
           //this.LoginModel = oLoginModel;
-         
         },
-       
+
         onpresshome: function () {
           this.getRouter().navTo("RouteHomePage");
         },
