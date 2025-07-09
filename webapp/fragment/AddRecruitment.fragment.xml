@@ -2,8 +2,6 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout.form"
-    xmlns:f="sap.ui.layout.form"
-    xmlns:l="sap.ui.layout"
 >
     <Dialog
         id="myDialog"
@@ -30,57 +28,46 @@
             id="candidateForm"
         >
             <layout:content>
-                <Label text="{i18n>compName}" />
+                <Label text="{i18n>compName}" required="true" />
                 <Input
-                    value="{stuDataModel>/Name}"
+                    value="{stuDataModel>/FullName}"
                     id="FM_RE_Name"
-                    required="true"
-                    liveChange="RE_ValidateName"
+                    liveChange="onValidateName" 
                     valueStateText="{i18n>commonNameValueState}"
                     valueState="{modelValuStateError>/NameState}"
                     maxLength="100"
                     editable="{EditableModeltruefalse>/Editable}"
                 />
 
-                <Label text="{i18n>TableColCurrentPackage}" />
+                <Label text="{i18n>TableColCurrentPackage}" required="true" />
                 <Input
-                    value="{stuDataModel>/CurrentCTC}"
-                    liveChange="RE_ValidateNameExpectedCTC"
-                    required="true"
+                    value="{stuDataModel>/CurrentSalary}"
+                    liveChange="onValidateCTC"
                     id="FM_RE_CurrentCTC"
                     valueState="{modelValuStateError>/CurrentCTCState}"
                     valueStateText="{i18n>CurrentCTC}"
                     editable="{EditableModeltruefalse>/Editable}"
                     maxLength="10"
+                    type="Number"
                 />
 
-                <Label text="{i18n>TableColExpectedPackage}" />
+                <Label text="{i18n>TableColExpectedPackage}" required="true" />
                 <Input
-                    value="{stuDataModel>/ExpectedCTC}"
-                    liveChange="RE_ValidateNameExpectedCTC"
-                    required="true"
+                    value="{stuDataModel>/ExpectedSalary}"
+                    liveChange="onValidateCTC" 
                     id="FM_RE_ExpectedCTC"
                     valueState="{modelValuStateError>/ExpectedCTCState}"
                     valueStateText="{i18n>ExpectedCTC}"
                     editable="{EditableModeltruefalse>/Editable}"
                     maxLength="10"
+                    type="Number"
                 />
 
-                <Label text="{i18n>LabeleAVLForInterview}" />
-                <!-- <Input
-                    value="{stuDataModel>/AvailableForInterview}"
-                    id="FM_RE_AvlInterview"
-                    required="true"
-                    liveChange="FRE_ValidateAvlForIntervewField"
-                    valueState="{modelValuStateError>/AvailableForInterviewState}"
-                    editable="{EditableModeltruefalse>/Editable}"
-                /> -->
+                <Label text="{i18n>LabeleAVLForInterview}" required="true" />
                 <ComboBox
                     items="{setInterviewYesNo>/results}"
                     id="FM_RE_AvlInterview"
                     selectedKey="{stuDataModel>/AvailableForInterview}"
-                    required="true"
-                    change="FRE_ValidateAvlForIntervewField"
                     valueState="{modelValuStateError>/AvailableForInterviewState}"
                     editable="{EditableModeltruefalse>/Editable}"
                     valueStateText="{i18n>InterviewAVL}"
@@ -91,69 +78,50 @@
                     />
                 </ComboBox>
 
-                <Label text="{i18n>LabelNoticePeriod}" />
+                <Label text="{i18n>LabelNoticePeriod}" required="true" />
                 <Input
-                    value="{= ${stuDataModel>/NoticePeriod} === '0' ? 'Immediate' : ${stuDataModel>/NoticePeriod} }"
-                    required="true"
+                    value="{stuDataModel>/NoticePeriod}" 
+                    placeholder="e.g., 30 or Immediate"
                     id="FM_RE_NoticePeriod"
-                    maxLength="5"
-                    liveChange="RE_ValidateNameExpectedCTC"
+                    maxLength="15"
                     valueState="{modelValuStateError>/NoticePeriodState}"
                     valueStateText="{i18n>NoticePeriod}"
                     editable="{EditableModeltruefalse>/Editable}"
                 />
-
-                <Label text="{i18n>expCountry}" />
+                <Label text="{i18n>expCountry}" required="true" />
                 <Select
                     items="{CountryModel>/}"
                     id="FM_Id_Country"
                     selectedKey="{stuDataModel>/Country}"
-                    required="true"
                     editable="{EditableModeltruefalse>/Editable}"
-                    change="FRE_CountryLiveChange"
+                    change="onDialogCountryChange"
                 >
                     <core:Item
                         key="{CountryModel>code}"
                         text="{CountryModel>countryName}"
                     />
                 </Select>
-                <!-- <Input
-                    id="FM_Id_Country"
-                    value="{stuDataModel>/City}"
-                    required="true"
-                    editable="{EditableModeltruefalse>/Editable}"
-                    valueState="{modelValuStateError>/City}"
-                /> -->
 
-                <Label text="{i18n>city}" />
+                <Label text="{i18n>city}" required="true" />
                 <ComboBox
                     items="{BaseLocationModel>/}"
                     id="FM_Id_City"
                     value="{stuDataModel>/City}"
-                    required="true"
                     valueState="{modelValuStateError>/City}"
                     valueStateText="{i18n>cityVAlueState}"
                     editable="{EditableModeltruefalse>/Editable}"
-                    change="RE_ValidateCityField"
                 >
                     <core:Item
                         key="{BaseLocationModel>city}"
                         text="{BaseLocationModel>city}"
                     />
                 </ComboBox>
-                <!-- <Input
-                    id="FM_Id_CityInput"
-                    value="{stuDataModel>/City}"
-                    required="true"
-                    editable="{EditableModeltruefalse>/Editable}"
-                    valueState="{modelValuStateError>/City}"
-                /> -->
 
-                <Label text="{i18n>mobilenumber}" />
+                <Label text="{i18n>mobilenumber}" required="true" />
                 <Select
                     id="FM_Id_STDCode"
                     items="{codeModel>/}"
-                    selectedKey="{stuDataModel>/STDCode}"
+                    selectedKey="{stuDataModel>/ISD}"
                     editable="{EditableModeltruefalse>/Editable}"
                 >
                     <core:Item
@@ -162,14 +130,14 @@
                     />
                 </Select>
                 <Input
-                    value="{stuDataModel>/MobileNumber}"
-                    required="true"
-                    liveChange="RE_ValidateMobileField"
+                    value="{stuDataModel>/Mobile}"
+                    liveChange="onValidateMobile" 
                     maxLength="10"
                     id="FM_Id_MobileNumber"
                     valueState="{modelValuStateError>/MobileNumberState}"
                     valueStateText="{i18n>mobileNoValueState}"
                     editable="{EditableModeltruefalse>/Editable}"
+                    type="Tel"
                 />
 
                 <Label text="{i18n>LabeleAvlForInterviewDate}" />
@@ -178,7 +146,6 @@
                     valueFormat="yyyy-MM-dd"
                     minDate="{path:'myyModel>/minnDate'}"
                     maxDate="{path:'myyModel>/maxDates'}"
-                    change="RE_ValidateDateField"
                     id="FM_Id_DateAvlForInterview"
                     value="{path:'stuDataModel>/Date',formatter:'.formatter.formatDate'}"
                     class="sapUiSmallMarginBottom"
@@ -187,40 +154,34 @@
                     editable="{EditableModeltruefalse>/Editable}"
                 />
 
-                <Label text="{i18n>emailId}" />
+                <Label text="{i18n>emailId}" required="true" />
                 <Input
-                    value="{stuDataModel>/EmailID}"
+                    value="{stuDataModel>/Email}"
                     type="Email"
                     id="FM_Id_Email"
-                    required="true"
-                    liveChange="RE_VAlidateEmailField"
+                    liveChange="onValidateEmail"
                     valueState="{modelValuStateError>/EmailIDState}"
                     valueStateText="{i18n>emailValueState}"
                     editable="{EditableModeltruefalse>/Editable}"
                     maxLength="100"
                 />
 
-                <Label text="{i18n>TableColExperience}" />
+                <Label text="{i18n>TableColExperience}" required="true" />
                 <Input
                     value="{stuDataModel>/Experience}"
-                    required="true"
-                    liveChange="RE_ValidateNameExpectedCTC"
+                    liveChange="onValidateCTC"
                     id="FM_Id_Experience"
                     valueState="{modelValuStateError>/ExperienceState}"
                     valueStateText="{i18n>ExperienceValueText}"
                     maxLength="5"
                     editable="{EditableModeltruefalse>/Editable}"
+                    type="Number"
                 />
 
-                <Label
-                    text="{i18n>TableColSkills}"
-                    id="skillsa"
-                />
+                <Label text="{i18n>TableColSkills}" required="true" />
                 <Input
                     value="{stuDataModel>/Skills}"
-                    required="true"
                     id="FM_Id_Skills"
-                    liveChange="RE_ValidateRemarkField"
                     valueState="{modelValuStateError>/SkillsState}"
                     valueStateText="{i18n>skillValueState}"
                     maxLength="200"
@@ -232,7 +193,6 @@
                     value="{stuDataModel>/Remark}"
                     rows="4"
                     id="FM_Id_Remark"
-                    liveChange="RE_ValidateRemarkField"
                     valueState="{modelValuStateError>/RemarkState}"
                     editable="{EditableModeltruefalse>/Editable}"
                     maxLength="200"
@@ -247,28 +207,17 @@
                     id="FM_Id_SubmitBTN"
                     text="{i18n>submit}"
                     type="Accept"
-                    class="btn1"
-                    press="RE_StudentDataSave"
+                    press="onSaveNewCandidate" 
                 />
-
                 <Button
                     id="FM_Id_EditBTN"
                     text="{i18n>edit}"
-                    class="btn122"
                     type="Emphasized"
-                    press="FRE_UpDateTimeFragmentFieldEditable"
+                    press="onDialogEditToggle" 
                 />
-                <!-- <Button
-                    text="Save"
-                    id="UpdatedDataSubmitId"
-                    class="btn"
-                    type="Accept"
-                    press="UpdateStudent"
-                /> -->
                 <Button
                     text="{i18n>CancelButton}"
-                    class="btn"
-                    press="FRE_CloseFragment"
+                    press="_closeDialog"
                     type="Reject"
                 />
             </OverflowToolbar>

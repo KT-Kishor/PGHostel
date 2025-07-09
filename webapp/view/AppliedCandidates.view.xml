@@ -1,8 +1,8 @@
 <mvc:View
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
     controllerName="sap.kt.com.minihrsolution.controller.AppliedCandidates"
+    xmlns:mvc="sap.ui.core.mvc"
     xmlns:core="sap.ui.core"
+    xmlns="sap.m"
     xmlns:fb="sap.ui.comp.filterbar"
 >
     <Page>
@@ -13,7 +13,6 @@
             />
         </headerContent>
         
-        <!-- FilterBar with clear IDs and event handlers -->
         <fb:FilterBar
             id="appliedCandidatesFilterBar"
             persistencyKey="myPersKey"
@@ -24,7 +23,6 @@
             showFilterConfiguration="false"
         >
             <fb:filterGroupItems>
-                <!-- Filter 1: Employee Name (as a text input) -->
                 <fb:FilterGroupItem
                     name="name"
                     label="{i18n>compName}"
@@ -32,7 +30,7 @@
                     visibleInFilterBar="true"
                 >
                     <fb:control>
-                             <ComboBox
+                        <ComboBox
                             name="Name"
                             items="{path: 'UniqueNamesModel>/'}"
                             id="filterEmployeeName"
@@ -46,7 +44,6 @@
                     </fb:control>
                 </fb:FilterGroupItem>
 
-                <!-- Filter 2: Notice Period (as a dropdown) -->
                 <fb:FilterGroupItem
                     name="SupplierName"
                     label="{i18n>TableColNoticePeriod}"
@@ -54,17 +51,14 @@
                     visibleInFilterBar="true"
                 >
                     <fb:control>
-                        <ComboBox
-    id="filterNoticePeriod"
-    items="{path: 'ExpectedCTC>/data'}"
-    showClearIcon="true"
-    selectedKey="">
-    <core:Item key="{ExpectedCTC>value}" text="{ExpectedCTC>value}" />
-</ComboBox>
+                        <Input
+                            id="filterNoticePeriod"
+                            placeholder="e.g., 30, Immediate"
+                            showClearIcon="true"
+                        />
                     </fb:control>
                 </fb:FilterGroupItem>
 
-                <!-- Filter 3: Skills (as a dropdown) -->
                 <fb:FilterGroupItem
                     name="skills"
                     label="{i18n>TableColSkills}"
@@ -73,7 +67,7 @@
                 >
                     <fb:control>
                        <Input
-                       id="filterSkills"
+                            id="filterSkills"
                             placeholder="Type skill..."
                             showSuggestion="true"
                             suggest="onSuggestSkills"
@@ -84,7 +78,6 @@
                     </fb:control>
                 </fb:FilterGroupItem>
                 
-                <!-- Filter 4: Experience (as a dropdown) -->
                 <fb:FilterGroupItem
                     name="Experince"
                     label="{i18n>TableColExperience}"
@@ -107,34 +100,79 @@
             </fb:filterGroupItems>
         </fb:FilterBar>
 
-        <!-- Table with a clear ID -->
+        <!-- MERGED TABLE: The Table now has the CRUD buttons and detailed columns -->
         <Table
             id="appliedCandidatesTable"
             items="{DataTableModel>/}"
+            mode="SingleSelectLeft"
+            class="sapUiResponsiveMargin"
+            width="auto"
         >
+            <headerToolbar>
+                <OverflowToolbar>
+                    <content>
+                        <Title
+                            text="{i18n>TableHeader}"
+                            level="H2"
+                        />
+                        <ToolbarSpacer />
+                        <!-- Buttons from Recruitment.view.xml -->
+                        <Button
+                            text="{i18n>create}"
+                            press="onAddNewCandidate"
+                            type="Accept"
+                            tooltip="{i18n>tooltipAdduser}"
+                        />
+                        <Button
+                            text="{i18n>edit}"
+                            type="Emphasized"
+                            press="onEditCandidate"
+                            tooltip="{i18n>tooltipEditUser}"
+                        />
+                        <Button
+                            text="{i18n>delete}"
+                            press="onDeleteCandidate"
+                            type="Reject"
+                            tooltip="{i18n>tooltipDeleteStudent}"
+                        />
+                        <Button
+                            text="{i18n>export}"
+                            type="Ghost"
+                            press="onExport"
+                            class="sapUiSmallMarginEnd"
+                        />
+                    </content>
+                </OverflowToolbar>
+            </headerToolbar>
             <columns>
-                <Column><Text text="{i18n>compName}" /></Column>
-                <Column><Text text="{i18n>TableColNameHeistQualification}" /></Column>
-                <Column><Text text="{i18n>TableColSkills}" /></Column>
-                <Column><Text text="{i18n>TableColNoticePeriod}" /></Column>
-                <Column><Text text="{i18n>TableColNameJob}" /></Column>
-                                <Column><Text text="{i18n>experience}" /></Column>
-
+                <!-- Detailed Columns from Recruitment.view.xml -->
+                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>compName}" /></Column>
+                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColCurrentPackage}" /></Column>
+                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColExpectedPackage}" /></Column>
+                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColNoticePeriod}" /></Column>
+                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>mobilenumber}" /></Column>
+                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>emailId}" /></Column>
+                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColExperience}" /></Column>
+                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColSkills}" /></Column>
             </columns>
             <items>
+                <!-- NOTE: 'onCandidatePress' is for navigating to details, while the buttons are for CRUD -->
                 <ColumnListItem type="Navigation" press="onCandidatePress">
                     <cells>
+                        <!-- Bindings updated to use DataTableModel -->
                         <Text text="{DataTableModel>FullName}" />
-                        <Text text="{DataTableModel>HighestQualifaction}" />
-                        <Text text="{DataTableModel>Skills}" />
-                        <Text text="{DataTableModel>NoticePeriod}" />
-                        <Text text="{DataTableModel>JobTitle}" />
+                        <Text text="{DataTableModel>CurrentSalary} LPA" />
+                        <Text text="{DataTableModel>ExpectedSalary} LPA" />
+                        <Text text="{= ${DataTableModel>NoticePeriod} === '0' ? 'Immediate' : ${DataTableModel>NoticePeriod} + ' Days'}" />
+                        <Text text="{DataTableModel>ISD}-{DataTableModel>Mobile}" />
+                        <Text text="{DataTableModel>Email}" />
                         <Text text="{DataTableModel>Experience} Years" />
-
+                        <Text text="{DataTableModel>Skills}" />
                     </cells>
                 </ColumnListItem>
             </items>
         </Table>
+
         <footer>
             <Bar>
                 <contentLeft>
