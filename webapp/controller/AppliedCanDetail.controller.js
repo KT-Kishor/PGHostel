@@ -153,7 +153,9 @@ sap.ui.define([
             var oCandidate = this.getView().getModel("setDataToForm").getData();
             this.getOwnerComponent().getRouter().navTo("RouteEmployeeOfferDetails", {
                 sParOffer: oCandidate.FullName,
-                sParEmployee: oCandidate.Email
+                sParEmployee: oCandidate.Gender,
+                sParMail: oCandidate.Email,
+                sParAddress: oCandidate.Address
             });
         }
 

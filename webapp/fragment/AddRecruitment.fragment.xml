@@ -71,6 +71,7 @@
                     valueState="{modelValuStateError>/AvailableForInterviewState}"
                     editable="{EditableModeltruefalse>/Editable}"
                     valueStateText="{i18n>InterviewAVL}"
+                    change="onDropdownChange"
                 >
                     <core:Item
                         key="{setInterviewYesNo>key}"
@@ -84,9 +85,11 @@
                     placeholder="e.g., 30 or Immediate"
                     id="FM_RE_NoticePeriod"
                     maxLength="15"
+                    type="Number"
                     valueState="{modelValuStateError>/NoticePeriodState}"
                     valueStateText="{i18n>NoticePeriod}"
                     editable="{EditableModeltruefalse>/Editable}"
+                    liveChange="onValidateMandatoryField"
                 />
                 <Label text="{i18n>expCountry}" required="true" />
                 <Select
@@ -110,6 +113,7 @@
                     valueState="{modelValuStateError>/City}"
                     valueStateText="{i18n>cityVAlueState}"
                     editable="{EditableModeltruefalse>/Editable}"
+                    change="onDropdownChange"
                 >
                     <core:Item
                         key="{BaseLocationModel>city}"
@@ -123,6 +127,7 @@
                     items="{codeModel>/}"
                     selectedKey="{stuDataModel>/ISD}"
                     editable="{EditableModeltruefalse>/Editable}"
+                    change="onDropdownChange"
                 >
                     <core:Item
                         key="{codeModel>calling_code}"
@@ -152,6 +157,7 @@
                     valueState="{modelValuStateError>/DateState}"
                     valueStateText="Select correct date"
                     editable="{EditableModeltruefalse>/Editable}"
+                    change="onValidateMandatoryField"
                 />
 
                 <Label text="{i18n>emailId}" required="true" />
@@ -186,6 +192,7 @@
                     valueStateText="{i18n>skillValueState}"
                     maxLength="200"
                     editable="{EditableModeltruefalse>/Editable}"
+                    liveChange="onValidateMandatoryField"
                 />
 
                 <Label text="{i18n>LebeleRemark}" />

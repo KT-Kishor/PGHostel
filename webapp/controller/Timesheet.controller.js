@@ -4,8 +4,9 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/ui/unified/DateRange",
     "sap/suite/ui/commons/Timeline",
-    "sap/suite/ui/commons/TimelineItem"
-], function (BaseController, JSONModel, MessageToast, DateRange, Timeline, TimelineItem) {
+    "sap/suite/ui/commons/TimelineItem",
+    "sap/ui/export/Spreadsheet"
+], function (BaseController, JSONModel, MessageToast, DateRange, Timeline, TimelineItem, Spreadsheet) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.Timesheet", {
 
@@ -13,7 +14,7 @@ sap.ui.define([
             this.getRouter().getRoute("RouteTimesheet").attachMatched(this._onRouteMatched, this);
         },
 
-       _onRouteMatched: async function () {
+        _onRouteMatched: async function () {
             var LoginFunction = await this.commonLoginFunction("Timesheet");
             if (!LoginFunction) return;
 
@@ -70,7 +71,7 @@ sap.ui.define([
             }
             // Logic for Month vs. Weekly Calendar
             if (sMonthKey || sYearValue) { // Calendar is disabled if EITHER month or year is selected
-                oViewModel.setProperty("/isCalendarEnabled", false);       
+                oViewModel.setProperty("/isCalendarEnabled", false);
                 // Apply month filter only if a month is selected
                 if(sMonthKey) {
                     aFilteredData = aFilteredData.filter(entry => {
@@ -111,7 +112,7 @@ sap.ui.define([
         },
 
 
-         TS_onCalendarDateSelect: function (oEvent) {
+        TS_onCalendarDateSelect: function (oEvent) {
             if (!this.getView().getModel("viewModel").getProperty("/isCalendarEnabled")) { return; }
             const aSelectedDates = oEvent.getSource().getSelectedDates();
             if (aSelectedDates.length > 0) {
@@ -301,5 +302,27 @@ sap.ui.define([
             });
             oDialog.open();
         },
+        TS_onExport: function () {
+            const aData = this.getView().getModel("FilteredTimesheetModel").getData();
+            const aCols = [
+                { label: this.i18nModel.getText("employeeID"), property: "EmployeeID" },
+                { label: this.i18nModel.getText("employeeName"), property: "EmployeeName" },
+                { label: this.i18nModel.getText("manager"), property: "ManagerName" },
+                { label: this.i18nModel.getText("taskID"), property: "TaskID" },
+                { label: this.i18nModel.getText("assignmentName"), property: "TaskName" },
+                { label: this.i18nModel.getText("date"), property: "Date", type: "date" },
+                { label: this.i18nModel.getText("hoursWorked"), property: "HoursWorked" },
+                // { label: this.i18nModel.getText("comments"), property: "comments" },
+                { label: this.i18nModel.getText("status"), property: "Status" }
+            ];
+            const oSettings = {
+                workbook: { columns: aCols },
+                dataSource: aData,
+                fileName: "Timesheet_Data.xlsx"
+            };
+            const oSheet = new Spreadsheet(oSettings);
+            oSheet.build().finally(() => oSheet.destroy());
+        }
+
     });
 });

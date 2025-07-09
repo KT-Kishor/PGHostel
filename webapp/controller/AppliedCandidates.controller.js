@@ -266,12 +266,18 @@ sap.ui.define([
         },
 
         _validateAllDialogFields: function () {
-            const oData = this.getView().getModel("stuDataModel").getData();
-            if (!oData.FullName || !oData.ExpectedSalary || !oData.CurrentSalary || !oData.Email || !oData.Skills) {
-                MessageToast.show(this.i18na.getText("mandatoryFieldsError"));
-                return false;
+            try {
+                var isValid =
+                    utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_CurrentCTC"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_ExpectedCTC"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_RE_AvlInterview"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_City"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_STDCode"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("FM_Id_MobileNumber"), "ID") &&
+                    utils._LCvalidateEmail(sap.ui.getCore().byId("FM_Id_Email"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("FM_Id_Experience"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_Skills"), "ID");
+                if (!isValid) {
+                    MessageToast.show(this.i18na.getText("mandetoryFields"));
+                }
+            } catch (error) {
+                console.error("Error validating dialog fields:", error);
             }
-            return true;
         },
 
         // validation handlers 
@@ -279,16 +285,18 @@ sap.ui.define([
         onValidateCTC: (oEvent) => utils._LCvalidateAmount(oEvent),
         onValidateMobile: (oEvent) => utils._LCvalidateMobileNumber(oEvent),
         onValidateEmail: (oEvent) => utils._LCvalidateEmail(oEvent),
+        onValidateMandatoryField: (oEvent) => utils._LCvalidateMandatoryField(oEvent),
+        onDropdownChange: (oEvent) => utils._LCstrictValidationComboBox(oEvent),
 
         onExport: function () {
             const aData = this.getView().getModel("DataTableModel").getData();
             const aCols = [
-                { label: "Name", property: "Name" },
-                { label: "Current CTC (LPA)", property: "CurrentCTC" },
-                { label: "Expected CTC (LPA)", property: "ExpectedCTC" },
+                { label: "Name", property: "FullName" },
+                { label: "Current CTC (LPA)", property: "CurrentSalary" },
+                { label: "Expected CTC (LPA)", property: "ExpectedSalary" },
                 { label: "Notice Period (Days)", property: "NoticePeriod", template: "{0}" }, // Template to handle '0'
-                { label: "Mobile Number", property: "MobileNumber" },
-                { label: "Email", property: "EmailID" },
+                { label: "Mobile Number", property: "Mobile" },
+                { label: "Email", property: "Email" },
                 { label: "Experience (Years)", property: "Experience" },
                 { label: "Skills", property: "Skills" }
             ];

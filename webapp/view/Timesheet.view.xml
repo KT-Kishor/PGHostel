@@ -66,6 +66,12 @@
                     <Title text="{i18n>tileTimesheetFooter}" />
                     <ToolbarSpacer />
                     <Button text="{i18n>fillTimesheet}" press="TS_onFillDetails" type="Accept" tooltip="{i18n>fillTimesheet}" />
+                     <Button
+                            text="{i18n>export}"
+                            type="Ghost"
+                            press="TS_onExport"
+                            class="sapUiSmallMarginEnd"
+                        />
                   </OverflowToolbar>
                 </headerToolbar>
               
