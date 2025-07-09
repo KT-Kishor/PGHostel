@@ -33,7 +33,6 @@
 			<!-- form header  -->
 			<f:toolbar>
 				<Toolbar>
-					<Title text="{i18n>employeeDetails}"/>
 					<ToolbarSpacer />
 					<Button
                         id="ACD_id_EditButton"
