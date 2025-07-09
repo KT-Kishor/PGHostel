@@ -302,23 +302,59 @@ sap.ui.define([
             });
             oDialog.open();
         },
+        _findLastComment: function (aComments, sCommenterName) {
+            if (!aComments || aComments.length === 0 || !sCommenterName) {
+                return "";
+            }
+            const aFilteredComments = aComments.filter(oComment => oComment.CommentedBy === sCommenterName);
+            if (aFilteredComments.length === 0) {
+                return "";
+            }
+            aFilteredComments.sort((a, b) => new Date(b.CommentDateTime) - new Date(a.CommentDateTime));
+            return aFilteredComments[0].Comment;
+        },
         TS_onExport: function () {
-            const aData = this.getView().getModel("FilteredTimesheetModel").getData();
+            const aOriginalData = this.getView().getModel("FilteredTimesheetModel").getData();
+            if (!aOriginalData || aOriginalData.length === 0) {
+                MessageToast.show(this.i18nModel.getText("noDataToExport")); // Use i18n
+                return;
+            }
+            //  PREPARE THE DATA FOR EXPORT 
+            const aExportData = aOriginalData.map(oRow => {
+                // Find the last comments using our new helper function
+                const sEmployeeComment = this._findLastComment(oRow.comments, oRow.EmployeeName);
+                const sManagerComment = this._findLastComment(oRow.comments, oRow.ManagerName);
+                // Return a new, "flat" object for the export
+                return {
+                    EmployeeID: oRow.EmployeeID,
+                    EmployeeName: oRow.EmployeeName,
+                    ManagerName: oRow.ManagerName,
+                    TaskID: oRow.TaskID,
+                    TaskName: oRow.TaskName,
+                    Date: oRow.Date,
+                    HoursWorked: oRow.HoursWorked,
+                    Status: oRow.Status,
+                    EmployeeComment: sEmployeeComment,
+                    ManagerComment: sManagerComment
+                };
+            });
             const aCols = [
                 { label: this.i18nModel.getText("employeeID"), property: "EmployeeID" },
                 { label: this.i18nModel.getText("employeeName"), property: "EmployeeName" },
                 { label: this.i18nModel.getText("manager"), property: "ManagerName" },
                 { label: this.i18nModel.getText("taskID"), property: "TaskID" },
                 { label: this.i18nModel.getText("assignmentName"), property: "TaskName" },
-                { label: this.i18nModel.getText("date"), property: "Date", type: "date" },
-                { label: this.i18nModel.getText("hoursWorked"), property: "HoursWorked" },
-                // { label: this.i18nModel.getText("comments"), property: "comments" },
+                { label: this.i18nModel.getText("date"), property: "Date", type: "Date", format: "dd-mm-yyyy" },
+                { label: this.i18nModel.getText("hoursWorked"), property: "HoursWorked", type: "Number" },
+                { label: this.i18nModel.getText("employeeComment"), property: "EmployeeComment" }, // Direct mapping
+                { label: this.i18nModel.getText("managerComment"), property: "ManagerComment" },  // Direct mapping
                 { label: this.i18nModel.getText("status"), property: "Status" }
             ];
             const oSettings = {
                 workbook: { columns: aCols },
-                dataSource: aData,
-                fileName: "Timesheet_Data.xlsx"
+                dataSource: aExportData, // Use the prepared data
+                fileName: "Timesheet_Data.xlsx",
+                worker: false
             };
             const oSheet = new Spreadsheet(oSettings);
             oSheet.build().finally(() => oSheet.destroy());
