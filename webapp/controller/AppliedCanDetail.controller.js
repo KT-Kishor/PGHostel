@@ -9,7 +9,7 @@ sap.ui.define([
     return BaseController.extend("sap.kt.com.minihrsolution.controller.AppliedCanDetail", {
         formatter: formatter,
         onInit: function () {
-            const oViewModel = new JSONModel({isEditMode: false  });
+            const oViewModel = new JSONModel({ isEditMode: false });
             this.getView().setModel(oViewModel, "viewModel");
             const router = this.getOwnerComponent().getRouter();
             router
@@ -43,7 +43,7 @@ sap.ui.define([
         onLogout: function () {
             this.CommonLogoutFunction(); // Navigate to login page 
         },
-      onDownloadResume: function () {
+        onDownloadResume: function () {
             const oData = this.getView().getModel("setDataToForm").getData();
             console.log("Resume Data:", oData);
 
@@ -148,6 +148,13 @@ sap.ui.define([
 
             this.getView().addDependent(this._oResumeDialog);
             this._oResumeDialog.open();
+        },
+        ACD_onBoardCandidate: function () {
+            var oCandidate = this.getView().getModel("setDataToForm").getData();
+            this.getOwnerComponent().getRouter().navTo("RouteEmployeeOfferDetails", {
+                sParOffer: oCandidate.FullName,
+                sParEmployee: oCandidate.Email
+            });
         }
 
     });

@@ -53,6 +53,8 @@
                         icon="sap-icon://download"
                         type="Ghost"
                     />
+					<Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>generateOffer}" id="ACD_id_EmpOnBoard"   press="ACD_onBoardCandidate"   type="Accept"/>
+
 				</Toolbar>
 			</f:toolbar>
 			<f:content>
