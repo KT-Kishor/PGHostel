@@ -9,22 +9,31 @@ sap.ui.define([
     return BaseController.extend("sap.kt.com.minihrsolution.controller.AppliedCanDetail", {
         formatter: formatter,
         onInit: function () {
+            const oViewModel = new JSONModel({isEditMode: false  });
+            this.getView().setModel(oViewModel, "viewModel");
             const router = this.getOwnerComponent().getRouter();
             router
                 .getRoute("AppliedCanDetail")
                 .attachPatternMatched(this._onObjectMatched, this);
         },
         _onObjectMatched: async function (oEvent) {
+            this.getView().getModel("viewModel").setProperty("/isEditMode", false);
             var LoginFUnction = await this.commonLoginFunction("Recruitment");
             if (!LoginFUnction) return;
             this.sUserId = oEvent.getParameter("arguments").id;
             let data = this.getView().getModel("DataTableModel").getData();
-            // console.log(data);
             let filterData = data.find((Element) => Element.ID === this.sUserId);
-            // console.log(filterData);
             let formModel = new JSONModel(filterData);
             this.getView().setModel(formModel, "setDataToForm");
-
+        },
+        ACD_onEditPress: function () {
+            const oViewModel = this.getView().getModel("viewModel");
+            const bIsEditMode = oViewModel.getProperty("/isEditMode");
+            if (bIsEditMode) {
+                const oDataToSave = this.getView().getModel("setDataToForm").getData();
+                sap.m.MessageToast.show("Details saved successfully!");
+            }
+            oViewModel.setProperty("/isEditMode", !bIsEditMode);
         },
 
         onPageNavButtonPress: function () {
@@ -34,7 +43,7 @@ sap.ui.define([
         onLogout: function () {
             this.CommonLogoutFunction(); // Navigate to login page 
         },
-        onDownloadResume: function () {
+      onDownloadResume: function () {
             const oData = this.getView().getModel("setDataToForm").getData();
             console.log("Resume Data:", oData);
 

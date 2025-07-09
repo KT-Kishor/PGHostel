@@ -4,97 +4,75 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessageToast",
-    "../model/formatter",      // MERGED: Dependency from Recruitment
-    "../utils/validation",   // MERGED: Dependency from Recruitment
-    "sap/ui/export/Spreadsheet" // MERGED: Dependency from Recruitment
+    "../model/formatter",
+    "../utils/validation",
+    "sap/ui/export/Spreadsheet"
 ], function (BaseController, JSONModel, Filter, FilterOperator, MessageToast, formatter, utils, Spreadsheet) {
     "use strict";
-
     return BaseController.extend("sap.kt.com.minihrsolution.controller.AppliedCandidates", {
-
-        formatter: formatter, // MERGED: formatter reference
-
+        formatter: formatter,
         onInit: function () {
             const router = this.getOwnerComponent().getRouter();
             router.getRoute("AppliedCandidates").attachPatternMatched(this._onObjectMatched, this);
         },
-
         _onObjectMatched: async function () {
             var LoginFUnction = await this.commonLoginFunction("AppliedCandidates");
             if (!LoginFUnction) return;
-
-            // MERGED: All necessary model and i18n initializations from Recruitment
             this.i18na = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-
             this.getView().setModel(new JSONModel({
                 minnDate: new Date(),
                 maxDates: new Date(new Date().setDate(new Date().getDate() + 30))
             }), "myyModel");
-
             this.getView().setModel(new JSONModel({
                 NameState: "None", ExpectedCTCState: "None", CurrentCTCState: "None",
                 AvailableForInterviewState: "None", NoticePeriodState: "None", MobileNumberState: "None",
                 DateState: "None", EmailIDState: "None", ExperienceState: "None",
                 RemarkState: "None", SkillsState: "None", City: "None"
             }), "modelValuStateError");
-
             this.getView().setModel(new JSONModel({ Editable: true }), "EditableModeltruefalse");
             this.getView().setModel(new JSONModel({ results: [{ key: "YES", text: "YES" }, { key: "NO", text: "NO" }] }), "setInterviewYesNo");
-
-            this.AC_ReadCall(); // This is our main data read function
+            this.AC_ReadCall();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Recruitment Dashboard");
             this.onFilterBarClear();
+            this.getView().setModel(new JSONModel({
+                isEditMode: false, busy: false
+            }), "viewModel");
         },
-
-        // This is the single function to read/refresh data for the table
         AC_ReadCall: async function () {
             this.getBusyDialog();
             try {
-                // Reading from JobApplications. Change to JobApplications if that's the correct list entity.
                 const data = await this.ajaxReadWithJQuery("JobApplications");
                 const aCandidates = data.data || [];
-
                 this.getOwnerComponent().setModel(new JSONModel(aCandidates), "DataTableModel");
-
                 const nameSet = new Set(aCandidates.map(c => c.FullName).filter(Boolean));
                 this.getView().setModel(new JSONModel(Array.from(nameSet).map(name => ({ FullName: name }))), "UniqueNamesModel");
-
             } catch (err) {
                 MessageToast.show("Failed to load candidate data.");
             } finally {
                 this.closeBusyDialog();
             }
         },
-
-        // --- Standard Navigation and Filter Logic ---
-
         onPressback: function () {
             this.getOwnerComponent().getRouter().navTo("RouteTilePage");
         },
-
         onLogout: function () {
             this.CommonLogoutFunction();
         },
-
         onCandidatePress: function (oEvent) {
             const id = oEvent.getSource().getBindingContext("DataTableModel").getObject().ID;
             this.getOwnerComponent().getRouter().navTo("AppliedCanDetail", { id: id });
         },
-
         onFilterBarClear: function () {
             this.byId("filterEmployeeName").setSelectedKey("");
             this.byId("filterNoticePeriod").setValue("");
             this.byId("filterSkills").setValue("");
             this.byId("filterExperience").setSelectedKey("");
-
             const oBinding = this.byId("appliedCandidatesTable").getBinding("items");
             if (oBinding) {
                 oBinding.filter([]);
             }
         },
-
         onFilterBarSearch: function () {
-            // This robust search function is kept
             this.getBusyDialog();
             setTimeout(() => {
                 try {
@@ -102,28 +80,22 @@ sap.ui.define([
                     const sNoticePeriod = this.byId("filterNoticePeriod").getValue().trim().toLowerCase();
                     const sSkills = this.byId("filterSkills").getValue().trim().toLowerCase();
                     const sExperienceKey = this.byId("filterExperience").getSelectedKey();
-
                     const aFilters = [];
-
                     if (sName) aFilters.push(new Filter("FullName", FilterOperator.Contains, sName));
                     if (sSkills) aFilters.push(new Filter("Skills", FilterOperator.Contains, sSkills));
-
                     if (sNoticePeriod) {
                         aFilters.push(new Filter({
                             path: "NoticePeriod",
                             test: sValue => String(sValue).toLowerCase().includes(sNoticePeriod)
                         }));
                     }
-
                     if (sExperienceKey) {
                         const [min, max] = sExperienceKey.split("-").map(val => parseInt(val.trim(), 10));
                         if (!isNaN(min) && !isNaN(max)) {
                             aFilters.push(new Filter("Experience", FilterOperator.BT, min, max));
                         }
                     }
-
                     this.byId("appliedCandidatesTable").getBinding("items").filter(aFilters);
-
                 } catch (error) {
                     MessageToast.show("Error during filtering.");
                 } finally {
@@ -146,10 +118,6 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({ skills: aSuggestionItems }), "skillModel");
         },
 
-        // =======================================================================
-        // MERGED: All CRUD, Dialog, and Helper functions from Recruitment.controller.js
-        // =======================================================================
-
         onAddNewCandidate: function () {
             const oNewCandidate = {
                 FullName: "",
@@ -171,39 +139,29 @@ sap.ui.define([
             this._openDialog("Create Candidate", true);
             this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", true);
         },
-
         onEditCandidate: function () {
             const oTable = this.byId("appliedCandidatesTable");
             const oSelectedItem = oTable.getSelectedItem();
-
             if (!oSelectedItem) {
                 MessageToast.show(this.i18na.getText("MessageNoRowSelected"));
                 return;
             }
-
             const oContext = oSelectedItem.getBindingContext("DataTableModel");
             const oCandidateData = jQuery.extend({}, oContext.getObject());
-
-            // Handle data transformations for the dialog
             if (oCandidateData.Date === "1899-11-30T00:00:00.000Z") oCandidateData.Date = null;
             if (oCandidateData.NoticePeriod === "0") oCandidateData.NoticePeriod = "Immediate";
-
             this.getView().setModel(new JSONModel(oCandidateData), "stuDataModel");
             this._openDialog("Edit Candidate", false);
             this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", false);
         },
-
         onDeleteCandidate: function () {
             const oTable = this.byId("appliedCandidatesTable");
             const oSelectedItem = oTable.getSelectedItem();
-
             if (!oSelectedItem) {
                 MessageToast.show(this.i18na.getText("MessageNoRowSelected"));
                 return;
             }
-
             const sID = oSelectedItem.getBindingContext("DataTableModel").getObject().ID;
-
             this.showConfirmationDialog(
                 this.i18na.getText("confirmTitle"),
                 this.i18na.getText("ConfirmRecruitmentDeleteMessage"),
@@ -222,14 +180,11 @@ sap.ui.define([
                 }
             );
         },
-
         _preparePayload: function () {
             if (!this._validateAllDialogFields()) return null;
-
             const oPayload = this.getView().getModel("stuDataModel").getData();
             let noticePeriodValue = sap.ui.getCore().byId("FM_RE_NoticePeriod").getValue().trim();
             oPayload.NoticePeriod = noticePeriodValue.toLowerCase() === 'immediate' ? "0" : noticePeriodValue;
-
             let dateValue = sap.ui.getCore().byId("FM_Id_DateAvlForInterview").getValue();
             if (dateValue) {
                 oPayload.Date = dateValue.split(".").reverse().join("/");
@@ -240,7 +195,6 @@ sap.ui.define([
         onSaveNewCandidate: async function () {
             const oPayload = this._preparePayload();
             if (!oPayload) return;
-
             this.getBusyDialog();
             try {
                 await this.ajaxCreateWithJQuery("JobApplications", { data: oPayload });
@@ -253,11 +207,9 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
-
         onUpdateCandidate: async function () {
             const oPayload = this._preparePayload();
             if (!oPayload) return;
-
             this.getBusyDialog();
             try {
                 await this.ajaxUpdateWithJQuery("JobApplications", { data: oPayload, filters: { ID: oPayload.ID } });
@@ -270,9 +222,6 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
-
-        // --- Dialog Management ---
-
         _openDialog: function (sTitle, bIsCreate) {
             if (!this.oDialog) {
                 this.oDialog = sap.ui.core.Fragment.load({
@@ -293,7 +242,6 @@ sap.ui.define([
                 oDialog.open();
             });
         },
-
         _closeDialog: function () {
             if (this.oDialog) {
                 this.oDialog.then(oDialog => oDialog.close());
@@ -310,7 +258,6 @@ sap.ui.define([
                 this.onUpdateCandidate();
             }
         },
-
         onDialogCountryChange: function (oEvent) {
             const sCountryCode = oEvent.getSource().getSelectedKey();
             const oCityComboBox = sap.ui.getCore().byId("FM_Id_City");
@@ -318,10 +265,7 @@ sap.ui.define([
             this.getView().getModel("stuDataModel").setProperty("/City", "");
         },
 
-        // --- Validation and Export ---
-
         _validateAllDialogFields: function () {
-            // This is a simplified version of your validation. You can expand it.
             const oData = this.getView().getModel("stuDataModel").getData();
             if (!oData.FullName || !oData.ExpectedSalary || !oData.CurrentSalary || !oData.Email || !oData.Skills) {
                 MessageToast.show(this.i18na.getText("mandatoryFieldsError"));
@@ -330,9 +274,9 @@ sap.ui.define([
             return true;
         },
 
-        // Renamed validation handlers to avoid confusion
+        // validation handlers 
         onValidateName: (oEvent) => utils._LCvalidateName(oEvent),
-        onValidateCTC: (oEvent) => utils._LCvalidateAmount(oEvent), 
+        onValidateCTC: (oEvent) => utils._LCvalidateAmount(oEvent),
         onValidateMobile: (oEvent) => utils._LCvalidateMobileNumber(oEvent),
         onValidateEmail: (oEvent) => utils._LCvalidateEmail(oEvent),
 
@@ -348,13 +292,11 @@ sap.ui.define([
                 { label: "Experience (Years)", property: "Experience" },
                 { label: "Skills", property: "Skills" }
             ];
-
             const oSettings = {
                 workbook: { columns: aCols },
                 dataSource: aData,
                 fileName: "Candidate_Data.xlsx"
             };
-
             const oSheet = new Spreadsheet(oSettings);
             oSheet.build().finally(() => oSheet.destroy());
         }
