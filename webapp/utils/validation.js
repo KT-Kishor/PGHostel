@@ -99,7 +99,7 @@ sap.ui.define([], function () {
         cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
       }
       oInput.setValue(cleanedValue);
-    
+
       if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
         oInput.setValueState("Error");
         return false;
@@ -441,7 +441,7 @@ sap.ui.define([], function () {
       var oField = type === "ID" ? oEvent : oEvent.getSource();
       if (!oField) return false;
       var value = parseFloat(oField.getValue());
-      if (isNaN(value) || value < 0 || value > 8) {
+      if (isNaN(value) || value <= 0 || value > 8) {
         oField.setValueState("Error");
         return false;
       } else {

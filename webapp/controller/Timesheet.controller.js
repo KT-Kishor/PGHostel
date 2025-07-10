@@ -317,7 +317,7 @@ sap.ui.define([
         TS_onExport: function () {
             const aOriginalData = this.getView().getModel("FilteredTimesheetModel").getData();
             if (!aOriginalData || aOriginalData.length === 0) {
-                MessageToast.show(this.i18nModel.getText("noDataToExport")); // Use i18n
+                MessageToast.show(this.i18nModel.getText("noDatainFile")); 
                 return;
             }
             //  PREPARE THE DATA FOR EXPORT 
@@ -345,7 +345,7 @@ sap.ui.define([
                 { label: this.i18nModel.getText("manager"), property: "ManagerName" },
                 { label: this.i18nModel.getText("taskID"), property: "TaskID" },
                 { label: this.i18nModel.getText("assignmentName"), property: "TaskName" },
-                { label: this.i18nModel.getText("date"), property: "Date", type: "Date", format: "dd-mm-yyyy" },
+                { label: this.i18nModel.getText("date"), property: "Date", type: "Date", format: "dd/mm/yyyy" },
                 { label: this.i18nModel.getText("hoursWorked"), property: "HoursWorked", type: "Number" },
                 { label: this.i18nModel.getText("employeeComment"), property: "EmployeeComment" }, // Direct mapping
                 { label: this.i18nModel.getText("managerComment"), property: "ManagerComment" },  // Direct mapping

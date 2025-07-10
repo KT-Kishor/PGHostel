@@ -59,7 +59,8 @@
                 selectionChange="T_TableSelectionChange"
                 alternateRowColors="true"
                 items="{path: 'FilteredTimesheetModel>/', sorter: {path: 'Status',descending: false,group: true}}" 
-                growingThreshold="50">
+                growingThreshold="50"
+                noDataText="{i18n>noData}">
             
                 <headerToolbar>
                   <OverflowToolbar>

@@ -68,17 +68,18 @@
             <Table
                 id="TSA_id_Table"
                 mode="MultiSelect"
-                items="{ApprovalTimesheetModel>/}"
+                items="{path:'ApprovalTimesheetModel>/', sorter: {path: 'EmployeeID',descending: false,group: true}}"
                 growing="true"
                 selectionChange="TSA_onSelect"
                 growingScrollToLoad="true"
                 growingThreshold="50"
                 alternateRowColors="true"
-                class="sapUiTinyMargin">
+                class="sapUiTinyMargin"
+                 noDataText="{i18n>noData}">
                 <columns>
-                    <Column demandPopin="true">
+                    <!-- <Column demandPopin="true">
                         <Text text="{i18n>employeeID}"/>
-                    </Column>
+                    </Column> -->
                     <Column minScreenWidth="Tablet" demandPopin="true">
                         <Text text="{i18n>assignmentName}"/>
                     </Column>
@@ -102,7 +103,7 @@
                 <items>
                     <ColumnListItem>
                         <cells>
-                            <Text text="{ApprovalTimesheetModel>EmployeeID}"/>
+                            <!-- <Text text="{ApprovalTimesheetModel>EmployeeID}"/> -->
                             <Text text="{ApprovalTimesheetModel>TaskName}"/>
                             <Text text="{path:'ApprovalTimesheetModel>Date',formatter:'.Formatter.formatDate'}"/>
                             <Text text="{ApprovalTimesheetModel>Day}"/>

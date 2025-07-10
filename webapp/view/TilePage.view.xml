@@ -250,11 +250,11 @@
                                 <ux:ObjectPageSubSection titleUppercase="false">
                                     <ux:blocks>
                                         <layout:HorizontalLayout allowWrapping="true" class="sapUiTinyMargin">
-                                            <GenericTile visible="{= ${AppVisibilityModel>/RecruitmentApp} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>headerrecruitment}" press="TileV_Recruitment">
+                                            <!-- <GenericTile visible="{= ${AppVisibilityModel>/RecruitmentApp} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>headerrecruitment}" press="TileV_Recruitment">
                                                 <TileContent unit="{i18n>assetFooter}">
                                                     <ImageContent src="sap-icon://add-employee" />
                                                 </TileContent>
-                                            </GenericTile>
+                                            </GenericTile> -->
                                             <GenericTile header="Chat App" class="sapUiMediumMargin" press="Tile_ChatApp">
                                                 <TileContent unit="{i18n>assetFooter}">
                                                     <ImageContent src="sap-icon://message-popup" />
