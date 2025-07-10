@@ -41,6 +41,7 @@ sap.ui.define([
             this.byId("TSA_id_Status").setValue("Submitted"); // Set default status
             this._applyAllFilters(); // Apply the default filter
             this.closeBusyDialog();
+            this.initializeBirthdayCarousel();
         },
 
         _getStartOfWeek: function (date) {

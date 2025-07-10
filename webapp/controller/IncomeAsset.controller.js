@@ -93,9 +93,7 @@ sap.ui.define([
                 this.getView().byId("IA_id_PickedBy").setSelectedKey("");
 
                 this.getView().byId("IA_id_PickedBy").setSelectedKey("");
-
-
-
+                this.initializeBirthdayCarousel();
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");

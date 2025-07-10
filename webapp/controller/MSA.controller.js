@@ -20,6 +20,7 @@ sap.ui.define([
                 } finally {
                     this.closeBusyDialog(); // Close after async call finishes
                 }
+                 this.initializeBirthdayCarousel();
             },
             onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");

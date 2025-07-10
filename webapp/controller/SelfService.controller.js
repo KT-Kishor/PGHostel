@@ -17,6 +17,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 try {
                     var LoginFUnction = await this.commonLoginFunction("SelfService");
                     if (!LoginFUnction) return;
+                    this.initializeBirthdayCarousel();
                     this.getBusyDialog();
                     const oView = this.getView();
                     this.i18nModel = oView.getModel("i18n").getResourceBundle();

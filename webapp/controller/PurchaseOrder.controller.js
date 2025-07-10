@@ -46,12 +46,9 @@ sap.ui.define([
 
             })
             this.getView().setModel(model, "PurchaseOrderModel");
-
-
-            
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Purchase Order");
             this._ViewDatePickersReadOnly(["PO_idECreationDatePicker"], this.getView());
-
+            this.initializeBirthdayCarousel();
         },
         finacial: function () {
             var oDateRange = this.byId("PO_idECreationDatePicker");

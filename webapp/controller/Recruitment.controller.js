@@ -74,7 +74,7 @@ sap.ui.define(
                     this.RE_ReadUpdatedDataFromBakend();
                     this.RE_RemoveValueState();
                     this.getView().getModel("LoginModel").setProperty("/HeaderName", "Recruitment Details");
-
+                    this.initializeBirthdayCarousel();
                 },
 
                 //Add student function all data

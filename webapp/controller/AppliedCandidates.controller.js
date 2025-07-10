@@ -37,6 +37,7 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({
                 isEditMode: false, busy: false
             }), "viewModel");
+            this.initializeBirthdayCarousel();
         },
         AC_ReadCall: async function () {
             this.getBusyDialog();

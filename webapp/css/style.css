@@ -9,10 +9,9 @@
   border-color: greenyellow;
   color: deeppink;
 }
-.sapMGT{
+.sapMGT {
   background-position: center;
-  background-image: url('../image/footer.jpg');
-  
+  background-image: url("../image/footer.jpg");
 }
 .Groupclass {
   margin: 8px 0;
@@ -24,7 +23,7 @@
   border-radius: 10px;
   max-width: 60%;
   margin: 4px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .chatBubbleMe {
@@ -35,29 +34,28 @@
   background-color: #f8bbd0; /* Light pink background */
 }
 
-
 .customRow .formBox {
-    width: 32%;
-    min-width: 200px;
-    box-sizing: border-box;
-    padding-right: 0.5rem;
+  width: 32%;
+  min-width: 200px;
+  box-sizing: border-box;
+  padding-right: 0.5rem;
 }
 
 @media only screen and (max-width: 600px) {
-    .customRow .formBox {
-        width: 100%;
-        margin-bottom: 0.75rem;
-    }
+  .customRow .formBox {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
 }
 
 .TextColor {
-  color:darksalmon;
+  color: darksalmon;
 }
 
-.chatAreaContainer{
+.chatAreaContainer {
   height: 100%;
   width: 100%;
-  background-image: url('../image/Chatbackground.jpg');
+  background-image: url("../image/Chatbackground.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -66,7 +64,7 @@
 .myBackgroundStyle {
   height: 100%;
   width: 100%;
-  background-image: url('../image/back.jpg');
+  background-image: url("../image/back.jpg");
   background-repeat: round;
   background-size: cover;
   background-position: center;
@@ -111,14 +109,14 @@
   margin-right: 10px;
 }
 .sapMMsgStrip {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 .sapUiSmallMargin {
   margin-left: 5px;
   margin-right: 5px;
 }
-.TextColor{
+.TextColor {
   color: #0070f2 !important;
   line-height: 1.5rem !important;
 }
@@ -146,7 +144,7 @@
 .myBackgroundStylehome {
   height: 100%;
   width: 100%;
-  background-image: url('../image/homeback.jpg');
+  background-image: url("../image/homeback.jpg");
   background-repeat: round;
   background-size: cover;
   background-position: center;
@@ -178,7 +176,6 @@
   font-size: 48px;
   font-weight: bold;
   font-family: League spartan !important;
-
 }
 
 .position-welcome {
@@ -201,7 +198,7 @@
   max-width: 700px;
   line-height: 1.8;
 }
-.Aboutus{
+.Aboutus {
   border-radius: 10px !important;
 }
 .custom-aboutus {
@@ -212,109 +209,111 @@
   line-height: 1.8;
 }
 .custom-background {
-  background-image: url('../image/costumeback.jpg');
+  background-image: url("../image/costumeback.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
 }
-.carrer-Des{
+.carrer-Des {
   font-family: sans-serif;
   line-height: 1.5;
 }
-.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS) .sapUiBlockLayoutRow:first-of-type .sapUiBlockCellContent {
+.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
+  .sapUiBlockLayoutRow:first-of-type
+  .sapUiBlockCellContent {
   margin-top: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
- 
 }
-.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS) .sapUiBlockLayoutRow:last-of-type .sapUiBlockCellContent {
+.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
+  .sapUiBlockLayoutRow:last-of-type
+  .sapUiBlockCellContent {
   margin-bottom: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
   line-height: 1.5;
 }
-.sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle{
+.sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle {
   font-size: 1.5rem;
   color: #000103;
 }
 .formBorder {
-  border: 1px solid #ccc;     
-  border-radius: 8px;          
-  color: #ddf5ff !important;         
-  box-shadow: 0 2px 4px rgba(0,0,0,1);  
-  background-color:transparent; 
-  font-weight: bold;   
-  align-items: center;  
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  color: #ddf5ff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+  background-color: transparent;
+  font-weight: bold;
+  align-items: center;
 }
 
 .career-background {
-  background-image: url('../image/career1.jpg');
+  background-image: url("../image/career1.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 0.60rem;
+  border-radius: 0.6rem;
   border-radius: 8px;
 }
 
 .service-background {
-  background-image: url('../image/custom-software-banner.jpg');
+  background-image: url("../image/custom-software-banner.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .sapUxAPObjectPageWrapper {
-    background-color:#eff1f2 !important;
-    opacity: 95%;
+  background-color: #eff1f2 !important;
+  opacity: 95%;
 }
 
 .home-background {
-  background-image: url('../image/Home.jpg');
+  background-image: url("../image/Home.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 0.60rem;
+  border-radius: 0.6rem;
 }
-.Servicetab{
-  border-radius: 0.60rem;
+.Servicetab {
+  border-radius: 0.6rem;
 }
-.Products_list{
-  border-radius: 0.60rem;
+.Products_list {
+  border-radius: 0.6rem;
 }
-.allvideo{
-  border-radius: 0.80rem !important;
+.allvideo {
+  border-radius: 0.8rem !important;
 }
 
-.demo-form{
-  background-image: url('../image/Newdemo.png');
-  background-size: cover; 
-  border-radius: 0.60rem;
-  background-position: center; 
+.demo-form {
+  background-image: url("../image/Newdemo.png");
+  background-size: cover;
+  border-radius: 0.6rem;
+  background-position: center;
   background-repeat: no-repeat;
 }
-.commonclass{
+.commonclass {
   margin-top: 7rem !important;
 }
-.btnrequest{
+.btnrequest {
   margin-right: 6rem;
 }
 .login-background {
-  background-image: url('../image/new.back.jpg');
+  background-image: url("../image/new.back.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
- .responsiveCenterFlex {
+.responsiveCenterFlex {
   box-sizing: border-box;
 }
 
 /* For mobile devices: center both vertically and horizontally */
- @media only screen and (max-width: 600px) {
+@media only screen and (max-width: 600px) {
   .responsiveCenterFlex {
-      align-items: center !important;
-      justify-content: center !important;
-      height: 100vh;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100vh;
   }
-} 
+}
 .contact-touch {
   background-color: white;
   border-radius: 15px;
@@ -322,36 +321,36 @@
 }
 
 .expert-background {
-  background-image: url('../image/61933fc323a04-7-apa-itu-sap-btp-perbandingan-dengan-scp.jpg');
+  background-image: url("../image/61933fc323a04-7-apa-itu-sap-btp-perbandingan-dengan-scp.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  height: 100VH;
-  width: 100VW;
+  height: 100vh;
+  width: 100vw;
 }
 
 .products-background {
-  background-image: url('../image/home.jpg');
+  background-image: url("../image/home.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .contact-background {
-  background-image: url('../image/contactPage.jpg');
+  background-image: url("../image/contactPage.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 0.60rem;
+  border-radius: 0.6rem;
 }
 
-.Training-background{
-background-color: #eafdf9;
-background-image: url('../image/Home.jpg');
+.Training-background {
+  background-color: #eafdf9;
+  background-image: url("../image/Home.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-border-radius: 0.60rem;
+  border-radius: 0.6rem;
 }
 .button-container {
   margin-top: 20px; /* Adds space above the button */
@@ -364,68 +363,68 @@ border-radius: 0.60rem;
   margin-bottom: 10px;
   line-height: 1.5rem !important;
 }
-.product-des{
+.product-des {
   margin-left: 18px;
   font-family: sans-serif;
   font-size: 16px !important;
   color: #2964d9;
 }
 
-.products-title{
+.products-title {
   font-size: 20px;
   /* font-weight: bold; */
   color: #2964d9;
   margin-bottom: 10px;
   line-height: 1.5rem !important;
 }
-.checkmark-text{
+.checkmark-text {
   display: block;
   margin-bottom: 12px;
   font-family: sans-serif;
 }
-.training-text{
+.training-text {
   margin-left: 0.5rem;
   font-family: sans-serif;
-  margin-bottom: 12px
-  }
-  .description-text {
-    font-size: 16px;
-    font-family: sans-serif;
-    line-height: 1.5rem !important;
-    color: #555;
-    margin-bottom: 10px;
-  }
-  .big-apply-button {
-    font-size: 2rem;
-    padding: 0.75rem 2rem;
-    height: 3rem;
-    width: fit-content !important;
-  }
-  .content-box {
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 1);
-    text-align: left;
-  }
-  
-  .custom-trainee-title{
-    font-size: 30px;
-    font-family: Helvetica, sans-serif;
-    color: black;
-    line-height: 1.9;
-    /* font-weight: bold; */
-    max-width: 700px;
-  }
-  .section-title {
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 10px;
-    color: #222;
-    margin-bottom: 12px
-  }
+  margin-bottom: 12px;
+}
+.description-text {
+  font-size: 16px;
+  font-family: sans-serif;
+  line-height: 1.5rem !important;
+  color: #555;
+  margin-bottom: 10px;
+}
+.big-apply-button {
+  font-size: 2rem;
+  padding: 0.75rem 2rem;
+  height: 3rem;
+  width: fit-content !important;
+}
+.content-box {
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 1);
+  text-align: left;
+}
+
+.custom-trainee-title {
+  font-size: 30px;
+  font-family: Helvetica, sans-serif;
+  color: black;
+  line-height: 1.9;
+  /* font-weight: bold; */
+  max-width: 700px;
+}
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #222;
+  margin-bottom: 12px;
+}
 .custom-input-height .sapMInputInner,
 .custom-input-height .sapMTextAreaInner {
-  height: 2rem; 
+  height: 2rem;
   width: 200px;
 }
 
@@ -494,14 +493,42 @@ h2.sapUxAPObjectPageHeaderIdentifierTitle,
 h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   font-size: 1.5rem !important;
 }
-.sapUiSizeCompact .sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMSB.sapMSBTransparent .sapMBtnContent,
-.sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMSB.sapMSBTransparent .sapMBtnContent,
-.sapUiSizeCompact .sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMBtnInner .sapMBtnContent,
-.sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMBtnInner .sapMBtnContent,
-.sapUiSizeCompact .sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMSB.sapMSBTransparent .sapMBtnIcon,
-.sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMSB.sapMSBTransparent .sapMBtnIcon,
-.sapUiSizeCompact .sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMBtnInner .sapMBtnIcon,
-.sapUxAPAnchorBar .sapMBarChild.sapUxAPAnchorBarButton .sapMBtnInner .sapMBtnIcon {
+.sapUiSizeCompact
+  .sapUxAPAnchorBar
+  .sapMBarChild.sapUxAPAnchorBarButton
+  .sapMSB.sapMSBTransparent
+  .sapMBtnContent,
+.sapUxAPAnchorBar
+  .sapMBarChild.sapUxAPAnchorBarButton
+  .sapMSB.sapMSBTransparent
+  .sapMBtnContent,
+.sapUiSizeCompact
+  .sapUxAPAnchorBar
+  .sapMBarChild.sapUxAPAnchorBarButton
+  .sapMBtnInner
+  .sapMBtnContent,
+.sapUxAPAnchorBar
+  .sapMBarChild.sapUxAPAnchorBarButton
+  .sapMBtnInner
+  .sapMBtnContent,
+.sapUiSizeCompact
+  .sapUxAPAnchorBar
+  .sapMBarChild.sapUxAPAnchorBarButton
+  .sapMSB.sapMSBTransparent
+  .sapMBtnIcon,
+.sapUxAPAnchorBar
+  .sapMBarChild.sapUxAPAnchorBarButton
+  .sapMSB.sapMSBTransparent
+  .sapMBtnIcon,
+.sapUiSizeCompact
+  .sapUxAPAnchorBar
+  .sapMBarChild.sapUxAPAnchorBarButton
+  .sapMBtnInner
+  .sapMBtnIcon,
+.sapUxAPAnchorBar
+  .sapMBarChild.sapUxAPAnchorBarButton
+  .sapMBtnInner
+  .sapMBtnIcon {
   color: black !important;
   font-size: 16px !important;
 }
@@ -569,11 +596,11 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 
 .custom-vbox {
-  align-items:flex-end;
+  align-items: flex-end;
   width: 100%;
 }
-.rich-vbox{
-align-items:flex-start;
+.rich-vbox {
+  align-items: flex-start;
   width: 100%;
 }
 
@@ -596,7 +623,6 @@ align-items:flex-start;
   margin-left: 50% !important;
 }
 
-
 .sapMObjStatusInverted .sapMObjStatusText {
   padding: 0.1875rem 0.25rem;
   width: max-content;
@@ -606,12 +632,12 @@ align-items:flex-start;
   color: rgb(9, 12, 17);
 }
 
-.sapMOHR .sapMOHRAttr .sapMObjectAttributeDiv>span:only-of-type {
+.sapMOHR .sapMOHRAttr .sapMObjectAttributeDiv > span:only-of-type {
   color: rgb(250, 144, 106);
 }
 
-.sapMObjStatus>.sapMObjStatusTitle {
-  padding-right: .25rem;
+.sapMObjStatus > .sapMObjStatusTitle {
+  padding-right: 0.25rem;
   color: rgb(9, 12, 17);
 }
 
@@ -633,11 +659,11 @@ align-items:flex-start;
   max-width: 20rem !important;
   color: #000 !important;
 }
-.Login{
+.Login {
   width: fit-content !important;
   margin-left: 1.9rem !important;
 }
-.otpclass{
+.otpclass {
   margin-left: 0.7rem !important;
 }
 .taskNameColor .sapMObjectAttributeText {
@@ -695,8 +721,8 @@ align-items:flex-start;
 }
 
 .summaryBox {
-	width: 240px;
-	margin: 8px;
+  width: 240px;
+  margin: 8px;
 }
 .summaryBox {
   margin: 0.5rem;
@@ -711,55 +737,74 @@ align-items:flex-start;
   border-radius: 8px;
 }
 .salaryPanelMargin {
-  margin-bottom: 20px; 
+  margin-bottom: 20px;
 }
 
 @media (min-width: 1175px) {
-    .salaryBox, .deductionBox {
-        width: 48% !important;
-    }
+  .salaryBox,
+  .deductionBox {
+    width: 48% !important;
+  }
 }
 
 @media (max-width: 1174px) {
-    .salaryBox, .deductionBox {
-        width: 100% !important;
-    }
+  .salaryBox,
+  .deductionBox {
+    width: 100% !important;
+  }
 }
 
 .PayByDateClass {
   white-space: nowrap !important;
 }
 .sapUiCompFilterBarNonPhone {
-    padding-top: 1rem;    
-    padding-bottom: 1rem;
-    padding-right: 1rem;
-    padding-left: 1rem;
-   background-image: linear-gradient(to bottom right, rgb(170, 212, 237), rgb(173, 166, 249));
-    /* background-image: url("../image/Filter.jpg") !important; 
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  background-image: linear-gradient(
+    to bottom right,
+    rgb(170, 212, 237),
+    rgb(173, 166, 249)
+  );
+  /* background-image: url("../image/Filter.jpg") !important; 
      background-size: cover; 
      background-position: center;
      background-repeat: no-repeat; */
 }
 .sapFDynamicPageTitle {
-    z-index: 4;
-    position: relative;
-    min-height: 3rem;
-    padding: 0.5rem 2rem 0.5rem 3rem;
-    display: flex
-;
-    display: -webkit-flex;
-    flex-direction: column;
-    -webkit-flex-direction: column;
-    box-sizing: border-box;
-    background-image: linear-gradient(to bottom right, rgb(170, 212, 237), rgb(173, 166, 249)) !important;
-   
+  z-index: 4;
+  position: relative;
+  min-height: 3rem;
+  padding: 0.5rem 2rem 0.5rem 3rem;
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: column;
+  -webkit-flex-direction: column;
+  box-sizing: border-box;
+  background-image: linear-gradient(
+    to bottom right,
+    rgb(170, 212, 237),
+    rgb(173, 166, 249)
+  ) !important;
 }
 .sapMGHLI {
-    background-image: linear-gradient(to bottom right, rgb(170, 212, 237), rgb(173, 166, 249)) !important;
-    font-weight: bold;
-    color: #006064;
+  background-image: linear-gradient(
+    to bottom right,
+    rgb(170, 212, 237),
+    rgb(173, 166, 249)
+  ) !important;
+  font-weight: bold;
+  color: #006064;
 }
 
 .rightMarginCustom {
-    margin-right: 40px;
+  margin-right: 40px;
 }
+
+/* .sapMPopover .sapMPopoverScroll {
+  background-image: url("../image/career1.jpg") !important;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+} */

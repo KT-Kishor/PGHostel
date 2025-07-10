@@ -35,6 +35,7 @@ sap.ui.define(
           } else {
             this.MA_onSearch(); // Normal case
           }
+          this.initializeBirthdayCarousel();
         },
         onPressback: function () {
           localStorage.setItem("cameFromTilePage", "true");

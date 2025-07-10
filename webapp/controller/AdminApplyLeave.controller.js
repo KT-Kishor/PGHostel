@@ -22,6 +22,7 @@ sap.ui.define(
                 _onRouteMatched: async function () {
                     var LoginFUnction = await this.commonLoginFunction("Leaves");
                     if (!LoginFUnction) return;
+                    this.initializeBirthdayCarousel();
                     var that = this;
                     that.getBusyDialog(); // Show busy dialog
                     that.onClearAndSearch("AL_id_leavefilterbar");// Clear and search function

@@ -26,6 +26,7 @@ sap.ui.define([
                     this.closeBusyDialog();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
+                this.initializeBirthdayCarousel();
             },
 
             Emp_det_onSearch: async function () {

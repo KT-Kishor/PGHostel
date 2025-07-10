@@ -20,6 +20,7 @@ sap.ui.define([
                 this.oModel.setProperty("/isRouteLOP", false);
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("paySlipTitle"));
                 this.that.closeBusyDialog();
+                this.initializeBirthdayCarousel();
             },
 
             AP_onPressAddPayslip: function () {

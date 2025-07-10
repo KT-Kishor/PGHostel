@@ -23,7 +23,7 @@ sap.ui.define(
                 this.onClearAndSearch("CI_id_ConsultantInvoiceFilterBar"); // Clear and search function
                 this.ContractReadCall();
                 this.bDateRangeTriggered = false;
-
+                this.initializeBirthdayCarousel();
             },
 
             ContractReadCall: async function() {

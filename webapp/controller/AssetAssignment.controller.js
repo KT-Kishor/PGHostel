@@ -72,6 +72,7 @@ sap.ui.define([
                     var oModel = new JSONModel(filteredEmp);
                     this.getView().setModel(oModel, "AdminModel");
                 }
+                this.initializeBirthdayCarousel();
             },
             getModelData: function () {
                 this.getOwnerComponent().getModel("EmpModel");

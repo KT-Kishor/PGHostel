@@ -92,6 +92,7 @@ sap.ui.define([
                 } finally {
                     this.closeBusyDialog();
                 }
+                
             },
 
             onLogout: function () {

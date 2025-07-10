@@ -16,6 +16,7 @@ sap.ui.define([
   _onRouteMatched: async function (OEvent) {
       var LoginFUnction = await this.commonLoginFunction("MyInbox");
       if (!LoginFUnction) return;
+      this.initializeBirthdayCarousel();
       const oView = this.getView();
       ["MI_id_ButReSend", "MI_id_ButApprove", "MI_id_ButReject", "MI_id_ButPaid"].forEach(id => {
         oView.byId(id).setVisible(false);

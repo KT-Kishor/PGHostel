@@ -41,6 +41,7 @@ sap.ui.define(
         await this._commonGETCall("BaseLocation", "BaseLocationData", {});
         this.FST_onEnableImport();
         this.closeBusyDialog();
+        this.initializeBirthdayCarousel();
       },
 
       onPressback: function () {

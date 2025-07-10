@@ -14,6 +14,10 @@
     />
     <ToolbarSpacer />
     <Button
+        press="Tile_NotifictionBTN"
+        icon="sap-icon://bell"
+    />
+    <Button
         press="onLogout"
         icon="sap-icon://log"
         tooltip="{i18n>logoutTooltip}"

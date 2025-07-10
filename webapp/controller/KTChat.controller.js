@@ -50,6 +50,7 @@ sap.ui.define([
 
 			// Update model with filtered list
 			this.getView().getModel("chat").setProperty("/filteredEmployees", aFilteredEmployees);
+			this.initializeBirthdayCarousel();
 		},
 
 		changeName: function (oEvent) {

@@ -38,6 +38,7 @@ sap.ui.define([
             await this._initializeCalendarAndLegend();
             this.TS_onClear();
             this.closeBusyDialog();
+            this.initializeBirthdayCarousel();
         },
 
         TSD_ReadTimesheetEntries: async function () {

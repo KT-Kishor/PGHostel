@@ -28,6 +28,7 @@ sap.ui.define(
           await this.CompanyInvoice_onSearch();
           this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
           this.getView().getModel("LoginModel").setProperty("/RichText", false);
+          this.initializeBirthdayCarousel();
         },
 
         CompanyInvoice_onSearch: async function () {

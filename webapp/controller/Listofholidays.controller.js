@@ -39,6 +39,7 @@ sap.ui.define(
             this.closeBusyDialog();
             MessageToast.show(error.message || error.responseText);
           });
+          this.initializeBirthdayCarousel();
         },
 
         onSearch: async function () {

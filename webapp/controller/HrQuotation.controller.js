@@ -64,6 +64,7 @@ sap.ui.define(
           await this.HQ_onSearch();
         }
         this.closeBusyDialog();
+        this.initializeBirthdayCarousel();
       },
       onTableUpdateFinished: function (oEvent) {
         // Update the count in the header when table updates

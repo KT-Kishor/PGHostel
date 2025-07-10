@@ -4,13 +4,19 @@ sap.ui.define(
     "sap/m/MessageToast",
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
-	"sap/gantt/shape/Path",
+    "sap/gantt/shape/Path",
+    "sap/m/Popover",
+    "sap/m/Dialog",
+    "sap/m/Button",
+    "sap/m/Text",
+    "sap/m/VBox",
+    "sap/m/NotificationListItem",
+    "sap/m/List",
   ],
   function (BaseController,
-	MessageToast,
-	utils,
-	JSONModel,
-	Path) {
+    MessageToast,
+    utils,
+    JSONModel, Path, Popover, Dialog, Button, Text, VBox, NotificationListItem, List) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.TilePage",
@@ -54,36 +60,36 @@ sap.ui.define(
           this.initializeBirthdayCarousel();
         },
 
-        initializeBirthdayCarousel: function () {
-          if (this._autoScrollTimer) {
-            clearInterval(this._autoScrollTimer);
-          }
-          var filteredModel = this.getView().getModel("EmpDetails").getData().filter(function (item) {
-            return new Date(item.DateOfBirth).getDate() === new Date().getDate() &&
-              new Date(item.DateOfBirth).getMonth() === new Date().getMonth();
-          });
-          var oBirthdayModel = new JSONModel(filteredModel);
-          this.getView().setModel(oBirthdayModel, "BirthdayModel");
-          var oCarousel = this.byId("carouselSample");
-          var iInterval = 3000; // in milliseconds
+        // initializeBirthdayCarousel: function () {
+        //   if (this._autoScrollTimer) {
+        //     clearInterval(this._autoScrollTimer);
+        //   }
+        //   var filteredModel = this.getView().getModel("EmpDetails").getData().filter(function (item) {
+        //     return new Date(item.DateOfBirth).getDate() === new Date().getDate() &&
+        //       new Date(item.DateOfBirth).getMonth() === new Date().getMonth();
+        //   });
+        //   var oBirthdayModel = new JSONModel(filteredModel);
+        //   this.getView().setModel(oBirthdayModel, "BirthdayModel");
+        //   var oCarousel = this.byId("carouselSample");
+        //   var iInterval = 3000; // in milliseconds
 
-          // Ensure there is more than one page before starting the timer
-          if (oCarousel && oCarousel.getPages().length > 1) {
-            this._autoScrollTimer = setInterval(function () {
-              var oCarouselInstance = this.byId("carouselSample");
+        //   // Ensure there is more than one page before starting the timer
+        //   if (oCarousel && oCarousel.getPages().length > 1) {
+        //     this._autoScrollTimer = setInterval(function () {
+        //       var oCarouselInstance = this.byId("carouselSample");
 
-              // 2. THE BULLETPROOF CHECK:
-              // Check if the control object exists AND if its DOM element is still rendered.
-              // getDomRef() will be null if the control is not on the screen.
-              if (oCarouselInstance && oCarouselInstance.getDomRef()) {
-                oCarouselInstance.next();
-              }
+        //       // 2. THE BULLETPROOF CHECK:
+        //       // Check if the control object exists AND if its DOM element is still rendered.
+        //       // getDomRef() will be null if the control is not on the screen.
+        //       if (oCarouselInstance && oCarouselInstance.getDomRef()) {
+        //         oCarouselInstance.next();
+        //       }
 
-            }.bind(this), iInterval);
-          }
-        },
+        //     }.bind(this), iInterval);
+        //   }
+        // },
 
-        onPressCC: function() {
+        onPressCC: function () {
           MessageToast.show("Implementation in progress");
         },
 
@@ -428,7 +434,7 @@ sap.ui.define(
           this.getRouter().navTo("AppliedCandidates");
         },
         Tile_ChatApp: function () {
-            this.getRouter().navTo("RouteKTChat");
+          this.getRouter().navTo("RouteKTChat");
           // var oView = this.getView();
           // // Ensure user selection is reset before opening
           // if (!this.Chatapp) {
@@ -491,14 +497,33 @@ sap.ui.define(
         },
 
         OnPressNavigationMsaDet: function (oEvent) {
-           var MsaID = oEvent.getSource().getBindingContext("MSASOWModel").getProperty("MsaID");
-            this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID })
+          var MsaID = oEvent.getSource().getBindingContext("MSASOWModel").getProperty("MsaID");
+          this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID })
         },
 
         CI_onPressInvoiceRow: function (oEvent) {
-          var Path=encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModelData").getObject().InvNo);
+          var Path = encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModelData").getObject().InvNo);
           this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
         },
+
+        // Tile_NotifictionBTN: function (oEvent) {
+        //   var oView = this.getView();
+        //   var oButton = oEvent.getSource();
+
+        //   if (!this.oPopover) {
+        //     sap.ui.core.Fragment.load({
+        //       name: "sap.kt.com.minihrsolution.fragment.TileNotification",
+        //       controller: this
+        //     }).then(function (oPopover) {
+        //       this.oPopover = oPopover;
+        //       oView.addDependent(this.oPopover);
+        //       this.oPopover.openBy(oButton);
+        //     }.bind(this));
+        //   } else {
+        //     this.oPopover.openBy(oButton);
+        //   }
+        // },
+        
 
         // _loadChatHistory: function (sEmployeeId) {
         //   // Mock data - replace with actual data loading

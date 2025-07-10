@@ -36,7 +36,7 @@ sap.ui.define([
                     this.T_onSearch();// filter function for trainee 
                 }
                 this._makeDatePickersReadOnly(["T_id_JoiningDate"]);
-
+                this.initializeBirthdayCarousel();
             },
 
             //read call for trainee

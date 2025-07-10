@@ -37,6 +37,7 @@ sap.ui.define([
                    this.getOwnerComponent().setModel(new JSONModel(filteredData), "incomeModel");
                    this.closeBusyDialog()
                 })
+                this.initializeBirthdayCarousel();
       },
        onPressback: function () {
         this.getOwnerComponent().getRouter().navTo("RouteTilePage");

@@ -50,6 +50,7 @@ sap.ui.define([
                     }
                     oRoleModel.setData(aRoles);
                 }
+                this.initializeBirthdayCarousel();
             },
             // Read call for employee offer data
             readCallForEmployeeOffer: async function (filter) {

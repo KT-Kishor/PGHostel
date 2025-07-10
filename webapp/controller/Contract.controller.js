@@ -33,6 +33,7 @@ sap.ui.define(
                     } finally {
                         this.closeBusyDialog(); // Close after async call finishes
                     }
+                     this.initializeBirthdayCarousel();
                 },
                 readCallForContract: async function(filter) {
                     this.getBusyDialog(); // <-- Open custom BusyDialog

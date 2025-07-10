@@ -34,6 +34,7 @@ sap.ui.define([
         } finally {
           this.closeBusyDialog(); // Hide in all cases
         }
+        this.initializeBirthdayCarousel();
       },
 
       //common Dialog Function

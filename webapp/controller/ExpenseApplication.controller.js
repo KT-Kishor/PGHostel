@@ -55,6 +55,7 @@ sap.ui.define([
             } finally {
                 this.closeBusyDialog();
             }
+            this.initializeBirthdayCarousel();
         },
 
         onTableSelectionChange: function (oEvent) {

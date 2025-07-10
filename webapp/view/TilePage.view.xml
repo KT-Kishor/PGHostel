@@ -15,6 +15,7 @@
         <headerContent>
             <Text text="{= 'Welcome ' + ${LoginModel>/EmployeeName} }" class="boldBlueText sapUiLargeMarginBegin" />
             <ToolbarSpacer />
+            <Button press="Tile_NotifictionBTN" icon="sap-icon://bell"/>
             <Button press="TileV_onBackPress" icon="sap-icon://log" />
         </headerContent>
         <!-- The Splitter's orientation and pane sizes will now dynamically adjust based on device -->
@@ -22,7 +23,7 @@
             <l:PaneContainer orientation="Horizontal">
             <l:SplitPane requiredParentWidth="300" id="default" demandPane="true" >
 				<l:layoutData>
-					<l:SplitterLayoutData size="50%"/>
+					<l:SplitterLayoutData size="100%"/>
 				</l:layoutData>
 				<ux:ObjectPageLayout upperCaseAnchorBar="false" id="id_ObjectPageLayoutTile">
                     <ux:sections>
@@ -285,7 +286,7 @@
 						<l:SplitterLayoutData size="50%" />
 					</l:layoutData>
                     <VBox>
-                        <Carousel visible="{= ${BirthdayModel>/}.length > 0 }" id="carouselSample" backgroundDesign="Transparent" height="auto" width="auto" loop="true" showPageIndicator="false" pages="{path: 'BirthdayModel>/'}">
+                        <Carousel visible="{= ${BirthdayModel>/}.length > 0 }" backgroundDesign="Transparent" height="auto" width="auto" loop="true" showPageIndicator="false" pages="{path: 'BirthdayModel>/'}">
                         <pages>
                             <f:Card class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" width="auto">
                                 <f:header>
@@ -312,7 +313,7 @@
         ${LoginModel>/Role} === 'HR Manager'
       )}">
                     <f:content>
-                        <Table items="{MSASOWModel>/}">
+                        <Table items="{MSASOWModel>/}" id="MSATableCard">
                         <headerToolbar>
                                     <OverflowToolbar>
                                         <Title
