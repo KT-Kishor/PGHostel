@@ -85,35 +85,6 @@ sap.ui.define(
           this.initializeBirthdayCarousel();
         },
 
-        // initializeBirthdayCarousel: function () {
-        //   if (this._autoScrollTimer) {
-        //     clearInterval(this._autoScrollTimer);
-        //   }
-        //   var filteredModel = this.getView().getModel("EmpDetails").getData().filter(function (item) {
-        //     return new Date(item.DateOfBirth).getDate() === new Date().getDate() &&
-        //       new Date(item.DateOfBirth).getMonth() === new Date().getMonth();
-        //   });
-        //   var oBirthdayModel = new JSONModel(filteredModel);
-        //   this.getView().setModel(oBirthdayModel, "BirthdayModel");
-        //   var oCarousel = this.byId("carouselSample");
-        //   var iInterval = 3000; // in milliseconds
-
-        //   // Ensure there is more than one page before starting the timer
-        //   if (oCarousel && oCarousel.getPages().length > 1) {
-        //     this._autoScrollTimer = setInterval(function () {
-        //       var oCarouselInstance = this.byId("carouselSample");
-
-        //       // 2. THE BULLETPROOF CHECK:
-        //       // Check if the control object exists AND if its DOM element is still rendered.
-        //       // getDomRef() will be null if the control is not on the screen.
-        //       if (oCarouselInstance && oCarouselInstance.getDomRef()) {
-        //         oCarouselInstance.next();
-        //       }
-
-        //     }.bind(this), iInterval);
-        //   }
-        // },
-
         onPressCC: function () {
           MessageToast.show("Implementation in progress");
         },

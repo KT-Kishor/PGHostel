@@ -13,7 +13,7 @@
         resizable="true"
         class="backgroundfragment">
          <VBox>
-                        <Carousel visible="{= ${BirthdayModel>/}.length > 0 }" backgroundDesign="Transparent" height="260px" width="700px" loop="true" showPageIndicator="false" pages="{path: 'BirthdayModel>/'}">
+                        <Carousel id="TN_id_Carousel" visible="{= ${BirthdayModel>/}.length > 0 }" backgroundDesign="Transparent" height="260px" width="700px" loop="true" showPageIndicator="false" pages="{path: 'BirthdayModel>/'}">
                         <pages>
                             <f:Card class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" width="auto">
                                 <f:header>
@@ -33,12 +33,12 @@
                         </pages>
                     </Carousel>
                     <f:Card width="auto" class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" visible="{= ${MSASOWModel>/length} > 0
-      &amp;&amp; (
-        ${LoginModel>/Role} === 'Admin' ||
-        ${LoginModel>/Role} === 'Demo' ||
-        ${LoginModel>/Role} === 'AccountManage' ||
-        ${LoginModel>/Role} === 'HR Manager'
-      )}">
+                        &amp;&amp; (
+                            ${LoginModel>/Role} === 'Admin' ||
+                            ${LoginModel>/Role} === 'Demo' ||
+                            ${LoginModel>/Role} === 'AccountManage' ||
+                            ${LoginModel>/Role} === 'HR Manager'
+                        )}">
                     <f:content>
                         <Table items="{MSASOWModel>/}" id="">
                         <headerToolbar>

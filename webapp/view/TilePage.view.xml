@@ -286,7 +286,7 @@
 						<l:SplitterLayoutData size="50%" />
 					</l:layoutData>
                     <VBox>
-                        <Carousel visible="{= ${BirthdayModel>/}.length > 0 }" backgroundDesign="Transparent" height="auto" width="auto" loop="true" showPageIndicator="false" pages="{path: 'BirthdayModel>/'}">
+                        <Carousel id="TP_id_Carousel" visible="{= ${BirthdayModel>/}.length > 0 }" backgroundDesign="Transparent" height="auto" width="auto" loop="true" showPageIndicator="false" pages="{path: 'BirthdayModel>/'}">
                         <pages>
                             <f:Card class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" width="auto">
                                 <f:header>

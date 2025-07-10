@@ -1170,40 +1170,45 @@ sap.ui.define([
           this.oPopover = oPopover;
           oView.addDependent(this.oPopover);
           this.oPopover.openBy(oButton);
+          this.initializeBirthdayCarousel();
         }.bind(this));
       } else {
         this.oPopover.openBy(oButton);
+        this.initializeBirthdayCarousel();
       }
     },
 
     initializeBirthdayCarousel: function () {
-          if (this._autoScrollTimer) {
-            clearInterval(this._autoScrollTimer);
-          }
-          var filteredModel = this.getView().getModel("EmpDetails").getData().filter(function (item) {
-            return new Date(item.DateOfBirth).getDate() === new Date().getDate() &&
-              new Date(item.DateOfBirth).getMonth() === new Date().getMonth();
-          });
-          var oBirthdayModel = new JSONModel(filteredModel);
-          this.getView().setModel(oBirthdayModel, "BirthdayModel");
-          var oCarousel = this.byId("carouselSample");
-          var iInterval = 3000; // in milliseconds
+      if (this._autoScrollTimer) {
+        clearInterval(this._autoScrollTimer);
+      }
+      var filteredModel = this.getView().getModel("EmpDetails").getData().filter(function (item) {
+        return new Date(item.DateOfBirth).getDate() === new Date().getDate() &&
+          new Date(item.DateOfBirth).getMonth() === new Date().getMonth();
+      });
+      var oBirthdayModel = new JSONModel(filteredModel);
+      this.getView().setModel(oBirthdayModel, "BirthdayModel");
+      var aCarouselIds = ["TP_id_Carousel", "TN_id_Carousel"];
+      var iInterval = 3000; // in milliseconds
 
-          // Ensure there is more than one page before starting the timer
-          if (oCarousel && oCarousel.getPages().length > 1) {
-            this._autoScrollTimer = setInterval(function () {
-              var oCarouselInstance = this.byId("carouselSample");
+      aCarouselIds.forEach(function (sCarouselId) {
+        // Determine how to get the carousel instance
+        var oCarousel = sCarouselId === "TN_id_Carousel"
+          ? sap.ui.getCore().byId(sCarouselId)
+          : this.byId(sCarouselId);
 
-              // 2. THE BULLETPROOF CHECK:
-              // Check if the control object exists AND if its DOM element is still rendered.
-              // getDomRef() will be null if the control is not on the screen.
-              if (oCarouselInstance && oCarouselInstance.getDomRef()) {
-                oCarouselInstance.next();
-              }
+        if (oCarousel && oCarousel.getPages().length > 1) {
+          this["_autoScrollTimer_" + sCarouselId] = setInterval(function () {
+            var oCarouselInstance = sCarouselId === "TN_id_Carousel"
+              ? sap.ui.getCore().byId(sCarouselId)
+              : this.byId(sCarouselId);
 
-            }.bind(this), iInterval);
-          }
-        },
-
+            if (oCarouselInstance && oCarouselInstance.getDomRef()) {
+              oCarouselInstance.next();
+            }
+          }.bind(this), iInterval);
+        }
+      }.bind(this));
+    },
   })
 });
