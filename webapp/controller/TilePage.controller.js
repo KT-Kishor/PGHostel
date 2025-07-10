@@ -55,6 +55,31 @@ sap.ui.define(
             selectedEmployee: null
           });
           this.getView().setModel(oChatModel);
+            var oData = {
+            messages: [],         // For the input box chat bubbles
+            current_chat: [],
+            current_room: "",     // ReceiverID
+            username: "",
+            filteredEmployees: []
+          };
+
+          var oModel = new JSONModel(oData);
+          this.getView().setModel(oModel, "chat");
+          sap.ui.getCore().setModel(oModel, "chat");
+          const oLoginModel = this.getView().getModel("LoginModel");
+          const sCurrentUserID = oLoginModel.getProperty("/EmployeeID");
+
+          // Get original employee data
+          const oEmpModel = this.getView().getModel("EmpDetails");
+          const aAllEmployees = oEmpModel.getData();
+
+          // Filter out current user
+          const aFilteredEmployees = aAllEmployees.filter(function (oEmployee) {
+            return oEmployee.EmployeeID !== sCurrentUserID;
+          });
+
+          // Update model with filtered list
+          this.getView().getModel("chat").setProperty("/filteredEmployees", aFilteredEmployees);
 
           this.CreateEmployeeModel();
           this.initializeBirthdayCarousel();
@@ -92,6 +117,7 @@ sap.ui.define(
         onPressCC: function () {
           MessageToast.show("Implementation in progress");
         },
+        
 
         CreateEmployeeModel: function () {
           var empData = this.getView().getModel("EmpModel").getData() || [];
@@ -434,23 +460,23 @@ sap.ui.define(
           this.getRouter().navTo("AppliedCandidates");
         },
         Tile_ChatApp: function () {
-          this.getRouter().navTo("RouteKTChat");
-          // var oView = this.getView();
-          // // Ensure user selection is reset before opening
-          // if (!this.Chatapp) {
-          //   sap.ui.core.Fragment.load({
-          //     name: "sap.kt.com.minihrsolution.fragment.KTChatApp",
-          //     controller: this,
-          //   }).then(
-          //     function (Chatapp) {
-          //       this.Chatapp = Chatapp;
-          //       oView.addDependent(this.Chatapp);
-          //       this.Chatapp.open();
-          //     }.bind(this)
-          //   );
-          // } else {
-          //   this.Chatapp.open();
-          // }
+          // this.getRouter().navTo("RouteKTChat");
+          var oView = this.getView();
+          // Ensure user selection is reset before opening
+          if (!this.Chatapp) {
+            sap.ui.core.Fragment.load({
+              name: "sap.kt.com.minihrsolution.fragment.KTChatApp",
+              controller: this,
+            }).then(
+              function (Chatapp) {
+                this.Chatapp = Chatapp;
+                oView.addDependent(this.Chatapp);
+                this.Chatapp.open();
+              }.bind(this)
+            );
+          } else {
+            this.Chatapp.open();
+          }
         },
         onCloseDialog: function () {
           if (this.Chatapp) {
@@ -472,30 +498,6 @@ sap.ui.define(
         //   var sValue = oEvent.getParameter("value");
         //   this.getView().getModel("EmpDetails").setProperty("/messageText", sValue);
         // },
-
-        onSendMessage: function () {
-          var oModel = this.getView().getModel(); // unnamed model
-
-          if (!oModel) {
-            console.error("Model not found.");
-            return;
-          }
-
-          var sMessage = oModel.getProperty("/messageText");
-          if (!sMessage?.trim()) return;
-
-          var aMessages = oModel.getProperty("/messages") || [];
-
-          aMessages.push({
-            sender: "You",
-            time: new Date().toLocaleTimeString(),
-            content: sMessage
-          });
-
-          oModel.setProperty("/messages", aMessages);
-          oModel.setProperty("/messageText", ""); // clear input
-        },
-
         OnPressNavigationMsaDet: function (oEvent) {
           var MsaID = oEvent.getSource().getBindingContext("MSASOWModel").getProperty("MsaID");
           this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID })
@@ -523,34 +525,113 @@ sap.ui.define(
         //     this.oPopover.openBy(oButton);
         //   }
         // },
-        
+         changeName: function (oEvent) {
+          var sName = oEvent.getSource().getValue();
+          if (!sName.trim()) {
+            MessageToast.show("Please enter your name.");
+            return;
+          }
 
-        // _loadChatHistory: function (sEmployeeId) {
-        //   // Mock data - replace with actual data loading
-        //   var aMockMessages = [
-        //     {
-        //       sender: "Employee",
-        //       time: new Date().toLocaleTimeString(),
-        //       content: "Hello! How can I help you today?",
-        //       isSent: false
-        //     }
-        //   ];
-        //   this.getView().getModel("EmpDetails").setProperty("/messages", aMockMessages);
-        //   this._scrollToBottom();
-        // },
+          var oChatModel = sap.ui.getCore().getModel("chat");
+          oChatModel.setProperty("/username", sName);
+          MessageToast.show("Name set to: " + sName);
+        },
+        sendMessage: function () {
+          const oInput = sap.ui.getCore().byId("messageInput1");
+          const sText = oInput.getValue().trim();
+          if (!sText) return;
 
-        // _scrollToBottom: function () {
-        //   var oList = this.byId("messageList");
-        //   if (oList) {
-        //     setTimeout(function () {
-        //       var iLastIndex = oList.getItems().length - 1;
-        //       if (iLastIndex >= 0) {
-        //         oList.scrollToIndex(iLastIndex);
-        //       }
-        //     }, 0);
-        //   }
-        // }
+          const oChatModel = this.getView().getModel("chat");
+          const oLoginModel = this.getView().getModel("LoginModel");
 
+          const sSenderID = oLoginModel.getProperty("/EmployeeID");
+          const sSenderName = oLoginModel.getProperty("/EmployeeName");
+          const sReceiverID = oChatModel.getProperty("/current_room");
+
+          if (!sSenderID || !sReceiverID) {
+            MessageToast.show("Please select a recipient first.");
+            return;
+          }
+
+          const oPayload = {
+            data: {
+              SenderID: sSenderID,
+              ReceiverID: sReceiverID,
+              MessageText: btoa(sText)// Proper encoding
+            }
+          };
+
+          this.ajaxCreateWithJQuery("ChatApplication", oPayload)
+            .then(() => {
+              // Update List model for chat bubble display
+              const aMsgList = oChatModel.getProperty("/messages") || [];
+              aMsgList.push({
+                text: sText, // Store original text (not encoded) in local model
+                sender: "me",
+                time: new Date().toLocaleTimeString()
+              });
+              oChatModel.setProperty("/messages", aMsgList);
+              oInput.setValue("");
+            })
+            .catch(function (err) {
+              MessageToast.show("Failed to send message.");
+              console.error(err);
+            });
+        },
+        onPressGoToMaster: function (oEvent) {
+          const oSelected = oEvent.getSource().getBindingContext("chat").getObject();
+          const sReceiverID = oSelected.EmployeeID;
+          const sReceiverName = oSelected.EmployeeName;
+
+          const oChatModel = this.getView().getModel("chat");
+          const oLoginModel = this.getView().getModel("LoginModel");
+
+          const sSenderID = oLoginModel.getProperty("/EmployeeID");
+
+          oChatModel.setProperty("/current_room", sReceiverID);
+          oChatModel.setProperty("/currentReceiverName", sReceiverName);
+          oChatModel.setProperty("/username", oLoginModel.getProperty("/EmployeeName"));
+          oChatModel.setProperty("/messages", []); // Clear old
+
+          // Function to fetch messages
+          const fetchMessages = () => {
+            this.ajaxReadWithJQuery("getMessagesBetweenUsers", {
+              SenderID: sSenderID,
+              ReceiverID: sReceiverID
+            }).then((response) => {
+              const aServerMessages = response.results || [];
+              const aMessages = aServerMessages.map((msg) => {
+                let decodedText = atob(msg.MessageText);
+                const isMine = String(msg.SenderID) === String(sSenderID);
+                return {
+                  text: decodedText,
+                  sender: isMine ? "me" : "them",
+                  time: new Date(msg.SentAt).toLocaleTimeString()
+                };
+              });
+
+              const oTitle = sap.ui.getCore().byId("headerTitle");
+              if (oTitle) oTitle.setText(sReceiverName);
+
+              oChatModel.setProperty("/messages", aMessages);
+            }).catch((err) => {
+              MessageToast.show("Failed to load messages");
+            });
+          };
+
+          // Immediately fetch messages once
+          fetchMessages();
+
+          // Clear previous interval if any
+          if (this.messagePollInterval) {
+            clearInterval(this.messagePollInterval);
+          }
+
+          // Set new polling interval (every 2 seconds)
+          this.messagePollInterval = setInterval(fetchMessages, 5000);
+        }
+
+      
       }
     );
   }

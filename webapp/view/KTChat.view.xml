@@ -6,9 +6,9 @@
   xmlns:core="sap.ui.core"
   displayBlock="true">
   
-  <SplitApp id="splitApp">
+  <!-- <SplitApp id="splitApp"> -->
     <!-- Master Page (Groups List) -->
-    <masterPages>
+    <!-- <masterPages>
   <Page id="masterPage" title="KT Chat App">
     <content>
       <Input
@@ -28,10 +28,10 @@
       </List>
     </content>
   </Page>
-</masterPages>
+</masterPages> -->
 
     <!-- Detail Page (Chat Timeline) -->
-    <detailPages>
+    <!-- <detailPages>
       <Page id="detailPage" >
       <headerContent>
             <Title id="headerTitle" text="Chat App" level="H2"/>
@@ -79,6 +79,6 @@
         </content>
       </Page>
     </detailPages>
-  </SplitApp>
+  </SplitApp> -->
 
 </mvc:View>
