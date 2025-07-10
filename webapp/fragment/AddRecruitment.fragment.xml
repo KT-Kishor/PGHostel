@@ -153,7 +153,7 @@
                     value="{path:'stuDataModel>/Date',formatter:'.formatter.formatDate'}"
                     class="sapUiSmallMarginBottom"
                     valueState="{modelValuStateError>/DateState}"
-                    valueStateText="Select correct date"
+                    valueStateText="{i18n>dateValueState}"
                     editable="{EditableModeltruefalse>/Editable}"
                     change="onValidateMandatoryField"
                 />

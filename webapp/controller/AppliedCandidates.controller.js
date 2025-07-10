@@ -181,8 +181,10 @@ sap.ui.define([
             );
         },
         _preparePayload: function () {
-            if (!this._validateAllDialogFields());
-            const oPayload = this.getView().getModel("stuDataModel").getData();
+            if (!this._validateAllDialogFields()) {
+                return null;
+            }
+            const oPayload = jQuery.extend({}, this.getView().getModel("stuDataModel").getData());
             let noticePeriodValue = sap.ui.getCore().byId("FM_RE_NoticePeriod").getValue().trim();
             oPayload.NoticePeriod = noticePeriodValue.toLowerCase() === 'immediate' ? "0" : noticePeriodValue;
             let dateValue = sap.ui.getCore().byId("FM_Id_DateAvlForInterview").getValue();
@@ -267,14 +269,26 @@ sap.ui.define([
 
         _validateAllDialogFields: function () {
             try {
-                var isValid =
-                    utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_CurrentCTC"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_ExpectedCTC"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_RE_AvlInterview"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_City"), "ID") &&
-                    utils._LCvalidateMobileNumber(sap.ui.getCore().byId("FM_Id_MobileNumber"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_DateAvlForInterview"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("FM_Id_Email"), "ID") && utils._LCvalidateAmount(sap.ui.getCore().byId("FM_Id_Experience"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_Skills"), "ID");
+                const isValid =
+                    utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") &&
+                    utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_CurrentCTC"), "ID") &&
+                    utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_ExpectedCTC"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_RE_AvlInterview"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_City"), "ID") &&
+                    utils._LCvalidateMobileNumber(sap.ui.getCore().byId("FM_Id_MobileNumber"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_DateAvlForInterview"), "ID") &&
+                    utils._LCvalidateEmail(sap.ui.getCore().byId("FM_Id_Email"), "ID") &&
+                    utils._LCvalidateAmount(sap.ui.getCore().byId("FM_Id_Experience"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_Skills"), "ID");
+
                 if (!isValid) {
                     MessageToast.show(this.i18na.getText("mandetoryFields"));
                 }
+                return isValid;
             } catch (error) {
-                console.error("Error validating dialog fields:", error);
+                MessageToast.show("An error occurred during validation.");
+                return false;
             }
         },
 
