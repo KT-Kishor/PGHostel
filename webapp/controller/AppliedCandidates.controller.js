@@ -248,6 +248,17 @@ sap.ui.define([
             if (this.oDialog) {
                 this.oDialog.then(oDialog => oDialog.close());
             }
+            sap.ui.getCore().byId("FM_RE_Name").setValueState("None");
+            sap.ui.getCore().byId("FM_RE_CurrentCTC").setValueState("None");
+            sap.ui.getCore().byId("FM_RE_ExpectedCTC").setValueState("None");
+            sap.ui.getCore().byId("FM_RE_AvlInterview").setValueState("None");
+            sap.ui.getCore().byId("FM_RE_NoticePeriod").setValueState("None");
+            sap.ui.getCore().byId("FM_Id_MobileNumber").setValueState("None");
+            sap.ui.getCore().byId("FM_Id_DateAvlForInterview").setValueState("None");
+            sap.ui.getCore().byId("FM_Id_Email").setValueState("None");     
+            sap.ui.getCore().byId("FM_Id_Experience").setValueState("None");
+            sap.ui.getCore().byId("FM_Id_Skills").setValueState("None");
+            sap.ui.getCore().byId("FM_Id_City").setValueState("None");
             this.getView().byId("appliedCandidatesTable").removeSelections();
         },
 
