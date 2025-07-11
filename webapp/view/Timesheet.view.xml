@@ -70,6 +70,7 @@
                      <Button
                             text="{i18n>export}"
                             type="Ghost"
+                            tooltip="{i18n>exportTooltip}"
                             press="TS_onExport"
                             class="sapUiSmallMarginEnd"
                         />

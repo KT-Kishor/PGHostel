@@ -38,6 +38,7 @@ sap.ui.define([
                 isEditMode: false, busy: false
             }), "viewModel");
             this.initializeBirthdayCarousel();
+            this._makeDatePickersReadOnly(["filterExperience"]);
         },
         AC_ReadCall: async function () {
             this.getBusyDialog();
@@ -77,26 +78,46 @@ sap.ui.define([
             this.getBusyDialog();
             setTimeout(() => {
                 try {
-                    const sName = this.byId("filterEmployeeName").getValue().trim().toLowerCase();
-                    const sNoticePeriod = this.byId("filterNoticePeriod").getValue().trim().toLowerCase();
-                    const sSkills = this.byId("filterSkills").getValue().trim().toLowerCase();
-                    const sExperienceKey = this.byId("filterExperience").getSelectedKey();
+                    const oTableBinding = this.byId("appliedCandidatesTable").getBinding("items");
                     const aFilters = [];
-                    if (sName) aFilters.push(new Filter("FullName", FilterOperator.Contains, sName));
-                    if (sSkills) aFilters.push(new Filter("Skills", FilterOperator.Contains, sSkills));
+                    // 1. Name Filter
+                    const sName = this.byId("filterEmployeeName").getValue().trim();
+                    if (sName) {
+                        aFilters.push(new Filter("FullName", FilterOperator.Contains, sName));
+                    }
+                    // 2. Notice Period Filter
+                    const sNoticePeriod = this.byId("filterNoticePeriod").getValue().trim();
                     if (sNoticePeriod) {
+                        let sNoticeValue = sNoticePeriod.toLowerCase();
                         aFilters.push(new Filter({
                             path: "NoticePeriod",
-                            test: sValue => String(sValue).toLowerCase().includes(sNoticePeriod)
+                            test: function (sValue) {
+                                let sDataValue = String(sValue);
+                                if (sDataValue === '0') {
+                                    sDataValue = 'immediate';
+                                }
+                                return sDataValue.includes(sNoticeValue);
+                            }
                         }));
                     }
-                    if (sExperienceKey) {
-                        const [min, max] = sExperienceKey.split("-").map(val => parseInt(val.trim(), 10));
-                        if (!isNaN(min) && !isNaN(max)) {
-                            aFilters.push(new Filter("Experience", FilterOperator.BT, min, max));
+                    // 3. Skills Filter
+                    const sSkills = this.byId("filterSkills").getValue().trim();
+                    if (sSkills) {
+                        aFilters.push(new Filter("Skills", FilterOperator.Contains, sSkills));
+                    }
+                    // 4. Experience Filter 
+                    const sExperienceValue = this.byId("filterExperience").getValue().trim(); // Use getValue() to get the text like "2-4"
+                    if (sExperienceValue) {
+                        const aRange = sExperienceValue.split("-");
+                        if (aRange.length === 2) {
+                            const min = parseInt(aRange[0].trim(), 10);
+                            const max = parseInt(aRange[1].trim(), 10);
+                            if (!isNaN(min) && !isNaN(max)) {
+                                aFilters.push(new Filter("Experience", FilterOperator.BT, min, max));
+                            }
                         }
                     }
-                    this.byId("appliedCandidatesTable").getBinding("items").filter(aFilters);
+                    oTableBinding.filter(aFilters);
                 } catch (error) {
                     MessageToast.show("Error during filtering.");
                 } finally {
@@ -256,7 +277,7 @@ sap.ui.define([
             sap.ui.getCore().byId("FM_RE_NoticePeriod").setValueState("None");
             sap.ui.getCore().byId("FM_Id_MobileNumber").setValueState("None");
             sap.ui.getCore().byId("FM_Id_DateAvlForInterview").setValueState("None");
-            sap.ui.getCore().byId("FM_Id_Email").setValueState("None");     
+            sap.ui.getCore().byId("FM_Id_Email").setValueState("None");
             sap.ui.getCore().byId("FM_Id_Experience").setValueState("None");
             sap.ui.getCore().byId("FM_Id_Skills").setValueState("None");
             sap.ui.getCore().byId("FM_Id_City").setValueState("None");
