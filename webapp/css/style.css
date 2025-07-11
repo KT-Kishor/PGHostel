@@ -818,3 +818,34 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   width: 110px;
   padding: 0;
 }
+.responsiveCard {
+  max-width: 700px;  /* upper limit */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* For screens below 768px (mobile/tablet) */
+@media screen and (max-width: 768px) {
+  .responsiveCarousel {
+    width: 20.5rem !important;
+    height: 18.5rem !important;
+  }
+
+  .responsiveCard {
+    width: 90% !important;
+    height: 90% !important;
+  }
+}
+
+/* For desktop: apply fixed sizes */
+@media screen and (min-width: 769px) {
+  .responsiveCarousel {
+    width: 45rem;
+    height: 17.5rem;
+  }
+
+  .responsiveCard {
+    max-width: 100%;
+    height: auto;
+  }
+}

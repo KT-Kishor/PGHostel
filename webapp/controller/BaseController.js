@@ -1158,6 +1158,26 @@ sap.ui.define([
       }
     },
 
+    // Tile_NotifictionBTN: function (oEvent) {
+    //   var oView = this.getView();
+    //   var oButton = oEvent.getSource();
+
+    //   if (!this.oPopover) {
+    //     sap.ui.core.Fragment.load({
+    //       name: "sap.kt.com.minihrsolution.fragment.TileNotification",
+    //       controller: this
+    //     }).then(function (oPopover) {
+    //       this.oPopover = oPopover;
+    //       oView.addDependent(this.oPopover);
+    //       this.oPopover.openBy(oButton);
+    //       this.initializeBirthdayCarousel();
+    //     }.bind(this));
+    //   } else {
+    //     this.oPopover.openBy(oButton);
+    //     this.initializeBirthdayCarousel();
+    //   }
+    // },
+
     Tile_NotifictionBTN: function (oEvent) {
       var oView = this.getView();
       var oButton = oEvent.getSource();
@@ -1169,12 +1189,22 @@ sap.ui.define([
         }).then(function (oPopover) {
           this.oPopover = oPopover;
           oView.addDependent(this.oPopover);
+
           this.oPopover.openBy(oButton);
           this.initializeBirthdayCarousel();
         }.bind(this));
       } else {
         this.oPopover.openBy(oButton);
         this.initializeBirthdayCarousel();
+      }
+    },
+    onClosePopover: function () {
+      if (this.oPopover) {
+        this.oPopover.attachAfterClose(function () {
+          this.oPopover.destroy();
+          this.oPopover = null;
+        }.bind(this));
+        this.oPopover.close();
       }
     },
 
@@ -1188,18 +1218,18 @@ sap.ui.define([
       });
       var oBirthdayModel = new JSONModel(filteredModel);
       this.getView().setModel(oBirthdayModel, "BirthdayModel");
-      var aCarouselIds = ["TP_id_Carousel", "TN_id_Carousel"];
-      var iInterval = 3000; // in milliseconds
+      var aCarouselIds = ["TP_id_Carousel", "TN_idd_Carouselid"];
+      var iInterval = 5000; // in milliseconds
 
       aCarouselIds.forEach(function (sCarouselId) {
         // Determine how to get the carousel instance
-        var oCarousel = sCarouselId === "TN_id_Carousel"
+        var oCarousel = sCarouselId === "TN_idd_Carouselid"
           ? sap.ui.getCore().byId(sCarouselId)
           : this.byId(sCarouselId);
 
         if (oCarousel && oCarousel.getPages().length > 1) {
           this["_autoScrollTimer_" + sCarouselId] = setInterval(function () {
-            var oCarouselInstance = sCarouselId === "TN_id_Carousel"
+            var oCarouselInstance = sCarouselId === "TN_idd_Carouselid"
               ? sap.ui.getCore().byId(sCarouselId)
               : this.byId(sCarouselId);
 

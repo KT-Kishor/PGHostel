@@ -281,7 +281,7 @@
                     </ux:sections>
                 </ux:ObjectPageLayout>
 			</l:SplitPane>
-            <l:SplitPane requiredParentWidth="1000">
+            <!-- <l:SplitPane requiredParentWidth="1000">
 					<l:layoutData>
 						<l:SplitterLayoutData size="50%" />
 					</l:layoutData>
@@ -395,16 +395,10 @@
                     </f:content>
                     </f:Card>
                 </VBox>
-				</l:SplitPane>
+				</l:SplitPane> -->
             </l:PaneContainer>
         </l:ResponsiveSplitter>
-        <Button
-            icon="sap-icon://message-popup"
-            text="Chat with me"
-            press="onFloatingButtonPress"
-            class="floatingButton"
-            type="Emphasized"
-        />
+
         <footer>
             <Bar>
                 <contentLeft>
