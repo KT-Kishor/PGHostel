@@ -107,6 +107,7 @@
             mode="SingleSelectLeft"
             class="sapUiResponsiveMargin"
             width="auto"
+            showNoData="{i18n>noData}"
         >
             <headerToolbar>
                 <OverflowToolbar>

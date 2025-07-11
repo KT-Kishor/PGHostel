@@ -26,12 +26,24 @@ sap.ui.define([
             let formModel = new JSONModel(filterData);
             this.getView().setModel(formModel, "setDataToForm");
         },
-        ACD_onEditPress: function () {
+        ACD_onEditPress: async function () {
             const oViewModel = this.getView().getModel("viewModel");
             const bIsEditMode = oViewModel.getProperty("/isEditMode");
             if (bIsEditMode) {
                 const oDataToSave = this.getView().getModel("setDataToForm").getData();
-                sap.m.MessageToast.show("Details saved successfully!");
+                this.getBusyDialog(); 
+                try {
+                    await this.ajaxUpdateWithJQuery("JobApplications", {
+                        data: oDataToSave,
+                        filters: { ID: oDataToSave.ID }
+                    });
+                    sap.m.MessageToast.show("Details saved successfully!");
+                } catch (error) {
+                    sap.m.MessageToast.show(error.message || "Error saving data");
+                    this.closeBusyDialog();
+                    return;
+                }
+                this.closeBusyDialog();
             }
             oViewModel.setProperty("/isEditMode", !bIsEditMode);
         },
