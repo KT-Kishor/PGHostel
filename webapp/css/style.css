@@ -849,3 +849,279 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     height: auto;
   }
 }
+
+.myCustomButton {
+  height: 60px !important;
+  width: 345px !important;
+  font-size: 20px !important; 
+  padding: 0 !important;
+}
+
+.myCustomButton .sapMBtnInner {
+  background-color: #141f7d !important; 
+  height: 100% !important;
+  line-height: normal !important;
+  padding: 16px !important;
+  font-size: 24px !important;
+  border-radius: 8px;
+}
+
+.myCustomButton .sapMBtnContent {
+  color: white !important;
+  font-size: 18px;
+}
+
+.myCustomIconBtn {
+  height: 60px !important;
+  width: 60px !important;
+  padding: 0 !important;
+}
+
+.myCustomIconBtn .sapMBtnInner {
+  background-color: white !important;
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: 8px;
+  border: 3px solid white !important;
+  border-color: #141f7d !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.myCustomIconBtn .sapMBtnIcon {
+  color: #141f7d !important;
+  font-size: 30px !important;
+  margin-left: -12px !important;
+  margin-top: 4px !important;
+}
+
+.myFormattedText {
+  width: 60%;
+  max-width: 100%;
+  min-width: 280px;
+  font-size: 1rem;
+  line-height: 1.5 !important;
+  font-family: "Helvetica Neue", Arial, sans-serif !important;
+  text-align: justify;
+  margin: 0 auto; /* centers it horizontally */
+  padding: 0;
+  color: #222 !important;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* 100% width on mobile */
+@media screen and (max-width: 600px) {
+  .myFormattedText {
+    width: 100% !important;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+
+/* Paragraphs and lists */
+.myFormattedText p,
+.myFormattedText li {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem !important;
+  line-height: 1.6 !important;
+  color: inherit !important;
+  text-align: justify;
+}
+
+/* Unordered & ordered list */
+.myFormattedText ul,
+.myFormattedText ol {
+  padding-left: 1.5rem !important;
+  margin: 0 0 1rem 0;
+}
+
+/* List items */
+.myFormattedText li {
+  list-style-position: outside;
+}
+
+/* Headings */
+.myFormattedText h1,
+.myFormattedText h2,
+.myFormattedText h3,
+.myFormattedText h4,
+.myFormattedText h5,
+.myFormattedText h6 {
+  margin: 1rem 0 0.5rem 0;
+  font-weight: bold;
+  color: inherit !important;
+}
+
+/* Emphasis */
+.myFormattedText em,
+.myFormattedText i {
+  font-style: italic;
+}
+
+.myFormattedText strong,
+.myFormattedText b {
+  font-weight: bold !important;
+  color: inherit !important;
+}
+
+/* Underline and strike */
+.myFormattedText u {
+  text-decoration: underline;
+}
+
+.myFormattedText s,
+.myFormattedText strike {
+  text-decoration: line-through;
+}
+
+/* Highlight (mark) */
+.myFormattedText mark {
+  background-color: yellow;
+  color: black;
+}
+
+/* Span general styling */
+.myFormattedText span {
+  color: inherit;
+  font-family: inherit;
+}
+
+/* Superscript and subscript */
+.myFormattedText sup {
+  vertical-align: super;
+  font-size: smaller;
+}
+
+.myFormattedText sub {
+  vertical-align: sub;
+  font-size: smaller;
+}
+
+/* Code and preformatted */
+.myFormattedText code {
+  font-family: monospace;
+  background-color: #f5f5f5;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.myFormattedText pre {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  overflow: auto;
+  font-family: monospace;
+}
+
+/* Blockquote */
+.myFormattedText blockquote {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 4px solid #ccc;
+  color: #555;
+  font-style: italic;
+}
+
+/* Images */
+.myFormattedText img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem 0;
+}
+
+/* Links */
+.myFormattedText a {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.myFormattedText a:hover {
+  color: #0056b3;
+}
+
+/* Horizontal Rule */
+.myFormattedText hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 1rem 0;
+}
+
+.myFormattedText .highlight {
+  background-color: yellow;
+  color: black;
+  font-weight: bold;
+}
+
+.blockInputTyping .sapMInputBaseInner {
+  pointer-events: none;
+}
+
+/* Common box */
+.shareItemBox {
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.shareItemBox:hover {
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+/* Last item without bottom border */
+.shareItemBoxLast {
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.shareItemBoxLast:hover {
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+.shareText {
+  margin-left: 0.5rem;
+}
+
+.myAppBackground {
+  background-image: url('../image/background.jpg') !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-attachment: fixed !important; /* Optional: Fixed or scroll */
+  opacity: 1 !important; /* Optional: Adjust if needed for readability */
+}
+
+/* Ensures content is readable over the background */
+.sapMShellContent {
+  background-color: transparent !important;
+}
+
+.myAppBackground::before {
+  content: "" !important;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1 !important;
+}
+
+.myCustomFilterBar.sapUiCompFilterBarNonPhone {
+  background-image: none !important;
+  background-color: white !important;
+}
+
+.myCustomFilterBar.sapUiCompFilterBarNonPhone .sapMInputBaseInner {
+  background-color: transparent !important; 
+  border: none !important; 
+  box-shadow: none !important; 
+}

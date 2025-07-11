@@ -173,7 +173,7 @@
                         <headerToolbar>
                             <OverflowToolbar>
                                 <Title
-                                    text="{i18n>invoiceDetails}"
+                                    text="{i18n>invoiceTileDetail}"
                                     level="H1"
                                 />
                             </OverflowToolbar>

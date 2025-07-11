@@ -668,6 +668,11 @@
                     ]
                 },
                  {
+          "name": "RouteJobView",
+          "pattern": "JobView:?query:",
+          "target": ["TargetJobView"]
+        },
+                 {
           "name": "AppliedCanDetail",
           "pattern": "AppliedCanDetail/{id}",
           "target": ["TargetAppliedCanDetail"]
@@ -1033,8 +1038,14 @@
           "clearControlAggregation": false,
           "viewId": "AppliedCanDetail",
           "viewName": "AppliedCanDetail"
+        },
+        "TargetJobView": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "JobView",
+          "viewName": "JobView"
         }
-
             }
         },
         "rootView": {

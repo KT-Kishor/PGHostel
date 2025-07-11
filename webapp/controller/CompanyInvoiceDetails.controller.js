@@ -1014,10 +1014,10 @@ sap.ui.define([
                 sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
                 sap.ui.getCore().byId("idFrgConvertionRate").setValueState("None");
 
-                if (this._oDialog) {
-                    this._oDialog.close();
-                    this._oDialog.destroy(true);
-                    this._oDialog = null;
+                if (this.oDialog) {
+                    this.oDialog.close();
+                    this.oDialog.destroy(true);
+                    this.oDialog = null;
                 }
             },
             onLiveTransactionID: function (oEvent) { utils._LCvalidateMandatoryField(oEvent) },
@@ -1164,6 +1164,7 @@ sap.ui.define([
                     aData.CompanyInvoiceItem.forEach((item, index) => item.IndexNo = index + 1);
                     oModel.setProperty("/CompanyInvoiceItem", aData.CompanyInvoiceItem);
                     this.SNoValue = aData.CompanyInvoiceItem.length;
+                    this.totalAmountCalculation();
                 }
             },
 
