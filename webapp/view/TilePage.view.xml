@@ -255,11 +255,11 @@
                                                     <ImageContent src="sap-icon://add-employee" />
                                                 </TileContent>
                                             </GenericTile> -->
-                                            <GenericTile header="Chat App" class="sapUiMediumMargin" press="Tile_ChatApp">
+                                            <!-- <GenericTile header="Chat App" class="sapUiMediumMargin" press="Tile_ChatApp">
                                                 <TileContent unit="{i18n>assetFooter}">
                                                     <ImageContent src="sap-icon://message-popup" />
                                                 </TileContent>
-                                            </GenericTile>
+                                            </GenericTile> -->
 
                                              <GenericTile
                                     visible="{= ${AppVisibilityModel>/RecruitmentApp} === '1' ? true : false}"
@@ -398,6 +398,13 @@
 				</l:SplitPane>
             </l:PaneContainer>
         </l:ResponsiveSplitter>
+        <Button
+            icon="sap-icon://message-popup"
+            text="Chat with me"
+            press="onFloatingButtonPress"
+            class="floatingButton"
+            type="Emphasized"
+        />
         <footer>
             <Bar>
                 <contentLeft>

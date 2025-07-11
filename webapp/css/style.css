@@ -808,3 +808,13 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   background-position: center;
   background-repeat: no-repeat;
 } */
+.floatingButton {
+  position: fixed;
+  bottom: 100px;
+  right: 100px;
+  z-index: 1000;
+  border-radius: 50%;
+  height: 80px;
+  width: 110px;
+  padding: 0;
+}

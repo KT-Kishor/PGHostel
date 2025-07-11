@@ -430,7 +430,7 @@ sap.ui.define(
         TileV_RecruitementDashbord: function () {
           this.getRouter().navTo("AppliedCandidates");
         },
-        Tile_ChatApp: function () {
+        onFloatingButtonPress: function () {
           // this.getRouter().navTo("RouteKTChat");
           var oView = this.getView();
           // Ensure user selection is reset before opening
