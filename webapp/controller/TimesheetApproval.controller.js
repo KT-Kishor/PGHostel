@@ -137,7 +137,11 @@ sap.ui.define([
             this._applyAllFilters();
         },
         filterTimesheetForCurrentWeek: function () {
-            this._applyAllFilters();
+            this.getBusyDialog();
+            setTimeout(() => {
+                this._applyAllFilters();
+                this.closeBusyDialog();
+            }, 500);
         },
         TSA_onCalendarDateSelect: function (oEvent) {
             this.getBusyDialog();
