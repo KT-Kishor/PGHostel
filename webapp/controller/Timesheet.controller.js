@@ -349,7 +349,7 @@ sap.ui.define([
                 { label: this.i18nModel.getText("employeeID"), property: "EmployeeID" },
                 { label: this.i18nModel.getText("employeeName"), property: "EmployeeName" },
                 { label: this.i18nModel.getText("manager"), property: "ManagerName" },
-                { label: this.i18nModel.getText("taskID"), property: "TaskID" },
+                { label: this.i18nModel.getText("taskid"), property: "TaskID" },
                 { label: this.i18nModel.getText("assignmentName"), property: "TaskName" },
                 { label: this.i18nModel.getText("date"), property: "Date", type: "Date", format: "dd/mm/yyyy" },
                 { label: this.i18nModel.getText("hoursWorked"), property: "HoursWorked", type: "Number" },

@@ -42,13 +42,13 @@
                         tooltip="{i18n>editDetails}"
                     />
 					<Button
-                        text="View Resume"
+                        text="{i18n>viewResume}"
                         press="openResumePreview"
                         icon="sap-icon://display"
                         type="Attention"
                     />
 					<Button
-                        text="Download Resume"
+                        text="{i18n>downloadResume}"
                         press="onDownloadResume"
                         icon="sap-icon://download"
                         type="Ghost"
