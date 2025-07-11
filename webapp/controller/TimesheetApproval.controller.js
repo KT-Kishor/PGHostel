@@ -91,7 +91,6 @@ sap.ui.define([
             // Check if any filter in the filter bar is active
             const bIsFilterBarActive = sEmployeeValue || sMonthValue || sStatusValue || sYearValue;
             if (bIsFilterBarActive) {
-                //  Filter bar has values. Filter by them. ---    
                 // The calendar is secondary. Disable it if Month or Year is used.
                 oViewModel.setProperty("/isCalendarEnabled", !(sMonthValue || sYearValue));
 
@@ -134,53 +133,62 @@ sap.ui.define([
             this.TSA_onSelect();
         },
 
-           onFilterChange: function () {
+        onFilterChange: function () {
             this._applyAllFilters();
         },
         filterTimesheetForCurrentWeek: function () {
             this._applyAllFilters();
         },
         TSA_onCalendarDateSelect: function (oEvent) {
-            if (!this.getView().getModel("viewModel").getProperty("/isCalendarEnabled")) { return; }
-            const aSelectedDates = oEvent.getSource().getSelectedDates();
-            if (aSelectedDates.length > 0) {
-                const oSelectedDate = aSelectedDates[0].getStartDate();
-                oSelectedDate.setHours(0, 0, 0, 0);
-                // When clicking a single day, respect the other filters
-                const sEmployeeValue = this.byId("TSA_id_Employee").getValue();
-                const sStatusValue = this.byId("TSA_id_Status").getValue();
-                const sYearValue = this.byId("TSA_id_Year").getValue();
-                const sMonthValue = this.byId("TSA_id_Month").getValue();
-                let aFilteredData = this._fullApprovalData;
-                if (sEmployeeValue) { aFilteredData = aFilteredData.filter(e => e.EmployeeID === sEmployeeValue); }
-                if (sStatusValue) { aFilteredData = aFilteredData.filter(e => e.Status === sStatusValue); }
-                // The primary filter here is the single selected date
-                 aFilteredData = aFilteredData.filter(entry => {
-                    if (!entry.Date) return false;
-                    const entryDate = new Date(entry.Date);
-                    entryDate.setHours(0, 0, 0, 0);
-                    return entryDate.getTime() === oSelectedDate.getTime();
-                });
-                this.getView().getModel("ApprovalTimesheetModel").setData(aFilteredData);
-            } else {
-                this._applyAllFilters();
-            }
-            this.byId("TSA_id_Table").removeSelections(true);
-            this.TSA_onSelect();
+            this.getBusyDialog();
+            setTimeout(() => {
+                if (!this.getView().getModel("viewModel").getProperty("/isCalendarEnabled")) {
+                    this.closeBusyDialog();
+                    return;
+                }
+                const aSelectedDates = oEvent.getSource().getSelectedDates();
+                if (aSelectedDates.length > 0) {
+                    const oSelectedDate = aSelectedDates[0].getStartDate();
+                    oSelectedDate.setHours(0, 0, 0, 0);
+                    const sEmployeeValue = this.byId("TSA_id_Employee").getValue();
+                    const sStatusValue = this.byId("TSA_id_Status").getValue();
+                    const sYearValue = this.byId("TSA_id_Year").getValue();
+                    const sMonthValue = this.byId("TSA_id_Month").getValue();
+                    let aFilteredData = this._fullApprovalData;
+                    if (sEmployeeValue) {
+                        aFilteredData = aFilteredData.filter(e => e.EmployeeID === sEmployeeValue);
+                    }
+                    if (sStatusValue) {
+                        aFilteredData = aFilteredData.filter(e => e.Status === sStatusValue);
+                    }
+                    aFilteredData = aFilteredData.filter(entry => {
+                        if (!entry.Date) return false;
+                        const entryDate = new Date(entry.Date);
+                        entryDate.setHours(0, 0, 0, 0);
+                        return entryDate.getTime() === oSelectedDate.getTime();
+                    });
+                    this.getView().getModel("ApprovalTimesheetModel").setData(aFilteredData);
+                } else {
+                    this._applyAllFilters();
+                }
+                this.byId("TSA_id_Table").removeSelections(true);
+                this.TSA_onSelect();
+                this.closeBusyDialog();
+            }, 300);
         },
-           TSA_onSearch: function () {
+        TSA_onSearch: function () {
             this.getBusyDialog();
             setTimeout(() => {
                 this._applyAllFilters();
                 this.closeBusyDialog();
-            }, 100);
+            }, 500);
         },
 
         TSA_onClear: function (bIsInitialLoad) {
             this.byId("TSA_id_Employee").setValue("");
             this.byId("TSA_id_Month").setValue("");
             this.byId("TSA_id_Status").setValue("");
-            this.byId("TSA_id_Year").setValue("");     
+            this.byId("TSA_id_Year").setValue("");
             // Only apply filters immediately if it's a user action, not on initial load
             if (!bIsInitialLoad) {
                 this._applyAllFilters();

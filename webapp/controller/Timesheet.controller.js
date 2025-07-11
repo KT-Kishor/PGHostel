@@ -74,7 +74,7 @@ sap.ui.define([
             if (sMonthKey || sYearValue) { // Calendar is disabled if EITHER month or year is selected
                 oViewModel.setProperty("/isCalendarEnabled", false);
                 // Apply month filter only if a month is selected
-                if(sMonthKey) {
+                if (sMonthKey) {
                     aFilteredData = aFilteredData.filter(entry => {
                         if (!entry.Date) return false;
                         return (new Date(entry.Date).getMonth() + 1).toString() === sMonthKey;
@@ -105,32 +105,38 @@ sap.ui.define([
 
         filterTimesheetForCurrentWeek: function () {
             this.getBusyDialog();
-
             setTimeout(() => {
                 this._applyAllFilters();
                 this.closeBusyDialog();
-            }, 100);
+            }, 500);
         },
 
 
         TS_onCalendarDateSelect: function (oEvent) {
-            if (!this.getView().getModel("viewModel").getProperty("/isCalendarEnabled")) { return; }
-            const aSelectedDates = oEvent.getSource().getSelectedDates();
-            if (aSelectedDates.length > 0) {
-                const oSelectedDate = aSelectedDates[0].getStartDate();
-                oSelectedDate.setHours(0, 0, 0, 0);
-                const aFilteredData = this.timesheetData.filter(entry => {
-                    if (!entry.Date) return false;
-                    const entryDate = new Date(entry.Date);
-                    entryDate.setHours(0, 0, 0, 0);
-                    return entryDate.getTime() === oSelectedDate.getTime();
-                });
-                this.getView().getModel("FilteredTimesheetModel").setData(aFilteredData);
-            } else {
-                this._applyAllFilters();
-            }
-            this.byId("TD_id_Table").removeSelections(true);
-            this.T_TableSelectionChange();
+            this.getBusyDialog();
+            setTimeout(() => {
+                if (!this.getView().getModel("viewModel").getProperty("/isCalendarEnabled")) {
+                    this.closeBusyDialog();
+                    return;
+                }
+                const aSelectedDates = oEvent.getSource().getSelectedDates();
+                if (aSelectedDates.length > 0) {
+                    const oSelectedDate = aSelectedDates[0].getStartDate();
+                    oSelectedDate.setHours(0, 0, 0, 0);
+                    const aFilteredData = this.timesheetData.filter(entry => {
+                        if (!entry.Date) return false;
+                        const entryDate = new Date(entry.Date);
+                        entryDate.setHours(0, 0, 0, 0);
+                        return entryDate.getTime() === oSelectedDate.getTime();
+                    });
+                    this.getView().getModel("FilteredTimesheetModel").setData(aFilteredData);
+                } else {
+                    this._applyAllFilters();
+                }
+                this.byId("TD_id_Table").removeSelections(true);
+                this.T_TableSelectionChange();
+                this.closeBusyDialog();
+            }, 500);
         },
 
         T_onSearch: function () {
@@ -138,7 +144,7 @@ sap.ui.define([
             setTimeout(() => {
                 this._applyAllFilters();
                 this.closeBusyDialog();
-            }, 100);
+            }, 500);
         },
 
         TS_onClear: function () {
@@ -148,7 +154,7 @@ sap.ui.define([
             setTimeout(() => {
                 this._applyAllFilters();
                 this.closeBusyDialog();
-            }, 100);
+            }, 500);
         },
 
 
@@ -317,7 +323,7 @@ sap.ui.define([
         TS_onExport: function () {
             const aOriginalData = this.getView().getModel("FilteredTimesheetModel").getData();
             if (!aOriginalData || aOriginalData.length === 0) {
-                MessageToast.show(this.i18nModel.getText("noDatainFile")); 
+                MessageToast.show(this.i18nModel.getText("noDatainFile"));
                 return;
             }
             //  PREPARE THE DATA FOR EXPORT 
