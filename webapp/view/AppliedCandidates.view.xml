@@ -100,14 +100,13 @@
             </fb:filterGroupItems>
         </fb:FilterBar>
 
-        <!-- MERGED TABLE: The Table now has the CRUD buttons and detailed columns -->
         <Table
             id="appliedCandidatesTable"
             items="{DataTableModel>/}"
             mode="SingleSelectLeft"
             class="sapUiResponsiveMargin"
             width="auto"
-            showNoData="{i18n>noData}"
+            noDataText="{i18n>noData}"
         >
             <headerToolbar>
                 <OverflowToolbar>
@@ -117,7 +116,6 @@
                             level="H2"
                         />
                         <ToolbarSpacer />
-                        <!-- Buttons from Recruitment.view.xml -->
                         <Button
                             text="{i18n>create}"
                             press="onAddNewCandidate"
@@ -146,7 +144,6 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-                <!-- Detailed Columns from Recruitment.view.xml -->
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>compName}" /></Column>
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColCurrentPackage}" /></Column>
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColExpectedPackage}" /></Column>
@@ -157,10 +154,8 @@
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColSkills}" /></Column>
             </columns>
             <items>
-                <!-- NOTE: 'onCandidatePress' is for navigating to details, while the buttons are for CRUD -->
                 <ColumnListItem type="Navigation" press="onCandidatePress">
                     <cells>
-                        <!-- Bindings updated to use DataTableModel -->
                         <Text text="{DataTableModel>FullName}" />
                         <Text text="{DataTableModel>CurrentSalary} LPA" />
                         <Text text="{DataTableModel>ExpectedSalary} LPA" />
