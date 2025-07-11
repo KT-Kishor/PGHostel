@@ -8,28 +8,13 @@
   xmlns:mvc="sap.ui.core.mvc"
   xmlns:u="sap.ui.unified">
 
-<Dialog id="chatDialog"  class="sapUiResponsivePadding" stretch="true" draggable="true" resizable="true" contentHeight="50%" contentWidth="50%">
-<customHeader>
-          <Bar>
-            <contentMiddle>
-              <Title text="KT Chat" />
-            </contentMiddle>
-            <contentRight>
-              <Button 
-                icon="sap-icon://decline"
-                press=".onCloseDialog"
-                tooltip="Close" />
-            </contentRight>
-          </Bar>
-        </customHeader>
+<Dialog id="chatDialog"  class="sapUiResponsivePadding" stretch="true" draggable="true" resizable="true"  showHeader="false">
+
   <SplitApp id="splitApp">
 
     <!-- Master Page -->
     <masterPages>
       <Page id="masterPage1">
-       
-     
-
         <content>
           <Input
             placeholder="Enter your name and Press ↵ to submit."
@@ -56,9 +41,14 @@
             <contentMiddle>
               <Title id="headerTitle" text="Chat App" />
             </contentMiddle>
+            <contentRight>
+              <Button  
+                icon="sap-icon://decline"
+                press=".onCloseDialog"
+                tooltip="Close" />
+            </contentRight>
           </Bar>
         </customHeader>
-
         <content>
           <ScrollContainer
             width="100%"

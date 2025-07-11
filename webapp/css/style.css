@@ -812,6 +812,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   position: fixed;
   bottom: 100px;
   right: 100px;
+  cursor: pointer;
   z-index: 1000;
   border-radius: 50%;
   height: 80px;

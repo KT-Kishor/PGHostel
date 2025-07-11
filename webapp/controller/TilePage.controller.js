@@ -3,20 +3,12 @@ sap.ui.define(
     "./BaseController",
     "sap/m/MessageToast",
     "../utils/validation",
-    "sap/ui/model/json/JSONModel",
-    "sap/gantt/shape/Path",
-    "sap/m/Popover",
-    "sap/m/Dialog",
-    "sap/m/Button",
-    "sap/m/Text",
-    "sap/m/VBox",
-    "sap/m/NotificationListItem",
-    "sap/m/List",
+    "sap/ui/model/json/JSONModel"
   ],
   function (BaseController,
     MessageToast,
     utils,
-    JSONModel, Path, Popover, Dialog, Button, Text, VBox, NotificationListItem, List) {
+    JSONModel) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.TilePage",
@@ -49,6 +41,7 @@ sap.ui.define(
           this.AppVisibilityReadCall();
           await this._fetchCommonData("AllLoginDetails", "EmpModel");
           await this._fetchCommonData("EmployeeDetails", "EmpDetails");
+          // await this._fetchCommonData("getMessagesBetweenUsers", "MessageModel");
           var oChatModel = new JSONModel({
             messages: [],
             messageText: "",
@@ -76,6 +69,9 @@ sap.ui.define(
           // Filter out current user
           const aFilteredEmployees = aAllEmployees.filter(function (oEmployee) {
             return oEmployee.EmployeeID !== sCurrentUserID;
+
+            // read all messages
+    
           });
 
           // Update model with filtered list
@@ -464,24 +460,6 @@ sap.ui.define(
           var Path = encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModelData").getObject().InvNo);
           this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
         },
-
-        // Tile_NotifictionBTN: function (oEvent) {
-        //   var oView = this.getView();
-        //   var oButton = oEvent.getSource();
-
-        //   if (!this.oPopover) {
-        //     sap.ui.core.Fragment.load({
-        //       name: "sap.kt.com.minihrsolution.fragment.TileNotification",
-        //       controller: this
-        //     }).then(function (oPopover) {
-        //       this.oPopover = oPopover;
-        //       oView.addDependent(this.oPopover);
-        //       this.oPopover.openBy(oButton);
-        //     }.bind(this));
-        //   } else {
-        //     this.oPopover.openBy(oButton);
-        //   }
-        // },
         changeName: function (oEvent) {
           var sName = oEvent.getSource().getValue();
           if (!sName.trim()) {
@@ -549,6 +527,8 @@ sap.ui.define(
           oChatModel.setProperty("/currentReceiverName", sReceiverName);
           oChatModel.setProperty("/username", oLoginModel.getProperty("/EmployeeName"));
           oChatModel.setProperty("/messages", []); // Clear old
+            // var oScrollContainer = sap.ui.getCore().byId("chatScrollContainer");
+            //   oScrollContainer.scrollTo(0, 9999999999999);
 
           // Function to fetch messages
           const fetchMessages = () => {
@@ -574,25 +554,20 @@ sap.ui.define(
               if (oTitle) oTitle.setText(sReceiverName);
 
               oChatModel.setProperty("/messages", aMessages);
+
+            
             }).catch((err) => {
               MessageToast.show("Failed to load messages");
               console.error(err);
             });
           };
-
-
-          // Immediately fetch messages once
           fetchMessages();
-
-
           if (this.messagePollInterval) {
             clearInterval(this.messagePollInterval);
           }
-
-          // Set new polling interval 
-          this.messagePollInterval = setInterval(fetchMessages, 2000);
+          // Set new  interval 
+          this.messagePollInterval = setInterval(fetchMessages, 1000);
         }
-
 
       }
     );
