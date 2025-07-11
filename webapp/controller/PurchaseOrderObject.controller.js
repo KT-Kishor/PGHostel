@@ -491,7 +491,7 @@ sap.ui.define([
                 console.error(e);
             }
         },
-        onSuccessDialog: function () {
+           onSuccessDialog  : function () {
             if (!this._oDialog) {
                 this._oDialog = new sap.m.Dialog({
                     title: "Success",
@@ -779,7 +779,6 @@ sap.ui.define([
         },
 
         POO_onPDFButtonPress: async function () {
-         
             var oPDFModel = this.getView().getModel("PDFData");
             var oPOModel = this.getView().getModel("PurchaseOrderModel").getData();
             oPDFModel.setProperty("/ClientCompanyName", oPOModel.CustomerName);

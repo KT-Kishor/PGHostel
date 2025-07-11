@@ -136,6 +136,7 @@
                     id="OB_Timeline"
                     title="Timeline of Assets"
                     tooltip="Timeline of Assets"
+                    
                 >
                     <subSections>
                         <ObjectPageSubSection titleUppercase="false">
@@ -210,7 +211,7 @@
                                         </m:Column> -->
                                         <m:Column
                                           minScreenWidth="Tablet"
-                    demandPopin="true">
+                                          demandPopin="true">
                                             <m:Text
                                                 text="{i18n>assignedName}"
                                                 tooltip="{i18n>assignedName}"

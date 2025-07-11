@@ -5,11 +5,13 @@ sap.ui.define([
     "sap/ui/unified/DateRange",
     "sap/suite/ui/commons/Timeline",
     "sap/suite/ui/commons/TimelineItem",
-    "sap/ui/export/Spreadsheet"
-], function (BaseController, JSONModel, MessageToast, DateRange, Timeline, TimelineItem, Spreadsheet) {
+    "sap/ui/export/Spreadsheet",
+      "../model/formatter",
+], function (BaseController, JSONModel, MessageToast, DateRange, Timeline, TimelineItem, Spreadsheet,Formatter) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.Timesheet", {
 
+            Formatter: Formatter,
         onInit: function () {
             this.getRouter().getRoute("RouteTimesheet").attachMatched(this._onRouteMatched, this);
         },
@@ -338,7 +340,7 @@ sap.ui.define([
                     ManagerName: oRow.ManagerName,
                     TaskID: oRow.TaskID,
                     TaskName: oRow.TaskName,
-                    Date: oRow.Date,
+                    Date:Formatter.formatDate(oRow.Date),
                     HoursWorked: oRow.HoursWorked,
                     Status: oRow.Status,
                     EmployeeComment: sEmployeeComment,
@@ -351,7 +353,7 @@ sap.ui.define([
                 { label: this.i18nModel.getText("manager"), property: "ManagerName" },
                 { label: this.i18nModel.getText("taskid"), property: "TaskID" },
                 { label: this.i18nModel.getText("assignmentName"), property: "TaskName" },
-                { label: this.i18nModel.getText("date"), property: "Date", type: "Date", format: "dd/mm/yyyy" },
+                { label: this.i18nModel.getText("date"), property: "Date", type: "string" },
                 { label: this.i18nModel.getText("hoursWorked"), property: "HoursWorked", type: "Number" },
                 { label: this.i18nModel.getText("employeeComment"), property: "EmployeeComment" }, // Direct mapping
                 { label: this.i18nModel.getText("managerComment"), property: "ManagerComment" },  // Direct mapping

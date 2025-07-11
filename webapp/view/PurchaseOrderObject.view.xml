@@ -472,6 +472,7 @@
                                                     type="Accept"
                                                     text="{i18n>createitem}"
                                                     press="onAddItemButtonPress"
+                                                    
                                                 />
                                             </m:Toolbar>
                                         </m:headerToolbar>
