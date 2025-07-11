@@ -926,18 +926,24 @@ sap.ui.define([
 
                 var totalReceivedAmount = 0;
                 if (allPaymentData) {
-                    totalReceivedAmount = this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount");
+                    totalReceivedAmount = allPaymentData.getProperty("/AllReceivedAmount");
                 }
+
+                var sValue = paymentModel.getProperty("/ReceivedAmount") || "";
+                sValue = sValue.replaceAll(',', '');
+                paymentModel.setProperty("/ReceivedAmount", sValue);
+
                 var totalAmount = parseFloat(paymentModel.getProperty("/TotalAmount")) || 0;
-                var receivedAmount = parseFloat(paymentModel.getProperty("/ReceivedAmount").replaceAll(',', '')) || 0;
-                var receivedTDS = parseFloat(paymentModel.getProperty("/ReceivedTDS").replaceAll(',', '')) || 0;
-                var AllreceivedTDS = parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedTDS")) || 0;
+                var receivedAmount = parseFloat(sValue) || 0;
+                var receivedTDS = parseFloat((paymentModel.getProperty("/ReceivedTDS") || "").replaceAll(',', '')) || 0;
+                var AllreceivedTDS = parseFloat(allPaymentData.getProperty("/AllReceivedTDS")) || 0;
 
                 var dueAmount = totalAmount - totalReceivedAmount - receivedAmount - receivedTDS - AllreceivedTDS;
                 paymentModel.setProperty("/DueAmount", dueAmount.toFixed(2));
                 this.onChangePaymentConvertionRate();
+
                 if (oEvent) {
-                    var enteredAmount = parseFloat(oEvent.getParameter("value"));
+                    var enteredAmount = parseFloat(oEvent.getParameter("value").replaceAll(',', '')) || 0;
                     var dueAmount = parseFloat(this.DueAmount);
                     this.ResivedAmount = true;
                     if (enteredAmount === dueAmount) {
@@ -963,14 +969,15 @@ sap.ui.define([
                 (isNaN(AmountInINR)) ? oModelData.setProperty("/AmountInINR", '0.00') : oModelData.setProperty("/AmountInINR", AmountInINR.toFixed(2));
             },
 
-            onChangeReceivedTDS: async function () {
+            onChangeReceivedTDS: async function (oEvent) {
                 var oInput = sap.ui.getCore().byId("idReceivedTDS");
-                var sValue = oInput.getValue();
+                var sValue = oInput.getValue().replaceAll(',', ''); // Remove comma
+                oInput.setValue(sValue);  // Update cleaned value back to Input
 
                 if (parseFloat(sValue) > parseFloat(this.ResivedTDS)) {
                     this.ResivedTDSFlag = false;
                     oInput.setValueState("Error");
-                    oInput.setValueStateText(this.i18nModel.getText("tdsAmountError")); // Make sure this key exists in i18n
+                    oInput.setValueStateText(this.i18nModel.getText("tdsAmountError"));
                 } else {
                     this.ResivedTDSFlag = true;
                     oInput.setValueState("None");
@@ -1032,15 +1039,41 @@ sap.ui.define([
                 if (paymentModel.Currency !== "INR") {
                     isCurrencyValid = utils._LCvalidateAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID");
                 } else {
-                    await this.onChangeReceivedTDS(); // now returns boolean
+                    await this.onChangeReceivedTDS();
                 }
+
+                var receivedAmount = parseFloat((paymentModel.ReceivedAmount || "0").replaceAll(',', ''));
+                var receivedTDS = parseFloat((paymentModel.ReceivedTDS).replaceAll(',', ''));
+                var isReceivedAmountInvalid = isNaN(receivedAmount) || receivedAmount <= 0;
+                var isReceivedTDSInvalid = isNaN(receivedTDS) || receivedTDS <= 0;
+
+                if (isReceivedAmountInvalid) {
+                    sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
+                } else {
+                    sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
+                }
+
+                if (isReceivedTDSInvalid) {
+                    sap.ui.getCore().byId("idReceivedTDS").setValueState("Error").setValueStateText(this.i18nModel.getText("tdsAmountError"));
+                } else {
+                    sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
+                }
+
+                if (isReceivedAmountInvalid || isReceivedTDSInvalid) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+
                 const isValid = isMandatoryValid && isCurrencyValid && this.ResivedAmount && this.ResivedTDSFlag;
-                if (!this.ResivedAmount) sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
+                if (!this.ResivedAmount) {
+                   sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
+                }
 
                 if (!isValid) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
+
                 if (Number(paymentModel.DueAmount) < 0) {
                     sap.m.MessageBox.error(this.i18nModel.getText("dueAmountZeroOrNegative"));
                     return;
