@@ -55,7 +55,7 @@ sap.ui.define(
             selectedEmployee: null
           });
           this.getView().setModel(oChatModel);
-            var oData = {
+          var oData = {
             messages: [],         // For the input box chat bubbles
             current_chat: [],
             current_room: "",     // ReceiverID
@@ -88,7 +88,7 @@ sap.ui.define(
         onPressCC: function () {
           MessageToast.show("Implementation in progress");
         },
-        
+
 
         CreateEmployeeModel: function () {
           var empData = this.getView().getModel("EmpModel").getData() || [];
@@ -454,21 +454,7 @@ sap.ui.define(
             this.Chatapp.close();
           }
         },
-        // onEmployeeSelect: function (oEvent) {
-        //   var oSelected = oEvent.getParameter("listItem");
-        //   var oEmployee = oSelected.getBindingContext("EmpDetails").getObject();
 
-        //   // Update selected employee in model
-        //   this.getView().getModel("EmpDetails").setProperty("/selectedEmployee", oEmployee);
-
-        //   // Load chat history for selected employee
-        //   this._loadChatHistory(oEmployee.EmployeeID);
-        // },
-
-        // onMessageInputChange: function (oEvent) {
-        //   var sValue = oEvent.getParameter("value");
-        //   this.getView().getModel("EmpDetails").setProperty("/messageText", sValue);
-        // },
         OnPressNavigationMsaDet: function (oEvent) {
           var MsaID = oEvent.getSource().getBindingContext("MSASOWModel").getProperty("MsaID");
           this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID })
@@ -496,7 +482,7 @@ sap.ui.define(
         //     this.oPopover.openBy(oButton);
         //   }
         // },
-         changeName: function (oEvent) {
+        changeName: function (oEvent) {
           var sName = oEvent.getSource().getValue();
           if (!sName.trim()) {
             MessageToast.show("Please enter your name.");
@@ -537,7 +523,7 @@ sap.ui.define(
               // Update List model for chat bubble display
               const aMsgList = oChatModel.getProperty("/messages") || [];
               aMsgList.push({
-                text: sText, // Store original text (not encoded) in local model
+                text: sText,
                 sender: "me",
                 time: new Date().toLocaleTimeString()
               });
@@ -571,9 +557,12 @@ sap.ui.define(
               ReceiverID: sReceiverID
             }).then((response) => {
               const aServerMessages = response.results || [];
+
+              const sSenderName = oLoginModel.getProperty("/EmployeeName"); // Logged-in user's name
+
               const aMessages = aServerMessages.map((msg) => {
-                let decodedText = atob(msg.MessageText);
-                const isMine = String(msg.SenderID) === String(sSenderID);
+                const decodedText = atob(msg.MessageText);
+                const isMine = msg.Sender === sSenderName; // Now comparing names
                 return {
                   text: decodedText,
                   sender: isMine ? "me" : "them",
@@ -587,22 +576,24 @@ sap.ui.define(
               oChatModel.setProperty("/messages", aMessages);
             }).catch((err) => {
               MessageToast.show("Failed to load messages");
+              console.error(err);
             });
           };
+
 
           // Immediately fetch messages once
           fetchMessages();
 
-          // Clear previous interval if any
+
           if (this.messagePollInterval) {
             clearInterval(this.messagePollInterval);
           }
 
-          // Set new polling interval (every 2 seconds)
-          this.messagePollInterval = setInterval(fetchMessages, 5000);
+          // Set new polling interval 
+          this.messagePollInterval = setInterval(fetchMessages, 2000);
         }
 
-      
+
       }
     );
   }
