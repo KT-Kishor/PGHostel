@@ -7,6 +7,12 @@
 	xmlns:m="sap.m">
 	<m:Page id="MsaE_id_Page" title="{i18n>msaDetails}" navButtonPress="MsaE_onBack" showNavButton="true">
 	<m:headerContent>
+    <m:Button
+                press="Tile_NotifictionBTN"
+                icon="sap-icon://bell"
+                type="Transparent"
+                tooltip="Notifications"
+            />
 	<m:Button
         press="onLogout"
         icon="sap-icon://log"

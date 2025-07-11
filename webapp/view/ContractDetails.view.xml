@@ -6,6 +6,12 @@
 	<Page id="C_id_PageCreate" title="{i18n>headerContractDetails}" showNavButton="true" navButtonPress="CD_onPressback" >
 	<headerContent>
 	<Button
+                press="Tile_NotifictionBTN"
+                icon="sap-icon://bell"
+                type="Transparent"
+                tooltip="Notifications"
+            />
+	<Button
         press="onLogout"
         icon="sap-icon://log"
         tooltip="{i18n>logoutTooltip}"

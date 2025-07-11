@@ -6,6 +6,12 @@
 	<Page id="MsaD_id_Page" title="{i18n>generateMsa}" navButtonPress="MsaD_onBack" showNavButton="true">
 	<headerContent>
 	<Button
+                press="Tile_NotifictionBTN"
+                icon="sap-icon://bell"
+                type="Transparent"
+                tooltip="Notifications"
+            />
+	<Button
         press="onLogout"
         icon="sap-icon://log"
         tooltip="{i18n>logoutTooltip}"

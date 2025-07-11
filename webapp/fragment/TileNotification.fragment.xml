@@ -25,7 +25,7 @@
         </customHeader>
         <VBox>
             <Carousel
-                id="TN_idd_Carouselid"
+                id="TN_id_Carousel"
                 visible="{= ${BirthdayModel>/}.length > 0 }"
                 class="courselclass responsiveCarousel"
                 backgroundDesign="Transparent"

@@ -5,7 +5,13 @@
 	xmlns:m="sap.m"
 	xmlns:core="sap.ui.core">
 	<m:Page id="CUF_id_Contractpage" title="{i18n>contractDetails}" navButtonPress="CU_onBack" showNavButton="true">
-	<m:headerContent>
+	<m:headerContent>	
+	<m:Button
+                press="Tile_NotifictionBTN"
+                icon="sap-icon://bell"
+                type="Transparent"
+                tooltip="Notifications"
+            />
 	<m:Button
         press="onLogout"
         icon="sap-icon://log"

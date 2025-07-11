@@ -26,6 +26,7 @@ sap.ui.define(
           this._fetchTaskDetails(sTaskID);
           this.readCallForAllLoginDetails();
           this.CommonReadcall({ TaskID: sTaskID });
+          this.initializeBirthdayCarousel();
         },
 
         onLogout: function () {

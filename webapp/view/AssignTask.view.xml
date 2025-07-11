@@ -12,6 +12,10 @@
     >
         <headerContent>
             <Button
+                press="Tile_NotifictionBTN"
+                icon="sap-icon://bell"
+            />
+            <Button
                 press="onLogout"
                 icon="sap-icon://log"
                 tooltip="{i18n>logoutTooltip}"
@@ -20,12 +24,10 @@
         </headerContent>
         <content>
             <ObjectHeader
-              
                 responsive="true"
                 backgroundDesign="Translucent"
                 class="sapUiResponsivePadding--header"
                 binding="{TaskDetailsModel>/}"
-             
             >
                 <ObjectAttribute
                     title="{i18n>taskName}"
@@ -162,8 +164,12 @@
                             <Text text="{AssignModel>EmployeeID}" />
                             <Text text="{AssignModel>EmployeeName}" />
 
-                            <Text text="{path:'AssignModel>StartDate',formatter:'.Formatter.formatDate'}" />
-                            <Text text="{path:'AssignModel>EndDate',formatter:'.Formatter.formatDate'}" />
+                            <Text
+                                text="{path:'AssignModel>StartDate',formatter:'.Formatter.formatDate'}"
+                            />
+                            <Text
+                                text="{path:'AssignModel>EndDate',formatter:'.Formatter.formatDate'}"
+                            />
                             <Text text="{AssignModel>HoursWorked}" />
                         </cells>
                     </ColumnListItem>

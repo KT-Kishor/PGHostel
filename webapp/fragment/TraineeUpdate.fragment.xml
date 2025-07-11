@@ -7,6 +7,12 @@
 	<m:Page id="TUF_id_pageTrainee" title="{i18n>traineeEdit}" showNavButton="true" navButtonPress="TUF_onPressback">
 	<m:headerContent>
 	<m:Button
+                press="Tile_NotifictionBTN"
+                icon="sap-icon://bell"
+                type="Transparent"
+                tooltip="Notifications"
+            />
+	<m:Button
         press="onLogout"
         icon="sap-icon://log"
         tooltip="{i18n>logoutTooltip}"

@@ -398,13 +398,7 @@
 				</l:SplitPane> -->
             </l:PaneContainer>
         </l:ResponsiveSplitter>
-             <Button
-            icon="sap-icon://message-popup"
-            text="Chat with me"
-            press="onFloatingButtonPress"
-            class="floatingButton"
-            type="Emphasized"
-        />
+        
         <footer>
             <Bar>
                 <contentLeft>

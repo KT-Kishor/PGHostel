@@ -7,6 +7,12 @@
 	<Page id="EOD_id_PageCrate" title="{i18n>headerEmployeeOffer}" showNavButton="true" navButtonPress="EOD_onPressBackBtn">
 	<headerContent>
 	<Button
+                press="Tile_NotifictionBTN"
+                icon="sap-icon://bell"
+                type="Transparent"
+                tooltip="Notifications"
+            />
+	<Button
         press="onLogout"
         icon="sap-icon://log"
         tooltip="{i18n>logoutTooltip}"

@@ -9,6 +9,12 @@
 
 <m:Page id="id_Expense_Details" title="{i18n>expDetails}" navButtonPress="Exp_Det_onPressBackBtn" showNavButton="true">
  <m:headerContent>
+ <m:Button
+                press="Tile_NotifictionBTN"
+                icon="sap-icon://bell"
+                type="Transparent"
+                tooltip="Notifications"
+            />
           <m:Button
         press="onLogout"
         icon="sap-icon://log"

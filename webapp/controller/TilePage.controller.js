@@ -40,50 +40,15 @@ sap.ui.define(
           this.getView().getModel("MSASOWModel").setProperty("/length", this.getView().getModel("MSASOWModel").getData().length);
           this.AppVisibilityReadCall();
           await this._fetchCommonData("AllLoginDetails", "EmpModel");
-          await this._fetchCommonData("EmployeeDetails", "EmpDetails");
-          // await this._fetchCommonData("getMessagesBetweenUsers", "MessageModel");
-          var oChatModel = new JSONModel({
-            messages: [],
-            messageText: "",
-            selectedEmployee: null
-          });
-          this.getView().setModel(oChatModel);
-          var oData = {
-            messages: [],         // For the input box chat bubbles
-            current_chat: [],
-            current_room: "",     // ReceiverID
-            username: "",
-            filteredEmployees: []
-          };
-
-          var oModel = new JSONModel(oData);
-          this.getView().setModel(oModel, "chat");
-          sap.ui.getCore().setModel(oModel, "chat");
-          const oLoginModel = this.getView().getModel("LoginModel");
-          const sCurrentUserID = oLoginModel.getProperty("/EmployeeID");
-
-          // Get original employee data
-          const oEmpModel = this.getView().getModel("EmpDetails");
-          const aAllEmployees = oEmpModel.getData();
-
-          // Filter out current user
-          const aFilteredEmployees = aAllEmployees.filter(function (oEmployee) {
-            return oEmployee.EmployeeID !== sCurrentUserID;
-
-            // read all messages
-    
-          });
-
-          // Update model with filtered list
-          this.getView().getModel("chat").setProperty("/filteredEmployees", aFilteredEmployees);
-
+          await this._fetchCommonData("EmployeeDetails", "EmpDetails");      
+          
           this.CreateEmployeeModel();
           this.initializeBirthdayCarousel();
         },
 
-        onPressCC: function () {
-          MessageToast.show("Implementation in progress");
-        },
+        // onPressCC: function () {
+        //   MessageToast.show("Implementation in progress");
+        // },
 
 
         CreateEmployeeModel: function () {
@@ -426,30 +391,7 @@ sap.ui.define(
         TileV_RecruitementDashbord: function () {
           this.getRouter().navTo("AppliedCandidates");
         },
-        onFloatingButtonPress: function () {
-          // this.getRouter().navTo("RouteKTChat");
-          var oView = this.getView();
-          // Ensure user selection is reset before opening
-          if (!this.Chatapp) {
-            sap.ui.core.Fragment.load({
-              name: "sap.kt.com.minihrsolution.fragment.KTChatApp",
-              controller: this,
-            }).then(
-              function (Chatapp) {
-                this.Chatapp = Chatapp;
-                oView.addDependent(this.Chatapp);
-                this.Chatapp.open();
-              }.bind(this)
-            );
-          } else {
-            this.Chatapp.open();
-          }
-        },
-        onCloseDialog: function () {
-          if (this.Chatapp) {
-            this.Chatapp.close();
-          }
-        },
+       
 
         OnPressNavigationMsaDet: function (oEvent) {
           var MsaID = oEvent.getSource().getBindingContext("MSASOWModel").getProperty("MsaID");
@@ -460,114 +402,7 @@ sap.ui.define(
           var Path = encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModelData").getObject().InvNo);
           this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
         },
-        changeName: function (oEvent) {
-          var sName = oEvent.getSource().getValue();
-          if (!sName.trim()) {
-            MessageToast.show("Please enter your name.");
-            return;
-          }
-
-          var oChatModel = sap.ui.getCore().getModel("chat");
-          oChatModel.setProperty("/username", sName);
-          MessageToast.show("Name set to: " + sName);
-        },
-        sendMessage: function () {
-          const oInput = sap.ui.getCore().byId("messageInput1");
-          const sText = oInput.getValue().trim();
-          if (!sText) return;
-
-          const oChatModel = this.getView().getModel("chat");
-          const oLoginModel = this.getView().getModel("LoginModel");
-
-          const sSenderID = oLoginModel.getProperty("/EmployeeID");
-          const sSenderName = oLoginModel.getProperty("/EmployeeName");
-          const sReceiverID = oChatModel.getProperty("/current_room");
-
-          if (!sSenderID || !sReceiverID) {
-            MessageToast.show("Please select a recipient first.");
-            return;
-          }
-
-          const oPayload = {
-            data: {
-              SenderID: sSenderID,
-              ReceiverID: sReceiverID,
-              MessageText: btoa(sText)// Proper encoding
-            }
-          };
-
-          this.ajaxCreateWithJQuery("ChatApplication", oPayload)
-            .then(() => {
-              // Update List model for chat bubble display
-              const aMsgList = oChatModel.getProperty("/messages") || [];
-              aMsgList.push({
-                text: sText,
-                sender: "me",
-                time: new Date().toLocaleTimeString()
-              });
-              oChatModel.setProperty("/messages", aMsgList);
-              oInput.setValue("");
-            })
-            .catch(function (err) {
-              MessageToast.show("Failed to send message.");
-              console.error(err);
-            });
-        },
-        onPressGoToMaster: function (oEvent) {
-          const oSelected = oEvent.getSource().getBindingContext("chat").getObject();
-          const sReceiverID = oSelected.EmployeeID;
-          const sReceiverName = oSelected.EmployeeName;
-
-          const oChatModel = this.getView().getModel("chat");
-          const oLoginModel = this.getView().getModel("LoginModel");
-
-          const sSenderID = oLoginModel.getProperty("/EmployeeID");
-
-          oChatModel.setProperty("/current_room", sReceiverID);
-          oChatModel.setProperty("/currentReceiverName", sReceiverName);
-          oChatModel.setProperty("/username", oLoginModel.getProperty("/EmployeeName"));
-          oChatModel.setProperty("/messages", []); // Clear old
-            // var oScrollContainer = sap.ui.getCore().byId("chatScrollContainer");
-            //   oScrollContainer.scrollTo(0, 9999999999999);
-
-          // Function to fetch messages
-          const fetchMessages = () => {
-            this.ajaxReadWithJQuery("getMessagesBetweenUsers", {
-              SenderID: sSenderID,
-              ReceiverID: sReceiverID
-            }).then((response) => {
-              const aServerMessages = response.results || [];
-
-              const sSenderName = oLoginModel.getProperty("/EmployeeName"); // Logged-in user's name
-
-              const aMessages = aServerMessages.map((msg) => {
-                const decodedText = atob(msg.MessageText);
-                const isMine = msg.Sender === sSenderName; // Now comparing names
-                return {
-                  text: decodedText,
-                  sender: isMine ? "me" : "them",
-                  time: new Date(msg.SentAt).toLocaleTimeString()
-                };
-              });
-
-              const oTitle = sap.ui.getCore().byId("headerTitle");
-              if (oTitle) oTitle.setText(sReceiverName);
-
-              oChatModel.setProperty("/messages", aMessages);
-
-            
-            }).catch((err) => {
-              MessageToast.show("Failed to load messages");
-              console.error(err);
-            });
-          };
-          fetchMessages();
-          if (this.messagePollInterval) {
-            clearInterval(this.messagePollInterval);
-          }
-          // Set new  interval 
-          this.messagePollInterval = setInterval(fetchMessages, 1000);
-        }
+       
 
       }
     );

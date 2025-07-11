@@ -7,6 +7,12 @@
 	<m:Page title="{i18n>invoiceDetails}" showNavButton="true" navButtonPress="CID_onPressback" id="CID_id_MyPageId">
 	<m:headerContent>
 	<m:Button
+                press="Tile_NotifictionBTN"
+                icon="sap-icon://bell"
+                type="Transparent"
+                tooltip="Notifications"
+            />
+	<m:Button
         press="onLogout"
         icon="sap-icon://log"
         tooltip="{i18n>logoutTooltip}"
