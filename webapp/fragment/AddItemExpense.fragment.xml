@@ -29,9 +29,9 @@
 							<Input id="ExpDet_id_Amount" valueStateText="{i18n>ExpExpenseAmountMess}" value="{ExpenseCreateModel>/ExpenseAmount}" liveChange="LC_ExpAmount" placeholder="{i18n>placeAmount}" enabled="{viewModel>/enable}" maxLength="15"/>
 						</VBox>
 						<VBox width="calc(30% - 5px)">
-							<Select items="{CurrencyModel>/}" width="100%" change="onChangeCurrency" selectedKey="{ExpenseCreateModel>/Currency}" id="idCurrency" enabled="{viewModel>/enable}">
+							<ComboBox items="{path:'CurrencyModel>/',length:1000}" valueStateText="{i18n>selectCurrency}" width="100%" change="onChangeCurrency" value="{ExpenseCreateModel>/Currency}" id="idCurrency" enabled="{viewModel>/enable}">
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-							</Select>
+							</ComboBox>
 						</VBox>
 					</HBox>
 					<!-- Conversion Rate -->

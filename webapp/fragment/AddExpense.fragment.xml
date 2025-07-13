@@ -50,12 +50,12 @@
 				</ComboBox>
 				<!-- Source -->
 				<Label text="{i18n>expSource}"  required="true"/>
-				<ComboBox change="Exp_onChangeSource" valueStateText="{i18n>expValStaSource}" id="exp-Id-Source" items="{BaseLocationModel>/}"  value="{CreateExpenseModel>/Source}" >
+				<ComboBox change="Exp_onChangeSource" valueStateText="{i18n>expValStaSource}" id="exp-Id-Source" items="{path:'BaseLocationModel>/',length:1000}"  value="{CreateExpenseModel>/Source}" >
 					<core:ListItem key="{BaseLocationModel>CountryCode}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 				</ComboBox>
 				<!-- Destination -->
 				<Label text="{i18n>expDestination}" required="{viewModel>/required}"/>
-				<ComboBox change="Exp_onChangeDestination" valueStateText="{i18n>expValStaDestination}" id="exp-Id-Destination" items="{BaseLocationModel>/}"  value="{CreateExpenseModel>/Destination}"  >
+				<ComboBox change="Exp_onChangeDestination" valueStateText="{i18n>expValStaDestination}" id="exp-Id-Destination" items="{path:'BaseLocationModel>/',length:1000}"  value="{CreateExpenseModel>/Destination}"  >
 					<core:ListItem key="{BaseLocationModel>CountryCode}" text="{BaseLocationModel>city}" additionalText="{CreateExpenseModel>branchCode}"/>
 				</ComboBox>
 				<!-- Cost Center -->

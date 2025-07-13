@@ -473,6 +473,32 @@ sap.ui.define([], function () {
       }
     },
 
+    _LCvalidateMultipleDecimal: function (oEvent, type) {
+  var oInput = type === "ID" ? oEvent : oEvent.getSource();
+  var value = oInput.getValue().trim();
+
+  // Remove all characters except digits and dot
+  var cleanedValue = value.replace(/[^0-9.]/g, "");
+
+  // Ensure only one decimal point is allowed
+  var parts = cleanedValue.split(".");
+  if (parts.length > 2) {
+    cleanedValue = parts[0] + "." + parts.slice(1).join(""); // keep first dot, merge rest
+  }
+
+  // Set cleaned value back to input
+  oInput.setValue(cleanedValue);
+
+  // Check if it's a valid float number
+  if (isNaN(cleanedValue)) {
+    oInput.setValueState("Error");
+    return false;
+  }
+
+  oInput.setValueState("None");
+  return true;
+},
+
     _LCstrictValidationComboBox: function (oEvent, type) {
       var oComboBox = type === "ID" ? oEvent : oEvent.getSource();
       var sValue = oComboBox.getValue();

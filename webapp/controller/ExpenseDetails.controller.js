@@ -30,13 +30,9 @@ sap.ui.define([
 
                     this.MyInBox = false;
                     if (this.ExpenseID.includes("MyInbox")) {
-                        // await this._fetchCommonData("Country", "CountryModel");
-                        //  await this._fetchCommonData("BaseLocation", "BaseLocationModel");
                         this.ExpenseID = this.ExpenseID.split("|")[0];
                         this.MyInBox = true;
                     }
-
-                    // if (!this.getView().getModel("CurrencyModel")) await this._fetchCommonData("Currency", "CurrencyModel");
                     await this._fetchCommonData("Expense", "FilteredExpenseModel", {
                         ExpenseID: this.ExpenseID,
                     });
@@ -194,6 +190,9 @@ sap.ui.define([
                 this.getView().getModel("tokenModel").setProperty("/tokens", [])
                 this.openFragment();
             },
+            onChangeCurrency:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent);
+            },
             //Update Expense Items
             Exp_Det_onPressExpenseItemEdit: function () {
                 if (this.byId("exp_Id_ExpenseTable").getSelectedItem() === null) {
@@ -291,7 +290,7 @@ sap.ui.define([
             },
             // Conversion Rate validation
             LC_ExpConversionRate: function (oEvent) {
-                utils._LCvalidateAmount(oEvent);
+                utils._LCvalidateMultipleDecimal(oEvent);
                 this.Exp_Frg_onChangeConverstionRate();
             },
             //Comments Validation
@@ -547,7 +546,7 @@ sap.ui.define([
             async Exp_Det_onPressSubmit() {
                 var oModel = this.getView().getModel("ExpenseCreateModel").getData();
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
-                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
+                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idCurrency"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
 
                     var Attachment = this.getView().getModel("tokenModel").getData();
                     if (!Attachment.tokens || Attachment.tokens.length === 0) {
@@ -608,10 +607,11 @@ sap.ui.define([
                             ? true
                             : (
                                 utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") &&
+                                utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idCurrency"), "ID") &&
                                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") &&
                                 (
                                     oModel.Currency !== "INR"
-                                        ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID")
+                                        ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID")
                                         : true
                                 )))) {
 
